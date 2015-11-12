@@ -39,7 +39,7 @@ namespace linear
 		return 0;
 	}
 
-	double ZeroDatavector::norm2() const
+	double ZeroDatavector::Norm2() const
 	{
 		return 0.0;
 	}

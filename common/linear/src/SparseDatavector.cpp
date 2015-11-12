@@ -99,7 +99,7 @@ namespace linear
 	}
 	
 	template<typename ValueType, typename IntegerListType>
-	double SparseDatavector<ValueType, IntegerListType>::norm2() const
+	double SparseDatavector<ValueType, IntegerListType>::Norm2() const
 	{
 		return (double)_indices.Size();
 	}

@@ -15,7 +15,7 @@ namespace linear
 	DoubleSubvectorCref::DoubleSubvectorCref(const double * ptr, uint size) : _ptr(ptr), _size(size)
 	{}
 
-	double DoubleSubvectorCref::norm2() const
+	double DoubleSubvectorCref::Norm2() const
 	{
 		double result = 0.0;
 		for(uint i=0; i<_size; ++i)
@@ -46,7 +46,7 @@ namespace linear
 		return result;
 	}
 
-	void DoubleSubvectorCref::print(ostream & os) const
+	void DoubleSubvectorCref::Print(ostream & os) const
 	{
 		for(uint i = 0; i<_size; ++i)
 		{

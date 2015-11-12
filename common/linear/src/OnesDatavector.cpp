@@ -54,7 +54,7 @@ namespace linear
 		return _dim;
 	}
 
-	double OnesDatavector::norm2() const
+	double OnesDatavector::Norm2() const
 	{
 		return (double)_dim;
 	}

@@ -12,7 +12,7 @@ namespace print
 	{
 		/// Prints a human-friendly description of the Mapping to a stream
 		///
-		virtual void print(ostream& os, int indentation, int enumeration);
+		virtual void Print(ostream& os, int indentation, int enumeration);
 	};
 
 	/// A class that adds printing capabilities to a Mapping
@@ -21,7 +21,7 @@ namespace print
 	{
 		/// Prints a human-friendly description of the Mapping to a stream
 		///
-		virtual void print(ostream& os, int indentation, int enumeration);
+		virtual void Print(ostream& os, int indentation, int enumeration);
 	};
 
 	/// A class that adds printing capabilities to a Mapping
@@ -30,7 +30,7 @@ namespace print
 	{
 		/// Prints a human-friendly description of the Mapping to a stream
 		///
-		virtual void print(ostream& os, int indentation, int enumeration);
+		virtual void Print(ostream& os, int indentation, int enumeration);
 	};
 
 	/// A class that adds printing capabilities to a Mapping
@@ -39,7 +39,7 @@ namespace print
 	{
 		/// Prints a human-friendly description of the Mapping to a stream
 		///
-		virtual void print(ostream& os, int indentation, int enumeration);
+		virtual void Print(ostream& os, int indentation, int enumeration);
 	};
 
 	/// A class that adds printing capabilities to a Mapping
@@ -48,7 +48,7 @@ namespace print
 	{
 		/// Prints a human-friendly description of the Mapping to a stream
 		///
-		virtual void print(ostream& os, int indentation, int enumeration);
+		virtual void Print(ostream& os, int indentation, int enumeration);
 	};
 
 	/// A class that adds printing capabilities to a Mapping
@@ -57,7 +57,7 @@ namespace print
 	{
 		/// Prints a human-friendly description of the Mapping to a stream
 		///
-		virtual void print(ostream& os, int indentation, int enumeration);
+		virtual void Print(ostream& os, int indentation, int enumeration);
 	};
 
 	/// A class that adds printing capabilities to a Mapping
@@ -66,6 +66,6 @@ namespace print
 	{
 		/// Prints a human-friendly description of the Mapping to a stream
 		///
-		virtual void print(ostream& os, int indentation, int enumeration);
+		virtual void Print(ostream& os, int indentation, int enumeration);
 	};
 }

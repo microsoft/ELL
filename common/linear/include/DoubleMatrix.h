@@ -64,7 +64,7 @@ namespace linear
 
 		/// Prints the matrix to an output stream
 		///
-		virtual void print(ostream& os) const override;
+		virtual void Print(ostream& os) const override;
 
 	protected:
 		DoubleMatrixBase(uint size, uint NumRows, uint NumColumns);

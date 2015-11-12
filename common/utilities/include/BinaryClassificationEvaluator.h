@@ -35,7 +35,7 @@ namespace utilities
 		double GetLastError() const;
 
 		/// Prints losses and errors to an ostream
-		void print(ostream& os) const;
+		void Print(ostream& os) const;
 
 	private:
 		vector<evaluation> _evals;

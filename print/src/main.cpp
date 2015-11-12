@@ -6,7 +6,7 @@
 #include <fstream>
 #include <stdexcept>
 
-using namespace print;
+using namespace Print;
 using std::ifstream;
 using std::cerr;
 using std::cout;
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 		// read the map and print out its description
 		auto map = mappings::Io::read(fs);
 		auto printable_map = dynamic_pointer_cast<printable>(map);
-		printable_map->print(cout);
+		printable_map->Print(cout);
 
 	}
 	catch (runtime_error e)

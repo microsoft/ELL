@@ -3,12 +3,14 @@
 #pragma once
 
 #include "SupervisedExample.h"
+
 #include "DatavectorBuilder.h"
+using linear::DatavectorBuilder;
 
 #include <string>
-#include <iostream>
-
 using std::string;
+
+#include <iostream>
 using std::ostream;
 
 namespace dataset
@@ -37,11 +39,11 @@ namespace dataset
 
 		/// Parses a Row from svmlight formet
 		///
-		SupervisedExample parse(const string& str);
+		SupervisedExample Parse(const string& str);
 
 		/// Serializes an example to an output stream in svmlight format
 		///
-		void print(const SupervisedExample& example, ostream& os) const;
+		void Print(const SupervisedExample& example, ostream& os) const;
 	
 	private:
 		bool _has_weight;

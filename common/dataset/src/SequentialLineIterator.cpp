@@ -4,12 +4,12 @@
 
 namespace dataset
 {
-	SequentialLineIterator::SequentialLineIterator(istream& is) : istream_iterator<delimited_text<'\n'>>(is)
+	SequentialLineIterator::SequentialLineIterator(istream& is) : istream_iterator<DelimitedText<'\n'>>(is)
 	{}
 
 	bool SequentialLineIterator::IsValid() const
 	{
-		return *this != istream_iterator<delimited_text<'\n'>>();
+		return *this != istream_iterator<DelimitedText<'\n'>>();
 	}
 
 	void SequentialLineIterator::Next()

@@ -32,7 +32,7 @@ namespace linear
 
 		/// Computes the vector squared 2-norm
 		///
-		virtual double norm2() const override;
+		virtual double Norm2() const override;
 
 		/// Performs (*p_other) += scalar * (*this), where other is a dense vector
 		///
@@ -44,7 +44,7 @@ namespace linear
 
 		/// Prints the vector to an output stream
 		///
-		virtual void print(ostream & os) const override;
+		virtual void Print(ostream & os) const override;
 
 		/// \returns The Size of the vector
 		///

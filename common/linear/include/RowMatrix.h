@@ -128,7 +128,7 @@ namespace linear
 
 		/// Human readable printout to an output stream
 		///
-		virtual void print(ostream& os) const override;
+		virtual void Print(ostream& os) const override;
 
 	private:
 		std::vector<DatavectorType> _rows;

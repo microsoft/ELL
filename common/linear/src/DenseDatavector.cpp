@@ -100,7 +100,7 @@ namespace linear
 	}
 
 	template<typename ValueType>
-	double DenseDatavector<ValueType>::norm2() const
+	double DenseDatavector<ValueType>::Norm2() const
 	{
 		double result = 0.0;
 		for(double element : _mem)

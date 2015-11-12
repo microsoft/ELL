@@ -94,7 +94,7 @@ void vector_test1(IDataVector& v, const DoubleVector& x)
 	cout << "Vector Test 1 on " << typeid(v).name() << endl;
 	cout << "Specified Dim:\t" << v.Size() << endl;
 	cout << "Contents:\n" << v << endl;
-	cout << "Norm2:\t" << v.norm2() << endl;
+	cout << "Norm2:\t" << v.Norm2() << endl;
 
 	DoubleVector w(v.Size());
 	v.AddTo(w);

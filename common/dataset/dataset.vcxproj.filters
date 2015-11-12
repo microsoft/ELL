@@ -40,9 +40,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="tcc\RowDataset.tcc">
-      <Filter>tcc</Filter>
-    </None>
     <None Include="tcc\SequentialLineIterator.tcc">
       <Filter>tcc</Filter>
     </None>

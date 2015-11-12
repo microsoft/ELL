@@ -21,10 +21,10 @@ namespace linear
 
 		/// Human readable printout to an output stream
 		///
-		virtual void print(ostream& os) const = 0;
+		virtual void Print(ostream& os) const = 0;
 	};
 
-	/// Generic operator<< that calls each class's print() function
+	/// Generic operator<< that calls each class's Print() function
 	///
 	ostream& operator<<(ostream& os, const Base& v);
 }

@@ -22,7 +22,7 @@ namespace linear
 
 		/// Computes the vector squared 2-norm
 		///
-		virtual double norm2() const =0;
+		virtual double Norm2() const =0;
 
 		/// Performs other += scalar * (*this), where other is a dense vector
 		///

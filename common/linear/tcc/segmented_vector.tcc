@@ -30,13 +30,13 @@ namespace linear
 	}
 
 	template<typename SegmentType>
-	double segmented_vector_base<SegmentType>::norm2() const
+	double segmented_vector_base<SegmentType>::Norm2() const
 	{
 		// TODO - parallelize
 		double value = 0.0;
 		for(const auto& segment : _segments)
 		{
-			value += segment.norm2();
+			value += segment.Norm2();
 		}
 		return value;
 	}

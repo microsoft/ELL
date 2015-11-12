@@ -148,7 +148,7 @@ namespace linear
 		}
 	}
 
-	void DoubleMatrixBase::print(ostream& os) const
+	void DoubleMatrixBase::Print(ostream& os) const
 	{
 		for(uint i = 0; i < _num_rows; ++i)
 		{

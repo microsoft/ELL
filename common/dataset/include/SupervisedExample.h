@@ -3,7 +3,10 @@
 #pragma once
 
 #include "IDataVector.h"
-using namespace linear;
+using linear::IDataVector;
+
+#include "types.h"
+using linear::uint;
 
 #include <memory>
 using std::unique_ptr;
@@ -55,7 +58,7 @@ namespace dataset
 
 		/// Inherited via IDataVector
 		///
-		virtual double norm2() const override;
+		virtual double Norm2() const override;
 
 		/// Inherited via IDataVector
 		///

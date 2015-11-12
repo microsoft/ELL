@@ -5,9 +5,9 @@
 #include "SupervisedExample.h"
 
 #include <iterator>
-#include <vector>
-
 using std::iterator;
+
+#include <vector>
 using std::vector;
 
 namespace dataset

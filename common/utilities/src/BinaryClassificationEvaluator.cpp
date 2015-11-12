@@ -25,7 +25,7 @@ namespace utilities
 		return _evals[_evals.size()-1].error;
 	}
 
-	void BinaryClassificationEvaluator::print(ostream & os) const
+	void BinaryClassificationEvaluator::Print(ostream & os) const
 	{
 		os << "binary classification evaluation\nloss\terror\n";
 		for(auto& e : _evals)
@@ -36,7 +36,7 @@ namespace utilities
 
 	ostream& operator<<(ostream & os, const BinaryClassificationEvaluator & evaluation)
 	{
-		evaluation.print(os);
+		evaluation.Print(os);
 		return os;
 	}
 }

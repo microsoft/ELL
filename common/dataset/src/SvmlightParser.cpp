@@ -22,7 +22,7 @@ namespace dataset
 
 	/// Parses a Row from svmlight formet
 	///
-	SupervisedExample SvmlightParser::parse(const string& str) 
+	SupervisedExample SvmlightParser::Parse(const string& str) 
 	{
 		// setup stream
 		stringstream ss(str);
@@ -74,10 +74,10 @@ namespace dataset
 
 	/// Serializes an example to an output stream in svmlight format
 	///
-	void SvmlightParser::print(const SupervisedExample& example, ostream& os) const 
+	void SvmlightParser::Print(const SupervisedExample& example, ostream& os) const 
 	{
 		if(_has_weight)	os << example.GetWeight() << '\t';
 		os << example.GetLabel() << '\t';
-		example.print(os);
+		example.Print(os);
 	}
 }

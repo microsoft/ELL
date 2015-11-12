@@ -6,7 +6,7 @@ namespace linear
 {
 	ostream& operator<<(ostream& os, const Base& v)
 	{
-		v.print(os);
+		v.Print(os);
 		return os;
 	}
 }

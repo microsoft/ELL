@@ -2,24 +2,24 @@
 
 #pragma once
 
-#include "RowMatrix.h"
-using namespace linear;
-
 #include "SupervisedExample.h"
+
+#include "RowMatrix.h"
+using linear::RowMatrix;
 
 #include<string>
 using std::string;
 
 namespace dataset
 {
-	typedef RowMatrix<SupervisedExample> RowDataset;
+	using RowDataset = RowMatrix<SupervisedExample>;
 
+	/// Container that holds a static function that loads and parses a dataset 
+	///
 	struct Loader
 	{
-
 		template<typename RowIteratorType, typename ParserType>
 		static RowDataset Load(RowIteratorType& line_iterator, ParserType& parser);
-
 	};
 }
 

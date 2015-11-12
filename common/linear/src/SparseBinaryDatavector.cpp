@@ -105,7 +105,7 @@ namespace linear
 	}
 
 	template<typename IntegerListType>
-	double SparseBinaryDatavectorBase<IntegerListType>::norm2() const
+	double SparseBinaryDatavectorBase<IntegerListType>::Norm2() const
 	{
 		return (double)_indices.Size();
 	}

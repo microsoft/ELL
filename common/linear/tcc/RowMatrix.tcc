@@ -185,7 +185,7 @@ namespace linear
 	}
 
 	template<typename DatavectorType>
-	void RowMatrix<DatavectorType>::print(ostream& os) const
+	void RowMatrix<DatavectorType>::Print(ostream& os) const
 	{
 		for (uint i = 0; i < NumRows(); ++i)
 		{

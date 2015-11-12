@@ -2,7 +2,6 @@
 
 namespace dataset
 {
-
 	template<typename RowIteratorType, typename ParserType>
 	ParsingIterator<RowIteratorType, ParserType>::ParsingIterator(RowIteratorType& row_iter, ParserType& parser) :
 		_row_iter(row_iter), _parser(parser)
@@ -14,7 +13,6 @@ namespace dataset
 		return _row_iter.IsValid();
 	}
 
-
 	template<typename RowIteratorType, typename ParserType>
 	void ParsingIterator<RowIteratorType, ParserType>::Next()
 	{
@@ -24,6 +22,6 @@ namespace dataset
 	template<typename RowIteratorType, typename ParserType>
 	SupervisedExample ParsingIterator<RowIteratorType, ParserType>::GetValue()
 	{
-		return _parser.parse(_row_iter.GetValue());
+		return _parser.Parse(_row_iter.GetValue());
 	}
 }

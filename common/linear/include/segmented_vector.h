@@ -42,7 +42,7 @@
 //
 //		/// Computes the vector squared 2-norm
 //		///
-//		virtual double norm2() const override;
+//		virtual double Norm2() const override;
 //
 //		/// Performs (*p_other) += scalar * (*this), where other is a dense vector
 //		///

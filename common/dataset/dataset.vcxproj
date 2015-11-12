@@ -95,7 +95,6 @@
   <ItemGroup>
     <None Include="tcc\Loader.tcc" />
     <None Include="tcc\ParsingIterator.tcc" />
-    <None Include="tcc\RowDataset.tcc" />
     <None Include="tcc\SequentialLineIterator.tcc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

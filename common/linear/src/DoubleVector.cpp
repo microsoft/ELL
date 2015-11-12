@@ -9,7 +9,7 @@ namespace linear
 		fill(begin(), end(), 0);
 	}
 
-	double DoubleVector::norm2() const
+	double DoubleVector::Norm2() const
 	{
 		double result = 0.0;
 		for(double element : *this)
@@ -46,7 +46,7 @@ namespace linear
 		return result;
 	}
 
-	void DoubleVector::print(ostream & os) const
+	void DoubleVector::Print(ostream & os) const
 	{
 		for (double x : *this)
 		{

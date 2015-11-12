@@ -49,9 +49,9 @@ namespace dataset
 		return _up_instance->NumNonzeros();
 	}
 
-	double SupervisedExample::norm2() const
+	double SupervisedExample::Norm2() const
 	{
-		return _up_instance->norm2();
+		return _up_instance->Norm2();
 	}
 
 	void SupervisedExample::AddTo(double * p_other, double scalar) const
