@@ -6,31 +6,31 @@
 namespace linear
 {
     template<typename IntegerListType>
-    bool SparseBinaryDatavectorBase<IntegerListType>::ConstIterator::IsValid() const
+    bool SparseBinaryDatavectorBase<IntegerListType>::Iterator::IsValid() const
     {
         return _list_iterator.IsValid();
     }
 
     template<typename IntegerListType>
-    void SparseBinaryDatavectorBase<IntegerListType>::ConstIterator::Next()
+    void SparseBinaryDatavectorBase<IntegerListType>::Iterator::Next()
     {
         _list_iterator.Next();
     }
 
     template<typename IntegerListType>
-    uint SparseBinaryDatavectorBase<IntegerListType>::ConstIterator::GetIndex() const
+    uint SparseBinaryDatavectorBase<IntegerListType>::Iterator::GetIndex() const
     {
         return _list_iterator.GetValue();
     }
 
     template<typename IntegerListType>
-    double SparseBinaryDatavectorBase<IntegerListType>::ConstIterator::GetValue() const
+    double SparseBinaryDatavectorBase<IntegerListType>::Iterator::GetValue() const
     {
         return (double)1.0;
     }
 
     template<typename IntegerListType>
-    SparseBinaryDatavectorBase<IntegerListType>::ConstIterator::ConstIterator(const IndexIteratorType& list_iterator)
+    SparseBinaryDatavectorBase<IntegerListType>::Iterator::Iterator(const IndexIteratorType& list_iterator)
         : _list_iterator(list_iterator)
     {}
 
@@ -77,7 +77,7 @@ namespace linear
     //template<typename IntegerListType>
     //void SparseBinaryDatavectorBase<IntegerListType>::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const // TODO
     //{
-    //    auto iter = _indices.GetConstIterator();
+    //    auto iter = _indices.GetIterator();
     //    while(iter.IsValid())
     //    {
     //        func(index_offset + iter.GetValue(), (double)1.0);
@@ -113,7 +113,7 @@ namespace linear
     template<typename IntegerListType>
     void SparseBinaryDatavectorBase<IntegerListType>::AddTo(double* p_other, double scalar) const
     {
-        auto iter = _indices.GetConstIterator();
+        auto iter = _indices.GetIterator();
         while (iter.IsValid())
         {
             p_other[iter.GetValue()] += scalar;
@@ -126,7 +126,7 @@ namespace linear
     {
         double value = 0.0;
         
-        auto iter = _indices.GetConstIterator();
+        auto iter = _indices.GetIterator();
         while (iter.IsValid())
         {
             value += (double)p_other[iter.GetValue()];
@@ -137,9 +137,21 @@ namespace linear
     }
 
     template<typename IntegerListType>
-    typename SparseBinaryDatavectorBase<IntegerListType>::ConstIterator SparseBinaryDatavectorBase<IntegerListType>::GetConstIterator() const
+    typename SparseBinaryDatavectorBase<IntegerListType>::Iterator SparseBinaryDatavectorBase<IntegerListType>::GetIterator() const
     {
-        return ConstIterator(_indices.GetConstIterator());
+        return Iterator(_indices.GetIterator());
+    }
+
+    template<typename IntegerListType>
+    void SparseBinaryDatavectorBase<IntegerListType>::Print(ostream & os) const
+    {
+        auto iterator = GetIterator();
+        while(iterator.IsValid())
+        {
+            auto indexValue = iterator.GetValue();
+            os << indexValue << '\t';
+            iterator.Next();
+        }
     }
 
     template SparseBinaryDatavectorBase<CompressedIntegerList>;

@@ -7,22 +7,22 @@ using std::runtime_error;
 
 namespace linear
 {
-    bool IntegerList::ConstIterator::IsValid() const
+    bool IntegerList::Iterator::IsValid() const
     {
         return _begin < _end;
     }
 
-    void IntegerList::ConstIterator::Next()
+    void IntegerList::Iterator::Next()
     {
         ++_begin;
     }
 
-    uint IntegerList::ConstIterator::GetValue() const
+    uint IntegerList::Iterator::GetValue() const
     {
         return *_begin;
     }
 
-    IntegerList::ConstIterator::ConstIterator(const vector_iterator& begin, const vector_iterator& end) : _begin(begin), _end(end)
+    IntegerList::Iterator::Iterator(const vector_iterator& begin, const vector_iterator& end) : _begin(begin), _end(end)
     {}
 
     IntegerList::IntegerList()
@@ -58,8 +58,8 @@ namespace linear
         _list.resize(0);
     }
 
-    IntegerList::ConstIterator IntegerList::GetConstIterator() const
+    IntegerList::Iterator IntegerList::GetIterator() const
     {
-        return ConstIterator(_list.cbegin(), _list.cend());
+        return Iterator(_list.cbegin(), _list.cend());
     }
 }

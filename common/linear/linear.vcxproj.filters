@@ -126,9 +126,6 @@
     <ClCompile Include="src\IMatrix.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\IDataVector.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\IVector.cpp">
       <Filter>src</Filter>
     </ClCompile>

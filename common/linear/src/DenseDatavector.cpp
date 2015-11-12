@@ -7,13 +7,13 @@
 namespace linear
 {
     template<typename ValueType>
-    bool DenseDatavector<ValueType>::ConstIterator::IsValid() const
+    bool DenseDatavector<ValueType>::Iterator::IsValid() const
     {
         return (_begin == _end);
     }
 
     template<typename ValueType>
-    void DenseDatavector<ValueType>::ConstIterator::Next()
+    void DenseDatavector<ValueType>::Iterator::Next()
     {
         do
         {
@@ -24,13 +24,13 @@ namespace linear
     }
 
     template<typename ValueType>
-    IndexValue DenseDatavector<ValueType>::ConstIterator::GetValue() const
+    IndexValue DenseDatavector<ValueType>::Iterator::GetValue() const
     {
         return IndexValue(_index, (double)*_begin);
     }
 
     template<typename ValueType>
-    DenseDatavector<ValueType>::ConstIterator::ConstIterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end)
+    DenseDatavector<ValueType>::Iterator::Iterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end)
     {}
 
     template<typename ValueType>
@@ -129,6 +129,24 @@ namespace linear
         }
         
         return result;
+    }
+
+    template<typename ValueType>
+    typename DenseDatavector<ValueType>::Iterator DenseDatavector<ValueType>::GetIterator() const
+    {
+        return Iterator(_mem.begin(), _mem.end());
+    }
+
+    template<typename ValueType>
+    void DenseDatavector<ValueType>::Print(ostream & os) const
+    {
+        auto iterator =  GetIterator();
+        while(iterator.IsValid())
+        {
+            auto indexValue = iterator.GetValue();
+            os << indexValue << '\t';
+            iterator.Next();
+        }
     }
 
     template DenseDatavector<float>;

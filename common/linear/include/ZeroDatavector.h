@@ -63,5 +63,9 @@ namespace linear
         /// Computes the Dot product
         ///
         virtual double Dot(const double* p_other) const override;
+
+        /// Prints the datavector to an output stream
+        ///
+        virtual void Print(ostream& os) const override;
     };
 }

@@ -14,29 +14,29 @@ using std::swap;
 namespace linear
 {
     template<typename DatavectorType>
-    RowMatrix<DatavectorType>::ConstIterator::ConstIterator(const RowMatrix& table, uint row, uint max_row) : _table(table), _row(row), _max_row(max_row)
+    RowMatrix<DatavectorType>::Iterator::Iterator(const RowMatrix& table, uint row, uint max_row) : _table(table), _row(row), _max_row(max_row)
     {}
 
     template<typename DatavectorType>
-    bool RowMatrix<DatavectorType>::ConstIterator::IsValid() const
+    bool RowMatrix<DatavectorType>::Iterator::IsValid() const
     {
         return _row < _max_row;
     }
 
     template<typename DatavectorType>
-    uint RowMatrix<DatavectorType>::ConstIterator::NumIteratesLeft() const
+    uint RowMatrix<DatavectorType>::Iterator::NumIteratesLeft() const
     {
         return _max_row - _row;
     }
     
     template<typename DatavectorType>
-    void RowMatrix<DatavectorType>::ConstIterator::Next() 
+    void RowMatrix<DatavectorType>::Iterator::Next() 
     {
         ++_row;
     }
     
     template<typename DatavectorType>
-    const DatavectorType& RowMatrix<DatavectorType>::ConstIterator::GetValue() const
+    const DatavectorType& RowMatrix<DatavectorType>::Iterator::GetValue() const
     {
         assert(_row < _table.NumRows() && _row < _max_row);
     
@@ -62,7 +62,7 @@ namespace linear
     }
 
     template<typename DatavectorType>
-    typename RowMatrix<DatavectorType>::ConstIterator RowMatrix<DatavectorType>::GetIterator(uint row, uint size) const
+    typename RowMatrix<DatavectorType>::Iterator RowMatrix<DatavectorType>::GetIterator(uint row, uint size) const
     {
         uint max_row = row + size;
         if(max_row > NumRows() || size == 0)
@@ -70,7 +70,7 @@ namespace linear
             max_row = NumRows();
         }
 
-        return ConstIterator(*this, row, max_row);
+        return Iterator(*this, row, max_row);
     }
 
     template<typename DatavectorType>

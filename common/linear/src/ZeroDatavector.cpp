@@ -51,4 +51,7 @@ namespace linear
     {
         return 0.0;
     }
+
+    void ZeroDatavector::Print(ostream & os) const
+    {}
 }

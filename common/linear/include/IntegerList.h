@@ -9,7 +9,7 @@
 
 namespace linear
 {
-    /// A non-decreasing list of nonegative integers, with a forward ConstIterator.
+    /// A non-decreasing list of nonegative integers, with a forward Iterator.
     ///
     class IntegerList
     {
@@ -19,17 +19,17 @@ namespace linear
 
         /// A read-only forward iterator for the IntegerList.
         ///
-        class ConstIterator 
+        class Iterator 
         {
         public:
 
             /// Default copy ctor
             ///
-            ConstIterator(const ConstIterator&) = default;
+            Iterator(const Iterator&) = default;
 
             /// Default move ctor
             ///
-            ConstIterator(ConstIterator&&) = default;
+            Iterator(Iterator&&) = default;
 
             /// \returns True if the iterator is currently pointing to a valid iterate
             ///
@@ -46,7 +46,7 @@ namespace linear
         private:
 
             /// private ctor, can only be called from IntegerList class
-            ConstIterator(const vector_iterator& begin, const vector_iterator& end);
+            Iterator(const vector_iterator& begin, const vector_iterator& end);
             friend class IntegerList;
 
             // members
@@ -90,9 +90,9 @@ namespace linear
         ///
         void Reset();
 
-        /// \Returns a ConstIterator that points to the beginning of the list.
+        /// \Returns a Iterator that points to the beginning of the list.
         ///
-        ConstIterator GetConstIterator() const;
+        Iterator GetIterator() const;
 
         ///@{
         void operator= (const IntegerList&) = delete;

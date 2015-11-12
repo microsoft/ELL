@@ -19,17 +19,17 @@ namespace linear
 
         /// A read-only forward iterator for the sparse binary vector.
         ///
-        class ConstIterator
+        class Iterator
         {
         public:
 
             /// Default copy ctor
             ///
-            ConstIterator(const ConstIterator&) = default;
+            Iterator(const Iterator&) = default;
 
             /// Default move ctor
             ///
-            ConstIterator(ConstIterator&&) = default;
+            Iterator(Iterator&&) = default;
 
             /// \returns True if the iterator is currently pointing to a valid iterate
             ///
@@ -41,16 +41,16 @@ namespace linear
 
             /// \returns The current index-value pair
             ///
-            IndexValue GetValue() const;            
+            IndexValue GetValue() const;
 
         private:
             
             // define typenames to improve readability
-            using IndexIteratorType = typename IntegerListType::ConstIterator;
+            using IndexIteratorType = typename IntegerListType::Iterator;
             using ValueIteratorType = typename vector<ValueType>::const_iterator;
 
             /// private ctor, can only be called from SparseDatavector class
-            ConstIterator(const IndexIteratorType& list_iterator, const ValueIteratorType& value_iterator);
+            Iterator(const IndexIteratorType& list_iterator, const ValueIteratorType& value_iterator);
             friend SparseDatavector<ValueType, IntegerListType>;
 
             // members
@@ -106,9 +106,13 @@ namespace linear
         ///
         virtual double Dot(const double* p_other) const override;
 
-        /// \Returns a ConstIterator that traverses the non-zero entries of the sparse vector
+        /// \Returns a Iterator that traverses the non-zero entries of the sparse vector
         ///
-        ConstIterator GetConstIterator() const;
+        Iterator GetIterator() const;
+
+        /// Prints the datavector to an output stream
+        ///
+        virtual void Print(ostream& os) const override;
 
     private:
         IntegerListType _indices;

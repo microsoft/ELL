@@ -16,7 +16,7 @@ namespace linear
     typedef uint64_t uint;
     typedef uint8_t uint8;
 
-    /// A non-decreasing list of nonegative integers, with a forward ConstIterator, stored in a compressed delta enconding.
+    /// A non-decreasing list of nonegative integers, with a forward Iterator, stored in a compressed delta enconding.
     ///
     class CompressedIntegerList
     {
@@ -24,17 +24,17 @@ namespace linear
 
         /// A read-only forward iterator for the CompressedIntegerList.
         ///
-        class ConstIterator
+        class Iterator
         {
         public:
 
             /// Default copy ctor
             ///
-            ConstIterator(const ConstIterator&) = default;
+            Iterator(const Iterator&) = default;
 
             /// Default move ctor
             ///
-            ConstIterator(ConstIterator&&) = default;
+            Iterator(Iterator&&) = default;
 
             /// \returns True if the iterator is currently pointing to a valid iterate
             ///
@@ -51,7 +51,7 @@ namespace linear
         private:
 
             /// private ctor, can only be called from CompressedIntegerList class
-            ConstIterator(const uint8 *iter, const uint8 *end);
+            Iterator(const uint8 *iter, const uint8 *end);
             friend class CompressedIntegerList;
 
             // members
@@ -97,9 +97,9 @@ namespace linear
         ///
         void Reset();
 
-        /// \Returns a ConstIterator that points to the beginning of the list.
+        /// \Returns a Iterator that points to the beginning of the list.
         ///
-        ConstIterator GetConstIterator() const;
+        Iterator GetIterator() const;
 
         ///@{
         void operator= (const CompressedIntegerList&) = delete;

@@ -28,17 +28,17 @@ namespace linear
 
         /// A read-only forward iterator of rows in the RowMatrix.
         ///
-        class ConstIterator
+        class Iterator
         {
         public:
 
             /// Default copy ctor
             ///
-            ConstIterator(const ConstIterator&) = default;
+            Iterator(const Iterator&) = default;
 
             /// Default move ctor
             ///
-            ConstIterator(ConstIterator&&) = default;
+            Iterator(Iterator&&) = default;
 
             /// \returns True if the iterator is currently pointing to a valid iterate
             ///
@@ -59,7 +59,7 @@ namespace linear
         private:
 
             /// private ctor, can only be called from RowMatrix class
-            ConstIterator(const RowMatrix& table, uint row, uint max_row);
+            Iterator(const RowMatrix& table, uint row, uint max_row);
             friend RowMatrix<DatavectorType>;
 
             // members
@@ -98,7 +98,7 @@ namespace linear
 
         /// \returns an iterator that traverses the rows
         ///
-        ConstIterator GetIterator(uint row = 0, uint size = 0) const;
+        Iterator GetIterator(uint row = 0, uint size = 0) const;
         
         /// Moves a row into the bottom of the matrix 
         ///

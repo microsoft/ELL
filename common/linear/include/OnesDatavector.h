@@ -64,6 +64,10 @@ namespace linear
         ///
         virtual double Dot(const double* p_other) const override;
 
+        /// Prints the datavector to an output stream
+        ///
+        virtual void Print(ostream& os) const override;
+
     private:
         uint _dim = 0;
     };

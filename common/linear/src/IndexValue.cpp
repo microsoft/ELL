@@ -18,4 +18,15 @@ namespace linear
     {
         return _value;
     }
+
+    void IndexValue::Print(ostream & os) const
+    {
+        os << _index << ':' << _value;
+    }
+
+    ostream& operator<<(ostream& os, const IndexValue& indexValue)
+    {
+        indexValue.Print(os);
+        return os;
+    }
 }

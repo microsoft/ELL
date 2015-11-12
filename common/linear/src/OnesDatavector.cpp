@@ -77,4 +77,12 @@ namespace linear
 
         return result;
     }
+
+    void OnesDatavector::Print(ostream & os) const
+    {
+        for(int i=0; i<_dim; ++i)
+        {
+            os << i << ":1\t";
+        }
+    }
 }

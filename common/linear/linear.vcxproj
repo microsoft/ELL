@@ -124,7 +124,6 @@
     <ClCompile Include="src\IMatrix.cpp" />
     <ClCompile Include="src\IndexValue.cpp" />
     <ClCompile Include="src\IntegerList.cpp" />
-    <ClCompile Include="src\IDataVector.cpp" />
     <ClCompile Include="src\IVector.cpp" />
     <ClCompile Include="src\OnesDatavector.cpp" />
     <ClCompile Include="src\SegmentedVector.cpp" />

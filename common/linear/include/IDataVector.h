@@ -40,9 +40,5 @@ namespace linear
         /// \returns The number of non-zeros
         ///
         virtual uint NumNonzeros() const =0;
-
-        /// Human readable printout to an output stream
-        ///
-        virtual void Print(ostream& os) const override;
     };
 }

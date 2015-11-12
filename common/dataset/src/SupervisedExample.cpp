@@ -63,4 +63,9 @@ namespace dataset
     {
         return _up_instance->Dot(p_other);
     }
+
+    void SupervisedExample::Print(ostream & os) const
+    {
+        _up_instance->Print(os);
+    }
 }

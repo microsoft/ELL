@@ -24,17 +24,17 @@ namespace linear
 
         /// A read-only forward iterator for the sparse binary vector.
         ///
-        class ConstIterator // TODO: implement this type
+        class Iterator // TODO: implement this type
         {
         public:
 
             /// Default copy ctor
             ///
-            ConstIterator(const ConstIterator&) = default;
+            Iterator(const Iterator&) = default;
 
             /// Default move ctor
             ///
-            ConstIterator(ConstIterator&&) = default;
+            Iterator(Iterator&&) = default;
 
             /// \returns True if the iterator is currently pointing to a valid iterate
             ///
@@ -54,7 +54,7 @@ namespace linear
             using StlIteratorType = typename vector<ValueType>::const_iterator;
 
             /// private ctor, can only be called from SparseDatavector class
-            ConstIterator(const StlIteratorType& begin, const StlIteratorType& end);
+            Iterator(const StlIteratorType& begin, const StlIteratorType& end);
             friend DenseDatavector<ValueType>;
 
             // members
@@ -111,6 +111,14 @@ namespace linear
         /// Computes the Dot product
         ///
         virtual double Dot(const double* p_other) const override;
+
+        /// \Returns a Iterator that points to the beginning of the list.
+        ///
+        Iterator GetIterator() const;
+
+        /// Prints the datavector to an output stream
+        ///
+        virtual void Print(ostream& os) const override;
 
     private:
         uint _num_nonzeros;

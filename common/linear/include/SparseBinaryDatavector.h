@@ -18,17 +18,17 @@ namespace linear
 
         /// A read-only forward iterator for the sparse binary vector.
         ///
-        class ConstIterator
+        class Iterator
         {
         public:
 
             /// Default copy ctor
             ///
-            ConstIterator(const ConstIterator&) = default;
+            Iterator(const Iterator&) = default;
 
             /// Default move ctor
             ///
-            ConstIterator(ConstIterator&&) = default;
+            Iterator(Iterator&&) = default;
 
             /// \returns True if the iterator is currently pointing to a valid iterate
             ///
@@ -49,10 +49,10 @@ namespace linear
         private:
 
             // define typename to improve readability
-            using IndexIteratorType = typename IntegerListType::ConstIterator;
+            using IndexIteratorType = typename IntegerListType::Iterator;
 
             // private ctor, can only be called from SparseBinaryDatavectorBase class
-            ConstIterator(const typename IntegerListType::ConstIterator& list_iterator);
+            Iterator(const typename IntegerListType::Iterator& list_iterator);
             friend SparseBinaryDatavectorBase<IntegerListType>;
 
             // members
@@ -107,9 +107,13 @@ namespace linear
         ///
         virtual double Dot(const double* p_other) const override;
 
-        /// \Returns a ConstIterator that traverses the non-zero entries of the sparse vector
+        /// \Returns a Iterator that traverses the non-zero entries of the sparse vector
         ///
-        ConstIterator GetConstIterator() const;
+        Iterator GetIterator() const;
+
+        /// Prints the datavector to an output stream
+        ///
+        virtual void Print(ostream& os) const override;
 
     private:
         IntegerListType _indices;

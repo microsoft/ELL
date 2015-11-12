@@ -5,26 +5,26 @@
 namespace linear
 {
     template<typename ValueType, typename IntegerListType>
-    bool SparseDatavector<ValueType, IntegerListType>::ConstIterator::IsValid() const
+    bool SparseDatavector<ValueType, IntegerListType>::Iterator::IsValid() const
     {
         return _index_iterator.IsValid();
     }
 
     template<typename ValueType, typename IntegerListType>
-    void SparseDatavector<ValueType, IntegerListType>::ConstIterator::Next()
+    void SparseDatavector<ValueType, IntegerListType>::Iterator::Next()
     {
         _index_iterator.Next();
         ++_value_iterator;
     }
 
     template<typename ValueType, typename IntegerListType>
-    IndexValue SparseDatavector<ValueType, IntegerListType>::ConstIterator::GetValue() const
+    IndexValue SparseDatavector<ValueType, IntegerListType>::Iterator::GetValue() const
     {
         return IndexValue(_index_iterator.GetValue(), *_value_iterator);
     }
 
     template<typename ValueType, typename IntegerListType>
-    SparseDatavector<ValueType, IntegerListType>::ConstIterator::ConstIterator(
+    SparseDatavector<ValueType, IntegerListType>::Iterator::Iterator(
         const IndexIteratorType& index_iterator,
         const ValueIteratorType& value_iterator)
         : _index_iterator(index_iterator), _value_iterator(value_iterator)
@@ -71,7 +71,7 @@ namespace linear
     //template<typename ValueType, typename IntegerListType>
     //void SparseDatavector<ValueType, IntegerListType>::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const
     //{
-    //    auto iter = GetConstIterator();
+    //    auto iter = GetIterator();
     //    while(iter.IsValid())
     //    {
     //        func(index_offset + iter.GetIndex(), iter.GetValue());
@@ -107,7 +107,7 @@ namespace linear
     template<typename ValueType, typename IntegerListType>
     void SparseDatavector<ValueType, IntegerListType>::AddTo(double* p_other, double scalar) const
     {
-        auto iter = GetConstIterator();
+        auto iter = GetIterator();
         while (iter.IsValid())
         {
             auto current = iter.GetValue();
@@ -121,7 +121,7 @@ namespace linear
     {
         double value = 0.0;
         
-        auto iter = GetConstIterator();
+        auto iter = GetIterator();
         while (iter.IsValid())
         {
             auto current = iter.GetValue();
@@ -133,9 +133,21 @@ namespace linear
     }
 
     template<typename ValueType, typename IntegerListType>
-    typename SparseDatavector<ValueType, IntegerListType>::ConstIterator SparseDatavector<ValueType, IntegerListType>::GetConstIterator() const
+    typename SparseDatavector<ValueType, IntegerListType>::Iterator SparseDatavector<ValueType, IntegerListType>::GetIterator() const
     {
-        return ConstIterator(_indices.GetConstIterator(), _values.cbegin());
+        return Iterator(_indices.GetIterator(), _values.cbegin());
+    }
+
+    template<typename ValueType, typename IntegerListType>
+    void SparseDatavector<ValueType, IntegerListType>::Print(ostream & os) const
+    {
+        auto iterator = GetIterator();
+        while(iterator.IsValid())
+        {
+            auto indexValue = iterator.GetValue();
+            os << indexValue << '\t';
+            iterator.Next();
+        }
     }
 
     template SparseDatavector<double, CompressedIntegerList>;

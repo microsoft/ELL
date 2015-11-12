@@ -68,6 +68,10 @@ namespace dataset
         ///
         virtual double Dot(const double * p_other) const override;
 
+        /// Prints the datavector to an output stream
+        ///
+        virtual void Print(ostream& os) const override;
+
     private:
         unique_ptr<IDataVector> _up_instance;
         double _weight;

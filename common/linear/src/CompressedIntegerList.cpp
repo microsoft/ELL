@@ -9,12 +9,12 @@ using std::runtime_error;
 namespace linear
 {
 
-    bool CompressedIntegerList::ConstIterator::IsValid() const
+    bool CompressedIntegerList::Iterator::IsValid() const
     {
         return _iter < _end;
     }
 
-    void CompressedIntegerList::ConstIterator::Next()
+    void CompressedIntegerList::Iterator::Next()
     {
         uint delta;
         _iter += _iter_increment;
@@ -41,12 +41,12 @@ namespace linear
         _value += delta;
     }
 
-    uint CompressedIntegerList::ConstIterator::GetValue() const
+    uint CompressedIntegerList::Iterator::GetValue() const
     {
         return _value;
     }
 
-    CompressedIntegerList::ConstIterator::ConstIterator(const uint8 *iter, const uint8 *end) : _iter(iter), _end(end), _value(0), _iter_increment(0)
+    CompressedIntegerList::Iterator::Iterator(const uint8 *iter, const uint8 *end) : _iter(iter), _end(end), _value(0), _iter_increment(0)
     {
         Next();
     }
@@ -134,8 +134,8 @@ namespace linear
         _size = 0;
     }
 
-    CompressedIntegerList::ConstIterator CompressedIntegerList::GetConstIterator() const
+    CompressedIntegerList::Iterator CompressedIntegerList::GetIterator() const
     {
-        return ConstIterator(_mem.data(), _mem.data() + _mem.size());
+        return Iterator(_mem.data(), _mem.data() + _mem.size());
     }
 }
