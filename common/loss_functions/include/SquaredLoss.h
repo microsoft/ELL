@@ -4,9 +4,10 @@
 
 namespace loss_functions
 {
+	/// Implements the squared loss function: loss(x) = x*x
+	///
     class SquaredLoss
     {
-
     public:
 
         /// \returns The value of the loss at a given point

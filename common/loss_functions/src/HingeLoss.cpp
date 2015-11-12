@@ -2,7 +2,6 @@
 
 #include "HingeLoss.h"
 
-
 namespace loss_functions
 {
     double HingeLoss::Evaluate(double prediction, double label) const
