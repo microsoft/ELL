@@ -3,7 +3,6 @@
 #pragma once
 
 #include <vector>
-
 using std::vector;
 
 namespace tree_layout
@@ -51,11 +50,12 @@ namespace tree_layout
         /// default constructor
         Layout(){};
 
-        ///
+        /// Constructs a layout with given parameters
         ///
         Layout(size_t size, double min_offset, double max_offset, double min_depth, double max_depth);
 
-        Layout(const Layout& l) : Positions(l.Positions), MinOffset(l.MinOffset), MaxOffset(l.MaxOffset), MinDepth(l.MinDepth), MaxDepth(l.MaxDepth) {}
+        /// Copy ctor // TODO maybe replace with default?
+        Layout(const Layout& l) : _positions(l._positions), _minOffset(l._minOffset), _maxOffset(l._maxOffset), _minDepth(l._minDepth), _maxDepth(l._maxDepth) {}
 
         ///
         /// \returns A reference to the position of a specified vertex
@@ -86,13 +86,13 @@ namespace tree_layout
         ///
         double GetMaxDepth() const;
 
-        const vector<VertexPosition>& GetVertices() const { return Positions; }
+        const vector<VertexPosition>& GetVertices() const { return _positions; } // TODO move code to cpp
 
     private:
-        vector<VertexPosition> Positions;
-        double MinOffset = 0;
-        double MaxOffset = 0;
-        double MinDepth = 0;
-        double MaxDepth = 0;
+        vector<VertexPosition> _positions;
+        double _minOffset = 0;
+        double _maxOffset = 0;
+        double _minDepth = 0;
+        double _maxDepth = 0;
     };
 }

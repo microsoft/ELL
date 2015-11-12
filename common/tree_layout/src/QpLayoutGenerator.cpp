@@ -1,9 +1,6 @@
 // QpLayoutGenerator.cpp
 
 #include "QpLayoutGenerator.h"
-#include <cmath>
-
-using std::move;
 
 namespace tree_layout
 {

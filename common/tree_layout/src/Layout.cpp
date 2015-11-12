@@ -1,9 +1,8 @@
 // Layout.cpp
 
 #include "Layout.h"
-#include <stdexcept>
-#include <string>
 
+#include <stdexcept>
 using std::runtime_error;
 
 namespace tree_layout
@@ -36,42 +35,42 @@ namespace tree_layout
     }
 
     Layout::Layout(size_t size, double min_offset, double max_offset, double min_depth, double max_depth) :
-        Positions(size), MinOffset(min_offset), MaxOffset(max_offset), MinDepth(min_depth), MaxDepth(max_depth)
+        _positions(size), _minOffset(min_offset), _maxOffset(max_offset), _minDepth(min_depth), _maxDepth(max_depth)
     {}
 
     VertexPosition& Layout::operator[](int index)
     {
-        return Positions[index];
+        return _positions[index];
     }
 
     const VertexPosition& Layout::operator[](int index) const
     {
-        return Positions[index];
+        return _positions[index];
     }
 
     int Layout::size() const
     {
-        return (int)Positions.size();
+        return (int)_positions.size();
     }
 
     double Layout::GetMinOffset() const
     {
-        return MinOffset;
+        return _minOffset;
     }
 
     double Layout::GetMaxOffset() const
     {
-        return MaxOffset;
+        return _maxOffset;
     }
 
     double Layout::GetMinDepth() const
     {
-        return MinDepth;
+        return _minDepth;
     }
 
     double Layout::GetMaxDepth() const
     {
-        return MaxDepth;
+        return _maxDepth;
     }
 
 }

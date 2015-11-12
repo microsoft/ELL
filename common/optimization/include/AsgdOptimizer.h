@@ -8,7 +8,7 @@ using predictors::SharedLinearBinaryPredictor;
 
 // linear
 #include "DoubleVector.h"
-using namespace linear;
+using linear::DoubleVector;
 
 namespace convex_optimization
 {
@@ -25,7 +25,7 @@ namespace convex_optimization
         /// Performs a given number of learning iterations
         ///
         template<typename ExampleIteratorType, typename LossFunctionType>
-        void Update(ExampleIteratorType& data_iter, const LossFunctionType& loss_function, double L2_regularization);
+        void Update(ExampleIteratorType& data_iter, const LossFunctionType& loss_function, double l2Regularization);
 
         /// \returns The averaged predictor
         ///

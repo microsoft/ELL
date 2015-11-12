@@ -3,7 +3,6 @@
 #pragma once
 
 #include <vector>
-
 using std::vector;
 
 namespace decision_tree
@@ -40,7 +39,7 @@ namespace decision_tree
 
         /// Represents a pair of Children of a binary tree
         ///
-        class Children
+        class Children // TODO rename to ChildPair
         {
         public:
 

@@ -1,9 +1,8 @@
 // MutableDecisionTree.cpp
 
 #include "MutableDecisionTree.h"
-#include <stdexcept>
-#include <string>
 
+#include <stdexcept>
 using std::runtime_error;
 using std::swap;
 

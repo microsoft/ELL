@@ -3,9 +3,10 @@
 #pragma once
 
 #include "Layout.h"
-#include <vector>
 
+#include <vector>
 using std::vector;
+using std::pair;
 
 namespace tree_layout
 {
@@ -77,6 +78,7 @@ namespace tree_layout
         struct VertexInfo
         {
             VertexInfo(int i, double s);
+
             int index;
             double space_left;
         };
@@ -100,7 +102,7 @@ namespace tree_layout
         void MoveParents(const ChildrenVectorType& Children, int node_index, double step_size);
 
         template<typename ChildrenVectorType>
-        std::vector<std::pair<double, double>> SimpleLayout(const ChildrenVectorType& Children, int node_index, int depth);
+        vector<pair<double, double>> SimpleLayout(const ChildrenVectorType& Children, int node_index, int depth);
 
         template<typename ChildrenVectorType>
         void IncrementOffsets(const ChildrenVectorType& Children, int node_index, double displacement);

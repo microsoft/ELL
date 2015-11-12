@@ -1,12 +1,17 @@
 // QpLayoutGenerator.tcc
 
 #include <stdexcept>
-#include <cassert>
-#include <iostream>
-#include <numeric>
-#include <algorithm>
+using std::runtime_error;
 
-using namespace std;
+#include <iostream>
+using std::cout;
+
+#include <algorithm>
+using std::min;
+using std::max;
+using std::make_pair;
+
+
 
 namespace tree_layout
 {
