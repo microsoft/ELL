@@ -2,7 +2,6 @@
 
 #include "DoubleVector.h"
 #include "operators.h"
-#include "segmented_vector.h"
 #include "DenseDatavector.h"
 #include "DoubleMatrix.h"
 #include "IntegerList.h"

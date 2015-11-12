@@ -4,7 +4,6 @@
 
 #include "RowMatrix.h"
 #include "IMatrix.h"
-#include "segmented_vector.h"
 
 #include <vector>
 using std::vector;
