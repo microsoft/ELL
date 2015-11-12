@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug|x64">
@@ -83,7 +83,7 @@
     <ClInclude Include="include\files.h" />
     <ClInclude Include="include\JsonSerializer.h" />
     <ClInclude Include="include\random_engines.h" />
-    <ClInclude Include="include\shared_arguments.h" />
+    <ClInclude Include="include\SharedArguments.h" />
     <ClInclude Include="include\types.h" />
   </ItemGroup>
   <ItemGroup>

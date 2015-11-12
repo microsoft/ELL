@@ -2,15 +2,19 @@
 
 // utilities
 #include "files.h"
-#include "CommandLineParser.h" 
-#include "random_engines.h"
-#include "shared_arguments.h" 
-#include "BinaryClassificationEvaluator.h"
-using utilities::CommandLineParser;
-using utilities::ParsedSharedArguments;
-using utilities::BinaryClassificationEvaluator;
-using utilities::GetRandomEngine;
 using utilities::OpenIfstream;
+
+#include "CommandLineParser.h" 
+using utilities::CommandLineParser;
+
+#include "random_engines.h"
+using utilities::GetRandomEngine;
+
+#include "SharedArguments.h" 
+using utilities::ParsedSharedArguments;
+
+#include "BinaryClassificationEvaluator.h"
+using utilities::BinaryClassificationEvaluator;
 
 // mappings
 #include "mappings.h"
@@ -29,7 +33,7 @@ using namespace dataset;
 #include "SharedLinearBinaryPredictor.h"
 using predictors::SharedLinearBinaryPredictor;
 
-// convex_optimization
+// optimization
 #include "AsgdOptimizer.h"
 using namespace convex_optimization;
 
@@ -40,12 +44,6 @@ using namespace loss_functions;
 
 // command line arguments
 #include "args.h"
-
-#include <fstream>
-#include <string>
-#include <stdexcept>
-#include <vector>
-#include <memory>
 
 #include <random>
 using std::default_random_engine;

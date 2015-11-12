@@ -4,7 +4,7 @@ using utilities::ParsedArgSet;
 
 /// A struct that holds the command line parameters for the trainer
 ///
-struct sgd_arguments
+struct SgdArguments
 {
     int num_epochs = 0;
     double loss_scale = 0;
@@ -13,7 +13,7 @@ struct sgd_arguments
 
 /// A subclass of cmd_arguments that knows how to Add its members to the command line parser
 ///
-struct ParsedSgdArguments : sgd_arguments, ParsedArgSet
+struct ParsedSgdArguments : SgdArguments, ParsedArgSet
 {
     ParsedSgdArguments(CommandLineParser& parser)
     {
