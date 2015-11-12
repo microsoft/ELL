@@ -69,9 +69,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dataset", "common\dataset\d
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loss_functions", "common\loss_functions\loss_functions.vcxproj", "{D6FDE3E6-4E52-4BA3-AB0D-BB7C9B100803}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "convex_optimization", "common\convex_optimization\convex_optimization.vcxproj", "{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "predictors", "common\predictors\predictors.vcxproj", "{13682BFD-E22B-462B-9520-E234B624734A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "optimization", "common\optimization\optimization.vcxproj", "{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -128,14 +128,14 @@ Global
 		{D6FDE3E6-4E52-4BA3-AB0D-BB7C9B100803}.debug|x64.Build.0 = debug|x64
 		{D6FDE3E6-4E52-4BA3-AB0D-BB7C9B100803}.release|x64.ActiveCfg = release|x64
 		{D6FDE3E6-4E52-4BA3-AB0D-BB7C9B100803}.release|x64.Build.0 = release|x64
-		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}.debug|x64.ActiveCfg = debug|x64
-		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}.debug|x64.Build.0 = debug|x64
-		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}.release|x64.ActiveCfg = release|x64
-		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}.release|x64.Build.0 = release|x64
 		{13682BFD-E22B-462B-9520-E234B624734A}.debug|x64.ActiveCfg = debug|x64
 		{13682BFD-E22B-462B-9520-E234B624734A}.debug|x64.Build.0 = debug|x64
 		{13682BFD-E22B-462B-9520-E234B624734A}.release|x64.ActiveCfg = release|x64
 		{13682BFD-E22B-462B-9520-E234B624734A}.release|x64.Build.0 = release|x64
+		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}.debug|x64.ActiveCfg = debug|x64
+		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}.debug|x64.Build.0 = debug|x64
+		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}.release|x64.ActiveCfg = release|x64
+		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}.release|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,7 +151,7 @@ Global
 		{EB82BF14-D313-4DE1-B5EF-CAB9F36BC24F} = {10B973DF-BD58-4B4A-9EBD-DF247C1746AE}
 		{50749761-3F3D-44AE-9993-B6250A9E88AA} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
 		{D6FDE3E6-4E52-4BA3-AB0D-BB7C9B100803} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
-		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
 		{13682BFD-E22B-462B-9520-E234B624734A} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
+		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
 	EndGlobalSection
 EndGlobal
