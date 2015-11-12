@@ -12,7 +12,7 @@ namespace loss_functions
 
         /// Constructs a LogLoss object
         ///
-        LogLoss(double Scale = 1.0);
+        LogLoss(double scale = 1.0);
 
         /// \returns The value of the loss at a given point
         ///

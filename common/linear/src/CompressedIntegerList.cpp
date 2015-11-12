@@ -31,7 +31,7 @@ namespace linear
         }
         else
         {
-            // read in the Next bytes, Shift them over to fit the 6 bits of first_val we're using, and Add first_val
+            // read in the Next bytes, shift them over to fit the 6 bits of first_val we're using, and Add first_val
             delta = 0;
             memcpy(&delta, _iter + 1, total_bytes - 1);
             delta = (delta << 6) | (first_val & 0x3f);

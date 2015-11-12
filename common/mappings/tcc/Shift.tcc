@@ -2,7 +2,7 @@
 
 namespace mappings
 {
-    template <typename IndexValueIterator>
-    Shift::Shift(IndexValueIterator begin, IndexValueIterator end) : Coordinatewise(begin, end, Shift::Add)
+    template <typename IndexValueIteratorType>
+    Shift::Shift(IndexValueIteratorType begin, IndexValueIteratorType end) : Coordinatewise(begin, end, Shift::Add)
     {}
 }

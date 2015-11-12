@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     try
     {
         // read the map and compile out its description
-        auto map = mappings::Io::read(fs);
+        auto map = mappings::Io::Read(fs);
         auto compilable_map = dynamic_pointer_cast<compilable>(map);
         compilable_map->compile(cout);
 

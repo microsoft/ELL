@@ -28,11 +28,11 @@ namespace mappings
 
         /// Serializes an index value pair
         ///
-        void Serialize(JsonSerializer& js) const;
+        void Serialize(JsonSerializer& serializer) const;
 
         /// Deserializes an index value pair
         ///
-        void Deserialize(JsonSerializer& js);
+        void Deserialize(JsonSerializer& serializer);
 
     private:
         int _index;

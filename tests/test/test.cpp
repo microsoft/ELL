@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
         L1->PushBack(make_shared<mappings::Constant>(.4));
         col->PushBack(L1);
 
-        Io::write(fs, col);
+        Io::Write(fs, col);
     }
     catch (runtime_error e)
     {
@@ -129,9 +129,9 @@ int main(int argc, char* argv[])
 }
 
 #include "deserializer.h"
-void mappings::Deserialize(JsonSerializer& js, std::shared_ptr<Mapping>& up)
+void mappings::Deserialize(JsonSerializer& serializer, std::shared_ptr<Mapping>& up)
 {
-    mappings::DefaultDeserialize(js, up);
+    mappings::DefaultDeserialize(serializer, up);
 }
 
 

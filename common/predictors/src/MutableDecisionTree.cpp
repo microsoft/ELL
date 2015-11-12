@@ -27,12 +27,12 @@ namespace decision_tree
         _child0(child0), _child1(child1)
     {}
 
-    int MutableDecisionTree::Children::get_child0() const
+    int MutableDecisionTree::Children::GetChild0() const
     {
         return _child0;
     }
 
-    int MutableDecisionTree::Children::get_child1() const
+    int MutableDecisionTree::Children::GetChild1() const
     {
         return _child1;
     }
@@ -131,7 +131,7 @@ namespace decision_tree
             int parent_of_leaf = _parents[leaf_index];
             int parent_of_new_interior = _parents[new_interior_index];
 
-            if (_children[parent_of_leaf].get_child0() == leaf_index)
+            if (_children[parent_of_leaf].GetChild0() == leaf_index)
             {
                 _children[parent_of_leaf].set_child0(new_interior_index);
             }
@@ -139,7 +139,7 @@ namespace decision_tree
             {
                 _children[parent_of_leaf].set_child1(new_interior_index);
             }
-            if (_children[parent_of_new_interior].get_child0() == new_interior_index)
+            if (_children[parent_of_new_interior].GetChild0() == new_interior_index)
             {
                 _children[parent_of_new_interior].set_child0(leaf_index);
             }

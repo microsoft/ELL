@@ -1,25 +1,25 @@
 // deserializer.cpp
 
 #include "mappings.h"
-#include <stdexcept>
 
+#include <memory>
 using std::shared_ptr;
 using std::make_shared;
 
 
 // this code deliberately commented out, and should appear in any Project that uses mappings with default serialization
 // ====================================================================================================================
-// void mappings::Deserialize(JsonSerializer& js, std::shared_ptr<Mapping>& up)
+// void mappings::Deserialize(JsonSerializer& serializer, std::shared_ptr<Mapping>& up)
 // {
-//     mappings::DefaultDeserialize(js, up);
+//     mappings::DefaultDeserialize(serializer, up);
 // }
 
 namespace mappings
 {
-    void DefaultDeserialize(JsonSerializer& js, shared_ptr<Mapping>& up)
+    void DefaultDeserialize(JsonSerializer& serializer, shared_ptr<Mapping>& up)
     {
-        auto type = js.read<string>("_type");
-        auto version = js.read<int>("_version");
+        auto type = serializer.Read<string>("_type");
+        auto version = serializer.Read<int>("_version");
 
         if (type == "Constant")
         {
@@ -61,6 +61,6 @@ namespace mappings
             throw runtime_error("unidentified type in map file: " + type);
         }
 
-        up->Deserialize(js, version);
+        up->Deserialize(serializer, version);
     }
 }

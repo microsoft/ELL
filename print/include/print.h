@@ -17,7 +17,7 @@ namespace print
 
     /// A class that adds printing capabilities to a Mapping
     ///
-    class PrintableScale : public Scale, public printable
+    class PrintableScale : public scale, public printable
     {
         /// Prints a human-friendly description of the Mapping to a stream
         ///

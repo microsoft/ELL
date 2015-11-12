@@ -3,10 +3,11 @@
 #pragma once
 
 #include "Mapping.h"
-#include <vector>
-#include <memory>
 
+#include <vector>
 using std::vector;
+
+#include <memory>
 using std::shared_ptr;
 
 namespace mappings
@@ -23,13 +24,13 @@ namespace mappings
 
         /// applys the Mapping (reads inputs from the input vector and writes output to the output vector)
         ///
-        virtual void apply(const double* input, double* output) const;
+        virtual void Apply(const double* input, double* output) const;
         
-        /// \returns The input dimension of the column. Namely, the apply function assumes that the input array is at least this long
+        /// \returns The input dimension of the column. Namely, the Apply function assumes that the input array is at least this long
         ///
         virtual int GetMinInputDim() const;
 
-        /// \returns The output dimension of the column. Namely, the apply function assumes that the output array is at least this long
+        /// \returns The output dimension of the column. Namely, the Apply function assumes that the output array is at least this long
         ///
         virtual int GetOutputDim() const;
 
@@ -47,11 +48,11 @@ namespace mappings
 
         /// Serializes the column in json format
         ///
-        virtual void Serialize(JsonSerializer& js) const;
+        virtual void Serialize(JsonSerializer& serializer) const;
 
         /// Deserializes the column in json format
         ///
-        virtual void Deserialize(JsonSerializer& js, int version = _current_version);
+        virtual void Deserialize(JsonSerializer& serializer, int version = _current_version);
 
         /// KeepLayers(0) keeps the entire Mapping
         /// KeepLayers(positive) keeps only the specified number of layers, starting from the top

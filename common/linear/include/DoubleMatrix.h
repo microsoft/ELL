@@ -50,7 +50,7 @@ namespace linear
         ///
         virtual double& operator()(uint i, uint j) =0;
 
-        /// \returns A Constant reference to an element of the matrix, specified by coordinates i,j
+        /// \returns A constant reference to an element of the matrix, specified by coordinates i,j
         ///
         virtual double operator()(uint i, uint j) const =0;    
 
@@ -92,7 +92,7 @@ namespace linear
         ///
         virtual double& operator()(uint i, uint j) override;
 
-        /// \returns A Constant reference to an element of the matrix, specified by coordinates i,j
+        /// \returns A constant reference to an element of the matrix, specified by coordinates i,j
         ///
         virtual double operator()(uint i, uint j) const override;
     };
@@ -112,7 +112,7 @@ namespace linear
         ///
         virtual double& operator()(uint i, uint j) override;
 
-        /// \returns A Constant reference to an element of the matrix, specified by coordinates i,j
+        /// \returns A constant reference to an element of the matrix, specified by coordinates i,j
         ///
         virtual double operator()(uint i, uint j) const override;
     };
@@ -160,7 +160,7 @@ namespace linear
         ///
         virtual double& operator()(uint i, uint j) override;
 
-        /// \returns A Constant reference to an element of the matrix, specified by coordinates i,j
+        /// \returns A constant reference to an element of the matrix, specified by coordinates i,j
         ///
         virtual double operator()(uint i, uint j) const override;
 
@@ -195,7 +195,7 @@ namespace linear
         ///
         virtual double& operator()(uint i, uint j) override;
 
-        /// \returns A Constant reference to an element of the matrix, specified by coordinates i,j
+        /// \returns A constant reference to an element of the matrix, specified by coordinates i,j
         ///
         virtual double operator()(uint i, uint j) const override;
 

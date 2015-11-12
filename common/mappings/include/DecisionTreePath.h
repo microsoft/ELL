@@ -2,46 +2,45 @@
 #pragma once
 
 #include "Mapping.h"
-#include <vector>
 
+#include <vector>
 using std::vector;
 
 namespace mappings
-{
-    
+{   
     class DecisionTreePath : public Mapping
     {
     public:
 
         /// Represents a pair of Children of a binary tree
         ///
-        class Childs
+        class ChildPair
         {
         public:
 
             /// Default constructor
             ///
-            Childs();
+            ChildPair();
 
             /// Constructs the pair of Children
             ///
-            Childs(int child0, int child1);
+            ChildPair(int child0, int child1);
 
             /// \returns Child 0
             ///
-            int get_child0() const;
+            int GetChild0() const;
 
             /// \returns Child 1
             ///
-            int get_child1() const;
+            int GetChild1() const;
 
             /// Serializes the Mapping in json format
             ///
-            virtual void Serialize(JsonSerializer& js) const;
+            virtual void Serialize(JsonSerializer& serializer) const;
 
             /// Deserializes the Mapping in json format
             ///
-            virtual void Deserialize(JsonSerializer& js);
+            virtual void Deserialize(JsonSerializer& serializer);
 
         private:
             int _child0;
@@ -59,11 +58,11 @@ namespace mappings
 
         /// \returns A reference to the Children vector
         ///
-        vector<Childs>& Children();
+        vector<ChildPair>& Children();
 
         /// \returns A reference to the Children vector
         ///
-        const vector<Childs>& Children() const;
+        const vector<ChildPair>& Children() const;
 
         /// \returns The input index offset
         ///
@@ -71,13 +70,13 @@ namespace mappings
 
         /// applys the Mapping (reads inputs from the input vector and writes output to the output vector
         ///
-        virtual void apply(const double* input, double* output) const;
+        virtual void Apply(const double* input, double* output) const;
 
-        /// \returns The input dimension of the Mapping. Namely, the apply function assumes that the input array is at least this long
+        /// \returns The input dimension of the Mapping. Namely, the Apply function assumes that the input array is at least this long
         ///
         virtual int GetMinInputDim() const;
 
-        /// \returns The output dimension of the Mapping. Namely, the apply function assumes that the output array is at least this long
+        /// \returns The output dimension of the Mapping. Namely, the Apply function assumes that the output array is at least this long
         ///    
         virtual int GetOutputDim() const;
 
@@ -91,14 +90,14 @@ namespace mappings
 
         /// Serializes the Mapping in json format
         ///
-        virtual void Serialize(JsonSerializer& js) const;
+        virtual void Serialize(JsonSerializer& serializer) const;
 
         /// Deserializes the Mapping in json format
         ///
-        virtual void Deserialize(JsonSerializer& js, int version = _current_version);
+        virtual void Deserialize(JsonSerializer& serializer, int version = _current_version);
 
     protected:
-        vector<Childs> _children;
+        vector<ChildPair> _children;
         int _input_index_offset;
 
         static const int _current_version = 1;

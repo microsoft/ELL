@@ -1,10 +1,11 @@
 // Sum.cpp
 
 #include "Sum.h"
-#include <stdexcept>
-#include <string>
 
+#include <stdexcept>
 using std::runtime_error;
+
+#include <string>
 using std::to_string;
 
 namespace mappings
@@ -12,7 +13,7 @@ namespace mappings
 
     Sum::Sum(int first_input_indices, int input_index_count) : _first_input_indices(first_input_indices), _input_indices_count(input_index_count)
     {
-        _type = types::Sum;
+        _type = types::sum;
     }
 
     void Sum::SetFirstInputIndices(int index)
@@ -35,7 +36,7 @@ namespace mappings
         return _input_indices_count;
     }
     
-    void Sum::apply(const double* input, double* output) const
+    void Sum::Apply(const double* input, double* output) const
     {
         double value = 0.0;
         
@@ -56,20 +57,20 @@ namespace mappings
         return 1;
     }
 
-    void Sum::Serialize(JsonSerializer& js) const
+    void Sum::Serialize(JsonSerializer& serializer) const
     {
         // version 1
-        Mapping::SerializeHeader(js, 1);
-        js.write("first_input_indices", _first_input_indices);
-        js.write("input_index_count", _input_indices_count);
+        Mapping::SerializeHeader(serializer, 1);
+        serializer.Write("first_input_indices", _first_input_indices);
+        serializer.Write("input_index_count", _input_indices_count);
     }
 
-    void Sum::Deserialize(JsonSerializer& js, int version)
+    void Sum::Deserialize(JsonSerializer& serializer, int version)
     {
         if (version == 1)
         {
-            js.read("first_input_indices", _first_input_indices);
-            js.read("input_index_count", _input_indices_count);
+            serializer.Read("first_input_indices", _first_input_indices);
+            serializer.Read("input_index_count", _input_indices_count);
         }
         else
         {

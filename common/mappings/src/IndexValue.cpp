@@ -1,4 +1,3 @@
-#include "..\..\linear\include\IndexValue.h"
 // IndexValue.cpp
 
 #include "IndexValue.h"
@@ -21,15 +20,15 @@ namespace mappings
         return _value;
     }
 
-    void IndexValue::Serialize(JsonSerializer& js) const
+    void IndexValue::Serialize(JsonSerializer& serializer) const
     {
-        js.write("index", _index);
-        js.write("value", _value);
+        serializer.Write("index", _index);
+        serializer.Write("value", _value);
     }
 
-    void IndexValue::Deserialize(JsonSerializer& js)
+    void IndexValue::Deserialize(JsonSerializer& serializer)
     {
-        js.read("index", _index);
-        js.read("value", _value);
+        serializer.Read("index", _index);
+        serializer.Read("value", _value);
     }
 }

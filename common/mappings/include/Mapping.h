@@ -3,11 +3,12 @@
 #pragma once
 
 #include "JsonSerializer.h"
-#include <string>
-#include <vector>
-
 using utilities::JsonSerializer;
+
+#include <string>
 using std::string;
+
+#include <vector>
 using std::vector;
 
 namespace mappings
@@ -17,7 +18,7 @@ namespace mappings
     class Mapping
     {
     public:
-        enum types { Constant, Scale, Shift, Sum, DecisionTreePath, Row, Column};
+        enum types { constant, scale, shift, sum, decisionTreePath, row, column};
 
         /// \returns The type of Mapping
         ///
@@ -25,31 +26,31 @@ namespace mappings
     
         /// applys the Mapping (reads inputs from the input vector and writes output to the output vector
         ///
-        virtual void apply(const double* input, double* output) const = 0;
+        virtual void Apply(const double* input, double* output) const = 0;
 
         /// applys the Mapping (reads inputs from the input vector and writes output to the output vector
         ///
-        void apply(const vector<double>& input, vector<double>& output) const;
+        void Apply(const vector<double>& input, vector<double>& output) const;
 
-        /// \returns The input dimension of the Mapping. Namely, the apply function assumes that the input array is at least this long
+        /// \returns The input dimension of the Mapping. Namely, the Apply function assumes that the input array is at least this long
         ///
         virtual int GetMinInputDim() const = 0;
 
-        /// \returns The output dimension of the Mapping. Namely, the apply function assumes that the output array is at least this long
+        /// \returns The output dimension of the Mapping. Namely, the Apply function assumes that the output array is at least this long
         ///
         virtual int GetOutputDim() const = 0;
 
         /// Serializes the Mapping in json format
         ///
-        virtual void Serialize(JsonSerializer& js) const = 0;
+        virtual void Serialize(JsonSerializer& serializer) const = 0;
 
         /// Deserializes the Mapping in json format
         ///
-        virtual void Deserialize(JsonSerializer& js, int version) = 0;
+        virtual void Deserialize(JsonSerializer& serializer, int version) = 0;
         
     protected:
         types _type;
 
-        void SerializeHeader(JsonSerializer& js, int version) const;
+        void SerializeHeader(JsonSerializer& serializer, int version) const;
     };
 }

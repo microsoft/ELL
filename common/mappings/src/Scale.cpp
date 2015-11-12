@@ -1,17 +1,18 @@
 // Scale.cpp
 
 #include "Scale.h"
-#include <stdexcept>
-#include <string>
 
+#include <stdexcept>
 using std::runtime_error;
+
+#include <string>
 using std::to_string;
 
 namespace mappings
 {
     Scale::Scale() : Coordinatewise(Scale::Multiply)
     {
-        _type = types::Scale;
+        _type = types::scale;
     }
 
     double Scale::Multiply(double a, double b)

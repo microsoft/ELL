@@ -1,17 +1,18 @@
 // Constant.cpp
 
 #include "Constant.h"
-#include <stdexcept>
-#include <string>
 
+#include <stdexcept>
 using std::runtime_error;
+
+#include <string>
 using std::to_string;
 
 namespace mappings
 {
     Constant::Constant(double c) : _c(c)
     {
-        _type = types::Constant;
+        _type = types::constant;
     }
 
     void Constant::SetConstant(double c)
@@ -24,7 +25,7 @@ namespace mappings
         return _c;
     }
 
-    void Constant::apply(const double* input, double* output) const
+    void Constant::Apply(const double* input, double* output) const
     {
         output[0] = _c;
     }
@@ -39,18 +40,18 @@ namespace mappings
         return 1;
     }
 
-    void Constant::Serialize(JsonSerializer& js) const
+    void Constant::Serialize(JsonSerializer& serializer) const
     {
         // version 1
-        Mapping::SerializeHeader(js, 1);
-        js.write("c", _c);
+        Mapping::SerializeHeader(serializer, 1);
+        serializer.Write("c", _c);
     }
 
-    void Constant::Deserialize(JsonSerializer& js, int version)
+    void Constant::Deserialize(JsonSerializer& serializer, int version)
     {
         if (version == 1)
         {
-            js.read("c", _c);
+            serializer.Read("c", _c);
         }
         else
         {

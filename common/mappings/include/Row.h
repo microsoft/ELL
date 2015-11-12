@@ -3,12 +3,15 @@
 #pragma once
 
 #include "Mapping.h"
-#include <vector>
-#include <memory>
-#include <exception>
 
+#include <vector>
 using std::vector;
+
+#include <memory>
+
 using std::shared_ptr;
+
+#include <exception>
 using std::exception;
 
 namespace mappings
@@ -25,13 +28,13 @@ namespace mappings
 
         /// applys the Mapping (reads inputs from the input vector and writes output to the output vector
         ///
-        virtual void apply(const double* input, double* output) const;
+        virtual void Apply(const double* input, double* output) const;
 
-        /// \returns The input dimension of the row. Namely, the apply function assumes that the input array is at least this long
+        /// \returns The input dimension of the row. Namely, the Apply function assumes that the input array is at least this long
         ///
         virtual int GetMinInputDim() const;
 
-        /// \returns The output dimension of the row. Namely, the apply function assumes that the output array is at least this long
+        /// \returns The output dimension of the row. Namely, the Apply function assumes that the output array is at least this long
         ///
         virtual int GetOutputDim() const;
 
@@ -41,11 +44,11 @@ namespace mappings
 
         /// Serializes the row in json format
         ///
-        virtual void Serialize(JsonSerializer& js) const;
+        virtual void Serialize(JsonSerializer& serializer) const;
 
         /// Deserializes the row in json format
         ///
-        virtual void Deserialize(JsonSerializer& js, int version = _current_version);
+        virtual void Deserialize(JsonSerializer& serializer, int version = _current_version);
 
     protected:
         vector<shared_ptr<Mapping>> _row_elements;

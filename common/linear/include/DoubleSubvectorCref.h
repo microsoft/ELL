@@ -22,11 +22,11 @@ namespace linear
     {
     public:
 
-        /// Constructs a Constant reference to a double vector
+        /// Constructs a constant reference to a double vector
         ///
         DoubleSubvectorCref(const DoubleVector& vec, uint offset = 0, uint size = UINT64_MAX);
 
-        /// Constructs a Constant reference to a double vector
+        /// Constructs a constant reference to a double vector
         ///
         DoubleSubvectorCref(const double* ptr, uint size);
 

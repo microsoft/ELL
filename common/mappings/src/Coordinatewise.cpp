@@ -1,10 +1,11 @@
 // Coordinatewise.cpp
 
 #include "Coordinatewise.h"
-#include <stdexcept>
-#include <string>
 
+#include <stdexcept>
 using std::runtime_error;
+
+#include <string>
 using std::to_string;
 
 namespace mappings
@@ -12,17 +13,17 @@ namespace mappings
     Coordinatewise::Coordinatewise(function<double(double, double)> func) : _func(func)
     {}
 
-    Coordinatewise::index_value_iterator Coordinatewise::begin() const
+    Coordinatewise::IndexValueIterator Coordinatewise::begin() const
     {
         return _index_values.cbegin();
     }
 
-    Coordinatewise::index_value_iterator Coordinatewise::end() const
+    Coordinatewise::IndexValueIterator Coordinatewise::end() const
     {
         return _index_values.cend();
     }
 
-    void Coordinatewise::apply(const double* input, double* output) const
+    void Coordinatewise::Apply(const double* input, double* output) const
     {
         for(size_t i = 0; i<_index_values.size(); ++i)
         {
@@ -50,18 +51,18 @@ namespace mappings
         return (int)_index_values.size();
     }
 
-    void Coordinatewise::Serialize(JsonSerializer& js) const
+    void Coordinatewise::Serialize(JsonSerializer& serializer) const
     {
         // version 1
-        Mapping::SerializeHeader(js, 1);
-        js.write("index_values", _index_values);
+        Mapping::SerializeHeader(serializer, 1);
+        serializer.Write("index_values", _index_values);
     }
 
-    void Coordinatewise::Deserialize(JsonSerializer& js, int version)
+    void Coordinatewise::Deserialize(JsonSerializer& serializer, int version)
     {
         if(version == 1)
         {
-            js.read("index_values", _index_values);
+            serializer.Read("index_values", _index_values);
         }
         else
         {

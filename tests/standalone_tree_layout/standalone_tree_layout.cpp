@@ -22,12 +22,12 @@ struct node
 
     node(int child0, int child1, double output) : child0(child0), child1(child1), output(output) {}
 
-    int get_child0() const
+    int GetChild0() const
     {
         return child0;
     }
 
-    int get_child1() const
+    int GetChild1() const
     {
         return child1;
     }
@@ -165,7 +165,7 @@ void write_header(const QpLayoutGenerator::Params& p, ostream& os, bool use_html
 
         os << R"(
 
-    <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.8.3.js"></script>
+    <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.8.3.serializer"></script>
 
 <script type="text/javascript">
 
@@ -309,7 +309,7 @@ void write_tree(const tree_info& tree, ostream& os, bool use_html)
 
     double normalizer = 1600.0 / (l.GetMaxOffset() - min_offset + 50);
     int gap = 20;
-    double Scale = 0.25;
+    double scale = 0.25;
 
     if (use_html)
     {
@@ -317,12 +317,12 @@ void write_tree(const tree_info& tree, ostream& os, bool use_html)
     }
 
 
-    os << "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"" << Scale*(max_offset - min_offset) << "\" height=\"" << Scale*(max_depth - min_depth) << "\" viewBox=\"" << min_offset - gap << " " << min_depth - gap << " " << max_offset + (2 * gap) << " " << max_depth + (2 * gap) << "\" preserveAspectRatio=\"xMinYMin meet\">" << endl << endl;
+    os << "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"" << scale*(max_offset - min_offset) << "\" height=\"" << scale*(max_depth - min_depth) << "\" viewBox=\"" << min_offset - gap << " " << min_depth - gap << " " << max_offset + (2 * gap) << " " << max_depth + (2 * gap) << "\" preserveAspectRatio=\"xMinYMin meet\">" << endl << endl;
     os << "<g>" << endl;
     for (int j = 0; j < (int)nodes.size(); ++j)
     {
-        int child0 = nodes[j].get_child0();
-        int child1 = nodes[j].get_child1();
+        int child0 = nodes[j].GetChild0();
+        int child1 = nodes[j].GetChild1();
 
         if (child0 != -1)
         {

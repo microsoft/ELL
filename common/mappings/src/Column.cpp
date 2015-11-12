@@ -2,12 +2,14 @@
 
 #include "Column.h"
 #include "deserializer.h"
-#include <stdexcept>
-#include <cassert>
-#include <string>
 
-using std::swap;
+#include <stdexcept>
 using std::runtime_error;
+
+#include <cassert>
+
+#include <string>
+using std::swap;
 using std::to_string;
 
 namespace mappings
@@ -15,37 +17,37 @@ namespace mappings
 
     Column::Column() : _max_internal_dim(0)
     {
-        _type = Mapping::Column;
+        _type = Mapping::column;
     }
 
-    void Column::apply(const double* input, double* output) const
+    void Column::Apply(const double* input, double* output) const
     {
         size_t size = _column_elements.size();
 
         if (size == 1)
         {
-            _column_elements[0]->apply(input, output);
+            _column_elements[0]->Apply(input, output);
         }
         else if (size == 2)
         {
             vector<double> tmp(_max_internal_dim);
-            _column_elements[0]->apply(input, &tmp[0]);
-            _column_elements[1]->apply(&tmp[0], output);
+            _column_elements[0]->Apply(input, &tmp[0]);
+            _column_elements[1]->Apply(&tmp[0], output);
         }
         else if (size > 2)
         {
             vector<double> tmp_in(_max_internal_dim);
             vector<double> tmp_out(_max_internal_dim);
 
-            _column_elements[0]->apply(input, &tmp_in[0]);
+            _column_elements[0]->Apply(input, &tmp_in[0]);
 
             for (size_t i = 1; i < size - 2; ++i)
             {
-                _column_elements[i]->apply(&tmp_in[0], &tmp_out[0]);
+                _column_elements[i]->Apply(&tmp_in[0], &tmp_out[0]);
                 swap(tmp_in, tmp_out);
             }
 
-            _column_elements[size - 1]->apply(&tmp_in[0], output);
+            _column_elements[size - 1]->Apply(&tmp_in[0], output);
         }
     }
 
@@ -70,7 +72,7 @@ namespace mappings
     void Column::PushBack(shared_ptr<Mapping> m)
     {
         // don't nest columns
-        assert(m->GetType() != Mapping::types::Column);
+        assert(m->GetType() != Mapping::types::column);
 
         if (_column_elements.size() > 0)
         {
@@ -97,20 +99,20 @@ namespace mappings
         return _column_elements[index];
     }
 
-    void Column::Serialize(JsonSerializer& js) const
+    void Column::Serialize(JsonSerializer& serializer) const
     {
         // version 1
-        Mapping::SerializeHeader(js, 1);
-        js.write("mappings", _column_elements);
-        js.write("max_dim", _max_internal_dim);
+        Mapping::SerializeHeader(serializer, 1);
+        serializer.Write("mappings", _column_elements);
+        serializer.Write("max_dim", _max_internal_dim);
     }
 
-    void Column::Deserialize(JsonSerializer& js, int version)
+    void Column::Deserialize(JsonSerializer& serializer, int version)
     {
         if (version == 1)
         {
-            js.read("mappings", _column_elements);
-            js.read("max_dim", _max_internal_dim);
+            serializer.Read("mappings", _column_elements);
+            serializer.Read("max_dim", _max_internal_dim);
         }
         else
         {

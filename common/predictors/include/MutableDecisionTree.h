@@ -50,11 +50,11 @@ namespace decision_tree
 
             /// \returns Child 0
             ///
-            int get_child0() const;
+            int GetChild0() const;
 
             /// \returns Child 1
             ///
-            int get_child1() const;
+            int GetChild1() const;
 
             /// Sets child 0
             ///

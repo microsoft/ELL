@@ -3,11 +3,12 @@
 #pragma once
 
 #include "Mapping.h"
-#include <iostream>
-#include <memory>
 
+#include <iostream>
 using std::istream;
 using std::ostream;
+
+#include <memory>
 using std::shared_ptr;
 
 namespace mappings
@@ -20,11 +21,11 @@ namespace mappings
 
         /// writes a Mapping to a stream
         ///
-        static void write(ostream& os, shared_ptr<Mapping> map);
+        static void Write(ostream& os, shared_ptr<Mapping> map);
 
         /// reads a Mapping from a stream
         ///
-        static shared_ptr<Mapping> read(istream& is);
+        static shared_ptr<Mapping> Read(istream& is);
 
         /// reads a column Mapping from a stream
         /// num_layers = 0 keeps the entire Mapping

@@ -8,7 +8,7 @@ using std::move;
 namespace utilities
 {
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::write(KeyType key, const ValueType& value, typename enable_if<is_class<ValueType>::value>::type* SFINAE)
+    void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_class<ValueType>::value>::type* SFINAE)
     {
         try
         {
@@ -23,7 +23,7 @@ namespace utilities
     }
 
     template<typename KeyType>
-    void JsonSerializer::write(KeyType key, const string& value)
+    void JsonSerializer::Write(KeyType key, const string& value)
     {
         try
         {
@@ -36,13 +36,13 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* SFINAE)
+    void JsonSerializer::Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* SFINAE)
     {
-        write(key, *ptr);
+        Write(key, *ptr);
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::write(KeyType key, const ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* SFINAE)
+    void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* SFINAE)
     {
         try
         {
@@ -55,7 +55,7 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::write(KeyType key, const ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* SFINAE)
+    void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* SFINAE)
     {
         try
         {
@@ -68,14 +68,14 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::write(KeyType key, const vector<ValueType>& vec)
+    void JsonSerializer::Write(KeyType key, const vector<ValueType>& vec)
     {
         try
         {
             JsonSerializer sub_serializer;
             for (size_t i = 0; i < vec.size(); ++i)
             {
-                sub_serializer.write((int)i, vec[i]);
+                sub_serializer.Write((int)i, vec[i]);
             }
             _json_value[key] = sub_serializer._json_value;
         }
@@ -86,7 +86,7 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::read(KeyType key, ValueType& value, typename enable_if<is_class<ValueType>::value>::type* SFINAE) const
+    void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_class<ValueType>::value>::type* SFINAE) const
     {
         try
         {    
@@ -101,13 +101,13 @@ namespace utilities
     }
 
     template<typename KeyType>
-    void JsonSerializer::read(KeyType key, string& value) const
+    void JsonSerializer::Read(KeyType key, string& value) const
     {
         get(key, value);
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::read(KeyType key, shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* SFINAE) const
+    void JsonSerializer::Read(KeyType key, shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* SFINAE) const
     {
         try
         {
@@ -122,13 +122,13 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::read(KeyType key, ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* SFINAE) const
+    void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* SFINAE) const
     {
         get(key, value);
     }
 
     template<typename ValueType, typename KeyType>
-    ValueType JsonSerializer::read(KeyType key, typename enable_if<is_default_constructible<ValueType>::value>::type* SFINAE) const
+    ValueType JsonSerializer::Read(KeyType key, typename enable_if<is_default_constructible<ValueType>::value>::type* SFINAE) const
     {
         ValueType val;
         get(key, val);
@@ -136,7 +136,7 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::read(KeyType key, ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* SFINAE) const
+    void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* SFINAE) const
     {
         int ival;
         get(key, ival);
@@ -144,7 +144,7 @@ namespace utilities
     }
 
     template<typename ValueType, typename KeyType>
-    ValueType JsonSerializer::read(KeyType key, typename enable_if<is_enum<ValueType>::value>::type* SFINAE) const
+    ValueType JsonSerializer::Read(KeyType key, typename enable_if<is_enum<ValueType>::value>::type* SFINAE) const
     {
         int val;
         get(key, val);
@@ -152,7 +152,7 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::read(KeyType key, vector<ValueType>& vec) const
+    void JsonSerializer::Read(KeyType key, vector<ValueType>& vec) const
     {
         try
         {
@@ -164,7 +164,7 @@ namespace utilities
             for (size_t i = 0; i < sub_serializer._json_value.size(); ++i)
             {
                 ValueType val;
-                sub_serializer.read((int)i, val);
+                sub_serializer.Read((int)i, val);
                 vec.push_back(move(val));
             }
         }

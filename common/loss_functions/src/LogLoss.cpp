@@ -8,7 +8,7 @@ using std::exp;
 
 namespace loss_functions
 {
-    LogLoss::LogLoss(double Scale) : _scale(Scale)
+    LogLoss::LogLoss(double scale) : _scale(scale)
     {}
 
     double LogLoss::Evaluate(double prediction, double label) const

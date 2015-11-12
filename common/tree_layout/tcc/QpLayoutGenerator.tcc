@@ -117,10 +117,10 @@ namespace tree_layout
             ancestors.push_back(index);
 
             // recurse
-            int child0 = Children[index].get_child0();
+            int child0 = Children[index].GetChild0();
             BuildLayers(Children, child0, ancestors, prev_layer_ancestors);
 
-            int child1 = Children[index].get_child1();
+            int child1 = Children[index].GetChild1();
             BuildLayers(Children, child1, ancestors, prev_layer_ancestors);
             ancestors.pop_back();
         }
@@ -135,8 +135,8 @@ namespace tree_layout
         }
 
         // recurse
-        int child0 = Children[node_index].get_child0();
-        int child1 = Children[node_index].get_child1();
+        int child0 = Children[node_index].GetChild0();
+        int child1 = Children[node_index].GetChild1();
 
         vector<pair<double, double>> x0 = SimpleLayout(Children, child0, depth + 1); 
         vector<pair<double, double>> x1 = SimpleLayout(Children, child1, depth + 1); 
@@ -181,8 +181,8 @@ namespace tree_layout
 
         if (node_index < Children.size()) // leaf node
         {
-            int child0 = Children[node_index].get_child0();
-            int child1 = Children[node_index].get_child1();
+            int child0 = Children[node_index].GetChild0();
+            int child1 = Children[node_index].GetChild1();
             IncrementOffsets(Children, child0, displacement);
             IncrementOffsets(Children, child1, displacement);
         }
@@ -226,8 +226,8 @@ namespace tree_layout
 
         for (int i = 0; i < Children.size(); ++i)
         {
-            int child0 = Children[i].get_child0();
-            int child1 = Children[i].get_child1();
+            int child0 = Children[i].GetChild0();
+            int child1 = Children[i].GetChild1();
 
             double parent_offset = offsets[i];
             double child0_offset = offsets[child0];
@@ -255,8 +255,8 @@ namespace tree_layout
     {
         if (node_index < Children.size())
         {
-            int child0 = Children[node_index].get_child0();
-            int child1 = Children[node_index].get_child1();
+            int child0 = Children[node_index].GetChild0();
+            int child1 = Children[node_index].GetChild1();
 
             // recurse
             MoveParents(Children, child0, step_size);
