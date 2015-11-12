@@ -9,14 +9,14 @@ using std::to_string;
 
 namespace mappings
 {
-	Shift::Shift() : Coordinatewise(Shift::Add)
-	{
-		_type = types::Shift;
-	}
+    Shift::Shift() : Coordinatewise(Shift::Add)
+    {
+        _type = types::Shift;
+    }
 
-	double Shift::Add(double a, double b)
-	{
-		return a + b;
-	}
+    double Shift::Add(double a, double b)
+    {
+        return a + b;
+    }
 
 }

@@ -10,5 +10,5 @@ using std::string;
 
 namespace utilities
 {
-	ifstream OpenIfstream(string filepath);
+    ifstream OpenIfstream(string filepath);
 }

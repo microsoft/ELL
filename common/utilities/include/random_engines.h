@@ -16,7 +16,7 @@ using std::seed_seq;
 
 namespace utilities 
 {
-	vector<default_random_engine> GetRandomEngines(int num = 1, string seed_string = "");
+    vector<default_random_engine> GetRandomEngines(int num = 1, string seed_string = "");
 
-	default_random_engine GetRandomEngine(string seed_string = "");
+    default_random_engine GetRandomEngine(string seed_string = "");
 }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug|x64">
@@ -100,7 +100,7 @@
     <ClInclude Include="include\IDataVector.h" />
     <ClInclude Include="include\OnesDatavector.h" />
     <ClInclude Include="include\operators.h" />
-    <ClInclude Include="include\segmented_vector.h" />
+    <ClInclude Include="include\SegmentedVector.h" />
     <ClInclude Include="include\SparseBinaryDatavector.h" />
     <ClInclude Include="include\RowMatrix.h" />
     <ClInclude Include="include\BiMatrix.h" />
@@ -127,7 +127,7 @@
     <ClCompile Include="src\IDataVector.cpp" />
     <ClCompile Include="src\IVector.cpp" />
     <ClCompile Include="src\OnesDatavector.cpp" />
-    <ClCompile Include="src\segmented_vector.cpp" />
+    <ClCompile Include="src\SegmentedVector.cpp" />
     <ClCompile Include="src\SparseBinaryDatavector.cpp" />
     <ClCompile Include="src\SparseDatavector.cpp" />
     <ClCompile Include="src\DatavectorBuilder.cpp" />

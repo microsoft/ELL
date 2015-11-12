@@ -5,5 +5,5 @@ convex_optimization::AsgdOptimizer::AsgdOptimizer(uint dim) : _total_iterations(
 
 const SharedLinearBinaryPredictor convex_optimization::AsgdOptimizer::GetPredictor() const
 {
-	return _predictor;
+    return _predictor;
 }

@@ -59,63 +59,63 @@ using std::endl;
 
 int main(int argc, char* argv[])
 {
-	try
-	{
-		// parse the command line
-		CommandLineParser cmd_parser(argc, argv);
-		ParsedSharedArguments shared_arguments(cmd_parser);
-		ParsedSgdArguments trainer_args(cmd_parser);
-		cmd_parser.ParseArgs();
+    try
+    {
+        // parse the command line
+        CommandLineParser cmd_parser(argc, argv);
+        ParsedSharedArguments shared_arguments(cmd_parser);
+        ParsedSgdArguments trainer_args(cmd_parser);
+        cmd_parser.ParseArgs();
 
-		// open data file
-		ifstream data_fs = OpenIfstream(shared_arguments.data_file);
+        // open data file
+        ifstream data_fs = OpenIfstream(shared_arguments.data_file);
 
-		// create line iterator - read line by line sequentially
-		SequentialLineIterator li(data_fs);
+        // create line iterator - read line by line sequentially
+        SequentialLineIterator li(data_fs);
 
-		// create svmlight parser
-		SvmlightParser p(shared_arguments.data_file_has_weights);
+        // create svmlight parser
+        SvmlightParser p(shared_arguments.data_file_has_weights);
 
-		// create random number generator
-		auto rng = GetRandomEngine(shared_arguments.data_random_seed_string);
+        // create random number generator
+        auto rng = GetRandomEngine(shared_arguments.data_random_seed_string);
 
-		// Load a dataset, permute, and get a data iterator
-		auto data = Loader::Load(li, p);
+        // Load a dataset, permute, and get a data iterator
+        auto data = Loader::Load(li, p);
 
-		// create loss function
-		LogLoss loss(1);
+        // create loss function
+        LogLoss loss(1);
 
-		// create sgd trainer
-		uint dim = data.NumColumns();
-		AsgdOptimizer optimizer(dim);
+        // create sgd trainer
+        uint dim = data.NumColumns();
+        AsgdOptimizer optimizer(dim);
 
-		// create evaluator
-		BinaryClassificationEvaluator evaluator;
+        // create evaluator
+        BinaryClassificationEvaluator evaluator;
 
-		// perform epochs
-		for(int epoch = 0; epoch < trainer_args.num_epochs; ++epoch)
-		{
-			// randomly permute the data
-			data.RandPerm(rng);
+        // perform epochs
+        for(int epoch = 0; epoch < trainer_args.num_epochs; ++epoch)
+        {
+            // randomly permute the data
+            data.RandPerm(rng);
 
-			// iterate over the entire permuted dataset
-			auto training_iter = data.GetIterator();
-			optimizer.Update(training_iter, loss, trainer_args.l2_regularization);
+            // iterate over the entire permuted dataset
+            auto training_iter = data.GetIterator();
+            optimizer.Update(training_iter, loss, trainer_args.l2_regularization);
 
-			// Evaluate
-			auto eval_iter = data.GetIterator();
-			evaluator.Evaluate(eval_iter, optimizer.GetPredictor(), loss);
-		}
+            // Evaluate
+            auto eval_iter = data.GetIterator();
+            evaluator.Evaluate(eval_iter, optimizer.GetPredictor(), loss);
+        }
 
-		// print loss and errors
-		cout << "training error\n" << evaluator << endl;
-	}
-	catch (runtime_error e)
-	{
-		cerr << "runtime error: " << e.what() << endl;
-	}
+        // print loss and errors
+        cout << "training error\n" << evaluator << endl;
+    }
+    catch (runtime_error e)
+    {
+        cerr << "runtime error: " << e.what() << endl;
+    }
 
-	return 0;
+    return 0;
 }
 
 

@@ -2,41 +2,41 @@
 
 namespace utilities
 {
-	BinaryClassificationEvaluator::BinaryClassificationEvaluator()
-	{}
+    BinaryClassificationEvaluator::BinaryClassificationEvaluator()
+    {}
 
-	double BinaryClassificationEvaluator::GetLastLoss() const
-	{
-		if(_evals.size() == 0)
-		{
-			return 0;
-		}
+    double BinaryClassificationEvaluator::GetLastLoss() const
+    {
+        if(_evals.size() == 0)
+        {
+            return 0;
+        }
 
-		return _evals[_evals.size()-1].loss;
-	}
+        return _evals[_evals.size()-1].loss;
+    }
 
-	double BinaryClassificationEvaluator::GetLastError() const
-	{
-		if(_evals.size() == 0)
-		{
-			return 0;
-		}
+    double BinaryClassificationEvaluator::GetLastError() const
+    {
+        if(_evals.size() == 0)
+        {
+            return 0;
+        }
 
-		return _evals[_evals.size()-1].error;
-	}
+        return _evals[_evals.size()-1].error;
+    }
 
-	void BinaryClassificationEvaluator::Print(ostream & os) const
-	{
-		os << "binary classification evaluation\nloss\terror\n";
-		for(auto& e : _evals)
-		{
-			os << e.loss << '\t' << e.error << endl;
-		}
-	}
+    void BinaryClassificationEvaluator::Print(ostream & os) const
+    {
+        os << "binary classification evaluation\nloss\terror\n";
+        for(auto& e : _evals)
+        {
+            os << e.loss << '\t' << e.error << endl;
+        }
+    }
 
-	ostream& operator<<(ostream & os, const BinaryClassificationEvaluator & evaluation)
-	{
-		evaluation.Print(os);
-		return os;
-	}
+    ostream& operator<<(ostream & os, const BinaryClassificationEvaluator & evaluation)
+    {
+        evaluation.Print(os);
+        return os;
+    }
 }

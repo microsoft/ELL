@@ -9,13 +9,13 @@ using std::to_string;
 
 namespace mappings
 {
-	Scale::Scale() : Coordinatewise(Scale::Multiply)
-	{
-		_type = types::Scale;
-	}
+    Scale::Scale() : Coordinatewise(Scale::Multiply)
+    {
+        _type = types::Scale;
+    }
 
-	double Scale::Multiply(double a, double b)
-	{
-		return a * b;
-	}
+    double Scale::Multiply(double a, double b)
+    {
+        return a * b;
+    }
 }

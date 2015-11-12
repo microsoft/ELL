@@ -6,11 +6,11 @@
 
 namespace linear
 {
-	void IDataVector::Print(ostream& os) const
-	{
-		//auto printer = [&](uint index, double value) {os << index << ':' << value << '\t';};
-		//foreach_nonzero(printer);
+    void IDataVector::Print(ostream& os) const
+    {
+        //auto printer = [&](uint index, double value) {os << index << ':' << value << '\t';};
+        //foreach_nonzero(printer);
 
-		// TODO
-	}
+        // TODO
+    }
 }

@@ -8,101 +8,101 @@
 
 namespace linear
 {
-	typedef uint64_t uint;
-	typedef uint8_t uint8;
+    typedef uint64_t uint;
+    typedef uint8_t uint8;
 
-	/// A non-decreasing list of nonegative integers, with a forward ConstIterator, stored in a compressed delta enconding.
-	///
-	class CompressedIntegerList
-	{
-	public:
+    /// A non-decreasing list of nonegative integers, with a forward ConstIterator, stored in a compressed delta enconding.
+    ///
+    class CompressedIntegerList
+    {
+    public:
 
-		/// A read-only forward iterator for the CompressedIntegerList.
-		///
-		class ConstIterator : std::iterator<std::forward_iterator_tag, uint>
-		{
-		public:
+        /// A read-only forward iterator for the CompressedIntegerList.
+        ///
+        class ConstIterator : std::iterator<std::forward_iterator_tag, uint>
+        {
+        public:
 
-			/// Default copy ctor
-			///
-			ConstIterator(const ConstIterator&) = default;
+            /// Default copy ctor
+            ///
+            ConstIterator(const ConstIterator&) = default;
 
-			/// Default move ctor
-			///
-			ConstIterator(ConstIterator&&) = default;
+            /// Default move ctor
+            ///
+            ConstIterator(ConstIterator&&) = default;
 
-			/// \returns True if the iterator is currently pointing to a valid iterate
-			///
-			bool IsValid() const;
+            /// \returns True if the iterator is currently pointing to a valid iterate
+            ///
+            bool IsValid() const;
 
-			/// Proceeds to the Next iterate
-			///
-			void Next(); 
+            /// Proceeds to the Next iterate
+            ///
+            void Next();
 
-			/// Returns the value of the current iterate
-			///
-			uint GetValue() const;
+            /// Returns the value of the current iterate
+            ///
+            uint GetValue() const;
 
-		private:
+        private:
 
-			/// private ctor, can only be called from CompressedIntegerList class
-			ConstIterator(const uint8 *iter, const uint8 *end);
-			friend class CompressedIntegerList;
+            /// private ctor, can only be called from CompressedIntegerList class
+            ConstIterator(const uint8 *iter, const uint8 *end);
+            friend class CompressedIntegerList;
 
-			// members
-			const uint8* _iter;
-			const uint8* _end;
-			uint _value;
-			uint _iter_increment;
-		};
+            // members
+            const uint8* _iter;
+            const uint8* _end;
+            uint _value;
+            uint _iter_increment;
+        };
 
-		/// Default Constructor. Constructs an empty list.
-		///
-		CompressedIntegerList();
+        /// Default Constructor. Constructs an empty list.
+        ///
+        CompressedIntegerList();
 
-		/// Move constructor
-		///
-		CompressedIntegerList(CompressedIntegerList&& other) = default;
+        /// Move constructor
+        ///
+        CompressedIntegerList(CompressedIntegerList&& other) = default;
 
-		/// Deleted copy constructor
-		///
-		CompressedIntegerList(const CompressedIntegerList&) = delete;
+        /// Deleted copy constructor
+        ///
+        CompressedIntegerList(const CompressedIntegerList&) = delete;
 
-		/// Default Destructor.
-		///
-		~CompressedIntegerList() = default;
+        /// Default Destructor.
+        ///
+        ~CompressedIntegerList() = default;
 
-		/// \returns The number of entries in the list
-		///
-		uint Size() const;
+        /// \returns The number of entries in the list
+        ///
+        uint Size() const;
 
-		/// Allocates a specified number of entires to the list
-		///
-		void Reserve(uint size);
+        /// Allocates a specified number of entires to the list
+        ///
+        void Reserve(uint size);
 
-		/// \returns The maximal integer in the list
-		///
-		uint Max() const;
-		
-		/// Appends an integer to the end of the list.
-		///
-		void PushBack(uint value);
+        /// \returns The maximal integer in the list
+        ///
+        uint Max() const;
 
-		/// Deletes all of the vector content and sets its Size to zero
-		///
-		void Reset();
+        /// Appends an integer to the end of the list.
+        ///
+        void PushBack(uint value);
 
-		/// \Returns a ConstIterator that points to the beginning of the list.
-		///
-		ConstIterator GetConstIterator() const;
+        /// Deletes all of the vector content and sets its Size to zero
+        ///
+        void Reset();
 
-		///@{
-		void operator= (const CompressedIntegerList&) = delete;
-		///@}
+        /// \Returns a ConstIterator that points to the beginning of the list.
+        ///
+        ConstIterator GetConstIterator() const;
 
-	private:
-		std::vector<uint8> _mem;
-		uint _last;
-		uint _size;
-	};
+        ///@{
+        void operator= (const CompressedIntegerList&) = delete;
+        ///@}
+
+    private:
+        std::vector<uint8> _mem;
+        uint _last;
+        uint _size;
+    };
 }

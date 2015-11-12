@@ -5,23 +5,23 @@ using std::move;
 
 namespace dataset
 {
-	template<typename RowIteratorType, typename ParserType>
-	RowDataset Loader::Load(RowIteratorType& line_iterator, ParserType& parser)
-	{
+    template<typename RowIteratorType, typename ParserType>
+    RowDataset Loader::Load(RowIteratorType& line_iterator, ParserType& parser)
+    {
 
-		// parse each line according to the parser
-		ParsingIterator<RowIteratorType, ParserType> iter(line_iterator, parser);
+        // parse each line according to the parser
+        ParsingIterator<RowIteratorType, ParserType> iter(line_iterator, parser);
 
-		// create a dataset
-		RowDataset dataset;
+        // create a dataset
+        RowDataset dataset;
 
-		// Load Row by Row
-		while (iter.IsValid())
-		{
-			dataset.PushBackRow(iter.GetValue());
-			iter.Next();
-		}
+        // Load Row by Row
+        while (iter.IsValid())
+        {
+            dataset.PushBackRow(iter.GetValue());
+            iter.Next();
+        }
 
-		return move(dataset);
-	}
+        return move(dataset);
+    }
 }

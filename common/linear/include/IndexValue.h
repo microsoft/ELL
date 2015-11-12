@@ -4,25 +4,25 @@
 
 namespace linear
 {
-	class IndexValue
-	{
+    class IndexValue
+    {
 
-	public:
-		
-		/// Ctor
-		///
-		IndexValue(uint index, double value);
+    public:
+        
+        /// Ctor
+        ///
+        IndexValue(uint index, double value);
 
-		/// \returns The index
-		///
-		uint GetIndex() const;
+        /// \returns The index
+        ///
+        uint GetIndex() const;
 
-		/// \return The value
-		///
-		double GetValue() const;
+        /// \return The value
+        ///
+        double GetValue() const;
 
-	private:
-		uint _index;
-		double _value;
-	};
+    private:
+        uint _index;
+        double _value;
+    };
 }

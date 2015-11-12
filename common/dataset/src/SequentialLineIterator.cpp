@@ -4,21 +4,21 @@
 
 namespace dataset
 {
-	SequentialLineIterator::SequentialLineIterator(istream& is) : istream_iterator<DelimitedText<'\n'>>(is)
-	{}
+    SequentialLineIterator::SequentialLineIterator(istream& is) : istream_iterator<DelimitedText<'\n'>>(is)
+    {}
 
-	bool SequentialLineIterator::IsValid() const
-	{
-		return *this != istream_iterator<DelimitedText<'\n'>>();
-	}
+    bool SequentialLineIterator::IsValid() const
+    {
+        return *this != istream_iterator<DelimitedText<'\n'>>();
+    }
 
-	void SequentialLineIterator::Next()
-	{
-		++(*this);
-	}
+    void SequentialLineIterator::Next()
+    {
+        ++(*this);
+    }
 
-	const string& SequentialLineIterator::GetValue() const
-	{
-		return **this;
-	}
+    const string& SequentialLineIterator::GetValue() const
+    {
+        return **this;
+    }
 }

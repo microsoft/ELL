@@ -6,23 +6,23 @@
 
 namespace linear
 {
-	void IVector::AddTo(vector<double>& other, double scalar) const
-	{
-		assert(Size() <= other.size());
-		if(Size() > 0)
-		{
-			AddTo(&other[0], scalar);
-		}
-	}
+    void IVector::AddTo(vector<double>& other, double scalar) const
+    {
+        assert(Size() <= other.size());
+        if(Size() > 0)
+        {
+            AddTo(&other[0], scalar);
+        }
+    }
 
-	double IVector::Dot(const vector<double>& other) const
-	{
-		assert(Size() <= other.size());
-		if(Size() == 0)
-		{
-			return 0;
-		}
+    double IVector::Dot(const vector<double>& other) const
+    {
+        assert(Size() <= other.size());
+        if(Size() == 0)
+        {
+            return 0;
+        }
 
-		return Dot(&other[0]);
-	}
+        return Dot(&other[0]);
+    }
 }

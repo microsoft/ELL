@@ -6,6 +6,6 @@
 
 namespace linear
 {
-	typedef uint64_t uint;
+    typedef uint64_t uint;
 }
 

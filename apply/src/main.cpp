@@ -34,59 +34,59 @@ using std::string;
 
 int main(int argc, char* argv[])
 {
-	try
-	{
-		// parse the command line
-		CommandLineParser cmd_parser(argc, argv);
-		ParsedSharedArguments shared_arguments(cmd_parser);
-		cmd_parser.ParseArgs();
+    try
+    {
+        // parse the command line
+        CommandLineParser cmd_parser(argc, argv);
+        ParsedSharedArguments shared_arguments(cmd_parser);
+        cmd_parser.ParseArgs();
 
-		// open map file
-		ifstream map_fs = OpenIfstream(shared_arguments.map_file);
+        // open map file
+        ifstream map_fs = OpenIfstream(shared_arguments.map_file);
 
-		// open data file
-		ifstream data_fs = OpenIfstream(shared_arguments.data_file);
+        // open data file
+        ifstream data_fs = OpenIfstream(shared_arguments.data_file);
 
-		// Load the model
-		auto col = Io::ReadColumn(map_fs, shared_arguments.map_layers);
+        // Load the model
+        auto col = Io::ReadColumn(map_fs, shared_arguments.map_layers);
 
-		//// we want to read the data file sequentially
-		//SequentialLineIterator sli(data_fs);
-		//
-		//// get a parser for svmlight format
-		//SvmlightParser sp;
+        //// we want to read the data file sequentially
+        //SequentialLineIterator sli(data_fs);
+        //
+        //// get a parser for svmlight format
+        //SvmlightParser sp;
 
-		//// wrap the parser with a Mapping, to get a new parser
-		//using mapped_svmlight_parser = MappedParser<SvmlightParser>;
-		//mapped_svmlight_parser mp(sp, col);
+        //// wrap the parser with a Mapping, to get a new parser
+        //using mapped_svmlight_parser = MappedParser<SvmlightParser>;
+        //mapped_svmlight_parser mp(sp, col);
 
-		//// create an iterator that wraps the parser
-		//using mapped_svmlight_parsing_iterator = ParsingIterator<SequentialLineIterator, mapped_svmlight_parser>;
-		//mapped_svmlight_parsing_iterator pi(sli, mp, col->GetOutputDim());
+        //// create an iterator that wraps the parser
+        //using mapped_svmlight_parsing_iterator = ParsingIterator<SequentialLineIterator, mapped_svmlight_parser>;
+        //mapped_svmlight_parsing_iterator pi(sli, mp, col->GetOutputDim());
 
-		//// process Row by Row
-		//int counter = 0;
-		//while (pi.IsValid())
-		//{
-		//	auto& x = pi.GetFeatureVector();
-		//	auto y = pi.GetLabel();
-		//	auto w = pi.GetWeight();
+        //// process Row by Row
+        //int counter = 0;
+        //while (pi.IsValid())
+        //{
+        //    auto& x = pi.GetFeatureVector();
+        //    auto y = pi.GetLabel();
+        //    auto w = pi.GetWeight();
 
-		//	// generate output and print it out TODO
-		//	
-		//	
-		//	pi.Next();
-		//	++counter;
-		//} 
+        //    // generate output and print it out TODO
+        //    
+        //    
+        //    pi.Next();
+        //    ++counter;
+        //} 
 
-	}
-	catch (runtime_error e)
-	{
-		cerr << "runtime error: " << e.what() << std::endl;
-		return 1;
-	}
+    }
+    catch (runtime_error e)
+    {
+        cerr << "runtime error: " << e.what() << std::endl;
+        return 1;
+    }
 
-	return 0;
+    return 0;
 }
 
 

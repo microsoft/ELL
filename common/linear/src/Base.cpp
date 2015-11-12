@@ -4,9 +4,9 @@
 
 namespace linear
 {
-	ostream& operator<<(ostream& os, const Base& v)
-	{
-		v.Print(os);
-		return os;
-	}
+    ostream& operator<<(ostream& os, const Base& v)
+    {
+        v.Print(os);
+        return os;
+    }
 }
