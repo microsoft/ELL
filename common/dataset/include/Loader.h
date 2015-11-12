@@ -14,13 +14,13 @@ namespace dataset
 {
 	typedef RowMatrix<SupervisedExample> RowDataset;
 
-	namespace Loader
+	struct Loader
 	{
 
 		template<typename RowIteratorType, typename ParserType>
-		RowDataset Load(RowIteratorType& line_iterator, ParserType& parser);
+		static RowDataset Load(RowIteratorType& line_iterator, ParserType& parser);
 
-	}
+	};
 }
 
 #include "../tcc/Loader.tcc"
