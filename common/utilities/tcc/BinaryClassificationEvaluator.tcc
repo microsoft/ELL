@@ -6,7 +6,7 @@ namespace utilities
     void BinaryClassificationEvaluator::Evaluate(ExampleIteratorType& data_iter, const PredictorType& predictor, const LossFunctionType& loss_function)
     {
         
-        evaluation current_eval; 
+        Evaluation current_eval; 
         double total_weight = 0;
 
         while(data_iter.IsValid())

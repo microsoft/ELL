@@ -1,5 +1,13 @@
 // CommandLineParser.tcc
+
 #include <stdexcept>
+
+#include <string>
+using std::string;
+using std::pair;
+
+#include <sstream>
+using std::stringstream;
 
 namespace utilities
 {
@@ -15,28 +23,28 @@ namespace utilities
     // myexe.exe foo.tsv bar.tsv
     // myexe.exe -t 8 -x blah foo.tsv bar.tsv
     template <typename T, typename U>
-    void CommandLineParser::AddOption(T& option, std::string name, std::string short_name, std::string description, const U& default_value)
+    void CommandLineParser::AddOption(T& option, string name, string short_name, string description, const U& default_value)
     {
-        auto callback = [&option, this](std::string option_val)
+        auto callback = [&option, this](string option_val)
         {
             bool did_parse = ParseVal<T>(option_val, option);
             return did_parse;
         };
 
-        OptionInfo info(name, short_name, description, to_string(default_value), callback);
+        OptionInfo info(name, short_name, description, ToString(default_value), callback);
         AddOption(info);
     }
 
     template <typename T>
-    static bool CommandLineParser::ParseVal(std::string str, T& result)
+    static bool CommandLineParser::ParseVal(string str, T& result)
     {
-        std::stringstream ss(str);
+        stringstream ss(str);
         ss >> result;
         return true;
     }
 
     template <typename T>
-    static bool CommandLineParser::ParseVal(std::string str, std::vector<std::pair<std::string, T>> val_names, T& result, std::string& result_string)
+    static bool CommandLineParser::ParseVal(string str, vector<pair<string, T>> val_names, T& result, string& result_string)
     {
         bool did_find_one = false;
         for (const auto& val_name_pair : val_names)
@@ -58,9 +66,9 @@ namespace utilities
     }
 
     template <typename T>
-    static std::string CommandLineParser::to_string(const T& val)
+    static string CommandLineParser::ToString(const T& val)
     {
-        std::stringstream ss;
+        stringstream ss;
         ss << val;
         return ss.str();
     }
@@ -68,14 +76,14 @@ namespace utilities
 
     // bool specialization
     template <>
-    inline bool CommandLineParser::ParseVal<bool>(std::string val, bool& result)
+    inline bool CommandLineParser::ParseVal<bool>(string val, bool& result)
     {
         result = (val[0] == 't');
         return true;
     }
 
     template<>
-    inline std::string CommandLineParser::to_string<bool>(const bool& val)
+    inline string CommandLineParser::ToString<bool>(const bool& val)
     {
         return val ? "true" : "false";
     }

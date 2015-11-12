@@ -1,8 +1,9 @@
 // JsonSerializer.tcc
 
 #include <stdexcept>
-
 using std::runtime_error;
+
+#include <memory>
 using std::move;
 
 namespace utilities
@@ -103,7 +104,7 @@ namespace utilities
     template<typename KeyType>
     void JsonSerializer::Read(KeyType key, string& value) const
     {
-        get(key, value);
+        Get(key, value);
     }
 
     template<typename KeyType, typename ValueType>
@@ -124,14 +125,14 @@ namespace utilities
     template<typename KeyType, typename ValueType>
     void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* SFINAE) const
     {
-        get(key, value);
+        Get(key, value);
     }
 
     template<typename ValueType, typename KeyType>
     ValueType JsonSerializer::Read(KeyType key, typename enable_if<is_default_constructible<ValueType>::value>::type* SFINAE) const
     {
         ValueType val;
-        get(key, val);
+        Get(key, val);
         return val;
     }
 
@@ -139,7 +140,7 @@ namespace utilities
     void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* SFINAE) const
     {
         int ival;
-        get(key, ival);
+        Get(key, ival);
         value = (ValueType)ival;
     }
 
@@ -147,7 +148,7 @@ namespace utilities
     ValueType JsonSerializer::Read(KeyType key, typename enable_if<is_enum<ValueType>::value>::type* SFINAE) const
     {
         int val;
-        get(key, val);
+        Get(key, val);
         return (ValueType)val;
     }
 
@@ -175,7 +176,7 @@ namespace utilities
     }
 
     template<typename KeyType>
-    void JsonSerializer::get(KeyType key, bool& value) const
+    void JsonSerializer::Get(KeyType key, bool& value) const
     {
         try
         {
@@ -188,7 +189,7 @@ namespace utilities
     }
 
     template<typename KeyType>
-    void JsonSerializer::get(KeyType key, int& value) const
+    void JsonSerializer::Get(KeyType key, int& value) const
     {
         try
         {
@@ -201,7 +202,7 @@ namespace utilities
     }
 
     template<typename KeyType>
-    void JsonSerializer::get(KeyType key, unsigned int& value) const
+    void JsonSerializer::Get(KeyType key, unsigned int& value) const
     {
         try
         {
@@ -214,7 +215,7 @@ namespace utilities
     }
 
     template<typename KeyType>
-    void JsonSerializer::get(KeyType key, float& value) const
+    void JsonSerializer::Get(KeyType key, float& value) const
     {
         try
         {
@@ -227,7 +228,7 @@ namespace utilities
     }
 
     template<typename KeyType>
-    void JsonSerializer::get(KeyType key, double& value) const
+    void JsonSerializer::Get(KeyType key, double& value) const
     {
         try
         {
@@ -240,7 +241,7 @@ namespace utilities
     }
 
     template<typename KeyType>
-    void JsonSerializer::get(KeyType key, string& value) const
+    void JsonSerializer::Get(KeyType key, string& value) const
     {
         try
         {

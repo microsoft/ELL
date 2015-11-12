@@ -80,7 +80,7 @@ namespace utilities
     {
     public:
     
-        /// Constructor -- takes arg list
+        /// Constructor, takes arg list
         ///
         CommandLineParser(int argc, char**argv);
         
@@ -109,12 +109,6 @@ namespace utilities
         ///
         bool HasOption(string option);
 
-        /// TODO: document
-        ///
-        // cjacobs: these are currently unused --- keep them?
-        size_t NumArgs();
-        string GetArg(int index);
-
     protected:
 
         /// TODO: document
@@ -138,7 +132,7 @@ namespace utilities
         /// TODO: document
         ///
         template <typename T>
-        static string to_string(const T& val);
+        static string ToString(const T& val);
 
         struct DocumentationEntry    
         {

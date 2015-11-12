@@ -1,4 +1,4 @@
-// shared_arguments.h
+// SharedArguments.h
 
 #pragma once
 
@@ -14,7 +14,7 @@ namespace utilities
 {
     /// A struct that holds the command line parameters for the application
     ///
-    struct shared_arguments
+    struct SharedArguments
     {
         string data_file = "";
         bool data_file_has_weights = false;
@@ -26,7 +26,7 @@ namespace utilities
 
     /// A subclass of app_arguments that knows how to Add its members to the command line parser
     ///
-    struct ParsedSharedArguments : public shared_arguments, public ParsedArgSet
+    struct ParsedSharedArguments : public SharedArguments, public ParsedArgSet
     {
 
         ParsedSharedArguments(CommandLineParser& parser)

@@ -34,9 +34,9 @@ namespace utilities
         }
     }
 
-    ostream& operator<<(ostream & os, const BinaryClassificationEvaluator & evaluation)
+    ostream& operator<<(ostream & os, const BinaryClassificationEvaluator & evaluator)
     {
-        evaluation.Print(os);
+        evaluator.Print(os);
         return os;
     }
 }

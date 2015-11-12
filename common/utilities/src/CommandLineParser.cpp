@@ -139,16 +139,6 @@ namespace utilities
         return needs_reparse;
     }
 
-    size_t CommandLineParser::NumArgs()
-    {
-        return _args.size();
-    }
-
-    string CommandLineParser::GetArg(int index)
-    {
-        return _args[index];
-    }
-
     bool CommandLineParser::HasOption(string option)
     {
         return _options.find(option) != _options.end();
@@ -165,7 +155,7 @@ namespace utilities
         }
     }
 
-    inline bool find_best_match(string str, const vector<string>& val_names, string& result_string)
+    inline bool FindBestMatch(string str, const vector<string>& val_names, string& result_string)  // TODO: this function is not used anywhere -erase it?
     {
         bool did_find_one = false;
         for (const auto& val_name : val_names)

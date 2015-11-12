@@ -1,8 +1,8 @@
 // files.cpp
 
 #include "files.h"
-#include <stdexcept>
 
+#include <stdexcept>
 using std::runtime_error;
 
 namespace utilities

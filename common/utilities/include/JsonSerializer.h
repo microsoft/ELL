@@ -2,24 +2,23 @@
 
 #pragma once
 
-#include <ctype.h>
-
 #include "../../amalgamated_jsoncpp/json/json.h"
-#include <type_traits>
-#include <string>
-#include <memory>
-#include <vector>
-#include <exception>
 
-using std::vector;
-using std::string;
+#include <type_traits>
 using std::enable_if;
 using std::is_class;
 using std::is_enum;
 using std::is_fundamental;
-using std::shared_ptr;
 using std::is_default_constructible;
-using std::exception;
+
+#include <string>
+using std::string;
+
+#include <memory>
+using std::shared_ptr;
+
+#include <vector>
+using std::vector;
 
 namespace utilities
 {
@@ -101,7 +100,7 @@ namespace utilities
 
         /// convert the serialized objects to a string 
         ///
-        string to_string() const;
+        string ToString() const;
 
         /// convert a string to a datastructure from which one can read objects 
         ///
@@ -111,22 +110,22 @@ namespace utilities
         Json::Value _json_value;
 
         template<typename KeyType>
-        void get(KeyType key, bool& value) const;
+        void Get(KeyType key, bool& value) const;
 
         template<typename KeyType>
-        void get(KeyType key, int& value) const;
+        void Get(KeyType key, int& value) const;
 
         template<typename KeyType>
-        void get(KeyType key, unsigned int& value) const;
+        void Get(KeyType key, unsigned int& value) const;
 
         template<typename KeyType>
-        void get(KeyType key, float& value) const;
+        void Get(KeyType key, float& value) const;
 
         template<typename KeyType>
-        void get(KeyType key, double& value) const;
+        void Get(KeyType key, double& value) const;
 
         template<typename KeyType>
-        void get(KeyType key, string& value) const;
+        void Get(KeyType key, string& value) const;
     };
 }
 

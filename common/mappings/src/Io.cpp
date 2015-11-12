@@ -48,7 +48,7 @@ namespace mappings
         // Serialize Mapping
         JsonSerializer writer;
         writer.Write("Base", map);
-        auto str = writer.to_string();
+        auto str = writer.ToString();
         
         // write to stream
         os << str;

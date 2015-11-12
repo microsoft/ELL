@@ -1,14 +1,14 @@
 // jason_serializer.cpp
 
 #include "JsonSerializer.h"
-#include <stdexcept>
 
+#include <stdexcept>
 using std::runtime_error;
 
 namespace utilities
 {
 
-    std::string JsonSerializer::to_string() const
+    std::string JsonSerializer::ToString() const
     {
         try
         {

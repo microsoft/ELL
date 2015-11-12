@@ -15,7 +15,7 @@ namespace utilities
     {
     public:
 
-        struct evaluation
+        struct Evaluation
         {
             double loss = 0;
             double error = 0;
@@ -38,7 +38,7 @@ namespace utilities
         void Print(ostream& os) const;
 
     private:
-        vector<evaluation> _evals;
+        vector<Evaluation> _evals;
     };
 
     ostream& operator<<(ostream& os, const BinaryClassificationEvaluator& evaluation);
