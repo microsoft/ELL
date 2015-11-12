@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{951EAFB6-2B18-4385-8E6D-950DD10CBA98}</ProjectGuid>
+    <RootNamespace>linear</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <OutDir>lib\$(Configuration)\</OutDir>
+    <IntDir>obj\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <OutDir>lib\$(Configuration)\</OutDir>
+    <IntDir>obj\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PrecompiledHeaderFile />
+      <PrecompiledHeaderOutputFile />
+      <AdditionalIncludeDirectories>include;</AdditionalIncludeDirectories>
+      <OpenMPSupport>false</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PrecompiledHeaderFile />
+      <PrecompiledHeaderOutputFile />
+      <AdditionalIncludeDirectories>include;</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Base.h" />
+    <ClInclude Include="include\CompressedIntegerList.h" />
+    <ClInclude Include="include\DoubleMatrix.h" />
+    <ClInclude Include="include\DenseDatavector.h" />
+    <ClInclude Include="include\DoubleSubvectorCref.h" />
+    <ClInclude Include="include\DoubleVector.h" />
+    <ClInclude Include="include\IndexValue.h" />
+    <ClInclude Include="include\IntegerList.h" />
+    <ClInclude Include="include\IMatrix.h" />
+    <ClInclude Include="include\IVector.h" />
+    <ClInclude Include="include\IDataVector.h" />
+    <ClInclude Include="include\OnesDatavector.h" />
+    <ClInclude Include="include\operators.h" />
+    <ClInclude Include="include\segmented_vector.h" />
+    <ClInclude Include="include\SparseBinaryDatavector.h" />
+    <ClInclude Include="include\RowMatrix.h" />
+    <ClInclude Include="include\BiMatrix.h" />
+    <ClInclude Include="include\SparseDatavector.h" />
+    <ClInclude Include="include\types.h" />
+    <ClInclude Include="include\DatavectorBuilder.h" />
+    <ClInclude Include="include\ZeroDatavector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="tcc\segmented_vector.tcc" />
+    <None Include="tcc\RowMatrix.tcc" />
+    <None Include="tcc\BiMatrix.tcc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Base.cpp" />
+    <ClCompile Include="src\CompressedIntegerList.cpp" />
+    <ClCompile Include="src\DoubleMatrix.cpp" />
+    <ClCompile Include="src\DenseDatavector.cpp" />
+    <ClCompile Include="src\DoubleSubvectorCref.cpp" />
+    <ClCompile Include="src\DoubleVector.cpp" />
+    <ClCompile Include="src\IMatrix.cpp" />
+    <ClCompile Include="src\IndexValue.cpp" />
+    <ClCompile Include="src\IntegerList.cpp" />
+    <ClCompile Include="src\IDataVector.cpp" />
+    <ClCompile Include="src\IVector.cpp" />
+    <ClCompile Include="src\OnesDatavector.cpp" />
+    <ClCompile Include="src\segmented_vector.cpp" />
+    <ClCompile Include="src\SparseBinaryDatavector.cpp" />
+    <ClCompile Include="src\SparseDatavector.cpp" />
+    <ClCompile Include="src\DatavectorBuilder.cpp" />
+    <ClCompile Include="src\ZeroDatavector.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="README.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

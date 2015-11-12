@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="tcc">
+      <UniqueIdentifier>{d59d86ef-8228-4d8b-997f-849097d96dfd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\CommandLineParser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\JsonSerializer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\amalgamated_jsoncpp\json\json.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\files.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\random_engines.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BinaryClassificationEvaluator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\types.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shared_arguments.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="tcc\CommandLineParser.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\JsonSerializer.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\BinaryClassificationEvaluator.tcc">
+      <Filter>tcc</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CommandLineParser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JsonSerializer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\amalgamated_jsoncpp\jsoncpp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\files.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\random_engines.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BinaryClassificationEvaluator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

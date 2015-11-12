@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="tcc">
+      <UniqueIdentifier>{d59d86ef-8228-4d8b-997f-849097d96dfd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\CompressedIntegerList.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IntegerList.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Base.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\operators.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RowMatrix.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\types.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\segmented_vector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BiMatrix.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DenseDatavector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OnesDatavector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SparseBinaryDatavector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SparseDatavector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ZeroDatavector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatavectorBuilder.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DoubleVector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DoubleMatrix.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IMatrix.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IVector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IDataVector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DoubleSubvectorCref.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IndexValue.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="tcc\RowMatrix.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\segmented_vector.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\BiMatrix.tcc">
+      <Filter>tcc</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CompressedIntegerList.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Base.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntegerList.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\segmented_vector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OnesDatavector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SparseBinaryDatavector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SparseDatavector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ZeroDatavector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DatavectorBuilder.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DenseDatavector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DoubleVector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DoubleMatrix.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IMatrix.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IDataVector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IVector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DoubleSubvectorCref.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IndexValue.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="README.txt" />
+  </ItemGroup>
+</Project>
