@@ -15,7 +15,7 @@ namespace dataset
         // create a dataset
         RowDataset dataset;
 
-        // Load Row by Row
+        // Load row by row
         while (iter.IsValid())
         {
             dataset.PushBackRow(iter.GetValue());

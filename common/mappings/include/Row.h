@@ -27,11 +27,11 @@ namespace mappings
         ///
         virtual void apply(const double* input, double* output) const;
 
-        /// \returns The input dimension of the Row. Namely, the apply function assumes that the input array is at least this long
+        /// \returns The input dimension of the row. Namely, the apply function assumes that the input array is at least this long
         ///
         virtual int GetMinInputDim() const;
 
-        /// \returns The output dimension of the Row. Namely, the apply function assumes that the output array is at least this long
+        /// \returns The output dimension of the row. Namely, the apply function assumes that the output array is at least this long
         ///
         virtual int GetOutputDim() const;
 
@@ -39,11 +39,11 @@ namespace mappings
 
         const shared_ptr<Mapping> operator[] (int index) const;
 
-        /// Serializes the Row in json format
+        /// Serializes the row in json format
         ///
         virtual void Serialize(JsonSerializer& js) const;
 
-        /// Deserializes the Row in json format
+        /// Deserializes the row in json format
         ///
         virtual void Deserialize(JsonSerializer& js, int version = _current_version);
 

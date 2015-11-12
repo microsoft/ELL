@@ -27,7 +27,7 @@ namespace linear
 
         _up_vec->PushBack(index, value);
         
-        // Update vector_stats
+        // Update VectorStats
         if(value != 1)
         {
             _vector_stats.contains_nonbinary = true;
@@ -38,7 +38,7 @@ namespace linear
             _vector_stats.contains_non_shorts = true;
         }
 
-        ++_vector_stats.NumNonzeros;
+        ++_vector_stats.numNonzeros;
     }
 
     unique_ptr<IDataVector> DatavectorBuilder::GetVectorAndReset()
@@ -46,7 +46,7 @@ namespace linear
         unique_ptr<IDataVector> output_vec = nullptr;
         
         // sparse
-        if(_vector_stats.NumNonzeros * 3 < _up_vec->Size())
+        if(_vector_stats.numNonzeros * 3 < _up_vec->Size())
         {
             ++_builder_stats.num_sparse;
 
@@ -75,13 +75,13 @@ namespace linear
             ++_builder_stats.num_dense;
 
             // all zeros
-            if(_vector_stats.NumNonzeros == 0)
+            if(_vector_stats.numNonzeros == 0)
             {
                 output_vec = make_unique<ZeroDatavector>(*_up_vec);
             }
 
             // all ones
-            else if(_vector_stats.NumNonzeros == _up_vec->Size())
+            else if(_vector_stats.numNonzeros == _up_vec->Size())
             {
                 output_vec = make_unique<OnesDatavector>(*_up_vec);
             }
@@ -95,7 +95,7 @@ namespace linear
         
         // Reset
         _up_vec->Reset();
-        _vector_stats = vector_stats();
+        _vector_stats = VectorStats();
         
         // return
         return move(output_vec);

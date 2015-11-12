@@ -2,13 +2,13 @@
 
 #pragma once
 
+#include "types.h"
+
 #include <cstdint>
 #include <vector>
 
 namespace linear
 {
-    typedef uint64_t uint;
-
     /// A non-decreasing list of nonegative integers, with a forward ConstIterator.
     ///
     class IntegerList

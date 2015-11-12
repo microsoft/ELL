@@ -3,8 +3,8 @@
 #pragma once
 
 #include "Base.h"
-#include <vector>
 
+#include <vector>
 using std::vector;
 
 namespace linear

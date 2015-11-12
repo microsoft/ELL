@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
         //using mapped_svmlight_parsing_iterator = ParsingIterator<SequentialLineIterator, mapped_svmlight_parser>;
         //mapped_svmlight_parsing_iterator pi(sli, mp, col->GetOutputDim());
 
-        //// process Row by Row
+        //// process row by row
         //int counter = 0;
         //while (pi.IsValid())
         //{

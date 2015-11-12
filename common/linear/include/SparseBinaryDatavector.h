@@ -2,14 +2,13 @@
 
 #pragma once
 
+#include "types.h"
 #include "IDataVector.h"
 #include "IntegerList.h"
 #include "CompressedIntegerList.h"
 
 namespace linear
 {
-    typedef uint64_t uint;
-
     /// Implements a sparse binary vector as an increasing list of the coordinates where the value is 1.0
     ///
     template<typename IntegerListType>
@@ -50,14 +49,14 @@ namespace linear
         private:
 
             // define typename to improve readability
-            using index_iter_type = typename IntegerListType::ConstIterator;
+            using IndexIteratorType = typename IntegerListType::ConstIterator;
 
             // private ctor, can only be called from SparseBinaryDatavectorBase class
             ConstIterator(const typename IntegerListType::ConstIterator& list_iterator);
             friend SparseBinaryDatavectorBase<IntegerListType>;
 
             // members
-            index_iter_type _list_iterator;
+            IndexIteratorType _list_iterator;
         };
 
         /// Constructs an empty sparse binary vector
@@ -86,7 +85,7 @@ namespace linear
 
         /// Calls a callback function for each non-zero entry in the vector, in order of increasing index
         ///
-        //virtual    void foreach_nonzero(function<void(uint, double)> func, uint index_offset = 0) const override;
+        //virtual    void foreach_nonzero(function<void(uint, double)> func, uint index_offset = 0) const override; TODO
 
         /// \returns The largest index of a non-zero entry plus one
         ///

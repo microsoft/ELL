@@ -5,8 +5,6 @@
 #include "IDataVector.h"
 #include "IndexValue.h"
 
-//#include <functional>
-
 #include <vector>
 using std::vector;
 
@@ -53,15 +51,15 @@ namespace linear
         private:
 
             // define typenames to improve readability
-            using stl_iter_type = typename vector<ValueType>::const_iterator;
+            using StlIteratorType = typename vector<ValueType>::const_iterator;
 
             /// private ctor, can only be called from SparseDatavector class
-            ConstIterator(const stl_iter_type& begin, const stl_iter_type& end);
+            ConstIterator(const StlIteratorType& begin, const StlIteratorType& end);
             friend DenseDatavector<ValueType>;
 
             // members
-            stl_iter_type _begin;
-            stl_iter_type _end;
+            StlIteratorType _begin;
+            StlIteratorType _end;
             uint _index;
         };
 

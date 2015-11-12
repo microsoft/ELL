@@ -3,8 +3,8 @@
 #pragma once
 
 #include "Base.h"
-#include <vector>
 
+#include <vector>
 using std::vector;
 
 namespace linear
@@ -16,9 +16,9 @@ namespace linear
     {
     public:
         
-        /// The type of each Row
+        /// The type of each row
         ///
-        using row_type = typename RowMatrixType::row_type;
+        using RowType = typename RowMatrixType::RowType;
 
         /// Constructs a bioriented matrix
         ///
@@ -32,9 +32,9 @@ namespace linear
         ///
         BiMatrix(const BiMatrix<RowMatrixType>&) = delete;
 
-        /// \returns A reference to a Column
+        /// \returns A reference to a column
         ///
-        const row_type& GetColumn(uint index) const;
+        const RowType& GetColumn(uint index) const;
 
         /// Performs a general vector matrix product: y = alpha * x * M + beta * y
         ///

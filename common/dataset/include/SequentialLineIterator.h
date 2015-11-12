@@ -36,11 +36,11 @@ namespace dataset
         ///
         bool IsValid() const;
 
-        /// Proceeds to the Next Row
+        /// Proceeds to the Next row
         ///
         void Next();
 
-        /// \returns A const reference to the Row
+        /// \returns A const reference to the row
         ///
         const string& GetValue() const;
     };

@@ -25,7 +25,7 @@ namespace linear
 
     template<typename ValueType, typename IntegerListType>
     SparseDatavector<ValueType, IntegerListType>::ConstIterator::ConstIterator(
-        const index_iter_type& index_iterator,
+        const IndexIteratorType& index_iterator,
         const value_iter_type& value_iterator)
         : _index_iterator(index_iterator), _value_iterator(value_iterator)
     {}

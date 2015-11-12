@@ -2,9 +2,14 @@
 
 #pragma once
 
-#include <cstdint>
+#include "types.h"
+
 #include <vector>
+using std::vector;
+
 #include <iterator>
+using std::iterator;
+using std::forward_iterator_tag;
 
 namespace linear
 {
@@ -19,7 +24,7 @@ namespace linear
 
         /// A read-only forward iterator for the CompressedIntegerList.
         ///
-        class ConstIterator : std::iterator<std::forward_iterator_tag, uint>
+        class ConstIterator
         {
         public:
 
@@ -101,7 +106,7 @@ namespace linear
         ///@}
 
     private:
-        std::vector<uint8> _mem;
+        vector<uint8> _mem;
         uint _last;
         uint _size;
     };

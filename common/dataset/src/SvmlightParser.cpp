@@ -20,7 +20,7 @@ namespace dataset
     SvmlightParser::SvmlightParser(bool has_weight) : _has_weight(has_weight)
     {}
 
-    /// Parses a Row from svmlight formet
+    /// Parses a row from svmlight formet
     ///
     SupervisedExample SvmlightParser::Parse(const string& str) 
     {

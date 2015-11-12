@@ -66,6 +66,5 @@ namespace linear
 
     private:
         uint _dim = 0;
-
     };
 }

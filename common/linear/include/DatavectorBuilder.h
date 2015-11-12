@@ -17,14 +17,14 @@ namespace linear
     {
     public:
 
-        struct vector_stats
+        struct VectorStats
         {
             bool contains_nonbinary = false;
             bool contains_non_shorts = false;
-            uint NumNonzeros = 0;
+            uint numNonzeros = 0;
         };
 
-        struct builder_stats
+        struct BuilderStats
         {
             uint num_dense = 0;
             uint num_sparse = 0;
@@ -44,8 +44,8 @@ namespace linear
 
     private:
         unique_ptr<IDataVector> _up_vec;
-        vector_stats _vector_stats;
-        builder_stats _builder_stats;
+        VectorStats _vector_stats;
+        BuilderStats _builder_stats;
     };
 }
 

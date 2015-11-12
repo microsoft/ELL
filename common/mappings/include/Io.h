@@ -26,7 +26,7 @@ namespace mappings
         ///
         static shared_ptr<Mapping> read(istream& is);
 
-        /// reads a Column Mapping from a stream
+        /// reads a column Mapping from a stream
         /// num_layers = 0 keeps the entire Mapping
         /// num_layers = positive keeps only the specified number of layers, starting from the top
         /// num_layers = negative subtracts the specified number of layers, starting from the bottom

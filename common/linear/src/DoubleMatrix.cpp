@@ -18,7 +18,7 @@ namespace linear
         return _num_columns;
     }
 
-    void DoubleMatrixBase::set(uint i, uint j, double value)
+    void DoubleMatrixBase::Set(uint i, uint j, double value)
     {
         operator()(i,j) = value;
     }
@@ -160,8 +160,8 @@ namespace linear
         }
     }
 
-    DoubleMatrixBase::DoubleMatrixBase(uint size, uint NumRows, uint NumColumns)
-        : vector<double>(size), _num_rows(NumRows), _num_columns(NumColumns)
+    DoubleMatrixBase::DoubleMatrixBase(uint size, uint numRows, uint numColumns)
+        : vector<double>(size), _num_rows(numRows), _num_columns(numColumns)
     {}
 
     double DoubleMatrixBase::RowDot(uint i, const double* p_x) const
@@ -184,37 +184,37 @@ namespace linear
         return value;
     }
 
-    // MatrixStructure::Column
+    // MatrixStructure::column
 
-    DoubleMatrix<MatrixStructure::Column>::DoubleMatrix(uint NumRows, uint NumColumns) :
-        DoubleMatrixBase(NumRows*NumColumns, NumRows, NumColumns)
+    DoubleMatrix<MatrixStructure::column>::DoubleMatrix(uint numRows, uint numColumns) :
+        DoubleMatrixBase(numRows*numColumns, numRows, numColumns)
     {}
 
-    double& DoubleMatrix<MatrixStructure::Column>::operator()(uint i, uint j)
+    double& DoubleMatrix<MatrixStructure::column>::operator()(uint i, uint j)
     {
         assert(i < this->_num_rows && j < this->_num_columns);
         return this->operator[](j * this->_num_rows + i);
     }
 
-    double DoubleMatrix<MatrixStructure::Column>::operator()(uint i, uint j) const
+    double DoubleMatrix<MatrixStructure::column>::operator()(uint i, uint j) const
     {
         assert(i < this->_num_rows && j < this->_num_columns);
         return this->operator[](j * this->_num_rows + i);
     }
 
-    // MatrixStructure::Row
+    // MatrixStructure::row
 
-    DoubleMatrix<MatrixStructure::Row>::DoubleMatrix(uint NumRows, uint NumColumns) :
-        DoubleMatrixBase(NumRows*NumColumns, NumRows, NumColumns)
+    DoubleMatrix<MatrixStructure::row>::DoubleMatrix(uint numRows, uint numColumns) :
+        DoubleMatrixBase(numRows*numColumns, numRows, numColumns)
     {}
 
-    double& DoubleMatrix<MatrixStructure::Row>::operator()(uint i, uint j)
+    double& DoubleMatrix<MatrixStructure::row>::operator()(uint i, uint j)
     {
         assert(i < this->_num_rows && j < this->_num_columns);
         return this->operator[](i * this->_num_columns + j);
     }
 
-    double DoubleMatrix<MatrixStructure::Row>::operator()(uint i, uint j) const
+    double DoubleMatrix<MatrixStructure::row>::operator()(uint i, uint j) const
     {
         assert(i < this->_num_rows && j < this->_num_columns);
         return this->operator[](i * this->_num_columns + j);
@@ -223,13 +223,13 @@ namespace linear
     // MatrixStructure::column_square
 
     DoubleMatrix<MatrixStructure::column_square>::DoubleMatrix(uint dimension) :
-        DoubleMatrix<MatrixStructure::Column>(dimension, dimension)
+        DoubleMatrix<MatrixStructure::column>(dimension, dimension)
     {}
 
     // MatrixStructure::row_square
 
     DoubleMatrix<MatrixStructure::row_square>::DoubleMatrix(uint dimension) :
-        DoubleMatrix<MatrixStructure::Row>(dimension, dimension)
+        DoubleMatrix<MatrixStructure::row>(dimension, dimension)
     {}
 
     // MatrixStructure::row_square_uptriangular
@@ -238,14 +238,14 @@ namespace linear
         DoubleMatrixBase(dimension*(dimension + 1) / 2, dimension, dimension)
     {}
 
-    void DoubleMatrix<MatrixStructure::row_square_uptriangular>::set(uint i, uint j, double value)
+    void DoubleMatrix<MatrixStructure::row_square_uptriangular>::Set(uint i, uint j, double value)
     {
         if(i > j)
         {
             throw runtime_error("Cannot set element in the lower triangle of an upper triangular matrix");
         }
 
-        DoubleMatrixBase::set(i, j, value);
+        DoubleMatrixBase::Set(i, j, value);
     }
 
     double& DoubleMatrix<MatrixStructure::row_square_uptriangular>::operator()(uint i, uint j)
@@ -281,14 +281,14 @@ namespace linear
         DoubleMatrixBase(dimension, dimension, dimension)
     {}
 
-    void DoubleMatrix<MatrixStructure::diagonal>::set(uint i, uint j, double value)
+    void DoubleMatrix<MatrixStructure::diagonal>::Set(uint i, uint j, double value)
     {
         if(i != j)
         {
             throw runtime_error("Cannot set off-diagonal elements of a diagonal matrix");
         }
 
-        DoubleMatrixBase::set(i, j, value);
+        DoubleMatrixBase::Set(i, j, value);
     }
 
     double& DoubleMatrix<MatrixStructure::diagonal>::operator()(uint i, uint j)

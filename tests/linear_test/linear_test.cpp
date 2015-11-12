@@ -41,20 +41,20 @@ void fill_matrix_binary_random(MatrixType& M, int rows, int cols, bool lower_tri
         {
             for(int j = 0; j < cols && j < i; ++j)
             {
-                M.set(i, j, dist(rng));
+                M.Set(i, j, dist(rng));
             }
         }
 
         if(i < cols)
         {
-            M.set(i, i, dist(rng));
+            M.Set(i, i, dist(rng));
         }
 
         if(upper_triangle)
         {
             for(int j = i+1; j < cols; ++j)
             {
-                M.set(i, j, dist(rng));
+                M.Set(i, j, dist(rng));
             }
         }
     }
@@ -63,17 +63,17 @@ void fill_matrix_binary_random(MatrixType& M, int rows, int cols, bool lower_tri
 template <typename MatrixType>
 void fill_matrix_binary_random2(MatrixType& M, int rows, int cols)
 {
-    using row_type = typename MatrixType::row_type;
+    using RowType = typename MatrixType::RowType;
     uniform_int_distribution<int> dist(0, 1);
     default_random_engine rng(1234);
     for (int i = 0; i < rows; ++i)
     {
-        row_type Row;
+        RowType row;
         for (int j = 0; j < cols; ++j)
         {
-            Row.PushBack(j, dist(rng));
+            row.PushBack(j, dist(rng));
         }
-        M.PushBackRow(move(Row));
+        M.PushBackRow(move(row));
     }
 }
 
@@ -204,25 +204,25 @@ int main(int argc, char* argv[])
         vector_test1(*v12, x);
 
         // matrix tests
-        DoubleMatrix<MatrixStructure::Column> M1(8, 9);
+        DoubleMatrix<MatrixStructure::column> M1(8, 9);
         fill_matrix_binary_random(M1, 8, 9, true, true);
-        matrix_test1(M1, x, y, true, "Column");
+        matrix_test1(M1, x, y, true, "column");
 
-        DoubleMatrix<MatrixStructure::Row> M4(8, 9);
+        DoubleMatrix<MatrixStructure::row> M4(8, 9);
         fill_matrix_binary_random(M4, 8, 9, true, true);
-        matrix_test1(M4, x, y, true, "Row");
+        matrix_test1(M4, x, y, true, "row");
 
         DoubleMatrix<MatrixStructure::column_square> M2(9);
         fill_matrix_binary_random(M2, 8, 9, true, true);
-        matrix_test1(M2, x, y, true, "Column square");
+        matrix_test1(M2, x, y, true, "column square");
 
         DoubleMatrix<MatrixStructure::row_square> M5(9);
         fill_matrix_binary_random(M5, 8, 9, true, true);
-        matrix_test1(M5, x, y, true, "Row square");
+        matrix_test1(M5, x, y, true, "row square");
 
         DoubleMatrix<MatrixStructure::row_square_uptriangular> M6(9);
         fill_matrix_binary_random(M6, 8, 9, false, true);
-        matrix_test1(M6, x, y, true, "Row square upper triangular");
+        matrix_test1(M6, x, y, true, "row square upper triangular");
 
         DoubleMatrix<MatrixStructure::diagonal> M7(9);
         fill_matrix_binary_random(M7, 8, 9, false, false);

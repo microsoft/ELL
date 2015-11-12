@@ -48,18 +48,18 @@ namespace linear
             /// 
             uint NumIteratesLeft() const;
 
-            /// Proceeds to the Next Row
+            /// Proceeds to the Next row
             ///
             void Next();
 
-            /// \returns A const reference to the Row
+            /// \returns A const reference to the row
             ///
             const DatavectorType& GetValue() const;
 
         private:
 
             /// private ctor, can only be called from RowMatrix class
-            ConstIterator(const RowMatrix& table, uint Row, uint max_row);
+            ConstIterator(const RowMatrix& table, uint row, uint max_row);
             friend RowMatrix<DatavectorType>;
 
             // members
@@ -68,9 +68,9 @@ namespace linear
             uint _max_row;
         };
 
-        /// The type of each Row
+        /// The type of each row
         ///
-        using row_type = DatavectorType;
+        using RowType = DatavectorType;
 
         /// Default ctor
         ///
@@ -92,19 +92,19 @@ namespace linear
         ///
         virtual uint NumColumns() const override;
 
-        /// \returns A reference to a Row
+        /// \returns A reference to a row
         ///
-        const row_type& GetRow(uint index) const;
+        const RowType& GetRow(uint index) const;
 
         /// \returns an iterator that traverses the rows
         ///
-        ConstIterator GetIterator(uint Row = 0, uint size = 0) const;
+        ConstIterator GetIterator(uint row = 0, uint size = 0) const;
         
-        /// Moves a Row into the bottom of the matrix 
+        /// Moves a row into the bottom of the matrix 
         ///
-        void PushBackRow(DatavectorType&& Row);
+        void PushBackRow(DatavectorType&& row);
 
-        /// Constructs a new Row at the bottom of the matrix with given constructor arguments
+        /// Constructs a new row at the bottom of the matrix with given constructor arguments
         ///
         template<typename... Args >
         void EmplaceBackRow(Args&&... args);
@@ -113,7 +113,7 @@ namespace linear
         ///
         void RandPerm(default_random_engine& rng);
 
-        /// Permutes the matrix so that the first NumRows of the matrix are uniform, and the rest of the rows are arbitrary
+        /// Permutes the matrix so that the first numRows of the matrix are uniform, and the rest of the rows are arbitrary
         /// 
         void RandPerm(default_random_engine& rng, uint count);
 

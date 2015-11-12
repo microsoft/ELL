@@ -34,7 +34,7 @@ namespace mappings
         auto col = dynamic_pointer_cast<Column>(map);
         if (col == nullptr)
         {
-            throw runtime_error("stream does not contain a Column Mapping");
+            throw runtime_error("stream does not contain a column Mapping");
         }
         col->KeepLayers(num_layers);
         return col;

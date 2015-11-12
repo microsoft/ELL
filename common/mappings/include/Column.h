@@ -25,31 +25,31 @@ namespace mappings
         ///
         virtual void apply(const double* input, double* output) const;
         
-        /// \returns The input dimension of the Column. Namely, the apply function assumes that the input array is at least this long
+        /// \returns The input dimension of the column. Namely, the apply function assumes that the input array is at least this long
         ///
         virtual int GetMinInputDim() const;
 
-        /// \returns The output dimension of the Column. Namely, the apply function assumes that the output array is at least this long
+        /// \returns The output dimension of the column. Namely, the apply function assumes that the output array is at least this long
         ///
         virtual int GetOutputDim() const;
 
-        /// Adds a Mapping to the bottom of the Column
+        /// Adds a Mapping to the bottom of the column
         ///
         void PushBack(shared_ptr<Mapping> m);
 
-        /// \returns A reference to one of the mappings in the Column
+        /// \returns A reference to one of the mappings in the column
         ///
         shared_ptr<Mapping> operator[] (int index);
 
-        /// \returns A reference to one of the mappings in the Column
+        /// \returns A reference to one of the mappings in the column
         ///
         const shared_ptr<Mapping> operator[] (int index) const;
 
-        /// Serializes the Column in json format
+        /// Serializes the column in json format
         ///
         virtual void Serialize(JsonSerializer& js) const;
 
-        /// Deserializes the Column in json format
+        /// Deserializes the column in json format
         ///
         virtual void Deserialize(JsonSerializer& js, int version = _current_version);
 

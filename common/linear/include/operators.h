@@ -5,13 +5,13 @@
 #include "IMatrix.h"
 #include "SparseBinaryDatavector.h"
 #include "IntegerList.h"
-#include <functional>
-#include <memory>
-#include <vector>
 
+#include <memory>
 using std::shared_ptr;
+
+#include <vector>
 using std::vector;
-using std::function;
+
 
 namespace linear
 {

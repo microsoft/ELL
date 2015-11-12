@@ -30,7 +30,7 @@ namespace linear
     }
 
     template<typename ValueType>
-    DenseDatavector<ValueType>::ConstIterator::ConstIterator(const stl_iter_type& begin, const stl_iter_type& end) : _begin(begin), _end(end)
+    DenseDatavector<ValueType>::ConstIterator::ConstIterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end)
     {}
 
     template<typename ValueType>

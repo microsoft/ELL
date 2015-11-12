@@ -37,7 +37,7 @@ namespace dataset
         ///
         SvmlightParser(bool has_weight=false);
 
-        /// Parses a Row from svmlight formet
+        /// Parses a row from svmlight formet
         ///
         SupervisedExample Parse(const string& str);
 

@@ -30,7 +30,7 @@ namespace linear
     }
 
     template<typename IntegerListType>
-    SparseBinaryDatavectorBase<IntegerListType>::ConstIterator::ConstIterator(const index_iter_type& list_iterator)
+    SparseBinaryDatavectorBase<IntegerListType>::ConstIterator::ConstIterator(const IndexIteratorType& list_iterator)
         : _list_iterator(list_iterator)
     {}
 
