@@ -70,7 +70,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\common\utilities\lib\$(Configuration);..\..\common\mappings\lib\$(Configuration);..\..\common\dataset\lib\$(Configuration);..\..\common\linear\lib\$(Configuration);..\..\common\loss_functions\lib\$(Configuration);..\..\common\convex_optimization\lib\$(Configuration);..\..\common\predictors\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\common\utilities\lib\$(Configuration);..\..\common\mappings\lib\$(Configuration);..\..\common\dataset\lib\$(Configuration);..\..\common\linear\lib\$(Configuration);..\..\common\loss_functions\lib\$(Configuration);..\..\common\optimization\lib\$(Configuration);..\..\common\predictors\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>utilities.lib;mappings.lib;dataset.lib;linear.lib;loss_functions.lib;convex_optimization.lib;predictors.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -93,7 +93,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\common\utilities\lib\$(Configuration);..\..\common\mappings\lib\$(Configuration);..\..\common\dataset\lib\$(Configuration);..\..\common\linear\lib\$(Configuration);..\..\common\loss_functions\lib\$(Configuration);..\..\common\convex_optimization\lib\$(Configuration);..\..\common\predictors\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\common\utilities\lib\$(Configuration);..\..\common\mappings\lib\$(Configuration);..\..\common\dataset\lib\$(Configuration);..\..\common\linear\lib\$(Configuration);..\..\common\loss_functions\lib\$(Configuration);..\..\common\optimization\lib\$(Configuration);..\..\common\predictors\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>utilities.lib;mappings.lib;dataset.lib;linear.lib;loss_functions.lib;convex_optimization.lib;predictors.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
