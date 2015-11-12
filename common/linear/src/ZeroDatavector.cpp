@@ -26,7 +26,7 @@ namespace linear
     void ZeroDatavector::Reset()
     {}
 
-    //void ZeroDatavector::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const
+    //void ZeroDatavector::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const // TODO
     //{}
 
     uint ZeroDatavector::Size() const

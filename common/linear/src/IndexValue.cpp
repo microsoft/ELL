@@ -18,6 +18,4 @@ namespace linear
     {
         return _value;
     }
-
-
 }

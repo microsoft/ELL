@@ -36,7 +36,7 @@ namespace linear
         _dim = 0;
     }
 
-    //void OnesDatavector::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const
+    //void OnesDatavector::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const // TODO
     //{
     //    for(uint i=0; i<_dim; ++i)
     //    {

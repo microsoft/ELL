@@ -75,7 +75,7 @@ namespace linear
     }
 
     //template<typename ValueType>
-    //void DenseDatavector<ValueType>::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const
+    //void DenseDatavector<ValueType>::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const // TODO
     //{
     //    for(uint i=0; i<Size(); ++i)
     //    {

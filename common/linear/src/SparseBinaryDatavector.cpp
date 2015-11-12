@@ -75,7 +75,7 @@ namespace linear
     }
 
     //template<typename IntegerListType>
-    //void SparseBinaryDatavectorBase<IntegerListType>::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const
+    //void SparseBinaryDatavectorBase<IntegerListType>::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const // TODO
     //{
     //    auto iter = _indices.GetConstIterator();
     //    while(iter.IsValid())

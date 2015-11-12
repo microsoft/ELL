@@ -47,15 +47,15 @@ namespace linear
             
             // define typenames to improve readability
             using IndexIteratorType = typename IntegerListType::ConstIterator;
-            using value_iter_type = typename vector<ValueType>::const_iterator;
+            using ValueIteratorType = typename vector<ValueType>::const_iterator;
 
             /// private ctor, can only be called from SparseDatavector class
-            ConstIterator(const IndexIteratorType& list_iterator, const value_iter_type& value_iterator);
+            ConstIterator(const IndexIteratorType& list_iterator, const ValueIteratorType& value_iterator);
             friend SparseDatavector<ValueType, IntegerListType>;
 
             // members
             IndexIteratorType _index_iterator;
-            value_iter_type _value_iterator;
+            ValueIteratorType _value_iterator;
         };
 
         /// Constructs an empty sparse binary vector

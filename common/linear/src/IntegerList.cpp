@@ -62,5 +62,4 @@ namespace linear
     {
         return ConstIterator(_list.cbegin(), _list.cend());
     }
-
 }
