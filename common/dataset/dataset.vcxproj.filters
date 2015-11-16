@@ -27,6 +27,18 @@
     <ClInclude Include="include\Loader.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="src\SparseVectorParsingIterator.cpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SparseVectorParsingIterator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IndexValue.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SupervisedExampleBuilder.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\SvmlightParser.cpp">
@@ -38,6 +50,9 @@
     <ClCompile Include="src\SequentialLineIterator.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\IndexValue.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\SequentialLineIterator.tcc">
@@ -47,6 +62,9 @@
       <Filter>tcc</Filter>
     </None>
     <None Include="tcc\Loader.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\SupervisedExampleBuilder.tcc">
       <Filter>tcc</Filter>
     </None>
   </ItemGroup>

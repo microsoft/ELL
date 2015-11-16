@@ -81,13 +81,18 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\IndexValue.h" />
     <ClInclude Include="include\Loader.h" />
     <ClInclude Include="include\ParsingIterator.h" />
     <ClInclude Include="include\SequentialLineIterator.h" />
+    <ClInclude Include="include\SparseVectorParsingIterator.h" />
     <ClInclude Include="include\SupervisedExample.h" />
+    <ClInclude Include="include\SupervisedExampleBuilder.h" />
     <ClInclude Include="include\SvmlightParser.h" />
+    <ClInclude Include="src\SparseVectorParsingIterator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\IndexValue.cpp" />
     <ClCompile Include="src\SequentialLineIterator.cpp" />
     <ClCompile Include="src\SupervisedExample.cpp" />
     <ClCompile Include="src\SvmlightParser.cpp" />
@@ -96,6 +101,7 @@
     <None Include="tcc\Loader.tcc" />
     <None Include="tcc\ParsingIterator.tcc" />
     <None Include="tcc\SequentialLineIterator.tcc" />
+    <None Include="tcc\SupervisedExampleBuilder.tcc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
