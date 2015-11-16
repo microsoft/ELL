@@ -1,23 +1,23 @@
-// DatavectorBuilder.cpp
+// DataVectorBuilder.cpp
 
-#include "DatavectorBuilder.h"
-#include "DenseDatavector.h"
-#include "SparseDatavector.h"
-#include "SparseBinaryDatavector.h"
-#include "ZeroDatavector.h"
-#include "OnesDatavector.h"
+#include "DataVectorBuilder.h"
+#include "DenseDataVector.h"
+#include "SparseDataVector.h"
+#include "SparseBinaryDataVector.h"
+#include "ZeroDataVector.h"
+#include "OnesDataVector.h"
 
 using std::move;
 using std::make_unique;
 
 namespace linear
 {
-    DatavectorBuilder::DatavectorBuilder() 
+    DataVectorBuilder::DataVectorBuilder() 
     {
-        _up_vec = make_unique<SparseFloatDatavector>();
+        _up_vec = make_unique<SparseFloatDataVector>();
     }
 
-    void DatavectorBuilder::PushBack(uint index, double value)
+    void DataVectorBuilder::PushBack(uint index, double value)
     {
 
         if(value == 0)
@@ -41,7 +41,7 @@ namespace linear
         ++_vector_stats.numNonzeros;
     }
 
-    unique_ptr<IDataVector> DatavectorBuilder::GetVectorAndReset()
+    unique_ptr<IDataVector> DataVectorBuilder::GetVectorAndReset()
     {
         unique_ptr<IDataVector> output_vec = nullptr;
         
@@ -53,19 +53,19 @@ namespace linear
             // binary
             if(!_vector_stats.contains_nonbinary)
             {
-                output_vec = make_unique<SparseBinaryDatavector>(*_up_vec);
+                output_vec = make_unique<SparseBinaryDataVector>(*_up_vec);
             }
 
             // short sparse
             else if(!_vector_stats.contains_non_shorts)
             {
-                output_vec = make_unique<SparseShortDatavector>(*_up_vec);
+                output_vec = make_unique<SparseShortDataVector>(*_up_vec);
             }
 
             // other sparse
             else
             {
-                output_vec = make_unique<SparseFloatDatavector>(*_up_vec);
+                output_vec = make_unique<SparseFloatDataVector>(*_up_vec);
             }
         }
 
@@ -77,19 +77,19 @@ namespace linear
             // all zeros
             if(_vector_stats.numNonzeros == 0)
             {
-                output_vec = make_unique<ZeroDatavector>(*_up_vec);
+                output_vec = make_unique<ZeroDataVector>(*_up_vec);
             }
 
             // all ones
             else if(_vector_stats.numNonzeros == _up_vec->Size())
             {
-                output_vec = make_unique<OnesDatavector>(*_up_vec);
+                output_vec = make_unique<OnesDataVector>(*_up_vec);
             }
 
             // other dense
             else
             {
-                output_vec = make_unique<FloatDatavector>(*_up_vec);
+                output_vec = make_unique<FloatDataVector>(*_up_vec);
             }
         }
         

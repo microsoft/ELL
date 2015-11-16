@@ -4,7 +4,7 @@
 
 namespace dataset
 {
-    template<typename DefaultDataVectorType>  // fix Datavector -> DataVector
+    template<typename DefaultDataVectorType> 
     class SupervisedExampleBuilder
     {
     public:

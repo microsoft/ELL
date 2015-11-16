@@ -2,8 +2,8 @@
 
 namespace predictors
 {
-    template<typename DatavectorType>
-    double SharedLinearBinaryPredictor::Predict(const DatavectorType& example) const
+    template<typename DataVectorType>
+    double SharedLinearBinaryPredictor::Predict(const DataVectorType& example) const
     {
         return example.Dot(_sp_predictor->w) + _sp_predictor->b;
     }

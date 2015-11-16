@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="include">
@@ -35,22 +35,19 @@
     <ClInclude Include="include\BiMatrix.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\DenseDatavector.h">
+    <ClInclude Include="include\OnesDataVector.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OnesDatavector.h">
+    <ClInclude Include="include\SparseBinaryDataVector.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\SparseBinaryDatavector.h">
+    <ClInclude Include="include\SparseDataVector.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\SparseDatavector.h">
+    <ClInclude Include="include\ZeroDataVector.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\ZeroDatavector.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DatavectorBuilder.h">
+    <ClInclude Include="include\DataVectorBuilder.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\DoubleVector.h">
@@ -77,6 +74,9 @@
     <ClInclude Include="include\SegmentedVector.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\DenseDataVector.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\RowMatrix.tcc">
@@ -99,22 +99,22 @@
     <ClCompile Include="src\IntegerList.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\OnesDatavector.cpp">
+    <ClCompile Include="src\OnesDataVector.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SparseBinaryDatavector.cpp">
+    <ClCompile Include="src\SparseBinaryDataVector.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SparseDatavector.cpp">
+    <ClCompile Include="src\SparseDataVector.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\ZeroDatavector.cpp">
+    <ClCompile Include="src\ZeroDataVector.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\DatavectorBuilder.cpp">
+    <ClCompile Include="src\DataVectorBuilder.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\DenseDatavector.cpp">
+    <ClCompile Include="src\DenseDataVector.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\DoubleVector.cpp">

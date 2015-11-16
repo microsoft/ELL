@@ -18,7 +18,7 @@ namespace linear
 {
     /// Base class for RowMatrix
     ///
-    template<typename DatavectorType>
+    template<typename DataVectorType>
     class RowMatrix : public IMatrix
     {
     public:
@@ -54,13 +54,13 @@ namespace linear
 
             /// \returns A const reference to the row
             ///
-            const DatavectorType& GetValue() const;
+            const DataVectorType& GetValue() const;
 
         private:
 
             /// private ctor, can only be called from RowMatrix class
             Iterator(const RowMatrix& table, uint row, uint max_row);
-            friend RowMatrix<DatavectorType>;
+            friend RowMatrix<DataVectorType>;
 
             // members
             const RowMatrix& _table;
@@ -70,7 +70,7 @@ namespace linear
 
         /// The type of each row
         ///
-        using RowType = DatavectorType;
+        using RowType = DataVectorType;
 
         /// Default ctor
         ///
@@ -78,11 +78,11 @@ namespace linear
 
         /// Default move constructor
         ///
-        RowMatrix(RowMatrix<DatavectorType>&& other) = default;
+        RowMatrix(RowMatrix<DataVectorType>&& other) = default;
 
         /// Deleted copy constructor
         ///
-        RowMatrix(const RowMatrix<DatavectorType>& other) = delete;
+        RowMatrix(const RowMatrix<DataVectorType>& other) = delete;
 
         /// \returns The number of rows in the matrix
         ///
@@ -102,7 +102,7 @@ namespace linear
         
         /// Moves a row into the bottom of the matrix 
         ///
-        void PushBackRow(DatavectorType&& row);
+        void PushBackRow(DataVectorType&& row);
 
         /// Constructs a new row at the bottom of the matrix with given constructor arguments
         ///
@@ -130,7 +130,7 @@ namespace linear
         virtual void Print(ostream& os) const override;
 
     private:
-        std::vector<DatavectorType> _rows;
+        std::vector<DataVectorType> _rows;
         uint _num_columns = 0;
     };
 }

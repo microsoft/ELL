@@ -3,7 +3,7 @@
 //#pragma once
 //
 //#include "IDataVector.h"
-//#include "DenseDatavector.h"
+//#include "DenseDataVector.h"
 //
 //// stl
 //#include <vector>
@@ -15,7 +15,7 @@
 //{
 //    /// Base class for segmented vectors
 //    ///
-//    template<typename SegmentType = DenseDatavector>
+//    template<typename SegmentType = DenseDataVector>
 //    class segmented_vector_base : public IDataVector
 //    {
 //    public:
@@ -60,7 +60,7 @@
 //
 //    /// A segmented vector is a vector that is internally broken up stored in segments. At construction time, the Size of each segment is decided, and the dimension of the segmented vector is a multiple of the segment_size
 //    ///
-//    template<typename SegmentType = DenseDatavector>
+//    template<typename SegmentType = DenseDataVector>
 //    class segmented_vector : public segmented_vector_base<SegmentType>
 //    {
 //    public:

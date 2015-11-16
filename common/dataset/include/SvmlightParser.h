@@ -4,8 +4,8 @@
 
 #include "SupervisedExample.h"
 
-#include "DatavectorBuilder.h"
-using linear::DatavectorBuilder;
+#include "DataVectorBuilder.h"
+using linear::DataVectorBuilder;
 
 #include <string>
 using std::string;
@@ -47,7 +47,7 @@ namespace dataset
     
     private:
         bool _has_weight;
-        DatavectorBuilder _builder;
+        DataVectorBuilder _builder;
     };
 }
 

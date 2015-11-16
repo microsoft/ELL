@@ -3,7 +3,7 @@
 #pragma once
 
 #include "IMatrix.h"
-#include "SparseBinaryDatavector.h"
+#include "SparseBinaryDataVector.h"
 #include "IntegerList.h"
 
 #include <memory>

@@ -85,11 +85,11 @@
     <ClInclude Include="include\Loader.h" />
     <ClInclude Include="include\ParsingIterator.h" />
     <ClInclude Include="include\SequentialLineIterator.h" />
-    <ClInclude Include="include\SparseVectorParsingIterator.h" />
+    <ClInclude Include="include\SparseEntryParsingIterator.h" />
     <ClInclude Include="include\SupervisedExample.h" />
     <ClInclude Include="include\SupervisedExampleBuilder.h" />
     <ClInclude Include="include\SvmlightParser.h" />
-    <ClInclude Include="src\SparseVectorParsingIterator.cpp" />
+    <ClInclude Include="src\SparseEntryParsingIterator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\IndexValue.cpp" />

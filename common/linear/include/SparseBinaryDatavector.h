@@ -1,4 +1,4 @@
-// SparseBinaryDatavector.h
+// SparseBinaryDataVector.h
 
 #pragma once
 
@@ -12,7 +12,7 @@ namespace linear
     /// Implements a sparse binary vector as an increasing list of the coordinates where the value is 1.0
     ///
     template<typename IntegerListType>
-    class SparseBinaryDatavectorBase : public IDataVector
+    class SparseBinaryDataVectorBase : public IDataVector
     {
     public:
 
@@ -51,9 +51,9 @@ namespace linear
             // define typename to improve readability
             using IndexIteratorType = typename IntegerListType::Iterator;
 
-            // private ctor, can only be called from SparseBinaryDatavectorBase class
+            // private ctor, can only be called from SparseBinaryDataVectorBase class
             Iterator(const typename IntegerListType::Iterator& list_iterator);
-            friend SparseBinaryDatavectorBase<IntegerListType>;
+            friend SparseBinaryDataVectorBase<IntegerListType>;
 
             // members
             IndexIteratorType _list_iterator;
@@ -61,19 +61,19 @@ namespace linear
 
         /// Constructs an empty sparse binary vector
         ///
-        SparseBinaryDatavectorBase();
+        SparseBinaryDataVectorBase();
 
         /// Converting constructor
         ///
-        explicit SparseBinaryDatavectorBase(const IDataVector& other);
+        explicit SparseBinaryDataVectorBase(const IDataVector& other);
 
         /// Move constructor
         ///
-        SparseBinaryDatavectorBase(SparseBinaryDatavectorBase<IntegerListType>&& other) = default;
+        SparseBinaryDataVectorBase(SparseBinaryDataVectorBase<IntegerListType>&& other) = default;
 
         /// Deleted copy constructor
         ///
-        SparseBinaryDatavectorBase(const SparseBinaryDatavectorBase<IntegerListType>& other) = delete;
+        SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = delete;
 
         /// Sets the element at the given index to 1.0. Calls to this function must have a monotonically increasing argument. 
         /// The value argument must equal 1.0
@@ -119,20 +119,20 @@ namespace linear
         IntegerListType _indices;
     };
 
-    class  SparseBinaryDatavector : public SparseBinaryDatavectorBase<CompressedIntegerList>
+    class  SparseBinaryDataVector : public SparseBinaryDataVectorBase<CompressedIntegerList>
     {
     public:
-        using SparseBinaryDatavectorBase<CompressedIntegerList>::SparseBinaryDatavectorBase;
+        using SparseBinaryDataVectorBase<CompressedIntegerList>::SparseBinaryDataVectorBase;
 
         /// \returns The type of the vector
         ///
         virtual type GetType() const override;
     };
 
-    class UncompressedSparseBinaryVector : public SparseBinaryDatavectorBase<IntegerList>
+    class UncompressedSparseBinaryVector : public SparseBinaryDataVectorBase<IntegerList>
     {
     public:
-        using SparseBinaryDatavectorBase<IntegerList>::SparseBinaryDatavectorBase;
+        using SparseBinaryDataVectorBase<IntegerList>::SparseBinaryDataVectorBase;
 
         /// \returns The type of the vector
         ///

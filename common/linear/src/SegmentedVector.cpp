@@ -1,7 +1,7 @@
 //// segmented_vector.cpp
 //
 //#include "segmented_vector.h"
-//#include "ZeroDatavector.h"
+//#include "ZeroDataVector.h"
 //
 //using std::move;
 //using std::make_unique;
@@ -34,10 +34,10 @@
 //        // perhaps recycle a dense vector
 //        auto recycled_dense_vector = _segments[last_segment].auto_type();
 //
-//        // pad with ZeroDatavector segments as needed
+//        // pad with ZeroDataVector segments as needed
 //        for(; last_segment<segment_index-1; ++last_segment)
 //        {
-//            _segments.emplace_back(make_unique<ZeroDatavector>(SEGMENT_SIZE));
+//            _segments.emplace_back(make_unique<ZeroDataVector>(SEGMENT_SIZE));
 //        }
 //
 //        // Add the a dense segment at the end
@@ -48,7 +48,7 @@
 //    }
 //
 //
-//    unique_ptr<FloatDatavector> segmented_vector<auto_vector>::auto_type()
+//    unique_ptr<FloatDataVector> segmented_vector<auto_vector>::auto_type()
 //    {
 //        return _segments[_segments.Size()-1].auto_type();
 //    }

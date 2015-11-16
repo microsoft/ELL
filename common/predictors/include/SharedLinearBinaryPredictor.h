@@ -37,8 +37,8 @@ namespace predictors
 
         /// \returns the output of the predictor for a given example
         ///
-        template<typename DatavectorType>
-        double Predict(const DatavectorType& example) const;
+        template<typename DataVectorType>
+        double Predict(const DataVectorType& example) const;
 
     private:
         struct BiasedVector

@@ -1,4 +1,4 @@
-// SparseVectorParsingIterator.h
+// SparseEntryParsingIterator.h
 
 #pragma once
 
@@ -15,15 +15,19 @@ using std::stringstream;
 
 namespace dataset
 {
-
-    class SparseVectorParsingIterator
+    /// Parses and iterates over a stringstream of index-value pairs
+    ///
+    class SparseEntryParsingIterator
     {
     public:
-        SparseVectorParsingIterator(stringstream&& sstream);
+
+        /// Constructs an interator by wrapping a stringstream
+        ///
+        SparseEntryParsingIterator(stringstream&& sstream);
 
         /// Default move ctor
         ///
-        SparseVectorParsingIterator(SparseVectorParsingIterator&&) = default;
+        SparseEntryParsingIterator(SparseEntryParsingIterator&&) = default;
 
         /// \returns True if the iterator is currently pointing to a valid iterate
         ///

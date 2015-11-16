@@ -1,6 +1,6 @@
-// SparseVectorParsingIterator.cpp
+// SparseEntryParsingIterator.cpp
 
-#include "SparseVectorParsingIterator.h"
+#include "SparseEntryParsingIterator.h"
 
 #include <memory>
 using std::move;
@@ -10,17 +10,17 @@ using std::runtime_error;
 
 namespace dataset
 {
-    SparseVectorParsingIterator::SparseVectorParsingIterator(stringstream&& sstream) : _sstream(move(sstream)), _currentIndexValue(0,0)
+    SparseEntryParsingIterator::SparseEntryParsingIterator(stringstream&& sstream) : _sstream(move(sstream)), _currentIndexValue(0,0)
     {
         Next();   
     }
 
-    bool SparseVectorParsingIterator::IsValid() const
+    bool SparseEntryParsingIterator::IsValid() const
     {
         return !_sstream.fail();
     }
 
-    void SparseVectorParsingIterator::Next()
+    void SparseEntryParsingIterator::Next()
     {
         uint index;
         _sstream >> index;
@@ -39,7 +39,7 @@ namespace dataset
         _currentIndexValue = IndexValue(index, value);
     }
 
-    IndexValue SparseVectorParsingIterator::GetValue() const
+    IndexValue SparseEntryParsingIterator::GetValue() const
     {
         return _currentIndexValue;
     }

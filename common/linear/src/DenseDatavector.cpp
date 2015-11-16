@@ -1,19 +1,19 @@
-// DenseDatavector.cpp
+// DenseDataVector.cpp
 
-#include "DenseDatavector.h"
+#include "DenseDataVector.h"
 
 #include <cassert>
 
 namespace linear
 {
     template<typename ValueType>
-    bool DenseDatavector<ValueType>::Iterator::IsValid() const
+    bool DenseDataVector<ValueType>::Iterator::IsValid() const
     {
         return (_begin == _end);
     }
 
     template<typename ValueType>
-    void DenseDatavector<ValueType>::Iterator::Next()
+    void DenseDataVector<ValueType>::Iterator::Next()
     {
         do
         {
@@ -24,23 +24,23 @@ namespace linear
     }
 
     template<typename ValueType>
-    IndexValue DenseDatavector<ValueType>::Iterator::GetValue() const
+    IndexValue DenseDataVector<ValueType>::Iterator::GetValue() const
     {
         return IndexValue(_index, (double)*_begin);
     }
 
     template<typename ValueType>
-    DenseDatavector<ValueType>::Iterator::Iterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end)
+    DenseDataVector<ValueType>::Iterator::Iterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end)
     {}
 
     template<typename ValueType>
-    DenseDatavector<ValueType>::DenseDatavector()
+    DenseDataVector<ValueType>::DenseDataVector()
     {
         _mem.reserve(DEFAULT_DENSE_VECTOR_CAPACITY);
     }
 
     template<typename ValueType>
-    DenseDatavector<ValueType>::DenseDatavector(const IDataVector& other) : _mem(other.Size()), _num_nonzeros(other.NumNonzeros())
+    DenseDataVector<ValueType>::DenseDataVector(const IDataVector& other) : _mem(other.Size()), _num_nonzeros(other.NumNonzeros())
     {
         //auto setter = [this](uint index, double value)
         //{
@@ -53,7 +53,7 @@ namespace linear
     }
 
     template<typename ValueType>
-    void DenseDatavector<ValueType>::PushBack(uint index, double value)
+    void DenseDataVector<ValueType>::PushBack(uint index, double value)
     {
         if(value == 0)
         {
@@ -68,14 +68,14 @@ namespace linear
     }
     
     template<typename ValueType>
-    void DenseDatavector<ValueType>::Reset()
+    void DenseDataVector<ValueType>::Reset()
     {
         _mem.resize(0);
         _num_nonzeros = 0;
     }
 
     //template<typename ValueType>
-    //void DenseDatavector<ValueType>::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const // TODO
+    //void DenseDataVector<ValueType>::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const // TODO
     //{
     //    for(uint i=0; i<Size(); ++i)
     //    {
@@ -88,19 +88,19 @@ namespace linear
     //}
 
     template<typename ValueType>
-    uint DenseDatavector<ValueType>::Size() const
+    uint DenseDataVector<ValueType>::Size() const
     {
         return _mem.size();
     }
 
     template<typename ValueType>
-    uint DenseDatavector<ValueType>::NumNonzeros() const
+    uint DenseDataVector<ValueType>::NumNonzeros() const
     {
         return _num_nonzeros;
     }
 
     template<typename ValueType>
-    double DenseDatavector<ValueType>::Norm2() const
+    double DenseDataVector<ValueType>::Norm2() const
     {
         double result = 0.0;
         for(double element : _mem)
@@ -111,7 +111,7 @@ namespace linear
     }
 
     template<typename ValueType>
-    void DenseDatavector<ValueType>::AddTo(double* p_other, double scalar) const
+    void DenseDataVector<ValueType>::AddTo(double* p_other, double scalar) const
     {
         for(uint i = 0; i<Size(); ++i)
         {
@@ -120,7 +120,7 @@ namespace linear
     }
 
     template<typename ValueType>
-    double DenseDatavector<ValueType>::Dot(const double* p_other) const
+    double DenseDataVector<ValueType>::Dot(const double* p_other) const
     {
         double result = 0.0;
         for(uint i = 0; i<Size(); ++i)
@@ -132,13 +132,13 @@ namespace linear
     }
 
     template<typename ValueType>
-    typename DenseDatavector<ValueType>::Iterator DenseDatavector<ValueType>::GetIterator() const
+    typename DenseDataVector<ValueType>::Iterator DenseDataVector<ValueType>::GetIterator() const
     {
         return Iterator(_mem.begin(), _mem.end());
     }
 
     template<typename ValueType>
-    void DenseDatavector<ValueType>::Print(ostream & os) const
+    void DenseDataVector<ValueType>::Print(ostream & os) const
     {
         auto iterator =  GetIterator();
         while(iterator.IsValid())
@@ -149,16 +149,16 @@ namespace linear
         }
     }
 
-    template DenseDatavector<float>;
+    template DenseDataVector<float>;
 
-    IDataVector::type FloatDatavector::GetType() const
+    IDataVector::type FloatDataVector::GetType() const
     {
         return type::dense_double;
     }
 
-    template DenseDatavector<double>;
+    template DenseDataVector<double>;
 
-    IDataVector::type DoubleDatavector::GetType() const
+    IDataVector::type DoubleDataVector::GetType() const
     {
         return type::dense_float;
     }

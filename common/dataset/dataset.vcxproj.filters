@@ -27,17 +27,17 @@
     <ClInclude Include="include\Loader.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="src\SparseVectorParsingIterator.cpp">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SparseVectorParsingIterator.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\IndexValue.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\SupervisedExampleBuilder.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SparseEntryParsingIterator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SparseEntryParsingIterator.cpp">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

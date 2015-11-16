@@ -1,4 +1,4 @@
-// DatavectorBuilder.h
+// DataVectorBuilder.h
 
 #pragma once
 
@@ -11,9 +11,9 @@ using std::move;
 
 namespace linear
 {
-    /// DatavectorBuilder Base class
+    /// DataVectorBuilder Base class
     ///
-    class DatavectorBuilder
+    class DataVectorBuilder
     {
     public:
 
@@ -32,7 +32,7 @@ namespace linear
 
         /// Constructs a vector builder
         ///
-        DatavectorBuilder();
+        DataVectorBuilder();
 
         /// Sets an entry in the vector
         ///

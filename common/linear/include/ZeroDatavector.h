@@ -1,4 +1,4 @@
-// ZeroDatavector.h
+// ZeroDataVector.h
 
 #pragma once
 
@@ -6,27 +6,27 @@
 
 namespace linear
 {
-    /// ZeroDatavector Base class
+    /// ZeroDataVector Base class
     ///
-    class ZeroDatavector : public IDataVector
+    class ZeroDataVector : public IDataVector
     {
     public:
 
         /// Constructor
         ///
-        ZeroDatavector() = default;
+        ZeroDataVector() = default;
 
         /// Converting constructor
         ///
-        explicit ZeroDatavector(const IDataVector& other);
+        explicit ZeroDataVector(const IDataVector& other);
 
         /// Move constructor
         ///
-        ZeroDatavector(ZeroDatavector&& other) = default;
+        ZeroDataVector(ZeroDataVector&& other) = default;
 
         /// Deleted copy constructor
         ///
-        ZeroDatavector(const ZeroDatavector&) = delete;
+        ZeroDataVector(const ZeroDataVector&) = delete;
 
         /// \returns The type of the vector
         ///

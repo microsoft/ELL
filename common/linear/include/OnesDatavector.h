@@ -1,4 +1,4 @@
-// OnesDatavector.h
+// OnesDataVector.h
 
 #pragma once
 
@@ -6,27 +6,27 @@
 
 namespace linear
 {
-    /// OnesDatavector Base class
+    /// OnesDataVector Base class
     ///
-    class OnesDatavector : public IDataVector
+    class OnesDataVector : public IDataVector
     {
     public:
 
         /// Constructor
         ///
-        OnesDatavector(uint dim = 0);
+        OnesDataVector(uint dim = 0);
 
         /// Converting constructor
         ///
-        explicit OnesDatavector(const IDataVector& other);
+        explicit OnesDataVector(const IDataVector& other);
 
         /// Move constructor
         ///
-        OnesDatavector(OnesDatavector&& other) = default;
+        OnesDataVector(OnesDataVector&& other) = default;
 
         /// Deleted copy constructor
         ///
-        OnesDatavector(const OnesDatavector&) = delete;
+        OnesDataVector(const OnesDataVector&) = delete;
 
         /// \returns The type of the vector
         ///

@@ -1,4 +1,4 @@
-// DenseDatavector.h
+// DenseDataVector.h
 
 #pragma once
 
@@ -15,10 +15,10 @@ using std::ostream;
 
 namespace linear
 {
-    /// DenseDatavector Base class
+    /// DenseDataVector Base class
     ///
     template<typename ValueType>
-    class DenseDatavector : public IDataVector
+    class DenseDataVector : public IDataVector
     {
     public:
 
@@ -53,9 +53,9 @@ namespace linear
             // define typenames to improve readability
             using StlIteratorType = typename vector<ValueType>::const_iterator;
 
-            /// private ctor, can only be called from SparseDatavector class
+            /// private ctor, can only be called from SparseDataVector class
             Iterator(const StlIteratorType& begin, const StlIteratorType& end);
-            friend DenseDatavector<ValueType>;
+            friend DenseDataVector<ValueType>;
 
             // members
             StlIteratorType _begin;
@@ -66,19 +66,19 @@ namespace linear
 
         /// Constructor
         ///
-        DenseDatavector();
+        DenseDataVector();
 
         /// Converting constructor
         ///
-        explicit DenseDatavector(const IDataVector& other);
+        explicit DenseDataVector(const IDataVector& other);
 
         /// Move constructor
         ///
-        DenseDatavector(DenseDatavector&& other) = default;
+        DenseDataVector(DenseDataVector&& other) = default;
 
         /// Deleted copy constructor
         ///
-        DenseDatavector(const DenseDatavector&) = delete;
+        DenseDataVector(const DenseDataVector&) = delete;
 
         /// Sets an entry in the vector
         ///
@@ -125,20 +125,20 @@ namespace linear
         vector<ValueType> _mem;
     };
 
-    class FloatDatavector : public DenseDatavector<float> 
+    class FloatDataVector : public DenseDataVector<float> 
     {
     public:
-        using DenseDatavector<float>::DenseDatavector;
+        using DenseDataVector<float>::DenseDataVector;
 
         /// \returns The type of the vector
         ///
         virtual type GetType() const override;
     };
 
-    class DoubleDatavector : public DenseDatavector<double>
+    class DoubleDataVector : public DenseDataVector<double>
     {
     public:
-        using DenseDatavector<double>::DenseDatavector;
+        using DenseDataVector<double>::DenseDataVector;
 
         /// \returns The type of the vector
         ///

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug|x64">
@@ -90,7 +90,7 @@
     <ClInclude Include="include\Base.h" />
     <ClInclude Include="include\CompressedIntegerList.h" />
     <ClInclude Include="include\DoubleMatrix.h" />
-    <ClInclude Include="include\DenseDatavector.h" />
+    <ClInclude Include="include\DenseDataVector.h" />
     <ClInclude Include="include\DoubleSubvectorCref.h" />
     <ClInclude Include="include\DoubleVector.h" />
     <ClInclude Include="include\IndexValue.h" />
@@ -98,16 +98,16 @@
     <ClInclude Include="include\IMatrix.h" />
     <ClInclude Include="include\IVector.h" />
     <ClInclude Include="include\IDataVector.h" />
-    <ClInclude Include="include\OnesDatavector.h" />
+    <ClInclude Include="include\OnesDataVector.h" />
     <ClInclude Include="include\operators.h" />
     <ClInclude Include="include\SegmentedVector.h" />
-    <ClInclude Include="include\SparseBinaryDatavector.h" />
+    <ClInclude Include="include\SparseBinaryDataVector.h" />
     <ClInclude Include="include\RowMatrix.h" />
     <ClInclude Include="include\BiMatrix.h" />
-    <ClInclude Include="include\SparseDatavector.h" />
+    <ClInclude Include="include\SparseDataVector.h" />
     <ClInclude Include="include\types.h" />
-    <ClInclude Include="include\DatavectorBuilder.h" />
-    <ClInclude Include="include\ZeroDatavector.h" />
+    <ClInclude Include="include\DataVectorBuilder.h" />
+    <ClInclude Include="include\ZeroDataVector.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\segmented_vector.tcc" />
@@ -118,19 +118,19 @@
     <ClCompile Include="src\Base.cpp" />
     <ClCompile Include="src\CompressedIntegerList.cpp" />
     <ClCompile Include="src\DoubleMatrix.cpp" />
-    <ClCompile Include="src\DenseDatavector.cpp" />
+    <ClCompile Include="src\DenseDataVector.cpp" />
     <ClCompile Include="src\DoubleSubvectorCref.cpp" />
     <ClCompile Include="src\DoubleVector.cpp" />
     <ClCompile Include="src\IMatrix.cpp" />
     <ClCompile Include="src\IndexValue.cpp" />
     <ClCompile Include="src\IntegerList.cpp" />
     <ClCompile Include="src\IVector.cpp" />
-    <ClCompile Include="src\OnesDatavector.cpp" />
+    <ClCompile Include="src\OnesDataVector.cpp" />
     <ClCompile Include="src\SegmentedVector.cpp" />
-    <ClCompile Include="src\SparseBinaryDatavector.cpp" />
-    <ClCompile Include="src\SparseDatavector.cpp" />
-    <ClCompile Include="src\DatavectorBuilder.cpp" />
-    <ClCompile Include="src\ZeroDatavector.cpp" />
+    <ClCompile Include="src\SparseBinaryDataVector.cpp" />
+    <ClCompile Include="src\SparseDataVector.cpp" />
+    <ClCompile Include="src\DataVectorBuilder.cpp" />
+    <ClCompile Include="src\ZeroDataVector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="README.txt" />

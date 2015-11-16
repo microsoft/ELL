@@ -1,4 +1,4 @@
-// SparseDatavector.h
+// SparseDataVector.h
 
 #pragma once
 
@@ -13,7 +13,7 @@ namespace linear
     /// Implements a sparse binary vector as an increasing list of the coordinates where the value is 1.0
     ///
     template<typename ValueType, typename IntegerListType>
-    class SparseDatavector : public IDataVector
+    class SparseDataVector : public IDataVector
     {
     public:
 
@@ -49,9 +49,9 @@ namespace linear
             using IndexIteratorType = typename IntegerListType::Iterator;
             using ValueIteratorType = typename vector<ValueType>::const_iterator;
 
-            /// private ctor, can only be called from SparseDatavector class
+            /// private ctor, can only be called from SparseDataVector class
             Iterator(const IndexIteratorType& list_iterator, const ValueIteratorType& value_iterator);
-            friend SparseDatavector<ValueType, IntegerListType>;
+            friend SparseDataVector<ValueType, IntegerListType>;
 
             // members
             IndexIteratorType _index_iterator;
@@ -60,19 +60,19 @@ namespace linear
 
         /// Constructs an empty sparse binary vector
         ///
-        SparseDatavector();
+        SparseDataVector();
 
         /// Converting constructor
         ///
-        explicit SparseDatavector(const IDataVector& other);
+        explicit SparseDataVector(const IDataVector& other);
 
         /// Move constructor
         ///
-        SparseDatavector(SparseDatavector<ValueType, IntegerListType>&& other) = default;
+        SparseDataVector(SparseDataVector<ValueType, IntegerListType>&& other) = default;
 
         /// Deleted copy constructor
         ///
-        SparseDatavector(const SparseDatavector<ValueType, IntegerListType>& other) = delete;
+        SparseDataVector(const SparseDataVector<ValueType, IntegerListType>& other) = delete;
 
         /// Sets the element at the given index to 1.0. Calls to this function must have a monotonically increasing argument. 
         /// The value argument must equal 1.0
@@ -119,30 +119,30 @@ namespace linear
         vector<ValueType> _values;
     };
 
-    class SparseDoubleDatavector : public SparseDatavector<double, CompressedIntegerList>
+    class SparseDoubleDataVector : public SparseDataVector<double, CompressedIntegerList>
     {
     public:
-        using SparseDatavector<double, CompressedIntegerList>::SparseDatavector;
+        using SparseDataVector<double, CompressedIntegerList>::SparseDataVector;
 
         /// \returns The type of the vector
         ///
         virtual type GetType() const override;
     };
 
-    class SparseFloatDatavector : public SparseDatavector<float, CompressedIntegerList>
+    class SparseFloatDataVector : public SparseDataVector<float, CompressedIntegerList>
     {
     public:
-        using SparseDatavector<float, CompressedIntegerList>::SparseDatavector;
+        using SparseDataVector<float, CompressedIntegerList>::SparseDataVector;
 
         /// \returns The type of the vector
         ///
         virtual type GetType() const override;
     };
 
-    class SparseShortDatavector : public SparseDatavector<short, CompressedIntegerList>
+    class SparseShortDataVector : public SparseDataVector<short, CompressedIntegerList>
     {
     public:
-        using SparseDatavector<short, CompressedIntegerList>::SparseDatavector;
+        using SparseDataVector<short, CompressedIntegerList>::SparseDataVector;
 
         /// \returns The type of the vector
         ///

@@ -2,15 +2,15 @@
 
 #include "DoubleVector.h"
 #include "operators.h"
-#include "DenseDatavector.h"
+#include "DenseDataVector.h"
 #include "DoubleMatrix.h"
 #include "IntegerList.h"
 #include "CompressedIntegerList.h"
-#include "SparseDatavector.h"
-#include "SparseBinaryDatavector.h"
+#include "SparseDataVector.h"
+#include "SparseBinaryDataVector.h"
 #include "RowMatrix.h"
 #include "BiMatrix.h"
-#include "DatavectorBuilder.h"
+#include "DataVectorBuilder.h"
 #include <memory>
 #include <algorithm>
 #include <string>
@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
         auto y = get_rand_vector(8);
 
         // vector tests
-        DoubleDatavector v1;
+        DoubleDataVector v1;
         fill_vector_binary_random(v1, 21);
         vector_test1(v1, x);
 
@@ -170,23 +170,23 @@ int main(int argc, char* argv[])
         fill_vector_binary_random(v2, 21);
         vector_test1(v2, x);
 
-        SparseBinaryDatavector v3;
+        SparseBinaryDataVector v3;
         fill_vector_binary_random(v3, 21);
         vector_test1(v3, x);
 
-        SparseDoubleDatavector v4;
+        SparseDoubleDataVector v4;
         fill_vector_binary_random(v4, 21);
         vector_test1(v4, x);
 
-        SparseFloatDatavector v6;
+        SparseFloatDataVector v6;
         fill_vector_binary_random(v6, 21);
         vector_test1(v6, x);
 
-        SparseShortDatavector v8;
+        SparseShortDataVector v8;
         fill_vector_binary_random(v8, 21);
         vector_test1(v8, x);
 
-        DatavectorBuilder builder;
+        DataVectorBuilder builder;
         fill_vector_binary_random(builder, 21, 0.5);
         auto v9 = builder.GetVectorAndReset();
         vector_test1(*v9, x);
@@ -232,13 +232,13 @@ int main(int argc, char* argv[])
         fill_matrix_binary_random2(M8, 8, 9);
         matrix_test1(M8, x, y, false);
 
-        RowMatrix<SparseBinaryDatavector> M9;
+        RowMatrix<SparseBinaryDataVector> M9;
         fill_matrix_binary_random2(M9, 8, 9);
         matrix_test1(M9, x, y, false);
 
 
 /*
-        RowMatrix<segmented_vector<FloatDatavector>> M11;
+        RowMatrix<segmented_vector<FloatDataVector>> M11;
         fill_matrix_binary_random2(M11, 8, 9);
         matrix_test1(M11, x, y, false);
 
@@ -249,7 +249,7 @@ int main(int argc, char* argv[])
 */
         int foo = 5;
 
-        //BiMatrix<RowMatrix<SparseBinaryDatavector<CompressedIntegerList>>> M13;
+        //BiMatrix<RowMatrix<SparseBinaryDataVector<CompressedIntegerList>>> M13;
         //fill_matrix_binary_random(M13, 8, 9, true, true);
         //matrix_test1(M13, x, y, true);
 
