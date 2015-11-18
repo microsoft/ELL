@@ -19,7 +19,7 @@ namespace linear
 
         /// A read-only forward iterator for the sparse binary vector.
         ///
-        class Iterator
+        class Iterator : public IIndexValueIterator
         {
         public:
 
@@ -64,7 +64,8 @@ namespace linear
 
         /// Converting constructor
         ///
-        explicit SparseDataVector(const IDataVector& other);
+        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        SparseDataVector(IndexValueIteratorType&& indexValueIterator);
 
         /// Move constructor
         ///
@@ -149,4 +150,6 @@ namespace linear
         virtual type GetType() const override;
     };
 }
+
+#include "../tcc/SparseDataVector.tcc"
 

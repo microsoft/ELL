@@ -39,23 +39,6 @@ namespace linear
     {}
 
     template<typename IntegerListType>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(const IDataVector& other) 
-    {
-        //_indices.Reserve(other.NumNonzeros());
-
-        //other.foreach_nonzero(
-        //[this](uint index, double value) 
-        //{ 
-        //    if(value > 0)
-        //    {
-        //        this->PushBack(index);
-        //    }
-        //});
-
-        // TODO
-    }
-
-    template<typename IntegerListType>
     void SparseBinaryDataVectorBase<IntegerListType>::PushBack(uint index, double value)
     {
         if (value == 0)

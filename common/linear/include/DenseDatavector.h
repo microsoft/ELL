@@ -11,6 +11,10 @@ using std::vector;
 #include <iostream>
 using std::ostream;
 
+#include <type_traits>
+using std::is_base_of;
+using std::enable_if_t;
+
 #define DEFAULT_DENSE_VECTOR_CAPACITY 1000
 
 namespace linear
@@ -24,7 +28,7 @@ namespace linear
 
         /// A read-only forward iterator for the sparse binary vector.
         ///
-        class Iterator // TODO: implement this type
+        class Iterator : public IIndexValueIterator
         {
         public:
 
@@ -60,7 +64,7 @@ namespace linear
             // members
             StlIteratorType _begin;
             StlIteratorType _end;
-            uint _index;
+            uint _index = 0;
         };
 
 
@@ -70,7 +74,8 @@ namespace linear
 
         /// Converting constructor
         ///
-        explicit DenseDataVector(const IDataVector& other);
+        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        DenseDataVector(IndexValueIteratorType&& indexValueIterator);
 
         /// Move constructor
         ///
@@ -145,5 +150,7 @@ namespace linear
         virtual type GetType() const override;
     };
 }
+
+#include "../tcc/DenseDatavector.tcc"
 
 

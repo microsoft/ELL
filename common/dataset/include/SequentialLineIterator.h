@@ -8,29 +8,19 @@ using std::string;
 #include <iostream>
 using std::istream;
 
-#include <iterator>
-using std::istream_iterator;
+#include <memory>
+using std::shared_ptr;
 
 namespace dataset
 {
-    /// A helper class that holds a text snippet that was extracted from a longer text, and is aware of its delimiter
-    ///
-    template<char Delimiter>
-    struct DelimitedText : public string {};
-
-    /// Reads text from an input stream until the delimiter is encountered
-    ///
-    template<char Delimiter>
-    istream& operator>> (istream& is, DelimitedText<Delimiter>& ln);
-
     /// An iterator that reads a long text line by line
     ///
-    class SequentialLineIterator : public istream_iterator<DelimitedText<'\n'>>
+    class SequentialLineIterator 
     {
     public:
         /// Constructs a sequential line iterator
         ///
-        SequentialLineIterator(istream& is);
+        SequentialLineIterator(istream& istream, char delim = '\n');
 
         /// \returns True if the iterator is currently pointing to a valid iterate
         ///
@@ -42,8 +32,11 @@ namespace dataset
 
         /// \returns A const reference to the row
         ///
-        const string& GetValue() const;
+        shared_ptr<const string> GetValue() const;
+
+    private:
+        shared_ptr<string> _spCurrentLine = nullptr;
+        istream& _istream;
+        char _delim;
     };
 }
-
-#include "../tcc/SequentialLineIterator.tcc"

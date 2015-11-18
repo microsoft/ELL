@@ -35,21 +35,6 @@ namespace linear
     {}
 
     template<typename ValueType, typename IntegerListType>
-    SparseDataVector<ValueType, IntegerListType>::SparseDataVector(const IDataVector& other) 
-    {
-        //_indices.Reserve(other.NumNonzeros());
-        //_values.Reserve(other.NumNonzeros());
-
-        //other.foreach_nonzero(
-        //[this](uint index, double value) 
-        //{ 
-        //    this->PushBack(index, value);
-        //});
-
-        // TODO
-    }
-
-    template<typename ValueType, typename IntegerListType>
     void SparseDataVector<ValueType, IntegerListType>::PushBack(uint index, double value)
     {
         if (value == 0)

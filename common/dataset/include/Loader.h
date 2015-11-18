@@ -18,8 +18,8 @@ namespace dataset
     ///
     struct Loader
     {
-        template<typename RowIteratorType, typename ParserType>
-        static RowDataset Load(RowIteratorType& line_iterator, ParserType& parser);
+        template<typename RowIteratorType, typename VectorEntryParserType>
+        static RowDataset Load(RowIteratorType line_iterator, VectorEntryParserType parser);
     };
 }
 

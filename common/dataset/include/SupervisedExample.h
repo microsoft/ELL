@@ -73,7 +73,7 @@ namespace dataset
         virtual void Print(ostream& os) const override;
 
     private:
-        unique_ptr<IDataVector> _up_instance;
+        unique_ptr<IDataVector> _upInstance;
         double _weight;
         double _label;
 

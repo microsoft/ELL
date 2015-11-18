@@ -6,7 +6,7 @@ using std::move;
 
 namespace dataset
 {
-    SupervisedExample::SupervisedExample(unique_ptr<IDataVector> instance, double label, double weight) : _up_instance(move(instance)), _label(label), _weight(weight)
+    SupervisedExample::SupervisedExample(unique_ptr<IDataVector> instance, double label, double weight) : _upInstance(move(instance)), _label(label), _weight(weight)
     {}
 
     double SupervisedExample::GetWeight() const
@@ -26,46 +26,46 @@ namespace dataset
 
     void SupervisedExample::Reset()
     {
-        _up_instance->Reset();
+        _upInstance->Reset();
     }
 
     void SupervisedExample::PushBack(uint index, double value)
     {
-        _up_instance->PushBack(index, value);
+        _upInstance->PushBack(index, value);
     }
 
     //void SupervisedExample::foreach_nonzero(std::function<void(uint, double)> func, uint index_offset) const
     //{
-    //    _up_instance->foreach_nonzero(func, index_offset);
+    //    _upInstance->foreach_nonzero(func, index_offset);
     //}
 
     uint SupervisedExample::Size() const
     {
-        return _up_instance->Size();
+        return _upInstance->Size();
     }
 
     uint SupervisedExample::NumNonzeros() const
     {
-        return _up_instance->NumNonzeros();
+        return _upInstance->NumNonzeros();
     }
 
     double SupervisedExample::Norm2() const
     {
-        return _up_instance->Norm2();
+        return _upInstance->Norm2();
     }
 
     void SupervisedExample::AddTo(double * p_other, double scalar) const
     {
-        _up_instance->AddTo(p_other, scalar);
+        _upInstance->AddTo(p_other, scalar);
     }
 
     double SupervisedExample::Dot(const double * p_other) const
     {
-        return _up_instance->Dot(p_other);
+        return _upInstance->Dot(p_other);
     }
 
     void SupervisedExample::Print(ostream & os) const
     {
-        _up_instance->Print(os);
+        _upInstance->Print(os);
     }
 }

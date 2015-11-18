@@ -37,9 +37,9 @@ int main(int argc, char* argv[])
     try
     {
         // parse the command line
-        CommandLineParser cmd_parser(argc, argv);
-        ParsedSharedArguments shared_arguments(cmd_parser);
-        cmd_parser.ParseArgs();
+        CommandLineParser cmd_instanceParser(argc, argv);
+        ParsedSharedArguments shared_arguments(cmd_instanceParser);
+        cmd_instanceParser.ParseArgs();
 
         // open map file
         ifstream map_fs = OpenIfstream(shared_arguments.map_file);
@@ -57,11 +57,11 @@ int main(int argc, char* argv[])
         //SvmlightParser sp;
 
         //// wrap the parser with a Mapping, to get a new parser
-        //using mapped_svmlight_parser = MappedParser<SvmlightParser>;
-        //mapped_svmlight_parser mp(sp, col);
+        //using mapped_svmlight_instanceParser = MappedParser<SvmlightParser>;
+        //mapped_svmlight_instanceParser mp(sp, col);
 
         //// create an iterator that wraps the parser
-        //using mapped_svmlight_parsing_iterator = ParsingIterator<SequentialLineIterator, mapped_svmlight_parser>;
+        //using mapped_svmlight_parsing_iterator = ParsingIterator<SequentialLineIterator, mapped_svmlight_instanceParser>;
         //mapped_svmlight_parsing_iterator pi(sli, mp, col->GetOutputDim());
 
         //// process row by row

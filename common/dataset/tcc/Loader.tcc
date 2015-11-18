@@ -5,12 +5,12 @@ using std::move;
 
 namespace dataset
 {
-    template<typename RowIteratorType, typename ParserType>
-    RowDataset Loader::Load(RowIteratorType& line_iterator, ParserType& parser)
+    template<typename RowIteratorType, typename VectorEntryParserType>
+    RowDataset Loader::Load(RowIteratorType line_iterator, VectorEntryParserType parser)
     {
 
         // parse each line according to the parser
-        ParsingIterator<RowIteratorType, ParserType> iter(line_iterator, parser);
+        ParsingIterator<RowIteratorType, VectorEntryParserType> iter(line_iterator, parser);
 
         // create a dataset
         RowDataset dataset;

@@ -24,8 +24,8 @@ _USE_DEFAULT_DESERIALIZER_  // use the default deserializer for mappings
 
 // dataset
 #include "SequentialLineIterator.h"
+#include "SparseEntryParser.h"
 #include "ParsingIterator.h"
-#include "SvmlightParser.h"
 #include "loader.h"
 using namespace dataset;
 
@@ -55,15 +55,18 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
+#include <cstdlib>
+using std::strtod;
+
 int main(int argc, char* argv[])
 {
     try
     {
         // parse the command line
-        CommandLineParser cmd_parser(argc, argv);
-        ParsedSharedArguments shared_arguments(cmd_parser);
-        ParsedSgdArguments trainer_args(cmd_parser);
-        cmd_parser.ParseArgs();
+        CommandLineParser cmd_instanceParser(argc, argv);
+        ParsedSharedArguments shared_arguments(cmd_instanceParser);
+        ParsedSgdArguments trainer_args(cmd_instanceParser);
+        cmd_instanceParser.ParseArgs();
 
         // open data file
         ifstream data_fs = OpenIfstream(shared_arguments.data_file);
@@ -71,8 +74,8 @@ int main(int argc, char* argv[])
         // create line iterator - read line by line sequentially
         SequentialLineIterator li(data_fs);
 
-        // create svmlight parser
-        SvmlightParser p(shared_arguments.data_file_has_weights);
+        // create parser
+        SparseEntryParser p;
 
         // create random number generator
         auto rng = GetRandomEngine(shared_arguments.data_random_seed_string);

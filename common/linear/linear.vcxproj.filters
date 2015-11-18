@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="include">
@@ -88,6 +88,18 @@
     <None Include="tcc\BiMatrix.tcc">
       <Filter>tcc</Filter>
     </None>
+    <None Include="tcc\DataVectorBuilder.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\DenseDataVector.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\SparseDataVector.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\SparseBinaryDataVector.tcc">
+      <Filter>tcc</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CompressedIntegerList.cpp">
@@ -109,9 +121,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ZeroDataVector.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DataVectorBuilder.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\DenseDataVector.cpp">

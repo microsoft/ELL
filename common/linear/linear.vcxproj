@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug|x64">
@@ -110,9 +110,13 @@
     <ClInclude Include="include\ZeroDataVector.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="tcc\DataVectorBuilder.tcc" />
+    <None Include="tcc\DenseDataVector.tcc" />
     <None Include="tcc\segmented_vector.tcc" />
     <None Include="tcc\RowMatrix.tcc" />
     <None Include="tcc\BiMatrix.tcc" />
+    <None Include="tcc\SparseBinaryDataVector.tcc" />
+    <None Include="tcc\SparseDataVector.tcc" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Base.cpp" />
@@ -129,7 +133,6 @@
     <ClCompile Include="src\SegmentedVector.cpp" />
     <ClCompile Include="src\SparseBinaryDataVector.cpp" />
     <ClCompile Include="src\SparseDataVector.cpp" />
-    <ClCompile Include="src\DataVectorBuilder.cpp" />
     <ClCompile Include="src\ZeroDataVector.cpp" />
   </ItemGroup>
   <ItemGroup>

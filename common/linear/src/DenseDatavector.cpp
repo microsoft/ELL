@@ -9,7 +9,7 @@ namespace linear
     template<typename ValueType>
     bool DenseDataVector<ValueType>::Iterator::IsValid() const
     {
-        return (_begin == _end);
+        return (_begin != _end);
     }
 
     template<typename ValueType>
@@ -31,7 +31,13 @@ namespace linear
 
     template<typename ValueType>
     DenseDataVector<ValueType>::Iterator::Iterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end)
-    {}
+    {
+        while(_begin < _end && *_begin == 0)
+        {
+            ++_begin;
+            ++_index;
+        } 
+    }
 
     template<typename ValueType>
     DenseDataVector<ValueType>::DenseDataVector()
@@ -39,20 +45,7 @@ namespace linear
         _mem.reserve(DEFAULT_DENSE_VECTOR_CAPACITY);
     }
 
-    template<typename ValueType>
-    DenseDataVector<ValueType>::DenseDataVector(const IDataVector& other) : _mem(other.Size()), _num_nonzeros(other.NumNonzeros())
-    {
-        //auto setter = [this](uint index, double value)
-        //{
-        //    _mem[index] = (ValueType)value;
-
-        //};
-        //other.foreach_nonzero(setter);
-
-        // TODO
-    }
-
-    template<typename ValueType>
+     template<typename ValueType>
     void DenseDataVector<ValueType>::PushBack(uint index, double value)
     {
         if(value == 0)

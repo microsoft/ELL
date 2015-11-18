@@ -186,22 +186,22 @@ int main(int argc, char* argv[])
         fill_vector_binary_random(v8, 21);
         vector_test1(v8, x);
 
-        DataVectorBuilder builder;
-        fill_vector_binary_random(builder, 21, 0.5);
-        auto v9 = builder.GetVectorAndReset();
-        vector_test1(*v9, x);
+        //DataVectorBuilder builder;
+        //fill_vector_binary_random(builder, 21, 0.5);
+        //auto v9 = builder.GetVectorAndReset();
+        //vector_test1(*v9, x);
 
-        fill_vector_binary_random(builder, 21, 0.07);
-        auto v10 = builder.GetVectorAndReset();
-        vector_test1(*v10, x);
+        //fill_vector_binary_random(builder, 21, 0.07);
+        //auto v10 = builder.GetVectorAndReset();
+        //vector_test1(*v10, x);
 
-        fill_vector_binary_random(builder, 21, 0);
-        auto v11 = builder.GetVectorAndReset();
-        vector_test1(*v11, x);
+        //fill_vector_binary_random(builder, 21, 0);
+        //auto v11 = builder.GetVectorAndReset();
+        //vector_test1(*v11, x);
 
-        fill_vector_binary_random(builder, 21, 1);
-        auto v12 = builder.GetVectorAndReset();
-        vector_test1(*v12, x);
+        //fill_vector_binary_random(builder, 21, 1);
+        //auto v12 = builder.GetVectorAndReset();
+        //vector_test1(*v12, x);
 
         // matrix tests
         DoubleMatrix<MatrixStructure::column> M1(8, 9);

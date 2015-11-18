@@ -13,39 +13,16 @@ namespace linear
 {
     /// DataVectorBuilder Base class
     ///
+    template<typename DefaultDataVectorType>
     class DataVectorBuilder
     {
     public:
 
-        struct VectorStats
-        {
-            bool contains_nonbinary = false;
-            bool contains_non_shorts = false;
-            uint numNonzeros = 0;
-        };
-
-        struct BuilderStats
-        {
-            uint num_dense = 0;
-            uint num_sparse = 0;
-        };
-
-        /// Constructs a vector builder
+        /// Chooses the optimal DataVector representation for a list of index-value pairs
         ///
-        DataVectorBuilder();
-
-        /// Sets an entry in the vector
-        ///
-        void PushBack(uint index, double value);
-
-        /// Calls a callback function for each non-zero entry in the vector, in order of increasing index
-        ///
-        unique_ptr<IDataVector> GetVectorAndReset();
-
-    private:
-        unique_ptr<IDataVector> _up_vec;
-        VectorStats _vector_stats;
-        BuilderStats _builder_stats;
+        template<typename IndexValueIteratorType>
+        static unique_ptr<IDataVector> Build(IndexValueIteratorType&& indexValueIterator);
     };
 }
 
+#include "../tcc/DataVectorBuilder.tcc"
