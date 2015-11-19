@@ -7,7 +7,7 @@ using utilities::OpenIfstream;
 #include "CommandLineParser.h" 
 using utilities::CommandLineParser;
 
-#include "random_engines.h"
+#include "randomEngines.h"
 using utilities::GetRandomEngine;
 
 #include "SharedArguments.h" 
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
         cmd_instanceParser.ParseArgs();
 
         // open data file
-        ifstream data_fs = OpenIfstream(shared_arguments.data_file);
+        ifstream data_fs = OpenIfstream(shared_arguments.dataFile);
 
         // create line iterator - read line by line sequentially
         SequentialLineIterator li(data_fs);
@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
         SparseEntryParser p;
 
         // create random number generator
-        auto rng = GetRandomEngine(shared_arguments.data_random_seed_string);
+        auto rng = GetRandomEngine(shared_arguments.dataRandomSeedString);
 
         // Load a dataset, permute, and get a data iterator
         auto data = Loader::Load(li, p);
@@ -94,14 +94,14 @@ int main(int argc, char* argv[])
         BinaryClassificationEvaluator evaluator;
 
         // perform epochs
-        for(int epoch = 0; epoch < trainer_args.num_epochs; ++epoch)
+        for(int epoch = 0; epoch < trainer_args.numEpochs; ++epoch)
         {
             // randomly permute the data
             data.RandPerm(rng);
 
             // iterate over the entire permuted dataset
             auto training_iter = data.GetIterator();
-            optimizer.Update(training_iter, loss, trainer_args.l2_regularization);
+            optimizer.Update(training_iter, loss, trainer_args.l2Regularization);
 
             // Evaluate
             auto eval_iter = data.GetIterator();

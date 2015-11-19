@@ -17,7 +17,7 @@ namespace mappings
     void Mapping::SerializeHeader(JsonSerializer& serializer, int version) const
     {
         // to make the file more readable
-        const string type_names[] = { "Constant", "Scale", "Shift", "Sum", "DecisionTreePath", "Row", "Column" };
+        const string type_names[] = { "constant", "scale", "shift", "sum", "decisionTreePath", "row", "column" };
         serializer.Write("_type", type_names[(int)_type]);
         serializer.Write("_version", version);
     }

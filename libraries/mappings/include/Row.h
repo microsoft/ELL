@@ -48,12 +48,12 @@ namespace mappings
 
         /// Deserializes the row in json format
         ///
-        virtual void Deserialize(JsonSerializer& serializer, int version = _current_version);
+        virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion);
 
     protected:
-        vector<shared_ptr<Mapping>> _row_elements;
-        uint64 _in_dim;
-        uint64 _out_dim;
-        static const int _current_version = 1;
+        vector<shared_ptr<Mapping>> _rowElements;
+        uint64 _inDim;
+        uint64 _outDim;
+        static const int _currentVersion = 1;
     };
 }

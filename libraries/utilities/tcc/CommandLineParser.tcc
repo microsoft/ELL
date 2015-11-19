@@ -23,7 +23,7 @@ namespace utilities
     // myexe.exe foo.tsv bar.tsv
     // myexe.exe -t 8 -x blah foo.tsv bar.tsv
     template <typename T, typename U>
-    void CommandLineParser::AddOption(T& option, string name, string short_name, string description, const U& default_value)
+    void CommandLineParser::AddOption(T& option, string name, string shortName, string description, const U& defaultValue)
     {
         auto callback = [&option, this](string option_val)
         {
@@ -31,7 +31,7 @@ namespace utilities
             return did_parse;
         };
 
-        OptionInfo info(name, short_name, description, ToString(default_value), callback);
+        OptionInfo info(name, shortName, description, ToString(defaultValue), callback);
         AddOption(info);
     }
 

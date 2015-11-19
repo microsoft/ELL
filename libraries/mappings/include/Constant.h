@@ -39,10 +39,10 @@ namespace mappings
 
         /// Deserializes the Mapping in json format
         ///
-        virtual void Deserialize(JsonSerializer& serializer, int version = _current_version);
+        virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion);
 
     protected:
         double _c;
-        static const int _current_version = 1;
+        static const int _currentVersion = 1;
     };
 }

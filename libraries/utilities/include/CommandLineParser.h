@@ -44,9 +44,9 @@ namespace utilities
     struct OptionInfo
     {
         string name;
-        string short_name;
+        string shortName;
         string description;
-        string default_value_string; // for printing
+        string defaultValue_string; // for printing
         string current_value_string;
         vector<string> enum_values; // for enumerated values // TODO: make this into a more general constraint mechanism (?)
 
@@ -60,7 +60,7 @@ namespace utilities
 
         /// TODO: document
         ///
-        OptionInfo(string name, string short_name, string description, string default_value, function<bool(string)> set_value_callback);
+        OptionInfo(string name, string shortName, string description, string defaultValue, function<bool(string)> set_value_callback);
 
         // TODO: either have get_help_string() or print_help() methods for help and current value
     };
@@ -87,7 +87,7 @@ namespace utilities
         /// AddOption adds a new option to the commandline parser
         ///
         template <typename T, typename U>
-        void AddOption(T& option, string name, string short_name, string description, const U& default_value);
+        void AddOption(T& option, string name, string shortName, string description, const U& defaultValue);
 
         /// Adds a string that gets printed out when pring_usage() is called
         ///
@@ -143,12 +143,12 @@ namespace utilities
             DocumentationEntry(type t, string str) : EntryType(t), EntryString(str) {}
         };
 
-        vector<string> _original_args;
-        string _exe_name;
+        vector<string> _originalArgs;
+        string _exeName;
         vector<string> _args;
-        map<string, string> _short_to_long_name_map;
+        map<string, string> _shortToLongNameMap;
         map<string, OptionInfo> _options;
-        vector<DocumentationEntry> _doc_entries;
+        vector<DocumentationEntry> _docEntries;
 
         void AddOption(const OptionInfo& info);
         virtual bool SetOption(string option_name, string option_val); // returns true if we need to reparse

@@ -15,7 +15,7 @@ namespace utilities
     //
     // OptionInfo class
     //
-    OptionInfo::OptionInfo(string name, string short_name, string description, string default_value, function<bool(string)> set_value_callback) : name(name), short_name(short_name), description(description), default_value_string(default_value), set_value_callbacks({ set_value_callback })
+    OptionInfo::OptionInfo(string name, string shortName, string description, string defaultValue, function<bool(string)> set_value_callback) : name(name), shortName(shortName), description(description), defaultValue_string(defaultValue), set_value_callbacks({ set_value_callback })
     {
     }
 
@@ -29,24 +29,24 @@ namespace utilities
 
     void CommandLineParser::SetArgs(int argc, char** argv)
     {
-        _original_args.insert(_original_args.end(), &argv[0], &argv[argc]);
+        _originalArgs.insert(_originalArgs.end(), &argv[0], &argv[argc]);
     }
 
     void CommandLineParser::ParseArgs()
     {
         // TODO: should probably throw an exception here
-        if (_original_args.size() == 0)
+        if (_originalArgs.size() == 0)
             return;
 
-        string exe_path = _original_args[0];
+        string exe_path = _originalArgs[0];
         size_t slash_pos = exe_path.find_last_of("/\\");
         if (slash_pos == string::npos)
         {
-            _exe_name = exe_path;
+            _exeName = exe_path;
         }
         else
         {
-            _exe_name = exe_path.substr(slash_pos + 1);
+            _exeName = exe_path.substr(slash_pos + 1);
         }
 
         // While we're parsing the arguments, we may Add new conditional options. If we do so, we need
@@ -63,10 +63,10 @@ namespace utilities
             }
 
             needs_reparse = false;
-            size_t argc = _original_args.size();
+            size_t argc = _originalArgs.size();
             for (int index = 1; index < argc; index++)
             {
-                string arg = _original_args[index];
+                string arg = _originalArgs[index];
                 if (arg[0] == '-') // it's an option
                 {
                     string option;
@@ -76,14 +76,14 @@ namespace utilities
                     }
                     else // short name
                     {
-                        string short_name = string(arg.begin() + 1, arg.end());
-                        option = _short_to_long_name_map[short_name];
+                        string shortName = string(arg.begin() + 1, arg.end());
+                        option = _shortToLongNameMap[shortName];
                     }
 
                     if (option == "" && arg != "--") // "--" is the special "ignore this" option --- used to put between flag arguments and the filepath
                     {
                         cerr << "Error: unknown option " << arg << ", skipping." << endl;
-                        if (index < argc - 1 && _original_args[index + 1][0] != '-')  // skip the Next value as well, unless it's an option
+                        if (index < argc - 1 && _originalArgs[index + 1][0] != '-')  // skip the Next value as well, unless it's an option
                         {
                             index++;
                         }
@@ -94,7 +94,7 @@ namespace utilities
                         unset_args.erase(option);
                         if (index < argc - 1)
                         {
-                            string val = _original_args[index + 1];
+                            string val = _originalArgs[index + 1];
                             if (val[0] == '-')
                             {
                                 needs_reparse = SetOption(option, "true") || needs_reparse;
@@ -113,7 +113,7 @@ namespace utilities
                 }
                 else
                 {
-                    _args.push_back(_original_args[index]);
+                    _args.push_back(_originalArgs[index]);
                 }
             }
 
@@ -132,7 +132,7 @@ namespace utilities
             if (iter != _options.end())
             {
                 const OptionInfo& arg_info = iter->second;
-                string default_val = arg_info.default_value_string;
+                string default_val = arg_info.defaultValue_string;
                 needs_reparse = SetOption(arg_name, default_val) || needs_reparse;
             }
         }
@@ -147,11 +147,11 @@ namespace utilities
     void CommandLineParser::AddOption(const OptionInfo& info)
     {
         _options[info.name] = info;
-        _doc_entries.emplace_back(DocumentationEntry::type::option, info.name);
+        _docEntries.emplace_back(DocumentationEntry::type::option, info.name);
 
-        if (info.short_name != "")
+        if (info.shortName != "")
         {
-            _short_to_long_name_map[info.short_name] = info.name;
+            _shortToLongNameMap[info.shortName] = info.name;
         }
     }
 
@@ -217,30 +217,30 @@ namespace utilities
 
     void CommandLineParser::AddDocumentationString(string str)
     {
-        _doc_entries.emplace_back(DocumentationEntry::type::str, str);
+        _docEntries.emplace_back(DocumentationEntry::type::str, str);
     }
 
     string option_name_string(const OptionInfo& option)
     {
-        if (option.short_name == "")
+        if (option.shortName == "")
         {
-            return option.name + " [" + option.default_value_string + "]";
+            return option.name + " [" + option.defaultValue_string + "]";
         }
         else
         {
-            return option.name + " (-" + option.short_name + ") [" + option.default_value_string + "]";
+            return option.name + " (-" + option.shortName + ") [" + option.defaultValue_string + "]";
         }
     }
 
     size_t option_name_help_length(const OptionInfo& option)
     {
         size_t len = option.name.size() + 2;
-        if (option.short_name != "")
+        if (option.shortName != "")
         {
-            len += (option.short_name.size() + 4);
+            len += (option.shortName.size() + 4);
         }
     
-        len += option.default_value_string.size() + 3; // 3 for " [" + "]" at begin/end
+        len += option.defaultValue_string.size() + 3; // 3 for " [" + "]" at begin/end
 
         const size_t max_name_len = 32;
         return min(max_name_len, len);
@@ -258,10 +258,10 @@ namespace utilities
             }
         }
 
-        out << "Usage: " << _exe_name << " [options]" << endl;
+        out << "Usage: " << _exeName << " [options]" << endl;
         out << endl;
 
-        for (const auto& entry: _doc_entries)
+        for (const auto& entry: _docEntries)
         {
             switch (entry.EntryType)
             {
@@ -297,10 +297,10 @@ namespace utilities
 
     void CommandLineParser::PrintCurrentValues(ostream& out)
     {
-        out << "Current parameters for " << _exe_name << endl;
+        out << "Current parameters for " << _exeName << endl;
 
         set<string> visited_options;
-        for (auto& entry: _doc_entries)
+        for (auto& entry: _docEntries)
         {
             if (entry.EntryType == DocumentationEntry::type::option)
             {
@@ -310,7 +310,7 @@ namespace utilities
                 if (opt.current_value_string != "")
                 {
                     out << opt.current_value_string;
-                    if (opt.current_value_string == opt.default_value_string)
+                    if (opt.current_value_string == opt.defaultValue_string)
                     {
                         out << " (default)";
                     }
@@ -318,7 +318,7 @@ namespace utilities
                 }
                 else
                 {
-                    out << "[" << opt.default_value_string << "]" << endl;
+                    out << "[" << opt.defaultValue_string << "]" << endl;
                 }
             }
         }

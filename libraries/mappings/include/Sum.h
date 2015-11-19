@@ -15,7 +15,7 @@ namespace mappings
     public:
         /// Constructs a Sum Mapping 
         ///
-        Sum(uint64 first_input_indices = 0, uint64 input_index_count = 0);
+        Sum(uint64 firstInputIndex = 0, uint64 inputIndexCount = 0);
 
         /// Sets the first input index to sum
         ///
@@ -51,12 +51,12 @@ namespace mappings
 
         /// Deserializes the Mapping in json format
         ///
-        virtual void Deserialize(JsonSerializer& serializer, int version = _current_version);
+        virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion);
 
     protected:
-        uint64 _first_input_indices;
-        uint64 _input_indices_count;
-        static const int _current_version = 1;
+        uint64 _firstInputIndex;
+        uint64 _inputIndexCount;
+        static const int _currentVersion = 1;
     };
 }
 

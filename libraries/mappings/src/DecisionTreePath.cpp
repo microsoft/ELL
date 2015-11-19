@@ -58,7 +58,7 @@ namespace mappings
 
     uint64 DecisionTreePath::GetInputIndexOffset() const
     {
-        return _input_index_offset;
+        return _inputIndexOffset;
     }
 
     void DecisionTreePath::Apply(const double* input, double* output) const
@@ -71,7 +71,7 @@ namespace mappings
         while (index < GetNumInteriorVertices())
         {
             output[index] = 1.0;
-            double input_value = input[_input_index_offset + index];
+            double input_value = input[_inputIndexOffset + index];
 
             if(input_value <= 0)
             {
@@ -89,7 +89,7 @@ namespace mappings
 
     uint64 DecisionTreePath::GetMinInputDim() const
     {
-        return _input_index_offset + GetNumInteriorVertices();
+        return _inputIndexOffset + GetNumInteriorVertices();
     }
 
     uint64 DecisionTreePath::GetOutputDim() const
@@ -112,7 +112,7 @@ namespace mappings
         // version 1
         Mapping::SerializeHeader(serializer, 1);
         serializer.Write("Children", _children);
-        serializer.Write("input_index_offset", _input_index_offset);
+        serializer.Write("inputIndexOffset", _inputIndexOffset);
     }
 
     void DecisionTreePath::Deserialize(JsonSerializer& serializer, int version)
@@ -120,7 +120,7 @@ namespace mappings
         if (version == 1)
         {
             serializer.Read("Children", _children);
-            serializer.Read("input_index_offset", _input_index_offset);
+            serializer.Read("inputIndexOffset", _inputIndexOffset);
         }
         else
         {

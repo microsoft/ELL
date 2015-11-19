@@ -54,12 +54,12 @@ namespace mappings
 
         /// Deserializes the Mapping in json format
         ///
-        virtual void Deserialize(JsonSerializer& serializer, int version = _current_version);
+        virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion);
 
     protected:
-        vector<SerializableIndexValue> _index_values;
+        vector<SerializableIndexValue> _indexValues;
         function<double(double, double)> _func;
-        static const int _current_version = 1;
+        static const int _currentVersion = 1;
     };
 }
 

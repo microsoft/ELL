@@ -6,7 +6,7 @@
 using namespace utilities;
 
 // treetools shared
-#include "shared_arguments.h"
+#include "sharedArguments.h"
 using namespace utilities;
 
 // mappings
@@ -42,10 +42,10 @@ int main(int argc, char* argv[])
         cmd_instanceParser.ParseArgs();
 
         // open map file
-        ifstream map_fs = OpenIfstream(shared_arguments.map_file);
+        ifstream map_fs = OpenIfstream(shared_arguments.mapFile);
 
         // open data file
-        ifstream data_fs = OpenIfstream(shared_arguments.data_file);
+        ifstream data_fs = OpenIfstream(shared_arguments.dataFile);
 
         // Load the model
         auto col = Io::ReadColumn(map_fs, shared_arguments.map_layers);

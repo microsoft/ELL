@@ -62,19 +62,19 @@ namespace tree_layout
 
     Layout QpLayoutGenerator::GetLayout() const
     {
-        uint64 num_layers = (uint64)_layers.size();
-        vector<double> depths(num_layers);
+        uint64 numLayers = (uint64)_layers.size();
+        vector<double> depths(numLayers);
         depths[0] = 0.0;
-        double depth_space = _params.depth_space * pow(_params.depth_space_growth_factor, num_layers - 1.0);
+        double depthSpace = _params.depthSpace * pow(_params.depthSpaceGrowthFactor, numLayers - 1.0);
 
         // find min max offsets
         double min_offset = _offsets[0];
         double max_offset = min_offset;
-        for (uint64 i = 1; i < num_layers; ++i)
+        for (uint64 i = 1; i < numLayers; ++i)
         {
-            depths[i] = depths[i - 1] + depth_space;
+            depths[i] = depths[i - 1] + depthSpace;
 
-            depth_space /= _params.depth_space_growth_factor;
+            depthSpace /= _params.depthSpaceGrowthFactor;
             uint64 first_in_layer = _layers[i][0].index;
             uint64 last_in_layer = _layers[i][_layers[i].size() - 1].index;
 
@@ -83,7 +83,7 @@ namespace tree_layout
         }
 
         // max depth
-        double max_depth = depths[num_layers - 1];
+        double max_depth = depths[numLayers - 1];
 
         // create Layout
         Layout l(_offsets.size(), min_offset, max_offset, 0.0, max_depth);

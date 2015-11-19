@@ -23,7 +23,7 @@ namespace tree_layout
 
             /// The maximum number of gradient descent steps to take. The more steps, the longer the running time, and the better the solution
             ///
-            int gd_num_steps = 5000;
+            int gdNumSteps = 5000;
 
             /// The gradient descent step Size
             ///
@@ -31,19 +31,19 @@ namespace tree_layout
 
             /// The space between vertices at depth k and vertices at depth k+1 (if the tree is top down, this is the vertical spacing)
             ///
-            double depth_space = 1.0;
+            double depthSpace = 1.0;
 
             /// The depth spacing closer to the root is larger. This is the multiplier that determines the spacing depth spacing at different levels
             ///
-            double depth_space_growth_factor = 1.04;
+            double depthSpaceGrowthFactor = 1.04;
 
             /// The default space between adjacent vertices at the same depth (if the tree is top down, this is the default horizontal spacing)
             ///
-            double offset_space = 1.0;
+            double offsetSpace = 1.0;
 
             /// This parameters controls the space between adjacent vertices at the same depth that have a large tree distance 
             ///
-            double offset_space_growth_factor = 0.5;
+            double offsetSpaceGrowthFactor = 0.5;
 
             /// Springs at greater depth have higher spring coefficients, by pow(depth, spring_coeff_growth)
             ///
@@ -51,7 +51,7 @@ namespace tree_layout
 
             /// Natural rest length of springs connecting Children. 
             ///
-            double spring_rest_length = 0;
+            double springRestLength = 0;
 
             /// If true, try to move parent nodes toward midpoint of Children at end
             bool postprocess = false;

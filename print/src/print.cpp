@@ -73,10 +73,10 @@ namespace print
         {
             os << enumeration << ". ";
         }
-        os << "ROW\tmin input dim : " << GetMinInputDim() << ", output dim : " << GetOutputDim() << ", width: " << _row_elements.size() << endl;
+        os << "ROW\tmin input dim : " << GetMinInputDim() << ", output dim : " << GetOutputDim() << ", width: " << _rowElements.size() << endl;
 
-        auto begin = _row_elements.cbegin();
-        auto end = _row_elements.cend();
+        auto begin = _rowElements.cbegin();
+        auto end = _rowElements.cend();
         int index = 1;
         while (begin != end)
         {
@@ -93,10 +93,10 @@ namespace print
         {
             os << enumeration << ". ";
         }
-        os << "COLUMN\tmin input dim : " << GetMinInputDim() << ", output dim : " << GetOutputDim() << ", height: " << _column_elements.size() << endl;
+        os << "COLUMN\tmin input dim : " << GetMinInputDim() << ", output dim : " << GetOutputDim() << ", height: " << _columnElements.size() << endl;
 
-        auto begin = _column_elements.cbegin();
-        auto end = _column_elements.cend();
+        auto begin = _columnElements.cbegin();
+        auto end = _columnElements.cend();
         int index = 1;
         while (begin != end)
         {

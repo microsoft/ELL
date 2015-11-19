@@ -11,36 +11,36 @@ using std::to_string;
 namespace mappings
 {
 
-    Sum::Sum(uint64 first_input_indices, uint64 input_index_count) : _first_input_indices(first_input_indices), _input_indices_count(input_index_count) // TODO indices ?
+    Sum::Sum(uint64 firstInputIndex, uint64 inputIndexCount) : _firstInputIndex(firstInputIndex), _inputIndexCount(inputIndexCount) // TODO indices ?
     {
         _type = types::sum;
     }
 
     void Sum::SetFirstInputIndices(uint64 index)
     {
-        _first_input_indices = index;
+        _firstInputIndex = index;
     }
 
     uint64 Sum::GetFirstInputIndices() const
     {
-        return _first_input_indices;
+        return _firstInputIndex;
     }
 
     void Sum::SetInputIndicesCount(uint64 count)
     {
-        _input_indices_count = count;
+        _inputIndexCount = count;
     }
 
     uint64 Sum::GetInputIndicesCount() const
     {
-        return _input_indices_count;
+        return _inputIndexCount;
     }
     
     void Sum::Apply(const double* input, double* output) const
     {
         double value = 0.0;
         
-        for (uint64 i = _first_input_indices; i < _first_input_indices + _input_indices_count; ++i)
+        for (uint64 i = _firstInputIndex; i < _firstInputIndex + _inputIndexCount; ++i)
         {
             value += input[i];
         }
@@ -49,7 +49,7 @@ namespace mappings
 
     uint64 Sum::GetMinInputDim() const
     {
-        return _first_input_indices + _input_indices_count;
+        return _firstInputIndex + _inputIndexCount;
     }
 
     uint64 Sum::GetOutputDim() const
@@ -61,16 +61,16 @@ namespace mappings
     {
         // version 1
         Mapping::SerializeHeader(serializer, 1);
-        serializer.Write("first_input_indices", _first_input_indices);
-        serializer.Write("input_index_count", _input_indices_count);
+        serializer.Write("firstInputIndex", _firstInputIndex);
+        serializer.Write("inputIndexCount", _inputIndexCount);
     }
 
     void Sum::Deserialize(JsonSerializer& serializer, int version)
     {
         if (version == 1)
         {
-            serializer.Read("first_input_indices", _first_input_indices);
-            serializer.Read("input_index_count", _input_indices_count);
+            serializer.Read("firstInputIndex", _firstInputIndex);
+            serializer.Read("inputIndexCount", _inputIndexCount);
         }
         else
         {

@@ -31,7 +31,7 @@ namespace mappings
         return map;
     }
 
-    shared_ptr<Column> Io::ReadColumn(istream& is, int num_layers)
+    shared_ptr<Column> Io::ReadColumn(istream& is, int numLayers)
     {
         auto map = Read(is);
         auto col = dynamic_pointer_cast<Column>(map);
@@ -39,7 +39,7 @@ namespace mappings
         {
             throw runtime_error("stream does not contain a column Mapping");
         }
-        col->KeepLayers(num_layers);
+        col->KeepLayers(numLayers);
         return col;
     }
 

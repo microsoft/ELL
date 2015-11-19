@@ -103,14 +103,14 @@ void write_header(const QpLayoutGenerator::Params& p, ostream& os, bool use_html
         
         // write parameter values used to generate ensemble
         os << "<!--" << endl;
-        os << "gd_num_steps: " << p.gd_num_steps << endl;
-        os << "gd_learning_reate: " << p.gd_learning_rate << endl;
-        os << "depth_space: " << p.depth_space << endl;
-        os << "depth_space_growth_factor: " << p.depth_space_growth_factor << endl;
-        os << "offset_space: " << p.offset_space << endl;
-        os << "offset_space_growth_factor: " << p.offset_space_growth_factor << endl;
-        os << "spring_coeff_growth_factor: " << p.spring_coeff_growth << endl;
-        os << "spring_rest_length: " << p.spring_rest_length << endl;
+        os << "gdNumSteps: " << p.gdNumSteps << endl;
+        os << "gdLearningRate: " << p.gd_learning_rate << endl;
+        os << "depthSpace: " << p.depthSpace << endl;
+        os << "depthSpaceGrowthFactor: " << p.depthSpaceGrowthFactor << endl;
+        os << "offsetSpace: " << p.offsetSpace << endl;
+        os << "offsetSpaceGrowthFactor: " << p.offsetSpaceGrowthFactor << endl;
+        os << "springCoeffGrowthFactor: " << p.spring_coeff_growth << endl;
+        os << "springRestLength: " << p.springRestLength << endl;
         os << "-->" << endl;
 
         os << "<head>" << endl;
@@ -422,13 +422,13 @@ int main(int argc, char* argv[])
     bool use_html = ends_with(output_filename, ".html");
 
     QpLayoutGenerator::Params p;
-    p.depth_space = 40.0;
-    p.depth_space_growth_factor = 1.04; // 1.08;
-    p.offset_space = 40.0;
-    p.offset_space_growth_factor = 10.0;
-    p.gd_num_steps = max_steps;
+    p.depthSpace = 40.0;
+    p.depthSpaceGrowthFactor = 1.04; // 1.08;
+    p.offsetSpace = 40.0;
+    p.offsetSpaceGrowthFactor = 10.0;
+    p.gdNumSteps = max_steps;
     p.gd_learning_rate = 0.01;
-    p.spring_rest_length = p.offset_space;
+    p.springRestLength = p.offsetSpace;
     p.spring_coeff_growth = 1; // 1.5;
     p.postprocess = fix_parents;
     p.SimpleLayout = SimpleLayout;

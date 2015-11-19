@@ -100,7 +100,7 @@ namespace tree_layout
         double space_left = 1.0 + closest_common_ancestor;
 
         // get the cumulative space_left in the layer
-        double cum_space_left = _params.offset_space + _params.offset_space_growth_factor * log2(space_left);
+        double cum_space_left = _params.offsetSpace + _params.offsetSpaceGrowthFactor * log2(space_left);
         if (size > 0)
         {
             cum_space_left += layer[layer.size() - 1].space_left;
@@ -148,10 +148,10 @@ namespace tree_layout
         size_t min_depth = min(x0.size(), x1.size());
         size_t max_depth = max(x0.size(), x1.size());
 
-        double max_dist = _params.offset_space;
+        double max_dist = _params.offsetSpace;
         for (uint64 d = 0; d < min_depth; d++)
         {
-            double gap = _params.offset_space +_params.offset_space_growth_factor * log2(2.0+d);
+            double gap = _params.offsetSpace +_params.offsetSpaceGrowthFactor * log2(2.0+d);
             double dist = gap + x0[d].second - x1[d].first;
             max_dist = max(dist, max_dist);
         }
@@ -196,7 +196,7 @@ namespace tree_layout
     template<typename ChildrenVectorType>
     void QpLayoutGenerator::Optimize(const ChildrenVectorType& Children)
     {
-        for (uint64 t = 1; t <= _params.gd_num_steps; ++t)
+        for (uint64 t = 1; t <= _params.gdNumSteps; ++t)
         {
             vector<double> old_offsets = _offsets;
             GdStep(Children, _params.gd_learning_rate);
@@ -243,8 +243,8 @@ namespace tree_layout
 
             double spring0_len = (parent_offset - child0_offset);
             double spring1_len = (parent_offset - child1_offset);
-            double spring0_f = spring_coeff * (spring0_len - _params.spring_rest_length / 2.0);
-            double spring1_f = spring_coeff * (spring1_len + _params.spring_rest_length / 2.0);
+            double spring0_f = spring_coeff * (spring0_len - _params.springRestLength / 2.0);
+            double spring1_f = spring_coeff * (spring1_len + _params.springRestLength / 2.0);
 
             // gradient step of parent towards Children
             grad[i] -= step_size * (spring0_f + spring1_f);

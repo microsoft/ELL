@@ -26,7 +26,7 @@ using std::stringstream;
 // A struct of parameters
 struct app_params
 {
-    int num_iter = 0;
+    int numIter = 0;
     double thresh = 0.0;
 };
 
@@ -41,7 +41,7 @@ struct parsed_params : app_params, utilities::ParsedArgSet
     virtual void AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddDocumentationString("---- Iteration-related parameters ----"); // optional documentation string that gets printed out when you use the --help option
-        parser.AddOption(num_iter, "num_iter", "i", "Number of iterations", 1);
+        parser.AddOption(numIter, "numIter", "i", "Number of iterations", 1);
         parser.AddOption(thresh, "thresh", "t", "Threshold", 0.01);
     }
 };
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
     // Now actually parse the arguments and set the corresponding parameter values
     cmdline.ParseArgs();
 
-    cout << "num_iter: " << Params.num_iter << endl;
+    cout << "numIter: " << Params.numIter << endl;
     cout << "thresh: " << Params.thresh << endl;
 
     if (filepath == "")

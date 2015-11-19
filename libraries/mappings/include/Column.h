@@ -52,7 +52,7 @@ namespace mappings
 
         /// Deserializes the column in json format
         ///
-        virtual void Deserialize(JsonSerializer& serializer, int version = _current_version);
+        virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion);
 
         /// KeepLayers(0) keeps the entire Mapping
         /// KeepLayers(positive) keeps only the specified number of layers, starting from the top
@@ -60,9 +60,9 @@ namespace mappings
         void KeepLayers(int num = 0);
 
     protected:
-        vector<shared_ptr<Mapping>> _column_elements;
-        uint64 _max_internal_dim;
-        static const int _current_version = 1;
+        vector<shared_ptr<Mapping>> _columnElements;
+        uint64 _maxInternalDim;
+        static const int _currentVersion = 1;
 
     };
 }

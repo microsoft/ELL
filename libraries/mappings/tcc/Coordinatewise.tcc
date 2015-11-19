@@ -7,7 +7,7 @@ namespace mappings
     {
         while(begin != end)
         {
-            _index_values.emplace_back(begin->GetIndex(), begin->Get());
+            _indexValues.emplace_back(begin->GetIndex(), begin->Get());
             ++begin;
         }
     }

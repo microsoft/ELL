@@ -54,7 +54,7 @@ namespace mappings
         /// Constructs a decision tree from an iterator that has methods ...
         ///
         template<typename ChildrenIteratorType>
-        DecisionTreePath(ChildrenIteratorType iter, ChildrenIteratorType end, uint64 input_index_offset);
+        DecisionTreePath(ChildrenIteratorType iter, ChildrenIteratorType end, uint64 inputIndexOffset);
 
         /// \returns A reference to the Children vector
         ///
@@ -94,13 +94,13 @@ namespace mappings
 
         /// Deserializes the Mapping in json format
         ///
-        virtual void Deserialize(JsonSerializer& serializer, int version = _current_version);
+        virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion);
 
     protected:
         vector<ChildPair> _children;
-        uint64 _input_index_offset;
+        uint64 _inputIndexOffset;
 
-        static const int _current_version = 1;
+        static const int _currentVersion = 1;
     };
 }
 
