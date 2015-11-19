@@ -4,6 +4,36 @@
 
 namespace linear
 {
+
+    bool DoubleVector::Iterator::IsValid() const
+    {
+        return (_begin != _end);
+    }
+
+    void DoubleVector::Iterator::Next()
+    {
+        do
+        {
+            ++_begin;
+            ++_index;
+        } 
+        while(_begin < _end && *_begin == 0);
+    }
+
+    indexValue DoubleVector::Iterator::Get() const
+    {
+        return indexValue{_index, (double)*_begin};
+    }
+
+    DoubleVector::Iterator::Iterator(const vector<double>::const_iterator& begin, const vector<double>::const_iterator& end) : _begin(begin), _end(end)
+    {
+        while(_begin < _end && *_begin == 0)
+        {
+            ++_begin;
+            ++_index;
+        }
+    }
+
     void DoubleVector::Reset()
     {
         fill(begin(), end(), 0);
@@ -46,6 +76,11 @@ namespace linear
         return result;
     }
 
+    uint64 DoubleVector::Size() const
+    {
+        return vector<double>::size();
+    }
+
     void DoubleVector::Print(ostream & os) const
     {
         for (double x : *this)
@@ -54,8 +89,8 @@ namespace linear
         }
     }
 
-    uint64 DoubleVector::Size() const
+    DoubleVector::Iterator DoubleVector::GetIterator() const
     {
-        return vector<double>::size();
+        return Iterator(cbegin(), cend());
     }
 }
