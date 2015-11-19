@@ -5,7 +5,7 @@
 #include "IDataVector.h"
 
 #include "types.h"
-using linear::uint;
+
 
 #include <memory>
 using std::unique_ptr;
@@ -41,19 +41,19 @@ namespace dataset
 
         /// Inherited via IDataVector
         ///
-        virtual void PushBack(uint index, double value = 1.0) override;
+        virtual void PushBack(uint64 index, double value = 1.0) override;
 
         /// Inherited via IDataVector
         ///
-        //virtual void foreach_nonzero(std::function<void(uint, double)> func, uint index_offset = 0) const override;
+        //virtual void foreach_nonzero(std::function<void(uint64, double)> func, uint64 index_offset = 0) const override;
 
         /// Inherited via IDataVector
         ///
-        virtual uint Size() const override;
+        virtual uint64 Size() const override;
 
         /// \returns The number of non-zeros
         ///
-        virtual uint NumNonzeros() const override;
+        virtual uint64 NumNonzeros() const override;
 
         /// Inherited via IDataVector
         ///

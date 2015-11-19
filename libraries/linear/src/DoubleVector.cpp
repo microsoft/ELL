@@ -21,7 +21,7 @@ namespace linear
 
     void DoubleVector::AddTo(double* p_other, double scalar) const
     {
-        for(uint i = 0; i<Size(); ++i)
+        for(uint64 i = 0; i<Size(); ++i)
         {
             p_other[i] += scalar * (*this)[i];
         }
@@ -29,7 +29,7 @@ namespace linear
 
     void DoubleVector::Scale(double s)
     {
-        for (uint i = 0; i<Size(); ++i)
+        for (uint64 i = 0; i<Size(); ++i)
         {
             (*this)[i] *= s;
         }
@@ -38,7 +38,7 @@ namespace linear
     double DoubleVector::Dot(const double* p_other) const
     {
         double result = 0.0;
-        for(uint i = 0; i<Size(); ++i)
+        for(uint64 i = 0; i<Size(); ++i)
         {
             result += (*this)[i] * p_other[i];
         }
@@ -54,7 +54,7 @@ namespace linear
         }
     }
 
-    uint DoubleVector::Size() const
+    uint64 DoubleVector::Size() const
     {
         return vector<double>::size();
     }

@@ -11,7 +11,7 @@ using predictors::SharedLinearBinaryPredictor;
 using linear::DoubleVector;
 
 #include "types.h"
-using linear::uint;
+
 
 namespace convex_optimization
 {
@@ -23,7 +23,7 @@ namespace convex_optimization
 
         /// Constructs the optimizer
         ///
-        AsgdOptimizer(uint dim);
+        AsgdOptimizer(uint64 dim);
 
         /// Performs a given number of learning iterations
         ///
@@ -35,7 +35,7 @@ namespace convex_optimization
         const SharedLinearBinaryPredictor GetPredictor() const;
             
     private:
-        uint _total_iterations;
+        uint64 _total_iterations;
         DoubleVector _w;
         double _b;
         SharedLinearBinaryPredictor _predictor;

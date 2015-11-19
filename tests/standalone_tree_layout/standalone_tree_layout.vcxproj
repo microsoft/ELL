@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug|x64">
@@ -62,7 +62,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\mappings\include;..\..\libraries\tree_layout\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\mappings\include;..\..\libraries\tree_layout\include;..\..\libraries\common\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -83,7 +83,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\mappings\include;..\..\libraries\tree_layout\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\mappings\include;..\..\libraries\tree_layout\include;..\..\libraries\common\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -38,7 +38,7 @@ namespace tree_layout
             Optimize(Children);
             if (_params.postprocess)
             {
-                for (int i = 0; i < 10; i++)
+                for (uint64 i = 0; i < 10; i++)
                 {
                     MoveParents(Children, 0, 0.1);
                     Project();
@@ -61,16 +61,16 @@ namespace tree_layout
     template<typename ChildrenVectorType>
     void QpLayoutGenerator::BuildLayers(const ChildrenVectorType& Children)
     {
-        vector<int> ancestors;
-        vector<vector<int>> prev_layer_ancestors;
+        vector<uint64> ancestors;
+        vector<vector<uint64>> prev_layer_ancestors;
         BuildLayers(Children, 0, ancestors, prev_layer_ancestors);
     }
 
     template<typename ChildrenVectorType>
-    void QpLayoutGenerator::BuildLayers(const ChildrenVectorType& Children, int index, vector<int>& ancestors, vector<vector<int>>& prev_layer_ancestors)
+    void QpLayoutGenerator::BuildLayers(const ChildrenVectorType& Children, uint64 index, vector<uint64>& ancestors, vector<vector<uint64>>& prev_layer_ancestors)
     {
-        int depth = (int)ancestors.size();
-        if (depth > (int)Children.size())
+        uint64 depth = (uint64)ancestors.size();
+        if (depth > (uint64)Children.size())
         {
             throw runtime_error("infinite recursion: perhaps the Children structure is loopy");
         }
@@ -86,13 +86,13 @@ namespace tree_layout
 
         // get the current layer and its Size
         auto& layer = _layers[depth];
-        int size = (int)layer.size();
+        uint64 size = (uint64)layer.size();
 
-        int closest_common_ancestor = 0;
+        uint64 closest_common_ancestor = 0;
         if (prev_layer_ancestors.size() > depth && prev_layer_ancestors[depth].size() > depth - 1)
         {
             // count down until we reach the root or our ancestor list diverges from the one stored in prev_layer_ancestors
-            for (int d = depth - 1; d >= 0 && ancestors[d] != prev_layer_ancestors[depth][d]; --d)
+            for (uint64 d = depth - 1; d >= 0 && ancestors[d] != prev_layer_ancestors[depth][d]; --d)
             {
                 ++closest_common_ancestor;
             }
@@ -117,22 +117,22 @@ namespace tree_layout
         prev_layer_ancestors[depth] = ancestors;
 
         // termination condition of the recursion
-        if (index < (int)Children.size())
+        if (index < (uint64)Children.size())
         {
             ancestors.push_back(index);
 
             // recurse
-            int child0 = Children[index].GetChild0();
+            uint64 child0 = Children[index].GetChild0();
             BuildLayers(Children, child0, ancestors, prev_layer_ancestors);
 
-            int child1 = Children[index].GetChild1();
+            uint64 child1 = Children[index].GetChild1();
             BuildLayers(Children, child1, ancestors, prev_layer_ancestors);
             ancestors.pop_back();
         }
     }
 
     template<typename ChildrenVectorType>
-    vector<pair<double, double>> QpLayoutGenerator::SimpleLayout(const ChildrenVectorType& Children, int node_index, int depth)
+    vector<pair<double, double>> QpLayoutGenerator::SimpleLayout(const ChildrenVectorType& Children, uint64 node_index, uint64 depth)
     {
         if (node_index >= Children.size()) // leaf node
         {
@@ -140,8 +140,8 @@ namespace tree_layout
         }
 
         // recurse
-        int child0 = Children[node_index].GetChild0();
-        int child1 = Children[node_index].GetChild1();
+        uint64 child0 = Children[node_index].GetChild0();
+        uint64 child1 = Children[node_index].GetChild1();
 
         vector<pair<double, double>> x0 = SimpleLayout(Children, child0, depth + 1); 
         vector<pair<double, double>> x1 = SimpleLayout(Children, child1, depth + 1); 
@@ -149,7 +149,7 @@ namespace tree_layout
         size_t max_depth = max(x0.size(), x1.size());
 
         double max_dist = _params.offset_space;
-        for (int d = 0; d < min_depth; d++)
+        for (uint64 d = 0; d < min_depth; d++)
         {
             double gap = _params.offset_space +_params.offset_space_growth_factor * log2(2.0+d);
             double dist = gap + x0[d].second - x1[d].first;
@@ -158,7 +158,7 @@ namespace tree_layout
 
         vector<pair<double, double>> result(max_depth+1);
         result[0] = make_pair(-max_dist / 2, max_dist / 2);
-        for (int d = 0; d < max_depth; d++)
+        for (uint64 d = 0; d < max_depth; d++)
         {
             if (d < x0.size() && d < x1.size()) // we have both left and right subtree at this depth
             {
@@ -180,14 +180,14 @@ namespace tree_layout
     }
 
     template<typename ChildrenVectorType>
-    void QpLayoutGenerator::IncrementOffsets(const ChildrenVectorType& Children, int node_index, double displacement)
+    void QpLayoutGenerator::IncrementOffsets(const ChildrenVectorType& Children, uint64 node_index, double displacement)
     {
         _offsets[node_index] += displacement;
 
         if (node_index < Children.size()) // leaf node
         {
-            int child0 = Children[node_index].GetChild0();
-            int child1 = Children[node_index].GetChild1();
+            uint64 child0 = Children[node_index].GetChild0();
+            uint64 child1 = Children[node_index].GetChild1();
             IncrementOffsets(Children, child0, displacement);
             IncrementOffsets(Children, child1, displacement);
         }
@@ -196,14 +196,14 @@ namespace tree_layout
     template<typename ChildrenVectorType>
     void QpLayoutGenerator::Optimize(const ChildrenVectorType& Children)
     {
-        for (int t = 1; t <= _params.gd_num_steps; ++t)
+        for (uint64 t = 1; t <= _params.gd_num_steps; ++t)
         {
             vector<double> old_offsets = _offsets;
             GdStep(Children, _params.gd_learning_rate);
             Project();
 
             double total_disp = 0;
-            for (int index = 0; index < _offsets.size(); index++)
+            for (uint64 index = 0; index < _offsets.size(); index++)
             {
                 double diff = old_offsets[index] - _offsets[index];
                 total_disp += diff*diff;
@@ -218,21 +218,21 @@ namespace tree_layout
         _gd_increment.assign(_gd_increment.size(), 0.0);
         ComputeGradient(Children, _offsets, _depth_index, step_size, _gd_increment);
 
-        for (int i = 0; i < (int)_gd_increment.size(); ++i)
+        for (uint64 i = 0; i < (uint64)_gd_increment.size(); ++i)
         {
             _offsets[i] += _gd_increment[i];
         }
     }
 
     template<typename ChildrenVectorType>
-    void QpLayoutGenerator::ComputeGradient(const ChildrenVectorType& Children, const vector<double>& offsets, const vector<int>& depths, double step_size, vector<double>& grad)
+    void QpLayoutGenerator::ComputeGradient(const ChildrenVectorType& Children, const vector<double>& offsets, const vector<uint64>& depths, double step_size, vector<double>& grad)
     {
         size_t num_nodes = Children.size() * 2 + 1;
 
-        for (int i = 0; i < Children.size(); ++i)
+        for (uint64 i = 0; i < Children.size(); ++i)
         {
-            int child0 = Children[i].GetChild0();
-            int child1 = Children[i].GetChild1();
+            uint64 child0 = Children[i].GetChild0();
+            uint64 child1 = Children[i].GetChild1();
 
             double parent_offset = offsets[i];
             double child0_offset = offsets[child0];
@@ -256,12 +256,12 @@ namespace tree_layout
     }
 
     template<typename ChildrenVectorType>
-    void QpLayoutGenerator::MoveParents(const ChildrenVectorType& Children, int node_index, double step_size)
+    void QpLayoutGenerator::MoveParents(const ChildrenVectorType& Children, uint64 node_index, double step_size)
     {
         if (node_index < Children.size())
         {
-            int child0 = Children[node_index].GetChild0();
-            int child1 = Children[node_index].GetChild1();
+            uint64 child0 = Children[node_index].GetChild0();
+            uint64 child1 = Children[node_index].GetChild1();
 
             // recurse
             MoveParents(Children, child0, step_size);

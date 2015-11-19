@@ -1,9 +1,9 @@
 #include "SharedLinearBinaryPredictor.h"
 
-predictors::SharedLinearBinaryPredictor::BiasedVector::BiasedVector(uint dim) : w(dim), b(0.0)
+predictors::SharedLinearBinaryPredictor::BiasedVector::BiasedVector(uint64 dim) : w(dim), b(0.0)
 {}
 
-predictors::SharedLinearBinaryPredictor::SharedLinearBinaryPredictor(uint dim) 
+predictors::SharedLinearBinaryPredictor::SharedLinearBinaryPredictor(uint64 dim) 
 {
     _sp_predictor = make_shared<BiasedVector>(dim);
 }

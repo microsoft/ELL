@@ -18,7 +18,7 @@ namespace linear
 
         /// \returns The Size of the vector
         ///
-        virtual uint Size() const =0;
+        virtual uint64 Size() const =0;
 
         /// Computes the vector squared 2-norm
         ///

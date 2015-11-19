@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "types.h"
+
 #include <vector>
 using std::vector;
 
@@ -60,15 +62,15 @@ namespace tree_layout
         ///
         /// \returns A reference to the position of a specified vertex
         ///
-        VertexPosition& operator[](int index);
+        VertexPosition& operator[](uint64 index);
 
         /// \returns A reference to the position of a specified vertex
         ///
-        const VertexPosition& operator[](int index) const;
+        const VertexPosition& operator[](uint64 index) const;
 
         /// \return The number of vertices
         ///
-        int size() const;
+        uint64 size() const;
 
         /// \returns The min offset (if the tree is top down, this is the left of its bounding box)
         ///

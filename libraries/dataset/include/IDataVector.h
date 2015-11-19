@@ -3,7 +3,7 @@
 #pragma once
 
 #include "types.h"
-using linear::uint;
+
 
 #include "IVector.h"
 using linear::IVector;
@@ -31,7 +31,7 @@ namespace dataset
 
         /// Adds a value at the end of the vector
         ///
-        virtual void PushBack(uint index, double value = 1.0) = 0;
+        virtual void PushBack(uint64 index, double value = 1.0) = 0;
 
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its memory
         ///
@@ -39,10 +39,10 @@ namespace dataset
 
         /// Calls a callback function for each non-zero entry in the vector, in order of increasing index
         ///
-        //virtual void foreach_nonzero(function<void(uint, double)> func, uint index_offset = 0) const = 0; // TODO
+        //virtual void foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset = 0) const = 0; // TODO
 
         /// \returns The number of non-zeros
         ///
-        virtual uint NumNonzeros() const =0;
+        virtual uint64 NumNonzeros() const =0;
     };
 }

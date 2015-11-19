@@ -11,27 +11,27 @@ using std::to_string;
 namespace mappings
 {
 
-    Sum::Sum(int first_input_indices, int input_index_count) : _first_input_indices(first_input_indices), _input_indices_count(input_index_count)
+    Sum::Sum(uint64 first_input_indices, uint64 input_index_count) : _first_input_indices(first_input_indices), _input_indices_count(input_index_count) // TODO indices ?
     {
         _type = types::sum;
     }
 
-    void Sum::SetFirstInputIndices(int index)
+    void Sum::SetFirstInputIndices(uint64 index)
     {
         _first_input_indices = index;
     }
 
-    int Sum::GetFirstInputIndices() const
+    uint64 Sum::GetFirstInputIndices() const
     {
         return _first_input_indices;
     }
 
-    void Sum::SetInputIndicesCount(int count)
+    void Sum::SetInputIndicesCount(uint64 count)
     {
         _input_indices_count = count;
     }
 
-    int Sum::GetInputIndicesCount() const
+    uint64 Sum::GetInputIndicesCount() const
     {
         return _input_indices_count;
     }
@@ -40,19 +40,19 @@ namespace mappings
     {
         double value = 0.0;
         
-        for (int i = _first_input_indices; i < _first_input_indices + _input_indices_count; ++i)
+        for (uint64 i = _first_input_indices; i < _first_input_indices + _input_indices_count; ++i)
         {
             value += input[i];
         }
         output[0] = value;
     }
 
-    int Sum::GetMinInputDim() const
+    uint64 Sum::GetMinInputDim() const
     {
         return _first_input_indices + _input_indices_count;
     }
 
-    int Sum::GetOutputDim() const
+    uint64 Sum::GetOutputDim() const
     {
         return 1;
     }

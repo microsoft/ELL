@@ -5,11 +5,7 @@
 #include "IDataVector.h"
 
 #include "types.h"
-using linear::uint;
 
-#include "IndexValue.h"
-using linear::IndexValue;
-using linear::IIndexValueIterator;
 
 #include <vector>
 using std::vector;
@@ -56,7 +52,7 @@ namespace dataset
 
             /// \returns The current index-value pair
             ///
-            IndexValue GetValue() const;
+            indexValue GetValue() const;
 
         private:
 
@@ -70,7 +66,7 @@ namespace dataset
             // members
             StlIteratorType _begin;
             StlIteratorType _end;
-            uint _index = 0;
+            uint64 _index = 0;
         };
 
         /// Constructor
@@ -92,7 +88,7 @@ namespace dataset
 
         /// Sets an entry in the vector
         ///
-        virtual void PushBack(uint index, double value = 1.0) override;
+        virtual void PushBack(uint64 index, double value = 1.0) override;
 
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its memory
         ///
@@ -100,15 +96,15 @@ namespace dataset
 
         /// Calls a callback function for each non-zero entry in the vector, in order of increasing index
         ///
-        //virtual    void foreach_nonzero(function<void(uint, double)> func, uint index_offset = 0) const override;
+        //virtual    void foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset = 0) const override;
 
         /// \returns The largest index of a non-zero entry plus one
         ///
-        virtual uint Size() const override;
+        virtual uint64 Size() const override;
 
         /// \returns The number of non-zeros
         ///
-        virtual uint NumNonzeros() const override;
+        virtual uint64 NumNonzeros() const override;
 
         /// Computes the vector squared 2-norm
         ///
@@ -131,7 +127,7 @@ namespace dataset
         virtual void Print(ostream& os) const override;
 
     private:
-        uint _num_nonzeros;
+        uint64 _num_nonzeros;
         vector<ValueType> _mem;
     };
 

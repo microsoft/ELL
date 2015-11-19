@@ -29,22 +29,22 @@ namespace dataset
         _upInstance->Reset();
     }
 
-    void SupervisedExample::PushBack(uint index, double value)
+    void SupervisedExample::PushBack(uint64 index, double value)
     {
         _upInstance->PushBack(index, value);
     }
 
-    //void SupervisedExample::foreach_nonzero(std::function<void(uint, double)> func, uint index_offset) const
+    //void SupervisedExample::foreach_nonzero(std::function<void(uint64, double)> func, uint64 index_offset) const
     //{
     //    _upInstance->foreach_nonzero(func, index_offset);
     //}
 
-    uint SupervisedExample::Size() const
+    uint64 SupervisedExample::Size() const
     {
         return _upInstance->Size();
     }
 
-    uint SupervisedExample::NumNonzeros() const
+    uint64 SupervisedExample::NumNonzeros() const
     {
         return _upInstance->NumNonzeros();
     }

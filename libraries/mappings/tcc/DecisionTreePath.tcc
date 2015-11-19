@@ -3,7 +3,7 @@
 namespace mappings
 {
     template<typename ChildrenIteratorType>
-    DecisionTreePath::DecisionTreePath(ChildrenIteratorType iter, ChildrenIteratorType end, int input_index_offset) : 
+    DecisionTreePath::DecisionTreePath(ChildrenIteratorType iter, ChildrenIteratorType end, uint64 input_index_offset) : 
         _input_index_offset(input_index_offset)
     {
         _type = types::decisionTreePath;

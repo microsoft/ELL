@@ -24,11 +24,11 @@ namespace linear
 
         /// Constructs a constant reference to a double vector
         ///
-        DoubleSubvectorCref(const DoubleVector& vec, uint offset = 0, uint size = UINT64_MAX);
+        DoubleSubvectorCref(const DoubleVector& vec, uint64 offset = 0, uint64 size = UINT64_MAX);
 
         /// Constructs a constant reference to a double vector
         ///
-        DoubleSubvectorCref(const double* ptr, uint size);
+        DoubleSubvectorCref(const double* ptr, uint64 size);
 
         /// Computes the vector squared 2-norm
         ///
@@ -48,11 +48,11 @@ namespace linear
 
         /// \returns The Size of the vector
         ///
-        virtual uint Size() const override;
+        virtual uint64 Size() const override;
 
     private:
         const double* _ptr;
-        uint _size;
+        uint64 _size;
     };
 }
 

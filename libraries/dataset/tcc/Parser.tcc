@@ -1,7 +1,7 @@
 // parsing.tcc
 
 #include "types.h"
-using linear::uint;
+
 
 #include <cstdlib>
 using std::strtod;
@@ -38,14 +38,14 @@ namespace dataset
     }
 
     // wrapper for strtoul
-    inline void cParse(const char*& pStr, char*& pEnd, uint& value)
+    inline void cParse(const char*& pStr, char*& pEnd, uint64& value)
     {
         unsigned long x = strtoul(pStr, &pEnd, 0);
-        if(x != (uint)x)
+        if(x != (uint64)x)
         {
             errno = ERANGE;
         }
-        value = (uint)x;
+        value = (uint64)x;
     }
 
     // wrapper for strtol

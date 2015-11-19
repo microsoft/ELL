@@ -49,7 +49,7 @@ namespace linear
 
         /// \returns The Size of the vector
         ///
-        virtual uint Size() const override;
+        virtual uint64 Size() const override;
     };
 }
 

@@ -18,9 +18,9 @@ namespace dataset
     }
 
     template<typename ValueType, typename IntegerListType>
-    IndexValue SparseDataVector<ValueType, IntegerListType>::Iterator::GetValue() const
+    indexValue SparseDataVector<ValueType, IntegerListType>::Iterator::GetValue() const
     {
-        return IndexValue(_index_iterator.GetValue(), *_value_iterator);
+        return indexValue{_index_iterator.GetValue(), (double)*_value_iterator};
     }
 
     template<typename ValueType, typename IntegerListType>
@@ -35,7 +35,7 @@ namespace dataset
     {}
 
     template<typename ValueType, typename IntegerListType>
-    void SparseDataVector<ValueType, IntegerListType>::PushBack(uint index, double value)
+    void SparseDataVector<ValueType, IntegerListType>::PushBack(uint64 index, double value)
     {
         if (value == 0)
         {
@@ -54,18 +54,18 @@ namespace dataset
     }
 
     //template<typename ValueType, typename IntegerListType>
-    //void SparseDataVector<ValueType, IntegerListType>::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const
+    //void SparseDataVector<ValueType, IntegerListType>::foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset) const
     //{
     //    auto iter = GetIterator();
     //    while(iter.IsValid())
     //    {
-    //        func(index_offset + iter.GetIndex(), iter.GetValue());
+    //        func(index_offset + iter.index, iter.GetValue());
     //        iter.Next();
     //    }
     //}
 
     template<typename ValueType, typename IntegerListType>
-    uint SparseDataVector<ValueType, IntegerListType>::Size() const
+    uint64 SparseDataVector<ValueType, IntegerListType>::Size() const
     {
         if(_indices.Size() == 0)
         {
@@ -78,7 +78,7 @@ namespace dataset
     }
 
     template<typename ValueType, typename IntegerListType>
-    uint SparseDataVector<ValueType, IntegerListType>::NumNonzeros() const
+    uint64 SparseDataVector<ValueType, IntegerListType>::NumNonzeros() const
     {
         return _indices.Size();
     }
@@ -96,7 +96,7 @@ namespace dataset
         while (iter.IsValid())
         {
             auto current = iter.GetValue();
-            p_other[current.GetIndex()] += scalar * current.GetValue();
+            p_other[current.index] += scalar * current.value;
             iter.Next();
         }
     }
@@ -110,7 +110,7 @@ namespace dataset
         while (iter.IsValid())
         {
             auto current = iter.GetValue();
-            value += current.GetValue() * p_other[current.GetIndex()];
+            value += current.value * p_other[current.index];
             iter.Next();
         }
     
@@ -129,8 +129,8 @@ namespace dataset
         auto iterator = GetIterator();
         while(iterator.IsValid())
         {
-            auto indexValue = iterator.GetValue();
-            os << indexValue << '\t';
+            auto entry = iterator.GetValue();
+            os << entry.index << ':' << entry.value << '\t';
             iterator.Next();
         }
     }

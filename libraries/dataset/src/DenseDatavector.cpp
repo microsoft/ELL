@@ -24,9 +24,9 @@ namespace dataset
     }
 
     template<typename ValueType>
-    IndexValue DenseDataVector<ValueType>::Iterator::GetValue() const
+    indexValue DenseDataVector<ValueType>::Iterator::GetValue() const
     {
-        return IndexValue(_index, (double)*_begin);
+        return indexValue{_index, (double)*_begin};
     }
 
     template<typename ValueType>
@@ -46,7 +46,7 @@ namespace dataset
     }
 
      template<typename ValueType>
-    void DenseDataVector<ValueType>::PushBack(uint index, double value)
+    void DenseDataVector<ValueType>::PushBack(uint64 index, double value)
     {
         if(value == 0)
         {
@@ -68,9 +68,9 @@ namespace dataset
     }
 
     //template<typename ValueType>
-    //void DenseDataVector<ValueType>::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const // TODO
+    //void DenseDataVector<ValueType>::foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset) const // TODO
     //{
-    //    for(uint i=0; i<Size(); ++i)
+    //    for(uint64 i=0; i<Size(); ++i)
     //    {
     //        double value = _mem[i];
     //        if(value != 0)
@@ -81,13 +81,13 @@ namespace dataset
     //}
 
     template<typename ValueType>
-    uint DenseDataVector<ValueType>::Size() const
+    uint64 DenseDataVector<ValueType>::Size() const
     {
         return _mem.size();
     }
 
     template<typename ValueType>
-    uint DenseDataVector<ValueType>::NumNonzeros() const
+    uint64 DenseDataVector<ValueType>::NumNonzeros() const
     {
         return _num_nonzeros;
     }
@@ -106,7 +106,7 @@ namespace dataset
     template<typename ValueType>
     void DenseDataVector<ValueType>::AddTo(double* p_other, double scalar) const
     {
-        for(uint i = 0; i<Size(); ++i)
+        for(uint64 i = 0; i<Size(); ++i)
         {
             p_other[i] += (double)(scalar * _mem[i]);
         }
@@ -116,7 +116,7 @@ namespace dataset
     double DenseDataVector<ValueType>::Dot(const double* p_other) const
     {
         double result = 0.0;
-        for(uint i = 0; i<Size(); ++i)
+        for(uint64 i = 0; i<Size(); ++i)
         {
             result += _mem[i] * p_other[i];
         }
@@ -136,8 +136,8 @@ namespace dataset
         auto iterator =  GetIterator();
         while(iterator.IsValid())
         {
-            auto indexValue = iterator.GetValue();
-            os << indexValue << '\t';
+            auto entry = iterator.GetValue();
+            os << entry.index << ':' << entry.value << '\t';
             iterator.Next();
         }
     }

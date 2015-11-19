@@ -3,7 +3,7 @@
 #pragma once
 
 #include "types.h"
-using linear::uint;
+
 
 #include <cstdint>
 #include <vector>
@@ -16,7 +16,7 @@ namespace dataset
     {
     public:
 
-        typedef std::vector<uint>::const_iterator vector_iterator;
+        typedef std::vector<uint64>::const_iterator vector_iterator;
 
         /// A read-only forward iterator for the IntegerList.
         ///
@@ -42,7 +42,7 @@ namespace dataset
 
             /// Returns the value of the current iterate
             ///
-            uint GetValue() const;
+            uint64 GetValue() const;
 
         private:
 
@@ -73,19 +73,19 @@ namespace dataset
 
         /// \returns The number of entries in the list
         ///
-        uint Size() const;
+        uint64 Size() const;
 
         /// Allocates a specified number of entires to the list
         ///
-        void Reserve(uint size);
+        void Reserve(uint64 size);
 
         /// \returns The maximal integer in the list
         ///
-        uint Max() const;
+        uint64 Max() const;
 
         /// Appends an integer to the end of the list.
         ///
-        void PushBack(uint value);
+        void PushBack(uint64 value);
 
         /// Deletes all of the vector content and sets its Size to zero
         ///
@@ -100,6 +100,6 @@ namespace dataset
         ///@}
 
     private:
-        std::vector<uint> _list;
+        std::vector<uint64> _list;
     };
 }

@@ -62,6 +62,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linear", "libraries\linear\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linear_test", "tests\linear_test\linear_test.vcxproj", "{EB82BF14-D313-4DE1-B5EF-CAB9F36BC24F}"
 	ProjectSection(ProjectDependencies) = postProject
+		{50749761-3F3D-44AE-9993-B6250A9E88AA} = {50749761-3F3D-44AE-9993-B6250A9E88AA}
 		{951EAFB6-2B18-4385-8E6D-950DD10CBA98} = {951EAFB6-2B18-4385-8E6D-950DD10CBA98}
 	EndProjectSection
 EndProject
@@ -72,6 +73,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "predictors", "libraries\predictors\predictors.vcxproj", "{13682BFD-E22B-462B-9520-E234B624734A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "optimization", "libraries\optimization\optimization.vcxproj", "{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "libraries\common\common.vcxproj", "{50EE045D-4DAA-44B9-9F1A-1FEC297173B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -136,6 +139,10 @@ Global
 		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}.debug|x64.Build.0 = debug|x64
 		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}.release|x64.ActiveCfg = release|x64
 		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}.release|x64.Build.0 = release|x64
+		{50EE045D-4DAA-44B9-9F1A-1FEC297173B4}.debug|x64.ActiveCfg = debug|x64
+		{50EE045D-4DAA-44B9-9F1A-1FEC297173B4}.debug|x64.Build.0 = debug|x64
+		{50EE045D-4DAA-44B9-9F1A-1FEC297173B4}.release|x64.ActiveCfg = release|x64
+		{50EE045D-4DAA-44B9-9F1A-1FEC297173B4}.release|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -153,5 +160,6 @@ Global
 		{D6FDE3E6-4E52-4BA3-AB0D-BB7C9B100803} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
 		{13682BFD-E22B-462B-9520-E234B624734A} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
 		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
+		{50EE045D-4DAA-44B9-9F1A-1FEC297173B4} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
 	EndGlobalSection
 EndGlobal

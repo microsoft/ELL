@@ -15,23 +15,23 @@ namespace mappings
     public:
         /// Constructs a Sum Mapping 
         ///
-        Sum(int first_input_indices = 0, int input_index_count = 0);
+        Sum(uint64 first_input_indices = 0, uint64 input_index_count = 0);
 
         /// Sets the first input index to sum
         ///
-        void SetFirstInputIndices(int index);
+        void SetFirstInputIndices(uint64 index);
 
         /// Sets the first input index to sum
         ///
-        int GetFirstInputIndices() const;
+        uint64 GetFirstInputIndices() const;
 
         /// Sets the first input index to sum
         ///
-        void SetInputIndicesCount(int count);
+        void SetInputIndicesCount(uint64 count);
 
         /// Sets the first input index to sum
         ///
-        int GetInputIndicesCount() const;
+        uint64 GetInputIndicesCount() const;
 
         /// applys the Mapping (reads inputs from the input vector and writes output to the output vector
         ///
@@ -39,11 +39,11 @@ namespace mappings
 
         /// \returns The input dimension of the Mapping. Namely, the Apply function assumes that the input array is at least this long
         ///
-        virtual int GetMinInputDim() const;
+        virtual uint64 GetMinInputDim() const;
 
         /// \returns The output dimension of the Mapping. Namely, the Apply function assumes that the output array is at least this long
         ///    
-        virtual int GetOutputDim() const;
+        virtual uint64 GetOutputDim() const;
 
         /// Serializes the Mapping in json format
         ///
@@ -54,8 +54,8 @@ namespace mappings
         virtual void Deserialize(JsonSerializer& serializer, int version = _current_version);
 
     protected:
-        int _first_input_indices;
-        int _input_indices_count;
+        uint64 _first_input_indices;
+        uint64 _input_indices_count;
         static const int _current_version = 1;
     };
 }

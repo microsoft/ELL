@@ -32,9 +32,6 @@
     <ClInclude Include="include\BinaryClassificationEvaluator.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\types.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\SharedArguments.h">
       <Filter>include</Filter>
     </ClInclude>

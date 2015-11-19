@@ -208,7 +208,20 @@ namespace utilities
         {
             value = _json_value[key].asUInt();
         }
-        catch (...)    // underlying json implementation may throw an exception 
+        catch(...)    // underlying json implementation may throw an exception 
+        {
+            throw runtime_error("jsoncpp threw an unspecified exception during read");
+        }
+    }
+
+    template<typename KeyType>
+    void JsonSerializer::Get(KeyType key, uint64& value) const
+    {
+        try
+        {
+            value = _json_value[key].asUInt64();
+        }
+        catch(...)    // underlying json implementation may throw an exception 
         {
             throw runtime_error("jsoncpp threw an unspecified exception during read");
         }

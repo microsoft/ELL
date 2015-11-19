@@ -34,7 +34,7 @@ namespace linear
 
         /// \returns A reference to a column
         ///
-        const RowType& GetColumn(uint index) const;
+        const RowType& GetColumn(uint64 index) const;
 
         /// Performs a general vector matrix product: y = alpha * x * M + beta * y
         ///

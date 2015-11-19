@@ -30,12 +30,12 @@ namespace mappings
         output[0] = _c;
     }
 
-    int Constant::GetMinInputDim() const
+    uint64 Constant::GetMinInputDim() const
     {
         return 0;
     }
 
-    int Constant::GetOutputDim() const
+    uint64 Constant::GetOutputDim() const
     {
         return 1;
     }

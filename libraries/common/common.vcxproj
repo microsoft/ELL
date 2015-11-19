@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{50749761-3F3D-44AE-9993-B6250A9E88AA}</ProjectGuid>
-    <RootNamespace>dataset</RootNamespace>
+    <ProjectGuid>{50EE045D-4DAA-44B9-9F1A-1FEC297173B4}</ProjectGuid>
+    <RootNamespace>common</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
@@ -51,14 +51,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>include;..\linear\include;..\common\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\utilities\lib</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
@@ -68,7 +67,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>include;..\linear\include;..\common\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -76,49 +75,11 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\utilities\lib</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\ZeroDatavector.cpp" />
-    <ClInclude Include="include\CompressedIntegerList.h" />
-    <ClInclude Include="include\DatavectorBuilder.h" />
-    <ClInclude Include="include\DenseDatavector.h" />
-    <ClInclude Include="include\IDataVector.h" />
-    <ClInclude Include="include\IntegerList.h" />
-    <ClInclude Include="include\Loader.h" />
-    <ClInclude Include="include\OnesDatavector.h" />
-    <ClInclude Include="include\Parser.h" />
-    <ClInclude Include="include\ParsingIterator.h" />
-    <ClInclude Include="include\SequentialLineIterator.h" />
-    <ClInclude Include="include\SparseBinaryDatavector.h" />
-    <ClInclude Include="include\SparseDatavector.h" />
-    <ClInclude Include="include\SparseEntryParser.h" />
-    <ClInclude Include="include\SupervisedExample.h" />
-    <ClInclude Include="include\SupervisedExampleBuilder.h" />
-    <ClCompile Include="src\CompressedIntegerList.cpp" />
-    <ClCompile Include="src\DenseDatavector.cpp" />
-    <ClCompile Include="src\IntegerList.cpp" />
-    <ClCompile Include="src\OnesDatavector.cpp" />
-    <ClCompile Include="src\SparseBinaryDatavector.cpp" />
-    <ClCompile Include="src\SparseDatavector.cpp" />
-    <ClCompile Include="src\SparseEntryParser.cpp" />
-    <ClInclude Include="include\ZeroDatavector.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\SequentialLineIterator.cpp" />
-    <ClCompile Include="src\SupervisedExample.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="tcc\DataVectorBuilder.tcc" />
-    <None Include="tcc\DenseDataVector.tcc" />
-    <None Include="tcc\Loader.tcc" />
-    <None Include="tcc\Parser.tcc" />
-    <None Include="tcc\ParsingIterator.tcc" />
-    <None Include="tcc\SparseBinaryDataVector.tcc" />
-    <None Include="tcc\SparseDataVector.tcc" />
-    <None Include="tcc\SupervisedExampleBuilder.tcc" />
+    <ClInclude Include="include\types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

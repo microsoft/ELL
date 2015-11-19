@@ -7,7 +7,7 @@
 #include "ZeroDataVector.h"
 
 #include "types.h"
-using linear::uint;
+
 
 #include <memory>
 using std::move;
@@ -28,23 +28,21 @@ namespace dataset
 
         bool containsNonBinary = false;
         bool containsNonShorts = false;
-        uint numNonZeros = 0;
+        uint64 numNonZeros = 0;
 
         while(indexValueIterator.IsValid())
         {
             // add entry to vector
-            auto indexValue = indexValueIterator.GetValue();
-            uint index = indexValue.GetIndex();
-            double value = indexValue.GetValue();
-            up_vec->PushBack(index, value);
+            auto entry = indexValueIterator.GetValue();
+            up_vec->PushBack(entry.index, entry.value);
 
             // Update VectorStats
-            if(value != 1.0)
+            if(entry.value != 1.0)
             {
                 containsNonBinary = true;
             }
 
-            if(((short)value) != value)
+            if(((short)entry.value) != entry.value)
             {
                 containsNonShorts = true;
             }

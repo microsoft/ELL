@@ -17,7 +17,7 @@ namespace predictors
     class SharedLinearBinaryPredictor
     {
     public:
-        SharedLinearBinaryPredictor(uint dim);
+        SharedLinearBinaryPredictor(uint64 dim);
 
         /// \returns the underlying DoubleVector
         ///
@@ -43,7 +43,7 @@ namespace predictors
     private:
         struct BiasedVector
         {
-            BiasedVector(uint dim);
+            BiasedVector(uint64 dim);
             DoubleVector w;
             double b;
         };

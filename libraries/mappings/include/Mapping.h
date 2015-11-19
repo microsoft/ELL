@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "types.h"
+
 #include "JsonSerializer.h"
 using utilities::JsonSerializer;
 
@@ -34,11 +36,11 @@ namespace mappings
 
         /// \returns The input dimension of the Mapping. Namely, the Apply function assumes that the input array is at least this long
         ///
-        virtual int GetMinInputDim() const = 0;
+        virtual uint64 GetMinInputDim() const = 0;
 
         /// \returns The output dimension of the Mapping. Namely, the Apply function assumes that the output array is at least this long
         ///
-        virtual int GetOutputDim() const = 0;
+        virtual uint64 GetOutputDim() const = 0;
 
         /// Serializes the Mapping in json format
         ///

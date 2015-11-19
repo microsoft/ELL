@@ -14,7 +14,7 @@ using std::swap;
 namespace linear
 {
     template<typename DataVectorType>
-    RowMatrix<DataVectorType>::Iterator::Iterator(const RowMatrix& table, uint row, uint max_row) : _table(table), _row(row), _max_row(max_row)
+    RowMatrix<DataVectorType>::Iterator::Iterator(const RowMatrix& table, uint64 row, uint64 max_row) : _table(table), _row(row), _max_row(max_row)
     {}
 
     template<typename DataVectorType>
@@ -24,7 +24,7 @@ namespace linear
     }
 
     template<typename DataVectorType>
-    uint RowMatrix<DataVectorType>::Iterator::NumIteratesLeft() const
+    uint64 RowMatrix<DataVectorType>::Iterator::NumIteratesLeft() const
     {
         return _max_row - _row;
     }
@@ -50,7 +50,7 @@ namespace linear
     }
 
     template<typename DataVectorType>
-    uint RowMatrix<DataVectorType>::NumColumns() const
+    uint64 RowMatrix<DataVectorType>::NumColumns() const
     {
         return _num_columns;
     }
@@ -62,9 +62,9 @@ namespace linear
     }
 
     template<typename DataVectorType>
-    typename RowMatrix<DataVectorType>::Iterator RowMatrix<DataVectorType>::GetIterator(uint row, uint size) const
+    typename RowMatrix<DataVectorType>::Iterator RowMatrix<DataVectorType>::GetIterator(uint64 row, uint64 size) const
     {
-        uint max_row = row + size;
+        uint64 max_row = row + size;
         if(max_row > NumRows() || size == 0)
         {
             max_row = NumRows();
@@ -76,7 +76,7 @@ namespace linear
     template<typename DataVectorType>
     void RowMatrix<DataVectorType>::PushBackRow(DataVectorType&& row)
     {
-        uint numColumns = row.Size();
+        uint64 numColumns = row.Size();
         _rows.emplace_back(move(row));
 
         if(_num_columns < numColumns)
@@ -91,7 +91,7 @@ namespace linear
     {
         _rows.emplace_back(args...);
 
-        uint numColumns = _rows[_rows.size()-1].size();
+        uint64 numColumns = _rows[_rows.size()-1].size();
         if(_num_columns < numColumns)
         {
             _num_columns = numColumns;
@@ -120,7 +120,7 @@ namespace linear
     template<typename DataVectorType>
     void RowMatrix<DataVectorType>::Gemv(const double* p_x, double* p_y, double alpha, double beta) const
     {
-        int size = (int)NumRows(); // openmp doesn't like uint
+        int size = (int)NumRows(); // openmp doesn't like uint64
 
         if (alpha == 1.0)
         {
@@ -187,7 +187,7 @@ namespace linear
     template<typename DataVectorType>
     void RowMatrix<DataVectorType>::Print(ostream& os) const
     {
-        for (uint i = 0; i < NumRows(); ++i)
+        for (uint64 i = 0; i < NumRows(); ++i)
         {
             os << "Row " << i << "\t" << this->GetRow(i) << endl;
         }

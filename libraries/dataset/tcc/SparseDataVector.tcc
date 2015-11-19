@@ -9,7 +9,7 @@ namespace dataset
         while(indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.GetValue();
-            PushBack(indexValue.GetIndex(), indexValue.GetValue());
+            PushBack(indexValue.index, indexValue.value);
             indexValueIterator.Next();
         }
     }

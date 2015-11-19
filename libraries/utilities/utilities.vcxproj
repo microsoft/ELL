@@ -53,7 +53,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile />
       <PrecompiledHeaderOutputFile />
-      <AdditionalIncludeDirectories>include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\common\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -68,7 +68,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile />
       <PrecompiledHeaderOutputFile />
-      <AdditionalIncludeDirectories>include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\common\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -84,7 +84,6 @@
     <ClInclude Include="include\JsonSerializer.h" />
     <ClInclude Include="include\random_engines.h" />
     <ClInclude Include="include\SharedArguments.h" />
-    <ClInclude Include="include\types.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\BinaryClassificationEvaluator.tcc" />

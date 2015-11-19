@@ -28,11 +28,11 @@ namespace mappings
         
         /// \returns The input dimension of the column. Namely, the Apply function assumes that the input array is at least this long
         ///
-        virtual int GetMinInputDim() const;
+        virtual uint64 GetMinInputDim() const;
 
         /// \returns The output dimension of the column. Namely, the Apply function assumes that the output array is at least this long
         ///
-        virtual int GetOutputDim() const;
+        virtual uint64 GetOutputDim() const;
 
         /// Adds a Mapping to the bottom of the column
         ///
@@ -61,7 +61,7 @@ namespace mappings
 
     protected:
         vector<shared_ptr<Mapping>> _column_elements;
-        int _max_internal_dim;
+        uint64 _max_internal_dim;
         static const int _current_version = 1;
 
     };

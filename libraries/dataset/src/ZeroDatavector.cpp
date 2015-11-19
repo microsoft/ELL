@@ -17,7 +17,7 @@ namespace dataset
     void ZeroDataVector::Iterator::Next()
     {}
 
-    IndexValue ZeroDataVector::Iterator::GetValue() const
+    indexValue ZeroDataVector::Iterator::GetValue() const
     {
         throw runtime_error("this code should bever be reached");
     }
@@ -30,7 +30,7 @@ namespace dataset
         return type::zero;
     }
 
-    void ZeroDataVector::PushBack(uint index, double value)
+    void ZeroDataVector::PushBack(uint64 index, double value)
     {
         if(value != 0)
         {
@@ -41,15 +41,15 @@ namespace dataset
     void ZeroDataVector::Reset()
     {}
 
-    //void ZeroDataVector::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const // TODO
+    //void ZeroDataVector::foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset) const // TODO
     //{}
 
-    uint ZeroDataVector::Size() const
+    uint64 ZeroDataVector::Size() const
     {
         return 0;
     }
 
-    uint ZeroDataVector::NumNonzeros() const
+    uint64 ZeroDataVector::NumNonzeros() const
     {
         return 0;
     }

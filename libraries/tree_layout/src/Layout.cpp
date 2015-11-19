@@ -38,19 +38,19 @@ namespace tree_layout
         _positions(size), _minOffset(min_offset), _maxOffset(max_offset), _minDepth(min_depth), _maxDepth(max_depth)
     {}
 
-    VertexPosition& Layout::operator[](int index)
+    VertexPosition& Layout::operator[](uint64 index)
     {
         return _positions[index];
     }
 
-    const VertexPosition& Layout::operator[](int index) const
+    const VertexPosition& Layout::operator[](uint64 index) const
     {
         return _positions[index];
     }
 
-    int Layout::size() const
+    uint64 Layout::size() const
     {
-        return (int)_positions.size();
+        return (uint64)_positions.size();
     }
 
     double Layout::GetMinOffset() const

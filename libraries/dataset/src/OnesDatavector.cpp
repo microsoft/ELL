@@ -3,7 +3,7 @@
 #include "OnesDataVector.h"
 
 #include "types.h"
-using linear::uint;
+
 
 #include <stdexcept>
 using std::runtime_error;
@@ -28,15 +28,15 @@ namespace dataset
         ++_index;
     }
 
-    IndexValue OnesDataVector::Iterator::GetValue() const
+    indexValue OnesDataVector::Iterator::GetValue() const
     {
-        return IndexValue(_index, 1);
+        return indexValue{_index, 1};
     }
 
-    OnesDataVector::Iterator::Iterator(uint size) : _size(size)
+    OnesDataVector::Iterator::Iterator(uint64 size) : _size(size)
     {}
 
-    OnesDataVector::OnesDataVector(uint dim) : _size(dim)
+    OnesDataVector::OnesDataVector(uint64 dim) : _size(dim)
     {}
 
     OnesDataVector::OnesDataVector(const IDataVector& other) : _size(other.Size())
@@ -47,7 +47,7 @@ namespace dataset
         return type::ones;
     }
 
-    void OnesDataVector::PushBack(uint index, double value)
+    void OnesDataVector::PushBack(uint64 index, double value)
     {
         if(value != 1 || index != _size)
         {
@@ -61,20 +61,20 @@ namespace dataset
         _size = 0;
     }
 
-    //void OnesDataVector::foreach_nonzero(function<void(uint, double)> func, uint index_offset) const // TODO
+    //void OnesDataVector::foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset) const // TODO
     //{
-    //    for(uint i=0; i<_size; ++i)
+    //    for(uint64 i=0; i<_size; ++i)
     //    {
     //        func(index_offset+i, 1.0);
     //    }
     //}
 
-    uint OnesDataVector::Size() const
+    uint64 OnesDataVector::Size() const
     {
         return _size;
     }
 
-    uint OnesDataVector::NumNonzeros() const
+    uint64 OnesDataVector::NumNonzeros() const
     {
         return _size;
     }
@@ -86,7 +86,7 @@ namespace dataset
 
     void OnesDataVector::AddTo(double* p_other, double scalar) const
     {
-        for(uint i = 0; i<_size; ++i)
+        for(uint64 i = 0; i<_size; ++i)
         {
             p_other[i] += (double)scalar;
         }
@@ -95,7 +95,7 @@ namespace dataset
     double OnesDataVector::Dot(const double* p_other) const
     {
         double result = 0.0;
-        for(uint i = 0; i<_size; ++i)
+        for(uint64 i = 0; i<_size; ++i)
         {
             result += p_other[i];
         }

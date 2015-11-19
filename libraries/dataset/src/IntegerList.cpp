@@ -17,7 +17,7 @@ namespace dataset
         ++_begin;
     }
 
-    uint IntegerList::Iterator::GetValue() const
+    uint64 IntegerList::Iterator::GetValue() const
     {
         return *_begin;
     }
@@ -28,17 +28,17 @@ namespace dataset
     IntegerList::IntegerList()
     {}
 
-    uint IntegerList::Size() const
+    uint64 IntegerList::Size() const
     {
         return _list.size();
     }
 
-    void IntegerList::Reserve(uint size)
+    void IntegerList::Reserve(uint64 size)
     {
         _list.reserve(size);
     }
 
-    uint IntegerList::Max() const
+    uint64 IntegerList::Max() const
     {
         if(_list.size()==0)
         {
@@ -48,7 +48,7 @@ namespace dataset
         return _list[Size()-1];
     }
 
-    void IntegerList::PushBack(uint value)
+    void IntegerList::PushBack(uint64 value)
     {
         _list.push_back(value);
     }

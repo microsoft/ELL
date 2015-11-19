@@ -24,15 +24,15 @@ namespace mappings
 
             /// Constructs the pair of Children
             ///
-            ChildPair(int child0, int child1);
+            ChildPair(uint64 child0, uint64 child1);
 
             /// \returns Child 0
             ///
-            int GetChild0() const;
+            uint64 GetChild0() const;
 
             /// \returns Child 1
             ///
-            int GetChild1() const;
+            uint64 GetChild1() const;
 
             /// Serializes the Mapping in json format
             ///
@@ -43,8 +43,8 @@ namespace mappings
             virtual void Deserialize(JsonSerializer& serializer);
 
         private:
-            int _child0;
-            int _child1;
+            uint64 _child0;
+            uint64 _child1;
         };
 
         /// Default constructor
@@ -54,7 +54,7 @@ namespace mappings
         /// Constructs a decision tree from an iterator that has methods ...
         ///
         template<typename ChildrenIteratorType>
-        DecisionTreePath(ChildrenIteratorType iter, ChildrenIteratorType end, int input_index_offset);
+        DecisionTreePath(ChildrenIteratorType iter, ChildrenIteratorType end, uint64 input_index_offset);
 
         /// \returns A reference to the Children vector
         ///
@@ -66,7 +66,7 @@ namespace mappings
 
         /// \returns The input index offset
         ///
-        int GetInputIndexOffset() const;
+        uint64 GetInputIndexOffset() const;
 
         /// applys the Mapping (reads inputs from the input vector and writes output to the output vector
         ///
@@ -74,19 +74,19 @@ namespace mappings
 
         /// \returns The input dimension of the Mapping. Namely, the Apply function assumes that the input array is at least this long
         ///
-        virtual int GetMinInputDim() const;
+        virtual uint64 GetMinInputDim() const;
 
         /// \returns The output dimension of the Mapping. Namely, the Apply function assumes that the output array is at least this long
         ///    
-        virtual int GetOutputDim() const;
+        virtual uint64 GetOutputDim() const;
 
         /// \returns The number of vertices
         ///
-        int GetNumVertices() const;
+        uint64 GetNumVertices() const;
 
         /// \returns The number of interior vertices
         ///
-        int GetNumInteriorVertices() const;
+        uint64 GetNumInteriorVertices() const;
 
         /// Serializes the Mapping in json format
         ///
@@ -98,7 +98,7 @@ namespace mappings
 
     protected:
         vector<ChildPair> _children;
-        int _input_index_offset;
+        uint64 _input_index_offset;
 
         static const int _current_version = 1;
     };

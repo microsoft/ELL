@@ -3,7 +3,7 @@
 #pragma once
 
 #include "types.h"
-using linear::uint;
+
 
 namespace dataset
 {
@@ -23,8 +23,8 @@ namespace dataset
         ///     std::string stlString = "3.14    7   "
         ///     const char* pStr = stlString.c_str(); 
         ///     double x;
-        ///     uint y;
-        ///     uint z;
+        ///     uint64 y;
+        ///     uint64 z;
         ///     auto result = parse(pStr, /* out */ x);
         ///     assert(result == Parser::Result::success && x == 3.14);
         ///     result = parse(pStr, /* out */ y);

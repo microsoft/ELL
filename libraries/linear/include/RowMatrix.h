@@ -46,7 +46,7 @@ namespace linear
 
             /// \returns the number of iterates left in this iterator, including the current one
             /// 
-            uint NumIteratesLeft() const;
+            uint64 NumIteratesLeft() const;
 
             /// Proceeds to the Next row
             ///
@@ -59,13 +59,13 @@ namespace linear
         private:
 
             /// private ctor, can only be called from RowMatrix class
-            Iterator(const RowMatrix& table, uint row, uint max_row);
+            Iterator(const RowMatrix& table, uint64 row, uint64 max_row);
             friend RowMatrix<DataVectorType>;
 
             // members
             const RowMatrix& _table;
-            uint _row;
-            uint _max_row;
+            uint64 _row;
+            uint64 _max_row;
         };
 
         /// The type of each row
@@ -86,19 +86,19 @@ namespace linear
 
         /// \returns The number of rows in the matrix
         ///
-        virtual uint NumRows() const override;
+        virtual uint64 NumRows() const override;
 
         /// \returns The number of columns in the matrix
         ///
-        virtual uint NumColumns() const override;
+        virtual uint64 NumColumns() const override;
 
         /// \returns A reference to a row
         ///
-        const RowType& GetRow(uint index) const;
+        const RowType& GetRow(uint64 index) const;
 
         /// \returns an iterator that traverses the rows
         ///
-        Iterator GetIterator(uint row = 0, uint size = 0) const;
+        Iterator GetIterator(uint64 row = 0, uint64 size = 0) const;
         
         /// Moves a row into the bottom of the matrix 
         ///
@@ -115,7 +115,7 @@ namespace linear
 
         /// Permutes the matrix so that the first numRows of the matrix are uniform, and the rest of the rows are arbitrary
         /// 
-        void RandPerm(default_random_engine& rng, uint count);
+        void RandPerm(default_random_engine& rng, uint64 count);
 
         /// Performs a general matrix vector product: y = alpha * M * x + beta * y
         ///
@@ -131,7 +131,7 @@ namespace linear
 
     private:
         std::vector<DataVectorType> _rows;
-        uint _num_columns = 0;
+        uint64 _num_columns = 0;
     };
 }
 

@@ -2,7 +2,9 @@
 #pragma once
 
 #include "Mapping.h"
-#include "IndexValue.h"
+#include "SerializableIndexValue.h"
+
+#include "types.h"
 
 #include <vector>
 using std::vector;
@@ -24,7 +26,7 @@ namespace mappings
         template <typename IndexValueIterator>
         Coordinatewise(IndexValueIterator begin, IndexValueIterator end, function<double(double, double)> func);
 
-        using IndexValueIterator = vector<IndexValue>::const_iterator;
+        using IndexValueIterator = vector<SerializableIndexValue>::const_iterator;
 
         /// TODO
         ///
@@ -40,11 +42,11 @@ namespace mappings
 
         /// \returns The input dimension of the Mapping. Namely, the Apply function assumes that the input array is at least this long
         ///
-        virtual int GetMinInputDim() const;
+        virtual uint64 GetMinInputDim() const;
 
         /// \returns The output dimension of the Mapping. Namely, the Apply function assumes that the output array is at least this long
         ///    
-        virtual int GetOutputDim() const;
+        virtual uint64 GetOutputDim() const;
 
         /// Serializes the Mapping in json format
         ///
@@ -55,7 +57,7 @@ namespace mappings
         virtual void Deserialize(JsonSerializer& serializer, int version = _current_version);
 
     protected:
-        vector<IndexValue> _index_values;
+        vector<SerializableIndexValue> _index_values;
         function<double(double, double)> _func;
         static const int _current_version = 1;
     };

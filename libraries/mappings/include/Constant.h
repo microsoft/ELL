@@ -27,11 +27,11 @@ namespace mappings
 
         /// \returns The input dimension of the Mapping. Namely, the Apply function assumes that the input array is at least this long
         ///
-        virtual int GetMinInputDim() const;
+        virtual uint64 GetMinInputDim() const;
 
         /// \returns The output dimension of the Mapping. Namely, the Apply function assumes that the output array is at least this long
         ///    
-        virtual int GetOutputDim() const;
+        virtual uint64 GetOutputDim() const;
 
         /// Serializes the Mapping in json format
         ///

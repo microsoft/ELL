@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "IndexValue.h"
-using linear::IndexValue;
+#include "types.h"
 
 #include <string>
 using std::string;
@@ -43,12 +42,12 @@ namespace dataset
 
             /// \returns The current index-value pair
             ///
-            IndexValue GetValue() const;
+            indexValue GetValue() const;
 
         private:
             shared_ptr<const string> _spExampleString; // hold on to the shared ptr to make sure that string is not deleted
             const char* _currentPos = 0;
-            IndexValue _currentIndexValue;
+            indexValue _currentIndexValue;
             bool _isValid = true;
 
             // Private constructor that can only be called from SparseEntryParser

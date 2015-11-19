@@ -27,28 +27,28 @@ namespace mappings
     {
         for(size_t i = 0; i<_index_values.size(); ++i)
         {
-            int index = _index_values[i].GetIndex();
-            double value = _index_values[i].GetValue();
+            uint64 index = _index_values[i].index;
+            double value = _index_values[i].value;
             output[i] = _func(input[index], value);
         }
     }
 
-    int Coordinatewise::GetMinInputDim() const
+    uint64 Coordinatewise::GetMinInputDim() const
     {
-        int min_input_dim = 0;
+        uint64 min_input_dim = 0;
         for(size_t i = 0; i<_index_values.size(); ++i)
         {
-            if(_index_values[i].GetIndex() >= min_input_dim)
+            if(_index_values[i].index >= min_input_dim)
             {
-                min_input_dim = _index_values[i].GetIndex() + 1;
+                min_input_dim = _index_values[i].index + 1;
             }
         }
         return min_input_dim;
     }
 
-    int Coordinatewise::GetOutputDim() const
+    uint64 Coordinatewise::GetOutputDim() const
     {
-        return (int)_index_values.size();
+        return (uint64)_index_values.size();
     }
 
     void Coordinatewise::Serialize(JsonSerializer& serializer) const

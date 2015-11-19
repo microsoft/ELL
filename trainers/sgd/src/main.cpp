@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
         LogLoss loss(1);
 
         // create sgd trainer
-        uint dim = data.NumColumns();
+        uint64 dim = data.NumColumns();
         AsgdOptimizer optimizer(dim);
 
         // create evaluator

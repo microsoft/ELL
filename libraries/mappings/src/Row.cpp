@@ -30,12 +30,12 @@ namespace mappings
         }
     }
 
-    int Row::GetMinInputDim() const
+    uint64 Row::GetMinInputDim() const
     {
         return _in_dim;
     }
 
-    int Row::GetOutputDim() const
+    uint64 Row::GetOutputDim() const
     {
         return _out_dim;
     }

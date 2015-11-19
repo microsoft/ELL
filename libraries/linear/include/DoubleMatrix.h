@@ -32,15 +32,15 @@ namespace linear
 
         /// \returns The number of rows in the matrix
         ///
-        virtual uint NumRows() const override;
+        virtual uint64 NumRows() const override;
 
         /// \returns The number of columns in the matrix
         ///
-        virtual uint NumColumns() const override;
+        virtual uint64 NumColumns() const override;
 
         /// Sets an entry in the matrix
         ///
-        virtual void Set(uint i, uint j, double value = 1.0);
+        virtual void Set(uint64 i, uint64 j, double value = 1.0);
 
         /// Sets all of the matrix elements to zero
         ///
@@ -48,11 +48,11 @@ namespace linear
 
         /// \returns A reference to an element of the matrix, specified by coordinates i,j
         ///
-        virtual double& operator()(uint i, uint j) =0;
+        virtual double& operator()(uint64 i, uint64 j) =0;
 
         /// \returns A constant reference to an element of the matrix, specified by coordinates i,j
         ///
-        virtual double operator()(uint i, uint j) const =0;    
+        virtual double operator()(uint64 i, uint64 j) const =0;    
 
         /// Performs a general matrix vector product: y = alpha * M * x + beta * y
         ///
@@ -67,14 +67,14 @@ namespace linear
         virtual void Print(ostream& os) const override;
 
     protected:
-        DoubleMatrixBase(uint size, uint numRows, uint numColumns);
+        DoubleMatrixBase(uint64 size, uint64 numRows, uint64 numColumns);
 
-        uint _num_rows;
-        uint _num_columns;
+        uint64 _num_rows;
+        uint64 _num_columns;
 
     private:
-        double RowDot(uint i, const double* p_x) const;
-        double ColumnDot(uint j, const double* p_x) const;
+        double RowDot(uint64 i, const double* p_x) const;
+        double ColumnDot(uint64 j, const double* p_x) const;
     };
 
     /// Templated DoubleMatrix class specialization for column-major matrices
@@ -86,15 +86,15 @@ namespace linear
         
         /// Constructs a column major dense matrix
         ///
-        DoubleMatrix(uint numRows, uint numColumns);
+        DoubleMatrix(uint64 numRows, uint64 numColumns);
 
         /// \returns A reference to an element of the matrix, specified by coordinates i,j
         ///
-        virtual double& operator()(uint i, uint j) override;
+        virtual double& operator()(uint64 i, uint64 j) override;
 
         /// \returns A constant reference to an element of the matrix, specified by coordinates i,j
         ///
-        virtual double operator()(uint i, uint j) const override;
+        virtual double operator()(uint64 i, uint64 j) const override;
     };
 
     /// Templated DoubleMatrix class specialization for row-major matrices
@@ -106,15 +106,15 @@ namespace linear
 
         /// Constructs a row major dense matrix
         ///
-        DoubleMatrix(uint numRows, uint numColumns);
+        DoubleMatrix(uint64 numRows, uint64 numColumns);
 
         /// \returns A reference to an element of the matrix, specified by coordinates i,j
         ///
-        virtual double& operator()(uint i, uint j) override;
+        virtual double& operator()(uint64 i, uint64 j) override;
 
         /// \returns A constant reference to an element of the matrix, specified by coordinates i,j
         ///
-        virtual double operator()(uint i, uint j) const override;
+        virtual double operator()(uint64 i, uint64 j) const override;
     };
 
     /// Templated DoubleMatrix class specialization for column-major square matrices
@@ -126,7 +126,7 @@ namespace linear
 
         /// Constructs a column major square dense matrix
         ///
-        DoubleMatrix(uint dimension);
+        DoubleMatrix(uint64 dimension);
     };
 
     /// Templated DoubleMatrix class specialization for row-major square matrices
@@ -138,7 +138,7 @@ namespace linear
 
         /// Constructs a row major square dense matrix
         ///
-        DoubleMatrix(uint dimension);
+        DoubleMatrix(uint64 dimension);
     };
 
     /// Templated DoubleMatrix class specialization for row-major square upper-triangular matrices
@@ -150,19 +150,19 @@ namespace linear
 
         /// Constructs a row major square upper-triangular dense matrix
         ///
-        DoubleMatrix(uint dimension);
+        DoubleMatrix(uint64 dimension);
 
         /// Sets an entry in the matrix
         ///
-        virtual void Set(uint i, uint j, double value = 1.0) override;
+        virtual void Set(uint64 i, uint64 j, double value = 1.0) override;
 
         /// \returns A reference to an element of the matrix, specified by coordinates i,j
         ///
-        virtual double& operator()(uint i, uint j) override;
+        virtual double& operator()(uint64 i, uint64 j) override;
 
         /// \returns A constant reference to an element of the matrix, specified by coordinates i,j
         ///
-        virtual double operator()(uint i, uint j) const override;
+        virtual double operator()(uint64 i, uint64 j) const override;
 
         /// Performs a general matrix vector product: y = alpha * M * x + beta * y
         ///
@@ -185,19 +185,19 @@ namespace linear
 
         /// Constructs a row major square upper-triangular dense matrix
         ///
-        DoubleMatrix(uint dimension);
+        DoubleMatrix(uint64 dimension);
 
         /// Sets an entry in the matrix
         ///
-        virtual void Set(uint i, uint j, double value = 1.0) override;
+        virtual void Set(uint64 i, uint64 j, double value = 1.0) override;
 
         /// \returns A reference to an element of the matrix, specified by coordinates i,j
         ///
-        virtual double& operator()(uint i, uint j) override;
+        virtual double& operator()(uint64 i, uint64 j) override;
 
         /// \returns A constant reference to an element of the matrix, specified by coordinates i,j
         ///
-        virtual double operator()(uint i, uint j) const override;
+        virtual double operator()(uint64 i, uint64 j) const override;
 
         /// Performs a general matrix vector product: y = alpha * M * x + beta * y
         ///

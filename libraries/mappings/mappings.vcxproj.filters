@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="include">
@@ -47,10 +47,10 @@
     <ClInclude Include="include\Shift.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\IndexValue.h">
+    <ClInclude Include="include\Coordinatewise.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Coordinatewise.h">
+    <ClInclude Include="include\SerializableIndexValue.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -85,10 +85,10 @@
     <ClCompile Include="src\Shift.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\IndexValue.cpp">
+    <ClCompile Include="src\Coordinatewise.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Coordinatewise.cpp">
+    <ClCompile Include="src\SerializableIndexValue.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

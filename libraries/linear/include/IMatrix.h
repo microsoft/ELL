@@ -17,11 +17,11 @@ namespace linear
 
         /// \returns The number of rows in the matrix
         ///
-        virtual uint NumRows() const = 0;
+        virtual uint64 NumRows() const = 0;
 
         /// \returns The number of columns in the matrix
         ///
-        virtual uint NumColumns() const = 0;
+        virtual uint64 NumColumns() const = 0;
 
         /// Performs a general matrix vector product: y = alpha * M * x + beta * y
         ///

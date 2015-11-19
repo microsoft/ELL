@@ -4,7 +4,7 @@
 
 namespace linear
 {
-    DoubleSubvectorCref::DoubleSubvectorCref(const DoubleVector& vec, uint offset, uint size) : _ptr(&vec[offset]), _size(size)
+    DoubleSubvectorCref::DoubleSubvectorCref(const DoubleVector& vec, uint64 offset, uint64 size) : _ptr(&vec[offset]), _size(size)
     {
         if (_size > vec.Size())
         {
@@ -12,13 +12,13 @@ namespace linear
         }
     }
 
-    DoubleSubvectorCref::DoubleSubvectorCref(const double * ptr, uint size) : _ptr(ptr), _size(size)
+    DoubleSubvectorCref::DoubleSubvectorCref(const double * ptr, uint64 size) : _ptr(ptr), _size(size)
     {}
 
     double DoubleSubvectorCref::Norm2() const
     {
         double result = 0.0;
-        for(uint i=0; i<_size; ++i)
+        for(uint64 i=0; i<_size; ++i)
         {
             double x = _ptr[i];
             result += x * x;
@@ -28,7 +28,7 @@ namespace linear
 
     void DoubleSubvectorCref::AddTo(double* p_other, double scalar) const
     {
-        for(uint i = 0; i<_size; ++i)
+        for(uint64 i = 0; i<_size; ++i)
         {
             p_other[i] += scalar * _ptr[i];
         }
@@ -38,7 +38,7 @@ namespace linear
     double DoubleSubvectorCref::Dot(const double* p_other) const
     {
         double result = 0.0;
-        for(uint i = 0; i<_size; ++i)
+        for(uint64 i = 0; i<_size; ++i)
         {
             result += _ptr[i] * p_other[i];
         }
@@ -48,13 +48,13 @@ namespace linear
 
     void DoubleSubvectorCref::Print(ostream & os) const
     {
-        for(uint i = 0; i<_size; ++i)
+        for(uint64 i = 0; i<_size; ++i)
         {
             os << _ptr[i] << '\t';
         }
     }
 
-    uint DoubleSubvectorCref::Size() const
+    uint64 DoubleSubvectorCref::Size() const
     {
         return _size;
     }

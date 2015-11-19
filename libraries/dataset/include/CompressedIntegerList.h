@@ -3,7 +3,7 @@
 #pragma once
 
 #include "types.h"
-using linear::uint;
+
 
 #include <vector>
 using std::vector;
@@ -46,7 +46,7 @@ namespace dataset
 
             /// Returns the value of the current iterate
             ///
-            uint GetValue() const;
+            uint64 GetValue() const;
 
         private:
 
@@ -57,8 +57,8 @@ namespace dataset
             // members
             const uint8* _iter;
             const uint8* _end;
-            uint _value;
-            uint _iter_increment;
+            uint64 _value;
+            uint64 _iter_increment;
         };
 
         /// Default Constructor. Constructs an empty list.
@@ -79,19 +79,19 @@ namespace dataset
 
         /// \returns The number of entries in the list
         ///
-        uint Size() const;
+        uint64 Size() const;
 
         /// Allocates a specified number of entires to the list
         ///
-        void Reserve(uint size);
+        void Reserve(uint64 size);
 
         /// \returns The maximal integer in the list
         ///
-        uint Max() const;
+        uint64 Max() const;
 
         /// Appends an integer to the end of the list.
         ///
-        void PushBack(uint value);
+        void PushBack(uint64 value);
 
         /// Deletes all of the vector content and sets its Size to zero
         ///
@@ -107,7 +107,7 @@ namespace dataset
 
     private:
         vector<uint8> _mem;
-        uint _last;
-        uint _size;
+        uint64 _last;
+        uint64 _size;
     };
 }

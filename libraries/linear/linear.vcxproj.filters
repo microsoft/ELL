@@ -23,9 +23,6 @@
     <ClInclude Include="include\RowMatrix.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\types.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\BiMatrix.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -42,9 +39,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\DoubleSubvectorCref.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\IndexValue.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -73,9 +67,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\DoubleSubvectorCref.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\IndexValue.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

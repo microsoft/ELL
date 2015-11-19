@@ -4,6 +4,8 @@
 
 #include "../../amalgamated_jsoncpp/json/json.h"
 
+#include "types.h"
+
 #include <type_traits>
 using std::enable_if;
 using std::is_class;
@@ -117,6 +119,9 @@ namespace utilities
 
         template<typename KeyType>
         void Get(KeyType key, unsigned int& value) const;
+
+        template<typename KeyType>
+        void Get(KeyType key, uint64& value) const;
 
         template<typename KeyType>
         void Get(KeyType key, float& value) const;

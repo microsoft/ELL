@@ -62,7 +62,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\libraries\linear\include;..\..\libraries\dataset\include;..\..\libraries\utilities\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libraries\common\include;..\..\libraries\linear\include;..\..\libraries\dataset\include;..\..\libraries\utilities\include</AdditionalIncludeDirectories>
       <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -84,7 +84,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\libraries\linear\include;..\..\libraries\dataset\include;..\..\libraries\utilities\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libraries\common\include;..\..\libraries\linear\include;..\..\libraries\dataset\include;..\..\libraries\utilities\include</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>

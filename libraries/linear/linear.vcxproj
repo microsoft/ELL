@@ -53,7 +53,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile />
       <PrecompiledHeaderOutputFile />
-      <AdditionalIncludeDirectories>include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\common\include</AdditionalIncludeDirectories>
       <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -73,7 +73,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile />
       <PrecompiledHeaderOutputFile />
-      <AdditionalIncludeDirectories>include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\common\include</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -91,13 +91,11 @@
     <ClInclude Include="include\DoubleMatrix.h" />
     <ClInclude Include="include\DoubleSubvectorCref.h" />
     <ClInclude Include="include\DoubleVector.h" />
-    <ClInclude Include="include\IndexValue.h" />
     <ClInclude Include="include\IMatrix.h" />
     <ClInclude Include="include\IVector.h" />
     <ClInclude Include="include\operators.h" />
     <ClInclude Include="include\RowMatrix.h" />
     <ClInclude Include="include\BiMatrix.h" />
-    <ClInclude Include="include\types.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\RowMatrix.tcc" />
@@ -109,7 +107,6 @@
     <ClCompile Include="src\DoubleSubvectorCref.cpp" />
     <ClCompile Include="src\DoubleVector.cpp" />
     <ClCompile Include="src\IMatrix.cpp" />
-    <ClCompile Include="src\IndexValue.cpp" />
     <ClCompile Include="src\IVector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

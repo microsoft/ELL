@@ -15,16 +15,16 @@ namespace mappings
     DecisionTreePath::ChildPair::ChildPair()
     {}
 
-    DecisionTreePath::ChildPair::ChildPair(int child0, int child1) :
+    DecisionTreePath::ChildPair::ChildPair(uint64 child0, uint64 child1) :
         _child0(child0), _child1(child1)
     {}
 
-    int DecisionTreePath::ChildPair::GetChild0() const
+    uint64 DecisionTreePath::ChildPair::GetChild0() const
     {
         return _child0;
     }
 
-    int DecisionTreePath::ChildPair::GetChild1() const
+    uint64 DecisionTreePath::ChildPair::GetChild1() const
     {
         return _child1;
     }
@@ -56,7 +56,7 @@ namespace mappings
         return _children;
     }
 
-    int DecisionTreePath::GetInputIndexOffset() const
+    uint64 DecisionTreePath::GetInputIndexOffset() const
     {
         return _input_index_offset;
     }
@@ -67,7 +67,7 @@ namespace mappings
         fill(output, output+GetOutputDim(), 0.0);
 
         // set indicators for interior nodes
-        int index = 0;
+        uint64 index = 0;
         while (index < GetNumInteriorVertices())
         {
             output[index] = 1.0;
@@ -87,24 +87,24 @@ namespace mappings
         output[index] = 1.0;
     }
 
-    int DecisionTreePath::GetMinInputDim() const
+    uint64 DecisionTreePath::GetMinInputDim() const
     {
         return _input_index_offset + GetNumInteriorVertices();
     }
 
-    int DecisionTreePath::GetOutputDim() const
+    uint64 DecisionTreePath::GetOutputDim() const
     {
         return GetNumVertices();
     }
 
-    int DecisionTreePath::GetNumVertices() const
+    uint64 DecisionTreePath::GetNumVertices() const
     {
         return GetNumInteriorVertices() * 2 + 1;
     }
 
-    int DecisionTreePath::GetNumInteriorVertices() const
+    uint64 DecisionTreePath::GetNumInteriorVertices() const
     {
-        return (int)_children.size();
+        return (uint64)_children.size();
     }
     
     void DecisionTreePath::Serialize(JsonSerializer& serializer) const

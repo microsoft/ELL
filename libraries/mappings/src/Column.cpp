@@ -51,7 +51,7 @@ namespace mappings
         }
     }
 
-    int Column::GetMinInputDim() const
+    uint64 Column::GetMinInputDim() const
     {
         if (_column_elements.size() == 0)
         {
@@ -60,7 +60,7 @@ namespace mappings
         return _column_elements[0]->GetMinInputDim();
     }
 
-    int Column::GetOutputDim() const
+    uint64 Column::GetOutputDim() const
     {
         if (_column_elements.size() == 0)
         {
@@ -76,7 +76,7 @@ namespace mappings
 
         if (_column_elements.size() > 0)
         {
-            int dim = _column_elements[_column_elements.size() - 1]->GetOutputDim();
+            auto dim = _column_elements[_column_elements.size() - 1]->GetOutputDim();
             
             if (dim > _max_internal_dim)
             {

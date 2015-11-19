@@ -32,11 +32,11 @@ namespace mappings
 
         /// \returns The input dimension of the row. Namely, the Apply function assumes that the input array is at least this long
         ///
-        virtual int GetMinInputDim() const;
+        virtual uint64 GetMinInputDim() const;
 
         /// \returns The output dimension of the row. Namely, the Apply function assumes that the output array is at least this long
         ///
-        virtual int GetOutputDim() const;
+        virtual uint64 GetOutputDim() const;
 
         void PushBack(shared_ptr<Mapping> m);
 
@@ -52,8 +52,8 @@ namespace mappings
 
     protected:
         vector<shared_ptr<Mapping>> _row_elements;
-        int _in_dim;
-        int _out_dim;
+        uint64 _in_dim;
+        uint64 _out_dim;
         static const int _current_version = 1;
     };
 }

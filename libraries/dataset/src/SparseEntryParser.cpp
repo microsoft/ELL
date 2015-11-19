@@ -31,7 +31,7 @@ namespace dataset
     void SparseEntryParser::Iterator::Next()
     {
         // parse index
-        uint index;
+        uint64 index;
         auto result = Parser::Parse(_currentPos, index);
 
         // handle errors
@@ -78,15 +78,15 @@ namespace dataset
             }
         }
 
-        _currentIndexValue = IndexValue(index, value);
+        _currentIndexValue = indexValue{index, value};
     }
 
-    IndexValue SparseEntryParser::Iterator::GetValue() const
+    indexValue SparseEntryParser::Iterator::GetValue() const
     {
         return _currentIndexValue;
     }
 
-    SparseEntryParser::Iterator::Iterator(shared_ptr<const string> spExampleString, const char* pStr) : _spExampleString(spExampleString), _currentPos(pStr), _currentIndexValue(0,0)
+    SparseEntryParser::Iterator::Iterator(shared_ptr<const string> spExampleString, const char* pStr) : _spExampleString(spExampleString), _currentPos(pStr)
     {
         Next();
     }
