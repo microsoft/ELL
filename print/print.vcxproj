@@ -59,12 +59,12 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>include;..\common\utilities\include;..\common\mappings\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\libraries\utilities\include;..\libraries\mappings\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\common\utilities\lib\$(Configuration);..\common\mappings\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\libraries\utilities\lib\$(Configuration);..\libraries\mappings\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>utilities.lib;mappings.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -80,14 +80,14 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>include;..\common\utilities\include;..\common\mappings\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\libraries\utilities\include;..\libraries\mappings\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\common\utilities\lib\$(Configuration);..\common\mappings\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\libraries\utilities\lib\$(Configuration);..\libraries\mappings\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>utilities.lib;mappings.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

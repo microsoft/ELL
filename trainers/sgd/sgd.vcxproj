@@ -65,12 +65,12 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>include;..\..\common\treetools_shared\include;..\..\common\linear\include;..\..\common\utilities\include;..\..\common\mappings\include;..\..\common\dataset\include;..\..\common\predictors\include;..\..\common\optimization\include;..\..\common\loss_functions\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\..\libraries\treetools_shared\include;..\..\libraries\linear\include;..\..\libraries\utilities\include;..\..\libraries\mappings\include;..\..\libraries\dataset\include;..\..\libraries\predictors\include;..\..\libraries\optimization\include;..\..\libraries\loss_functions\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\common\utilities\lib\$(Configuration);..\..\common\mappings\lib\$(Configuration);..\..\common\dataset\lib\$(Configuration);..\..\common\linear\lib\$(Configuration);..\..\common\loss_functions\lib\$(Configuration);..\..\common\optimization\lib\$(Configuration);..\..\common\predictors\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\mappings\lib\$(Configuration);..\..\libraries\dataset\lib\$(Configuration);..\..\libraries\linear\lib\$(Configuration);..\..\libraries\loss_functions\lib\$(Configuration);..\..\libraries\optimization\lib\$(Configuration);..\..\libraries\predictors\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>utilities.lib;mappings.lib;dataset.lib;linear.lib;loss_functions.lib;optimization.lib;predictors.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -86,14 +86,14 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>include;..\..\common\treetools_shared\include;..\..\common\linear\include;..\..\common\utilities\include;..\..\common\mappings\include;..\..\common\dataset\include;..\..\common\predictors\include;..\..\common\optimization\include;..\..\common\loss_functions\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\..\libraries\treetools_shared\include;..\..\libraries\linear\include;..\..\libraries\utilities\include;..\..\libraries\mappings\include;..\..\libraries\dataset\include;..\..\libraries\predictors\include;..\..\libraries\optimization\include;..\..\libraries\loss_functions\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\common\utilities\lib\$(Configuration);..\..\common\mappings\lib\$(Configuration);..\..\common\dataset\lib\$(Configuration);..\..\common\linear\lib\$(Configuration);..\..\common\loss_functions\lib\$(Configuration);..\..\common\optimization\lib\$(Configuration);..\..\common\predictors\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\mappings\lib\$(Configuration);..\..\libraries\dataset\lib\$(Configuration);..\..\libraries\linear\lib\$(Configuration);..\..\libraries\loss_functions\lib\$(Configuration);..\..\libraries\optimization\lib\$(Configuration);..\..\libraries\predictors\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>utilities.lib;mappings.lib;dataset.lib;linear.lib;loss_functions.lib;optimization.lib;predictors.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

@@ -62,12 +62,12 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\common\utilities\include;..\..\common\predictors\include;..\..\common\mappings\include;..\..\common\tree_layout\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\mappings\include;..\..\libraries\tree_layout\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\common\utilities\lib\$(Configuration);..\..\common\predictors\lib\$(Configuration);..\..\common\mappings\lib\$(Configuration);..\..\common\tree_layout\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\predictors\lib\$(Configuration);..\..\libraries\mappings\lib\$(Configuration);..\..\libraries\tree_layout\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>utilities.lib;predictors.lib;tree_layout.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -83,14 +83,14 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\common\utilities\include;..\..\common\predictors\include;..\..\common\mappings\include;..\..\common\tree_layout\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\mappings\include;..\..\libraries\tree_layout\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\common\utilities\lib\$(Configuration);..\..\common\predictors\lib\$(Configuration);..\..\common\mappings\lib\$(Configuration);..\..\common\tree_layout\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\predictors\lib\$(Configuration);..\..\libraries\mappings\lib\$(Configuration);..\..\libraries\tree_layout\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>utilities.lib;predictors.lib;tree_layout.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

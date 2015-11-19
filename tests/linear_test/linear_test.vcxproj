@@ -62,13 +62,13 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\common\linear\include;..\..\common\dataset\include;..\..\common\utilities\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libraries\linear\include;..\..\libraries\dataset\include;..\..\libraries\utilities\include</AdditionalIncludeDirectories>
       <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\common\linear\lib\$(Configuration);..\..\common\dataset\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libraries\linear\lib\$(Configuration);..\..\libraries\dataset\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>dataset.lib;linear.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -84,7 +84,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\common\linear\include;..\..\common\dataset\include;..\..\common\utilities\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libraries\linear\include;..\..\libraries\dataset\include;..\..\libraries\utilities\include</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -92,7 +92,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\common\linear\lib\$(Configuration);..\..\common\dataset\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libraries\linear\lib\$(Configuration);..\..\libraries\dataset\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>dataset.lib;linear.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

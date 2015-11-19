@@ -59,12 +59,12 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\common\utilities\linear;..\..\common\utilities\include;..\..\common\predictors\include;..\..\common\mappings\include;..\..\common\tree_layout\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libraries\utilities\linear;..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\mappings\include;..\..\libraries\tree_layout\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\common\linear\lib\$(Configuration);..\..\common\utilities\lib\$(Configuration);..\..\common\predictors\lib\$(Configuration);..\..\common\mappings\lib\$(Configuration);..\..\common\tree_layout\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libraries\linear\lib\$(Configuration);..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\predictors\lib\$(Configuration);..\..\libraries\mappings\lib\$(Configuration);..\..\libraries\tree_layout\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>linear.lib;utilities.lib;predictors.lib;mappings.lib;tree_layout.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -80,14 +80,14 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\common\utilities\linear;..\..\common\utilities\include;..\..\common\predictors\include;..\..\common\mappings\include;..\..\common\tree_layout\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libraries\utilities\linear;..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\mappings\include;..\..\libraries\tree_layout\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\common\linear\lib\$(Configuration);..\..\common\utilities\lib\$(Configuration);..\..\common\predictors\lib\$(Configuration);..\..\common\mappings\lib\$(Configuration);..\..\common\tree_layout\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libraries\linear\lib\$(Configuration);..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\predictors\lib\$(Configuration);..\..\libraries\mappings\lib\$(Configuration);..\..\libraries\tree_layout\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>linear.lib;utilities.lib;predictors.lib;mappings.lib;tree_layout.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

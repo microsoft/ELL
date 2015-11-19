@@ -3,12 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mappings", "common\mappings\mappings.vcxproj", "{7C153142-6FA8-4479-93B8-10DB8DA56D56}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mappings", "libraries\mappings\mappings.vcxproj", "{7C153142-6FA8-4479-93B8-10DB8DA56D56}"
 	ProjectSection(ProjectDependencies) = postProject
 		{42ED2CDB-3B80-4DDB-A3FE-36E933BECA5C} = {42ED2CDB-3B80-4DDB-A3FE-36E933BECA5C}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utilities", "common\utilities\utilities.vcxproj", "{42ED2CDB-3B80-4DDB-A3FE-36E933BECA5C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utilities", "libraries\utilities\utilities.vcxproj", "{42ED2CDB-3B80-4DDB-A3FE-36E933BECA5C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "print", "print\print.vcxproj", "{0BA2A5CE-69C9-45AD-A2CA-52448DAA7C43}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -25,7 +25,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compile", "compile\compile.
 		{7C153142-6FA8-4479-93B8-10DB8DA56D56} = {7C153142-6FA8-4479-93B8-10DB8DA56D56}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tree_layout", "common\tree_layout\tree_layout.vcxproj", "{EF1D9D2B-20D4-4C15-BB27-8E4F80E0E734}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tree_layout", "libraries\tree_layout\tree_layout.vcxproj", "{EF1D9D2B-20D4-4C15-BB27-8E4F80E0E734}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{10B973DF-BD58-4B4A-9EBD-DF247C1746AE}"
 EndProject
@@ -45,7 +45,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "standalone_tree_layout", "t
 		{13682BFD-E22B-462B-9520-E234B624734A} = {13682BFD-E22B-462B-9520-E234B624734A}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{02F40ED6-9C6C-483E-B694-808DD6EB7A69}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{02F40ED6-9C6C-483E-B694-808DD6EB7A69}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trainers", "trainers", "{B3695D8F-1B7C-4FA3-829D-F725AEA31EE6}"
 EndProject
@@ -58,20 +58,20 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sgd", "trainers\sgd\sgd.vcx
 		{D6FDE3E6-4E52-4BA3-AB0D-BB7C9B100803} = {D6FDE3E6-4E52-4BA3-AB0D-BB7C9B100803}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linear", "common\linear\linear.vcxproj", "{951EAFB6-2B18-4385-8E6D-950DD10CBA98}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linear", "libraries\linear\linear.vcxproj", "{951EAFB6-2B18-4385-8E6D-950DD10CBA98}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linear_test", "tests\linear_test\linear_test.vcxproj", "{EB82BF14-D313-4DE1-B5EF-CAB9F36BC24F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{951EAFB6-2B18-4385-8E6D-950DD10CBA98} = {951EAFB6-2B18-4385-8E6D-950DD10CBA98}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dataset", "common\dataset\dataset.vcxproj", "{50749761-3F3D-44AE-9993-B6250A9E88AA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dataset", "libraries\dataset\dataset.vcxproj", "{50749761-3F3D-44AE-9993-B6250A9E88AA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loss_functions", "common\loss_functions\loss_functions.vcxproj", "{D6FDE3E6-4E52-4BA3-AB0D-BB7C9B100803}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loss_functions", "libraries\loss_functions\loss_functions.vcxproj", "{D6FDE3E6-4E52-4BA3-AB0D-BB7C9B100803}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "predictors", "common\predictors\predictors.vcxproj", "{13682BFD-E22B-462B-9520-E234B624734A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "predictors", "libraries\predictors\predictors.vcxproj", "{13682BFD-E22B-462B-9520-E234B624734A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "optimization", "common\optimization\optimization.vcxproj", "{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "optimization", "libraries\optimization\optimization.vcxproj", "{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

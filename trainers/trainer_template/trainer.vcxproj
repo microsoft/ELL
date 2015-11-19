@@ -63,12 +63,12 @@
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
-      <AdditionalIncludeDirectories>include;..\..\common\utilities\include;..\..\common\mappings\include;..\..\common\data_iterators\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\..\libraries\utilities\include;..\..\libraries\mappings\include;..\..\libraries\data_iterators\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\common\utilities\lib\$(Configuration);..\..\common\mappings\lib\$(Configuration);..\..\common\data_iterators\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\mappings\lib\$(Configuration);..\..\libraries\data_iterators\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>utilities.lib;mappings.lib;data_iterators.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -85,14 +85,14 @@
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
-      <AdditionalIncludeDirectories>include;..\..\common\utilities\include;..\..\common\mappings\include;..\..\common\data_iterators\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\..\libraries\utilities\include;..\..\libraries\mappings\include;..\..\libraries\data_iterators\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\common\utilities\lib\$(Configuration);..\..\common\mappings\lib\$(Configuration);..\..\common\data_iterators\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\mappings\lib\$(Configuration);..\..\libraries\data_iterators\lib\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>utilities.lib;mappings.lib;data_iterators.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
