@@ -9,6 +9,10 @@
 #include "types.h"
 using linear::uint;
 
+#include "IndexValue.h"
+using linear::IndexValue;
+using linear::IIndexValueIterator;
+
 namespace dataset
 {
     /// Implements a sparse binary vector as an increasing list of the coordinates where the value is 1.0

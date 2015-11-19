@@ -7,6 +7,10 @@
 #include "types.h"
 using linear::uint;
 
+#include "IndexValue.h"
+using linear::IndexValue;
+using linear::IIndexValueIterator;
+
 namespace dataset
 {
     /// OnesDataVector Base class
@@ -14,6 +18,42 @@ namespace dataset
     class OnesDataVector : public IDataVector
     {
     public:
+
+        /// A read-only forward iterator for the sparse binary vector.
+        ///
+        class Iterator : public IIndexValueIterator
+        {
+        public:
+
+            /// Default copy ctor
+            ///
+            Iterator(const Iterator&) = default;
+
+            /// Default move ctor
+            ///
+            Iterator(Iterator&&) = default;
+
+            /// \returns True if the iterator is currently pointing to a valid iterate
+            ///
+            bool IsValid() const;
+
+            /// Proceeds to the Next iterate
+            ///
+            void Next();
+
+            /// \returns The current index-value pair
+            ///
+            IndexValue GetValue() const;
+
+        private:
+            /// private ctor, can only be called from SparseDataVector class
+            Iterator(uint size);
+            friend OnesDataVector;
+
+            // members
+            uint _size = 0;
+            uint _index = 0;
+        };
 
         /// Constructor
         ///
@@ -67,11 +107,15 @@ namespace dataset
         ///
         virtual double Dot(const double* p_other) const override;
 
+        /// \Returns a Iterator that points to the beginning of the datavector.
+        ///
+        Iterator GetIterator() const;
+
         /// Prints the datavector to an output stream
         ///
         virtual void Print(ostream& os) const override;
 
     private:
-        uint _dim = 0;
+        uint _size = 0;
     };
 }

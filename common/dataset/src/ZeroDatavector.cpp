@@ -8,6 +8,20 @@ using std::runtime_error;
 
 namespace dataset
 {
+
+    bool ZeroDataVector::Iterator::IsValid() const
+    {
+        return false;
+    }
+
+    void ZeroDataVector::Iterator::Next()
+    {}
+
+    IndexValue ZeroDataVector::Iterator::GetValue() const
+    {
+        throw runtime_error("this code should bever be reached");
+    }
+
     ZeroDataVector::ZeroDataVector(const IDataVector& other) 
     {}
 
@@ -51,6 +65,11 @@ namespace dataset
     double ZeroDataVector::Dot(const double* p_other) const
     {
         return 0.0;
+    }
+
+    ZeroDataVector::Iterator ZeroDataVector::GetIterator() const
+    {
+        return Iterator();
     }
 
     void ZeroDataVector::Print(ostream & os) const

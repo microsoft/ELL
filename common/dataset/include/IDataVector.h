@@ -45,9 +45,4 @@ namespace dataset
         ///
         virtual uint NumNonzeros() const =0;
     };
-
-    /// Base class for internal iterator classes that are inside each DataVector
-    ///
-    struct IIndexValueIterator {};
-
 }

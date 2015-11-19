@@ -9,6 +9,7 @@ using linear::uint;
 
 #include "IndexValue.h"
 using linear::IndexValue;
+using linear::IIndexValueIterator;
 
 #include <vector>
 using std::vector;
@@ -71,7 +72,6 @@ namespace dataset
             StlIteratorType _end;
             uint _index = 0;
         };
-
 
         /// Constructor
         ///

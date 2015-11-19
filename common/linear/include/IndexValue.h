@@ -33,4 +33,6 @@ namespace linear
     };
 
     ostream& operator<<(ostream& os, const IndexValue& indexValue);
+
+    struct IIndexValueIterator {};
 }

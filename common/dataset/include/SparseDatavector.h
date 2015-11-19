@@ -5,11 +5,12 @@
 #include "IDataVector.h"
 #include "CompressedIntegerList.h"
 
-#include "IndexValue.h"
-using linear::IndexValue;
-
 #include "types.h"
 using linear::uint;
+
+#include "IndexValue.h"
+using linear::IndexValue;
+using linear::IIndexValueIterator;
 
 namespace dataset
 {
