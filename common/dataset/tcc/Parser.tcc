@@ -94,15 +94,15 @@ namespace dataset
     }
 
     template<typename ValueType>
-    ParseResults parse(const char*& pStr, /* out */ ValueType& value)
+    Parser::Result Parser::Parse(const char*& pStr, /* out */ ValueType& value)
     { 
         // trim whitespace
-        trim(pStr);
+        Trim(pStr);
 
         // check for eof
         if(*pStr == '\0')
         {
-            return ParseResults::endOfString;
+            return Result::endOfString;
         }
 
         // check for "//" comment indicator
@@ -110,14 +110,14 @@ namespace dataset
         {
             if(*(pStr+1) == '/')
             {
-                return ParseResults::beginComment;
+                return Result::beginComment;
             }
         }
 
         // check for "#" comment indicator
         if(*pStr == '#')
         {
-            return ParseResults::beginComment;
+            return Result::beginComment;
         }
 
         char* pEnd = 0;
@@ -132,11 +132,11 @@ namespace dataset
         // check for parse errors
         if(pStr == pEnd)
         {
-            return ParseResults::badFormat;
+            return Result::badFormat;
         }
         if(errno == ERANGE)
         {
-            return ParseResults::outOfRange;
+            return Result::outOfRange;
         }
 
         // restore state
@@ -145,10 +145,10 @@ namespace dataset
         // increment pointer
         pStr = pEnd; 
 
-        return ParseResults::success;
+        return Result::success;
     }
 
-    inline void trim(const char*& pStr)
+    void Parser::Trim(const char*& pStr)
     {
         while(isspace(*pStr))
         {

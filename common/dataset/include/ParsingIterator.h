@@ -4,9 +4,6 @@
 
 #include "SupervisedExample.h"
 
-#include <iterator>
-using std::iterator;
-
 #include <vector>
 using std::vector;
 
@@ -15,7 +12,7 @@ namespace dataset
     /// An input iterator that traverses a textual dataset row by row and applies a parser to each row into a dense feature vector of doubles, 
     /// a double label, and a double weight.
     template<typename RowIteratorType, typename VectorEntryParserType>
-    class ParsingIterator : public iterator<std::input_iterator_tag, vector<double>>
+    class ParsingIterator 
     {
     public:
 

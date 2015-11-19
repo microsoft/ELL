@@ -1,7 +1,7 @@
 // SparseEntryParser.cpp
 
 #include "SparseEntryParser.h"
-#include "parsing.h"
+#include "Parser.h"
 
 #include <memory>
 using std::move;
@@ -32,21 +32,21 @@ namespace dataset
     {
         // parse index
         uint index;
-        auto result = parse(_currentPos, index);
+        auto result = Parser::Parse(_currentPos, index);
 
         // handle errors
-        if(result != ParseResults::success)
+        if(result != Parser::Result::success)
         {
-            if(result == ParseResults::endOfString || result == ParseResults::beginComment)
+            if(result == Parser::Result::endOfString || result == Parser::Result::beginComment)
             {
                 _isValid = false;
                 return;
             }
-            if(result == ParseResults::badFormat)
+            if(result == Parser::Result::badFormat)
             {
                 throw runtime_error("bad format, expected unsigned integer near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
-            else if(result == ParseResults::outOfRange)
+            else if(result == Parser::Result::outOfRange)
             {
                 throw runtime_error("index out of unsigned integer range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
@@ -60,19 +60,19 @@ namespace dataset
         ++_currentPos;
 
         double value;
-        result = parse(_currentPos, value);
+        result = Parser::Parse(_currentPos, value);
 
-        if(result != ParseResults::success)
+        if(result != Parser::Result::success)
         {
-            if(result == ParseResults::endOfString || result == ParseResults::beginComment)
+            if(result == Parser::Result::endOfString || result == Parser::Result::beginComment)
             {
                 throw runtime_error("bad format, string ended prematurely in " + *_spExampleString);
             }
-            if(result == ParseResults::badFormat)
+            if(result == Parser::Result::badFormat)
             {
                 throw runtime_error("bad format, expected double near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
-            else if(result == ParseResults::outOfRange)
+            else if(result == Parser::Result::outOfRange)
             {
                 throw runtime_error("index out of double range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }

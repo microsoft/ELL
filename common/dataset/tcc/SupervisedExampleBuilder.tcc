@@ -1,6 +1,6 @@
 // SupervisedExampleBuilder.tcc
 
-#include "parsing.h"
+#include "Parser.h"
 
 #include "DatavectorBuilder.h"
 using linear::DataVectorBuilder;
@@ -15,17 +15,17 @@ namespace dataset
     SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::SupervisedExampleBuilder(VectorEntryParserType parser, bool hasWeight) : _instanceParser(parser), _hasWeight(hasWeight)
     {}
 
-    void handleErrors(ParseResults result, const string& str)
+    void handleErrors(Parser::Result result, const string& str)
     {
-        if(result == ParseResults::badFormat)
+        if(result == Parser::Result::badFormat)
         {
             throw runtime_error("bad format real value in '" + str + "'");
         }
-        else if(result == ParseResults::endOfString || result == ParseResults::beginComment)
+        else if(result == Parser::Result::endOfString || result == Parser::Result::beginComment)
         {
             throw runtime_error("premature end-of-string or comment in '" + str + "'");
         }
-        else if(result == ParseResults::outOfRange)
+        else if(result == Parser::Result::outOfRange)
         {
             throw runtime_error("real value out of double precision range in '" + str + "'");
         }
@@ -42,18 +42,18 @@ namespace dataset
         // parse weight
         if(_hasWeight)
         {
-            auto result = parse(pStr, /* out */ weight);
+            auto result = Parser::Parse(pStr, /* out */ weight);
 
-            if(result != ParseResults::success)
+            if(result != Parser::Result::success)
             {
                 handleErrors(result, *spExampleString);
             }
         }
 
         // parse label
-        auto result = parse(pStr, /* out */ label);
+        auto result = Parser::Parse(pStr, /* out */ label);
 
-        if(result != ParseResults::success)
+        if(result != Parser::Result::success)
         {
             handleErrors(result, *spExampleString);
         }

@@ -83,7 +83,7 @@
   <ItemGroup>
     <ClInclude Include="include\IndexValue.h" />
     <ClInclude Include="include\Loader.h" />
-    <ClInclude Include="include\parsing.h" />
+    <ClInclude Include="include\Parser.h" />
     <ClInclude Include="include\ParsingIterator.h" />
     <ClInclude Include="include\SequentialLineIterator.h" />
     <ClInclude Include="include\SparseEntryParser.h" />
@@ -98,7 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\Loader.tcc" />
-    <None Include="tcc\parsing.tcc" />
+    <None Include="tcc\Parser.tcc" />
     <None Include="tcc\ParsingIterator.tcc" />
     <None Include="tcc\SupervisedExampleBuilder.tcc" />
   </ItemGroup>

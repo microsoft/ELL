@@ -33,10 +33,7 @@
     <ClInclude Include="include\SparseEntryParser.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="src\SparseEntryParser.cpp">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="include\parsing.h">
+    <ClInclude Include="include\Parser.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,6 +47,7 @@
     <ClCompile Include="src\IndexValue.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\SparseEntryParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\ParsingIterator.tcc">
@@ -61,7 +59,7 @@
     <None Include="tcc\SupervisedExampleBuilder.tcc">
       <Filter>tcc</Filter>
     </None>
-    <None Include="tcc\parsing.tcc">
+    <None Include="tcc\Parser.tcc">
       <Filter>tcc</Filter>
     </None>
   </ItemGroup>
