@@ -18,23 +18,51 @@ namespace mappings
     {
     public:
 
+        /// A read-only forward iterator for the sparse binary vector.
+        ///
+        class Iterator : public IIndexValueIterator
+        {
+        public:
+
+            /// Default copy ctor
+            ///
+            Iterator(const Iterator&) = default;
+
+            /// Default move ctor
+            ///
+            Iterator(Iterator&&) = default;
+
+            /// \returns True if the iterator is currently pointing to a valid iterate
+            ///
+            bool IsValid() const;
+
+            /// Proceeds to the Next iterate
+            ///
+            void Next();
+
+            /// \returns The current index-value pair
+            ///
+            indexValue Get() const;
+
+        private:
+
+            /// private ctor, can only be called from SparseDataVector class
+            Iterator(const vector<SerializableIndexValue>::const_iterator& begin, const vector<SerializableIndexValue>::const_iterator& end);
+            friend Coordinatewise;
+
+            // members
+            vector<SerializableIndexValue>::const_iterator _begin;
+            vector<SerializableIndexValue>::const_iterator _end;
+        };
+
         /// Constructs a default Mapping
         ///
         Coordinatewise(function<double(double,double)> func);
 
-        /// Constructs a Coordinatewise Mapping from index value pairs
-        template <typename IndexValueIterator>
-        Coordinatewise(IndexValueIterator begin, IndexValueIterator end, function<double(double, double)> func);
-
-        using IndexValueIterator = vector<SerializableIndexValue>::const_iterator;
-
-        /// TODO
+        /// Converting constructor
         ///
-        IndexValueIterator begin() const;
-
-        ///
-        ///
-        IndexValueIterator end() const;
+        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        Coordinatewise(IndexValueIteratorType indexValueIterator, function<double(double, double)> func);
 
         /// applys the Mapping (reads inputs from the input vector and writes output to the output vector
         ///
@@ -47,6 +75,10 @@ namespace mappings
         /// \returns The output dimension of the Mapping. Namely, the Apply function assumes that the output array is at least this long
         ///    
         virtual uint64 GetOutputDim() const;
+
+        /// \Returns a Iterator that points to the beginning of the list.
+        ///
+        Iterator GetIterator() const;
 
         /// Serializes the Mapping in json format
         ///

@@ -10,18 +10,26 @@ using std::to_string;
 
 namespace mappings
 {
-    Coordinatewise::Coordinatewise(function<double(double, double)> func) : _func(func)
+    bool Coordinatewise::Iterator::IsValid() const
+    {
+        return (_begin != _end);
+    }
+
+    void Coordinatewise::Iterator::Next()
+    {
+        ++_begin;
+    }
+
+    indexValue Coordinatewise::Iterator::Get() const
+    {
+        return *_begin;
+    }
+
+    Coordinatewise::Iterator::Iterator(const vector<SerializableIndexValue>::const_iterator& begin, const vector<SerializableIndexValue>::const_iterator& end) : _begin(begin), _end(end)
     {}
 
-    Coordinatewise::IndexValueIterator Coordinatewise::begin() const
-    {
-        return _indexValues.cbegin();
-    }
-
-    Coordinatewise::IndexValueIterator Coordinatewise::end() const
-    {
-        return _indexValues.cend();
-    }
+    Coordinatewise::Coordinatewise(function<double(double, double)> func) : _func(func)
+    {}
 
     void Coordinatewise::Apply(const double* input, double* output) const
     {
@@ -49,6 +57,11 @@ namespace mappings
     uint64 Coordinatewise::GetOutputDim() const
     {
         return (uint64)_indexValues.size();
+    }
+
+    Coordinatewise::Iterator Coordinatewise::GetIterator() const
+    {
+        return Iterator(_indexValues.cbegin(), _indexValues.cend());
     }
 
     void Coordinatewise::Serialize(JsonSerializer& serializer) const

@@ -2,13 +2,15 @@
 
 namespace mappings
 {
-    template <typename IndexValueIterator>
-    Coordinatewise::Coordinatewise(IndexValueIterator begin, IndexValueIterator end, function<double(double, double)> func) : _func(func)
+   
+    template<typename IndexValueIteratorType, typename concept>
+    Coordinatewise::Coordinatewise(IndexValueIteratorType indexValueIterator, function<double(double, double)> func) : _func(func)
     {
-        while(begin != end)
+        while(indexValueIterator.IsValid())
         {
-            _indexValues.emplace_back(begin->GetIndex(), begin->Get());
-            ++begin;
+            auto entry = indexValueIterator.Get();
+            _indexValues.push_back(entry);
+            indexValueIterator.Next();
         }
     }
 }
