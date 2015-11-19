@@ -30,7 +30,7 @@ namespace dataset
 
         /// \returns The weight of the current example
         ///
-        SupervisedExample GetValue();
+        SupervisedExample Get();
 
     private:
         RowIteratorType _rowIterator;

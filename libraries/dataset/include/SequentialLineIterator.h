@@ -32,7 +32,7 @@ namespace dataset
 
         /// \returns A const reference to the row
         ///
-        shared_ptr<const string> GetValue() const;
+        shared_ptr<const string> Get() const;
 
     private:
         shared_ptr<string> _spCurrentLine = nullptr;

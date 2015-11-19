@@ -17,7 +17,7 @@ namespace decision_tree
         return _index;
     }
 
-    double MutableDecisionTree::SplitRule::GetValue() const
+    double MutableDecisionTree::SplitRule::Get() const
     {
         return _value;
     }

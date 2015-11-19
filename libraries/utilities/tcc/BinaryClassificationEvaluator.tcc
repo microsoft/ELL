@@ -11,7 +11,7 @@ namespace utilities
 
         while(data_iter.IsValid())
         {
-            const auto& example = data_iter.GetValue();
+            const auto& example = data_iter.Get();
             double prediction = predictor.Predict(example);
             double loss = loss_function.Evaluate(prediction, example.GetLabel());
 

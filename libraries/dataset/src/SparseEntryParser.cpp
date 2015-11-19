@@ -81,7 +81,7 @@ namespace dataset
         _currentIndexValue = indexValue{index, value};
     }
 
-    indexValue SparseEntryParser::Iterator::GetValue() const
+    indexValue SparseEntryParser::Iterator::Get() const
     {
         return _currentIndexValue;
     }

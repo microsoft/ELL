@@ -18,9 +18,9 @@ namespace dataset
     }
 
     template<typename ValueType, typename IntegerListType>
-    indexValue SparseDataVector<ValueType, IntegerListType>::Iterator::GetValue() const
+    indexValue SparseDataVector<ValueType, IntegerListType>::Iterator::Get() const
     {
-        return indexValue{_index_iterator.GetValue(), (double)*_value_iterator};
+        return indexValue{_index_iterator.Get(), (double)*_value_iterator};
     }
 
     template<typename ValueType, typename IntegerListType>
@@ -59,7 +59,7 @@ namespace dataset
     //    auto iter = GetIterator();
     //    while(iter.IsValid())
     //    {
-    //        func(index_offset + iter.index, iter.GetValue());
+    //        func(index_offset + iter.index, iter.Get());
     //        iter.Next();
     //    }
     //}
@@ -95,7 +95,7 @@ namespace dataset
         auto iter = GetIterator();
         while (iter.IsValid())
         {
-            auto current = iter.GetValue();
+            auto current = iter.Get();
             p_other[current.index] += scalar * current.value;
             iter.Next();
         }
@@ -109,7 +109,7 @@ namespace dataset
         auto iter = GetIterator();
         while (iter.IsValid())
         {
-            auto current = iter.GetValue();
+            auto current = iter.Get();
             value += current.value * p_other[current.index];
             iter.Next();
         }
@@ -129,7 +129,7 @@ namespace dataset
         auto iterator = GetIterator();
         while(iterator.IsValid())
         {
-            auto entry = iterator.GetValue();
+            auto entry = iterator.Get();
             os << entry.index << ':' << entry.value << '\t';
             iterator.Next();
         }

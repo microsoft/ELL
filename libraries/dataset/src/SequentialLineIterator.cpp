@@ -32,7 +32,7 @@ namespace dataset
         }
     }
 
-    shared_ptr<const string> SequentialLineIterator::GetValue() const
+    shared_ptr<const string> SequentialLineIterator::Get() const
     {
         return _spCurrentLine;
     }

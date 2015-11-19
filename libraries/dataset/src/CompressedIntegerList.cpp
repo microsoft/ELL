@@ -42,7 +42,7 @@ namespace dataset
         _value += delta;
     }
 
-    uint64 CompressedIntegerList::Iterator::GetValue() const
+    uint64 CompressedIntegerList::Iterator::Get() const
     {
         return _value;
     }

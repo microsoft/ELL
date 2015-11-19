@@ -54,7 +54,7 @@ namespace linear
 
             /// \returns A const reference to the row
             ///
-            const DataVectorType& GetValue() const;
+            const DataVectorType& Get() const;
 
         private:
 

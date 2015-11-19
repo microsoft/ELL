@@ -32,7 +32,7 @@ namespace convex_optimization
             double t = (double)_total_iterations;
 
             // get the Next example
-            const auto& example = data_iter.GetValue();
+            const auto& example = data_iter.Get();
             double label = example.GetLabel();
             double weight = example.GetWeight();
 

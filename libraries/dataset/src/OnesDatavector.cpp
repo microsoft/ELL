@@ -28,7 +28,7 @@ namespace dataset
         ++_index;
     }
 
-    indexValue OnesDataVector::Iterator::GetValue() const
+    indexValue OnesDataVector::Iterator::Get() const
     {
         return indexValue{_index, 1};
     }

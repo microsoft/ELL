@@ -17,7 +17,7 @@ namespace dataset
         ++_begin;
     }
 
-    uint64 IntegerList::Iterator::GetValue() const
+    uint64 IntegerList::Iterator::Get() const
     {
         return *_begin;
     }

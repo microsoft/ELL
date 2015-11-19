@@ -24,7 +24,7 @@ namespace dataset
     }
 
     template<typename ValueType>
-    indexValue DenseDataVector<ValueType>::Iterator::GetValue() const
+    indexValue DenseDataVector<ValueType>::Iterator::Get() const
     {
         return indexValue{_index, (double)*_begin};
     }
@@ -136,7 +136,7 @@ namespace dataset
         auto iterator =  GetIterator();
         while(iterator.IsValid())
         {
-            auto entry = iterator.GetValue();
+            auto entry = iterator.Get();
             os << entry.index << ':' << entry.value << '\t';
             iterator.Next();
         }

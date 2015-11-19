@@ -21,11 +21,11 @@ namespace dataset
     template<typename IntegerListType>
     uint64 SparseBinaryDataVectorBase<IntegerListType>::Iterator::GetIndex() const
     {
-        return _list_iterator.GetValue();
+        return _list_iterator.Get();
     }
 
     template<typename IntegerListType>
-    double SparseBinaryDataVectorBase<IntegerListType>::Iterator::GetValue() const
+    double SparseBinaryDataVectorBase<IntegerListType>::Iterator::Get() const
     {
         return (double)1.0;
     }
@@ -100,7 +100,7 @@ namespace dataset
         auto iter = _indices.GetIterator();
         while (iter.IsValid())
         {
-            p_other[iter.GetValue()] += scalar;
+            p_other[iter.Get()] += scalar;
             iter.Next();
         }
     }
@@ -113,7 +113,7 @@ namespace dataset
         auto iter = _indices.GetIterator();
         while (iter.IsValid())
         {
-            value += (double)p_other[iter.GetValue()];
+            value += (double)p_other[iter.Get()];
             iter.Next();
         }
         
@@ -132,7 +132,7 @@ namespace dataset
         auto iterator = GetIterator();
         while(iterator.IsValid())
         {
-            auto indexValue = iterator.GetValue();
+            auto indexValue = iterator.Get();
             os << indexValue << '\t';
             iterator.Next();
         }

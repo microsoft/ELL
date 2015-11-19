@@ -33,7 +33,7 @@ namespace dataset
         while(indexValueIterator.IsValid())
         {
             // add entry to vector
-            auto entry = indexValueIterator.GetValue();
+            auto entry = indexValueIterator.Get();
             up_vec->PushBack(entry.index, entry.value);
 
             // Update VectorStats

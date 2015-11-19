@@ -30,7 +30,7 @@ namespace decision_tree
 
             /// \returns The value
             ///
-            double GetValue() const;
+            double Get() const;
 
         private:
             int _index;

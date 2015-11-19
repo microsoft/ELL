@@ -45,7 +45,7 @@ namespace dataset
 
             /// \returns The current value
             ///
-            double GetValue() const;
+            double Get() const;
 
         private:
 

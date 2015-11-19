@@ -46,7 +46,7 @@ namespace dataset
 
             /// Returns the value of the current iterate
             ///
-            uint64 GetValue() const;
+            uint64 Get() const;
 
         private:
 

@@ -18,7 +18,7 @@ namespace dataset
         // Load row by row
         while (iter.IsValid())
         {
-            dataset.PushBackRow(iter.GetValue());
+            dataset.PushBackRow(iter.Get());
             iter.Next();
         }
 

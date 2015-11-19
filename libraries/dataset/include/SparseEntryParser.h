@@ -42,7 +42,7 @@ namespace dataset
 
             /// \returns The current index-value pair
             ///
-            indexValue GetValue() const;
+            indexValue Get() const;
 
         private:
             shared_ptr<const string> _spExampleString; // hold on to the shared ptr to make sure that string is not deleted

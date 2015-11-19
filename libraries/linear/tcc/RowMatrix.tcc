@@ -36,7 +36,7 @@ namespace linear
     }
     
     template<typename DataVectorType>
-    const DataVectorType& RowMatrix<DataVectorType>::Iterator::GetValue() const
+    const DataVectorType& RowMatrix<DataVectorType>::Iterator::Get() const
     {
         assert(_row < _table.NumRows() && _row < _max_row);
     

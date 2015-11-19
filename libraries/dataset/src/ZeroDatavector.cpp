@@ -17,7 +17,7 @@ namespace dataset
     void ZeroDataVector::Iterator::Next()
     {}
 
-    indexValue ZeroDataVector::Iterator::GetValue() const
+    indexValue ZeroDataVector::Iterator::Get() const
     {
         throw runtime_error("this code should bever be reached");
     }
