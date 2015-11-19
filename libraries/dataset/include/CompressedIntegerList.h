@@ -14,8 +14,6 @@ using std::forward_iterator_tag;
 
 namespace dataset
 {
-    typedef uint8_t uint8; // TODO unify this with types.h
-
     /// A non-decreasing list of nonegative integers, with a forward Iterator, stored in a compressed delta enconding.
     ///
     class CompressedIntegerList
