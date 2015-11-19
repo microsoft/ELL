@@ -20,7 +20,7 @@ namespace dataset
 {
     template<typename DefaultDataVectorType>
     template<typename IndexValueIteratorType>
-    unique_ptr<IDataVector> DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIteratorType&& indexValueIterator)
+    unique_ptr<IDataVector> DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIteratorType indexValueIterator)
     {
         static_assert(is_same<DefaultDataVectorType, FloatDataVector>::value || is_same<DefaultDataVectorType, SparseFloatDataVector>::value, "default DataVector type can be either FloatDataVector or SparseFloatDataVector");
 
