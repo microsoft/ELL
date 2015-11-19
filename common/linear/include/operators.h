@@ -3,8 +3,6 @@
 #pragma once
 
 #include "IMatrix.h"
-#include "SparseBinaryDataVector.h"
-#include "IntegerList.h"
 
 #include <memory>
 using std::shared_ptr;

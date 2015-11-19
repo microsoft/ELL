@@ -1,30 +1,26 @@
-// CompressedIntegerList.h
+// IntegerList.h
 
 #pragma once
 
 #include "types.h"
+using linear::uint;
 
+#include <cstdint>
 #include <vector>
-using std::vector;
 
-#include <iterator>
-using std::iterator;
-using std::forward_iterator_tag;
-
-namespace linear
+namespace dataset
 {
-    typedef uint64_t uint;
-    typedef uint8_t uint8;
-
-    /// A non-decreasing list of nonegative integers, with a forward Iterator, stored in a compressed delta enconding.
+    /// A non-decreasing list of nonegative integers, with a forward Iterator.
     ///
-    class CompressedIntegerList
+    class IntegerList
     {
     public:
 
-        /// A read-only forward iterator for the CompressedIntegerList.
+        typedef std::vector<uint>::const_iterator vector_iterator;
+
+        /// A read-only forward iterator for the IntegerList.
         ///
-        class Iterator
+        class Iterator 
         {
         public:
 
@@ -50,32 +46,30 @@ namespace linear
 
         private:
 
-            /// private ctor, can only be called from CompressedIntegerList class
-            Iterator(const uint8 *iter, const uint8 *end);
-            friend class CompressedIntegerList;
+            /// private ctor, can only be called from IntegerList class
+            Iterator(const vector_iterator& begin, const vector_iterator& end);
+            friend class IntegerList;
 
             // members
-            const uint8* _iter;
-            const uint8* _end;
-            uint _value;
-            uint _iter_increment;
+            vector_iterator _begin;
+            vector_iterator _end;
         };
 
         /// Default Constructor. Constructs an empty list.
         ///
-        CompressedIntegerList();
+        IntegerList();
 
-        /// Move constructor
+        /// Move Constructor
         ///
-        CompressedIntegerList(CompressedIntegerList&& other) = default;
+        IntegerList(IntegerList&& other) = default;
 
         /// Deleted copy constructor
         ///
-        CompressedIntegerList(const CompressedIntegerList&) = delete;
+        IntegerList(const IntegerList&) = delete;
 
         /// Default Destructor.
         ///
-        ~CompressedIntegerList() = default;
+        ~IntegerList() = default;
 
         /// \returns The number of entries in the list
         ///
@@ -102,12 +96,10 @@ namespace linear
         Iterator GetIterator() const;
 
         ///@{
-        void operator= (const CompressedIntegerList&) = delete;
+        void operator= (const IntegerList&) = delete;
         ///@}
 
     private:
-        vector<uint8> _mem;
-        uint _last;
-        uint _size;
+        std::vector<uint> _list;
     };
 }

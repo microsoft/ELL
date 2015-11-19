@@ -1,12 +1,13 @@
 // CompressedIntegerList.cpp
 
 #include "CompressedIntegerList.h"
+
 #include <cassert>
 
 #include <stdexcept>
 using std::runtime_error;
 
-namespace linear
+namespace dataset
 {
 
     bool CompressedIntegerList::Iterator::IsValid() const

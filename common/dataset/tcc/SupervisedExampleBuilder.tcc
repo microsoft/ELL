@@ -1,9 +1,7 @@
 // SupervisedExampleBuilder.tcc
 
 #include "Parser.h"
-
 #include "DatavectorBuilder.h"
-using linear::DataVectorBuilder;
 
 #include <cstdlib>
 using std::strtod;

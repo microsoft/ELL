@@ -1,6 +1,6 @@
 // SparseBinaryDataVector.tcc
 
-namespace linear
+namespace dataset
 {
     template<typename IntegerListType>
     template<typename IndexValueIteratorType, typename concept>

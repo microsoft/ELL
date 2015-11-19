@@ -1,15 +1,22 @@
 // OnesDataVector.cpp
 
 #include "OnesDataVector.h"
+
+#include "types.h"
+using linear::uint;
+
 #include <stdexcept>
+using std::runtime_error;
+
 #include <cmath>
+using std::fabs;
+
 #include <cassert>
 
-using std::runtime_error;
-using std::fabs;
+#include <memory>
 using std::move;
 
-namespace linear
+namespace dataset
 {
     OnesDataVector::OnesDataVector(uint dim) : _dim(dim)
     {}

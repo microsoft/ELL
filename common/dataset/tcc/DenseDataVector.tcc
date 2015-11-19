@@ -1,10 +1,10 @@
-// SparseDataVector.tcc
+// DenseDataVector.tcc
 
-namespace linear
+namespace dataset
 {
-    template<typename ValueType, typename IntegerListType>
+    template<typename ValueType>
     template<typename IndexValueIteratorType, typename concept>
-    SparseDataVector<ValueType, IntegerListType>::SparseDataVector(IndexValueIteratorType&& indexValueIterator)
+    DenseDataVector<ValueType>::DenseDataVector(IndexValueIteratorType&& indexValueIterator)
     {
         // TODO, check that IndexValueIteratorType is the right type by adding a using statement to all of the iter defitniions
 

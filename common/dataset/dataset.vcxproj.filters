@@ -24,9 +24,6 @@
     <ClInclude Include="include\Loader.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\IndexValue.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\SupervisedExampleBuilder.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -34,6 +31,33 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Parser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CompressedIntegerList.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatavectorBuilder.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DenseDatavector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IDataVector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IntegerList.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OnesDatavector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SparseBinaryDatavector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SparseDatavector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ZeroDatavector.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,10 +68,28 @@
     <ClCompile Include="src\SequentialLineIterator.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\IndexValue.cpp">
+    <ClCompile Include="src\SparseEntryParser.cpp" />
+    <ClCompile Include="src\CompressedIntegerList.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SparseEntryParser.cpp" />
+    <ClCompile Include="src\DenseDatavector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntegerList.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OnesDatavector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SparseBinaryDatavector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SparseDatavector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ZeroDatavector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\ParsingIterator.tcc">
@@ -60,6 +102,18 @@
       <Filter>tcc</Filter>
     </None>
     <None Include="tcc\Parser.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\DataVectorBuilder.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\DenseDataVector.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\SparseBinaryDataVector.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\SparseDataVector.tcc">
       <Filter>tcc</Filter>
     </None>
   </ItemGroup>

@@ -1,9 +1,7 @@
 // ParsingIterator.tcc
 
 #include "SupervisedExampleBuilder.h"
-
 #include "DenseDataVector.h"
-using linear::FloatDataVector;
 
 namespace dataset
 {

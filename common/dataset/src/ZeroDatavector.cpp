@@ -1,11 +1,12 @@
 // ZeroDataVector.cpp
 
 #include "ZeroDataVector.h"
+
 #include <stdexcept>
 
 using std::runtime_error;
 
-namespace linear
+namespace dataset
 {
     ZeroDataVector::ZeroDataVector(const IDataVector& other) 
     {}

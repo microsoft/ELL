@@ -4,7 +4,7 @@
 
 #include <cassert>
 
-namespace linear
+namespace dataset
 {
     template<typename ValueType>
     bool DenseDataVector<ValueType>::Iterator::IsValid() const

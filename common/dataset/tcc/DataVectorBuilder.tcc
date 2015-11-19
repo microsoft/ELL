@@ -1,13 +1,13 @@
 // DataVectorBulder.tcc
 
-#include "types.h"
-using linear::uint;
-
 #include "SparseDataVector.h"
 #include "SparseBinaryDataVector.h"
 #include "DenseDataVector.h"
 #include "OnesDataVector.h"
 #include "ZeroDataVector.h"
+
+#include "types.h"
+using linear::uint;
 
 #include <memory>
 using std::move;
@@ -16,7 +16,7 @@ using std::make_unique;
 #include <type_traits>
 using std::is_same;
 
-namespace linear
+namespace dataset
 {
     template<typename DefaultDataVectorType>
     template<typename IndexValueIteratorType>

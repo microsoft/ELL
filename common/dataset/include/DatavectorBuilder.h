@@ -9,7 +9,7 @@
 using std::unique_ptr;
 using std::move;
 
-namespace linear
+namespace dataset
 {
     /// DataVectorBuilder Base class
     ///

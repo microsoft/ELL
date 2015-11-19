@@ -2,7 +2,11 @@
 
 #pragma once
 
+#include "types.h"
+using linear::uint;
+
 #include "IVector.h"
+using linear::IVector;
 
 // stl
 #include <vector>
@@ -11,7 +15,7 @@ using std::vector;
 #include <functional>
 using std::function;
 
-namespace linear
+namespace dataset
 {
     /// Base class for infinite-dimensional vectors of double numbers. Each implementation of this class has a mathematical dimension of
     /// infinity and includes an explicitly specified prefix followed by an implicit suffix of zeros. 

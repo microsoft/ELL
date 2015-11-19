@@ -1,6 +1,6 @@
-// IDataVector.cpp
+// IVector.cpp
 
-#include "IDataVector.h"
+#include "IVector.h"
 
 #include <cassert>
 

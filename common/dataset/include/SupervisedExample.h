@@ -3,7 +3,6 @@
 #pragma once
 
 #include "IDataVector.h"
-using linear::IDataVector;
 
 #include "types.h"
 using linear::uint;

@@ -1,28 +1,22 @@
-// DenseDataVector.h
+// SparseDataVector.h
 
 #pragma once
 
 #include "IDataVector.h"
+#include "CompressedIntegerList.h"
+
 #include "IndexValue.h"
+using linear::IndexValue;
 
-#include <vector>
-using std::vector;
+#include "types.h"
+using linear::uint;
 
-#include <iostream>
-using std::ostream;
-
-#include <type_traits>
-using std::is_base_of;
-using std::enable_if_t;
-
-#define DEFAULT_DENSE_VECTOR_CAPACITY 1000
-
-namespace linear
+namespace dataset
 {
-    /// DenseDataVector Base class
+    /// Implements a sparse binary vector as an increasing list of the coordinates where the value is 1.0
     ///
-    template<typename ValueType>
-    class DenseDataVector : public IDataVector
+    template<typename ValueType, typename IntegerListType>
+    class SparseDataVector : public IDataVector
     {
     public:
 
@@ -53,41 +47,40 @@ namespace linear
             IndexValue GetValue() const;
 
         private:
-
+            
             // define typenames to improve readability
-            using StlIteratorType = typename vector<ValueType>::const_iterator;
+            using IndexIteratorType = typename IntegerListType::Iterator;
+            using ValueIteratorType = typename vector<ValueType>::const_iterator;
 
             /// private ctor, can only be called from SparseDataVector class
-            Iterator(const StlIteratorType& begin, const StlIteratorType& end);
-            friend DenseDataVector<ValueType>;
+            Iterator(const IndexIteratorType& list_iterator, const ValueIteratorType& value_iterator);
+            friend SparseDataVector<ValueType, IntegerListType>;
 
             // members
-            StlIteratorType _begin;
-            StlIteratorType _end;
-            uint _index = 0;
+            IndexIteratorType _index_iterator;
+            ValueIteratorType _value_iterator;
         };
 
-
-        /// Constructor
+        /// Constructs an empty sparse binary vector
         ///
-        DenseDataVector();
+        SparseDataVector();
 
         /// Converting constructor
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        DenseDataVector(IndexValueIteratorType&& indexValueIterator);
+        SparseDataVector(IndexValueIteratorType&& indexValueIterator);
 
         /// Move constructor
         ///
-        DenseDataVector(DenseDataVector&& other) = default;
+        SparseDataVector(SparseDataVector<ValueType, IntegerListType>&& other) = default;
 
         /// Deleted copy constructor
         ///
-        DenseDataVector(const DenseDataVector&) = delete;
+        SparseDataVector(const SparseDataVector<ValueType, IntegerListType>& other) = delete;
 
-        /// Sets an entry in the vector
-        ///
-        virtual void PushBack(uint index, double value = 1.0) override;
+        /// Sets the element at the given index to 1.0. Calls to this function must have a monotonically increasing argument. 
+        /// The value argument must equal 1.0
+        virtual void PushBack(uint index, double value) override;
 
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its memory
         ///
@@ -109,15 +102,15 @@ namespace linear
         ///
         virtual double Norm2() const override;
 
-        /// Performs (*p_other) += scalar * (*this), where other is a dense vector
+        /// Performs (*p_other) += scalar * (*this), where other a dense vector
         ///
         virtual void AddTo(double* p_other, double scalar = 1.0) const override;
-        
+
         /// Computes the Dot product
         ///
         virtual double Dot(const double* p_other) const override;
 
-        /// \Returns a Iterator that points to the beginning of the list.
+        /// \Returns a Iterator that traverses the non-zero entries of the sparse vector
         ///
         Iterator GetIterator() const;
 
@@ -126,24 +119,34 @@ namespace linear
         virtual void Print(ostream& os) const override;
 
     private:
-        uint _num_nonzeros;
-        vector<ValueType> _mem;
+        IntegerListType _indices;
+        vector<ValueType> _values;
     };
 
-    class FloatDataVector : public DenseDataVector<float> 
+    class SparseDoubleDataVector : public SparseDataVector<double, CompressedIntegerList>
     {
     public:
-        using DenseDataVector<float>::DenseDataVector;
+        using SparseDataVector<double, CompressedIntegerList>::SparseDataVector;
 
         /// \returns The type of the vector
         ///
         virtual type GetType() const override;
     };
 
-    class DoubleDataVector : public DenseDataVector<double>
+    class SparseFloatDataVector : public SparseDataVector<float, CompressedIntegerList>
     {
     public:
-        using DenseDataVector<double>::DenseDataVector;
+        using SparseDataVector<float, CompressedIntegerList>::SparseDataVector;
+
+        /// \returns The type of the vector
+        ///
+        virtual type GetType() const override;
+    };
+
+    class SparseShortDataVector : public SparseDataVector<short, CompressedIntegerList>
+    {
+    public:
+        using SparseDataVector<short, CompressedIntegerList>::SparseDataVector;
 
         /// \returns The type of the vector
         ///
@@ -151,6 +154,5 @@ namespace linear
     };
 }
 
-#include "../tcc/DenseDatavector.tcc"
-
+#include "../tcc/SparseDataVector.tcc"
 

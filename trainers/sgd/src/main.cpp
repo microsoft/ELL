@@ -16,11 +16,11 @@ using utilities::ParsedSharedArguments;
 #include "BinaryClassificationEvaluator.h"
 using utilities::BinaryClassificationEvaluator;
 
-// mappings
-#include "mappings.h"
-using namespace mappings;
+//// mappings
+//#include "mappings.h"
+//using namespace mappings;
 
-_USE_DEFAULT_DESERIALIZER_  // use the default deserializer for mappings
+//_USE_DEFAULT_DESERIALIZER_  // use the default deserializer for mappings
 
 // dataset
 #include "SequentialLineIterator.h"

@@ -2,7 +2,7 @@
 
 #include "SparseDataVector.h"
 
-namespace linear
+namespace dataset
 {
     template<typename ValueType, typename IntegerListType>
     bool SparseDataVector<ValueType, IntegerListType>::Iterator::IsValid() const

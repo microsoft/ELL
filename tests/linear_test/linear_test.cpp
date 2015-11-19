@@ -16,6 +16,7 @@
 #include <string>
 
 using namespace linear;
+using namespace dataset;
 using namespace std;
 
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "IndexValue.h"
+using linear::IndexValue;
 
 #include <string>
 using std::string;

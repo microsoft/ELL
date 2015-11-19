@@ -5,7 +5,7 @@
 #include <stdexcept>
 using std::runtime_error;
 
-namespace linear
+namespace dataset
 {
     bool IntegerList::Iterator::IsValid() const
     {

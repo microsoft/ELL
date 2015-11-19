@@ -1,9 +1,10 @@
 // SparseBinaryDataVector.cpp
 
 #include "SparseBinaryDataVector.h"
+
 #include <cassert>
 
-namespace linear
+namespace dataset
 {
     template<typename IntegerListType>
     bool SparseBinaryDataVectorBase<IntegerListType>::Iterator::IsValid() const

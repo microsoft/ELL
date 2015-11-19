@@ -14,12 +14,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\CompressedIntegerList.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\IntegerList.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\Base.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -35,21 +29,6 @@
     <ClInclude Include="include\BiMatrix.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OnesDataVector.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SparseBinaryDataVector.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SparseDataVector.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ZeroDataVector.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DataVectorBuilder.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\DoubleVector.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -62,19 +41,10 @@
     <ClInclude Include="include\IVector.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\IDataVector.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\DoubleSubvectorCref.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\IndexValue.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SegmentedVector.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DenseDataVector.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -82,48 +52,12 @@
     <None Include="tcc\RowMatrix.tcc">
       <Filter>tcc</Filter>
     </None>
-    <None Include="tcc\segmented_vector.tcc">
-      <Filter>tcc</Filter>
-    </None>
     <None Include="tcc\BiMatrix.tcc">
-      <Filter>tcc</Filter>
-    </None>
-    <None Include="tcc\DataVectorBuilder.tcc">
-      <Filter>tcc</Filter>
-    </None>
-    <None Include="tcc\DenseDataVector.tcc">
-      <Filter>tcc</Filter>
-    </None>
-    <None Include="tcc\SparseDataVector.tcc">
-      <Filter>tcc</Filter>
-    </None>
-    <None Include="tcc\SparseBinaryDataVector.tcc">
       <Filter>tcc</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\CompressedIntegerList.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Base.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\IntegerList.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OnesDataVector.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SparseBinaryDataVector.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SparseDataVector.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ZeroDataVector.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DenseDataVector.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\DoubleVector.cpp">
@@ -144,11 +78,5 @@
     <ClCompile Include="src\IndexValue.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SegmentedVector.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="README.txt" />
   </ItemGroup>
 </Project>

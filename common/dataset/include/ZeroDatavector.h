@@ -4,7 +4,10 @@
 
 #include "IDataVector.h"
 
-namespace linear
+#include "types.h"
+using linear::uint;
+
+namespace dataset
 {
     /// ZeroDataVector Base class
     ///
