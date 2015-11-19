@@ -67,7 +67,7 @@ namespace dataset
         /// Converting constructor
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        SparseBinaryDataVectorBase(IndexValueIteratorType&& indexValueIterator);
+        SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator);
 
         /// Move constructor
         ///

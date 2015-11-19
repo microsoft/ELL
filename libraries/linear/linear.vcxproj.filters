@@ -49,6 +49,9 @@
     <None Include="tcc\BiMatrix.tcc">
       <Filter>tcc</Filter>
     </None>
+    <None Include="tcc\DoubleVector.tcc">
+      <Filter>tcc</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Base.cpp">

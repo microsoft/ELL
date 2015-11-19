@@ -68,7 +68,6 @@
     <ClCompile Include="src\SequentialLineIterator.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SparseEntryParser.cpp" />
     <ClCompile Include="src\CompressedIntegerList.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -88,6 +87,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ZeroDatavector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SparseEntryParser.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

@@ -4,7 +4,7 @@ namespace dataset
 {
     template<typename IntegerListType>
     template<typename IndexValueIteratorType, typename concept>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType&& indexValueIterator)
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator)
     {
         while(indexValueIterator.IsValid())
         {

@@ -61,6 +61,11 @@ namespace linear
         using vector<double>::vector;
         using IVector::AddTo;
 
+        /// Converting constructor
+        ///
+        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        DoubleVector(IndexValueIteratorType indexValueIterator);
+
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its memory
         ///
         void Reset();
@@ -94,5 +99,7 @@ namespace linear
         virtual void Print(ostream & os) const override;
     };
 }
+
+#include "../tcc/DoubleVector.tcc"
 
 

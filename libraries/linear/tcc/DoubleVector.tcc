@@ -1,10 +1,9 @@
-// DenseDataVector.tcc
+// DoubleVector.tcc
 
-namespace dataset
+namespace linear
 {
-    template<typename ValueType>
     template<typename IndexValueIteratorType, typename concept>
-    DenseDataVector<ValueType>::DenseDataVector(IndexValueIteratorType indexValueIterator)
+    DoubleVector::DoubleVector(IndexValueIteratorType indexValueIterator)
     {
         while(indexValueIterator.IsValid())
         {
@@ -14,3 +13,5 @@ namespace dataset
         }
     }
 }
+
+
