@@ -58,17 +58,6 @@ namespace dataset
         _indices.Reset();
     }
 
-    //template<typename IntegerListType>
-    //void SparseBinaryDataVectorBase<IntegerListType>::foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset) const // TODO
-    //{
-    //    auto iter = _indices.GetIterator();
-    //    while(iter.IsValid())
-    //    {
-    //        func(index_offset + iter.value, (double)1.0);
-    //        iter.Next();
-    //    }
-    //}
-
     template<typename IntegerListType>
     uint64 SparseBinaryDataVectorBase<IntegerListType>::Size() const
     {

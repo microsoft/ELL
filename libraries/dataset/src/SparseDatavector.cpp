@@ -53,17 +53,6 @@ namespace dataset
         _values.resize(0);
     }
 
-    //template<typename ValueType, typename IntegerListType>
-    //void SparseDataVector<ValueType, IntegerListType>::foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset) const
-    //{
-    //    auto iter = GetIterator();
-    //    while(iter.IsValid())
-    //    {
-    //        func(index_offset + iter.index, iter.Get());
-    //        iter.Next();
-    //    }
-    //}
-
     template<typename ValueType, typename IntegerListType>
     uint64 SparseDataVector<ValueType, IntegerListType>::Size() const
     {

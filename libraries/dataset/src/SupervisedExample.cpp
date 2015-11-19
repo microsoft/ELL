@@ -34,11 +34,6 @@ namespace dataset
         _upInstance->PushBack(index, value);
     }
 
-    //void SupervisedExample::foreach_nonzero(std::function<void(uint64, double)> func, uint64 index_offset) const
-    //{
-    //    _upInstance->foreach_nonzero(func, index_offset);
-    //}
-
     uint64 SupervisedExample::Size() const
     {
         return _upInstance->Size();

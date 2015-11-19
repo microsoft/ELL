@@ -45,10 +45,6 @@ namespace dataset
 
         /// Inherited via IDataVector
         ///
-        //virtual void foreach_nonzero(std::function<void(uint64, double)> func, uint64 index_offset = 0) const override;
-
-        /// Inherited via IDataVector
-        ///
         virtual uint64 Size() const override;
 
         /// \returns The number of non-zeros

@@ -87,10 +87,6 @@ namespace dataset
         ///
         virtual void Reset() override;
 
-        /// Calls a callback function for each non-zero entry in the vector, in order of increasing index
-        ///
-        //virtual    void foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset = 0) const override;
-
         /// \returns The largest index of a non-zero entry plus one
         ///
         virtual uint64 Size() const override;

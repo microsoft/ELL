@@ -61,14 +61,6 @@ namespace dataset
         _size = 0;
     }
 
-    //void OnesDataVector::foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset) const // TODO
-    //{
-    //    for(uint64 i=0; i<_size; ++i)
-    //    {
-    //        func(index_offset+i, 1.0);
-    //    }
-    //}
-
     uint64 OnesDataVector::Size() const
     {
         return _size;

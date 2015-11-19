@@ -67,19 +67,6 @@ namespace dataset
         _num_nonzeros = 0;
     }
 
-    //template<typename ValueType>
-    //void DenseDataVector<ValueType>::foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset) const // TODO
-    //{
-    //    for(uint64 i=0; i<Size(); ++i)
-    //    {
-    //        double value = _mem[i];
-    //        if(value != 0)
-    //        {
-    //            func(index_offset + i, value);
-    //        }
-    //    }
-    //}
-
     template<typename ValueType>
     uint64 DenseDataVector<ValueType>::Size() const
     {

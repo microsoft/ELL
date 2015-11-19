@@ -37,10 +37,6 @@ namespace dataset
         ///
         virtual void Reset() = 0;
 
-        /// Calls a callback function for each non-zero entry in the vector, in order of increasing index
-        ///
-        //virtual void foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset = 0) const = 0; // TODO
-
         /// \returns The number of non-zeros
         ///
         virtual uint64 NumNonzeros() const =0;

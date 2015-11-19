@@ -41,9 +41,6 @@ namespace dataset
     void ZeroDataVector::Reset()
     {}
 
-    //void ZeroDataVector::foreach_nonzero(function<void(uint64, double)> func, uint64 index_offset) const // TODO
-    //{}
-
     uint64 ZeroDataVector::Size() const
     {
         return 0;
