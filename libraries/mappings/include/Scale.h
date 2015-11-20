@@ -16,7 +16,7 @@ namespace mappings
         /// Constructs a Shift Mapping from index value pairs
         ///
         template <typename IndexValueIteratorType>
-        Scale(IndexValueIteratorType begin, IndexValueIteratorType end);
+        Scale(IndexValueIteratorType indexValueIterator);
 
         static double Multiply(double a, double b);
     };

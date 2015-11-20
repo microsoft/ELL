@@ -16,11 +16,11 @@ using utilities::ParsedSharedArguments;
 #include "BinaryClassificationEvaluator.h"
 using utilities::BinaryClassificationEvaluator;
 
-//// mappings
-//#include "mappings.h"
-//using namespace mappings;
+// mappings
+#include "mappings.h"
+using mappings::Scale;
 
-//_USE_DEFAULT_DESERIALIZER_  // use the default deserializer for mappings
+_USE_DEFAULT_DESERIALIZER_  // use the default deserializer for mappings
 
 // dataset
 #include "SequentialLineIterator.h"
@@ -100,16 +100,23 @@ int main(int argc, char* argv[])
             data.RandPerm(rng);
 
             // iterate over the entire permuted dataset
-            auto training_iter = data.GetIterator();
-            optimizer.Update(training_iter, loss, trainer_args.l2Regularization);
+            auto trainSetIterator = data.GetIterator();
+            optimizer.Update(trainSetIterator, loss, trainer_args.l2Regularization);
 
             // Evaluate
-            auto eval_iter = data.GetIterator();
-            evaluator.Evaluate(eval_iter, optimizer.GetPredictor(), loss);
+            auto evaluationIterator = data.GetIterator();
+            evaluator.Evaluate(evaluationIterator, optimizer.GetPredictor(), loss);
         }
 
         // print loss and errors
         cout << "training error\n" << evaluator << endl;
+
+        auto predictor = optimizer.GetPredictor();
+        auto weights = predictor.GetVector();
+        auto weightsIterator = weights.GetIterator();
+
+        // save predictor
+        Scale predictorWeights(weightsIterator);
     }
     catch (runtime_error e)
     {

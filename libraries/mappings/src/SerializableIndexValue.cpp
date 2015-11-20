@@ -4,6 +4,12 @@
 
 namespace mappings
 {
+    SerializableIndexValue::SerializableIndexValue(const indexValue & other)
+    {
+        index = other.index;
+        value = other.value;
+    }
+
     void SerializableIndexValue::Serialize(JsonSerializer& serializer) const
     {
         serializer.Write("index", index);

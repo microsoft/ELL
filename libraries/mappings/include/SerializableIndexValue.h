@@ -14,7 +14,13 @@ namespace mappings
     {
     public:
 
-        using indexValue::indexValue;
+        /// Default Ctor
+        ///
+        SerializableIndexValue() = default;
+
+        /// Copy Ctor
+        ///
+        SerializableIndexValue(const indexValue& other);
 
         /// Serializes an index value pair
         ///
