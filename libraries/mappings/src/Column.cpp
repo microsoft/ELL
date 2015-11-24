@@ -17,7 +17,7 @@ namespace mappings
 
     Column::Column() : _maxInternalDim(0)
     {
-        _type = Mapping::column;
+        _type = Types::column;
     }
 
     void Column::Apply(const double* input, double* output) const
@@ -72,7 +72,7 @@ namespace mappings
     void Column::PushBack(shared_ptr<Mapping> m)
     {
         // don't nest columns
-        assert(m->GetType() != Mapping::types::column);
+        assert(m->GetType() != Types::column);
 
         if (_columnElements.size() > 0)
         {

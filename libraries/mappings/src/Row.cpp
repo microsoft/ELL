@@ -16,7 +16,7 @@ namespace mappings
 
     Row::Row() : _inDim(0), _outDim(0)
     {
-        _type = Mapping::row;
+        _type = Types::row;
     }
 
     void Row::Apply(const double* input, double* output) const
@@ -43,7 +43,7 @@ namespace mappings
     void Row::PushBack(shared_ptr<Mapping> m)
     {
         // Don't nest columns in rows. The reason is that the output dimension of a column could decrease after it is nested, and this could cause inconsistencies 
-        assert(m->GetType() != Mapping::types::column);
+        assert(m->GetType() != Types::column);
 
         if (_inDim < m->GetMinInputDim())
         {

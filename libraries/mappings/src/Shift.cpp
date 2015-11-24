@@ -12,7 +12,7 @@ namespace mappings
 {
     Shift::Shift() : Coordinatewise(Shift::Add)
     {
-        _type = types::shift;
+        _type = Types::shift;
     }
 
     double Shift::Add(double a, double b)

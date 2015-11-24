@@ -12,7 +12,7 @@ namespace mappings
 {
     Scale::Scale() : Coordinatewise(Scale::Multiply)
     {
-        _type = types::scale;
+        _type = Types::scale;
     }
 
     double Scale::Multiply(double a, double b)

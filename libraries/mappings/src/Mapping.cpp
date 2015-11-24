@@ -9,7 +9,7 @@ namespace mappings
         Apply(&input[0], &output[0]);
     }
 
-    Mapping::types Mapping::GetType() const
+    Mapping::Types Mapping::GetType() const
     {
         return _type;
     }

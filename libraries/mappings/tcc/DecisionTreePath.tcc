@@ -6,7 +6,7 @@ namespace mappings
     DecisionTreePath::DecisionTreePath(ChildrenIteratorType iter, ChildrenIteratorType end, uint64 inputIndexOffset) : 
         _inputIndexOffset(inputIndexOffset)
     {
-        _type = types::decisionTreePath;
+        _type = Types::decisionTreePath;
 
         while (iter != end)
         {

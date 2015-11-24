@@ -43,7 +43,7 @@ namespace mappings
 
     DecisionTreePath::DecisionTreePath() 
     {
-        _type = Mapping::types::decisionTreePath;
+        _type = Types::decisionTreePath;
     }
 
     vector<DecisionTreePath::ChildPair>& DecisionTreePath::Children()

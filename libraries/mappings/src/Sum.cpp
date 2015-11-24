@@ -13,7 +13,7 @@ namespace mappings
 
     Sum::Sum(uint64 firstInputIndex, uint64 inputIndexCount) : _firstInputIndex(firstInputIndex), _inputIndexCount(inputIndexCount) // TODO indices ?
     {
-        _type = types::sum;
+        _type = Types::sum;
     }
 
     void Sum::SetFirstInputIndices(uint64 index)

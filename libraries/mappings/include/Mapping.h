@@ -20,11 +20,11 @@ namespace mappings
     class Mapping
     {
     public:
-        enum types { constant, scale, shift, sum, decisionTreePath, row, column};
+        enum class Types { constant, scale, shift, sum, decisionTreePath, row, column};
 
         /// \returns The type of Mapping
         ///
-        types GetType() const;
+        Types GetType() const;
     
         /// applys the Mapping (reads inputs from the input vector and writes output to the output vector
         ///
@@ -51,7 +51,7 @@ namespace mappings
         virtual void Deserialize(JsonSerializer& serializer, int version) = 0;
         
     protected:
-        types _type;
+        Types _type;
 
         void SerializeHeader(JsonSerializer& serializer, int version) const;
     };

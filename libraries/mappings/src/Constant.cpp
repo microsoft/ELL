@@ -12,7 +12,7 @@ namespace mappings
 {
     Constant::Constant(double c) : _c(c)
     {
-        _type = types::constant;
+        _type = Types::constant;
     }
 
     void Constant::SetConstant(double c)
