@@ -53,6 +53,12 @@
     <ClInclude Include="include\SerializableIndexValue.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Layer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Map.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Mapping.cpp">
@@ -91,6 +97,12 @@
     <ClCompile Include="src\SerializableIndexValue.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Layer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Map.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\DecisionTreePath.tcc">
@@ -103,6 +115,12 @@
       <Filter>tcc</Filter>
     </None>
     <None Include="tcc\Coordinatewise.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\Map.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\Layer.tcc">
       <Filter>tcc</Filter>
     </None>
   </ItemGroup>

@@ -82,6 +82,8 @@
     <ClInclude Include="include\Constant.h" />
     <ClInclude Include="include\Coordinatewise.h" />
     <ClInclude Include="include\DecisionTreePath.h" />
+    <ClInclude Include="include\Layer.h" />
+    <ClInclude Include="include\Map.h" />
     <ClInclude Include="include\SerializableIndexValue.h" />
     <ClInclude Include="include\Io.h" />
     <ClInclude Include="include\Shift.h" />
@@ -97,6 +99,8 @@
     <ClCompile Include="src\Constant.cpp" />
     <ClCompile Include="src\Coordinatewise.cpp" />
     <ClCompile Include="src\DecisionTreePath.cpp" />
+    <ClCompile Include="src\Layer.cpp" />
+    <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\SerializableIndexValue.cpp" />
     <ClCompile Include="src\Io.cpp" />
     <ClCompile Include="src\Shift.cpp" />
@@ -110,6 +114,8 @@
   <ItemGroup>
     <None Include="tcc\Coordinatewise.tcc" />
     <None Include="tcc\DecisionTreePath.tcc" />
+    <None Include="tcc\Layer.tcc" />
+    <None Include="tcc\Map.tcc" />
     <None Include="tcc\Scale.tcc" />
     <None Include="tcc\Shift.tcc" />
   </ItemGroup>
