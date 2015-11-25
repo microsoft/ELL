@@ -14,6 +14,9 @@ namespace mappings
     class Layer
     {
     public:
+        
+        
+        
         /// Ctor
         ///
         Layer(uint64 size);
@@ -28,7 +31,6 @@ namespace mappings
 
         /// Initializes the idenity layer by copying the input
         ///
-//        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         void Set(IndexValueIteratorType indexValueIterator);
 

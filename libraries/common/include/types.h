@@ -4,10 +4,6 @@
 
 #include <cstdint>
 
-#include <type_traits>
-using std::enable_if_t;
-using std::is_base_of;
-
 // abbreviations for basic types
 typedef uint64_t uint64;
 typedef uint32_t uint32;
