@@ -2,6 +2,8 @@
 #pragma once
 
 #include "types.h"
+#include "RealArray.h"
+using common::RealArray;
 
 #include <vector>
 using std::vector;
@@ -14,9 +16,6 @@ namespace mappings
     class Layer
     {
     public:
-        
-        
-        
         /// Ctor
         ///
         Layer(uint64 size);
@@ -50,8 +49,12 @@ namespace mappings
         ///
         void Clear();
 
+        /// \Returns An Iterator that points to the beginning of the vector.
+        ///
+        RealArray<double>::Iterator GetIterator() const;
+
     protected:
-        vector<double> _output;
+        RealArray<double> _output;
     };
 }
 

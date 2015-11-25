@@ -26,7 +26,7 @@ _USE_DEFAULT_DESERIALIZER_  // use the default deserializer for mappings
 #include "SequentialLineIterator.h"
 #include "SparseEntryParser.h"
 #include "ParsingIterator.h"
-#include "loader.h"
+#include "DatasetLoader.h"
 using namespace dataset;
 
 // linear
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
         auto rng = GetRandomEngine(shared_arguments.dataRandomSeedString);
 
         // Load a dataset, permute, and get a data iterator
-        auto data = Loader::Load(li, p);
+        auto data = DatasetLoader::Load(li, p);
 
         // create loss function
         LogLoss loss(1);

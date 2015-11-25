@@ -3,34 +3,34 @@
 
 namespace common
 {
-    template<typename RealType>
-    bool RealArray<RealType>::Iterator::IsValid() const
+    template<typename ValueType>
+    bool RealArray<ValueType>::Iterator::IsValid() const
     {
         return (_begin != _end);
     }
 
-    template<typename RealType>
-    void RealArray<RealType>::Iterator::Next()
+    template<typename ValueType>
+    void RealArray<ValueType>::Iterator::Next()
     {
         ++_begin;
         ++_index;
         SkipZeros();
     }
 
-    template<typename RealType>
-    indexValue RealArray<RealType>::Iterator::Get() const
+    template<typename ValueType>
+    indexValue RealArray<ValueType>::Iterator::Get() const
     {
         return indexValue{_index, (double)*_begin};
     }
 
-    template<typename RealType>
-    RealArray<RealType>::Iterator::Iterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end), _index(0)
+    template<typename ValueType>
+    RealArray<ValueType>::Iterator::Iterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end), _index(0)
     {
         SkipZeros();
     }
 
-    template<typename RealType>
-    void RealArray<RealType>::Iterator::SkipZeros()
+    template<typename ValueType>
+    void RealArray<ValueType>::Iterator::SkipZeros()
     {
         while(_begin < _end && *_begin == 0)
         {
@@ -39,12 +39,12 @@ namespace common
         }
     }
 
-    template<typename RealType>
-    RealArray<RealType>::RealArray(uint64 size) : vector<RealType>(size) {}
+    template<typename ValueType>
+    RealArray<ValueType>::RealArray(uint64 size) : vector<ValueType>(size) {}
 
-    template<typename RealType>
+    template<typename ValueType>
     template<typename IndexValueIteratorType, typename concept>
-    RealArray<RealType>::RealArray(IndexValueIteratorType indexValueIterator) : vector<RealArray>(0)
+    RealArray<ValueType>::RealArray(IndexValueIteratorType indexValueIterator) : vector<RealArray>(0)
     {
         while(indexValueIterator.IsValid())
         {
@@ -55,23 +55,29 @@ namespace common
         }
     }
     
-    template<typename RealType>
-    typename RealArray<RealType>::Iterator RealArray<RealType>::GetIterator() const
+    template<typename ValueType>
+    uint64 RealArray<ValueType>::Size() const
+    {
+        return size();
+    }
+
+    template<typename ValueType>
+    typename RealArray<ValueType>::Iterator RealArray<ValueType>::GetIterator() const
     {
         return Iterator(cbegin(), cend());
     }
 
-    template<typename RealType>
-    void RealArray<RealType>::Print(ostream& os) const
+    template<typename ValueType>
+    void RealArray<ValueType>::Print(ostream& os) const
     {
-        for(RealType x : *this)
+        for(ValueType x : *this)
         {
             os << x << '\t';
         }
     }
 
-    template<typename RealType>
-    ostream& operator<<(ostream& os, const RealArray<RealType>& array)
+    template<typename ValueType>
+    ostream& operator<<(ostream& os, const RealArray<ValueType>& array)
     {
         array.Print(os);
     }

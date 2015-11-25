@@ -16,12 +16,12 @@ namespace dataset
 
     /// Container that holds a static function that loads and parses a dataset 
     ///
-    struct Loader
+    struct DatasetLoader
     {
         template<typename RowIteratorType, typename VectorEntryParserType>
         static RowDataset Load(RowIteratorType line_iterator, VectorEntryParserType parser);
     };
 }
 
-#include "../tcc/Loader.tcc"
+#include "../tcc/DatasetLoader.tcc"
 

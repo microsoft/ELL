@@ -7,10 +7,13 @@
 #include <vector>
 using std::vector;
 
+#include <iostream>
+using std::ostream;
+
 namespace common
 {
-    template <typename RealType>
-    class RealArray : public vector<RealType>
+    template <typename ValueType>
+    class RealArray : public vector<ValueType>
     {
     public:
 
@@ -43,11 +46,11 @@ namespace common
         private:
 
             // abbreviate iterator type, for improved readability 
-            using StlIteratorType = typename vector<RealType>::const_iterator;
+            using StlIteratorType = typename vector<ValueType>::const_iterator;
 
             /// private ctor, can only be called from RealArray class
             Iterator(const StlIteratorType& begin, const StlIteratorType& end);
-            friend RealArray<RealType>;
+            friend RealArray<ValueType>;
 
             // members
             StlIteratorType _begin;
@@ -56,28 +59,38 @@ namespace common
             void SkipZeros();
         };
 
-
-        RealArray(uint64 size);
-        RealArray(const RealArray<RealType>&) = default;
-        RealArray(RealArray<RealType>&&) = default;
-
+        /// Ctor
+        ///
+        RealArray(uint64 size = 0);
+        
+        /// Default copy ctor
+        ///
+        RealArray(const RealArray<ValueType>&) = default;
+        
+        /// Default move ctor
+        ///
+        RealArray(RealArray<ValueType>&&) = default;
 
         /// Converting constructor
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         RealArray(IndexValueIteratorType indexValueIterator);
 
-        /// \Returns a Iterator that points to the beginning of the list.
+        /// \returns The size of the array
+        ///
+        uint64 Size() const;
+
+        /// \returns An Iterator that points to the beginning of the list.
         ///
         Iterator GetIterator() const;
 
         /// Prints the array to an output stream
         ///
-        virtual void Print(ostream & os) const;
+        void Print(ostream& os) const;
     };
 
-    template <typename RealType>
-    ostream& operator<<(ostream&, const RealArray<RealType>&);
+    template <typename ValueType>
+    ostream& operator<<(ostream&, const RealArray<ValueType>&);
 }
 
 #include "../tcc/RealArray.tcc"

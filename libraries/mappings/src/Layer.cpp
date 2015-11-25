@@ -12,7 +12,7 @@ namespace mappings
 
     uint64 Layer::Size() const
     {
-        return _output.size();
+        return _output.Size();
     }
 
     double Layer::GetValue(uint64 index) const
@@ -23,5 +23,10 @@ namespace mappings
     void Layer::Clear()
     {
         std::fill(_output.begin(), _output.end(), 0);
+    }
+
+    RealArray<double>::Iterator Layer::GetIterator() const
+    {
+        return _output.GetIterator();
     }
 }

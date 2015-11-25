@@ -6,7 +6,7 @@ using std::move;
 namespace dataset
 {
     template<typename RowIteratorType, typename VectorEntryParserType>
-    RowDataset Loader::Load(RowIteratorType line_iterator, VectorEntryParserType parser)
+    RowDataset DatasetLoader::Load(RowIteratorType line_iterator, VectorEntryParserType parser)
     {
 
         // parse each line according to the parser

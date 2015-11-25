@@ -104,7 +104,7 @@ namespace dataset
         ///@}
 
     private:
-        vector<uint8> _mem;
+        vector<uint8> _data;
         uint64 _last;
         uint64 _size;
     };

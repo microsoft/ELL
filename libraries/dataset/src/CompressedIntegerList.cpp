@@ -62,7 +62,7 @@ namespace dataset
 
     void CompressedIntegerList::Reserve(uint64 size)
     {
-        _mem.reserve(size*2); // guess that, on average, every entry will occupy 2 bytes
+        _data.reserve(size*2); // guess that, on average, every entry will occupy 2 bytes
     }
 
     uint64 CompressedIntegerList::Max() const
@@ -117,8 +117,8 @@ namespace dataset
         }
 
         int total_bytes = 1 << log2bytes;
-        _mem.resize(_mem.size() + total_bytes); // make room for new data
-        uint8 *buf = _mem.data() + _mem.size() - total_bytes; // get pointer to correct place in array
+        _data.resize(_data.size() + total_bytes); // make room for new data
+        uint8 *buf = _data.data() + _data.size() - total_bytes; // get pointer to correct place in array
         unsigned int mask = log2bytes << 6; // mask == log2(# bytes) shifted to be high-order 2 bits of a byte
         // splice the data length encoding in as the top 2 bits of the first byte
         // So, move all high-order bits of the delta over by 2 to make room, Add the mask, and Add the residual low-order bits of the delta
@@ -130,13 +130,13 @@ namespace dataset
 
     void CompressedIntegerList::Reset()
     {
-        _mem.resize(0);
+        _data.resize(0);
         _last = UINT64_MAX;
         _size = 0;
     }
 
     CompressedIntegerList::Iterator CompressedIntegerList::GetIterator() const
     {
-        return Iterator(_mem.data(), _mem.data() + _mem.size());
+        return Iterator(_data.data(), _data.data() + _data.size());
     }
 }

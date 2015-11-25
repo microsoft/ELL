@@ -4,7 +4,7 @@ namespace dataset
 {
     template<typename ValueType>
     template<typename IndexValueIteratorType, typename concept>
-    DenseDataVector<ValueType>::DenseDataVector(IndexValueIteratorType indexValueIterator)
+    DenseDataVector<ValueType>::DenseDataVector(IndexValueIteratorType indexValueIterator) 
     {
         while(indexValueIterator.IsValid())
         {

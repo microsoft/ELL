@@ -5,7 +5,8 @@
 #include "IDataVector.h"
 
 #include "types.h"
-
+#include "RealArray.h"
+using common::RealArray;
 
 #include <vector>
 using std::vector;
@@ -27,48 +28,6 @@ namespace dataset
     class DenseDataVector : public IDataVector
     {
     public:
-
-        /// A read-only forward iterator for the sparse binary vector.
-        ///
-        class Iterator : public IIndexValueIterator
-        {
-        public:
-
-            /// Default copy ctor
-            ///
-            Iterator(const Iterator&) = default;
-
-            /// Default move ctor
-            ///
-            Iterator(Iterator&&) = default;
-
-            /// \returns True if the iterator is currently pointing to a valid iterate
-            ///
-            bool IsValid() const;
-
-            /// Proceeds to the Next iterate
-            ///
-            void Next();
-
-            /// \returns The current index-value pair
-            ///
-            indexValue Get() const;
-
-        private:
-
-            // define typenames to improve readability
-            using StlIteratorType = typename vector<ValueType>::const_iterator;
-
-            /// private ctor, can only be called from SparseDataVector class
-            Iterator(const StlIteratorType& begin, const StlIteratorType& end);
-            friend DenseDataVector<ValueType>;
-
-            // members
-            StlIteratorType _begin;
-            StlIteratorType _end;
-            uint64 _index = 0;
-        };
-
         /// Constructor
         ///
         DenseDataVector();
@@ -114,9 +73,9 @@ namespace dataset
         ///
         virtual double Dot(const double* p_other) const override;
 
-        /// \Returns a Iterator that points to the beginning of the list.
+        /// \Returns An Iterator that points to the beginning of the vector.
         ///
-        Iterator GetIterator() const;
+        typename RealArray<ValueType>::Iterator GetIterator() const;
 
         /// Prints the datavector to an output stream
         ///
@@ -124,7 +83,7 @@ namespace dataset
 
     private:
         uint64 _num_nonzeros;
-        vector<ValueType> _mem;
+        RealArray<ValueType> _data;
     };
 
     class FloatDataVector : public DenseDataVector<float> 
