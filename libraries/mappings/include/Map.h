@@ -16,6 +16,9 @@ namespace mappings
 {
     class Map
     {
+
+        using Iterator = RealArray<double>::Iterator;
+
         /// Ctor
         ///
         Map(uint64 layerZeroSize);
@@ -24,6 +27,10 @@ namespace mappings
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         void Compute(IndexValueIteratorType indexValueIterator);
+
+        /// \Returns An Iterator that points to the beginning of a specified layer's output.
+        ///
+        Iterator GetIterator(uint64 layerIndex = maxUInt64) const;
 
     protected:
         vector<unique_ptr<Layer>> _layers;

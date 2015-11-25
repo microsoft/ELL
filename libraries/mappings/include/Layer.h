@@ -16,6 +16,9 @@ namespace mappings
     class Layer
     {
     public:
+
+        using Iterator = RealArray<double>::Iterator;
+
         /// Ctor
         ///
         Layer(uint64 size);
@@ -51,7 +54,7 @@ namespace mappings
 
         /// \Returns An Iterator that points to the beginning of the vector.
         ///
-        RealArray<double>::Iterator GetIterator() const;
+        Iterator GetIterator() const;
 
     protected:
         RealArray<double> _output;

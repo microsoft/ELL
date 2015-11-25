@@ -79,7 +79,7 @@ namespace dataset
     }
 
     template<typename ValueType>
-    typename RealArray<ValueType>::Iterator DenseDataVector<ValueType>::GetIterator() const
+    typename DenseDataVector<ValueType>::Iterator DenseDataVector<ValueType>::GetIterator() const
     {
         return _data.GetIterator();
     }

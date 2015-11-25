@@ -28,6 +28,9 @@ namespace dataset
     class DenseDataVector : public IDataVector
     {
     public:
+
+        using Iterator = typename RealArray<ValueType>::Iterator;
+
         /// Constructor
         ///
         DenseDataVector();
@@ -75,7 +78,7 @@ namespace dataset
 
         /// \Returns An Iterator that points to the beginning of the vector.
         ///
-        typename RealArray<ValueType>::Iterator GetIterator() const;
+        Iterator GetIterator() const;
 
         /// Prints the datavector to an output stream
         ///
