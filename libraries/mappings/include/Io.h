@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Mapping.h"
+#include "Layer.h"
 
 #include <iostream>
 using std::istream;
@@ -21,16 +21,16 @@ namespace mappings
 
         /// writes a Mapping to a stream
         ///
-        static void Write(ostream& os, shared_ptr<Mapping> map);
+        static void Write(ostream& os, shared_ptr<Layer> map);
 
         /// reads a Mapping from a stream
         ///
-        static shared_ptr<Mapping> Read(istream& is);
+        static shared_ptr<Layer> Read(istream& is);
 
-        /// reads a column Mapping from a stream
-        /// numLayers = 0 keeps the entire Mapping
-        /// numLayers = positive keeps only the specified number of layers, starting from the top
-        /// numLayers = negative subtracts the specified number of layers, starting from the bottom
-        static shared_ptr<Column> ReadColumn(istream& is, int numLayers);
+        ///// reads a column Mapping from a stream
+        ///// numLayers = 0 keeps the entire Mapping
+        ///// numLayers = positive keeps only the specified number of layers, starting from the top
+        ///// numLayers = negative subtracts the specified number of layers, starting from the bottom
+        //static shared_ptr<Column> ReadColumn(istream& is, int numLayers);
     };
 }

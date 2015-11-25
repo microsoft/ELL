@@ -43,8 +43,7 @@ namespace common
             ///
             indexValue Get() const;
 
-        private:
-
+        protected:
             // abbreviate iterator type, for improved readability 
             using StlIteratorType = typename vector<ValueType>::const_iterator;
 
@@ -80,7 +79,7 @@ namespace common
         ///
         uint64 Size() const;
 
-        /// \returns An Iterator that points to the beginning of the list.
+        /// \returns An Iterator that points to the beginning of the array.
         ///
         Iterator GetIterator() const;
 
@@ -91,6 +90,9 @@ namespace common
 
     template <typename ValueType>
     ostream& operator<<(ostream&, const RealArray<ValueType>&);
+
+    typedef RealArray<double> DoubleArray;
+    typedef RealArray<float> FloatArray;
 }
 
 #include "../tcc/RealArray.tcc"

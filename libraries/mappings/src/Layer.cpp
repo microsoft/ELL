@@ -15,7 +15,7 @@ namespace mappings
         return _output.Size();
     }
 
-    double Layer::GetValue(uint64 index) const
+    double Layer::Get(uint64 index) const
     {
         return _output[index];
     }
@@ -25,8 +25,16 @@ namespace mappings
         std::fill(_output.begin(), _output.end(), 0);
     }
 
-    RealArray<double>::Iterator Layer::GetIterator() const
+    Layer::Iterator Layer::GetIterator() const
     {
         return _output.GetIterator();
+    }
+
+    void Layer::SerializeHeader(JsonSerializer & serializer, int version) const
+    {
+        // to make the file more readable
+        const string type_names[] = {"constant", "scale", "shift", "sum", "decisionTreePath", "row", "column", "null"};
+        serializer.Write("_type", type_names[(int)_type]);
+        serializer.Write("_version", version);
     }
 }

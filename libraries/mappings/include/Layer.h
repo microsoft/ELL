@@ -3,7 +3,10 @@
 
 #include "types.h"
 #include "RealArray.h"
-using common::RealArray;
+using common::DoubleArray;
+
+#include "JsonSerializer.h"
+using utilities::JsonSerializer;
 
 #include <vector>
 using std::vector;
@@ -17,7 +20,9 @@ namespace mappings
     {
     public:
 
-        using Iterator = RealArray<double>::Iterator;
+        using Iterator = DoubleArray::Iterator;
+
+        enum class Types { constant, scale, shift, sum, decisionTreePath, row, column, null };
 
         /// Ctor
         ///
@@ -38,7 +43,7 @@ namespace mappings
 
         /// Trivial implementation of Compute which does nothing - override this function in derived classes
         ///
-        virtual void Compute(const vector<unique_ptr<Layer>>& previousLayers);
+        virtual void Compute(const vector<unique_ptr<Layer>>& previousLayers); //  TODO change this to pure virtual, and add new class called Trivial or instanceCopy or something
 
         /// \returns The size of the layer's output
         ///
@@ -46,7 +51,7 @@ namespace mappings
 
         /// \returns The output value at a given index
         ///
-        double GetValue(uint64 index) const;
+        double Get(uint64 index) const;
 
         /// Sets the output to zero
         ///
@@ -56,8 +61,19 @@ namespace mappings
         ///
         Iterator GetIterator() const;
 
+        /// Serializes the Mapping in json format
+        ///
+        virtual void Serialize(JsonSerializer& serializer) const = 0;
+        
+        /// Deserializes the Mapping in json format
+        ///
+        virtual void Deserialize(JsonSerializer& serializer, int version) = 0;
+                
     protected:
-        RealArray<double> _output;
+        void SerializeHeader(JsonSerializer& serializer, int version) const;
+
+        Types _type = Types::null;
+        DoubleArray _output;
     };
 }
 

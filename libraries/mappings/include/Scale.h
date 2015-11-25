@@ -1,11 +1,11 @@
 // Scale.h
 #pragma once
 
-#include "Coordinatewise.h"
+#include "Coordinatewise2.h"
 
 namespace mappings
 {
-    class Scale : public Coordinatewise
+    class Scale : public Coordinatewise2
     {
     public:
 

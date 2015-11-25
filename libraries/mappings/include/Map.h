@@ -17,7 +17,7 @@ namespace mappings
     class Map
     {
 
-        using Iterator = RealArray<double>::Iterator;
+        using Iterator = DoubleArray::Iterator;
 
         /// Ctor
         ///

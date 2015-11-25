@@ -24,6 +24,6 @@ struct indexValue
     double value;
 };
 
-// parent class for all iterators whose Get() function returns an indexValue
+// parent classes for iterators 
 struct IIndexValueIterator {};
 

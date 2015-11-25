@@ -10,7 +10,7 @@ using std::to_string;
 
 namespace mappings
 {
-    Shift::Shift() : Coordinatewise(Shift::Add)
+    Shift::Shift() : Coordinatewise2(Shift::Add)
     {
         _type = Types::shift;
     }

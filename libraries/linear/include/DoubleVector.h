@@ -6,7 +6,7 @@
 
 #include "types.h"
 #include "RealArray.h"
-using common::RealArray;
+using common::DoubleArray;
 
 #include <cassert>
 
@@ -14,11 +14,11 @@ namespace linear
 {
     /// DoubleVector class
     ///
-    class DoubleVector : public RealArray<double>, public IVector
+    class DoubleVector : public DoubleArray, public IVector
     {
     public:
 
-        using RealArray<double>::RealArray;
+        using DoubleArray::RealArray;
         using IVector::AddTo;
 
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its memory

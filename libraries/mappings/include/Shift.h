@@ -1,11 +1,11 @@
 // Shift.h
 #pragma once
 
-#include "Coordinatewise.h"
+#include "Coordinatewise2.h"
 
 namespace mappings
 {
-    class Shift : public Coordinatewise
+    class Shift : public Coordinatewise2
     {
     public:
 

@@ -48,11 +48,11 @@ namespace linear
 
     uint64 DoubleVector::Size() const
     {
-        return RealArray<double>::size();
+        return DoubleArray::size();
     }
 
     void DoubleVector::Print(ostream & os) const
     {
-        RealArray<double>::Print(os);
+        DoubleArray::Print(os);
     }
 }

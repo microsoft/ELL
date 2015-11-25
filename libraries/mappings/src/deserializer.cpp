@@ -16,17 +16,17 @@ using std::make_shared;
 
 namespace mappings
 {
-    void DefaultDeserialize(JsonSerializer& serializer, shared_ptr<Mapping>& up)
+    void DefaultDeserialize(JsonSerializer& serializer, shared_ptr<Layer>& up)
     {
         auto type = serializer.Read<string>("_type");
         auto version = serializer.Read<int>("_version");
 
-        if (type == "Constant")
-        {
-            up = make_shared<Constant>();
-        }
+        //if (type == "Constant")
+        //{
+        //    up = make_shared<Constant>();
+        //}
 
-        else if(type == "Scale")
+        if(type == "Scale")
         {
             up = make_shared<Scale>();
         }
@@ -36,25 +36,28 @@ namespace mappings
             up = make_shared<Shift>();
         }
 
-        else if(type == "Sum")
-        {
-            up = make_shared<Sum>();
-        }
+        //else if(type == "Sum")
+        //{
+        //    up = make_shared<Sum>();
+        //}
 
-        else if (type == "DecisionTreePath")
-        {
-            up = make_shared<DecisionTreePath>();
-        }
+        //else if (type == "DecisionTreePath")
+        //{
+        //    up = make_shared<DecisionTreePath>();
+        //}
 
-        else if (type == "Column")
-        {
-            up = make_shared<Column>();
-        }
+        //else if (type == "Column")
+        //{
+        //    up = make_shared<Column>();
+        //}
 
-        else if (type == "Row")
-        {
-            up = make_shared<Row>();
-        }
+        //else if (type == "Row")
+        //{
+        //    up = make_shared<Row>();
+        //}
+
+        // TODO add null
+        // TODO check capitalization of these type strings
 
         else
         {

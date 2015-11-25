@@ -59,6 +59,15 @@
     <ClInclude Include="include\Map.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Coordinatewise2.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IndexPair.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IndexPairList.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Mapping.cpp">
@@ -101,6 +110,15 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Map.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Coordinatewise2.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IndexPair.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IndexPairList.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

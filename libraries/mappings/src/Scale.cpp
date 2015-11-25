@@ -10,7 +10,7 @@ using std::to_string;
 
 namespace mappings
 {
-    Scale::Scale() : Coordinatewise(Scale::Multiply)
+    Scale::Scale() : Coordinatewise2(Scale::Multiply)
     {
         _type = Types::scale;
     }
