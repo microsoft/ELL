@@ -1,6 +1,6 @@
-// Coordinatewise2.cpp
+// Coordinatewise.cpp
 
-#include "Coordinatewise2.h"
+#include "Coordinatewise.h"
 
 #include <stdexcept>
 using std::runtime_error;
@@ -10,13 +10,13 @@ using std::to_string;
 
 namespace mappings
 {
-    Coordinatewise2::Coordinatewise2(const DoubleOperation & operation) : _operation(operation)
+    Coordinatewise::Coordinatewise(const DoubleOperation & operation) : _operation(operation)
     {}
 
-    Coordinatewise2::Coordinatewise2(const vector<double> & values, const IndexPairList & coordinates, const DoubleOperation& operation) : Layer(values.size()), _values(values), _coordinates(coordinates)
+    Coordinatewise::Coordinatewise(const vector<double> & values, const IndexPairList & coordinates, const DoubleOperation& operation) : Layer(values.size()), _values(values), _coordinates(coordinates)
     {}
 
-    void Coordinatewise2::Compute(const vector<unique_ptr<Layer>>& previousLayers)
+    void Coordinatewise::Compute(const vector<unique_ptr<Layer>>& previousLayers)
     {
         for(uint64 k=0; k<_values.size(); ++k)
         {
@@ -26,7 +26,7 @@ namespace mappings
         }
     }
 
-    void Coordinatewise2::Serialize(JsonSerializer& serializer) const
+    void Coordinatewise::Serialize(JsonSerializer& serializer) const
     {
         // version 1
         //Mapping::SerializeHeader(serializer, 1);
@@ -36,7 +36,7 @@ namespace mappings
 
     }
 
-    void Coordinatewise2::Deserialize(JsonSerializer& serializer, int version)
+    void Coordinatewise::Deserialize(JsonSerializer& serializer, int version)
     {
         if(version == 1)
         {

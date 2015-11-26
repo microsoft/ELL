@@ -1,4 +1,4 @@
-// Coordinatewise2.h
+// Coordinatewise.h
 #pragma once
 
 #include "Layer.h"
@@ -16,7 +16,7 @@ using std::function;
 
 namespace mappings
 {
-    class Coordinatewise2 : public Layer
+    class Coordinatewise : public Layer
     {
     public:
 
@@ -24,11 +24,11 @@ namespace mappings
 
         /// Ctor
         ///
-        Coordinatewise2(const DoubleOperation& operation);
+        Coordinatewise(const DoubleOperation& operation);
 
         /// Ctor
         ///
-        Coordinatewise2(const vector<double>& values, const IndexPairList& coordinates, const DoubleOperation& operation);
+        Coordinatewise(const vector<double>& values, const IndexPairList& coordinates, const DoubleOperation& operation);
 
         /// Computes the layer output
         ///

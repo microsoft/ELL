@@ -10,12 +10,12 @@ using std::to_string;
 
 namespace mappings
 {
-    Scale::Scale() : Coordinatewise2(Operation)
+    Scale::Scale() : Coordinatewise(Operation)
     {
         _type = Types::scale;
     }
 
-    Scale::Scale(const vector<double>& values, const IndexPairList & coordinates) : Coordinatewise2(values, coordinates, Operation)
+    Scale::Scale(const vector<double>& values, const IndexPairList & coordinates) : Coordinatewise(values, coordinates, Operation)
     {
         _type = Types::scale;
     }
