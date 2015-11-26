@@ -22,11 +22,11 @@ namespace mappings
 
         using Iterator = DoubleArray::Iterator;
 
-        enum class Types { constant, scale, shift, sum, decisionTreePath, row, column, null };
+        enum class Type { zero, scale, shift, sum, decisionTreePath };
 
         /// Default ctor
         ///
-        Layer(uint64 size = 0);
+        Layer(uint64 size, Type type);
 
         /// Default copy ctor
         ///
@@ -72,7 +72,7 @@ namespace mappings
     protected:
         void SerializeHeader(JsonSerializer& serializer, int version) const;
 
-        Types _type = Types::null;
+        Type _type;
         DoubleArray _output;
     };
 }

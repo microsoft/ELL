@@ -4,7 +4,7 @@
 
 namespace mappings
 {
-    Layer::Layer(uint64 size) : _output(size)
+    Layer::Layer(uint64 size, Type type) : _output(size), _type(type)
     {}
 
     void Layer::Compute(const vector<unique_ptr<Layer>>& previousLayers)
@@ -33,7 +33,7 @@ namespace mappings
     void Layer::SerializeHeader(JsonSerializer & serializer, int version) const
     {
         // to make the file more readable
-        const string type_names[] = {"constant", "scale", "shift", "sum", "decisionTreePath", "row", "column", "null"};
+        const string type_names[] = { "Zero", "Scale", "Shift", "Sum", "DecisionTreePath" };
         serializer.Write("_type", type_names[(int)_type]);
         serializer.Write("_version", version);
     }

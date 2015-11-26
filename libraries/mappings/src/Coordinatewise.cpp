@@ -10,10 +10,10 @@ using std::to_string;
 
 namespace mappings
 {
-    Coordinatewise::Coordinatewise(const DoubleOperation & operation) : _operation(operation)
+    Coordinatewise::Coordinatewise(const DoubleOperation & operation, Type type) : Layer(0, type), _operation(operation)
     {}
 
-    Coordinatewise::Coordinatewise(const vector<double> & values, const IndexPairList & coordinates, const DoubleOperation& operation) : Layer(values.size()), _values(values), _coordinates(coordinates)
+    Coordinatewise::Coordinatewise(const vector<double> & values, const IndexPairList & coordinates, const DoubleOperation& operation, Type type) : Layer(values.size(), type), _values(values), _coordinates(coordinates)
     {}
 
     void Coordinatewise::Compute(const vector<unique_ptr<Layer>>& previousLayers)
@@ -29,7 +29,7 @@ namespace mappings
     void Coordinatewise::Serialize(JsonSerializer& serializer) const
     {
         // version 1
-        //Mapping::SerializeHeader(serializer, 1);
+        Layer::SerializeHeader(serializer, 1);
 
         serializer.Write("values", _values);
         serializer.Write("coordinates", _coordinates);

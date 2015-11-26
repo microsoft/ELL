@@ -1,6 +1,9 @@
 #include "Zero.h"
 
-mappings::Zero::Zero(uint64 size) : Layer(size)
+#include <string>
+using std::to_string;
+
+mappings::Zero::Zero(uint64 size) : Layer(size, Type::zero)
 {}
 
 void mappings::Zero::Compute(const vector<unique_ptr<Layer>>& previousLayers)
@@ -10,9 +13,22 @@ void mappings::Zero::Compute(const vector<unique_ptr<Layer>>& previousLayers)
 
 void mappings::Zero::Serialize(JsonSerializer & serializer) const
 {
-    // TODO serialize the size
+    // version 1
+    Layer::SerializeHeader(serializer, 1);
+
+    serializer.Write("size", _output.size());
 }
 
 void mappings::Zero::Deserialize(JsonSerializer & serializer, int version)
 {
+    if (version == 1)
+    {
+        uint64 size = 0;
+        serializer.Read("size", size);
+        _output.resize(size);
+    }
+    else
+    {
+        throw runtime_error("unsupported version: " + to_string(version));
+    }
 }

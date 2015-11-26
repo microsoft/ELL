@@ -24,11 +24,11 @@ namespace mappings
 
         /// Ctor
         ///
-        Coordinatewise(const DoubleOperation& operation);
+        Coordinatewise(const DoubleOperation& operation, Type type);
 
         /// Ctor
         ///
-        Coordinatewise(const vector<double>& values, const IndexPairList& coordinates, const DoubleOperation& operation);
+        Coordinatewise(const vector<double>& values, const IndexPairList& coordinates, const DoubleOperation& operation, Type type);
 
         /// Computes the layer output
         ///
