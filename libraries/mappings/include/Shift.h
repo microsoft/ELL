@@ -9,17 +9,16 @@ namespace mappings
     {
     public:
 
-        /// Constructs a default Mapping
+        /// Ctor
         ///
         Shift();
 
-        /// Constructs a Shift Mapping from index value pairs
+        /// Ctor
         ///
-        template <typename IndexValueIteratorType>
-        Shift(IndexValueIteratorType begin, IndexValueIteratorType end);
+        Shift(const vector<double>& values, const IndexPairList& coordinates);
 
-        static double Add(double a, double b);
+        /// Static function that specifies the coordinatewise operation
+        ///
+        static double Operation(double value, double input) { return value + input; }
     };
 }
-
-#include "../tcc/Shift.tcc"

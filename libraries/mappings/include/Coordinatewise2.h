@@ -22,17 +22,23 @@ namespace mappings
 
         using DoubleOperation = function<double(double, double)>;
 
-        Coordinatewise2(const vector<double> & values, const IndexPairList& coordinates, DoubleOperation operation);
+        /// Ctor
+        ///
+        Coordinatewise2(const DoubleOperation& operation);
+
+        /// Ctor
+        ///
+        Coordinatewise2(const vector<double>& values, const IndexPairList& coordinates, const DoubleOperation& operation);
 
         /// Computes the layer output
         ///
         virtual void Compute(const vector<unique_ptr<Layer>>& previousLayers);
 
-        /// Serializes the Mapping in json format
+        /// Serializes the Layer in json format
         ///
         virtual void Serialize(JsonSerializer& serializer) const;
 
-        /// Deserializes the Mapping in json format
+        /// Deserializes the Layer in json format
         ///
         virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion);
 

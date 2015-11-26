@@ -10,7 +10,10 @@ using std::to_string;
 
 namespace mappings
 {
-    Coordinatewise2::Coordinatewise2(const vector<double> & values, const IndexPairList & coordinates, DoubleOperation operation) : Layer(values.size()), _values(values), _coordinates(coordinates)
+    Coordinatewise2::Coordinatewise2(const DoubleOperation & operation) : _operation(operation)
+    {}
+
+    Coordinatewise2::Coordinatewise2(const vector<double> & values, const IndexPairList & coordinates, const DoubleOperation& operation) : Layer(values.size()), _values(values), _coordinates(coordinates)
     {}
 
     void Coordinatewise2::Compute(const vector<unique_ptr<Layer>>& previousLayers)
@@ -39,6 +42,7 @@ namespace mappings
         {
             serializer.Read("values", _values);
             serializer.Read("coordinates", _coordinates);
+            _output.resize(_values.size());
         }
         else
         {

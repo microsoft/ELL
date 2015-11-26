@@ -24,9 +24,9 @@ namespace mappings
 
         enum class Types { constant, scale, shift, sum, decisionTreePath, row, column, null };
 
-        /// Ctor
+        /// Default ctor
         ///
-        Layer(uint64 size);
+        Layer(uint64 size = 0);
 
         /// Default copy ctor
         ///
@@ -41,9 +41,9 @@ namespace mappings
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         void Set(IndexValueIteratorType indexValueIterator);
 
-        /// Trivial implementation of Compute which does nothing - override this function in derived classes
+        /// Computes the output of the layer
         ///
-        virtual void Compute(const vector<unique_ptr<Layer>>& previousLayers); //  TODO change this to pure virtual, and add new class called Trivial or instanceCopy or something
+        virtual void Compute(const vector<unique_ptr<Layer>>& previousLayers) = 0; 
 
         /// \returns The size of the layer's output
         ///
@@ -61,11 +61,11 @@ namespace mappings
         ///
         Iterator GetIterator() const;
 
-        /// Serializes the Mapping in json format
+        /// Serializes the Layer in json format
         ///
         virtual void Serialize(JsonSerializer& serializer) const = 0;
         
-        /// Deserializes the Mapping in json format
+        /// Deserializes the Layer in json format
         ///
         virtual void Deserialize(JsonSerializer& serializer, int version) = 0;
                 

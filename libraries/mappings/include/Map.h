@@ -21,7 +21,7 @@ namespace mappings
 
         /// Ctor
         ///
-        Map(uint64 layerZeroSize);
+        Map(uint64 inputLayerSize);
     
         /// Computes the Map
         ///

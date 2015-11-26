@@ -80,7 +80,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\Constant.h" />
-    <ClInclude Include="include\Coordinatewise.h" />
     <ClInclude Include="include\Coordinatewise2.h" />
     <ClInclude Include="include\DecisionTreePath.h" />
     <ClInclude Include="include\IndexPair.h" />
@@ -97,10 +96,11 @@
     <ClInclude Include="include\mappings.h" />
     <ClInclude Include="include\Row.h" />
     <ClInclude Include="include\Scale.h" />
+    <ClInclude Include="include\Zero.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\Zero.cpp" />
     <ClCompile Include="src\Constant.cpp" />
-    <ClCompile Include="src\Coordinatewise.cpp" />
     <ClCompile Include="src\Coordinatewise2.cpp" />
     <ClCompile Include="src\DecisionTreePath.cpp" />
     <ClCompile Include="src\IndexPair.cpp" />
@@ -118,12 +118,9 @@
     <ClCompile Include="src\Scale.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="tcc\Coordinatewise.tcc" />
     <None Include="tcc\DecisionTreePath.tcc" />
     <None Include="tcc\Layer.tcc" />
     <None Include="tcc\Map.tcc" />
-    <None Include="tcc\Scale.tcc" />
-    <None Include="tcc\Shift.tcc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

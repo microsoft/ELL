@@ -10,13 +10,13 @@ using std::to_string;
 
 namespace mappings
 {
-    Shift::Shift() : Coordinatewise2(Shift::Add)
+    Shift::Shift() : Coordinatewise2(Operation)
     {
         _type = Types::shift;
     }
 
-    double Shift::Add(double a, double b)
+    Shift::Shift(const vector<double>& values, const IndexPairList & coordinates) : Coordinatewise2(values, coordinates, Operation)
     {
-        return a + b;
+        _type = Types::shift;
     }
 }

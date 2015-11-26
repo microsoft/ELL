@@ -9,17 +9,16 @@ namespace mappings
     {
     public:
 
-        /// Constructs a default Mapping
+        /// Ctor
         ///
         Scale();
 
-        /// Constructs a Shift Mapping from index value pairs
+        /// Ctor
         ///
-        template <typename IndexValueIteratorType>
-        Scale(IndexValueIteratorType indexValueIterator);
+        Scale(const vector<double>& values, const IndexPairList& coordinates);
 
-        static double Multiply(double a, double b);
+        /// Static function that specifies the coordinatewise operation
+        ///
+        static double Operation(double value, double input) { return value * input; }
     };
 }
-
-#include "../tcc/Scale.tcc"

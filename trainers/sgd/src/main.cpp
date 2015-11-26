@@ -114,9 +114,6 @@ int main(int argc, char* argv[])
         auto predictor = optimizer.GetPredictor();
         auto weights = predictor.GetVector();
         auto weightsIterator = weights.GetIterator();
-
-        // save predictor
-        Scale predictorWeights(weightsIterator);
     }
     catch (runtime_error e)
     {

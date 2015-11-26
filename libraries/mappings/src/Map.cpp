@@ -1,15 +1,16 @@
 // Map.cpp
 
 #include "Map.h"
+#include "Zero.h"
 
 using std::make_unique;
 using std::move;
 
 namespace mappings
 {
-    Map::Map(uint64 layerZeroSize)
+    Map::Map(uint64 inputLayerSize)
     {
-        _layers.push_back(make_unique<Layer>(layerZeroSize));
+        _layers.push_back(make_unique<Zero>(inputLayerSize));
     }
 
     Map::Iterator Map::GetIterator(uint64 layerIndex) const
