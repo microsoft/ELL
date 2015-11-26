@@ -2,6 +2,7 @@
 
 #include "Map.h"
 #include "Zero.h"
+#include "deserializer.h"
 
 using std::make_unique;
 using std::move;
@@ -21,5 +22,15 @@ namespace mappings
         }
 
         return _layers[layerIndex]->GetIterator();
+    }
+
+    void Map::Serialize(JsonSerializer & serializer) const
+    {
+        serializer.Write("layers", _layers);
+    }
+
+    void Map::Deserialize(JsonSerializer & serializer)
+    {
+        serializer.Read("layers", _layers);
     }
 }

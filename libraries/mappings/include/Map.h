@@ -10,13 +10,13 @@
 using std::vector;
 
 #include <memory>
-using std::unique_ptr;
+using std::shared_ptr;
 
 namespace mappings
 {
     class Map
     {
-
+    public:
         using Iterator = DoubleArray::Iterator;
 
         /// Ctor
@@ -32,8 +32,16 @@ namespace mappings
         ///
         Iterator GetIterator(uint64 layerIndex = maxUInt64) const;
 
+        /// Serializes the Map in json format
+        ///
+        void Serialize(JsonSerializer& serializer) const;
+
+        /// Deserializes the Map in json format
+        ///
+        void Deserialize(JsonSerializer& serializer);
+
     protected:
-        vector<unique_ptr<Layer>> _layers;
+        vector<shared_ptr<Layer>> _layers;
     };
 }
 

@@ -30,6 +30,11 @@ namespace utilities
     {
     public:
 
+        /// write shared_ptrs to a classe
+        ///
+        template<typename KeyType, typename ValueType>
+        void Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* SFINAE = nullptr);
+
         /// write classes
         ///
         template<typename KeyType, typename ValueType>
@@ -39,11 +44,6 @@ namespace utilities
         ///
         template<typename KeyType>
         void Write(KeyType key, const string& value);
-
-        /// write unique_ptrs to a classe
-        ///
-        template<typename KeyType, typename ValueType>
-        void Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* SFINAE = nullptr);
 
         /// write fundamental types 
         ///

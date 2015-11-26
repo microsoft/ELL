@@ -8,6 +8,13 @@ using std::move;
 
 namespace utilities
 {
+
+    template<typename KeyType, typename ValueType>
+    void JsonSerializer::Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* SFINAE)
+    {
+        Write(key, *ptr);
+    }
+
     template<typename KeyType, typename ValueType>
     void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_class<ValueType>::value>::type* SFINAE)
     {
@@ -34,12 +41,6 @@ namespace utilities
         {
             throw runtime_error("jsoncpp threw an unspecified exception during write");
         }
-    }
-
-    template<typename KeyType, typename ValueType>
-    void JsonSerializer::Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* SFINAE)
-    {
-        Write(key, *ptr);
     }
 
     template<typename KeyType, typename ValueType>
