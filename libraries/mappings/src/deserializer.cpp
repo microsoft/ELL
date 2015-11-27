@@ -8,6 +8,11 @@ using std::make_shared;
 
 namespace mappings
 {
+    void Deserialize(JsonSerializer& serializer, std::shared_ptr<Map>& up)
+    {
+        up->Deserialize(serializer);
+    }
+
     void DefaultDeserialize(JsonSerializer& serializer, shared_ptr<Layer>& up)
     {
         auto type = serializer.Read<string>("_type");

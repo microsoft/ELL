@@ -22,7 +22,7 @@ namespace mappings
         
         // read Map
         auto map =  shared_ptr<Map>(nullptr);
-        reader.Read("Base", *map);
+        reader.Read("Base", map);
 
         return map;
     }
@@ -31,7 +31,7 @@ namespace mappings
     {    
         // Serialize Mapping
         JsonSerializer writer;
-        writer.Write("Base", *map);
+        writer.Write("Base", map);
         auto str = writer.ToString();
         
         // write to stream
