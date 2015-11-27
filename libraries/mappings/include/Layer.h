@@ -73,7 +73,7 @@ namespace mappings
         void SerializeHeader(JsonSerializer& serializer, int version) const;
 
         Type _type;
-        DoubleArray _output;
+        DoubleArray _output; // TODO make this vector<double> and move DoubleArray to linear library
     };
 }
 

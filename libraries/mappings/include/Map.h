@@ -3,8 +3,14 @@
 #pragma once
 
 #include "Layer.h"
+#include "IndexPairList.h"
 
+// common
 #include "types.h"
+
+// predictors
+#include "SharedLinearBinaryPredictor.h"
+using predictors::SharedLinearBinaryPredictor;
 
 #include <vector>
 using std::vector;
@@ -31,6 +37,10 @@ namespace mappings
         /// \Returns An Iterator that points to the beginning of a specified layer's output.
         ///
         Iterator GetIterator(uint64 layerIndex = maxUInt64) const;
+
+        /// Adds a shared linear predictor to the map, as a scale layer followed by a sum layer
+        ///
+        void Add(const SharedLinearBinaryPredictor& predictor, const IndexPairList& predictorInput);
 
         /// Serializes the Map in json format
         ///

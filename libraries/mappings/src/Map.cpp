@@ -24,6 +24,11 @@ namespace mappings
         return _layers[layerIndex]->GetIterator();
     }
 
+    void Map::Add(const SharedLinearBinaryPredictor & predictor, const IndexPairList & predictorInput)
+    {
+        // TODO - implement this, but first add Sum
+    }
+
     void Map::Serialize(JsonSerializer & serializer) const
     {
         serializer.Write("layers", _layers);
