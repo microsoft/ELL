@@ -14,19 +14,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Mapping.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Row.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\deserializer.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Column.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Constant.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\mappings.h">
@@ -42,9 +30,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Scale.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SerializableIndexValue.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Layer.h">
@@ -70,19 +55,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Mapping.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Constant.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Column.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\deserializer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Row.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Io.cpp">
@@ -95,9 +68,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Scale.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SerializableIndexValue.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Layer.cpp">

@@ -79,42 +79,32 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Constant.h" />
     <ClInclude Include="include\Coordinatewise.h" />
     <ClInclude Include="include\DecisionTreePath.h" />
     <ClInclude Include="include\IndexPair.h" />
     <ClInclude Include="include\IndexPairList.h" />
     <ClInclude Include="include\Layer.h" />
     <ClInclude Include="include\Map.h" />
-    <ClInclude Include="include\SerializableIndexValue.h" />
     <ClInclude Include="include\Io.h" />
     <ClInclude Include="include\Shift.h" />
     <ClInclude Include="include\Sum.h" />
-    <ClInclude Include="include\Mapping.h" />
-    <ClInclude Include="include\Column.h" />
     <ClInclude Include="include\deserializer.h" />
     <ClInclude Include="include\mappings.h" />
-    <ClInclude Include="include\Row.h" />
     <ClInclude Include="include\Scale.h" />
     <ClInclude Include="include\Zero.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\Zero.cpp" />
-    <ClCompile Include="src\Constant.cpp" />
     <ClCompile Include="src\Coordinatewise.cpp" />
     <ClCompile Include="src\DecisionTreePath.cpp" />
     <ClCompile Include="src\IndexPair.cpp" />
     <ClCompile Include="src\IndexPairList.cpp" />
     <ClCompile Include="src\Layer.cpp" />
     <ClCompile Include="src\Map.cpp" />
-    <ClCompile Include="src\SerializableIndexValue.cpp" />
     <ClCompile Include="src\Io.cpp" />
     <ClCompile Include="src\Shift.cpp" />
     <ClCompile Include="src\Sum.cpp" />
-    <ClCompile Include="src\Mapping.cpp" />
-    <ClCompile Include="src\Column.cpp" />
     <ClCompile Include="src\deserializer.cpp" />
-    <ClCompile Include="src\Row.cpp" />
     <ClCompile Include="src\Scale.cpp" />
   </ItemGroup>
   <ItemGroup>

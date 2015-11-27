@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "Mapping.h"
-
 // utilities
 #include "JsonSerializer.h"
 using utilities::JsonSerializer;
