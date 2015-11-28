@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Layer.h"
-#include "IndexPairList.h"
+#include "Coordinate.h"
 
 #include "types.h"
 #include "RealArray.h"
@@ -28,7 +28,7 @@ namespace mappings
 
         /// Ctor
         ///
-        Coordinatewise(const vector<double>& values, const IndexPairList& coordinates, const DoubleOperation& operation, Type type);
+        Coordinatewise(const vector<double>& values, const vector<Coordinate>& coordinates, const DoubleOperation& operation, Type type);
 
         /// Computes the layer output
         ///
@@ -44,7 +44,7 @@ namespace mappings
 
     protected:
         vector<double> _values;
-        IndexPairList _coordinates;
+        vector<Coordinate> _coordinates;
         DoubleOperation _operation;
         static const int _currentVersion = 1;
     };

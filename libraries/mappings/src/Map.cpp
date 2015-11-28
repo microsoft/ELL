@@ -24,7 +24,7 @@ namespace mappings
         return _layers[layerIndex]->GetIterator();
     }
 
-    void Map::Add(const SharedLinearBinaryPredictor & predictor, const IndexPairList & predictorInput)
+    void Map::Add(const SharedLinearBinaryPredictor & predictor, const vector<Coordinate> & predictorInput)
     {
         // TODO - implement this, but first add Sum
     }

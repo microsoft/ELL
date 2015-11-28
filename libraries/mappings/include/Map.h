@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Layer.h"
-#include "IndexPairList.h"
+#include "Coordinate.h"
 
 // common
 #include "types.h"
@@ -40,7 +40,7 @@ namespace mappings
 
         /// Adds a shared linear predictor to the map, as a scale layer followed by a sum layer
         ///
-        void Add(const SharedLinearBinaryPredictor& predictor, const IndexPairList& predictorInput);
+        void Add(const SharedLinearBinaryPredictor& predictor, const vector<Coordinate>& predictorInput);
 
         /// Serializes the Map in json format
         ///

@@ -1,4 +1,4 @@
-// IndexPair.h
+// Coordinate.h
 
 #pragma once
 
@@ -12,29 +12,29 @@ namespace mappings
 {
     /// Represents an index value pair
     ///
-    class IndexPair
+    class Coordinate
     {
     public:
 
         /// Ctor
         ///
-        IndexPair(uint64 i=0, uint64 j=0);
+        Coordinate(uint64 row=0, uint64 column=0);
 
         /// Copy ctor
         ///
-        IndexPair(const IndexPair&) = default;
+        Coordinate(const Coordinate&) = default;
 
         /// Move ctor
         ///
-        IndexPair(IndexPair&&) = default;
+        Coordinate(Coordinate&&) = default;
 
         /// \returns the i index
         ///
-        uint64 GetI() const;
+        uint64 GetRow() const;
 
         /// \returns the j index
         ///
-        uint64 GetJ() const; 
+        uint64 GetColumn() const; 
 
         /// Serializes an index value pair
         ///
@@ -45,7 +45,7 @@ namespace mappings
         void Deserialize(JsonSerializer& serializer);
 
     private:
-        uint64 _i = 0;
-        uint64 _j = 0;
+        uint64 _row = 0;
+        uint64 _column = 0;
     };
 }

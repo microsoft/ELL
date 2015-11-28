@@ -15,7 +15,7 @@ namespace mappings
 
         /// Ctor
         ///
-        Scale(const vector<double>& values, const IndexPairList& coordinates);
+        Scale(const vector<double>& values, const vector<Coordinate>& coordinates);
 
         /// Static function that specifies the coordinatewise operation
         ///

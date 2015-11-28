@@ -15,7 +15,7 @@ namespace mappings
 
         /// Ctor
         ///
-        Shift(const vector<double>& values, const IndexPairList& coordinates);
+        Shift(const vector<double>& values, const vector<Coordinate>& coordinates);
 
         /// Static function that specifies the coordinatewise operation
         ///

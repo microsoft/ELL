@@ -81,8 +81,7 @@
   <ItemGroup>
     <ClInclude Include="include\Coordinatewise.h" />
     <ClInclude Include="include\DecisionTreePath.h" />
-    <ClInclude Include="include\IndexPair.h" />
-    <ClInclude Include="include\IndexPairList.h" />
+    <ClInclude Include="include\Coordinate.h" />
     <ClInclude Include="include\Layer.h" />
     <ClInclude Include="include\Map.h" />
     <ClInclude Include="include\Io.h" />
@@ -97,8 +96,7 @@
     <ClCompile Include="include\Zero.cpp" />
     <ClCompile Include="src\Coordinatewise.cpp" />
     <ClCompile Include="src\DecisionTreePath.cpp" />
-    <ClCompile Include="src\IndexPair.cpp" />
-    <ClCompile Include="src\IndexPairList.cpp" />
+    <ClCompile Include="src\Coordinate.cpp" />
     <ClCompile Include="src\Layer.cpp" />
     <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\Io.cpp" />

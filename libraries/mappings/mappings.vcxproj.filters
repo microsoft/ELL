@@ -38,12 +38,6 @@
     <ClInclude Include="include\Map.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\IndexPair.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\IndexPairList.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\Zero.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -51,6 +45,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Coordinatewise.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Coordinate.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -76,12 +73,6 @@
     <ClCompile Include="src\Map.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\IndexPair.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\IndexPairList.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="include\Zero.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -89,6 +80,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Coordinatewise.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Coordinate.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
