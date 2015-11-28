@@ -8,51 +8,31 @@
 using std::make_shared;
 using std::runtime_error;
 
-void layers::Deserialize(JsonSerializer& serializer, std::shared_ptr<layers::Mapping>& up)
+void layers::Deserialize(JsonSerializer& serializer, std::shared_ptr<layers::Layer>& up)
 {
     auto type = serializer.Read<string>("_type");
-    auto version = serializer.Read<int>("_version");
 
-    if (type == "Constant")
+    if (type == "Zero")
     {
-        up = make_shared<print::PrintableConstant>();
+        up = make_shared<PrintableZero>();
     }
 
     else if(type == "Scale")
     {
-        up = make_shared<print::PrintableScale>();
+        up = make_shared<PrintableScale>();
     }
 
     else if(type == "Shift")
     {
-        up = make_shared<print::PrintableShift>();
+        up = make_shared<PrintableShift>();
     }
 
     else if(type == "Sum")
     {
-        up = make_shared<print::PrintableSum>();
+        up = make_shared<PrintableSum>();
     }
 
-    else if (type == "DecisionTreePath")
-    {
-        up = make_shared<print::PrintableDecisionTreePath>();
-    }
-
-    else if (type == "Row")
-    {
-        up = make_shared<print::PrintableRow>();
-    }
-
-    else if (type == "Column")
-    {
-        up = make_shared<print::PrintableColumn>();
-    }
-
-    else
-    {
-        throw runtime_error("unidentified type in map file: " + type);
-    }
-
+    auto version = serializer.Read<int>("_version");
     up->Deserialize(serializer, version);
 }
 

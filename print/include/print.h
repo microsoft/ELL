@@ -2,70 +2,40 @@
 
 #pragma once
 
-#include "printable.h"
+#include "IPrintable.h"
 
-namespace print
+/// A class that adds printing capabilities to a layer
+///
+class PrintableZero : public Zero, public IPrintable
 {
-    /// A class that adds printing capabilities to a Mapping
+    /// Prints a human-friendly description of the layer to a stream
     ///
-    class PrintableConstant : public Constant, public printable
-    {
-        /// Prints a human-friendly description of the Mapping to a stream
-        ///
-        virtual void Print(ostream& os, int indentation, int enumeration);
-    };
+    virtual void Print(ostream& os, int indentation, int enumeration) override;
+};
 
-    /// A class that adds printing capabilities to a Mapping
+/// A class that adds printing capabilities to a layer
+///
+class PrintableScale : public Scale, public IPrintable
+{
+    /// Prints a human-friendly description of the layer to a stream
     ///
-    class PrintableScale : public scale, public printable
-    {
-        /// Prints a human-friendly description of the Mapping to a stream
-        ///
-        virtual void Print(ostream& os, int indentation, int enumeration);
-    };
+    virtual void Print(ostream& os, int indentation, int enumeration) override;
+};
 
-    /// A class that adds printing capabilities to a Mapping
+/// A class that adds printing capabilities to a layer
+///
+class PrintableShift : public Shift, public IPrintable
+{
+    /// Prints a human-friendly description of the layer to a stream
     ///
-    class PrintableShift : public Shift, public printable
-    {
-        /// Prints a human-friendly description of the Mapping to a stream
-        ///
-        virtual void Print(ostream& os, int indentation, int enumeration);
-    };
+    virtual void Print(ostream& os, int indentation, int enumeration) override;
+};
 
-    /// A class that adds printing capabilities to a Mapping
+/// A class that adds printing capabilities to a layer
+///
+class PrintableSum : public Sum, public IPrintable
+{
+    /// Prints a human-friendly description of the layer to a stream
     ///
-    class PrintableSum : public Sum, public printable
-    {
-        /// Prints a human-friendly description of the Mapping to a stream
-        ///
-        virtual void Print(ostream& os, int indentation, int enumeration);
-    };
-
-    /// A class that adds printing capabilities to a Mapping
-    ///
-    class PrintableDecisionTreePath : public DecisionTreePath, public printable
-    {
-        /// Prints a human-friendly description of the Mapping to a stream
-        ///
-        virtual void Print(ostream& os, int indentation, int enumeration);
-    };
-
-    /// A class that adds printing capabilities to a Mapping
-    ///
-    class PrintableRow : public Row, public printable
-    {
-        /// Prints a human-friendly description of the Mapping to a stream
-        ///
-        virtual void Print(ostream& os, int indentation, int enumeration);
-    };
-
-    /// A class that adds printing capabilities to a Mapping
-    ///
-    class PrintableColumn : public Column, public printable
-    {
-        /// Prints a human-friendly description of the Mapping to a stream
-        ///
-        virtual void Print(ostream& os, int indentation, int enumeration);
-    };
-}
+    virtual void Print(ostream& os, int indentation, int enumeration) override;
+};

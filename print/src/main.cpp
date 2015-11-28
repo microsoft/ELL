@@ -1,44 +1,48 @@
 // main.cpp
 
-#include "JsonSerializer.h"
-#include "printable.h"
-#include <iostream>
-#include <fstream>
-#include <stdexcept>
+#include "IPrintable.h"
 
-using namespace Print;
-using std::ifstream;
+// utilities
+#include "JsonSerializer.h"
+#include "files.h"
+using utilities::OpenIfstream;
+
+// layers
+#include "layers.h"
+using layers::Map;
+
+#include<iostream>
 using std::cerr;
 using std::cout;
 using std::endl;
-using std::dynamic_pointer_cast;
+
+#include <fstream>
+using std::ifstream;
+
+#include <stdexcept>
 using std::runtime_error;
+
+#include <memory>
+using std::dynamic_pointer_cast;
 
 int main(int argc, char* argv[])
 {
     if (argc != 2)
     {
-        cerr << "usage: print.exe <map file>\n";
-        return 1;
-    }
-
-    // open file
-    auto filepath = argv[1];
-    ifstream fs(filepath);
-
-    // check that it opened
-    if (!fs.is_open())
-    {
-        cerr << "error reading file " << filepath << endl;
+        cerr << "usage: print.exe <layers file>\n";
         return 1;
     }
 
     try
     {
-        // read the map and print out its description
-        auto map = layers::Io::Read(fs);
-        auto printable_map = dynamic_pointer_cast<printable>(map);
-        printable_map->Print(cout);
+        // open file
+        auto layersFile = argv[1];
+        ifstream layersFStream = OpenIfstream(layersFile);
+        auto map = layers::Io::Read(layersFStream);
+
+        // cast to printable map
+        auto printableMap = dynamic_pointer_cast<IPrintable>(map);
+        printableMap->Print(cout);
 
     }
     catch (runtime_error e)
