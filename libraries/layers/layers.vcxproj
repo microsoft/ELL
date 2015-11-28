@@ -11,23 +11,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F7B4A03E-C2E7-4CCA-8C9D-61813E962F26}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
-    <RootNamespace>test</RootNamespace>
+    <ProjectGuid>{7C153142-6FA8-4479-93B8-10DB8DA56D56}</ProjectGuid>
+    <RootNamespace>layers</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -40,59 +39,76 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-    <OutDir>bin\$(Configuration)\</OutDir>
+    <OutDir>lib\$(Configuration)\</OutDir>
     <IntDir>obj\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>bin\$(Configuration)\</OutDir>
+    <OutDir>lib\$(Configuration)\</OutDir>
     <IntDir>obj\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeaderFile>
-      </PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>
-      </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\libraries\common\include;..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\layers\include;..\..\libraries\tree_layout\include</AdditionalIncludeDirectories>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>include;..\utilities\include;..\common\include;..\predictors\include;..\linear\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\libraries\linear\lib\$(Configuration);..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\predictors\lib\$(Configuration);..\..\libraries\layers\lib\$(Configuration);..\..\libraries\tree_layout\lib\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>linear.lib;utilities.lib;predictors.lib;layers.lib;tree_layout.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>..\utilities\lib</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeaderFile>
-      </PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>
-      </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\libraries\common\include;..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\layers\include;..\..\libraries\tree_layout\include</AdditionalIncludeDirectories>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>include;..\utilities\include;..\common\include;..\predictors\include;..\linear\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\libraries\linear\lib\$(Configuration);..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\predictors\lib\$(Configuration);..\..\libraries\layers\lib\$(Configuration);..\..\libraries\tree_layout\lib\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>linear.lib;utilities.lib;predictors.lib;layers.lib;tree_layout.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>..\utilities\lib</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="test.cpp" />
+    <ClInclude Include="include\Coordinatewise.h" />
+    <ClInclude Include="include\DecisionTreePath.h" />
+    <ClInclude Include="include\Coordinate.h" />
+    <ClInclude Include="include\Layer.h" />
+    <ClInclude Include="include\Map.h" />
+    <ClInclude Include="include\Io.h" />
+    <ClInclude Include="include\Shift.h" />
+    <ClInclude Include="include\Sum.h" />
+    <ClInclude Include="include\deserializer.h" />
+    <ClInclude Include="include\layers.h" />
+    <ClInclude Include="include\Scale.h" />
+    <ClInclude Include="include\Zero.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="include\Zero.cpp" />
+    <ClCompile Include="src\Coordinatewise.cpp" />
+    <ClCompile Include="src\DecisionTreePath.cpp" />
+    <ClCompile Include="src\Coordinate.cpp" />
+    <ClCompile Include="src\Layer.cpp" />
+    <ClCompile Include="src\Map.cpp" />
+    <ClCompile Include="src\Io.cpp" />
+    <ClCompile Include="src\Shift.cpp" />
+    <ClCompile Include="src\Sum.cpp" />
+    <ClCompile Include="src\deserializer.cpp" />
+    <ClCompile Include="src\Scale.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="tcc\DecisionTreePath.tcc" />
+    <None Include="tcc\Layer.tcc" />
+    <None Include="tcc\Map.tcc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,6 @@
 //// test.cpp
 //
-//#include "mappings.h"
+//#include "layers.h"
 //#include "MutableDecisionTree.h"
 //#include "QpLayoutGenerator.h"
 //#include "CommandLineParser.h"
@@ -12,7 +12,7 @@
 //#include <string>
 //
 //using namespace decision_tree;
-//using namespace mappings;
+//using namespace layers;
 //using namespace tree_layout;
 //using std::make_shared;
 //using std::ifstream;
@@ -112,10 +112,10 @@ int main(int argc, char* argv[])
 //        auto col = make_shared<Column>();
 //
 //        auto L1 = make_shared<Row>();
-//        L1->PushBack(make_shared<mappings::Constant>(.1));
-//        L1->PushBack(make_shared<mappings::Constant>(.2));
-//        L1->PushBack(make_shared<mappings::Constant>(.3));
-//        L1->PushBack(make_shared<mappings::Constant>(.4));
+//        L1->PushBack(make_shared<layers::Constant>(.1));
+//        L1->PushBack(make_shared<layers::Constant>(.2));
+//        L1->PushBack(make_shared<layers::Constant>(.3));
+//        L1->PushBack(make_shared<layers::Constant>(.4));
 //        col->PushBack(L1);
 //
 //        Io::Write(fs, col);
@@ -129,9 +129,9 @@ int main(int argc, char* argv[])
 //}
 //
 //#include "deserializer.h"
-//void mappings::Deserialize(JsonSerializer& serializer, std::shared_ptr<Mapping>& up)
+//void layers::Deserialize(JsonSerializer& serializer, std::shared_ptr<Mapping>& up)
 //{
-//    mappings::DefaultDeserialize(serializer, up);
+//    layers::DefaultDeserialize(serializer, up);
 //}
 //
 //

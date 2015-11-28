@@ -65,13 +65,13 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>include;..\..\libraries\treetools_shared\include;..\..\libraries\common\include;..\..\libraries\linear\include;..\..\libraries\utilities\include;..\..\libraries\mappings\include;..\..\libraries\dataset\include;..\..\libraries\predictors\include;..\..\libraries\optimization\include;..\..\libraries\loss_functions\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\..\libraries\treetools_shared\include;..\..\libraries\common\include;..\..\libraries\linear\include;..\..\libraries\utilities\include;..\..\libraries\layers\include;..\..\libraries\dataset\include;..\..\libraries\predictors\include;..\..\libraries\optimization\include;..\..\libraries\loss_functions\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\mappings\lib\$(Configuration);..\..\libraries\dataset\lib\$(Configuration);..\..\libraries\linear\lib\$(Configuration);..\..\libraries\loss_functions\lib\$(Configuration);..\..\libraries\optimization\lib\$(Configuration);..\..\libraries\predictors\lib\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>utilities.lib;mappings.lib;dataset.lib;linear.lib;loss_functions.lib;optimization.lib;predictors.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\layers\lib\$(Configuration);..\..\libraries\dataset\lib\$(Configuration);..\..\libraries\linear\lib\$(Configuration);..\..\libraries\loss_functions\lib\$(Configuration);..\..\libraries\optimization\lib\$(Configuration);..\..\libraries\predictors\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>utilities.lib;layers.lib;dataset.lib;linear.lib;loss_functions.lib;optimization.lib;predictors.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
@@ -86,15 +86,15 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>include;..\..\libraries\treetools_shared\include;..\..\libraries\common\include;..\..\libraries\linear\include;..\..\libraries\utilities\include;..\..\libraries\mappings\include;..\..\libraries\dataset\include;..\..\libraries\predictors\include;..\..\libraries\optimization\include;..\..\libraries\loss_functions\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\..\libraries\treetools_shared\include;..\..\libraries\common\include;..\..\libraries\linear\include;..\..\libraries\utilities\include;..\..\libraries\layers\include;..\..\libraries\dataset\include;..\..\libraries\predictors\include;..\..\libraries\optimization\include;..\..\libraries\loss_functions\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\mappings\lib\$(Configuration);..\..\libraries\dataset\lib\$(Configuration);..\..\libraries\linear\lib\$(Configuration);..\..\libraries\loss_functions\lib\$(Configuration);..\..\libraries\optimization\lib\$(Configuration);..\..\libraries\predictors\lib\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>utilities.lib;mappings.lib;dataset.lib;linear.lib;loss_functions.lib;optimization.lib;predictors.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\libraries\utilities\lib\$(Configuration);..\..\libraries\layers\lib\$(Configuration);..\..\libraries\dataset\lib\$(Configuration);..\..\libraries\linear\lib\$(Configuration);..\..\libraries\loss_functions\lib\$(Configuration);..\..\libraries\optimization\lib\$(Configuration);..\..\libraries\predictors\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>utilities.lib;layers.lib;dataset.lib;linear.lib;loss_functions.lib;optimization.lib;predictors.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

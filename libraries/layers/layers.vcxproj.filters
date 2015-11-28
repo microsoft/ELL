@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="tcc">
+      <UniqueIdentifier>{634f6e63-f1e6-40c1-b946-632a36088e97}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\deserializer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Io.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Sum.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DecisionTreePath.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scale.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Layer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Map.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zero.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Shift.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Coordinatewise.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Coordinate.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\layers.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\deserializer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Io.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sum.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DecisionTreePath.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scale.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Layer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Map.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Zero.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shift.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Coordinatewise.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Coordinate.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="tcc\DecisionTreePath.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\Map.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\Layer.tcc">
+      <Filter>tcc</Filter>
+    </None>
+  </ItemGroup>
+</Project>

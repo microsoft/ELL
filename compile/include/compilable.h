@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "mappings.h"
+#include "layers.h"
 #include <iostream>
 
 using std::ostream;
-using namespace mappings;
+using namespace layers;
 
 namespace compile
 {

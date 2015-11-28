@@ -8,7 +8,7 @@
 using std::make_shared;
 using std::runtime_error;
 
-void mappings::Deserialize(JsonSerializer& serializer, std::shared_ptr<mappings::Mapping>& up)
+void layers::Deserialize(JsonSerializer& serializer, std::shared_ptr<layers::Mapping>& up)
 {
     auto type = serializer.Read<string>("_type");
     auto version = serializer.Read<int>("_version");

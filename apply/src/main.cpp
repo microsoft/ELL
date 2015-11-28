@@ -9,11 +9,11 @@ using namespace utilities;
 #include "sharedArguments.h"
 using namespace utilities;
 
-// mappings
-#include "mappings.h"
-using namespace mappings;
+// layers
+#include "layers.h"
+using namespace layers;
 
-_USE_DEFAULT_DESERIALIZER_  // use the default deserializer for mappings
+_USE_DEFAULT_DESERIALIZER_  // use the default deserializer for layers
 
 // data iterators
 //#include "SequentialLineIterator.h"

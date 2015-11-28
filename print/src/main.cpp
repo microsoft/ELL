@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     try
     {
         // read the map and print out its description
-        auto map = mappings::Io::Read(fs);
+        auto map = layers::Io::Read(fs);
         auto printable_map = dynamic_pointer_cast<printable>(map);
         printable_map->Print(cout);
 
