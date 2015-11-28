@@ -16,8 +16,7 @@ namespace utilities
     // OptionInfo class
     //
     OptionInfo::OptionInfo(string name, string shortName, string description, string defaultValue, function<bool(string)> set_value_callback) : name(name), shortName(shortName), description(description), defaultValue_string(defaultValue), set_value_callbacks({ set_value_callback })
-    {
-    }
+    {}
 
     //
     // CommandLineParser class

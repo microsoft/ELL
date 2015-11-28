@@ -27,6 +27,7 @@ namespace layers
     {
         // version 1
         Layer::SerializeHeader(serializer, 1);
+        serializer.Write("bias", _bias);
         serializer.Write("coordinates", _coordinates);
     }
 
@@ -34,6 +35,7 @@ namespace layers
     {
         if (version == 1)
         {
+            serializer.Read("bias", _bias);
             serializer.Read("coordinates", _coordinates);
             _output.resize(1);
         }

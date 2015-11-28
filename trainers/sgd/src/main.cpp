@@ -3,6 +3,7 @@
 // utilities
 #include "files.h"
 using utilities::OpenIfstream;
+using utilities::OpenOfstream;
 
 #include "CommandLineParser.h" 
 using utilities::CommandLineParser;
@@ -56,25 +57,25 @@ int main(int argc, char* argv[])
     try
     {
         // parse the command line
-        CommandLineParser cmd_instanceParser(argc, argv);
-        ParsedSharedArguments shared_arguments(cmd_instanceParser);
-        ParsedSgdArguments trainer_args(cmd_instanceParser);
-        cmd_instanceParser.ParseArgs();
+        CommandLineParser commandLineParser(argc, argv);
+        ParsedSharedArguments sharedArguments(commandLineParser);
+        ParsedSgdArguments trainerArguments(commandLineParser);
+        commandLineParser.ParseArgs();
 
         // open data file
-        ifstream data_fs = OpenIfstream(shared_arguments.dataFile);
+        ifstream dataFStream = OpenIfstream(sharedArguments.dataFile);
 
         // create line iterator - read line by line sequentially
-        SequentialLineIterator li(data_fs);
+        SequentialLineIterator lineIterator(dataFStream);
 
         // create parser
-        SparseEntryParser p;
+        SparseEntryParser sparseEntryParser;
 
         // create random number generator
-        auto rng = GetRandomEngine(shared_arguments.dataRandomSeedString);
+        auto rng = GetRandomEngine(sharedArguments.dataRandomSeedString);
 
         // Load a dataset, permute, and get a data iterator
-        auto data = DatasetLoader::Load(li, p);
+        auto data = DatasetLoader::Load(lineIterator, sparseEntryParser);
 
         // create loss function
         LogLoss loss(1);
@@ -87,14 +88,14 @@ int main(int argc, char* argv[])
         BinaryClassificationEvaluator evaluator;
 
         // perform epochs
-        for(int epoch = 0; epoch < trainer_args.numEpochs; ++epoch)
+        for(int epoch = 0; epoch < trainerArguments.numEpochs; ++epoch)
         {
             // randomly permute the data
             data.RandPerm(rng);
 
             // iterate over the entire permuted dataset
             auto trainSetIterator = data.GetIterator();
-            optimizer.Update(trainSetIterator, loss, trainer_args.l2Regularization);
+            optimizer.Update(trainSetIterator, loss, trainerArguments.l2Regularization);
 
             // Evaluate
             auto evaluationIterator = data.GetIterator();
@@ -112,6 +113,18 @@ int main(int argc, char* argv[])
         auto predictor = optimizer.GetPredictor();
         auto map = make_shared<Map>(dim);
         map->Add(predictor, inputCoordinates);
+
+        // save map to output file
+        if (sharedArguments.outputFile != "")
+        {
+            ofstream outputFStream = OpenOfstream(sharedArguments.outputFile);
+            layers::Io::Write(outputFStream, map);
+        }
+
+        stringstream s;
+        layers::Io::Write(s, map);
+        auto ss = s.str();
+
     }
     catch (runtime_error e)
     {

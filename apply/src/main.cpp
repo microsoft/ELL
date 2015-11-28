@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         cmd_instanceParser.ParseArgs();
 
         // open map file
-        ifstream map_fs = OpenIfstream(shared_arguments.mapFile);
+        ifstream map_fs = OpenIfstream(shared_arguments.layersFile);
 
         // open data file
         ifstream data_fs = OpenIfstream(shared_arguments.dataFile);
