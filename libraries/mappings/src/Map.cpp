@@ -1,7 +1,7 @@
 // Map.cpp
 
 #include "Map.h"
-#include "Zero.h"
+#include "mappings.h"
 #include "deserializer.h"
 
 using std::make_unique;
@@ -24,9 +24,17 @@ namespace mappings
         return _layers[layerIndex]->GetIterator();
     }
 
-    void Map::Add(const SharedLinearBinaryPredictor & predictor, const vector<Coordinate> & predictorInput)
+    void Map::Add(const SharedLinearBinaryPredictor& predictor, const vector<Coordinate> & predictorInput)
     {
-        // TODO - implement this, but first add Sum
+        uint64 scaleRow = _layers.size();
+        const DoubleVector& weights = predictor.GetVector();
+
+        _layers.push_back(make_shared<Scale>(weights, predictorInput));
+        
+        vector<Coordinate> scaleOutputs;
+        Coordinate::FillBack(scaleOutputs, scaleRow, weights.Size());
+
+        _layers.push_back(make_shared<Sum>(predictor.GetBias(), scaleOutputs));
     }
 
     void Map::Serialize(JsonSerializer & serializer) const

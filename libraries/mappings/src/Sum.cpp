@@ -10,7 +10,7 @@ namespace mappings
     Sum::Sum() : Layer(1, Type::sum) 
     {}
 
-    Sum::Sum(const vector<Coordinate> & coordinates, double bias) : Layer(1, Type::sum), _coordinates(coordinates), _bias(bias)
+    Sum::Sum(double bias, const vector<Coordinate> & coordinates) : Layer(1, Type::sum), _bias(bias), _coordinates(coordinates)
     {}
 
     void Sum::Compute(const vector<unique_ptr<Layer>>& previousLayers)

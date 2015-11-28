@@ -44,6 +44,8 @@ namespace mappings
         ///
         void Deserialize(JsonSerializer& serializer);
 
+        static void FillBack(vector<Coordinate>& vector, uint64 row, uint64 numColumns, uint64 fromColumn=0);
+
     private:
         uint64 _row = 0;
         uint64 _column = 0;
