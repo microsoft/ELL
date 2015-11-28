@@ -18,7 +18,8 @@ using utilities::BinaryClassificationEvaluator;
 
 // mappings
 #include "mappings.h"
-using mappings::Scale;
+using mappings::Map;
+using mappings::Coordinate;
 
 _USE_DEFAULT_DESERIALIZER_  // use the default deserializer for mappings
 
@@ -45,18 +46,10 @@ using namespace loss_functions;
 // command line arguments
 #include "args.h"
 
-#include <random>
-using std::default_random_engine;
-using std::seed_seq;
-using std::random_device;
-
 #include <iostream>
 using std::cerr;
 using std::cout;
 using std::endl;
-
-#include <cstdlib>
-using std::strtod;
 
 int main(int argc, char* argv[])
 {
@@ -111,9 +104,14 @@ int main(int argc, char* argv[])
         // print loss and errors
         cout << "training error\n" << evaluator << endl;
 
+        // TEMP = create coordinates of raw input
+        vector<Coordinate> inputCoordinates;
+        Coordinate::FillBack(inputCoordinates, 0, dim);
+
+        // create Map
         auto predictor = optimizer.GetPredictor();
-        auto weights = predictor.GetVector();
-        auto weightsIterator = weights.GetIterator();
+        auto map = make_shared<Map>(dim);
+        map->Add(predictor, inputCoordinates);
     }
     catch (runtime_error e)
     {
