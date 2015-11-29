@@ -33,12 +33,12 @@ namespace utilities
         /// write shared_ptrs to a classe
         ///
         template<typename KeyType, typename ValueType>
-        void Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* SFINAE = nullptr);
+        void Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* concept = nullptr);
 
         /// write classes
         ///
         template<typename KeyType, typename ValueType>
-        void Write(KeyType key, const ValueType& value, typename enable_if<is_class<ValueType>::value>::type* SFINAE = nullptr);
+        void Write(KeyType key, const ValueType& value, typename enable_if<is_class<ValueType>::value>::type* concept = nullptr);
 
         /// write strings
         ///
@@ -48,12 +48,12 @@ namespace utilities
         /// write fundamental types 
         ///
         template<typename KeyType, typename ValueType>
-        void Write(KeyType key, const ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* SFINAE = nullptr);
+        void Write(KeyType key, const ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* concept = nullptr);
 
-        /// write an enum type by casting it to int
-        ///
-        template<typename KeyType, typename ValueType>
-        void Write(KeyType key, const ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* SFINAE = nullptr);
+        ///// write an enum type by casting it to int
+        /////
+        //template<typename KeyType, typename ValueType>
+        //void Write(KeyType key, const ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* concept = nullptr);
 
         /// write vectors
         ///
@@ -63,37 +63,37 @@ namespace utilities
         /// read subclasses
         ///
         template<typename KeyType, typename ValueType>
-        void Read(KeyType key, ValueType& value, typename enable_if<is_class<ValueType>::value>::type* SFINAE = nullptr) const;
+        void Read(KeyType key, ValueType& value, typename enable_if<is_class<ValueType>::value>::type* concept = nullptr) const;
 
         /// read strings
         ///
         template<typename KeyType>
         void Read(KeyType key, string& value) const;
 
-        /// read unique_ptrs to a class
+        /// read shared_ptrs to a class
         ///
         template<typename KeyType, typename ValueType>
-        void Read(KeyType key, shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* SFINAE = nullptr) const;
+        void Read(KeyType key, shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* concept = nullptr) const;
     
         /// read fundamental types 
         ///
         template<typename KeyType, typename ValueType>
-        void Read(KeyType key, ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* SFINAE = nullptr) const;
+        void Read(KeyType key, ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* concept = nullptr) const;
     
         /// read fundamental types with a return value (usage: auto x = JsonSerializer.read<int>("x");) 
         ///
         template<typename ValueType, typename KeyType>
-        ValueType Read(KeyType key, typename enable_if<is_default_constructible<ValueType>::value>::type* SFINAE = nullptr) const;
+        ValueType Read(KeyType key, typename enable_if<is_default_constructible<ValueType>::value>::type* concept = nullptr) const;
 
-        /// read an enum type by casting it from int
-        ///
-        template<typename KeyType, typename ValueType>
-        void Read(KeyType key, ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* SFINAE = nullptr) const;
-        
-        /// read an enum type by casting it from int, with a return value
-        ///
-        template<typename ValueType, typename KeyType>
-        ValueType Read(KeyType key, typename enable_if<is_enum<ValueType>::value>::type* SFINAE = nullptr) const;
+        ///// read an enum type by casting it from int
+        /////
+        //template<typename KeyType, typename ValueType>
+        //void Read(KeyType key, ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* concept = nullptr) const;
+        //
+        ///// read an enum type by casting it from int, with a return value
+        /////
+        //template<typename ValueType, typename KeyType>
+        //ValueType Read(KeyType key, typename enable_if<is_enum<ValueType>::value>::type* concept = nullptr) const;
     
         /// read vectors
         ///

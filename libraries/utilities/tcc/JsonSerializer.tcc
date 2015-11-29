@@ -8,15 +8,14 @@ using std::move;
 
 namespace utilities
 {
-
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* SFINAE)
+    void JsonSerializer::Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* concept)
     {
         Write(key, *ptr);
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_class<ValueType>::value>::type* SFINAE)
+    void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_class<ValueType>::value>::type* concept)
     {
         try
         {
@@ -44,7 +43,7 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* SFINAE)
+    void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* concept)
     {
         try
         {
@@ -56,18 +55,18 @@ namespace utilities
         }
     }
 
-    template<typename KeyType, typename ValueType>
-    void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* SFINAE)
-    {
-        try
-        {
-            _json_value[key] = (int)value;
-        }
-        catch (...)    // underlying json implementation may throw an exception 
-        {
-            throw runtime_error("jsoncpp threw an unspecified exception during write");
-        }
-    }
+    //template<typename KeyType, typename ValueType>
+    //void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* concept)
+    //{
+    //    try
+    //    {
+    //        _json_value[key] = (int)value;
+    //    }
+    //    catch (...)    // underlying json implementation may throw an exception 
+    //    {
+    //        throw runtime_error("jsoncpp threw an unspecified exception during write");
+    //    }
+    //}
 
     template<typename KeyType, typename ValueType>
     void JsonSerializer::Write(KeyType key, const vector<ValueType>& vec)
@@ -88,7 +87,7 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_class<ValueType>::value>::type* SFINAE) const
+    void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_class<ValueType>::value>::type* concept) const
     {
         try
         {    
@@ -109,7 +108,7 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Read(KeyType key, shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* SFINAE) const
+    void JsonSerializer::Read(KeyType key, shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* concept) const
     {
         try
         {
@@ -124,34 +123,34 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* SFINAE) const
+    void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* concept) const
     {
         Get(key, value);
     }
 
     template<typename ValueType, typename KeyType>
-    ValueType JsonSerializer::Read(KeyType key, typename enable_if<is_default_constructible<ValueType>::value>::type* SFINAE) const
+    ValueType JsonSerializer::Read(KeyType key, typename enable_if<is_default_constructible<ValueType>::value>::type* concept) const
     {
         ValueType val;
         Get(key, val);
         return val;
     }
 
-    template<typename KeyType, typename ValueType>
-    void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* SFINAE) const
-    {
-        int ival;
-        Get(key, ival);
-        value = (ValueType)ival;
-    }
+    //template<typename KeyType, typename ValueType>
+    //void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* concept) const
+    //{
+    //    int ival;
+    //    Get(key, ival);
+    //    value = (ValueType)ival;
+    //}
 
-    template<typename ValueType, typename KeyType>
-    ValueType JsonSerializer::Read(KeyType key, typename enable_if<is_enum<ValueType>::value>::type* SFINAE) const
-    {
-        int val;
-        Get(key, val);
-        return (ValueType)val;
-    }
+    //template<typename ValueType, typename KeyType>
+    //ValueType JsonSerializer::Read(KeyType key, typename enable_if<is_enum<ValueType>::value>::type* concept) const
+    //{
+    //    int val;
+    //    Get(key, val);
+    //    return (ValueType)val;
+    //}
 
     template<typename KeyType, typename ValueType>
     void JsonSerializer::Read(KeyType key, vector<ValueType>& vec) const
