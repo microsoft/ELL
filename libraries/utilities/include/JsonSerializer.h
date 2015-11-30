@@ -13,6 +13,9 @@ using std::is_enum;
 using std::is_fundamental;
 using std::is_default_constructible;
 
+#include <functional>
+using std::function;
+
 #include <string>
 using std::string;
 
@@ -30,7 +33,7 @@ namespace utilities
     {
     public:
 
-        /// write shared_ptrs to a classe
+        /// write shared_ptrs to a class
         ///
         template<typename KeyType, typename ValueType>
         void Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* concept = nullptr);
@@ -50,17 +53,17 @@ namespace utilities
         template<typename KeyType, typename ValueType>
         void Write(KeyType key, const ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* concept = nullptr);
 
-        ///// write an enum type by casting it to int
-        /////
-        //template<typename KeyType, typename ValueType>
-        //void Write(KeyType key, const ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* concept = nullptr);
-
         /// write vectors
         ///
         template<typename KeyType, typename ValueType>
         void Write(KeyType key, const vector<ValueType>& vec);
 
-        /// read subclasses
+        /// read shared_ptrs to a class
+        ///
+        template<typename KeyType, typename ValueType, typename DeserializerType>
+        void Read(KeyType key, shared_ptr<ValueType>& ptr, DeserializerType deserializer) const;
+
+        /// read classes
         ///
         template<typename KeyType, typename ValueType>
         void Read(KeyType key, ValueType& value, typename enable_if<is_class<ValueType>::value>::type* concept = nullptr) const;
@@ -70,11 +73,6 @@ namespace utilities
         template<typename KeyType>
         void Read(KeyType key, string& value) const;
 
-        /// read shared_ptrs to a class
-        ///
-        template<typename KeyType, typename ValueType>
-        void Read(KeyType key, shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* concept = nullptr) const;
-    
         /// read fundamental types 
         ///
         template<typename KeyType, typename ValueType>
@@ -85,16 +83,11 @@ namespace utilities
         template<typename ValueType, typename KeyType>
         ValueType Read(KeyType key, typename enable_if<is_default_constructible<ValueType>::value>::type* concept = nullptr) const;
 
-        ///// read an enum type by casting it from int
-        /////
-        //template<typename KeyType, typename ValueType>
-        //void Read(KeyType key, ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* concept = nullptr) const;
-        //
-        ///// read an enum type by casting it from int, with a return value
-        /////
-        //template<typename ValueType, typename KeyType>
-        //ValueType Read(KeyType key, typename enable_if<is_enum<ValueType>::value>::type* concept = nullptr) const;
-    
+        /// read vectors of shared_ptrs
+        ///
+        template<typename KeyType, typename ValueType, typename DeserializerType>
+        void Read(KeyType key, vector<shared_ptr<ValueType>>& vec, DeserializerType deserializer) const;
+
         /// read vectors
         ///
         template<typename KeyType, typename ValueType>

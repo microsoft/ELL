@@ -18,11 +18,9 @@ using utilities::ParsedSharedArguments;
 using utilities::BinaryClassificationEvaluator;
 
 // layers
-#include "layers.h"
+#include "Map.h"
 using layers::Map;
 using layers::Coordinate;
-
-_USE_DEFAULT_DESERIALIZER_  // use the default deserializer for layers
 
 // dataset
 #include "SequentialLineIterator.h"
@@ -112,19 +110,14 @@ int main(int argc, char* argv[])
         // create Map
         auto predictor = optimizer.GetPredictor();
         auto map = make_shared<Map>(dim);
-        map->Add(predictor, inputCoordinates);
+        predictor.AddTo(*map, inputCoordinates);
 
         // save map to output file
         if (sharedArguments.outputFile != "")
         {
             ofstream outputFStream = OpenOfstream(sharedArguments.outputFile);
-            layers::Io::Write(outputFStream, map);
+            map->Serialize(outputFStream);
         }
-
-        stringstream s;
-        layers::Io::Write(s, map);
-        auto ss = s.str();
-
     }
     catch (runtime_error e)
     {

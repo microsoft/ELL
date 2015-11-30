@@ -68,7 +68,7 @@ namespace layers
         /// Deserializes the Layer in json format
         ///
         virtual void Deserialize(JsonSerializer& serializer, int version) = 0;
-                
+
     protected:
         void SerializeHeader(JsonSerializer& serializer, int version) const;
 

@@ -1,6 +1,7 @@
 // main.cpp
 
 #include "IPrintable.h"
+#include "print.h"
 
 // utilities
 #include "JsonSerializer.h"
@@ -8,7 +9,7 @@
 using utilities::OpenIfstream;
 
 // layers
-#include "layers.h"
+#include "Map.h"
 using layers::Map;
 
 #include<iostream>
@@ -38,12 +39,8 @@ int main(int argc, char* argv[])
         // open file
         auto layersFile = argv[1];
         ifstream layersFStream = OpenIfstream(layersFile);
-        auto map = layers::Io::Read(layersFStream);
-
-        // cast to printable map
-        auto printableMap = dynamic_pointer_cast<IPrintable>(map);
-        printableMap->Print(cout);
-
+        auto map = Map::Deserialize<PrintableMap>(layersFStream);
+        map->Print(cout);
     }
     catch (runtime_error e)
     {

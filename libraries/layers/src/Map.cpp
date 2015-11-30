@@ -2,16 +2,15 @@
 
 #include "Map.h"
 #include "layers.h"
-#include "deserializer.h"
 
-using std::make_unique;
+using std::make_shared;
 using std::move;
 
 namespace layers
 {
     Map::Map(uint64 inputLayerSize)
     {
-        _layers.push_back(make_unique<Zero>(inputLayerSize));
+        _layers.push_back(make_shared<Zero>(inputLayerSize));
     }
 
     Map::Iterator Map::GetIterator(uint64 layerIndex) const
@@ -24,17 +23,10 @@ namespace layers
         return _layers[layerIndex]->GetIterator();
     }
 
-    void Map::Add(const SharedLinearBinaryPredictor& predictor, const vector<Coordinate> & predictorInput)
+    uint64 Map::PushBack(shared_ptr<Layer> layer)
     {
-        uint64 scaleRow = _layers.size();
-        const DoubleVector& weights = predictor.GetVector();
-
-        _layers.push_back(make_shared<Scale>(weights, predictorInput));
-        
-        vector<Coordinate> scaleOutputs;
-        Coordinate::FillBack(scaleOutputs, scaleRow, weights.Size());
-
-        _layers.push_back(make_shared<Sum>(predictor.GetBias(), scaleOutputs));
+        _layers.push_back(layer);
+        return _layers.size() - 1;
     }
 
     void Map::Serialize(JsonSerializer & serializer) const
@@ -42,8 +34,45 @@ namespace layers
         serializer.Write("layers", _layers);
     }
 
+    void Map::Serialize(ostream& os) const
+    {
+        JsonSerializer writer;
+        writer.Write("Base", *this);
+        auto str = writer.ToString();
+        os << str;
+    }
+
     void Map::Deserialize(JsonSerializer & serializer)
     {
-        serializer.Read("layers", _layers);
+        serializer.Read("layers", _layers, DeserializeLayers);
+    }
+
+    void Map::DeserializeLayers(JsonSerializer & serializer, shared_ptr<Layer>& up)
+    {
+        auto type = serializer.Read<string>("_type");
+        auto version = serializer.Read<int>("_version");
+
+        if (type == "Zero")
+        {
+            up = make_shared<Zero>();
+        }
+        else if (type == "Scale")
+        {
+            up = make_shared<Scale>();
+        }
+        else if (type == "Shift")
+        {
+            up = make_shared<Shift>();
+        }
+        else if (type == "Sum")
+        {
+            up = make_shared<Sum>();
+        }
+        else
+        {
+            throw runtime_error("unidentified type in map file: " + type);
+        }
+
+        up->Deserialize(serializer, version);
     }
 }

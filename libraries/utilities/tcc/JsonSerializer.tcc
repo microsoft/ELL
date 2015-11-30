@@ -55,19 +55,6 @@ namespace utilities
         }
     }
 
-    //template<typename KeyType, typename ValueType>
-    //void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* concept)
-    //{
-    //    try
-    //    {
-    //        _json_value[key] = (int)value;
-    //    }
-    //    catch (...)    // underlying json implementation may throw an exception 
-    //    {
-    //        throw runtime_error("jsoncpp threw an unspecified exception during write");
-    //    }
-    //}
-
     template<typename KeyType, typename ValueType>
     void JsonSerializer::Write(KeyType key, const vector<ValueType>& vec)
     {
@@ -107,14 +94,14 @@ namespace utilities
         Get(key, value);
     }
 
-    template<typename KeyType, typename ValueType>
-    void JsonSerializer::Read(KeyType key, shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* concept) const
+    template<typename KeyType, typename ValueType, typename DeserializerType>
+    void JsonSerializer::Read(KeyType key, shared_ptr<ValueType>& ptr, DeserializerType deserializer) const
     {
         try
         {
             JsonSerializer sub_serializer;
             sub_serializer._json_value = _json_value[key];
-            Deserialize(sub_serializer, ptr);
+            deserializer(sub_serializer, ptr);
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
@@ -136,21 +123,32 @@ namespace utilities
         return val;
     }
 
-    //template<typename KeyType, typename ValueType>
-    //void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_enum<ValueType>::value>::type* concept) const
-    //{
-    //    int ival;
-    //    Get(key, ival);
-    //    value = (ValueType)ival;
-    //}
+    template<typename KeyType, typename ValueType, typename DeserializerType>
+    void JsonSerializer::Read(KeyType key, vector<shared_ptr<ValueType>>& vec, DeserializerType deserializer) const
+    {
+        try
+        {
+            JsonSerializer sub_serializer;
+            sub_serializer._json_value = _json_value[key];
 
-    //template<typename ValueType, typename KeyType>
-    //ValueType JsonSerializer::Read(KeyType key, typename enable_if<is_enum<ValueType>::value>::type* concept) const
-    //{
-    //    int val;
-    //    Get(key, val);
-    //    return (ValueType)val;
-    //}
+            vec.clear();
+            vec.reserve(sub_serializer._json_value.size());
+            for (size_t i = 0; i < sub_serializer._json_value.size(); ++i)
+            {
+                shared_ptr<ValueType> val = nullptr;
+                sub_serializer.Read((int)i, val, deserializer);
+                vec.push_back(move(val));
+            }
+        }
+        catch (runtime_error e)
+        {
+            throw e;
+        }
+        catch (...)    // underlying json implementation may throw an exception 
+        {
+            throw runtime_error("jsoncpp threw an unspecified exception during read");
+        }
+    }
 
     template<typename KeyType, typename ValueType>
     void JsonSerializer::Read(KeyType key, vector<ValueType>& vec) const

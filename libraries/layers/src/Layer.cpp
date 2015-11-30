@@ -30,7 +30,7 @@ namespace layers
         return _output.GetIterator();
     }
 
-    void Layer::SerializeHeader(JsonSerializer & serializer, int version) const
+    void Layer::SerializeHeader(JsonSerializer& serializer, int version) const
     {
         // to make the file more readable
         const string type_names[] = { "Zero", "Scale", "Shift", "Sum", "DecisionTreePath" };

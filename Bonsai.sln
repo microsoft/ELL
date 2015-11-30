@@ -84,6 +84,7 @@ Global
 		{42ED2CDB-3B80-4DDB-A3FE-36E933BECA5C}.release|x64.ActiveCfg = release|x64
 		{42ED2CDB-3B80-4DDB-A3FE-36E933BECA5C}.release|x64.Build.0 = release|x64
 		{0BA2A5CE-69C9-45AD-A2CA-52448DAA7C43}.debug|x64.ActiveCfg = debug|x64
+		{0BA2A5CE-69C9-45AD-A2CA-52448DAA7C43}.debug|x64.Build.0 = debug|x64
 		{0BA2A5CE-69C9-45AD-A2CA-52448DAA7C43}.release|x64.ActiveCfg = release|x64
 		{0BA2A5CE-69C9-45AD-A2CA-52448DAA7C43}.release|x64.Build.0 = release|x64
 		{EE811BCD-5551-45FE-B44C-6F11689A7F56}.debug|x64.ActiveCfg = debug|x64

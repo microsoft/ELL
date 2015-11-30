@@ -3,39 +3,59 @@
 #pragma once
 
 #include "IPrintable.h"
+#include "layers.h"
+using namespace layers;
 
-/// A class that adds printing capabilities to a layer
-///
-class PrintableZero : public Zero, public IPrintable
+struct PrintableMap
 {
     /// Prints a human-friendly description of the layer to a stream
     ///
-    virtual void Print(ostream& os, int indentation, int enumeration) override;
+    void Print(ostream& os);
+
+    /// Deserializes the Map in json format
+    ///
+    void Deserialize(JsonSerializer& serializer);
+
+    /// Static function for deserializing shared_ptr<Layer>
+    ///
+    static void DeserializeLayers(JsonSerializer& serializer, shared_ptr<IPrintable>& up);
+
+private:
+    vector<shared_ptr<IPrintable>> _printables;
 };
 
-/// A class that adds printing capabilities to a layer
+/// A struct that adds printing capabilities to a layer
 ///
-class PrintableScale : public Scale, public IPrintable
+struct PrintableZero : public Zero, public IPrintable
 {
     /// Prints a human-friendly description of the layer to a stream
     ///
-    virtual void Print(ostream& os, int indentation, int enumeration) override;
+    virtual void Print(ostream& os) override;
 };
 
-/// A class that adds printing capabilities to a layer
+/// A struct that adds printing capabilities to a layer
 ///
-class PrintableShift : public Shift, public IPrintable
+struct PrintableScale : public Scale, public IPrintable
 {
     /// Prints a human-friendly description of the layer to a stream
     ///
-    virtual void Print(ostream& os, int indentation, int enumeration) override;
+    virtual void Print(ostream& os) override;
 };
 
-/// A class that adds printing capabilities to a layer
+/// A struct that adds printing capabilities to a layer
 ///
-class PrintableSum : public Sum, public IPrintable
+struct PrintableShift : public Shift, public IPrintable
 {
     /// Prints a human-friendly description of the layer to a stream
     ///
-    virtual void Print(ostream& os, int indentation, int enumeration) override;
+    virtual void Print(ostream& os) override;
+};
+
+/// A struct that adds printing capabilities to a layer
+///
+struct PrintableSum : public Sum, public IPrintable
+{
+    /// Prints a human-friendly description of the layer to a stream
+    ///
+    virtual void Print(ostream& os) override;
 };

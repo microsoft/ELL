@@ -4,6 +4,12 @@
 
 #include "types.h"
 
+#include "Map.h"
+using layers::Map;
+
+#include "Coordinate.h"
+using layers::Coordinate;
+
 #include <memory>
 using std::shared_ptr;
 using std::make_shared;
@@ -39,6 +45,10 @@ namespace predictors
         ///
         template<typename DataVectorType>
         double Predict(const DataVectorType& example) const;
+
+        /// Adds the predictor to a map
+        ///
+        void AddTo(Map& map, const vector<Coordinate>& inputCoordinates) const;
 
     private:
         struct BiasedVector

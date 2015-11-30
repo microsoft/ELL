@@ -1,5 +1,15 @@
 // Map.tcc
 
+#include "JsonSerializer.h"
+using utilities::JsonSerializer;
+
+#include <string>
+using std::string;
+using std::istreambuf_iterator;
+
+#include <memory>
+using std::make_shared;
+
 namespace layers
 {
     template<typename IndexValueIteratorType, typename concept>
@@ -14,4 +24,20 @@ namespace layers
             _layers[i]->Compute(_layers);
         }
     }
+
+    template<typename MapType>
+    shared_ptr<MapType> Map::Deserialize(istream& is)
+    {
+        // parse stream contents
+        auto str = string(istreambuf_iterator<char>(is), istreambuf_iterator<char>());
+        JsonSerializer reader;
+        reader.FromString(str);
+
+        // read Map
+        auto map = make_shared<MapType>();
+        reader.Read("Base", *map);
+
+        return map;
+    }
+
 }

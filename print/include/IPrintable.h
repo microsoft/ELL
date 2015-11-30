@@ -13,6 +13,6 @@ struct IPrintable
 {
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///
-    virtual void Print(ostream& os, int indentation = 0, int enumeration = 0) = 0;
+    virtual void Print(ostream& os) = 0;
 };
 

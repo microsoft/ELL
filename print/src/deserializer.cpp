@@ -1,6 +1,5 @@
 // deserializer.cpp
 
-#include "deserializer.h"
 #include "print.h"
 #include <memory>
 #include <stdexcept>
@@ -8,7 +7,7 @@
 using std::make_shared;
 using std::runtime_error;
 
-void layers::Deserialize(JsonSerializer& serializer, std::shared_ptr<layers::Layer>& up)
+void DeserializeLayers(JsonSerializer& serializer, std::shared_ptr<layers::Layer>& up)
 {
     auto type = serializer.Read<string>("_type");
 

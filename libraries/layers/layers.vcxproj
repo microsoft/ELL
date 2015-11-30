@@ -51,7 +51,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>include;..\utilities\include;..\common\include;..\predictors\include;..\linear\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\utilities\include;..\common\include;..\linear\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -67,7 +67,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>include;..\utilities\include;..\common\include;..\predictors\include;..\linear\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\utilities\include;..\common\include;..\linear\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -84,10 +84,8 @@
     <ClInclude Include="include\Coordinate.h" />
     <ClInclude Include="include\Layer.h" />
     <ClInclude Include="include\Map.h" />
-    <ClInclude Include="include\Io.h" />
     <ClInclude Include="include\Shift.h" />
     <ClInclude Include="include\Sum.h" />
-    <ClInclude Include="include\deserializer.h" />
     <ClInclude Include="include\layers.h" />
     <ClInclude Include="include\Scale.h" />
     <ClInclude Include="include\Zero.h" />
