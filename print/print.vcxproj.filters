@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\print.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\LayerVisualizer.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\print.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IPrintable.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LayerVisualizer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{cb394254-a40d-4841-84d3-43d009ad5866}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cpp">
+      <UniqueIdentifier>{00be475c-482e-4f72-8582-df269c1378b7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

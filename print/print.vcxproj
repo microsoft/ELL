@@ -92,11 +92,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cpp\LayerVisualizer.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\deserializer.cpp" />
     <ClCompile Include="src\print.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\LayerVisualizer.h" />
     <ClInclude Include="include\print.h" />
     <ClInclude Include="include\IPrintable.h" />
   </ItemGroup>
