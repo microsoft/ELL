@@ -1,4 +1,4 @@
-// LayerVisualizer.h
+// LayerLayout.h
 
 # pragma once
 
@@ -16,19 +16,17 @@ using std::vector;
 #include <stdexcept>
 using std::runtime_error;
 
-class LayerVisualizer
+class LayerLayout
 {
 public:
 
-    LayerVisualizer(double xOffset, double yOffset, double maxWidth, uint64 numElements);
+    LayerLayout(double xOffset, double yOffset, double maxX, uint64 numElement);
 
     double GetXMidOffset(uint64 outputIndex) const;
 
     double GetYTopOffset(uint64 outputIndex) const;
 
     double GetYBottomOffset(uint64 outputIndex) const;
-
-
 
 private:
     const double _gapToFirstElement = 60;

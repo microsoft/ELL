@@ -92,14 +92,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cpp\LayerVisualizer.cpp" />
+    <ClCompile Include="src\LayerLayout.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\print.cpp" />
+    <ClCompile Include="src\PrintableInput.cpp" />
+    <ClCompile Include="src\PrintableMap.cpp" />
+    <ClCompile Include="src\PrintableScale.cpp" />
+    <ClCompile Include="src\PrintableShift.cpp" />
+    <ClCompile Include="src\PrintableSum.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\LayerVisualizer.h" />
-    <ClInclude Include="include\print.h" />
     <ClInclude Include="include\IPrintable.h" />
+    <ClInclude Include="include\LayerLayout.h" />
+    <ClInclude Include="include\PrintableInput.h" />
+    <ClInclude Include="include\PrintableMap.h" />
+    <ClInclude Include="include\PrintableScale.h" />
+    <ClInclude Include="include\PrintableShift.h" />
+    <ClInclude Include="include\PrintableSum.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

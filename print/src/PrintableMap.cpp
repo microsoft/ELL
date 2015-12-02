@@ -1,17 +1,18 @@
-// print.cpp
+// PrintableMap.cpp
 
-#include "print.h"
-#include <memory>
-using std::dynamic_pointer_cast;
+#include "PrintableMap.h"
+#include "PrintableShift.h"
+#include "PrintableInput.h"
+#include "PrintableScale.h"
+#include "PrintableSum.h"
+
 using std::make_shared;
-
-using std::endl;
 
 void PrintableMap::Print(ostream & os)
 {
     for (uint64 k = 0; k < _printables.size(); ++k)
     {
-        _printables[k]->Print(os);
+        _printables[k]->Print(os, _printables);
     }
 }
 
@@ -27,7 +28,7 @@ void PrintableMap::DeserializeLayers(JsonSerializer & serializer, shared_ptr<IPr
 
     if (type == "Zero")
     {
-        auto upZero = make_shared<PrintableZero>();
+        auto upZero = make_shared<PrintableInput>();
         upZero->Deserialize(serializer, version);
         up = upZero;
     }
@@ -53,25 +54,5 @@ void PrintableMap::DeserializeLayers(JsonSerializer & serializer, shared_ptr<IPr
     {
         throw runtime_error("unidentified type in map file: " + type);
     }
-}
-
-void PrintableZero::Print(ostream& os)
-{
-    os << "Zero\tsize: " << Size() << endl;
-}
-
-void PrintableScale::Print(ostream& os)
-{
-    os << "Scale\tsize: " << Size() << endl;
-}
-
-void PrintableShift::Print(ostream& os)
-{
-    os << "Shift\tsize: " << Size() << endl;
-}
-
-void PrintableSum::Print(ostream& os)
-{
-    os << "Sum\tsize: " << Size() << endl;
 }
 

@@ -1,8 +1,8 @@
-// LayerVisualizer.cpp
+// LayerLayout.cpp
 
-#include "LayerVisualizer.h"
+#include "LayerLayout.h"
 
-LayerVisualizer::LayerVisualizer(double xOffset, double yOffset, double maxX, uint64 numElements) : _xOffset(xOffset), _yOffset(yOffset), _maxX(maxX), _elementXOffset(numElements)
+LayerLayout::LayerLayout(double xOffset, double yOffset, double maxX, uint64 numElements) : _xOffset(xOffset), _yOffset(yOffset), _maxX(maxX), _elementXMidOffset(numElements)
 {
     
     // width of the layer without abbreviated format 
@@ -55,17 +55,17 @@ LayerVisualizer::LayerVisualizer(double xOffset, double yOffset, double maxX, ui
     }
 }
 
-double LayerVisualizer::GetXMidOffset(uint64 outputIndex) const
+double LayerLayout::GetXMidOffset(uint64 outputIndex) const
 {
     return _elementXMidOffset[outputIndex];
 }
 
-double LayerVisualizer::GetYTopOffset(uint64 outputIndex) const
+double LayerLayout::GetYTopOffset(uint64 outputIndex) const
 {
     return _yOffset + _elementSpacing;
 }
 
-double LayerVisualizer::GetYBottomOffset(uint64 outputIndex) const
+double LayerLayout::GetYBottomOffset(uint64 outputIndex) const
 {
     return _yOffset + _elementSpacing + _elementHeight;
 }
