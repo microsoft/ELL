@@ -6,7 +6,7 @@ void PrintableShift::Print(ostream & os, const vector<shared_ptr<IPrintable>>& l
 {
 }
 
-void PrintableShift::ComputeLayout(double xOffset, double yOffset, double xMax)
+void PrintableShift::ComputeLayout(const CommandLineArgs& args, double yOffset)
 {
 }
 

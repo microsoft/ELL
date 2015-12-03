@@ -3,7 +3,7 @@
 #pragma once
 
 #include "IPrintable.h"
-#include "LayerLayout.h"
+#include "ElementXLayout.h"
 
 #include "layers.h"
 using namespace layers;
@@ -22,7 +22,7 @@ public:
 
     /// Computes the layer layout
     ///
-    virtual void ComputeLayout(double xOffset, double yOffset, double xMax) override;
+    virtual void ComputeLayout(const CommandLineArgs& args, double yOffset) override;
 
     /// Returns the begin-point of an arrow
     ///
@@ -32,6 +32,20 @@ public:
     ///
     virtual Point GetEndPoint(uint64 index) const override;
 
+    // \returns the layer width
+    //
+    virtual double GetWidth() const;
+
+    // \returns the layer height
+    //
+    virtual double GetHeight() const;
+
 private:
-    unique_ptr<LayerLayout> _upLayout = nullptr;
+    unique_ptr<ElementXLayout> _upLayout = nullptr;
+    double _xLayerIndent = 0;
+    double _yLayerOffset = 0;
+    double _elementWidth = 0;
+    double _elementHeight = 0;
+    double _yElementPadding = 0;
+
 };

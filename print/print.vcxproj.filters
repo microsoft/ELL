@@ -4,9 +4,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\LayerLayout.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\PrintableMap.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -22,6 +19,9 @@
     <ClCompile Include="src\PrintableSum.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\ElementXLayout.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -33,9 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\IPrintable.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\LayerLayout.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\PrintableMap.h">
@@ -51,6 +48,12 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\PrintableSum.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CommandLineArgs.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ElementXLayout.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

@@ -92,7 +92,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\LayerLayout.cpp" />
+    <ClCompile Include="src\ElementXLayout.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PrintableInput.cpp" />
     <ClCompile Include="src\PrintableMap.cpp" />
@@ -101,8 +101,9 @@
     <ClCompile Include="src\PrintableSum.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\CommandLineArgs.h" />
     <ClInclude Include="include\IPrintable.h" />
-    <ClInclude Include="include\LayerLayout.h" />
+    <ClInclude Include="include\ElementXLayout.h" />
     <ClInclude Include="include\PrintableInput.h" />
     <ClInclude Include="include\PrintableMap.h" />
     <ClInclude Include="include\PrintableScale.h" />

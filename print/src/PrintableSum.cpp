@@ -6,7 +6,7 @@ void PrintableSum::Print(ostream & os, const vector<shared_ptr<IPrintable>>& lay
 {
 }
 
-void PrintableSum::ComputeLayout(double xOffset, double yOffset, double xMax)
+void PrintableSum::ComputeLayout(const CommandLineArgs& args, double yOffset)
 {
 }
 
@@ -18,4 +18,14 @@ Point PrintableSum::GetBeginPoint(uint64 index) const
 Point PrintableSum::GetEndPoint(uint64 index) const
 {
     return Point();
+}
+
+double PrintableSum::GetWidth() const
+{
+    return 0.0;
+}
+
+double PrintableSum::GetHeight() const
+{
+    return 0.0;
 }

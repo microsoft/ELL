@@ -8,12 +8,73 @@
 
 using std::make_shared;
 
-void PrintableMap::Print(ostream & os)
+void PrintableMap::Print(ostream & os, const CommandLineArgs& args)
 {
+
+    os << 
+R"aw(
+<html>
+<body>
+
+<style>
+    text
+    {
+        font-family:    sans-serif;
+    }
+
+    rect
+    {
+        stroke:        #222222;
+        stroke-width:    2;
+    }
+    
+    rect.InputLayer
+    {
+        fill:        #22AA22;
+    }
+
+    rect.ScaleLayer
+    {
+        fill:        #FF2244;
+    }
+
+    rect.Element
+    {
+        fill:        white;
+    }
+
+    ellipse.Connector
+    {
+        fill:        #222222;
+    }
+
+    path.Edge
+    {
+        stroke:        #110011;
+        stroke-width:    2;    
+        fill:        none;
+        stroke-dasharray:    4,2;
+    }
+</style>
+
+<svg>
+)aw";
+
+    double yOffset = args.yLayerIndent;
+
     for (uint64 k = 0; k < _printables.size(); ++k)
     {
+        _printables[k]->ComputeLayout(args, yOffset);
         _printables[k]->Print(os, _printables);
+        yOffset += _printables[k]->GetHeight() + args.yLayerSpacing;
     }
+
+    os << 
+R"aw(
+</svg>
+</body>
+</html>
+)aw";
 }
 
 void PrintableMap::Deserialize(JsonSerializer & serializer)

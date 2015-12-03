@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "LayerLayout.h"
+#include "ElementXLayout.h"
+#include "CommandLineArgs.h"
 
 #include "layers.h"
 using namespace layers;
@@ -32,15 +33,23 @@ public:
 
     /// Computes the layer layout
     ///
-    virtual void ComputeLayout(double xOffset, double yOffset, double xMax) = 0;
+    virtual void ComputeLayout(const CommandLineArgs& args, double yOffset) = 0;
 
-    /// Returns the begin-point of an arrow
+    /// \returns the begin-point of an arrow
     ///
     virtual Point GetBeginPoint(uint64 index) const = 0;
 
-    /// Returns the end-point of an arrow
+    /// \returns the end-point of an arrow
     ///
     virtual Point GetEndPoint(uint64 index) const = 0;
+
+    // \returns the layer width
+    //
+    virtual double GetWidth() const = 0;
+
+    // \returns the layer height
+    //
+    virtual double GetHeight() const = 0;
 };
 
  

@@ -6,7 +6,7 @@ void PrintableInput::Print(ostream & os, const vector<shared_ptr<IPrintable>>& l
 {
 }
 
-void PrintableInput::ComputeLayout(double xOffset, double yOffset, double xMax)
+void PrintableInput::ComputeLayout(const CommandLineArgs& args, double yOffset)
 {
 }
 

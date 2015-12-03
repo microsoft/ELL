@@ -3,6 +3,7 @@
 #pragma once
 
 #include "IPrintable.h"
+#include "CommandLineArgs.h"
 
 #include "JsonSerializer.h"
 using utilities::JsonSerializer;
@@ -22,7 +23,7 @@ class PrintableMap
 public:
     /// Prints a human-friendly description of the layer to a stream
     ///
-    void Print(ostream& os);
+    void Print(ostream& os, const CommandLineArgs& args);
 
     /// Deserializes the Map in json format
     ///
