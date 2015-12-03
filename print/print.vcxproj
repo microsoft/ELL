@@ -92,6 +92,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\svgHelpers.cpp" />
     <ClCompile Include="src\ElementXLayout.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PrintableInput.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="include\PrintableScale.h" />
     <ClInclude Include="include\PrintableShift.h" />
     <ClInclude Include="include\PrintableSum.h" />
+    <ClInclude Include="include\svgHelpers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

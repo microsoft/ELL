@@ -24,12 +24,12 @@ struct CommandLineArgs
         yLayerSpacing = 20;
         maxLayerWidth = 800;
 
-        xElementLeftPadding = 50;
+        xElementLeftPadding = 60;
         xElementRightPadding = 10;
         yElementPadding = 10;
         xElementSpacing = 5;
-        elementWidth = 40;
-        elementHeight = 30;
+        elementWidth = 50;
+        elementHeight = 40;
         dotsWidth = 50;
     }
 };

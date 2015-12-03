@@ -50,11 +50,24 @@ R"aw(
 
     path.Edge
     {
-        stroke:        #110011;
-        stroke-width:    2;    
-        fill:        none;
-        stroke-dasharray:    4,2;
+        stroke:             #110011;
+        stroke-width:       2;
+        fill:               none;
+        stroke-dasharray:   4,2;
     }
+
+    text.Layer
+    {
+        fill:           white;
+        font:           bold 15 sans-serif;        
+    }
+
+    text.Element
+    {
+        fill:           black;
+        font:           15 sans-serif;        
+    }
+
 </style>
 
 <svg>

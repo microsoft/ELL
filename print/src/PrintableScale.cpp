@@ -1,6 +1,7 @@
 // PrintableScale.cpp
 
 #include "PrintableScale.h"
+#include "svgHelpers.h"
 
 #include <memory>
 using std::make_unique;
@@ -48,51 +49,52 @@ int getPrecision(double x, int maxChars = 5)
 
 void PrintableScale::Print(ostream & os, const vector<shared_ptr<IPrintable>>& layers) const
 {
-    uint64 halfWidth = uint64(_elementWidth/2.0);
-    uint64 width = uint64(_elementWidth);
-    uint64 height = uint64(_elementHeight);
-    uint64 elementTop = uint64(_yLayerOffset + _yElementPadding);
-    uint64 xLayerIndext = uint64(_xLayerIndent);
-    uint64 yLayerOffset = uint64(_yLayerOffset);
-    uint64 layerWidth = uint64(_upLayout->GetWidth());
-    uint64 layerHeight = uint64(_elementHeight + _yElementPadding * 2.0);
-    uint64 yLayerMid = uint64(_yLayerOffset + _yElementPadding + _elementHeight/2.0);
+    double halfWidth = _elementWidth/2.0;
+    double elementTop = _yLayerOffset + _yElementPadding;
+    double layerWidth = _upLayout->GetWidth();
+    double layerHeight = _elementHeight + _yElementPadding * 2.0;
+    double yLayerMid = _yLayerOffset + _yElementPadding + _elementHeight/2.0;
 
     uint64 index = 1; // TODO
 
     // define what an element looks like
-    os << "<defs>\n";
-    os << "    <g id = \"Element" << to_string((uint64)this)  << "\">\n";
-    os << "        <ellipse class = \"Connector\" cx = \"" << halfWidth << "\" cy = \"0\" rx = \"5\" ry = \"5\" />\n";
-    os << "        <ellipse class = \"Connector\" cx = \"" << halfWidth << "\" cy = \"" << height << "\" rx = \"5\" ry = \"5\" />\n";
-    os << "        <rect class = \"Element\" x = \"0\" y = \"0\" rx = \"10\" ry = \"10\" width = \"" << width << "\" height = \"" << height << "\"/>\n";
-    os << "    </g>\n";
-    os << "</defs>\n\n";
+    string defName = "Element" + to_string((uint64)this);
+    os << "<defs>\n<g id = \"" << defName << "\">\n";
+    svgCircle(os, "Connector", halfWidth, 0, 5);
+    svgCircle(os, "Connector", halfWidth, _elementHeight, 5);
+    svgRect(os, "Element", 0, 0, 10, _elementWidth, _elementHeight);
+    os << "</g>\n</defs>\n\n";
 
     // draw the layer rectangle
-    os << "    <rect class=\"ScaleLayer\" x=\"" << xLayerIndext << "\" y=\"" << yLayerOffset << "\" rx=\"10\" ry=\"10\" width=\"" << layerWidth << "\" height=\"" << layerHeight << "\"/>\n";
+    svgRect(os, "ScaleLayer", _xLayerIndent, _yLayerOffset, 10, layerWidth, layerHeight);
 
     // write the layer index and type
-    uint64 layerIndexLeft = uint64(_xLayerIndent + 15);
-    uint64 typeLeft = uint64((_upLayout->GetXMid(0) - halfWidth + _xLayerIndent + 30) / 2.0);
+    double indexLeft = _xLayerIndent + 15;
+    double typeLeft = (_upLayout->GetXMid(0) - halfWidth + indexLeft) / 2.0;
 
-    os << "    <text x=\"" << layerIndexLeft << "\" y=\"" << yLayerMid+4 << "\" text-anchor=\"middle\" fill = \"white\" font-size = \"15\" font-weight = \"bold\">" << index << "</text>\n";
-    os << "    <text x=\"" << typeLeft << "\" y=\"" << yLayerMid << "\" text-anchor=\"middle\" fill = \"white\" font-size = \"13\" transform=\"rotate(-90, " << typeLeft << ", " << yLayerMid << ")\">SCALE</text>\n";
+    svgText(os, to_string(index), "Layer", indexLeft, yLayerMid);
+    svgText(os, "SCALE", "Layer", typeLeft, yLayerMid, true);
 
     // 
     for(uint64 k=0; k< _upLayout->GetNumElementsBeforeDots() ; ++k)
     {
-        uint64 elementLeft = uint64(_upLayout->GetXMid(k) - halfWidth);
-        uint64 elementMid = uint64(_upLayout->GetXMid(k));
-        os << "    <use xlink:href=\"#Element" << to_string((uint64)this) << "\" x=\"" << elementLeft << "\" y=\"" << elementTop << "\" />\n";
+        double elementLeft = _upLayout->GetXMid(k) - halfWidth;
+        double elementMid = _upLayout->GetXMid(k);
+        svgUse(os, defName, elementLeft, elementTop);
         
         int precision = getPrecision(_values[k]);
-        os << "    <text x=\"" << elementMid << "\" y=\"" << yLayerMid+4 << "\" text-anchor=\"middle\" font-size = \"13\">" << fixed << setprecision(precision) <<  _values[k] << "</text>\n";
+        svgText(os, _values[k], precision, "Element", elementMid, yLayerMid);
     }
 
     if(_upLayout->IsAbbreviated())
     {
-        os << "    <use xlink:href=\"#Element" << to_string((uint64)this) << "\" x=\"" << uint64(_upLayout->GetXMid(_output.Size()-1) - halfWidth) << "\" y=\"" << elementTop << "\" />\n";
+        uint64 k = _output.Size() - 1;
+        double elementLeft = _upLayout->GetXMid(k) - halfWidth;
+        double elementMid = _upLayout->GetXMid(k);
+
+        os << "    <use xlink:href=\"#Element" << to_string((uint64)this) << "\" x=\"" << elementLeft << "\" y=\"" << elementTop << "\" />\n";
+        int precision = getPrecision(_values[k]);
+        svgText(os, _values[k], precision, "Element", elementMid, yLayerMid);
 
         uint64 dotsXMid = uint64(_upLayout->GetDotsXMid());
 

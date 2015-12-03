@@ -22,6 +22,9 @@
     <ClCompile Include="src\ElementXLayout.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="include\svgHelpers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -54,6 +57,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\ElementXLayout.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\svgHelpers.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
