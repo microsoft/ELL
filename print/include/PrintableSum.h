@@ -29,6 +29,16 @@ public:
     ///
     virtual Point GetEndPoint(uint64 index) const override;
 
-    virtual double GetWidth() const override;
-    virtual double GetHeight() const override;
+    /// \returns the layer width
+    ///
+    virtual double GetWidth() const;
+
+    /// \returns the layer height
+    ///
+    virtual double GetHeight() const;
+
+    /// \returns the layer type name
+    ///
+    virtual string GetTypeName() const override;
+
 };

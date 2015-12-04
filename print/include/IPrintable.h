@@ -43,13 +43,17 @@ public:
     ///
     virtual Point GetEndPoint(uint64 index) const = 0;
 
-    // \returns the layer width
-    //
+    /// \returns the layer width
+    ///
     virtual double GetWidth() const = 0;
 
-    // \returns the layer height
-    //
+    /// \returns the layer height
+    ///
     virtual double GetHeight() const = 0;
+
+    // \returns the layer type name
+    ///
+    virtual string GetTypeName() const = 0;
 };
 
  

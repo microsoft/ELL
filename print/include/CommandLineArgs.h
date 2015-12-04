@@ -15,9 +15,12 @@ struct CommandLineArgs
     double xElementLeftPadding = 0;
     double xElementRightPadding = 0;
     double yElementPadding = 0;
+    double yEmptyElementPadding = 0;
     double xElementSpacing = 0;
     double elementWidth = 0;
     double elementHeight = 0;
+    double emptyElementWidth = 0;
+    double emptyElementHeight = 0;
     double elementCornerRadius = 0;
     double elementConnectorRadius = 0;
     int valueMaxChars = 0;
@@ -32,13 +35,16 @@ struct CommandLineArgs
         maxLayerWidth = 800;
         layerCornerRadius = 10;
 
-        xElementLeftPadding = 60;
+        xElementLeftPadding = 70;
         xElementRightPadding = 10;
-        yElementPadding = 12;
+        yElementPadding = 14;
+        yEmptyElementPadding = 12;
         xElementSpacing = 5;
         elementWidth = 55;
         elementHeight = 40;
-        elementCornerRadius = 10;
+        emptyElementWidth = 40;
+        emptyElementHeight = 20;
+        elementCornerRadius = 5;
         elementConnectorRadius = 5;
         valueMaxChars = 6;
 

@@ -4,8 +4,12 @@
 #include "PrintableInput.h"
 #include "PrintableCoordinatewise.h"
 #include "PrintableSum.h"
+#include "svgHelpers.h"
 
 using std::make_shared;
+
+#include <string>
+using std::to_string;
 
 void PrintableMap::Print(ostream & os, const CommandLineArgs& args)
 {
@@ -32,9 +36,24 @@ R"aw(
         fill:        #22AA22;
     }
 
-    rect.ScaleLayer
+    rect.SCALE
     {
         fill:        #FF2244;
+    }
+
+    rect.SHIFT
+    {
+        fill:        #22FF44;
+    }
+
+    rect.SUM
+    {
+        fill:        #2244FF;
+    }
+
+    rect.IN
+    {
+        fill:        #AA0044;
     }
 
     rect.Element
@@ -78,11 +97,23 @@ R"aw(
 <svg>
 )aw";
 
+    // print layer by layer
     double yOffset = args.yLayerIndent;
-
     for (uint64 k = 0; k < _printables.size(); ++k)
     {
         _printables[k]->ComputeLayout(args, yOffset);
+
+        string typeName = _printables[k]->GetTypeName();
+        double layerLeft = args.xLayerIndent;
+        double layerHeight = _printables[k]->GetHeight();
+        double layerYMid = yOffset + layerHeight/2.0;
+
+        // draw the layer rectangle
+        svgRect(os, typeName, layerLeft, yOffset, args.layerCornerRadius, _printables[k]->GetWidth(), layerHeight);
+        svgText(os, to_string(k), "Layer", layerLeft + 15, layerYMid);
+        svgText(os, typeName, "Layer", layerLeft + 40, layerYMid, true);
+
+        // let the layer print its contents
         _printables[k]->Print(os, k, _printables);
         yOffset += _printables[k]->GetHeight() + args.yLayerSpacing;
     }
@@ -113,13 +144,13 @@ void PrintableMap::DeserializeLayers(JsonSerializer & serializer, shared_ptr<IPr
     }
     else if (type == "Scale")
     {
-        auto upScale = make_shared<PrintableCoordinatewise>("SCALE", "ScaleLayer");
+        auto upScale = make_shared<PrintableCoordinatewise>("SCALE");
         upScale->Deserialize(serializer, version);
         up = upScale;
     }
     else if (type == "Shift")
     {
-        auto upShift = make_shared<PrintableCoordinatewise>("SHIFT", "ShiftLayer");
+        auto upShift = make_shared<PrintableCoordinatewise>("SHIFT");
         upShift->Deserialize(serializer, version);
         up = upShift;
     }

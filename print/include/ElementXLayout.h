@@ -24,7 +24,7 @@ public:
 
     /// Ctor
     ///
-    ElementXLayout(uint64 numElements, const CommandLineArgs& args);
+    ElementXLayout(uint64 numElements, double xLayerIndent, double maxLayerWidth, double elementWidth, double xElementSpacing, double xElementLeftPadding, double xElementRightPadding, double dotsWidth);
 
     /// \returns the x-axis value of the middle of the requested element
     ///

@@ -10,7 +10,7 @@ using namespace layers;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableInput : public Scale, public IPrintable
+struct PrintableInput : public Zero, public IPrintable
 {
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream
@@ -29,11 +29,27 @@ public:
     ///
     virtual Point GetEndPoint(uint64 index) const override;
 
-    virtual double GetWidth() const override {
-        return 0;
-    }
-    virtual double GetHeight() const override {
-        return 0;
-    }
+    /// \returns the layer width
+    ///
+    virtual double GetWidth() const;
 
+    /// \returns the layer height
+    ///
+    virtual double GetHeight() const;
+
+    /// \returns the layer type name
+    ///
+    virtual string GetTypeName() const override;
+
+private:
+    unique_ptr<ElementXLayout> _upLayout = nullptr;
+
+    double _cy;
+    double _layerHeight;
+    double _elementWidth;
+    double _elementHeight;
+    double _elementCornerRadius;
+    double _elementConnectorRadius;
+    double _endPointY;
+    double _beginPointY;
 };

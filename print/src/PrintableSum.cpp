@@ -22,10 +22,15 @@ Point PrintableSum::GetEndPoint(uint64 index) const
 
 double PrintableSum::GetWidth() const
 {
-    return 0.0;
+    return 700;
 }
 
 double PrintableSum::GetHeight() const
 {
-    return 0.0;
+    return 50;
+}
+
+string PrintableSum::GetTypeName() const
+{
+    return string("SUM");
 }

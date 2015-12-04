@@ -2,19 +2,19 @@
 
 #include "ElementXLayout.h"
 
-ElementXLayout::ElementXLayout(uint64 numElements, const CommandLineArgs& args) : _elementXMid(numElements)
+ElementXLayout::ElementXLayout(uint64 numElements, double xLayerIndent, double maxLayerWidth, double elementWidth, double xElementSpacing, double xElementLeftPadding, double xElementRightPadding, double dotsWidth) : _elementXMid(numElements)
 {
     
     // width of the layer without abbreviated format 
-    double layerWidth = args.xElementLeftPadding + args.xElementRightPadding + numElements * args.elementWidth + (numElements-1) * args.xElementSpacing;
-    double elementWidthPlusSpace = args.elementWidth + args.xElementSpacing;
+    double layerWidth = xElementLeftPadding + xElementRightPadding + numElements * elementWidth + (numElements-1) * xElementSpacing;
+    double elementWidthPlusSpace = elementWidth + xElementSpacing;
 
     // non-abbreviated
-    if(layerWidth <= args.maxLayerWidth)
+    if(layerWidth <= maxLayerWidth)
     {
         _layerWidth = layerWidth;
         _numElementsBeforeDots = numElements;
-        double firstElementXMiddle = args.xLayerIndent + args.xElementLeftPadding + args.elementWidth/2.0;
+        double firstElementXMiddle = xLayerIndent + xElementLeftPadding + elementWidth/2.0;
         for(uint64 k = 0; k<numElements; ++k)
         {
             _elementXMid[k] = firstElementXMiddle + k * elementWidthPlusSpace;
@@ -24,12 +24,12 @@ ElementXLayout::ElementXLayout(uint64 numElements, const CommandLineArgs& args) 
     //abbreviated
     else
     {
-        _layerWidth = args.maxLayerWidth;
+        _layerWidth = maxLayerWidth;
         _abbreviated = true;
 
-        double elementsWidth = args.maxLayerWidth - args.xElementLeftPadding - args.xElementRightPadding;
-        double elementsBeforeDotsWidth = elementsWidth - args.dotsWidth - args.elementWidth - args.xElementSpacing;
-        _numElementsBeforeDots = uint64(elementsBeforeDotsWidth / (args.elementWidth + args.xElementSpacing));
+        double elementsWidth = maxLayerWidth - xElementLeftPadding - xElementRightPadding;
+        double elementsBeforeDotsWidth = elementsWidth - dotsWidth - elementWidth - xElementSpacing;
+        _numElementsBeforeDots = uint64(elementsBeforeDotsWidth / (elementWidth + xElementSpacing));
         
         if(elementsBeforeDotsWidth <= 0 || _numElementsBeforeDots == 0)
         {
@@ -37,15 +37,15 @@ ElementXLayout::ElementXLayout(uint64 numElements, const CommandLineArgs& args) 
         }
 
         // elements before dots
-        double firstElementXMiddle = args.xLayerIndent + args.xElementLeftPadding + args.elementWidth/2.0;
+        double firstElementXMiddle = xLayerIndent + xElementLeftPadding + elementWidth/2.0;
         for(uint64 k = 0; k<_numElementsBeforeDots; ++k)
         {
             _elementXMid[k] = firstElementXMiddle + k * elementWidthPlusSpace;
         }
 
         // elements represented by dots
-        double dotsLeft = args.xLayerIndent + args.xElementLeftPadding + _numElementsBeforeDots * elementWidthPlusSpace;
-        double dotsRight = args.xLayerIndent + _layerWidth - args.xElementRightPadding - elementWidthPlusSpace;
+        double dotsLeft = xLayerIndent + xElementLeftPadding + _numElementsBeforeDots * elementWidthPlusSpace;
+        double dotsRight = xLayerIndent + _layerWidth - xElementRightPadding - elementWidthPlusSpace;
         _dotsXMid = (dotsLeft + dotsRight) / 2.0;
         double numInvisibleElements = double(numElements - _numElementsBeforeDots - 1);
         double invisibleElementsSpacing = (dotsRight - dotsLeft) / (numInvisibleElements-1);
@@ -56,7 +56,7 @@ ElementXLayout::ElementXLayout(uint64 numElements, const CommandLineArgs& args) 
         }
 
         /// element after dots
-        _elementXMid[numElements-1] = dotsRight + args.xElementSpacing + args.elementWidth/2.0;
+        _elementXMid[numElements-1] = dotsRight + xElementSpacing + elementWidth/2.0;
     }
 }
 
