@@ -68,6 +68,12 @@ R"aw(
         font:           15 sans-serif;        
     }
 
+    text.ElementIndex
+    {
+        fill:           #666666;
+        font:           9 sans-serif;        
+    }
+
 </style>
 
 <svg>
@@ -78,7 +84,7 @@ R"aw(
     for (uint64 k = 0; k < _printables.size(); ++k)
     {
         _printables[k]->ComputeLayout(args, yOffset);
-        _printables[k]->Print(os, _printables);
+        _printables[k]->Print(os, k, _printables);
         yOffset += _printables[k]->GetHeight() + args.yLayerSpacing;
     }
 

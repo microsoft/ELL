@@ -2,7 +2,7 @@
 
 #include "PrintableShift.h"
 
-void PrintableShift::Print(ostream & os, const vector<shared_ptr<IPrintable>>& layers) const
+void PrintableShift::Print(ostream & os, uint64 index, const vector<shared_ptr<IPrintable>>& layers) const
 {
 }
 

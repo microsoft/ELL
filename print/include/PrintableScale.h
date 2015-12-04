@@ -18,7 +18,7 @@ struct PrintableScale : public Scale, public IPrintable
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///
-    virtual void Print(ostream& os, const vector<shared_ptr<IPrintable>>& layers) const override;
+    virtual void Print(ostream& os, uint64 index, const vector<shared_ptr<IPrintable>>& layers) const override;
 
     /// Computes the layer layout
     ///
@@ -42,10 +42,14 @@ public:
 
 private:
     unique_ptr<ElementXLayout> _upLayout = nullptr;
-    double _xLayerIndent = 0;
-    double _yLayerOffset = 0;
-    double _elementWidth = 0;
-    double _elementHeight = 0;
-    double _yElementPadding = 0;
 
+    double _x;
+    double _cy;
+    double _layerHeight;
+    double _layerCornerRadius;
+    double _elementWidth;
+    double _elementHeight;
+    double _elementCornerRadius;
+    double _elementConnectorRadius;
+    int _valueMaxChars;
 };
