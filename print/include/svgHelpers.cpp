@@ -118,6 +118,6 @@ void svgPrintElement(ostream & os, double value, int maxChars, uint64 k, const s
     }
 
     double elementMid = elementLeft + elementWidth/2.0;
-    svgText(os, value, precision, "Element", elementMid, elementTop + elementHeight/2.0 -4);
+    svgText(os, value, precision, "Element", elementMid, elementTop + elementHeight/2.0 -6);
     svgText(os, to_string(k), "ElementIndex", elementMid, elementTop + elementHeight - 10);
 }

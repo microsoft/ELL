@@ -1,4 +1,4 @@
-// PrintableScale.h
+// PrintableCoordinatewise.h
 
 #pragma once
 
@@ -13,9 +13,13 @@ using std::unique_ptr;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableScale : public Scale, public IPrintable
+struct PrintableCoordinatewise : public Scale, public IPrintable
 {
 public:
+    /// Ctor
+    ///
+    PrintableCoordinatewise(string typeName, string svgClass);    
+
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///
     virtual void Print(ostream& os, uint64 index, const vector<shared_ptr<IPrintable>>& layers) const override;
@@ -42,6 +46,9 @@ public:
 
 private:
     unique_ptr<ElementXLayout> _upLayout = nullptr;
+
+    string _typeName;
+    string _svgClass;
 
     double _x;
     double _cy;

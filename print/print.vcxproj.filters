@@ -7,22 +7,19 @@
     <ClCompile Include="src\PrintableMap.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\PrintableScale.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\PrintableInput.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PrintableShift.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PrintableSum.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ElementXLayout.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="include\svgHelpers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PrintableCoordinatewise.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PrintableSum.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,13 +38,7 @@
     <ClInclude Include="include\PrintableMap.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\PrintableScale.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\PrintableInput.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PrintableShift.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\PrintableSum.h">
@@ -60,6 +51,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\svgHelpers.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PrintableCoordinatewise.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

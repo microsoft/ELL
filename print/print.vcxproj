@@ -97,8 +97,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PrintableInput.cpp" />
     <ClCompile Include="src\PrintableMap.cpp" />
-    <ClCompile Include="src\PrintableScale.cpp" />
-    <ClCompile Include="src\PrintableShift.cpp" />
+    <ClCompile Include="src\PrintableCoordinatewise.cpp" />
     <ClCompile Include="src\PrintableSum.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -107,8 +106,7 @@
     <ClInclude Include="include\ElementXLayout.h" />
     <ClInclude Include="include\PrintableInput.h" />
     <ClInclude Include="include\PrintableMap.h" />
-    <ClInclude Include="include\PrintableScale.h" />
-    <ClInclude Include="include\PrintableShift.h" />
+    <ClInclude Include="include\PrintableCoordinatewise.h" />
     <ClInclude Include="include\PrintableSum.h" />
     <ClInclude Include="include\svgHelpers.h" />
   </ItemGroup>

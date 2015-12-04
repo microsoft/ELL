@@ -1,9 +1,8 @@
 // PrintableMap.cpp
 
 #include "PrintableMap.h"
-#include "PrintableShift.h"
 #include "PrintableInput.h"
-#include "PrintableScale.h"
+#include "PrintableCoordinatewise.h"
 #include "PrintableSum.h"
 
 using std::make_shared;
@@ -114,13 +113,13 @@ void PrintableMap::DeserializeLayers(JsonSerializer & serializer, shared_ptr<IPr
     }
     else if (type == "Scale")
     {
-        auto upScale = make_shared<PrintableScale>();
+        auto upScale = make_shared<PrintableCoordinatewise>("SCALE", "ScaleLayer");
         upScale->Deserialize(serializer, version);
         up = upScale;
     }
     else if (type == "Shift")
     {
-        auto upShift = make_shared<PrintableShift>();
+        auto upShift = make_shared<PrintableCoordinatewise>("SHIFT", "ShiftLayer");
         upShift->Deserialize(serializer, version);
         up = upShift;
     }
