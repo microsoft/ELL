@@ -1,4 +1,3 @@
-#include "..\include\RealArray.h"
 // RealArray.tcc
 
 namespace common
