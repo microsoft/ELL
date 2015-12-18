@@ -5,8 +5,6 @@
 #include "Coordinate.h"
 
 #include "types.h"
-#include "RealArray.h"
-using common::DoubleArray;
 
 #include <vector>
 using std::vector;
