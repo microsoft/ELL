@@ -71,7 +71,7 @@ R"aw(
         stroke:             #110011;
         stroke-width:       2;
         fill:               none;
-        stroke-dasharray:   4,2;
+        stroke-dasharray:   6,2;
     }
 
     text.Layer

@@ -55,12 +55,7 @@ private:
 
     double _cy;
     double _layerHeight;
-    double _elementWidth;
-    double _elementHeight;
-    double _elementCornerRadius;
-    double _elementConnectorRadius;
-    double _endPointY;
-    double _beginPointY;
     int _valueMaxChars;
-
+    double _edgeFlattness;
+    ElementStyleArgs _elementStyle;
 };

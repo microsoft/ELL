@@ -47,6 +47,30 @@ void svgDots(ostream& os, double cx, double cy)
     svgCircle(os, "Dots", cx+8, cy, 2);
 }
 
+void svgEdge(ostream & os, Point from, Point to, double edgeFlattness)
+{
+    double xDist = to.x - from.x;
+    double yDist = to.y - from.y;
+
+    if (xDist == 0)
+    {
+        os << "    <path class=\"Edge\" d=\"M " << from.x << " " << from.y << " L " << to.x << " " << to.y << "\"/>\n";
+    }
+
+    else
+    {
+        const double drop = yDist*edgeFlattness / 2.0;
+        double qFrac = drop / xDist;
+        if (qFrac < 0) qFrac = -qFrac;
+        if (qFrac > 0.25) qFrac = 0.25;
+        double slopeFrac = 1 - 2 * qFrac;
+
+        const double slopeDy = yDist - 2.0 * drop;
+
+        os << "    <path class=\"Edge\" d=\"M " << from.x << " " << from.y << " q 0 " << drop << " " << xDist*qFrac << " " << drop+slopeDy*qFrac << " l " << xDist*slopeFrac << " " << slopeDy*slopeFrac << " q " << xDist*qFrac << " " << slopeDy*qFrac << " " << xDist*qFrac << " " << drop+slopeDy*qFrac << "\"/>\n";
+    }
+}
+
 int GetPrecision(double value, int maxChars)
 {
     int precision = 0;
@@ -74,13 +98,13 @@ int GetPrecision(double value, int maxChars)
     return precision;
 }
 
-string svgDefineElement(ostream& os, uint64 index, double width, double height, double cornerRadius, double connectorRadius)
+string svgDefineElement(ostream& os, uint64 index, ElementStyleArgs styleArgs)
 {
     string typeName = "Element" + to_string(index);
     os << "<defs>\n<g id = \"" << typeName << "\">\n";
-    svgCircle(os, "Connector", width/2.0, 0, connectorRadius);
-    svgCircle(os, "Connector", width/2.0, height, connectorRadius);
-    svgRect(os, "Element", 0, 0, cornerRadius, width, height);
+    svgCircle(os, "Connector", styleArgs.width/2.0, 0, styleArgs.connectorRadius);
+    svgCircle(os, "Connector", styleArgs.width/2.0, styleArgs.height, styleArgs.connectorRadius);
+    svgRect(os, "Element", 0, 0, styleArgs.cornerRadius, styleArgs.width, styleArgs.height);
     os << "</g>\n</defs>\n\n";
     return typeName;
 }

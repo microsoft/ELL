@@ -41,4 +41,10 @@ public:
     ///
     virtual string GetTypeName() const override;
 
+private:
+    double _elementLeft;
+    double _elementTop;
+    double _elementXMid;
+    double _elementYMid;
+
 };

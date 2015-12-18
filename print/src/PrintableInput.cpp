@@ -16,12 +16,12 @@ inline void printElement(ostream & os, const string& elementDefName, uint64 inde
 
 void PrintableInput::Print(ostream & os, uint64 index, const vector<shared_ptr<IPrintable>>& layers) const
 {
-    double halfWidth = _elementWidth/2.0;
-    double elementTop = _cy - _elementHeight/2.0;
-    double elementBottom = elementTop + _elementHeight;
+    double halfWidth = _elementStyle.width/2.0;
+    double elementTop = _cy - _elementStyle.height/2.0;
+    double elementBottom = elementTop + _elementStyle.height;
 
     // define the element shape
-    string elementDefName = svgDefineElement(os, index, _elementWidth, _elementHeight, _elementCornerRadius, _elementConnectorRadius);
+    string elementDefName = svgDefineElement(os, index, _elementStyle);
 
     // print the visible elements, before the dots
     for(uint64 k = 0; k< _upLayout->GetNumElementsBeforeDots(); ++k)
@@ -46,26 +46,21 @@ void PrintableInput::Print(ostream & os, uint64 index, const vector<shared_ptr<I
 
 void PrintableInput::ComputeLayout(const CommandLineArgs& args, double layerYOffset)
 {
-    _upLayout = make_unique<ElementXLayout>(_output.size(), args.xLayerIndent, args.maxLayerWidth, args.emptyElementWidth, args.xElementSpacing, args.xElementLeftPadding, args.xElementRightPadding, args.dotsWidth);
+    _upLayout = make_unique<ElementXLayout>(_output.size(), args.xLayerIndent, args.maxLayerWidth, args.emptyElementStyle.width, args.xElementSpacing, args.xElementLeftPadding, args.xElementRightPadding, args.dotsWidth);
 
-    _layerHeight = args.emptyElementHeight + 2*args.yEmptyElementPadding;
+    _layerHeight = args.emptyElementStyle.height + 2*args.yEmptyElementPadding;
     _cy = layerYOffset + _layerHeight / 2.0;
-    _elementWidth = args.emptyElementWidth;
-    _elementHeight = args.emptyElementHeight;
-    _elementCornerRadius = args.elementCornerRadius;
-    _elementConnectorRadius = args.elementConnectorRadius;
-    _endPointY = layerYOffset + args.yElementPadding - _elementConnectorRadius/2.0;
-    _beginPointY = layerYOffset + args.yElementPadding + _elementHeight + _elementConnectorRadius/2.0;
+    _elementStyle = args.emptyElementStyle;
 }
 
 Point PrintableInput::GetBeginPoint(uint64 index) const
 {
-    return Point{_upLayout->GetXMid(index), _beginPointY};
+    return Point{ _upLayout->GetXMid(index), _cy + (_elementStyle.height + _elementStyle.connectorRadius) / 2.0 };
 }
 
 Point PrintableInput::GetEndPoint(uint64 index) const
 {
-    return Point{_upLayout->GetXMid(index), _endPointY};
+    return Point{ _upLayout->GetXMid(index), _cy - (_elementStyle.height + _elementStyle.connectorRadius) / 2.0 };
 }
 
 double PrintableInput::GetWidth() const

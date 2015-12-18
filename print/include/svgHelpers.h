@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ElementXLayout.h"
+#include "IPrintable.h"
 
 #include "types.h"
 
@@ -20,8 +21,8 @@ void svgCircle(ostream& os, string svgClass, double cx, double cy, double radius
 void svgText(ostream& os, string text, string svgClass, double cx, double y, bool vertical = false);
 void svgText(ostream& os, double text, int precision, string svgClass, double cx, double y);
 void svgDots(ostream& os, double cx, double cy);
+void svgEdge(ostream& os, Point from, Point to, double edgeFlattness);
 void svgUse(ostream& os, string href, double x, double y);
-
 int GetPrecision(double value, int maxChars);
+string svgDefineElement(ostream& os, uint64 index, ElementStyleArgs styleArgs);
 
-string svgDefineElement(ostream& os, uint64 index, double width, double height, double cornerRadius, double connectorRadius);

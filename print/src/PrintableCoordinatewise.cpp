@@ -20,32 +20,35 @@ inline void printElement(ostream & os, const string& elementDefName, uint64 inde
 
 void PrintableCoordinatewise::Print(ostream & os, uint64 index, const vector<shared_ptr<IPrintable>>& layers) const
 {
-   double halfWidth = _elementWidth/2.0;
-   double elementTop = _cy - _elementHeight/2.0;
-   double elementBottom = elementTop + _elementHeight;
+   double elementTop = _cy - _elementStyle.height/2.0;
+   double elementBottom = elementTop + _elementStyle.height;
 
    // define the element shape
-   string elementDefName = svgDefineElement(os, index, _elementWidth, _elementHeight, _elementCornerRadius, _elementConnectorRadius);
+   string elementDefName = svgDefineElement(os, index, _elementStyle);
 
    // print the visible elements, before the dots
    for(uint64 k = 0; k< _upLayout->GetNumElementsBeforeDots(); ++k)
    {
        double elementXMid = _upLayout->GetXMid(k);
-       double elementLeft = elementXMid-halfWidth;
+       double elementLeft = elementXMid- _elementStyle.width / 2.0;
        double value = _values[k];
        int precision = GetPrecision(value, _valueMaxChars);
        printElement(os, elementDefName, k, elementXMid, elementLeft, _cy, elementTop, value, precision);
+       auto input = _coordinates[k];
+       svgEdge(os, layers[input.GetRow()]->GetBeginPoint(input.GetColumn()), GetEndPoint(k), _edgeFlattness);
    }
 
    // if abbreviated, draw the dots and the last element
    if(_upLayout->IsAbbreviated())
    {
-       uint64 k = _values.size()-1;
+       uint64 k = _values.size()-1; // TODO move all this crap into the function, make the fiunction a member
        double elementXMid = _upLayout->GetXMid(k);
-       double elementLeft = elementXMid-halfWidth;
+       double elementLeft = elementXMid- _elementStyle.width / 2.0;
        double value = _values[k];
        int precision = GetPrecision(value, _valueMaxChars);
        printElement(os, elementDefName, k, elementXMid, elementLeft, _cy, elementTop, value, precision);
+       auto input = _coordinates[k];
+       svgEdge(os, layers[input.GetRow()]->GetBeginPoint(input.GetColumn()), GetEndPoint(k), _edgeFlattness);
 
        double dotsXMid = _upLayout->GetDotsXMid();
        svgDots(os, dotsXMid, _cy);
@@ -54,27 +57,23 @@ void PrintableCoordinatewise::Print(ostream & os, uint64 index, const vector<sha
 
 void PrintableCoordinatewise::ComputeLayout(const CommandLineArgs& args, double layerYOffset)
 {
-    _upLayout = make_unique<ElementXLayout>(_values.size(), args.xLayerIndent, args.maxLayerWidth, args.elementWidth, args.xElementSpacing, args.xElementLeftPadding, args.xElementRightPadding, args.dotsWidth);
+    _upLayout = make_unique<ElementXLayout>(_values.size(), args.xLayerIndent, args.maxLayerWidth, args.coordinatewiseElementStyle.width, args.xElementSpacing, args.xElementLeftPadding, args.xElementRightPadding, args.dotsWidth);
 
-    _layerHeight = args.elementHeight + 2*args.yElementPadding;
-    _cy = layerYOffset + _layerHeight / 2.0;
-    _elementWidth = args.elementWidth;
-    _elementHeight = args.elementHeight;
-    _elementCornerRadius = args.elementCornerRadius;
-    _elementConnectorRadius = args.elementConnectorRadius;
+    _layerHeight = args.coordinatewiseElementStyle.height + 2*args.yElementPadding;
+    _cy = layerYOffset + _layerHeight / 2.0;   
+    _elementStyle = args.coordinatewiseElementStyle;
     _valueMaxChars = args.valueMaxChars;
-    _endPointY = layerYOffset + args.yElementPadding - _elementConnectorRadius/2.0;
-    _beginPointY = layerYOffset + args.yElementPadding + _elementHeight + _elementConnectorRadius/2.0;
+    _edgeFlattness = args.edgeFlattness;
 }
 
 Point PrintableCoordinatewise::GetBeginPoint(uint64 index) const
 {
-    return Point{_upLayout->GetXMid(index), _beginPointY} ;
+    return Point{_upLayout->GetXMid(index), _cy + (_elementStyle.height + _elementStyle.connectorRadius)/2.0} ;
 }
 
 Point PrintableCoordinatewise::GetEndPoint(uint64 index) const
 {
-    return Point{_upLayout->GetXMid(index), _endPointY};
+    return Point{_upLayout->GetXMid(index), - (_elementStyle.height + _elementStyle.connectorRadius) / 2.0};
 }
 
 double PrintableCoordinatewise::GetWidth() const

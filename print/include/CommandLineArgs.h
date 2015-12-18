@@ -4,7 +4,16 @@
 
 #include "types.h"
 
-struct CommandLineArgs
+
+struct ElementStyleArgs
+{
+    double width = 0;
+    double height = 0;
+    double cornerRadius = 0;
+    double connectorRadius = 0;
+};
+
+struct CommandLineArgs 
 {
     double xLayerIndent = 0;
     double yLayerIndent = 0;
@@ -17,22 +26,20 @@ struct CommandLineArgs
     double yElementPadding = 0;
     double yEmptyElementPadding = 0;
     double xElementSpacing = 0;
-    double elementWidth = 0;
-    double elementHeight = 0;
-    double emptyElementWidth = 0;
-    double emptyElementHeight = 0;
-    double elementCornerRadius = 0;
-    double elementConnectorRadius = 0;
     int valueMaxChars = 0;
 
+    double edgeFlattness = 0;
     double dotsWidth = 0;
+
+    ElementStyleArgs coordinatewiseElementStyle;
+    ElementStyleArgs emptyElementStyle;
 
     CommandLineArgs()
     {
         xLayerIndent = 20;
         yLayerIndent = 10;
         yLayerSpacing = 20;
-        maxLayerWidth = 800;
+        maxLayerWidth = 1200;
         layerCornerRadius = 10;
 
         xElementLeftPadding = 70;
@@ -40,14 +47,20 @@ struct CommandLineArgs
         yElementPadding = 14;
         yEmptyElementPadding = 12;
         xElementSpacing = 5;
-        elementWidth = 55;
-        elementHeight = 40;
-        emptyElementWidth = 40;
-        emptyElementHeight = 20;
-        elementCornerRadius = 5;
-        elementConnectorRadius = 5;
         valueMaxChars = 6;
 
+        edgeFlattness = 0.7;
         dotsWidth = 50;
+
+        coordinatewiseElementStyle.width = 55;
+        coordinatewiseElementStyle.height = 40;
+        coordinatewiseElementStyle.cornerRadius = 5;
+        coordinatewiseElementStyle.connectorRadius = 5;
+
+        emptyElementStyle.width = 40;
+        emptyElementStyle.height = 20;
+        emptyElementStyle.cornerRadius = 5;
+        emptyElementStyle.connectorRadius = 5;
+
     }
 };
