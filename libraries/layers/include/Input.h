@@ -1,4 +1,4 @@
-// Zero.h 
+// Input.h 
 
 #pragma once
 
@@ -8,17 +8,17 @@
 
 namespace layers
 {
-    class Zero : public Layer
+    class Input : public Layer
     {
     public:
 
         /// Ctor
         ///
-        Zero(uint64 size = 0);
+        Input(uint64 size = 0);
 
         /// Default copy ctor
         ///
-        Zero(const Zero&) = default;
+        Input(const Input&) = default;
 
         /// Computes the output of the layer
         ///

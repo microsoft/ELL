@@ -29,9 +29,6 @@
     <ClInclude Include="include\Map.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Zero.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\Shift.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -42,6 +39,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\layers.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -64,9 +64,6 @@
     <ClCompile Include="src\Map.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="include\Zero.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Shift.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -74,6 +71,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Coordinate.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Input.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

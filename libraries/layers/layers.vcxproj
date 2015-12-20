@@ -88,10 +88,10 @@
     <ClInclude Include="include\Sum.h" />
     <ClInclude Include="include\layers.h" />
     <ClInclude Include="include\Scale.h" />
-    <ClInclude Include="include\Zero.h" />
+    <ClInclude Include="include\Input.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\Zero.cpp" />
+    <ClCompile Include="include\Input.cpp" />
     <ClCompile Include="src\Coordinatewise.cpp" />
     <ClCompile Include="src\DecisionTreePath.cpp" />
     <ClCompile Include="src\Coordinate.cpp" />

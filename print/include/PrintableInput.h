@@ -9,7 +9,7 @@ using namespace layers;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableInput : public Zero, public PrintableEmpty
+struct PrintableInput : public Input, public PrintableEmpty
 {
 public:
     /// Returns the number of elements in the layer

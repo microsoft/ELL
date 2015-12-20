@@ -168,7 +168,7 @@ void PrintableMap::DeserializeLayers(JsonSerializer & serializer, shared_ptr<IPr
     auto type = serializer.Read<string>("_type");
     auto version = serializer.Read<int>("_version");
 
-    if (type == "Zero")
+    if (type == "Input")
     {
         auto upZero = make_shared<PrintableInput>();
         upZero->Deserialize(serializer, version);

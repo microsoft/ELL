@@ -4,7 +4,7 @@
 
 uint64 PrintableInput::Size() const
 {
-    return Zero::Size();
+    return Input::Size();
 }
 
 string PrintableInput::GetTypeName() const

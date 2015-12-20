@@ -48,7 +48,9 @@ namespace predictors
 
         vector<Coordinate> scaleOutputs;
         Coordinate::FillBack(scaleOutputs, rowIndex, _sp_predictor->w.Size());
-        map.PushBack(make_shared<Sum>(scaleOutputs));
+        rowIndex = map.PushBack(make_shared<Sum>(scaleOutputs));
+
+        //map.PushBack(make_shared<Shift>())
 
         // _sp_predictor->b TODO
     }

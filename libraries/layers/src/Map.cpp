@@ -10,7 +10,7 @@ namespace layers
 {
     Map::Map(uint64 inputLayerSize)
     {
-        _layers.push_back(make_shared<Zero>(inputLayerSize));
+        _layers.push_back(make_shared<Input>(inputLayerSize));
     }
 
     Map::Iterator Map::GetIterator(uint64 layerIndex) const
@@ -52,9 +52,9 @@ namespace layers
         auto type = serializer.Read<string>("_type");
         auto version = serializer.Read<int>("_version");
 
-        if (type == "Zero")
+        if (type == "Input")
         {
-            up = make_shared<Zero>();
+            up = make_shared<Input>();
         }
         else if (type == "Scale")
         {

@@ -1,4 +1,4 @@
-#include "Zero.h"
+#include "Input.h"
 
 #include <string>
 using std::to_string;
@@ -9,20 +9,20 @@ using std::runtime_error;
 namespace layers
 {
 
-    Zero::Zero(uint64 size) : Layer(size, Type::zero)
+    Input::Input(uint64 size) : Layer(size, Type::zero)
     {}
 
-    void Zero::Compute(const vector<unique_ptr<Layer>>& previousLayers)
+    void Input::Compute(const vector<unique_ptr<Layer>>& previousLayers)
     {
         Clear();
     }
 
-    VectorIterator<Coordinate> Zero::GetInputCoordinates(uint64 index) const
+    VectorIterator<Coordinate> Input::GetInputCoordinates(uint64 index) const
     {
         throw runtime_error("this place in the code should never be reached");
     }
 
-    void Zero::Serialize(JsonSerializer & serializer) const
+    void Input::Serialize(JsonSerializer & serializer) const
     {
         // version 1
         Layer::SerializeHeader(serializer, 1);
@@ -30,7 +30,7 @@ namespace layers
         serializer.Write("size", _output.size());
     }
 
-    void Zero::Deserialize(JsonSerializer & serializer, int version)
+    void Input::Deserialize(JsonSerializer & serializer, int version)
     {
         if (version == 1)
         {

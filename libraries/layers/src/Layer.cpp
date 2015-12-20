@@ -33,7 +33,7 @@ namespace layers
     void Layer::SerializeHeader(JsonSerializer& serializer, int version) const
     {
         // to make the file more readable
-        const string type_names[] = { "Zero", "Scale", "Shift", "Sum", "DecisionTreePath" };
+        const string type_names[] = { "Input", "Scale", "Shift", "Sum", "DecisionTreePath" };
         serializer.Write("_type", type_names[(int)_type]);
         serializer.Write("_version", version);
     }
