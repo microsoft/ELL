@@ -48,7 +48,7 @@ struct CommandLineArgs
         xLayerIndent = 20;
         yLayerIndent = 10;
         yLayerSpacing = 30;
-        maxLayerWidth = 1200;
+        maxLayerWidth = 700;
         layerCornerRadius = 10;
 
         xElementLeftPadding = 70;

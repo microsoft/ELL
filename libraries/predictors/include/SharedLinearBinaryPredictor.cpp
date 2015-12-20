@@ -3,11 +3,10 @@
 #include "Coordinate.h"
 using layers::Coordinate;
 
-#include "Scale.h"
+#include "layers.h"
 using layers::Scale;
-
-#include "Sum.h"
 using layers::Sum;
+using layers::Shift;
 
 #include <memory>
 using std::make_shared;
@@ -50,8 +49,6 @@ namespace predictors
         Coordinate::FillBack(scaleOutputs, rowIndex, _sp_predictor->w.Size());
         rowIndex = map.PushBack(make_shared<Sum>(scaleOutputs));
 
-        //map.PushBack(make_shared<Shift>())
-
-        // _sp_predictor->b TODO
+        map.PushBack(make_shared<Shift>(_sp_predictor->b, Coordinate{rowIndex, 0}));
     }
 }

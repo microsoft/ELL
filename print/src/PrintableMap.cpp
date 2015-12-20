@@ -33,11 +33,6 @@ R"aw(
         stroke-width:    2;
     }
     
-    rect.InputLayer
-    {
-        fill:        #22AA22;
-    }
-
     rect.SCALE
     {
         fill:        #FF2244;
@@ -45,17 +40,17 @@ R"aw(
 
     rect.SHIFT
     {
-        fill:        #22FF44;
+        fill:        #22AA11;
     }
 
     rect.SUM
     {
-        fill:        #2244FF;
+        fill:        #7744FF;
     }
 
     rect.IN
     {
-        fill:        #AA0044;
+        fill:        #AAAAAA;
     }
 
     rect.Element

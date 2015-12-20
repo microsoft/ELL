@@ -13,7 +13,13 @@ namespace layers
     Coordinatewise::Coordinatewise(const DoubleOperation & operation, Type type) : Layer(0, type), _operation(operation)
     {}
 
-    Coordinatewise::Coordinatewise(const vector<double> & values, const vector<Coordinate>& coordinates, const DoubleOperation& operation, Type type) : Layer(values.size(), type), _values(values), _coordinates(coordinates)
+    Coordinatewise::Coordinatewise(double value, Coordinate coordinate, const DoubleOperation & operation, Type type) : Layer(1, type), _operation(operation), _values(0), _coordinates(0)
+    {
+        _values.push_back(value);
+        _coordinates.push_back(coordinate);
+    }
+
+    Coordinatewise::Coordinatewise(const vector<double> & values, const vector<Coordinate>& coordinates, const DoubleOperation& operation, Type type) : Layer(values.size(), type), _operation(operation), _values(values), _coordinates(coordinates)
     {}
 
     void Coordinatewise::Compute(const vector<unique_ptr<Layer>>& previousLayers)

@@ -26,6 +26,10 @@ namespace layers
 
         /// Ctor
         ///
+        Coordinatewise(double value, Coordinate coordinate, const DoubleOperation& operation, Type type);
+
+        /// Ctor
+        ///
         Coordinatewise(const vector<double>& values, const vector<Coordinate>& coordinates, const DoubleOperation& operation, Type type);
 
         /// Computes the layer output
