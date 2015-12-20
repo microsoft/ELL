@@ -16,7 +16,6 @@ using std::dynamic_pointer_cast;
 
 void PrintableMap::Print(ostream & os, const CommandLineArgs& args)
 {
-
     os << 
 R"aw(
 <html>

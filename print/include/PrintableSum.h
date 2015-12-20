@@ -10,7 +10,7 @@ using namespace layers;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableSum : public Scale, public IPrintable
+struct PrintableSum : public Sum, public IPrintable
 {
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream
