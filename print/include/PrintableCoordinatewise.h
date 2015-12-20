@@ -60,6 +60,5 @@ private:
     double _cy;
     double _layerHeight;
     int _valueMaxChars;
-    double _edgeFlattness;
     ElementStyleArgs _elementStyle;
 };

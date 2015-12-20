@@ -58,7 +58,6 @@ void PrintableCoordinatewise::ComputeLayout(const CommandLineArgs& args, double 
     _cy = layerYOffset + _layerHeight / 2.0;   
     _elementStyle = args.coordinatewiseElementStyle;
     _valueMaxChars = args.valueMaxChars;
-    _edgeFlattness = args.edgeFlattness;
 }
 
 Point PrintableCoordinatewise::GetBeginPoint(uint64 index) const

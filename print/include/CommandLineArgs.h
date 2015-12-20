@@ -36,7 +36,6 @@ struct CommandLineArgs
     double xElementSpacing = 0;
     int valueMaxChars = 0;
 
-    double edgeFlattness = 0;
     double dotsWidth = 0;
 
     ElementStyleArgs coordinatewiseElementStyle;
