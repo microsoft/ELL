@@ -1,40 +1,16 @@
 // PrintableSum.cpp
 
 #include "PrintableSum.h"
+#include "svgHelpers.h"
 
-void PrintableSum::Print(ostream& os) const
-{}
+using std::make_unique;
 
-void PrintableSum::ComputeLayout(const CommandLineArgs& args, double yOffset)
-{}
+#include <string>
+using std::to_string;
 
-Point PrintableSum::GetBeginPoint(uint64 index) const
+uint64 PrintableSum::Size() const
 {
-    return Point();
-}
-
-Point PrintableSum::GetEndPoint(uint64 index) const
-{
-    return Point();
-}
-
-double PrintableSum::GetWidth() const
-{
-    return 700;
-}
-
-double PrintableSum::GetHeight() const
-{
-    return 50;
-}
-
-bool PrintableSum::IsHidden(uint64 index) const
-{
-    if (index == 0)
-    {
-        return false;
-    }
-    return true;
+    return Sum::Size();
 }
 
 string PrintableSum::GetTypeName() const

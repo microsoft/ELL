@@ -127,17 +127,19 @@ R"aw(;
         // print edges
         if (row > 0) // skip input layer
         {
-            auto layer = dynamic_pointer_cast<Layer>(_layers[row]);
-            uint64 layerSize = layer->Size();
+            uint64 layerSize = _layers[row]->Size();
             for (uint64 column = 0; column<layerSize; ++column)
             {
-                if (!_layers[row]->IsHidden(column)) // skip hidden elements
+                if (!_layers[row]->IsHidden(column)) // if output is hidden, hide edge
                 {
-                    auto inputCoordinates = layer->GetInputCoordinates(column);
+                    auto inputCoordinates = dynamic_pointer_cast<Layer>(_layers[row])->GetInputCoordinates(column);
                     while (inputCoordinates.IsValid()) // foreach incoming edge
                     {
                         auto inputCoord = inputCoordinates.Get();
-                        svgEdge(os, _layers[inputCoord.GetRow()]->GetBeginPoint(inputCoord.GetColumn()), _layers[row]->GetEndPoint(column), 0.7); // TODO
+                        if (!_layers[inputCoord.GetRow()]->IsHidden(inputCoord.GetColumn())) // if input is hidden, hide edge
+                        {
+                            svgEdge(os, _layers[inputCoord.GetRow()]->GetBeginPoint(inputCoord.GetColumn()), _layers[row]->GetEndPoint(column), args.edgeStyle.flattness);
+                        }
                         inputCoordinates.Next();
                     }
                 }

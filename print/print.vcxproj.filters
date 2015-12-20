@@ -22,6 +22,9 @@
     <ClCompile Include="src\HorizontalLayout.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\PrintableEmpty.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -54,6 +57,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\HorizontalLayout.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PrintableEmpty.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

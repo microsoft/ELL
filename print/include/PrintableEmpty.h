@@ -1,4 +1,4 @@
-// PrintableCoordinatewise.h
+// PrintableEmpty.h
 
 #pragma once
 
@@ -8,22 +8,11 @@
 #include "layers.h"
 using namespace layers;
 
-#include <memory>
-using std::unique_ptr;
-
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableCoordinatewise : public Scale, public IPrintable
+struct PrintableEmpty : public IPrintable
 {
 public:
-    /// Ctor
-    ///
-    PrintableCoordinatewise(string typeName);
-
-    /// Returns the number of elements in the layer
-    ///
-    virtual uint64 Size() const override;
-
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///
     virtual void Print(ostream& os) const override;
@@ -52,17 +41,9 @@ public:
     ///
     virtual bool IsHidden(uint64 index) const override;
 
-    /// \returns the layer type name
-    ///
-    virtual string GetTypeName() const override;
-
-private:
+protected:
     unique_ptr<HorizontalLayout> _upLayout = nullptr;
-
-    string _typeName;
-
     double _cy;
     double _layerHeight;
-    int _valueMaxChars;
     ElementStyleArgs _elementStyle;
 };

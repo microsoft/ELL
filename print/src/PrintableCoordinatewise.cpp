@@ -11,11 +11,9 @@ using std::to_string;
 PrintableCoordinatewise::PrintableCoordinatewise(string typeName) : _typeName(typeName)
 {}
 
-inline void printElement(ostream & os, const string& elementDefName, uint64 index, double elementXMid, double elementLeft, double elementYMid, double elementTop, double value, int precision)
+uint64 PrintableCoordinatewise::Size() const
 {
-    svgUse(os, elementDefName, elementLeft, elementTop);
-    svgText(os, value, precision, "Element", elementXMid, elementYMid - 5);
-    svgText(os, to_string(index), "ElementIndex", elementXMid, elementYMid + 10);
+    return Coordinatewise::Size();
 }
 
 void PrintableCoordinatewise::Print(ostream & os) const
@@ -38,7 +36,11 @@ void PrintableCoordinatewise::Print(ostream & os) const
        double elementLeft = elementXMid- _elementStyle.width / 2.0;
        double value = _values[k];
        int precision = GetPrecision(value, _valueMaxChars);
-       printElement(os, elementDefName, k, elementXMid, elementLeft, _cy, elementTop, value, precision);
+
+       svgUse(os, elementDefName, elementLeft, elementTop);
+       svgText(os, value, precision, "Element", elementXMid, _cy - 5);
+       svgText(os, to_string(k), "ElementIndex", elementXMid, _cy + 10);
+
        auto input = _coordinates[k];
    }
 

@@ -26,10 +26,9 @@ struct Point
 class IPrintable 
 {
 public:
-
-    ///// Returns the number of elements in the layer
-    /////
-    //virtual uint64 Size() const = 0;
+    /// Returns the number of elements in the layer
+    ///
+    virtual uint64 Size() const = 0;
 
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///

@@ -47,7 +47,7 @@ struct CommandLineArgs
     {
         xLayerIndent = 20;
         yLayerIndent = 10;
-        yLayerSpacing = 20;
+        yLayerSpacing = 30;
         maxLayerWidth = 1200;
         layerCornerRadius = 10;
 
@@ -70,7 +70,7 @@ struct CommandLineArgs
         emptyElementStyle.cornerRadius = 5;
         emptyElementStyle.connectorRadius = 5;
 
-        edgeStyle.flattness = 0.7;
-        edgeStyle.dashStyle = "4,2";
+        edgeStyle.flattness = 0.6;
+        edgeStyle.dashStyle = "7,2";
     }
 };
