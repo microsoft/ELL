@@ -46,9 +46,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\deserializer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Io.cpp">
       <Filter>src</Filter>
     </ClCompile>

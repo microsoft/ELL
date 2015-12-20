@@ -100,7 +100,6 @@
     <ClCompile Include="src\Io.cpp" />
     <ClCompile Include="src\Shift.cpp" />
     <ClCompile Include="src\Sum.cpp" />
-    <ClCompile Include="src\deserializer.cpp" />
     <ClCompile Include="src\Scale.cpp" />
   </ItemGroup>
   <ItemGroup>

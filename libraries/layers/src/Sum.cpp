@@ -10,12 +10,12 @@ namespace layers
     Sum::Sum() : Layer(1, Type::sum) 
     {}
 
-    Sum::Sum(double bias, const vector<Coordinate> & coordinates) : Layer(1, Type::sum), _bias(bias), _coordinates(coordinates)
+    Sum::Sum(const vector<Coordinate> & coordinates) : Layer(1, Type::sum), _coordinates(coordinates)
     {}
 
     void Sum::Compute(const vector<unique_ptr<Layer>>& previousLayers)
     {
-        double output = _bias;
+        double output = 0;
         for (auto coordinate : _coordinates)
         {
             output += previousLayers[coordinate.GetRow()]->Get(coordinate.GetColumn());
@@ -37,7 +37,6 @@ namespace layers
     {
         // version 1
         Layer::SerializeHeader(serializer, 1);
-        serializer.Write("bias", _bias);
         serializer.Write("coordinates", _coordinates);
     }
 
@@ -45,7 +44,6 @@ namespace layers
     {
         if (version == 1)
         {
-            serializer.Read("bias", _bias);
             serializer.Read("coordinates", _coordinates);
             _output.resize(1);
         }

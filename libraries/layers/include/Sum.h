@@ -24,7 +24,7 @@ namespace layers
 
         /// Ctor
         ///
-        Sum(double bias, const vector<Coordinate>& coordinates);
+        Sum(const vector<Coordinate>& coordinates);
 
         /// Computes the layer output
         ///
@@ -43,7 +43,6 @@ namespace layers
         virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion);
 
     protected:
-        double _bias;
         vector<Coordinate> _coordinates;
         static const int _currentVersion = 1;
     };
