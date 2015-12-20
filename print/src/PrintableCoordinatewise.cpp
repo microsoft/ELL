@@ -52,7 +52,7 @@ void PrintableCoordinatewise::Print(ostream & os) const
 
 void PrintableCoordinatewise::ComputeLayout(const CommandLineArgs& args, double layerYOffset)
 {
-    _upLayout = make_unique<ElementXLayout>(_values.size(), args.xLayerIndent, args.maxLayerWidth, args.coordinatewiseElementStyle.width, args.xElementSpacing, args.xElementLeftPadding, args.xElementRightPadding, args.dotsWidth);
+    _upLayout = make_unique<HorizontalLayout>(_values.size(), args.xLayerIndent, args.maxLayerWidth, args.coordinatewiseElementStyle.width, args.xElementSpacing, args.xElementLeftPadding, args.xElementRightPadding, args.dotsWidth);
 
     _layerHeight = args.coordinatewiseElementStyle.height + 2*args.yElementPadding;
     _cy = layerYOffset + _layerHeight / 2.0;   

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "IPrintable.h"
-#include "ElementXLayout.h"
+#include "HorizontalLayout.h"
 
 #include "layers.h"
 using namespace layers;
@@ -46,7 +46,7 @@ public:
     virtual string GetTypeName() const override;
 
 private:
-    unique_ptr<ElementXLayout> _upLayout = nullptr;
+    unique_ptr<HorizontalLayout> _upLayout = nullptr;
 
     double _cy;
     double _layerHeight;

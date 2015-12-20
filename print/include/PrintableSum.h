@@ -3,7 +3,7 @@
 #pragma once
 
 #include "IPrintable.h"
-#include "ElementXLayout.h"
+#include "HorizontalLayout.h"
 
 #include "layers.h"
 using namespace layers;

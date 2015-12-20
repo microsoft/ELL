@@ -44,7 +44,7 @@ void PrintableInput::Print(ostream & os) const
 
 void PrintableInput::ComputeLayout(const CommandLineArgs& args, double layerYOffset)
 {
-    _upLayout = make_unique<ElementXLayout>(_output.size(), args.xLayerIndent, args.maxLayerWidth, args.emptyElementStyle.width, args.xElementSpacing, args.xElementLeftPadding, args.xElementRightPadding, args.dotsWidth);
+    _upLayout = make_unique<HorizontalLayout>(_output.size(), args.xLayerIndent, args.maxLayerWidth, args.emptyElementStyle.width, args.xElementSpacing, args.xElementLeftPadding, args.xElementRightPadding, args.dotsWidth);
 
     _layerHeight = args.emptyElementStyle.height + 2*args.yEmptyElementPadding;
     _cy = layerYOffset + _layerHeight / 2.0;

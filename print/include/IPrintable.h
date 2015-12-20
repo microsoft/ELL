@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ElementXLayout.h"
+#include "HorizontalLayout.h"
 #include "CommandLineArgs.h"
 
 #include "layers.h"

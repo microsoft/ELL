@@ -1,4 +1,4 @@
-// ElementXLayout.h
+// HorizontalLayout.h
 
 # pragma once
 
@@ -18,13 +18,13 @@ using std::vector;
 #include <stdexcept>
 using std::runtime_error;
 
-class ElementXLayout
+class HorizontalLayout
 {
 public:
 
     /// Ctor
     ///
-    ElementXLayout(uint64 numElements, double xLayerIndent, double maxLayerWidth, double elementWidth, double xElementSpacing, double xElementLeftPadding, double xElementRightPadding, double dotsWidth);
+    HorizontalLayout(uint64 numElements, double xLayerIndent, double maxLayerWidth, double elementWidth, double xElementSpacing, double xElementLeftPadding, double xElementRightPadding, double dotsWidth);
 
     /// \returns the x-axis value of the middle of the requested element
     ///
@@ -42,18 +42,12 @@ public:
     ///
     bool IsHidden(uint64 index) const;
 
-    ///// \returns the number of elements before the dots
-    /////
-    //uint64 GetNumElementsBeforeDots() const;
-
     /// \returns the x-axis value of the middle of the dots
     ///
     double GetGapXMid() const;
 
 private:
     vector<double> _elementXMid;
-    //bool _abbreviated = false;
-    //uint64 _numElementsBeforeDots = 0;
     uint64 _numHiddenElements = 0;
     double _layerWidth = 0;
     double _dotsXMid = 0;

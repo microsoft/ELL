@@ -1,7 +1,7 @@
 // svgHelpers.cpp
 
 #include "svgHelpers.h"
-#include "ElementXLayout.h"
+#include "HorizontalLayout.h"
 
 #include <iomanip>
 using std::setprecision;

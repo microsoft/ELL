@@ -10,9 +10,6 @@
     <ClCompile Include="src\PrintableInput.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\ElementXLayout.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="include\svgHelpers.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -20,6 +17,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\PrintableSum.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HorizontalLayout.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,13 +47,13 @@
     <ClInclude Include="include\CommandLineArgs.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\ElementXLayout.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\svgHelpers.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\PrintableCoordinatewise.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HorizontalLayout.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
