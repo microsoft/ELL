@@ -23,6 +23,16 @@ namespace layers
         _output[0] = output;
     }
 
+    VectorIterator<Coordinate> Sum::GetInputCoordinates(uint64 index) const
+    {
+        if (index != 0)
+        {
+            throw runtime_error("sum only has one output");
+        }
+
+        return VectorIterator<Coordinate>(_coordinates.cbegin(), _coordinates.cend());
+    }
+
     void Sum::Serialize(JsonSerializer & serializer) const
     {
         // version 1

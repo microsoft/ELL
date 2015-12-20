@@ -79,12 +79,12 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\IterableArray.h" />
+    <ClInclude Include="include\VectorIterator.h" />
     <ClInclude Include="include\RealArray.h" />
     <ClInclude Include="include\types.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="tcc\IterableArray.tcc" />
+    <None Include="tcc\VectorIterator.tcc" />
     <None Include="tcc\RealArray.tcc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

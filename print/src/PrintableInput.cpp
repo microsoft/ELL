@@ -24,22 +24,20 @@ void PrintableInput::Print(ostream & os, uint64 index, const vector<shared_ptr<I
     string elementDefName = svgDefineElement(os, index, _elementStyle);
 
     // print the visible elements, before the dots
-    for(uint64 k = 0; k< _upLayout->GetNumElementsBeforeDots(); ++k)
+    for (uint64 k = 0; k < _output.size(); ++k)
     {
-        double elementXMid = _upLayout->GetXMid(k);
-        double elementLeft = elementXMid-halfWidth;
-        printElement(os, elementDefName, k, elementXMid, elementLeft, _cy, elementTop);
+        if (!_upLayout->IsHidden(k))
+        {
+            double elementXMid = _upLayout->GetXMid(k);
+            double elementLeft = elementXMid - halfWidth;
+            printElement(os, elementDefName, k, elementXMid, elementLeft, _cy, elementTop);
+        }
     }
 
     // if abbreviated, draw the dots and the last element
-    if(_upLayout->IsAbbreviated())
+    if(_upLayout->HasHidden())
     {
-        uint64 k = _output.size()-1;
-        double elementXMid = _upLayout->GetXMid(k);
-        double elementLeft = elementXMid-halfWidth;
-        printElement(os, elementDefName, k, elementXMid, elementLeft, _cy, elementTop);
-
-        double dotsXMid = _upLayout->GetDotsXMid();
+        double dotsXMid = _upLayout->GetGapXMid();
         svgDots(os, dotsXMid, _cy);
     }
 }
@@ -71,6 +69,11 @@ double PrintableInput::GetWidth() const
 double PrintableInput::GetHeight() const
 {
     return _layerHeight;
+}
+
+bool PrintableInput::IsHidden(uint64 index) const
+{
+    return _upLayout->IsHidden(index);
 }
 
 string PrintableInput::GetTypeName() const

@@ -31,11 +31,15 @@ public:
 
     /// \returns the layer width
     ///
-    virtual double GetWidth() const;
+    virtual double GetWidth() const override;
 
     /// \returns the layer height
     ///
-    virtual double GetHeight() const;
+    virtual double GetHeight() const override;
+
+    /// \returns True if the specified element is visible
+    ///
+    virtual bool IsHidden(uint64 index) const override;
 
     /// \returns the layer type name
     ///

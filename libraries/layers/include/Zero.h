@@ -24,6 +24,10 @@ namespace layers
         ///
         virtual void Compute(const vector<unique_ptr<Layer>>& previousLayers) override;
 
+        /// \Returns An Iterator to the inputs that the specified output depends on
+        ///
+        virtual VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;
+
         /// Serializes the Layer in json format
         ///
         virtual void Serialize(JsonSerializer & serializer) const override;

@@ -6,9 +6,7 @@ void PrintableSum::Print(ostream& os, uint64 index, const vector<shared_ptr<IPri
 {}
 
 void PrintableSum::ComputeLayout(const CommandLineArgs& args, double yOffset)
-{
-
-}
+{}
 
 Point PrintableSum::GetBeginPoint(uint64 index) const
 {
@@ -28,6 +26,15 @@ double PrintableSum::GetWidth() const
 double PrintableSum::GetHeight() const
 {
     return 50;
+}
+
+bool PrintableSum::IsHidden(uint64 index) const
+{
+    if (index == 0)
+    {
+        return false;
+    }
+    return true;
 }
 
 string PrintableSum::GetTypeName() const

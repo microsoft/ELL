@@ -4,7 +4,6 @@
 
 ElementXLayout::ElementXLayout(uint64 numElements, double xLayerIndent, double maxLayerWidth, double elementWidth, double xElementSpacing, double xElementLeftPadding, double xElementRightPadding, double dotsWidth) : _elementXMid(numElements)
 {
-    
     // width of the layer without abbreviated format 
     double layerWidth = xElementLeftPadding + xElementRightPadding + numElements * elementWidth + (numElements-1) * xElementSpacing;
     double elementWidthPlusSpace = elementWidth + xElementSpacing;
@@ -13,7 +12,7 @@ ElementXLayout::ElementXLayout(uint64 numElements, double xLayerIndent, double m
     if(layerWidth <= maxLayerWidth)
     {
         _layerWidth = layerWidth;
-        _numElementsBeforeDots = numElements;
+        _numHiddenElements = 0;
         double firstElementXMiddle = xLayerIndent + xElementLeftPadding + elementWidth/2.0;
         for(uint64 k = 0; k<numElements; ++k)
         {
@@ -21,38 +20,37 @@ ElementXLayout::ElementXLayout(uint64 numElements, double xLayerIndent, double m
         }
     }
     
-    //abbreviated
+    // abbreviated layer: shows as many visible elements as possible, followed by a gap, followed by one last element
     else
     {
         _layerWidth = maxLayerWidth;
-        _abbreviated = true;
 
         double elementsWidth = maxLayerWidth - xElementLeftPadding - xElementRightPadding;
-        double elementsBeforeDotsWidth = elementsWidth - dotsWidth - elementWidth - xElementSpacing;
-        _numElementsBeforeDots = uint64(elementsBeforeDotsWidth / (elementWidth + xElementSpacing));
+        double elementsBeforeGapWidth = elementsWidth - dotsWidth - elementWidth - xElementSpacing;
+        uint64 numElementsBeforeGap = uint64(elementsBeforeGapWidth / (elementWidth + xElementSpacing));
+        _numHiddenElements = numElements - 1 - numElementsBeforeGap;
         
-        if(elementsBeforeDotsWidth <= 0 || _numElementsBeforeDots == 0)
+        if(elementsBeforeGapWidth <= 0 || numElementsBeforeGap == 0)
         {
             throw runtime_error("unable to visualize layer within the specified constraints (increase width, decrease dots width or element width/spacing)");
         }
 
-        // elements before dots
+        // elements before gap
         double firstElementXMiddle = xLayerIndent + xElementLeftPadding + elementWidth/2.0;
-        for(uint64 k = 0; k<_numElementsBeforeDots; ++k)
+        for(uint64 k = 0; k<numElementsBeforeGap; ++k)
         {
             _elementXMid[k] = firstElementXMiddle + k * elementWidthPlusSpace;
         }
 
         // elements represented by dots
-        double dotsLeft = xLayerIndent + xElementLeftPadding + _numElementsBeforeDots * elementWidthPlusSpace;
+        double dotsLeft = xLayerIndent + xElementLeftPadding + numElementsBeforeGap * elementWidthPlusSpace;
         double dotsRight = xLayerIndent + _layerWidth - xElementRightPadding - elementWidthPlusSpace;
         _dotsXMid = (dotsLeft + dotsRight) / 2.0;
-        double numInvisibleElements = double(numElements - _numElementsBeforeDots - 1);
-        double invisibleElementsSpacing = (dotsRight - dotsLeft) / (numInvisibleElements-1);
+        double hiddenElementsSpacing = (dotsRight - dotsLeft) / (_numHiddenElements -1);
 
-        for(uint64 k = _numElementsBeforeDots; k<numElements-1; ++k)
+        for(uint64 k = numElementsBeforeGap; k<numElements-1; ++k)
         {
-            _elementXMid[k] = dotsLeft + (k- _numElementsBeforeDots) * invisibleElementsSpacing;
+            _elementXMid[k] = dotsLeft + (k- numElementsBeforeGap) * hiddenElementsSpacing;
         }
 
         /// element after dots
@@ -70,17 +68,22 @@ double ElementXLayout::GetWidth() const
     return _layerWidth;
 }
 
-bool ElementXLayout::IsAbbreviated() const
+bool ElementXLayout::HasHidden() const
 {
-    return _abbreviated;
+    return _numHiddenElements > 0;
 }
 
-uint64 ElementXLayout::GetNumElementsBeforeDots() const
+bool ElementXLayout::IsHidden(uint64 index) const
 {
-    return _numElementsBeforeDots;
+    uint64 numElements = _elementXMid.size();
+    if (index == numElements - 1 || index < numElements - 1 - _numHiddenElements)
+    {
+        return false;
+    }
+    return true;
 }
 
-double ElementXLayout::GetDotsXMid() const
+double ElementXLayout::GetGapXMid() const
 {
     return _dotsXMid;
 }

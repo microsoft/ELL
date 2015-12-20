@@ -34,5 +34,5 @@ public:
     static void DeserializeLayers(JsonSerializer& serializer, shared_ptr<IPrintable>& up);
 
 private:
-    vector<shared_ptr<IPrintable>> _printables;
+    vector<shared_ptr<IPrintable>> _layers;
 };

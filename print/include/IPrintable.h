@@ -27,6 +27,10 @@ class IPrintable
 {
 public:
 
+    ///// Returns the number of elements in the layer
+    /////
+    //virtual uint64 Size() const = 0;
+
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///
     virtual void Print(ostream& os, uint64 index, const vector<shared_ptr<IPrintable>>& layers) const = 0;
@@ -51,7 +55,11 @@ public:
     ///
     virtual double GetHeight() const = 0;
 
-    // \returns the layer type name
+    /// \returns True if the specified element is visible
+    ///
+    virtual bool IsHidden(uint64 index) const = 0;
+
+    /// \returns the layer type name
     ///
     virtual string GetTypeName() const = 0;
 };

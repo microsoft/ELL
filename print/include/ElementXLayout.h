@@ -34,22 +34,27 @@ public:
     ///
     double GetWidth() const;
 
-    /// \returns true if the layer is presented in abbreviated form
+    /// \returns True if the layer is presented in abbreviated form
     ///
-    bool IsAbbreviated() const;
+    bool HasHidden() const;
 
-    /// \returns the number of elements before the dots
+    /// \returns True if the specified element is hidden
     ///
-    uint64 GetNumElementsBeforeDots() const;
+    bool IsHidden(uint64 index) const;
+
+    ///// \returns the number of elements before the dots
+    /////
+    //uint64 GetNumElementsBeforeDots() const;
 
     /// \returns the x-axis value of the middle of the dots
     ///
-    double GetDotsXMid() const;
+    double GetGapXMid() const;
 
 private:
     vector<double> _elementXMid;
-    bool _abbreviated = false;
-    uint64 _numElementsBeforeDots = 0;
+    //bool _abbreviated = false;
+    //uint64 _numElementsBeforeDots = 0;
+    uint64 _numHiddenElements = 0;
     double _layerWidth = 0;
     double _dotsXMid = 0;
 };

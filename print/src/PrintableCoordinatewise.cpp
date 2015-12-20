@@ -27,30 +27,25 @@ void PrintableCoordinatewise::Print(ostream & os, uint64 index, const vector<sha
    string elementDefName = svgDefineElement(os, index, _elementStyle);
 
    // print the visible elements, before the dots
-   for(uint64 k = 0; k< _upLayout->GetNumElementsBeforeDots(); ++k)
+   for (uint64 k = 0; k < _values.size(); ++k)
    {
+       if (_upLayout->IsHidden(k))
+       {
+           continue;
+       }
+
        double elementXMid = _upLayout->GetXMid(k);
        double elementLeft = elementXMid- _elementStyle.width / 2.0;
        double value = _values[k];
        int precision = GetPrecision(value, _valueMaxChars);
        printElement(os, elementDefName, k, elementXMid, elementLeft, _cy, elementTop, value, precision);
        auto input = _coordinates[k];
-       svgEdge(os, layers[input.GetRow()]->GetBeginPoint(input.GetColumn()), GetEndPoint(k), _edgeFlattness);
    }
 
-   // if abbreviated, draw the dots and the last element
-   if(_upLayout->IsAbbreviated())
+   // if has hidden elements, draw the dots
+   if(_upLayout->HasHidden())
    {
-       uint64 k = _values.size()-1; // TODO move all this crap into the function, make the fiunction a member
-       double elementXMid = _upLayout->GetXMid(k);
-       double elementLeft = elementXMid- _elementStyle.width / 2.0;
-       double value = _values[k];
-       int precision = GetPrecision(value, _valueMaxChars);
-       printElement(os, elementDefName, k, elementXMid, elementLeft, _cy, elementTop, value, precision);
-       auto input = _coordinates[k];
-       svgEdge(os, layers[input.GetRow()]->GetBeginPoint(input.GetColumn()), GetEndPoint(k), _edgeFlattness);
-
-       double dotsXMid = _upLayout->GetDotsXMid();
+       double dotsXMid = _upLayout->GetGapXMid();
        svgDots(os, dotsXMid, _cy);
    }
 }
@@ -73,7 +68,7 @@ Point PrintableCoordinatewise::GetBeginPoint(uint64 index) const
 
 Point PrintableCoordinatewise::GetEndPoint(uint64 index) const
 {
-    return Point{_upLayout->GetXMid(index), - (_elementStyle.height + _elementStyle.connectorRadius) / 2.0};
+    return Point{_upLayout->GetXMid(index), _cy - (_elementStyle.height + _elementStyle.connectorRadius) / 2.0};
 }
 
 double PrintableCoordinatewise::GetWidth() const
@@ -84,6 +79,11 @@ double PrintableCoordinatewise::GetWidth() const
 double PrintableCoordinatewise::GetHeight() const
 {
     return _layerHeight;
+}
+
+bool PrintableCoordinatewise::IsHidden(uint64 index) const
+{
+    return _upLayout->IsHidden(index);
 }
 
 string PrintableCoordinatewise::GetTypeName() const

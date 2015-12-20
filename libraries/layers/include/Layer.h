@@ -1,9 +1,14 @@
 // Layer.h
 #pragma once
 
+#include "Coordinate.h"
+
 #include "types.h"
 #include "RealArray.h"
 using common::DoubleArray;
+
+#include "VectorIterator.h"
+using common::VectorIterator;
 
 #include "JsonSerializer.h"
 using utilities::JsonSerializer;
@@ -57,9 +62,13 @@ namespace layers
         ///
         void Clear();
 
-        /// \Returns An Iterator that points to the beginning of the vector.
+        /// \Returns An Iterator that points to the beginning of the output vector.
         ///
         Iterator GetIterator() const;
+
+        /// \Returns An Iterator to the inputs that the specified output depends on
+        ///
+        virtual VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const = 0;
 
         /// Serializes the Layer in json format
         ///
