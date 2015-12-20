@@ -48,8 +48,8 @@ int main(int argc, char* argv[])
         
         ofstream svgOStream = OpenOfstream(svgFile);
         map->Print(svgOStream, args);
-
     }
+
     catch (runtime_error e)
     {
         cerr << "runtime error: " << e.what() << std::endl;

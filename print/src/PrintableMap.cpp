@@ -73,7 +73,12 @@ R"aw(
         stroke:             #110011;
         stroke-width:       2;
         fill:               none;
-        stroke-dasharray:   6,2;
+        stroke-dasharray:   )aw"; 
+    
+    os << args.edgeStyle.dashStyle;
+        
+    os <<
+R"aw(;
     }
 
     text.Layer
@@ -97,6 +102,7 @@ R"aw(
 </style>
 
 <svg>
+
 )aw";
 
     // print layer by layer
@@ -116,7 +122,7 @@ R"aw(
         svgText(os, typeName, "Layer", layerLeft + 40, layerYMid, true);
 
         // let the layer print its contents
-        _layers[row]->Print(os, row, _layers);
+        _layers[row]->Print(os);
 
         // print edges
         if (row > 0) // skip input layer

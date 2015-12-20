@@ -10,27 +10,30 @@ namespace layers
     Sum::Sum() : Layer(1, Type::sum) 
     {}
 
-    Sum::Sum(const vector<Coordinate> & coordinates) : Layer(1, Type::sum), _coordinates(coordinates)
+    Sum::Sum(const vector<Coordinate> & coordinates) : Layer(1, Type::sum), _coordinates(0)
+    {
+        _coordinates.push_back(coordinates);
+    }
+
+    Sum::Sum(const vector<vector<Coordinate>>& coordinates) : Layer(coordinates.size(), Type::sum), _coordinates(coordinates)
     {}
 
     void Sum::Compute(const vector<unique_ptr<Layer>>& previousLayers)
     {
-        double output = 0;
-        for (auto coordinate : _coordinates)
+        for (uint64 k = 0; k<_coordinates.size(); ++k)
         {
-            output += previousLayers[coordinate.GetRow()]->Get(coordinate.GetColumn());
+            double output = 0;
+            for (auto coordinate : _coordinates[k])
+            {
+                output += previousLayers[coordinate.GetRow()]->Get(coordinate.GetColumn());
+            }
+            _output[k] = output;
         }
-        _output[0] = output;
     }
 
     VectorIterator<Coordinate> Sum::GetInputCoordinates(uint64 index) const
     {
-        if (index != 0)
-        {
-            throw runtime_error("sum only has one output");
-        }
-
-        return VectorIterator<Coordinate>(_coordinates.cbegin(), _coordinates.cend());
+        return VectorIterator<Coordinate>(_coordinates[index].cbegin(), _coordinates[index].cend());
     }
 
     void Sum::Serialize(JsonSerializer & serializer) const

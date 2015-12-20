@@ -15,7 +15,7 @@ struct PrintableSum : public Sum, public IPrintable
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///
-    virtual void Print(ostream& os, uint64 index, const vector<shared_ptr<IPrintable>>& layers) const override;
+    virtual void Print(ostream& os) const override;
 
     /// Computes the layer layout
     ///
@@ -50,5 +50,4 @@ private:
     double _elementTop;
     double _elementXMid;
     double _elementYMid;
-
 };

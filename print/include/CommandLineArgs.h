@@ -4,6 +4,8 @@
 
 #include "types.h"
 
+#include <string>
+using std::string;
 
 struct ElementStyleArgs
 {
@@ -11,6 +13,12 @@ struct ElementStyleArgs
     double height = 0;
     double cornerRadius = 0;
     double connectorRadius = 0;
+};
+
+struct EdgeStyleArgs
+{
+    string dashStyle = "";
+    double flattness = 0;
 };
 
 struct CommandLineArgs 
@@ -34,6 +42,8 @@ struct CommandLineArgs
     ElementStyleArgs coordinatewiseElementStyle;
     ElementStyleArgs emptyElementStyle;
 
+    EdgeStyleArgs edgeStyle;
+
     CommandLineArgs()
     {
         xLayerIndent = 20;
@@ -49,7 +59,6 @@ struct CommandLineArgs
         xElementSpacing = 5;
         valueMaxChars = 6;
 
-        edgeFlattness = 0.7;
         dotsWidth = 50;
 
         coordinatewiseElementStyle.width = 55;
@@ -62,5 +71,7 @@ struct CommandLineArgs
         emptyElementStyle.cornerRadius = 5;
         emptyElementStyle.connectorRadius = 5;
 
+        edgeStyle.flattness = 0.7;
+        edgeStyle.dashStyle = "4,2";
     }
 };

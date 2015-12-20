@@ -18,13 +18,13 @@ inline void printElement(ostream & os, const string& elementDefName, uint64 inde
     svgText(os, to_string(index), "ElementIndex", elementXMid, elementYMid + 10);
 }
 
-void PrintableCoordinatewise::Print(ostream & os, uint64 index, const vector<shared_ptr<IPrintable>>& layers) const
+void PrintableCoordinatewise::Print(ostream & os) const
 {
    double elementTop = _cy - _elementStyle.height/2.0;
    double elementBottom = elementTop + _elementStyle.height;
 
    // define the element shape
-   string elementDefName = svgDefineElement(os, index, _elementStyle);
+   string elementDefName = svgDefineElement(os, (void*)this, _elementStyle);
 
    // print the visible elements, before the dots
    for (uint64 k = 0; k < _values.size(); ++k)

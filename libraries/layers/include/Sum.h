@@ -18,13 +18,17 @@ namespace layers
     {
     public:
 
-        /// Ctor
+        /// Ctor - constructs an empty sum
         ///
         Sum();
 
-        /// Ctor
+        /// Ctor - constructs a single sum
         ///
         Sum(const vector<Coordinate>& coordinates);
+
+        /// Ctor - constructs a multi-dimensional sum
+        ///
+        Sum(const  vector<vector<Coordinate>>& coordinates);
 
         /// Computes the layer output
         ///
@@ -43,7 +47,7 @@ namespace layers
         virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion);
 
     protected:
-        vector<Coordinate> _coordinates;
+        vector<vector<Coordinate>> _coordinates;
         static const int _currentVersion = 1;
     };
 }

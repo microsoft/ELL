@@ -33,7 +33,7 @@ public:
 
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///
-    virtual void Print(ostream& os, uint64 index, const vector<shared_ptr<IPrintable>>& layers) const = 0;
+    virtual void Print(ostream& os) const = 0;
 
     /// Computes the layer layout
     ///

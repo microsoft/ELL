@@ -98,9 +98,9 @@ int GetPrecision(double value, int maxChars)
     return precision;
 }
 
-string svgDefineElement(ostream& os, uint64 index, ElementStyleArgs styleArgs)
+string svgDefineElement(ostream& os, void* uid, ElementStyleArgs styleArgs)
 {
-    string typeName = "Element" + to_string(index);
+    string typeName = "Element" + to_string((uint64)uid);
     os << "<defs>\n<g id = \"" << typeName << "\">\n";
     svgCircle(os, "Connector", styleArgs.width/2.0, 0, styleArgs.connectorRadius);
     svgCircle(os, "Connector", styleArgs.width/2.0, styleArgs.height, styleArgs.connectorRadius);

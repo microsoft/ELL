@@ -24,5 +24,5 @@ void svgDots(ostream& os, double cx, double cy);
 void svgEdge(ostream& os, Point from, Point to, double edgeFlattness);
 void svgUse(ostream& os, string href, double x, double y);
 int GetPrecision(double value, int maxChars);
-string svgDefineElement(ostream& os, uint64 index, ElementStyleArgs styleArgs);
+string svgDefineElement(ostream& os, void* uid, ElementStyleArgs styleArgs);
 

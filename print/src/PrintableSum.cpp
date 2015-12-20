@@ -2,7 +2,7 @@
 
 #include "PrintableSum.h"
 
-void PrintableSum::Print(ostream& os, uint64 index, const vector<shared_ptr<IPrintable>>& layers) const
+void PrintableSum::Print(ostream& os) const
 {}
 
 void PrintableSum::ComputeLayout(const CommandLineArgs& args, double yOffset)
