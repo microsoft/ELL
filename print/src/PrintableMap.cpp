@@ -101,13 +101,13 @@ R"aw(;
 )aw";
 
     // print layer by layer
-    double yOffset = args.yLayerIndent;
+    double yOffset = args.layerVerticalMargin;
     for (uint64 row = 0; row < _layers.size(); ++row)
     {
         _layers[row]->ComputeLayout(args, yOffset);
 
         string typeName = _layers[row]->GetTypeName();
-        double layerLeft = args.xLayerIndent;
+        double layerLeft = args.layerHorizontalMargin;
         double layerHeight = _layers[row]->GetHeight();
         double layerYMid = yOffset + layerHeight/2.0;
 
@@ -142,7 +142,7 @@ R"aw(;
         }
 
         // compute offset of next layer
-        yOffset += _layers[row]->GetHeight() + args.yLayerSpacing;
+        yOffset += _layers[row]->GetHeight() + args.layerVerticalSpacing;
     }
 
     os << 

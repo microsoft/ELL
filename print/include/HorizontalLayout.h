@@ -24,7 +24,7 @@ public:
 
     /// Ctor
     ///
-    HorizontalLayout(uint64 numElements, double xLayerIndent, double maxLayerWidth, double elementWidth, double xElementSpacing, double xElementLeftPadding, double xElementRightPadding, double dotsWidth);
+    HorizontalLayout(uint64 numElements, double layerHorizontalMargin, double layerMaxWidth, double elementWidth, double xElementSpacing, double elementHorizontalLeftPadding, double elementHorizontalRightPadding, double dotsWidth);
 
     /// \returns the x-axis value of the middle of the requested element
     ///

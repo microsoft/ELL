@@ -2,18 +2,18 @@
 
 #include "HorizontalLayout.h"
 
-HorizontalLayout::HorizontalLayout(uint64 numElements, double xLayerIndent, double maxLayerWidth, double elementWidth, double xElementSpacing, double xElementLeftPadding, double xElementRightPadding, double dotsWidth) : _elementXMid(numElements)
+HorizontalLayout::HorizontalLayout(uint64 numElements, double layerHorizontalMargin, double layerMaxWidth, double elementWidth, double xElementSpacing, double elementHorizontalLeftPadding, double elementHorizontalRightPadding, double dotsWidth) : _elementXMid(numElements)
 {
     // width of the layer without abbreviated format 
-    double layerWidth = xElementLeftPadding + xElementRightPadding + numElements * elementWidth + (numElements-1) * xElementSpacing;
+    double layerWidth = elementHorizontalLeftPadding + elementHorizontalRightPadding + numElements * elementWidth + (numElements-1) * xElementSpacing;
     double elementWidthPlusSpace = elementWidth + xElementSpacing;
 
     // non-abbreviated
-    if(layerWidth <= maxLayerWidth)
+    if(layerWidth <= layerMaxWidth)
     {
         _layerWidth = layerWidth;
         _numHiddenElements = 0;
-        double firstElementXMiddle = xLayerIndent + xElementLeftPadding + elementWidth/2.0;
+        double firstElementXMiddle = layerHorizontalMargin + elementHorizontalLeftPadding + elementWidth/2.0;
         for(uint64 k = 0; k<numElements; ++k)
         {
             _elementXMid[k] = firstElementXMiddle + k * elementWidthPlusSpace;
@@ -23,9 +23,9 @@ HorizontalLayout::HorizontalLayout(uint64 numElements, double xLayerIndent, doub
     // abbreviated layer: shows as many visible elements as possible, followed by a gap, followed by one last element
     else
     {
-        _layerWidth = maxLayerWidth;
+        _layerWidth = layerMaxWidth;
 
-        double elementsWidth = maxLayerWidth - xElementLeftPadding - xElementRightPadding;
+        double elementsWidth = layerMaxWidth - elementHorizontalLeftPadding - elementHorizontalRightPadding;
         double elementsBeforeGapWidth = elementsWidth - dotsWidth - elementWidth - xElementSpacing;
         uint64 numElementsBeforeGap = uint64(elementsBeforeGapWidth / (elementWidth + xElementSpacing));
         _numHiddenElements = numElements - 1 - numElementsBeforeGap;
@@ -36,15 +36,15 @@ HorizontalLayout::HorizontalLayout(uint64 numElements, double xLayerIndent, doub
         }
 
         // elements before gap
-        double firstElementXMiddle = xLayerIndent + xElementLeftPadding + elementWidth/2.0;
+        double firstElementXMiddle = layerHorizontalMargin + elementHorizontalLeftPadding + elementWidth/2.0;
         for(uint64 k = 0; k<numElementsBeforeGap; ++k)
         {
             _elementXMid[k] = firstElementXMiddle + k * elementWidthPlusSpace;
         }
 
         // elements represented by dots
-        double dotsLeft = xLayerIndent + xElementLeftPadding + numElementsBeforeGap * elementWidthPlusSpace;
-        double dotsRight = xLayerIndent + _layerWidth - xElementRightPadding - elementWidthPlusSpace;
+        double dotsLeft = layerHorizontalMargin + elementHorizontalLeftPadding + numElementsBeforeGap * elementWidthPlusSpace;
+        double dotsRight = layerHorizontalMargin + _layerWidth - elementHorizontalRightPadding - elementWidthPlusSpace;
         _dotsXMid = (dotsLeft + dotsRight) / 2.0;
         double hiddenElementsSpacing = (dotsRight - dotsLeft) / (_numHiddenElements -1);
 

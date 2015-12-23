@@ -4,73 +4,95 @@
 
 #include "types.h"
 
+// utilities
+#include "CommandLineParser.h"
+using utilities::ParsedArgSet;
+using utilities::CommandLineParser;
+
+// stl
 #include <string>
 using std::string;
 
 struct ElementStyleArgs
 {
-    double width = 0;
-    double height = 0;
-    double cornerRadius = 0;
-    double connectorRadius = 0;
+    double width;
+    double height;
+    double cornerRadius;
+    double connectorRadius;
+    double leftPadding;
+    double rightPadding;
+    double verticalPadding;
+    double horizontalSpacing;
+    double dotsWidth;
 };
 
 struct EdgeStyleArgs
 {
-    string dashStyle = "";
-    double flattness = 0;
+    string dashStyle;
+    double flattness;
 };
 
-struct CommandLineArgs 
+struct CommandLineArgs
 {
-    double xLayerIndent = 0;
-    double yLayerIndent = 0;
-    double yLayerSpacing = 0;
-    double maxLayerWidth = 0;
-    double layerCornerRadius = 0;
+    string layersFile;
+    string svgFile;
 
-    double xElementLeftPadding = 0;
-    double xElementRightPadding = 0;
-    double yElementPadding = 0;
-    double yEmptyElementPadding = 0;
-    double xElementSpacing = 0;
-    int valueMaxChars = 0;
+    double layerHorizontalMargin;
+    double layerVerticalMargin;
+    double layerVerticalSpacing;
+    double layerMaxWidth;
+    double layerCornerRadius;
 
-    double dotsWidth = 0;
+    int valueElementMaxChars;
 
-    ElementStyleArgs coordinatewiseElementStyle;
+    ElementStyleArgs valueElementStyle;
     ElementStyleArgs emptyElementStyle;
 
     EdgeStyleArgs edgeStyle;
+};
 
-    CommandLineArgs()
+struct ParsedCommandLineArgs : public CommandLineArgs, public ParsedArgSet
+{
+    ParsedCommandLineArgs(CommandLineParser& parser)
     {
-        xLayerIndent = 20;
-        yLayerIndent = 10;
-        yLayerSpacing = 30;
-        maxLayerWidth = 700;
-        layerCornerRadius = 10;
+        AddArgs(parser);
+    }
 
-        xElementLeftPadding = 70;
-        xElementRightPadding = 10;
-        yElementPadding = 14;
-        yEmptyElementPadding = 12;
-        xElementSpacing = 5;
-        valueMaxChars = 6;
+    virtual void AddArgs(CommandLineParser& parser)
+    {
+        parser.AddOption(layersFile, "layersFile", "lf", "Path to the input file that contains the layer information", "");
+        parser.AddOption(svgFile, "svgFile", "sf", "Path to the output svg file", "");
 
-        dotsWidth = 50;
+        // TODO: confirm that the filenames are set. Perhaps add method "AddRequiredOption"
 
-        coordinatewiseElementStyle.width = 55;
-        coordinatewiseElementStyle.height = 40;
-        coordinatewiseElementStyle.cornerRadius = 5;
-        coordinatewiseElementStyle.connectorRadius = 5;
+        parser.AddOption(layerHorizontalMargin, "layerHorizontalMargin", "lhm", "Horizontal distance to the left edge of each layer", 20);
+        parser.AddOption(layerVerticalMargin, "layerVerticalMargin", "lvm", "Vertical distnace to the top edge of the first layer", 10);
+        parser.AddOption(layerVerticalSpacing, "layerVerticalSpacing", "lvs", "The amount of vertical space between layers", 30);
+        parser.AddOption(layerMaxWidth, "layerMaxWidth", "lmw", "The maximum width of any layer", 700);
+        parser.AddOption(layerCornerRadius, "layerCornerRadius", "lcr", "Radius of layer rounded corners", 10);
+        
+        parser.AddOption(valueElementStyle.width, "valueElementWidth", "vew", "Width of each element in a layer that shows values", 55);
+        parser.AddOption(valueElementStyle.height, "valueElementHeight", "veh", "Height of each element in a layer that shows values", 40);
+        parser.AddOption(valueElementStyle.cornerRadius, "valueElementCornerRadius", "vecr", "Radius of rounded corners of elements in a layer that shows values", 5);
+        parser.AddOption(valueElementStyle.connectorRadius, "valueElementConnectorRadius", "vekr", "Radius of connectors on top and bottom of elements in a layer that shows values", 5);
+        parser.AddOption(valueElementStyle.leftPadding, "valueElementLeftPadding", "velp", "Horizontal distance between the left edge of a layer that shows values and its first element", 70);
+        parser.AddOption(valueElementStyle.rightPadding, "valueElementRightPadding", "verp", "Horizontal distance between the right edge of a layer that shows values and its last element", 10);
+        parser.AddOption(valueElementStyle.verticalPadding, "valueElementVerticalPadding", "vevp", "Vertical distance between the top/bottom edges of a layer that shows values and the top/bottom edges of its elements", 14);
+        parser.AddOption(valueElementStyle.horizontalSpacing, "valueElementHorizontalSpacing", "vehs", "Horizontal distance between consecutive elements in a layer that shows values", 5);
+        parser.AddOption(valueElementStyle.dotsWidth, "valueElementDotsWidth", "vedw", "Minimum width of the gap used to show the three dots, which show up when some of the elements are hidden", 45);
+        parser.AddOption(valueElementMaxChars, "valueElementMaxChars", "vemc", "Number of characters used to print the value in each element", 6);
 
-        emptyElementStyle.width = 40;
-        emptyElementStyle.height = 20;
-        emptyElementStyle.cornerRadius = 5;
-        emptyElementStyle.connectorRadius = 5;
+        parser.AddOption(emptyElementStyle.width, "emptyElementWidth", "eew", "Width of each element in a layer that doesn't show values", 40);
+        parser.AddOption(emptyElementStyle.height, "emptyElementHeight", "eeh", "Height of each element in a layer that doesn't show values", 20);
+        parser.AddOption(emptyElementStyle.cornerRadius, "emptyElementCornerRadius", "eecr", "Radius of rounded corners of elements in a layer that doesn't show values", 5);
+        parser.AddOption(emptyElementStyle.connectorRadius, "emptyElementConnectorRadius", "eekr", "Radius of connectors on top and bottom of elements in a layer that doesn't show values", 5);
+        parser.AddOption(emptyElementStyle.leftPadding, "emptyElementLeftPadding", "eelp", "Horizontal distance between the left edge of a layer that doesn't show values and its first element", 70);
+        parser.AddOption(emptyElementStyle.rightPadding, "emptyElementRightPadding", "eerp", "Horizontal distance between the right edge of a layer that doesn't show values and its last element", 10);
+        parser.AddOption(emptyElementStyle.verticalPadding, "emptyElementVerticalPadding", "eevp", "Vertical distance between the top/bottom edges of a layer that doesn't show values and the top/bottom edges of its elements", 14);
+        parser.AddOption(emptyElementStyle.horizontalSpacing, "emptyElementHorizontalSpacing", "eehs", "Horizontal distance between consecutive elements in a layer that doesn't show values", 5);
+        parser.AddOption(valueElementStyle.dotsWidth, "valueElementDotsWidth", "vedw", "Minimum width of the gap used to show the three dots, which show up when some of the elements are hidden", 45);
 
-        edgeStyle.flattness = 0.6;
-        edgeStyle.dashStyle = "7,2";
+        parser.AddOption(edgeStyle.flattness, "edgeFlattness", "ef", "Flatness of edges: between 0 and 1", 0.85);
+        parser.AddOption(edgeStyle.dashStyle, "edgeDashStyle", "eds", "The dash style of the edges", "5,2");
     }
 };

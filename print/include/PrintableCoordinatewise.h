@@ -63,6 +63,6 @@ private:
 
     double _cy;
     double _layerHeight;
-    int _valueMaxChars;
+    int _valueElementMaxChars;
     ElementStyleArgs _elementStyle;
 };

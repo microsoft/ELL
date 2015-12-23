@@ -35,7 +35,7 @@ void PrintableCoordinatewise::Print(ostream & os) const
        double elementXMid = _upLayout->GetXMid(k);
        double elementLeft = elementXMid- _elementStyle.width / 2.0;
        double value = _values[k];
-       int precision = GetPrecision(value, _valueMaxChars);
+       int precision = GetPrecision(value, _valueElementMaxChars);
 
        svgUse(os, elementDefName, elementLeft, elementTop);
        svgText(os, value, precision, "Element", elementXMid, _cy - 5);
@@ -54,12 +54,12 @@ void PrintableCoordinatewise::Print(ostream & os) const
 
 void PrintableCoordinatewise::ComputeLayout(const CommandLineArgs& args, double layerYOffset)
 {
-    _upLayout = make_unique<HorizontalLayout>(_values.size(), args.xLayerIndent, args.maxLayerWidth, args.coordinatewiseElementStyle.width, args.xElementSpacing, args.xElementLeftPadding, args.xElementRightPadding, args.dotsWidth);
+    _upLayout = make_unique<HorizontalLayout>(_values.size(), args.layerHorizontalMargin, args.layerMaxWidth, args.valueElementStyle.width, args.valueElementStyle.horizontalSpacing, args.valueElementStyle.leftPadding, args.valueElementStyle.rightPadding, args.valueElementStyle.dotsWidth); // just pass the entire tyle struct
 
-    _layerHeight = args.coordinatewiseElementStyle.height + 2*args.yElementPadding;
+    _layerHeight = args.valueElementStyle.height + 2*args.valueElementStyle.verticalPadding;
     _cy = layerYOffset + _layerHeight / 2.0;   
-    _elementStyle = args.coordinatewiseElementStyle;
-    _valueMaxChars = args.valueMaxChars;
+    _elementStyle = args.valueElementStyle;
+    _valueElementMaxChars = args.valueElementMaxChars;
 }
 
 Point PrintableCoordinatewise::GetBeginPoint(uint64 index) const

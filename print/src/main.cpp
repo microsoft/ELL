@@ -36,17 +36,19 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+
     try
     {
-        CommandLineArgs args;
-        auto layersFile = argv[1];
-        auto svgFile = argv[2];
+        // parse the command line
+        CommandLineParser commandLineParser(argc, argv);
+        ParsedCommandLineArgs args(commandLineParser);
+        commandLineParser.ParseArgs();
 
         // open file
-        ifstream layersFStream = OpenIfstream(layersFile);
+        ifstream layersFStream = OpenIfstream(args.layersFile);
         auto map = Map::Deserialize<PrintableMap>(layersFStream);
         
-        ofstream svgOStream = OpenOfstream(svgFile);
+        ofstream svgOStream = OpenOfstream(args.svgFile);
         map->Print(svgOStream, args);
     }
 
