@@ -30,13 +30,6 @@ using std::dynamic_pointer_cast;
 
 int main(int argc, char* argv[])
 {
-    if (argc != 3)
-    {
-        cerr << "usage: print.exe <layers file> <output file>\n";
-        return 1;
-    }
-
-
     try
     {
         // parse the command line
