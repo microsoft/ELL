@@ -2,7 +2,7 @@
 
 # pragma once
 
-#include "CommandLineArgs.h"
+#include "CommandLineArguments.h"
 
 #include "types.h"
 

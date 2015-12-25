@@ -1,4 +1,4 @@
-// CommandLineArgs.h
+// CommandLineArguments.h
 
 #pragma once
 
@@ -32,7 +32,7 @@ struct EdgeStyleArgs
     double flattness;
 };
 
-struct CommandLineArgs
+struct CommandLineArguments
 {
     string layersFile;
     string svgFile;
@@ -51,9 +51,9 @@ struct CommandLineArgs
     EdgeStyleArgs edgeStyle;
 };
 
-struct ParsedCommandLineArgs : public CommandLineArgs, public ParsedArgSet
+struct ParsedCommandLineArguments : public CommandLineArguments, public ParsedArgSet
 {
-    ParsedCommandLineArgs(CommandLineParser& parser)
+    ParsedCommandLineArguments(CommandLineParser& parser)
     {
         AddArgs(parser);
     }

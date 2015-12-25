@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug|x64">
@@ -9,6 +9,23 @@
       <Configuration>release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\CommandLineArguments.h" />
+    <ClInclude Include="include\Compilable.h" />
+    <ClInclude Include="include\CompilableInput.h" />
+    <ClInclude Include="include\CompilableScale.h" />
+    <ClInclude Include="include\CompilableShift.h" />
+    <ClInclude Include="include\CompilableSum.h" />
+    <ClInclude Include="include\Compiler.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CompilableScale.cpp" />
+    <ClCompile Include="src\CompilableShift.cpp" />
+    <ClCompile Include="src\CompilableSum.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\CompilableInput.cpp" />
+    <ClCompile Include="src\Compiler.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0A27D627-72FB-4158-95DB-C40EF3A35652}</ProjectGuid>
@@ -59,13 +76,13 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>include;..\libraries\utilities\include;..\libraries\mappings\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\libraries\common\include;..\libraries\utilities\include;..\libraries\layers\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\libraries\utilities\lib\$(Configuration);..\libraries\mappings\lib\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>utilities.lib;mappings.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\libraries\utilities\lib\$(Configuration);..\libraries\layers\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>utilities.lib;layers.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
@@ -80,26 +97,17 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>include;..\libraries\utilities\include;..\libraries\mappings\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\libraries\common\include;..\libraries\utilities\include;..\libraries\layers\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\libraries\utilities\lib\$(Configuration);..\libraries\mappings\lib\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>utilities.lib;mappings.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\libraries\utilities\lib\$(Configuration);..\libraries\layers\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>utilities.lib;layers.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\deserializer.cpp" />
-    <ClCompile Include="src\compile.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\compile.h" />
-    <ClInclude Include="include\compilable.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

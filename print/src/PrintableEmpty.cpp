@@ -37,7 +37,7 @@ void PrintableEmpty::Print(ostream & os) const
     }
 }
 
-void PrintableEmpty::ComputeLayout(const CommandLineArgs& args, double layerYOffset)
+void PrintableEmpty::ComputeLayout(const CommandLineArguments& args, double layerYOffset)
 {
     _upLayout = make_unique<HorizontalLayout>(Size(), args.layerHorizontalMargin, args.layerMaxWidth, args.emptyElementStyle.width, args.emptyElementStyle.horizontalSpacing, args.emptyElementStyle.leftPadding, args.emptyElementStyle.rightPadding, args.emptyElementStyle.dotsWidth);
 

@@ -92,7 +92,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\svgHelpers.cpp" />
     <ClCompile Include="src\HorizontalLayout.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PrintableEmpty.cpp" />
@@ -100,9 +99,10 @@
     <ClCompile Include="src\PrintableMap.cpp" />
     <ClCompile Include="src\PrintableCoordinatewise.cpp" />
     <ClCompile Include="src\PrintableSum.cpp" />
+    <ClCompile Include="src\svgHelpers.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\CommandLineArgs.h" />
+    <ClInclude Include="include\CommandLineArguments.h" />
     <ClInclude Include="include\IPrintable.h" />
     <ClInclude Include="include\HorizontalLayout.h" />
     <ClInclude Include="include\PrintableEmpty.h" />

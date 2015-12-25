@@ -2,7 +2,7 @@
 
 #include "IPrintable.h"
 #include "PrintableMap.h"
-#include "CommandLineArgs.h"
+#include "CommandLineArguments.h"
 
 // utilities
 #include "JsonSerializer.h"
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     {
         // parse the command line
         CommandLineParser commandLineParser(argc, argv);
-        ParsedCommandLineArgs args(commandLineParser);
+        ParsedCommandLineArguments args(commandLineParser);
         commandLineParser.ParseArgs();
 
         // open file

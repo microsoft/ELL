@@ -3,7 +3,7 @@
 #pragma once
 
 #include "HorizontalLayout.h"
-#include "CommandLineArgs.h"
+#include "CommandLineArguments.h"
 
 #include "layers.h"
 using namespace layers;
@@ -23,6 +23,7 @@ struct Point
 };
 
 /// An interface for classes that can print human-friendly descriptions of themselves
+///
 class IPrintable 
 {
 public:
@@ -36,7 +37,7 @@ public:
 
     /// Computes the layer layout
     ///
-    virtual void ComputeLayout(const CommandLineArgs& args, double yOffset) = 0;
+    virtual void ComputeLayout(const CommandLineArguments& args, double yOffset) = 0;
 
     /// \returns the begin-point of an arrow
     ///

@@ -1,20 +1,28 @@
-// compilable.cpp
+// Compilable.h
 
 #pragma once
 
-#include "layers.h"
-#include <iostream>
+#include "CommandLineArguments.h"
 
-using std::ostream;
+#include "layers.h"
 using namespace layers;
 
-namespace compile
+#include "types.h"
+
+#include <iostream>
+using std::ostream;
+
+#include <memory>
+using std::shared_ptr;
+
+/// An interface for classes that can print human-friendly descriptions of themselves
+///
+class Compilable 
 {
-    /// An interface for classes that can compile human-friendly descriptions of themselves
-    struct compilable 
-    {
-        /// compiles a human-firiendly description of the underlying class to an output stream
-        ///
-        virtual void compile(ostream& os, int indentation = 0, int enumeration = 0) = 0;
-    };
-}
+public:
+    /// Returns the number of elements in the layer
+    ///
+    virtual uint64 Size() const = 0;
+};
+
+ 

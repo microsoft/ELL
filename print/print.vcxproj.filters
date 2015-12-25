@@ -10,9 +10,6 @@
     <ClCompile Include="src\PrintableInput.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="include\svgHelpers.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\PrintableCoordinatewise.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -23,6 +20,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\PrintableEmpty.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\svgHelpers.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,9 +47,6 @@
     <ClInclude Include="include\PrintableSum.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\CommandLineArgs.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\svgHelpers.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -60,6 +57,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\PrintableEmpty.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CommandLineArguments.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

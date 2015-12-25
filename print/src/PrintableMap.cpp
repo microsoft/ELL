@@ -14,7 +14,7 @@ using std::to_string;
 #include <memory>
 using std::dynamic_pointer_cast;
 
-void PrintableMap::Print(ostream & os, const CommandLineArgs& args)
+void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
 {
     os << 
 R"aw(
