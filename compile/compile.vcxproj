@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Action.h" />
     <ClInclude Include="include\CommandLineArguments.h" />
     <ClInclude Include="include\Compilable.h" />
     <ClInclude Include="include\CompilableInput.h" />

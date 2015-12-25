@@ -29,5 +29,7 @@ public:
     static void DeserializeLayers(JsonSerializer& serializer, shared_ptr<Compilable>& up);
 
 private:
+    void SetActions();
+
     vector<shared_ptr<Compilable>> _layers;
 };

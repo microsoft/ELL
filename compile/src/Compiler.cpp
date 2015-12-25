@@ -54,3 +54,19 @@ void Compiler::DeserializeLayers(JsonSerializer & serializer, shared_ptr<Compila
     }
 }
 
+void Compiler::SetActions()
+{
+    if (_layers.size() == 0)
+    {
+        return;
+    }
+
+    // set trivial actions for output elements (actually, do this in a separate fiunction called SetOutputs)
+
+    // iterate over layers from the bottom up
+    for (uint64 i = _layers.size() - 1; i > 0; ++i)
+    {
+        // _layers[i]->SetActions(_layers);
+    }
+}
+

@@ -30,6 +30,9 @@
     <ClInclude Include="include\CommandLineArguments.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Action.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
