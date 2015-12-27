@@ -92,9 +92,6 @@
     <ClCompile Include="src\DenseDataVector.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\MappedParser.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\ParsingIterator.tcc">
@@ -116,6 +113,9 @@
       <Filter>tcc</Filter>
     </None>
     <None Include="tcc\DatasetLoader.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\MappedParser.tcc">
       <Filter>tcc</Filter>
     </None>
   </ItemGroup>

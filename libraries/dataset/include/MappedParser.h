@@ -14,6 +14,7 @@ namespace dataset
 {
     /// Wraps any other parser and passes it through a map
     ///
+    template<typename InternalParserType>
     class MappedParser
     {
     public:
@@ -46,8 +47,14 @@ namespace dataset
             // Private constructor that can only be called from SparseEntryParser
             Iterator();
             friend class MappedParser;
+
         };
 
         Iterator GetIterator(shared_ptr<const string> spExampleString, const char* pStr) const;
+
+    private:
+        InternalParserType _internalParser;
     };
 }
+
+#include "../tcc/MappedParser.tcc"

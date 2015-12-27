@@ -81,7 +81,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\MappedParser.cpp" />
     <ClCompile Include="src\ZeroDataVector.cpp" />
     <ClInclude Include="include\CompressedIntegerList.h" />
     <ClInclude Include="include\DatavectorBuilder.h" />
@@ -115,6 +114,7 @@
     <None Include="tcc\DataVectorBuilder.tcc" />
     <None Include="tcc\DenseDataVector.tcc" />
     <None Include="tcc\DatasetLoader.tcc" />
+    <None Include="tcc\MappedParser.tcc" />
     <None Include="tcc\ParsingIterator.tcc" />
     <None Include="tcc\SparseBinaryDataVector.tcc" />
     <None Include="tcc\SparseDataVector.tcc" />
