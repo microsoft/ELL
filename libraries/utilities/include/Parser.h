@@ -4,8 +4,7 @@
 
 #include "types.h"
 
-
-namespace dataset
+namespace utilities
 {
     class Parser
     {

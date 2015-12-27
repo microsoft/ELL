@@ -35,6 +35,9 @@
     <ClInclude Include="include\randomEngines.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Parser.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\CommandLineParser.tcc">
@@ -44,6 +47,9 @@
       <Filter>tcc</Filter>
     </None>
     <None Include="tcc\BinaryClassificationEvaluator.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\Parser.tcc">
       <Filter>tcc</Filter>
     </None>
   </ItemGroup>
@@ -64,6 +70,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\randomEngines.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Parser.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

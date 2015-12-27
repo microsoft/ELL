@@ -1,11 +1,12 @@
 // SupervisedExampleBuilder.tcc
 
-#include "Parser.h"
 #include "DatavectorBuilder.h"
+
+#include "Parser.h"
+using utilities::Parser;
 
 #include <cstdlib>
 using std::strtod;
-
 
 namespace dataset
 {

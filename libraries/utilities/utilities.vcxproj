@@ -82,6 +82,7 @@
     <ClInclude Include="include\CommandLineParser.h" />
     <ClInclude Include="include\files.h" />
     <ClInclude Include="include\JsonSerializer.h" />
+    <ClInclude Include="include\Parser.h" />
     <ClInclude Include="include\randomEngines.h" />
     <ClInclude Include="include\SharedArguments.h" />
   </ItemGroup>
@@ -89,6 +90,7 @@
     <None Include="tcc\BinaryClassificationEvaluator.tcc" />
     <None Include="tcc\CommandLineParser.tcc" />
     <None Include="tcc\JsonSerializer.tcc" />
+    <None Include="tcc\Parser.tcc" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\amalgamated_jsoncpp\jsoncpp.cpp" />
@@ -96,6 +98,7 @@
     <ClCompile Include="src\CommandLineParser.cpp" />
     <ClCompile Include="src\files.cpp" />
     <ClCompile Include="src\JsonSerializer.cpp" />
+    <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\randomEngines.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

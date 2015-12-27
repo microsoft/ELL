@@ -2,7 +2,6 @@
 
 #include "types.h"
 
-
 #include <cstdlib>
 using std::strtod;
 
@@ -12,7 +11,7 @@ using std::runtime_error;
 #include<string>
 using std::string;
 
-namespace dataset
+namespace utilities
 {
     // wrapper for strtof
     inline void cParse(const char*& pStr, char*& pEnd, float& value)
@@ -150,7 +149,7 @@ namespace dataset
 
     void Parser::Trim(const char*& pStr)
     {
-        while(isspace(*pStr))
+        while (isspace(*pStr))
         {
             ++pStr;
         }

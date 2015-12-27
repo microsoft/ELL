@@ -51,7 +51,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>include;..\linear\include;..\common\include;..\layers\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\linear\include;..\common\include;..\layers\include;..\utilities\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -68,7 +68,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>include;..\linear\include;..\common\include;..\layers\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\linear\include;..\common\include;..\layers\include;..\utilities\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -89,7 +89,6 @@
     <ClInclude Include="include\IntegerList.h" />
     <ClInclude Include="include\DatasetLoader.h" />
     <ClInclude Include="include\OnesDataVector.h" />
-    <ClInclude Include="include\Parser.h" />
     <ClInclude Include="include\ParsingIterator.h" />
     <ClInclude Include="include\SequentialLineIterator.h" />
     <ClInclude Include="include\SparseBinaryDataVector.h" />
@@ -114,7 +113,6 @@
     <None Include="tcc\DataVectorBuilder.tcc" />
     <None Include="tcc\DenseDataVector.tcc" />
     <None Include="tcc\DatasetLoader.tcc" />
-    <None Include="tcc\Parser.tcc" />
     <None Include="tcc\ParsingIterator.tcc" />
     <None Include="tcc\SparseBinaryDataVector.tcc" />
     <None Include="tcc\SparseDataVector.tcc" />

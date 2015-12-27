@@ -27,9 +27,6 @@
     <ClInclude Include="include\SparseEntryParser.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Parser.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\CompressedIntegerList.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -98,9 +95,6 @@
       <Filter>tcc</Filter>
     </None>
     <None Include="tcc\SupervisedExampleBuilder.tcc">
-      <Filter>tcc</Filter>
-    </None>
-    <None Include="tcc\Parser.tcc">
       <Filter>tcc</Filter>
     </None>
     <None Include="tcc\DataVectorBuilder.tcc">

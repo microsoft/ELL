@@ -1,7 +1,10 @@
 // SparseEntryParser.cpp
 
 #include "SparseEntryParser.h"
+
+// utilities
 #include "Parser.h"
+using utilities::Parser;
 
 #include <memory>
 using std::move;
