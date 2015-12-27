@@ -7,11 +7,6 @@
 
 #include "types.h"
 
-
-
-
-
-
 namespace dataset
 {
     /// Implements a sparse binary vector as an increasing list of the coordinates where the value is 1.0

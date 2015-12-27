@@ -81,6 +81,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\MappedParser.cpp" />
     <ClCompile Include="src\ZeroDataVector.cpp" />
     <ClInclude Include="include\CompressedIntegerList.h" />
     <ClInclude Include="include\DatavectorBuilder.h" />
@@ -88,6 +89,7 @@
     <ClInclude Include="include\IDataVector.h" />
     <ClInclude Include="include\IntegerList.h" />
     <ClInclude Include="include\DatasetLoader.h" />
+    <ClInclude Include="include\MappedParser.h" />
     <ClInclude Include="include\OnesDataVector.h" />
     <ClInclude Include="include\ParsingIterator.h" />
     <ClInclude Include="include\SequentialLineIterator.h" />
