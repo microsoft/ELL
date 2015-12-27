@@ -72,8 +72,5 @@
     <ClCompile Include="src\randomEngines.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Parser.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

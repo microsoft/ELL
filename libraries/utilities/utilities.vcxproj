@@ -98,7 +98,6 @@
     <ClCompile Include="src\CommandLineParser.cpp" />
     <ClCompile Include="src\files.cpp" />
     <ClCompile Include="src\JsonSerializer.cpp" />
-    <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\randomEngines.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
