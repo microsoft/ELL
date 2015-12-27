@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
         // create random number generator
         auto rng = GetRandomEngine(sharedArguments.dataRandomSeedString);
 
-        // Load a dataset, permute, and get a data iterator
+        // Load a dataset
         auto data = DatasetLoader::Load(lineIterator, sparseEntryParser);
 
         // create loss function
