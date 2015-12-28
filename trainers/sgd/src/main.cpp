@@ -25,6 +25,7 @@ using layers::Coordinate;
 // dataset
 #include "SequentialLineIterator.h"
 #include "SparseEntryParser.h"
+#include "MappedParser.h"
 #include "ParsingIterator.h"
 #include "DatasetLoader.h"
 using namespace dataset;
@@ -69,11 +70,18 @@ int main(int argc, char* argv[])
         // create parser
         SparseEntryParser sparseEntryParser;
 
-        // create random number generator
-        auto rng = GetRandomEngine(sharedArguments.dataRandomSeedString);
-
-        // Load a dataset
-        auto data = DatasetLoader::Load(lineIterator, sparseEntryParser);
+        // load dataset
+        RowDataset data;
+        if (true) // no map file
+        {
+            data = DatasetLoader::Load(lineIterator, sparseEntryParser);
+        }
+        else
+        {
+            Map map; // load Map
+            MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, map);
+            data = DatasetLoader::Load(lineIterator, mappedParser);
+        }
 
         // create loss function
         LogLoss loss(1);
@@ -84,6 +92,9 @@ int main(int argc, char* argv[])
 
         // create evaluator
         BinaryClassificationEvaluator evaluator;
+
+        // create random number generator
+        auto rng = GetRandomEngine(sharedArguments.dataRandomSeedString);
 
         // perform epochs
         for(int epoch = 0; epoch < trainerArguments.numEpochs; ++epoch)

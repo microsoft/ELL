@@ -84,6 +84,14 @@ namespace linear
         ///
         RowMatrix(const RowMatrix<DataVectorType>& other) = delete;
 
+        /// Default move assignment operator
+        ///
+        RowMatrix<DataVectorType>& operator=(RowMatrix<DataVectorType>&& other) = default; // add assignment operators to all classes
+
+        /// Deleted asignment operator
+        ///
+        RowMatrix<DataVectorType>& operator=(const RowMatrix<DataVectorType>& other) = delete;
+
         /// \returns The number of rows in the matrix
         ///
         virtual uint64 NumRows() const override;

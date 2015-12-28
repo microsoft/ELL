@@ -21,7 +21,7 @@ namespace dataset
     {
     public:
 
-        class Iterator
+        class Iterator : public IIndexValueIterator
         {
         public:
             /// default copy ctor

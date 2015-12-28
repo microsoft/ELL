@@ -4,6 +4,11 @@
 
 #include "types.h"
 
+// layers
+#include "Map.h"
+using layers::Map;
+
+// stl
 #include <string>
 using std::string;
 
@@ -18,42 +23,17 @@ namespace dataset
     class MappedParser
     {
     public:
+        /// Ctor
+        ///
+        MappedParser(const InternalParserType& internalParser, const Map& map);
 
-        class Iterator
-        {
-        public:
-            /// default copy ctor
-            ///
-            Iterator(Iterator&) = default;
-
-            /// Default move ctor
-            ///
-            Iterator(Iterator&&) = default;
-
-            /// \returns True if the iterator is currently pointing to a valid iterate
-            ///
-            bool IsValid() const;
-
-            /// Proceeds to the Next iterate
-            ///
-            void Next();
-
-            /// \returns The current index-value pair
-            ///
-            indexValue Get() const;
-
-        private:
-
-            // Private constructor that can only be called from SparseEntryParser
-            Iterator();
-            friend class MappedParser;
-
-        };
-
-        Iterator GetIterator(shared_ptr<const string> spExampleString, const char* pStr) const;
+        /// \returns An iterator that parses the given string
+        ///
+        Map::Iterator GetIterator(shared_ptr<const string> spExampleString, const char* pStr) const;
 
     private:
         InternalParserType _internalParser;
+        Map _map;
     };
 }
 
