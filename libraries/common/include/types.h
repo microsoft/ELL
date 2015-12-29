@@ -18,7 +18,7 @@ const uint16 maxUInt16 = numeric_limits<uint16>::max();
 const uint8 maxUInt8 = numeric_limits<uint8>::max();
 
 // An entry in a vector
-struct indexValue
+struct IndexValue
 {
     uint64 index;
     double value;

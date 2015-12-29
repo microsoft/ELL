@@ -13,16 +13,28 @@ using std::make_shared;
 namespace layers
 {
     template<typename IndexValueIteratorType, typename concept>
-    void Map::Compute(IndexValueIteratorType indexValueIterator)
+    Map::Iterator Map::Compute(IndexValueIteratorType IndexValueIterator, shared_ptr<vector<Coordinate>> spOutputCoordinates) const
     {
-        // copy the values to layer zero
-        _layers[0]->Set(indexValueIterator);
+        // allocate memory to store the output of the map calculation
+        auto outputs = AllocateOutputs();
+        
+        // set the input // TODO - move this functionality into RealArray/DoubleArray (possibly move those into utilities project)
+        uint64 inputSize = _layers[0]->Size();
+        while (IndexValueIterator.IsValid())
+        {
+            IndexValue IndexValue = IndexValueIterator.Get();
+            if (IndexValue.index >= inputSize) break;
+            (*outputs)[0][IndexValue.index] = IndexValue.value;
+            IndexValueIterator.Next();
+        }
 
         // compute layers 1,2,... in order
         for(uint64 i = 1; i<_layers.size(); ++i)
         {
-            _layers[i]->Compute(_layers);
+            _layers[i]->Compute(i, *outputs);
         }
+        
+        return Iterator(outputs, spOutputCoordinates);
     }
 
     template<typename MapType>

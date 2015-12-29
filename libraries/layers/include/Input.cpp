@@ -9,17 +9,22 @@ using std::runtime_error;
 namespace layers
 {
 
-    Input::Input(uint64 size) : Layer(size, Type::zero)
+    Input::Input(uint64 size) : Layer(Type::zero), _size(size)
     {}
 
-    void Input::Compute(const vector<unique_ptr<Layer>>& previousLayers)
+    uint64 Input::Size() const
     {
-        Clear();
+        return _size;
+    }
+
+    void Input::Compute(uint64 rowIndex, vector<vector<double>>& outputs) const
+    {
+        throw runtime_error("this code should never be reached");
     }
 
     VectorIterator<Coordinate> Input::GetInputCoordinates(uint64 index) const
     {
-        throw runtime_error("this place in the code should never be reached");
+        throw runtime_error("this code should never be reached");
     }
 
     void Input::Serialize(JsonSerializer & serializer) const
@@ -27,16 +32,14 @@ namespace layers
         // version 1
         Layer::SerializeHeader(serializer, 1);
 
-        serializer.Write("size", _output.size());
+        serializer.Write("size", _size);
     }
 
     void Input::Deserialize(JsonSerializer & serializer, int version)
     {
         if (version == 1)
         {
-            uint64 size = 0;
-            serializer.Read("size", size);
-            _output.resize(size);
+            serializer.Read("size", _size);
         }
         else
         {

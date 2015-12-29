@@ -25,13 +25,11 @@ namespace layers
     {
     public:
 
-        using Iterator = DoubleArray::Iterator;
-
         enum class Type { zero, scale, shift, sum, decisionTreePath };
 
         /// Default ctor
         ///
-        Layer(uint64 size, Type type);
+        Layer(Type type);
 
         /// Default copy ctor
         ///
@@ -41,30 +39,13 @@ namespace layers
         ///
         Layer(Layer&&) = default;
 
-        /// Initializes the idenity layer by copying the input
+        /// \returns The size of the layer's output
         ///
-        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        void Set(IndexValueIteratorType indexValueIterator);
+        virtual uint64 Size() const = 0;
 
         /// Computes the output of the layer
         ///
-        virtual void Compute(const vector<unique_ptr<Layer>>& previousLayers) = 0; 
-
-        /// \returns The size of the layer's output
-        ///
-        uint64 Size() const;
-
-        /// \returns The output value at a given index
-        ///
-        double Get(uint64 index) const;
-
-        /// Sets the output to zero
-        ///
-        void Clear();
-
-        /// \Returns An Iterator that points to the beginning of the output vector.
-        ///
-        Iterator GetIterator() const;
+        virtual void Compute(uint64 rowIndex, vector<vector<double>>& outputs) const = 0;
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///
@@ -82,9 +63,7 @@ namespace layers
         void SerializeHeader(JsonSerializer& serializer, int version) const;
 
         Type _type;
-        DoubleArray _output; // TODO make this vector<double> and move DoubleArray to linear library
     };
 }
 
-#include "../tcc/Layer.tcc"
 

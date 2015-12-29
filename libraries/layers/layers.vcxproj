@@ -104,7 +104,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\DecisionTreePath.tcc" />
-    <None Include="tcc\Layer.tcc" />
     <None Include="tcc\Map.tcc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

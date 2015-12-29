@@ -43,7 +43,7 @@ namespace dataset
 
             /// \returns The current index-value pair
             ///
-            indexValue Get() const;
+            IndexValue Get() const;
 
         private:
             /// private ctor, can only be called from SparseDataVector class

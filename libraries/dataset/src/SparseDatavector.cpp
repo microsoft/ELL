@@ -18,9 +18,9 @@ namespace dataset
     }
 
     template<typename ValueType, typename IntegerListType>
-    indexValue SparseDataVector<ValueType, IntegerListType>::Iterator::Get() const
+    IndexValue SparseDataVector<ValueType, IntegerListType>::Iterator::Get() const
     {
-        return indexValue{_index_iterator.Get(), (double)*_value_iterator};
+        return IndexValue{_index_iterator.Get(), (double)*_value_iterator};
     }
 
     template<typename ValueType, typename IntegerListType>

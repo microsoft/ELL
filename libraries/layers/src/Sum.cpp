@@ -7,27 +7,31 @@ using std::to_string;
 
 namespace layers
 {
-    Sum::Sum() : Layer(1, Type::sum) 
+    Sum::Sum() : Layer(Type::sum) 
     {}
 
-    Sum::Sum(const vector<Coordinate> & coordinates) : Layer(1, Type::sum), _coordinates(0)
+    Sum::Sum(const vector<Coordinate> & coordinates) : Layer(Type::sum), _coordinates(0)
     {
         _coordinates.push_back(coordinates);
     }
 
-    Sum::Sum(const vector<vector<Coordinate>>& coordinates) : Layer(coordinates.size(), Type::sum), _coordinates(coordinates)
+    Sum::Sum(const vector<vector<Coordinate>>& coordinates) : Layer(Type::sum), _coordinates(coordinates)
     {}
 
-    void Sum::Compute(const vector<unique_ptr<Layer>>& previousLayers)
+    uint64 Sum::Size() const
+    {
+        return 1;
+    }
+    void Sum::Compute(uint64 rowIndex, vector<vector<double>>& outputs) const
     {
         for (uint64 k = 0; k<_coordinates.size(); ++k)
         {
             double output = 0;
             for (auto coordinate : _coordinates[k])
             {
-                output += previousLayers[coordinate.GetRow()]->Get(coordinate.GetColumn());
+                output += outputs[coordinate.GetRow()][coordinate.GetColumn()];
             }
-            _output[k] = output;
+            outputs[rowIndex][k] = output;
         }
     }
 
@@ -48,7 +52,6 @@ namespace layers
         if (version == 1)
         {
             serializer.Read("coordinates", _coordinates);
-            _output.resize(1);
         }
         else
         {

@@ -37,9 +37,9 @@ int main(int argc, char* argv[])
         ParsedCommandLineArguments args(commandLineParser);
         commandLineParser.ParseArgs();
 
-        // open file
-        ifstream layersFStream = OpenIfstream(args.layersFile);
-        auto map = Map::Deserialize<PrintableMap>(layersFStream);
+        // open map file
+        ifstream mapFStream = OpenIfstream(args.mapFile);
+        auto map = Map::Deserialize<PrintableMap>(mapFStream);
         
         ofstream svgOStream = OpenOfstream(args.svgFile);
         map->Print(svgOStream, args);

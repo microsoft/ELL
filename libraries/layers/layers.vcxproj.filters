@@ -84,8 +84,5 @@
     <None Include="tcc\Map.tcc">
       <Filter>tcc</Filter>
     </None>
-    <None Include="tcc\Layer.tcc">
-      <Filter>tcc</Filter>
-    </None>
   </ItemGroup>
 </Project>

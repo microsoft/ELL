@@ -30,9 +30,13 @@ namespace layers
         ///
         Sum(const  vector<vector<Coordinate>>& coordinates);
 
+        /// \returns The size of the layer's output
+        ///
+        virtual uint64 Size() const override;
+
         /// Computes the layer output
         ///
-        virtual void Compute(const vector<unique_ptr<Layer>>& previousLayers);
+        virtual void Compute(uint64 rowIndex, vector<vector<double>>& outputs) const override;
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///

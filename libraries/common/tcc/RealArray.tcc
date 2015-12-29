@@ -17,9 +17,9 @@ namespace common
     }
 
     template<typename ValueType>
-    indexValue RealArray<ValueType>::Iterator::Get() const
+    IndexValue RealArray<ValueType>::Iterator::Get() const
     {
-        return indexValue{_index, (double)*_begin};
+        return IndexValue{_index, (double)*_begin};
     }
 
     template<typename ValueType>
@@ -43,14 +43,14 @@ namespace common
 
     template<typename ValueType>
     template<typename IndexValueIteratorType, typename concept>
-    RealArray<ValueType>::RealArray(IndexValueIteratorType indexValueIterator) : vector<RealArray>(0)
+    RealArray<ValueType>::RealArray(IndexValueIteratorType IndexValueIterator) : vector<RealArray>(0)
     {
-        while(indexValueIterator.IsValid())
+        while(IndexValueIterator.IsValid())
         {
-            auto entry = indexValueIterator.Get();
+            auto entry = IndexValueIterator.Get();
             resize(entry.index+1);
             (*this)[entry.index] = entry.value;
-            indexValueIterator.Next();
+            IndexValueIterator.Next();
         }
     }
     

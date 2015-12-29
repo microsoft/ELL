@@ -58,10 +58,10 @@ namespace dataset
         }
 
         // create index-value iterator from the rest of the string
-        auto indexValueIterator = _instanceParser.GetIterator(spExampleString, pStr);
+        auto IndexValueIterator = _instanceParser.GetIterator(spExampleString, pStr);
 
         // create instance
-        auto upInstance = DataVectorBuilder<DefaultDataVectorType>::Build(indexValueIterator);
+        auto upInstance = DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIterator);
 
         // return supervised example
         return SupervisedExample(move(upInstance), label, weight);

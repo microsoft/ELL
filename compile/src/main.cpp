@@ -37,8 +37,8 @@ int main(int argc, char* argv[])
         commandLineParser.ParseArgs();
 
         // open file
-        ifstream layersFStream = OpenIfstream(args.layersFile);
-        auto map = Map::Deserialize<Compiler>(layersFStream);
+        ifstream mapFStream = OpenIfstream(args.mapFile);
+        auto map = Map::Deserialize<Compiler>(mapFStream);
         
         ofstream svgOStream = OpenOfstream(args.codeFile);
     }

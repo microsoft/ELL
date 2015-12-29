@@ -21,7 +21,7 @@ namespace dataset
         /// Chooses the optimal DataVector representation for a list of index-value pairs
         ///
         template<typename IndexValueIteratorType>
-        static unique_ptr<IDataVector> Build(IndexValueIteratorType indexValueIterator);
+        static unique_ptr<IDataVector> Build(IndexValueIteratorType IndexValueIterator);
     };
 }
 

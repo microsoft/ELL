@@ -34,7 +34,7 @@ struct EdgeStyleArgs
 
 struct CommandLineArguments
 {
-    string layersFile;
+    string mapFile;
     string svgFile;
 
     double layerHorizontalMargin;
@@ -60,7 +60,7 @@ struct ParsedCommandLineArguments : public CommandLineArguments, public ParsedAr
 
     virtual void AddArgs(CommandLineParser& parser)
     {
-        parser.AddOption(layersFile, "layersFile", "lf", "Path to the input file that contains the layer information", "");
+        parser.AddOption(mapFile, "mapFile", "lf", "Path to the input file that contains the layer information", "");
         parser.AddOption(svgFile, "svgFile", "sf", "Path to the output svg file", "");
 
         // TODO: confirm that the filenames are set. Perhaps add method "AddRequiredOption"

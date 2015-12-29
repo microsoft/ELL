@@ -20,9 +20,13 @@ namespace layers
         ///
         Input(const Input&) = default;
 
+        /// \returns The size of the layer's output
+        ///
+        virtual uint64 Size() const override;
+
         /// Computes the output of the layer
         ///
-        virtual void Compute(const vector<unique_ptr<Layer>>& previousLayers) override;
+        virtual void Compute(uint64 rowIndex, vector<vector<double>>& outputs) const override;
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///
@@ -36,5 +40,7 @@ namespace layers
         ///
         virtual void Deserialize(JsonSerializer & serializer, int version) override;
 
+    private:
+        uint64 _size;
     };
 }

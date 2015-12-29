@@ -72,19 +72,27 @@ int main(int argc, char* argv[])
 
         // load dataset
         RowDataset data;
-        if (true) // no map file
+        if (sharedArguments.inputMapFile == "")
         {
             data = DatasetLoader::Load(lineIterator, sparseEntryParser);
         }
         else
         {
-            Map map; // load Map
-            MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, map);
+            // open map file
+            ifstream mapFStream = OpenIfstream(sharedArguments.inputMapFile);
+            auto map = Map::Deserialize<Map>(mapFStream);
+
+            // create list of output coordinates
+            auto spOutputCoordinates = make_shared<vector<Coordinate>>();
+            Coordinate::FillBack(*spOutputCoordinates, 0, 20, 0);
+            
+            // load data
+            MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, *map, spOutputCoordinates);
             data = DatasetLoader::Load(lineIterator, mappedParser);
         }
 
         // create loss function
-        LogLoss loss(1);
+        LogLoss loss;
 
         // create sgd trainer
         uint64 dim = data.NumColumns();
@@ -124,9 +132,9 @@ int main(int argc, char* argv[])
         predictor.AddTo(*map, inputCoordinates);
 
         // save map to output file
-        if (sharedArguments.outputFile != "")
+        if (sharedArguments.outputMapFile != "")
         {
-            ofstream outputFStream = OpenOfstream(sharedArguments.outputFile);
+            ofstream outputFStream = OpenOfstream(sharedArguments.outputMapFile);
             map->Serialize(outputFStream);
         }
     }

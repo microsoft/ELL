@@ -22,8 +22,43 @@ namespace layers
     class Map
     {
     public:
-        using Iterator = DoubleArray::Iterator;
 
+        class Iterator : public IIndexValueIterator
+        {
+        public:
+
+            /// Default copy ctor
+            ///
+            Iterator(const Iterator&) = default;
+
+            /// Default move ctor
+            ///
+            Iterator(Iterator&&) = default;
+
+            /// \returns True if the iterator is currently pointing to a valid iterate
+            ///
+            bool IsValid() const;
+
+            /// Proceeds to the Next iterate
+            ///
+            void Next();
+
+            /// \returns The current index-value pair
+            ///
+            IndexValue Get() const;
+
+        protected:
+            shared_ptr<vector<vector<double>>> _spOutputs;
+            shared_ptr<vector<Coordinate>> _spOutputCoordinates;
+            uint64 _index;
+
+            /// private ctor, can only be called from Map class
+            Iterator(shared_ptr<vector<vector<double>>> spOutput, shared_ptr<vector<Coordinate>> spOutputCoordinates);
+            friend Map;
+        };
+
+        /// Ctor
+        ///
         Map() = default;
         
         /// Ctor
@@ -33,11 +68,7 @@ namespace layers
         /// Computes the Map
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        void Compute(IndexValueIteratorType indexValueIterator);
-
-        /// \Returns An Iterator that points to the beginning of a specified layer's output.
-        ///
-        Iterator GetIterator(uint64 layerIndex = maxUInt64) const;
+        Iterator Compute(IndexValueIteratorType IndexValueIterator, shared_ptr<vector<Coordinate>> spOutputCoordinates) const;
 
         /// Adds a shared layer to the map
         /// \returns The row index of the added layer
@@ -58,7 +89,7 @@ namespace layers
         /// reads a Map from a stream
         ///
         template<typename MapType = Map>
-        static shared_ptr<MapType> Deserialize(istream& is);
+        static shared_ptr<MapType> Deserialize(istream& is); // TODO: why does this return a shared_ptr, while the dataset loader returns a moved object
 
         /// Static function for deserializing shared_ptr<Layer>
         ///
@@ -66,6 +97,8 @@ namespace layers
 
     protected:
         vector<shared_ptr<Layer>> _layers;
+
+        shared_ptr<vector<vector<double>>> AllocateOutputs() const;
     };
 }
 

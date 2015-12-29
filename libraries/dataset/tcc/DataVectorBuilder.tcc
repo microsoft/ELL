@@ -20,7 +20,7 @@ namespace dataset
 {
     template<typename DefaultDataVectorType>
     template<typename IndexValueIteratorType>
-    unique_ptr<IDataVector> DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIteratorType indexValueIterator)
+    unique_ptr<IDataVector> DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIteratorType IndexValueIterator)
     {
         static_assert(is_same<DefaultDataVectorType, FloatDataVector>::value || is_same<DefaultDataVectorType, SparseFloatDataVector>::value, "default DataVector type can be either FloatDataVector or SparseFloatDataVector");
 
@@ -30,10 +30,10 @@ namespace dataset
         bool containsNonShorts = false;
         uint64 numNonZeros = 0;
 
-        while(indexValueIterator.IsValid())
+        while(IndexValueIterator.IsValid())
         {
             // add entry to vector
-            auto entry = indexValueIterator.Get();
+            auto entry = IndexValueIterator.Get();
             up_vec->PushBack(entry.index, entry.value);
 
             // Update VectorStats
@@ -50,7 +50,7 @@ namespace dataset
             ++numNonZeros;
 
             // next
-            indexValueIterator.Next();
+            IndexValueIterator.Next();
         }
 
         // Logic to choose the best representation

@@ -19,8 +19,8 @@ namespace utilities
         string dataFile = "";
         bool dataFileHasWeights = false;
         string dataRandomSeedString = "";
-        string layersFile = "";
-        string outputFile = "";
+        string inputMapFile = "";
+        string outputMapFile = "";
     };
 
     /// A subclass of app_arguments that knows how to Add its members to the command line parser
@@ -37,8 +37,8 @@ namespace utilities
             parser.AddOption(dataFile, "dataFile", "df", "Path to the data file", "");
             parser.AddOption(dataFileHasWeights, "dataFileHasWeights", "hw", "Indicates whether the data file format specifies a weight per example", false);
             parser.AddOption(dataRandomSeedString, "dataRandomSeedString", "dr", "String used to initialize the random generator that permutes the dataset", "RandomString");
-            parser.AddOption(layersFile, "layersFile", "lf", "Path to the layers file", "");
-            parser.AddOption(outputFile, "outputFile", "of", "Path to the output file", "");
+            parser.AddOption(inputMapFile, "inputMapFile", "imf", "Path to the input map file", "");
+            parser.AddOption(outputMapFile, "outputMapFile", "omf", "Path to the output map file", "");
         }
     };
 }

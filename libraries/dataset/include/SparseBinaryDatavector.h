@@ -41,7 +41,7 @@ namespace dataset
 
             /// \returns The current index
             ///
-            uint64 GetIndex() const; // TODO: replace with indexValue class as return type
+            uint64 GetIndex() const; // TODO: replace with IndexValue class as return type
 
             /// \returns The current value
             ///
@@ -67,7 +67,7 @@ namespace dataset
         /// Converting constructor
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator);
+        SparseBinaryDataVectorBase(IndexValueIteratorType IndexValueIterator);
 
         /// Move constructor
         ///

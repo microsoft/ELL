@@ -4,13 +4,13 @@ namespace dataset
 {
     template<typename ValueType, typename IntegerListType>
     template<typename IndexValueIteratorType, typename concept>
-    SparseDataVector<ValueType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator)
+    SparseDataVector<ValueType, IntegerListType>::SparseDataVector(IndexValueIteratorType IndexValueIterator)
     {
-        while(indexValueIterator.IsValid())
+        while(IndexValueIterator.IsValid())
         {
-            auto indexValue = indexValueIterator.Get();
-            PushBack(indexValue.index, indexValue.value);
-            indexValueIterator.Next();
+            auto IndexValue = IndexValueIterator.Get();
+            PushBack(IndexValue.index, IndexValue.value);
+            IndexValueIterator.Next();
         }
     }
 }

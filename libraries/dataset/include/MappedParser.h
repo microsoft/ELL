@@ -25,7 +25,7 @@ namespace dataset
     public:
         /// Ctor
         ///
-        MappedParser(const InternalParserType& internalParser, const Map& map);
+        MappedParser(const InternalParserType& internalParser, const Map& map, shared_ptr<vector<Coordinate>> spOutputCoordinates);
 
         /// \returns An iterator that parses the given string
         ///
@@ -34,6 +34,7 @@ namespace dataset
     private:
         InternalParserType _internalParser;
         Map _map;
+        shared_ptr<vector<Coordinate>> _spOutputCoordinates;
     };
 }
 

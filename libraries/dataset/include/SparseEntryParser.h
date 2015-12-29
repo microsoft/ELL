@@ -42,12 +42,12 @@ namespace dataset
 
             /// \returns The current index-value pair
             ///
-            indexValue Get() const;
+            IndexValue Get() const;
 
         private:
             shared_ptr<const string> _spExampleString; // hold on to the shared ptr to make sure that string is not deleted
             const char* _currentPos = 0;
-            indexValue _currentIndexValue;
+            IndexValue _currentIndexValue;
             bool _isValid = true;
 
             // Private constructor that can only be called from SparseEntryParser

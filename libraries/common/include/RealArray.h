@@ -41,7 +41,7 @@ namespace common
 
             /// \returns The current index-value pair
             ///
-            indexValue Get() const;
+            IndexValue Get() const;
 
         protected:
             // abbreviate iterator type, for improved readability 
@@ -73,7 +73,7 @@ namespace common
         /// Converting constructor
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        RealArray(IndexValueIteratorType indexValueIterator);
+        RealArray(IndexValueIteratorType IndexValueIterator);
 
         /// \returns The size of the array
         ///

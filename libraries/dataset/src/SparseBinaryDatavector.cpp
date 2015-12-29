@@ -121,8 +121,8 @@ namespace dataset
         auto iterator = GetIterator();
         while(iterator.IsValid())
         {
-            auto indexValue = iterator.Get();
-            os << indexValue << '\t';
+            auto IndexValue = iterator.Get();
+            os << IndexValue << '\t';
             iterator.Next();
         }
     }
