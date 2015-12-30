@@ -36,7 +36,7 @@ namespace utilities
     }
 
     template <typename T>
-    static bool CommandLineParser::ParseVal(string str, T& result)
+    bool CommandLineParser::ParseVal(string str, T& result)
     {
         stringstream ss(str);
         ss >> result;
@@ -44,7 +44,7 @@ namespace utilities
     }
 
     template <typename T>
-    static bool CommandLineParser::ParseVal(string str, vector<pair<string, T>> val_names, T& result, string& result_string)
+    bool CommandLineParser::ParseVal(string str, vector<pair<string, T>> val_names, T& result, string& result_string)
     {
         bool did_find_one = false;
         for (const auto& val_name_pair : val_names)
@@ -66,7 +66,7 @@ namespace utilities
     }
 
     template <typename T>
-    static string CommandLineParser::ToString(const T& val)
+    string CommandLineParser::ToString(const T& val)
     {
         stringstream ss;
         ss << val;

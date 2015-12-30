@@ -77,7 +77,7 @@ namespace linear
     void RowMatrix<DataVectorType>::PushBackRow(DataVectorType&& row)
     {
         uint64 numColumns = row.Size();
-        _rows.emplace_back(move(row));
+        _rows.emplace_back(std::move(row));
 
         if(_num_columns < numColumns)
         {

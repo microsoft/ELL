@@ -11,7 +11,7 @@ using std::min;
 using std::max;
 using std::make_pair;
 
-
+#include <cmath>
 
 namespace tree_layout
 {
@@ -92,7 +92,7 @@ namespace tree_layout
         if (prev_layer_ancestors.size() > depth && prev_layer_ancestors[depth].size() > depth - 1)
         {
             // count down until we reach the root or our ancestor list diverges from the one stored in prev_layer_ancestors
-            for (uint64 d = depth - 1; d >= 0 && ancestors[d] != prev_layer_ancestors[depth][d]; --d)
+            for (int64_t d = depth - 1; d >= 0 && ancestors[d] != prev_layer_ancestors[depth][d]; --d)
             {
                 ++closest_common_ancestor;
             }

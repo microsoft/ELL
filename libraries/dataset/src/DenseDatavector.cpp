@@ -12,7 +12,7 @@ namespace dataset
         _data.reserve(DEFAULT_DENSE_VECTOR_CAPACITY);
     }
 
-     template<typename ValueType>
+    template<typename ValueType>
     void DenseDataVector<ValueType>::PushBack(uint64 index, double value)
     {
         if(value == 0)
@@ -90,14 +90,14 @@ namespace dataset
         _data.Print(os);
     }
 
-    template DenseDataVector<float>;
+    template class DenseDataVector<float>;
 
     IDataVector::type FloatDataVector::GetType() const
     {
         return type::dense_double;
     }
 
-    template DenseDataVector<double>;
+    template class DenseDataVector<double>;
 
     IDataVector::type DoubleDataVector::GetType() const
     {
