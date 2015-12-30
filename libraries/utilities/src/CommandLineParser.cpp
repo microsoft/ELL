@@ -119,6 +119,18 @@ namespace utilities
             // Need to set default args here, in case one of them enables a conditional argument set
             needs_reparse = SetDefaultArgs(unset_args) || needs_reparse;
         }
+
+        // Finally, invoke the post-parse callbacks
+        bool didPass = true;
+        for(const auto& callback: _parseCallbacks)
+        {
+            didPass = didPass && callback(*this);
+        }
+
+        if(!didPass)
+        {
+            throw std::runtime_error("Error in parse callbacks");
+        }
     }
 
     bool CommandLineParser::SetDefaultArgs(const set<string>& unset_args)
@@ -145,6 +157,16 @@ namespace utilities
 
     void CommandLineParser::AddOption(const OptionInfo& info)
     {
+        if(_options.find(info.name) != _options.end())
+        {
+            throw std::runtime_error("Error: adding same option more than once");
+        }
+
+        if(_shortToLongNameMap.find(info.shortName) != _shortToLongNameMap.end())
+        {
+            throw std::runtime_error("Error: adding same short name more than once");
+        }
+
         _options[info.name] = info;
         _docEntries.emplace_back(DocumentationEntry::type::option, info.name);
 
@@ -152,6 +174,11 @@ namespace utilities
         {
             _shortToLongNameMap[info.shortName] = info.name;
         }
+    }
+
+    void CommandLineParser::AddParseCallback(const ParseCallback& callback)
+    {
+        _parseCallbacks.push_back(callback);
     }
 
     inline bool FindBestMatch(string str, const vector<string>& val_names, string& result_string)  // TODO: this function is not used anywhere -erase it?
