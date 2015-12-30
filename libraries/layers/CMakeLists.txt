@@ -9,6 +9,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
 
 set (SRC src/Coordinate.cpp
+         src/CoordinateListFactory.cpp
          src/Coordinatewise.cpp
          src/DecisionTreePath.cpp
          src/Io.cpp
@@ -19,6 +20,7 @@ set (SRC src/Coordinate.cpp
          src/Sum.cpp)
 
 set (INCLUDE include/Coordinate.h
+             include/CoordinateListFactory.h
              include/Coordinatewise.h
              include/DecisionTreePath.h
              include/Input.cpp

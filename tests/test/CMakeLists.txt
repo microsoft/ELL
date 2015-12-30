@@ -12,4 +12,6 @@ set (SRC test.cpp)
 include_directories(../../libraries/utilities/include)
 
 add_executable(test_exe ${SRC})
-#target_link_libraries(test)
+
+target_link_libraries(test_exe utilities)
+

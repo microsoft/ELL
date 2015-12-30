@@ -8,7 +8,7 @@ PROJECT(predictors)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
 set (SRC src/MutableDecisionTree.cpp
-         include/SharedLinearBinaryPredictor.cpp)
+         src/SharedLinearBinaryPredictor.cpp)
 
 set (INCLUDE include/MutableDecisionTree.h
              include/SharedLinearBinaryPredictor.h)

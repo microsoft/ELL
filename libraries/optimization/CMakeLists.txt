@@ -7,7 +7,7 @@ PROJECT(optimization)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
-set (SRC include/AsgdOptimizer.cpp)
+set (SRC src/AsgdOptimizer.cpp)
 
 set (INCLUDE include/AsgdOptimizer.h)
 
