@@ -85,7 +85,7 @@
     <None Include="tcc\AsgdOptimizer.tcc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\AsgdOptimizer.cpp" />
+    <ClCompile Include="src\AsgdOptimizer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

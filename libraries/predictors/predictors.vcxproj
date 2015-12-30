@@ -83,8 +83,8 @@
     <ClInclude Include="include\SharedLinearBinaryPredictor.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\SharedLinearBinaryPredictor.cpp" />
     <ClCompile Include="src\MutableDecisionTree.cpp" />
+    <ClCompile Include="src\SharedLinearBinaryPredictor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\SharedLinearBinaryPredictor.tcc" />
