@@ -1,9 +1,10 @@
 //// test.cpp
 //
+
 //#include "layers.h"
 //#include "MutableDecisionTree.h"
 //#include "QpLayoutGenerator.h"
-//#include "CommandLineParser.h"
+#include "CommandLineParser.h"
 //#include <vector>
 //#include <memory>
 //#include <iostream>
@@ -46,17 +47,27 @@
 //    }
 //};
 //
+
+bool postParseCallback(utilities::CommandLineParser& parser)
+{
+    std::cout << "Callback" << std::endl;
+
+    return parser.HasOption("a");
+
+    return true;
+}
+
 int main(int argc, char* argv[])
-{}
-//    utilities::CommandLineParser cmdline(argc, argv);
-//
+{
+    utilities::CommandLineParser cmdline(argc, argv);
+
 //    // Add plain variables to the parser
-//    bool print_help;
-//    string filepath;
-//    cmdline.AddDocumentationString("---- General app parameters ----");
-//    cmdline.AddOption(filepath, "filepath", "f", "Output filepath", "");
-//    cmdline.AddOption(print_help, "help", "", "Print help and exit", "");
-//
+    bool print_help;
+    string filepath;
+    cmdline.AddDocumentationString("---- General app parameters ----");
+    cmdline.AddOption(filepath, "filepath", "f", "Output filepath", "");
+    cmdline.AddOption(print_help, "help", "", "Print help and exit", "");
+
 //    // Here is a convenient way to use a struct of parameters:
 //    parsed_params Params(cmdline);
 //
@@ -66,8 +77,11 @@ int main(int argc, char* argv[])
 //        return 0;
 //    }
 //
-//    // Now actually parse the arguments and set the corresponding parameter values
-//    cmdline.ParseArgs();
+
+    cmdline.AddParseCallback(postParseCallback);
+
+    // Now actually parse the arguments and set the corresponding parameter values
+    cmdline.ParseArgs();
 //
 //    cout << "numIter: " << Params.numIter << endl;
 //    cout << "thresh: " << Params.thresh << endl;
@@ -125,8 +139,9 @@ int main(int argc, char* argv[])
 //        cerr << "runtime error: " << e.what() << std::endl;
 //    }
 //
-//    return 0;
-//}
+    return 0;
+}
+
 //
 //#include "deserializer.h"
 //void layers::Deserialize(JsonSerializer& serializer, std::shared_ptr<Mapping>& up)
