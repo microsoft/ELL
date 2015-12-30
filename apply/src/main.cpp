@@ -13,7 +13,7 @@ using namespace utilities;
 #include "layers.h"
 using namespace layers;
 
-_USE_DEFAULT_DESERIALIZER_  // use the default deserializer for layers
+// _USE_DEFAULT_DESERIALIZER_  // use the default deserializer for layers
 
 // data iterators
 //#include "SequentialLineIterator.h"
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         cmd_instanceParser.ParseArgs();
 
         // open map file
-        ifstream map_fs = OpenIfstream(shared_arguments.mapFile);
+        ifstream map_fs = OpenIfstream(shared_arguments.inputMapFile);
 
         // open data file
         ifstream data_fs = OpenIfstream(shared_arguments.dataFile);
