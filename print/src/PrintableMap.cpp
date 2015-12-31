@@ -35,22 +35,22 @@ R"aw(
     
     rect.SCALE
     {
-        fill:        #FF2244;
+        fill:        #06aed5;
     }
 
     rect.SHIFT
     {
-        fill:        #22AA11;
+        fill:        #f15156;
     }
 
     rect.SUM
     {
-        fill:        #7744FF;
+        fill:        #cf4eff;
     }
 
     rect.IN
     {
-        fill:        #AAAAAA;
+        fill:        #bbbbbb;
     }
 
     rect.Element
@@ -101,18 +101,18 @@ R"aw(;
 )aw";
 
     // print layer by layer
-    double yOffset = args.layerVerticalMargin;
+    double layerTop = args.layerVerticalMargin;
+    double layerLeft = args.layerHorizontalMargin;
     for (uint64 row = 0; row < _layers.size(); ++row)
     {
-        _layers[row]->ComputeLayout(args, yOffset);
+        _layers[row]->ComputeLayout(args, layerLeft, layerTop);
 
         string typeName = _layers[row]->GetTypeName();
-        double layerLeft = args.layerHorizontalMargin;
         double layerHeight = _layers[row]->GetHeight();
-        double layerYMid = yOffset + layerHeight/2.0;
+        double layerYMid = layerTop + layerHeight/2.0;
 
         // draw the layer rectangle
-        svgRect(os, typeName, layerLeft, yOffset, args.layerCornerRadius, _layers[row]->GetWidth(), layerHeight);
+        svgRect(os, typeName, layerLeft, layerTop, args.layerCornerRadius, _layers[row]->GetWidth(), layerHeight);
         svgText(os, to_string(row), "Layer", layerLeft + 15, layerYMid);
         svgText(os, typeName, "Layer", layerLeft + 40, layerYMid, true);
 
@@ -142,7 +142,8 @@ R"aw(;
         }
 
         // compute offset of next layer
-        yOffset += _layers[row]->GetHeight() + args.layerVerticalSpacing;
+        layerTop += _layers[row]->GetHeight() + args.layerVerticalSpacing;
+        layerLeft += args.layerHorizontalMarginIncrement;
     }
 
     os << 

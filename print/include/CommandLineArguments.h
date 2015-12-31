@@ -38,6 +38,7 @@ struct CommandLineArguments
     string svgFile;
 
     double layerHorizontalMargin;
+    double layerHorizontalMarginIncrement;
     double layerVerticalMargin;
     double layerVerticalSpacing;
     double layerMaxWidth;
@@ -60,12 +61,13 @@ struct ParsedCommandLineArguments : public CommandLineArguments, public ParsedAr
 
     virtual void AddArgs(CommandLineParser& parser)
     {
-        parser.AddOption(mapFile, "mapFile", "lf", "Path to the input file that contains the layer information", "");
-        parser.AddOption(svgFile, "svgFile", "sf", "Path to the output svg file", "");
+        parser.AddOption(mapFile, "inputMapFile", "imf", "Path to the input file that contains the map information", "");
+        parser.AddOption(svgFile, "outputSvgFile", "osf", "Path to the output svg file", "");
 
         // TODO: confirm that the filenames are set. Perhaps add method "AddRequiredOption"
 
         parser.AddOption(layerHorizontalMargin, "layerHorizontalMargin", "lhm", "Horizontal distance to the left edge of each layer", 20);
+        parser.AddOption(layerHorizontalMarginIncrement, "layerHorizontalMarginIncrement", "lhmi", "Ammount by which the horizontal distance to the left edge of each layer increases", 13);
         parser.AddOption(layerVerticalMargin, "layerVerticalMargin", "lvm", "Vertical distnace to the top edge of the first layer", 10);
         parser.AddOption(layerVerticalSpacing, "layerVerticalSpacing", "lvs", "The amount of vertical space between layers", 30);
         parser.AddOption(layerMaxWidth, "layerMaxWidth", "lmw", "The maximum width of any layer", 700);
@@ -92,7 +94,7 @@ struct ParsedCommandLineArguments : public CommandLineArguments, public ParsedAr
         parser.AddOption(emptyElementStyle.horizontalSpacing, "emptyElementHorizontalSpacing", "eehs", "Horizontal distance between consecutive elements in a layer that doesn't show values", 5);
         parser.AddOption(emptyElementStyle.dotsWidth, "emptyElementDotsWidth", "eedw", "Minimum width of the gap used to show the three dots, which show up when some of the elements are hidden", 45);
 
-        parser.AddOption(edgeStyle.flattness, "edgeFlattness", "ef", "Flatness of edges: between 0 and 1", 0.85);
+        parser.AddOption(edgeStyle.flattness, "edgeFlattness", "ef", "Flatness of edges: between 0 and 1", 0.65);
         parser.AddOption(edgeStyle.dashStyle, "edgeDashStyle", "eds", "The dash style of the edges", "5,2");
     }
 };

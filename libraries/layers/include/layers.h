@@ -6,4 +6,5 @@
 #include "Sum.h"
 #include "DecisionTreePath.h"
 #include "Map.h"
+#include "CoordinateListFactory.h"
 

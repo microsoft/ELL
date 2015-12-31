@@ -52,12 +52,12 @@ void PrintableCoordinatewise::Print(ostream & os) const
    }
 }
 
-void PrintableCoordinatewise::ComputeLayout(const CommandLineArguments& args, double layerYOffset)
+void PrintableCoordinatewise::ComputeLayout(const CommandLineArguments& args, double layerLeft, double layerTop)
 {
-    _upLayout = make_unique<HorizontalLayout>(_values.size(), args.layerHorizontalMargin, args.layerMaxWidth, args.valueElementStyle.width, args.valueElementStyle.horizontalSpacing, args.valueElementStyle.leftPadding, args.valueElementStyle.rightPadding, args.valueElementStyle.dotsWidth); // just pass the entire tyle struct
+    _upLayout = make_unique<HorizontalLayout>(_values.size(), layerLeft, args.layerMaxWidth, args.valueElementStyle.width, args.valueElementStyle.horizontalSpacing, args.valueElementStyle.leftPadding, args.valueElementStyle.rightPadding, args.valueElementStyle.dotsWidth); // just pass the entire tyle struct
 
     _layerHeight = args.valueElementStyle.height + 2*args.valueElementStyle.verticalPadding;
-    _cy = layerYOffset + _layerHeight / 2.0;   
+    _cy = layerTop + _layerHeight / 2.0;   
     _elementStyle = args.valueElementStyle;
     _valueElementMaxChars = args.valueElementMaxChars;
 }

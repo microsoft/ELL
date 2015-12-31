@@ -37,7 +37,7 @@ public:
 
     /// Computes the layer layout
     ///
-    virtual void ComputeLayout(const CommandLineArguments& args, double yOffset) = 0;
+    virtual void ComputeLayout(const CommandLineArguments& args, double layerLeft, double layerTop) = 0;
 
     /// \returns the begin-point of an arrow
     ///
