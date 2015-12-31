@@ -9,10 +9,12 @@ using std::move;
 #include <string>
 using std::string;
 
+using std::istreambuf_iterator;
+
 namespace utilities
 {
     template<typename Type>
-    static Type JsonSerializer::Load(istream& is, string name)
+    Type JsonSerializer::Load(istream& is, string name)
     {
         // parse stream contents
         auto str = string(istreambuf_iterator<char>(is), istreambuf_iterator<char>());
