@@ -75,6 +75,15 @@ namespace common
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         RealArray(IndexValueIteratorType IndexValueIterator);
 
+        /// Sets the array to zero
+        ///
+        void Clear();
+
+        /// Sets the enties of the array
+        ///
+        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        void Set(IndexValueIteratorType IndexValueIterator);
+
         /// \returns The size of the array
         ///
         uint64 Size() const;

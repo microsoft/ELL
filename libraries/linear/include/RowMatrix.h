@@ -86,7 +86,7 @@ namespace linear
 
         /// Default move assignment operator
         ///
-        RowMatrix<DataVectorType>& operator=(RowMatrix<DataVectorType>&& other) = default; // TODO add assignment operators to all classes
+        RowMatrix<DataVectorType>& operator=(RowMatrix<DataVectorType>&& other) = default;
 
         /// Deleted asignment operator
         ///

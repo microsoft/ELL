@@ -55,6 +55,29 @@ namespace common
     }
     
     template<typename ValueType>
+    void RealArray<ValueType>::Clear()
+    {
+        fill(begin(), end(), 0);
+    }
+
+    template<typename ValueType>
+    template<typename IndexValueIteratorType, typename concept>
+    void RealArray<ValueType>::Set(IndexValueIteratorType IndexValueIterator)
+    {
+        Clear();
+        while (IndexValueIterator.IsValid())
+        {
+            auto entry = IndexValueIterator.Get();
+            if (entry.index >= size())
+            {
+                break;
+            }
+            (*this)[entry.index] = entry.value;
+            IndexValueIterator.Next();
+        }
+    }
+
+    template<typename ValueType>
     uint64 RealArray<ValueType>::Size() const
     {
         return size();
