@@ -28,12 +28,4 @@ namespace layers
         serializer.Read("r", _row);
         serializer.Read("c", _column);
     }
-
-    void Coordinate::FillBack(vector<Coordinate>& vector, uint64 row, uint64 numColumns, uint64 fromColumn)
-    {
-        for (uint64 column = fromColumn; column < fromColumn + numColumns; ++column)
-        {
-            vector.emplace_back(row, column);
-        }
-    }
 }

@@ -13,7 +13,7 @@ using std::make_shared;
 namespace layers
 {
     template<typename IndexValueIteratorType, typename concept>
-    Map::Iterator Map::Compute(IndexValueIteratorType IndexValueIterator, shared_ptr<vector<Coordinate>> spOutputCoordinates) const
+    Map::Iterator Map::Compute(IndexValueIteratorType IndexValueIterator, const vector<Coordinate>& outputCoordinates) const
     {
         // allocate memory to store the output of the map calculation
         auto outputs = AllocateOutputs();
@@ -34,7 +34,7 @@ namespace layers
             _layers[i]->Compute(i, *outputs);
         }
         
-        return Iterator(outputs, spOutputCoordinates);
+        return Iterator(outputs, outputCoordinates);
     }
 
     template<typename MapType>

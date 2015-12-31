@@ -1,7 +1,8 @@
 #include "SharedLinearBinaryPredictor.h"
 
-#include "Coordinate.h"
+#include "CoordinateListFactory.h"
 using layers::Coordinate;
+using layers::CoordinateListFactory;
 
 #include "layers.h"
 using layers::Scale;
@@ -45,8 +46,7 @@ namespace predictors
     {
         uint64 rowIndex = map.PushBack(make_shared<Scale>(_sp_predictor->w, inputCoordinates));
 
-        vector<Coordinate> scaleOutputs;
-        Coordinate::FillBack(scaleOutputs, rowIndex, _sp_predictor->w.Size());
+        vector<Coordinate> scaleOutputs = CoordinateListFactory::Sequence(rowIndex, _sp_predictor->w.Size());
         rowIndex = map.PushBack(make_shared<Sum>(scaleOutputs));
 
         map.PushBack(make_shared<Shift>(_sp_predictor->b, Coordinate{rowIndex, 0}));

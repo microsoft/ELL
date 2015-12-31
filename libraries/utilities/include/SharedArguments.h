@@ -20,6 +20,7 @@ namespace utilities
         bool dataFileHasWeights = false;
         string dataRandomSeedString = "";
         string inputMapFile = "";
+        uint32 inputMapIgnoreSuffix = 0;
         string outputMapFile = "";
     };
 
@@ -38,6 +39,7 @@ namespace utilities
             parser.AddOption(dataFileHasWeights, "dataFileHasWeights", "hw", "Indicates whether the data file format specifies a weight per example", false);
             parser.AddOption(dataRandomSeedString, "dataRandomSeedString", "dr", "String used to initialize the random generator that permutes the dataset", "RandomString");
             parser.AddOption(inputMapFile, "inputMapFile", "imf", "Path to the input map file", "");
+            parser.AddOption(inputMapIgnoreSuffix, "inputMapIgnoreSuffix", "imis", "The number of layers from the bottom of the input map to igrnore", 0);
             parser.AddOption(outputMapFile, "outputMapFile", "omf", "Path to the output map file", "");
         }
     };

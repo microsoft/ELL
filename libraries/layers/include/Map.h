@@ -49,11 +49,11 @@ namespace layers
 
         protected:
             shared_ptr<vector<vector<double>>> _spOutputs;
-            shared_ptr<vector<Coordinate>> _spOutputCoordinates;
+            const vector<Coordinate>& _outputCoordinates;
             uint64 _index;
 
             /// private ctor, can only be called from Map class
-            Iterator(shared_ptr<vector<vector<double>>> spOutput, shared_ptr<vector<Coordinate>> spOutputCoordinates);
+            Iterator(shared_ptr<vector<vector<double>>> spOutput, const vector<Coordinate>& outputCoordinates);
             friend Map;
         };
 
@@ -68,11 +68,19 @@ namespace layers
         /// Computes the Map
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        Iterator Compute(IndexValueIteratorType IndexValueIterator, shared_ptr<vector<Coordinate>> spOutputCoordinates) const;
+        Iterator Compute(IndexValueIteratorType IndexValueIterator, const vector<Coordinate>& outputCoordinates) const;
 
         /// Adds a shared layer to the map
         /// \returns The row index of the added layer
         uint64 PushBack(shared_ptr<Layer> layer);
+
+        /// \returns The number of layers in the map
+        ///
+        uint64 NumLayers() const;
+
+        /// \returns The number of elements in a specified layer
+        ///
+        uint64 LayerSize(uint64 index) const;
 
         /// Serializes the Map in json format
         ///

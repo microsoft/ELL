@@ -8,6 +8,9 @@
 #include "Map.h"
 using layers::Map;
 
+#include "Coordinate.h"
+using layers::Coordinate;
+
 // stl
 #include <string>
 using std::string;
@@ -25,7 +28,7 @@ namespace dataset
     public:
         /// Ctor
         ///
-        MappedParser(const InternalParserType& internalParser, const Map& map, shared_ptr<vector<Coordinate>> spOutputCoordinates);
+        MappedParser(const InternalParserType& internalParser, const Map& map, vector<Coordinate> outputCoordinates);
 
         /// \returns An iterator that parses the given string
         ///
@@ -34,7 +37,7 @@ namespace dataset
     private:
         InternalParserType _internalParser;
         Map _map;
-        shared_ptr<vector<Coordinate>> _spOutputCoordinates;
+        vector<Coordinate> _outputCoordinates;
     };
 }
 

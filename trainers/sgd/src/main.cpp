@@ -20,7 +20,9 @@ using utilities::BinaryClassificationEvaluator;
 // layers
 #include "Map.h"
 using layers::Map;
-using layers::Coordinate;
+
+#include "CoordinateListFactory.h"
+using layers::CoordinateListFactory;
 
 // dataset
 #include "SequentialLineIterator.h"
@@ -61,6 +63,9 @@ int main(int argc, char* argv[])
         ParsedSgdArguments trainerArguments(commandLineParser);
         commandLineParser.ParseArgs();
 
+        // create the map 
+        //Map map;
+
         // open data file
         ifstream dataFStream = OpenIfstream(sharedArguments.dataFile);
 
@@ -80,14 +85,13 @@ int main(int argc, char* argv[])
         {
             // open map file
             ifstream mapFStream = OpenIfstream(sharedArguments.inputMapFile);
-            auto map = Map::Deserialize<Map>(mapFStream);
+            auto map = Map::Deserialize<Map>(mapFStream); // TODO, why does this return a shared ptr? myabe move semantics better?
 
             // create list of output coordinates
-            auto spOutputCoordinates = make_shared<vector<Coordinate>>();
-            Coordinate::FillBack(*spOutputCoordinates, 0, 20, 0);
+            auto outputCoordinates = CoordinateListFactory::IgnoreSuffix(*map, sharedArguments.inputMapIgnoreSuffix); // TODO outputCoordinates is a bad name, because it is actually the input
             
             // load data
-            MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, *map, spOutputCoordinates);
+            MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, *map, outputCoordinates);
             data = DatasetLoader::Load(lineIterator, mappedParser);
         }
 
@@ -123,8 +127,7 @@ int main(int argc, char* argv[])
         cout << "training error\n" << evaluator << endl;
 
         // TEMP = create coordinates of raw input
-        vector<Coordinate> inputCoordinates;
-        Coordinate::FillBack(inputCoordinates, 0, dim);
+        auto inputCoordinates = CoordinateListFactory::Sequence(0, dim); // TODO create one map at the beginning of main
 
         // create Map
         auto predictor = optimizer.GetPredictor();

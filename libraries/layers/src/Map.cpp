@@ -1,3 +1,5 @@
+#include "..\include\Map.h"
+#include "..\include\Map.h"
 // Map.cpp
 
 #include "Map.h"
@@ -10,7 +12,7 @@ namespace layers
 {
     bool Map::Iterator::IsValid() const
     {
-        return _index < _spOutputCoordinates->size();
+        return _index < _outputCoordinates.size();
     }
 
     void Map::Iterator::Next()
@@ -22,15 +24,15 @@ namespace layers
     ///
     IndexValue Map::Iterator::Get() const
     {
-        auto coordinate = (*_spOutputCoordinates)[_index];
+        auto coordinate = _outputCoordinates[_index];
         uint64 row = coordinate.GetRow();
         uint64 column = coordinate.GetColumn();
         return IndexValue{ _index, (*_spOutputs)[row][column] };
     }
 
-    Map::Iterator::Iterator(shared_ptr<vector<vector<double>>> spOutput, shared_ptr<vector<Coordinate>> spOutputCoordinates) :
+    Map::Iterator::Iterator(shared_ptr<vector<vector<double>>> spOutput, const vector<Coordinate>& outputCoordinates) :
         _spOutputs(spOutput),
-        _spOutputCoordinates(spOutputCoordinates),
+        _outputCoordinates(outputCoordinates),
         _index(0)
     {}
 
@@ -44,6 +46,16 @@ namespace layers
         uint64 row = _layers.size();
         _layers.push_back(layer);
         return row;
+    }
+
+    uint64 Map::NumLayers() const
+    {
+        return _layers.size();
+    }
+
+    uint64 Map::LayerSize(uint64 index) const
+    {
+        return _layers[index]->Size();
     }
 
     void Map::Serialize(JsonSerializer & serializer) const

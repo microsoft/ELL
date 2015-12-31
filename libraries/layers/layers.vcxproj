@@ -79,6 +79,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\CoordinateListFactory.h" />
     <ClInclude Include="include\Coordinatewise.h" />
     <ClInclude Include="include\DecisionTreePath.h" />
     <ClInclude Include="include\Coordinate.h" />
@@ -92,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\Input.cpp" />
+    <ClCompile Include="src\CoordinateListFactory.cpp" />
     <ClCompile Include="src\Coordinatewise.cpp" />
     <ClCompile Include="src\DecisionTreePath.cpp" />
     <ClCompile Include="src\Coordinate.cpp" />
