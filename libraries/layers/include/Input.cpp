@@ -17,7 +17,7 @@ namespace layers
         return _size;
     }
 
-    void Input::Compute(uint64 rowIndex, vector<vector<double>>& outputs) const
+    void Input::Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const
     {
         throw runtime_error("this code should never be reached");
     }

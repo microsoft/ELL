@@ -45,7 +45,7 @@ namespace layers
 
         /// Computes the output of the layer
         ///
-        virtual void Compute(uint64 rowIndex, vector<vector<double>>& outputs) const = 0;
+        virtual void Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const = 0;
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///

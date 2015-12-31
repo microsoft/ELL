@@ -5,6 +5,7 @@
 #include "Layer.h"
 
 #include "types.h"
+#include "RealArray.h"
 
 namespace layers
 {
@@ -26,7 +27,7 @@ namespace layers
 
         /// Computes the output of the layer
         ///
-        virtual void Compute(uint64 rowIndex, vector<vector<double>>& outputs) const override;
+        virtual void Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const override;
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///

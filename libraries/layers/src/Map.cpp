@@ -6,7 +6,6 @@
 #include "layers.h"
 
 using std::make_shared;
-using std::move; // TODO remove?
 
 namespace layers
 {
@@ -30,7 +29,7 @@ namespace layers
         return IndexValue{ _index, (*_spOutputs)[row][column] };
     }
 
-    Map::Iterator::Iterator(shared_ptr<vector<vector<double>>> spOutput, const vector<Coordinate>& outputCoordinates) :
+    Map::Iterator::Iterator(shared_ptr<vector<DoubleArray>> spOutput, const vector<Coordinate>& outputCoordinates) :
         _spOutputs(spOutput),
         _outputCoordinates(outputCoordinates),
         _index(0)
@@ -105,9 +104,9 @@ namespace layers
         up->Deserialize(serializer, version);
     }
 
-    shared_ptr<vector<vector<double>>> Map::AllocateOutputs() const
+    shared_ptr<vector<DoubleArray>> Map::AllocateOutputs() const
     {
-        auto outputs = make_shared<vector<vector<double>>>();
+        auto outputs = make_shared<vector<DoubleArray>>();
         for (uint64 i = 0; i < _layers.size(); ++i)
         {
             outputs->emplace_back(_layers[i]->Size());

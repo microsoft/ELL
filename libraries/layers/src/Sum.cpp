@@ -22,7 +22,7 @@ namespace layers
     {
         return 1;
     }
-    void Sum::Compute(uint64 rowIndex, vector<vector<double>>& outputs) const
+    void Sum::Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const
     {
         for (uint64 k = 0; k<_coordinates.size(); ++k)
         {

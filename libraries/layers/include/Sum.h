@@ -5,6 +5,7 @@
 #include "Coordinate.h"
 
 #include "types.h"
+#include "RealArray.h"
 
 #include <vector>
 using std::vector;
@@ -36,7 +37,7 @@ namespace layers
 
         /// Computes the layer output
         ///
-        virtual void Compute(uint64 rowIndex, vector<vector<double>>& outputs) const override;
+        virtual void Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const override;
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///

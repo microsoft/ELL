@@ -29,7 +29,7 @@ namespace layers
         return _coordinates.size();
     }
 
-    void Coordinatewise::Compute(uint64 rowIndex, vector<vector<double>>& outputs) const
+    void Coordinatewise::Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const
     {
         for(uint64 k=0; k<_values.size(); ++k)
         {

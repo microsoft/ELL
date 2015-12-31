@@ -7,6 +7,7 @@
 
 // common
 #include "types.h"
+#include "RealArray.h"
 
 #include <vector>
 using std::vector;
@@ -48,12 +49,12 @@ namespace layers
             IndexValue Get() const;
 
         protected:
-            shared_ptr<vector<vector<double>>> _spOutputs;
+            shared_ptr<vector<DoubleArray>> _spOutputs;
             const vector<Coordinate>& _outputCoordinates;
             uint64 _index;
 
             /// private ctor, can only be called from Map class
-            Iterator(shared_ptr<vector<vector<double>>> spOutput, const vector<Coordinate>& outputCoordinates);
+            Iterator(shared_ptr<vector<DoubleArray>> spOutput, const vector<Coordinate>& outputCoordinates);
             friend Map;
         };
 
@@ -117,7 +118,7 @@ namespace layers
     protected:
         vector<shared_ptr<Layer>> _layers;
 
-        shared_ptr<vector<vector<double>>> AllocateOutputs() const;
+        shared_ptr<vector<DoubleArray>> AllocateOutputs() const;
     };
 }
 
