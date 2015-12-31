@@ -6,8 +6,25 @@ using std::runtime_error;
 #include <memory>
 using std::move;
 
+#include <string>
+using std::string;
+
 namespace utilities
 {
+    template<typename Type>
+    static Type JsonSerializer::Load(istream& is, string name)
+    {
+        // parse stream contents
+        auto str = string(istreambuf_iterator<char>(is), istreambuf_iterator<char>());
+        JsonSerializer reader;
+        reader.FromString(str);
+
+        // read object
+        Type t;
+        reader.Read(name, t);
+        return move(t);
+    }
+
     template<typename KeyType, typename ValueType>
     void JsonSerializer::Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* concept)
     {

@@ -25,6 +25,9 @@ using std::shared_ptr;
 #include <vector>
 using std::vector;
 
+#include <iostream>
+using std::istream;
+
 namespace utilities
 {
     /// A datastructure that enables us to read/write objects, which can red/write itself as a json string
@@ -32,6 +35,11 @@ namespace utilities
     class JsonSerializer
     {
     public:
+
+        /// Static function that loads an object from a JSON formatted file
+        ///
+        template<typename Type>
+        static Type Load(istream& is, string name);
 
         /// write shared_ptrs to a class
         ///

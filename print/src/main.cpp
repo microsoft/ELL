@@ -39,10 +39,10 @@ int main(int argc, char* argv[])
 
         // open map file
         ifstream mapFStream = OpenIfstream(args.mapFile);
-        auto map = Map::Deserialize<PrintableMap>(mapFStream);
+        auto map = JsonSerializer::Load<PrintableMap>(mapFStream, "Base");
         
         ofstream svgOStream = OpenOfstream(args.svgFile);
-        map->Print(svgOStream, args);
+        map.Print(svgOStream, args);
     }
 
     catch (runtime_error e)

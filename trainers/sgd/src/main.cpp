@@ -63,8 +63,14 @@ int main(int argc, char* argv[])
         ParsedSgdArguments trainerArguments(commandLineParser);
         commandLineParser.ParseArgs();
 
-        // create the map 
-        //Map map;
+        // create a map 
+        Map map;
+
+        // create a list of input coordinates for this map
+        vector<Coordinate> inputCoordinates;
+
+        // create a dataset
+        RowDataset data;
 
         // open data file
         ifstream dataFStream = OpenIfstream(sharedArguments.dataFile);
@@ -72,26 +78,32 @@ int main(int argc, char* argv[])
         // create line iterator - read line by line sequentially
         SequentialLineIterator lineIterator(dataFStream);
 
-        // create parser
+        // create parser for sparse vectors (SVMLight format)
         SparseEntryParser sparseEntryParser;
 
-        // load dataset
-        RowDataset data;
+        // handle two cases - input map specified or unspecified
         if (sharedArguments.inputMapFile == "")
         {
+            // load data wihtout applying any map
             data = DatasetLoader::Load(lineIterator, sparseEntryParser);
+
+            // create default map with single input layer
+            map = Map(data.NumColumns());
+
+            // create a coordinate list of this map
+            inputCoordinates = CoordinateListFactory::Sequence(0, data.NumColumns()); 
         }
         else
         {
             // open map file
             ifstream mapFStream = OpenIfstream(sharedArguments.inputMapFile);
-            auto map = Map::Deserialize<Map>(mapFStream); // TODO, why does this return a shared ptr? myabe move semantics better?
+            map = JsonSerializer::Load<Map>(mapFStream, "Base");
 
             // create list of output coordinates
-            auto outputCoordinates = CoordinateListFactory::IgnoreSuffix(*map, sharedArguments.inputMapIgnoreSuffix); // TODO outputCoordinates is a bad name, because it is actually the input
+            inputCoordinates = CoordinateListFactory::IgnoreSuffix(map, sharedArguments.inputMapIgnoreSuffix);
             
             // load data
-            MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, *map, outputCoordinates);
+            MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
             data = DatasetLoader::Load(lineIterator, mappedParser);
         }
 
@@ -99,8 +111,7 @@ int main(int argc, char* argv[])
         LogLoss loss;
 
         // create sgd trainer
-        uint64 dim = data.NumColumns();
-        AsgdOptimizer optimizer(dim);
+        AsgdOptimizer optimizer(data.NumColumns());
 
         // create evaluator
         BinaryClassificationEvaluator evaluator;
@@ -126,19 +137,15 @@ int main(int argc, char* argv[])
         // print loss and errors
         cout << "training error\n" << evaluator << endl;
 
-        // TEMP = create coordinates of raw input
-        auto inputCoordinates = CoordinateListFactory::Sequence(0, dim); // TODO create one map at the beginning of main
-
-        // create Map
+        // update the map with the newly learned layers
         auto predictor = optimizer.GetPredictor();
-        auto map = make_shared<Map>(dim);
-        predictor.AddTo(*map, inputCoordinates);
+        predictor.AddTo(map, inputCoordinates);
 
         // save map to output file
         if (sharedArguments.outputMapFile != "")
         {
             ofstream outputFStream = OpenOfstream(sharedArguments.outputMapFile);
-            map->Serialize(outputFStream);
+            map.Serialize(outputFStream);
         }
     }
     catch (runtime_error e)

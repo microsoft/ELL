@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 
         // open file
         ifstream mapFStream = OpenIfstream(args.mapFile);
-        auto map = Map::Deserialize<Compiler>(mapFStream);
+        auto map = JsonSerializer::Load<Compiler>(mapFStream, "Base");
         
         ofstream svgOStream = OpenOfstream(args.codeFile);
     }

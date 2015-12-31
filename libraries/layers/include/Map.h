@@ -64,7 +64,23 @@ namespace layers
         /// Ctor
         ///
         Map(uint64 inputLayerSize);
-    
+
+        /// default copy ctor
+        ///
+        Map(const Map&) = default;
+
+        /// default move ctor
+        ///
+        Map(Map&&) = default;
+
+        /// Default assignment operator
+        ///
+        Map& operator=(const Map&) = default;
+
+        /// Default assignment move operator
+        ///
+        Map& operator=(Map&&) = default;
+
         /// Computes the Map
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
@@ -93,11 +109,6 @@ namespace layers
         /// Deserializes the Map in json format
         ///
         void Deserialize(JsonSerializer& serializer);
-
-        /// reads a Map from a stream
-        ///
-        template<typename MapType = Map>
-        static shared_ptr<MapType> Deserialize(istream& is); // TODO: why does this return a shared_ptr, while the dataset loader returns a moved object
 
         /// Static function for deserializing shared_ptr<Layer>
         ///

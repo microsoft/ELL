@@ -94,7 +94,7 @@ namespace dataset
             }
 
             // all ones
-            else if(numNonZeros == up_vec->Size())
+            else if(!containsNonBinary && numNonZeros == up_vec->Size())
             {
                 return make_unique<OnesDataVector>(up_vec->Size());
             }

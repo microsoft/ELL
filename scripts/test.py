@@ -9,4 +9,4 @@ outputMapFile1 = os.path.abspath(os.path.join(workingDirectory, "output1.map"))
 outputMapFile2 = os.path.abspath(os.path.join(workingDirectory, "output2.map"))
 
 os.system("%s -df %s -omf %s" %(trainerExecutablePath, trainingDataPath, outputMapFile1))
-os.system("%s -df %s -imf %s -omf %s" %(trainerExecutablePath, trainingDataPath, outputMapFile1, outputMapFile2))
+os.system("%s -df %s -imf %s -omf %s -imis 2" %(trainerExecutablePath, trainingDataPath, outputMapFile1, outputMapFile2))

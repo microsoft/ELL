@@ -36,20 +36,4 @@ namespace layers
         
         return Iterator(outputs, outputCoordinates);
     }
-
-    template<typename MapType>
-    shared_ptr<MapType> Map::Deserialize(istream& is)
-    {
-        // parse stream contents
-        auto str = string(istreambuf_iterator<char>(is), istreambuf_iterator<char>());
-        JsonSerializer reader;
-        reader.FromString(str);
-
-        // read Map
-        auto map = make_shared<MapType>();
-        reader.Read("Base", *map);
-
-        return map;
-    }
-
 }
