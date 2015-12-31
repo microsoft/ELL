@@ -10,6 +10,8 @@ using std::fixed;
 #include <string>
 using std::to_string;
 
+#include <cmath>
+
 void svgRect(ostream& os, string svgClass, double x, double y, double radius, double width, double height)
 {
     os << "    <rect class=\"" << svgClass << "\" x=\"" << (int)x << "\" y=\"" << (int)y << "\" rx=\"" << (int)radius << "\" ry=\"" << (int)radius << "\" width=\"" << (int)width << "\" height=\"" << (int)height << "\"/>\n";

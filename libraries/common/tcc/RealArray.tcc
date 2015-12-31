@@ -80,13 +80,13 @@ namespace common
     template<typename ValueType>
     uint64 RealArray<ValueType>::Size() const
     {
-        return size();
+        return this->size();
     }
 
     template<typename ValueType>
     typename RealArray<ValueType>::Iterator RealArray<ValueType>::GetIterator() const
     {
-        return Iterator(cbegin(), cend());
+        return Iterator(this->cbegin(), this->cend());
     }
 
     template<typename ValueType>

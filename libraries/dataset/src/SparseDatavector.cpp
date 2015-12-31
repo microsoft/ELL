@@ -124,21 +124,21 @@ namespace dataset
         }
     }
 
-    template SparseDataVector<double, CompressedIntegerList>;
+    template class SparseDataVector<double, CompressedIntegerList>;
 
     IDataVector::type SparseDoubleDataVector::GetType() const
     {
         return type::sparse_double;
     }
 
-    template SparseDataVector<float, CompressedIntegerList>;
+    template class SparseDataVector<float, CompressedIntegerList>;
 
     IDataVector::type SparseFloatDataVector::GetType() const
     {
         return type::sparse_float;
     }
 
-    template SparseDataVector<short, CompressedIntegerList>;
+    template class SparseDataVector<short, CompressedIntegerList>;
 
     IDataVector::type SparseShortDataVector::GetType() const
     {

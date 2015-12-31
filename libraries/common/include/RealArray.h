@@ -72,7 +72,7 @@ namespace common
 
         /// Converting constructor
         ///
-        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         RealArray(IndexValueIteratorType IndexValueIterator);
 
         /// Sets the array to zero

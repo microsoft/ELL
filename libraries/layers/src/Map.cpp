@@ -1,5 +1,3 @@
-#include "..\include\Map.h"
-#include "..\include\Map.h"
 // Map.cpp
 
 #include "Map.h"

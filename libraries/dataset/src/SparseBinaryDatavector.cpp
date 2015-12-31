@@ -127,17 +127,17 @@ namespace dataset
         }
     }
 
-    template SparseBinaryDataVectorBase<CompressedIntegerList>;
-
     IDataVector::type SparseBinaryDataVector::GetType() const
     {
         return type::sparse_binary;
     }
 
-    template SparseBinaryDataVectorBase<IntegerList>;
-
     IDataVector::type UncompressedSparseBinaryVector::GetType() const
     {
         return type::uncompressed_sparse_binary;
     }
+
+    // Explicit instantiation
+    template class SparseBinaryDataVectorBase<CompressedIntegerList>;
+    template class SparseBinaryDataVectorBase<IntegerList>;
 }

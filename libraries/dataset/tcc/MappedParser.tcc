@@ -8,7 +8,6 @@ using utilities::Parser;
 using std::move;
 
 #include <stdexcept>
-#include "..\include\MappedParser.h"
 using std::runtime_error;
 
 namespace dataset

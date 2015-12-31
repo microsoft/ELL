@@ -47,11 +47,11 @@ namespace layers
 
         /// Serializes the Layer in json format
         ///
-        virtual void Serialize(JsonSerializer& serializer) const;
+        virtual void Serialize(JsonSerializer& serializer) const override;
 
         /// Deserializes the Layer in json format
         ///
-        virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion);
+        virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion) override;
 
     protected:
         vector<double> _values;
