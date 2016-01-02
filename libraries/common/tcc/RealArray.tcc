@@ -57,7 +57,7 @@ namespace common
     template<typename ValueType>
     void RealArray<ValueType>::Clear()
     {
-        fill(begin(), end(), 0);
+        fill(this->begin(), this->end(), 0);
     }
 
     template<typename ValueType>
@@ -68,7 +68,7 @@ namespace common
         while (IndexValueIterator.IsValid())
         {
             auto entry = IndexValueIterator.Get();
-            if (entry.index >= size())
+            if (entry.index >= this->size())
             {
                 break;
             }
