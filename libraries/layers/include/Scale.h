@@ -15,7 +15,7 @@ namespace layers
 
         /// Ctor
         ///
-        Scale(const vector<double>& values, const vector<Coordinate>& coordinates);
+        Scale(const vector<double>& values, const CoordinateList& coordinates);
 
         /// Static function that specifies the coordinatewise operation
         ///

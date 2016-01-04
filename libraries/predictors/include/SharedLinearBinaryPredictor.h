@@ -8,7 +8,7 @@
 using layers::Map;
 
 #include "Coordinate.h"
-using layers::Coordinate;
+using layers::CoordinateList;
 
 #include <memory>
 using std::shared_ptr;
@@ -48,7 +48,7 @@ namespace predictors
 
         /// Adds the predictor to a map
         ///
-        void AddTo(Map& map, const vector<Coordinate>& inputCoordinates) const;
+        void AddTo(Map& map, const CoordinateList& inputCoordinates) const;
 
     private:
         struct BiasedVector

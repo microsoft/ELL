@@ -55,11 +55,11 @@ namespace layers
 
         protected:
             shared_ptr<vector<DoubleArray>> _spOutputs;
-            const vector<Coordinate>& _outputCoordinates;
+            const CoordinateList& _outputCoordinates;
             uint64 _index;
 
             /// private ctor, can only be called from Map class
-            Iterator(shared_ptr<vector<DoubleArray>> spOutput, const vector<Coordinate>& outputCoordinates);
+            Iterator(shared_ptr<vector<DoubleArray>> spOutput, const CoordinateList& outputCoordinates);
             friend Map;
         };
 
@@ -90,7 +90,7 @@ namespace layers
         /// Computes the Map
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        Iterator Compute(IndexValueIteratorType IndexValueIterator, const vector<Coordinate>& outputCoordinates) const;
+        Iterator Compute(IndexValueIteratorType IndexValueIterator, const CoordinateList& outputCoordinates) const;
 
         /// Adds a shared layer to the map
         /// \returns The row index of the added layer

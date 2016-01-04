@@ -31,7 +31,7 @@ namespace layers
 
         /// Ctor
         ///
-        Coordinatewise(const vector<double>& values, const vector<Coordinate>& coordinates, const DoubleOperation& operation, Type type);
+        Coordinatewise(const vector<double>& values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type);
 
         /// \returns The size of the layer's output
         ///
@@ -55,7 +55,7 @@ namespace layers
 
     protected:
         vector<double> _values;
-        vector<Coordinate> _coordinates;
+        CoordinateList _coordinates;
         DoubleOperation _operation;
         static const int _currentVersion = 1;
     };

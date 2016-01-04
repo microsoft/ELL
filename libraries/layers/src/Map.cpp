@@ -27,7 +27,7 @@ namespace layers
         return IndexValue{ _index, (*_spOutputs)[row][column] };
     }
 
-    Map::Iterator::Iterator(shared_ptr<vector<DoubleArray>> spOutput, const vector<Coordinate>& outputCoordinates) :
+    Map::Iterator::Iterator(shared_ptr<vector<DoubleArray>> spOutput, const CoordinateList& outputCoordinates) :
         _spOutputs(spOutput),
         _outputCoordinates(outputCoordinates),
         _index(0)

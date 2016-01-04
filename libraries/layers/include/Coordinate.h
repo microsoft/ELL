@@ -48,4 +48,6 @@ namespace layers
         uint64 _row = 0;
         uint64 _column = 0;
     };
+
+    typedef vector<Coordinate> CoordinateList;
 }

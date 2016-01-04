@@ -13,7 +13,7 @@ using std::make_shared;
 namespace layers
 {
     template<typename IndexValueIteratorType, typename concept>
-    Map::Iterator Map::Compute(IndexValueIteratorType indexValueIterator, const vector<Coordinate>& outputCoordinates) const
+    Map::Iterator Map::Compute(IndexValueIteratorType indexValueIterator, const CoordinateList& outputCoordinates) const
     {
         // allocate memory to store the output of the map calculation
         auto outputs = AllocateOutputs(); // Does AllocateOutputs have to return shared_ptr? 

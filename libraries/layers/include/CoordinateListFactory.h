@@ -13,10 +13,10 @@ namespace layers
     class CoordinateListFactory
     {
     public:
-        static vector<Coordinate> Sequence(uint64 row, uint64 numColumns, uint64 fromColumn = 0);
-        static vector<Coordinate> IgnoreSuffix(const Map& map, uint64 numLayersToDrop);
+        static CoordinateList Sequence(uint64 row, uint64 numColumns, uint64 fromColumn = 0);
+        static CoordinateList IgnoreSuffix(const Map& map, uint64 numLayersToDrop);
 
     private:
-        static void FillBack(vector<Coordinate>& vector, uint64 row, uint64 numColumns, uint64 fromColumn = 0);
+        static void FillBack(CoordinateList& vector, uint64 row, uint64 numColumns, uint64 fromColumn = 0);
     };
 }

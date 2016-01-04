@@ -13,7 +13,7 @@ using std::runtime_error;
 namespace dataset
 {
     template<typename InternalParserType>
-    MappedParser<InternalParserType>::MappedParser(const InternalParserType& internalParser, const Map& map, vector<Coordinate> outputCoordinates) :
+    MappedParser<InternalParserType>::MappedParser(const InternalParserType& internalParser, const Map& map, CoordinateList outputCoordinates) :
         _internalParser(internalParser),
         _map(map),
         _outputCoordinates(outputCoordinates)

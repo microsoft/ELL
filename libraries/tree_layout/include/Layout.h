@@ -93,7 +93,7 @@ namespace tree_layout
         ///
         double GetMaxDepth() const;
 
-        const vector<VertexPosition>& GetVertices() const { return _positions; } // TODO move code to cpp
+        const vector<VertexPosition>& GetVertices() const;
 
     private:
         vector<VertexPosition> _positions;

@@ -19,7 +19,7 @@ namespace layers
 
         /// Ctor
         ///
-        Shift(const vector<double>& values, const vector<Coordinate>& coordinates);
+        Shift(const vector<double>& values, const CoordinateList& coordinates);
 
         /// Static function that specifies the coordinatewise operation
         ///

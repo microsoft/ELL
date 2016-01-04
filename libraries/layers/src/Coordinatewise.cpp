@@ -21,7 +21,7 @@ namespace layers
         _coordinates.push_back(coordinate);
     }
 
-    Coordinatewise::Coordinatewise(const vector<double> & values, const vector<Coordinate>& coordinates, const DoubleOperation& operation, Type type) : Layer(type), _operation(operation), _values(values), _coordinates(coordinates)
+    Coordinatewise::Coordinatewise(const vector<double> & values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type) : Layer(type), _operation(operation), _values(values), _coordinates(coordinates)
     {}
 
     uint64 Coordinatewise::Size() const

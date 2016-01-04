@@ -25,11 +25,11 @@ namespace layers
 
         /// Ctor - constructs a single sum
         ///
-        Sum(const vector<Coordinate>& coordinates);
+        Sum(const CoordinateList& coordinates);
 
         /// Ctor - constructs a multi-dimensional sum
         ///
-        Sum(const  vector<vector<Coordinate>>& coordinates);
+        Sum(const  vector<CoordinateList>& coordinates);
 
         /// \returns The size of the layer's output
         ///
@@ -52,7 +52,7 @@ namespace layers
         virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion) override;
 
     protected:
-        vector<vector<Coordinate>> _coordinates;
+        vector<CoordinateList> _coordinates;
         static const int _currentVersion = 1;
     };
 }

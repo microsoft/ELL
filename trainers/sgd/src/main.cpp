@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
         Map map;
 
         // create a list of input coordinates for this map
-        vector<Coordinate> inputCoordinates;
+        CoordinateList inputCoordinates;
 
         // create a dataset
         RowDataset data;

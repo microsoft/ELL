@@ -73,4 +73,8 @@ namespace tree_layout
         return _maxDepth;
     }
 
+    const vector<VertexPosition>& Layout::GetVertices() const
+    {
+        return _positions;
+    }
 }

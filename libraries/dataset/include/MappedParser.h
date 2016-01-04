@@ -9,7 +9,7 @@
 using layers::Map;
 
 #include "Coordinate.h"
-using layers::Coordinate;
+using layers::CoordinateList;
 
 // stl
 #include <string>
@@ -28,7 +28,7 @@ namespace dataset
     public:
         /// Ctor
         ///
-        MappedParser(const InternalParserType& internalParser, const Map& map, vector<Coordinate> outputCoordinates);
+        MappedParser(const InternalParserType& internalParser, const Map& map, CoordinateList outputCoordinates);
 
         /// \returns An iterator that parses the given string
         ///
@@ -37,7 +37,7 @@ namespace dataset
     private:
         InternalParserType _internalParser;
         Map _map;
-        vector<Coordinate> _outputCoordinates;
+        CoordinateList _outputCoordinates;
     };
 }
 

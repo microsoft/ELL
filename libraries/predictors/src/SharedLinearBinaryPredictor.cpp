@@ -42,11 +42,11 @@ namespace predictors
         return _sp_predictor->b;
     }
 
-    void SharedLinearBinaryPredictor::AddTo(Map& map, const vector<Coordinate>& inputCoordinates) const
+    void SharedLinearBinaryPredictor::AddTo(Map& map, const CoordinateList& inputCoordinates) const
     {
         uint64 rowIndex = map.PushBack(make_shared<Scale>(_sp_predictor->w, inputCoordinates));
 
-        vector<Coordinate> scaleOutputs = CoordinateListFactory::Sequence(rowIndex, _sp_predictor->w.Size());
+        CoordinateList scaleOutputs = CoordinateListFactory::Sequence(rowIndex, _sp_predictor->w.Size());
         rowIndex = map.PushBack(make_shared<Sum>(scaleOutputs));
 
         map.PushBack(make_shared<Shift>(_sp_predictor->b, Coordinate{rowIndex, 0}));

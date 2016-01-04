@@ -10,12 +10,12 @@ namespace layers
     Sum::Sum() : Layer(Type::sum) 
     {}
 
-    Sum::Sum(const vector<Coordinate> & coordinates) : Layer(Type::sum), _coordinates(0)
+    Sum::Sum(const CoordinateList & coordinates) : Layer(Type::sum), _coordinates(0)
     {
         _coordinates.push_back(coordinates);
     }
 
-    Sum::Sum(const vector<vector<Coordinate>>& coordinates) : Layer(Type::sum), _coordinates(coordinates)
+    Sum::Sum(const vector<CoordinateList>& coordinates) : Layer(Type::sum), _coordinates(coordinates)
     {}
 
     uint64 Sum::Size() const
