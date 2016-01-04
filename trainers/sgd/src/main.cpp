@@ -2,7 +2,6 @@
 
 // utilities
 #include "files.h"
-using utilities::OpenIfstream;
 using utilities::OpenOfstream;
 
 #include "CommandLineParser.h" 
@@ -27,22 +26,16 @@ using utilities::BinaryClassificationEvaluator;
 #include "Map.h"
 using layers::Map;
 
-#include "CoordinateListFactory.h"
-using layers::CoordinateListFactory;
+#include "Coordinate.h"
+using layers::CoordinateList;
 
 // dataset
-#include "SequentialLineIterator.h"
-using dataset::SequentialLineIterator;
-
-#include "SparseEntryParser.h"
-using dataset::SparseEntryParser;
-
-#include "MappedParser.h"
-using dataset::MappedParser;
-
-#include "DatasetLoader.h"
+#include "SupervisedExample.h"
 using dataset::RowDataset;
-using dataset::DatasetLoader;
+
+// common
+#include "DatasetMapLoader.h"
+using common::DatasetMapLoader;
 
 // optimization
 #include "AsgdOptimizer.h"
@@ -77,55 +70,17 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.ParseArgs();
 
-        // create a map 
+        // create and load a dataset, a map, and a coordinate list
+        RowDataset dataset;
         Map map;
-
-        // create a list of input coordinates for this map
         CoordinateList inputCoordinates;
-
-        // create a dataset
-        RowDataset data;
-
-        // open data file
-        ifstream dataFStream = OpenIfstream(dataLoadArguments.inputDataFile);
-
-        // create line iterator - read line by line sequentially
-        SequentialLineIterator lineIterator(dataFStream);
-
-        // create parser for sparse vectors (SVMLight format)
-        SparseEntryParser sparseEntryParser;
-
-        // handle two cases - input map specified or unspecified
-        if (mapLoadArguments.inputMapFile == "")
-        {
-            // load data wihtout applying any map
-            data = DatasetLoader::Load(lineIterator, sparseEntryParser);
-
-            // create default map with single input layer
-            map = Map(data.NumColumns());
-
-            // create a coordinate list of this map
-            inputCoordinates = CoordinateListFactory::Sequence(0, data.NumColumns()); 
-        }
-        else
-        {
-            // load map
-            ifstream mapFStream = OpenIfstream(mapLoadArguments.inputMapFile);
-            map = JsonSerializer::Load<Map>(mapFStream, "Base");
-
-            // create list of output coordinates
-            inputCoordinates = CoordinateListFactory::IgnoreSuffix(map, mapLoadArguments.inputMapIgnoreSuffix);
-            
-            // load data
-            MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
-            data = DatasetLoader::Load(lineIterator, mappedParser);
-        }
+        DatasetMapLoader::Load(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
 
         // create loss function
         LogLoss loss;
 
         // create sgd trainer
-        AsgdOptimizer optimizer(data.NumColumns());
+        AsgdOptimizer optimizer(dataset.NumColumns());
 
         // create evaluator
         BinaryClassificationEvaluator evaluator;
@@ -137,14 +92,14 @@ int main(int argc, char* argv[])
         for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
         {
             // randomly permute the data
-            data.RandPerm(rng);
+            dataset.RandPerm(rng);
 
             // iterate over the entire permuted dataset
-            auto trainSetIterator = data.GetIterator();
+            auto trainSetIterator = dataset.GetIterator();
             optimizer.Update(trainSetIterator, loss, sgdArguments.l2Regularization);
 
             // Evaluate
-            auto evaluationIterator = data.GetIterator();
+            auto evaluationIterator = dataset.GetIterator();
             evaluator.Evaluate(evaluationIterator, optimizer.GetPredictor(), loss);
         }
 

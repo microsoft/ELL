@@ -49,5 +49,5 @@ namespace layers
         uint64 _column = 0;
     };
 
-    typedef vector<Coordinate> CoordinateList;
+    using  CoordinateList = vector<Coordinate>;
 }

@@ -7,5 +7,26 @@
     <Filter Include="tcc">
       <UniqueIdentifier>{86dce830-cede-4b7d-8fd3-f3a1ee3fcae0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{d1a08781-ebce-4c58-9f02-28b20856bd6b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\DatasetMapLoader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatasetLoader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\DatasetMapLoader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="tcc\DatasetLoader.tcc">
+      <Filter>tcc</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -4,9 +4,14 @@
 
 #include "IDataVector.h"
 
+// types
 #include "types.h"
 
+// linear
+#include "RowMatrix.h"
+using linear::RowMatrix;
 
+// stl
 #include <memory>
 using std::unique_ptr;
 
@@ -71,7 +76,7 @@ namespace dataset
         unique_ptr<IDataVector> _upInstance;
         double _weight;
         double _label;
-
     };
 
+    using RowDataset = RowMatrix<SupervisedExample>;
 }
