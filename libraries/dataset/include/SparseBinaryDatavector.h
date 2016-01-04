@@ -44,13 +44,9 @@ namespace dataset
             ///
             void Next();
 
-            /// \returns The current index
-            ///
-            uint64 GetIndex() const; // TODO: replace with IndexValue class as return type
-
             /// \returns The current value
             ///
-            double Get() const;
+            IndexValue Get() const;
 
         private:
 

@@ -19,15 +19,9 @@ namespace dataset
     }
 
     template<typename IntegerListType>
-    uint64 SparseBinaryDataVectorBase<IntegerListType>::Iterator::GetIndex() const
+    IndexValue SparseBinaryDataVectorBase<IntegerListType>::Iterator::Get() const
     {
-        return _list_iterator.Get();
-    }
-
-    template<typename IntegerListType>
-    double SparseBinaryDataVectorBase<IntegerListType>::Iterator::Get() const
-    {
-        return (double)1.0;
+        return IndexValue { _list_iterator.Get(), 1.0 };
     }
 
     template<typename IntegerListType>
@@ -121,8 +115,8 @@ namespace dataset
         auto iterator = GetIterator();
         while(iterator.IsValid())
         {
-            auto IndexValue = iterator.Get();
-            os << IndexValue << '\t';
+            auto entry = iterator.Get();
+            os << entry.index << ':' << entry.value << '\t';
             iterator.Next();
         }
     }
