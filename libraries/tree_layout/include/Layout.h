@@ -56,8 +56,13 @@ namespace tree_layout
         ///
         Layout(size_t size, double min_offset, double max_offset, double min_depth, double max_depth);
 
-        /// Copy ctor // TODO maybe replace with default?
-        Layout(const Layout& l) : _positions(l._positions), _minOffset(l._minOffset), _maxOffset(l._maxOffset), _minDepth(l._minDepth), _maxDepth(l._maxDepth) {}
+        /// Copy ctor 
+        ///
+        Layout(const Layout&) = default;
+
+        /// Move ctor 
+        ///
+        Layout(Layout&&) = default;
 
         ///
         /// \returns A reference to the position of a specified vertex
