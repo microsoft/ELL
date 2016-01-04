@@ -15,15 +15,9 @@
     <ClInclude Include="include\RealArray.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\VectorIterator.h">
-      <Filter>include</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\RealArray.tcc">
-      <Filter>tcc</Filter>
-    </None>
-    <None Include="tcc\VectorIterator.tcc">
       <Filter>tcc</Filter>
     </None>
   </ItemGroup>

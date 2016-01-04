@@ -1,6 +1,6 @@
 // IterableArray.tcc
 
-namespace common
+namespace utilities
 {
     template<typename ValueType>
     VectorIterator<ValueType>::VectorIterator(const StlVectorIteratorType& begin, const StlVectorIteratorType& end) : _begin(begin), _end(end)

@@ -8,7 +8,7 @@
 using common::DoubleArray;
 
 #include "VectorIterator.h"
-using common::VectorIterator;
+using utilities::VectorIterator;
 
 #include "JsonSerializer.h"
 using utilities::JsonSerializer;

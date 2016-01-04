@@ -85,12 +85,14 @@
     <ClInclude Include="include\Parser.h" />
     <ClInclude Include="include\randomEngines.h" />
     <ClInclude Include="include\SharedArguments.h" />
+    <ClInclude Include="include\VectorIterator.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\BinaryClassificationEvaluator.tcc" />
     <None Include="tcc\CommandLineParser.tcc" />
     <None Include="tcc\JsonSerializer.tcc" />
     <None Include="tcc\Parser.tcc" />
+    <None Include="tcc\VectorIterator.tcc" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\amalgamated_jsoncpp\jsoncpp.cpp" />

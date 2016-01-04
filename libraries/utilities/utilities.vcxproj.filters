@@ -38,6 +38,9 @@
     <ClInclude Include="include\Parser.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\VectorIterator.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="tcc\CommandLineParser.tcc">
@@ -50,6 +53,9 @@
       <Filter>tcc</Filter>
     </None>
     <None Include="tcc\Parser.tcc">
+      <Filter>tcc</Filter>
+    </None>
+    <None Include="tcc\VectorIterator.tcc">
       <Filter>tcc</Filter>
     </None>
   </ItemGroup>

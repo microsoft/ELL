@@ -10,7 +10,7 @@ using std::vector;
 #include <iostream>
 using std::ostream;
 
-namespace common
+namespace utilities
 {
     /// A read-only forward iterator for vectors.
     ///
