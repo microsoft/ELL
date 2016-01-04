@@ -8,4 +8,17 @@
       <UniqueIdentifier>{86dce830-cede-4b7d-8fd3-f3a1ee3fcae0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\types.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RealArray.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="tcc\RealArray.tcc">
+      <Filter>tcc</Filter>
+    </None>
+  </ItemGroup>
 </Project>

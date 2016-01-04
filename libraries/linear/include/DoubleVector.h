@@ -6,7 +6,7 @@
 
 #include "types.h"
 #include "RealArray.h"
-using common::DoubleArray;
+using types::DoubleArray;
 
 #include <cassert>
 

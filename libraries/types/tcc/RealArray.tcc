@@ -1,6 +1,6 @@
 // RealArray.tcc
 
-namespace common
+namespace types
 {
     template<typename ValueType>
     bool RealArray<ValueType>::Iterator::IsValid() const

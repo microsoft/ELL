@@ -77,7 +77,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>include;..\libraries\common\include;..\libraries\utilities\include;..\libraries\layers\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\libraries\types\include;..\libraries\utilities\include;..\libraries\layers\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -98,7 +98,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>include;..\libraries\common\include;..\libraries\utilities\include;..\libraries\layers\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\libraries\types\include;..\libraries\utilities\include;..\libraries\layers\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

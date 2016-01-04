@@ -65,7 +65,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>include;..\..\libraries\treetools_shared\include;..\..\libraries\common\include;..\..\libraries\linear\include;..\..\libraries\utilities\include;..\..\libraries\layers\include;..\..\libraries\dataset\include;..\..\libraries\predictors\include;..\..\libraries\optimization\include;..\..\libraries\loss_functions\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\..\libraries\treetools_shared\include;..\..\libraries\types\include;..\..\libraries\linear\include;..\..\libraries\utilities\include;..\..\libraries\layers\include;..\..\libraries\dataset\include;..\..\libraries\predictors\include;..\..\libraries\optimization\include;..\..\libraries\loss_functions\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -86,7 +86,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>include;..\..\libraries\treetools_shared\include;..\..\libraries\common\include;..\..\libraries\linear\include;..\..\libraries\utilities\include;..\..\libraries\layers\include;..\..\libraries\dataset\include;..\..\libraries\predictors\include;..\..\libraries\optimization\include;..\..\libraries\loss_functions\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\..\libraries\treetools_shared\include;..\..\libraries\types\include;..\..\libraries\linear\include;..\..\libraries\utilities\include;..\..\libraries\layers\include;..\..\libraries\dataset\include;..\..\libraries\predictors\include;..\..\libraries\optimization\include;..\..\libraries\loss_functions\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

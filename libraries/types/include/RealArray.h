@@ -15,7 +15,7 @@ using std::ostream;
 using std::enable_if_t;
 using std::is_base_of;
 
-namespace common
+namespace types
 {
     template <typename ValueType>
     class RealArray : public vector<ValueType>

@@ -62,7 +62,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\mappings\include;..\..\libraries\tree_layout\include;..\..\libraries\common\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\mappings\include;..\..\libraries\tree_layout\include;..\..\libraries\types\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -83,7 +83,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\mappings\include;..\..\libraries\tree_layout\include;..\..\libraries\common\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libraries\utilities\include;..\..\libraries\predictors\include;..\..\libraries\mappings\include;..\..\libraries\tree_layout\include;..\..\libraries\types\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

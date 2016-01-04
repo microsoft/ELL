@@ -6,7 +6,7 @@
 
 #include "types.h"
 #include "RealArray.h"
-using common::RealArray;
+using types::RealArray;
 
 //stl
 #include <vector>

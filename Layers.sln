@@ -89,6 +89,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "libraries\common\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "layers", "libraries\layers\layers.vcxproj", "{7C153142-6FA8-4479-93B8-10DB8DA56D56}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "types", "libraries\types\types.vcxproj", "{CB66102D-E4F7-47FB-8E70-929B7D332409}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|x64 = debug|x64
@@ -158,6 +160,10 @@ Global
 		{7C153142-6FA8-4479-93B8-10DB8DA56D56}.debug|x64.Build.0 = debug|x64
 		{7C153142-6FA8-4479-93B8-10DB8DA56D56}.release|x64.ActiveCfg = release|x64
 		{7C153142-6FA8-4479-93B8-10DB8DA56D56}.release|x64.Build.0 = release|x64
+		{CB66102D-E4F7-47FB-8E70-929B7D332409}.debug|x64.ActiveCfg = debug|x64
+		{CB66102D-E4F7-47FB-8E70-929B7D332409}.debug|x64.Build.0 = debug|x64
+		{CB66102D-E4F7-47FB-8E70-929B7D332409}.release|x64.ActiveCfg = release|x64
+		{CB66102D-E4F7-47FB-8E70-929B7D332409}.release|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,5 +182,6 @@ Global
 		{9D4AB3E4-C26B-4B7D-80EB-61267044F7D8} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
 		{50EE045D-4DAA-44B9-9F1A-1FEC297173B4} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
 		{7C153142-6FA8-4479-93B8-10DB8DA56D56} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
+		{CB66102D-E4F7-47FB-8E70-929B7D332409} = {02F40ED6-9C6C-483E-B694-808DD6EB7A69}
 	EndGlobalSection
 EndGlobal
