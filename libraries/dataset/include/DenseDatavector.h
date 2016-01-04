@@ -8,6 +8,7 @@
 #include "RealArray.h"
 using common::RealArray;
 
+//stl
 #include <vector>
 using std::vector;
 
@@ -15,8 +16,8 @@ using std::vector;
 using std::ostream;
 
 #include <type_traits>
-using std::is_base_of;
 using std::enable_if_t;
+using std::is_base_of;
 
 #define DEFAULT_DENSE_VECTOR_CAPACITY 1000
 

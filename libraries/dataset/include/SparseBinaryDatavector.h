@@ -8,6 +8,11 @@
 
 #include "types.h"
 
+// stl
+#include <type_traits>
+using std::enable_if_t;
+using std::is_base_of;
+
 namespace dataset
 {
     /// Implements a sparse binary vector as an increasing list of the coordinates where the value is 1.0
@@ -66,7 +71,7 @@ namespace dataset
 
         /// Converting constructor
         ///
-        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         SparseBinaryDataVectorBase(IndexValueIteratorType IndexValueIterator);
 
         /// Move constructor

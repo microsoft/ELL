@@ -45,6 +45,7 @@ namespace utilities
         ///
         template<typename KeyType, typename ValueType>
         void Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* concept = nullptr);
+        // TODO there are two styles of adding "concepts" in this solution. One of them appears above. unify.
 
         /// write classes
         ///

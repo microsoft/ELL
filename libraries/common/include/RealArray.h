@@ -4,11 +4,16 @@
 
 #include "types.h"
 
+// stl
 #include <vector>
 using std::vector;
 
 #include <iostream>
 using std::ostream;
+
+#include <type_traits>
+using std::enable_if_t;
+using std::is_base_of;
 
 namespace common
 {
@@ -72,7 +77,7 @@ namespace common
 
         /// Converting constructor
         ///
-        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         RealArray(IndexValueIteratorType IndexValueIterator);
 
         /// Sets the array to zero
@@ -81,7 +86,7 @@ namespace common
 
         /// Sets the enties of the array
         ///
-        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         void Set(IndexValueIteratorType IndexValueIterator);
 
         /// \returns The size of the array
