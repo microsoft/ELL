@@ -6,7 +6,7 @@ using std::runtime_error;
 #include <cmath>
 using std::log;
 
-namespace convex_optimization
+namespace optimization
 {
     template<typename ExampleIteratorType, typename LossFunctionType>
     void AsgdOptimizer::Update(ExampleIteratorType& data_iter, const LossFunctionType& loss_function, double lambda)

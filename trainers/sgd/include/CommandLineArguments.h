@@ -1,12 +1,17 @@
-// args.h
+// CommandLineArguments.h
 
+#include "types.h"
+
+// utilities
+#include "CommandLineParser.h"
 using utilities::ParsedArgSet;
+using utilities::CommandLineParser;
 
 /// A struct that holds the command line parameters for the trainer
 ///
 struct SgdArguments
 {
-    int numEpochs = 0;
+    uint64 numEpochs = 0;
     double lossScale = 0;
     double l2Regularization = 0;
 };

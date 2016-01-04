@@ -38,14 +38,9 @@ using dataset::MappedParser;
 using dataset::RowDataset;
 using dataset::DatasetLoader;
 
-
-// linear
-#include "SharedLinearBinaryPredictor.h"
-using predictors::SharedLinearBinaryPredictor;
-
 // optimization
 #include "AsgdOptimizer.h"
-using namespace convex_optimization;
+using optimization::AsgdOptimizer;
 
 // loss_functions
 #include "HingeLoss.h"
@@ -53,7 +48,7 @@ using namespace convex_optimization;
 using namespace loss_functions;
 
 // command line arguments
-#include "args.h"
+#include "CommandLineArguments.h"
 
 #include <iostream>
 using std::cerr;

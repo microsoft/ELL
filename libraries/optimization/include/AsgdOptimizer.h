@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "types.h"
+
 // predictors
 #include "SharedLinearBinaryPredictor.h"
 using predictors::SharedLinearBinaryPredictor;
@@ -10,10 +12,7 @@ using predictors::SharedLinearBinaryPredictor;
 #include "DoubleVector.h"
 using linear::DoubleVector;
 
-#include "types.h"
-
-
-namespace convex_optimization
+namespace optimization
 {
     /// Implements the Averaged Stochstic Gradient Descent algorithm on an L2 regularized empirical loss
     ///

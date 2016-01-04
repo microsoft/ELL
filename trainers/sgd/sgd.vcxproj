@@ -14,7 +14,7 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\args.h" />
+    <ClInclude Include="include\CommandLineArguments.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{968EFC5A-68A0-4A3A-8312-801C3A7AAEFD}</ProjectGuid>
