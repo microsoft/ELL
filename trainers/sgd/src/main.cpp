@@ -26,11 +26,18 @@ using layers::CoordinateListFactory;
 
 // dataset
 #include "SequentialLineIterator.h"
+using dataset::SequentialLineIterator;
+
 #include "SparseEntryParser.h"
+using dataset::SparseEntryParser;
+
 #include "MappedParser.h"
-#include "ParsingIterator.h"
+using dataset::MappedParser;
+
 #include "DatasetLoader.h"
-using namespace dataset;
+using dataset::RowDataset;
+using dataset::DatasetLoader;
+
 
 // linear
 #include "SharedLinearBinaryPredictor.h"

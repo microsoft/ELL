@@ -1,5 +1,7 @@
 // Loader.tcc
 
+#include "ParsingIterator.h"
+
 #include <memory>
 using std::move;
 
