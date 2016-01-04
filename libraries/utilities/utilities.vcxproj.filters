@@ -29,9 +29,6 @@
     <ClInclude Include="include\BinaryClassificationEvaluator.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\SharedArguments.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\randomEngines.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -39,6 +36,18 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\VectorIterator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MapLoadArguments.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataLoadArguments.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataSaveArguments.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MapSaveArguments.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -76,6 +85,18 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\randomEngines.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapLoadArguments.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataLoadArguments.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataSaveArguments.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapSaveArguments.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

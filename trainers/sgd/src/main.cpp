@@ -11,8 +11,14 @@ using utilities::CommandLineParser;
 #include "randomEngines.h"
 using utilities::GetRandomEngine;
 
-#include "SharedArguments.h" 
-using utilities::ParsedSharedArguments;
+#include "MapLoadArguments.h" 
+using utilities::ParsedMapLoadArguments;
+
+#include "MapSaveArguments.h" 
+using utilities::ParsedMapSaveArguments;
+
+#include "DataLoadArguments.h" 
+using utilities::ParsedDataLoadArguments;
 
 #include "BinaryClassificationEvaluator.h"
 using utilities::BinaryClassificationEvaluator;
@@ -59,10 +65,16 @@ int main(int argc, char* argv[])
 {
     try
     {
-        // parse the command line
+        // create a command line parser
         CommandLineParser commandLineParser(argc, argv);
-        ParsedSharedArguments sharedArguments(commandLineParser);
-        ParsedSgdArguments trainerArguments(commandLineParser);
+
+        // add arguments to the command line parser
+        ParsedMapLoadArguments mapLoadArguments(commandLineParser);
+        ParsedDataLoadArguments dataLoadArguments(commandLineParser);
+        ParsedMapSaveArguments mapSaveArguments(commandLineParser);
+        ParsedSgdArguments sgdArguments(commandLineParser);
+        
+        // parse command line
         commandLineParser.ParseArgs();
 
         // create a map 
@@ -75,7 +87,7 @@ int main(int argc, char* argv[])
         RowDataset data;
 
         // open data file
-        ifstream dataFStream = OpenIfstream(sharedArguments.dataFile);
+        ifstream dataFStream = OpenIfstream(dataLoadArguments.inputDataFile);
 
         // create line iterator - read line by line sequentially
         SequentialLineIterator lineIterator(dataFStream);
@@ -84,7 +96,7 @@ int main(int argc, char* argv[])
         SparseEntryParser sparseEntryParser;
 
         // handle two cases - input map specified or unspecified
-        if (sharedArguments.inputMapFile == "")
+        if (mapLoadArguments.inputMapFile == "")
         {
             // load data wihtout applying any map
             data = DatasetLoader::Load(lineIterator, sparseEntryParser);
@@ -97,12 +109,12 @@ int main(int argc, char* argv[])
         }
         else
         {
-            // open map file
-            ifstream mapFStream = OpenIfstream(sharedArguments.inputMapFile);
+            // load map
+            ifstream mapFStream = OpenIfstream(mapLoadArguments.inputMapFile);
             map = JsonSerializer::Load<Map>(mapFStream, "Base");
 
             // create list of output coordinates
-            inputCoordinates = CoordinateListFactory::IgnoreSuffix(map, sharedArguments.inputMapIgnoreSuffix);
+            inputCoordinates = CoordinateListFactory::IgnoreSuffix(map, mapLoadArguments.inputMapIgnoreSuffix);
             
             // load data
             MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
@@ -119,17 +131,17 @@ int main(int argc, char* argv[])
         BinaryClassificationEvaluator evaluator;
 
         // create random number generator
-        auto rng = GetRandomEngine(sharedArguments.dataRandomSeedString);
+        auto rng = GetRandomEngine(sgdArguments.dataRandomPermutationSeedString);
 
         // perform epochs
-        for(int epoch = 0; epoch < trainerArguments.numEpochs; ++epoch)
+        for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
         {
             // randomly permute the data
             data.RandPerm(rng);
 
             // iterate over the entire permuted dataset
             auto trainSetIterator = data.GetIterator();
-            optimizer.Update(trainSetIterator, loss, trainerArguments.l2Regularization);
+            optimizer.Update(trainSetIterator, loss, sgdArguments.l2Regularization);
 
             // Evaluate
             auto evaluationIterator = data.GetIterator();
@@ -144,9 +156,9 @@ int main(int argc, char* argv[])
         predictor.AddTo(map, inputCoordinates);
 
         // save map to output file
-        if (sharedArguments.outputMapFile != "")
+        if (mapSaveArguments.outputMapFile != "")
         {
-            ofstream outputFStream = OpenOfstream(sharedArguments.outputMapFile);
+            ofstream outputFStream = OpenOfstream(mapSaveArguments.outputMapFile);
             map.Serialize(outputFStream);
         }
     }
