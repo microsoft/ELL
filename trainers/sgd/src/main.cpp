@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
             auto trainSetIterator = dataset.GetIterator();
             optimizer.Update(trainSetIterator, loss, sgdArguments.l2Regularization);
 
-            // Evaluate
+            // Evaluate training error
             auto evaluationIterator = dataset.GetIterator();
             evaluator.Evaluate(evaluationIterator, optimizer.GetPredictor(), loss);
         }
@@ -124,7 +124,3 @@ int main(int argc, char* argv[])
 
     return 0;
 }
-
-
-
-
