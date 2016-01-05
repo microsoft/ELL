@@ -1,93 +1,66 @@
 // main.cpp
 
-// utilities
-#include "files.h"
-#include "CommandLineParser.h"
-using namespace utilities;
+#include "CommandLineParser.h" 
+using utilities::CommandLineParser;
 
-// treetools shared
-#include "sharedArguments.h"
-using namespace utilities;
+#include "MapLoadArguments.h" 
+using utilities::ParsedMapLoadArguments;
+
+#include "DataLoadArguments.h" 
+using utilities::ParsedDataLoadArguments;
+
+#include "DataSaveArguments.h" 
+using utilities::ParsedDataSaveArguments;
 
 // layers
-#include "layers.h"
-using namespace layers;
+#include "Map.h"
+using layers::Map;
 
-// _USE_DEFAULT_DESERIALIZER_  // use the default deserializer for layers
+#include "Coordinate.h"
+using layers::CoordinateList;
 
-// data iterators
-//#include "SequentialLineIterator.h"
-//#include "ParsingIterator.h"
-//#include "SvmlightParser.h"
-//#include "MappedParser.h"
-//using namespace data_iterators;
+// dataset
+#include "SupervisedExample.h"
+using dataset::RowDataset;
 
-#include <memory>
-using std::dynamic_pointer_cast;
+// common
+#include "DatasetMapLoader.h"
+using common::DatasetMapLoader;
 
+// stl
 #include <iostream>
 using std::cerr;
 using std::endl;
 
-#include <string>
-using std::string;
+#include <stdexcept>
+using std::runtime_error;
 
 int main(int argc, char* argv[])
 {
     try
     {
-        // parse the command line
-        CommandLineParser cmd_instanceParser(argc, argv);
-        ParsedSharedArguments shared_arguments(cmd_instanceParser);
-        cmd_instanceParser.ParseArgs();
+        // create a command line parser
+        CommandLineParser commandLineParser(argc, argv);
 
-        // open map file
-        ifstream map_fs = OpenIfstream(shared_arguments.inputMapFile);
+        // add arguments to the command line parser
+        ParsedMapLoadArguments mapLoadArguments(commandLineParser);
+        ParsedDataLoadArguments dataLoadArguments(commandLineParser);
+        ParsedDataSaveArguments dataSaveArguments(commandLineParser);
 
-        // open data file
-        ifstream data_fs = OpenIfstream(shared_arguments.dataFile);
+        // parse command line
+        commandLineParser.ParseArgs();
 
-        // Load the model
-        auto col = Io::ReadColumn(map_fs, shared_arguments.map_layers);
-
-        //// we want to read the data file sequentially
-        //SequentialLineIterator sli(data_fs);
-        //
-        //// get a parser for svmlight format
-        //SvmlightParser sp;
-
-        //// wrap the parser with a Mapping, to get a new parser
-        //using mapped_svmlight_instanceParser = MappedParser<SvmlightParser>;
-        //mapped_svmlight_instanceParser mp(sp, col);
-
-        //// create an iterator that wraps the parser
-        //using mapped_svmlight_parsing_iterator = ParsingIterator<SequentialLineIterator, mapped_svmlight_instanceParser>;
-        //mapped_svmlight_parsing_iterator pi(sli, mp, col->GetOutputDim());
-
-        //// process row by row
-        //int counter = 0;
-        //while (pi.IsValid())
-        //{
-        //    auto& x = pi.GetFeatureVector();
-        //    auto y = pi.GetLabel();
-        //    auto w = pi.GetWeight();
-
-        //    // generate output and print it out TODO
-        //    
-        //    
-        //    pi.Next();
-        //    ++counter;
-        //} 
+        // create and load a dataset, a map, and a coordinate list
+        RowDataset dataset;
+        Map map;
+        CoordinateList inputCoordinates;
+        DatasetMapLoader::Load(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
 
     }
     catch (runtime_error e)
     {
-        cerr << "runtime error: " << e.what() << std::endl;
-        return 1;
+        cerr << "runtime error: " << e.what() << endl;
     }
 
     return 0;
 }
-
-
-
