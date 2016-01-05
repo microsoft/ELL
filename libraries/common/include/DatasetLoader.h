@@ -14,7 +14,7 @@ namespace common
 {
     /// Container that holds a static function that loads and parses a dataset 
     ///
-    struct DatasetLoader
+    struct DatasetLoader // TODO make this a standard function, not a static member
     {
         template<typename RowIteratorType, typename VectorEntryParserType>
         static RowDataset Load(RowIteratorType line_iterator, VectorEntryParserType parser);
