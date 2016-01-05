@@ -22,6 +22,9 @@
 //using std::endl;
 //using std::string;
 //using std::stringstream;
+
+using namespace utilities;
+
 //
 //
 //// A struct of parameters
@@ -48,18 +51,66 @@
 //};
 //
 
+// Test of ParsedArgSet
+/// A struct that holds command line parameters for loading maps
+///
+struct TestArguments
+{
+	string outputDataFile = "";
+	bool outputDataFileHasWeights = false;
+};
+
+/// A version of DataSaveArguments that adds its members to the command line parser
+///
+struct ParsedTestArguments : public TestArguments, public ParsedArgSet
+{
+	/// Ctor
+	///
+	ParsedTestArguments(CommandLineParser& parser) : ParsedArgSet(parser)
+	{
+		AddArgs(parser);
+	}
+
+	/// Adds the arguments to the command line parser
+	///
+	virtual void AddArgs(CommandLineParser& parser)
+	{
+		parser.AddOption(
+			outputDataFile,
+			"outputDataFile",
+			"odf",
+			"Path to the output data file",
+			"");
+
+		parser.AddOption(
+			outputDataFileHasWeights,
+			"outputDataFileHasWeights",
+			"odfhw",
+			"Indicates whether the output data file format specifies a weight per example",
+			false);
+	}
+
+	virtual bool PostProcess(CommandLineParser& parser)
+	{
+		std::cout << "Got ParsedTestArguments PostProcess callback" << std::endl;
+		std::cout << "outputDataFile = " << outputDataFile << std::endl;
+		std::cout << "outputDataFileHasWeights = " << outputDataFileHasWeights << std::endl;
+		return true;
+	}
+};
+
 bool postParseCallback(utilities::CommandLineParser& parser)
 {
-    std::cout << "Callback" << std::endl;
+    std::cout << "Standalone callback called" << std::endl;
 
-    return parser.HasOption("a");
+    // return parser.HasOption("a");
 
     return true;
 }
 
 int main(int argc, char* argv[])
 {
-    utilities::CommandLineParser cmdline(argc, argv);
+    CommandLineParser cmdline(argc, argv);
 
 //    // Add plain variables to the parser
     bool print_help;
@@ -67,6 +118,9 @@ int main(int argc, char* argv[])
     cmdline.AddDocumentationString("---- General app parameters ----");
     cmdline.AddOption(filepath, "filepath", "f", "Output filepath", "");
     cmdline.AddOption(print_help, "help", "", "Print help and exit", "");
+
+	// add parsed arg set
+	ParsedTestArguments testArgs(cmdline);
 
 //    // Here is a convenient way to use a struct of parameters:
 //    parsed_params Params(cmdline);
@@ -78,11 +132,14 @@ int main(int argc, char* argv[])
 //    }
 //
 
-    cmdline.AddParseCallback(postParseCallback);
+    cmdline.AddPostParseCallback(postParseCallback);
 
     // Now actually parse the arguments and set the corresponding parameter values
     cmdline.ParseArgs();
-//
+
+	
+	
+	//
 //    cout << "numIter: " << Params.numIter << endl;
 //    cout << "thresh: " << Params.thresh << endl;
 //

@@ -21,7 +21,7 @@ struct SgdArguments
 ///
 struct ParsedSgdArguments : SgdArguments, ParsedArgSet
 {
-    ParsedSgdArguments(CommandLineParser& parser)
+    ParsedSgdArguments(CommandLineParser& parser) : ParsedArgSet(parser)
     {
         AddArgs(parser);
     }

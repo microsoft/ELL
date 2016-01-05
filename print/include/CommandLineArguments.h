@@ -54,7 +54,7 @@ struct CommandLineArguments
 
 struct ParsedCommandLineArguments : public CommandLineArguments, public ParsedArgSet
 {
-    ParsedCommandLineArguments(CommandLineParser& parser)
+    ParsedCommandLineArguments(CommandLineParser& parser) : ParsedArgSet(parser)
     {
         AddArgs(parser);
     }

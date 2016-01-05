@@ -4,7 +4,7 @@
 
 namespace utilities
 {
-    ParsedDataSaveArguments::ParsedDataSaveArguments(CommandLineParser& parser) 
+    ParsedDataSaveArguments::ParsedDataSaveArguments(CommandLineParser& parser) : ParsedArgSet(parser)
     {
         AddArgs(parser);
     }

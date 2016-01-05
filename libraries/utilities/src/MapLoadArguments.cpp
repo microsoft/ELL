@@ -4,7 +4,7 @@
 
 namespace utilities
 {
-    ParsedMapLoadArguments::ParsedMapLoadArguments(CommandLineParser& parser)
+    ParsedMapLoadArguments::ParsedMapLoadArguments(CommandLineParser& parser) : ParsedArgSet(parser)
     {
         AddArgs(parser);
     }
