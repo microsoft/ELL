@@ -12,6 +12,14 @@ using std::max;
 
 namespace utilities
 {
+	//
+	// ParsedArgSet class
+	//
+	ParsedArgSet::ParsedArgSet(CommandLineParser& parser)
+	{
+		parser.AddPostParseCallback([this](CommandLineParser& p) { return PostProcess(p);});
+	}
+
     //
     // OptionInfo class
     //
@@ -176,7 +184,7 @@ namespace utilities
         }
     }
 
-    void CommandLineParser::AddParseCallback(const ParseCallback& callback)
+    void CommandLineParser::AddPostParseCallback(const ParseCallback& callback)
     {
         _parseCallbacks.push_back(callback);
     }

@@ -47,7 +47,9 @@ namespace utilities
     class ParsedArgSet
     {
     public:
+		ParsedArgSet(CommandLineParser& parser);
         virtual void AddArgs(CommandLineParser& parser) {};
+		virtual bool PostProcess(CommandLineParser& parser) { return true; }
     };
 
     /// TODO: document
@@ -122,7 +124,7 @@ namespace utilities
 
         /// Adds a callback function that gets invoked after ParseArgs() is called
         using ParseCallback = std::function<bool(CommandLineParser&)>;
-        void AddParseCallback(const ParseCallback& callback);
+        void AddPostParseCallback(const ParseCallback& callback);
 
     protected:
 
