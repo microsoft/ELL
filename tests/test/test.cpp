@@ -28,8 +28,6 @@ using std::endl;
 
 using namespace utilities;
 
-
-
 // A struct of parameters
 struct app_params
 {
@@ -37,8 +35,8 @@ struct app_params
     double thresh = 0.0;
 };
 
-// A subclass of your parameter struct that knows how to Add its members to the commandline parser
-struct ParsedParams : app_params, utilities::ParsedArgSet
+// A subclass of your parameter struct that knows how to add its members to the commandline parser
+struct ParsedParams : app_params, ParsedArgSet
 {
     ParsedParams(CommandLineParser& parser) : ParsedArgSet(parser)
     {
@@ -91,15 +89,15 @@ int main(int argc, char* argv[])
 	}
 	catch (const CommandLineParser::ParseErrorException& ex)
 	{
-		std::cerr << "Parsing failed" << std::endl;
+		cerr << "Parsing failed" << endl;
 		for (const auto& result : ex.GetParseErrors())
 		{
-			std::cerr << result.GetMessage() << std::endl;
+			cerr << result.GetMessage() << endl;
 		}
 		exit(0);
 	}
 
-	std::cout << "filepath: " << filepath << std::endl;
+	cout << "filepath: " << filepath << endl;
 
 //
 //    cout << "numIter: " << Params.numIter << endl;
@@ -108,7 +106,7 @@ int main(int argc, char* argv[])
 //    if (filepath == "")
 //    {
 //        cout << "Error: filepath not set!" << endl;
-//        throw std::runtime_error("filepath not set");
+//        throw runtime_error("filepath not set");
 //    }
 //
 //    cout << "filepath: " << filepath << endl;
@@ -155,7 +153,7 @@ int main(int argc, char* argv[])
 //    }
 //    catch (runtime_error e)
 //    {
-//        cerr << "runtime error: " << e.what() << std::endl;
+//        cerr << "runtime error: " << e.what() << endl;
 //    }
 //
 	return 0;
