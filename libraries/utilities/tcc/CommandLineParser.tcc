@@ -73,7 +73,6 @@ namespace utilities
         return ss.str();
     }
 
-
     // bool specialization
     template <>
     inline bool CommandLineParser::ParseVal<bool>(string val, bool& result)

@@ -20,6 +20,43 @@ namespace utilities
 		parser.AddPostParseCallback([this](CommandLineParser& p) { return PostProcess(p);});
 	}
 
+	void ParsedArgSet::AddArgs(CommandLineParser& parser)
+	{
+	}
+
+	CommandLineParser::ParseResult ParsedArgSet::PostProcess(CommandLineParser& parser)
+	{
+		return CommandLineParser::ParseResult();
+	}
+
+	CommandLineParser::ParseResult::ParseResult()
+	{
+		_message = "";
+		_isValid = true;
+	}
+
+	CommandLineParser::ParseResult::ParseResult(bool ok)
+	{
+		_message = "";
+		_isValid = ok;
+	}
+
+	CommandLineParser::ParseResult::ParseResult(const char* message)
+	{
+		_message = message;
+		_isValid = false;
+	}
+
+	CommandLineParser::ParseResult::operator bool()
+	{
+		return _isValid;
+	}
+
+	string CommandLineParser::ParseResult::GetMessage() const
+	{
+		return _message;
+	}
+
     //
     // OptionInfo class
     //
@@ -41,9 +78,22 @@ namespace utilities
 
     void CommandLineParser::ParseArgs()
     {
-        // TODO: should probably throw an exception here
+        // TODO: should probably throw an exception here ?
         if (_originalArgs.size() == 0)
             return;
+
+		bool printHelpAndExit = false;
+		if (!HasOption("help"))
+		{
+			if (HasShortName("h"))
+			{
+				AddOption(printHelpAndExit, "help", "", "Print help and exit", false);
+			}
+			else
+			{
+				AddOption(printHelpAndExit, "help", "h", "Print help and exit", false);
+			}
+		}
 
         string exe_path = _originalArgs[0];
         size_t slash_pos = exe_path.find_last_of("/\\");
@@ -56,7 +106,7 @@ namespace utilities
             _exeName = exe_path.substr(slash_pos + 1);
         }
 
-        // While we're parsing the arguments, we may Add new conditional options. If we do so, we need
+        // While we're parsing the arguments, we may add new conditional options. If we do so, we need
         // to reparse the inputs in case some earlier commandline option referred to one of these new
         // options. So we repeatedly parse the command line text until we haven't added any new conditional options.
     
@@ -129,17 +179,32 @@ namespace utilities
         }
 
         // Finally, invoke the post-parse callbacks
-        bool didPass = true;
+		bool isValid = true;
+		vector<ParseResult> parseErrors;
         for(const auto& callback: _parseCallbacks)
         {
-            didPass = didPass && callback(*this);
+			auto callbackResult = callback(*this);
+			if (!callbackResult)
+			{
+				isValid = false;
+				if (callbackResult.GetMessage() != "")
+				{
+					parseErrors.push_back(callbackResult);
+				}
+			}
         }
 
-        if(!didPass)
-        {
-            throw std::runtime_error("Error in parse callbacks");
-        }
-    }
+		if (printHelpAndExit)
+		{
+			PrintUsage(std::cout); // TODO: allow constructor to optionally specify output stream for help text
+			throw PrintHelpException("");
+		}
+
+		if (!isValid)
+		{
+			throw ParseErrorException("Error in parse callback", parseErrors);
+		}
+	}
 
     bool CommandLineParser::SetDefaultArgs(const set<string>& unset_args)
     {
@@ -162,6 +227,11 @@ namespace utilities
     {
         return _options.find(option) != _options.end();
     }
+
+	bool CommandLineParser::HasShortName(string shortName)
+	{
+		return _shortToLongNameMap.find(shortName) != _shortToLongNameMap.end();
+	}
 
     void CommandLineParser::AddOption(const OptionInfo& info)
     {

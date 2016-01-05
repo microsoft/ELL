@@ -8,15 +8,6 @@
 //   a sdca parser, both of which are subclasses of a global_descent parser, the choice of which to use is conditional on the gd_alg option
 // * tokenize the input stream based on whitespace, then split on entries starting with '-' --- the first item will be the option, followed by zero or more values
 //   in this case, we maybe need to use the special '--' option to specify positional / unnamed arguments (and/or have them appear first)
-
-
-
-// First things to do:
-//
-// + add post-parse callback list
-// + throw or something when AddOption is called twice with same argument string
-// * automatically add "--help" option
-// * throw exceptions on error and when automatically printing help
 // * (optionally?) accept /arg instead of -arg or --arg
 
 
@@ -43,15 +34,6 @@ using std::pair;
 
 namespace utilities
 {
-    class CommandLineParser;
-    class ParsedArgSet
-    {
-    public:
-		ParsedArgSet(CommandLineParser& parser);
-        virtual void AddArgs(CommandLineParser& parser) {};
-		virtual bool PostProcess(CommandLineParser& parser) { return true; }
-    };
-
     /// TODO: document
     ///
     struct OptionInfo
@@ -122,9 +104,41 @@ namespace utilities
         ///
         bool HasOption(string option);
 
-        /// Adds a callback function that gets invoked after ParseArgs() is called
-        using ParseCallback = std::function<bool(CommandLineParser&)>;
-        void AddPostParseCallback(const ParseCallback& callback);
+		bool HasShortName(string shortName);
+
+		class ParseResult
+		{
+		public:
+			ParseResult(); // No error
+			ParseResult(bool ok); // Error (or not), no message
+			ParseResult(const char *message); // Error
+			operator bool();
+			string GetMessage() const;
+
+		private:
+			string _message;
+			bool _isValid;
+		};
+
+		/// Adds a callback function that gets invoked after ParseArgs() is called
+		using ParseCallback = std::function<ParseResult(CommandLineParser&)>;
+		void AddPostParseCallback(const ParseCallback& callback);
+
+		class PrintHelpException : public std::runtime_error
+		{
+			using std::runtime_error::runtime_error;
+		};
+
+		class ParseErrorException : public std::runtime_error 
+		{
+		public:
+			using std::runtime_error::runtime_error;
+			ParseErrorException(const char* message, std::vector<ParseResult> errors) : std::runtime_error(message), _errors(errors) {}
+			const vector<ParseResult>& GetParseErrors() const { return _errors; }
+
+		private:
+			vector<ParseResult> _errors;
+		};
 
     protected:
 
@@ -172,6 +186,19 @@ namespace utilities
         virtual bool SetOption(string option_name, string option_val); // returns true if we need to reparse
         bool SetDefaultArgs(const set<string>& unset_args); // returns true if we need to reparse
     };
+
+	// TODO: put this in separate file
+
+	/// ParsedArgSet class
+	///
+	class ParsedArgSet
+	{
+	public:
+		ParsedArgSet(CommandLineParser& parser);
+
+		virtual void AddArgs(CommandLineParser& parser);
+		virtual CommandLineParser::ParseResult PostProcess(CommandLineParser& parser);
+	};
 }
 
 #include "../tcc/CommandLineParser.tcc"
