@@ -11,6 +11,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
 # Include cmake projects for libraries and executables
+add_subdirectory(libraries/common)
 add_subdirectory(libraries/dataset)
 add_subdirectory(libraries/layers)
 add_subdirectory(libraries/linear)

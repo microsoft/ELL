@@ -9,8 +9,8 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
 set (SRC standalone_tree_layout.cpp)
 
-include_directories(../../libraries/common/include)
 include_directories(../../libraries/tree_layout/include)
+include_directories(../../libraries/types/include)
 
 add_executable(standalone_tree_layout ${SRC})
 target_link_libraries(standalone_tree_layout tree_layout)

@@ -19,10 +19,10 @@ source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(tcc)
-include_directories(../common/include)
 include_directories(../linear/include)
 include_directories(../layers/include)
 include_directories(../predictors/include)
+include_directories(../types/include)
 include_directories(../utilities/include)
 
 add_library(optimization ${SRC} ${INCLUDE} ${TCC})

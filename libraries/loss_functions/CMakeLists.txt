@@ -20,6 +20,6 @@ source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 
 include_directories(include)
-include_directories(../common/include)
+include_directories(../types/include)
 
 add_library(loss_functions ${SRC} ${INCLUDE})

@@ -20,7 +20,6 @@ set (SRC src/CompressedIntegerList.cpp
                  src/ZeroDatavector.cpp)
 
 set (INCLUDE include/CompressedIntegerList.h
-                     include/DatasetLoader.h
                      include/DatavectorBuilder.h
                      include/DenseDatavector.h
                      include/IDataVector.h
@@ -37,7 +36,6 @@ set (INCLUDE include/CompressedIntegerList.h
                      include/ZeroDatavector.h)
 
 set (TCC tcc/DataVectorBuilder.tcc
-                 tcc/DatasetLoader.tcc
                  tcc/DenseDataVector.tcc
                  tcc/MappedParser.tcc
                  tcc/ParsingIterator.tcc
@@ -51,8 +49,9 @@ source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(tcc)
-include_directories(../common/include)
 include_directories(../linear/include)
+include_directories(../layers/include)
+include_directories(../types/include)
 include_directories(../utilities/include)
 
 add_library(dataset ${SRC} ${INCLUDE} ${TCC})

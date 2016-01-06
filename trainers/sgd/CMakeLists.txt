@@ -8,7 +8,7 @@ PROJECT(sgd)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
 set (SRC src/main.cpp)
-set (INCLUDE include/args.h)
+set (INCLUDE include/CommandLineArguments.h)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -21,7 +21,9 @@ include_directories(../../libraries/linear/include)
 include_directories(../../libraries/loss_functions/include)
 include_directories(../../libraries/predictors/include)
 include_directories(../../libraries/optimization/include)
+include_directories(../../libraries/types/include)
 include_directories(../../libraries/utilities/include)
 
+
 add_executable(sgd ${SRC} ${INCLUDE})
-target_link_libraries(sgd dataset layers linear loss_functions predictors optimization utilities)
+target_link_libraries(sgd common dataset layers linear loss_functions predictors optimization utilities)

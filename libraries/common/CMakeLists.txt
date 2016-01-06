@@ -1,19 +1,19 @@
 #
-# cmake file for predictors library
+# cmake file for common library
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
-PROJECT(predictors)
+PROJECT(common)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
-set (SRC src/MutableDecisionTree.cpp
-         src/SharedLinearBinaryPredictor.cpp)
 
-set (INCLUDE include/MutableDecisionTree.h
-             include/SharedLinearBinaryPredictor.h)
+set (SRC src/DatasetMapLoader.cpp)
 
-set (TCC tcc/SharedLinearBinaryPredictor.tcc)
+set (INCLUDE include/DatasetLoader.h
+             include/DatasetMapLoader.h)
+
+set (TCC tcc/DatasetLoader.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -21,9 +21,10 @@ source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(tcc)
+include_directories(../dataset/include)
 include_directories(../layers/include)
 include_directories(../linear/include)
 include_directories(../types/include)
 include_directories(../utilities/include)
 
-add_library(predictors ${SRC} ${INCLUDE} ${TCC})
+add_library(common ${SRC} ${INCLUDE} ${TCC})

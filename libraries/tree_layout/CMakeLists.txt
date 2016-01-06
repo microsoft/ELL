@@ -21,6 +21,6 @@ source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(tcc)
-include_directories(../common/include)
+include_directories(../types/include)
 
 add_library(tree_layout ${SRC} ${INCLUDE} ${TCC})

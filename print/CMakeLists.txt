@@ -30,9 +30,9 @@ source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 
 include_directories(include)
-include_directories(../libraries/common/include)
-include_directories(../libraries/utilities/include)
 include_directories(../libraries/layers/include)
+include_directories(../libraries/types/include)
+include_directories(../libraries/utilities/include)
 
 add_executable(print ${SRC} ${INCLUDE})
 target_link_libraries(print utilities layers)
