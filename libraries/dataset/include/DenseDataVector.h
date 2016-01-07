@@ -111,6 +111,6 @@ namespace dataset
     };
 }
 
-#include "../tcc/DenseDatavector.tcc"
+#include "../tcc/DenseDataVector.tcc"
 
 

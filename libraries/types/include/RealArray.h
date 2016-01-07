@@ -12,6 +12,7 @@ using std::vector;
 using std::ostream;
 
 #include <type_traits>
+using std::enable_if;
 using std::enable_if_t;
 using std::is_base_of;
 

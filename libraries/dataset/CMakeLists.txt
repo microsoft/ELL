@@ -1,4 +1,4 @@
-#
+
 # cmake file for dataset library
 #
 
@@ -9,31 +9,31 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
 
 set (SRC src/CompressedIntegerList.cpp
-                 src/DenseDatavector.cpp
+                 src/DenseDataVector.cpp
                  src/IntegerList.cpp
-                 src/OnesDatavector.cpp
+                 src/OnesDataVector.cpp
                  src/SequentialLineIterator.cpp
-                 src/SparseBinaryDatavector.cpp
-                 src/SparseDatavector.cpp
+                 src/SparseBinaryDataVector.cpp
+                 src/SparseDataVector.cpp
                  src/SparseEntryParser.cpp
                  src/SupervisedExample.cpp
-                 src/ZeroDatavector.cpp)
+                 src/ZeroDataVector.cpp)
 
 set (INCLUDE include/CompressedIntegerList.h
-                     include/DatavectorBuilder.h
-                     include/DenseDatavector.h
+                     include/DataVectorBuilder.h
+                     include/DenseDataVector.h
                      include/IDataVector.h
                      include/IntegerList.h
                      include/MappedParser.h
-                     include/OnesDatavector.h
+                     include/OnesDataVector.h
                      include/ParsingIterator.h
                      include/SequentialLineIterator.h
-                     include/SparseBinaryDatavector.h
-                     include/SparseDatavector.h
+                     include/SparseBinaryDataVector.h
+                     include/SparseDataVector.h
                      include/SparseEntryParser.h
                      include/SupervisedExample.h
                      include/SupervisedExampleBuilder.h
-                     include/ZeroDatavector.h)
+                     include/ZeroDataVector.h)
 
 set (TCC tcc/DataVectorBuilder.tcc
                  tcc/DenseDataVector.tcc

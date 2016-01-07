@@ -1,6 +1,6 @@
 // SupervisedExampleBuilder.tcc
 
-#include "DatavectorBuilder.h"
+#include "DataVectorBuilder.h"
 
 #include "Parser.h"
 using utilities::Parser;

@@ -25,7 +25,6 @@ set (INCLUDE include/Base.h
              include/operators.h)
 
 set (TCC tcc/BiMatrix.tcc
-         tcc/DoubleVector.tcc
          tcc/RowMatrix.tcc)
 
 source_group("src" FILES ${SRC})
