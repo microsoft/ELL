@@ -7,6 +7,9 @@
 #include <stdexcept>
 using std::runtime_error;
 
+#include <cstring>
+using std::memcpy;
+
 namespace dataset
 {
 
