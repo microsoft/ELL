@@ -21,11 +21,6 @@ struct SgdArguments
 ///
 struct ParsedSgdArguments : SgdArguments, ParsedArgSet
 {
-    ParsedSgdArguments(CommandLineParser& parser) : ParsedArgSet(parser)
-    {
-        AddArgs(parser);
-    }
-
     virtual void AddArgs(CommandLineParser& parser)
     {
         parser.AddOption(numEpochs, "numEpochs", "e", "Number of epochs over the data", 3);

@@ -62,10 +62,15 @@ int main(int argc, char* argv[])
         CommandLineParser commandLineParser(argc, argv);
 
         // add arguments to the command line parser
-        ParsedMapLoadArguments mapLoadArguments(commandLineParser);
-        ParsedDataLoadArguments dataLoadArguments(commandLineParser);
-        ParsedMapSaveArguments mapSaveArguments(commandLineParser);
-        ParsedSgdArguments sgdArguments(commandLineParser);
+        ParsedMapLoadArguments mapLoadArguments;
+        ParsedDataLoadArguments dataLoadArguments;
+        ParsedMapSaveArguments mapSaveArguments;
+        ParsedSgdArguments sgdArguments;
+
+        commandLineParser.AddOptionSet(mapLoadArguments);
+        commandLineParser.AddOptionSet(dataLoadArguments);
+        commandLineParser.AddOptionSet(mapSaveArguments);
+        commandLineParser.AddOptionSet(sgdArguments);
         
         // parse command line
         commandLineParser.ParseArgs();

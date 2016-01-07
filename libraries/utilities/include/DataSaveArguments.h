@@ -26,10 +26,6 @@ namespace utilities
     ///
     struct ParsedDataSaveArguments : public DataSaveArguments, public ParsedArgSet
     {
-        /// Ctor
-        ///
-        ParsedDataSaveArguments(CommandLineParser& parser);
-        
         /// Adds the arguments to the command line parser
         ///
         virtual void AddArgs(CommandLineParser& parser);

@@ -38,11 +38,6 @@ struct app_params
 // A subclass of your parameter struct that knows how to add its members to the commandline parser
 struct ParsedParams : app_params, ParsedArgSet
 {
-    ParsedParams(CommandLineParser& parser) : ParsedArgSet(parser)
-    {
-        AddArgs(parser);
-    }
-
     virtual void AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddDocumentationString("---- Iteration-related parameters ----"); // optional documentation string that gets printed out when you use the --help option
@@ -70,14 +65,17 @@ int main(int argc, char* argv[])
 {
 	CommandLineParser cmdline(argc, argv);
 
+	cmdline.AddDocumentationString("---- General app parameters ----");
+
+
 	// Add a plain variable to the parser
 	string filepath;
-	cmdline.AddDocumentationString("---- General app parameters ----");
 	cmdline.AddOption(filepath, "filepath", "f", "Output filepath", "");
 
 	// add parsed arg set
-	ParsedParams testArgs(cmdline);
-
+    ParsedParams testArgs;
+    cmdline.AddOptionSet(testArgs);
+    
 	// Now actually parse the arguments and set the corresponding parameter values
 	try
 	{

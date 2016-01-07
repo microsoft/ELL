@@ -26,10 +26,6 @@ namespace utilities
     ///
     struct ParsedDataLoadArguments : public DataLoadArguments, public ParsedArgSet
     {
-        /// Ctor
-        ///
-        ParsedDataLoadArguments(CommandLineParser& parser);
-        
         /// Adds the arguments to the command line parser
         ///
         virtual void AddArgs(CommandLineParser& parser);

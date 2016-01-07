@@ -21,11 +21,6 @@ struct CommandLineArguments
 
 struct ParsedCommandLineArguments : public CommandLineArguments, public ParsedArgSet
 {
-    ParsedCommandLineArguments(CommandLineParser& parser) : ParsedArgSet(parser)
-    {
-        AddArgs(parser);
-    }
-
     virtual void AddArgs(CommandLineParser& parser)
     {
         parser.AddOption(mapFile, "mapFile", "lf", "Path to the input file that contains the layer information", "");

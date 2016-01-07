@@ -15,16 +15,15 @@ namespace utilities
 	//
 	// ParsedArgSet class
 	//
-	ParsedArgSet::ParsedArgSet(CommandLineParser& parser)
+	ParsedArgSet::ParsedArgSet()
 	{
-		parser.AddPostParseCallback([this](CommandLineParser& p) { return PostProcess(p);});
 	}
 
 	void ParsedArgSet::AddArgs(CommandLineParser& parser)
 	{
 	}
 
-	CommandLineParser::ParseResult ParsedArgSet::PostProcess(CommandLineParser& parser)
+	CommandLineParser::ParseResult ParsedArgSet::PostProcess(const CommandLineParser& parser)
 	{
 		return CommandLineParser::ParseResult();
 	}
@@ -181,7 +180,7 @@ namespace utilities
         // Finally, invoke the post-parse callbacks
 		bool isValid = true;
 		vector<ParseResult> parseErrors;
-        for(const auto& callback: _parseCallbacks)
+        for(const auto& callback: _postParseCallbacks)
         {
 			auto callbackResult = callback(*this);
 			if (!callbackResult)
@@ -254,9 +253,9 @@ namespace utilities
         }
     }
 
-    void CommandLineParser::AddPostParseCallback(const ParseCallback& callback)
+    void CommandLineParser::AddPostParseCallback(const PostParseCallback& callback)
     {
-        _parseCallbacks.push_back(callback);
+        _postParseCallbacks.push_back(callback);
     }
 
     inline bool FindBestMatch(string str, const vector<string>& val_names, string& result_string)  // TODO: this function is not used anywhere -erase it?
@@ -317,6 +316,12 @@ namespace utilities
         }
 
         return did_enable_more_params;
+    }
+
+    void CommandLineParser::AddOptionSet(ParsedArgSet& options)
+    {
+        AddPostParseCallback([this, &options](CommandLineParser& p) { return options.PostProcess(p);});
+        options.AddArgs(*this);
     }
 
     void CommandLineParser::AddDocumentationString(string str)

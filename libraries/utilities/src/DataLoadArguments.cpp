@@ -4,11 +4,6 @@
 
 namespace utilities
 {
-    ParsedDataLoadArguments::ParsedDataLoadArguments(CommandLineParser& parser) : ParsedArgSet(parser)
-    {
-        AddArgs(parser);
-    }
-
     void ParsedDataLoadArguments::AddArgs(CommandLineParser& parser)
     {
         parser.AddOption(

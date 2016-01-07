@@ -71,6 +71,7 @@ namespace utilities
     // myexe.exe foo.tsv
     // myexe.exe foo.tsv bar.tsv
     // myexe.exe -t 8 -x blah foo.tsv bar.tsv
+    class ParsedArgSet;
     class CommandLineParser
     {
     public:
@@ -83,6 +84,10 @@ namespace utilities
         ///
         template <typename T, typename U>
         void AddOption(T& option, string name, string shortName, string description, const U& defaultValue);
+
+        /// AddOptionSet adds a ParsedArgSet to the commandline parser
+        ///
+        void AddOptionSet(ParsedArgSet& options);
 
         /// Adds a string that gets printed out when pring_usage() is called
         ///
@@ -121,8 +126,8 @@ namespace utilities
 		};
 
 		/// Adds a callback function that gets invoked after ParseArgs() is called
-		using ParseCallback = std::function<ParseResult(CommandLineParser&)>;
-		void AddPostParseCallback(const ParseCallback& callback);
+		using PostParseCallback = std::function<ParseResult(CommandLineParser&)>;
+		void AddPostParseCallback(const PostParseCallback& callback);
 
 		class PrintHelpException : public std::runtime_error
 		{
@@ -180,25 +185,24 @@ namespace utilities
         map<string, string> _shortToLongNameMap;
         map<string, OptionInfo> _options;
         vector<DocumentationEntry> _docEntries;
-        vector<ParseCallback> _parseCallbacks;
+        vector<PostParseCallback> _postParseCallbacks;
 
         void AddOption(const OptionInfo& info);
         virtual bool SetOption(string option_name, string option_val); // returns true if we need to reparse
         bool SetDefaultArgs(const set<string>& unset_args); // returns true if we need to reparse
     };
 
-	// TODO: put this in separate file
-
 	/// ParsedArgSet class
 	///
 	class ParsedArgSet
 	{
 	public:
-		ParsedArgSet(CommandLineParser& parser);
+		ParsedArgSet();
 
 		virtual void AddArgs(CommandLineParser& parser);
-		virtual CommandLineParser::ParseResult PostProcess(CommandLineParser& parser);
+		virtual CommandLineParser::ParseResult PostProcess(const CommandLineParser& parser);
 	};
+
 }
 
 #include "../tcc/CommandLineParser.tcc"

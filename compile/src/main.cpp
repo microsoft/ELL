@@ -33,7 +33,8 @@ int main(int argc, char* argv[])
     {
         // parse the command line
         CommandLineParser commandLineParser(argc, argv);
-        ParsedCommandLineArguments args(commandLineParser);
+        ParsedCommandLineArguments args;
+        commandLineParser.AddOptionSet(args);
         commandLineParser.ParseArgs();
 
         // open file

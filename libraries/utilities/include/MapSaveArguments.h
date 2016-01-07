@@ -25,10 +25,6 @@ namespace utilities
     ///
     struct ParsedMapSaveArguments : public MapSaveArguments, public ParsedArgSet
     {
-        /// Ctor
-        ///
-        ParsedMapSaveArguments(CommandLineParser& parser);
-        
         /// Adds the arguments to the command line parser
         ///
         virtual void AddArgs(CommandLineParser& parser);

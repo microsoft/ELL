@@ -4,11 +4,6 @@
 
 namespace utilities
 {
-    ParsedMapLoadArguments::ParsedMapLoadArguments(CommandLineParser& parser) : ParsedArgSet(parser)
-    {
-        AddArgs(parser);
-    }
-
     void ParsedMapLoadArguments::AddArgs(CommandLineParser& parser)
     {
         parser.AddOption(
