@@ -1,7 +1,0 @@
-// DoubleVector.tcc
-
-namespace linear
-{
-}
-
-

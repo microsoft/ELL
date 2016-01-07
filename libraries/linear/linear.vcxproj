@@ -53,7 +53,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile />
       <PrecompiledHeaderOutputFile />
-      <AdditionalIncludeDirectories>include;..\types\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\common\include</AdditionalIncludeDirectories>
       <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -73,7 +73,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile />
       <PrecompiledHeaderOutputFile />
-      <AdditionalIncludeDirectories>include;..\types\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\common\include</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -98,7 +98,6 @@
     <ClInclude Include="include\BiMatrix.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="tcc\DoubleVector.tcc" />
     <None Include="tcc\RowMatrix.tcc" />
     <None Include="tcc\BiMatrix.tcc" />
   </ItemGroup>

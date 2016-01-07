@@ -51,6 +51,5 @@ namespace linear
     };
 }
 
-#include "../tcc/DoubleVector.tcc"
 
 
