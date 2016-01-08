@@ -22,7 +22,7 @@ set (INCLUDE include/Action.h
              include/CompilableShift.h
              include/CompilableSum.h
              include/Compiler.h
-             include/compilable.h)
+             include/Compilable.h)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
