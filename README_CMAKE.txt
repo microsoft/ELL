@@ -8,7 +8,7 @@ a subdirectory called build, and change to that directory.
 
 Now invoke cmake to create a build environment (in this case, using makefiles):
 
-    > cmake -g "Unix Makefiles" ..
+    > cmake -G "Unix Makefiles" ..
 
 Now build the project(s) using make:
 
