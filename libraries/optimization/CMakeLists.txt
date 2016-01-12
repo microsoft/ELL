@@ -1,9 +1,12 @@
 #
-# cmake file for optimization library
+# cmake file
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
-PROJECT(optimization)
+
+set (PROJ_NAME optimization)
+
+PROJECT(${PROJ_NAME})
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
@@ -25,4 +28,7 @@ include_directories(../predictors/include)
 include_directories(../types/include)
 include_directories(../utilities/include)
 
-add_library(optimization ${SRC} ${INCLUDE} ${TCC})
+add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
+
+set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+

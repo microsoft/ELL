@@ -1,9 +1,12 @@
 #
-# cmake file for loss_functions library
+# cmake file
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
-PROJECT(loss_functions)
+
+set (PROJ_NAME loss_functions)
+
+PROJECT(${PROJ_NAME})
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
@@ -22,4 +25,6 @@ source_group("include" FILES ${INCLUDE})
 include_directories(include)
 include_directories(../types/include)
 
-add_library(loss_functions ${SRC} ${INCLUDE})
+add_library(${PROJ_NAME} ${SRC} ${INCLUDE})
+
+set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
