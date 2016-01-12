@@ -1,9 +1,12 @@
 #
-# cmake file for predictors library
+# cmake file
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
-PROJECT(predictors)
+
+set (PROJ_NAME predictors)
+
+PROJECT(${PROJ_NAME})
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
@@ -26,4 +29,7 @@ include_directories(../linear/include)
 include_directories(../types/include)
 include_directories(../utilities/include)
 
-add_library(predictors ${SRC} ${INCLUDE} ${TCC})
+add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
+
+set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+

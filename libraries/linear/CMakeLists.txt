@@ -1,9 +1,12 @@
 #
-# cmake file for linear library
+# cmake file
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
-PROJECT(linear)
+
+set (PROJ_NAME linear)
+
+PROJECT(${PROJ_NAME})
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
@@ -35,4 +38,6 @@ include_directories(include)
 include_directories(tcc)
 include_directories(../types/include)
 
-add_library(linear ${SRC} ${INCLUDE} ${TCC})
+add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
+
+set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")

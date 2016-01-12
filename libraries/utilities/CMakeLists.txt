@@ -1,9 +1,12 @@
 #
-# cmake file for mappings library
+# cmake file
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
-PROJECT(utilities)
+
+set (PROJ_NAME utilities)
+
+PROJECT(${PROJ_NAME})
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
@@ -43,4 +46,6 @@ include_directories(include)
 include_directories(tcc)
 include_directories(../types/include)
 
-add_library(utilities ${SRC} ${INCLUDE} ${TCC})
+add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
+
+set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")

@@ -3,7 +3,7 @@
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
-PROJECT(Bonsai)
+PROJECT(Layers)
 
 # Turn on ability to create folders to organize projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
