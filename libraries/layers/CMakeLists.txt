@@ -16,6 +16,7 @@ set (SRC src/Coordinate.cpp
          src/CoordinateListFactory.cpp
          src/Coordinatewise.cpp
          src/DecisionTreePath.cpp
+         src/Input.cpp
          src/Io.cpp
          src/Layer.cpp
          src/Map.cpp
@@ -27,7 +28,6 @@ set (INCLUDE include/Coordinate.h
              include/CoordinateListFactory.h
              include/Coordinatewise.h
              include/DecisionTreePath.h
-             include/Input.cpp
              include/Input.h
              include/Layer.h
              include/Map.h
