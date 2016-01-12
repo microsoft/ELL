@@ -3,7 +3,10 @@
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
-project(linear_test)
+
+set (PROJ_NAME linear_test)
+
+project(${PROJ_NAME})
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
@@ -14,5 +17,8 @@ include_directories(../../libraries/dataset/tcc)
 include_directories(../../libraries/linear/include)
 include_directories(../../libraries/types/include)
 
-add_executable(linear_test ${SRC})
-target_link_libraries(linear_test dataset linear)
+add_executable(${PROJ_NAME} ${SRC})
+
+set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tests")
+
+target_link_libraries(${PROJ_NAME} dataset linear)

@@ -3,7 +3,10 @@
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
-PROJECT(compile)
+
+set (PROJ_NAME compile)
+
+PROJECT(${PROJ_NAME})
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
@@ -32,5 +35,6 @@ include_directories(../libraries/layers/include)
 include_directories(../libraries/types/include)
 include_directories(../libraries/utilities/include)
 
-add_executable(compile ${SRC} ${INCLUDE})
-target_link_libraries(compile utilities layers)
+add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
+
+target_link_libraries(${PROJ_NAME} utilities layers)
