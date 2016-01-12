@@ -19,8 +19,8 @@ namespace layers
 
     void Coordinate::Serialize(JsonSerializer& serializer) const
     {
-        serializer.Write("r", _row); 
-        serializer.Write("c", _column);
+      serializer.Write("r", (Json::UInt64)_row); 
+      serializer.Write("c", (Json::UInt64)_column);
     }
 
     void Coordinate::Deserialize(JsonSerializer& serializer)

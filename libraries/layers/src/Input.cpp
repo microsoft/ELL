@@ -32,7 +32,7 @@ namespace layers
         // version 1
         Layer::SerializeHeader(serializer, 1);
 
-        serializer.Write("size", _size);
+        serializer.Write("size", (Json::UInt64)_size);
     }
 
     void Input::Deserialize(JsonSerializer & serializer, int version)
