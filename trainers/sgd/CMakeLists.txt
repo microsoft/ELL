@@ -5,7 +5,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
 PROJECT(sgd)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+  add_compile_options(-std=c++1y)
+endif()
 
 set (SRC src/main.cpp)
 set (INCLUDE include/CommandLineArguments.h)
