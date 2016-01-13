@@ -4,7 +4,6 @@
 
 #include "types.h"
 
-
 #include "IVector.h"
 using linear::IVector;
 

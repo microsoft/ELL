@@ -35,3 +35,8 @@ add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "trainers")
 
 target_link_libraries(${PROJ_NAME} common dataset layers linear loss_functions predictors optimization utilities)
+
+add_test(NAME sgd_train
+         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} 
+         COMMAND ${PROJ_NAME} -idf data/a9a.txt)
+

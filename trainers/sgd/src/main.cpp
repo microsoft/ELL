@@ -125,6 +125,7 @@ int main(int argc, char* argv[])
     catch (runtime_error e)
     {
         cerr << "runtime error: " << e.what() << endl;
+        return 1;
     }
 
     return 0;

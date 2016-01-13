@@ -12,6 +12,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   add_compile_options(-std=c++1y)
 endif()
 
+enable_testing()
+
 # Include cmake projects for libraries and executables
 add_subdirectory(libraries/common)
 add_subdirectory(libraries/dataset)
