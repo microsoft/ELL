@@ -115,7 +115,7 @@ namespace utilities
 		{
 		public:
 			ParseResult(); // No error
-			ParseResult(bool ok); // Error (or not), no message
+			ParseResult(bool ok); // Error (if ok == false), no message
 			ParseResult(const char *message); // Error
 			operator bool();
 			string GetMessage() const;
@@ -128,22 +128,6 @@ namespace utilities
 		/// Adds a callback function that gets invoked after ParseArgs() is called
 		using PostParseCallback = std::function<ParseResult(CommandLineParser&)>;
 		void AddPostParseCallback(const PostParseCallback& callback);
-
-		class PrintHelpException : public std::runtime_error
-		{
-			using std::runtime_error::runtime_error;
-		};
-
-		class ParseErrorException : public std::runtime_error 
-		{
-		public:
-			using std::runtime_error::runtime_error;
-			ParseErrorException(const char* message, std::vector<ParseResult> errors) : std::runtime_error(message), _errors(errors) {}
-			const vector<ParseResult>& GetParseErrors() const { return _errors; }
-
-		private:
-			vector<ParseResult> _errors;
-		};
 
     protected:
 
@@ -203,6 +187,23 @@ namespace utilities
 		virtual CommandLineParser::ParseResult PostProcess(const CommandLineParser& parser);
 	};
 
+	/// Exceptions thrown by CommandLineParser: 
+	///
+	class PrintHelpException : public std::runtime_error
+	{
+		using std::runtime_error::runtime_error;
+	};
+
+	class ParseErrorException : public std::runtime_error
+	{
+	public:
+		using std::runtime_error::runtime_error;
+		ParseErrorException(const char* message, std::vector<CommandLineParser::ParseResult> errors) : std::runtime_error(message), _errors(errors) {}
+		const vector<CommandLineParser::ParseResult>& GetParseErrors() const { return _errors; }
+
+	private:
+		vector<CommandLineParser::ParseResult> _errors;
+	};
 }
 
 #include "../tcc/CommandLineParser.tcc"

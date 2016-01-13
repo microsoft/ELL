@@ -81,11 +81,11 @@ int main(int argc, char* argv[])
 	{
 		cmdline.ParseArgs();
 	}
-	catch (const CommandLineParser::PrintHelpException&)
+	catch (const PrintHelpException&)
 	{
 		exit(0);
 	}
-	catch (const CommandLineParser::ParseErrorException& ex)
+	catch (const ParseErrorException& ex)
 	{
 		cerr << "Parsing failed" << endl;
 		for (const auto& result : ex.GetParseErrors())
