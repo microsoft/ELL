@@ -45,7 +45,7 @@ struct ParsedParams : app_params, ParsedArgSet
         parser.AddOption(thresh, "thresh", "t", "Threshold", 0.01);
     }
 
-	virtual CommandLineParser::ParseResult PostProcess(CommandLineParser& parser)
+	virtual CommandLineParser::ParseResult PostProcess(const CommandLineParser& parser) override
 	{
 		if (numIter <= 0)
 		{
