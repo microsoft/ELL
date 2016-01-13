@@ -23,35 +23,51 @@ namespace utilities
 	{
 	}
 
-	CommandLineParser::ParseResult ParsedArgSet::PostProcess(const CommandLineParser& parser)
+	ParseResult ParsedArgSet::PostProcess(const CommandLineParser& parser)
 	{
-		return CommandLineParser::ParseResult();
+		return ParseResult();
 	}
 
-	CommandLineParser::ParseResult::ParseResult()
+	//
+	// ParseResult class
+	//
+	ParseResult::ParseResult() : _isOK(true)
 	{
-		_message = "";
-		_isValid = true;
 	}
 
-	CommandLineParser::ParseResult::ParseResult(bool ok)
+	ParseResult::ParseResult(bool ok) : _isOK(ok)
 	{
-		_message = "";
-		_isValid = ok;
 	}
 
-	CommandLineParser::ParseResult::ParseResult(const char* message)
+	ParseResult::ParseResult(const char* message) : _isOK(false)
 	{
-		_message = message;
-		_isValid = false;
+		_messages.emplace_back(message);
 	}
 
-	CommandLineParser::ParseResult::operator bool()
+	ParseResult::ParseResult(const string& message) : _isOK(false)
 	{
-		return _isValid;
+		_messages.emplace_back(message);
 	}
 
-	string CommandLineParser::ParseResult::GetMessage() const
+	ParseResult::ParseResult(const vector<string>& messages) : _messages(messages)
+	{
+		_isOK = _messages.size() == 0;
+	}
+
+	ParseResult::operator bool()
+	{
+		return _isOK;
+	}
+
+
+	//
+	// ParseError class
+	//
+	ParseError::ParseError(const string& message) : _message(message)
+	{
+	}
+
+	string ParseError::GetMessage() const
 	{
 		return _message;
 	}
@@ -179,16 +195,16 @@ namespace utilities
 
         // Finally, invoke the post-parse callbacks
 		bool isValid = true;
-		vector<ParseResult> parseErrors;
+		vector<ParseError> parseErrors;
         for(const auto& callback: _postParseCallbacks)
         {
 			auto callbackResult = callback(*this);
-			if (!callbackResult)
+			if (!callbackResult) // callbackResult is an error
 			{
 				isValid = false;
-				if (callbackResult.GetMessage() != "")
+				for (auto message : callbackResult._messages)
 				{
-					parseErrors.push_back(callbackResult);
+					parseErrors.emplace_back(message);
 				}
 			}
         }

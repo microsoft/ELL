@@ -60,7 +60,35 @@ namespace utilities
         // TODO: either have get_help_string() or print_help() methods for help and current value
     };
 
-    // format of argv: Main.exe [options]
+
+	class ParseResult
+	{
+	public:
+		ParseResult(); // No error
+		ParseResult(bool ok); // Error (if ok == false), no message
+		ParseResult(const char *message); // Error
+		ParseResult(const string& message); // Error
+		ParseResult(const vector<string>& messages); // list of errors (or success, if empty)
+		operator bool();
+
+		friend class CommandLineParser;
+
+	private:
+		vector<string> _messages;
+		bool _isOK;
+	};
+
+	class ParseError
+	{
+	public:
+		ParseError(const string& message);
+		string GetMessage() const;
+
+	private:
+		string _message;
+	};
+
+	// format of argv: Main.exe [options]
     // where options are of the form "-<string> <option>" where the <option> part is mandatory (defaulting to 'true')
     // options have two names, the short name is used with a single hyphen, and the long name with two
     // e.g., "-s true" and "--serial_mode true" can mean the same thing
@@ -110,20 +138,6 @@ namespace utilities
         bool HasOption(string option);
 
 		bool HasShortName(string shortName);
-
-		class ParseResult
-		{
-		public:
-			ParseResult(); // No error
-			ParseResult(bool ok); // Error (if ok == false), no message
-			ParseResult(const char *message); // Error
-			operator bool();
-			string GetMessage() const;
-
-		private:
-			string _message;
-			bool _isValid;
-		};
 
 		/// Adds a callback function that gets invoked after ParseArgs() is called
 		using PostParseCallback = std::function<ParseResult(CommandLineParser&)>;
@@ -184,7 +198,7 @@ namespace utilities
 		ParsedArgSet();
 
 		virtual void AddArgs(CommandLineParser& parser);
-		virtual CommandLineParser::ParseResult PostProcess(const CommandLineParser& parser);
+		virtual ParseResult PostProcess(const CommandLineParser& parser);
 	};
 
 	/// Exceptions thrown by CommandLineParser: 
@@ -198,11 +212,11 @@ namespace utilities
 	{
 	public:
 		using std::runtime_error::runtime_error;
-		ParseErrorException(const char* message, std::vector<CommandLineParser::ParseResult> errors) : std::runtime_error(message), _errors(errors) {}
-		const vector<CommandLineParser::ParseResult>& GetParseErrors() const { return _errors; }
+		ParseErrorException(const char* message, std::vector<ParseError> errors) : std::runtime_error(message), _errors(errors) {}
+		const vector<ParseError>& GetParseErrors() const { return _errors; }
 
 	private:
-		vector<CommandLineParser::ParseResult> _errors;
+		vector<ParseError> _errors;
 	};
 }
 

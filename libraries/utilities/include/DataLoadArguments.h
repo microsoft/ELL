@@ -32,6 +32,6 @@ namespace utilities
 
         /// Check arguments
         ///
-        virtual CommandLineParser::ParseResult PostProcess(const CommandLineParser& parser);
+        virtual ParseResult PostProcess(const CommandLineParser& parser);
     };
 }

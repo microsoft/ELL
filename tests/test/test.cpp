@@ -45,16 +45,41 @@ struct ParsedParams : app_params, ParsedArgSet
         parser.AddOption(thresh, "thresh", "t", "Threshold", 0.01);
     }
 
-	virtual CommandLineParser::ParseResult PostProcess(const CommandLineParser& parser) override
+	virtual ParseResult PostProcess(const CommandLineParser& parser) override
 	{
+		vector<string> errors;
 		if (numIter <= 0)
 		{
-			return "Number of iterations must be > 0";
+			errors.push_back("Number of iterations must be > 0");
 		}
 
 		if (thresh > 1.0)
 		{
-			return "Threshold must be <= 1.0";
+			errors.push_back("Threshold must be <= 1.0");
+		}
+
+		return errors;
+	}
+};
+
+struct file_params
+{
+	string filename;
+};
+
+// A subclass of your parameter struct that knows how to add its members to the commandline parser
+struct ParsedFileParams : file_params, ParsedArgSet
+{
+	virtual void AddArgs(utilities::CommandLineParser& parser)
+	{
+		parser.AddOption(filename, "filename", "f", "Output filename", "");
+	}
+
+	virtual ParseResult PostProcess(const CommandLineParser& parser) override
+	{
+		if (filename == "")
+		{
+			return "Need a filename!";
 		}
 
 		return true;
@@ -69,12 +94,15 @@ int main(int argc, char* argv[])
 
 
 	// Add a plain variable to the parser
-	string filepath;
-	cmdline.AddOption(filepath, "filepath", "f", "Output filepath", "");
+	bool isDebug;
+	cmdline.AddOption(isDebug, "debug", "d", "Debug mode", "");
 
 	// add parsed arg set
     ParsedParams testArgs;
     cmdline.AddOptionSet(testArgs);
+
+	ParsedFileParams fileArgs;
+	cmdline.AddOptionSet(fileArgs);
     
 	// Now actually parse the arguments and set the corresponding parameter values
 	try
@@ -95,7 +123,7 @@ int main(int argc, char* argv[])
 		exit(0);
 	}
 
-	cout << "filepath: " << filepath << endl;
+	cout << "filename: " << fileArgs.filename << endl;
 
 //
 //    cout << "numIter: " << Params.numIter << endl;

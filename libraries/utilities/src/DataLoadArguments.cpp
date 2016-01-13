@@ -22,7 +22,7 @@ namespace utilities
             false);
     }
 
-    CommandLineParser::ParseResult ParsedDataLoadArguments::PostProcess(const CommandLineParser & parser)
+    ParseResult ParsedDataLoadArguments::PostProcess(const CommandLineParser & parser)
     {
         if (inputDataFile == "") return "-inputDataFile (or -idf) is required";
         
