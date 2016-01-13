@@ -31,8 +31,8 @@ namespace common
         CoordinateList& coordinateList)
     {
         // open data file
-      // ifstream dataFStream = OpenIfstream(dataLoadArguments.inputDataFile);
-      ifstream dataFStream = ifstream("foo");
+        ifstream dataFStream = OpenIfstream(dataLoadArguments.inputDataFile);
+
         // create line iterator - read line by line sequentially
         SequentialLineIterator lineIterator(dataFStream);
 
@@ -57,8 +57,7 @@ namespace common
         else
         {
             // load map
-	  //            ifstream mapFStream = OpenIfstream(mapLoadArguments.inputMapFile);
-	  ifstream mapFStream("foo");
+            ifstream mapFStream = OpenIfstream(mapLoadArguments.inputMapFile);
 
             map = JsonSerializer::Load<Map>(mapFStream, "Base");
 

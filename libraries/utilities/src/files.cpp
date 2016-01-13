@@ -34,4 +34,18 @@ namespace utilities
 
         return fs;
     }
+
+    bool FileIsReadable(string filepath)
+    {
+        // open file
+        ifstream fs(filepath);
+
+        // check that it opened
+        if(!fs.is_open())
+        {
+            return true;
+        }
+
+        return false;
+    }
 }
