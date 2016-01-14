@@ -2,6 +2,7 @@
 
 #include "CommandLineParser.h" 
 using utilities::CommandLineParser;
+using utilities::ParseErrorException;
 
 #include "MapLoadArguments.h" 
 using utilities::ParsedMapLoadArguments;
@@ -25,11 +26,12 @@ using dataset::RowDataset;
 
 // common
 #include "Loaders.h"
-using common::LoadDatasetMapCoordinates;
+using common::GetDataIterator;
 
 // stl
 #include <iostream>
 using std::cerr;
+using std::cout;
 using std::endl;
 
 #include <stdexcept>
@@ -54,16 +56,36 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.ParseArgs();
 
-        // create and load a dataset, a map, and a coordinate list
-        RowDataset dataset;
-        Map map;
-        CoordinateList inputCoordinates;
-        LoadDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
+        // create mapped data iterator based on the command line params
+        auto dataIterator = GetDataIterator(dataLoadArguments, mapLoadArguments);
 
+        // Load row by row
+        while(dataIterator->IsValid())
+        {
+            // get next example
+            auto supervisedExample = dataIterator->Get();
+
+            // print the example to standard output
+            supervisedExample.Print(cout);
+
+            // move on 
+            dataIterator->Next();
+        }
     }
-    catch (runtime_error e)
+    catch(ParseErrorException exception)
     {
-        cerr << "runtime error: " << e.what() << endl;
+        cerr << "Command line parse error:" << endl;
+        for(const auto& error : exception.GetParseErrors())
+        {
+            cerr << error.GetMessage() << endl;
+        }
+        return 0;
+    }
+    catch(runtime_error exception)
+    {
+        cerr << "Runtime error:" << endl;
+        cerr << exception.what() << endl;
+        return 1;
     }
 
     return 0;

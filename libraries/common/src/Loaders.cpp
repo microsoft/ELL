@@ -41,13 +41,13 @@ namespace common
         return GetParsingIterator(move(lineIterator), sparseEntryParser);
     }
 
-    unique_ptr<IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const Map& map, const CoordinateList& coordinateList)
+    unique_ptr<IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const Map& map, const CoordinateList& inputCoordinates)
     {
         // create parser for sparse vectors (SVMLight format)
         SparseEntryParser sparseEntryParser;
 
         // create mapped parser
-        MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, map, coordinateList);
+        MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
 
         // create line iterator - read line by line sequentially
         SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
@@ -56,22 +56,42 @@ namespace common
         return GetParsingIterator(move(lineIterator), mappedParser);
     }
 
-    void DataIteratorToRowDataset(IParsingIterator& parsingIterator, RowDataset& dataset)
+    unique_ptr<IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments)
+    {
+        Map map;
+        CoordinateList coordinateList;
+        return GetDataIteratorMapCoordinates(dataLoadArguments, mapLoadArguments, map, coordinateList);
+    }
+
+    unique_ptr<IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, /* out */ Map& map, /* out */ CoordinateList& inputCoordinates)
+    {
+        // load map
+        auto inputMapFStream = OpenIfstream(mapLoadArguments.inputMapFile);
+        map = JsonSerializer::Load<Map>(inputMapFStream, "Base");
+
+        // create list of output coordinates
+        inputCoordinates = CoordinateListFactory::IgnoreSuffix(map, mapLoadArguments.inputMapIgnoreSuffix);
+
+        // get data iterator
+        return GetDataIterator(dataLoadArguments, map, inputCoordinates);
+    }
+
+    void DataIteratorToRowDataset(IParsingIterator& dataIterator, /* out */ RowDataset& dataset)
     {
         // Load row by row
-        while (parsingIterator.IsValid())
+        while (dataIterator.IsValid())
         {
-            dataset.PushBackRow(parsingIterator.Get());
-            parsingIterator.Next();
+            dataset.PushBackRow(dataIterator.Get());
+            dataIterator.Next();
         }
     }
 
-    void LoadDatasetMapCoordinates(
+    void GetRowDatasetMapCoordinates(
         const DataLoadArguments& dataLoadArguments,
         const MapLoadArguments& mapLoadArguments,
-        RowDataset& rowDataset,
-        Map& map,
-        CoordinateList& coordinateList)
+        /* out */ RowDataset& rowDataset,
+        /* out */ Map& map,
+        /* out */ CoordinateList& inputCoordinates)
     {
         // handle two cases - input map specified or unspecified
         if (mapLoadArguments.inputMapFile == "")
@@ -89,19 +109,12 @@ namespace common
             map = Map(numColumns);
 
             // create a coordinate list of this map
-            coordinateList = CoordinateListFactory::Sequence(0, numColumns);
+            inputCoordinates = CoordinateListFactory::Sequence(0, numColumns);
         }
         else
         {
-            // load map
-            auto inputMapFStream = OpenIfstream(mapLoadArguments.inputMapFile);
-            map = JsonSerializer::Load<Map>(inputMapFStream, "Base");
-
-            // create list of output coordinates
-            coordinateList = CoordinateListFactory::IgnoreSuffix(map, mapLoadArguments.inputMapIgnoreSuffix);
-
-            // get data iterator
-            auto upDataIterator = GetDataIterator(dataLoadArguments, map, coordinateList);
+            // get data iterator. map, coordinates
+            auto upDataIterator = GetDataIteratorMapCoordinates(dataLoadArguments, mapLoadArguments, map, inputCoordinates);
 
             // load dataset
             DataIteratorToRowDataset(*upDataIterator, rowDataset);

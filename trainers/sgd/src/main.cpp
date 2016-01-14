@@ -38,7 +38,7 @@ using dataset::RowDataset;
 
 // common
 #include "Loaders.h"
-using common::LoadDatasetMapCoordinates;
+using common::GetRowDatasetMapCoordinates;
 
 // optimization
 #include "AsgdOptimizer.h"
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
         RowDataset dataset;
         Map map;
         CoordinateList inputCoordinates;
-        LoadDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
+        GetRowDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
 
         // create loss function
         LogLoss loss;
@@ -130,11 +130,12 @@ int main(int argc, char* argv[])
         {
             cerr << error.GetMessage() << endl;
         }
-        exit(0);
+        return 0;
     }
     catch (runtime_error exception)
     {
-        cerr << "runtime error: " << exception.what() << endl;
+        cerr << "Runtime error:" << endl;
+        cerr << exception.what() << endl;
         return 1;
     }
 
