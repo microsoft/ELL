@@ -12,12 +12,9 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/DatasetMapLoader.cpp)
+set (SRC src/Loaders.cpp)
 
-set (INCLUDE include/DatasetLoader.h
-             include/DatasetMapLoader.h)
-
-set (TCC tcc/DatasetLoader.tcc)
+set (INCLUDE include/Loaders.h)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

@@ -4,8 +4,8 @@
 
 namespace loss_functions
 {
-	/// Implements the squared loss function: loss(x) = x*x
-	///
+    /// Implements the squared loss function: loss(x) = x*x
+    ///
     class SquaredLoss
     {
     public:

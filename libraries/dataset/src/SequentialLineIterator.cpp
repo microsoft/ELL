@@ -2,14 +2,20 @@
 
 #include "SequentialLineIterator.h"
 
+// utilities
+#include "files.h"
+using utilities::OpenIfstream;
+
+// stl
 using std::getline;
 using std::make_shared;
 using std::move;
 
 namespace dataset
 {
-    SequentialLineIterator::SequentialLineIterator(istream& istream, char delim) : _istream(istream), _delim(delim)
+    SequentialLineIterator::SequentialLineIterator(const string& filepath, char delim) : _delim(delim)
     {
+        _iFStream = OpenIfstream(filepath);
         Next();
     }
 
@@ -21,8 +27,8 @@ namespace dataset
     void SequentialLineIterator::Next()
     {
         auto spNextLine = make_shared<string>();
-        getline(_istream, *spNextLine, _delim); // TODO (ofer) - make this more efficient by using char[] rather than string
-        if(_istream.fail())
+        getline(_iFStream, *spNextLine, _delim);
+        if(_iFStream.fail())
         {
             _spCurrentLine = nullptr;
         }

@@ -24,8 +24,8 @@ using layers::CoordinateList;
 using dataset::RowDataset;
 
 // common
-#include "DatasetMapLoader.h"
-using common::DatasetMapLoader;
+#include "Loaders.h"
+using common::LoadDatasetMapCoordinates;
 
 // stl
 #include <iostream>
@@ -47,18 +47,18 @@ int main(int argc, char* argv[])
         ParsedDataLoadArguments dataLoadArguments;
         ParsedDataSaveArguments dataSaveArguments;
 
-		commandLineParser.AddOptionSet(mapLoadArguments);
-		commandLineParser.AddOptionSet(dataLoadArguments);
-		commandLineParser.AddOptionSet(dataSaveArguments);
-		
-		// parse command line
+        commandLineParser.AddOptionSet(mapLoadArguments);
+        commandLineParser.AddOptionSet(dataLoadArguments);
+        commandLineParser.AddOptionSet(dataSaveArguments);
+        
+        // parse command line
         commandLineParser.ParseArgs();
 
         // create and load a dataset, a map, and a coordinate list
         RowDataset dataset;
         Map map;
         CoordinateList inputCoordinates;
-        DatasetMapLoader::Load(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
+        LoadDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
 
     }
     catch (runtime_error e)

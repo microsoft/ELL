@@ -45,88 +45,88 @@ struct ParsedParams : app_params, ParsedArgSet
         parser.AddOption(thresh, "thresh", "t", "Threshold", 0.01);
     }
 
-	virtual ParseResult PostProcess(const CommandLineParser& parser) override
-	{
-		vector<string> errors;
-		if (numIter <= 0)
-		{
-			errors.push_back("Number of iterations must be > 0");
-		}
+    virtual ParseResult PostProcess(const CommandLineParser& parser) override
+    {
+        vector<string> errors;
+        if (numIter <= 0)
+        {
+            errors.push_back("Number of iterations must be > 0");
+        }
 
-		if (thresh > 1.0)
-		{
-			errors.push_back("Threshold must be <= 1.0");
-		}
+        if (thresh > 1.0)
+        {
+            errors.push_back("Threshold must be <= 1.0");
+        }
 
-		return errors;
-	}
+        return errors;
+    }
 };
 
 struct file_params
 {
-	string filename;
+    string filename;
 };
 
 // A subclass of your parameter struct that knows how to add its members to the commandline parser
 struct ParsedFileParams : file_params, ParsedArgSet
 {
-	virtual void AddArgs(utilities::CommandLineParser& parser)
-	{
-		parser.AddOption(filename, "filename", "f", "Output filename", "");
-	}
+    virtual void AddArgs(utilities::CommandLineParser& parser)
+    {
+        parser.AddOption(filename, "filename", "f", "Output filename", "");
+    }
 
-	virtual ParseResult PostProcess(const CommandLineParser& parser) override
-	{
-		if (filename == "")
-		{
-			return "Need a filename!";
-		}
+    virtual ParseResult PostProcess(const CommandLineParser& parser) override
+    {
+        if (filename == "")
+        {
+            return "Need a filename!";
+        }
 
-		return true;
-	}
+        return true;
+    }
 };
 
 int main(int argc, char* argv[])
 {
-	CommandLineParser cmdline(argc, argv);
+    CommandLineParser cmdline(argc, argv);
 
-	cmdline.AddDocumentationString("---- General app parameters ----");
+    cmdline.AddDocumentationString("---- General app parameters ----");
 
 
-	// Add a plain variable to the parser
-	bool isDebug;
-	cmdline.AddOption(isDebug, "debug", "d", "Debug mode", "");
+    // Add a plain variable to the parser
+    bool isDebug;
+    cmdline.AddOption(isDebug, "debug", "d", "Debug mode", "");
 
-	// add parsed arg set
+    // add parsed arg set
     ParsedParams testArgs;
     cmdline.AddOptionSet(testArgs);
 
-	ParsedFileParams fileArgs;
-	cmdline.AddOptionSet(fileArgs);
+    ParsedFileParams fileArgs;
+    cmdline.AddOptionSet(fileArgs);
     
-	// Now actually parse the arguments and set the corresponding parameter values
-	try
-	{
-		cmdline.ParseArgs();
-	}
-	catch (const ParseErrorException& ex)
-	{
-		cerr << "Parsing failed" << endl;
-		for (const auto& result : ex.GetParseErrors())
-		{
-			cerr << result.GetMessage() << endl;
-		}
-		exit(0);
-	}
 
-	if (cmdline.ShouldPrintUsage())
-	{
-		cmdline.PrintUsage(cout);
-		exit(0);
-	}
+    // Now actually parse the arguments and set the corresponding parameter values
+    try
+    {
+        cmdline.ParseArgs();
+    }
+    catch (const ParseErrorException& ex)
+    {
+        cerr << "Parsing failed" << endl;
+        for (const auto& result : ex.GetParseErrors())
+        {
+            cerr << result.GetMessage() << endl;
+        }
+        exit(0);
+    }
 
-	cout << "filename: " << fileArgs.filename << endl;
+    if (cmdline.ShouldPrintUsage())
+    {
+        cmdline.PrintUsage(cout);
+        exit(0);
+    }
 
+    cout << "filename: " << fileArgs.filename << endl;
 
 	cout << "filename arg value: " << cmdline.GetOptionValue("filename") << endl;
 	cout << "numIter arg value: " << cmdline.GetOptionValue("numIter") << endl;
@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
 //        cerr << "runtime error: " << e.what() << endl;
 //    }
 //
-	return 0;
+    return 0;
 }
 
 //

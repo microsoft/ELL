@@ -5,12 +5,15 @@
 #include <stdexcept>
 using std::runtime_error;
 
+#include <memory>
+using std::make_unique;
+
 namespace utilities
 {
     ifstream OpenIfstream(string filepath)
     {
         // open file
-        ifstream fs(filepath);
+        auto fs = ifstream(filepath);
 
         // check that it opened
         if(!fs.is_open())
@@ -24,7 +27,7 @@ namespace utilities
     ofstream OpenOfstream(string filepath)
     {
         // open file
-        ofstream fs(filepath);
+        auto fs = ofstream(filepath);
 
         // check that it opened
         if (!fs.is_open())
@@ -35,13 +38,13 @@ namespace utilities
         return fs;
     }
 
-    bool FileIsReadable(string filepath)
+    bool IsFileReadable(string filepath)
     {
         // open file
         ifstream fs(filepath);
 
         // check that it opened
-        if(!fs.is_open())
+        if(fs.is_open())
         {
             return true;
         }

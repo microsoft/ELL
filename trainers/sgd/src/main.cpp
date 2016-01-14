@@ -1,11 +1,14 @@
 // main.cpp
 
+#include "CommandLineArguments.h"
+
 // utilities
 #include "files.h"
 using utilities::OpenOfstream;
 
 #include "CommandLineParser.h" 
 using utilities::CommandLineParser;
+using utilities::ParseErrorException;
 
 #include "randomEngines.h"
 using utilities::GetRandomEngine;
@@ -34,8 +37,8 @@ using layers::CoordinateList;
 using dataset::RowDataset;
 
 // common
-#include "DatasetMapLoader.h"
-using common::DatasetMapLoader;
+#include "Loaders.h"
+using common::LoadDatasetMapCoordinates;
 
 // optimization
 #include "AsgdOptimizer.h"
@@ -46,9 +49,7 @@ using optimization::AsgdOptimizer;
 #include "LogLoss.h"
 using namespace loss_functions;
 
-// command line arguments
-#include "CommandLineArguments.h"
-
+// stl
 #include <iostream>
 using std::cerr;
 using std::cout;
@@ -85,7 +86,7 @@ int main(int argc, char* argv[])
         RowDataset dataset;
         Map map;
         CoordinateList inputCoordinates;
-        DatasetMapLoader::Load(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
+        LoadDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
 
         // create loss function
         LogLoss loss;
@@ -124,13 +125,22 @@ int main(int argc, char* argv[])
         // save map to output file
         if (mapSaveArguments.outputMapFile != "")
         {
-            ofstream outputFStream = OpenOfstream(mapSaveArguments.outputMapFile);
-            map.Serialize(outputFStream);
+            auto outputMapFStream = OpenOfstream(mapSaveArguments.outputMapFile);
+            map.Serialize(outputMapFStream);
         }
     }
-    catch (runtime_error e)
+    catch (ParseErrorException exception)
     {
-        cerr << "runtime error: " << e.what() << endl;
+        cerr << "Command line parse error:" << endl;
+        for (const auto& error : exception.GetParseErrors())
+        {
+            cerr << error.GetMessage() << endl;
+        }
+        exit(0);
+    }
+    catch (runtime_error exception)
+    {
+        cerr << "runtime error: " << exception.what() << endl;
         return 1;
     }
 

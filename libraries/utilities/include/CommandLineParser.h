@@ -61,34 +61,34 @@ namespace utilities
     };
 
 
-    class ParseResult
-    {
-    public:
-        ParseResult(); // No error
-        ParseResult(bool ok); // Error (if ok == false), no message
-        ParseResult(const char *message); // Error
-        ParseResult(const string& message); // Error
-        ParseResult(const vector<string>& messages); // list of errors (or success, if empty)
-        operator bool();
+	class ParseResult
+	{
+	public:
+		ParseResult(); // No error
+		ParseResult(bool ok); // Error (if ok == false), no message
+		ParseResult(const char *message); // Error
+		ParseResult(const string& message); // Error
+		ParseResult(const vector<string>& messages); // list of errors (or success, if empty)
+		operator bool();
 
-        friend class CommandLineParser;
+		friend class CommandLineParser;
 
-    private:
-        vector<string> _messages;
-        bool _isOK;
-    };
+	private:
+		vector<string> _messages;
+		bool _isOK;
+	};
 
-    class ParseError
-    {
-    public:
-        ParseError(const string& message);
-        string GetMessage() const;
+	class ParseError
+	{
+	public:
+		ParseError(const string& message);
+		string GetMessage() const;
 
-    private:
-        string _message;
-    };
+	private:
+		string _message;
+	};
 
-    // format of argv: Main.exe [options]
+	// format of argv: Main.exe [options]
     // where options are of the form "-<string> <option>" where the <option> part is mandatory (defaulting to 'true')
     // options have two names, the short name is used with a single hyphen, and the long name with two
     // e.g., "-s true" and "--serial_mode true" can mean the same thing
@@ -103,11 +103,11 @@ namespace utilities
     class CommandLineParser
     {
     public:
-
+    
         /// Constructor, takes arg list
         ///
         CommandLineParser(int argc, char**argv);
-
+        
         /// AddOption adds a new option to the commandline parser
         ///
         template <typename T, typename U>
@@ -143,11 +143,11 @@ namespace utilities
         ///
         bool HasOption(string option);
 
-        bool HasShortName(string shortName);
+		bool HasShortName(string shortName);
 
-        /// Adds a callback function that gets invoked after ParseArgs() is called
-        using PostParseCallback = std::function<ParseResult(CommandLineParser&)>;
-        void AddPostParseCallback(const PostParseCallback& callback);
+		/// Adds a callback function that gets invoked after ParseArgs() is called
+		using PostParseCallback = std::function<ParseResult(CommandLineParser&)>;
+		void AddPostParseCallback(const PostParseCallback& callback);
 
     protected:
 
@@ -174,7 +174,7 @@ namespace utilities
         template <typename T>
         static string ToString(const T& val);
 
-        struct DocumentationEntry
+        struct DocumentationEntry    
         {
             enum type { option, str };
             type EntryType;
@@ -198,29 +198,29 @@ namespace utilities
         bool SetDefaultArgs(const set<string>& unset_args); // returns true if we need to reparse
     };
 
-    /// ParsedArgSet class
-    ///
-    class ParsedArgSet
-    {
-    public:
-        ParsedArgSet();
+	/// ParsedArgSet class
+	///
+	class ParsedArgSet
+	{
+	public:
+		ParsedArgSet();
 
-        virtual void AddArgs(CommandLineParser& parser);
-        virtual ParseResult PostProcess(const CommandLineParser& parser);
-    };
+		virtual void AddArgs(CommandLineParser& parser);
+		virtual ParseResult PostProcess(const CommandLineParser& parser);
+	};
 
-    /// Exceptions thrown by CommandLineParser: 
-    ///
-    class ParseErrorException : public std::runtime_error
-    {
-    public:
-        using std::runtime_error::runtime_error;
-        ParseErrorException(const char* message, std::vector<ParseError> errors) : std::runtime_error(message), _errors(errors) {}
-        const vector<ParseError>& GetParseErrors() const { return _errors; }
+	/// Exceptions thrown by CommandLineParser: 
+	///
+	class ParseErrorException : public std::runtime_error
+	{
+	public:
+		using std::runtime_error::runtime_error;
+		ParseErrorException(const char* message, std::vector<ParseError> errors) : std::runtime_error(message), _errors(errors) {}
+		const vector<ParseError>& GetParseErrors() const { return _errors; }
 
-    private:
-        vector<ParseError> _errors;
-    };
+	private:
+		vector<ParseError> _errors;
+	};
 }
 
 #include "../tcc/CommandLineParser.tcc"

@@ -1,7 +1,17 @@
-#include "..\include\DataLoadArguments.h"
 // DataLoadArguments.cpp
 
 #include "DataLoadArguments.h"
+
+// utilities
+#include "files.h"
+using utilities::IsFileReadable;
+
+// stl
+#include <vector>
+using std::vector;
+
+#include <string>
+using std::string;
 
 namespace utilities
 {
@@ -14,7 +24,7 @@ namespace utilities
             "Path to the input data file",
             "");
 
-        parser.AddOption(
+        parser.AddOption(       // TODO this parameter is not used anywhere
             inputDataFileHasWeights,
             "inputDataFileHasWeights",
             "idfhw",
@@ -24,10 +34,20 @@ namespace utilities
 
     ParseResult ParsedDataLoadArguments::PostProcess(const CommandLineParser & parser)
     {
-        if (inputDataFile == "") return "-inputDataFile (or -idf) is required";
+        vector<string> parseErrorMessages;
         
-        // TODO: check if the file exists
+        if(inputDataFile == "")
+        {
+            parseErrorMessages.push_back("-inputDataFile (or -idf) is required");
+        }
+        else
+        {
+            if(!IsFileReadable(inputDataFile))
+            {
+                parseErrorMessages.push_back("cannot read from specified input data file: " + inputDataFile);
+            }
+        }
 
-        return true;
+        return parseErrorMessages;
     }
 }

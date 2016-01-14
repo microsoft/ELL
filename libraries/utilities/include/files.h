@@ -2,12 +2,16 @@
 
 #pragma once
 
+// stl
 #include <fstream>
 using std::ifstream;
 using std::ofstream;
 
 #include <string>
 using std::string;
+
+#include <memory>
+using std::unique_ptr;
 
 namespace utilities
 {
@@ -21,5 +25,5 @@ namespace utilities
 
     /// \returns True if the file exists and can be opened
     ///
-    bool FileIsReadable(string filepath);
+    bool IsFileReadable(string filepath);
 }

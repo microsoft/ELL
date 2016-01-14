@@ -13,39 +13,39 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 set (SRC src/CompressedIntegerList.cpp
-                 src/DenseDataVector.cpp
-                 src/IntegerList.cpp
-                 src/OnesDataVector.cpp
-                 src/SequentialLineIterator.cpp
-                 src/SparseBinaryDataVector.cpp
-                 src/SparseDataVector.cpp
-                 src/SparseEntryParser.cpp
-                 src/SupervisedExample.cpp
-                 src/ZeroDataVector.cpp)
+         src/DenseDataVector.cpp
+         src/IntegerList.cpp
+         src/OnesDataVector.cpp
+         src/SequentialLineIterator.cpp
+         src/SparseBinaryDataVector.cpp
+         src/SparseDataVector.cpp
+         src/SparseEntryParser.cpp
+         src/SupervisedExample.cpp
+         src/ZeroDataVector.cpp)
 
 set (INCLUDE include/CompressedIntegerList.h
-                     include/DataVectorBuilder.h
-                     include/DenseDataVector.h
-                     include/IDataVector.h
-                     include/IntegerList.h
-                     include/MappedParser.h
-                     include/OnesDataVector.h
-                     include/ParsingIterator.h
-                     include/SequentialLineIterator.h
-                     include/SparseBinaryDataVector.h
-                     include/SparseDataVector.h
-                     include/SparseEntryParser.h
-                     include/SupervisedExample.h
-                     include/SupervisedExampleBuilder.h
-                     include/ZeroDataVector.h)
+             include/DataVectorBuilder.h
+             include/DenseDataVector.h
+             include/IDataVector.h
+             include/IntegerList.h
+             include/MappedParser.h
+             include/OnesDataVector.h
+             include/ParsingIterator.h
+             include/SequentialLineIterator.h
+             include/SparseBinaryDataVector.h
+             include/SparseDataVector.h
+             include/SparseEntryParser.h
+             include/SupervisedExample.h
+             include/SupervisedExampleBuilder.h
+             include/ZeroDataVector.h)
 
 set (TCC tcc/DataVectorBuilder.tcc
-                 tcc/DenseDataVector.tcc
-                 tcc/MappedParser.tcc
-                 tcc/ParsingIterator.tcc
-                 tcc/SparseBinaryDataVector.tcc
-                 tcc/SparseDataVector.tcc
-                 tcc/SupervisedExampleBuilder.tcc)
+         tcc/DenseDataVector.tcc
+         tcc/MappedParser.tcc
+         tcc/ParsingIterator.tcc
+         tcc/SparseBinaryDataVector.tcc
+         tcc/SparseDataVector.tcc
+         tcc/SupervisedExampleBuilder.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
