@@ -2,14 +2,20 @@
 
 #include "SequentialLineIterator.h"
 
+// utilities
+#include "files.h"
+using utilities::OpenIfstream;
+
+// stl
 using std::getline;
 using std::make_shared;
 using std::move;
 
 namespace dataset
 {
-    SequentialLineIterator::SequentialLineIterator(unique_ptr<istream>&& upIstream, char delim) : _upIstream(move(upIstream)), _delim(delim)
+    SequentialLineIterator::SequentialLineIterator(const string& filepath, char delim) : _delim(delim)
     {
+        _upIstream = OpenIfstream(filepath);
         Next();
     }
 

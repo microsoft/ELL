@@ -31,11 +31,8 @@ namespace common
 {
     unique_ptr<IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
     {
-        // open data file
-        auto upDataFStream = OpenIfstream(dataLoadArguments.inputDataFile);
-
-        // create line iterator - read line by line sequentially
-        SequentialLineIterator lineIterator(move(upDataFStream));
+       // create line iterator - read line by line sequentially
+        SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
 
         // create parser for sparse vectors (SVMLight format)
         SparseEntryParser sparseEntryParser;
@@ -52,11 +49,8 @@ namespace common
         // create mapped parser
         MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, map, coordinateList);
 
-        // open data file
-        auto upDataFStream = OpenIfstream(dataLoadArguments.inputDataFile);
-
         // create line iterator - read line by line sequentially
-        SequentialLineIterator lineIterator(move(upDataFStream)); // TODO bug
+        SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
 
         // Create iterator
         return GetParsingIterator(move(lineIterator), mappedParser);

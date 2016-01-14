@@ -21,7 +21,7 @@ namespace dataset
     public:
         /// Constructs a sequential line iterator
         ///
-        SequentialLineIterator(unique_ptr<istream>&& upIstream, char delim = '\n');
+        SequentialLineIterator(const string& filepath, char delim = '\n');
 
         /// deleted copy Ctor
         ///
