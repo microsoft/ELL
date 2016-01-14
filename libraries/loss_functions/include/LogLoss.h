@@ -4,8 +4,8 @@
 
 namespace loss_functions
 {
-	/// Implements the log-loss functions: loss(x) = log(1 + exp(-x))
-	///
+    /// Implements the log-loss functions: loss(x) = log(1 + exp(-x))
+    ///
     class LogLoss
     {
     public:

@@ -1,11 +1,14 @@
 // main.cpp
 
+#include "CommandLineArguments.h"
+
 // utilities
 #include "files.h"
 using utilities::OpenOfstream;
 
 #include "CommandLineParser.h" 
 using utilities::CommandLineParser;
+using utilities::ParseErrorException;
 
 #include "randomEngines.h"
 using utilities::GetRandomEngine;
@@ -46,9 +49,7 @@ using optimization::AsgdOptimizer;
 #include "LogLoss.h"
 using namespace loss_functions;
 
-// command line arguments
-#include "CommandLineArguments.h"
-
+// stl
 #include <iostream>
 using std::cerr;
 using std::cout;
@@ -122,9 +123,18 @@ int main(int argc, char* argv[])
             map.Serialize(outputMapFStream);
         }
     }
-    catch (runtime_error e)
+    catch (ParseErrorException exception)
     {
-        cerr << "runtime error: " << e.what() << endl;
+        cerr << "Command line parse error:" << endl;
+        for (const auto& error : exception.GetParseErrors())
+        {
+            cerr << error.GetMessage() << endl;
+        }
+        exit(0);
+    }
+    catch (runtime_error exception)
+    {
+        cerr << "runtime error: " << exception.what() << endl;
         return 1;
     }
 

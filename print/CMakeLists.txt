@@ -30,7 +30,7 @@ set (INCLUDE include/CommandLineArguments.h
                    include/PrintableMap.h
                    include/PrintableSum.h
                    include/svgHelpers.h)
-	     
+         
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 

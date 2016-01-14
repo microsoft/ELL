@@ -12,65 +12,65 @@ using std::max;
 
 namespace utilities
 {
-	//
-	// ParsedArgSet class
-	//
-	ParsedArgSet::ParsedArgSet()
-	{
-	}
+    //
+    // ParsedArgSet class
+    //
+    ParsedArgSet::ParsedArgSet()
+    {
+    }
 
-	void ParsedArgSet::AddArgs(CommandLineParser& parser)
-	{
-	}
+    void ParsedArgSet::AddArgs(CommandLineParser& parser)
+    {
+    }
 
-	ParseResult ParsedArgSet::PostProcess(const CommandLineParser& parser)
-	{
-		return ParseResult();
-	}
+    ParseResult ParsedArgSet::PostProcess(const CommandLineParser& parser)
+    {
+        return ParseResult();
+    }
 
-	//
-	// ParseResult class
-	//
-	ParseResult::ParseResult() : _isOK(true)
-	{
-	}
+    //
+    // ParseResult class
+    //
+    ParseResult::ParseResult() : _isOK(true)
+    {
+    }
 
-	ParseResult::ParseResult(bool ok) : _isOK(ok)
-	{
-	}
+    ParseResult::ParseResult(bool ok) : _isOK(ok)
+    {
+    }
 
-	ParseResult::ParseResult(const char* message) : _isOK(false)
-	{
-		_messages.emplace_back(message);
-	}
+    ParseResult::ParseResult(const char* message) : _isOK(false)
+    {
+        _messages.emplace_back(message);
+    }
 
-	ParseResult::ParseResult(const string& message) : _isOK(false)
-	{
-		_messages.emplace_back(message);
-	}
+    ParseResult::ParseResult(const string& message) : _isOK(false)
+    {
+        _messages.emplace_back(message);
+    }
 
-	ParseResult::ParseResult(const vector<string>& messages) : _messages(messages)
-	{
-		_isOK = _messages.size() == 0;
-	}
+    ParseResult::ParseResult(const vector<string>& messages) : _messages(messages)
+    {
+        _isOK = _messages.size() == 0;
+    }
 
-	ParseResult::operator bool()
-	{
-		return _isOK;
-	}
+    ParseResult::operator bool()
+    {
+        return _isOK;
+    }
 
 
-	//
-	// ParseError class
-	//
-	ParseError::ParseError(const string& message) : _message(message)
-	{
-	}
+    //
+    // ParseError class
+    //
+    ParseError::ParseError(const string& message) : _message(message)
+    {
+    }
 
-	string ParseError::GetMessage() const
-	{
-		return _message;
-	}
+    string ParseError::GetMessage() const
+    {
+        return _message;
+    }
 
     //
     // OptionInfo class
@@ -97,18 +97,18 @@ namespace utilities
         if (_originalArgs.size() == 0)
             return;
 
-		bool printHelpAndExit = false;
-		if (!HasOption("help"))
-		{
-			if (HasShortName("h"))
-			{
-				AddOption(printHelpAndExit, "help", "", "Print help and exit", false);
-			}
-			else
-			{
-				AddOption(printHelpAndExit, "help", "h", "Print help and exit", false);
-			}
-		}
+        bool printHelpAndExit = false;
+        if (!HasOption("help"))
+        {
+            if (HasShortName("h"))
+            {
+                AddOption(printHelpAndExit, "help", "", "Print help and exit", false);
+            }
+            else
+            {
+                AddOption(printHelpAndExit, "help", "h", "Print help and exit", false);
+            }
+        }
 
         string exe_path = _originalArgs[0];
         size_t slash_pos = exe_path.find_last_of("/\\");
@@ -194,32 +194,32 @@ namespace utilities
         }
 
         // Finally, invoke the post-parse callbacks
-		bool isValid = true;
-		vector<ParseError> parseErrors;
+        bool isValid = true;
+        vector<ParseError> parseErrors;
         for(const auto& callback: _postParseCallbacks)
         {
-			auto callbackResult = callback(*this);
-			if (!callbackResult) // callbackResult is an error
-			{
-				isValid = false;
-				for (auto message : callbackResult._messages)
-				{
-					parseErrors.emplace_back(message);
-				}
-			}
+            auto callbackResult = callback(*this);
+            if (!callbackResult) // callbackResult is an error
+            {
+                isValid = false;
+                for (auto message : callbackResult._messages)
+                {
+                    parseErrors.emplace_back(message);
+                }
+            }
         }
 
-		if (printHelpAndExit)
-		{
-			PrintUsage(std::cout); // TODO: allow constructor to optionally specify output stream for help text
-			throw PrintHelpException("");
-		}
+        if (printHelpAndExit)
+        {
+            PrintUsage(std::cout); // TODO: allow constructor to optionally specify output stream for help text
+            throw PrintHelpException("");
+        }
 
-		if (!isValid)
-		{
-			throw ParseErrorException("Error in parse callback", parseErrors);
-		}
-	}
+        if (!isValid)
+        {
+            throw ParseErrorException("Error in parse callback", parseErrors);
+        }
+    }
 
     bool CommandLineParser::SetDefaultArgs(const set<string>& unset_args)
     {
@@ -243,10 +243,10 @@ namespace utilities
         return _options.find(option) != _options.end();
     }
 
-	bool CommandLineParser::HasShortName(string shortName)
-	{
-		return _shortToLongNameMap.find(shortName) != _shortToLongNameMap.end();
-	}
+    bool CommandLineParser::HasShortName(string shortName)
+    {
+        return _shortToLongNameMap.find(shortName) != _shortToLongNameMap.end();
+    }
 
     void CommandLineParser::AddOption(const OptionInfo& info)
     {

@@ -25,5 +25,5 @@ namespace utilities
 
     /// \returns True if the file exists and can be opened
     ///
-    bool FileIsReadable(string filepath);
+    bool IsFileReadable(string filepath);
 }

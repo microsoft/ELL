@@ -4,8 +4,8 @@
 
 namespace loss_functions
 {
-	/// Implements the hinge loss function: loss(x) = max(1-x, 0)
-	///
+    /// Implements the hinge loss function: loss(x) = max(1-x, 0)
+    ///
     class HingeLoss
     {
 
