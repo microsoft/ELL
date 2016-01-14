@@ -81,7 +81,7 @@ namespace utilities
     //
     // CommandLineParser class
     //
-    CommandLineParser::CommandLineParser(int argc, char**argv)
+    CommandLineParser::CommandLineParser(int argc, char**argv) : _shouldPrintUsage(false)
     {
         SetArgs(argc, argv);
     }
@@ -209,11 +209,7 @@ namespace utilities
 			}
         }
 
-		if (printHelpAndExit)
-		{
-			PrintUsage(std::cout); // TODO: allow constructor to optionally specify output stream for help text
-			throw PrintHelpException("");
-		}
+		_shouldPrintUsage = printHelpAndExit;
 
 		if (!isValid)
 		{
@@ -371,7 +367,12 @@ namespace utilities
         return min(max_name_len, len);
     }
 
-    void CommandLineParser::PrintUsage(ostream& out)
+	bool CommandLineParser::ShouldPrintUsage() const
+	{
+		return _shouldPrintUsage;
+	}
+
+	void CommandLineParser::PrintUsage(ostream& out)
     {
         // Find longest option name so we can align descriptions
         size_t longest_name = 0;

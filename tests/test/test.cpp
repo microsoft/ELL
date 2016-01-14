@@ -109,10 +109,6 @@ int main(int argc, char* argv[])
 	{
 		cmdline.ParseArgs();
 	}
-	catch (const PrintHelpException&)
-	{
-		exit(0);
-	}
 	catch (const ParseErrorException& ex)
 	{
 		cerr << "Parsing failed" << endl;
@@ -120,6 +116,12 @@ int main(int argc, char* argv[])
 		{
 			cerr << result.GetMessage() << endl;
 		}
+		exit(0);
+	}
+
+	if (cmdline.ShouldPrintUsage())
+	{
+		cmdline.PrintUsage(cout);
 		exit(0);
 	}
 

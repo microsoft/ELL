@@ -125,15 +125,20 @@ namespace utilities
         ///
         void ParseArgs();
 
-        /// TODO: document
-        ///
-        virtual void PrintUsage(ostream& out);
+		/// TODO: document
+		///
+		bool ShouldPrintUsage() const;
+		
+		/// TODO: document
+		///
+		virtual void PrintUsage(ostream& out);
 
         /// TODO: document
         ///
         virtual void PrintCurrentValues(ostream& out);
 
-        /// TODO: document
+		
+		/// TODO: document
         ///
         bool HasOption(string option);
 
@@ -184,6 +189,7 @@ namespace utilities
         map<string, OptionInfo> _options;
         vector<DocumentationEntry> _docEntries;
         vector<PostParseCallback> _postParseCallbacks;
+		bool _shouldPrintUsage = false;
 
         void AddOption(const OptionInfo& info);
         virtual bool SetOption(string option_name, string option_val); // returns true if we need to reparse
@@ -203,11 +209,6 @@ namespace utilities
 
 	/// Exceptions thrown by CommandLineParser: 
 	///
-	class PrintHelpException : public std::runtime_error
-	{
-		using std::runtime_error::runtime_error;
-	};
-
 	class ParseErrorException : public std::runtime_error
 	{
 	public:

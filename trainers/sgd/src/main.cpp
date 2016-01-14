@@ -75,6 +75,12 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.ParseArgs();
 
+		// print help if requested
+		if (commandLineParser.ShouldPrintUsage())
+		{
+			commandLineParser.PrintUsage(cout);
+		}
+
         // create and load a dataset, a map, and a coordinate list
         RowDataset dataset;
         Map map;
