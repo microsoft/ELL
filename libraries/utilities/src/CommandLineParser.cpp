@@ -12,65 +12,65 @@ using std::max;
 
 namespace utilities
 {
-	//
-	// ParsedArgSet class
-	//
-	ParsedArgSet::ParsedArgSet()
-	{
-	}
+    //
+    // ParsedArgSet class
+    //
+    ParsedArgSet::ParsedArgSet()
+    {
+    }
 
-	void ParsedArgSet::AddArgs(CommandLineParser& parser)
-	{
-	}
+    void ParsedArgSet::AddArgs(CommandLineParser& parser)
+    {
+    }
 
-	ParseResult ParsedArgSet::PostProcess(const CommandLineParser& parser)
-	{
-		return ParseResult();
-	}
+    ParseResult ParsedArgSet::PostProcess(const CommandLineParser& parser)
+    {
+        return ParseResult();
+    }
 
-	//
-	// ParseResult class
-	//
-	ParseResult::ParseResult() : _isOK(true)
-	{
-	}
+    //
+    // ParseResult class
+    //
+    ParseResult::ParseResult() : _isOK(true)
+    {
+    }
 
-	ParseResult::ParseResult(bool ok) : _isOK(ok)
-	{
-	}
+    ParseResult::ParseResult(bool ok) : _isOK(ok)
+    {
+    }
 
-	ParseResult::ParseResult(const char* message) : _isOK(false)
-	{
-		_messages.emplace_back(message);
-	}
+    ParseResult::ParseResult(const char* message) : _isOK(false)
+    {
+        _messages.emplace_back(message);
+    }
 
-	ParseResult::ParseResult(const string& message) : _isOK(false)
-	{
-		_messages.emplace_back(message);
-	}
+    ParseResult::ParseResult(const string& message) : _isOK(false)
+    {
+        _messages.emplace_back(message);
+    }
 
-	ParseResult::ParseResult(const vector<string>& messages) : _messages(messages)
-	{
-		_isOK = _messages.size() == 0;
-	}
+    ParseResult::ParseResult(const vector<string>& messages) : _messages(messages)
+    {
+        _isOK = _messages.size() == 0;
+    }
 
-	ParseResult::operator bool()
-	{
-		return _isOK;
-	}
+    ParseResult::operator bool()
+    {
+        return _isOK;
+    }
 
 
-	//
-	// ParseError class
-	//
-	ParseError::ParseError(const string& message) : _message(message)
-	{
-	}
+    //
+    // ParseError class
+    //
+    ParseError::ParseError(const string& message) : _message(message)
+    {
+    }
 
-	string ParseError::GetMessage() const
-	{
-		return _message;
-	}
+    string ParseError::GetMessage() const
+    {
+        return _message;
+    }
 
     //
     // OptionInfo class
@@ -97,18 +97,18 @@ namespace utilities
         if (_originalArgs.size() == 0)
             return;
 
-		bool printHelpAndExit = false;
-		if (!HasOption("help"))
-		{
-			if (HasShortName("h"))
-			{
-				AddOption(printHelpAndExit, "help", "", "Print help and exit", false);
-			}
-			else
-			{
-				AddOption(printHelpAndExit, "help", "h", "Print help and exit", false);
-			}
-		}
+        bool printHelpAndExit = false;
+        if (!HasOption("help"))
+        {
+            if (HasShortName("h"))
+            {
+                AddOption(printHelpAndExit, "help", "", "Print help and exit", false);
+            }
+            else
+            {
+                AddOption(printHelpAndExit, "help", "h", "Print help and exit", false);
+            }
+        }
 
         string exe_path = _originalArgs[0];
         size_t slash_pos = exe_path.find_last_of("/\\");
@@ -124,7 +124,7 @@ namespace utilities
         // While we're parsing the arguments, we may add new conditional options. If we do so, we need
         // to reparse the inputs in case some earlier commandline option referred to one of these new
         // options. So we repeatedly parse the command line text until we haven't added any new conditional options.
-    
+
         bool needs_reparse = true;
         while (needs_reparse)
         {
@@ -185,7 +185,7 @@ namespace utilities
                 }
                 else
                 {
-                    _args.push_back(_originalArgs[index]);
+                    _positional_args.push_back(_originalArgs[index]);
                 }
             }
 
@@ -194,28 +194,28 @@ namespace utilities
         }
 
         // Finally, invoke the post-parse callbacks
-		bool isValid = true;
-		vector<ParseError> parseErrors;
-        for(const auto& callback: _postParseCallbacks)
+        bool isValid = true;
+        vector<ParseError> parseErrors;
+        for (const auto& callback : _postParseCallbacks)
         {
-			auto callbackResult = callback(*this);
-			if (!callbackResult) // callbackResult is an error
-			{
-				isValid = false;
-				for (auto message : callbackResult._messages)
-				{
-					parseErrors.emplace_back(message);
-				}
-			}
+            auto callbackResult = callback(*this);
+            if (!callbackResult) // callbackResult is an error
+            {
+                isValid = false;
+                for (auto message : callbackResult._messages)
+                {
+                    parseErrors.emplace_back(message);
+                }
+            }
         }
 
-		_shouldPrintUsage = printHelpAndExit;
+        _shouldPrintUsage = printHelpAndExit;
 
-		if (!isValid)
-		{
-			throw ParseErrorException("Error in parse callback", parseErrors);
-		}
-	}
+        if (!isValid)
+        {
+            throw ParseErrorException("Error in parse callback", parseErrors);
+        }
+    }
 
     bool CommandLineParser::SetDefaultArgs(const set<string>& unset_args)
     {
@@ -239,19 +239,19 @@ namespace utilities
         return _options.find(option) != _options.end();
     }
 
-	bool CommandLineParser::HasShortName(string shortName)
-	{
-		return _shortToLongNameMap.find(shortName) != _shortToLongNameMap.end();
-	}
+    bool CommandLineParser::HasShortName(string shortName)
+    {
+        return _shortToLongNameMap.find(shortName) != _shortToLongNameMap.end();
+    }
 
     void CommandLineParser::AddOption(const OptionInfo& info)
     {
-        if(_options.find(info.name) != _options.end())
+        if (_options.find(info.name) != _options.end())
         {
             throw std::runtime_error("Error: adding same option more than once");
         }
 
-        if(_shortToLongNameMap.find(info.shortName) != _shortToLongNameMap.end())
+        if (_shortToLongNameMap.find(info.shortName) != _shortToLongNameMap.end())
         {
             throw std::runtime_error("Error: adding same short name more than once");
         }
@@ -360,19 +360,19 @@ namespace utilities
         {
             len += (option.shortName.size() + 4);
         }
-    
+
         len += option.defaultValue_string.size() + 3; // 3 for " [" + "]" at begin/end
 
         const size_t max_name_len = 32;
         return min(max_name_len, len);
     }
 
-	bool CommandLineParser::ShouldPrintUsage() const
-	{
-		return _shouldPrintUsage;
-	}
+    bool CommandLineParser::ShouldPrintUsage() const
+    {
+        return _shouldPrintUsage;
+    }
 
-	void CommandLineParser::PrintUsage(ostream& out)
+    void CommandLineParser::PrintUsage(ostream& out)
     {
         // Find longest option name so we can align descriptions
         size_t longest_name = 0;
@@ -387,7 +387,7 @@ namespace utilities
         out << "Usage: " << _exeName << " [options]" << endl;
         out << endl;
 
-        for (const auto& entry: _docEntries)
+        for (const auto& entry : _docEntries)
         {
             switch (entry.EntryType)
             {
@@ -426,7 +426,7 @@ namespace utilities
         out << "Current parameters for " << _exeName << endl;
 
         set<string> visited_options;
-        for (auto& entry: _docEntries)
+        for (auto& entry : _docEntries)
         {
             if (entry.EntryType == DocumentationEntry::type::option)
             {
@@ -462,6 +462,19 @@ namespace utilities
                 out << "\t--" << opt.first << ": " << opt.second.current_value_string << endl;
                 did_print = true;
             }
+        }
+    }
+
+    string CommandLineParser::GetOptionValue(const string& option)
+    {
+        auto it = _options.find(option);
+        if (it != _options.end())
+        {
+            return it->second.current_value_string;
+        }
+        else
+        {
+            return "";
         }
     }
 }

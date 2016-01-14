@@ -127,8 +127,12 @@ int main(int argc, char* argv[])
 
 	cout << "filename: " << fileArgs.filename << endl;
 
-//
-//    cout << "numIter: " << Params.numIter << endl;
+
+	cout << "filename arg value: " << cmdline.GetOptionValue("filename") << endl;
+	cout << "numIter arg value: " << cmdline.GetOptionValue("numIter") << endl;
+	cout << "thresh arg value: " << cmdline.GetOptionValue("thresh") << endl;
+
+	//    cout << "numIter: " << Params.numIter << endl;
 //    cout << "thresh: " << Params.thresh << endl;
 //
 //    if (filepath == "")
