@@ -23,39 +23,43 @@ using dataset::MappedParser;
 #include "ParsingIterator.h"
 using dataset::GetParsingIterator;
 
+// stl
+#include <memory>
+using std::move;
+
 namespace common
 {
     unique_ptr<IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
     {
         // open data file
-        ifstream dataFStream = OpenIfstream(dataLoadArguments.inputDataFile);
+        auto upDataFStream = OpenIfstream(dataLoadArguments.inputDataFile);
 
         // create line iterator - read line by line sequentially
-        SequentialLineIterator lineIterator(dataFStream);
+        SequentialLineIterator lineIterator(move(upDataFStream));
 
         // create parser for sparse vectors (SVMLight format)
         SparseEntryParser sparseEntryParser;
 
         // Create iterator
-        return GetParsingIterator(lineIterator, sparseEntryParser);
+        return GetParsingIterator(move(lineIterator), sparseEntryParser);
     }
 
     unique_ptr<IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const Map& map, const CoordinateList& coordinateList)
     {
-        // open data file
-        ifstream dataFStream = OpenIfstream(dataLoadArguments.inputDataFile);
-
-        // create line iterator - read line by line sequentially
-        SequentialLineIterator lineIterator(dataFStream);
-
         // create parser for sparse vectors (SVMLight format)
         SparseEntryParser sparseEntryParser;
 
         // create mapped parser
         MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, map, coordinateList);
 
+        // open data file
+        auto upDataFStream = OpenIfstream(dataLoadArguments.inputDataFile);
+
+        // create line iterator - read line by line sequentially
+        SequentialLineIterator lineIterator(move(upDataFStream)); // TODO bug
+
         // Create iterator
-        return GetParsingIterator(lineIterator, mappedParser);
+        return GetParsingIterator(move(lineIterator), mappedParser);
     }
 
     void LoadDataset(IParsingIterator& parsingIterator, RowDataset& dataset)
@@ -96,8 +100,8 @@ namespace common
         else
         {
             // load map
-            ifstream mapFStream = OpenIfstream(mapLoadArguments.inputMapFile);
-            map = JsonSerializer::Load<Map>(mapFStream, "Base");
+            auto upMapFStream = OpenIfstream(mapLoadArguments.inputMapFile);
+            map = JsonSerializer::Load<Map>(*upMapFStream, "Base");
 
             // create list of output coordinates
             coordinateList = CoordinateListFactory::IgnoreSuffix(map, mapLoadArguments.inputMapIgnoreSuffix);

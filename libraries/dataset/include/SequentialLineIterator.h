@@ -10,6 +10,7 @@ using std::istream;
 
 #include <memory>
 using std::shared_ptr;
+using std::unique_ptr;
 
 namespace dataset
 {
@@ -20,7 +21,15 @@ namespace dataset
     public:
         /// Constructs a sequential line iterator
         ///
-        SequentialLineIterator(istream& istream, char delim = '\n');
+        SequentialLineIterator(unique_ptr<istream>&& upIstream, char delim = '\n');
+
+        /// deleted copy Ctor
+        ///
+        SequentialLineIterator(const SequentialLineIterator&) = delete; // this ctor is deleted because a provate member of this class cannot be copied
+
+        /// default move Ctor
+        ///
+        SequentialLineIterator(SequentialLineIterator&&) = default;
 
         /// \returns True if the iterator is currently pointing to a valid iterate
         ///
@@ -36,7 +45,7 @@ namespace dataset
 
     private:
         shared_ptr<string> _spCurrentLine = nullptr;
-        istream& _istream;
+        unique_ptr<istream> _upIstream;
         char _delim;
     };
 }

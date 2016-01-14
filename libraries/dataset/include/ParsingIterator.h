@@ -37,7 +37,7 @@ namespace dataset
     public:
         /// Constructs a parsing iterator
         /// \param row_iter An input iterator of strings, that traverses the textual dataset row by row
-        ParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser);
+        ParsingIterator(RowIteratorType&& row_iter, const VectorEntryParserType& parser);
 
         /// \returns True if the iterator is currently pointing to a valid iterate
         ///
@@ -59,7 +59,7 @@ namespace dataset
     /// \returns A unique_ptr to a Parsing Iterator
     ///
     template<typename RowIteratorType, typename VectorEntryParserType>
-    unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser);
+    unique_ptr<IParsingIterator> GetParsingIterator(const RowIteratorType& row_iter, const VectorEntryParserType& parser);
 }
 
 #include "../tcc/ParsingIterator.tcc"

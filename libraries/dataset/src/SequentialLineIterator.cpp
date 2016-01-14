@@ -8,7 +8,7 @@ using std::move;
 
 namespace dataset
 {
-    SequentialLineIterator::SequentialLineIterator(istream& istream, char delim) : _istream(istream), _delim(delim)
+    SequentialLineIterator::SequentialLineIterator(unique_ptr<istream>&& upIstream, char delim) : _upIstream(move(upIstream)), _delim(delim)
     {
         Next();
     }
@@ -21,8 +21,8 @@ namespace dataset
     void SequentialLineIterator::Next()
     {
         auto spNextLine = make_shared<string>();
-        getline(_istream, *spNextLine, _delim); // TODO (ofer) - make this more efficient by using char[] rather than string
-        if(_istream.fail())
+        getline(*_upIstream, *spNextLine, _delim);
+        if(_upIstream->fail())
         {
             _spCurrentLine = nullptr;
         }

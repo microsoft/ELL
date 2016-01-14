@@ -5,15 +5,18 @@
 #include <stdexcept>
 using std::runtime_error;
 
+#include <memory>
+using std::make_unique;
+
 namespace utilities
 {
-    ifstream OpenIfstream(string filepath)
+    unique_ptr<ifstream> OpenIfstream(string filepath)
     {
         // open file
-        ifstream fs(filepath);
+        auto fs = make_unique<ifstream>(filepath);
 
         // check that it opened
-        if(!fs.is_open())
+        if(!fs->is_open())
         {
             throw runtime_error("error openning file " + filepath);
         }
@@ -21,13 +24,13 @@ namespace utilities
         return fs;
     }
 
-    ofstream OpenOfstream(string filepath)
+    unique_ptr<ofstream> OpenOfstream(string filepath)
     {
         // open file
-        ofstream fs(filepath);
+        auto fs = make_unique<ofstream>(filepath);
 
         // check that it opened
-        if (!fs.is_open())
+        if (!fs->is_open())
         {
             throw runtime_error("error openning file " + filepath);
         }

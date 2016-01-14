@@ -38,10 +38,10 @@ int main(int argc, char* argv[])
         commandLineParser.ParseArgs();
 
         // open file
-        ifstream mapFStream = OpenIfstream(args.mapFile);
-        auto map = JsonSerializer::Load<Compiler>(mapFStream, "Base");
+        auto upMapFStream = OpenIfstream(args.mapFile);
+        auto map = JsonSerializer::Load<Compiler>(*upMapFStream, "Base");
         
-        ofstream svgOStream = OpenOfstream(args.codeFile);
+        auto upSvgOStream = OpenOfstream(args.codeFile);
     }
 
     catch (runtime_error e)
