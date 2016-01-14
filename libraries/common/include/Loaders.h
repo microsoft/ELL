@@ -26,19 +26,19 @@ using dataset::IParsingIterator;
 
 namespace common
 {
-    /// TODO
+    /// Gets a data iterator from a data file, based on command line parameters
     ///
     unique_ptr<IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments);
 
-    /// TODO
+    /// Gets a mapped data iterator, based on command line parameters, a map, and a coordinate list
     ///
     unique_ptr<IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const Map& map, const CoordinateList& coordinateList);
 
-    /// TODO
+    /// Converts a data iterator (one that gets supervised examples) into a RowDataset
     ///
-    void LoadDataset(IParsingIterator& parsingIterator, RowDataset& dataset);
+    void DataIteratorToRowDataset(IParsingIterator& parsingIterator, RowDataset& dataset);
 
-    /// TODO
+    /// Loads a dataset, a map, and a coordinate list based on command line parameters
     ///
     void LoadDatasetMapCoordinates(
         const DataLoadArguments& dataLoadArguments,

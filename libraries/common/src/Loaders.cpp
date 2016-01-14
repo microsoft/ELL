@@ -56,7 +56,7 @@ namespace common
         return GetParsingIterator(move(lineIterator), mappedParser);
     }
 
-    void LoadDataset(IParsingIterator& parsingIterator, RowDataset& dataset)
+    void DataIteratorToRowDataset(IParsingIterator& parsingIterator, RowDataset& dataset)
     {
         // Load row by row
         while (parsingIterator.IsValid())
