@@ -39,11 +39,11 @@ int main(int argc, char* argv[])
         commandLineParser.ParseArgs();
 
         // open map file
-        auto upMapFStream = OpenIfstream(args.mapFile);
-        auto map = JsonSerializer::Load<PrintableMap>(*upMapFStream, "Base");
+        auto mapFStream = OpenIfstream(args.mapFile);
+        auto map = JsonSerializer::Load<PrintableMap>(mapFStream, "Base");
         
-        auto upSvgOStream = OpenOfstream(args.svgFile);
-        map.Print(*upSvgOStream, args);
+        auto outputSvgFStream = OpenOfstream(args.svgFile);
+        map.Print(outputSvgFStream, args);
     }
 
     catch (runtime_error e)

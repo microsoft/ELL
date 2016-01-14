@@ -94,8 +94,8 @@ namespace common
         else
         {
             // load map
-            auto upMapFStream = OpenIfstream(mapLoadArguments.inputMapFile);
-            map = JsonSerializer::Load<Map>(*upMapFStream, "Base");
+            auto inputMapFStream = OpenIfstream(mapLoadArguments.inputMapFile);
+            map = JsonSerializer::Load<Map>(inputMapFStream, "Base");
 
             // create list of output coordinates
             coordinateList = CoordinateListFactory::IgnoreSuffix(map, mapLoadArguments.inputMapIgnoreSuffix);

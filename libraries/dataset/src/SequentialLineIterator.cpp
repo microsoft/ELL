@@ -15,7 +15,7 @@ namespace dataset
 {
     SequentialLineIterator::SequentialLineIterator(const string& filepath, char delim) : _delim(delim)
     {
-        _upIstream = OpenIfstream(filepath);
+        _iFStream = OpenIfstream(filepath);
         Next();
     }
 
@@ -27,8 +27,8 @@ namespace dataset
     void SequentialLineIterator::Next()
     {
         auto spNextLine = make_shared<string>();
-        getline(*_upIstream, *spNextLine, _delim);
-        if(_upIstream->fail())
+        getline(_iFStream, *spNextLine, _delim);
+        if(_iFStream.fail())
         {
             _spCurrentLine = nullptr;
         }

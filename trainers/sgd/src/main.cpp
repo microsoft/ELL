@@ -118,8 +118,8 @@ int main(int argc, char* argv[])
         // save map to output file
         if (mapSaveArguments.outputMapFile != "")
         {
-            auto upOutputFStream = OpenOfstream(mapSaveArguments.outputMapFile);
-            map.Serialize(*upOutputFStream);
+            auto outputMapFStream = OpenOfstream(mapSaveArguments.outputMapFile);
+            map.Serialize(outputMapFStream);
         }
     }
     catch (runtime_error e)

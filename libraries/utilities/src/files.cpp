@@ -10,13 +10,13 @@ using std::make_unique;
 
 namespace utilities
 {
-    unique_ptr<ifstream> OpenIfstream(string filepath)
+    ifstream OpenIfstream(string filepath)
     {
         // open file
-        auto fs = make_unique<ifstream>(filepath);
+        auto fs = ifstream(filepath);
 
         // check that it opened
-        if(!fs->is_open())
+        if(!fs.is_open())
         {
             throw runtime_error("error openning file " + filepath);
         }
@@ -24,13 +24,13 @@ namespace utilities
         return fs;
     }
 
-    unique_ptr<ofstream> OpenOfstream(string filepath)
+    ofstream OpenOfstream(string filepath)
     {
         // open file
-        auto fs = make_unique<ofstream>(filepath);
+        auto fs = ofstream(filepath);
 
         // check that it opened
-        if (!fs->is_open())
+        if (!fs.is_open())
         {
             throw runtime_error("error openning file " + filepath);
         }

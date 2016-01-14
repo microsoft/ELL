@@ -5,8 +5,8 @@
 #include <string>
 using std::string;
 
-#include <iostream>
-using std::istream;
+#include <fstream>
+using std::ifstream;
 
 #include <memory>
 using std::shared_ptr;
@@ -45,7 +45,7 @@ namespace dataset
 
     private:
         shared_ptr<string> _spCurrentLine = nullptr;
-        unique_ptr<istream> _upIstream;
+        ifstream _iFStream;
         char _delim;
     };
 }

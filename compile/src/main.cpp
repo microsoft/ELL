@@ -38,8 +38,8 @@ int main(int argc, char* argv[])
         commandLineParser.ParseArgs();
 
         // open file
-        auto upMapFStream = OpenIfstream(args.mapFile);
-        auto map = JsonSerializer::Load<Compiler>(*upMapFStream, "Base");
+        auto outputMapFStream = OpenIfstream(args.mapFile);
+        auto map = JsonSerializer::Load<Compiler>(outputMapFStream, "Base");
         
         auto upSvgOStream = OpenOfstream(args.codeFile);
     }
