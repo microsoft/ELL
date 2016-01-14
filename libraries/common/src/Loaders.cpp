@@ -80,7 +80,7 @@ namespace common
             auto upDataIterator = GetDataIterator(dataLoadArguments);
 
             // load dataset
-            LoadDataset(*upDataIterator, rowDataset);
+            DataIteratorToRowDataset(*upDataIterator, rowDataset);
 
             // number of columns
             uint64 numColumns = rowDataset.NumColumns();
@@ -104,7 +104,7 @@ namespace common
             auto upDataIterator = GetDataIterator(dataLoadArguments, map, coordinateList);
 
             // load dataset
-            LoadDataset(*upDataIterator, rowDataset);
+            DataIteratorToRowDataset(*upDataIterator, rowDataset);
         }
     }
 }
