@@ -17,7 +17,7 @@ namespace utilities
 {
     /// Opens an ifstream and throws an exception if a problem occurs
     ///
-    ifstream OpenIfstream(string filepath); // returns ptr because ifstream has deleted copy/move ctors
+    ifstream OpenIfstream(string filepath);
     
     /// Opens an ofstream and throws an exception if a problem occurs
     ///
