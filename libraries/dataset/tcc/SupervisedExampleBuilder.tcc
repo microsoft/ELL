@@ -2,9 +2,6 @@
 
 #include "DataVectorBuilder.h"
 
-#include "Parser.h"
-using utilities::Parser;
-
 #include <cstdlib>
 using std::strtod;
 
@@ -13,22 +10,6 @@ namespace dataset
     template<typename VectorEntryParserType, typename DefaultDataVectorType>
     SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::SupervisedExampleBuilder(VectorEntryParserType parser, bool hasWeight) : _instanceParser(parser), _hasWeight(hasWeight)
     {}
-
-    void handleErrors(Parser::Result result, const string& str)
-    {
-        if(result == Parser::Result::badFormat)
-        {
-            throw runtime_error("bad format real value in '" + str + "'");
-        }
-        else if(result == Parser::Result::endOfString || result == Parser::Result::beginComment)
-        {
-            throw runtime_error("premature end-of-string or comment in '" + str + "'");
-        }
-        else if(result == Parser::Result::outOfRange)
-        {
-            throw runtime_error("real value out of double precision range in '" + str + "'");
-        }
-    }
 
     template<typename VectorEntryParserType, typename DefaultDataVectorType>
     SupervisedExample SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::Build(shared_ptr<const string> spExampleString)
@@ -65,5 +46,22 @@ namespace dataset
 
         // return supervised example
         return SupervisedExample(move(upInstance), label, weight);
+    }
+
+    template<typename VectorEntryParserType, typename DefaultDataVectorType>
+    void dataset::SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::handleErrors(Parser::Result result, const string & str)
+    {
+        if (result == Parser::Result::badFormat)
+        {
+            throw runtime_error("bad format real value in '" + str + "'");
+        }
+        else if (result == Parser::Result::endOfString || result == Parser::Result::beginComment)
+        {
+            throw runtime_error("premature end-of-string or comment in '" + str + "'");
+        }
+        else if (result == Parser::Result::outOfRange)
+        {
+            throw runtime_error("real value out of double precision range in '" + str + "'");
+        }
     }
 }

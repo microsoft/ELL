@@ -34,8 +34,8 @@ using layers::CoordinateList;
 using dataset::RowDataset;
 
 // common
-#include "DatasetMapLoader.h"
-using common::DatasetMapLoader;
+#include "Loaders.h"
+using common::LoadDatasetMapCoordinates;
 
 // optimization
 #include "AsgdOptimizer.h"
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
         RowDataset dataset;
         Map map;
         CoordinateList inputCoordinates;
-        DatasetMapLoader::Load(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
+        LoadDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
 
         // create loss function
         LogLoss loss;

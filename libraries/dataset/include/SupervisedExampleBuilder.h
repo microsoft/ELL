@@ -5,6 +5,11 @@
 #include "SupervisedExample.h"
 #include "SparseEntryParser.h"
 
+// utilities
+#include "Parser.h"
+using utilities::Parser;
+
+// stl
 #include<string>
 using std::string;
 
@@ -26,10 +31,13 @@ namespace dataset
         SupervisedExample Build(shared_ptr<const string> spExampleString);
 
     private:
+        void handleErrors(Parser::Result result, const string& str);
+
         VectorEntryParserType _instanceParser;
         bool _hasWeight;
         char _delim;
     };
+
 }
 
 #include "../tcc/SupervisedExampleBuilder.tcc"

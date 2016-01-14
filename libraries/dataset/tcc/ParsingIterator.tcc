@@ -30,4 +30,11 @@ namespace dataset
         SupervisedExampleBuilder<VectorEntryParserType, FloatDataVector> exampleBuilder(_instanceParser);
         return exampleBuilder.Build(_rowIterator.Get());
     }
+
+    template<typename RowIteratorType, typename VectorEntryParserType>
+    unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser)
+    {
+        return make_unique<ParsingIterator<RowIteratorType, VectorEntryParserType>>(row_iter, parser);
+    }
+
 }
