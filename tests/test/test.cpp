@@ -104,14 +104,11 @@ int main(int argc, char* argv[])
     ParsedFileParams fileArgs;
     cmdline.AddOptionSet(fileArgs);
     
+
     // Now actually parse the arguments and set the corresponding parameter values
     try
     {
         cmdline.ParseArgs();
-    }
-    catch (const PrintHelpException&)
-    {
-        exit(0);
     }
     catch (const ParseErrorException& ex)
     {
@@ -123,10 +120,19 @@ int main(int argc, char* argv[])
         exit(0);
     }
 
+    if (cmdline.ShouldPrintUsage())
+    {
+        cmdline.PrintUsage(cout);
+        exit(0);
+    }
+
     cout << "filename: " << fileArgs.filename << endl;
 
-//
-//    cout << "numIter: " << Params.numIter << endl;
+	cout << "filename arg value: " << cmdline.GetOptionValue("filename") << endl;
+	cout << "numIter arg value: " << cmdline.GetOptionValue("numIter") << endl;
+	cout << "thresh arg value: " << cmdline.GetOptionValue("thresh") << endl;
+
+	//    cout << "numIter: " << Params.numIter << endl;
 //    cout << "thresh: " << Params.thresh << endl;
 //
 //    if (filepath == "")

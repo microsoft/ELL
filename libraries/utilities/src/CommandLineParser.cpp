@@ -81,7 +81,7 @@ namespace utilities
     //
     // CommandLineParser class
     //
-    CommandLineParser::CommandLineParser(int argc, char**argv)
+    CommandLineParser::CommandLineParser(int argc, char**argv) : _shouldPrintUsage(false)
     {
         SetArgs(argc, argv);
     }
@@ -124,7 +124,7 @@ namespace utilities
         // While we're parsing the arguments, we may add new conditional options. If we do so, we need
         // to reparse the inputs in case some earlier commandline option referred to one of these new
         // options. So we repeatedly parse the command line text until we haven't added any new conditional options.
-    
+
         bool needs_reparse = true;
         while (needs_reparse)
         {
@@ -185,7 +185,7 @@ namespace utilities
                 }
                 else
                 {
-                    _args.push_back(_originalArgs[index]);
+                    _positional_args.push_back(_originalArgs[index]);
                 }
             }
 
@@ -196,7 +196,7 @@ namespace utilities
         // Finally, invoke the post-parse callbacks
         bool isValid = true;
         vector<ParseError> parseErrors;
-        for(const auto& callback: _postParseCallbacks)
+        for (const auto& callback : _postParseCallbacks)
         {
             auto callbackResult = callback(*this);
             if (!callbackResult) // callbackResult is an error
@@ -209,11 +209,7 @@ namespace utilities
             }
         }
 
-        if (printHelpAndExit)
-        {
-            PrintUsage(std::cout); // TODO: allow constructor to optionally specify output stream for help text
-            throw PrintHelpException("");
-        }
+        _shouldPrintUsage = printHelpAndExit;
 
         if (!isValid)
         {
@@ -250,12 +246,12 @@ namespace utilities
 
     void CommandLineParser::AddOption(const OptionInfo& info)
     {
-        if(_options.find(info.name) != _options.end())
+        if (_options.find(info.name) != _options.end())
         {
             throw std::runtime_error("Error: adding same option more than once");
         }
 
-        if(_shortToLongNameMap.find(info.shortName) != _shortToLongNameMap.end())
+        if (_shortToLongNameMap.find(info.shortName) != _shortToLongNameMap.end())
         {
             throw std::runtime_error("Error: adding same short name more than once");
         }
@@ -364,11 +360,16 @@ namespace utilities
         {
             len += (option.shortName.size() + 4);
         }
-    
+
         len += option.defaultValue_string.size() + 3; // 3 for " [" + "]" at begin/end
 
         const size_t max_name_len = 32;
         return min(max_name_len, len);
+    }
+
+    bool CommandLineParser::ShouldPrintUsage() const
+    {
+        return _shouldPrintUsage;
     }
 
     void CommandLineParser::PrintUsage(ostream& out)
@@ -386,7 +387,7 @@ namespace utilities
         out << "Usage: " << _exeName << " [options]" << endl;
         out << endl;
 
-        for (const auto& entry: _docEntries)
+        for (const auto& entry : _docEntries)
         {
             switch (entry.EntryType)
             {
@@ -425,7 +426,7 @@ namespace utilities
         out << "Current parameters for " << _exeName << endl;
 
         set<string> visited_options;
-        for (auto& entry: _docEntries)
+        for (auto& entry : _docEntries)
         {
             if (entry.EntryType == DocumentationEntry::type::option)
             {
@@ -461,6 +462,19 @@ namespace utilities
                 out << "\t--" << opt.first << ": " << opt.second.current_value_string << endl;
                 did_print = true;
             }
+        }
+    }
+
+    string CommandLineParser::GetOptionValue(const string& option)
+    {
+        auto it = _options.find(option);
+        if (it != _options.end())
+        {
+            return it->second.current_value_string;
+        }
+        else
+        {
+            return "";
         }
     }
 }
