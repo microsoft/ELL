@@ -2,7 +2,7 @@
 # cmake file for print project
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 set (PROJ_NAME print)
 
