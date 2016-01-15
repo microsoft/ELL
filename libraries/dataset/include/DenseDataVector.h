@@ -72,7 +72,8 @@ namespace dataset
         /// Performs (*p_other) += scalar * (*this), where other is a dense vector
         ///
         virtual void AddTo(double* p_other, double scalar = 1.0) const override;
-        
+        using IVector::AddTo;
+
         /// Computes the Dot product
         ///
         virtual double Dot(const double* p_other) const override;

@@ -17,8 +17,11 @@ using linear::DoubleVector;
 
 // stl
 #include <iostream>
-using std::cerr;
+using std::cout;
 using std::endl;
+
+#include<string>
+using std::string;
 
 bool testFailed = false;
 
@@ -37,103 +40,147 @@ bool isEqual(double a, double b)
     }
 }
 
-template<typename DataVectorType>
-bool dotProductTest(const DoubleArray& a, const DoubleVector& b, double expectedResult)
+bool isEqual(const DoubleVector& a, const DoubleVector& b)
 {
-    DataVectorType dataVector(a.GetIterator());
-    double result = dataVector.Dot(b);
-    return isEqual(result, expectedResult);
+    for(int i = 0; i < a.Size(); ++i)
+    {
+        if(isEqual(a[i], b[i]) == false)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
-void dotProductTest()
+/// Generates a DoubleVector, for the purpose of testing
+///
+DoubleVector getVector()
 {
-    DoubleArray a(15);
-    a[3] = 1.0;
-    a[4] = 1.0;
-    a[12] = 1.0;
-    a[13] = 1.0;
+    DoubleVector a(15);
+    a[0] = 0.1;
+    a[1] = 1.2;
+    a[2] = 2.3;
+    a[3] = 3.4;
+    a[4] = 4.5;
+    a[5] = 5.6;
+    a[6] = 6.7;
+    a[7] = 7.8;
+    a[8] = 8.9;
+    a[9] = 9.0;
+    a[10] = -0.1;
+    a[11] = -1.2;
+    a[12] = -2.3;
+    a[13] = -3.4;
+    a[14] = -4.5;
 
-    DoubleVector b(15);
-    b[0] = 0.1;
-    b[1] = 1.2;
-    b[2] = 2.3;
-    b[3] = 3.4;
-    b[4] = 4.5;
-    b[5] = 5.6;
-    b[6] = 6.7;
-    b[7] = 7.8;
-    b[8] = 8.9;
-    b[9] = 9.0;
-    b[10] = -0.1;
-    b[11] = -1.2;
-    b[12] = -2.3;
-    b[13] = -3.4;
-    b[14] = -4.5;
+    return a;
+}
 
+void processTest(const string& testName, const string& typeName, bool success)
+{
+    cout << "Running " << testName << " test with " << typeName << " ... ";
+
+    if (success)
+    {
+        cout << "Passed\n";
+    }
+    else
+    {
+        cout << "Failed\n";
+        testFailed = true;
+    }
+}
+
+template<typename DataVectorType>
+void dotTest()
+{
+    auto a = getVector();
+
+    DoubleArray b(15);
+    b[3] = 1.0;
+    b[4] = 1.0;
+    b[12] = 1.0;
+    b[13] = 1.0;
+
+    DataVectorType c(b.GetIterator());
+
+    double result = c.Dot(a);
     const double expectedResult = 2.2;
 
-    // test vectors with content
-    if(dotProductTest<DoubleDataVector>(a, b, expectedResult) == false)
-    {
-        cerr << "failed dot product test with DoubleDataVector" << endl;
-        testFailed = true;
-    }
+    processTest("Dot()", typeid(DataVectorType).name(), isEqual(result, expectedResult));
+}
 
-    if(dotProductTest<FloatDataVector>(a, b, expectedResult) == false)
-    {
-        cerr << "failed dot product test with FloatDataVector" << endl;
-        testFailed = true;
-    }
-
-    if(dotProductTest<SparseDoubleDataVector>(a, b, expectedResult) == false)
-    {
-        cerr << "failed dot product test with SparseDoubleDataVector" << endl;
-        testFailed = true;
-    }
-
-    if(dotProductTest<SparseFloatDataVector>(a, b, expectedResult) == false)
-    {
-        cerr << "failed dot product test with SparseFloatDataVector" << endl;
-        testFailed = true;
-    }
-
-    if(dotProductTest<SparseShortDataVector>(a, b, expectedResult) == false)
-    {
-        cerr << "failed dot product test with SparseShortDataVector" << endl;
-        testFailed = true;
-    }
-
-    if(dotProductTest<SparseBinaryDataVector>(a, b, expectedResult) == false)
-    {
-        cerr << "failed dot product test with SparseBinaryDataVector" << endl;
-        testFailed = true;
-    }
-
-    if(dotProductTest<UncompressedSparseBinaryDataVector>(a, b, expectedResult) == false)
-    {
-        cerr << "failed dot product test with UncompressedSparseBinaryDataVector" << endl;
-        testFailed = true;
-    }
-
+void dotTestZeroDataVector()
+{
+    auto a = getVector();
     ZeroDataVector z;
-    if(!isEqual(z.Dot(b), 0.0))
-    {
-        cerr << "failed dot product test with ZeroDataVector" << endl;
-        testFailed = true;
-    }
+    double result = z.Dot(a);
+    processTest("Dot()", "ZeroDataVector", isEqual(result, 0.0));
+}
 
-    // test ones vector
+void dotTestOnesDataVector()
+{
+    auto a = getVector();
     OnesDataVector o(4);
-    if(!isEqual(o.Dot(b), 7.0))
-    {
-        cerr << "failed dot product test with OnesDataVector" << endl;
-        testFailed = true;
-    }
+    double result = o.Dot(a);
+    processTest("Dot()", "OnesDataVector", isEqual(result, 7.0));
+}
+
+void dotTest()
+{
+    dotTest<DoubleDataVector>();
+    dotTest<FloatDataVector>();
+    dotTest<SparseDoubleDataVector>();
+    dotTest<SparseFloatDataVector>();
+    dotTest<SparseShortDataVector>();
+    dotTest<SparseBinaryDataVector>();
+    dotTest<UncompressedSparseBinaryDataVector>();
+    dotTestZeroDataVector();
+    dotTestOnesDataVector();
+}
+
+/// Adds a DataVector to a DoubleVector in two different ways and checks that the result is the same
+///
+template<typename DataVectorType1, typename DataVectorType2>
+void addToTest()
+{
+    auto a1 = getVector();
+    auto a2 = getVector();
+
+    DoubleArray b(15);
+    b[3] = 1.0;
+    b[4] = 1.0;
+    b[12] = 1.0;
+    b[13] = 1.0;
+
+    DataVectorType1 c1(b.GetIterator());
+    DataVectorType2 c2(b.GetIterator());
+
+    c1.AddTo(a1);
+    c2.AddTo(a2);
+
+    string name1 = typeid(DataVectorType1).name();
+    string name2 = typeid(DataVectorType2).name();
+
+    processTest("AddTo()", name1 + " and " + name2, isEqual(a1, a2));
+}
+
+void addToTest()
+{
+    addToTest<DoubleDataVector, FloatDataVector>();
+    addToTest<DoubleDataVector, SparseDoubleDataVector>();
+    addToTest<DoubleDataVector, SparseFloatDataVector>();
+    addToTest<DoubleDataVector, SparseShortDataVector>();
+    addToTest<DoubleDataVector, SparseBinaryDataVector>();
+    addToTest<DoubleDataVector, UncompressedSparseBinaryDataVector>();
+
+    // TODO Zero and Ones DataVectors
 }
 
 int main()
 {
-    dotProductTest();
+    dotTest();
+    addToTest();
 
     if(testFailed)
     {
