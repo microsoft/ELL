@@ -43,7 +43,7 @@ namespace types
 
     template<typename ValueType>
     template<typename IndexValueIteratorType, typename concept>
-    RealArray<ValueType>::RealArray(IndexValueIteratorType IndexValueIterator) : vector<RealArray>(0)
+    RealArray<ValueType>::RealArray(IndexValueIteratorType IndexValueIterator) : vector<ValueType>(0)
     {
         while(IndexValueIterator.IsValid())
         {

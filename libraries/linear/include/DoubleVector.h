@@ -33,7 +33,7 @@ namespace linear
         /// Converting constructor
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        DoubleVector(IndexValueIteratorType indexValueIterator) : DoubleArray(15) {} // TODO fix this
+        DoubleVector(IndexValueIteratorType indexValueIterator) : DoubleArray(indexValueIterator) {} // TODO fix this
 
         using IVector::AddTo;
 
