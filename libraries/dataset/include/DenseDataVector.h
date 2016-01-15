@@ -76,6 +76,7 @@ namespace dataset
         /// Computes the Dot product
         ///
         virtual double Dot(const double* p_other) const override;
+        using IVector::Dot;
 
         /// \Returns An Iterator that points to the beginning of the vector.
         ///

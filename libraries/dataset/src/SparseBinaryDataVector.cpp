@@ -126,7 +126,7 @@ namespace dataset
         return type::sparse_binary;
     }
 
-    IDataVector::type UncompressedSparseBinaryVector::GetType() const
+    IDataVector::type UncompressedSparseBinaryDataVector::GetType() const
     {
         return type::uncompressed_sparse_binary;
     }

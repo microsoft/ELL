@@ -62,3 +62,16 @@ add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
+#
+# dataVectorTest
+#
+
+set (TEST_NAME dataVectorTest)
+
+add_executable(${TEST_NAME} tests/${TEST_NAME}.cpp ${INCLUDE})
+
+target_link_libraries(${TEST_NAME} dataset linear)
+
+set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
+
+add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})

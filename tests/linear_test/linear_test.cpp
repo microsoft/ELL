@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
         fill_vector_binary_random(v1, 21);
         vector_test1(v1, x);
 
-        UncompressedSparseBinaryVector v2;
+        UncompressedSparseBinaryDataVector v2;
         fill_vector_binary_random(v2, 21);
         vector_test1(v2, x);
 
@@ -229,7 +229,7 @@ int main(int argc, char* argv[])
         fill_matrix_binary_random(M7, 8, 9, false, false);
         matrix_test1(M7, x, y, true, "diagonal");
 
-        RowMatrix<UncompressedSparseBinaryVector> M8;
+        RowMatrix<UncompressedSparseBinaryDataVector> M8;
         fill_matrix_binary_random2(M8, 8, 9);
         matrix_test1(M8, x, y, false);
 

@@ -29,7 +29,6 @@ include_directories(../../libraries/optimization/include)
 include_directories(../../libraries/types/include)
 include_directories(../../libraries/utilities/include)
 
-
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "trainers")

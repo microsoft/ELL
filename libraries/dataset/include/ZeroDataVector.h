@@ -4,12 +4,8 @@
 
 #include "IDataVector.h"
 
+// types
 #include "types.h"
-
-
-
-
-
 
 namespace dataset
 {
@@ -98,6 +94,7 @@ namespace dataset
         /// Computes the Dot product
         ///
         virtual double Dot(const double* p_other) const override;
+        using IVector::Dot;
 
         /// \Returns a Iterator that points to the beginning of the datavector.
         ///

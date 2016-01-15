@@ -105,6 +105,7 @@ namespace dataset
         /// Computes the Dot product
         ///
         virtual double Dot(const double* p_other) const override;
+        using IVector::Dot;
 
         /// \Returns a Iterator that traverses the non-zero entries of the sparse vector
         ///
@@ -128,7 +129,7 @@ namespace dataset
         virtual type GetType() const override;
     };
 
-    class UncompressedSparseBinaryVector : public SparseBinaryDataVectorBase<IntegerList>
+    class UncompressedSparseBinaryDataVector : public SparseBinaryDataVectorBase<IntegerList>
     {
     public:
         using SparseBinaryDataVectorBase<IntegerList>::SparseBinaryDataVectorBase;
