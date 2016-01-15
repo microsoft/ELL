@@ -40,6 +40,8 @@ bool isEqual(double a, double b)
     }
 }
 
+/// checks if two vectors are equal, up to a small numerical error in each coordinate
+///
 bool isEqual(const DoubleVector& a, const DoubleVector& b)
 {
     for(int i = 0; i < a.Size(); ++i)
@@ -76,6 +78,8 @@ DoubleVector getVector()
     return a;
 }
 
+/// Prints the results of a test and sets the global testFailed flag if appropriate
+///
 void processTest(const string& testName, const string& typeName, bool success)
 {
     cout << "Running " << testName << " test with " << typeName << " ... ";
@@ -91,6 +95,8 @@ void processTest(const string& testName, const string& typeName, bool success)
     }
 }
 
+/// Tests the Dot() member of DataVectors
+///
 template<typename DataVectorType>
 void dotTest()
 {
@@ -110,6 +116,8 @@ void dotTest()
     processTest("Dot()", typeid(DataVectorType).name(), isEqual(result, expectedResult));
 }
 
+/// Tests the Dot() member of ZeroDataVector
+///
 void dotTestZeroDataVector()
 {
     auto a = getVector();
@@ -118,6 +126,8 @@ void dotTestZeroDataVector()
     processTest("Dot()", "ZeroDataVector", isEqual(result, 0.0));
 }
 
+/// Tests the Dot() member of OnesDataVector
+///
 void dotTestOnesDataVector()
 {
     auto a = getVector();
@@ -126,6 +136,8 @@ void dotTestOnesDataVector()
     processTest("Dot()", "OnesDataVector", isEqual(result, 7.0));
 }
 
+/// Tests the Dot() member of DataVectors
+///
 void dotTest()
 {
     dotTest<DoubleDataVector>();
@@ -165,6 +177,39 @@ void addToTest()
     processTest("AddTo()", name1 + " and " + name2, isEqual(a1, a2));
 }
 
+/// Tests the AddTo() member of ZeroDataVector
+///
+void addToTestZeroDataVector()
+{
+    auto a1 = getVector();
+    auto a2 = getVector();
+
+    ZeroDataVector z;
+
+    z.AddTo(a1);
+
+    processTest("AddTo()", "class dataset::ZeroDataVector", isEqual(a1, a2));
+}
+
+/// Tests the AddTo() member of OnesDataVector
+///
+void addToTestOnesDataVector()
+{
+    auto a1 = getVector();
+    auto a2 = getVector();
+
+    OnesDataVector o(a1.Size());
+
+    o.AddTo(a1);
+
+    double norm1 = a1.Norm2();
+    double norm2 = a2.Norm2() + 2 * o.Dot(a2) + a2.Size();
+
+    processTest("AddTo()", "class dataset::OnesDataVector", isEqual(norm1, norm2));
+}
+
+/// Tests the AddTo() member of DataVectors
+///
 void addToTest()
 {
     addToTest<DoubleDataVector, FloatDataVector>();
@@ -173,10 +218,12 @@ void addToTest()
     addToTest<DoubleDataVector, SparseShortDataVector>();
     addToTest<DoubleDataVector, SparseBinaryDataVector>();
     addToTest<DoubleDataVector, UncompressedSparseBinaryDataVector>();
-
-    // TODO Zero and Ones DataVectors
+    addToTestZeroDataVector();
+    addToTestOnesDataVector();
 }
 
+/// Runs all tests
+///
 int main()
 {
     dotTest();
