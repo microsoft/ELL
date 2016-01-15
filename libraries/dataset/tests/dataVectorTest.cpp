@@ -15,6 +15,15 @@ using types::DoubleArray;
 #include "DoubleVector.h"
 using linear::DoubleVector;
 
+// stl
+#include <iostream>
+using std::cerr;
+using std::endl;
+
+bool testFailed = false;
+
+/// checks if two doubles are equal, up to a small numerical error
+///
 bool isEqual(double a, double b)
 {
     const double epsilon = 1.0e-8;
@@ -36,7 +45,7 @@ bool dotProductTest(const DoubleArray& a, const DoubleVector& b, double expected
     return isEqual(result, expectedResult);
 }
 
-bool dotProductTest()
+void dotProductTest()
 {
     DoubleArray a(15);
     a[3] = 1.0;
@@ -64,37 +73,69 @@ bool dotProductTest()
     const double expectedResult = 2.2;
 
     // test vectors with content
-    if(dotProductTest<DoubleDataVector>(a, b, expectedResult) &&
-        dotProductTest<FloatDataVector>(a, b, expectedResult) &&
-        dotProductTest<SparseDoubleDataVector>(a, b, expectedResult) &&
-        dotProductTest<SparseFloatDataVector>(a, b, expectedResult) &&
-        dotProductTest<SparseShortDataVector>(a, b, expectedResult) &&
-        dotProductTest<SparseBinaryDataVector>(a, b, expectedResult) &&
-        dotProductTest<UncompressedSparseBinaryDataVector>(a, b, expectedResult) == false)
+    if(dotProductTest<DoubleDataVector>(a, b, expectedResult) == false)
     {
-        return false;
+        cerr << "failed dot product test with DoubleDataVector" << endl;
+        testFailed = true;
     }
 
-    // test zero vector
+    if(dotProductTest<FloatDataVector>(a, b, expectedResult) == false)
+    {
+        cerr << "failed dot product test with FloatDataVector" << endl;
+        testFailed = true;
+    }
+
+    if(dotProductTest<SparseDoubleDataVector>(a, b, expectedResult) == false)
+    {
+        cerr << "failed dot product test with SparseDoubleDataVector" << endl;
+        testFailed = true;
+    }
+
+    if(dotProductTest<SparseFloatDataVector>(a, b, expectedResult) == false)
+    {
+        cerr << "failed dot product test with SparseFloatDataVector" << endl;
+        testFailed = true;
+    }
+
+    if(dotProductTest<SparseShortDataVector>(a, b, expectedResult) == false)
+    {
+        cerr << "failed dot product test with SparseShortDataVector" << endl;
+        testFailed = true;
+    }
+
+    if(dotProductTest<SparseBinaryDataVector>(a, b, expectedResult) == false)
+    {
+        cerr << "failed dot product test with SparseBinaryDataVector" << endl;
+        testFailed = true;
+    }
+
+    if(dotProductTest<UncompressedSparseBinaryDataVector>(a, b, expectedResult) == false)
+    {
+        cerr << "failed dot product test with UncompressedSparseBinaryDataVector" << endl;
+        testFailed = true;
+    }
+
     ZeroDataVector z;
     if(!isEqual(z.Dot(b), 0.0))
     {
-        return false;
+        cerr << "failed dot product test with ZeroDataVector" << endl;
+        testFailed = true;
     }
 
     // test ones vector
     OnesDataVector o(4);
     if(!isEqual(o.Dot(b), 7.0))
     {
-        return false;
+        cerr << "failed dot product test with OnesDataVector" << endl;
+        testFailed = true;
     }
-
-    return true;
 }
 
 int main()
 {
-    if(dotProductTest() == false)
+    dotProductTest();
+
+    if(testFailed)
     {
         return 1;
     }
