@@ -2,7 +2,7 @@
 # cmake file
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 set (PROJ_NAME common)
 
@@ -29,5 +29,6 @@ include_directories(../types/include)
 include_directories(../utilities/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
+target_link_libraries(${PROJ_NAME} dataset layers utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")

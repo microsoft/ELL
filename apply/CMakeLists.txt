@@ -2,7 +2,7 @@
 # cmake file for apply project
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 set (PROJ_NAME apply)
 
@@ -23,4 +23,4 @@ include_directories(../libraries/utilities/include)
 
 add_executable(${PROJ_NAME} ${SRC})
 
-target_link_libraries(${PROJ_NAME} utilities layers linear common dataset)
+target_link_libraries(${PROJ_NAME} utilities layers linear dataset common)

@@ -2,7 +2,7 @@
 # cmake file for Bonsai projects
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 PROJECT(Layers)
 
 # Turn on ability to create folders to organize projects

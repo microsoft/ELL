@@ -2,7 +2,7 @@
 # cmake file for test_exe project
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 set (PROJ_NAME test_exe)
 
