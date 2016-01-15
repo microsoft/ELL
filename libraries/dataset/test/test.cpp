@@ -1,4 +1,4 @@
-// dataVectorTest.cpp
+// test.cpp
 
 #include "SparseDataVector.h"
 #include "DenseDataVector.h"
