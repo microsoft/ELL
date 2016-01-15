@@ -18,7 +18,23 @@ namespace linear
     {
     public:
 
-        using DoubleArray::RealArray;
+        /// Ctor
+        ///
+        DoubleVector(uint64 size = 0);
+
+        /// Default copy ctor
+        ///
+        DoubleVector(const DoubleVector&) = default;
+
+        /// Default move ctor
+        ///
+        DoubleVector(DoubleVector&&) = default;
+
+        /// Converting constructor
+        ///
+        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        DoubleVector(IndexValueIteratorType indexValueIterator) : DoubleArray(15) {} // TODO fix this
+
         using IVector::AddTo;
 
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its memory

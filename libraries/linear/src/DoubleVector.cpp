@@ -4,6 +4,10 @@
 
 namespace linear
 {
+
+    DoubleVector::DoubleVector(uint64 size) : DoubleArray(size)
+    {}
+
     void DoubleVector::Reset()
     {
         fill(begin(), end(), 0);

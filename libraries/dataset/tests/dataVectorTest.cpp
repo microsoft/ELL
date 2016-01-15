@@ -222,12 +222,26 @@ void addToTest()
     addToTestOnesDataVector();
 }
 
+void iteratorConstructorTest()
+{
+    auto a = getVector();
+
+    DoubleDataVector b(a.GetIterator());
+    SparseDoubleDataVector c(b.GetIterator());
+    FloatDataVector d(c.GetIterator());
+    SparseFloatDataVector e(d.GetIterator());
+    DoubleVector f(e.GetIterator());
+
+    processTest("Iterator and Ctor", "all float/double precision DataVector types", isEqual(a, f));
+}
+
 /// Runs all tests
 ///
 int main()
 {
     dotTest();
     addToTest();
+    iteratorConstructorTest();
 
     if(testFailed)
     {

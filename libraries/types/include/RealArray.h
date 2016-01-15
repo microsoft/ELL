@@ -85,7 +85,7 @@ namespace types
         ///
         void Clear();
 
-        /// Sets the enties of the array
+        /// Sets the entries of the array
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         void Set(IndexValueIteratorType IndexValueIterator);
