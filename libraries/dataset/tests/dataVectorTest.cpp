@@ -27,10 +27,9 @@ bool testFailed = false;
 
 /// checks if two doubles are equal, up to a small numerical error
 ///
-bool isEqual(double a, double b)
+bool isEqual(double a, double b, double tolerance = 1.0e-8)
 {
-    const double epsilon = 1.0e-8;
-    if(a-b < epsilon && b-a < epsilon)
+    if(a-b < tolerance && b-a < tolerance)
     {
         return true;
     }
@@ -42,11 +41,11 @@ bool isEqual(double a, double b)
 
 /// checks if two vectors are equal, up to a small numerical error in each coordinate
 ///
-bool isEqual(const DoubleVector& a, const DoubleVector& b)
+bool isEqual(const DoubleVector& a, const DoubleVector& b, double tolerance = 1.0e-8)
 {
     for(int i = 0; i < a.Size(); ++i)
     {
-        if(isEqual(a[i], b[i]) == false)
+        if(isEqual(a[i], b[i], tolerance) == false)
         {
             return false;
         }
@@ -232,7 +231,7 @@ void iteratorConstructorTest()
     SparseFloatDataVector e(d.GetIterator());
     DoubleVector f(e.GetIterator());
 
-    processTest("Iterator and Ctor", "all float/double precision DataVector types", isEqual(a, f));
+    processTest("Iterator and Ctor", "all float/double precision DataVector types", isEqual(a, f, 1.0e-6));
 }
 
 /// Runs all tests
