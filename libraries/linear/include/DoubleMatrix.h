@@ -9,7 +9,7 @@ using std::vector;
 
 namespace linear
 {
-    enum class MatrixStructure { column, row, column_square, row_square, row_square_uptriangular, diagonal };
+    enum class MatrixStructure { column, row, columnSquare, rowSquare, rowSquareUptriangular, diagonal };
 
     /// Templated DoubleMatrix class with ElementType and StructureType template arguments
     ///
@@ -122,7 +122,7 @@ namespace linear
     /// Templated DoubleMatrix class specialization for column-major square matrices
     ///
     template<>
-    class DoubleMatrix<MatrixStructure::column_square> : public DoubleMatrix<MatrixStructure::column>
+    class DoubleMatrix<MatrixStructure::columnSquare> : public DoubleMatrix<MatrixStructure::column>
     {
     public:
         /// Constructs a column major square dense matrix
@@ -133,7 +133,7 @@ namespace linear
     /// Templated DoubleMatrix class specialization for row-major square matrices
     ///
     template<>
-    class DoubleMatrix<MatrixStructure::row_square> : public DoubleMatrix<MatrixStructure::row>
+    class DoubleMatrix<MatrixStructure::rowSquare> : public DoubleMatrix<MatrixStructure::row>
     {
     public:
         /// Constructs a row major square dense matrix
@@ -144,7 +144,7 @@ namespace linear
     /// Templated DoubleMatrix class specialization for row-major square upper-triangular matrices
     ///
     template<>
-    class DoubleMatrix<MatrixStructure::row_square_uptriangular> : public DoubleMatrixBase
+    class DoubleMatrix<MatrixStructure::rowSquareUptriangular> : public DoubleMatrixBase
     {
     public:
         /// Constructs a row major square upper-triangular dense matrix
@@ -166,10 +166,12 @@ namespace linear
         /// Performs a general matrix vector product: y = alpha * M * x + beta * y
         ///
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
+        using IMatrix::Gemv;
 
         /// Performs a general vector matrix product: y = alpha * x * M + beta * y
         ///
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
+        using IMatrix::Gevm;
 
     private:
         double _dummy = 0;
@@ -200,10 +202,12 @@ namespace linear
         /// Performs a general matrix vector product: y = alpha * M * x + beta * y
         ///
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
+        using IMatrix::Gemv;
 
         /// Performs a general vector matrix product: y = alpha * x * M + beta * y
         ///
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
+        using IMatrix::Gevm;
 
     private:
         double _dummy = 0;

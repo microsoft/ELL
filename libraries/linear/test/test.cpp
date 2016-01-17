@@ -7,6 +7,9 @@ using linear::MatrixStructure;
 #include "DoubleVector.h"
 using linear::DoubleVector;
 
+// types
+#include "types.h"
+
 // stl
 #include <iostream>
 using std::cout;
@@ -70,27 +73,27 @@ void processTest(const string& testName, const string& typeName, bool success)
 /// Fills a matrix with binary numbers (using a random generator with fixed seed)
 ///
 template<typename MatrixType>
-MatrixType getMatrix(int numRows, int numCols, int seed)
+void fillMatrix(MatrixType& M, int seed, bool lowerTriangle, bool upperTriangle)
 {
     default_random_engine rng(seed);
     normal_distribution<> dist(0,1);
-    MatrixType M(numRows, numCols);
-    for (int row = 0; row < numRows; ++row)
+    for (uint64 row = 0; row < M.NumRows(); ++row)
     {
-        for (int col = 0; col < numCols; ++col)
+        uint64 fromColumn = lowerTriangle ? 0 : row;
+        uint64 toColumn = upperTriangle ? M.NumColumns() : row;
+        for (uint64 col = fromColumn; col < toColumn; ++col)
         {
             M(row, col) = dist(rng);
         }
     }
-    return M;
 }
 
-DoubleVector getVector(int size, int seed)
+DoubleVector getVector(uint64 size, int seed)
 {
     default_random_engine rng(seed);
     normal_distribution<> dist(0, 1);
     DoubleVector v(size);
-    for (int i = 0; i < size; ++i)
+    for (uint64 i = 0; i < size; ++i)
     {
         v[i] = dist(rng);
     }
@@ -100,13 +103,11 @@ DoubleVector getVector(int size, int seed)
 /// Tests Gemv()
 ///
 template<typename MatrixType1, typename MatrixType2>
-void testGemv(int numRows, int numColumns, double alpha, double beta)
+void testGemv(const MatrixType1& M1, const MatrixType2& M2, double alpha, double beta)
 {
-    auto M1 = getMatrix<MatrixType1>(numRows, numColumns, 123);
-    auto M2 = getMatrix<MatrixType2>(numRows, numColumns, 123);
-    auto v = getVector(numColumns, 345);
-    auto output1 = getVector(numRows, 567);
-    auto output2 = getVector(numRows, 567);
+    auto v = getVector(M1.NumColumns(), 345);
+    auto output1 = getVector(M1.NumRows(), 567);
+    auto output2 = getVector(M1.NumRows(), 567);
 
     M1.Gemv(v, output1, alpha, beta);
     M2.Gemv(v, output2, alpha, beta);
@@ -121,10 +122,53 @@ void testGemv(int numRows, int numColumns, double alpha, double beta)
 ///
 void testGemv()
 {
-    testGemv<DoubleMatrix<MatrixStructure::column>, DoubleMatrix<MatrixStructure::row>>(13, 17, 0, 0);
-    testGemv<DoubleMatrix<MatrixStructure::column>, DoubleMatrix<MatrixStructure::row>>(13, 17, 1, 0);
-    testGemv<DoubleMatrix<MatrixStructure::column>, DoubleMatrix<MatrixStructure::row>>(13, 17, 0, 1);
-    testGemv<DoubleMatrix<MatrixStructure::column>, DoubleMatrix<MatrixStructure::row>>(13, 17, 1, 1);
+    DoubleMatrix<MatrixStructure::column> M1(13, 17);
+    DoubleMatrix<MatrixStructure::row> M2(13, 17);
+    fillMatrix(M1, 123, true, true);
+    fillMatrix(M2, 123, true, true);
+
+    testGemv(M1, M2, 0, 0);
+    testGemv(M1, M2, 1, 0);
+    testGemv(M1, M2, 0, 1);
+    testGemv(M1, M2, 1, 1);
+
+    DoubleMatrix<MatrixStructure::column> M3(17, 17);
+    DoubleMatrix<MatrixStructure::columnSquare> M4(17);
+    fillMatrix(M3, 123, true, true);
+    fillMatrix(M4, 123, true, true);
+
+    testGemv(M3, M4, 0, 0);
+    testGemv(M3, M4, 1, 0);
+    testGemv(M3, M4, 0, 1);
+    testGemv(M3, M4, 1, 1);
+
+    DoubleMatrix<MatrixStructure::rowSquare> M5(17);
+    fillMatrix(M5, 123, true, true);
+
+    testGemv(M3, M5, 0, 0);
+    testGemv(M3, M5, 1, 0);
+    testGemv(M3, M5, 0, 1);
+    testGemv(M3, M5, 1, 1);
+
+    DoubleMatrix<MatrixStructure::columnSquare> M6(17);
+    DoubleMatrix<MatrixStructure::rowSquareUptriangular> M7(17);
+    fillMatrix(M6, 123, false, true);
+    fillMatrix(M7, 123, false, true);
+
+    testGemv(M6, M7, 0, 0);
+    testGemv(M6, M7, 1, 0);
+    testGemv(M6, M7, 0, 1);
+    testGemv(M6, M7, 1, 1);
+
+    DoubleMatrix<MatrixStructure::columnSquare> M8(17);
+    DoubleMatrix<MatrixStructure::diagonal> M9(17);
+    fillMatrix(M8, 123, false, false);
+    fillMatrix(M9, 123, false, false);
+
+    testGemv(M8, M9, 0, 0);
+    testGemv(M8, M9, 1, 0);
+    testGemv(M8, M9, 0, 1);
+    testGemv(M8, M9, 1, 1);
 }
 
 /// Runs all tests
