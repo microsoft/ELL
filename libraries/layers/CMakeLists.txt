@@ -60,7 +60,7 @@ set (TEST_NAME ${PROJ_NAME}_test)
 
 add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} dataset linear)
+target_link_libraries(${TEST_NAME} layers utilities)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

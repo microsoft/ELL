@@ -221,17 +221,44 @@ void addToTest()
     addToTestOnesDataVector();
 }
 
+/// Casts one DataVector type into another and checks that the result is the same
+///
+template<typename DataVectorType1, typename DataVectorType2>
 void iteratorConstructorTest()
 {
     auto a = getVector();
 
-    DoubleDataVector b(a.GetIterator());
-    SparseDoubleDataVector c(b.GetIterator());
-    FloatDataVector d(c.GetIterator());
-    SparseFloatDataVector e(d.GetIterator());
-    DoubleVector f(e.GetIterator());
+    DataVectorType1 b(a.GetIterator());
+    DataVectorType2 c(b.GetIterator());
 
-    processTest("Iterator and Ctor", "all float/double precision DataVector types", isEqual(a, f, 1.0e-6));
+    DoubleVector d(c.GetIterator());
+
+    string name1 = typeid(DataVectorType1).name();
+    string name2 = typeid(DataVectorType2).name();
+
+    processTest("Iterator and Ctor", name1 + " and " + name2, isEqual(a, d, 1.0e-6));
+}
+
+/// Tests the GetIterator() and Constructors
+///
+void iteratorConstructorTest()
+{
+    iteratorConstructorTest<DoubleDataVector, DoubleDataVector>();
+    iteratorConstructorTest<DoubleDataVector, FloatDataVector>();
+    iteratorConstructorTest<DoubleDataVector, SparseDoubleDataVector>();
+    iteratorConstructorTest<DoubleDataVector, SparseFloatDataVector>();
+    iteratorConstructorTest<FloatDataVector, DoubleDataVector>();
+    iteratorConstructorTest<FloatDataVector, FloatDataVector>();
+    iteratorConstructorTest<FloatDataVector, SparseDoubleDataVector>();
+    iteratorConstructorTest<FloatDataVector, SparseFloatDataVector>();
+    iteratorConstructorTest<SparseDoubleDataVector, DoubleDataVector>();
+    iteratorConstructorTest<SparseDoubleDataVector, FloatDataVector>();
+    iteratorConstructorTest<SparseDoubleDataVector, SparseDoubleDataVector>();
+    iteratorConstructorTest<SparseDoubleDataVector, SparseFloatDataVector>();
+    iteratorConstructorTest<SparseFloatDataVector, DoubleDataVector>();
+    iteratorConstructorTest<SparseFloatDataVector, FloatDataVector>();
+    iteratorConstructorTest<SparseFloatDataVector, SparseDoubleDataVector>();
+    iteratorConstructorTest<SparseFloatDataVector, SparseFloatDataVector>();
 }
 
 /// Runs all tests

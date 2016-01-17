@@ -57,10 +57,12 @@ namespace linear
         /// Performs a general matrix vector product: y = alpha * M * x + beta * y
         ///
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
+        using IMatrix::Gemv;
 
         /// Performs a general vector matrix product: y = alpha * x * M + beta * y
         ///
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
+        using IMatrix::Gevm;
 
         /// Prints the matrix to an output stream
         ///
@@ -123,7 +125,6 @@ namespace linear
     class DoubleMatrix<MatrixStructure::column_square> : public DoubleMatrix<MatrixStructure::column>
     {
     public:
-
         /// Constructs a column major square dense matrix
         ///
         DoubleMatrix(uint64 dimension);
@@ -135,7 +136,6 @@ namespace linear
     class DoubleMatrix<MatrixStructure::row_square> : public DoubleMatrix<MatrixStructure::row>
     {
     public:
-
         /// Constructs a row major square dense matrix
         ///
         DoubleMatrix(uint64 dimension);
@@ -147,7 +147,6 @@ namespace linear
     class DoubleMatrix<MatrixStructure::row_square_uptriangular> : public DoubleMatrixBase
     {
     public:
-
         /// Constructs a row major square upper-triangular dense matrix
         ///
         DoubleMatrix(uint64 dimension);
@@ -182,7 +181,6 @@ namespace linear
     class DoubleMatrix<MatrixStructure::diagonal> : public DoubleMatrixBase
     {
     public:
-
         /// Constructs a row major square upper-triangular dense matrix
         ///
         DoubleMatrix(uint64 dimension);
