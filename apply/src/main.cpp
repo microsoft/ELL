@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
-        commandLineParser.AddOptionSet(dataSaveArguments);
+        commandLineParser.AddOptionSet(dataSaveArguments); // TODO - currently, the exe just prints to stdout
         
         // parse command line
         commandLineParser.ParseArgs();
