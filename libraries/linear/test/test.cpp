@@ -135,6 +135,7 @@ void testGemv()
 int main()
 {
     testGemv();
+    // TODO test subvectorCref
 
     if(testFailed())
     {

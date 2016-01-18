@@ -228,6 +228,11 @@ int main()
     addToTest();
     iteratorConstructorTest();
 
+    // TODO - test integer list and compressed integer list
+    // TODO - test data vector builder and supervised example builder
+    // TODO - test supervised example
+    // TODO - test parsing iterator, sequential line iterator, and sparse entry parser 
+
     if(testFailed())
     {
         return 1;
