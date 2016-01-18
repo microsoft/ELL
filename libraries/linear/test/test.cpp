@@ -7,6 +7,12 @@ using linear::MatrixStructure;
 #include "DoubleVector.h"
 using linear::DoubleVector;
 
+// testing
+#include "testing.h"
+using testing::isEqual;
+using testing::processTest;
+using testing::testFailed;
+
 // types
 #include "types.h"
 
@@ -22,53 +28,6 @@ using std::to_string;
 #include <random>
 using std::default_random_engine;
 using std::normal_distribution;
-
-bool testFailed = false;
-
-/// checks if two doubles are equal, up to a small numerical error
-///
-bool isEqual(double a, double b, double tolerance = 1.0e-8)
-{
-    if (a - b < tolerance && b - a < tolerance)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-/// checks if two vectors are equal, up to a small numerical error in each coordinate
-///
-bool isEqual(const DoubleVector& a, const DoubleVector& b, double tolerance = 1.0e-8)
-{
-    for (int i = 0; i < a.Size(); ++i)
-    {
-        if (isEqual(a[i], b[i], tolerance) == false)
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-/// Prints the results of a test and sets the global testFailed flag if appropriate
-///
-void processTest(const string& testName, const string& typeName, bool success)
-{
-    cout << "Running " << testName << " test with " << typeName << " ... ";
-
-    if (success)
-    {
-        cout << "Passed\n";
-    }
-    else
-    {
-        cout << "Failed\n";
-        testFailed = true;
-    }
-}
 
 /// Fills a matrix with binary numbers (using a random generator with fixed seed)
 ///
@@ -115,7 +74,7 @@ void testGemv(const MatrixType1& M1, const MatrixType2& M2, double alpha, double
     string name1 = typeid(MatrixType1).name();
     string name2 = typeid(MatrixType2).name();
 
-    processTest("Gemv(" + to_string(alpha) + "," + to_string(beta) + ")", name1 + " and " + name2, isEqual(output1, output2, 1.0e-8));
+    processTest("Comapring " + name1 + "::Gemv() and " + name2 + "::Gemv() with arguments " + to_string(alpha) + ", " + to_string(beta), isEqual(output1, output2, 1.0e-8));
 }
 
 /// Tests Gemv() for all matrix types
@@ -177,7 +136,7 @@ int main()
 {
     testGemv();
 
-    if(testFailed)
+    if(testFailed())
     {
         return 1;
     }

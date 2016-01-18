@@ -7,6 +7,12 @@
 #include "OnesDataVector.h"
 using namespace dataset;
 
+// testing
+#include "testing.h"
+using testing::isEqual;
+using testing::processTest;
+using testing::testFailed;
+
 // types
 #include "RealArray.h"
 using types::DoubleArray;
@@ -22,36 +28,6 @@ using std::endl;
 
 #include<string>
 using std::string;
-
-bool testFailed = false;
-
-/// checks if two doubles are equal, up to a small numerical error
-///
-bool isEqual(double a, double b, double tolerance = 1.0e-8)
-{
-    if(a-b < tolerance && b-a < tolerance)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-/// checks if two vectors are equal, up to a small numerical error in each coordinate
-///
-bool isEqual(const DoubleVector& a, const DoubleVector& b, double tolerance = 1.0e-8)
-{
-    for(int i = 0; i < a.Size(); ++i)
-    {
-        if(isEqual(a[i], b[i], tolerance) == false)
-        {
-            return false;
-        }
-    }
-    return true;
-}
 
 /// Generates a DoubleVector, for the purpose of testing
 ///
@@ -77,23 +53,6 @@ DoubleVector getVector()
     return a;
 }
 
-/// Prints the results of a test and sets the global testFailed flag if appropriate
-///
-void processTest(const string& testName, const string& typeName, bool success)
-{
-    cout << "Running " << testName << " test with " << typeName << " ... ";
-
-    if (success)
-    {
-        cout << "Passed\n";
-    }
-    else
-    {
-        cout << "Failed\n";
-        testFailed = true;
-    }
-}
-
 /// Tests the Dot() member of DataVectors
 ///
 template<typename DataVectorType>
@@ -112,7 +71,7 @@ void dotTest()
     double result = c.Dot(a);
     const double expectedResult = 2.2;
 
-    processTest("Dot()", typeid(DataVectorType).name(), isEqual(result, expectedResult));
+    processTest("Testing " + string(typeid(DataVectorType).name()) + "::Dot()", isEqual(result, expectedResult));
 }
 
 /// Tests the Dot() member of ZeroDataVector
@@ -122,7 +81,7 @@ void dotTestZeroDataVector()
     auto a = getVector();
     ZeroDataVector z;
     double result = z.Dot(a);
-    processTest("Dot()", "ZeroDataVector", isEqual(result, 0.0));
+    processTest("Testing dataset::ZeroDataVector::Dot()", isEqual(result, 0.0));
 }
 
 /// Tests the Dot() member of OnesDataVector
@@ -132,7 +91,7 @@ void dotTestOnesDataVector()
     auto a = getVector();
     OnesDataVector o(4);
     double result = o.Dot(a);
-    processTest("Dot()", "OnesDataVector", isEqual(result, 7.0));
+    processTest("Testing dataset::OnesDataVector::Dot()", isEqual(result, 7.0));
 }
 
 /// Tests the Dot() member of DataVectors
@@ -173,7 +132,7 @@ void addToTest()
     string name1 = typeid(DataVectorType1).name();
     string name2 = typeid(DataVectorType2).name();
 
-    processTest("AddTo()", name1 + " and " + name2, isEqual(a1, a2));
+    processTest("Comparing AddTo() in " + name1 + " and " + name2, isEqual(a1, a2));
 }
 
 /// Tests the AddTo() member of ZeroDataVector
@@ -187,7 +146,7 @@ void addToTestZeroDataVector()
 
     z.AddTo(a1);
 
-    processTest("AddTo()", "class dataset::ZeroDataVector", isEqual(a1, a2));
+    processTest("Testing dataset::ZeroDataVector::AddTo()", isEqual(a1, a2));
 }
 
 /// Tests the AddTo() member of OnesDataVector
@@ -204,7 +163,7 @@ void addToTestOnesDataVector()
     double norm1 = a1.Norm2();
     double norm2 = a2.Norm2() + 2 * o.Dot(a2) + a2.Size();
 
-    processTest("AddTo()", "class dataset::OnesDataVector", isEqual(norm1, norm2));
+    processTest("Testing dataset::OnesDataVector::AddTo()", isEqual(norm1, norm2));
 }
 
 /// Tests the AddTo() member of DataVectors
@@ -236,7 +195,7 @@ void iteratorConstructorTest()
     string name1 = typeid(DataVectorType1).name();
     string name2 = typeid(DataVectorType2).name();
 
-    processTest("Iterator and Ctor", name1 + " and " + name2, isEqual(a, d, 1.0e-6));
+    processTest("Casting " + name1 + " to " + name2, isEqual(a, d, 1.0e-6));
 }
 
 /// Tests the GetIterator() and Constructors
@@ -269,7 +228,7 @@ int main()
     addToTest();
     iteratorConstructorTest();
 
-    if(testFailed)
+    if(testFailed())
     {
         return 1;
     }

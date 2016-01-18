@@ -50,9 +50,11 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 set (TEST_NAME ${PROJ_NAME}_test)
 
+include_directories(../testing/include)
+
 add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} linear)
+target_link_libraries(${TEST_NAME} linear testing)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 
