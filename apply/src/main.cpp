@@ -2,7 +2,8 @@
 
 #include "CommandLineParser.h" 
 using utilities::CommandLineParser;
-using utilities::ParseErrorException;
+using utilities::CommandLineParserErrorException;
+using utilities::CommandLineParserPrintHelpException;
 
 #include "MapLoadArguments.h" 
 using utilities::ParsedMapLoadArguments;
@@ -84,7 +85,7 @@ int main(int argc, char* argv[])
             dataIterator->Next();
         }
     }
-    catch(ParseErrorException exception)
+    catch(CommandLineParserErrorException exception)
     {
         cerr << "Command line parse error:" << endl;
         for(const auto& error : exception.GetParseErrors())
@@ -92,6 +93,9 @@ int main(int argc, char* argv[])
             cerr << error.GetMessage() << endl;
         }
         return 0;
+    }
+    catch (CommandLineParserPrintHelpException)
+    {
     }
     catch(runtime_error exception)
     {

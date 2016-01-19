@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
     {
         cmdline.ParseArgs();
     }
-    catch (const ParseErrorException& ex)
+    catch (const CommandLineParserErrorException& ex)
     {
         cerr << "Parsing failed" << endl;
         for (const auto& result : ex.GetParseErrors())
@@ -119,13 +119,13 @@ int main(int argc, char* argv[])
         }
         exit(0);
     }
-
-    if (cmdline.ShouldPrintUsage())
+    catch (const CommandLineParserPrintHelpException& ex)
     {
-        cmdline.PrintUsage(cout);
+        cout << ex.GetHelpText() << endl;
         exit(0);
     }
 
+    cout << "commandline text: " << cmdline.GetCommandLine() << endl;
     cout << "filename: " << fileArgs.filename << endl;
 
     cout << "filename arg value: " << cmdline.GetOptionValue("filename") << endl;
