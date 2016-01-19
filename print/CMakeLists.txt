@@ -4,10 +4,11 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
+# define project
 set (PROJ_NAME print)
-
 PROJECT(${PROJ_NAME})
 
+#enable C++11 in GCC
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   add_compile_options(-std=c++1y)
 endif()
@@ -39,7 +40,9 @@ include_directories(../libraries/layers/include)
 include_directories(../libraries/types/include)
 include_directories(../libraries/utilities/include)
 
+# create executable in build\bin
+set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
+set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
-
 target_link_libraries(${PROJ_NAME} utilities layers)
 
