@@ -63,9 +63,13 @@ int main(int argc, char* argv[])
         // create mapped data iterator based on the command line params
         auto dataIterator = GetDataIterator(dataLoadArguments, mapLoadArguments);
 
-        // get output stream 
+        // if output file specified, replace stdout with it 
         ofstream outputDataStream;
-        outputDataStream = OpenOfstream(dataSaveArguments.outputDataFile);
+        if (dataSaveArguments.outputDataFile != "")
+        {
+            outputDataStream = OpenOfstream(dataSaveArguments.outputDataFile);
+            cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
+        }
 
         // Load row by row
         while(dataIterator->IsValid())
@@ -73,8 +77,8 @@ int main(int argc, char* argv[])
             // get next example
             auto supervisedExample = dataIterator->Get();
 
-            // print the example to standard output
-            supervisedExample.Print(outputDataStream);
+            // print the example
+            supervisedExample.Print(cout);
 
             // move on 
             dataIterator->Next();

@@ -19,7 +19,6 @@ namespace utilities
     struct DataSaveArguments
     {
         string outputDataFile = "";
-        bool outputDataFileHasWeights = false;
     };
 
     /// A version of DataSaveArguments that adds its members to the command line parser
