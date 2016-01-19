@@ -29,5 +29,9 @@ namespace utilities
         /// Adds the arguments to the command line parser
         ///
         virtual void AddArgs(CommandLineParser& parser);
+
+        /// Check arguments
+        ///
+        virtual ParseResult PostProcess(const CommandLineParser& parser);
     };
 }

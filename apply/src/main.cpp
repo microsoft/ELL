@@ -28,6 +28,10 @@ using dataset::RowDataset;
 #include "Loaders.h"
 using common::GetDataIterator;
 
+// utilities
+#include "files.h"
+using utilities::OpenOfstream;
+
 // stl
 #include <iostream>
 using std::cerr;
@@ -51,13 +55,17 @@ int main(int argc, char* argv[])
 
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
-        commandLineParser.AddOptionSet(dataSaveArguments); // TODO - currently, the exe just prints to stdout
+        commandLineParser.AddOptionSet(dataSaveArguments); 
         
         // parse command line
         commandLineParser.ParseArgs();
 
         // create mapped data iterator based on the command line params
         auto dataIterator = GetDataIterator(dataLoadArguments, mapLoadArguments);
+
+        // get output stream 
+        ofstream outputDataStream;
+        outputDataStream = OpenOfstream(dataSaveArguments.outputDataFile);
 
         // Load row by row
         while(dataIterator->IsValid())
@@ -66,7 +74,7 @@ int main(int argc, char* argv[])
             auto supervisedExample = dataIterator->Get();
 
             // print the example to standard output
-            supervisedExample.Print(cout);
+            supervisedExample.Print(outputDataStream);
 
             // move on 
             dataIterator->Next();

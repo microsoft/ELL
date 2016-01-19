@@ -1,3 +1,4 @@
+#include "..\include\DataSaveArguments.h"
 // DataSaveArguments.cpp
 
 #include "DataSaveArguments.h"
@@ -19,5 +20,17 @@ namespace utilities
             "odfhw",
             "Indicates whether the output data file format specifies a weight per example",
             false);
+    }
+
+    ParseResult ParsedDataSaveArguments::PostProcess(const CommandLineParser & parser)
+    {
+        vector<string> parseErrorMessages;
+
+        if (outputDataFile == "")
+        {
+            parseErrorMessages.push_back("-outputDataFile (or -odf) is required");
+        }
+
+        return parseErrorMessages;
     }
 }
