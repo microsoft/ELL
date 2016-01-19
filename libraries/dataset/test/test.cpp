@@ -29,6 +29,9 @@ using std::endl;
 #include<string>
 using std::string;
 
+#include <sstream>
+using std::stringstream;
+
 /// Generates a DoubleVector, for the purpose of testing
 ///
 DoubleVector getVector()
@@ -220,6 +223,38 @@ void iteratorConstructorTest()
     iteratorConstructorTest<SparseFloatDataVector, SparseFloatDataVector>();
 }
 
+/// Tests that two DataVector types print identically
+///
+template<typename DataVectorType1, typename DataVectorType2>
+void printTest()
+{
+    auto a = getVector();
+
+    DataVectorType1 b1(a.GetIterator());
+    DataVectorType2 b2(a.GetIterator());
+
+    stringstream ss1;
+    stringstream ss2;
+
+    b1.Print(ss1);
+    b2.Print(ss2);
+
+    string s1 = ss1.str();
+    string s2 = ss2.str();
+
+    string name1 = typeid(DataVectorType1).name();
+    string name2 = typeid(DataVectorType2).name();
+
+    processTest("Comparing " + name1 + "::Print() and " + name2 + "::Print()", s1 == s2);
+}
+
+void printTest()
+{
+    printTest<DoubleDataVector, FloatDataVector>();
+    printTest<DoubleDataVector, SparseDoubleDataVector>();
+    printTest<DoubleDataVector, SparseFloatDataVector>();
+}
+
 /// Runs all tests
 ///
 int main()
@@ -227,6 +262,7 @@ int main()
     dotTest();
     addToTest();
     iteratorConstructorTest();
+    printTest();
 
     // TODO - test integer list and compressed integer list
     // TODO - test data vector builder and supervised example builder
