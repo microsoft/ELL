@@ -127,15 +127,13 @@ namespace utilities
 
         /// TODO: document
         ///
-        bool ShouldPrintUsage() const;
+        string GetHelpString();
 
         /// TODO: document
         ///
-        virtual void PrintUsage(ostream& out);
+        string GetCurrentValuesString();
 
-        /// TODO: document
-        ///
-        virtual void PrintCurrentValues(ostream& out);
+        string GetCommandLine() const;
 
         string GetOptionValue(const string& option);
 
@@ -190,8 +188,6 @@ namespace utilities
         map<string, OptionInfo> _options;
         vector<DocumentationEntry> _docEntries;
         vector<PostParseCallback> _postParseCallbacks;
-        bool _shouldPrintUsage = false;
-
 
         void AddOption(const OptionInfo& info);
         virtual bool SetOption(string option_name, string option_val); // returns true if we need to reparse
@@ -211,15 +207,39 @@ namespace utilities
 
     /// Exceptions thrown by CommandLineParser: 
     ///
-    class ParseErrorException : public std::runtime_error
+    class CommandLineParserException : public std::runtime_error
     {
     public:
         using std::runtime_error::runtime_error;
-        ParseErrorException(const char* message, std::vector<ParseError> errors) : std::runtime_error(message), _errors(errors) {}
+        CommandLineParserException(const char* message) : std::runtime_error(message) {};
+    };
+
+    class CommandLineParserErrorException : CommandLineParserException
+    {
+    public:
+        CommandLineParserErrorException(const char* message) : CommandLineParserException(message){}
+        CommandLineParserErrorException(const char* message, std::vector<ParseError> errors) : CommandLineParserException(message), _errors(errors) {}
         const vector<ParseError>& GetParseErrors() const { return _errors; }
 
     private:
         vector<ParseError> _errors;
+    };
+
+    class CommandLineParserPrintHelpException : public CommandLineParserException
+    {
+    public:
+        CommandLineParserPrintHelpException(std::string helpText) : CommandLineParserException(""), _helpText(helpText) {}
+        std::string GetHelpText() const { return _helpText; }
+
+    private:
+        std::string _helpText;
+    };
+
+
+    class CommandLineParserInvalidOptionsException : public CommandLineParserException
+    {
+    public:
+        CommandLineParserInvalidOptionsException(std::string what) : CommandLineParserException(what) {}
     };
 }
 

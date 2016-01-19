@@ -4,11 +4,11 @@
 
 #include <iostream>
 using std::endl;
-using std::cerr;
 
 #include <algorithm>
 using std::min;
 using std::max;
+using std::for_each;
 
 namespace utilities
 {
@@ -81,14 +81,26 @@ namespace utilities
     //
     // CommandLineParser class
     //
-    CommandLineParser::CommandLineParser(int argc, char**argv) : _shouldPrintUsage(false)
+    CommandLineParser::CommandLineParser(int argc, char**argv) 
     {
         SetArgs(argc, argv);
     }
 
     void CommandLineParser::SetArgs(int argc, char** argv)
     {
+        _originalArgs.clear();
         _originalArgs.insert(_originalArgs.end(), &argv[0], &argv[argc]);
+
+        string exe_path = _originalArgs[0];
+        size_t slash_pos = exe_path.find_last_of("/\\");
+        if (slash_pos == string::npos)
+        {
+            _exeName = exe_path;
+        }
+        else
+        {
+            _exeName = exe_path.substr(slash_pos + 1);
+        }
     }
 
     void CommandLineParser::ParseArgs()
@@ -108,17 +120,6 @@ namespace utilities
             {
                 AddOption(printHelpAndExit, "help", "h", "Print help and exit", false);
             }
-        }
-
-        string exe_path = _originalArgs[0];
-        size_t slash_pos = exe_path.find_last_of("/\\");
-        if (slash_pos == string::npos)
-        {
-            _exeName = exe_path;
-        }
-        else
-        {
-            _exeName = exe_path.substr(slash_pos + 1);
         }
 
         // While we're parsing the arguments, we may add new conditional options. If we do so, we need
@@ -154,7 +155,8 @@ namespace utilities
 
                     if (option == "" && arg != "--") // "--" is the special "ignore this" option --- used to put between flag arguments and the filepath
                     {
-                        cerr << "Error: unknown option " << arg << ", skipping." << endl;
+                        string errorMessage = "Error: unknown option " + arg;
+                        throw CommandLineParserErrorException("Unknown option", {errorMessage});
                         if (index < argc - 1 && _originalArgs[index + 1][0] != '-')  // skip the Next value as well, unless it's an option
                         {
                             index++;
@@ -209,11 +211,14 @@ namespace utilities
             }
         }
 
-        _shouldPrintUsage = printHelpAndExit;
+        if (printHelpAndExit)
+        {
+            throw CommandLineParserPrintHelpException(GetHelpString());
+        }
 
         if (!isValid)
         {
-            throw ParseErrorException("Error in parse callback", parseErrors);
+            throw CommandLineParserErrorException("Error in parse callback", parseErrors);
         }
     }
 
@@ -248,12 +253,12 @@ namespace utilities
     {
         if (_options.find(info.name) != _options.end())
         {
-            throw std::runtime_error("Error: adding same option more than once");
+            throw CommandLineParserInvalidOptionsException("Error: adding same option more than once");
         }
 
         if (_shortToLongNameMap.find(info.shortName) != _shortToLongNameMap.end())
         {
-            throw std::runtime_error("Error: adding same short name more than once");
+            throw CommandLineParserInvalidOptionsException("Error: adding same short name more than once");
         }
 
         _options[info.name] = info;
@@ -367,13 +372,9 @@ namespace utilities
         return min(max_name_len, len);
     }
 
-    bool CommandLineParser::ShouldPrintUsage() const
+    string CommandLineParser::GetHelpString()
     {
-        return _shouldPrintUsage;
-    }
-
-    void CommandLineParser::PrintUsage(ostream& out)
-    {
+        stringstream out;
         // Find longest option name so we can align descriptions
         size_t longest_name = 0;
         for (const auto& iter : _options)
@@ -393,7 +394,7 @@ namespace utilities
             {
             case DocumentationEntry::type::option:
             {
-                const auto& info = _options[entry.EntryString];
+                const OptionInfo& info = _options[entry.EntryString];
                 string option_name = option_name_string(info);
                 size_t this_option_name_len = option_name_help_length(info);
                 size_t pad_len = 2 + (longest_name - this_option_name_len);
@@ -419,10 +420,13 @@ namespace utilities
                 break;
             }
         }
+
+        return out.str();
     }
 
-    void CommandLineParser::PrintCurrentValues(ostream& out)
+    string CommandLineParser::GetCurrentValuesString()
     {
+        stringstream out;
         out << "Current parameters for " << _exeName << endl;
 
         set<string> visited_options;
@@ -463,6 +467,16 @@ namespace utilities
                 did_print = true;
             }
         }
+
+        return out.str();
+    }
+
+    string CommandLineParser::GetCommandLine() const
+    {
+        stringstream out;
+        out << _exeName;
+        for_each(_originalArgs.begin() + 1, _originalArgs.end(), [&out](const string& s) { out << " " << s; });
+        return out.str();
     }
 
     string CommandLineParser::GetOptionValue(const string& option)
