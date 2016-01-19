@@ -31,4 +31,5 @@ add_subdirectory(print)
 add_subdirectory(tests/standalone_tree_layout)
 add_subdirectory(tests/test)
 add_subdirectory(trainers/sgd)
+add_subdirectory(scripts)
 
