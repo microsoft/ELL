@@ -38,7 +38,7 @@ struct app_params
 // A subclass of your parameter struct that knows how to add its members to the commandline parser
 struct ParsedParams : app_params, ParsedArgSet
 {
-    virtual void AddArgs(utilities::CommandLineParser& parser)
+    virtual void AddArgs(utilities::CommandLineParser& parser) override
     {
         parser.AddDocumentationString("---- Iteration-related parameters ----"); // optional documentation string that gets printed out when you use the --help option
         parser.AddOption(numIter, "numIter", "i", "Number of iterations", 0);
@@ -70,7 +70,7 @@ struct file_params
 // A subclass of your parameter struct that knows how to add its members to the commandline parser
 struct ParsedFileParams : file_params, ParsedArgSet
 {
-    virtual void AddArgs(utilities::CommandLineParser& parser)
+    virtual void AddArgs(utilities::CommandLineParser& parser) override
     {
         parser.AddOption(filename, "filename", "f", "Output filename", "");
     }
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
     {
         cmdline.ParseArgs();
     }
-    catch (const ParseErrorException& ex)
+    catch (const CommandLineParserErrorException& ex)
     {
         cerr << "Parsing failed" << endl;
         for (const auto& result : ex.GetParseErrors())
@@ -119,20 +119,20 @@ int main(int argc, char* argv[])
         }
         exit(0);
     }
-
-    if (cmdline.ShouldPrintUsage())
+    catch (const CommandLineParserPrintHelpException& ex)
     {
-        cmdline.PrintUsage(cout);
+        cout << ex.GetHelpText() << endl;
         exit(0);
     }
 
+    cout << "commandline text: " << cmdline.GetCommandLine() << endl;
     cout << "filename: " << fileArgs.filename << endl;
 
-	cout << "filename arg value: " << cmdline.GetOptionValue("filename") << endl;
-	cout << "numIter arg value: " << cmdline.GetOptionValue("numIter") << endl;
-	cout << "thresh arg value: " << cmdline.GetOptionValue("thresh") << endl;
+    cout << "filename arg value: " << cmdline.GetOptionValue("filename") << endl;
+    cout << "numIter arg value: " << cmdline.GetOptionValue("numIter") << endl;
+    cout << "thresh arg value: " << cmdline.GetOptionValue("thresh") << endl;
 
-	//    cout << "numIter: " << Params.numIter << endl;
+    //    cout << "numIter: " << Params.numIter << endl;
 //    cout << "thresh: " << Params.thresh << endl;
 //
 //    if (filepath == "")

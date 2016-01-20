@@ -2,7 +2,8 @@
 
 #include "CommandLineParser.h" 
 using utilities::CommandLineParser;
-using utilities::ParseErrorException;
+using utilities::CommandLineParserErrorException;
+using utilities::CommandLineParserPrintHelpException;
 
 #include "MapLoadArguments.h" 
 using utilities::ParsedMapLoadArguments;
@@ -28,6 +29,10 @@ using dataset::RowDataset;
 #include "Loaders.h"
 using common::GetDataIterator;
 
+// utilities
+#include "files.h"
+using utilities::OpenOfstream;
+
 // stl
 #include <iostream>
 using std::cerr;
@@ -51,7 +56,7 @@ int main(int argc, char* argv[])
 
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
-        commandLineParser.AddOptionSet(dataSaveArguments);
+        commandLineParser.AddOptionSet(dataSaveArguments); 
         
         // parse command line
         commandLineParser.ParseArgs();
@@ -59,20 +64,28 @@ int main(int argc, char* argv[])
         // create mapped data iterator based on the command line params
         auto dataIterator = GetDataIterator(dataLoadArguments, mapLoadArguments);
 
+        // if output file specified, replace stdout with it 
+        ofstream outputDataStream;
+        if (dataSaveArguments.outputDataFile != "")
+        {
+            outputDataStream = OpenOfstream(dataSaveArguments.outputDataFile);
+            cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
+        }
+
         // Load row by row
         while(dataIterator->IsValid())
         {
             // get next example
             auto supervisedExample = dataIterator->Get();
 
-            // print the example to standard output
+            // print the example
             supervisedExample.Print(cout);
 
             // move on 
             dataIterator->Next();
         }
     }
-    catch(ParseErrorException exception)
+    catch(CommandLineParserErrorException exception)
     {
         cerr << "Command line parse error:" << endl;
         for(const auto& error : exception.GetParseErrors())
@@ -80,6 +93,9 @@ int main(int argc, char* argv[])
             cerr << error.GetMessage() << endl;
         }
         return 0;
+    }
+    catch (CommandLineParserPrintHelpException)
+    {
     }
     catch(runtime_error exception)
     {

@@ -19,7 +19,6 @@ namespace utilities
     struct DataSaveArguments
     {
         string outputDataFile = "";
-        bool outputDataFileHasWeights = false;
     };
 
     /// A version of DataSaveArguments that adds its members to the command line parser
@@ -29,5 +28,9 @@ namespace utilities
         /// Adds the arguments to the command line parser
         ///
         virtual void AddArgs(CommandLineParser& parser);
+
+        /// Check arguments
+        ///
+        virtual ParseResult PostProcess(const CommandLineParser& parser);
     };
 }

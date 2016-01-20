@@ -10,6 +10,10 @@
 using utilities::OpenIfstream;
 using utilities::OpenOfstream;
 
+#include "CommandLineParser.h"
+using utilities::CommandLineParserErrorException;
+using utilities::CommandLineParserPrintHelpException;
+
 // layers
 #include "Map.h"
 using layers::Map;
@@ -45,7 +49,19 @@ int main(int argc, char* argv[])
         auto outputSvgFStream = OpenOfstream(args.svgFile);
         map.Print(outputSvgFStream, args);
     }
-
+    catch (const CommandLineParserPrintHelpException& ex)
+    {
+        cout << ex.GetHelpText() << endl;        
+    }
+    catch (const CommandLineParserErrorException& exception)
+    {
+        cerr << "Command line parse error:" << endl;
+        for (const auto& error : exception.GetParseErrors())
+        {
+            cerr << error.GetMessage() << endl;
+        }
+        return 0;
+    }
     catch (runtime_error e)
     {
         cerr << "runtime error: " << e.what() << std::endl;

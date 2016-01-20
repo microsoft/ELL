@@ -8,7 +8,8 @@ using utilities::OpenOfstream;
 
 #include "CommandLineParser.h" 
 using utilities::CommandLineParser;
-using utilities::ParseErrorException;
+using utilities::CommandLineParserErrorException;
+using utilities::CommandLineParserPrintHelpException;
 
 #include "randomEngines.h"
 using utilities::GetRandomEngine;
@@ -69,18 +70,20 @@ int main(int argc, char* argv[])
         ParsedSgdArguments sgdArguments;
 
         commandLineParser.AddOptionSet(mapLoadArguments);
-        commandLineParser.AddOptionSet(dataLoadArguments);
+        commandLineParser.AddOptionSet(dataLoadArguments); // TODO - currently, hasWeights is ignored
         commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(sgdArguments);
         
         // parse command line
-        commandLineParser.ParseArgs();
-
-		// print help if requested
-		if (commandLineParser.ShouldPrintUsage())
-		{
-			commandLineParser.PrintUsage(cout);
-		}
+        try
+        {
+            commandLineParser.ParseArgs();
+        }
+        catch (const CommandLineParserPrintHelpException& ex)
+        {
+            // print help if requested
+            cout << ex.GetHelpText() << endl;
+        }
 
         // create and load a dataset, a map, and a coordinate list
         RowDataset dataset;
@@ -129,7 +132,7 @@ int main(int argc, char* argv[])
             map.Serialize(outputMapFStream);
         }
     }
-    catch (ParseErrorException exception)
+    catch (const CommandLineParserErrorException& exception)
     {
         cerr << "Command line parse error:" << endl;
         for (const auto& error : exception.GetParseErrors())
@@ -137,6 +140,10 @@ int main(int argc, char* argv[])
             cerr << error.GetMessage() << endl;
         }
         return 0;
+    }
+    catch (const CommandLineParserPrintHelpException& exception)
+    {
+        cerr << exception.GetHelpText() << endl;
     }
     catch (runtime_error exception)
     {

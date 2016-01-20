@@ -58,9 +58,16 @@ namespace common
 
     unique_ptr<IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments)
     {
-        Map map;
-        CoordinateList coordinateList;
-        return GetDataIteratorMapCoordinates(dataLoadArguments, mapLoadArguments, map, coordinateList);
+        if (mapLoadArguments.inputMapFile == "")
+        {
+            return GetDataIterator(dataLoadArguments);
+        }
+        else
+        {
+            Map map;
+            CoordinateList coordinateList;
+            return GetDataIteratorMapCoordinates(dataLoadArguments, mapLoadArguments, map, coordinateList);
+        }
     }
 
     unique_ptr<IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, /* out */ Map& map, /* out */ CoordinateList& inputCoordinates)
