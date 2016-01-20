@@ -48,7 +48,7 @@ namespace types
         while(IndexValueIterator.IsValid())
         {
             auto entry = IndexValueIterator.Get();
-            resize(entry.index+1);
+            this->resize(entry.index+1);
             (*this)[entry.index] = entry.value;
             IndexValueIterator.Next();
         }

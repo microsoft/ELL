@@ -29,6 +29,8 @@ using std::to_string;
 using std::default_random_engine;
 using std::normal_distribution;
 
+#include <typeinfo>
+
 /// Fills a matrix with binary numbers (using a random generator with fixed seed)
 ///
 template<typename MatrixType>

@@ -14,6 +14,7 @@
 #include <memory>
 #include <algorithm>
 #include <string>
+#include <typeinfo>
 
 using namespace linear;
 using namespace dataset;
