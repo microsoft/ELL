@@ -1,13 +1,22 @@
-import os
+﻿import os
+import subprocess
 
-binDir = "C:/Users/OferD/Source/Repos/Bonsai/build/bin/Debug"
-dataDir = "C:/Users/OferD/Source/Repos/Bonsai/data"
+#binDir = os.path.abspath("C:/Users/OferD/Source/Repos/Bonsai/build/bin/Debug")
+#dataDir = os.path.abspath("C:/Users/OferD/Source/Repos/Bonsai/data")
+binDir = os.path.abspath("../bin/Debug")
+dataDir = os.path.abspath("../../data")
 
-trainingDataPath = os.path.abspath(os.path.join(dataDir, "a9a.txt"))
-outputMapFile1 = os.path.abspath(os.path.join(binDir, "output1.map"))
-outputMapFile2 = os.path.abspath(os.path.join(binDir, "output2.map"))
-outputSvgFile = os.path.abspath(os.path.join(binDir, "print.html"))
+#sgdBinary = os.path.join(binDir, "sgd.exe")
+#printBinary = os.path.join(binDir, "print.exe")
 
-os.system("%s -idf %s -omf %s" %(os.path.join(binDir, "sgd.exe"), trainingDataPath, outputMapFile1))
-os.system("%s -idf %s -imf %s -omf %s -imis 2" %(os.path.join(binDir, "sgd.exe"), trainingDataPath, outputMapFile1, outputMapFile2))
-os.system("%s -imf %s -osf %s" %(os.path.join(binDir, "print.exe"), outputMapFile2, outputSvgFile))
+sgdBinary = os.path.join(binDir, "sgd")
+printBinary = os.path.join(binDir, "print")
+
+trainingDataPath = os.path.join(dataDir, "a9a.txt")
+outputMapFile1 = os.path.join(binDir, "output1.map")
+outputMapFile2 = os.path.join(binDir, "output2.map")
+outputSvgFile = os.path.join(binDir, "print.html")
+
+subprocess.call([sgdBinary, '-idf', trainingDataPath, '-omf', outputMapFile1])
+subprocess.call([sgdBinary, '-idf', trainingDataPath, '-imf', outputMapFile1, '-omf', outputMapFile2, '-imis', '2'])
+subprocess.call([printBinary, '-imf', outputMapFile2, '-osf', outputSvgFile])

@@ -9,7 +9,7 @@ PROJECT(${PROJ_NAME})
 
 set (SRC test.py)
 
-add_custom_target(${PROJ_NAME} ALL SOURCES ${SRC})
+add_custom_target(${PROJ_NAME} ALL DEPENDS ${SRC} SOURCES ${SRC})
 
 #copy contents of scripts directory to build/scripts
 add_custom_command(TARGET ${PROJ_NAME} POST_BUILD
