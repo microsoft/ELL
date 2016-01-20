@@ -32,7 +32,7 @@ using std::string;
 #include <sstream>
 using std::stringstream;
 
-/// Generates a DoubleVector, for the purpose of testing
+/// Generates a DoubleVector
 ///
 DoubleVector getVector()
 {
@@ -56,18 +56,26 @@ DoubleVector getVector()
     return a;
 }
 
+/// Generates a binary valued DoubleVector
+///
+DoubleVector getBinaryVector()
+{
+    DoubleVector a(15);
+    a[3] = 1;
+    a[4] = 1;
+    a[12] = 1;
+    a[13] = 1;
+
+    return a;
+}
+
 /// Tests the Dot() member of DataVectors
 ///
 template<typename DataVectorType>
 void dotTest()
 {
     auto a = getVector();
-
-    DoubleArray b(15);
-    b[3] = 1.0;
-    b[4] = 1.0;
-    b[12] = 1.0;
-    b[13] = 1.0;
+    auto b = getBinaryVector();
 
     DataVectorType c(b.GetIterator());
 
@@ -186,10 +194,8 @@ void addToTest()
 /// Casts one DataVector type into another and checks that the result is the same
 ///
 template<typename DataVectorType1, typename DataVectorType2>
-void iteratorConstructorTest()
+void iteratorConstructorTest(const DoubleVector& a)
 {
-    auto a = getVector();
-
     DataVectorType1 b(a.GetIterator());
     DataVectorType2 c(b.GetIterator());
 
@@ -205,31 +211,81 @@ void iteratorConstructorTest()
 ///
 void iteratorConstructorTest()
 {
-    iteratorConstructorTest<DoubleDataVector, DoubleDataVector>();
-    iteratorConstructorTest<DoubleDataVector, FloatDataVector>();
-    iteratorConstructorTest<DoubleDataVector, SparseDoubleDataVector>();
-    iteratorConstructorTest<DoubleDataVector, SparseFloatDataVector>();
-    iteratorConstructorTest<FloatDataVector, DoubleDataVector>();
-    iteratorConstructorTest<FloatDataVector, FloatDataVector>();
-    iteratorConstructorTest<FloatDataVector, SparseDoubleDataVector>();
-    iteratorConstructorTest<FloatDataVector, SparseFloatDataVector>();
-    iteratorConstructorTest<SparseDoubleDataVector, DoubleDataVector>();
-    iteratorConstructorTest<SparseDoubleDataVector, FloatDataVector>();
-    iteratorConstructorTest<SparseDoubleDataVector, SparseDoubleDataVector>();
-    iteratorConstructorTest<SparseDoubleDataVector, SparseFloatDataVector>();
-    iteratorConstructorTest<SparseFloatDataVector, DoubleDataVector>();
-    iteratorConstructorTest<SparseFloatDataVector, FloatDataVector>();
-    iteratorConstructorTest<SparseFloatDataVector, SparseDoubleDataVector>();
-    iteratorConstructorTest<SparseFloatDataVector, SparseFloatDataVector>();
+    auto a = getVector();
+
+    iteratorConstructorTest<DoubleDataVector, DoubleDataVector>(a);
+    iteratorConstructorTest<DoubleDataVector, FloatDataVector>(a);
+    iteratorConstructorTest<DoubleDataVector, SparseDoubleDataVector>(a);
+    iteratorConstructorTest<DoubleDataVector, SparseFloatDataVector>(a);
+    iteratorConstructorTest<FloatDataVector, DoubleDataVector>(a);
+    iteratorConstructorTest<FloatDataVector, FloatDataVector>(a);
+    iteratorConstructorTest<FloatDataVector, SparseDoubleDataVector>(a);
+    iteratorConstructorTest<FloatDataVector, SparseFloatDataVector>(a);
+    iteratorConstructorTest<SparseDoubleDataVector, DoubleDataVector>(a);
+    iteratorConstructorTest<SparseDoubleDataVector, FloatDataVector>(a);
+    iteratorConstructorTest<SparseDoubleDataVector, SparseDoubleDataVector>(a);
+    iteratorConstructorTest<SparseDoubleDataVector, SparseFloatDataVector>(a);
+    iteratorConstructorTest<SparseFloatDataVector, DoubleDataVector>(a);
+    iteratorConstructorTest<SparseFloatDataVector, FloatDataVector>(a);
+    iteratorConstructorTest<SparseFloatDataVector, SparseDoubleDataVector>(a);
+    iteratorConstructorTest<SparseFloatDataVector, SparseFloatDataVector>(a);
+
+    auto b = getBinaryVector();
+
+    iteratorConstructorTest<DoubleDataVector, DoubleDataVector>(b);
+    iteratorConstructorTest<DoubleDataVector, FloatDataVector>(b);
+    iteratorConstructorTest<DoubleDataVector, SparseDoubleDataVector>(b);
+    iteratorConstructorTest<DoubleDataVector, SparseFloatDataVector>(b);
+    iteratorConstructorTest<DoubleDataVector, SparseShortDataVector>(b);
+    iteratorConstructorTest<DoubleDataVector, SparseBinaryDataVector>(b);
+    iteratorConstructorTest<DoubleDataVector, UncompressedSparseBinaryDataVector>(b);
+
+    iteratorConstructorTest<FloatDataVector, DoubleDataVector>(b);
+    iteratorConstructorTest<FloatDataVector, FloatDataVector>(b);
+    iteratorConstructorTest<FloatDataVector, SparseFloatDataVector>(b);
+    iteratorConstructorTest<FloatDataVector, SparseFloatDataVector>(b);
+    iteratorConstructorTest<FloatDataVector, SparseShortDataVector>(b);
+    iteratorConstructorTest<FloatDataVector, SparseBinaryDataVector>(b);
+    iteratorConstructorTest<FloatDataVector, UncompressedSparseBinaryDataVector>(b);
+
+    iteratorConstructorTest<SparseDoubleDataVector, DoubleDataVector>(b);
+    iteratorConstructorTest<SparseDoubleDataVector, FloatDataVector>(b);
+    iteratorConstructorTest<SparseDoubleDataVector, SparseDoubleDataVector>(b);
+    iteratorConstructorTest<SparseDoubleDataVector, SparseFloatDataVector>(b);
+    iteratorConstructorTest<SparseDoubleDataVector, SparseShortDataVector>(b);
+    iteratorConstructorTest<SparseDoubleDataVector, SparseBinaryDataVector>(b);
+    iteratorConstructorTest<SparseDoubleDataVector, UncompressedSparseBinaryDataVector>(b);
+
+    iteratorConstructorTest<SparseFloatDataVector, DoubleDataVector>(b);
+    iteratorConstructorTest<SparseFloatDataVector, FloatDataVector>(b);
+    iteratorConstructorTest<SparseFloatDataVector, SparseFloatDataVector>(b);
+    iteratorConstructorTest<SparseFloatDataVector, SparseFloatDataVector>(b);
+    iteratorConstructorTest<SparseFloatDataVector, SparseShortDataVector>(b);
+    iteratorConstructorTest<SparseFloatDataVector, SparseBinaryDataVector>(b);
+    iteratorConstructorTest<SparseFloatDataVector, UncompressedSparseBinaryDataVector>(b);
+
+    iteratorConstructorTest<SparseShortDataVector, DoubleDataVector>(b);
+    iteratorConstructorTest<SparseShortDataVector, FloatDataVector>(b);
+    iteratorConstructorTest<SparseShortDataVector, SparseFloatDataVector>(b);
+    iteratorConstructorTest<SparseShortDataVector, SparseFloatDataVector>(b);
+    iteratorConstructorTest<SparseShortDataVector, SparseShortDataVector>(b);
+    iteratorConstructorTest<SparseShortDataVector, SparseBinaryDataVector>(b);
+    iteratorConstructorTest<SparseShortDataVector, UncompressedSparseBinaryDataVector>(b);
+
+    iteratorConstructorTest<SparseBinaryDataVector, DoubleDataVector>(b);
+    iteratorConstructorTest<SparseBinaryDataVector, FloatDataVector>(b);
+    iteratorConstructorTest<SparseBinaryDataVector, SparseFloatDataVector>(b);
+    iteratorConstructorTest<SparseBinaryDataVector, SparseFloatDataVector>(b);
+    iteratorConstructorTest<SparseBinaryDataVector, SparseShortDataVector>(b);
+    iteratorConstructorTest<SparseBinaryDataVector, SparseBinaryDataVector>(b);
+    iteratorConstructorTest<SparseBinaryDataVector, UncompressedSparseBinaryDataVector>(b);
 }
 
 /// Tests that two DataVector types print identically
 ///
 template<typename DataVectorType1, typename DataVectorType2>
-void printTest()
+void printTest(const DoubleVector& a)
 {
-    auto a = getVector();
-
     DataVectorType1 b1(a.GetIterator());
     DataVectorType2 b2(a.GetIterator());
 
@@ -250,9 +306,19 @@ void printTest()
 
 void printTest()
 {
-    printTest<DoubleDataVector, FloatDataVector>();
-    printTest<DoubleDataVector, SparseDoubleDataVector>();
-    printTest<DoubleDataVector, SparseFloatDataVector>();
+    auto a = getVector();
+
+    printTest<DoubleDataVector, FloatDataVector>(a);
+    printTest<DoubleDataVector, SparseDoubleDataVector>(a);
+    printTest<DoubleDataVector, SparseFloatDataVector>(a);
+
+    auto b = getBinaryVector();
+
+    printTest<DoubleDataVector, FloatDataVector>(b);
+    printTest<DoubleDataVector, SparseDoubleDataVector>(b);
+    printTest<DoubleDataVector, SparseFloatDataVector>(b);
+    printTest<DoubleDataVector, SparseBinaryDataVector>(b);
+    printTest<DoubleDataVector, UncompressedSparseBinaryDataVector>(b);
 }
 
 /// Runs all tests
