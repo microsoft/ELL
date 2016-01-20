@@ -39,11 +39,5 @@ target_link_libraries(${PROJ_NAME} common dataset layers linear loss_functions p
 # put this project in the trainers folder in the IDE 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "trainers")
 
-# test
-add_test(NAME sgd_train
-         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} 
-         COMMAND ${PROJ_NAME} -idf data/a9a.txt)
-
 # copy executable to build/bin directory
-
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
