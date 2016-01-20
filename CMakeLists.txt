@@ -8,7 +8,7 @@ PROJECT(Layers)
 # Turn on ability to create folders to organize projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
   add_compile_options(-std=c++1y)
 endif()
 
