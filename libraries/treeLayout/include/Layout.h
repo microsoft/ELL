@@ -9,7 +9,7 @@ using std::vector;
 
 #include <cstring> // for size_t
 
-namespace tree_layout
+namespace treeLayout
 {
     /// Contains the (depth, offset) position of one vertex in the tree. If the root of the tree is to be on top, positive depth is down and positive offset is right.
     ///

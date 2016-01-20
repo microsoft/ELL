@@ -13,7 +13,7 @@ using std::make_pair;
 
 #include <cmath>
 
-namespace tree_layout
+namespace treeLayout
 {
     template<typename ChildrenVectorType>
     Layout QpLayoutGenerator::generate(const ChildrenVectorType& Children)

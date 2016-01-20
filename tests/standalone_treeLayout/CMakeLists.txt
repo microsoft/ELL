@@ -1,10 +1,10 @@
 #
-# cmake file for standalone_tree_layout project
+# cmake file for standalone_treeLayout project
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
-set (PROJ_NAME standalone_tree_layout)
+set (PROJ_NAME standalone_treeLayout)
 
 project(${PROJ_NAME})
 
@@ -12,13 +12,13 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC standalone_tree_layout.cpp)
+set (SRC standalone_treeLayout.cpp)
 
-include_directories(../../libraries/tree_layout/include)
+include_directories(../../libraries/treeLayout/include)
 include_directories(../../libraries/types/include)
 
 add_executable(${PROJ_NAME} ${SRC})
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tests")
 
-target_link_libraries(${PROJ_NAME} tree_layout)
+target_link_libraries(${PROJ_NAME} treeLayout)

@@ -8,7 +8,7 @@
 using std::vector;
 using std::pair;
 
-namespace tree_layout
+namespace treeLayout
 {
     /// An algorithhm for laying out a tree based on a springs and constraints physical system, which is minimized with gradient descent
     ///

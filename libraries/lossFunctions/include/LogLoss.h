@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace loss_functions
+namespace lossFunctions
 {
     /// Implements the log-loss functions: loss(x) = log(1 + exp(-x))
     ///

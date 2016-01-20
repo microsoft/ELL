@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace loss_functions
+namespace lossFunctions
 {
     /// Implements the squared loss function: loss(x) = x*x
     ///
