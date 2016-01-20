@@ -61,6 +61,7 @@ namespace dataset
 
     void SupervisedExample::Print(ostream & os) const
     {
+        os << _label << '\t';
         _upInstance->Print(os);
     }
 }

@@ -17,7 +17,7 @@ using std::unique_ptr;
 
 namespace dataset
 {
-    class SupervisedExample : public IDataVector
+    class SupervisedExample : public IDataVector // TODO - consider making this class not implement IDataVector
     {
     public:
 
