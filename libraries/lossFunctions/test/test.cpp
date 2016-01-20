@@ -1,13 +1,13 @@
 // test.cpp
 
 #include "HingeLoss.h"
-using loss_functions::HingeLoss;
+using lossFunctions::HingeLoss;
 
 #include "LogLoss.h"
-using loss_functions::LogLoss;
+using lossFunctions::LogLoss;
 
 #include "SquaredLoss.h"
-using loss_functions::SquaredLoss;
+using lossFunctions::SquaredLoss;
 
 // testing
 #include "testing.h"

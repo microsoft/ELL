@@ -14,7 +14,7 @@
 //
 //using namespace decision_tree;
 //using namespace layers;
-//using namespace tree_layout;
+//using namespace treeLayout;
 //using std::make_shared;
 //using std::ifstream;
 //using std::ofstream;

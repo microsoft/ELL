@@ -45,10 +45,10 @@ using common::GetRowDatasetMapCoordinates;
 #include "AsgdOptimizer.h"
 using optimization::AsgdOptimizer;
 
-// loss_functions
+// lossFunctions
 #include "HingeLoss.h"
 #include "LogLoss.h"
-using namespace loss_functions;
+using namespace lossFunctions;
 
 // stl
 #include <iostream>

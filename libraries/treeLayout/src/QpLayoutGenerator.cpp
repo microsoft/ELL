@@ -2,7 +2,7 @@
 
 #include "QpLayoutGenerator.h"
 
-namespace tree_layout
+namespace treeLayout
 {
 
     QpLayoutGenerator::Params::Params()

@@ -5,7 +5,7 @@
 #include <stdexcept>
 using std::runtime_error;
 
-namespace tree_layout
+namespace treeLayout
 {
     VertexPosition::VertexPosition()
     {}

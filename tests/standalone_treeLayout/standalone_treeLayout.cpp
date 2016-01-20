@@ -1,4 +1,4 @@
-// standalone_tree_layout.cpp
+// standalone_treeLayout.cpp
 
 #include "QpLayoutGenerator.h"
 #include <algorithm>
@@ -11,7 +11,7 @@
 #include <string>
 #include <cassert>
 
-using namespace tree_layout;
+using namespace treeLayout;
 using namespace std;
 
 struct node

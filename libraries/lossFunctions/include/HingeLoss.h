@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace loss_functions
+namespace lossFunctions
 {
     /// Implements the hinge loss function: loss(x) = max(1-x, 0)
     ///
@@ -10,7 +10,6 @@ namespace loss_functions
     {
 
     public:
-
         /// \returns The value of the loss at a given point
         ///
         double Evaluate(double prediction, double label) const;

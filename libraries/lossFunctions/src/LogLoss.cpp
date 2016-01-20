@@ -6,7 +6,7 @@
 using std::log;
 using std::exp;
 
-namespace loss_functions
+namespace lossFunctions
 {
     LogLoss::LogLoss(double scale) : _scale(scale)
     {}

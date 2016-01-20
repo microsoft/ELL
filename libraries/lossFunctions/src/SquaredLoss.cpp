@@ -6,7 +6,7 @@
 using std::log;
 using std::exp;
 
-namespace loss_functions
+namespace lossFunctions
 {
     double SquaredLoss::Evaluate(double prediction, double label) const
     {
