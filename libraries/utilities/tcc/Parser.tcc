@@ -59,10 +59,11 @@ namespace utilities
     }
 
     // wrapper for strtoul
-//    inline void cParse(const char*& pStr, char*& pEnd, unsigned long& value)
-//    {
-//        value = strtoul(pStr, &pEnd, 0);
-//    }
+    template <typename std::enable_if<!std::is_same<unsigned long, uint>::value>::type* = 0>
+    inline void cParse(const char*& pStr, char*& pEnd, unsigned long& value)
+    {
+        value = strtoul(pStr, &pEnd, 0);
+    }
 
     // wrapper for strtol
     inline void cParse(const char*& pStr, char*& pEnd, long& value)
