@@ -92,9 +92,13 @@ namespace types
     template<typename ValueType>
     void RealArray<ValueType>::Print(ostream& os) const
     {
-        for(ValueType x : *this)
+        auto iterator = GetIterator();
+
+        while(iterator.IsValid())
         {
-            os << x << '\t';
+            auto indexValue = iterator.Get();
+            os << indexValue.index << ':' << indexValue.value << '\t';
+            iterator.Next();
         }
     }
 

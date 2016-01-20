@@ -304,6 +304,45 @@ void printTest(const DoubleVector& a)
     processTest("Comparing " + name1 + "::Print() and " + name2 + "::Print()", s1 == s2);
 }
 
+void printTestOnesDataVector()
+{
+    DoubleDataVector a;
+    for(int i = 0; i<15; ++i)
+    {
+        a.PushBack(i, 1);
+    }
+
+    OnesDataVector b(15);
+
+    stringstream ass;
+    stringstream bss;
+
+    a.Print(ass);
+    b.Print(bss);
+
+    string as = ass.str();
+    string bs = bss.str();
+
+    processTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::OnesDataVector::Print()", as == bs);
+}
+
+void printTestZeroDataVector()
+{
+    DoubleDataVector a;
+    ZeroDataVector b;
+
+    stringstream ass;
+    stringstream bss;
+
+    a.Print(ass);
+    b.Print(bss);
+
+    string as = ass.str();
+    string bs = bss.str();
+
+    processTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::ZeroDataVector::Print()", as == bs);
+}
+
 void printTest()
 {
     auto a = getVector();
@@ -319,6 +358,9 @@ void printTest()
     printTest<DoubleDataVector, SparseFloatDataVector>(b);
     printTest<DoubleDataVector, SparseBinaryDataVector>(b);
     printTest<DoubleDataVector, UncompressedSparseBinaryDataVector>(b);
+
+    printTestOnesDataVector();
+    printTestZeroDataVector();
 }
 
 /// Runs all tests
@@ -330,6 +372,7 @@ int main()
     iteratorConstructorTest();
     printTest();
 
+    // TODO - test DataVector pushback and NumNonzeros
     // TODO - test integer list and compressed integer list
     // TODO - test data vector builder and supervised example builder
     // TODO - test supervised example
