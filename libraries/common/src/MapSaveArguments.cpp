@@ -2,7 +2,7 @@
 
 #include "MapSaveArguments.h"
 
-namespace utilities
+namespace common
 {
     void ParsedMapSaveArguments::AddArgs(CommandLineParser& parser)
     {

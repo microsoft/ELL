@@ -7,12 +7,14 @@
 // utilities
 #include "CommandLineParser.h"
 using utilities::CommandLineParser;
+using utilities::ParsedArgSet;
+using utilities::ParseResult;
 
 // stl
 #include <string>
 using std::string;
 
-namespace utilities
+namespace common
 {
     /// A struct that holds command line parameters for loading maps
     ///

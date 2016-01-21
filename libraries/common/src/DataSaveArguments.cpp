@@ -3,7 +3,7 @@
 
 #include "DataSaveArguments.h"
 
-namespace utilities
+namespace common
 {
     void ParsedDataSaveArguments::AddArgs(CommandLineParser& parser)
     {

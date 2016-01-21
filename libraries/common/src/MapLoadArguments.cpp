@@ -2,7 +2,7 @@
 
 #include "MapLoadArguments.h"
 
-namespace utilities
+namespace common
 {
     void ParsedMapLoadArguments::AddArgs(CommandLineParser& parser)
     {

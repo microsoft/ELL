@@ -34,8 +34,8 @@ struct EdgeStyleArgs
 
 struct CommandLineArguments
 {
-    string mapFile;
-    string svgFile;
+    string mapFile; // TODO use common args
+    string svgFile; // TODO use common args
 
     double layerHorizontalMargin;
     double layerHorizontalMarginIncrement;

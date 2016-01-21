@@ -13,7 +13,7 @@ using std::vector;
 #include <string>
 using std::string;
 
-namespace utilities
+namespace common
 {
     void ParsedDataLoadArguments::AddArgs(CommandLineParser& parser)
     {

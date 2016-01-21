@@ -14,15 +14,6 @@ using utilities::CommandLineParserPrintHelpException;
 #include "randomEngines.h"
 using utilities::GetRandomEngine;
 
-#include "MapLoadArguments.h" 
-using utilities::ParsedMapLoadArguments;
-
-#include "MapSaveArguments.h" 
-using utilities::ParsedMapSaveArguments;
-
-#include "DataLoadArguments.h" 
-using utilities::ParsedDataLoadArguments;
-
 #include "BinaryClassificationEvaluator.h"
 using utilities::BinaryClassificationEvaluator;
 
@@ -40,6 +31,15 @@ using dataset::RowDataset;
 // common
 #include "Loaders.h"
 using common::GetRowDatasetMapCoordinates;
+
+#include "MapLoadArguments.h" 
+using common::ParsedMapLoadArguments;
+
+#include "MapSaveArguments.h" 
+using common::ParsedMapSaveArguments;
+
+#include "DataLoadArguments.h" 
+using common::ParsedDataLoadArguments;
 
 // optimization
 #include "AsgdOptimizer.h"

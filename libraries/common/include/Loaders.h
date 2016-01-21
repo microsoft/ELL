@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include "MapLoadArguments.h"
+#include "DataLoadArguments.h" 
+
 // dataset
 #include "SupervisedExample.h"
 using dataset::RowDataset;
@@ -12,13 +15,6 @@ using layers::Map;
 
 #include "Coordinate.h"
 using layers::CoordinateList;
-
-// utilities
-#include "MapLoadArguments.h"
-using utilities::MapLoadArguments;
-
-#include "DataLoadArguments.h" 
-using utilities::DataLoadArguments;
 
 #include "ParsingIterator.h"
 using dataset::IParsingIterator;

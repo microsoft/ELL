@@ -5,15 +5,6 @@ using utilities::CommandLineParser;
 using utilities::CommandLineParserErrorException;
 using utilities::CommandLineParserPrintHelpException;
 
-#include "MapLoadArguments.h" 
-using utilities::ParsedMapLoadArguments;
-
-#include "DataLoadArguments.h" 
-using utilities::ParsedDataLoadArguments;
-
-#include "DataSaveArguments.h" 
-using utilities::ParsedDataSaveArguments;
-
 // layers
 #include "Map.h"
 using layers::Map;
@@ -28,6 +19,15 @@ using dataset::RowDataset;
 // common
 #include "Loaders.h"
 using common::GetDataIterator;
+
+#include "MapLoadArguments.h" 
+using common::ParsedMapLoadArguments;
+
+#include "DataLoadArguments.h" 
+using common::ParsedDataLoadArguments;
+
+#include "DataSaveArguments.h" 
+using common::ParsedDataSaveArguments;
 
 // utilities
 #include "files.h"

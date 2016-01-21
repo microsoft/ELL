@@ -1,4 +1,4 @@
-// MapLoadArguments.h
+// MapSaveArguments.h
 
 #pragma once
 
@@ -7,24 +7,24 @@
 // utilities
 #include "CommandLineParser.h"
 using utilities::CommandLineParser;
+using utilities::ParsedArgSet;
 
 // stl
 #include <string>
 using std::string;
 
-namespace utilities
+namespace common
 {
     /// A struct that holds command line parameters for loading maps
     ///
-    struct MapLoadArguments
+    struct MapSaveArguments
     {
-        string inputMapFile = "";
-        uint32 inputMapIgnoreSuffix = 0;
+        string outputMapFile = "";
     };
 
-    /// A version of MapLoadArguments that adds its members to the command line parser
+    /// A version of MapSaveArguments that adds its members to the command line parser
     ///
-    struct ParsedMapLoadArguments : public MapLoadArguments, public ParsedArgSet
+    struct ParsedMapSaveArguments : public MapSaveArguments, public ParsedArgSet
     {
         /// Adds the arguments to the command line parser
         ///
