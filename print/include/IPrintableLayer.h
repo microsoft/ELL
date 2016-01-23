@@ -1,4 +1,4 @@
-// IPrintable.h
+// IPrintableLayer.h
 
 #pragma once
 
@@ -24,7 +24,7 @@ struct Point
 
 /// An interface for classes that can print human-friendly descriptions of themselves
 ///
-class IPrintable 
+class IPrintableLayer 
 {
 public:
     /// Returns the number of elements in the layer

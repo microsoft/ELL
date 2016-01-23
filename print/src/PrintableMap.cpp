@@ -159,7 +159,7 @@ void PrintableMap::Deserialize(JsonSerializer & serializer)
     serializer.Read("layers", _layers, PrintableMap::DeserializeLayers);
 }
 
-void PrintableMap::DeserializeLayers(JsonSerializer & serializer, shared_ptr<IPrintable>& up)
+void PrintableMap::DeserializeLayers(JsonSerializer & serializer, shared_ptr<IPrintableLayer>& up)
 {
     auto type = serializer.Read<string>("_type");
     auto version = serializer.Read<int>("_version");

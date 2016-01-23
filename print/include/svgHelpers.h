@@ -3,7 +3,7 @@
 #pragma once
 
 #include "HorizontalLayout.h"
-#include "IPrintable.h"
+#include "IPrintableLayer.h"
 
 #include "types.h"
 

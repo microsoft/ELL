@@ -1,6 +1,6 @@
 // main.cpp
 
-#include "IPrintable.h"
+#include "IPrintableLayer.h"
 #include "PrintableMap.h"
 #include "CommandLineArguments.h"
 
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
         commandLineParser.ParseArgs();
 
         // open map file
-        auto mapFStream = OpenIfstream(args.mapFile);
+        auto mapFStream = OpenIfstream(args.mapFile); // TODO: use common args and common loader
         auto map = JsonSerializer::Load<PrintableMap>(mapFStream, "Base");
         
         auto outputSvgFStream = OpenOfstream(args.svgFile);
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
     }
     catch (const CommandLineParserPrintHelpException& ex)
     {
-        cout << ex.GetHelpText() << endl;        
+        cout << ex.GetHelpText() << endl;
     }
     catch (const CommandLineParserErrorException& exception)
     {

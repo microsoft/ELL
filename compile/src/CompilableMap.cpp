@@ -1,6 +1,6 @@
-// Compiler.cpp
+// CompilableMap.cpp
 
-#include "Compiler.h"
+#include "CompilableMap.h"
 #include "CompilableInput.h"
 #include "CompilableScale.h"
 #include "CompilableShift.h"
@@ -14,12 +14,12 @@ using std::to_string;
 #include <memory>
 using std::dynamic_pointer_cast;
 
-void Compiler::Deserialize(JsonSerializer & serializer)
+void CompilableMap::Deserialize(JsonSerializer& serializer)
 {
-    serializer.Read("layers", _layers, Compiler::DeserializeLayers);
+    serializer.Read("layers", _layers, CompilableMap::DeserializeLayers);
 }
 
-void Compiler::DeserializeLayers(JsonSerializer & serializer, shared_ptr<Compilable>& up)
+void CompilableMap::DeserializeLayers(JsonSerializer& serializer, shared_ptr<CompilableLayer>& up)
 {
     auto type = serializer.Read<string>("_type");
     auto version = serializer.Read<int>("_version");
@@ -53,20 +53,3 @@ void Compiler::DeserializeLayers(JsonSerializer & serializer, shared_ptr<Compila
         throw runtime_error("unidentified type in map file: " + type);
     }
 }
-
-void Compiler::SetActions()
-{
-    if (_layers.size() == 0)
-    {
-        return;
-    }
-
-    // set trivial actions for output elements (actually, do this in a separate fiunction called SetOutputs)
-
-    // iterate over layers from the bottom up
-    for (uint64 i = _layers.size() - 1; i > 0; ++i)
-    {
-        // _layers[i]->SetActions(_layers);
-    }
-}
-

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "IPrintable.h"
+#include "IPrintableLayer.h"
 #include "HorizontalLayout.h"
 
 #include "layers.h"
@@ -10,7 +10,7 @@ using namespace layers;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableEmpty : public IPrintable
+struct PrintableEmpty : public IPrintableLayer
 {
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream

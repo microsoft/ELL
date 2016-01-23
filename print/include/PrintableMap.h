@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "IPrintable.h"
+#include "IPrintableLayer.h"
 #include "CommandLineArguments.h"
 
 #include "JsonSerializer.h"
@@ -31,8 +31,8 @@ public:
 
     /// Static function for deserializing shared_ptr<Layer>
     ///
-    static void DeserializeLayers(JsonSerializer& serializer, shared_ptr<IPrintable>& up);
+    static void DeserializeLayers(JsonSerializer& serializer, shared_ptr<IPrintableLayer>& up);
 
 private:
-    vector<shared_ptr<IPrintable>> _layers;
+    vector<shared_ptr<IPrintableLayer>> _layers;
 };

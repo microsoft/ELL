@@ -18,7 +18,7 @@ member and non-member function names:
 use PascalCase, e.g., "int GetValue() const { return _value; }"
 When possible, function names should be imperative mood verbs, e.g., "GetValue()" and "Permute()". As a special case, accessor member functions should start with "Get". An exception is type conversion functions, which should start with "To", e.g., "ToString()".
 
-function parameters and local variable names: use camelCase, e.g., "currentValue". For mathematical programming, one could use "u", "v", "w", "x", "y", "z" for vectors or scalars, and "A", "B", "M" (or other capital single letters) for matrices.
+function names, function parameters and local variable names: use camelCase, e.g., "currentValue". For mathematical programming, one could use "u", "v", "w", "x", "y", "z" for vectors or scalars, and "A", "B", "M" (or other capital single letters) for matrices.
 
 member variable names: use "_" (underscore) followed by camelCase, e.g., "_myMemberVariable"
 

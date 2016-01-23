@@ -24,7 +24,7 @@ set (SRC src/HorizontalLayout.cpp
 
 set (INCLUDE include/CommandLineArguments.h
                    include/HorizontalLayout.h
-                   include/IPrintable.h
+                   include/IPrintableLayer.h
                    include/PrintableCoordinatewise.h
                    include/PrintableEmpty.h
                    include/PrintableInput.h

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "IPrintable.h"
+#include "IPrintableLayer.h"
 #include "HorizontalLayout.h"
 
 #include "layers.h"
@@ -13,7 +13,7 @@ using std::unique_ptr;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableCoordinatewise : public Scale, public IPrintable
+struct PrintableCoordinatewise : public Scale, public IPrintableLayer
 {
 public:
     /// Ctor

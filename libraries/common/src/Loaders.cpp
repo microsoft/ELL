@@ -70,11 +70,16 @@ namespace common
         }
     }
 
-    unique_ptr<IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, /* out */ Map& map, /* out */ CoordinateList& inputCoordinates)
+    Map GetMap(const MapLoadArguments& mapLoadArguments)
     {
         // load map
         auto inputMapFStream = OpenIfstream(mapLoadArguments.inputMapFile);
-        map = JsonSerializer::Load<Map>(inputMapFStream, "Base");
+        return JsonSerializer::Load<Map>(inputMapFStream, "Base");
+    }
+
+    unique_ptr<IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, /* out */ Map& map, /* out */ CoordinateList& inputCoordinates)
+    {
+        auto inputMapFStream = GetMap(mapLoadArguments);
 
         // create list of output coordinates
         inputCoordinates = CoordinateListFactory::IgnoreSuffix(map, mapLoadArguments.inputMapIgnoreSuffix);
