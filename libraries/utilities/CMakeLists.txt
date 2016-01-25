@@ -21,16 +21,20 @@ set (SRC src/BinaryClassificationEvaluator.cpp
 
 set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/CommandLineParser.h
+                       include/IIterator.h
                        include/JsonSerializer.h
+                       include/ParallelTransformIterator.h
                        include/Parser.h
+                       include/TransformIterator.h
                        include/files.h
                        include/randomEngines.h)
 
 set (TCC tcc/BinaryClassificationEvaluator.tcc
                    tcc/CommandLineParser.tcc
                    tcc/JsonSerializer.tcc
+                   tcc/ParallelTransformIterator.tcc
                    tcc/Parser.tcc
-                   tcc/VectorIterator.tcc)
+                   tcc/TransformIterator.tcc)
                    
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -50,9 +54,11 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 set (TEST_NAME ${PROJ_NAME}_test)
 
+include_directories(../testing/include)
+
 add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} dataset linear)
+target_link_libraries(${TEST_NAME} dataset linear testing)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

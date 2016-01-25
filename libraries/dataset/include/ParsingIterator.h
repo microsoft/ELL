@@ -4,6 +4,9 @@
 
 #include "SupervisedExample.h"
 
+#include "IIterator.h"
+using utilities::IIterator;
+
 /// stl
 #include <vector>
 using std::vector;
@@ -13,22 +16,8 @@ using std::unique_ptr;
 
 namespace dataset
 {
-    class IParsingIterator
-    {
-    public:
-        /// \returns True if the iterator is currently pointing to a valid iterate
-        ///
-        virtual bool IsValid() const = 0;
-
-        /// Proceeds to the Next row
-        ///
-        virtual void Next() = 0;
-
-        /// \returns The weight of the current example
-        ///
-        virtual SupervisedExample Get() = 0;
-    };
-
+    using IParsingIterator = IIterator<SupervisedExample>;
+    
     /// An input iterator that traverses a textual dataset row by row and applies a parser to each row into a dense feature vector of doubles, 
     /// a double label, and a double weight.
     template<typename RowIteratorType, typename VectorEntryParserType>
