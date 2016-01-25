@@ -19,7 +19,6 @@ namespace utilities
         Func _transformFn;
     };
 
-
     // Convenience function for creating TransformIterators
     template <typename InType, typename FnType>
     auto MakeTransform(IIterator<InType>& inIterator, FnType transformFn) -> TransformIterator<InType, decltype(transformFn(std::declval<InType>())), FnType>

@@ -1,10 +1,11 @@
 // ParallelTransformIterator.tcc
 
-using std::async;
+using std::async; // from <future>
 
-#include <iostream>
-using std::cerr;
-using std::endl;
+#include <thread>
+using std::thread;
+
+#define DEFAULT_MAX_TASKS 8
 
 namespace utilities
 {
@@ -12,27 +13,22 @@ namespace utilities
     // ParallelTransformIterator definitions
     //
 
-
-    // TODO: instead of just having buffer of futures, have buffer of
-    // output values. Otherwise, we can't instantiate a new future
-    // until we've retrieved the value of the last one.
-
-    // have the async call apply the transform fn and store it in the
-    // correct place in the buffer. The buffer could have more
-    // entries than there are threads and still be useful.
-
-    // Or does the current solution really work fine? 
-
-    template <typename InType, typename OutType, typename Func>
-    ParallelTransformIterator<InType, OutType, Func>::ParallelTransformIterator(IIterator<InType>& inIter, Func transformFn) : _inIter(inIter), _transformFn(transformFn), _currentIndex(0), _endIndex(-1), _currentOutputValid(false)
+    template <typename InType, typename OutType, typename Func, int MaxTasks>
+    ParallelTransformIterator<InType, OutType, Func, MaxTasks>::ParallelTransformIterator(IIterator<InType>& inIter, Func transformFn) : _inIter(inIter), _transformFn(transformFn), _currentIndex(0), _endIndex(-1), _currentOutputValid(false)
     {
         // Fill the buffer with futures that are the result of calling async(transformFn) on inIter
+        int maxTasks = MaxTasks == 0 ? thread::hardware_concurrency() : MaxTasks;
+        if (maxTasks == 0)
+        {
+            maxTasks = DEFAULT_MAX_TASKS;
+        }
+
+        _futures.reserve(maxTasks);
         int index = 0;
-        for(int index = 0; index < _maxSize; index++)
+        for(int index = 0; index < maxTasks; index++)
         {
             if(!_inIter.IsValid())
             {
-                _endIndex = index;
                 break;
             }
 
@@ -41,14 +37,14 @@ namespace utilities
         }
     }
     
-    template <typename InType, typename OutType, typename Func>
-    bool ParallelTransformIterator<InType, OutType, Func>::IsValid() const
+    template <typename InType, typename OutType, typename Func, int MaxTasks>
+    bool ParallelTransformIterator<InType, OutType, Func, MaxTasks>::IsValid() const
     {
         return _currentIndex != _endIndex;
     }
 
-    template <typename InType, typename OutType, typename Func>
-    void ParallelTransformIterator<InType, OutType, Func>::Next() 
+    template <typename InType, typename OutType, typename Func, int MaxTasks>
+    void ParallelTransformIterator<InType, OutType, Func, MaxTasks>::Next()
     {
         if(!IsValid())
         {
@@ -64,17 +60,18 @@ namespace utilities
         }
         else
         {
-            if(_endIndex < 0) // yuck
+            if(_endIndex < 0) // Check if we've already noted the end index
             {
                 _endIndex = _currentIndex;
             }
         }
-        _currentIndex = (_currentIndex+1)%_maxSize;
+        _currentIndex = (_currentIndex+1)%_futures.size();
     };
     
-    template <typename InType, typename OutType, typename Func>
-    OutType ParallelTransformIterator<InType, OutType, Func>::Get() 
+    template <typename InType, typename OutType, typename Func, int MaxTasks>
+    OutType ParallelTransformIterator<InType, OutType, Func, MaxTasks>::Get()
     {
+        // Need to cache output of current future, because calling future::get() twice is an error
         if(!_currentOutputValid)
         {
             _currentOutput = _futures[_currentIndex].get();

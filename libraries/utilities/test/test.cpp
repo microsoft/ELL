@@ -27,6 +27,14 @@ using std::string;
 #include <vector>
 using std::vector;
 
+#include <chrono>
+using std::chrono::duration_cast;
+using std::chrono::milliseconds;
+using std::chrono::system_clock;
+
+#include <numeric>
+using std::iota;
+
 template <typename T, typename IteratorType>
 class IteratorAdapter : public IIterator<T>
 {
@@ -50,7 +58,6 @@ auto MakeIterator(IteratorType begin, IteratorType end) -> IteratorAdapter<declt
     return IteratorAdapter<decltype(*begin), IteratorType>(begin, end);
 }
 
-
 void testIteratorAdapter()
 {
     // IteratorAdapter test
@@ -68,14 +75,63 @@ void testIteratorAdapter()
     processTest("IteratorAdapter length", index == vec.size());
 }
 
+float twoPointFiveTimes(int x)
+{
+    std::this_thread::sleep_for(milliseconds(200));
+    return float(2.5*x);
+}
+
+template <typename Func>
+milliseconds::rep timeIt(Func fn)
+{
+    system_clock::time_point start = system_clock::now();
+    fn();
+    system_clock::time_point end = system_clock::now();
+    return duration_cast<milliseconds>(end - start).count();
+}
+
+class MillisecondTimer
+{
+public:
+    MillisecondTimer() : _start(system_clock::now()), _running(true) {}
+    void Start()
+    {
+        _start = system_clock::now();
+        _running = true;
+    }
+
+    void Stop()
+    {
+        _end = system_clock::now();
+        _running = false;
+    }
+
+    milliseconds::rep Elapsed()
+    {
+        if (_running)
+        {
+            _end = system_clock::now();
+        }
+
+        return duration_cast<milliseconds>(_end - _start).count();
+    }
+
+
+private:
+    system_clock::time_point _start;
+    system_clock::time_point _end;
+    bool _running;
+};
+
 void testTransformIterator()
 {
-    vector<int> vec { 1, 2, 3, 4, 5, 6, 7, 8 };
-    auto twoPointFiveTimes = [](int x){ return float(2.5*x);};
+    vector<int> vec(128);
+    iota(vec.begin(), vec.end(), 5);
+
     auto srcIt = MakeIterator(vec.begin(), vec.end());
     auto transIt = MakeTransform(srcIt, twoPointFiveTimes);
 
-
+    MillisecondTimer timer;
     int index = 0;
     while(transIt.IsValid())
     {
@@ -83,16 +139,19 @@ void testTransformIterator()
         transIt.Next();
         index++;
     }
+    auto elapsed = timer.Elapsed();
+    cerr << "Elapsed time: " << elapsed << " ms" << endl;
 }
-
 
 void testParallelTransformIterator()
 {
-    vector<int> vec { 1, 2, 3, 4, 5, 6, 7, 8 };
+    vector<int> vec(128);
+    iota(vec.begin(), vec.end(), 5);
+
     auto srcIt = MakeIterator(vec.begin(), vec.end());
-    auto twoPointFiveTimes = [](int x){ return float(2.5*x);};
     auto transIt = MakeParallelTransform(srcIt, twoPointFiveTimes);
 
+    MillisecondTimer timer;
     int index = 0;
     while(transIt.IsValid())
     {
@@ -100,8 +159,9 @@ void testParallelTransformIterator()
         transIt.Next();
         index++;
     }
+    auto elapsed = timer.Elapsed();
+    cerr << "Elapsed time: " << elapsed << " ms" << endl;
 }
-
 
 /// Runs all tests
 ///
@@ -110,10 +170,9 @@ int main()
     // TODO test parser
 
     testIteratorAdapter();
+
     testTransformIterator();
     testParallelTransformIterator();
-
-    // TransformedIterator test
 
     if (testFailed())
     {
