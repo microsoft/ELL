@@ -1,6 +1,7 @@
 // ParallelTransformIterator.tcc
 
 using std::async; // from <future>
+using std::launch;
 
 #include <thread>
 using std::thread;
@@ -18,7 +19,7 @@ namespace utilities
     {
         // Fill the buffer with futures that are the result of calling async(transformFn) on inIter
         int maxTasks = MaxTasks == 0 ? thread::hardware_concurrency() : MaxTasks;
-        if (maxTasks == 0)
+        if (maxTasks == 0) // if thread::hardware_concurrency isn't implemented, use DEFAULT_MAX_TASKS tasks (maybe this should be 1)
         {
             maxTasks = DEFAULT_MAX_TASKS;
         }
@@ -32,7 +33,7 @@ namespace utilities
                 break;
             }
 
-            _futures.emplace_back(async(_transformFn, _inIter.Get()));
+            _futures.emplace_back(async(launch::async, _transformFn, _inIter.Get()));
             _inIter.Next();
         }
     }
@@ -55,7 +56,7 @@ namespace utilities
         // If necessary, create new future to handle next input
         if(_inIter.IsValid())
         {
-            _futures[_currentIndex] = async(_transformFn, _inIter.Get());
+            _futures[_currentIndex] = async(launch::async, _transformFn, _inIter.Get());
             _inIter.Next();
         }
         else

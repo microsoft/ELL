@@ -46,6 +46,8 @@ include_directories(../types/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 
+target_link_libraries(${PROJ_NAME} -pthread)
+
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 #
@@ -58,7 +60,7 @@ include_directories(../testing/include)
 
 add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} dataset linear testing)
+target_link_libraries(${TEST_NAME} dataset linear testing -pthread)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

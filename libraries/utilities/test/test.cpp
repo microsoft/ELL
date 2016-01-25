@@ -77,7 +77,7 @@ void testIteratorAdapter()
 
 float twoPointFiveTimes(int x)
 {
-    std::this_thread::sleep_for(milliseconds(200));
+    std::this_thread::sleep_for(milliseconds(10));
     return float(2.5*x);
 }
 
@@ -125,7 +125,7 @@ private:
 
 void testTransformIterator()
 {
-    vector<int> vec(128);
+    vector<int> vec(64);
     iota(vec.begin(), vec.end(), 5);
 
     auto srcIt = MakeIterator(vec.begin(), vec.end());
@@ -140,12 +140,12 @@ void testTransformIterator()
         index++;
     }
     auto elapsed = timer.Elapsed();
-    cerr << "Elapsed time: " << elapsed << " ms" << endl;
+    cout << "Elapsed time: " << elapsed << " ms" << endl;
 }
 
 void testParallelTransformIterator()
 {
-    vector<int> vec(128);
+    vector<int> vec(64);
     iota(vec.begin(), vec.end(), 5);
 
     auto srcIt = MakeIterator(vec.begin(), vec.end());
@@ -160,7 +160,7 @@ void testParallelTransformIterator()
         index++;
     }
     auto elapsed = timer.Elapsed();
-    cerr << "Elapsed time: " << elapsed << " ms" << endl;
+    cout << "Elapsed time: " << elapsed << " ms" << endl;
 }
 
 /// Runs all tests
@@ -170,7 +170,6 @@ int main()
     // TODO test parser
 
     testIteratorAdapter();
-
     testTransformIterator();
     testParallelTransformIterator();
 
