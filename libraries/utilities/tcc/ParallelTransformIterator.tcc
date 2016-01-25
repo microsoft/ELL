@@ -15,7 +15,13 @@ namespace utilities
 
     // TODO: instead of just having buffer of futures, have buffer of
     // output values. Otherwise, we can't instantiate a new future
-    // until we've retrieved the value of the last one. 
+    // until we've retrieved the value of the last one.
+
+    // have the async call apply the transform fn and store it in the
+    // correct place in the buffer. The buffer could have more
+    // entries than there are threads and still be useful.
+
+    // Or does the current solution really work fine? 
 
     template <typename InType, typename OutType, typename Func>
     ParallelTransformIterator<InType, OutType, Func>::ParallelTransformIterator(IIterator<InType>& inIter, Func transformFn) : _inIter(inIter), _transformFn(transformFn), _currentIndex(0), _endIndex(-1), _currentOutputValid(false)
