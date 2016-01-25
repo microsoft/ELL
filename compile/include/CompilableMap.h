@@ -21,11 +21,9 @@ class CompilableMap
 {
 public:
 
-    /// Prints the code
-
-
-
-
+    /// Generates C code that encodes the map
+    ///
+    void ToCode() const;
 
     /// Deserializes the Map in json format
     ///

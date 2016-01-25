@@ -14,6 +14,10 @@ using std::to_string;
 #include <memory>
 using std::dynamic_pointer_cast;
 
+void CompilableMap::ToCode() const
+{
+}
+
 void CompilableMap::Deserialize(JsonSerializer& serializer)
 {
     serializer.Read("layers", _layers, CompilableMap::DeserializeLayers);

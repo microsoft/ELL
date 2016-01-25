@@ -1,14 +1,11 @@
 // Loaders.cpp
 
 #include "Loaders.h"
+#include "CoordinateListFactory.h"
 
 // utilities
 #include "files.h"
 using utilities::OpenIfstream;
-
-// layers
-#include "CoordinateListFactory.h"
-using layers::CoordinateListFactory;
 
 // dataset
 #include "SequentialLineIterator.h"
@@ -79,10 +76,10 @@ namespace common
 
     unique_ptr<IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, /* out */ Map& map, /* out */ CoordinateList& inputCoordinates)
     {
-        auto inputMapFStream = GetMap(mapLoadArguments);
+        map = GetMap(mapLoadArguments);
 
         // create list of output coordinates
-        inputCoordinates = CoordinateListFactory::IgnoreSuffix(map, mapLoadArguments.inputMapIgnoreSuffix);
+        inputCoordinates = CoordinateListIgnoreMapSuffix(map, mapLoadArguments.coordinateListLoadArguments.coordinateListIgnoreSuffix);
 
         // get data iterator
         return GetDataIterator(dataLoadArguments, map, inputCoordinates);
@@ -121,7 +118,7 @@ namespace common
             map = Map(numColumns);
 
             // create a coordinate list of this map
-            inputCoordinates = CoordinateListFactory::Sequence(0, numColumns);
+            inputCoordinates = CoordinateSequence(0, numColumns);
         }
         else
         {

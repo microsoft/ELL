@@ -55,6 +55,17 @@ namespace layers
         return _layers[index]->Size();
     }
 
+    CoordinateList Map::GetCoordinateList(uint64 row) const
+    {
+        CoordinateList coordinateList;
+        uint64 numColumns = LayerSize(row);
+        for (uint64 column = 0; column < numColumns; ++column)
+        {
+            coordinateList.emplace_back(row, column);
+        }
+        return coordinateList;
+    }
+
     void Map::Serialize(JsonSerializer & serializer) const
     {
         serializer.Write("layers", _layers);

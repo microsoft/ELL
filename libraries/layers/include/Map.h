@@ -55,7 +55,7 @@ namespace layers
 
         protected:
             shared_ptr<vector<DoubleArray>> _spOutputs;
-            const CoordinateList& _outputCoordinates;
+            const CoordinateList _outputCoordinates;
             uint64 _index;
 
             /// private ctor, can only be called from Map class
@@ -103,6 +103,10 @@ namespace layers
         /// \returns The number of elements in a specified layer
         ///
         uint64 LayerSize(uint64 index) const;
+
+        /// \returns A list of coordinates in a specified layer
+        ///
+        CoordinateList GetCoordinateList(uint64 row) const;
 
         /// Serializes the Map in json format
         ///

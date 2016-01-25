@@ -63,6 +63,10 @@ int main(int argc, char* argv[])
         auto mapFStream = OpenIfstream(mapLoadArguments.inputMapFile); 
         auto map = JsonSerializer::Load<CompilableMap>(mapFStream, "Base");
 
+        // get coordinate list
+
+        map.ToCode();
+
     }
     catch(const CommandLineParserPrintHelpException& ex)
     {
