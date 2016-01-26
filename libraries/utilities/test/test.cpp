@@ -7,7 +7,8 @@ using testing::processTest;
 using testing::testFailed;
 
 #include "IIterator.h"
-using utilities::IIterator;
+using utilities::IteratorAdapter;
+using utilities::MakeIterator;
 
 #include "TransformIterator.h"
 using utilities::TransformIterator;
@@ -35,28 +36,6 @@ using std::chrono::system_clock;
 #include <numeric>
 using std::iota;
 
-template <typename T, typename IteratorType>
-class IteratorAdapter : public IIterator<T>
-{
-public:
-    IteratorAdapter(IteratorType begin, IteratorType end) : _current(begin), _end(end)
-    {
-    }
-
-    virtual bool IsValid() const override { return _current != _end; }
-    virtual void Next() override { if(IsValid()) _current++; }
-    virtual T Get() override { return *_current; }
-
-private:
-    IteratorType _current;
-    IteratorType _end;
-};
-
-template <typename IteratorType>
-auto MakeIterator(IteratorType begin, IteratorType end) -> IteratorAdapter<decltype(*begin), IteratorType>
-{
-    return IteratorAdapter<decltype(*begin), IteratorType>(begin, end);
-}
 
 void testIteratorAdapter()
 {
