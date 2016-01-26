@@ -22,9 +22,9 @@ def main(trainingDataFile, mapFile1, mapFile2, outputSvgFile=None):
     sgdBinary = os.path.join(binDir, 'sgd')
     printBinary = os.path.join(binDir, 'print')
     dataDir = os.path.abspath('../../data')
-    trainingDataPath = os.path.join(dataDir, trainingDataFile)
-    outputMapFile1 = os.path.join(binDir, mapFile1)
-    outputMapFile2 = os.path.join(binDir, mapFile2) 
+    trainingDataPath = trainingDataFile # os.path.join(dataDir, trainingDataFile)
+    outputMapFile1 = mapFile1 # os.path.join(binDir, mapFile1)
+    outputMapFile2 = mapFile2 # os.path.join(binDir, mapFile2) 
 
     subprocess.check_call([sgdBinary, '-idf', trainingDataPath, '-omf', outputMapFile1])
     subprocess.check_call([sgdBinary, '-idf', trainingDataPath, '-imf', outputMapFile1, '-omf', outputMapFile2, '-imis', '2'])
