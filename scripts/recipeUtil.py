@@ -27,10 +27,13 @@ def findDirWithFile(dirs, filenames):
                 return dir
     return None
 
-def callBinary(binaryFilename, args):
+def runBinary(binaryFilename, args=None):
     binDir = findDirWithFile(['../bin/Debug', '../bin/Release', '../bin'], [binaryFilename, binaryFilename+'.exe'])
     binPath = os.path.join(binDir, binaryFilename)
-    subprocess.check_call([binPath]+args)
+    if args:
+        subprocess.check_call([binPath]+args)
+    else:
+        subprocess.check_call([binPath])
 
 def exit(status=None):
     sys.exit(status)
