@@ -1,41 +1,21 @@
-﻿import os
-import subprocess
+﻿from recipeUtil import *
 
-def padList(l, length):
-    if len(l) < length:
-        return l + [None]*(length-len(l))
-    else:
-        return l[:length]
+dataFile = args[0]
+mapFile1 = args[1]
+mapFile2 = args[2]
+outFile = args[3]
 
-def findDirWithFile(dirs, filenames):
-    '''Of the supplied list of directories, returns the first one that contains a file in the list filenames'''
-    for dir in dirs:
-        for filename in filenames:
-            if os.path.isfile(os.path.join(dir, filename)):
-                return dir
-    return None
+print '####'
+print os.getcwd()
+print dataFile, mapFile1, mapFile2, outFile
+print '####'
 
-def main(trainingDataFile, mapFile1, mapFile2, outputSvgFile=None):
-    binDir = findDirWithFile(['../bin/Debug', '../bin/Release', '../bin'], ['sgd', 'sgd.exe'])
-    print binDir
+callBinary('sgd', ['-idf', dataFile, '-omf', mapFile1])
+callBinary('sgd', ['-idf', dataFile, '-imf', mapFile1, '-omf', mapFile2, '-imis', '2'])
+if outputSvgFile:
+    callBinary('print', ['-imf', mapFile2, '-osf', outFile])
 
-    sgdBinary = os.path.join(binDir, 'sgd')
-    printBinary = os.path.join(binDir, 'print')
-    dataDir = os.path.abspath('../../data')
-    trainingDataPath = os.path.join(dataDir, trainingDataFile)
-    outputMapFile1 = os.path.join(binDir, mapFile1)
-    outputMapFile2 = os.path.join(binDir, mapFile2) 
-
-    subprocess.check_call([sgdBinary, '-idf', trainingDataPath, '-omf', outputMapFile1])
-    subprocess.check_call([sgdBinary, '-idf', trainingDataPath, '-imf', outputMapFile1, '-omf', outputMapFile2, '-imis', '2'])
-    if outputSvgFile:
-        outputSvgFile = os.path.join(binDir, outputSvgFile)
-        subprocess.check_call([printBinary, '-imf', outputMapFile2, '-osf', outputSvgFile])
-
-if __name__ == '__main__':
-    import sys
-    dataFile, mapFile1, mapFile2, outFile = padList(sys.argv[1:], 4)
-    try:
-        main(dataFile, mapFile1, mapFile2, outFile)
-    except:
-        sys.exit(1)
+#try:
+#    train_and_print(args.dataFile, args.mapFile1, args.mapFile2, args.outFile)
+#except:
+#    sys.exit(1)
