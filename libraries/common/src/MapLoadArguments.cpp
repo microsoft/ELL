@@ -14,8 +14,8 @@ namespace common
             "");
         
         parser.AddOption(
-            coordinateListLoadArguments.coordinateListIgnoreSuffix,
-            "coordinateListIgnoreSuffix",
+            coordinateListLoadArguments.ignoreSuffix,
+            "ignoreSuffix",
             "clis",
             "The number of layers from the bottom of the input map to ignore",
             0);

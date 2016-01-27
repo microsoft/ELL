@@ -33,6 +33,10 @@ public:
 
     ///
     ///
+    const string& GetTargetVariableName() const;
+
+    ///
+    ///
     void SetInputCoordinates(string inputVariableName);
 
     /// \returns True if the action is not a null operations, namely, if it actually modifies the target in some way

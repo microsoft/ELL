@@ -16,6 +16,11 @@ const LinearOperation& AddToAction::GetOperation() const
     return _operation;
 }
 
+const string & AddToAction::GetTargetVariableName() const
+{
+    return _targetVariableName;
+}
+
 void AddToAction::SetInputCoordinates(string inputVariableName)
 {
     _inputVariableName = inputVariableName;

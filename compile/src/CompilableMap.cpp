@@ -14,8 +14,26 @@ using std::to_string;
 #include <memory>
 using std::dynamic_pointer_cast;
 
-void CompilableMap::ToCode() const
+void CompilableMap::ToCode(CoordinateList coordinateList) const
 {
+    // allocate datastructure to hold actions
+    vector<vector<vector<AddToAction>>> actions(NumLayers());
+    for(uint64 layerIndex = 0; layerIndex < NumLayers(); ++layerIndex)
+    {
+        actions[layerIndex].resize(_layers[layerIndex]->Size());
+    }
+
+    // backwards pass to assign actions
+    for(uint64 layerIndex = NumLayers() - 1; layerIndex > 0; --layerIndex)
+    {
+        auto compilableLayer = GetLayer<CompilableLayer>(layerIndex);
+        compilableLayer->BackwardPass(layerIndex, actions);
+    }
+
+    // forwards pass, to output code
+    for(uint64 layer = 0; layer < NumLayers(); ++layer)
+    { }
+
 }
 
 void CompilableMap::Deserialize(JsonSerializer& serializer)
@@ -23,7 +41,7 @@ void CompilableMap::Deserialize(JsonSerializer& serializer)
     serializer.Read("layers", _layers, CompilableMap::DeserializeLayers);
 }
 
-void CompilableMap::DeserializeLayers(JsonSerializer& serializer, shared_ptr<CompilableLayer>& up)
+void CompilableMap::DeserializeLayers(JsonSerializer& serializer, shared_ptr<Layer>& up)
 {
     auto type = serializer.Read<string>("_type");
     auto version = serializer.Read<int>("_version");

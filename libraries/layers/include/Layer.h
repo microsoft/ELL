@@ -24,7 +24,6 @@ namespace layers
     class Layer
     {
     public:
-
         enum class Type { zero, scale, shift, sum, decisionTreePath };
 
         /// Default ctor
@@ -45,7 +44,7 @@ namespace layers
 
         /// Computes the output of the layer
         ///
-        virtual void Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const = 0;
+        virtual void Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const = 0; // TODO - resolve the naming row vs. layer
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///

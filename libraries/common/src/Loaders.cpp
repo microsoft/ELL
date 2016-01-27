@@ -1,7 +1,7 @@
 // Loaders.cpp
 
 #include "Loaders.h"
-#include "CoordinateListFactory.h"
+#include "CoordinateListTools.h"
 
 // utilities
 #include "files.h"
@@ -79,7 +79,7 @@ namespace common
         map = GetMap(mapLoadArguments);
 
         // create list of output coordinates
-        inputCoordinates = CoordinateListIgnoreMapSuffix(map, mapLoadArguments.coordinateListLoadArguments.coordinateListIgnoreSuffix);
+        inputCoordinates = GetCoordinateList(map, mapLoadArguments.coordinateListLoadArguments);
 
         // get data iterator
         return GetDataIterator(dataLoadArguments, map, inputCoordinates);

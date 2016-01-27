@@ -103,31 +103,33 @@ R"aw(;
     // print layer by layer
     double layerTop = args.layerVerticalMargin;
     double layerLeft = args.layerHorizontalMargin;
-    for (uint64 row = 0; row < _layers.size(); ++row)
+    for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
     {
-        _layers[row]->ComputeLayout(args, layerLeft, layerTop);
+        auto printableLayer = GetLayer<IPrintableLayer>(layerIndex);
 
-        string typeName = _layers[row]->GetTypeName();
-        double layerHeight = _layers[row]->GetHeight();
+        printableLayer->ComputeLayout(args, layerLeft, layerTop);
+
+        string typeName = printableLayer->GetTypeName();
+        double layerHeight = printableLayer->GetHeight();
         double layerYMid = layerTop + layerHeight/2.0;
 
         // draw the layer rectangle
-        svgRect(os, typeName, layerLeft, layerTop, args.layerCornerRadius, _layers[row]->GetWidth(), layerHeight);
-        svgText(os, to_string(row), "Layer", layerLeft + 15, layerYMid);
+        svgRect(os, typeName, layerLeft, layerTop, args.layerCornerRadius, printableLayer->GetWidth(), layerHeight);
+        svgText(os, to_string(layerIndex), "Layer", layerLeft + 15, layerYMid);
         svgText(os, typeName, "Layer", layerLeft + 40, layerYMid, true);
 
         // let the layer print its contents
-        _layers[row]->Print(os);
+        printableLayer->Print(os);
 
         // print edges
-        if (row > 0) // skip input layer
+        if (layerIndex > 0) // skip input layer
         {
-            uint64 layerSize = _layers[row]->Size();
+            uint64 layerSize = _layers[layerIndex]->Size();
             for (uint64 column = 0; column<layerSize; ++column)
             {
-                if (!_layers[row]->IsHidden(column)) // if output is hidden, hide edge
+                if (!printableLayer->IsHidden(column)) // if output is hidden, hide edge
                 {
-                    auto inputCoordinates = dynamic_pointer_cast<Layer>(_layers[row])->GetInputCoordinates(column);
+                    auto inputCoordinates = _layers[row]->GetInputCoordinates(column);
                     while (inputCoordinates.IsValid()) // foreach incoming edge
                     {
                         auto inputCoord = inputCoordinates.Get();
@@ -159,7 +161,7 @@ void PrintableMap::Deserialize(JsonSerializer & serializer)
     serializer.Read("layers", _layers, PrintableMap::DeserializeLayers);
 }
 
-void PrintableMap::DeserializeLayers(JsonSerializer & serializer, shared_ptr<IPrintableLayer>& up)
+void PrintableMap::DeserializeLayers(JsonSerializer & serializer, shared_ptr<Layer>& up)
 {
     auto type = serializer.Read<string>("_type");
     auto version = serializer.Read<int>("_version");

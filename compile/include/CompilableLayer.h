@@ -19,13 +19,9 @@ using std::string;
 class CompilableLayer 
 {
 public:
-    /// Adds an action to the layer
-    ///
-    void AddAction(uint64 index, const AddToAction& action);
-
     /// This function is called for each layer, from the bottom up
     ///
-    virtual void BackwardPass() = 0;
+    virtual void BackwardPass(uint64 currentLayerIndex, vector<vector<vector<AddToAction>>>& actions) const = 0;
 
     //virtual void ProcessForward() = 0;
 

@@ -3,8 +3,16 @@
 #pragma once
 
 #include "IPrintableLayer.h"
-#include "CommandLineArguments.h"
+#include "CommandLineArguments.h" // TOCO change name of this file
 
+// layers
+#include "Layer.h"
+using layers::Layer;
+
+#include "Map.h"
+using layers::Map;
+
+// utilities
 #include "JsonSerializer.h"
 using utilities::JsonSerializer;
 
@@ -18,7 +26,7 @@ using std::vector;
 using std::shared_ptr;
 
 
-class PrintableMap
+class PrintableMap : public Map
 {
 public:
     /// Prints a human-friendly description of the layer to a stream
@@ -31,8 +39,5 @@ public:
 
     /// Static function for deserializing shared_ptr<Layer>
     ///
-    static void DeserializeLayers(JsonSerializer& serializer, shared_ptr<IPrintableLayer>& up);
-
-private:
-    vector<shared_ptr<IPrintableLayer>> _layers;
+    static void DeserializeLayers(JsonSerializer& serializer, shared_ptr<Layer>& up);
 };

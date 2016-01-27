@@ -1,4 +1,4 @@
-// CoordinateListTools.h
+// CoordinateListFactory.h
 
 #pragma once
 

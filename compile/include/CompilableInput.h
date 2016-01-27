@@ -11,6 +11,5 @@ using namespace layers;
 ///
 struct CompilableInput : public Input, public CompilableLayer
 {
-public:
-    virtual void BackwardPass() override {};
+    virtual void BackwardPass(uint64 currentLayerIndex, vector<vector<vector<AddToAction>>>& actions) const override;
 };

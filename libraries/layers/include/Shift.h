@@ -8,7 +8,6 @@ namespace layers
     class Shift : public Coordinatewise
     {
     public:
-
         /// Ctor
         ///
         Shift();

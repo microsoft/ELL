@@ -12,5 +12,5 @@ using namespace layers;
 struct CompilableShift : public Shift, public CompilableLayer
 {
 public:
-    virtual void BackwardPass() override {};
+    virtual void BackwardPass(uint64 currentLayerIndex, vector<vector<vector<AddToAction>>>& actions) const override;
 };

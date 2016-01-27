@@ -1,6 +1,6 @@
-// CoordinateListTools.cpp
+// CoordinateListFactory.cpp
 
-#include "CoordinateListTools.h"
+#include "CoordinateListFactory.h"
 
 namespace common
 {

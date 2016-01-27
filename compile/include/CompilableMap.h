@@ -4,9 +4,19 @@
 
 #include "CompilableLayer.h"
 
+// layers
+#include "Map.h"
+using layers::Map;
+using layers::Layer;
+
+#include "Coordinate.h"
+using layers::CoordinateList;
+
+// utilites
 #include "JsonSerializer.h"
 using utilities::JsonSerializer;
 
+// stl
 #include <iostream>
 using std::ostream;
 
@@ -17,13 +27,12 @@ using std::vector;
 using std::shared_ptr;
 
 
-class CompilableMap
+class CompilableMap : public Map
 {
 public:
-
     /// Generates C code that encodes the map
     ///
-    void ToCode() const;
+    void ToCode(CoordinateList coordinateList) const;
 
     /// Deserializes the Map in json format
     ///
@@ -31,7 +40,7 @@ public:
 
     /// Static function for deserializing shared_ptr<Layer>
     ///
-    static void DeserializeLayers(JsonSerializer& serializer, shared_ptr<CompilableLayer>& up);
+    static void DeserializeLayers(JsonSerializer& serializer, shared_ptr<Layer>& up);
 
 private:
 
@@ -39,6 +48,4 @@ private:
     /// Set actions that correspond to output values
     /// BackwardPass()
     /// ForwardPass()
-
-    vector<shared_ptr<CompilableLayer>> _layers;
 };

@@ -19,8 +19,8 @@ using utilities::CommandLineParserPrintHelpException;
 using layers::Map;
 
 // common
-// #include "Loaders.h" TODO - separate Map Loader from Data Loaders in common
-//using common::GetMap;
+#include "CoordinateListTools.h"
+using common::GetCoordinateList;
 
 #include "MapLoadArguments.h"
 using common::ParsedMapLoadArguments;
@@ -63,9 +63,9 @@ int main(int argc, char* argv[])
         auto mapFStream = OpenIfstream(mapLoadArguments.inputMapFile); 
         auto map = JsonSerializer::Load<CompilableMap>(mapFStream, "Base");
 
-        // get coordinate list
+        auto coordinateList = GetCoordinateList(map, mapLoadArguments.coordinateListLoadArguments);
 
-        map.ToCode();
+        map.ToCode(coordinateList);
 
     }
     catch(const CommandLineParserPrintHelpException& ex)

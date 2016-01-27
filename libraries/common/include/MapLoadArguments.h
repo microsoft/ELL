@@ -17,7 +17,7 @@ namespace common
 {
     struct CoordinateListLoadArguments
     {
-        uint32 coordinateListIgnoreSuffix = 0;
+        uint32 ignoreSuffix = 0;
     };
 
     /// A struct that holds command line parameters for loading maps

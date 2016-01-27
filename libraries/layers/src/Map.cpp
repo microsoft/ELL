@@ -50,18 +50,13 @@ namespace layers
         return _layers.size();
     }
 
-    uint64 Map::LayerSize(uint64 index) const
-    {
-        return _layers[index]->Size();
-    }
-
-    CoordinateList Map::GetCoordinateList(uint64 row) const
+    CoordinateList Map::GetCoordinateList(uint64 layerIndex) const
     {
         CoordinateList coordinateList;
-        uint64 numColumns = LayerSize(row);
+        uint64 numColumns = _layers[layerIndex]->Size();
         for (uint64 column = 0; column < numColumns; ++column)
         {
-            coordinateList.emplace_back(row, column);
+            coordinateList.emplace_back(layerIndex, column);
         }
         return coordinateList;
     }
