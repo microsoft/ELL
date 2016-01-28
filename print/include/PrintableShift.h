@@ -1,16 +1,16 @@
-// PrintableInput.h
+// PrintableShift.h
 
 #pragma once
 
 #include "IPrintableLayer.h"
 #include "LayerLayout.h"
 
-#include "Input.h"
-using layers::Input;
+#include "Shift.h"
+using layers::Shift;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableInput : public Input, public IPrintableLayer
+struct PrintableShift : public Shift, public IPrintableLayer
 {
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream

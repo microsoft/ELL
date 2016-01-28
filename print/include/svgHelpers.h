@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "HorizontalLayout.h"
+#include "LayerLayout.h"
 #include "IPrintableLayer.h"
 
 #include "types.h"

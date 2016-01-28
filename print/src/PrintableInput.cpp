@@ -2,12 +2,7 @@
 
 #include "PrintableInput.h"
 
-uint64 PrintableInput::Size() const
+LayerLayout PrintableInput::Print(ostream& os, double left, double top, const CommandLineArguments& args) const
 {
-    return Input::Size();
-}
-
-string PrintableInput::GetTypeName() const
-{
-    return string("IN");
+    return LayerLayout();
 }

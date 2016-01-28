@@ -1,16 +1,16 @@
-// PrintableInput.h
+// PrintableScale.h
 
 #pragma once
 
 #include "IPrintableLayer.h"
 #include "LayerLayout.h"
 
-#include "Input.h"
-using layers::Input;
+#include "Scale.h"
+using layers::Scale;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableInput : public Input, public IPrintableLayer
+struct PrintableScale : public Scale, public IPrintableLayer
 {
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream

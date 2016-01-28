@@ -1,7 +1,7 @@
 // svgHelpers.cpp
 
 #include "svgHelpers.h"
-#include "HorizontalLayout.h"
+#include "LayerLayout.h"
 
 #include <iomanip>
 using std::setprecision;
@@ -102,12 +102,13 @@ int GetPrecision(double value, int maxChars)
 
 string svgDefineElement(ostream& os, void* uid, ElementStyleArgs styleArgs)
 {
-    string typeName = "Element" + to_string((uint64)uid);
-    os << "<defs>\n<g id = \"" << typeName << "\">\n";
-    svgCircle(os, "Connector", styleArgs.width/2.0, 0, styleArgs.connectorRadius);
-    svgCircle(os, "Connector", styleArgs.width/2.0, styleArgs.height, styleArgs.connectorRadius);
-    svgRect(os, "Element", 0, 0, styleArgs.cornerRadius, styleArgs.width, styleArgs.height);
-    os << "</g>\n</defs>\n\n";
-    return typeName;
+    //string typeName = "Element" + to_string((uint64)uid);
+    //os << "<defs>\n<g id = \"" << typeName << "\">\n";
+    //svgCircle(os, "Connector", styleArgs.width/2.0, 0, styleArgs.connectorRadius);
+    //svgCircle(os, "Connector", styleArgs.width/2.0, styleArgs.height, styleArgs.connectorRadius);
+    //svgRect(os, "Element", 0, 0, styleArgs.cornerRadius, styleArgs.width, styleArgs.height);
+    //os << "</g>\n</defs>\n\n";
+    //return typeName;
+    return "";
 }
 

@@ -2,10 +2,16 @@
 
 #include "PrintableMap.h"
 #include "PrintableInput.h"
-#include "PrintableCoordinatewise.h"
+#include "PrintableShift.h"
+#include "PrintableScale.h"
 #include "PrintableSum.h"
 #include "svgHelpers.h"
 
+// utilities
+#include "StringFormat.h"
+using utilities::StringFormat;
+
+// stl
 using std::make_shared;
 
 #include <string>
@@ -14,14 +20,12 @@ using std::to_string;
 #include <memory>
 using std::dynamic_pointer_cast;
 
-void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
+namespace
 {
-    os << 
+    const char* styleDefinitionFormat = 
 R"aw(
-<html>
-<body>
-
 <style>
+
     text
     {
         font-family:    sans-serif;
@@ -68,12 +72,7 @@ R"aw(
         stroke:             #110011;
         stroke-width:       2;
         fill:               none;
-        stroke-dasharray:   )aw"; 
-    
-    os << args.edgeStyle.dashStyle;
-        
-    os <<
-R"aw(;
+        stroke-dasharray:   %s
     }
 
     text.Layer
@@ -95,65 +94,91 @@ R"aw(;
     }
 
 </style>
-
-<svg>
-
 )aw";
 
-    // print layer by layer
-    double layerTop = args.layerVerticalMargin;
-    double layerLeft = args.layerHorizontalMargin;
-    for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
-    {
-        auto printableLayer = GetLayer<IPrintableLayer>(layerIndex);
-
-        printableLayer->ComputeLayout(args, layerLeft, layerTop);
-
-        string typeName = printableLayer->GetTypeName();
-        double layerHeight = printableLayer->GetHeight();
-        double layerYMid = layerTop + layerHeight/2.0;
-
-        // draw the layer rectangle
-        svgRect(os, typeName, layerLeft, layerTop, args.layerCornerRadius, printableLayer->GetWidth(), layerHeight);
-        svgText(os, to_string(layerIndex), "Layer", layerLeft + 15, layerYMid);
-        svgText(os, typeName, "Layer", layerLeft + 40, layerYMid, true);
-
-        // let the layer print its contents
-        printableLayer->Print(os);
-
-        // print edges
-        if (layerIndex > 0) // skip input layer
-        {
-            uint64 layerSize = _layers[layerIndex]->Size();
-            for (uint64 column = 0; column<layerSize; ++column)
-            {
-                if (!printableLayer->IsHidden(column)) // if output is hidden, hide edge
-                {
-                    auto inputCoordinates = _layers[row]->GetInputCoordinates(column);
-                    while (inputCoordinates.IsValid()) // foreach incoming edge
-                    {
-                        auto inputCoord = inputCoordinates.Get();
-                        if (!_layers[inputCoord.GetRow()]->IsHidden(inputCoord.GetColumn())) // if input is hidden, hide edge
-                        {
-                            svgEdge(os, _layers[inputCoord.GetRow()]->GetBeginPoint(inputCoord.GetColumn()), _layers[row]->GetEndPoint(column), args.edgeStyle.flattness);
-                        }
-                        inputCoordinates.Next();
-                    }
-                }
-            }
-        }
-
-        // compute offset of next layer
-        layerTop += _layers[row]->GetHeight() + args.layerVerticalSpacing;
-        layerLeft += args.layerHorizontalMarginIncrement;
-    }
-
-    os << 
-R"aw(
-</svg>
-</body>
-</html>
+    const char* elementDefinitionFormat =
+        R"aw(
+<defs>
+    <g id = "%sElement">
+        <ellipse class = "Connector" cx = "%i" cy = "%i" rx = "%i" ry = "%i" />
+        <ellipse class = "Connector" cx = "%i" cy = "%i" rx = "%i" ry = "%i" />
+        <rect class = "Element" x = "%i" y = "%i" width = "%i" height = "%i" rx = "%i" ry = "%i" />
+    </g>
+</defs>
 )aw";
+
+}
+
+void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
+{
+    os << "<html>\n<body>\n";
+
+    auto styleDefinition = StringFormat(styleDefinitionFormat, args.edgeStyle.dashStyle);
+    os << styleDefinition;
+
+    os << "<svg>\n";
+
+    auto elementDefinition = StringFormat(elementDefinitionFormat, "Value", 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3);
+    os << elementDefinition;
+
+
+
+
+//    // print layer by layer
+//    double layerTop = args.layerVerticalMargin;
+//    double layerLeft = args.layerHorizontalMargin;
+//    for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
+//    {
+//        auto layer = GetLayer<IPrintableLayer>(layerIndex);
+//
+//        layer->ComputeLayout(args, layerLeft, layerTop);
+//
+//        string typeName = layer->GetTypeName();
+//        double layerHeight = layer->GetHeight();
+//        double layerYMid = layerTop + layerHeight/2.0;
+//
+//        // draw the layer rectangle
+//        svgRect(os, typeName, layerLeft, layerTop, args.layerCornerRadius, layer->GetWidth(), layerHeight);
+//        svgText(os, to_string(layerIndex), "Layer", layerLeft + 15, layerYMid);
+//        svgText(os, typeName, "Layer", layerLeft + 40, layerYMid, true);
+//
+//        // let the layer print its contents
+//        layer->Print(os);
+//
+//        // print edges
+//        if (layerIndex > 0) // skip input layer
+//        {
+//            uint64 layerSize = _layers[layerIndex]->Size();
+//            for (uint64 column = 0; column<layerSize; ++column)
+//            {
+//                if (!layer->IsHidden(column)) // if output is hidden, hide edge
+//                {
+//                    auto inputCoordinates = _layers[layerIndex]->GetInputCoordinates(column);
+//                    while (inputCoordinates.IsValid()) // foreach incoming edge
+//                    {
+//                        auto coordinate = inputCoordinates.Get();
+//                        auto inputLayer = GetLayer<IPrintableLayer>(coordinate.GetRow());
+//                        if (!inputLayer->IsHidden(coordinate.GetColumn())) // if input is hidden, hide edge
+//                        {
+//                            svgEdge(os, inputLayer->GetOutputPoint(coordinate.GetColumn()), layer->GetInputPoint(column), args.edgeStyle.flattness);
+//                        }
+//                        inputCoordinates.Next();
+//                    }
+//                }
+//            }
+//        }
+//
+//        // compute offset of next layer
+//        layerTop += layer->GetHeight() + args.layerVerticalSpacing;
+//        layerLeft += args.layerHorizontalMarginIncrement;
+//    }
+//
+//    os << 
+//R"aw(
+//</svg>
+//</body>
+//</html>
+//)aw";
 }
 
 void PrintableMap::Deserialize(JsonSerializer & serializer)
@@ -174,13 +199,13 @@ void PrintableMap::DeserializeLayers(JsonSerializer & serializer, shared_ptr<Lay
     }
     else if (type == "Scale")
     {
-        auto upScale = make_shared<PrintableCoordinatewise>("SCALE");
+        auto upScale = make_shared<PrintableScale>();
         upScale->Deserialize(serializer, version);
         up = upScale;
     }
     else if (type == "Shift")
     {
-        auto upShift = make_shared<PrintableCoordinatewise>("SHIFT");
+        auto upShift = make_shared<PrintableShift>();
         upShift->Deserialize(serializer, version);
         up = upShift;
     }

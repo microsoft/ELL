@@ -13,23 +13,25 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/BinaryClassificationEvaluator.cpp
-                   src/CommandLineParser.cpp
-                   src/JsonSerializer.cpp
-                   src/files.cpp
-                   src/randomEngines.cpp
-                   ../amalgamated_jsoncpp/jsoncpp.cpp)
+         src/CommandLineParser.cpp
+         src/JsonSerializer.cpp
+         src/files.cpp
+         src/randomEngines.cpp
+         ../amalgamated_jsoncpp/jsoncpp.cpp)
 
 set (INCLUDE include/BinaryClassificationEvaluator.h
-                       include/CommandLineParser.h
-                       include/JsonSerializer.h
-                       include/Parser.h
-                       include/files.h
-                       include/randomEngines.h)
+             include/CommandLineParser.h
+             include/files.h
+             include/JsonSerializer.h
+             include/Parser.h
+             include/StringFormat.h
+             include/randomEngines.h)
 
 set (TCC tcc/BinaryClassificationEvaluator.tcc
                    tcc/CommandLineParser.tcc
                    tcc/JsonSerializer.tcc
                    tcc/Parser.tcc
+                   tcc/StringFormat.tcc
                    tcc/VectorIterator.tcc)
                    
 source_group("src" FILES ${SRC})

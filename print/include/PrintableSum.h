@@ -2,22 +2,18 @@
 
 #pragma once
 
-#include "PrintableEmpty.h"
-#include "HorizontalLayout.h"
+#include "IPrintableLayer.h"
+#include "LayerLayout.h"
 
-#include "layers.h"
-using namespace layers;
+#include "Sum.h"
+using layers::Sum;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableSum : public Sum, public PrintableEmpty
+struct PrintableSum : public Sum, public IPrintableLayer
 {
 public:
-    /// Returns the number of elements in the layer
+    /// Prints a human-firiendly description of the underlying class to an output stream
     ///
-    virtual uint64 Size() const override;
-
-    /// \returns the layer type name
-    ///
-    virtual string GetTypeName() const override;
+    virtual LayerLayout Print(ostream& os, double left, double top, const CommandLineArguments& args) const override;
 };
