@@ -16,6 +16,7 @@ using std::make_shared;
 
 #include <string>
 using std::to_string;
+using std::endl;
 
 #include <memory>
 using std::dynamic_pointer_cast;
@@ -37,22 +38,22 @@ R"aw(
         stroke-width:    2;
     }
     
-    rect.SCALE
+    rect.Scale
     {
         fill:        #06aed5;
     }
 
-    rect.SHIFT
+    rect.Shift
     {
         fill:        #f15156;
     }
 
-    rect.SUM
+    rect.Sum
     {
         fill:        #cf4eff;
     }
 
-    rect.IN
+    rect.Input
     {
         fill:        #bbbbbb;
     }
@@ -99,10 +100,10 @@ R"aw(
     const char* elementDefinitionFormat =
         R"aw(
 <defs>
-    <g id = "%sElement">
-        <ellipse class = "Connector" cx = "%i" cy = "%i" rx = "%i" ry = "%i" />
-        <ellipse class = "Connector" cx = "%i" cy = "%i" rx = "%i" ry = "%i" />
-        <rect class = "Element" x = "%i" y = "%i" width = "%i" height = "%i" rx = "%i" ry = "%i" />
+    <g id="%sElement">
+        <ellipse class="Connector" cx="%i" cy="%i" rx="%i" ry="%i" />
+        <ellipse class="Connector" cx="%i" cy="%i" rx="%i" ry="%i" />
+        <rect class="Element" x="0" y="0" width="%i" height="%i" rx="%i" ry="%i" />
     </g>
 </defs>
 )aw";
@@ -112,31 +113,38 @@ R"aw(
 void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
 {
     os << "<html>\n<body>\n";
-
-    auto styleDefinition = StringFormat(styleDefinitionFormat, args.edgeStyle.dashStyle);
-    os << styleDefinition;
+    os << StringFormat(styleDefinitionFormat, args.edgeStyle.dashStyle);
 
     os << "<svg>\n";
 
-    auto elementDefinition = StringFormat(elementDefinitionFormat, "Value", 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3);
-    os << elementDefinition;
+    // define element shapes
+    os << StringFormat(elementDefinitionFormat,
+        "Value",
+        args.valueElementLayout.width / 2.0, 0, args.valueElementLayout.connectorRadius, args.valueElementLayout.connectorRadius,
+        args.valueElementLayout.width / 2.0, args.valueElementLayout.height, args.valueElementLayout.connectorRadius, args.valueElementLayout.connectorRadius,
+        args.valueElementLayout.width, args.valueElementLayout.height, args.valueElementStyle.cornerRadius, args.valueElementStyle.cornerRadius);
+
+    os << endl;
+    os << StringFormat(elementDefinitionFormat,
+        "Empty",
+        args.emptyElementLayout.width / 2.0, 0, args.emptyElementLayout.connectorRadius, args.emptyElementLayout.connectorRadius,
+        args.emptyElementLayout.width / 2.0, args.emptyElementLayout.height, args.emptyElementLayout.connectorRadius, args.emptyElementLayout.connectorRadius,
+        args.emptyElementLayout.width, args.emptyElementLayout.height, args.emptyElementStyle.cornerRadius, args.emptyElementStyle.cornerRadius);
+
+    // print layer by layer
+    double layerTop = args.layerLayout.verticalMargin;
+    vector<LayerLayout> layouts;
+
+    for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
+    {
+        auto printableLayer = GetLayer<PrintableLayer>(layerIndex);
+
+        auto layout = printableLayer->Print(os, args.layerLayout.horizontalMargin, layerTop, args); // TODO args not needed
+
+        layerTop += layout.GetHeight() + args.layerLayout.verticalSpacing;
 
 
-
-
-//    // print layer by layer
-//    double layerTop = args.layerVerticalMargin;
-//    double layerLeft = args.layerHorizontalMargin;
-//    for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
-//    {
-//        auto layer = GetLayer<IPrintableLayer>(layerIndex);
-//
-//        layer->ComputeLayout(args, layerLeft, layerTop);
-//
-//        string typeName = layer->GetTypeName();
-//        double layerHeight = layer->GetHeight();
-//        double layerYMid = layerTop + layerHeight/2.0;
-//
+        //
 //        // draw the layer rectangle
 //        svgRect(os, typeName, layerLeft, layerTop, args.layerCornerRadius, layer->GetWidth(), layerHeight);
 //        svgText(os, to_string(layerIndex), "Layer", layerLeft + 15, layerYMid);
@@ -157,7 +165,7 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
 //                    while (inputCoordinates.IsValid()) // foreach incoming edge
 //                    {
 //                        auto coordinate = inputCoordinates.Get();
-//                        auto inputLayer = GetLayer<IPrintableLayer>(coordinate.GetRow());
+//                        auto inputLayer = GetLayer<PrintableLayer>(coordinate.GetRow());
 //                        if (!inputLayer->IsHidden(coordinate.GetColumn())) // if input is hidden, hide edge
 //                        {
 //                            svgEdge(os, inputLayer->GetOutputPoint(coordinate.GetColumn()), layer->GetInputPoint(column), args.edgeStyle.flattness);
@@ -179,6 +187,7 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
 //</body>
 //</html>
 //)aw";
+    }
 }
 
 void PrintableMap::Deserialize(JsonSerializer & serializer)

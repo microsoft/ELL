@@ -9,6 +9,9 @@ LayerLayout PrintableScale::Print(ostream & os, double left, double top, const C
     // calculate the layout
     LayerLayout layout(Size(), args.layerLayout.maxWidth, args.valueElementLayout);
 
+    PrintableLayer::Print(os, left, top, layout);
+
+
    //// define the element shape
    //string elementDefName = svgDefineElement(os, (void*)this, args.valueElementStyle);
 

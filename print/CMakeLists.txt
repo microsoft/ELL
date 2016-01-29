@@ -14,23 +14,24 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/LayerLayout.cpp
-               src/PrintableInput.cpp
-               src/PrintableMap.cpp
-               src/PrintableScale.cpp
-               src/PrintableShift.cpp
-               src/PrintableSum.cpp
-               src/main.cpp
-               src/svgHelpers.cpp)
+         src/PrintableInput.cpp
+         src/PrintableLayer.cpp
+         src/PrintableMap.cpp
+         src/PrintableScale.cpp
+         src/PrintableShift.cpp
+         src/PrintableSum.cpp
+         src/main.cpp
+         src/svgHelpers.cpp)
 
 set (INCLUDE include/CommandLineArguments.h
-                   include/LayerLayout.h
-                   include/IPrintableLayer.h
-                   include/PrintableInput.h
-                   include/PrintableMap.h
-                   include/PrintableScale.h
-                   include/PrintableShift.h
-                   include/PrintableSum.h
-                   include/svgHelpers.h)
+             include/LayerLayout.h
+             include/PrintableLayer.h
+             include/PrintableInput.h
+             include/PrintableMap.h
+             include/PrintableScale.h
+             include/PrintableShift.h
+             include/PrintableSum.h
+             include/svgHelpers.h)
          
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

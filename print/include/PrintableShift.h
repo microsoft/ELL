@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "IPrintableLayer.h"
+#include "PrintableLayer.h"
 #include "LayerLayout.h"
 
 #include "Shift.h"
@@ -10,7 +10,7 @@ using layers::Shift;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableShift : public Shift, public IPrintableLayer
+struct PrintableShift : public Shift, public PrintableLayer
 {
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream

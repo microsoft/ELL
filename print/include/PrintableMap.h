@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "IPrintableLayer.h"
+#include "PrintableLayer.h"
 #include "CommandLineArguments.h" // TOCO change name of this file
 
 // layers

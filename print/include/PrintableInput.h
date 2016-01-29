@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "IPrintableLayer.h"
+#include "PrintableLayer.h"
 #include "LayerLayout.h"
 
 #include "Input.h"
@@ -10,7 +10,7 @@ using layers::Input;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableInput : public Input, public IPrintableLayer
+struct PrintableInput : public Input, public PrintableLayer
 {
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream
