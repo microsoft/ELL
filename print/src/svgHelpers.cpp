@@ -55,21 +55,21 @@ int GetPrecision(double number, int maxChars)
     return precision;
 }
 
-void svgRect(ostream& os, uint64 numTabs, const char* svgClass, double x, double y, double width, double height, double radius)
+void svgRect(ostream& os, uint64 numTabs, const string& svgClass, double x, double y, double width, double height, double radius)
 {
     svgTab(os, numTabs);
     auto format = R"aw(<rect class="%s" x="%f" y="%f" width="%f" height="%f" rx="%f" ry="%f" />\n)aw";
     StringFormat(os, format, svgClass, x, y, width, height, radius, radius);
 }
 
-void svgCircle(ostream& os, uint64 numTabs, const char* svgClass, double cx, double cy, double radius)
+void svgCircle(ostream& os, uint64 numTabs, const string& svgClass, double cx, double cy, double radius)
 {
     svgTab(os, numTabs);
     auto format = R"aw(<rect class="%s" cx="%f" cy="%f" rx="%f" ry="%f" />\n)aw";
     StringFormat(os, format, svgClass, cx, cy, radius, radius);
 }
 
-void svgText(ostream& os, uint64 numTabs, const char* svgClass, double cx, double cy, string text, double rotate)
+void svgText(ostream& os, uint64 numTabs, const string& svgClass, double cx, double cy, string text, double rotate)
 {
     svgTab(os, numTabs);
     auto format = R"aw(<text class="%s" x="%f" y="%f" text-anchor="middle" dy=".4em"  transform="rotate(%f,%f,%f)">)aw";
@@ -77,33 +77,37 @@ void svgText(ostream& os, uint64 numTabs, const char* svgClass, double cx, doubl
     os << text << "</text>\n";
 }
 
-void svgNumber(ostream& os, uint64 numTabs, const char* svgClass, double cx, double cy, double number, int maxChars, double rotate)
+void svgNumber(ostream& os, uint64 numTabs, const string& svgClass, double cx, double cy, double number, int maxChars, double rotate)
 {
     stringstream ss;
     ss << fixed << setprecision(GetPrecision(number, maxChars)) << number;
-    svgText(os, numTabs, svgClass, cx, cy, ss.str().c_str(), rotate);
+    svgText(os, numTabs, svgClass, cx, cy, ss.str(), rotate);
 }
 
-void svgUse(ostream& os, string href, double x, double y)
+void svgUse(ostream& os, uint64 numTabs, string id, double x, double y)
 {
-    os << "    <use xlink:href=\"#" << href << "\" x=\"" << x << "\" y=\"" << y << "\" />\n";
+    svgTab(os, numTabs);
+    auto format = R"aw(<use xlink:href="#%s" x="%f" y="%f" />)aw";
+    StringFormat(os, format, id, x, y);
 }
 
-void svgDots(ostream& os, double cx, double cy)
+void svgDots(ostream& os, uint64 numTabs, double cx, double cy)
 {
-    //svgCircle(os, "Dots", cx-8, cy, 2);
-    //svgCircle(os, "Dots", cx, cy, 2);
-    //svgCircle(os, "Dots", cx+8, cy, 2);
+    svgCircle(os, numTabs, "Dots", cx-8, cy, 2);
+    svgCircle(os, numTabs, "Dots", cx, cy, 2);
+    svgCircle(os, numTabs, "Dots", cx+8, cy, 2);
 }
 
-void svgEdge(ostream & os, Point from, Point to, double edgeFlattness)
+void svgEdge(ostream & os, uint64 numTabs, Point from, Point to, double edgeFlattness)
 {
     double xDist = to.x - from.x;
     double yDist = to.y - from.y;
 
     if (xDist == 0)
     {
-        os << "    <path class=\"Edge\" d=\"M " << from.x << " " << from.y << " L " << to.x << " " << to.y << "\"/>\n";
+        svgTab(os, numTabs);
+        const char* format = R"aw(<path class="Edge" d="M %f %f L %f %f />)aw";
+        StringFormat(os, format, from.x, from.y, to.x, to.y);
     }
 
     else
@@ -116,19 +120,12 @@ void svgEdge(ostream & os, Point from, Point to, double edgeFlattness)
 
         const double slopeDy = yDist - 2.0 * drop;
 
-        os << "    <path class=\"Edge\" d=\"M " << from.x << " " << from.y << " q 0 " << drop << " " << xDist*qFrac << " " << drop+slopeDy*qFrac << " l " << xDist*slopeFrac << " " << slopeDy*slopeFrac << " q " << xDist*qFrac << " " << slopeDy*qFrac << " " << xDist*qFrac << " " << drop+slopeDy*qFrac << "\"/>\n";
+        svgTab(os, numTabs);
+        const char* format = R"aw(<path class="Edge" d="M %f %f q 0 %f %f %f l %f %f q %f %f %f %f />)aw";
+        StringFormat(os, format, 
+            from.x, from.y, 
+            drop, xDist*qFrac, drop+slopeDy*qFrac, 
+            xDist*slopeFrac, slopeDy*slopeFrac, 
+            xDist*qFrac, slopeDy*qFrac, xDist*qFrac, drop+slopeDy*qFrac);
     }
 }
-
-string svgDefineElement(ostream& os, void* uid, ElementStyleArgs styleArgs)
-{
-    //string typeName = "Element" + to_string((uint64)uid);
-    //os << "<defs>\n<g id = \"" << typeName << "\">\n";
-    //svgCircle(os, "Connector", styleArgs.width/2.0, 0, styleArgs.connectorRadius);
-    //svgCircle(os, "Connector", styleArgs.width/2.0, styleArgs.height, styleArgs.connectorRadius);
-    //svgRect(os, "Element", 0, 0, styleArgs.cornerRadius, styleArgs.width, styleArgs.height);
-    //os << "</g>\n</defs>\n\n";
-    //return typeName;
-    return "";
-}
-
