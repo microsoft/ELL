@@ -8,6 +8,7 @@ LayerLayout::LayerLayout(uint64 numElements, double layerMaxWidth, ElementLayout
     _connectorOffset = (args.height + args.connectorRadius) / 2.0;
     _connectorRadius = args.connectorRadius;
     _layerHeight = args.height + 2.0 * args.verticalPadding;
+    _midY = _layerHeight / 2.0;
 
     // width of the layer without abbreviated format 
     double layerWidth = args.leftPadding + args.rightPadding + numElements * args.width + (numElements - 1) * args.horizontalSpacing;
@@ -91,6 +92,11 @@ bool LayerLayout::IsHidden(uint64 index) const
         return false;
     }
     return true;
+}
+
+double LayerLayout::GetMidY() const
+{
+    return _midY;
 }
 
 double LayerLayout::GetMidX(uint64 index) const

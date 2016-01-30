@@ -3,11 +3,12 @@
 #include "PrintableShift.h"
 #include "svgHelpers.h"
 
-
-LayerLayout PrintableShift::Print(ostream & os, double left, double top, const CommandLineArguments & args) const
+LayerLayout PrintableShift::Print(ostream & os, double left, double top, uint64 layerIndex, const CommandLineArguments & args) const
 {
     // calculate the layout
     LayerLayout layout(Size(), args.layerLayout.maxWidth, args.valueElementLayout);
+
+    PrintableLayer::Print(os, left, top, layerIndex, GetTypeName(), layout, args.layerStyle);
 
    //// define the element shape
    //string elementDefName = svgDefineElement(os, (void*)this, args.valueElementStyle);

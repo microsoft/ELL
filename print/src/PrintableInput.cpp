@@ -2,7 +2,12 @@
 
 #include "PrintableInput.h"
 
-LayerLayout PrintableInput::Print(ostream& os, double left, double top, const CommandLineArguments& args) const
+LayerLayout PrintableInput::Print(ostream& os, double left, double top, uint64 layerIndex, const CommandLineArguments& args) const
 {
-    return LayerLayout();
+    // calculate the layout
+    LayerLayout layout(Size(), args.layerLayout.maxWidth, args.emptyElementLayout);
+
+    PrintableLayer::Print(os, left, top, layerIndex, "Input", layout, args.layerStyle);
+
+    return layout;
 }

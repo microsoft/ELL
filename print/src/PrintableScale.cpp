@@ -4,12 +4,12 @@
 #include "svgHelpers.h"
 
 
-LayerLayout PrintableScale::Print(ostream & os, double left, double top, const CommandLineArguments & args) const
+LayerLayout PrintableScale::Print(ostream & os, double left, double top, uint64 layerIndex, const CommandLineArguments & args) const
 {
     // calculate the layout
     LayerLayout layout(Size(), args.layerLayout.maxWidth, args.valueElementLayout);
 
-    PrintableLayer::Print(os, left, top, layout);
+    PrintableLayer::Print(os, left, top, layerIndex, GetTypeName(), layout, args.layerStyle);
 
 
    //// define the element shape

@@ -24,10 +24,10 @@ class PrintableLayer
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///
-    virtual LayerLayout Print(ostream& os, double left, double top, const CommandLineArguments& args) const = 0;
+    virtual LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const CommandLineArguments& args) const = 0;
 
 protected:
-    void Print(ostream& os, double left, double top, const LayerLayout& layout) const;
+    void Print(ostream& os, double left, double top, uint64 layerIndex, const string& typeName, const LayerLayout& layout, const LayerStyleArgs& args) const;
 };
 
  

@@ -58,15 +58,17 @@ int GetPrecision(double number, int maxChars)
 void svgRect(ostream& os, uint64 numTabs, const string& svgClass, double x, double y, double width, double height, double radius)
 {
     svgTab(os, numTabs);
-    auto format = R"aw(<rect class="%s" x="%f" y="%f" width="%f" height="%f" rx="%f" ry="%f" />\n)aw";
+    auto format = R"aw(<rect class="%s" x="%f" y="%f" width="%f" height="%f" rx="%f" ry="%f" />)aw";
     StringFormat(os, format, svgClass, x, y, width, height, radius, radius);
+    os << endl;
 }
 
 void svgCircle(ostream& os, uint64 numTabs, const string& svgClass, double cx, double cy, double radius)
 {
     svgTab(os, numTabs);
-    auto format = R"aw(<rect class="%s" cx="%f" cy="%f" rx="%f" ry="%f" />\n)aw";
+    auto format = R"aw(<rect class="%s" cx="%f" cy="%f" rx="%f" ry="%f" />)aw";
     StringFormat(os, format, svgClass, cx, cy, radius, radius);
+    os << endl;
 }
 
 void svgText(ostream& os, uint64 numTabs, const string& svgClass, double cx, double cy, string text, double rotate)
@@ -89,6 +91,7 @@ void svgUse(ostream& os, uint64 numTabs, string id, double x, double y)
     svgTab(os, numTabs);
     auto format = R"aw(<use xlink:href="#%s" x="%f" y="%f" />)aw";
     StringFormat(os, format, id, x, y);
+    os << endl;
 }
 
 void svgDots(ostream& os, uint64 numTabs, double cx, double cy)
@@ -128,4 +131,6 @@ void svgEdge(ostream & os, uint64 numTabs, Point from, Point to, double edgeFlat
             xDist*slopeFrac, slopeDy*slopeFrac, 
             xDist*qFrac, slopeDy*qFrac, xDist*qFrac, drop+slopeDy*qFrac);
     }
+
+    os << endl;
 }

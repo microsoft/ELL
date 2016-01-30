@@ -32,16 +32,8 @@ using std::runtime_error;
 #include <memory>
 using std::dynamic_pointer_cast;
 
-#include "StringFormat.h"
-using utilities::StringFormat;
-
 int main(int argc, char* argv[])
 {
-
-    StringFormat(cout, "this is a test of %f things and %f things more", 5.0, 8, 6, 6, 6);
-
-
-
     try
     {
         // parse the command line
@@ -54,9 +46,8 @@ int main(int argc, char* argv[])
         auto mapFStream = OpenIfstream(args.mapFile); // TODO: use common args and common loader
         auto map = JsonSerializer::Load<PrintableMap>(mapFStream, "Base");
         
-//        auto outputSvgFStream = OpenOfstream(args.svgFile);
-//        map.Print(outputSvgFStream, args);
-        map.Print(cout, args);
+        auto outputSvgFStream = OpenOfstream(args.svgFile);
+        map.Print(outputSvgFStream, args);
     }
     catch (const CommandLineParserPrintHelpException& ex)
     {

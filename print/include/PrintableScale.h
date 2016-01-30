@@ -15,5 +15,5 @@ struct PrintableScale : public Scale, public PrintableLayer
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///
-    virtual LayerLayout Print(ostream& os, double left, double top, const CommandLineArguments& args) const override;
+    virtual LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const CommandLineArguments& args) const override;
 };

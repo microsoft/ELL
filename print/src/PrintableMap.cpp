@@ -37,38 +37,38 @@ R"aw(
 
         rect
         {
-            stroke:        #222222;
-            stroke-width:    2;
+            stroke:         #222222;
+            stroke-width:   2;
         }
     
         rect.Scale
         {
-            fill:        #06aed5;
+            fill:           #06aed5;
         }
 
         rect.Shift
         {
-            fill:        #f15156;
+            fill:           #f15156;
         }
 
         rect.Sum
         {
-            fill:        #cf4eff;
+            fill:           #cf4eff;
         }
 
         rect.Input
         {
-            fill:        #bbbbbb;
+            fill:           #bbbbbb;
         }
 
         rect.Element
         {
-            fill:        white;
+            fill:           white;
         }
 
         ellipse.Connector
         {
-            fill:        #222222;
+            fill:           #222222;
         }
 
         path.Edge
@@ -76,53 +76,39 @@ R"aw(
             stroke:             #110011;
             stroke-width:       2;
             fill:               none;
-            stroke-dasharray:   %s
+            stroke-dasharray:   %s;
         }
 
         text.Layer
         {
             fill:           white;
-            font:           bold 15 sans-serif;        
+            font:           bold 15 sans-serif;
         }
 
                 text.Element
         {
             fill:           black;
-            font:           15 sans-serif;        
+            font:           15 sans-serif;
         }
 
                 text.ElementIndex
         {
             fill:           #666666;
-            font:           9 sans-serif;        
+            font:           9 sans-serif;
         }
 
     </style>
+
 )aw";
 }
 
-
-string GetElementDefinitionString(const char* elementId, double width, double height, double connectorRadius, double cornerRadius)
+void PrintElementDefinition(ostream& os, const string& id, double width, double height, double connectorRadius, double cornerRadius)
 {
-//    stringstream ss;
-//    ss << "    <defs>\n        <g id=\"" << elementId << "\" />\n";
-//    ss << 
-//            <ellipse class="Connector" cx="0" cy="%f" rx="%f" ry="%f" />
-//            <ellipse class="Connector" cx="0" cy="%f" rx="%f" ry="%f" />
-//            <rect class="Element" x="%f" y="%f" width="%f" height="%f" rx="%f" ry="%f" />
-//        </g>
-//    </defs>
-//)aw";
-//
-//    auto string = StringFormat(elementDefinitionFormat,
-//                               elementId,
-//                               height/2, connectorRadius, connectorRadius,
-//                               -height/2, connectorRadius, connectorRadius,
-//                               -width/2, -height/2, width, height, cornerRadius, cornerRadius);
-//
-//    return string;
-
-    return "xx";
+    os << "            <g id=\"" << id << "\" />\n";
+    svgCircle(os, 4, "Connector", 0, height/2, connectorRadius);
+    svgCircle(os, 4, "Connector", 0, -height/2, connectorRadius);
+    svgRect(os, 4, "Element", -width/2, -height/2, width, height, cornerRadius);
+    os << "            </g>\n";
 }
 
 void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
@@ -130,14 +116,10 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
     os << "<html>\n<body>\n";
     StringFormat(os, styleDefinitionFormat, args.edgeStyle.dashStyle);
 
-    os << "<svg>\n";
-
-    // define element shapes
-    os << GetElementDefinitionString("ValueElement", args.valueElementLayout.width, args.valueElementLayout.height, args.valueElementLayout.connectorRadius, args.valueElementStyle.cornerRadius);
-
-    os << endl;
-
-    os << GetElementDefinitionString("EmptyElement", args.emptyElementLayout.width, args.emptyElementLayout.height, args.emptyElementLayout.connectorRadius, args.emptyElementStyle.cornerRadius);
+    os << "    <svg>\n\n        <defs>\n";
+    PrintElementDefinition(os, "ValueElement", args.valueElementLayout.width, args.valueElementLayout.height, args.valueElementLayout.connectorRadius, args.valueElementStyle.cornerRadius);
+    PrintElementDefinition(os, "EmptyElement", args.emptyElementLayout.width, args.emptyElementLayout.height, args.emptyElementLayout.connectorRadius, args.emptyElementStyle.cornerRadius);
+    os << "        </defs>\n\n";
 
     // print layer by layer
     double layerTop = args.layerLayout.verticalMargin;
@@ -146,21 +128,9 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
     for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
     {
         auto printableLayer = GetLayer<PrintableLayer>(layerIndex);
-
-        auto layout = printableLayer->Print(os, args.layerLayout.horizontalMargin, layerTop, args); // TODO args not needed
-
+        auto layout = printableLayer->Print(os, args.layerLayout.horizontalMargin, layerTop, layerIndex, args); // TODO args not needed
         layerTop += layout.GetHeight() + args.layerLayout.verticalSpacing;
 
-
-        //
-//        // draw the layer rectangle
-//        svgRect(os, typeName, layerLeft, layerTop, args.layerCornerRadius, layer->GetWidth(), layerHeight);
-//        svgText(os, to_string(layerIndex), "Layer", layerLeft + 15, layerYMid);
-//        svgText(os, typeName, "Layer", layerLeft + 40, layerYMid, true);
-//
-//        // let the layer print its contents
-//        layer->Print(os);
-//
 //        // print edges
 //        if (layerIndex > 0) // skip input layer
 //        {
@@ -196,6 +166,8 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
 //</html>
 //)aw";
     }
+
+    os << "\n    </svg>\n\n<html>\n<body>\n";
 }
 
 void PrintableMap::Deserialize(JsonSerializer & serializer)

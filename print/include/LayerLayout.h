@@ -28,8 +28,6 @@ class LayerLayout
 {
 public:
 
-    LayerLayout() {} // TODO remove this
-
     /// Ctor
     ///
     LayerLayout(uint64 numElements, double layerMaxWidth, ElementLayoutArgs args);
@@ -49,6 +47,10 @@ public:
     /// \returns True if the specified element is hidden
     ///
     bool IsHidden(uint64 index) const;
+
+    /// \returns the x-axis value of the middle of the requested element
+    ///
+    double GetMidY() const;
 
     /// \returns the x-axis value of the middle of the requested element
     ///
