@@ -18,118 +18,126 @@ using std::make_shared;
 using std::to_string;
 using std::endl;
 
+#include <sstream>
+using std::stringstream;
+
 #include <memory>
 using std::dynamic_pointer_cast;
 
 namespace
 {
-    const char* styleDefinitionFormat = 
+    const char* styleDefinitionFormat =
 R"aw(
-<style>
+    <style>
 
-    text
-    {
-        font-family:    sans-serif;
-    }
+        text
+        {
+            font-family:    sans-serif;
+        }
 
-    rect
-    {
-        stroke:        #222222;
-        stroke-width:    2;
-    }
+        rect
+        {
+            stroke:        #222222;
+            stroke-width:    2;
+        }
     
-    rect.Scale
-    {
-        fill:        #06aed5;
-    }
+        rect.Scale
+        {
+            fill:        #06aed5;
+        }
 
-    rect.Shift
-    {
-        fill:        #f15156;
-    }
+        rect.Shift
+        {
+            fill:        #f15156;
+        }
 
-    rect.Sum
-    {
-        fill:        #cf4eff;
-    }
+        rect.Sum
+        {
+            fill:        #cf4eff;
+        }
 
-    rect.Input
-    {
-        fill:        #bbbbbb;
-    }
+        rect.Input
+        {
+            fill:        #bbbbbb;
+        }
 
-    rect.Element
-    {
-        fill:        white;
-    }
+        rect.Element
+        {
+            fill:        white;
+        }
 
-    ellipse.Connector
-    {
-        fill:        #222222;
-    }
+        ellipse.Connector
+        {
+            fill:        #222222;
+        }
 
-    path.Edge
-    {
-        stroke:             #110011;
-        stroke-width:       2;
-        fill:               none;
-        stroke-dasharray:   %s
-    }
+        path.Edge
+        {
+            stroke:             #110011;
+            stroke-width:       2;
+            fill:               none;
+            stroke-dasharray:   %s
+        }
 
-    text.Layer
-    {
-        fill:           white;
-        font:           bold 15 sans-serif;        
-    }
+        text.Layer
+        {
+            fill:           white;
+            font:           bold 15 sans-serif;        
+        }
 
-    text.Element
-    {
-        fill:           black;
-        font:           15 sans-serif;        
-    }
+                text.Element
+        {
+            fill:           black;
+            font:           15 sans-serif;        
+        }
 
-    text.ElementIndex
-    {
-        fill:           #666666;
-        font:           9 sans-serif;        
-    }
+                text.ElementIndex
+        {
+            fill:           #666666;
+            font:           9 sans-serif;        
+        }
 
-</style>
+    </style>
 )aw";
+}
 
-    const char* elementDefinitionFormat =
-        R"aw(
-<defs>
-    <g id="%sElement">
-        <ellipse class="Connector" cx="%i" cy="%i" rx="%i" ry="%i" />
-        <ellipse class="Connector" cx="%i" cy="%i" rx="%i" ry="%i" />
-        <rect class="Element" x="0" y="0" width="%i" height="%i" rx="%i" ry="%i" />
-    </g>
-</defs>
-)aw";
 
+string GetElementDefinitionString(const char* elementId, double width, double height, double connectorRadius, double cornerRadius)
+{
+//    stringstream ss;
+//    ss << "    <defs>\n        <g id=\"" << elementId << "\" />\n";
+//    ss << 
+//            <ellipse class="Connector" cx="0" cy="%f" rx="%f" ry="%f" />
+//            <ellipse class="Connector" cx="0" cy="%f" rx="%f" ry="%f" />
+//            <rect class="Element" x="%f" y="%f" width="%f" height="%f" rx="%f" ry="%f" />
+//        </g>
+//    </defs>
+//)aw";
+//
+//    auto string = StringFormat(elementDefinitionFormat,
+//                               elementId,
+//                               height/2, connectorRadius, connectorRadius,
+//                               -height/2, connectorRadius, connectorRadius,
+//                               -width/2, -height/2, width, height, cornerRadius, cornerRadius);
+//
+//    return string;
+
+    return "xx";
 }
 
 void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
 {
     os << "<html>\n<body>\n";
-    os << StringFormat(styleDefinitionFormat, args.edgeStyle.dashStyle);
+    StringFormat(os, styleDefinitionFormat, args.edgeStyle.dashStyle);
 
     os << "<svg>\n";
 
     // define element shapes
-    os << StringFormat(elementDefinitionFormat,
-        "Value",
-        args.valueElementLayout.width / 2.0, 0, args.valueElementLayout.connectorRadius, args.valueElementLayout.connectorRadius,
-        args.valueElementLayout.width / 2.0, args.valueElementLayout.height, args.valueElementLayout.connectorRadius, args.valueElementLayout.connectorRadius,
-        args.valueElementLayout.width, args.valueElementLayout.height, args.valueElementStyle.cornerRadius, args.valueElementStyle.cornerRadius);
+    os << GetElementDefinitionString("ValueElement", args.valueElementLayout.width, args.valueElementLayout.height, args.valueElementLayout.connectorRadius, args.valueElementStyle.cornerRadius);
 
     os << endl;
-    os << StringFormat(elementDefinitionFormat,
-        "Empty",
-        args.emptyElementLayout.width / 2.0, 0, args.emptyElementLayout.connectorRadius, args.emptyElementLayout.connectorRadius,
-        args.emptyElementLayout.width / 2.0, args.emptyElementLayout.height, args.emptyElementLayout.connectorRadius, args.emptyElementLayout.connectorRadius,
-        args.emptyElementLayout.width, args.emptyElementLayout.height, args.emptyElementStyle.cornerRadius, args.emptyElementStyle.cornerRadius);
+
+    os << GetElementDefinitionString("EmptyElement", args.emptyElementLayout.width, args.emptyElementLayout.height, args.emptyElementLayout.connectorRadius, args.emptyElementStyle.cornerRadius);
 
     // print layer by layer
     double layerTop = args.layerLayout.verticalMargin;

@@ -10,8 +10,15 @@ using std::string;
 
 namespace utilities
 {
-    template<typename ... Args>
-    string StringFormat(const string& input, Args ... args);
+    ///
+    ///
+    template<typename ArgType, typename ... ArgTypes>
+    void StringFormat(ostream& os, const char* cstr, ArgType arg, ArgTypes ...args);
+
+    ///
+    ///
+    template<typename ... ArgTypes>
+    void StringFormat(ostream& os, const char* cstr, ArgTypes ...args);
 }
 
 #include "../tcc/StringFormat.tcc"

@@ -3,7 +3,7 @@
 #include "LayerLayout.h"
 
 
-LayerLayout::LayerLayout(uint64 numElements, double layerMaxWidth, ElementLayoutArgs args)
+LayerLayout::LayerLayout(uint64 numElements, double layerMaxWidth, ElementLayoutArgs args) : _elementMidX(numElements)
 {
     _connectorOffset = (args.height + args.connectorRadius) / 2.0;
     _connectorRadius = args.connectorRadius;

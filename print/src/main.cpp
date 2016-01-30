@@ -32,8 +32,16 @@ using std::runtime_error;
 #include <memory>
 using std::dynamic_pointer_cast;
 
+#include "StringFormat.h"
+using utilities::StringFormat;
+
 int main(int argc, char* argv[])
 {
+
+    StringFormat(cout, "this is a test of %f things and %f things more", 5.0, 8, 6, 6, 6);
+
+
+
     try
     {
         // parse the command line
@@ -53,6 +61,7 @@ int main(int argc, char* argv[])
     catch (const CommandLineParserPrintHelpException& ex)
     {
         cout << ex.GetHelpText() << endl;
+        return 0;
     }
     catch (const CommandLineParserErrorException& exception)
     {
@@ -61,11 +70,12 @@ int main(int argc, char* argv[])
         {
             cerr << error.GetMessage() << endl;
         }
-        return 0;
+        return 1;
     }
     catch (runtime_error e)
     {
         cerr << "runtime error: " << e.what() << std::endl;
+        return 1;
     }
 
     // the end
