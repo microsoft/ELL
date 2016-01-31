@@ -5,7 +5,7 @@
 
 namespace layers
 {
-    class Shift : public Coordinatewise
+    class Shift : public Coordinatewise // replace with std::plus
     {
     public:
         /// Ctor
