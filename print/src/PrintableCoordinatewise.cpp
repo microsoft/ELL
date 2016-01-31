@@ -1,59 +1,32 @@
-//// PrintableCoordinatewise.cpp
-//
-//#include "PrintableCoordinatewise.h"
-//#include "LayerLayout.h"
-//#include "svgHelpers.h"
-//
-//#include <string>
-//using std::to_string;
-//
-////LayerLayout PrintableCoordinatewise::Print(ostream& os, double left, double top, const CommandLineArguments& args) const
-////{
-////    LayerLayout layout( uint64 numElements, double layerMaxWidth, ElementLayoutArgs args)
-////
-////
-////
-////   double elementTop = _cy - _elementStyle.height/2.0;
-////   double elementBottom = elementTop + _elementStyle.height;
-////
-////   // define the element shape
-////   string elementDefName = svgDefineElement(os, (void*)this, _elementStyle);
-////
-////   // print the visible elements, before the dots
-////   for (uint64 k = 0; k < _values.size(); ++k)
-////   {
-////       if (_upLayout->IsHidden(k))
-////       {
-////           continue;
-////       }
-////
-////       double elementXMid = _upLayout->GetMidX(k);
-////       double elementLeft = elementXMid- _elementStyle.width / 2.0;
-////       double value = _values[k];
-////       int precision = GetPrecision(value, _valueElementMaxChars);
-////
-////       svgUse(os, elementDefName, elementLeft, elementTop);
-////       svgText(os, value, precision, "Element", elementXMid, _cy - 5);
-////       svgText(os, to_string(k), "ElementIndex", elementXMid, _cy + 10);
-////
-////       auto input = _coordinates[k];
-////   }
-////
-////   // if has hidden elements, draw the dots
-////   if(_upLayout->HasHidden())
-////   {
-////       double dotsXMid = _upLayout->GetDotsMidX();
-////       svgDots(os, dotsXMid, _cy);
-////   }
-////}
-////
-////void PrintableCoordinatewise::ComputeLayout(const CommandLineArguments& args, double layerLeft, double layerTop)
-////{
-////    _upLayout = make_unique<LayerLayout>(_values.size(), layerLeft, args.layerMaxWidth, args.valueElementStyle.width, args.valueElementStyle.horizontalSpacing, args.valueElementStyle.leftPadding, args.valueElementStyle.rightPadding, args.valueElementStyle.dotsWidth); // just pass the entire tyle struct
-////
-////    _layerHeight = args.valueElementStyle.height + 2*args.valueElementStyle.verticalPadding;
-////    _cy = layerTop + _layerHeight / 2.0;   
-////    _elementStyle = args.valueElementStyle;
-////    _valueElementMaxChars = args.valueElementMaxChars;
-////}
-////
+// PrintableCoordinatewise.cpp
+
+#include "PrintableCoordinatewise.h"
+#include "svgHelpers.h"
+
+PrintableCoordinatewise::PrintableCoordinatewise(const Coordinatewise::DoubleOperation& operation, Layer::Type type) : Coordinatewise(operation, type)
+{}
+
+LayerLayout PrintableCoordinatewise::Print(ostream & os, double left, double top, uint64 layerIndex, const CommandLineArguments & args) const
+{
+    // calculate the layout
+    LayerLayout layout(Size(), args.layerLayout.maxWidth, args.valueElementLayout);
+
+    PrintableLayer::Print(os, left, top, layerIndex, GetTypeName(), layout, args.layerStyle);
+
+   //// print the visible elements, before the dots
+   for (uint64 k = 0; k < layout.NumVisibleElements()-1; ++k)
+   {
+        svgValueElement(os, 2, left + layout.GetMidX(k), top + layout.GetMidY(), _values[k], args.valueElementMaxChars, k);
+   }
+
+   // print last element
+   svgValueElement(os, 2, left + layout.GetMidX(Size() - 1), top + layout.GetMidY(), _values[Size() - 1], args.valueElementMaxChars, Size() - 1);
+
+   // if has hidden elements, draw the dots
+   if(layout.HasHidden())
+   {
+       svgDots(os, 2, left+layout.GetDotsMidX(), top+layout.GetMidY());
+   }
+
+   return layout;
+}

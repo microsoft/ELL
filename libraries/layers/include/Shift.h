@@ -19,9 +19,5 @@ namespace layers
         /// Ctor
         ///
         Shift(const vector<double>& values, const CoordinateList& coordinates);
-
-        /// Static function that specifies the coordinatewise operation
-        ///
-        static double Operation(double value, double input) { return value + input; }
     };
 }

@@ -66,7 +66,7 @@ void svgRect(ostream& os, uint64 numTabs, const string& svgClass, double x, doub
 void svgCircle(ostream& os, uint64 numTabs, const string& svgClass, double cx, double cy, double radius)
 {
     svgTab(os, numTabs);
-    auto format = R"aw(<rect class="%s" cx="%f" cy="%f" rx="%f" ry="%f" />)aw";
+    auto format = R"aw(<ellipse class="%s" cx="%f" cy="%f" rx="%f" ry="%f" />)aw";
     StringFormat(os, format, svgClass, cx, cy, radius, radius);
     os << endl;
 }

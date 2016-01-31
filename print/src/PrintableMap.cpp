@@ -2,8 +2,7 @@
 
 #include "PrintableMap.h"
 #include "PrintableInput.h"
-#include "PrintableShift.h"
-#include "PrintableScale.h"
+#include "PrintableCoordinatewise.h"
 #include "PrintableSum.h"
 #include "svgHelpers.h"
 
@@ -23,6 +22,10 @@ using std::stringstream;
 
 #include <memory>
 using std::dynamic_pointer_cast;
+
+#include <functional>
+using std::plus;
+using std::multiplies;
 
 namespace
 {
@@ -130,6 +133,7 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
         auto printableLayer = GetLayer<PrintableLayer>(layerIndex);
         auto layout = printableLayer->Print(os, args.layerLayout.horizontalMargin, layerTop, layerIndex, args); // TODO args not needed
         layerTop += layout.GetHeight() + args.layerLayout.verticalSpacing;
+        os << endl;
 
 //        // print edges
 //        if (layerIndex > 0) // skip input layer
@@ -188,15 +192,15 @@ void PrintableMap::DeserializeLayers(JsonSerializer & serializer, shared_ptr<Lay
     }
     else if (type == "Scale")
     {
-        auto upScale = make_shared<PrintableScale>();
+        auto upScale = make_shared<PrintableCoordinatewise>(multiplies<double>(), Layer::Type::scale);
         upScale->Deserialize(serializer, version);
         up = upScale;
     }
     else if (type == "Shift")
     {
-        auto upShift = make_shared<PrintableShift>();
-        upShift->Deserialize(serializer, version);
-        up = upShift;
+        auto upCoordinatewise = make_shared<PrintableCoordinatewise>(plus<double>(), Layer::Type::shift);
+        upCoordinatewise->Deserialize(serializer, version);
+        up = upCoordinatewise;
     }
     else if (type == "Sum")
     {

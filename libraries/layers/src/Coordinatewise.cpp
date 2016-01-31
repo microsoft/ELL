@@ -10,7 +10,7 @@ using std::to_string;
 
 namespace layers
 {
-    Coordinatewise::Coordinatewise(const DoubleOperation & operation, Type type) : Layer(type), _operation(operation)
+    Coordinatewise::Coordinatewise(const DoubleOperation& operation, Type type) : Layer(type), _operation(operation)
     {}
 
     Coordinatewise::Coordinatewise(double value, Coordinate coordinate, const DoubleOperation & operation, Type type) : Layer(type), _values(0), _coordinates(0), _operation(operation)

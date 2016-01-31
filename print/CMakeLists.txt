@@ -17,8 +17,7 @@ set (SRC src/LayerLayout.cpp
          src/PrintableInput.cpp
          src/PrintableLayer.cpp
          src/PrintableMap.cpp
-         src/PrintableScale.cpp
-         src/PrintableShift.cpp
+         src/PrintableCoordinatewise.cpp
          src/PrintableSum.cpp
          src/main.cpp
          src/svgHelpers.cpp)
@@ -28,8 +27,7 @@ set (INCLUDE include/CommandLineArguments.h
              include/PrintableLayer.h
              include/PrintableInput.h
              include/PrintableMap.h
-             include/PrintableScale.h
-             include/PrintableShift.h
+             include/PrintableCoordinatewise.h
              include/PrintableSum.h
              include/svgHelpers.h)
          
