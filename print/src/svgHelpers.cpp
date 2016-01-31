@@ -109,7 +109,7 @@ void svgEdge(ostream & os, uint64 numTabs, Point from, Point to, double edgeFlat
     if (xDist == 0)
     {
         svgTab(os, numTabs);
-        const char* format = R"aw(<path class="Edge" d="M %f %f L %f %f />)aw";
+        const char* format = R"aw(<path class="Edge" d="M %f %f L %f %f" />)aw";
         StringFormat(os, format, from.x, from.y, to.x, to.y);
     }
 
@@ -124,7 +124,7 @@ void svgEdge(ostream & os, uint64 numTabs, Point from, Point to, double edgeFlat
         const double slopeDy = yDist - 2.0 * drop;
 
         svgTab(os, numTabs);
-        const char* format = R"aw(<path class="Edge" d="M %f %f q 0 %f %f %f l %f %f q %f %f %f %f />)aw";
+        const char* format = R"aw(<path class="Edge" d="M %f %f q 0 %f %f %f l %f %f q %f %f %f %f" />)aw";
         StringFormat(os, format, 
             from.x, from.y, 
             drop, xDist*qFrac, drop+slopeDy*qFrac, 

@@ -135,40 +135,35 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
         layerTop += layout.GetHeight() + args.layerLayout.verticalSpacing;
         os << endl;
 
-//        // print edges
-//        if (layerIndex > 0) // skip input layer
-//        {
-//            uint64 layerSize = _layers[layerIndex]->Size();
-//            for (uint64 column = 0; column<layerSize; ++column)
-//            {
-//                if (!layer->IsHidden(column)) // if output is hidden, hide edge
-//                {
-//                    auto inputCoordinates = _layers[layerIndex]->GetInputCoordinates(column);
-//                    while (inputCoordinates.IsValid()) // foreach incoming edge
-//                    {
-//                        auto coordinate = inputCoordinates.Get();
-//                        auto inputLayer = GetLayer<PrintableLayer>(coordinate.GetRow());
-//                        if (!inputLayer->IsHidden(coordinate.GetColumn())) // if input is hidden, hide edge
-//                        {
-//                            svgEdge(os, inputLayer->GetOutputPoint(coordinate.GetColumn()), layer->GetInputPoint(column), args.edgeStyle.flattness);
-//                        }
-//                        inputCoordinates.Next();
-//                    }
-//                }
-//            }
-//        }
-//
-//        // compute offset of next layer
-//        layerTop += layer->GetHeight() + args.layerVerticalSpacing;
-//        layerLeft += args.layerHorizontalMarginIncrement;
-//    }
-//
-//    os << 
-//R"aw(
-//</svg>
-//</body>
-//</html>
-//)aw";
+        // print edges
+        if (layerIndex > 0) // skip input layer
+        {
+            uint64 layerSize = _layers[layerIndex]->Size();
+            for (uint64 column = 0; column<layerSize; ++column)
+            {
+                if (!layout.IsHidden(column)) // if output is hidden, hide edge
+                {
+                    auto inputCoordinates = _layers[layerIndex]->GetInputCoordinates(column);
+                    while (inputCoordinates.IsValid()) // foreach incoming edge
+                    {
+                        auto coordinate = inputCoordinates.Get();
+                        const auto& inputLayout = layouts[coordinate.GetRow()];
+                        if (!inputLayout.IsHidden(coordinate.GetColumn())) // if input is hidden, hide edge
+                        {
+                            svgEdge(os, 2, inputLayout.GetOutputPoint(coordinate.GetColumn()), layout.GetInputPoint(column), args.edgeStyle.flattness);
+                        }
+
+                        // on to the next input
+                        inputCoordinates.Next();
+                    }
+                }
+            }
+        }
+
+        // add the current layer's layout to the list of layouts
+        layouts.push_back(move(layout));
+
+        os << endl;
     }
 
     os << "\n    </svg>\n\n<html>\n<body>\n";
