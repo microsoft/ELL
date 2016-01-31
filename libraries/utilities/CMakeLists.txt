@@ -46,7 +46,11 @@ include_directories(../types/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(${PROJ_NAME} -pthread)
+else()
+target_link_libraries(${PROJ_NAME})
+endif()
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
@@ -60,7 +64,11 @@ include_directories(../testing/include)
 
 add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
 
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(${TEST_NAME} dataset linear testing -pthread)
+else()
+target_link_libraries(${TEST_NAME} dataset linear testing)
+endif()
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

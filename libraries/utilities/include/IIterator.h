@@ -48,4 +48,9 @@ namespace utilities
         return IteratorAdapter<decltype(*begin), IteratorType>(begin, end);
     }
 
+    template <typename ContainerType>
+    auto MakeIterator(ContainerType& container) -> IteratorAdapter<typename ContainerType::value_type, typename ContainerType::iterator>
+    {
+        return IteratorAdapter<typename ContainerType::value_type, typename ContainerType::iterator>(container.begin(), container.end());
+    }
 }
