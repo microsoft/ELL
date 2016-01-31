@@ -84,6 +84,11 @@ bool LayerLayout::HasHidden() const
     return false;
 }
 
+uint64 LayerLayout::NumVisibleElements() const
+{
+    return _elementMidX.size() - _numHiddenElements;
+}
+
 bool LayerLayout::IsHidden(uint64 index) const
 {
     uint64 numElements = _elementMidX.size();

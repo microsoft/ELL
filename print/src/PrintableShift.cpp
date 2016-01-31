@@ -10,46 +10,20 @@ LayerLayout PrintableShift::Print(ostream & os, double left, double top, uint64 
 
     PrintableLayer::Print(os, left, top, layerIndex, GetTypeName(), layout, args.layerStyle);
 
-   //// define the element shape
-   //string elementDefName = svgDefineElement(os, (void*)this, args.valueElementStyle);
-
    //// print the visible elements, before the dots
-   //for (uint64 k = 0; k < _values.size(); ++k)
-   //{
-   //    if (_upLayout->IsHidden(k))
-   //    {
-   //        continue;
-   //    }
+   for (uint64 k = 0; k < layout.NumVisibleElements()-1; ++k)
+   {
+        svgValueElement(os, 2, left + layout.GetMidX(k), top + layout.GetMidY(), _values[k], args.valueElementMaxChars, k);
+   }
 
-   //    double elementXMid = _upLayout->GetMidX(k);
-   //    double elementLeft = elementXMid- _elementStyle.width / 2.0;
-   //    double value = _values[k];
-   //    int precision = GetPrecision(value, _valueElementMaxChars);
+   // print last element
+   svgValueElement(os, 2, left + layout.GetMidX(Size() - 1), top + layout.GetMidY(), _values[Size() - 1], args.valueElementMaxChars, Size() - 1);
 
-   //    svgUse(os, elementDefName, elementLeft, elementTop);
-   //    svgText(os, value, precision, "Element", elementXMid, _cy - 5);
-   //    svgText(os, to_string(k), "ElementIndex", elementXMid, _cy + 10);
-
-   //    auto input = _coordinates[k];
-   //}
-
-   //// if has hidden elements, draw the dots
-   //if(_upLayout->HasHidden())
-   //{
-   //    double dotsXMid = _upLayout->GetDotsMidX();
-   //    svgDots(os, dotsXMid, _cy);
-   //}
+   // if has hidden elements, draw the dots
+   if(layout.HasHidden())
+   {
+       svgDots(os, 2, left+layout.GetDotsMidX(), top+layout.GetMidY());
+   }
 
    return layout;
 }
-
-//void PrintableCoordinatewise::ComputeLayout(const CommandLineArguments& args, double layerLeft, double layerTop)
-//{
-    //_upLayout = make_unique<LayerLayout>(_values.size(), layerLeft, args.layerMaxWidth, args.valueElementStyle.width, args.valueElementStyle.horizontalSpacing, args.valueElementStyle.leftPadding, args.valueElementStyle.rightPadding, args.valueElementStyle.dotsWidth); // just pass the entire tyle struct
-
-    //_layerHeight = args.valueElementStyle.height + 2*args.valueElementStyle.verticalPadding;
-    //_cy = layerTop + _layerHeight / 2.0;   
-    //_elementStyle = args.valueElementStyle;
-    //_valueElementMaxChars = args.valueElementMaxChars;
-//}
-

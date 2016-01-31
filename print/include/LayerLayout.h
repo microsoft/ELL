@@ -41,8 +41,12 @@ public:
     double GetHeight() const;
 
     /// \returns True if the layer is presented in abbreviated form
-    ///
+    /// 
     bool HasHidden() const;
+
+    /// \returns The number of visible (non-hidden) elements
+    ///
+    uint64 NumVisibleElements() const;
 
     /// \returns True if the specified element is hidden
     ///

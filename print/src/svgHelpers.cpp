@@ -134,3 +134,10 @@ void svgEdge(ostream & os, uint64 numTabs, Point from, Point to, double edgeFlat
 
     os << endl;
 }
+
+void svgValueElement(ostream & os, uint64 numTabs, double cx, double cy, double number, int maxChars, uint64 index)
+{
+    svgUse(os, 2, "ValueElement", cx, cy);
+    svgNumber(os, 2, "Element", cx, cy-5, number, maxChars, 0);
+    svgText(os, 2, "ElementIndex", cx, cy+10, to_string(index), 0);
+}

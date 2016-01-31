@@ -85,13 +85,13 @@ R"aw(
             font:           bold 15 sans-serif;
         }
 
-                text.Element
+        text.Element
         {
             fill:           black;
             font:           15 sans-serif;
         }
 
-                text.ElementIndex
+        text.ElementIndex
         {
             fill:           #666666;
             font:           9 sans-serif;
@@ -104,7 +104,7 @@ R"aw(
 
 void PrintElementDefinition(ostream& os, const string& id, double width, double height, double connectorRadius, double cornerRadius)
 {
-    os << "            <g id=\"" << id << "\" />\n";
+    os << "            <g id=\"" << id << "\">\n";
     svgCircle(os, 4, "Connector", 0, height/2, connectorRadius);
     svgCircle(os, 4, "Connector", 0, -height/2, connectorRadius);
     svgRect(os, 4, "Element", -width/2, -height/2, width, height, cornerRadius);

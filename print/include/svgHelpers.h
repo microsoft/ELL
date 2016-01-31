@@ -40,3 +40,6 @@ void svgDots(ostream& os, uint64 numTabs, double cx, double cy);
 ///
 void svgEdge(ostream & os, uint64 numTabs, Point from, Point to, double edgeFlattness);
 
+///
+///
+void svgValueElement(ostream & os, uint64 numTabs, double cx, double cy, double number, int maxChars, uint64 index);
