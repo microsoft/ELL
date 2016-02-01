@@ -4,10 +4,6 @@
 
 #include "types.h"
 
-// stl
-#include <string>
-using std::string;
-
 namespace utilities
 {
     ///
