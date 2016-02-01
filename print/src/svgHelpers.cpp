@@ -28,24 +28,24 @@ void svgTab(ostream& os, uint64 numTabs)
     }
 }
 
-int GetPrecision(double number, int maxChars)
+int GetPrecision(double number, uint64 maxChars)
 {
     int precision = 0;
     if(number >= 1)
     {
-        precision = maxChars - 1 -(int)ceil(log10(number));   // save one char for "."
+        precision = (int)maxChars - 1 -(int)ceil(log10(number));   // save one char for "."
     }
     else if(number < 1 && number >= 0)
     {
-        precision = maxChars-2;   // save two characters for "0."
+        precision = (int)maxChars-2;   // save two characters for "0."
     }
     else if(number < 0 && number > -1)
     {
-        precision = maxChars - 3;   // save three chars for "-0."
+        precision = (int)maxChars - 3;   // save three chars for "-0."
     }
     else
     {
-        precision = maxChars - 2 - (int)ceil(log10(-number));   // save two chars for "-" and "."
+        precision = (int)maxChars - 2 - (int)ceil(log10(-number));   // save two chars for "-" and "."
     }
     if(precision < 0)
     {
@@ -79,7 +79,7 @@ void svgText(ostream& os, uint64 numTabs, const string& svgClass, double cx, dou
     os << text << "</text>\n";
 }
 
-void svgNumber(ostream& os, uint64 numTabs, const string& svgClass, double cx, double cy, double number, int maxChars, double rotate)
+void svgNumber(ostream& os, uint64 numTabs, const string& svgClass, double cx, double cy, double number, uint64 maxChars, double rotate)
 {
     stringstream ss;
     ss << fixed << setprecision(GetPrecision(number, maxChars)) << number;
@@ -135,9 +135,15 @@ void svgEdge(ostream & os, uint64 numTabs, Point from, Point to, double edgeFlat
     os << endl;
 }
 
-void svgValueElement(ostream & os, uint64 numTabs, double cx, double cy, double number, int maxChars, uint64 index)
+void svgValueElement(ostream & os, uint64 numTabs, double cx, double cy, double number, uint64 maxChars, uint64 index)
 {
     svgUse(os, 2, "ValueElement", cx, cy);
     svgNumber(os, 2, "Element", cx, cy-5, number, maxChars, 0);
     svgText(os, 2, "ElementIndex", cx, cy+10, to_string(index), 0);
+}
+
+void svgEmptyElement(ostream & os, uint64 numTabs, double cx, double cy, uint64 index)
+{
+    svgUse(os, 2, "EmptyElement", cx, cy);
+    svgText(os, 2, "ElementIndex", cx, cy, to_string(index), 0);
 }

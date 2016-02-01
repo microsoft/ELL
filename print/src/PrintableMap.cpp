@@ -120,8 +120,8 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
     StringFormat(os, styleDefinitionFormat, args.edgeStyle.dashStyle);
 
     os << "    <svg>\n\n        <defs>\n";
-    PrintElementDefinition(os, "ValueElement", args.valueElementLayout.width, args.valueElementLayout.height, args.valueElementLayout.connectorRadius, args.valueElementStyle.cornerRadius);
-    PrintElementDefinition(os, "EmptyElement", args.emptyElementLayout.width, args.emptyElementLayout.height, args.emptyElementLayout.connectorRadius, args.emptyElementStyle.cornerRadius);
+    PrintElementDefinition(os, "ValueElement", args.valueElementLayout.width, args.valueElementLayout.height, args.valueElementStyle.connectorRadius, args.valueElementStyle.cornerRadius);
+    PrintElementDefinition(os, "EmptyElement", args.emptyElementLayout.width, args.emptyElementLayout.height, args.emptyElementStyle.connectorRadius, args.emptyElementStyle.cornerRadius);
     os << "        </defs>\n\n";
 
     // print layer by layer

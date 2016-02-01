@@ -30,7 +30,7 @@ public:
 
     /// Ctor
     ///
-    LayerLayout(uint64 numElements, double layerMaxWidth, ElementLayoutArgs args);
+    LayerLayout(double left, double top, uint64 size, double layerMaxWidth, ElementLayoutArgs args);
 
     /// \returns the layer width
     ///
@@ -80,5 +80,4 @@ private:
     double _dotsMidX = 0;
     double _midY = 0;
     double _connectorOffset = 0;
-    double _connectorRadius = 0;
 };
