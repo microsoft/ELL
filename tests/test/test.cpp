@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
     // Now actually parse the arguments and set the corresponding parameter values
     try
     {
-        cmdline.ParseArgs();
+        cmdline.Parse();
     }
     catch (const CommandLineParserErrorException& ex)
     {

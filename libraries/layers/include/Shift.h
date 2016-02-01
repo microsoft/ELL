@@ -5,10 +5,9 @@
 
 namespace layers
 {
-    class Shift : public Coordinatewise
+    class Shift : public Coordinatewise // replace with std::plus
     {
     public:
-
         /// Ctor
         ///
         Shift();
@@ -20,9 +19,5 @@ namespace layers
         /// Ctor
         ///
         Shift(const vector<double>& values, const CoordinateList& coordinates);
-
-        /// Static function that specifies the coordinatewise operation
-        ///
-        static double Operation(double value, double input) { return value + input; }
     };
 }

@@ -5,23 +5,21 @@
 #include <stdexcept>
 using std::runtime_error;
 
-#include <cassert>
-
 #include <string>
 using std::to_string;
 
 namespace layers
 {
-    Coordinatewise::Coordinatewise(const DoubleOperation & operation, Type type) : Layer(type), _operation(operation)
+    Coordinatewise::Coordinatewise(const DoubleOperation& operation, Type type) : Layer(type), _operation(operation)
     {}
 
-    Coordinatewise::Coordinatewise(double value, Coordinate coordinate, const DoubleOperation & operation, Type type) : Layer(type), _operation(operation), _values(0), _coordinates(0)
+    Coordinatewise::Coordinatewise(double value, Coordinate coordinate, const DoubleOperation & operation, Type type) : Layer(type), _values(0), _coordinates(0), _operation(operation)
     {
         _values.push_back(value);
         _coordinates.push_back(coordinate);
     }
 
-    Coordinatewise::Coordinatewise(const vector<double> & values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type) : Layer(type), _operation(operation), _values(values), _coordinates(coordinates)
+    Coordinatewise::Coordinatewise(const vector<double> & values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type) : Layer(type), _values(values), _coordinates(coordinates), _operation(operation)
     {}
 
     uint64 Coordinatewise::Size() const

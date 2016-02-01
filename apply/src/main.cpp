@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(dataSaveArguments); 
         
         // parse command line
-        commandLineParser.ParseArgs();
+        commandLineParser.Parse();
 
         // create mapped data iterator based on the command line params
         auto dataIterator = GetDataIterator(dataLoadArguments, mapLoadArguments);

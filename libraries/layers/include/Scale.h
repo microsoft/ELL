@@ -5,7 +5,7 @@
 
 namespace layers
 {
-    class Scale : public Coordinatewise
+    class Scale : public Coordinatewise // replace with std::multiplies
     {
     public:
 

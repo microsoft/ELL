@@ -1,18 +1,31 @@
 // main.cpp
 
-#include "Compiler.h"
-#include "CommandLineArguments.h"
+#include "CompilableMap.h"
+#include "CompileArguments.h"
 
 // utilities
-#include "JsonSerializer.h"
 #include "files.h"
-using utilities::OpenIfstream;
+using utilities::JsonSerializer;
 using utilities::OpenOfstream;
+using utilities::OpenIfstream;
+
+#include "CommandLineParser.h" 
+using utilities::CommandLineParser;
+using utilities::CommandLineParserErrorException;
+using utilities::CommandLineParserPrintHelpException;
 
 // layers
 #include "Map.h"
 using layers::Map;
 
+// common
+#include "CoordinateListTools.h"
+using common::GetCoordinateList;
+
+#include "MapLoadArguments.h"
+using common::ParsedMapLoadArguments;
+
+// stl
 #include<iostream>
 using std::cerr;
 using std::cout;
@@ -31,20 +44,44 @@ int main(int argc, char* argv[])
 {
     try
     {
-        // parse the command line
+        // create a command line parser
         CommandLineParser commandLineParser(argc, argv);
-        ParsedCommandLineArguments args;
-        commandLineParser.AddOptionSet(args);
-        commandLineParser.ParseArgs();
+
+        // add arguments to the command line parser
+        ParsedMapLoadArguments mapLoadArguments;
+        ParsedCompileArguments compileArguments;
+
+        commandLineParser.AddOptionSet(mapLoadArguments);
+        commandLineParser.AddOptionSet(compileArguments); 
+
+        // parse command line
+        commandLineParser.Parse();
 
         // open file
-        auto outputMapFStream = OpenIfstream(args.mapFile);
-        auto map = JsonSerializer::Load<Compiler>(outputMapFStream, "Base");
-        
-        auto upSvgOStream = OpenOfstream(args.codeFile);
-    }
+        //auto map = GetMap(mapLoadArguments);
+        // open map file
+        auto mapFStream = OpenIfstream(mapLoadArguments.inputMapFile); 
+        auto map = JsonSerializer::Load<CompilableMap>(mapFStream, "Base");
 
-    catch (runtime_error e)
+        auto coordinateList = GetCoordinateList(map, mapLoadArguments.coordinateListLoadArguments);
+
+        map.ToCode(coordinateList);
+
+    }
+    catch(const CommandLineParserPrintHelpException& ex)
+    {
+        cout << ex.GetHelpText() << endl;
+    }
+    catch(const CommandLineParserErrorException& exception)
+    {
+        cerr << "Command line parse error:" << endl;
+        for(const auto& error : exception.GetParseErrors())
+        {
+            cerr << error.GetMessage() << endl;
+        }
+        return 0;
+    }
+    catch(runtime_error e)
     {
         cerr << "runtime error: " << e.what() << std::endl;
     }

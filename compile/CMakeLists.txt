@@ -14,33 +14,40 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/main.cpp
+                 src/AddToAction.cpp
                  src/CompilableInput.cpp
+                 src/CompilableLayer.cpp
+                 src/CompilableMap.cpp
                  src/CompilableScale.cpp
                  src/CompilableShift.cpp
                  src/CompilableSum.cpp
-                 src/Compiler.cpp)
+                 src/LinearOperation.cpp)
 
-
-set (INCLUDE include/Action.h
-             include/CommandLineArguments.h
+set (INCLUDE include/AddToAction.h
+             include/CompileArguments.h
              include/CompilableInput.h
+             include/CompilableLayer.h
+             include/CompilableMap.h
              include/CompilableScale.h
              include/CompilableShift.h
              include/CompilableSum.h
-             include/Compiler.h
-             include/Compilable.h)
+             include/LinearOperation.h)
+
+set (TCC tcc/LinearOperation.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
+source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(../libraries/layers/include)
 include_directories(../libraries/types/include)
 include_directories(../libraries/utilities/include)
+include_directories(../libraries/common/include)
 
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
-add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
+add_executable(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 
-target_link_libraries(${PROJ_NAME} utilities layers)
+target_link_libraries(${PROJ_NAME} utilities layers common)

@@ -9,6 +9,7 @@ using std::istreambuf_iterator;
 
 #include <memory>
 using std::make_shared;
+using std::dynamic_pointer_cast;
 
 namespace layers
 {
@@ -28,5 +29,11 @@ namespace layers
         }
         
         return Iterator(outputs, outputCoordinates);
+    }
+
+    template<typename LayerType>
+    shared_ptr<const LayerType> Map::GetLayer(uint64 layerIndex) const
+    {
+        return dynamic_pointer_cast<LayerType>(_layers[layerIndex]);
     }
 }

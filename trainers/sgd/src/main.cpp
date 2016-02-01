@@ -75,15 +75,7 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(sgdArguments);
         
         // parse command line
-        try
-        {
-            commandLineParser.ParseArgs();
-        }
-        catch (const CommandLineParserPrintHelpException& ex)
-        {
-            // print help if requested
-            cout << ex.GetHelpText() << endl;
-        }
+        commandLineParser.Parse();
 
         // create and load a dataset, a map, and a coordinate list
         RowDataset dataset;

@@ -1,8 +1,8 @@
-// HorizontalLayout.cpp
+// LayerLayout.cpp
 
-#include "HorizontalLayout.h"
+#include "LayerLayout.h"
 
-HorizontalLayout::HorizontalLayout(uint64 numElements, double layerHorizontalMargin, double layerMaxWidth, double elementWidth, double xElementSpacing, double elementHorizontalLeftPadding, double elementHorizontalRightPadding, double dotsWidth) : _elementXMid(numElements)
+LayerLayout::LayerLayout(uint64 numElements, double layerHorizontalMargin, double layerMaxWidth, double elementWidth, double xElementSpacing, double elementHorizontalLeftPadding, double elementHorizontalRightPadding, double dotsWidth) : _elementXMid(numElements)
 {
     // width of the layer without abbreviated format 
     double layerWidth = elementHorizontalLeftPadding + elementHorizontalRightPadding + numElements * elementWidth + (numElements-1) * xElementSpacing;
@@ -58,22 +58,22 @@ HorizontalLayout::HorizontalLayout(uint64 numElements, double layerHorizontalMar
     }
 }
 
-double HorizontalLayout::GetXMid(uint64 index) const
+double LayerLayout::GetXMid(uint64 index) const
 {
     return _elementXMid[index];
 }
 
-double HorizontalLayout::GetWidth() const
+double LayerLayout::GetWidth() const
 {
     return _layerWidth;
 }
 
-bool HorizontalLayout::HasHidden() const
+bool LayerLayout::HasHidden() const
 {
     return _numHiddenElements > 0;
 }
 
-bool HorizontalLayout::IsHidden(uint64 index) const
+bool LayerLayout::IsHidden(uint64 index) const
 {
     uint64 numElements = _elementXMid.size();
     if (index == numElements - 1 || index < numElements - 1 - _numHiddenElements)
@@ -83,7 +83,7 @@ bool HorizontalLayout::IsHidden(uint64 index) const
     return true;
 }
 
-double HorizontalLayout::GetGapXMid() const
+double LayerLayout::GetGapXMid() const
 {
     return _dotsXMid;
 }

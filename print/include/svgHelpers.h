@@ -1,9 +1,8 @@
-// SVGHelpers.h
+// SvgHelpers.h
 
 #pragma once
 
-#include "HorizontalLayout.h"
-#include "IPrintable.h"
+#include "LayerLayout.h"
 
 #include "types.h"
 
@@ -13,16 +12,42 @@ using std::ostream;
 #include <string>
 using std::string;
 
-#include <vector>
-using std::vector;
+/// TODO
+///
+void SvgRect(ostream& os, uint64 numTabs, const string& SvgClass, double x, double y, double width, double height, double radius);
 
-void svgRect(ostream& os, string svgClass, double x, double y, double radius, double width, double height);
-void svgCircle(ostream& os, string svgClass, double cx, double cy, double radius);
-void svgText(ostream& os, string text, string svgClass, double cx, double y, bool vertical = false);
-void svgText(ostream& os, double text, int precision, string svgClass, double cx, double y);
-void svgDots(ostream& os, double cx, double cy);
-void svgEdge(ostream& os, Point from, Point to, double edgeFlattness);
-void svgUse(ostream& os, string href, double x, double y);
-int GetPrecision(double value, int maxChars);
-string svgDefineElement(ostream& os, void* uid, ElementStyleArgs styleArgs);
+/// TODO
+///
+void SvgCircle(ostream& os, uint64 numTabs, const string& SvgClass, double cx, double cy, double radius);
 
+/// TODO
+///
+void SvgText(ostream& os, uint64 numTabs, const string& SvgClass, double cx, double cy, string text, double rotate);
+
+/// TODO
+///
+void SvgNumber(ostream& os, uint64 numTabs, const string& SvgClass, double cx, double cy, double number, int maxChars, double rotate);
+
+/// TODO
+///
+void SvgUse(ostream& os, uint64 numTabs, string id, double x, double y);
+
+/// TODO
+///
+void SvgDots(ostream& os, uint64 numTabs, double cx, double cy);
+
+/// TODO
+///
+void SvgEdge(ostream & os, uint64 numTabs, Point from, Point to, double edgeFlattness);
+
+///
+///
+void SvgValueElement(ostream & os, uint64 numTabs, double cx, double cy, double number, uint64 maxChars, uint64 index);
+
+///
+///
+void SvgEmptyElement(ostream & os, uint64 numTabs, double cx, double cy, uint64 index);
+
+///
+///
+void SvgInputElement(ostream & os, uint64 numTabs, double cx, double cy, uint64 index);

@@ -16,9 +16,6 @@ using std::vector;
 #include <memory>
 using std::shared_ptr;
 
-#include <iostream>
-using std::istream;
-
 #include <type_traits>
 using std::enable_if_t;
 using std::is_base_of;
@@ -55,7 +52,7 @@ namespace layers
 
         protected:
             shared_ptr<vector<DoubleArray>> _spOutputs;
-            const CoordinateList& _outputCoordinates;
+            const CoordinateList _outputCoordinates;
             uint64 _index;
 
             /// private ctor, can only be called from Map class
@@ -66,7 +63,7 @@ namespace layers
         /// Ctor
         ///
         Map() = default;
-        
+
         /// Ctor
         ///
         Map(uint64 inputLayerSize);
@@ -89,7 +86,7 @@ namespace layers
 
         /// Computes the Map
         ///
-        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        template <typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         Iterator Compute(IndexValueIteratorType IndexValueIterator, const CoordinateList& outputCoordinates) const;
 
         /// Adds a shared layer to the map
@@ -100,9 +97,14 @@ namespace layers
         ///
         uint64 NumLayers() const;
 
-        /// \returns The number of elements in a specified layer
+        /// \returns a Layer of a specified template type
         ///
-        uint64 LayerSize(uint64 index) const;
+        template<typename LayerType = Layer>
+        shared_ptr<const LayerType> GetLayer(uint64 layerIndex) const;
+
+        /// \returns A list of the coordinates in this layer
+        ///
+        CoordinateList GetCoordinateList(uint64 layerIndex) const;
 
         /// Serializes the Map in json format
         ///
@@ -114,7 +116,7 @@ namespace layers
 
         /// Deserializes the Map in json format
         ///
-        void Deserialize(JsonSerializer& serializer);
+        virtual void Deserialize(JsonSerializer& serializer);
 
         /// Static function for deserializing shared_ptr<Layer>
         ///
@@ -128,4 +130,3 @@ namespace layers
 }
 
 #include "../tcc/Map.tcc"
-

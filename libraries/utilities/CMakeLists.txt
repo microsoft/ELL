@@ -27,6 +27,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/Parser.h
                        include/TransformIterator.h
                        include/files.h
+                       include/StringFormat.h
                        include/randomEngines.h)
 
 set (TCC tcc/BinaryClassificationEvaluator.tcc
@@ -34,7 +35,9 @@ set (TCC tcc/BinaryClassificationEvaluator.tcc
                    tcc/JsonSerializer.tcc
                    tcc/ParallelTransformIterator.tcc
                    tcc/Parser.tcc
-                   tcc/TransformIterator.tcc)
+                   tcc/TransformIterator.tcc
+                   tcc/StringFormat.tcc
+                   tcc/VectorIterator.tcc)
                    
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -46,7 +49,11 @@ include_directories(../types/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(${PROJ_NAME} -pthread)
+else()
+target_link_libraries(${PROJ_NAME})
+endif()
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
@@ -60,7 +67,11 @@ include_directories(../testing/include)
 
 add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
 
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(${TEST_NAME} dataset linear testing -pthread)
+else()
+target_link_libraries(${TEST_NAME} dataset linear testing)
+endif()
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 
