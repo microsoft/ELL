@@ -24,12 +24,11 @@ struct ElementLayoutArgs
     double dotsWidth;                   // width of the "dots" that represent the hidden elements
 };
 
-struct LayerLayoutArgs
+struct MapLayoutArgs
 {
     double horizontalMargin;            // space to the left of the first layer
     double verticalMargin;              // space above the first layer
     double verticalSpacing;             // space between consecutive layers
-    double maxWidth;                    // maximal layer width
 };
 
 struct ElementStyleArgs
@@ -51,6 +50,7 @@ struct EdgeStyleArgs
 
 struct LayerStyleArgs
 {
+    double maxWidth;                    // maximal layer width
     double cornerRadius;
 };
 
@@ -63,7 +63,7 @@ struct CommandLineArguments
     ElementLayoutArgs emptyElementLayout;
     ValueElementStyleArgs valueElementStyle;
     ElementStyleArgs emptyElementStyle;
-    LayerLayoutArgs layerLayout;
+    MapLayoutArgs mapLayout;
     LayerStyleArgs layerStyle;
     EdgeStyleArgs edgeStyle;
 };
@@ -101,11 +101,11 @@ struct ParsedCommandLineArguments : public CommandLineArguments, public ParsedAr
         parser.AddOption(emptyElementStyle.cornerRadius, "emptyElementCornerRadius", "eecr", "Radius of rounded corners of elements in a layer that doesn't show values", 5);
         parser.AddOption(emptyElementStyle.connectorRadius, "emptyElementConnectorRadius", "eekr", "Radius of connectors on top and bottom of elements in a layer that doesn't show values", 5);
 
-        parser.AddOption(layerLayout.horizontalMargin, "layerHorizontalMargin", "lhm", "Horizontal distance to the left edge of each layer", 20);
-        parser.AddOption(layerLayout.verticalMargin, "layerVerticalMargin", "lvm", "Vertical distnace to the top edge of the first layer", 10);
-        parser.AddOption(layerLayout.verticalSpacing, "layerVerticalSpacing", "lvs", "The amount of vertical space between layers", 30);
-        parser.AddOption(layerLayout.maxWidth, "layerMaxWidth", "lmw", "The maximum width of any layer", 700);
+        parser.AddOption(mapLayout.horizontalMargin, "layerHorizontalMargin", "lhm", "Horizontal distance to the left edge of each layer", 20);
+        parser.AddOption(mapLayout.verticalMargin, "layerVerticalMargin", "lvm", "Vertical distnace to the top edge of the first layer", 10);
+        parser.AddOption(mapLayout.verticalSpacing, "layerVerticalSpacing", "lvs", "The amount of vertical space between layers", 30);
 
+        parser.AddOption(layerStyle.maxWidth, "layerMaxWidth", "lmw", "The maximum width of any layer", 700);
         parser.AddOption(layerStyle.cornerRadius, "layerCornerRadius", "lcr", "Radius of layer rounded corners", 10);
 
         parser.AddOption(edgeStyle.flattness, "edgeFlattness", "ef", "Flatness of edges: between 0 and 1", 0.65);

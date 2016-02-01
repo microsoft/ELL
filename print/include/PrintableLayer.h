@@ -27,7 +27,7 @@ public:
     virtual LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const CommandLineArguments& args) const = 0;
 
 protected:
-    LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const string& typeName, uint64 size, double maxWidth, const ElementLayoutArgs& elementLayout, const LayerStyleArgs& layerStyle) const;
+    LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const string& typeName, uint64 size, const ElementLayoutArgs& elementLayout, const LayerStyleArgs& layerStyle) const;
 };
 
  

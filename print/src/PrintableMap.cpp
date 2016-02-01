@@ -125,14 +125,14 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
     os << "        </defs>\n\n";
 
     // print layer by layer
-    double layerTop = args.layerLayout.verticalMargin;
+    double layerTop = args.mapLayout.verticalMargin;
     vector<LayerLayout> layouts;
 
     for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
     {
         auto printableLayer = GetLayer<PrintableLayer>(layerIndex);
-        auto layout = printableLayer->Print(os, args.layerLayout.horizontalMargin, layerTop, layerIndex, args); // TODO args not needed
-        layerTop += layout.GetHeight() + args.layerLayout.verticalSpacing;
+        auto layout = printableLayer->Print(os, args.mapLayout.horizontalMargin, layerTop, layerIndex, args); // TODO args not needed
+        layerTop += layout.GetHeight() + args.mapLayout.verticalSpacing;
         os << endl;
 
         // print edges

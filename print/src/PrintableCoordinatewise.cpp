@@ -8,7 +8,7 @@ PrintableCoordinatewise::PrintableCoordinatewise(const Coordinatewise::DoubleOpe
 
 LayerLayout PrintableCoordinatewise::Print(ostream & os, double left, double top, uint64 layerIndex, const CommandLineArguments & args) const
 {
-    auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetTypeName(), Size(), args.layerLayout.maxWidth, args.valueElementLayout, args.layerStyle);
+    auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetTypeName(), Size(), args.valueElementLayout, args.layerStyle);
 
    //// print the visible elements, before the dots
    for (uint64 k = 0; k < layout.NumVisibleElements()-1; ++k)

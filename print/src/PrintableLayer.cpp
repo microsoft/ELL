@@ -10,10 +10,10 @@ using std::to_string;
 #include <algorithm>
 using std::transform;
 
-LayerLayout PrintableLayer::Print(ostream& os, double left, double top, uint64 layerIndex, const string& typeName, uint64 size, double maxWidth, const ElementLayoutArgs& elementLayout, const LayerStyleArgs& layerStyle) const
+LayerLayout PrintableLayer::Print(ostream& os, double left, double top, uint64 layerIndex, const string& typeName, uint64 size, const ElementLayoutArgs& elementLayout, const LayerStyleArgs& layerStyle) const
 {
     // calculate the layout
-    LayerLayout layout(left, top, size, maxWidth, elementLayout);
+    LayerLayout layout(left, top, size, layerStyle.maxWidth, elementLayout);
 
     // draw the layer rectangle
     SvgRect(os, 2, typeName, left, top, layout.GetWidth(), layout.GetHeight(), layerStyle.cornerRadius);
