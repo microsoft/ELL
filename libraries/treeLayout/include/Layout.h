@@ -58,14 +58,6 @@ namespace treeLayout
         ///
         Layout(size_t size, double min_offset, double max_offset, double min_depth, double max_depth);
 
-        /// Copy ctor 
-        ///
-        Layout(const Layout&) = default;
-
-        /// Move ctor 
-        ///
-        Layout(Layout&&) = default;
-
         ///
         /// \returns A reference to the position of a specified vertex
         ///
