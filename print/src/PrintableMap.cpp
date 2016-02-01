@@ -4,7 +4,7 @@
 #include "PrintableInput.h"
 #include "PrintableCoordinatewise.h"
 #include "PrintableSum.h"
-#include "svgHelpers.h"
+#include "SvgHelpers.h"
 
 // utilities
 #include "StringFormat.h"
@@ -108,9 +108,9 @@ R"aw(
 void PrintElementDefinition(ostream& os, const string& id, double width, double height, double connectorRadius, double cornerRadius)
 {
     os << "            <g id=\"" << id << "\">\n";
-    svgCircle(os, 4, "Connector", 0, height/2, connectorRadius);
-    svgCircle(os, 4, "Connector", 0, -height/2, connectorRadius);
-    svgRect(os, 4, "Element", -width/2, -height/2, width, height, cornerRadius);
+    SvgCircle(os, 4, "Connector", 0, height/2, connectorRadius);
+    SvgCircle(os, 4, "Connector", 0, -height/2, connectorRadius);
+    SvgRect(os, 4, "Element", -width/2, -height/2, width, height, cornerRadius);
     os << "            </g>\n";
 }
 
@@ -119,7 +119,7 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
     os << "<html>\n<body>\n";
     StringFormat(os, styleDefinitionFormat, args.edgeStyle.dashStyle);
 
-    os << "    <svg>\n\n        <defs>\n";
+    os << "    <Svg>\n\n        <defs>\n";
     PrintElementDefinition(os, "ValueElement", args.valueElementLayout.width, args.valueElementLayout.height, args.valueElementStyle.connectorRadius, args.valueElementStyle.cornerRadius);
     PrintElementDefinition(os, "EmptyElement", args.emptyElementLayout.width, args.emptyElementLayout.height, args.emptyElementStyle.connectorRadius, args.emptyElementStyle.cornerRadius);
     os << "        </defs>\n\n";
@@ -150,7 +150,7 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
                         const auto& inputLayout = layouts[coordinate.GetRow()];
                         if (!inputLayout.IsHidden(coordinate.GetColumn())) // if input is hidden, hide edge
                         {
-                            svgEdge(os, 2, inputLayout.GetOutputPoint(coordinate.GetColumn()), layout.GetInputPoint(column), args.edgeStyle.flattness);
+                            SvgEdge(os, 2, inputLayout.GetOutputPoint(coordinate.GetColumn()), layout.GetInputPoint(column), args.edgeStyle.flattness);
                         }
 
                         // on to the next input
@@ -166,7 +166,7 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
         os << endl;
     }
 
-    os << "\n    </svg>\n\n<html>\n<body>\n";
+    os << "\n    </Svg>\n\n<html>\n<body>\n";
 }
 
 void PrintableMap::Deserialize(JsonSerializer & serializer)

@@ -73,7 +73,7 @@ struct ParsedCommandLineArguments : public CommandLineArguments, public ParsedAr
     virtual void AddArgs(CommandLineParser& parser)
     {
         parser.AddOption(mapFile, "inputMapFile", "imf", "Path to the input file that contains the map information", "");
-        parser.AddOption(svgFile, "outputSvgFile", "osf", "Path to the output svg file", "");
+        parser.AddOption(svgFile, "outputSvgFile", "osf", "Path to the output Svg file", "");
 
         //// TODO: confirm that the filenames are set. Perhaps add method "AddRequiredOption"
 

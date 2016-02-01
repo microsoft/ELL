@@ -20,7 +20,7 @@ set (SRC src/LayerLayout.cpp
          src/PrintableCoordinatewise.cpp
          src/PrintableSum.cpp
          src/main.cpp
-         src/svgHelpers.cpp)
+         src/SvgHelpers.cpp)
 
 set (INCLUDE include/CommandLineArguments.h
              include/LayerLayout.h
@@ -29,7 +29,7 @@ set (INCLUDE include/CommandLineArguments.h
              include/PrintableMap.h
              include/PrintableCoordinatewise.h
              include/PrintableSum.h
-             include/svgHelpers.h)
+             include/SvgHelpers.h)
          
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

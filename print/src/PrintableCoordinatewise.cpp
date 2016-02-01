@@ -1,7 +1,7 @@
 // PrintableCoordinatewise.cpp
 
 #include "PrintableCoordinatewise.h"
-#include "svgHelpers.h"
+#include "SvgHelpers.h"
 
 PrintableCoordinatewise::PrintableCoordinatewise(const Coordinatewise::DoubleOperation& operation, Layer::Type type) : Coordinatewise(operation, type)
 {}
@@ -13,16 +13,16 @@ LayerLayout PrintableCoordinatewise::Print(ostream & os, double left, double top
    //// print the visible elements, before the dots
    for (uint64 k = 0; k < layout.NumVisibleElements()-1; ++k)
    {
-        svgValueElement(os, 2, layout.GetMidX(k), layout.GetMidY(), _values[k], args.valueElementStyle.maxChars, k);
+        SvgValueElement(os, 2, layout.GetMidX(k), layout.GetMidY(), _values[k], args.valueElementStyle.maxChars, k);
    }
 
    // print last element
-   svgValueElement(os, 2, layout.GetMidX(Size() - 1), layout.GetMidY(), _values[Size() - 1], args.valueElementStyle.maxChars, Size() - 1);
+   SvgValueElement(os, 2, layout.GetMidX(Size() - 1), layout.GetMidY(), _values[Size() - 1], args.valueElementStyle.maxChars, Size() - 1);
 
    // if has hidden elements, draw the dots
    if(layout.HasHidden())
    {
-       svgDots(os, 2, layout.GetDotsMidX(), layout.GetMidY());
+       SvgDots(os, 2, layout.GetDotsMidX(), layout.GetMidY());
    }
 
    return layout;
