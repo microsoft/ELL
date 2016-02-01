@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(compileArguments); 
 
         // parse command line
-        commandLineParser.ParseArgs();
+        commandLineParser.Parse();
 
         // open file
         //auto map = GetMap(mapLoadArguments);

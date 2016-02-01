@@ -77,7 +77,6 @@ struct ParsedPrintArguments : public PrintArguments, public ParsedArgSet
 
         //// TODO: confirm that the filenames are set. Perhaps add method "AddRequiredOption"
 
-
         parser.AddOption(valueElementLayout.width, "valueElementWidth", "vew", "Width of each element in a layer that shows values", 55);
         parser.AddOption(valueElementLayout.height, "valueElementHeight", "veh", "Height of each element in a layer that shows values", 40);
         parser.AddOption(valueElementLayout.leftPadding, "valueElementLeftPadding", "velp", "Horizontal distance between the left edge of a layer that shows values and its first element", 70);

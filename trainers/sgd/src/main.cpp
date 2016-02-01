@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(sgdArguments);
         
         // parse command line
-        commandLineParser.ParseArgs();
+        commandLineParser.Parse();
 
         // create and load a dataset, a map, and a coordinate list
         RowDataset dataset;

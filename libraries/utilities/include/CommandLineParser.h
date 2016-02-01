@@ -123,7 +123,7 @@ namespace utilities
 
         /// Parses the commandline. Call this after setting up the options with AddOption
         ///
-        void ParseArgs();
+        void Parse();
 
         /// TODO: document
         ///
@@ -143,7 +143,7 @@ namespace utilities
 
         bool HasShortName(string shortName);
 
-        /// Adds a callback function that gets invoked after ParseArgs() is called
+        /// Adds a callback function that gets invoked after Parse() is called
         using PostParseCallback = std::function<ParseResult(CommandLineParser&)>;
         void AddPostParseCallback(const PostParseCallback& callback);
 

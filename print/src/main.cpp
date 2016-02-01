@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
         CommandLineParser commandLineParser(argc, argv);
         ParsedPrintArguments printArguments;
         commandLineParser.AddOptionSet(printArguments);
-        commandLineParser.ParseArgs();
+        commandLineParser.Parse();
 
         // open map file
         auto mapFStream = OpenIfstream(printArguments.mapFile); // TODO: use common Arguments and common loader

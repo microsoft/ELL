@@ -25,10 +25,6 @@ public:
 
     //virtual void ProcessForward() = 0;
 
-    /// Prints the code that executes the actions required by this layer
-    ///
-    //virtual void Print() const = 0;
-
     /// \returns The number of temp variable names allocated
     ///
     static uint64 NumTempVariableNames();
