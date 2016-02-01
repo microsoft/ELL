@@ -2,67 +2,22 @@
 
 #pragma once
 
-#include "IPrintable.h"
-#include "HorizontalLayout.h"
+#include "PrintableLayer.h"
+#include "LayerLayout.h"
 
-#include "layers.h"
-using namespace layers;
-
-#include <memory>
-using std::unique_ptr;
+#include "Coordinatewise.h"
+using layers::Coordinatewise;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableCoordinatewise : public Scale, public IPrintable
+struct PrintableCoordinatewise : public Coordinatewise, public PrintableLayer
 {
 public:
     /// Ctor
     ///
-    PrintableCoordinatewise(string typeName);
-
-    /// Returns the number of elements in the layer
-    ///
-    virtual uint64 Size() const override;
+    PrintableCoordinatewise(const Coordinatewise::DoubleOperation& operation, Layer::Type type);
 
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///
-    virtual void Print(ostream& os) const override;
-
-    /// Computes the layer layout
-    ///
-    virtual void ComputeLayout(const CommandLineArguments& args, double layerLeft, double layerTop) override;
-
-    /// Returns the begin-point of an arrow
-    ///
-    virtual Point GetBeginPoint(uint64 index) const override;
-
-    /// Returns the end-point of an arrow
-    ///
-    virtual Point GetEndPoint(uint64 index) const override;
-
-    /// \returns the layer width
-    ///
-    virtual double GetWidth() const override;
-
-    /// \returns the layer height
-    ///
-    virtual double GetHeight() const override;
-
-    /// \returns True if the specified element is visible
-    ///
-    virtual bool IsHidden(uint64 index) const override;
-
-    /// \returns the layer type name
-    ///
-    virtual string GetTypeName() const override;
-
-private:
-    unique_ptr<HorizontalLayout> _upLayout = nullptr;
-
-    string _typeName;
-
-    double _cy;
-    double _layerHeight;
-    int _valueElementMaxChars;
-    ElementStyleArgs _elementStyle;
+    virtual LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const override;
 };

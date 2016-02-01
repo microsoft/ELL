@@ -2,21 +2,18 @@
 
 #pragma once
 
-#include "PrintableEmpty.h"
+#include "PrintableLayer.h"
+#include "LayerLayout.h"
 
-#include "layers.h"
-using namespace layers;
+#include "Input.h"
+using layers::Input;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableInput : public Input, public PrintableEmpty
+struct PrintableInput : public Input, public PrintableLayer
 {
 public:
-    /// Returns the number of elements in the layer
+    /// Prints a human-firiendly description of the underlying class to an output stream
     ///
-    virtual uint64 Size() const override;
-
-    /// \returns the layer type name
-    ///
-    virtual string GetTypeName() const override;
+    virtual LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const override;
 };

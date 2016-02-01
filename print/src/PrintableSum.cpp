@@ -1,19 +1,27 @@
 // PrintableSum.cpp
 
 #include "PrintableSum.h"
-#include "svgHelpers.h"
+#include "SvgHelpers.h"
 
-using std::make_unique;
-
-#include <string>
-using std::to_string;
-
-uint64 PrintableSum::Size() const
+LayerLayout PrintableSum::Print(ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const
 {
-    return Sum::Size();
-}
+    // calculate the layout
+    auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetTypeName(), Size(), Arguments.emptyElementLayout, Arguments.layerStyle);
 
-string PrintableSum::GetTypeName() const
-{
-    return string("SUM");
+    //// print the visible elements, before the dots
+    for (uint64 k = 0; k < layout.NumVisibleElements() - 1; ++k)
+    {
+        SvgEmptyElement(os, 2, layout.GetMidX(k), layout.GetMidY(), k);
+    }
+
+    // print last element
+    SvgEmptyElement(os, 2, layout.GetMidX(Size() - 1), layout.GetMidY(), Size() - 1);
+
+    // if has hidden elements, draw the dots
+    if (layout.HasHidden())
+    {
+        SvgDots(os, 2, layout.GetDotsMidX(), layout.GetMidY());
+    }
+
+    return layout;
 }

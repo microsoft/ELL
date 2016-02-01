@@ -27,6 +27,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/Parser.h
                        include/TransformIterator.h
                        include/files.h
+             include/StringFormat.h
                        include/randomEngines.h)
 
 set (TCC tcc/BinaryClassificationEvaluator.tcc
@@ -35,6 +36,8 @@ set (TCC tcc/BinaryClassificationEvaluator.tcc
                    tcc/ParallelTransformIterator.tcc
                    tcc/Parser.tcc
                    tcc/TransformIterator.tcc)
+                   tcc/StringFormat.tcc
+                   tcc/VectorIterator.tcc)
                    
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

@@ -13,24 +13,23 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/HorizontalLayout.cpp
-               src/PrintableCoordinatewise.cpp
-               src/PrintableEmpty.cpp
-               src/PrintableInput.cpp
-               src/PrintableMap.cpp
-               src/PrintableSum.cpp
-               src/main.cpp
-               src/svgHelpers.cpp)
+set (SRC src/LayerLayout.cpp
+         src/PrintableInput.cpp
+         src/PrintableLayer.cpp
+         src/PrintableMap.cpp
+         src/PrintableCoordinatewise.cpp
+         src/PrintableSum.cpp
+         src/main.cpp
+         src/SvgHelpers.cpp)
 
-set (INCLUDE include/CommandLineArguments.h
-                   include/HorizontalLayout.h
-                   include/IPrintable.h
-                   include/PrintableCoordinatewise.h
-                   include/PrintableEmpty.h
-                   include/PrintableInput.h
-                   include/PrintableMap.h
-                   include/PrintableSum.h
-                   include/svgHelpers.h)
+set (INCLUDE include/PrintArguments.h
+             include/LayerLayout.h
+             include/PrintableLayer.h
+             include/PrintableInput.h
+             include/PrintableMap.h
+             include/PrintableCoordinatewise.h
+             include/PrintableSum.h
+             include/SvgHelpers.h)
          
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

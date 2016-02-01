@@ -1,4 +1,4 @@
-// HorizontalLayout.h
+// LayerLayout.h
 
 # pragma once
 
@@ -18,13 +18,13 @@ using std::vector;
 #include <stdexcept>
 using std::runtime_error;
 
-class HorizontalLayout
+class LayerLayout
 {
 public:
 
     /// Ctor
     ///
-    HorizontalLayout(uint64 numElements, double layerHorizontalMargin, double layerMaxWidth, double elementWidth, double xElementSpacing, double elementHorizontalLeftPadding, double elementHorizontalRightPadding, double dotsWidth);
+    LayerLayout(uint64 numElements, double layerHorizontalMargin, double layerMaxWidth, double elementWidth, double xElementSpacing, double elementHorizontalLeftPadding, double elementHorizontalRightPadding, double dotsWidth);
 
     /// \returns the x-axis value of the middle of the requested element
     ///

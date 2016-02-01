@@ -24,7 +24,6 @@ namespace layers
     class Layer
     {
     public:
-
         enum class Type { zero, scale, shift, sum, decisionTreePath };
 
         /// Default ctor
@@ -43,9 +42,13 @@ namespace layers
         ///
         virtual uint64 Size() const = 0;
 
+        /// \returns A string tha trepresents the layer type
+        ///
+        string GetTypeName() const;
+
         /// Computes the output of the layer
         ///
-        virtual void Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const = 0;
+        virtual void Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const = 0; // TODO - resolve the naming row vs. layer
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///
@@ -63,6 +66,7 @@ namespace layers
         void SerializeHeader(JsonSerializer& serializer, int version) const;
 
         Type _type;
+        static const string typeName[];
     };
 }
 

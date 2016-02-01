@@ -1,62 +1,116 @@
-// svgHelpers.cpp
+// SvgHelpers.cpp
 
-#include "svgHelpers.h"
-#include "HorizontalLayout.h"
+#include "SvgHelpers.h"
+#include "LayerLayout.h"
 
+// utilites
+#include "StringFormat.h"
+using utilities::StringFormat;
+
+// stl
 #include <iomanip>
 using std::setprecision;
 using std::fixed;
+
+using std::endl;
 
 #include <string>
 using std::to_string;
 
 #include <cmath>
 
-void svgRect(ostream& os, string svgClass, double x, double y, double radius, double width, double height)
+// unexposed utility functions
+void SvgTab(ostream& os, uint64 numTabs)
 {
-    os << "    <rect class=\"" << svgClass << "\" x=\"" << (int)x << "\" y=\"" << (int)y << "\" rx=\"" << (int)radius << "\" ry=\"" << (int)radius << "\" width=\"" << (int)width << "\" height=\"" << (int)height << "\"/>\n";
-}
-
-void svgCircle(ostream& os, string svgClass, double cx, double cy, double radius)
-{
-    os << "    <ellipse class = \"" << svgClass << "\" cx = \"" << (int)cx << "\" cy = \"" << (int)cy << "\" rx = \"" << (int)radius << "\" ry = \"" << (int)radius << "\" />\n";
-}
-
-void svgText(ostream& os, string text, string svgClass, double cx, double y, bool vertical)
-{
-    os << "    <text class=\"" << svgClass << "\" x=\"" << cx << "\" y=\"" << y << "\" text-anchor=\"middle\" dy=\".4em\"";
-    if (vertical)
+    for(uint64 i = 0; i<numTabs; ++i)
     {
-        os << " transform=\"rotate(-90, " << cx << ", " << y << ")\"";
+        os << "    ";
     }
-    os << ">" << text << "</text>\n";
 }
 
-void svgText(ostream& os, double text, int precision, string svgClass, double cx, double y)
+int GetPrecision(double number, uint64 maxChars)
 {
-    os << "    <text class=\"" << svgClass << "\" x=\"" << cx << "\" y=\"" << y << "\" text-anchor=\"middle\" dy=\".4em\"" << ">" << fixed << setprecision(precision) << text << "</text>\n";
+    int precision = 0;
+    if(number >= 1)
+    {
+        precision = (int)maxChars - 1 -(int)ceil(log10(number));   // save one char for "."
+    }
+    else if(number < 1 && number >= 0)
+    {
+        precision = (int)maxChars-2;   // save two characters for "0."
+    }
+    else if(number < 0 && number > -1)
+    {
+        precision = (int)maxChars - 3;   // save three chars for "-0."
+    }
+    else
+    {
+        precision = (int)maxChars - 2 - (int)ceil(log10(-number));   // save two chars for "-" and "."
+    }
+    if(precision < 0)
+    {
+        precision = 0;
+    }
+
+    return precision;
 }
 
-void svgUse(ostream& os, string href, double x, double y)
+void SvgRect(ostream& os, uint64 numTabs, const string& SvgClass, double x, double y, double width, double height, double radius)
 {
-    os << "    <use xlink:href=\"#" << href << "\" x=\"" << x << "\" y=\"" << y << "\" />\n";
+    SvgTab(os, numTabs);
+    auto format = R"aw(<rect class="%s" x="%f" y="%f" width="%f" height="%f" rx="%f" ry="%f" />)aw";
+    StringFormat(os, format, SvgClass, x, y, width, height, radius, radius);
+    os << endl;
 }
 
-void svgDots(ostream& os, double cx, double cy)
+void SvgCircle(ostream& os, uint64 numTabs, const string& SvgClass, double cx, double cy, double radius)
 {
-    svgCircle(os, "Dots", cx-8, cy, 2);
-    svgCircle(os, "Dots", cx, cy, 2);
-    svgCircle(os, "Dots", cx+8, cy, 2);
+    SvgTab(os, numTabs);
+    auto format = R"aw(<ellipse class="%s" cx="%f" cy="%f" rx="%f" ry="%f" />)aw";
+    StringFormat(os, format, SvgClass, cx, cy, radius, radius);
+    os << endl;
 }
 
-void svgEdge(ostream & os, Point from, Point to, double edgeFlattness)
+void SvgText(ostream& os, uint64 numTabs, const string& SvgClass, double cx, double cy, string text, double rotate)
+{
+    SvgTab(os, numTabs);
+    auto format = R"aw(<text class="%s" x="%f" y="%f" text-anchor="middle" dy=".4em"  transform="rotate(%f,%f,%f)">)aw";
+    StringFormat(os, format, SvgClass, cx, cy, rotate, cx, cy);
+    os << text << "</text>\n";
+}
+
+void SvgNumber(ostream& os, uint64 numTabs, const string& SvgClass, double cx, double cy, double number, uint64 maxChars, double rotate)
+{
+    stringstream ss;
+    ss << fixed << setprecision(GetPrecision(number, maxChars)) << number;
+    SvgText(os, numTabs, SvgClass, cx, cy, ss.str(), rotate);
+}
+
+void SvgUse(ostream& os, uint64 numTabs, string id, double x, double y)
+{
+    SvgTab(os, numTabs);
+    auto format = R"aw(<use xlink:href="#%s" x="%f" y="%f" />)aw";
+    StringFormat(os, format, id, x, y);
+    os << endl;
+}
+
+void SvgDots(ostream& os, uint64 numTabs, double cx, double cy)
+{
+    SvgCircle(os, numTabs, "Dots", cx-8, cy, 2);
+    SvgCircle(os, numTabs, "Dots", cx, cy, 2);
+    SvgCircle(os, numTabs, "Dots", cx+8, cy, 2);
+}
+
+void SvgEdge(ostream & os, uint64 numTabs, Point from, Point to, double edgeFlattness)
 {
     double xDist = to.x - from.x;
     double yDist = to.y - from.y;
 
     if (xDist == 0)
     {
-        os << "    <path class=\"Edge\" d=\"M " << from.x << " " << from.y << " L " << to.x << " " << to.y << "\"/>\n";
+        SvgTab(os, numTabs);
+        const char* format = R"aw(<path class="Edge" d="M %f %f L %f %f" />)aw";
+        StringFormat(os, format, from.x, from.y, to.x, to.y);
     }
 
     else
@@ -69,45 +123,33 @@ void svgEdge(ostream & os, Point from, Point to, double edgeFlattness)
 
         const double slopeDy = yDist - 2.0 * drop;
 
-        os << "    <path class=\"Edge\" d=\"M " << from.x << " " << from.y << " q 0 " << drop << " " << xDist*qFrac << " " << drop+slopeDy*qFrac << " l " << xDist*slopeFrac << " " << slopeDy*slopeFrac << " q " << xDist*qFrac << " " << slopeDy*qFrac << " " << xDist*qFrac << " " << drop+slopeDy*qFrac << "\"/>\n";
+        SvgTab(os, numTabs);
+        const char* format = R"aw(<path class="Edge" d="M %f %f q 0 %f %f %f l %f %f q %f %f %f %f" />)aw";
+        StringFormat(os, format, 
+            from.x, from.y, 
+            drop, xDist*qFrac, drop+slopeDy*qFrac, 
+            xDist*slopeFrac, slopeDy*slopeFrac, 
+            xDist*qFrac, slopeDy*qFrac, xDist*qFrac, drop+slopeDy*qFrac);
     }
+
+    os << endl;
 }
 
-int GetPrecision(double value, int maxChars)
+void SvgValueElement(ostream & os, uint64 numTabs, double cx, double cy, double number, uint64 maxChars, uint64 index)
 {
-    int precision = 0;
-    if(value >= 1)
-    {
-        precision = maxChars - 1 -(int)ceil(log10(value));   // save one char for "."
-    }
-    else if(value < 1 && value >= 0)
-    {
-        precision = maxChars-2;   // save two characters for "0."
-    }
-    else if(value < 0 && value > -1)
-    {
-        precision = maxChars - 3;   // save three chars for "-0."
-    }
-    else
-    {
-        precision = maxChars - 2 - (int)ceil(log10(-value));   // save two chars for "-" and "."
-    }
-    if(precision < 0)
-    {
-        precision = 0;
-    }
-
-    return precision;
+    SvgUse(os, 2, "ValueElement", cx, cy);
+    SvgNumber(os, 2, "Element", cx, cy-5, number, maxChars, 0);
+    SvgText(os, 2, "ElementIndex", cx, cy+10, to_string(index), 0);
 }
 
-string svgDefineElement(ostream& os, void* uid, ElementStyleArgs styleArgs)
+void SvgEmptyElement(ostream & os, uint64 numTabs, double cx, double cy, uint64 index)
 {
-    string typeName = "Element" + to_string((uint64)uid);
-    os << "<defs>\n<g id = \"" << typeName << "\">\n";
-    svgCircle(os, "Connector", styleArgs.width/2.0, 0, styleArgs.connectorRadius);
-    svgCircle(os, "Connector", styleArgs.width/2.0, styleArgs.height, styleArgs.connectorRadius);
-    svgRect(os, "Element", 0, 0, styleArgs.cornerRadius, styleArgs.width, styleArgs.height);
-    os << "</g>\n</defs>\n\n";
-    return typeName;
+    SvgUse(os, 2, "EmptyElement", cx, cy);
+    SvgText(os, 2, "ElementIndex", cx, cy, to_string(index), 0);
 }
 
+void SvgInputElement(ostream & os, uint64 numTabs, double cx, double cy, uint64 index)
+{
+    SvgUse(os, 2, "InputElement", cx, cy);
+    SvgText(os, 2, "ElementIndex", cx, cy, to_string(index), 0);
+}

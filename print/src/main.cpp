@@ -1,8 +1,8 @@
 // main.cpp
 
-#include "IPrintable.h"
+#include "PrintableLayer.h"
 #include "PrintableMap.h"
-#include "CommandLineArguments.h"
+#include "PrintArguments.h"
 
 // utilities
 #include "JsonSerializer.h"
@@ -38,20 +38,21 @@ int main(int argc, char* argv[])
     {
         // parse the command line
         CommandLineParser commandLineParser(argc, argv);
-        ParsedCommandLineArguments args;
-        commandLineParser.AddOptionSet(args);
-        commandLineParser.ParseArgs();
+        ParsedPrintArguments printArguments;
+        commandLineParser.AddOptionSet(printArguments);
+        commandLineParser.Parse();
 
         // open map file
-        auto mapFStream = OpenIfstream(args.mapFile);
+        auto mapFStream = OpenIfstream(printArguments.mapFile); // TODO: use common Arguments and common loader
         auto map = JsonSerializer::Load<PrintableMap>(mapFStream, "Base");
         
-        auto outputSvgFStream = OpenOfstream(args.svgFile);
-        map.Print(outputSvgFStream, args);
+        auto outputSvgFStream = OpenOfstream(printArguments.svgFile);
+        map.Print(outputSvgFStream, printArguments);
     }
     catch (const CommandLineParserPrintHelpException& ex)
     {
-        cout << ex.GetHelpText() << endl;        
+        cout << ex.GetHelpText() << endl;
+        return 0;
     }
     catch (const CommandLineParserErrorException& exception)
     {
@@ -60,11 +61,12 @@ int main(int argc, char* argv[])
         {
             cerr << error.GetMessage() << endl;
         }
-        return 0;
+        return 1;
     }
     catch (runtime_error e)
     {
         cerr << "runtime error: " << e.what() << std::endl;
+        return 1;
     }
 
     // the end

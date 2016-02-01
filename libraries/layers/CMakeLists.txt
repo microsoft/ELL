@@ -13,7 +13,6 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/Coordinate.cpp
-         src/CoordinateListFactory.cpp
          src/Coordinatewise.cpp
          src/DecisionTreePath.cpp
          src/Input.cpp
@@ -25,7 +24,6 @@ set (SRC src/Coordinate.cpp
          src/Sum.cpp)
 
 set (INCLUDE include/Coordinate.h
-             include/CoordinateListFactory.h
              include/Coordinatewise.h
              include/DecisionTreePath.h
              include/Input.h

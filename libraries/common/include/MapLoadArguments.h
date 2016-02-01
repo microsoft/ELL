@@ -15,12 +15,17 @@ using std::string;
 
 namespace common
 {
+    struct CoordinateListLoadArguments
+    {
+        uint32 ignoreSuffix = 0;
+    };
+
     /// A struct that holds command line parameters for loading maps
     ///
     struct MapLoadArguments
     {
         string inputMapFile = "";
-        uint32 inputMapIgnoreSuffix = 0;
+        CoordinateListLoadArguments coordinateListLoadArguments;
     };
 
     /// A version of MapLoadArguments that adds its members to the command line parser

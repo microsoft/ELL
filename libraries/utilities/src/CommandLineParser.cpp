@@ -103,7 +103,7 @@ namespace utilities
         }
     }
 
-    void CommandLineParser::ParseArgs()
+    void CommandLineParser::Parse()
     {
         // TODO: should probably throw an exception here ?
         if (_originalArgs.size() == 0)
