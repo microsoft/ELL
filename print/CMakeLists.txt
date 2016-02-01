@@ -22,7 +22,7 @@ set (SRC src/LayerLayout.cpp
          src/main.cpp
          src/SvgHelpers.cpp)
 
-set (INCLUDE include/CommandLineArguments.h
+set (INCLUDE include/PrintArguments.h
              include/LayerLayout.h
              include/PrintableLayer.h
              include/PrintableInput.h

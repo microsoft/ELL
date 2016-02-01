@@ -3,17 +3,17 @@
 #include "LayerLayout.h"
 
 
-LayerLayout::LayerLayout(double left, double top, uint64 size, double layerMaxWidth, ElementLayoutArgs args) : _elementMidX(size)
+LayerLayout::LayerLayout(double left, double top, uint64 size, double layerMaxWidth, ElementLayoutArguments Arguments) : _elementMidX(size)
 {
-    _connectorOffset = args.height / 2.0;
-    _layerHeight = args.height + 2.0 * args.verticalPadding;
+    _connectorOffset = Arguments.height / 2.0;
+    _layerHeight = Arguments.height + 2.0 * Arguments.verticalPadding;
     _midY = top + _layerHeight / 2.0;
 
     // width of the layer without abbreviated format 
-    double layerWidth = args.leftPadding + args.rightPadding + size * args.width + (size - 1) * args.horizontalSpacing;
+    double layerWidth = Arguments.leftPadding + Arguments.rightPadding + size * Arguments.width + (size - 1) * Arguments.horizontalSpacing;
 
-    double firstElementMidX = left + args.leftPadding + args.width / 2.0;
-    double elementWidthPlusSpacing = (args.width + args.horizontalSpacing);
+    double firstElementMidX = left + Arguments.leftPadding + Arguments.width / 2.0;
+    double elementWidthPlusSpacing = (Arguments.width + Arguments.horizontalSpacing);
 
     // non-abbreviated
     if(layerWidth <= layerMaxWidth)
@@ -32,10 +32,10 @@ LayerLayout::LayerLayout(double left, double top, uint64 size, double layerMaxWi
     {
         _layerWidth = layerMaxWidth;
 
-        double elementsWidth = layerMaxWidth - args.leftPadding - args.rightPadding;
-        uint64 numVisibleElements = uint64((elementsWidth - args.dotsWidth) / elementWidthPlusSpacing);
+        double elementsWidth = layerMaxWidth - Arguments.leftPadding - Arguments.rightPadding;
+        uint64 numVisibleElements = uint64((elementsWidth - Arguments.dotsWidth) / elementWidthPlusSpacing);
         
-        if(elementsWidth <= args.dotsWidth || numVisibleElements < 2)
+        if(elementsWidth <= Arguments.dotsWidth || numVisibleElements < 2)
         {
             throw runtime_error("unable to visualize layer within the specified constraints (increase width, decrease dots width or element width/spacing)");
         }
@@ -49,8 +49,8 @@ LayerLayout::LayerLayout(double left, double top, uint64 size, double layerMaxWi
         }
 
         // elements represented by dots
-        double dotsLeft = left + args.leftPadding + (numVisibleElements-1) * elementWidthPlusSpacing;
-        double dotsRight = _layerWidth - args.rightPadding - elementWidthPlusSpacing;
+        double dotsLeft = left + Arguments.leftPadding + (numVisibleElements-1) * elementWidthPlusSpacing;
+        double dotsRight = _layerWidth - Arguments.rightPadding - elementWidthPlusSpacing;
         _dotsMidX = (dotsLeft + dotsRight) / 2.0;
         double hiddenElementsSpacing = (dotsRight - dotsLeft) / (_numHiddenElements -1);
 
@@ -60,7 +60,7 @@ LayerLayout::LayerLayout(double left, double top, uint64 size, double layerMaxWi
         }
 
         /// element after dots
-        _elementMidX[size-1] = dotsRight + args.horizontalSpacing + args.width/2.0;
+        _elementMidX[size-1] = dotsRight + Arguments.horizontalSpacing + Arguments.width/2.0;
     }
 }
 

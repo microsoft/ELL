@@ -114,25 +114,25 @@ void PrintElementDefinition(ostream& os, const string& id, double width, double 
     os << "            </g>\n";
 }
 
-void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
+void PrintableMap::Print(ostream & os, const PrintArguments& Arguments)
 {
     os << "<html>\n<body>\n";
-    StringFormat(os, styleDefinitionFormat, args.edgeStyle.dashStyle);
+    StringFormat(os, styleDefinitionFormat, Arguments.edgeStyle.dashStyle);
 
     os << "    <Svg>\n\n        <defs>\n";
-    PrintElementDefinition(os, "ValueElement", args.valueElementLayout.width, args.valueElementLayout.height, args.valueElementStyle.connectorRadius, args.valueElementStyle.cornerRadius);
-    PrintElementDefinition(os, "EmptyElement", args.emptyElementLayout.width, args.emptyElementLayout.height, args.emptyElementStyle.connectorRadius, args.emptyElementStyle.cornerRadius);
+    PrintElementDefinition(os, "ValueElement", Arguments.valueElementLayout.width, Arguments.valueElementLayout.height, Arguments.valueElementStyle.connectorRadius, Arguments.valueElementStyle.cornerRadius);
+    PrintElementDefinition(os, "EmptyElement", Arguments.emptyElementLayout.width, Arguments.emptyElementLayout.height, Arguments.emptyElementStyle.connectorRadius, Arguments.emptyElementStyle.cornerRadius);
     os << "        </defs>\n\n";
 
     // print layer by layer
-    double layerTop = args.mapLayout.verticalMargin;
+    double layerTop = Arguments.mapLayout.verticalMargin;
     vector<LayerLayout> layouts;
 
     for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
     {
         auto printableLayer = GetLayer<PrintableLayer>(layerIndex);
-        auto layout = printableLayer->Print(os, args.mapLayout.horizontalMargin, layerTop, layerIndex, args); // TODO args not needed
-        layerTop += layout.GetHeight() + args.mapLayout.verticalSpacing;
+        auto layout = printableLayer->Print(os, Arguments.mapLayout.horizontalMargin, layerTop, layerIndex, Arguments); // TODO Arguments not needed
+        layerTop += layout.GetHeight() + Arguments.mapLayout.verticalSpacing;
         os << endl;
 
         // print edges
@@ -150,7 +150,7 @@ void PrintableMap::Print(ostream & os, const CommandLineArguments& args)
                         const auto& inputLayout = layouts[coordinate.GetRow()];
                         if (!inputLayout.IsHidden(coordinate.GetColumn())) // if input is hidden, hide edge
                         {
-                            SvgEdge(os, 2, inputLayout.GetOutputPoint(coordinate.GetColumn()), layout.GetInputPoint(column), args.edgeStyle.flattness);
+                            SvgEdge(os, 2, inputLayout.GetOutputPoint(coordinate.GetColumn()), layout.GetInputPoint(column), Arguments.edgeStyle.flattness);
                         }
 
                         // on to the next input

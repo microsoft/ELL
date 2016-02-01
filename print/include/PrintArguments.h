@@ -1,4 +1,4 @@
-// CommandLineArguments.h
+// PrintArguments.h
 
 #pragma once
 
@@ -13,7 +13,7 @@ using utilities::CommandLineParser;
 #include <string>
 using std::string;
 
-struct ElementLayoutArgs
+struct ElementLayoutArguments
 {
     double width;                       // element width
     double height;                      // element height
@@ -24,53 +24,53 @@ struct ElementLayoutArgs
     double dotsWidth;                   // width of the "dots" that represent the hidden elements
 };
 
-struct MapLayoutArgs
+struct MapLayoutArguments
 {
     double horizontalMargin;            // space to the left of the first layer
     double verticalMargin;              // space above the first layer
     double verticalSpacing;             // space between consecutive layers
 };
 
-struct ElementStyleArgs
+struct ElementStyleArguments
 {
     double cornerRadius;                // radius of the element corners
     double connectorRadius;             // radius of the input/output connectors
 };
 
-struct ValueElementStyleArgs : public ElementStyleArgs
+struct ValueElementStyleArguments : public ElementStyleArguments
 {
     uint64 maxChars;
 };
 
-struct EdgeStyleArgs
+struct EdgeStyleArguments
 {
     string dashStyle;
     double flattness;
 };
 
-struct LayerStyleArgs
+struct LayerStyleArguments
 {
     double maxWidth;                    // maximal layer width
     double cornerRadius;
 };
 
-struct CommandLineArguments
+struct PrintArguments
 {
-    string mapFile; // TODO use common args
-    string svgFile; // TODO use common args
+    string mapFile; // TODO use common Arguments
+    string svgFile; // TODO use common Arguments
 
-    ElementLayoutArgs valueElementLayout;
-    ElementLayoutArgs emptyElementLayout;
-    ValueElementStyleArgs valueElementStyle;
-    ElementStyleArgs emptyElementStyle;
-    MapLayoutArgs mapLayout;
-    LayerStyleArgs layerStyle;
-    EdgeStyleArgs edgeStyle;
+    ElementLayoutArguments valueElementLayout;
+    ElementLayoutArguments emptyElementLayout;
+    ValueElementStyleArguments valueElementStyle;
+    ElementStyleArguments emptyElementStyle;
+    MapLayoutArguments mapLayout;
+    LayerStyleArguments layerStyle;
+    EdgeStyleArguments edgeStyle;
 };
 
-struct ParsedCommandLineArguments : public CommandLineArguments, public ParsedArgSet
+struct ParsedPrintArguments : public PrintArguments, public ParsedArgSet
 {
-    virtual void AddArgs(CommandLineParser& parser)
+    virtual void AddArguments(CommandLineParser& parser)
     {
         parser.AddOption(mapFile, "inputMapFile", "imf", "Path to the input file that contains the map information", "");
         parser.AddOption(svgFile, "outputSvgFile", "osf", "Path to the output Svg file", "");

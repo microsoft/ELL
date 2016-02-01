@@ -10,7 +10,7 @@ using std::to_string;
 #include <algorithm>
 using std::transform;
 
-LayerLayout PrintableLayer::Print(ostream& os, double left, double top, uint64 layerIndex, const string& typeName, uint64 size, const ElementLayoutArgs& elementLayout, const LayerStyleArgs& layerStyle) const
+LayerLayout PrintableLayer::Print(ostream& os, double left, double top, uint64 layerIndex, const string& typeName, uint64 size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle) const
 {
     // calculate the layout
     LayerLayout layout(left, top, size, layerStyle.maxWidth, elementLayout);

@@ -2,7 +2,7 @@
 
 # pragma once
 
-#include "CommandLineArguments.h"
+#include "PrintArguments.h"
 
 #include "types.h"
 
@@ -30,7 +30,7 @@ public:
 
     /// Ctor
     ///
-    LayerLayout(double left, double top, uint64 size, double layerMaxWidth, ElementLayoutArgs args);
+    LayerLayout(double left, double top, uint64 size, double layerMaxWidth, ElementLayoutArguments Arguments);
 
     /// \returns the layer width
     ///

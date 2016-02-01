@@ -3,7 +3,7 @@
 #pragma once
 
 #include "PrintableLayer.h"
-#include "CommandLineArguments.h" // TOCO change name of this file
+#include "PrintArguments.h" // TOCO change name of this file
 
 // layers
 #include "Layer.h"
@@ -31,7 +31,7 @@ class PrintableMap : public Map
 public:
     /// Prints a human-friendly description of the layer to a stream
     ///
-    void Print(ostream& os, const CommandLineArguments& args);
+    void Print(ostream& os, const PrintArguments& Arguments);
 
     /// Deserializes the Map in json format
     ///

@@ -2,7 +2,7 @@
 
 #include "PrintableLayer.h"
 #include "PrintableMap.h"
-#include "CommandLineArguments.h"
+#include "PrintArguments.h"
 
 // utilities
 #include "JsonSerializer.h"
@@ -38,16 +38,16 @@ int main(int argc, char* argv[])
     {
         // parse the command line
         CommandLineParser commandLineParser(argc, argv);
-        ParsedCommandLineArguments args;
-        commandLineParser.AddOptionSet(args);
+        ParsedPrintArguments printArguments;
+        commandLineParser.AddOptionSet(printArguments);
         commandLineParser.ParseArgs();
 
         // open map file
-        auto mapFStream = OpenIfstream(args.mapFile); // TODO: use common args and common loader
+        auto mapFStream = OpenIfstream(printArguments.mapFile); // TODO: use common Arguments and common loader
         auto map = JsonSerializer::Load<PrintableMap>(mapFStream, "Base");
         
-        auto outputSvgFStream = OpenOfstream(args.svgFile);
-        map.Print(outputSvgFStream, args);
+        auto outputSvgFStream = OpenOfstream(printArguments.svgFile);
+        map.Print(outputSvgFStream, printArguments);
     }
     catch (const CommandLineParserPrintHelpException& ex)
     {

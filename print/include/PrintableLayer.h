@@ -3,7 +3,7 @@
 #pragma once
 
 #include "LayerLayout.h"
-#include "CommandLineArguments.h"
+#include "PrintArguments.h"
 
 #include "layers.h"
 using namespace layers;
@@ -24,10 +24,10 @@ class PrintableLayer
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///
-    virtual LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const CommandLineArguments& args) const = 0;
+    virtual LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const = 0;
 
 protected:
-    LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const string& typeName, uint64 size, const ElementLayoutArgs& elementLayout, const LayerStyleArgs& layerStyle) const;
+    LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const string& typeName, uint64 size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle) const;
 };
 
  
