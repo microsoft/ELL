@@ -27,7 +27,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/Parser.h
                        include/TransformIterator.h
                        include/files.h
-             include/StringFormat.h
+                       include/StringFormat.h
                        include/randomEngines.h)
 
 set (TCC tcc/BinaryClassificationEvaluator.tcc
@@ -35,7 +35,7 @@ set (TCC tcc/BinaryClassificationEvaluator.tcc
                    tcc/JsonSerializer.tcc
                    tcc/ParallelTransformIterator.tcc
                    tcc/Parser.tcc
-                   tcc/TransformIterator.tcc)
+                   tcc/TransformIterator.tcc
                    tcc/StringFormat.tcc
                    tcc/VectorIterator.tcc)
                    

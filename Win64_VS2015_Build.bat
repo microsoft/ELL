@@ -13,6 +13,6 @@ cd build
 "\Program Files (x86)\CMake\bin\ctest.exe" -V -C Debug
 
 :: compile the Release configuration
-:: "\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" Layers.sln /p:Configuration=Release
+:: "\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" /m Layers.sln /p:Configuration=Release
 
 
