@@ -11,11 +11,11 @@ LayerLayout PrintableInput::Print(ostream& os, double left, double top, uint64 l
     //// print the visible elements, before the dots
     for (uint64 k = 0; k < layout.NumVisibleElements() - 1; ++k)
     {
-        SvgEmptyElement(os, 2, layout.GetMidX(k), layout.GetMidY(), k);
+        SvgInputElement(os, 2, layout.GetMidX(k), layout.GetMidY(), k);
     }
 
     // print last element
-    SvgEmptyElement(os, 2, layout.GetMidX(Size() - 1), layout.GetMidY(), Size() - 1);
+    SvgInputElement(os, 2, layout.GetMidX(Size() - 1), layout.GetMidY(), Size() - 1);
 
     // if has hidden elements, draw the dots
     if (layout.HasHidden())

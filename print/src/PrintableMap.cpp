@@ -105,11 +105,14 @@ R"aw(
 )aw";
 }
 
-void PrintElementDefinition(ostream& os, const string& id, double width, double height, double connectorRadius, double cornerRadius)
+void PrintElementDefinition(ostream& os, const string& id, double width, double height, double connectorRadius, double cornerRadius, bool hasInputConnector=true)
 {
     os << "            <g id=\"" << id << "\">\n";
+    if (hasInputConnector)
+    {
+        SvgCircle(os, 4, "Connector", 0, -height / 2, connectorRadius);
+    }
     SvgCircle(os, 4, "Connector", 0, height/2, connectorRadius);
-    SvgCircle(os, 4, "Connector", 0, -height/2, connectorRadius);
     SvgRect(os, 4, "Element", -width/2, -height/2, width, height, cornerRadius);
     os << "            </g>\n";
 }
@@ -120,8 +123,28 @@ void PrintableMap::Print(ostream & os, const PrintArguments& Arguments)
     StringFormat(os, styleDefinitionFormat, Arguments.edgeStyle.dashStyle);
 
     os << "    <Svg>\n\n        <defs>\n";
-    PrintElementDefinition(os, "ValueElement", Arguments.valueElementLayout.width, Arguments.valueElementLayout.height, Arguments.valueElementStyle.connectorRadius, Arguments.valueElementStyle.cornerRadius);
-    PrintElementDefinition(os, "EmptyElement", Arguments.emptyElementLayout.width, Arguments.emptyElementLayout.height, Arguments.emptyElementStyle.connectorRadius, Arguments.emptyElementStyle.cornerRadius);
+    PrintElementDefinition(os,
+        "ValueElement",
+        Arguments.valueElementLayout.width, 
+        Arguments.valueElementLayout.height, 
+        Arguments.valueElementStyle.connectorRadius, 
+        Arguments.valueElementStyle.cornerRadius);
+    
+    PrintElementDefinition(os,
+        "EmptyElement",
+        Arguments.emptyElementLayout.width,
+        Arguments.emptyElementLayout.height,
+        Arguments.emptyElementStyle.connectorRadius,
+        Arguments.emptyElementStyle.cornerRadius);
+
+    PrintElementDefinition(os,
+        "InputElement",
+        Arguments.emptyElementLayout.width,
+        Arguments.emptyElementLayout.height,
+        Arguments.emptyElementStyle.connectorRadius,
+        Arguments.emptyElementStyle.cornerRadius,
+        false);
+
     os << "        </defs>\n\n";
 
     // print layer by layer

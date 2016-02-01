@@ -47,3 +47,7 @@ void SvgValueElement(ostream & os, uint64 numTabs, double cx, double cy, double 
 ///
 ///
 void SvgEmptyElement(ostream & os, uint64 numTabs, double cx, double cy, uint64 index);
+
+///
+///
+void SvgInputElement(ostream & os, uint64 numTabs, double cx, double cy, uint64 index);

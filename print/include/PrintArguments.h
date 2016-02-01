@@ -70,7 +70,7 @@ struct PrintArguments
 
 struct ParsedPrintArguments : public PrintArguments, public ParsedArgSet
 {
-    virtual void AddArguments(CommandLineParser& parser)
+    virtual void AddArgs(CommandLineParser& parser)
     {
         parser.AddOption(mapFile, "inputMapFile", "imf", "Path to the input file that contains the map information", "");
         parser.AddOption(svgFile, "outputSvgFile", "osf", "Path to the output Svg file", "");
@@ -91,7 +91,7 @@ struct ParsedPrintArguments : public PrintArguments, public ParsedArgSet
         parser.AddOption(valueElementStyle.maxChars, "valueElementMaxChars", "vemc", "Number of characters used to print the value in each element", 6);
 
         parser.AddOption(emptyElementLayout.width, "emptyElementWidth", "eew", "Width of each element in a layer that doesn't show values", 40);
-        parser.AddOption(emptyElementLayout.height, "emptyElementHeight", "eeh", "Height of each element in a layer that doesn't show values", 20);
+        parser.AddOption(emptyElementLayout.height, "emptyElementHeight", "eeh", "Height of each element in a layer that doesn't show values", 28);
         parser.AddOption(emptyElementLayout.leftPadding, "emptyElementLeftPadding", "eelp", "Horizontal distance between the left edge of a layer that doesn't show values and its first element", 70);
         parser.AddOption(emptyElementLayout.rightPadding, "emptyElementRightPadding", "eerp", "Horizontal distance between the right edge of a layer that doesn't show values and its last element", 10);
         parser.AddOption(emptyElementLayout.verticalPadding, "emptyElementVerticalPadding", "eevp", "Vertical distance between the top/bottom edges of a layer that doesn't show values and the top/bottom edges of its elements", 18);

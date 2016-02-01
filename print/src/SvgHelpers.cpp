@@ -147,3 +147,9 @@ void SvgEmptyElement(ostream & os, uint64 numTabs, double cx, double cy, uint64 
     SvgUse(os, 2, "EmptyElement", cx, cy);
     SvgText(os, 2, "ElementIndex", cx, cy, to_string(index), 0);
 }
+
+void SvgInputElement(ostream & os, uint64 numTabs, double cx, double cy, uint64 index)
+{
+    SvgUse(os, 2, "InputElement", cx, cy);
+    SvgText(os, 2, "ElementIndex", cx, cy, to_string(index), 0);
+}
