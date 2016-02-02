@@ -75,7 +75,7 @@ namespace utilities
     //
     // OptionInfo class
     //
-    OptionInfo::OptionInfo(string name, string shortName, string description, string defaultValue, function<bool(string)> set_value_callback) : name(name), shortName(shortName), description(description), defaultValue_string(defaultValue), set_value_callbacks({ set_value_callback })
+    OptionInfo::OptionInfo(string name, string shortName, string description, string defaultValue, function<bool(string)> set_value_callback) : name(name), shortName(shortName), description(description), defaultValueString(defaultValue), set_value_callbacks({ set_value_callback })
     {}
 
     //
@@ -92,14 +92,14 @@ namespace utilities
         _originalArgs.insert(_originalArgs.end(), &argv[0], &argv[argc]);
 
         string exe_path = _originalArgs[0];
-        size_t slash_pos = exe_path.find_last_of("/\\");
-        if (slash_pos == string::npos)
+        size_t slashPos = exe_path.find_last_of("/\\");
+        if (slashPos == string::npos)
         {
             _exeName = exe_path;
         }
         else
         {
-            _exeName = exe_path.substr(slash_pos + 1);
+            _exeName = exe_path.substr(slashPos + 1);
         }
     }
 
@@ -126,8 +126,8 @@ namespace utilities
         // to reparse the inputs in case some earlier commandline option referred to one of these new
         // options. So we repeatedly parse the command line text until we haven't added any new conditional options.
 
-        bool needs_reparse = true;
-        while (needs_reparse)
+        bool needsReparse = true;
+        while (needsReparse)
         {
             set<string> unset_args;
             for (const auto& opt : _options)
@@ -135,7 +135,7 @@ namespace utilities
                 unset_args.insert(opt.first);
             }
 
-            needs_reparse = false;
+            needsReparse = false;
             size_t argc = _originalArgs.size();
             for (int index = 1; index < argc; index++)
             {
@@ -171,28 +171,28 @@ namespace utilities
                             string val = _originalArgs[index + 1];
                             if (val[0] == '-')
                             {
-                                needs_reparse = SetOption(option, "true") || needs_reparse;
+                                needsReparse = SetOption(option, "true") || needsReparse;
                             }
                             else
                             {
-                                needs_reparse = SetOption(option, val) || needs_reparse;
+                                needsReparse = SetOption(option, val) || needsReparse;
                                 index++;
                             }
                         }
                         else // this is the last thing on the line --- assume it's a shortcut for --option true
                         {
-                            needs_reparse = SetOption(option, "true") || needs_reparse;
+                            needsReparse = SetOption(option, "true") || needsReparse;
                         }
                     }
                 }
                 else
                 {
-                    _positional_args.push_back(_originalArgs[index]);
+                    _positionalArgs.push_back(_originalArgs[index]);
                 }
             }
 
             // Need to set default args here, in case one of them enables a conditional argument set
-            needs_reparse = SetDefaultArgs(unset_args) || needs_reparse;
+            needsReparse = SetDefaultArgs(unset_args) || needsReparse;
         }
 
         // Finally, invoke the post-parse callbacks
@@ -224,19 +224,19 @@ namespace utilities
 
     bool CommandLineParser::SetDefaultArgs(const set<string>& unset_args)
     {
-        bool needs_reparse = false;
-        for (string arg_name : unset_args)
+        bool needsReparse = false;
+        for (string argName : unset_args)
         {
             // look up arg
-            auto iter = _options.find(arg_name);
+            auto iter = _options.find(argName);
             if (iter != _options.end())
             {
                 const OptionInfo& arg_info = iter->second;
-                string default_val = arg_info.defaultValue_string;
-                needs_reparse = SetOption(arg_name, default_val) || needs_reparse;
+                string default_val = arg_info.defaultValueString;
+                needsReparse = SetOption(argName, default_val) || needsReparse;
             }
         }
-        return needs_reparse;
+        return needsReparse;
     }
 
     bool CommandLineParser::HasOption(string option)
@@ -275,50 +275,50 @@ namespace utilities
         _postParseCallbacks.push_back(callback);
     }
 
-    inline bool FindBestMatch(string str, const vector<string>& val_names, string& result_string)  // TODO: this function is not used anywhere -erase it?
+    inline bool FindBestMatch(string str, const vector<string>& val_names, string& resultString)  // TODO: this function is not used anywhere -erase it?
     {
-        bool did_find_one = false;
-        for (const auto& val_name : val_names)
+        bool didFindOne = false;
+        for (const auto& valName : val_names)
         {
-            if (val_name.find(str) != string::npos)
+            if (valName.find(str) != string::npos)
             {
-                if (did_find_one)
+                if (didFindOne)
                 {
                     return false;
                 }
 
-                result_string = val_name;
-                did_find_one = true;
+                resultString = valName;
+                didFindOne = true;
             }
         }
 
-        return did_find_one;
+        return didFindOne;
     }
 
     bool CommandLineParser::SetOption(string option_name, string option_val)
     {
-        string old_value_string = _options[option_name].current_value_string;
-        _options[option_name].current_value_string = option_val;
+        string oldValueString = _options[option_name].currentValueString;
+        _options[option_name].currentValueString = option_val;
 
         bool ok = true;
-        bool did_enable_more_params = false;
-        for (auto set_value_cb : _options[option_name].set_value_callbacks)
+        bool didEnableMoreParams = false;
+        for (auto setValueCb : _options[option_name].set_value_callbacks)
         {
-            ok = ok && set_value_cb(option_val);
+            ok = ok && setValueCb(option_val);
         }
 
         if (ok)
         {
-            auto iter = _options[option_name].did_set_value_callbacks.begin();
-            while (iter != _options[option_name].did_set_value_callbacks.end())
+            auto iter = _options[option_name].didSetValueCallbacks.begin();
+            while (iter != _options[option_name].didSetValueCallbacks.end())
             {
-                auto& did_set_value_cb = *iter;
-                bool did_set = did_set_value_cb(_options[option_name].current_value_string);
+                auto& didSetValueCb = *iter;
+                bool did_set = didSetValueCb(_options[option_name].currentValueString);
                 if (did_set)
                 {
-                    did_enable_more_params = true;
+                    didEnableMoreParams = true;
                     // remove from list once it's called
-                    iter = _options[option_name].did_set_value_callbacks.erase(iter);
+                    iter = _options[option_name].didSetValueCallbacks.erase(iter);
                 }
                 else
                 {
@@ -329,10 +329,10 @@ namespace utilities
         }
         else
         {
-            _options[option_name].current_value_string = old_value_string;
+            _options[option_name].currentValueString = oldValueString;
         }
 
-        return did_enable_more_params;
+        return didEnableMoreParams;
     }
 
     void CommandLineParser::AddOptionSet(ParsedArgSet& options)
@@ -350,15 +350,15 @@ namespace utilities
     {
         if (option.shortName == "")
         {
-            return option.name + " [" + option.defaultValue_string + "]";
+            return option.name + " [" + option.defaultValueString + "]";
         }
         else
         {
-            return option.name + " (-" + option.shortName + ") [" + option.defaultValue_string + "]";
+            return option.name + " (-" + option.shortName + ") [" + option.defaultValueString + "]";
         }
     }
 
-    size_t option_name_help_length(const OptionInfo& option)
+    size_t optionNameHelpLength(const OptionInfo& option)
     {
         size_t len = option.name.size() + 2;
         if (option.shortName != "")
@@ -366,10 +366,10 @@ namespace utilities
             len += (option.shortName.size() + 4);
         }
 
-        len += option.defaultValue_string.size() + 3; // 3 for " [" + "]" at begin/end
+        len += option.defaultValueString.size() + 3; // 3 for " [" + "]" at begin/end
 
-        const size_t max_name_len = 32;
-        return min(max_name_len, len);
+        const size_t maxNameLen = 32;
+        return min(maxNameLen, len);
     }
 
     string CommandLineParser::GetHelpString()
@@ -381,7 +381,7 @@ namespace utilities
         {
             if (iter.first == iter.second.name) // wasn't a previously-undefined option
             {
-                longest_name = max(longest_name, option_name_help_length(iter.second));
+                longest_name = max(longest_name, optionNameHelpLength(iter.second));
             }
         }
 
@@ -396,8 +396,8 @@ namespace utilities
             {
                 const OptionInfo& info = _options[entry.EntryString];
                 string option_name = option_name_string(info);
-                size_t this_option_name_len = option_name_help_length(info);
-                size_t pad_len = 2 + (longest_name - this_option_name_len);
+                size_t thisOptionNameLen = optionNameHelpLength(info);
+                size_t pad_len = 2 + (longest_name - thisOptionNameLen);
                 string padding(pad_len, ' ');
                 out << "\t--" << option_name << padding << info.description;
                 if (info.enum_values.size() > 0)
@@ -437,10 +437,10 @@ namespace utilities
                 const auto& opt = _options[entry.EntryString];
                 visited_options.insert(opt.name);
                 out << "\t--" << opt.name << ": ";
-                if (opt.current_value_string != "")
+                if (opt.currentValueString != "")
                 {
-                    out << opt.current_value_string;
-                    if (opt.current_value_string == opt.defaultValue_string)
+                    out << opt.currentValueString;
+                    if (opt.currentValueString == opt.defaultValueString)
                     {
                         out << " (default)";
                     }
@@ -448,7 +448,7 @@ namespace utilities
                 }
                 else
                 {
-                    out << "[" << opt.defaultValue_string << "]" << endl;
+                    out << "[" << opt.defaultValueString << "]" << endl;
                 }
             }
         }
@@ -463,7 +463,7 @@ namespace utilities
                     out << endl;
                     out << "Unknown parameters" << endl;
                 }
-                out << "\t--" << opt.first << ": " << opt.second.current_value_string << endl;
+                out << "\t--" << opt.first << ": " << opt.second.currentValueString << endl;
                 did_print = true;
             }
         }
@@ -484,7 +484,7 @@ namespace utilities
         auto it = _options.find(option);
         if (it != _options.end())
         {
-            return it->second.current_value_string;
+            return it->second.currentValueString;
         }
         else
         {

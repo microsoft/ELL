@@ -25,10 +25,10 @@ namespace utilities
     template <typename T, typename U>
     void CommandLineParser::AddOption(T& option, string name, string shortName, string description, const U& defaultValue)
     {
-        auto callback = [&option, this](string option_val)
+        auto callback = [&option, this](string optionVal)
         {
-            bool did_parse = ParseVal<T>(option_val, option);
-            return did_parse;
+            bool didParse = ParseVal<T>(optionVal, option);
+            return didParse;
         };
 
         OptionInfo info(name, shortName, description, ToString(defaultValue), callback);
@@ -44,25 +44,25 @@ namespace utilities
     }
 
     template <typename T>
-    bool CommandLineParser::ParseVal(string str, vector<pair<string, T>> val_names, T& result, string& result_string)
+    bool CommandLineParser::ParseVal(string str, vector<pair<string, T>> valNames, T& result, string& resultString)
     {
-        bool did_find_one = false;
-        for (const auto& val_name_pair : val_names)
+        bool didFindOne = false;
+        for (const auto& valNamePair : valNames)
         {
-            if (val_name_pair.first.find(str) == 0)
+            if (valNamePair.first.find(str) == 0)
             {
-                if (did_find_one)
+                if (didFindOne)
                 {
                     return false;
                 }
 
-                result_string = val_name_pair.first;
-                result = val_name_pair.second;
-                did_find_one = true;
+                resultString = valNamePair.first;
+                result = valNamePair.second;
+                didFindOne = true;
             }
         }
 
-        return did_find_one;
+        return didFindOne;
     }
 
     template <typename T>

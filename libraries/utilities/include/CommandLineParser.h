@@ -44,12 +44,12 @@ namespace utilities
         string name;
         string shortName;
         string description;
-        string defaultValue_string; // for printing
-        string current_value_string;
+        string defaultValueString; // for printing
+        string currentValueString;
         vector<string> enum_values; // for enumerated values // TODO: make this into a more general constraint mechanism (?)
 
         vector<function<bool(string)>> set_value_callbacks; // callback returns "true" if value was successfully set, otherwise "false"
-        vector<function<bool(string)>> did_set_value_callbacks; // callback returns "true" if value was successfully set, otherwise "false"
+        vector<function<bool(string)>> didSetValueCallbacks; // callback returns "true" if value was successfully set, otherwise "false"
 
         // TODO: Add "policy" member (required, set_once, last_wins, etc.)
 
@@ -168,7 +168,7 @@ namespace utilities
         /// TODO: document
         ///
         template <typename T>
-        static bool ParseVal(string str, vector<pair<string, T>> val_names, T& result, string& result_string);
+        static bool ParseVal(string str, vector<pair<string, T>> val_names, T& result, string& resultString);
 
         /// TODO: document
         ///
@@ -186,7 +186,7 @@ namespace utilities
 
         vector<string> _originalArgs;
         string _exeName;
-        vector<string> _positional_args; // these are filename-type args at the end, currently unused
+        vector<string> _positionalArgs; // these are filename-type args at the end, currently unused
         map<string, string> _shortToLongNameMap;
         map<string, OptionInfo> _options;
         vector<DocumentationEntry> _docEntries;
