@@ -7,7 +7,7 @@
 namespace dataset
 {
     template<typename ValueType>
-    DenseDataVector<ValueType>::DenseDataVector()
+    DenseDataVector<ValueType>::DenseDataVector() : _num_nonzeros(0)
     {
         _data.reserve(DEFAULT_DENSE_VECTOR_CAPACITY);
     }

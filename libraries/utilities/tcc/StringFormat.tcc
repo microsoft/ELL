@@ -10,33 +10,6 @@ using std::setprecision;
 
 namespace utilities
 {
-    //template<typename ... Args>
-    //string StringFormat(const char* input, Args ...args)
-    //{
-    //    // allocate buffer of correct size
-    //    auto size = snprintf(nullptr, 0, input, args ...);
-    //    auto buf = new char[size + 1];      // leave room for trailing \0
-    //    
-    //    // format
-    //    snprintf(buf, size + 1, input, args ...);
-    //    
-    //    // cast back to stl::string
-    //    auto result = string(buf, buf + size);
-
-    //    // cleanup and return
-    //    delete[] buf;
-    //    return result;
-    //}
-
-    //template<typename ... Args>
-    //string StringFormat(const string& input, Args ...args)
-    //{
-    //    // get c-string
-    //    const char* cstr = input.c_str();
-
-    //    return StringFormat(cstr, args ...);
-    //}
-
     template<typename ArgType, typename ... ArgTypes>
     void StringFormat(ostream& os, const char* cstr, ArgType arg, ArgTypes ...args)
     {

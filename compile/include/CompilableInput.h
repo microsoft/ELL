@@ -4,8 +4,8 @@
 
 #include "CompilableLayer.h"
 
-#include "layers.h"
-using namespace layers;
+#include "Input.h"
+using layers::Input;
 
 /// A struct that adds printing capabilities to a layer
 ///

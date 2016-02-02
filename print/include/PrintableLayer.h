@@ -5,9 +5,6 @@
 #include "LayerLayout.h"
 #include "PrintArguments.h"
 
-#include "layers.h"
-using namespace layers;
-
 #include "types.h"
 
 #include <iostream>

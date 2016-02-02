@@ -35,9 +35,7 @@ namespace dataset
 
         VectorEntryParserType _instanceParser;
         bool _hasWeight;
-        char _delim;
     };
-
 }
 
 #include "../tcc/SupervisedExampleBuilder.tcc"

@@ -14,9 +14,7 @@ endif()
 
 set (SRC src/Coordinate.cpp
          src/Coordinatewise.cpp
-         src/DecisionTreePath.cpp
          src/Input.cpp
-         src/Io.cpp
          src/Layer.cpp
          src/Map.cpp
          src/Scale.cpp
@@ -25,14 +23,12 @@ set (SRC src/Coordinate.cpp
 
 set (INCLUDE include/Coordinate.h
              include/Coordinatewise.h
-             include/DecisionTreePath.h
              include/Input.h
              include/Layer.h
              include/Map.h
              include/Scale.h
              include/Shift.h
-             include/Sum.h
-             include/layers.h)
+             include/Sum.h)
 
 set (TCC tcc/DecisionTreePath.tcc
          tcc/Map.tcc)

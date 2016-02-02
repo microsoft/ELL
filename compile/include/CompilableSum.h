@@ -4,8 +4,8 @@
 
 #include "CompilableLayer.h"
 
-#include "layers.h"
-using namespace layers;
+#include "Sum.h"
+using layers::Sum;
 
 /// A struct that adds printing capabilities to a layer
 ///

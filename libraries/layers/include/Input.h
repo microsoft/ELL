@@ -21,6 +21,10 @@ namespace layers
         ///
         Input(const Input&) = default;
 
+        /// Default virtual destructor
+        ///
+        virtual ~Input() = default;
+
         /// \returns The size of the layer's output
         ///
         virtual uint64 Size() const override;
