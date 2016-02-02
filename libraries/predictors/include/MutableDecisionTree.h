@@ -2,8 +2,8 @@
 
 #pragma once
 
+// stl
 #include <vector>
-using std::vector;
 
 namespace decision_tree
 {
@@ -74,7 +74,7 @@ namespace decision_tree
 
         /// An iterator used to expose the tree split rules
         ///
-        using split_rule_iterator = vector<SplitRule>::const_iterator;
+        using split_rule_iterator = std::vector<SplitRule>::const_iterator;
 
         /// \returns An iterator over the split rules that points to the first SplitRule
         ///
@@ -86,7 +86,7 @@ namespace decision_tree
 
         /// An iterator used to expose the parent identities of vertices in the the tree
         ///
-        using parent_iterator = vector<int>::const_iterator;
+        using parent_iterator = std::vector<int>::const_iterator;
 
         /// \returns An iterator over parent indentities that points to the first vertex
         ///
@@ -98,7 +98,7 @@ namespace decision_tree
 
         /// An iterator used to expose the Children values of the tree
         ///
-        using children_iterator = vector<Children>::const_iterator;
+        using children_iterator = std::vector<Children>::const_iterator;
 
         /// \returns An iterator over Children values that points to the first vertex
         ///
@@ -110,7 +110,7 @@ namespace decision_tree
 
         /// An iterator used to expose the output values of the tree
         ///
-        using output_iterator = vector<double>::const_iterator;
+        using output_iterator = std::vector<double>::const_iterator;
 
         /// \returns An iterator over output values that points to the first vertex
         ///
@@ -140,9 +140,9 @@ namespace decision_tree
 
     private:
         
-        vector<SplitRule> _split_rules;
-        vector<Children> _children;
-        vector<int> _parents;
-        vector<double> _outputs;
+        std::vector<SplitRule> _split_rules;
+        std::vector<Children> _children;
+        std::vector<int> _parents;
+        std::vector<double> _outputs;
     };
 }

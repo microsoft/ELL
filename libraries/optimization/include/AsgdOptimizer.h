@@ -33,7 +33,7 @@ namespace optimization
             
     private:
         uint64 _total_iterations;
-        DoubleVector _w;
+        linear::DoubleVector _w;
         double _b;
         predictors::SharedLinearBinaryPredictor _predictor;
     };

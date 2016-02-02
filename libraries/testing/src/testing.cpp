@@ -2,12 +2,11 @@
 
 #include "testing.h"
 
+// types
 #include "types.h"
 
 // stl
 #include <iostream>
-using std::cout;
-using std::endl;
 
 namespace testing
 {
@@ -23,7 +22,7 @@ namespace testing
         }
     }
 
-    bool isEqual(const vector<double>& a, const vector<double>& b, double tolerance)
+    bool isEqual(const std::vector<double>& a, const std::vector<double>& b, double tolerance)
     {
         // allow vectors of different size, provided that they differ by a suffix of zeros
         uint64 size = a.size();
@@ -62,17 +61,17 @@ namespace testing
 
     bool testFailedFlag = false;
 
-    void processTest(const string& testDescription, bool success)
+    void processTest(const std::string& testDescription, bool success)
     {
-        cout << testDescription << " ... ";
+        std::cout << testDescription << " ... ";
 
         if (success)
         {
-            cout << "Passed\n";
+            std::cout << "Passed\n";
         }
         else
         {
-            cout << "Failed\n";
+            std::cout << "Failed\n";
             testFailedFlag = true;
         }
     }

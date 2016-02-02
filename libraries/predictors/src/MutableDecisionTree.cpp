@@ -2,9 +2,8 @@
 
 #include "MutableDecisionTree.h"
 
+// stl
 #include <stdexcept>
-using std::runtime_error;
-using std::swap;
 
 namespace decision_tree
 {
@@ -114,7 +113,7 @@ namespace decision_tree
         // check that the arguments are valid
         if(leaf_index >= GetNumVertices() || leaf_index < GetNumInteriorVertices())
         {
-            throw runtime_error("leaf index out of bounds");
+            throw std::runtime_error("leaf index out of bounds");
         }
 
         // get new indices
@@ -122,11 +121,11 @@ namespace decision_tree
         int child0_index = GetNumVertices();
         int child1_index = child0_index + 1;
 
-        // swap leaf_index with new_interior_index
+        // std::swap leaf_index with new_interior_index
         if (leaf_index != new_interior_index)
         {
 
-            // tell the parents about the swap
+            // tell the parents about the std::swap
             int parent_of_leaf = _parents[leaf_index];
             int parent_of_new_interior = _parents[new_interior_index];
 
@@ -147,9 +146,9 @@ namespace decision_tree
                 _children[parent_of_new_interior].set_child1(leaf_index);
             }
             
-            // swap the vertices
-            swap(_parents[leaf_index], _parents[new_interior_index]);
-            swap(_outputs[leaf_index], _outputs[new_interior_index]);
+            // std::swap the vertices
+            std::swap(_parents[leaf_index], _parents[new_interior_index]);
+            std::swap(_outputs[leaf_index], _outputs[new_interior_index]);
         }
 
         // Add new leaves

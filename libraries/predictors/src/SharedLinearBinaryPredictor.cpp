@@ -1,19 +1,13 @@
 #include "SharedLinearBinaryPredictor.h"
 
+// layers
 #include "Coordinate.h"
-using layers::Coordinate;
-
 #include "Scale.h"
-using layers::Scale;
-
 #include "Sum.h"
-using layers::Sum;
-
 #include "Shift.h"
-using layers::Shift;
 
+// stl
 #include <memory>
-using std::make_shared;
 
 namespace predictors
 {
@@ -22,15 +16,15 @@ namespace predictors
 
     SharedLinearBinaryPredictor::SharedLinearBinaryPredictor(uint64 dim)
     {
-        _sp_predictor = make_shared<BiasedVector>(dim);
+        _sp_predictor = std::make_shared<BiasedVector>(dim);
     }
 
-    DoubleVector & SharedLinearBinaryPredictor::GetVector()
+    linear::DoubleVector & SharedLinearBinaryPredictor::GetVector()
     {
         return _sp_predictor->w;
     }
 
-    const DoubleVector & SharedLinearBinaryPredictor::GetVector() const
+    const linear::DoubleVector & SharedLinearBinaryPredictor::GetVector() const
     {
         return _sp_predictor->w;
     }
@@ -45,12 +39,12 @@ namespace predictors
         return _sp_predictor->b;
     }
 
-    void SharedLinearBinaryPredictor::AddTo(Map& map, const CoordinateList& inputCoordinates) const
+    void SharedLinearBinaryPredictor::AddTo(layers::Map& map, const layers::CoordinateList& inputCoordinates) const
     {
-        uint64 rowIndex = map.PushBack(make_shared<Scale>(_sp_predictor->w, inputCoordinates));
+        uint64 rowIndex = map.PushBack(std::make_shared<layers::Scale>(_sp_predictor->w, inputCoordinates));
         auto coordinates = map.GetCoordinateList(rowIndex);
-        rowIndex = map.PushBack(make_shared<Sum>(coordinates));
+        rowIndex = map.PushBack(std::make_shared<layers::Sum>(coordinates));
 
-        map.PushBack(make_shared<Shift>(_sp_predictor->b, Coordinate{rowIndex, 0}));
+        map.PushBack(std::make_shared<layers::Shift>(_sp_predictor->b, layers::Coordinate{rowIndex, 0}));
     }
 }

@@ -4,10 +4,7 @@
 
 // stl
 #include <string>
-using std::string;
-
 #include <vector>
-using std::vector;
 
 namespace testing
 {
@@ -17,9 +14,9 @@ namespace testing
 
     /// checks if two vectors are equal, up to a small numerical error in each coordinate
     ///
-    bool isEqual(const vector<double>& a, const vector<double>& b, double tolerance = 1.0e-8);
+    bool isEqual(const std::vector<double>& a, const std::vector<double>& b, double tolerance = 1.0e-8);
 
-    void processTest(const string& testDescription, bool success);
+    void processTest(const std::string& testDescription, bool success);
 
     bool testFailed();
 }

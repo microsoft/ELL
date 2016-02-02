@@ -4,18 +4,15 @@
 
 #include "types.h"
 
+// layers
 #include "Map.h"
-using layers::Map;
-
 #include "Coordinate.h"
-using layers::CoordinateList;
 
+// stl
 #include <memory>
-using std::shared_ptr;
-using std::make_shared;
 
+// linear
 #include "DoubleVector.h"
-using namespace linear;
 
 namespace predictors
 {
@@ -27,11 +24,11 @@ namespace predictors
 
         /// \returns the underlying DoubleVector
         ///
-        DoubleVector& GetVector();
+        linear::DoubleVector& GetVector();
 
         /// \returns the const reference underlying DoubleVector
         ///
-        const DoubleVector& GetVector() const;
+        const linear::DoubleVector& GetVector() const;
 
         /// \returns the underlying bias
         ///
@@ -48,17 +45,17 @@ namespace predictors
 
         /// Adds the predictor to a map
         ///
-        void AddTo(Map& map, const CoordinateList& inputCoordinates) const;
+        void AddTo(layers::Map& map, const layers::CoordinateList& inputCoordinates) const;
 
     private:
         struct BiasedVector
         {
             BiasedVector(uint64 dim);
-            DoubleVector w;
+            linear::DoubleVector w;
             double b;
         };
 
-        shared_ptr<BiasedVector> _sp_predictor;
+        std::shared_ptr<BiasedVector> _sp_predictor;
     };
 }
 
