@@ -2,10 +2,11 @@
 
 #pragma once
 
+// types
+#include "types.h"
+
 // utilities
 #include "JsonSerializer.h"
-
-#include "types.h"
 
 // stl
 #include <vector>

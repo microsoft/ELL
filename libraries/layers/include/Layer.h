@@ -3,17 +3,17 @@
 
 #include "Coordinate.h"
 
+// types
 #include "types.h"
 #include "RealArray.h"
 
+// utilities
 #include "VectorIterator.h"
-
 #include "JsonSerializer.h"
 
+// stl
 #include <vector>
-
 #include <memory>
-
 #include <string>
 
 namespace layers

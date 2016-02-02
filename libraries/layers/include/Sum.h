@@ -4,11 +4,12 @@
 #include "Layer.h"
 #include "Coordinate.h"
 
+// types
 #include "types.h"
 #include "RealArray.h"
 
+// stl
 #include <vector>
-
 #include <functional>
 
 namespace layers

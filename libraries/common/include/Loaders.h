@@ -10,11 +10,10 @@
 
 // layers
 #include "Map.h"
-
 #include "Coordinate.h"
 
+// dataset
 #include "ParsingIterator.h"
-
 
 namespace common
 {

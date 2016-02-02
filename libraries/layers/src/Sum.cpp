@@ -4,7 +4,6 @@
 
 // stl
 #include <string>
-
 #include <stdexcept>
 
 namespace layers

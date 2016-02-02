@@ -1,8 +1,8 @@
 #include "Input.h"
 
+// stl
 #include <string>
-
-#include<stdexcept>
+#include <stdexcept>
 
 namespace layers
 {
