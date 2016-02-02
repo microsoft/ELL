@@ -11,7 +11,7 @@
 #include <string>
 #include <cassert>
 
-using namespace treeLayout;
+using namespace treeLayout; // TODO remove this
 using namespace std;
 
 struct node

@@ -1,67 +1,45 @@
 // test.cpp
 
+#include "IIterator.h"
+#include "TransformIterator.h"
+#include "ParallelTransformIterator.h"
+
 // testing
 #include "testing.h"
-using testing::isEqual;
-using testing::processTest;
-using testing::testFailed;
-
-#include "IIterator.h"
-using utilities::IteratorAdapter;
-using utilities::MakeIterator;
-
-#include "TransformIterator.h"
-using utilities::TransformIterator;
-
-#include "ParallelTransformIterator.h"
-using utilities::ParallelTransformIterator;
 
 // stl
 #include <iostream>
-using std::cout;
-using std::cerr;
-using std::endl;
-
 #include <string>
-using std::string;
-
 #include <vector>
-using std::vector;
-
 #include <chrono>
-using std::chrono::duration_cast;
-using std::chrono::milliseconds;
-using std::chrono::system_clock;
-
 #include <numeric>
-using std::iota;
-
+#include <thread>
 
 void testIteratorAdapter()
 {
-    // IteratorAdapter test
-    vector<int> vec { 1, 2, 3, 4, 5, 6 };
-    auto it = MakeIterator(vec.begin(), vec.end());
+    // utilities::IteratorAdapter test
+    std::vector<int> vec { 1, 2, 3, 4, 5, 6 };
+    auto it = utilities::MakeIterator(vec.begin(), vec.end());
     
     int index = 0;
     while(it.IsValid())
     {
-        processTest("IteratorAdapter.Get", it.Get() == vec[index]);
+        testing::processTest("utilities::IteratorAdapter.Get", it.Get() == vec[index]);
         it.Next();
         index++;
     }
             
-    processTest("IteratorAdapter length", index == vec.size());
+    testing::processTest("utilities::IteratorAdapter length", index == vec.size());
 }
 
 float twoPointFiveTimes(int x)
 {
-    std::this_thread::sleep_for(milliseconds(10));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     return float(2.5*x);
 }
 
 template <typename Func>
-milliseconds::rep timeIt(Func fn)
+std::chrono::milliseconds::rep timeIt(Func fn)
 {
     system_clock::time_point start = system_clock::now();
     fn();
@@ -72,74 +50,74 @@ milliseconds::rep timeIt(Func fn)
 class MillisecondTimer
 {
 public:
-    MillisecondTimer() : _start(system_clock::now()), _running(true) {}
+    MillisecondTimer() : _start(std::chrono::system_clock::now()), _running(true) {}
     void Start()
     {
-        _start = system_clock::now();
+        _start = std::chrono::system_clock::now();
         _running = true;
     }
 
     void Stop()
     {
-        _end = system_clock::now();
+        _end = std::chrono::system_clock::now();
         _running = false;
     }
 
-    milliseconds::rep Elapsed()
+    std::chrono::milliseconds::rep Elapsed()
     {
         if (_running)
         {
-            _end = system_clock::now();
+            _end = std::chrono::system_clock::now();
         }
 
-        return duration_cast<milliseconds>(_end - _start).count();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(_end - _start).count();
     }
 
 
 private:
-    system_clock::time_point _start;
-    system_clock::time_point _end;
+    std::chrono::system_clock::time_point _start;
+    std::chrono::system_clock::time_point _end;
     bool _running;
 };
 
 void testTransformIterator()
 {
-    vector<int> vec(64);
-    iota(vec.begin(), vec.end(), 5);
+    std::vector<int> vec(64);
+    std::iota(vec.begin(), vec.end(), 5);
 
-    auto srcIt = MakeIterator(vec.begin(), vec.end());
+    auto srcIt = utilities::MakeIterator(vec.begin(), vec.end());
     auto transIt = MakeTransform(srcIt, twoPointFiveTimes);
 
     MillisecondTimer timer;
     int index = 0;
     while(transIt.IsValid())
     {
-        processTest("TransformIterator.Get", transIt.Get() == float(2.5*vec[index]));
+        testing::processTest("utilities::TransformIterator.Get", transIt.Get() == float(2.5*vec[index]));
         transIt.Next();
         index++;
     }
     auto elapsed = timer.Elapsed();
-    cout << "Elapsed time: " << elapsed << " ms" << endl;
+    std::cout << "Elapsed time: " << elapsed << " ms" << std::endl;
 }
 
 void testParallelTransformIterator()
 {
-    vector<int> vec(64);
-    iota(vec.begin(), vec.end(), 5);
+    std::vector<int> vec(64);
+    std::iota(vec.begin(), vec.end(), 5);
 
-    auto srcIt = MakeIterator(vec.begin(), vec.end());
+    auto srcIt = utilities::MakeIterator(vec.begin(), vec.end());
     auto transIt = MakeParallelTransform(srcIt, twoPointFiveTimes);
 
     MillisecondTimer timer;
     int index = 0;
     while(transIt.IsValid())
     {
-        processTest("ParallelTransformIterator.Get", transIt.Get() == float(2.5*vec[index]));
+        testing::processTest("utilities::ParallelTransformIterator.Get", transIt.Get() == float(2.5*vec[index]));
         transIt.Next();
         index++;
     }
     auto elapsed = timer.Elapsed();
-    cout << "Elapsed time: " << elapsed << " ms" << endl;
+    std::cout << "Elapsed time: " << elapsed << " ms" << std::endl;
 }
 
 /// Runs all tests
@@ -152,7 +130,7 @@ int main()
     testTransformIterator();
     testParallelTransformIterator();
 
-    if (testFailed())
+    if (testing::testFailed())
     {
         return 1;
     }

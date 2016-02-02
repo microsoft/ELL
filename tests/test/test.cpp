@@ -27,7 +27,7 @@ using std::cerr;
 using std::endl;
 
 #include <vector>
-using std::vector;
+using std::vector;      // TODO remove using statements
 
 #include <string>
 using std::string;

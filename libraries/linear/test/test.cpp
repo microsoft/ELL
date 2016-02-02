@@ -1,34 +1,19 @@
 // test.cpp
 
 #include "DoubleMatrix.h"
-using linear::DoubleMatrix;
-using linear::MatrixStructure;
 
 #include "DoubleVector.h"
-using linear::DoubleVector;
 
 // testing
 #include "testing.h"
-using testing::isEqual;
-using testing::processTest;
-using testing::testFailed;
 
 // types
 #include "types.h"
 
 // stl
 #include <iostream>
-using std::cout;
-using std::endl;
-
-#include<string>
-using std::string;
-using std::to_string;
-
+#include <string>
 #include <random>
-using std::default_random_engine;
-using std::normal_distribution;
-
 #include <typeinfo>
 
 /// Fills a matrix with binary numbers (using a random generator with fixed seed)
@@ -36,8 +21,8 @@ using std::normal_distribution;
 template<typename MatrixType>
 void fillMatrix(MatrixType& M, int seed, bool lowerTriangle, bool upperTriangle)
 {
-    default_random_engine rng(seed);
-    normal_distribution<> dist(0,1);
+    std::default_random_engine rng(seed);
+    std::normal_distribution<> dist(0,1);
     for (uint64 row = 0; row < M.NumRows(); ++row)
     {
         uint64 fromColumn = lowerTriangle ? 0 : row;
@@ -49,11 +34,11 @@ void fillMatrix(MatrixType& M, int seed, bool lowerTriangle, bool upperTriangle)
     }
 }
 
-DoubleVector getVector(uint64 size, int seed)
+linear::DoubleVector getVector(uint64 size, int seed)
 {
-    default_random_engine rng(seed);
-    normal_distribution<> dist(0, 1);
-    DoubleVector v(size);
+    std::default_random_engine rng(seed);
+    std::normal_distribution<> dist(0, 1);
+    linear::DoubleVector v(size);
     for (uint64 i = 0; i < size; ++i)
     {
         v[i] = dist(rng);
@@ -73,18 +58,18 @@ void testGemv(const MatrixType1& M1, const MatrixType2& M2, double alpha, double
     M1.Gemv(v, output1, alpha, beta);
     M2.Gemv(v, output2, alpha, beta);
 
-    string name1 = typeid(MatrixType1).name();
-    string name2 = typeid(MatrixType2).name();
+    std::string name1 = typeid(MatrixType1).name();
+    std::string name2 = typeid(MatrixType2).name();
 
-    processTest("Comapring " + name1 + "::Gemv() and " + name2 + "::Gemv() with arguments " + to_string(alpha) + ", " + to_string(beta), isEqual(output1, output2, 1.0e-8));
+    testing::processTest("Comapring " + name1 + "::Gemv() and " + name2 + "::Gemv() with arguments " + std::to_string(alpha) + ", " + std::to_string(beta), testing::isEqual(output1, output2, 1.0e-8));
 }
 
 /// Tests Gemv() for all matrix types
 ///
 void testGemv()
 {
-    DoubleMatrix<MatrixStructure::column> M1(13, 17);
-    DoubleMatrix<MatrixStructure::row> M2(13, 17);
+    linear::DoubleMatrix<linear::MatrixStructure::column> M1(13, 17);
+    linear::DoubleMatrix<linear::MatrixStructure::row> M2(13, 17);
     fillMatrix(M1, 123, true, true);
     fillMatrix(M2, 123, true, true);
 
@@ -93,8 +78,8 @@ void testGemv()
     testGemv(M1, M2, 0, 1);
     testGemv(M1, M2, 1, 1);
 
-    DoubleMatrix<MatrixStructure::column> M3(17, 17);
-    DoubleMatrix<MatrixStructure::columnSquare> M4(17);
+    linear::DoubleMatrix<linear::MatrixStructure::column> M3(17, 17);
+    linear::DoubleMatrix<linear::MatrixStructure::columnSquare> M4(17);
     fillMatrix(M3, 123, true, true);
     fillMatrix(M4, 123, true, true);
 
@@ -103,7 +88,7 @@ void testGemv()
     testGemv(M3, M4, 0, 1);
     testGemv(M3, M4, 1, 1);
 
-    DoubleMatrix<MatrixStructure::rowSquare> M5(17);
+    linear::DoubleMatrix<linear::MatrixStructure::rowSquare> M5(17);
     fillMatrix(M5, 123, true, true);
 
     testGemv(M3, M5, 0, 0);
@@ -111,8 +96,8 @@ void testGemv()
     testGemv(M3, M5, 0, 1);
     testGemv(M3, M5, 1, 1);
 
-    DoubleMatrix<MatrixStructure::columnSquare> M6(17);
-    DoubleMatrix<MatrixStructure::rowSquareUptriangular> M7(17);
+    linear::DoubleMatrix<linear::MatrixStructure::columnSquare> M6(17);
+    linear::DoubleMatrix<linear::MatrixStructure::rowSquareUptriangular> M7(17);
     fillMatrix(M6, 123, false, true);
     fillMatrix(M7, 123, false, true);
 
@@ -121,8 +106,8 @@ void testGemv()
     testGemv(M6, M7, 0, 1);
     testGemv(M6, M7, 1, 1);
 
-    DoubleMatrix<MatrixStructure::columnSquare> M8(17);
-    DoubleMatrix<MatrixStructure::diagonal> M9(17);
+    linear::DoubleMatrix<linear::MatrixStructure::columnSquare> M8(17);
+    linear::DoubleMatrix<linear::MatrixStructure::diagonal> M9(17);
     fillMatrix(M8, 123, false, false);
     fillMatrix(M9, 123, false, false);
 
@@ -139,7 +124,7 @@ int main()
     testGemv();
     // TODO test subvectorCref
 
-    if(testFailed())
+    if(testing::testFailed())
     {
         return 1;
     }

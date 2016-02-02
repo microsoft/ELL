@@ -1,9 +1,10 @@
 // testing.cpp
 
-#include "testing.h"
-
 // types
 #include "types.h"
+
+// testing
+#include "testing.h"
 
 // stl
 #include <iostream>

@@ -10,7 +10,7 @@ namespace testing
 {
     /// checks if two doubles are equal, up to a small numerical error
     ///
-    bool isEqual(double a, double b, double tolerance = 1.0e-8);
+    bool isEqual(double a, double b, double tolerance = 1.0e-8);    // TODO capitalize names in this library
 
     /// checks if two vectors are equal, up to a small numerical error in each coordinate
     ///
