@@ -4,111 +4,98 @@
 
 #include "../../amalgamated_jsoncpp/json/json.h"
 
+// types
 #include "types.h"
 
+// stl
 #include <type_traits>
-using std::enable_if;
-using std::is_class;
-using std::is_enum;
-using std::is_fundamental;
-using std::is_default_constructible;
-
 #include <functional>
-using std::function;
-
 #include <string>
-using std::string;
-
 #include <memory>
-using std::shared_ptr;
-
 #include <vector>
-using std::vector;
-
 #include <iostream>
-using std::istream;
 
 namespace utilities
 {
-    /// A datastructure that enables us to read/write objects, which can red/write itself as a json string
+    /// A datastructure that enables us to read/write objects, which can red/write itself as a json std::string
     ///
     class JsonSerializer
     {
     public:
 
-        /// Static function that loads an object from a JSON formatted file
+        /// Static std::function that loads an object from a JSON formatted file
         ///
         template<typename Type>
-        static Type Load(istream& is, string name);
+        static Type Load(std::istream& is, std::string name);
 
         /// write shared_ptrs to a class
         ///
         template<typename KeyType, typename ValueType>
-        void Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* concept = nullptr);
+        void Write(KeyType key, const std::shared_ptr<ValueType>& ptr, typename std::enable_if<std::is_class<ValueType>::value>::type* concept = nullptr);
         // TODO there are two styles of adding "concepts" in this solution. One of them appears above. unify.
 
         /// write classes
         ///
         template<typename KeyType, typename ValueType>
-        void Write(KeyType key, const ValueType& value, typename enable_if<is_class<ValueType>::value>::type* concept = nullptr);
+        void Write(KeyType key, const ValueType& value, typename std::enable_if<std::is_class<ValueType>::value>::type* concept = nullptr);
 
         /// write strings
         ///
         template<typename KeyType>
-        void Write(KeyType key, const string& value);
+        void Write(KeyType key, const std::string& value);
 
         /// write fundamental types 
         ///
         template<typename KeyType, typename ValueType>
-        void Write(KeyType key, const ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* concept = nullptr);
+        void Write(KeyType key, const ValueType& value, typename std::enable_if<std::is_fundamental<ValueType>::value>::type* concept = nullptr);
 
         /// write vectors
         ///
         template<typename KeyType, typename ValueType>
-        void Write(KeyType key, const vector<ValueType>& vec);
+        void Write(KeyType key, const std::vector<ValueType>& vec);
 
         /// read shared_ptrs to a class
         ///
         template<typename KeyType, typename ValueType, typename DeserializerType>
-        void Read(KeyType key, shared_ptr<ValueType>& ptr, DeserializerType deserializer) const;
+        void Read(KeyType key, std::shared_ptr<ValueType>& ptr, DeserializerType deserializer) const;
 
         /// read classes
         ///
         template<typename KeyType, typename ValueType>
-        void Read(KeyType key, ValueType& value, typename enable_if<is_class<ValueType>::value>::type* concept = nullptr) const;
+        void Read(KeyType key, ValueType& value, typename std::enable_if<std::is_class<ValueType>::value>::type* concept = nullptr) const;
 
         /// read strings
         ///
         template<typename KeyType>
-        void Read(KeyType key, string& value) const;
+        void Read(KeyType key, std::string& value) const;
 
         /// read fundamental types 
         ///
         template<typename KeyType, typename ValueType>
-        void Read(KeyType key, ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* concept = nullptr) const;
+        void Read(KeyType key, ValueType& value, typename std::enable_if<std::is_fundamental<ValueType>::value>::type* concept = nullptr) const;
     
         /// read fundamental types with a return value (usage: auto x = JsonSerializer.read<int>("x");) 
         ///
         template<typename ValueType, typename KeyType>
-        ValueType Read(KeyType key, typename enable_if<is_default_constructible<ValueType>::value>::type* concept = nullptr) const;
+        ValueType Read(KeyType key, typename std::enable_if<std::is_default_constructible<ValueType>::value>::type* concept = nullptr) const;
 
         /// read vectors of shared_ptrs
         ///
         template<typename KeyType, typename ValueType, typename DeserializerType>
-        void Read(KeyType key, vector<shared_ptr<ValueType>>& vec, DeserializerType deserializer) const;
+        void Read(KeyType key, std::vector<std::shared_ptr<ValueType>>& vec, DeserializerType deserializer) const;
 
         /// read vectors
         ///
         template<typename KeyType, typename ValueType>
-        void Read(KeyType key, vector<ValueType>& vec) const;
+        void Read(KeyType key, std::vector<ValueType>& vec) const;
 
-        /// convert the serialized objects to a string 
+        /// convert the serialized objects to a std::string 
         ///
-        string ToString() const;
+        std::string ToString() const;
 
-        /// convert a string to a datastructure from which one can read objects 
+        /// convert a std::string to a datastructure from which one can read objects 
         ///
-        void FromString(const string& s);
+        void FromString(const std::string& s);
 
     private:
         Json::Value _json_value;
@@ -132,7 +119,7 @@ namespace utilities
         void Get(KeyType key, double& value) const;
 
         template<typename KeyType>
-        void Get(KeyType key, string& value) const;
+        void Get(KeyType key, std::string& value) const;
     };
 }
 

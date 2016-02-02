@@ -1,3 +1,5 @@
+// BinaryClassificationEvaluator.cpp
+
 #include "BinaryClassificationEvaluator.h"
 
 namespace utilities
@@ -25,16 +27,16 @@ namespace utilities
         return _evals[_evals.size()-1].error;
     }
 
-    void BinaryClassificationEvaluator::Print(ostream & os) const
+    void BinaryClassificationEvaluator::Print(std::ostream & os) const
     {
         os << "binary classification evaluation\nloss\terror\n";
         for(auto& e : _evals)
         {
-            os << e.loss << '\t' << e.error << endl;
+            os << e.loss << '\t' << e.error << std::endl;
         }
     }
 
-    ostream& operator<<(ostream & os, const BinaryClassificationEvaluator & evaluator)
+    std::ostream& operator<<(std::ostream & os, const BinaryClassificationEvaluator & evaluator)
     {
         evaluator.Print(os);
         return os;

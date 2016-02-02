@@ -7,6 +7,10 @@
 using utilities::ParsedArgSet;
 using utilities::CommandLineParser;
 
+// stl
+#include <string>
+using std::string;
+
 /// A struct that holds the command line parameters for the trainer
 ///
 struct SgdArguments

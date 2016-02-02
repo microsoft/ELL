@@ -2,11 +2,9 @@
 
 #include "types.h"
 
+// stl
 #include <cstdlib>
-using std::strtod;
-
 #include <stdexcept>
-using std::runtime_error;
 
 namespace utilities
 {
@@ -16,10 +14,10 @@ namespace utilities
         value = strtof(pStr, &pEnd);
     }
 
-    // wrapper for strtod
+    // wrapper for std::strtod
     inline void cParse(const char*& pStr, char*& pEnd, double& value)
     {
-        value = strtod(pStr, &pEnd);
+        value = std::strtod(pStr, &pEnd);
     }
 
     // wrapper for stroul

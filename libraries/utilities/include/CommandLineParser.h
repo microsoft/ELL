@@ -1,39 +1,25 @@
 // CommandLineParser.h
 
 // cjacobs: Next steps to do:
-// * Add policy field for options (required, set only once, set at least once, last wins, collect all, ...)
+// * Add policy field for options (required, std::set only once, std::set at least once, last wins, collect all, ...)
 // * Add more flexible constraints (using a callback?) for non-enum parameters
 // * have one "master" parser that has subordinate parsers to handle parameters for different modules (e.g., tree learner vs. booster vs. global optimizer)
-// * have conditional parsers whose set of known options depends on some other option --- maybe via polymorphism (so, have a gradient_descent parser and 
+// * have conditional parsers whose std::set of known options depends on some other option --- maybe via polymorphism (so, have a gradient_descent parser and 
 //   a sdca parser, both of which are subclasses of a global_descent parser, the choice of which to use is conditional on the gd_alg option
 // * tokenize the input stream based on whitespace, then split on entries starting with '-' --- the first item will be the option, followed by zero or more values
 //   in this case, we maybe need to use the special '--' option to specify positional / unnamed arguments (and/or have them appear first)
 // * (optionally?) accept /arg instead of -arg or --arg
 
-
 #pragma once
 
+// stl
 #include <iostream>
-using std::ostream;
-
 #include <vector>
-using std::vector;
-
 #include <map>
-using std::map;
-
 #include <set>
-using std::set;
-
 #include <functional>
-using std::function;
-
 #include <string>
-using std::string;
-using std::pair;
-
 #include <stdexcept>
-using std::runtime_error;
 
 namespace utilities
 {
@@ -41,15 +27,15 @@ namespace utilities
     ///
     struct OptionInfo
     {
-        string name;
-        string shortName;
-        string description;
-        string defaultValueString; // for printing
-        string currentValueString;
-        vector<string> enum_values; // for enumerated values // TODO: make this into a more general constraint mechanism (?)
+        std::string name;
+        std::string shortName;
+        std::string description;
+        std::string defaultValueString; // for printing
+        std::string currentValueString;
+        std::vector<std::string> enum_values; // for enumerated values // TODO: make this into a more general constraint mechanism (?)
 
-        vector<function<bool(string)>> set_value_callbacks; // callback returns "true" if value was successfully set, otherwise "false"
-        vector<function<bool(string)>> didSetValueCallbacks; // callback returns "true" if value was successfully set, otherwise "false"
+        std::vector<std::function<bool(std::string)>> set_value_callbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
+        std::vector<std::function<bool(std::string)>> didSetValueCallbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
 
         // TODO: Add "policy" member (required, set_once, last_wins, etc.)
 
@@ -58,7 +44,7 @@ namespace utilities
 
         /// TODO: document
         ///
-        OptionInfo(string name, string shortName, string description, string defaultValue, function<bool(string)> set_value_callback);
+        OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback);
 
         // TODO: either have get_help_string() or print_help() methods for help and current value
     };
@@ -70,29 +56,29 @@ namespace utilities
         ParseResult(); // No error
         ParseResult(bool ok); // Error (if ok == false), no message
         ParseResult(const char *message); // Error
-        ParseResult(const string& message); // Error
-        ParseResult(const vector<string>& messages); // list of errors (or success, if empty)
+        ParseResult(const std::string& message); // Error
+        ParseResult(const std::vector<std::string>& messages); // list of errors (or success, if empty)
         operator bool();
 
         friend class CommandLineParser;
 
     private:
-        vector<string> _messages;
+        std::vector<std::string> _messages;
         bool _isOK;
     };
 
     class ParseError
     {
     public:
-        ParseError(const string& message);
-        string GetMessage() const;
+        ParseError(const std::string& message);
+        std::string GetMessage() const;
 
     private:
-        string _message;
+        std::string _message;
     };
 
     // format of argv: Main.exe [options]
-    // where options are of the form "-<string> <option>" where the <option> part is mandatory (defaulting to 'true')
+    // where options are of the form "-<std::string> <option>" where the <option> part is mandatory (defaulting to 'true')
     // options have two names, the short name is used with a single hyphen, and the long name with two
     // e.g., "-s true" and "--serial_mode true" can mean the same thing
     // options are queried by the long name
@@ -114,15 +100,15 @@ namespace utilities
         /// AddOption adds a new option to the commandline parser
         ///
         template <typename T, typename U>
-        void AddOption(T& option, string name, string shortName, string description, const U& defaultValue);
+        void AddOption(T& option, std::string name, std::string shortName, std::string description, const U& defaultValue);
 
         /// AddOptionSet adds a ParsedArgSet to the commandline parser
         ///
         void AddOptionSet(ParsedArgSet& options);
 
-        /// Adds a string that gets printed out when pring_usage() is called
+        /// Adds a std::string that gets printed out when pring_usage() is called
         ///
-        virtual void AddDocumentationString(string str);
+        virtual void AddDocumentationString(std::string str);
 
         /// Parses the commandline. Call this after setting up the options with AddOption
         ///
@@ -130,23 +116,23 @@ namespace utilities
 
         /// TODO: document
         ///
-        string GetHelpString();
+        std::string GetHelpString();
 
         /// TODO: document
         ///
-        string GetCurrentValuesString();
+        std::string GetCurrentValuesString();
 
-        string GetCommandLine() const;
+        std::string GetCommandLine() const;
 
-        string GetOptionValue(const string& option);
+        std::string GetOptionValue(const std::string& option);
 
         /// TODO: document
         ///
-        bool HasOption(string option);
+        bool HasOption(std::string option);
 
-        bool HasShortName(string shortName);
+        bool HasShortName(std::string shortName);
 
-        /// Adds a callback function that gets invoked after Parse() is called
+        /// Adds a callback std::function that gets invoked after Parse() is called
         using PostParseCallback = std::function<ParseResult(CommandLineParser&)>;
         void AddPostParseCallback(const PostParseCallback& callback);
 
@@ -163,38 +149,38 @@ namespace utilities
         /// TODO: document
         ///
         template <typename T>
-        static bool ParseVal(string str, T& result);
+        static bool ParseVal(std::string str, T& result);
 
         /// TODO: document
         ///
         template <typename T>
-        static bool ParseVal(string str, vector<pair<string, T>> val_names, T& result, string& resultString);
+        static bool ParseVal(std::string str, std::vector<std::pair<std::string, T>> val_names, T& result, std::string& resultString);
 
         /// TODO: document
         ///
         template <typename T>
-        static string ToString(const T& val);
+        static std::string ToString(const T& val);
 
         struct DocumentationEntry
         {
             enum Type { option, str };
             Type EntryType;
-            string EntryString; // option name for option, docstring for string
+            std::string EntryString; // option name for option, docstring for std::string
 
-            DocumentationEntry(Type t, string str) : EntryType(t), EntryString(str) {}
+            DocumentationEntry(Type t, std::string str) : EntryType(t), EntryString(str) {}
         };
 
-        vector<string> _originalArgs;
-        string _exeName;
-        vector<string> _positionalArgs; // these are filename-type args at the end, currently unused
-        map<string, string> _shortToLongNameMap;
-        map<string, OptionInfo> _options;
-        vector<DocumentationEntry> _docEntries;
-        vector<PostParseCallback> _postParseCallbacks;
+        std::vector<std::string> _originalArgs;
+        std::string _exeName;
+        std::vector<std::string> _positionalArgs; // these are filename-type args at the end, currently unused
+        std::map<std::string, std::string> _shortToLongNameMap;
+        std::map<std::string, OptionInfo> _options;
+        std::vector<DocumentationEntry> _docEntries;
+        std::vector<PostParseCallback> _postParseCallbacks;
 
         void AddOption(const OptionInfo& info);
-        virtual bool SetOption(string option_name, string option_val); // returns true if we need to reparse
-        bool SetDefaultArgs(const set<string>& unset_args); // returns true if we need to reparse
+        virtual bool SetOption(std::string option_name, std::string option_val); // returns true if we need to reparse
+        bool SetDefaultArgs(const std::set<std::string>& unset_args); // returns true if we need to reparse
     };
 
     /// ParsedArgSet class
@@ -210,31 +196,31 @@ namespace utilities
 
     /// Exceptions thrown by CommandLineParser: 
     ///
-    class CommandLineParserException : public runtime_error
+    class CommandLineParserException : public std::runtime_error
     {
     public:
-        CommandLineParserException(const char* message) : runtime_error(message) {};
+        CommandLineParserException(const char* message) : std::runtime_error(message) {};
     };
 
     class CommandLineParserErrorException : CommandLineParserException
     {
     public:
         CommandLineParserErrorException(const char* message) : CommandLineParserException(message){}
-        CommandLineParserErrorException(const char* message, vector<ParseError> errors) : CommandLineParserException(message), _errors(errors) {}
-        const vector<ParseError>& GetParseErrors() const { return _errors; }
+        CommandLineParserErrorException(const char* message, std::vector<ParseError> errors) : CommandLineParserException(message), _errors(errors) {}
+        const std::vector<ParseError>& GetParseErrors() const { return _errors; }
 
     private:
-        vector<ParseError> _errors;
+        std::vector<ParseError> _errors;
     };
 
     class CommandLineParserPrintHelpException : public CommandLineParserException
     {
     public:
-        CommandLineParserPrintHelpException(string helpText) : CommandLineParserException(""), _helpText(helpText) {}
-        string GetHelpText() const { return _helpText; }
+        CommandLineParserPrintHelpException(std::string helpText) : CommandLineParserException(""), _helpText(helpText) {}
+        std::string GetHelpText() const { return _helpText; }
 
     private:
-        string _helpText;
+        std::string _helpText;
     };
 
 

@@ -3,11 +3,9 @@
 
 #include "IIterator.h"
 
+// stl
 #include <vector>
-using std::vector;
-
 #include <future>
-using std::future;
 
 namespace utilities
 {
@@ -27,7 +25,7 @@ namespace utilities
         IIterator<InType>& _inIter;
         Func _transformFn;
 
-        vector<future<OutType>> _futures;
+        std::vector<std::future<OutType>> _futures;
         OutType _currentOutput;
         bool _currentOutputValid;
         int _currentIndex = 0;

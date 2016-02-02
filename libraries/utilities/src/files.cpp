@@ -2,46 +2,44 @@
 
 #include "files.h"
 
+// stl
 #include <stdexcept>
-using std::runtime_error;
-
 #include <memory>
-using std::make_unique;
 
 namespace utilities
 {
-    ifstream OpenIfstream(string filepath)
+    std::ifstream OpenIfstream(std::string filepath)
     {
         // open file
-        auto fs = ifstream(filepath);
+        auto fs = std::ifstream(filepath);
 
         // check that it opened
         if(!fs.is_open())
         {
-            throw runtime_error("error openning file " + filepath);
+            throw std::runtime_error("error openning file " + filepath);
         }
 
         return fs;
     }
 
-    ofstream OpenOfstream(string filepath)
+    std::ofstream OpenOfstream(std::string filepath)
     {
         // open file
-        auto fs = ofstream(filepath);
+        auto fs = std::ofstream(filepath);
 
         // check that it opened
         if (!fs.is_open())
         {
-            throw runtime_error("error openning file " + filepath);
+            throw std::runtime_error("error openning file " + filepath);
         }
 
         return fs;
     }
 
-    bool IsFileReadable(string filepath)
+    bool IsFileReadable(std::string filepath)
     {
         // open file
-        ifstream fs(filepath);
+        std::ifstream fs(filepath);
 
         // check that it opened
         if(fs.is_open())

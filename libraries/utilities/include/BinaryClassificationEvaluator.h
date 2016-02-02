@@ -2,12 +2,9 @@
 
 #pragma once
 
+// stl
 #include <vector>
-using std::vector;
-
 #include <iostream>
-using std::ostream;
-using std::endl;
 
 namespace utilities
 {
@@ -34,14 +31,14 @@ namespace utilities
         ///
         double GetLastError() const;
 
-        /// Prints losses and errors to an ostream
-        void Print(ostream& os) const;
+        /// Prints losses and errors to an std::ostream
+        void Print(std::ostream& os) const;
 
     private:
-        vector<Evaluation> _evals;
+        std::vector<Evaluation> _evals;
     };
 
-    ostream& operator<<(ostream& os, const BinaryClassificationEvaluator& evaluation);
+    std::ostream& operator<<(std::ostream& os, const BinaryClassificationEvaluator& evaluation);
 }
 
 #include "../tcc/BinaryClassificationEvaluator.tcc"

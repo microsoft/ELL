@@ -4,11 +4,8 @@
 
 #include "types.h"
 
+// stl
 #include <vector>
-using std::vector;
-
-#include <iostream>
-using std::ostream;
 
 namespace utilities
 {
@@ -20,7 +17,7 @@ namespace utilities
     public:
 
         // abbreviate iterator type, for improved readability 
-        using StlVectorIteratorType = typename vector<ValueType>::const_iterator;
+        using StlVectorIteratorType = typename std::vector<ValueType>::const_iterator;
 
         /// Ctor
         ///

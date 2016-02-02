@@ -2,12 +2,11 @@
 
 #include "JsonSerializer.h"
 
+// stl
 #include <stdexcept>
-using std::runtime_error;
 
 namespace utilities
 {
-
     std::string JsonSerializer::ToString() const
     {
         try
@@ -16,7 +15,7 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during serialization");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during serialization");
         }
     }
 
@@ -29,7 +28,7 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during deserialization");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during deserialization");
         }
     }
 }

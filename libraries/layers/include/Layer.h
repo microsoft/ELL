@@ -19,6 +19,9 @@ using std::vector;
 #include <memory>
 using std::unique_ptr;
 
+#include <string>
+using std::string;
+
 namespace layers
 {
     class Layer

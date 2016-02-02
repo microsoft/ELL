@@ -8,6 +8,10 @@ using utilities::JsonSerializer;
 
 #include "types.h"
 
+// stl
+#include <vector>
+using std::vector;
+
 namespace layers
 {
     /// Represents an index value pair

@@ -1,12 +1,8 @@
 // StringFormat.tcc
 
+// stl
 #include <iostream>
-using std::fixed;
-using std::scientific;
-using std::defaultfloat;
-
 #include <iomanip>
-using std::setprecision;
 
 namespace utilities
 {
@@ -36,19 +32,19 @@ namespace utilities
         switch(specifier)
         {
         case 'i':
-            os << fixed << setprecision(0) << arg << setprecision(prec);
+            os << std::fixed << std::setprecision(0) << arg << std::setprecision(prec);
             break;
 
         case 'f':
-            os << fixed << arg;
+            os << std::fixed << arg;
             break;
 
         case 'e':
-            os << scientific << arg;
+            os << std::scientific << arg;
             break;
 
         case 's':
-            os << defaultfloat << arg;
+            os << std::defaultfloat << arg;
             break;
 
         case '%':

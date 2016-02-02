@@ -14,6 +14,9 @@ using std::to_string;
 #include <memory>
 using std::dynamic_pointer_cast;
 
+#include <stdexcept>
+using std::runtime_error;
+
 void CompilableMap::ToCode(CoordinateList coordinateList) const
 {
     // allocate datastructure to hold actions

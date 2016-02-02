@@ -26,6 +26,12 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+#include <vector>
+using std::vector;
+
+#include <string>
+using std::string;
+
 using namespace utilities;
 
 // A struct of parameters

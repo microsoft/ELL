@@ -2,6 +2,9 @@
 
 #include "DataSaveArguments.h"
 
+#include <vector>
+using std::vector;
+
 namespace common
 {
     void ParsedDataSaveArguments::AddArgs(CommandLineParser& parser)

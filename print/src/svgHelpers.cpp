@@ -81,7 +81,7 @@ void SvgText(ostream& os, uint64 numTabs, const string& SvgClass, double cx, dou
 
 void SvgNumber(ostream& os, uint64 numTabs, const string& SvgClass, double cx, double cy, double number, uint64 maxChars, double rotate)
 {
-    stringstream ss;
+    std::stringstream ss;
     ss << fixed << setprecision(GetPrecision(number, maxChars)) << number;
     SvgText(os, numTabs, SvgClass, cx, cy, ss.str(), rotate);
 }

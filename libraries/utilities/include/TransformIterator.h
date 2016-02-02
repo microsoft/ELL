@@ -3,6 +3,9 @@
 
 #include "IIterator.h"
 
+// stl
+#include <utility>
+
 namespace utilities
 {
     template <typename InType, typename OutType, typename Func>

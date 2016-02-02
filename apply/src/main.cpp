@@ -35,6 +35,7 @@ using utilities::OpenOfstream;
 
 // stl
 #include <iostream>
+using std::ofstream;
 using std::cerr;
 using std::cout;
 using std::endl;

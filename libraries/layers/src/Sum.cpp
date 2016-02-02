@@ -2,8 +2,12 @@
 
 #include "Sum.h"
 
+// stl
 #include <string>
 using std::to_string;
+
+#include <stdexcept>
+using std::runtime_error;
 
 namespace layers
 {

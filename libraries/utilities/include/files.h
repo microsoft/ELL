@@ -4,26 +4,19 @@
 
 // stl
 #include <fstream>
-using std::ifstream;
-using std::ofstream;
-
 #include <string>
-using std::string;
-
-#include <memory>
-using std::unique_ptr;
 
 namespace utilities
 {
-    /// Opens an ifstream and throws an exception if a problem occurs
+    /// Opens an std::ifstream and throws an exception if a problem occurs
     ///
-    ifstream OpenIfstream(string filepath);
+    std::ifstream OpenIfstream(std::string filepath);
     
-    /// Opens an ofstream and throws an exception if a problem occurs
+    /// Opens an std::ofstream and throws an exception if a problem occurs
     ///
-    ofstream OpenOfstream(string filepath);
+    std::ofstream OpenOfstream(std::string filepath);
 
     /// \returns True if the file exists and can be opened
     ///
-    bool IsFileReadable(string filepath);
+    bool IsFileReadable(std::string filepath);
 }

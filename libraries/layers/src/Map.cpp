@@ -6,7 +6,11 @@
 #include "Input.h"
 #include "Sum.h"
 
+// stl
 using std::make_shared;
+
+#include <stdexcept>
+using std::runtime_error;
 
 namespace layers
 {

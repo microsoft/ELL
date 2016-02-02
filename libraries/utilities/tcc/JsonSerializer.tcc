@@ -1,40 +1,32 @@
 // JsonSerializer.tcc
 
+// stl
 #include <stdexcept>
-using std::runtime_error;
-
-#include <memory>
-using std::move;
-
-#include <string>
-using std::string;
-
-using std::istreambuf_iterator;
 
 namespace utilities
 {
     template<typename Type>
-    Type JsonSerializer::Load(istream& is, string name)
+    Type JsonSerializer::Load(std::istream& is, std::string name)
     {
         // parse stream contents
-        auto str = string(istreambuf_iterator<char>(is), istreambuf_iterator<char>());
+        auto str = std::string(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
         JsonSerializer reader;
         reader.FromString(str);
 
         // read object
         Type t;
         reader.Read(name, t);
-        return move(t);
+        return std::move(t);
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Write(KeyType key, const shared_ptr<ValueType>& ptr, typename enable_if<is_class<ValueType>::value>::type* concept)
+    void JsonSerializer::Write(KeyType key, const std::shared_ptr<ValueType>& ptr, typename std::enable_if<std::is_class<ValueType>::value>::type* concept)
     {
         Write(key, *ptr);
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_class<ValueType>::value>::type* concept)
+    void JsonSerializer::Write(KeyType key, const ValueType& value, typename std::enable_if<std::is_class<ValueType>::value>::type* concept)
     {
         try
         {
@@ -44,12 +36,12 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during write");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during write");
         }
     }
 
     template<typename KeyType>
-    void JsonSerializer::Write(KeyType key, const string& value)
+    void JsonSerializer::Write(KeyType key, const std::string& value)
     {
         try
         {
@@ -57,12 +49,12 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during write");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during write");
         }
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Write(KeyType key, const ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* concept)
+    void JsonSerializer::Write(KeyType key, const ValueType& value, typename std::enable_if<std::is_fundamental<ValueType>::value>::type* concept)
     {
         try
         {
@@ -70,12 +62,12 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during write");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during write");
         }
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Write(KeyType key, const vector<ValueType>& vec)
+    void JsonSerializer::Write(KeyType key, const std::vector<ValueType>& vec)
     {
         try
         {
@@ -88,12 +80,12 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during write");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during write");
         }
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_class<ValueType>::value>::type* concept) const
+    void JsonSerializer::Read(KeyType key, ValueType& value, typename std::enable_if<std::is_class<ValueType>::value>::type* concept) const
     {
         try
         {    
@@ -103,18 +95,18 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during read");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
         }
     }
 
     template<typename KeyType>
-    void JsonSerializer::Read(KeyType key, string& value) const
+    void JsonSerializer::Read(KeyType key, std::string& value) const
     {
         Get(key, value);
     }
 
     template<typename KeyType, typename ValueType, typename DeserializerType>
-    void JsonSerializer::Read(KeyType key, shared_ptr<ValueType>& ptr, DeserializerType deserializer) const
+    void JsonSerializer::Read(KeyType key, std::shared_ptr<ValueType>& ptr, DeserializerType deserializer) const
     {
         try
         {
@@ -124,18 +116,18 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during read");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
         }
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Read(KeyType key, ValueType& value, typename enable_if<is_fundamental<ValueType>::value>::type* concept) const
+    void JsonSerializer::Read(KeyType key, ValueType& value, typename std::enable_if<std::is_fundamental<ValueType>::value>::type* concept) const
     {
         Get(key, value);
     }
 
     template<typename ValueType, typename KeyType>
-    ValueType JsonSerializer::Read(KeyType key, typename enable_if<is_default_constructible<ValueType>::value>::type* concept) const
+    ValueType JsonSerializer::Read(KeyType key, typename std::enable_if<std::is_default_constructible<ValueType>::value>::type* concept) const
     {
         ValueType val;
         Get(key, val);
@@ -143,7 +135,7 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType, typename DeserializerType>
-    void JsonSerializer::Read(KeyType key, vector<shared_ptr<ValueType>>& vec, DeserializerType deserializer) const
+    void JsonSerializer::Read(KeyType key, std::vector<std::shared_ptr<ValueType>>& vec, DeserializerType deserializer) const
     {
         try
         {
@@ -154,23 +146,23 @@ namespace utilities
             vec.reserve(sub_serializer._json_value.size());
             for (size_t i = 0; i < sub_serializer._json_value.size(); ++i)
             {
-                shared_ptr<ValueType> val = nullptr;
+                std::shared_ptr<ValueType> val = nullptr;
                 sub_serializer.Read((int)i, val, deserializer);
-                vec.push_back(move(val));
+                vec.push_back(std::move(val));
             }
         }
-        catch (runtime_error e)
+        catch (std::runtime_error e)
         {
             throw; // rethrow the exception
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during read");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
         }
     }
 
     template<typename KeyType, typename ValueType>
-    void JsonSerializer::Read(KeyType key, vector<ValueType>& vec) const
+    void JsonSerializer::Read(KeyType key, std::vector<ValueType>& vec) const
     {
         try
         {
@@ -183,12 +175,12 @@ namespace utilities
             {
                 ValueType val;
                 sub_serializer.Read((int)i, val);
-                vec.push_back(move(val));
+                vec.push_back(std::move(val));
             }
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during read");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
         }
     }
 
@@ -201,7 +193,7 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during read");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
         }
     }
 
@@ -214,7 +206,7 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during read");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
         }
     }
 
@@ -227,7 +219,7 @@ namespace utilities
         }
         catch(...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during read");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
         }
     }
 
@@ -240,7 +232,7 @@ namespace utilities
         }
         catch(...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during read");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
         }
     }
 
@@ -253,7 +245,7 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during read");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
         }
     }
 
@@ -266,12 +258,12 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during read");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
         }
     }
 
     template<typename KeyType>
-    void JsonSerializer::Get(KeyType key, string& value) const
+    void JsonSerializer::Get(KeyType key, std::string& value) const
     {
         try
         {
@@ -279,7 +271,7 @@ namespace utilities
         }
         catch (...)    // underlying json implementation may throw an exception 
         {
-            throw runtime_error("jsoncpp threw an unspecified exception during read");
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
         }
     }
 }

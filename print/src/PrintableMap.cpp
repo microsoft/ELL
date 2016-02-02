@@ -19,6 +19,7 @@ using std::endl;
 
 #include <memory>
 using std::dynamic_pointer_cast;
+using std::move;
 
 #include <functional>
 using std::plus;
