@@ -175,13 +175,13 @@ namespace utilities
         template <typename T>
         static string ToString(const T& val);
 
-        struct DocumentationEntry    
+        struct DocumentationEntry
         {
-            enum type { option, str };
-            type EntryType;
+            enum Type { option, str };
+            Type EntryType;
             string EntryString; // option name for option, docstring for string
 
-            DocumentationEntry(type t, string str) : EntryType(t), EntryString(str) {}
+            DocumentationEntry(Type t, string str) : EntryType(t), EntryString(str) {}
         };
 
         vector<string> _originalArgs;

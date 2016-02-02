@@ -262,7 +262,7 @@ namespace utilities
         }
 
         _options[info.name] = info;
-        _docEntries.emplace_back(DocumentationEntry::type::option, info.name);
+        _docEntries.emplace_back(DocumentationEntry::Type::option, info.name);
 
         if (info.shortName != "")
         {
@@ -343,7 +343,7 @@ namespace utilities
 
     void CommandLineParser::AddDocumentationString(string str)
     {
-        _docEntries.emplace_back(DocumentationEntry::type::str, str);
+        _docEntries.emplace_back(DocumentationEntry::Type::str, str);
     }
 
     string option_name_string(const OptionInfo& option)
@@ -392,7 +392,7 @@ namespace utilities
         {
             switch (entry.EntryType)
             {
-            case DocumentationEntry::type::option:
+            case DocumentationEntry::Type::option:
             {
                 const OptionInfo& info = _options[entry.EntryString];
                 string option_name = option_name_string(info);
@@ -415,7 +415,7 @@ namespace utilities
             }
             break;
 
-            case DocumentationEntry::type::str:
+            case DocumentationEntry::Type::str:
                 out << entry.EntryString << endl;
                 break;
             }
@@ -432,7 +432,7 @@ namespace utilities
         set<string> visited_options;
         for (auto& entry : _docEntries)
         {
-            if (entry.EntryType == DocumentationEntry::type::option)
+            if (entry.EntryType == DocumentationEntry::Type::option)
             {
                 const auto& opt = _options[entry.EntryString];
                 visited_options.insert(opt.name);
