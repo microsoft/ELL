@@ -68,7 +68,7 @@ namespace dataset
 
         /// Prints the datavector to an output stream
         ///
-        virtual void Print(ostream& os) const override;
+        virtual void Print(std::ostream& os) const override;
 
     private:
         std::unique_ptr<IDataVector> _upInstance;

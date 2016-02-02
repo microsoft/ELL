@@ -57,7 +57,7 @@ namespace dataset
         return _upInstance->Dot(p_other);
     }
 
-    void SupervisedExample::Print(ostream & os) const
+    void SupervisedExample::Print(std::ostream & os) const
     {
         os << _label << '\t';
         _upInstance->Print(os);

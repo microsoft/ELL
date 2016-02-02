@@ -8,7 +8,6 @@
 
 // stl
 #include <vector>
-using std::vector;
 
 namespace linear
 {
@@ -18,27 +17,27 @@ namespace linear
     {
     public:
 
-        /// \returns The Size of the vector
+        /// \returns The Size of the std::vector
         ///
         virtual uint64 Size() const =0;
 
-        /// Computes the vector squared 2-norm
+        /// Computes the std::vector squared 2-norm
         ///
         virtual double Norm2() const =0;
 
-        /// Performs other += scalar * (*this), where other is a dense vector
+        /// Performs other += scalar * (*this), where other is a dense std::vector
         ///
-        void AddTo(vector<double>& other, double scalar = 1.0) const;
+        void AddTo(std::vector<double>& other, double scalar = 1.0) const;
 
-        /// Performs (*p_other) += scalar * (*this), where other is a dense vector
+        /// Performs (*p_other) += scalar * (*this), where other is a dense std::vector
         ///
         virtual void AddTo(double* p_other, double scalar = 1.0) const = 0;
 
-        /// Computes the vector Dot product
+        /// Computes the std::vector Dot product
         ///
-        double Dot(const vector<double>& other) const;
+        double Dot(const std::vector<double>& other) const;
 
-        /// Computes the vector Dot product
+        /// Computes the std::vector Dot product
         ///
         virtual double Dot(const double* p_other) const = 0;
     };

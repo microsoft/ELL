@@ -5,7 +5,7 @@
 namespace linear
 {
 
-    DoubleVector::DoubleVector(uint64 size) : DoubleArray(size)
+    DoubleVector::DoubleVector(uint64 size) : types::DoubleArray(size)
     {}
 
     void DoubleVector::Reset()
@@ -52,11 +52,11 @@ namespace linear
 
     uint64 DoubleVector::Size() const
     {
-        return DoubleArray::size();
+        return types::DoubleArray::size();
     }
 
     void DoubleVector::Print(ostream & os) const
     {
-        DoubleArray::Print(os);
+        types::DoubleArray::Print(os);
     }
 }

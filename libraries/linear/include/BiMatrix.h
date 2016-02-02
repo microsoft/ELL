@@ -3,7 +3,6 @@
 #pragma once
 
 #include <vector>
-using std::vector;
 
 namespace linear
 {
@@ -34,7 +33,7 @@ namespace linear
         ///
         const RowType& GetColumn(uint64 index) const;
 
-        /// Performs a general vector matrix product: y = alpha * x * M + beta * y
+        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y
         ///
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
 

@@ -7,6 +7,9 @@
 // types
 #include "types.h"
 
+// stl
+#include <iostream>
+
 namespace dataset
 {
     /// OnesDataVector Base class
@@ -107,7 +110,7 @@ namespace dataset
 
         /// Prints the datavector to an output stream
         ///
-        virtual void Print(ostream& os) const override;
+        virtual void Print(std::ostream& os) const override;
 
     private:
         uint64 _size = 0;

@@ -3,7 +3,6 @@
 #pragma once
 
 #include <iostream>
-using std::ostream;
 
 namespace linear
 {
@@ -19,10 +18,10 @@ namespace linear
 
         /// Human readable printout to an output stream
         ///
-        virtual void Print(ostream& os) const = 0;
+        virtual void Print(std::ostream& os) const = 0;
     };
 
     /// Generic operator<< that calls each class's Print() function
     ///
-    ostream& operator<<(ostream& os, const Base& v);
+    std::ostream& operator<<(std::ostream& os, const Base& v);
 }

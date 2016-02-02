@@ -3,8 +3,6 @@
 #include "DoubleMatrix.h"
 #include <cassert>
 
-using std::runtime_error;
-using std::fill;
 
 namespace linear
 {
@@ -25,7 +23,7 @@ namespace linear
 
     void DoubleMatrixBase::Reset()
     {
-        fill(begin(), end(), 0);
+        std::fill(begin(), end(), 0);
     }
 
     void DoubleMatrixBase::Gemv(const double* p_x, double* p_y, double alpha, double beta) const
@@ -148,7 +146,7 @@ namespace linear
         }
     }
 
-    void DoubleMatrixBase::Print(ostream& os) const
+    void DoubleMatrixBase::Print(std::ostream& os) const
     {
         for(uint64 i = 0; i < _num_rows; ++i)
         {
@@ -161,7 +159,7 @@ namespace linear
     }
 
     DoubleMatrixBase::DoubleMatrixBase(uint64 size, uint64 numRows, uint64 numColumns)
-        : vector<double>(size), _num_rows(numRows), _num_columns(numColumns)
+        : std::vector<double>(size), _num_rows(numRows), _num_columns(numColumns)
     {}
 
     double DoubleMatrixBase::RowDot(uint64 i, const double* p_x) const
@@ -242,7 +240,7 @@ namespace linear
     {
         if(i > j)
         {
-            throw runtime_error("Cannot set element in the lower triangle of an upper triangular matrix");
+            throw std::runtime_error("Cannot set element in the lower triangle of an upper triangular matrix");
         }
 
         DoubleMatrixBase::Set(i, j, value);
@@ -285,7 +283,7 @@ namespace linear
     {
         if(i != j)
         {
-            throw runtime_error("Cannot set off-diagonal elements of a diagonal matrix");
+            throw std::runtime_error("Cannot set off-diagonal elements of a diagonal matrix");
         }
 
         DoubleMatrixBase::Set(i, j, value);

@@ -3,8 +3,6 @@
 #include "LogLoss.h"
 
 #include <cmath>
-using std::log;
-using std::exp;
 
 namespace lossFunctions
 {
@@ -21,8 +19,8 @@ namespace lossFunctions
         }
         else 
         {
-            double exp_neg_scaled_margin = exp(-scaled_margin);
-            return log(1.0 + exp_neg_scaled_margin) / _scale;
+            double exp_neg_scaled_margin = std::exp(-scaled_margin);
+            return std::log(1.0 + exp_neg_scaled_margin) / _scale;
         }
     }
 
@@ -32,12 +30,12 @@ namespace lossFunctions
 
         if(scaled_margin <= 0.0)
         {
-            double exp_scaled_margin = exp(scaled_margin);
+            double exp_scaled_margin = std::exp(scaled_margin);
             return -label / (1.0 + exp_scaled_margin);
         }
         else 
         {
-            double exp_neg_scaled_margin = exp(-scaled_margin);
+            double exp_neg_scaled_margin = std::exp(-scaled_margin);
             return -label * exp_neg_scaled_margin / (1.0 + exp_neg_scaled_margin);
         }
     }

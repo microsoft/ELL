@@ -6,7 +6,7 @@
 
 namespace linear
 {
-    void IVector::AddTo(vector<double>& other, double scalar) const
+    void IVector::AddTo(std::vector<double>& other, double scalar) const
     {
         assert(Size() <= other.size());
         if(Size() > 0)
@@ -15,7 +15,7 @@ namespace linear
         }
     }
 
-    double IVector::Dot(const vector<double>& other) const
+    double IVector::Dot(const std::vector<double>& other) const
     {
         assert(Size() <= other.size());
         if(Size() == 0)

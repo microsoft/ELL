@@ -10,6 +10,7 @@
 
 //stl
 #include <type_traits>
+#include <vector>
 
 namespace dataset
 {
@@ -50,7 +51,7 @@ namespace dataset
             
             // define typenames to improve readability
             using IndexIteratorType = typename IntegerListType::Iterator;
-            using ValueIteratorType = typename vector<ValueType>::const_iterator;
+            using ValueIteratorType = typename std::vector<ValueType>::const_iterator;
 
             /// private ctor, can only be called from SparseDataVector class
             Iterator(const IndexIteratorType& list_iterator, const ValueIteratorType& value_iterator);
@@ -114,11 +115,11 @@ namespace dataset
 
         /// Prints the datavector to an output stream
         ///
-        virtual void Print(ostream& os) const override;
+        virtual void Print(std::ostream& os) const override;
 
     private:
         IntegerListType _indices;
-        vector<ValueType> _values;
+        std::vector<ValueType> _values;
     };
 
     class SparseDoubleDataVector : public SparseDataVector<double, CompressedIntegerList>

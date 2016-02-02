@@ -113,7 +113,7 @@ namespace dataset
     }
 
     template<typename ValueType, typename IntegerListType>
-    void SparseDataVector<ValueType, IntegerListType>::Print(ostream & os) const
+    void SparseDataVector<ValueType, IntegerListType>::Print(std::ostream & os) const
     {
         auto iterator = GetIterator();
         while(iterator.IsValid())

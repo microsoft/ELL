@@ -2,13 +2,14 @@
 
 #pragma once
 
-#include "types.h"
-
 #include "IMatrix.h"
+
+// types
+#include "types.h"
 
 // stl
 #include <vector>
-using std::vector;
+#include <iostream>
 
 namespace linear
 {
@@ -21,7 +22,7 @@ namespace linear
     {};
 
     /// DoubleMatrix Base class
-    class DoubleMatrixBase : public vector<double>, public IMatrix
+    class DoubleMatrixBase : public std::vector<double>, public IMatrix
     {
     public:
 
@@ -57,19 +58,19 @@ namespace linear
         ///
         virtual double operator()(uint64 i, uint64 j) const =0;    
 
-        /// Performs a general matrix vector product: y = alpha * M * x + beta * y
+        /// Performs a general matrix std::vector product: y = alpha * M * x + beta * y
         ///
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
         using IMatrix::Gemv;
 
-        /// Performs a general vector matrix product: y = alpha * x * M + beta * y
+        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y
         ///
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
         using IMatrix::Gevm;
 
         /// Prints the matrix to an output stream
         ///
-        virtual void Print(ostream& os) const override;
+        virtual void Print(std::ostream& os) const override;
 
     protected:
         DoubleMatrixBase(uint64 size, uint64 numRows, uint64 numColumns);
@@ -166,12 +167,12 @@ namespace linear
         ///
         virtual double operator()(uint64 i, uint64 j) const override;
 
-        /// Performs a general matrix vector product: y = alpha * M * x + beta * y
+        /// Performs a general matrix std::vector product: y = alpha * M * x + beta * y
         ///
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
         using IMatrix::Gemv;
 
-        /// Performs a general vector matrix product: y = alpha * x * M + beta * y
+        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y
         ///
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
         using IMatrix::Gevm;
@@ -202,12 +203,12 @@ namespace linear
         ///
         virtual double operator()(uint64 i, uint64 j) const override;
 
-        /// Performs a general matrix vector product: y = alpha * M * x + beta * y
+        /// Performs a general matrix std::vector product: y = alpha * M * x + beta * y
         ///
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
         using IMatrix::Gemv;
 
-        /// Performs a general vector matrix product: y = alpha * x * M + beta * y
+        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y
         ///
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
         using IMatrix::Gevm;

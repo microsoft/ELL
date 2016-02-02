@@ -11,6 +11,7 @@
 
 // stl
 #include <type_traits>
+#include <iostream>
 
 namespace dataset
 {
@@ -113,7 +114,7 @@ namespace dataset
 
         /// Prints the datavector to an output stream
         ///
-        virtual void Print(ostream& os) const override;
+        virtual void Print(std::ostream& os) const override;
 
     private:
         IntegerListType _indices;

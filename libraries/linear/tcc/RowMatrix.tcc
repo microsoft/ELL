@@ -1,15 +1,11 @@
 // RowMatrix.tcc
 
 #include <stdexcept>
-using std::runtime_error;
 
 #include<random>
-using std::uniform_int_distribution;
 
 #include <cassert>
 
-using std::endl;
-using std::swap;
 
 namespace linear
 {
@@ -99,21 +95,21 @@ namespace linear
     }
 
     template<typename DataVectorType>
-    void RowMatrix<DataVectorType>::RandPerm(default_random_engine& rng)
+    void RowMatrix<DataVectorType>::RandPerm(std::default_random_engine& rng)
     {
         RandPerm(rng, NumRows());
     }
 
     template<typename DataVectorType>
-    void RowMatrix<DataVectorType>::RandPerm(default_random_engine& rng, uint64_t count)
+    void RowMatrix<DataVectorType>::RandPerm(std::default_random_engine& rng, uint64_t count)
     {
         uint64_t max_row = NumRows()-1;
 
         for(uint64_t i = 0; i < count; ++i)
         {
-            uniform_int_distribution<uint64_t> dist(i, max_row);
+            std::uniform_int_distribution<uint64_t> dist(i, max_row);
             uint64_t j = dist(rng);
-            swap(_rows[i], _rows[j]);
+            std::swap(_rows[i], _rows[j]);
         }
     }
 
@@ -181,15 +177,15 @@ namespace linear
     template<typename DataVectorType>
     void RowMatrix<DataVectorType>::Gevm(const double* p_x, double* p_y, double alpha, double beta) const
     {
-        throw runtime_error("function not implemented");
+        throw std::runtime_error("function not implemented");
     }
 
     template<typename DataVectorType>
-    void RowMatrix<DataVectorType>::Print(ostream& os) const
+    void RowMatrix<DataVectorType>::Print(std::ostream& os) const
     {
         for (uint64 i = 0; i < NumRows(); ++i)
         {
-            os << "Row " << i << "\t" << this->GetRow(i) << endl;
+            os << "Row " << i << "\t" << this->GetRow(i) << std::endl;
         }
     }
 

@@ -53,15 +53,15 @@ namespace dataset
     {
         if (result == utilities::Parser::Result::badFormat)
         {
-            throw runtime_error("bad format real value in '" + str + "'");
+            throw std::runtime_error("bad format real value in '" + str + "'");
         }
         else if (result == utilities::Parser::Result::endOfString || result == utilities::Parser::Result::beginComment)
         {
-            throw runtime_error("premature end-of-std::string or comment in '" + str + "'");
+            throw std::runtime_error("premature end-of-std::string or comment in '" + str + "'");
         }
         else if (result == utilities::Parser::Result::outOfRange)
         {
-            throw runtime_error("real value out of double precision range in '" + str + "'");
+            throw std::runtime_error("real value out of double precision range in '" + str + "'");
         }
     }
 }

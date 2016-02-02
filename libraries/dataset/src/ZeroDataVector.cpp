@@ -68,6 +68,6 @@ namespace dataset
         return Iterator();
     }
 
-    void ZeroDataVector::Print(ostream & os) const
+    void ZeroDataVector::Print(std::ostream & os) const
     {}
 }

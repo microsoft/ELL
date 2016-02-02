@@ -90,7 +90,7 @@ namespace dataset
         return Iterator(_size);
     }
 
-    void OnesDataVector::Print(ostream & os) const
+    void OnesDataVector::Print(std::ostream & os) const
     {
         for(int i=0; i<_size; ++i)
         {

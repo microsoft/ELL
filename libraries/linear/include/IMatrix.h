@@ -7,7 +7,6 @@
 #include "Base.h"
 
 #include <vector>
-using std::vector;
 
 namespace linear
 {
@@ -25,19 +24,19 @@ namespace linear
         ///
         virtual uint64 NumColumns() const = 0;
 
-        /// Performs a general matrix vector product: y = alpha * M * x + beta * y
+        /// Performs a general matrix std::vector product: y = alpha * M * x + beta * y
         ///
-        void Gemv(const vector<double>& x, vector<double>& y, double alpha = 1.0, double beta = 0.0) const;
+        void Gemv(const std::vector<double>& x, std::vector<double>& y, double alpha = 1.0, double beta = 0.0) const;
 
-        /// Performs a general matrix vector product: y = alpha * M * x + beta * y
+        /// Performs a general matrix std::vector product: y = alpha * M * x + beta * y
         ///
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const =0;
 
-        /// Performs a general vector matrix product: y = alpha * x * M + beta * y
+        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y
         ///
-        void Gevm(const vector<double>& x, vector<double>& y, double alpha = 1.0, double beta = 0.0) const;
+        void Gevm(const std::vector<double>& x, std::vector<double>& y, double alpha = 1.0, double beta = 0.0) const;
 
-        /// Performs a general vector matrix product: y = alpha * x * M + beta * y
+        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y
         ///
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const =0;
     };

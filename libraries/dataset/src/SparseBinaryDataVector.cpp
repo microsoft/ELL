@@ -111,7 +111,7 @@ namespace dataset
     }
 
     template<typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::Print(ostream & os) const
+    void SparseBinaryDataVectorBase<IntegerListType>::Print(std::ostream & os) const
     {
         auto iterator = GetIterator();
         while(iterator.IsValid())

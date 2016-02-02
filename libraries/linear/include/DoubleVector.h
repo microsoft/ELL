@@ -6,13 +6,12 @@
 
 #include "types.h"
 #include "RealArray.h"
-using types::DoubleArray;
 
 namespace linear
 {
     /// DoubleVector class
     ///
-    class DoubleVector : public DoubleArray, public IVector
+    class DoubleVector : public types::DoubleArray, public IVector
     {
     public:
 
@@ -31,7 +30,7 @@ namespace linear
         /// Converting constructor
         ///
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        DoubleVector(IndexValueIteratorType indexValueIterator) : DoubleArray(indexValueIterator) {}
+        DoubleVector(IndexValueIteratorType indexValueIterator) : types::DoubleArray(indexValueIterator) {}
 
         using IVector::AddTo;
 

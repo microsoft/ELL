@@ -6,13 +6,10 @@
 #include "IMatrix.h"
 
 #include <vector>
-using std::vector;
 
 #include <iostream>
-using std::ostream;
 
 #include <random>
-using std::default_random_engine;
 
 namespace linear
 {
@@ -119,23 +116,23 @@ namespace linear
 
         /// Randomly permutes the rows of the matrix
         ///
-        void RandPerm(default_random_engine& rng);
+        void RandPerm(std::default_random_engine& rng);
 
         /// Permutes the matrix so that the first numRows of the matrix are uniform, and the rest of the rows are arbitrary
         /// 
-        void RandPerm(default_random_engine& rng, uint64 count);
+        void RandPerm(std::default_random_engine& rng, uint64 count);
 
-        /// Performs a general matrix vector product: y = alpha * M * x + beta * y
+        /// Performs a general matrix std::vector product: y = alpha * M * x + beta * y
         ///
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
 
-        /// Performs a general vector matrix product: y = alpha * x * M + beta * y
+        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y
         ///
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
 
         /// Human readable printout to an output stream
         ///
-        virtual void Print(ostream& os) const override;
+        virtual void Print(std::ostream& os) const override;
 
     private:
         std::vector<DataVectorType> _rows;

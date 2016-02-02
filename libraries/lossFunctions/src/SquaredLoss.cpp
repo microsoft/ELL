@@ -3,8 +3,6 @@
 #include "SquaredLoss.h"
 
 #include <cmath>
-using std::log;
-using std::exp;
 
 namespace lossFunctions
 {
