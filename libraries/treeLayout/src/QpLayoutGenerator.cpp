@@ -63,7 +63,7 @@ namespace treeLayout
     Layout QpLayoutGenerator::GetLayout() const
     {
         uint64 numLayers = (uint64)_layers.size();
-        vector<double> depths(numLayers);
+        std::vector<double> depths(numLayers);
         depths[0] = 0.0;
         double depthSpace = _params.depthSpace * pow(_params.depthSpaceGrowthFactor, numLayers - 1.0);
 

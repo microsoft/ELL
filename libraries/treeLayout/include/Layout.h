@@ -2,11 +2,11 @@
 
 #pragma once
 
+// types
 #include "types.h"
 
+// stl
 #include <vector>
-using std::vector;
-
 #include <cstring> // for size_t
 
 namespace treeLayout
@@ -87,10 +87,10 @@ namespace treeLayout
         ///
         double GetMaxDepth() const;
 
-        const vector<VertexPosition>& GetVertices() const;
+        const std::vector<VertexPosition>& GetVertices() const;
 
     private:
-        vector<VertexPosition> _positions;
+        std::vector<VertexPosition> _positions;
         double _minOffset = 0;
         double _maxOffset = 0;
         double _minDepth = 0;

@@ -2,8 +2,8 @@
 
 #include "Layout.h"
 
+// stl
 #include <stdexcept>
-using std::runtime_error;
 
 namespace treeLayout
 {
@@ -73,7 +73,7 @@ namespace treeLayout
         return _maxDepth;
     }
 
-    const vector<VertexPosition>& Layout::GetVertices() const
+    const std::vector<VertexPosition>& Layout::GetVertices() const
     {
         return _positions;
     }

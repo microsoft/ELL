@@ -1,16 +1,9 @@
 // QpLayoutGenerator.tcc
 
+// stl
 #include <stdexcept>
-using std::runtime_error;
-
 #include <iostream>
-using std::cout;
-
 #include <algorithm>
-using std::min;
-using std::max;
-using std::make_pair;
-
 #include <cmath>
 
 namespace treeLayout
@@ -61,24 +54,24 @@ namespace treeLayout
     template<typename ChildrenVectorType>
     void QpLayoutGenerator::BuildLayers(const ChildrenVectorType& Children)
     {
-        vector<uint64> ancestors;
-        vector<vector<uint64>> prev_layer_ancestors;
+        std::vector<uint64> ancestors;
+        std::vector<std::vector<uint64>> prev_layer_ancestors;
         BuildLayers(Children, 0, ancestors, prev_layer_ancestors);
     }
 
     template<typename ChildrenVectorType>
-    void QpLayoutGenerator::BuildLayers(const ChildrenVectorType& Children, uint64 index, vector<uint64>& ancestors, vector<vector<uint64>>& prev_layer_ancestors)
+    void QpLayoutGenerator::BuildLayers(const ChildrenVectorType& Children, uint64 index, std::vector<uint64>& ancestors, std::vector<std::vector<uint64>>& prev_layer_ancestors)
     {
         uint64 depth = (uint64)ancestors.size();
         if (depth > (uint64)Children.size())
         {
-            throw runtime_error("infinite recursion: perhaps the Children structure is loopy");
+            throw std::runtime_error("infinite recursion: perhaps the Children structure is loopy");
         }
 
         // record the depth
         _depth_index[index] = depth;
 
-        // make sure that the _layers vector is long enough
+        // make sure that the _layers std::vector is long enough
         if (_layers.size() <= depth)
         {
             _layers.resize(depth + 1);
@@ -132,45 +125,45 @@ namespace treeLayout
     }
 
     template<typename ChildrenVectorType>
-    vector<pair<double, double>> QpLayoutGenerator::SimpleLayout(const ChildrenVectorType& Children, uint64 node_index, uint64 depth)
+    std::vector<std::pair<double, double>> QpLayoutGenerator::SimpleLayout(const ChildrenVectorType& Children, uint64 node_index, uint64 depth)
     {
         if (node_index >= Children.size()) // leaf node
         {
-            return vector<pair<double, double>>();
+            return std::vector<std::pair<double, double>>();
         }
 
         // recurse
         uint64 child0 = Children[node_index].GetChild0();
         uint64 child1 = Children[node_index].GetChild1();
 
-        vector<pair<double, double>> x0 = SimpleLayout(Children, child0, depth + 1); 
-        vector<pair<double, double>> x1 = SimpleLayout(Children, child1, depth + 1); 
-        size_t min_depth = min(x0.size(), x1.size());
-        size_t max_depth = max(x0.size(), x1.size());
+        std::vector<std::pair<double, double>> x0 = SimpleLayout(Children, child0, depth + 1); 
+        std::vector<std::pair<double, double>> x1 = SimpleLayout(Children, child1, depth + 1); 
+        size_t min_depth = std::min(x0.size(), x1.size());
+        size_t max_depth = std::max(x0.size(), x1.size());
 
         double max_dist = _params.offsetSpace;
         for (uint64 d = 0; d < min_depth; d++)
         {
             double gap = _params.offsetSpace +_params.offsetSpaceGrowthFactor * log2(2.0+d);
             double dist = gap + x0[d].second - x1[d].first;
-            max_dist = max(dist, max_dist);
+            max_dist = std::max(dist, max_dist);
         }
 
-        vector<pair<double, double>> result(max_depth+1);
-        result[0] = make_pair(-max_dist / 2, max_dist / 2);
+        std::vector<std::pair<double, double>> result(max_depth+1);
+        result[0] = std::make_pair(-max_dist / 2, max_dist / 2);
         for (uint64 d = 0; d < max_depth; d++)
         {
             if (d < x0.size() && d < x1.size()) // we have both left and right subtree at this depth
             {
-                result[d + 1] = make_pair(x0[d].first - max_dist / 2, x1[d].second + max_dist / 2);
+                result[d + 1] = std::make_pair(x0[d].first - max_dist / 2, x1[d].second + max_dist / 2);
             }
             else if (d >= x0.size()) // only right subtree
             {
-                result[d + 1] = make_pair(x1[d].first + max_dist / 2, x1[d].second + max_dist / 2);
+                result[d + 1] = std::make_pair(x1[d].first + max_dist / 2, x1[d].second + max_dist / 2);
             }
             else // only left subtree
             {
-                result[d + 1] = make_pair(x0[d].first - max_dist / 2, x0[d].second - max_dist / 2);
+                result[d + 1] = std::make_pair(x0[d].first - max_dist / 2, x0[d].second - max_dist / 2);
             }
         }
         IncrementOffsets(Children, child0, -max_dist / 2.0);
@@ -198,7 +191,7 @@ namespace treeLayout
     {
         for (uint64 t = 1; t <= _params.gdNumSteps; ++t)
         {
-            vector<double> old_offsets = _offsets;
+            std::vector<double> old_offsets = _offsets;
             GdStep(Children, _params.gd_learning_rate);
             Project();
 
@@ -225,7 +218,7 @@ namespace treeLayout
     }
 
     template<typename ChildrenVectorType>
-    void QpLayoutGenerator::ComputeGradient(const ChildrenVectorType& Children, const vector<double>& offsets, const vector<uint64>& depths, double step_size, vector<double>& grad)
+    void QpLayoutGenerator::ComputeGradient(const ChildrenVectorType& Children, const std::vector<double>& offsets, const std::vector<uint64>& depths, double step_size, std::vector<double>& grad)
     {
         size_t num_nodes = Children.size() * 2 + 1;
 
