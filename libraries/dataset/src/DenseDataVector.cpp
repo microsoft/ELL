@@ -2,6 +2,7 @@
 
 #include "DenseDataVector.h"
 
+// stl
 #include <cassert>
 
 namespace dataset
@@ -85,7 +86,7 @@ namespace dataset
     }
 
     template<typename ValueType>
-    void DenseDataVector<ValueType>::Print(ostream & os) const
+    void DenseDataVector<ValueType>::Print(std::ostream & os) const
     {
         _data.Print(os);
     }

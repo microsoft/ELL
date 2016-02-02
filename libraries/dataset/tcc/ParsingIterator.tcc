@@ -3,15 +3,11 @@
 #include "SupervisedExampleBuilder.h"
 #include "DenseDataVector.h"
 
-//stl
-#include <memory>
-using std::move;
-
 namespace dataset
 {
     template<typename RowIteratorType, typename VectorEntryParserType>
     ParsingIterator<RowIteratorType, VectorEntryParserType>::ParsingIterator(RowIteratorType&& row_iter, const VectorEntryParserType& parser) :
-        _rowIterator(move(row_iter)), _instanceParser(parser)
+        _rowIterator(std::move(row_iter)), _instanceParser(parser)
     {}
 
     template<typename RowIteratorType, typename VectorEntryParserType>
@@ -35,9 +31,9 @@ namespace dataset
     }
 
     template<typename RowIteratorType, typename VectorEntryParserType>
-    unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType&& row_iter, const VectorEntryParserType& parser)
+    std::unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType&& row_iter, const VectorEntryParserType& parser)
     {
-        return make_unique<ParsingIterator<RowIteratorType, VectorEntryParserType>>(move(row_iter), parser);
+        return std::make_unique<ParsingIterator<RowIteratorType, VectorEntryParserType>>(std::move(row_iter), parser);
     }
 
 }

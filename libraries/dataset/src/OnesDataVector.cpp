@@ -2,14 +2,9 @@
 
 #include "OnesDataVector.h"
 
-#include "types.h"
-
-
+// stl
 #include <stdexcept>
-using std::runtime_error;
-
 #include <cmath>
-using std::fabs;
 
 namespace dataset
 {
@@ -46,7 +41,7 @@ namespace dataset
     {
         if(value != 1 || index != _size)
         {
-            throw runtime_error("Cannot set elements of a ones vector to non-one values");
+            throw std::runtime_error("Cannot set elements of a ones vector to non-one values");
         }
         ++_size;
     }

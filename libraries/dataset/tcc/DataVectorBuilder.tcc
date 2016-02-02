@@ -8,23 +8,18 @@
 
 #include "types.h"
 
-
-#include <memory>
-using std::move;
-using std::make_unique;
-
+// stl
 #include <type_traits>
-using std::is_same;
 
 namespace dataset
 {
     template<typename DefaultDataVectorType>
     template<typename IndexValueIteratorType>
-    unique_ptr<IDataVector> DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIteratorType IndexValueIterator)
+    std::unique_ptr<IDataVector> DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIteratorType IndexValueIterator)
     {
-        static_assert(is_same<DefaultDataVectorType, FloatDataVector>::value || is_same<DefaultDataVectorType, SparseFloatDataVector>::value, "default DataVector type can be either FloatDataVector or SparseFloatDataVector");
+        static_assert(std::is_same<DefaultDataVectorType, FloatDataVector>::value || std::is_same<DefaultDataVectorType, SparseFloatDataVector>::value, "default DataVector type can be either FloatDataVector or SparseFloatDataVector");
 
-        auto up_vec = make_unique<DefaultDataVectorType>();
+        auto up_vec = std::make_unique<DefaultDataVectorType>();
 
         bool containsNonBinary = false;
         bool containsNonShorts = false;
@@ -61,25 +56,25 @@ namespace dataset
             // binary
             if(!containsNonBinary)
             {
-                return make_unique<SparseBinaryDataVector>(up_vec->GetIterator());
+                return std::make_unique<SparseBinaryDataVector>(up_vec->GetIterator());
             }
 
             // short sparse
             else if(!containsNonShorts)
             {
-                return make_unique<SparseShortDataVector>(up_vec->GetIterator());
+                return std::make_unique<SparseShortDataVector>(up_vec->GetIterator());
             }
 
             // other sparse
             else
             {
-                if (is_same<DefaultDataVectorType, SparseFloatDataVector>::value)
+                if (std::is_same<DefaultDataVectorType, SparseFloatDataVector>::value)
                 {
-                    return move(up_vec);
+                    return std::move(up_vec);
                 }
                 else
                 {
-                    return make_unique<SparseFloatDataVector>(up_vec->GetIterator());
+                    return std::make_unique<SparseFloatDataVector>(up_vec->GetIterator());
                 }
             }
         }
@@ -90,25 +85,25 @@ namespace dataset
             // all zeros (this is considered a dense vector since its Size() is zero, so the fraction of nonZeros is 0/0)
             if(numNonZeros == 0)
             {
-                return make_unique<ZeroDataVector>();
+                return std::make_unique<ZeroDataVector>();
             }
 
             // all ones
             else if(!containsNonBinary && numNonZeros == up_vec->Size())
             {
-                return make_unique<OnesDataVector>(up_vec->Size());
+                return std::make_unique<OnesDataVector>(up_vec->Size());
             }
 
             // other dense
             else
             {
-                if(is_same<DefaultDataVectorType, FloatDataVector>::value)
+                if(std::is_same<DefaultDataVectorType, FloatDataVector>::value)
                 {
-                    return move(up_vec);
+                    return std::move(up_vec);
                 }
                 else
                 {
-                    return make_unique<FloatDataVector>(up_vec->GetIterator());
+                    return std::make_unique<FloatDataVector>(up_vec->GetIterator());
                 }
             }
         }

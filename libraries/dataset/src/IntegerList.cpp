@@ -2,8 +2,8 @@
 
 #include "IntegerList.h"
 
+// stl
 #include <stdexcept>
-using std::runtime_error;
 
 namespace dataset
 {
@@ -42,7 +42,7 @@ namespace dataset
     {
         if(_list.size()==0)
         {
-            throw runtime_error("Can't get max of empty list");
+            throw std::runtime_error("Can't get max of empty list");
         }
 
         return _list[Size()-1];

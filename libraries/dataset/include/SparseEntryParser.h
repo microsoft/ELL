@@ -2,16 +2,13 @@
 
 #pragma once
 
+// types
 #include "types.h"
 
+// stl
 #include <string>
-using std::string;
-
 #include <iostream>
-using std::ostream;
-
 #include <memory>
-using std::shared_ptr;
 
 namespace dataset
 {
@@ -45,17 +42,17 @@ namespace dataset
             IndexValue Get() const;
 
         private:
-            shared_ptr<const string> _spExampleString; // hold on to the shared ptr to make sure that string is not deleted
+            std::shared_ptr<const std::string> _spExampleString; // hold on to the shared ptr to make sure that std::string is not deleted
             const char* _currentPos = 0;
             IndexValue _currentIndexValue;
             bool _isValid = true;
 
             // Private constructor that can only be called from SparseEntryParser
-            Iterator(shared_ptr<const string> spExampleString, const char* pStr);
+            Iterator(std::shared_ptr<const std::string> spExampleString, const char* pStr);
             friend class SparseEntryParser;
         };
 
-        Iterator GetIterator(shared_ptr<const string> spExampleString, const char* pStr) const;
+        Iterator GetIterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) const;
     };
 
 }

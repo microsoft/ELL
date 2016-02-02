@@ -6,17 +6,11 @@
 
 // layers
 #include "Map.h"
-using layers::Map;
-
 #include "Coordinate.h"
-using layers::CoordinateList;
 
 // stl
 #include <string>
-using std::string;
-
 #include <memory>
-using std::shared_ptr;
 
 namespace dataset
 {
@@ -28,16 +22,16 @@ namespace dataset
     public:
         /// Ctor
         ///
-        MappedParser(const InternalParserType& internalParser, const Map& map, CoordinateList outputCoordinates);
+        MappedParser(const InternalParserType& internalParser, const layers::Map& map, layers::CoordinateList outputCoordinates);
 
-        /// \returns An iterator that parses the given string
+        /// \returns An iterator that parses the given std::string
         ///
-        Map::Iterator GetIterator(shared_ptr<const string> spExampleString, const char* pStr) const;
+        layers::Map::Iterator GetIterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) const;
 
     private:
         InternalParserType _internalParser;
-        Map _map;
-        CoordinateList _outputCoordinates;
+        layers::Map _map;
+        layers::CoordinateList _outputCoordinates;
     };
 }
 

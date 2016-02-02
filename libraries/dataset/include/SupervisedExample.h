@@ -9,11 +9,9 @@
 
 // linear
 #include "RowMatrix.h"
-using linear::RowMatrix;
 
 // stl
 #include <memory>
-using std::unique_ptr;
 
 namespace dataset
 {
@@ -26,7 +24,7 @@ namespace dataset
 
         /// Constructs a supervised example
         ///
-        SupervisedExample(unique_ptr<IDataVector> instance, double label, double weight = 1.0);
+        SupervisedExample(std::unique_ptr<IDataVector> instance, double label, double weight = 1.0);
 
         /// \returns The weight
         ///
@@ -73,10 +71,10 @@ namespace dataset
         virtual void Print(ostream& os) const override;
 
     private:
-        unique_ptr<IDataVector> _upInstance;
+        std::unique_ptr<IDataVector> _upInstance;
         double _weight;
         double _label;
     };
 
-    using RowDataset = RowMatrix<SupervisedExample>;
+    using RowDataset = linear::RowMatrix<SupervisedExample>;
 }

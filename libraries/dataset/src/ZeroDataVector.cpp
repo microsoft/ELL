@@ -2,9 +2,8 @@
 
 #include "ZeroDataVector.h"
 
+// stl
 #include <stdexcept>
-
-using std::runtime_error;
 
 namespace dataset
 {
@@ -19,7 +18,7 @@ namespace dataset
 
     IndexValue ZeroDataVector::Iterator::Get() const
     {
-        throw runtime_error("this code should bever be reached");
+        throw std::runtime_error("this code should bever be reached");
     }
 
     ZeroDataVector::ZeroDataVector(const IDataVector& other) 
@@ -34,7 +33,7 @@ namespace dataset
     {
         if(value != 0)
         {
-            throw runtime_error("Cannot set elements of a zero vector");
+            throw std::runtime_error("Cannot set elements of a zero vector");
         }
     }
 

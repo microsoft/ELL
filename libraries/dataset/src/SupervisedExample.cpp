@@ -2,11 +2,9 @@
 
 #include "SupervisedExample.h"
 
-using std::move;
-
 namespace dataset
 {
-    SupervisedExample::SupervisedExample(unique_ptr<IDataVector> instance, double label, double weight) : _upInstance(move(instance)), _label(label), _weight(weight)
+    SupervisedExample::SupervisedExample(std::unique_ptr<IDataVector> instance, double label, double weight) : _upInstance(std::move(instance)), _label(label), _weight(weight)
     {}
 
     double SupervisedExample::GetWeight() const

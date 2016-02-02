@@ -2,8 +2,8 @@
 
 #include "DataVectorBuilder.h"
 
+// stl
 #include <cstdlib>
-using std::strtod;
 
 namespace dataset
 {
@@ -12,7 +12,7 @@ namespace dataset
     {}
 
     template<typename VectorEntryParserType, typename DefaultDataVectorType>
-    SupervisedExample SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::Build(shared_ptr<const string> spExampleString)
+    SupervisedExample SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::Build(std::shared_ptr<const std::string> spExampleString)
     {
         const char* pStr = spExampleString->c_str(); 
 
@@ -22,23 +22,23 @@ namespace dataset
         // parse weight
         if(_hasWeight)
         {
-            auto result = Parser::Parse(pStr, /* out */ weight);
+            auto result = utilities::Parser::Parse(pStr, /* out */ weight);
 
-            if(result != Parser::Result::success)
+            if(result != utilities::Parser::Result::success)
             {
                 handleErrors(result, *spExampleString);
             }
         }
 
         // parse label
-        auto result = Parser::Parse(pStr, /* out */ label);
+        auto result = utilities::Parser::Parse(pStr, /* out */ label);
 
-        if(result != Parser::Result::success)
+        if(result != utilities::Parser::Result::success)
         {
             handleErrors(result, *spExampleString);
         }
 
-        // create index-value iterator from the rest of the string
+        // create index-value iterator from the rest of the std::string
         auto IndexValueIterator = _instanceParser.GetIterator(spExampleString, pStr);
 
         // create instance
@@ -49,17 +49,17 @@ namespace dataset
     }
 
     template<typename VectorEntryParserType, typename DefaultDataVectorType>
-    void dataset::SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::handleErrors(Parser::Result result, const string & str)
+    void dataset::SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::handleErrors(utilities::Parser::Result result, const std::string & str)
     {
-        if (result == Parser::Result::badFormat)
+        if (result == utilities::Parser::Result::badFormat)
         {
             throw runtime_error("bad format real value in '" + str + "'");
         }
-        else if (result == Parser::Result::endOfString || result == Parser::Result::beginComment)
+        else if (result == utilities::Parser::Result::endOfString || result == utilities::Parser::Result::beginComment)
         {
-            throw runtime_error("premature end-of-string or comment in '" + str + "'");
+            throw runtime_error("premature end-of-std::string or comment in '" + str + "'");
         }
-        else if (result == Parser::Result::outOfRange)
+        else if (result == utilities::Parser::Result::outOfRange)
         {
             throw runtime_error("real value out of double precision range in '" + str + "'");
         }

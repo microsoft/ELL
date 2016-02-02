@@ -2,15 +2,12 @@
 
 #pragma once
 
+// types
 #include "types.h"
 
-
+// stl
 #include <vector>
-using std::vector;
-
 #include <iterator>
-using std::iterator;
-using std::forward_iterator_tag;
 
 namespace dataset
 {
@@ -20,7 +17,7 @@ namespace dataset
     {
     public:
 
-        /// A read-only forward iterator for the CompressedIntegerList.
+        /// A read-only forward std::iterator for the CompressedIntegerList.
         ///
         class Iterator
         {
@@ -34,7 +31,7 @@ namespace dataset
             ///
             Iterator(Iterator&&) = default;
 
-            /// \returns True if the iterator is currently pointing to a valid iterate
+            /// \returns True if the std::iterator is currently pointing to a valid iterate
             ///
             bool IsValid() const;
 
@@ -91,7 +88,7 @@ namespace dataset
         ///
         void PushBack(uint64 value);
 
-        /// Deletes all of the vector content and sets its Size to zero
+        /// Deletes all of the std::vector content and sets its Size to zero
         ///
         void Reset();
 
@@ -104,7 +101,7 @@ namespace dataset
         ///@}
 
     private:
-        vector<uint8> _data;
+        std::vector<uint8> _data;
         uint64 _last;
         uint64 _size;
     };

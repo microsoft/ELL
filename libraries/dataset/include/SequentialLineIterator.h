@@ -2,15 +2,10 @@
 
 #pragma once
 
+// stl
 #include <string>
-using std::string;
-
 #include <fstream>
-using std::ifstream;
-
 #include <memory>
-using std::shared_ptr;
-using std::unique_ptr;
 
 namespace dataset
 {
@@ -21,7 +16,7 @@ namespace dataset
     public:
         /// Constructs a sequential line iterator
         ///
-        SequentialLineIterator(const string& filepath, char delim = '\n');
+        SequentialLineIterator(const std::string& filepath, char delim = '\n');
 
         /// deleted copy Ctor
         ///
@@ -41,11 +36,11 @@ namespace dataset
 
         /// \returns A const reference to the row
         ///
-        shared_ptr<const string> Get() const;
+        std::shared_ptr<const std::string> Get() const;
 
     private:
-        shared_ptr<string> _spCurrentLine = nullptr;
-        ifstream _iFStream;
+        std::shared_ptr<std::string> _spCurrentLine = nullptr;
+        std::ifstream _iFStream;
         char _delim;
     };
 }

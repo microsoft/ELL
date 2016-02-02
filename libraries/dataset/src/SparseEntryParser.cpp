@@ -4,13 +4,10 @@
 
 // utilities
 #include "Parser.h"
-using utilities::Parser;
 
+// stl
 #include <memory>
-using std::move;
-
 #include <stdexcept>
-using std::runtime_error;
 
 namespace dataset
 {
@@ -19,9 +16,9 @@ namespace dataset
         return _isValid;
     }
 
-    string getSnippet(const char* pos)
+    std::string getSnippet(const char* pos)
     {
-        string str;
+        std::string str;
         const char* end = pos + 20;
         while(*pos != '\0' && pos < end)
         {
@@ -35,49 +32,49 @@ namespace dataset
     {
         // parse index
         uint64 index;
-        auto result = Parser::Parse(_currentPos, index);
+        auto result = utilities::Parser::Parse(_currentPos, index);
 
         // handle errors
-        if(result != Parser::Result::success)
+        if(result != utilities::Parser::Result::success)
         {
-            if(result == Parser::Result::endOfString || result == Parser::Result::beginComment)
+            if(result == utilities::Parser::Result::endOfString || result == utilities::Parser::Result::beginComment)
             {
                 _isValid = false;
                 return;
             }
-            if(result == Parser::Result::badFormat)
+            if(result == utilities::Parser::Result::badFormat)
             {
-                throw runtime_error("bad format, expected unsigned integer near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+                throw std::runtime_error("bad format, expected unsigned integer near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
-            else if(result == Parser::Result::outOfRange)
+            else if(result == utilities::Parser::Result::outOfRange)
             {
-                throw runtime_error("index out of unsigned integer range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+                throw std::runtime_error("index out of unsigned integer range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
         }
 
         // expect ':' character between index and value
         if(*_currentPos != ':')
         {
-            throw runtime_error("bad format, expected ':' between index and value near '" + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+            throw std::runtime_error("bad format, expected ':' between index and value near '" + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
         }
         ++_currentPos;
 
         double value;
-        result = Parser::Parse(_currentPos, value);
+        result = utilities::Parser::Parse(_currentPos, value);
 
-        if(result != Parser::Result::success)
+        if(result != utilities::Parser::Result::success)
         {
-            if(result == Parser::Result::endOfString || result == Parser::Result::beginComment)
+            if(result == utilities::Parser::Result::endOfString || result == utilities::Parser::Result::beginComment)
             {
-                throw runtime_error("bad format, string ended prematurely in " + *_spExampleString);
+                throw std::runtime_error("bad format, std::string ended prematurely in " + *_spExampleString);
             }
-            if(result == Parser::Result::badFormat)
+            if(result == utilities::Parser::Result::badFormat)
             {
-                throw runtime_error("bad format, expected double near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+                throw std::runtime_error("bad format, expected double near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
-            else if(result == Parser::Result::outOfRange)
+            else if(result == utilities::Parser::Result::outOfRange)
             {
-                throw runtime_error("index out of double range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+                throw std::runtime_error("index out of double range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
         }
 
@@ -89,12 +86,12 @@ namespace dataset
         return _currentIndexValue;
     }
 
-    SparseEntryParser::Iterator::Iterator(shared_ptr<const string> spExampleString, const char* pStr) : _spExampleString(spExampleString), _currentPos(pStr)
+    SparseEntryParser::Iterator::Iterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) : _spExampleString(spExampleString), _currentPos(pStr)
     {
         Next();
     }
 
-    SparseEntryParser::Iterator SparseEntryParser::GetIterator(shared_ptr<const string> spExampleString, const char* pStr) const
+    SparseEntryParser::Iterator SparseEntryParser::GetIterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) const
     {
         return Iterator(spExampleString, pStr);
     }

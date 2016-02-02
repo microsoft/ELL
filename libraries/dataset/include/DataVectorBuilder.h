@@ -6,8 +6,6 @@
 
 // stl
 #include <memory>
-using std::unique_ptr;
-using std::move;
 
 namespace dataset
 {
@@ -21,7 +19,7 @@ namespace dataset
         /// Chooses the optimal DataVector representation for a list of index-value pairs
         ///
         template<typename IndexValueIteratorType>
-        static unique_ptr<IDataVector> Build(IndexValueIteratorType IndexValueIterator);
+        static std::unique_ptr<IDataVector> Build(IndexValueIteratorType IndexValueIterator);
     };
 }
 

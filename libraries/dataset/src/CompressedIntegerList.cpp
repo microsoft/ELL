@@ -2,13 +2,10 @@
 
 #include "CompressedIntegerList.h"
 
+// stl
 #include <cassert>
-
 #include <stdexcept>
-using std::runtime_error;
-
 #include <cstring>
-using std::memcpy;
 
 namespace dataset
 {
@@ -37,7 +34,7 @@ namespace dataset
         {
             // read in the Next bytes, shift them over to fit the 6 bits of first_val we're using, and Add first_val
             delta = 0;
-            memcpy(&delta, _iter + 1, total_bytes - 1);
+            std::memcpy(&delta, _iter + 1, total_bytes - 1);
             delta = (delta << 6) | (first_val & 0x3f);
         }
 
@@ -72,7 +69,7 @@ namespace dataset
     {
         if(_size == 0)
         {
-            throw runtime_error("Can't get max of empty list");
+            throw std::runtime_error("Can't get max of empty list");
         }
 
         return _last;
@@ -126,7 +123,7 @@ namespace dataset
         // splice the data length encoding in as the top 2 bits of the first byte
         // So, move all high-order bits of the delta over by 2 to make room, Add the mask, and Add the residual low-order bits of the delta
         uint64 write_val = ((delta << 2) & 0xffffffffffffff00) | mask | (delta & 0x3f);
-        memcpy(buf, &write_val, total_bytes);
+        std::memcpy(buf, &write_val, total_bytes);
 
         ++_size;
     }

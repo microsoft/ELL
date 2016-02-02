@@ -4,21 +4,18 @@
 
 #include "SupervisedExample.h"
 
+// utilities
 #include "IIterator.h"
-using utilities::IIterator;
 
 /// stl
 #include <vector>
-using std::vector;
-
 #include <memory>
-using std::unique_ptr;
 
 namespace dataset
 {
-    using IParsingIterator = IIterator<SupervisedExample>;
+    using IParsingIterator = utilities::IIterator<SupervisedExample>;
     
-    /// An input iterator that traverses a textual dataset row by row and applies a parser to each row into a dense feature vector of doubles, 
+    /// An input iterator that traverses a textual dataset row by row and applies a parser to each row into a dense feature std::vector of doubles, 
     /// a double label, and a double weight.
     template<typename RowIteratorType, typename VectorEntryParserType>
     class ParsingIterator : public IParsingIterator
@@ -45,10 +42,10 @@ namespace dataset
         VectorEntryParserType _instanceParser;
     };
 
-    /// \returns A unique_ptr to a Parsing Iterator
+    /// \returns A std::unique_ptr to a Parsing Iterator
     ///
     template<typename RowIteratorType, typename VectorEntryParserType>
-    unique_ptr<IParsingIterator> GetParsingIterator(const RowIteratorType& row_iter, const VectorEntryParserType& parser);
+    std::unique_ptr<IParsingIterator> GetParsingIterator(const RowIteratorType& row_iter, const VectorEntryParserType& parser);
 }
 
 #include "../tcc/ParsingIterator.tcc"
