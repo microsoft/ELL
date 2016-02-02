@@ -48,13 +48,10 @@ using optimization::AsgdOptimizer;
 // lossFunctions
 #include "HingeLoss.h"
 #include "LogLoss.h"
-using namespace lossFunctions;
 
 // stl
 #include <iostream>
-using std::cerr;
-using std::cout;
-using std::endl;
+#include <stdexcept>
 
 int main(int argc, char* argv[])
 {
@@ -84,7 +81,7 @@ int main(int argc, char* argv[])
         GetRowDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
 
         // create loss function
-        LogLoss loss;
+        lossFunctions::LogLoss loss;
 
         // create sgd trainer
         AsgdOptimizer optimizer(dataset.NumColumns());
@@ -111,7 +108,7 @@ int main(int argc, char* argv[])
         }
 
         // print loss and errors
-        cout << "training error\n" << evaluator << endl;
+        std::cout << "training error\n" << evaluator << std::endl;
 
         // update the map with the newly learned layers
         auto predictor = optimizer.GetPredictor();
@@ -126,21 +123,21 @@ int main(int argc, char* argv[])
     }
     catch (const CommandLineParserErrorException& exception)
     {
-        cerr << "Command line parse error:" << endl;
+        std::cerr << "Command line parse error:" << std::endl;
         for (const auto& error : exception.GetParseErrors())
         {
-            cerr << error.GetMessage() << endl;
+            std::cerr << error.GetMessage() << std::endl;
         }
         return 0;
     }
     catch (const CommandLineParserPrintHelpException& exception)
     {
-        cerr << exception.GetHelpText() << endl;
+        std::cerr << exception.GetHelpText() << std::endl;
     }
-    catch (runtime_error exception)
+    catch (std::runtime_error exception)
     {
-        cerr << "Runtime error:" << endl;
-        cerr << exception.what() << endl;
+        std::cerr << "Runtime error:" << std::endl;
+        std::cerr << exception.what() << std::endl;
         return 1;
     }
 

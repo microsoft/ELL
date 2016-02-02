@@ -2,10 +2,7 @@
 
 /// stl
 #include <stdexcept>
-using std::runtime_error;
-
 #include <cmath>
-using std::log;
 
 #include <cassert>
 
@@ -25,9 +22,9 @@ namespace optimization
         const double T_prev = double(_total_iterations);
         const double T_next = T_prev + data_iter.NumIteratesLeft();
         const double eta = 1.0 / lambda / T_prev;
-        const double sigma = log(T_next) + 0.5 / T_next;
+        const double sigma = std::log(T_next) + 0.5 / T_next;
 
-        v.AddTo(v_avg, sigma - log(T_prev) - 0.5 / T_prev);
+        v.AddTo(v_avg, sigma - std::log(T_prev) - 0.5 / T_prev);
 
         while(data_iter.IsValid())
         {

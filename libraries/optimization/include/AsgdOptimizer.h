@@ -6,11 +6,9 @@
 
 // predictors
 #include "SharedLinearBinaryPredictor.h"
-using predictors::SharedLinearBinaryPredictor;
 
 // linear
 #include "DoubleVector.h"
-using linear::DoubleVector;
 
 namespace optimization
 {
@@ -31,13 +29,13 @@ namespace optimization
 
         /// \returns The averaged predictor
         ///
-        const SharedLinearBinaryPredictor GetPredictor() const;
+        const predictors::SharedLinearBinaryPredictor GetPredictor() const;
             
     private:
         uint64 _total_iterations;
         DoubleVector _w;
         double _b;
-        SharedLinearBinaryPredictor _predictor;
+        predictors::SharedLinearBinaryPredictor _predictor;
     };
 }
 
