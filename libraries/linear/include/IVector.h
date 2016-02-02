@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "types.h"
+
 #include "Base.h"
 
 // stl

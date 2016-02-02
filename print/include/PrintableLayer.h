@@ -19,6 +19,10 @@ using std::shared_ptr;
 class PrintableLayer 
 {
 public:
+    /// default virtual destructor
+    ///
+    virtual ~PrintableLayer() = default;
+
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///
     virtual LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const = 0;

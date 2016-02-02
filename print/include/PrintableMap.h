@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "PrintableLayer.h"
-#include "PrintArguments.h" // TOCO change name of this file
+#include "PrintArguments.h" 
 
 // layers
 #include "Layer.h"

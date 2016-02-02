@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "types.h"
-
 #include <iostream>
 using std::ostream;
 
@@ -15,7 +13,7 @@ namespace linear
     {
     public:
 
-        /// Virtual destructor
+        /// default virtual destructor
         ///
         virtual ~Base() = default;
 

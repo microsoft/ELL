@@ -8,8 +8,6 @@
 #include "RealArray.h"
 using types::DoubleArray;
 
-#include <cassert>
-
 namespace linear
 {
     /// DoubleVector class

@@ -32,6 +32,9 @@ using std::function;
 using std::string;
 using std::pair;
 
+#include <stdexcept>
+using std::runtime_error;
+
 namespace utilities
 {
     /// TODO: document
@@ -207,18 +210,17 @@ namespace utilities
 
     /// Exceptions thrown by CommandLineParser: 
     ///
-    class CommandLineParserException : public std::runtime_error
+    class CommandLineParserException : public runtime_error
     {
     public:
-        using std::runtime_error::runtime_error;
-        CommandLineParserException(const char* message) : std::runtime_error(message) {};
+        CommandLineParserException(const char* message) : runtime_error(message) {};
     };
 
     class CommandLineParserErrorException : CommandLineParserException
     {
     public:
         CommandLineParserErrorException(const char* message) : CommandLineParserException(message){}
-        CommandLineParserErrorException(const char* message, std::vector<ParseError> errors) : CommandLineParserException(message), _errors(errors) {}
+        CommandLineParserErrorException(const char* message, vector<ParseError> errors) : CommandLineParserException(message), _errors(errors) {}
         const vector<ParseError>& GetParseErrors() const { return _errors; }
 
     private:
@@ -228,18 +230,18 @@ namespace utilities
     class CommandLineParserPrintHelpException : public CommandLineParserException
     {
     public:
-        CommandLineParserPrintHelpException(std::string helpText) : CommandLineParserException(""), _helpText(helpText) {}
-        std::string GetHelpText() const { return _helpText; }
+        CommandLineParserPrintHelpException(string helpText) : CommandLineParserException(""), _helpText(helpText) {}
+        string GetHelpText() const { return _helpText; }
 
     private:
-        std::string _helpText;
+        string _helpText;
     };
 
 
     class CommandLineParserInvalidOptionsException : public CommandLineParserException
     {
     public:
-        CommandLineParserInvalidOptionsException(std::string what) : CommandLineParserException(what) {}
+        CommandLineParserInvalidOptionsException(const char* what) : CommandLineParserException(what) {}
     };
 }
 

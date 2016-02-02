@@ -11,9 +11,6 @@ using std::function;
 #include <vector>
 using std::vector;
 
-#include <cassert> // for assert
-#include <cstdint> // for UINT64_MAX
-
 namespace linear
 {
     /// DoubleSubvectorCref class

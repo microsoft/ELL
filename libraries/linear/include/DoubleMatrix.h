@@ -2,8 +2,11 @@
 
 #pragma once
 
+#include "types.h"
+
 #include "IMatrix.h"
 
+// stl
 #include <vector>
 using std::vector;
 
