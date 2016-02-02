@@ -31,6 +31,10 @@ namespace layers
         ///
         Sum(const  vector<CoordinateList>& coordinates);
 
+        /// default virtual destructor
+        ///
+        virtual ~Sum() = default;
+
         /// \returns The size of the layer's output
         ///
         virtual uint64 Size() const override;

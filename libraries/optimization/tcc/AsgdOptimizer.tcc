@@ -1,10 +1,13 @@
 // AsgdOptimizer.tcc
 
+/// stl
 #include <stdexcept>
 using std::runtime_error;
 
 #include <cmath>
 using std::log;
+
+#include <cassert>
 
 namespace optimization
 {
@@ -15,8 +18,8 @@ namespace optimization
         // get references to the vector and biases
         DoubleVector& v = _w;
         DoubleVector& v_avg = _predictor.GetVector();
-        double& b = _b;
-        double& b_avg = _predictor.GetBias();
+        //double& b = _b;   // TODO add learning of bias term
+        //double& b_avg = _predictor.GetBias();
 
         // define some constants
         const double T_prev = double(_total_iterations);

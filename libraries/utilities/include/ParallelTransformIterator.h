@@ -1,4 +1,4 @@
-// ParallelTransformIterator
+// ParallelTransformIterator.h
 #pragma once
 
 #include "IIterator.h"

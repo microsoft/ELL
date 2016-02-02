@@ -26,8 +26,7 @@ set (INCLUDE include/Base.h
              include/DoubleVector.h
              include/IMatrix.h
              include/IVector.h
-             include/RowMatrix.h
-             include/operators.h)
+             include/RowMatrix.h)
 
 set (TCC tcc/BiMatrix.tcc
          tcc/RowMatrix.tcc)

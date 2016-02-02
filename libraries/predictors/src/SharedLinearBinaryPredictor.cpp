@@ -3,9 +3,13 @@
 #include "Coordinate.h"
 using layers::Coordinate;
 
-#include "layers.h"
+#include "Scale.h"
 using layers::Scale;
+
+#include "Sum.h"
 using layers::Sum;
+
+#include "Shift.h"
 using layers::Shift;
 
 #include <memory>

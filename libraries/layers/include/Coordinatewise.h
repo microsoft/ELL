@@ -33,6 +33,10 @@ namespace layers
         ///
         Coordinatewise(const vector<double>& values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type);
 
+        /// Default virtual destructor
+        ///
+        virtual ~Coordinatewise() = default;
+
         /// \returns The size of the layer's output
         ///
         virtual uint64 Size() const override;

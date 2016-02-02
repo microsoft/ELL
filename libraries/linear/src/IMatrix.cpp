@@ -2,8 +2,6 @@
 
 #include "IMatrix.h"
 
-#include <cassert>
-
 namespace linear
 {
     void IMatrix::Gemv(const vector<double>& x, vector<double>& y, double alpha, double beta) const

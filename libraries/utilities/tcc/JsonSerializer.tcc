@@ -161,7 +161,7 @@ namespace utilities
         }
         catch (runtime_error e)
         {
-            throw e;
+            throw; // rethrow the exception
         }
         catch (...)    // underlying json implementation may throw an exception 
         {

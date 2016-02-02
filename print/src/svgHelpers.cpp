@@ -30,7 +30,7 @@ void SvgTab(ostream& os, uint64 numTabs)
 
 int GetPrecision(double number, uint64 maxChars)
 {
-    int precision = 0;
+    int precision;
     if(number >= 1)
     {
         precision = (int)maxChars - 1 -(int)ceil(log10(number));   // save one char for "."

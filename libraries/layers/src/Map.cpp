@@ -1,7 +1,10 @@
 // Map.cpp
 
 #include "Map.h"
-#include "layers.h"
+#include "Scale.h"
+#include "Shift.h"
+#include "Input.h"
+#include "Sum.h"
 
 using std::make_shared;
 

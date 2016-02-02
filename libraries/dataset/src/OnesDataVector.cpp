@@ -11,11 +11,6 @@ using std::runtime_error;
 #include <cmath>
 using std::fabs;
 
-#include <cassert>
-
-#include <memory>
-using std::move;
-
 namespace dataset
 {
     bool OnesDataVector::Iterator::IsValid() const

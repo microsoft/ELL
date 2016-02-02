@@ -38,6 +38,10 @@ namespace layers
         ///
         Layer(Layer&&) = default;
 
+        /// Default virtual destructor
+        ///
+        virtual ~Layer() = default;
+
         /// \returns The size of the layer's output
         ///
         virtual uint64 Size() const = 0;

@@ -12,7 +12,7 @@ namespace layers
 {
     /// Represents an index value pair
     ///
-    class Coordinate
+    class Coordinate final
     {
     public:
 

@@ -19,5 +19,9 @@ namespace layers
         /// Ctor
         ///
         Shift(const vector<double>& values, const CoordinateList& coordinates);
+
+        /// default virtual destructor
+        ///
+        virtual ~Shift() = default;
     };
 }

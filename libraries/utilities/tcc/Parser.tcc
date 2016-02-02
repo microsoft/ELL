@@ -8,9 +8,6 @@ using std::strtod;
 #include <stdexcept>
 using std::runtime_error;
 
-#include<string>
-using std::string;
-
 namespace utilities
 {
     // wrapper for strtof

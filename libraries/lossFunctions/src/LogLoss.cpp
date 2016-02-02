@@ -24,8 +24,6 @@ namespace lossFunctions
             double exp_neg_scaled_margin = exp(-scaled_margin);
             return log(1.0 + exp_neg_scaled_margin) / _scale;
         }
-
-        return 0.0;
     }
 
     double LogLoss::GetDerivative(double prediction, double label) const

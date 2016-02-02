@@ -9,9 +9,7 @@
 #include "Layer.h"
 using layers::Layer;
 
-#include <string>
-using std::string;
-
+// stl
 #include <vector>
 using std::vector;
 

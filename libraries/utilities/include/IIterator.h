@@ -12,6 +12,11 @@ namespace utilities
     class IIterator
     {
     public:
+
+        /// default virtual destructor
+        ///
+        virtual ~IIterator() = default;
+
         /// \returns True if the iterator is currently pointing to a valid iterate
         ///
         virtual bool IsValid() const = 0;

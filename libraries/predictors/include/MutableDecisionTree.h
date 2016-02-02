@@ -128,10 +128,6 @@ namespace decision_tree
         ///
         int GetNumInteriorVertices() const;
 
-        /// \returns The number of leaves
-        ///
-        int GetNumLeaves() const;
-
         /// Performs a split of a leaf
         ///
         void SplitLeaf(int leaf_index, 

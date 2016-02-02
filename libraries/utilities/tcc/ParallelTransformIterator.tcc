@@ -25,7 +25,6 @@ namespace utilities
         }
 
         _futures.reserve(maxTasks);
-        int index = 0;
         for(int index = 0; index < maxTasks; index++)
         {
             if(!_inIter.IsValid())

@@ -76,6 +76,10 @@ namespace layers
         ///
         Map(Map&&) = default;
 
+        /// default virtual destructor
+        ///
+        virtual ~Map() = default;
+        
         /// Default assignment operator
         ///
         Map& operator=(const Map&) = default;
