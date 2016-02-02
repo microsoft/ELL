@@ -5,17 +5,17 @@
 namespace layers
 {
 
-    const string Layer::typeName[] = { "Input", "Scale", "Shift", "Sum", "DecisionTreePath" };
+    const std::string Layer::typeName[] = { "Input", "Scale", "Shift", "Sum", "DecisionTreePath" };
 
     Layer::Layer(Type type) : _type(type)
     {}
 
-    string Layer::GetTypeName() const
+    std::string Layer::GetTypeName() const
     {
         return typeName[(int)_type];
     }
 
-    void Layer::SerializeHeader(JsonSerializer& serializer, int version) const
+    void Layer::SerializeHeader(utilities::JsonSerializer& serializer, int version) const
     {
         // to make the file more readable
         serializer.Write("_type", GetTypeName());

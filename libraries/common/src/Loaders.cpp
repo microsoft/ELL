@@ -5,55 +5,49 @@
 
 // utilities
 #include "files.h"
-using utilities::OpenIfstream;
 
 // dataset
 #include "SequentialLineIterator.h"
-using dataset::SequentialLineIterator;
 
 #include "SparseEntryParser.h"
-using dataset::SparseEntryParser;
 
 #include "MappedParser.h"
-using dataset::MappedParser;
 
 #include "ParsingIterator.h"
-using dataset::GetParsingIterator;
 
 // stl
 #include <memory>
-using std::move;
 
 namespace common
 {
-    unique_ptr<IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
+    std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
     {
        // create line iterator - read line by line sequentially
-        SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
+        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
 
         // create parser for sparse vectors (SVMLight format)
-        SparseEntryParser sparseEntryParser;
+        dataset::SparseEntryParser sparseEntryParser;
 
         // Create iterator
-        return GetParsingIterator(move(lineIterator), sparseEntryParser);
+        return dataset::GetParsingIterator(std::move(lineIterator), sparseEntryParser);
     }
 
-    unique_ptr<IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const Map& map, const CoordinateList& inputCoordinates)
+    std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const layers::Map& map, const layers::CoordinateList& inputCoordinates)
     {
         // create parser for sparse vectors (SVMLight format)
-        SparseEntryParser sparseEntryParser;
+        dataset::SparseEntryParser sparseEntryParser;
 
         // create mapped parser
-        MappedParser<SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
+        dataset::MappedParser<dataset::SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
 
         // create line iterator - read line by line sequentially
-        SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
+        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
 
         // Create iterator
-        return GetParsingIterator(move(lineIterator), mappedParser);
+        return dataset::GetParsingIterator(std::move(lineIterator), mappedParser);
     }
 
-    unique_ptr<IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments)
+    std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments)
     {
         if (mapLoadArguments.inputMapFile == "")
         {
@@ -61,20 +55,20 @@ namespace common
         }
         else
         {
-            Map map;
-            CoordinateList coordinateList;
+            layers::Map map;
+            layers::CoordinateList coordinateList;
             return GetDataIteratorMapCoordinates(dataLoadArguments, mapLoadArguments, map, coordinateList);
         }
     }
 
-    Map GetMap(const MapLoadArguments& mapLoadArguments)
+    layers::Map GetMap(const MapLoadArguments& mapLoadArguments)
     {
         // load map
-        auto inputMapFStream = OpenIfstream(mapLoadArguments.inputMapFile);
-        return JsonSerializer::Load<Map>(inputMapFStream, "Base");
+        auto inputMapFStream = utilities::OpenIfstream(mapLoadArguments.inputMapFile);
+        return utilities::JsonSerializer::Load<layers::Map>(inputMapFStream, "Base");
     }
 
-    unique_ptr<IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, /* out */ Map& map, /* out */ CoordinateList& inputCoordinates)
+    std::unique_ptr<dataset::IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, /* out */ layers::Map& map, /* out */ layers::CoordinateList& inputCoordinates)
     {
         map = GetMap(mapLoadArguments);
 
@@ -85,7 +79,7 @@ namespace common
         return GetDataIterator(dataLoadArguments, map, inputCoordinates);
     }
 
-    void DataIteratorToRowDataset(IParsingIterator& dataIterator, /* out */ RowDataset& dataset)
+    void DataIteratorToRowDataset(dataset::IParsingIterator& dataIterator, /* out */ dataset::RowDataset& dataset)
     {
         // Load row by row
         while (dataIterator.IsValid())
@@ -98,9 +92,9 @@ namespace common
     void GetRowDatasetMapCoordinates(
         const DataLoadArguments& dataLoadArguments,
         const MapLoadArguments& mapLoadArguments,
-        /* out */ RowDataset& rowDataset,
-        /* out */ Map& map,
-        /* out */ CoordinateList& inputCoordinates)
+        /* out */ dataset::RowDataset& rowDataset,
+        /* out */ layers::Map& map,
+        /* out */ layers::CoordinateList& inputCoordinates)
     {
         // handle two cases - input map specified or unspecified
         if (mapLoadArguments.inputMapFile == "")
@@ -115,7 +109,7 @@ namespace common
             uint64 numColumns = rowDataset.NumColumns();
 
             // create default map with single input layer
-            map = Map(numColumns);
+            map = layers::Map(numColumns);
 
             // create a coordinate list of this map
             inputCoordinates = CoordinateSequence(0, numColumns);

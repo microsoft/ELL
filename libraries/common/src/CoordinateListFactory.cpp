@@ -4,14 +4,14 @@
 
 namespace common
 {
-    CoordinateList GetCoordinateList(const Map& map, const CoordinateListLoadArguments& coordinateListLoadArguments)
+    layers::CoordinateList GetCoordinateList(const layers::Map& map, const CoordinateListLoadArguments& coordinateListLoadArguments)
     {
         return CoordinateListIgnoreMapSuffix(map, coordinateListLoadArguments.ignoreSuffix);
     }
 
-    CoordinateList CoordinateSequence(uint64 row, uint64 numColumns)
+    layers::CoordinateList CoordinateSequence(uint64 row, uint64 numColumns)
     {
-        CoordinateList coordinateList;
+        layers::CoordinateList coordinateList;
         for (uint64 column = 0; column < numColumns; ++column)
         {
             coordinateList.emplace_back(row, column);
@@ -19,7 +19,7 @@ namespace common
         return coordinateList;
     }
 
-    CoordinateList CoordinateListIgnoreMapSuffix(const Map& map, uint64 numLayersToDrop)
+    layers::CoordinateList CoordinateListIgnoreMapSuffix(const layers::Map& map, uint64 numLayersToDrop)
     {
         return map.GetCoordinateList(map.NumLayers() - numLayersToDrop);
     }

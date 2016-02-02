@@ -11,14 +11,8 @@
 
 // stl
 #include <vector>
-using std::vector;
-
 #include <memory>
-using std::shared_ptr;
-
 #include <type_traits>
-using std::enable_if_t;
-using std::is_base_of;
 
 namespace layers
 {
@@ -51,12 +45,12 @@ namespace layers
             IndexValue Get() const;
 
         protected:
-            shared_ptr<vector<DoubleArray>> _spOutputs;
+            std::shared_ptr<std::vector<types::DoubleArray>> _spOutputs;
             const CoordinateList _outputCoordinates;
             uint64 _index;
 
             /// private ctor, can only be called from Map class
-            Iterator(shared_ptr<vector<DoubleArray>> spOutput, const CoordinateList& outputCoordinates);
+            Iterator(std::shared_ptr<std::vector<types::DoubleArray>> spOutput, const CoordinateList& outputCoordinates);
             friend Map;
         };
 
@@ -90,12 +84,12 @@ namespace layers
 
         /// Computes the Map
         ///
-        template <typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        template <typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         Iterator Compute(IndexValueIteratorType IndexValueIterator, const CoordinateList& outputCoordinates) const;
 
         /// Adds a shared layer to the map
         /// \returns The row index of the added layer
-        uint64 PushBack(shared_ptr<Layer> layer);
+        uint64 PushBack(std::shared_ptr<Layer> layer);
 
         /// \returns The number of layers in the map
         ///
@@ -104,7 +98,7 @@ namespace layers
         /// \returns a Layer of a specified template type
         ///
         template<typename LayerType = Layer>
-        shared_ptr<const LayerType> GetLayer(uint64 layerIndex) const;
+        std::shared_ptr<const LayerType> GetLayer(uint64 layerIndex) const;
 
         /// \returns A list of the coordinates in this layer
         ///
@@ -112,7 +106,7 @@ namespace layers
 
         /// Serializes the Map in json format
         ///
-        void Serialize(JsonSerializer& serializer) const;
+        void Serialize(utilities::JsonSerializer& serializer) const;
 
         /// Serializes the Map in json format
         ///
@@ -120,16 +114,16 @@ namespace layers
 
         /// Deserializes the Map in json format
         ///
-        virtual void Deserialize(JsonSerializer& serializer);
+        virtual void Deserialize(utilities::JsonSerializer& serializer);
 
-        /// Static function for deserializing shared_ptr<Layer>
+        /// Static function for deserializing std::shared_ptr<Layer>
         ///
-        static void DeserializeLayers(JsonSerializer& serializer, shared_ptr<Layer>& up);
+        static void DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<Layer>& up);
 
     protected:
-        vector<shared_ptr<Layer>> _layers;
+        std::vector<std::shared_ptr<Layer>> _layers;
 
-        shared_ptr<vector<DoubleArray>> AllocateOutputs() const;
+        std::shared_ptr<std::vector<types::DoubleArray>> AllocateOutputs() const;
     };
 }
 

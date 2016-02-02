@@ -6,12 +6,9 @@
 
 // utilities
 #include "CommandLineParser.h"
-using utilities::CommandLineParser;
-using utilities::ParsedArgSet;
 
 // stl
 #include <string>
-using std::string;
 
 namespace common
 {
@@ -19,15 +16,15 @@ namespace common
     ///
     struct MapSaveArguments
     {
-        string outputMapFile = "";
+        std::string outputMapFile = "";
     };
 
     /// A version of MapSaveArguments that adds its members to the command line parser
     ///
-    struct ParsedMapSaveArguments : public MapSaveArguments, public ParsedArgSet
+    struct ParsedMapSaveArguments : public MapSaveArguments, public utilities::ParsedArgSet
     {
         /// Adds the arguments to the command line parser
         ///
-        virtual void AddArgs(CommandLineParser& parser);
+        virtual void AddArgs(utilities::CommandLineParser& parser);
     };
 }

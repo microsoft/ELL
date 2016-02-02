@@ -7,10 +7,8 @@
 #include "Sum.h"
 
 // stl
-using std::make_shared;
-
 #include <stdexcept>
-using std::runtime_error;
+#include <string>
 
 namespace layers
 {
@@ -34,7 +32,7 @@ namespace layers
         return IndexValue{ _index, (*_spOutputs)[row][column] };
     }
 
-    Map::Iterator::Iterator(shared_ptr<vector<DoubleArray>> spOutput, const CoordinateList& outputCoordinates) :
+    Map::Iterator::Iterator(std::shared_ptr<std::vector<types::DoubleArray>> spOutput, const CoordinateList& outputCoordinates) :
         _spOutputs(spOutput),
         _outputCoordinates(outputCoordinates),
         _index(0)
@@ -42,10 +40,10 @@ namespace layers
 
     Map::Map(uint64 inputLayerSize)
     {
-        _layers.push_back(make_shared<Input>(inputLayerSize));
+        _layers.push_back(std::make_shared<Input>(inputLayerSize));
     }
 
-    uint64 Map::PushBack(shared_ptr<Layer> layer)
+    uint64 Map::PushBack(std::shared_ptr<Layer> layer)
     {
         uint64 row = _layers.size();
         _layers.push_back(layer);
@@ -68,56 +66,56 @@ namespace layers
         return coordinateList;
     }
 
-    void Map::Serialize(JsonSerializer & serializer) const
+    void Map::Serialize(utilities::JsonSerializer & serializer) const
     {
         serializer.Write("layers", _layers);
     }
 
     void Map::Serialize(ostream& os) const
     {
-        JsonSerializer writer;
+        utilities::JsonSerializer writer;
         writer.Write("Base", *this);
         auto str = writer.ToString();
         os << str;
     }
 
-    void Map::Deserialize(JsonSerializer & serializer)
+    void Map::Deserialize(utilities::JsonSerializer & serializer)
     {
         serializer.Read("layers", _layers, DeserializeLayers);
     }
 
-    void Map::DeserializeLayers(JsonSerializer & serializer, shared_ptr<Layer>& up)
+    void Map::DeserializeLayers(utilities::JsonSerializer & serializer, std::shared_ptr<Layer>& up)
     {
-        auto type = serializer.Read<string>("_type");
+        auto type = serializer.Read<std::string>("_type");
         auto version = serializer.Read<int>("_version");
 
         if (type == "Input")
         {
-            up = make_shared<Input>();
+            up = std::make_shared<Input>();
         }
         else if (type == "Scale")
         {
-            up = make_shared<Scale>();
+            up = std::make_shared<Scale>();
         }
         else if (type == "Shift")
         {
-            up = make_shared<Shift>();
+            up = std::make_shared<Shift>();
         }
         else if (type == "Sum")
         {
-            up = make_shared<Sum>();
+            up = std::make_shared<Sum>();
         }
         else
         {
-            throw runtime_error("unidentified type in map file: " + type);
+            throw std::runtime_error("unidentified type in map file: " + type);
         }
 
         up->Deserialize(serializer, version);
     }
 
-    shared_ptr<vector<DoubleArray>> Map::AllocateOutputs() const
+    std::shared_ptr<std::vector<types::DoubleArray>> Map::AllocateOutputs() const
     {
-        auto outputs = make_shared<vector<DoubleArray>>();
+        auto outputs = std::make_shared<std::vector<types::DoubleArray>>();
         for (uint64 i = 0; i < _layers.size(); ++i)
         {
             outputs->emplace_back(_layers[i]->Size());

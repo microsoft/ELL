@@ -17,13 +17,13 @@ namespace layers
         return _column;
     }
 
-    void Coordinate::Serialize(JsonSerializer& serializer) const
+    void Coordinate::Serialize(utilities::JsonSerializer& serializer) const
     {
       serializer.Write("r", (Json::UInt64)_row); 
       serializer.Write("c", (Json::UInt64)_column);
     }
 
-    void Coordinate::Deserialize(JsonSerializer& serializer)
+    void Coordinate::Deserialize(utilities::JsonSerializer& serializer)
     {
         serializer.Read("r", _row);
         serializer.Read("c", _column);

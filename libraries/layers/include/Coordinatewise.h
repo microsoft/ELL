@@ -8,10 +8,8 @@
 #include "RealArray.h"
 
 #include <vector>
-using std::vector;
 
 #include <functional>
-using std::function;
 
 namespace layers
 {
@@ -19,7 +17,7 @@ namespace layers
     {
     public:
 
-        using DoubleOperation = function<double(double, double)>;
+        using DoubleOperation = std::function<double(double, double)>;
 
         /// Ctor
         ///
@@ -31,7 +29,7 @@ namespace layers
 
         /// Ctor
         ///
-        Coordinatewise(const vector<double>& values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type);
+        Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type);
 
         /// Default virtual destructor
         ///
@@ -43,22 +41,22 @@ namespace layers
 
         /// Computes the layer output
         ///
-        virtual void Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const override;
+        virtual void Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const override;
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///
-        virtual VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;
+        virtual utilities::VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;
 
         /// Serializes the Layer in json format
         ///
-        virtual void Serialize(JsonSerializer& serializer) const override;
+        virtual void Serialize(utilities::JsonSerializer& serializer) const override;
 
         /// Deserializes the Layer in json format
         ///
-        virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion) override;
+        virtual void Deserialize(utilities::JsonSerializer& serializer, int version = _currentVersion) override;
 
     protected:
-        vector<double> _values;
+        std::vector<double> _values;
         CoordinateList _coordinates;
         DoubleOperation _operation;
         static const int _currentVersion = 1;

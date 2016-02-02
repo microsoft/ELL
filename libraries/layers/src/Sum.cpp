@@ -4,10 +4,8 @@
 
 // stl
 #include <string>
-using std::to_string;
 
 #include <stdexcept>
-using std::runtime_error;
 
 namespace layers
 {
@@ -19,14 +17,14 @@ namespace layers
         _coordinates.push_back(coordinates);
     }
 
-    Sum::Sum(const vector<CoordinateList>& coordinates) : Layer(Type::sum), _coordinates(coordinates)
+    Sum::Sum(const std::vector<CoordinateList>& coordinates) : Layer(Type::sum), _coordinates(coordinates)
     {}
 
     uint64 Sum::Size() const
     {
         return 1;
     }
-    void Sum::Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const
+    void Sum::Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const
     {
         for (uint64 k = 0; k<_coordinates.size(); ++k)
         {
@@ -39,19 +37,19 @@ namespace layers
         }
     }
 
-    VectorIterator<Coordinate> Sum::GetInputCoordinates(uint64 index) const
+    utilities::VectorIterator<Coordinate> Sum::GetInputCoordinates(uint64 index) const
     {
-        return VectorIterator<Coordinate>(_coordinates[index].cbegin(), _coordinates[index].cend());
+        return utilities::VectorIterator<Coordinate>(_coordinates[index].cbegin(), _coordinates[index].cend());
     }
 
-    void Sum::Serialize(JsonSerializer & serializer) const
+    void Sum::Serialize(utilities::JsonSerializer & serializer) const
     {
         // version 1
         Layer::SerializeHeader(serializer, 1);
         serializer.Write("coordinates", _coordinates);
     }
 
-    void Sum::Deserialize(JsonSerializer & serializer, int version)
+    void Sum::Deserialize(utilities::JsonSerializer & serializer, int version)
     {
         if (version == 1)
         {
@@ -59,7 +57,7 @@ namespace layers
         }
         else
         {
-            throw runtime_error("unsupported version: " + to_string(version));
+            throw std::runtime_error("unsupported version: " + std::to_string(version));
         }
     }
 

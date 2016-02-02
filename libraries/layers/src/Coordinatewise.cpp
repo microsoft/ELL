@@ -2,11 +2,9 @@
 
 #include "Coordinatewise.h"
 
+// stl
 #include <stdexcept>
-using std::runtime_error;
-
 #include <string>
-using std::to_string;
 
 namespace layers
 {
@@ -19,7 +17,7 @@ namespace layers
         _coordinates.push_back(coordinate);
     }
 
-    Coordinatewise::Coordinatewise(const vector<double> & values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type) : Layer(type), _values(values), _coordinates(coordinates), _operation(operation)
+    Coordinatewise::Coordinatewise(const std::vector<double> & values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type) : Layer(type), _values(values), _coordinates(coordinates), _operation(operation)
     {}
 
     uint64 Coordinatewise::Size() const
@@ -27,7 +25,7 @@ namespace layers
         return _coordinates.size();
     }
 
-    void Coordinatewise::Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const
+    void Coordinatewise::Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const
     {
         for(uint64 k=0; k<_values.size(); ++k)
         {
@@ -37,12 +35,12 @@ namespace layers
         }
     }
 
-    VectorIterator<Coordinate> Coordinatewise::GetInputCoordinates(uint64 index) const
+    utilities::VectorIterator<Coordinate> Coordinatewise::GetInputCoordinates(uint64 index) const
     {
-        return VectorIterator<Coordinate>(_coordinates.cbegin()+index, _coordinates.cbegin()+index+1);
+        return utilities::VectorIterator<Coordinate>(_coordinates.cbegin()+index, _coordinates.cbegin()+index+1);
     }
 
-    void Coordinatewise::Serialize(JsonSerializer& serializer) const
+    void Coordinatewise::Serialize(utilities::JsonSerializer& serializer) const
     {
         // version 1
         Layer::SerializeHeader(serializer, 1);
@@ -50,7 +48,7 @@ namespace layers
         serializer.Write("coordinates", _coordinates);
     }
 
-    void Coordinatewise::Deserialize(JsonSerializer& serializer, int version)
+    void Coordinatewise::Deserialize(utilities::JsonSerializer& serializer, int version)
     {
         if(version == 1)
         {
@@ -59,7 +57,7 @@ namespace layers
         }
         else
         {
-            throw runtime_error("unsupported version: " + to_string(version));
+            throw std::runtime_error("unsupported version: " + std::to_string(version));
         }
     }
 }

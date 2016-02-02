@@ -3,11 +3,10 @@
 #include "DataSaveArguments.h"
 
 #include <vector>
-using std::vector;
 
 namespace common
 {
-    void ParsedDataSaveArguments::AddArgs(CommandLineParser& parser)
+    void ParsedDataSaveArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
             outputDataFile,
@@ -17,9 +16,9 @@ namespace common
             "");
     }
 
-    ParseResult ParsedDataSaveArguments::PostProcess(const CommandLineParser & parser)
+    utilities::ParseResult ParsedDataSaveArguments::PostProcess(const utilities::CommandLineParser & parser)
     {
-        vector<string> parseErrorMessages;
+        std::vector<std::string> parseErrorMessages;
 
         return parseErrorMessages;
     }

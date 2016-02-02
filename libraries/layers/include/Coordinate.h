@@ -4,13 +4,11 @@
 
 // utilities
 #include "JsonSerializer.h"
-using utilities::JsonSerializer;
 
 #include "types.h"
 
 // stl
 #include <vector>
-using std::vector;
 
 namespace layers
 {
@@ -42,16 +40,16 @@ namespace layers
 
         /// Serializes an index value pair
         ///
-        void Serialize(JsonSerializer& serializer) const;
+        void Serialize(utilities::JsonSerializer& serializer) const;
 
         /// Deserializes an index value pair
         ///
-        void Deserialize(JsonSerializer& serializer);
+        void Deserialize(utilities::JsonSerializer& serializer);
 
     private:
         uint64 _row = 0;
         uint64 _column = 0;
     };
 
-    using  CoordinateList = vector<Coordinate>;
+    using  CoordinateList = std::vector<Coordinate>;
 }

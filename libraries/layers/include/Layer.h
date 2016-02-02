@@ -5,22 +5,16 @@
 
 #include "types.h"
 #include "RealArray.h"
-using types::DoubleArray;
 
 #include "VectorIterator.h"
-using utilities::VectorIterator;
 
 #include "JsonSerializer.h"
-using utilities::JsonSerializer;
 
 #include <vector>
-using std::vector;
 
 #include <memory>
-using std::unique_ptr;
 
 #include <string>
-using std::string;
 
 namespace layers
 {
@@ -49,31 +43,31 @@ namespace layers
         ///
         virtual uint64 Size() const = 0;
 
-        /// \returns A string tha trepresents the layer type
+        /// \returns A std::string tha trepresents the layer type
         ///
-        string GetTypeName() const;
+        std::string GetTypeName() const;
 
         /// Computes the output of the layer
         ///
-        virtual void Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const = 0; // TODO - resolve the naming row vs. layer
+        virtual void Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const = 0; // TODO - resolve the naming row vs. layer
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///
-        virtual VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const = 0;
+        virtual utilities::VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const = 0;
 
         /// Serializes the Layer in json format
         ///
-        virtual void Serialize(JsonSerializer& serializer) const = 0;
+        virtual void Serialize(utilities::JsonSerializer& serializer) const = 0;
         
         /// Deserializes the Layer in json format
         ///
-        virtual void Deserialize(JsonSerializer& serializer, int version) = 0;
+        virtual void Deserialize(utilities::JsonSerializer& serializer, int version) = 0;
 
     protected:
-        void SerializeHeader(JsonSerializer& serializer, int version) const;
+        void SerializeHeader(utilities::JsonSerializer& serializer, int version) const;
 
         Type _type;
-        static const string typeName[];
+        static const std::string typeName[];
     };
 }
 

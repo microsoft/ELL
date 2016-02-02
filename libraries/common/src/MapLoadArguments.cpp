@@ -4,7 +4,7 @@
 
 namespace common
 {
-    void ParsedMapLoadArguments::AddArgs(CommandLineParser& parser)
+    void ParsedMapLoadArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
             inputMapFile,

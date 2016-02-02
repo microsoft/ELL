@@ -6,13 +6,9 @@
 
 // utilities
 #include "CommandLineParser.h"
-using utilities::CommandLineParser;
-using utilities::ParsedArgSet;
-using utilities::ParseResult;
 
 // stl
 #include <string>
-using std::string;
 
 namespace common
 {
@@ -20,19 +16,19 @@ namespace common
     ///
     struct DataSaveArguments
     {
-        string outputDataFile = "";
+        std::string outputDataFile = "";
     };
 
     /// A version of DataSaveArguments that adds its members to the command line parser
     ///
-    struct ParsedDataSaveArguments : public DataSaveArguments, public ParsedArgSet
+    struct ParsedDataSaveArguments : public DataSaveArguments, public utilities::ParsedArgSet
     {
         /// Adds the arguments to the command line parser
         ///
-        virtual void AddArgs(CommandLineParser& parser);
+        virtual void AddArgs(utilities::CommandLineParser& parser);
 
         /// Check arguments
         ///
-        virtual ParseResult PostProcess(const CommandLineParser& parser);
+        virtual utilities::ParseResult PostProcess(const utilities::CommandLineParser& parser);
     };
 }

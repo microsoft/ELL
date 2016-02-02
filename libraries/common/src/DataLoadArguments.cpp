@@ -4,18 +4,15 @@
 
 // utilities
 #include "files.h"
-using utilities::IsFileReadable;
 
 // stl
 #include <vector>
-using std::vector;
 
 #include <string>
-using std::string;
 
 namespace common
 {
-    void ParsedDataLoadArguments::AddArgs(CommandLineParser& parser)
+    void ParsedDataLoadArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
             inputDataFile,
@@ -32,9 +29,9 @@ namespace common
             false);
     }
 
-    ParseResult ParsedDataLoadArguments::PostProcess(const CommandLineParser & parser)
+    utilities::ParseResult ParsedDataLoadArguments::PostProcess(const utilities::CommandLineParser & parser)
     {
-        vector<string> parseErrorMessages;
+        std::vector<std::string> parseErrorMessages;
         
         if(inputDataFile == "")
         {
@@ -42,7 +39,7 @@ namespace common
         }
         else
         {
-            if(!IsFileReadable(inputDataFile))
+            if(!utilities::IsFileReadable(inputDataFile))
             {
                 parseErrorMessages.push_back("cannot read from specified input data file: " + inputDataFile);
             }

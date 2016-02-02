@@ -31,19 +31,19 @@ namespace layers
 
         /// Computes the output of the layer
         ///
-        virtual void Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const override;
+        virtual void Compute(uint64 rowIndex, vector<types::DoubleArray>& outputs) const override;
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///
-        virtual VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;
+        virtual utilities::VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;
 
         /// Serializes the Layer in json format
         ///
-        virtual void Serialize(JsonSerializer & serializer) const override;
+        virtual void Serialize(utilities::JsonSerializer & serializer) const override;
 
         /// Deserializes the Layer in json format
         ///
-        virtual void Deserialize(JsonSerializer & serializer, int version) override;
+        virtual void Deserialize(utilities::JsonSerializer & serializer, int version) override;
 
     private:
         uint64 _size;

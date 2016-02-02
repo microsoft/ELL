@@ -1,10 +1,8 @@
 #include "Input.h"
 
 #include <string>
-using std::to_string;
 
 #include<stdexcept>
-using std::runtime_error;
 
 namespace layers
 {
@@ -17,17 +15,17 @@ namespace layers
         return _size;
     }
 
-    void Input::Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const
+    void Input::Compute(uint64 rowIndex, vector<types::DoubleArray>& outputs) const
     {
-        throw runtime_error("this code should never be reached");
+        throw std::runtime_error("this code should never be reached");
     }
 
-    VectorIterator<Coordinate> Input::GetInputCoordinates(uint64 index) const
+    utilities::VectorIterator<Coordinate> Input::GetInputCoordinates(uint64 index) const
     {
-        throw runtime_error("this code should never be reached");
+        throw std::runtime_error("this code should never be reached");
     }
 
-    void Input::Serialize(JsonSerializer & serializer) const
+    void Input::Serialize(utilities::JsonSerializer & serializer) const
     {
         // version 1
         Layer::SerializeHeader(serializer, 1);
@@ -35,7 +33,7 @@ namespace layers
         serializer.Write("size", (Json::UInt64)_size);
     }
 
-    void Input::Deserialize(JsonSerializer & serializer, int version)
+    void Input::Deserialize(utilities::JsonSerializer & serializer, int version)
     {
         if (version == 1)
         {
@@ -43,7 +41,7 @@ namespace layers
         }
         else
         {
-            throw runtime_error("unsupported version: " + to_string(version));
+            throw std::runtime_error("unsupported version: " + std::to_string(version));
         }
     }
 }

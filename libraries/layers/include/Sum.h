@@ -8,10 +8,8 @@
 #include "RealArray.h"
 
 #include <vector>
-using std::vector;
 
 #include <functional>
-using std::function;
 
 namespace layers
 {
@@ -29,7 +27,7 @@ namespace layers
 
         /// Ctor - constructs a multi-dimensional sum
         ///
-        Sum(const  vector<CoordinateList>& coordinates);
+        Sum(const  std::vector<CoordinateList>& coordinates);
 
         /// default virtual destructor
         ///
@@ -41,22 +39,22 @@ namespace layers
 
         /// Computes the layer output
         ///
-        virtual void Compute(uint64 rowIndex, vector<DoubleArray>& outputs) const override;
+        virtual void Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const override;
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///
-        virtual VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;
+        virtual utilities::VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;
 
         /// Serializes the Layer in json format
         ///
-        virtual void Serialize(JsonSerializer& serializer) const override;
+        virtual void Serialize(utilities::JsonSerializer& serializer) const override;
 
         /// Deserializes the Layer in json format
         ///
-        virtual void Deserialize(JsonSerializer& serializer, int version = _currentVersion) override;
+        virtual void Deserialize(utilities::JsonSerializer& serializer, int version = _currentVersion) override;
 
     protected:
-        vector<CoordinateList> _coordinates;
+        std::vector<CoordinateList> _coordinates;
         static const int _currentVersion = 1;
     };
 }
