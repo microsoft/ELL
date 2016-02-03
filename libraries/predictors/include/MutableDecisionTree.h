@@ -5,7 +5,7 @@
 // stl
 #include <vector>
 
-namespace decision_tree
+namespace decisionTree
 {
     /// Represents a growable binary decision tree with interval splitting rules and outputs in all vertices
     ///
@@ -57,11 +57,11 @@ namespace decision_tree
 
             /// Sets child 0
             ///
-            void set_child0(int index);
+            void SetChild0(int index);
 
             /// Sets child 1
             ///
-            void set_child1(int index);
+            void SetChild1(int index);
 
         private:
             int _child0;
@@ -74,51 +74,51 @@ namespace decision_tree
 
         /// An iterator used to expose the tree split rules
         ///
-        using split_rule_iterator = std::vector<SplitRule>::const_iterator;
+        using SplitRuleIterator = std::vector<SplitRule>::const_iterator;
 
         /// \returns An iterator over the split rules that points to the first SplitRule
         ///
-        split_rule_iterator SplitRuleBegin() const;
+        SplitRuleIterator SplitRuleBegin() const;
 
         /// \returns An iterator over the split rules that points beyond the last SplitRule
         ///
-        split_rule_iterator SplitRuleEnd() const;
+        SplitRuleIterator SplitRuleEnd() const;
 
         /// An iterator used to expose the parent identities of vertices in the the tree
         ///
-        using parent_iterator = std::vector<int>::const_iterator;
+        using ParentIterator = std::vector<int>::const_iterator;
 
         /// \returns An iterator over parent indentities that points to the first vertex
         ///
-        parent_iterator ParentBegin() const;
+        ParentIterator ParentBegin() const;
 
         /// \returns An iterator over parent identities that points beyond the last vertex
         ///
-        parent_iterator ParentEnd() const;
+        ParentIterator ParentEnd() const;
 
         /// An iterator used to expose the Children values of the tree
         ///
-        using children_iterator = std::vector<Children>::const_iterator;
+        using ChildrenIterator = std::vector<Children>::const_iterator;
 
         /// \returns An iterator over Children values that points to the first vertex
         ///
-        children_iterator ChildrenBegin() const;
+        ChildrenIterator ChildrenBegin() const;
 
         /// \returns An iterator over Children values that points beyond the last vertex
         ///
-        children_iterator ChildrenEnd() const;
+        ChildrenIterator ChildrenEnd() const;
 
         /// An iterator used to expose the output values of the tree
         ///
-        using output_iterator = std::vector<double>::const_iterator;
+        using OutputIterator = std::vector<double>::const_iterator;
 
         /// \returns An iterator over output values that points to the first vertex
         ///
-        output_iterator OutputBegin() const;
+        OutputIterator OutputBegin() const;
 
         /// \returns An iterator over output values that points beyond the last vertex
         ///
-        output_iterator OutputEnd() const;
+        OutputIterator OutputEnd() const;
 
         /// \returns The number of vertices
         ///
@@ -140,7 +140,7 @@ namespace decision_tree
 
     private:
         
-        std::vector<SplitRule> _split_rules;
+        std::vector<SplitRule> _splitRules;
         std::vector<Children> _children;
         std::vector<int> _parents;
         std::vector<double> _outputs;
