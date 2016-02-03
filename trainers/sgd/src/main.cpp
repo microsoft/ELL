@@ -4,46 +4,25 @@
 
 // utilities
 #include "files.h"
-using utilities::OpenOfstream;
-
 #include "CommandLineParser.h" 
-using utilities::CommandLineParser;
-using utilities::CommandLineParserErrorException;
-using utilities::CommandLineParserPrintHelpException;
-
 #include "randomEngines.h"
-using utilities::GetRandomEngine;
-
 #include "BinaryClassificationEvaluator.h"
-using utilities::BinaryClassificationEvaluator;
 
 // layers
 #include "Map.h"
-using layers::Map;
-
 #include "Coordinate.h"
-using layers::CoordinateList;
 
 // dataset
 #include "SupervisedExample.h"
-using dataset::RowDataset;
 
 // common
 #include "Loaders.h"
-using common::GetRowDatasetMapCoordinates;
-
 #include "MapLoadArguments.h" 
-using common::ParsedMapLoadArguments;
-
 #include "MapSaveArguments.h" 
-using common::ParsedMapSaveArguments;
-
 #include "DataLoadArguments.h" 
-using common::ParsedDataLoadArguments;
 
 // optimization
 #include "AsgdOptimizer.h"
-using optimization::AsgdOptimizer;
 
 // lossFunctions
 #include "HingeLoss.h"
@@ -58,12 +37,12 @@ int main(int argc, char* argv[])
     try
     {
         // create a command line parser
-        CommandLineParser commandLineParser(argc, argv);
+        utilities::CommandLineParser commandLineParser(argc, argv);
 
         // add arguments to the command line parser
-        ParsedMapLoadArguments mapLoadArguments;
-        ParsedDataLoadArguments dataLoadArguments;
-        ParsedMapSaveArguments mapSaveArguments;
+        common::ParsedMapLoadArguments mapLoadArguments;
+        common::ParsedDataLoadArguments dataLoadArguments;
+        common::ParsedMapSaveArguments mapSaveArguments;
         ParsedSgdArguments sgdArguments;
 
         commandLineParser.AddOptionSet(mapLoadArguments);
@@ -75,22 +54,22 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // create and load a dataset, a map, and a coordinate list
-        RowDataset dataset;
-        Map map;
-        CoordinateList inputCoordinates;
+        dataset::RowDataset dataset;
+        layers::Map map;
+        layers::CoordinateList inputCoordinates;
         GetRowDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
 
         // create loss function
         lossFunctions::LogLoss loss;
 
         // create sgd trainer
-        AsgdOptimizer optimizer(dataset.NumColumns());
+        optimization::AsgdOptimizer optimizer(dataset.NumColumns());
 
         // create evaluator
-        BinaryClassificationEvaluator evaluator;
+        utilities::BinaryClassificationEvaluator evaluator;
 
         // create random number generator
-        auto rng = GetRandomEngine(sgdArguments.dataRandomPermutationSeedString);
+        auto rng = utilities::GetRandomEngine(sgdArguments.dataRandomPermutationSeedString);
 
         // perform epochs
         for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
@@ -117,11 +96,11 @@ int main(int argc, char* argv[])
         // save map to output file
         if (mapSaveArguments.outputMapFile != "")
         {
-            auto outputMapFStream = OpenOfstream(mapSaveArguments.outputMapFile);
+            auto outputMapFStream = utilities::OpenOfstream(mapSaveArguments.outputMapFile);
             map.Serialize(outputMapFStream);
         }
     }
-    catch (const CommandLineParserErrorException& exception)
+    catch (const utilities::CommandLineParserErrorException& exception)
     {
         std::cerr << "Command line parse error:" << std::endl;
         for (const auto& error : exception.GetParseErrors())
@@ -130,7 +109,7 @@ int main(int argc, char* argv[])
         }
         return 0;
     }
-    catch (const CommandLineParserPrintHelpException& exception)
+    catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
         std::cerr << exception.GetHelpText() << std::endl;
     }

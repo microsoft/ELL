@@ -4,12 +4,12 @@
 
 #include "CompilableLayer.h"
 
+// layers
 #include "Scale.h"
-using layers::Scale;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct CompilableScale : public Scale, public CompilableLayer
+struct CompilableScale : public layers::Scale, public CompilableLayer
 {
 public:
     virtual void BackwardPass(uint64 currentLayerIndex, vector<vector<vector<AddToAction>>>& actions) const override;

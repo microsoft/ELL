@@ -6,18 +6,12 @@
 #include "CompilableShift.h"
 #include "CompilableSum.h"
 
-using std::make_shared;
-
+// stl
 #include <string>
-using std::to_string;
-
 #include <memory>
-using std::dynamic_pointer_cast;
-
 #include <stdexcept>
-using std::runtime_error;
 
-void CompilableMap::ToCode(CoordinateList coordinateList) const
+void CompilableMap::ToCode(layers::CoordinateList coordinateList) const
 {
     // allocate datastructure to hold actions
     vector<vector<vector<AddToAction>>> actions(NumLayers());
@@ -39,42 +33,42 @@ void CompilableMap::ToCode(CoordinateList coordinateList) const
 
 }
 
-void CompilableMap::Deserialize(JsonSerializer& serializer)
+void CompilableMap::Deserialize(utilities::JsonSerializer& serializer)
 {
     serializer.Read("layers", _layers, CompilableMap::DeserializeLayers);
 }
 
-void CompilableMap::DeserializeLayers(JsonSerializer& serializer, shared_ptr<Layer>& up)
+void CompilableMap::DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<layers::Layer>& up)
 {
-    auto type = serializer.Read<string>("_type");
+    auto type = serializer.Read<std::string>("_type");
     auto version = serializer.Read<int>("_version");
 
     if (type == "Input")
     {
-        auto upZero = make_shared<CompilableInput>();
+        auto upZero = std::make_shared<CompilableInput>();
         upZero->Deserialize(serializer, version);
         up = upZero;
     }
     else if (type == "Scale")
     {
-        auto upScale = make_shared<CompilableScale>();
+        auto upScale = std::make_shared<CompilableScale>();
         upScale->Deserialize(serializer, version);
         up = upScale;
     }
     else if (type == "Shift")
     {
-        auto upShift = make_shared<CompilableShift>();
+        auto upShift = std::make_shared<CompilableShift>();
         upShift->Deserialize(serializer, version);
         up = upShift;
     }
     else if (type == "Sum")
     {
-        auto upSum = make_shared<CompilableSum>();
+        auto upSum = std::make_shared<CompilableSum>();
         upSum->Deserialize(serializer, version);
         up = upSum;
     }
     else
     {
-        throw runtime_error("unidentified type in map file: " + type);
+        throw std::runtime_error("unidentified type in map file: " + type);
     }
 }

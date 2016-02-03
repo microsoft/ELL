@@ -5,12 +5,12 @@
 #include "PrintableLayer.h"
 #include "LayerLayout.h"
 
+// layers
 #include "Sum.h"
-using layers::Sum;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableSum : public Sum, public PrintableLayer
+struct PrintableSum : public layers::Sum, public PrintableLayer
 {
 public:
     /// Prints a human-firiendly description of the underlying class to an output stream

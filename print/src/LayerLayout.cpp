@@ -37,7 +37,7 @@ LayerLayout::LayerLayout(double left, double top, uint64 size, double layerMaxWi
         
         if(elementsWidth <= Arguments.dotsWidth || numVisibleElements < 2)
         {
-            throw runtime_error("unable to visualize layer within the specified constraints (increase width, decrease dots width or element width/spacing)");
+            throw std::runtime_error("unable to visualize layer within the specified constraints (increase width, decrease dots width or element width/spacing)");
         }
 
         _numHiddenElements = size - numVisibleElements;

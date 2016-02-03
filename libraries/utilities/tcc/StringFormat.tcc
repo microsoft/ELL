@@ -7,7 +7,7 @@
 namespace utilities
 {
     template<typename ArgType, typename ... ArgTypes>
-    void StringFormat(ostream& os, const char* cstr, ArgType arg, ArgTypes ...args)
+    void StringFormat(std::ostream& os, const char* cstr, ArgType arg, ArgTypes ...args)
     {
         int n=0;
         const char* ptr = cstr;
@@ -63,7 +63,7 @@ namespace utilities
     }
 
     template<typename ... ArgTypes>
-    void StringFormat(ostream& os, const char* cstr, ArgTypes ...args)
+    void StringFormat(std::ostream& os, const char* cstr, ArgTypes ...args)
     {
         os << cstr;
     }

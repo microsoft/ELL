@@ -4,23 +4,17 @@
 
 #include "PrintArguments.h"
 
+// types.h
 #include "types.h"
-
-#include "Layer.h"
-using layers::Layer;
-
-// stl
-#include <vector>
-using std::vector;
-
-#include <stdexcept>
-using std::runtime_error;
 
 struct Point
 {
     double x;
     double y;
 };
+
+// stl
+#include <vector>
 
 class LayerLayout
 {
@@ -74,7 +68,7 @@ private:
     double _layerWidth = 0;
     double _layerHeight = 0;
     uint64 _numHiddenElements = 0;
-    vector<double> _elementMidX;
+    std::vector<double> _elementMidX;
     double _dotsMidX = 0;
     double _midY = 0;
     double _connectorOffset = 0;

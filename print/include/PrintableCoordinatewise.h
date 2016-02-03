@@ -6,16 +6,15 @@
 #include "LayerLayout.h"
 
 #include "Coordinatewise.h"
-using layers::Coordinatewise;
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct PrintableCoordinatewise : public Coordinatewise, public PrintableLayer
+struct PrintableCoordinatewise : public layers::Coordinatewise, public PrintableLayer
 {
 public:
     /// Ctor
     ///
-    PrintableCoordinatewise(const Coordinatewise::DoubleOperation& operation, Layer::Type type);
+    PrintableCoordinatewise(const layers::Coordinatewise::DoubleOperation& operation, layers::Layer::Type type);
 
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///

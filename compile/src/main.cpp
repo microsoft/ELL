@@ -5,50 +5,29 @@
 
 // utilities
 #include "files.h"
-using utilities::JsonSerializer;
-using utilities::OpenOfstream;
-using utilities::OpenIfstream;
-
 #include "CommandLineParser.h" 
-using utilities::CommandLineParser;
-using utilities::CommandLineParserErrorException;
-using utilities::CommandLineParserPrintHelpException;
 
 // layers
 #include "Map.h"
-using layers::Map;
 
 // common
 #include "CoordinateListTools.h"
-using common::GetCoordinateList;
-
 #include "MapLoadArguments.h"
-using common::ParsedMapLoadArguments;
 
 // stl
 #include<iostream>
-using std::cerr;
-using std::cout;
-using std::endl;
-
 #include <fstream>
-using std::ifstream;
-
 #include <stdexcept>
-using std::runtime_error;
-
-#include <memory>
-using std::dynamic_pointer_cast;
 
 int main(int argc, char* argv[])
 {
     try
     {
         // create a command line parser
-        CommandLineParser commandLineParser(argc, argv);
+        utilities::CommandLineParser commandLineParser(argc, argv);
 
         // add arguments to the command line parser
-        ParsedMapLoadArguments mapLoadArguments;
+        common::ParsedMapLoadArguments mapLoadArguments;
         ParsedCompileArguments compileArguments;
 
         commandLineParser.AddOptionSet(mapLoadArguments);
@@ -60,30 +39,30 @@ int main(int argc, char* argv[])
         // open file
         //auto map = GetMap(mapLoadArguments);
         // open map file
-        auto mapFStream = OpenIfstream(mapLoadArguments.inputMapFile); 
-        auto map = JsonSerializer::Load<CompilableMap>(mapFStream, "Base");
+        auto mapFStream = utilities::OpenIfstream(mapLoadArguments.inputMapFile); 
+        auto map = utilities::JsonSerializer::Load<CompilableMap>(mapFStream, "Base");
 
         auto coordinateList = GetCoordinateList(map, mapLoadArguments.coordinateListLoadArguments);
 
         map.ToCode(coordinateList);
 
     }
-    catch(const CommandLineParserPrintHelpException& ex)
+    catch(const utilities::CommandLineParserPrintHelpException& ex)
     {
-        cout << ex.GetHelpText() << endl;
+        std::cout << ex.GetHelpText() << std::endl;
     }
-    catch(const CommandLineParserErrorException& exception)
+    catch(const utilities::CommandLineParserErrorException& exception)
     {
-        cerr << "Command line parse error:" << endl;
+        std::cerr << "Command line parse error:" << std::endl;
         for(const auto& error : exception.GetParseErrors())
         {
-            cerr << error.GetMessage() << endl;
+            std::cerr << error.GetMessage() << std::endl;
         }
         return 0;
     }
-    catch(runtime_error e)
+    catch(std::runtime_error e)
     {
-        cerr << "runtime error: " << e.what() << std::endl;
+        std::cerr << "runtime error: " << e.what() << std::endl;
     }
 
     // the end

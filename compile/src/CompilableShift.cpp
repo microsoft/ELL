@@ -16,7 +16,7 @@ void CompilableShift::BackwardPass(uint64 currentLayerIndex, vector<vector<vecto
         for(const auto& action : outputActionList)
         {
             const LinearOperation& outputOperation = action.GetOperation();
-            const string& targetVariableName = action.GetTargetVariableName();
+            const std::string& targetVariableName = action.GetTargetVariableName();
             inputActionList.emplace_back(outputOperation.Compound(inputOperation), targetVariableName);
         }
     }

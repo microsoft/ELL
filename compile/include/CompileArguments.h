@@ -6,21 +6,18 @@
 
 // utilities
 #include "CommandLineParser.h"
-using utilities::ParsedArgSet;
-using utilities::CommandLineParser;
 
 // stl
 #include <string>
-using std::string;
 
 struct CompileArguments
 {
-    string outputCodeFile;
+    std::string outputCodeFile;
 };
 
-struct ParsedCompileArguments : public CompileArguments, public ParsedArgSet
+struct ParsedCompileArguments : public CompileArguments, public utilities::ParsedArgSet
 {
-    virtual void AddArgs(CommandLineParser& parser)
+    virtual void AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
             outputCodeFile,

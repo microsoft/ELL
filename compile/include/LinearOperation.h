@@ -4,7 +4,6 @@
 
 // stl
 #include <iostream>
-using std::ostream;
 
 class LinearOperation
 {
@@ -24,7 +23,7 @@ public:
     ///
     ///
     template<typename PrintableInputType>
-    void Print(ostream& os, const PrintableInputType& printableInput) const;
+    void Print(std::ostream& os, const PrintableInputType& printableInput) const;
 
 private:
     double _a = 0;

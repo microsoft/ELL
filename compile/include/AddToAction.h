@@ -9,10 +9,7 @@
 
 // stl
 #include <string>
-using std::string;
-
 #include <iostream>
-using std::ostream;
 
 /// Encodes the operation: "variable_targetID += a*x + b"
 ///
@@ -21,11 +18,11 @@ class AddToAction
 public:
     ///
     ///
-    AddToAction(string targetVariableName);
+    AddToAction(std::string targetVariableName);
 
     ///
     ///
-    AddToAction(const LinearOperation& operation, string targetVariableName);
+    AddToAction(const LinearOperation& operation, std::string targetVariableName);
 
     /// \returns The operation that is applied to the input variable, before it is added to the target variable
     ///
@@ -33,11 +30,11 @@ public:
 
     ///
     ///
-    const string& GetTargetVariableName() const;
+    const std::string& GetTargetVariableName() const;
 
     ///
     ///
-    void SetInputCoordinates(string inputVariableName);
+    void SetInputCoordinates(std::string inputVariableName);
 
     /// \returns True if the action is not a null operations, namely, if it actually modifies the target in some way
     ///
@@ -45,10 +42,10 @@ public:
 
     ///
     ///
-    void Print(ostream& os) const;
+    void Print(std::ostream& os) const;
 
 private:
     LinearOperation _operation;
-    string _inputVariableName = "";
-    string _targetVariableName = "";
+    std::string _inputVariableName = "";
+    std::string _targetVariableName = "";
 };

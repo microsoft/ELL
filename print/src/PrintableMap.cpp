@@ -8,22 +8,11 @@
 
 // utilities
 #include "StringFormat.h"
-using utilities::StringFormat;
 
 // stl
-using std::make_shared;
-
 #include <string>
-using std::to_string;
-using std::endl;
-
 #include <memory>
-using std::dynamic_pointer_cast;
-using std::move;
-
 #include <functional>
-using std::plus;
-using std::multiplies;
 
 namespace
 {
@@ -103,7 +92,7 @@ R"aw(
 )aw";
 }
 
-void PrintElementDefinition(ostream& os, const string& id, double width, double height, double connectorRadius, double cornerRadius, bool hasInputConnector=true)
+void PrintElementDefinition(ostream& os, const std::string& id, double width, double height, double connectorRadius, double cornerRadius, bool hasInputConnector=true)
 {
     os << "            <g id=\"" << id << "\">\n";
     if (hasInputConnector)
@@ -118,7 +107,7 @@ void PrintElementDefinition(ostream& os, const string& id, double width, double 
 void PrintableMap::Print(ostream & os, const PrintArguments& Arguments)
 {
     os << "<html>\n<body>\n";
-    StringFormat(os, styleDefinitionFormat, Arguments.edgeStyle.dashStyle);
+    utilities::StringFormat(os, styleDefinitionFormat, Arguments.edgeStyle.dashStyle);
 
     os << "    <Svg>\n\n        <defs>\n";
     PrintElementDefinition(os,
@@ -154,7 +143,7 @@ void PrintableMap::Print(ostream & os, const PrintArguments& Arguments)
         auto printableLayer = GetLayer<PrintableLayer>(layerIndex);
         auto layout = printableLayer->Print(os, Arguments.mapLayout.horizontalMargin, layerTop, layerIndex, Arguments); // TODO Arguments not needed
         layerTop += layout.GetHeight() + Arguments.mapLayout.verticalSpacing;
-        os << endl;
+        os << std::endl;
 
         // print edges
         if (layerIndex > 0) // skip input layer
@@ -182,51 +171,51 @@ void PrintableMap::Print(ostream & os, const PrintArguments& Arguments)
         }
 
         // add the current layer's layout to the list of layouts
-        layouts.push_back(move(layout));
+        layouts.push_back(std::move(layout));
 
-        os << endl;
+        os << std::endl;
     }
 
     os << "\n    </Svg>\n\n<html>\n<body>\n";
 }
 
-void PrintableMap::Deserialize(JsonSerializer & serializer)
+void PrintableMap::Deserialize(utilities::JsonSerializer & serializer)
 {
     serializer.Read("layers", _layers, PrintableMap::DeserializeLayers);
 }
 
-void PrintableMap::DeserializeLayers(JsonSerializer & serializer, shared_ptr<Layer>& up)
+void PrintableMap::DeserializeLayers(utilities::JsonSerializer & serializer, std::shared_ptr<layers::Layer>& up)
 {
-    auto type = serializer.Read<string>("_type");
+    auto type = serializer.Read<std::string>("_type");
     auto version = serializer.Read<int>("_version");
 
     if (type == "Input")
     {
-        auto upZero = make_shared<PrintableInput>();
+        auto upZero = std::make_shared<PrintableInput>();
         upZero->Deserialize(serializer, version);
         up = upZero;
     }
     else if (type == "Scale")
     {
-        auto upScale = make_shared<PrintableCoordinatewise>(multiplies<double>(), Layer::Type::scale);
+        auto upScale = std::make_shared<PrintableCoordinatewise>(std::multiplies<double>(), layers::Layer::Type::scale);
         upScale->Deserialize(serializer, version);
         up = upScale;
     }
     else if (type == "Shift")
     {
-        auto upCoordinatewise = make_shared<PrintableCoordinatewise>(plus<double>(), Layer::Type::shift);
+        auto upCoordinatewise = std::make_shared<PrintableCoordinatewise>(std::plus<double>(), layers::Layer::Type::shift);
         upCoordinatewise->Deserialize(serializer, version);
         up = upCoordinatewise;
     }
     else if (type == "Sum")
     {
-        auto upSum = make_shared<PrintableSum>();
+        auto upSum = std::make_shared<PrintableSum>();
         upSum->Deserialize(serializer, version);
         up = upSum;
     }
     else
     {
-        throw runtime_error("unidentified type in map file: " + type);
+        throw std::runtime_error("unidentified type in map file: " + type);
     }
 }
 

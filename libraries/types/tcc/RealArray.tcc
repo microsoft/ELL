@@ -39,7 +39,7 @@ namespace types
     }
 
     template<typename ValueType>
-    RealArray<ValueType>::RealArray(uint64 size) : vector<ValueType>(size) {}
+    RealArray<ValueType>::RealArray(uint64 size) : std::vector<ValueType>(size) {}
 
     template<typename ValueType>
     template<typename IndexValueIteratorType, typename concept>

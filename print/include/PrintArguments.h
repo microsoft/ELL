@@ -6,12 +6,9 @@
 
 // utilities
 #include "CommandLineParser.h"
-using utilities::ParsedArgSet;
-using utilities::CommandLineParser;
 
 // stl
 #include <string>
-using std::string;
 
 struct ElementLayoutArguments
 {
@@ -44,7 +41,7 @@ struct ValueElementStyleArguments : public ElementStyleArguments
 
 struct EdgeStyleArguments
 {
-    string dashStyle;
+    std::string dashStyle;
     double flattness;
 };
 
@@ -56,8 +53,8 @@ struct LayerStyleArguments
 
 struct PrintArguments
 {
-    string mapFile; // TODO use common Arguments
-    string svgFile; // TODO use common Arguments
+    std::string mapFile; // TODO use common Arguments
+    std::string svgFile; // TODO use common Arguments
 
     ElementLayoutArguments valueElementLayout;
     ElementLayoutArguments emptyElementLayout;
@@ -68,9 +65,9 @@ struct PrintArguments
     EdgeStyleArguments edgeStyle;
 };
 
-struct ParsedPrintArguments : public PrintArguments, public ParsedArgSet
+struct ParsedPrintArguments : public PrintArguments, public utilities::ParsedArgSet
 {
-    virtual void AddArgs(CommandLineParser& parser)
+    virtual void AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(mapFile, "inputMapFile", "imf", "Path to the input file that contains the map information", "");
         parser.AddOption(svgFile, "outputSvgFile", "osf", "Path to the output Svg file", "");
