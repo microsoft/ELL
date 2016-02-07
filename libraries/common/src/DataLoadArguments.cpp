@@ -7,7 +7,6 @@
 
 // stl
 #include <vector>
-
 #include <string>
 
 namespace common

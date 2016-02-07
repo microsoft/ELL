@@ -1,9 +1,10 @@
-// Loaders.h
+// DataLoaders.h
 
 #pragma once
 
 #include "MapLoadArguments.h"
 #include "DataLoadArguments.h" 
+#include "MapLoaders.h"
 
 // dataset
 #include "SupervisedExample.h"
@@ -28,10 +29,6 @@ namespace common
     /// Gets a mapped data iterator, based on command line parameters
     ///
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments);
-
-    /// Get a map, based on command line parameters
-    ///
-    layers::Map GetMap(const MapLoadArguments& mapLoadArguments);
 
     /// Gets a mapped data iterator, a map and a coordinate list, based on command line parameters
     ///

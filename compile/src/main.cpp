@@ -7,12 +7,12 @@
 #include "files.h"
 #include "CommandLineParser.h" 
 
-// layers
 #include "Map.h"
 
 // common
 #include "CoordinateListTools.h"
 #include "MapLoadArguments.h"
+#include "MapLoaders.h"
 
 // stl
 #include<iostream>
@@ -37,13 +37,12 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // open file
-        //auto map = GetMap(mapLoadArguments);
-        // open map file
-        auto mapFStream = utilities::OpenIfstream(mapLoadArguments.inputMapFile); 
-        auto map = utilities::JsonSerializer::Load<CompilableMap>(mapFStream, "Base");
+        auto map = common::GetMap<CompilableMap>(mapLoadArguments.inputMapFile);
 
+        // construct coordinate list
         auto coordinateList = GetCoordinateList(map, mapLoadArguments.coordinateListLoadArguments);
 
+        // 
         map.ToCode(coordinateList);
 
     }
