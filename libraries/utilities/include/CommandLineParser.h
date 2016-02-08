@@ -95,7 +95,8 @@ namespace utilities
     
         /// Constructor, takes arg list
         ///
-        CommandLineParser(int argc, char**argv);
+        CommandLineParser(int argc, char* argv[]);
+        CommandLineParser(int argc, const char* argv[]);
         
         /// AddOption adds a new option to the commandline parser
         ///
@@ -144,7 +145,7 @@ namespace utilities
 
         /// TODO: document
         ///
-        void SetArgs(int argc, char** argv);
+        void SetArgs(int argc, const char* argv[]);
 
         /// TODO: document
         ///

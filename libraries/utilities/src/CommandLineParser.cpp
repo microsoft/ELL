@@ -78,12 +78,17 @@ namespace utilities
     //
     // CommandLineParser class
     //
-    CommandLineParser::CommandLineParser(int argc, char**argv) 
+    CommandLineParser::CommandLineParser(int argc, char* argv[]) 
+    {
+        SetArgs(argc, const_cast<const char**>(argv));
+    }
+
+    CommandLineParser::CommandLineParser(int argc, const char* argv[]) 
     {
         SetArgs(argc, argv);
     }
 
-    void CommandLineParser::SetArgs(int argc, char** argv)
+    void CommandLineParser::SetArgs(int argc, const char* argv[])
     {
         _originalArgs.clear();
         _originalArgs.insert(_originalArgs.end(), &argv[0], &argv[argc]);
