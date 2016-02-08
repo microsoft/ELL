@@ -16,7 +16,7 @@
 #include "SupervisedExample.h"
 
 // common
-#include "Loaders.h"
+#include "DataLoaders.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 

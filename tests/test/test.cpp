@@ -1,27 +1,6 @@
-//// test.cpp
-//
+// test.cpp
 
-//#include "layers.h"
-//#include "MutableDecisionTree.h"
-//#include "QpLayoutGenerator.h"
 #include "CommandLineParser.h"
-//#include <vector>
-//#include <memory>
-//#include <iostream>
-//#include <fstream>
-//#include <sstream>
-//#include <string>
-//
-//using namespace decision_tree;
-//using namespace layers;
-//using namespace treeLayout;
-//using std::make_shared;
-//using std::ifstream;
-//using std::ofstream;
-//using std::cerr;
-//using std::endl;
-//using std::string;
-//using std::stringstream;
 using std::cout;
 using std::cerr;
 using std::endl;

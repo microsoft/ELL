@@ -15,16 +15,19 @@ endif()
 set (SRC src/CoordinateListTools.cpp
          src/DataLoadArguments.cpp
          src/DataSaveArguments.cpp
-         src/Loaders.cpp
+         src/DataLoaders.cpp
          src/MapLoadArguments.cpp
          src/MapSaveArguments.cpp)
 
 set (INCLUDE include/CoordinateListTools.h
              include/DataLoadArguments.h
              include/DataSaveArguments.h
-             include/Loaders.h
+             include/DataLoaders.h
              include/MapLoadArguments.h
+             include/MapLoaders.h
              include/MapSaveArguments.h)
+
+set (TCC tcc/MapLoaders.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

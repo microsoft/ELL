@@ -9,6 +9,9 @@
 #include "files.h"
 #include "CommandLineParser.h"
 
+// common
+#include "MapLoaders.h"
+
 // layers
 #include "Map.h"
 
@@ -29,10 +32,12 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // open map file
-        auto mapFStream = utilities::OpenIfstream(printArguments.mapFile); // TODO: use common Arguments and common loader
-        auto map = utilities::JsonSerializer::Load<PrintableMap>(mapFStream, "Base");
+        auto map = common::GetMap<PrintableMap>(printArguments.inputMapFile);
         
-        auto outputSvgFStream = utilities::OpenOfstream(printArguments.svgFile);
+        // open svg file
+        auto outputSvgFStream = utilities::OpenOfstream(printArguments.outputSvgFile);
+        
+        // print to svg file
         map.Print(outputSvgFStream, printArguments);
     }
     catch (const utilities::CommandLineParserPrintHelpException& ex)

@@ -53,8 +53,8 @@ struct LayerStyleArguments
 
 struct PrintArguments
 {
-    std::string mapFile; // TODO use common Arguments
-    std::string svgFile; // TODO use common Arguments
+    std::string inputMapFile; // TODO use common Arguments
+    std::string outputSvgFile; // TODO use common Arguments
 
     ElementLayoutArguments valueElementLayout;
     ElementLayoutArguments emptyElementLayout;
@@ -69,8 +69,8 @@ struct ParsedPrintArguments : public PrintArguments, public utilities::ParsedArg
 {
     virtual void AddArgs(utilities::CommandLineParser& parser)
     {
-        parser.AddOption(mapFile, "inputMapFile", "imf", "Path to the input file that contains the map information", "");
-        parser.AddOption(svgFile, "outputSvgFile", "osf", "Path to the output Svg file", "");
+        parser.AddOption(inputMapFile, "inputMapFile", "imf", "Path to the input file that contains the map information", "");
+        parser.AddOption(outputSvgFile, "outputSvgFile", "osf", "Path to the output Svg file", "");
 
         //// TODO: confirm that the filenames are set. Perhaps add method "AddRequiredOption"
 

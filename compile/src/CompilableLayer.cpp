@@ -12,7 +12,7 @@ uint64 CompilableLayer::NumTempVariableNames()
 
 std::string CompilableLayer::GetNextTempVariableName()
 {
-    std::string name = "var" + _tempVariableCounter;
+    std::string name = "var" + std::to_string(_tempVariableCounter);
     ++_tempVariableCounter;
     return name;
 }

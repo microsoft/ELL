@@ -41,10 +41,10 @@ float twoPointFiveTimes(int x)
 template <typename Func>
 std::chrono::milliseconds::rep timeIt(Func fn)
 {
-    system_clock::time_point start = system_clock::now();
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
     fn();
-    system_clock::time_point end = system_clock::now();
-    return duration_cast<milliseconds>(end - start).count();
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 }
 
 class MillisecondTimer

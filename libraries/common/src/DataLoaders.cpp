@@ -1,6 +1,6 @@
-// Loaders.cpp
+// DataLoaders.cpp
 
-#include "Loaders.h"
+#include "DataLoaders.h"
 #include "CoordinateListTools.h"
 
 // utilities
@@ -8,11 +8,8 @@
 
 // dataset
 #include "SequentialLineIterator.h"
-
 #include "SparseEntryParser.h"
-
 #include "MappedParser.h"
-
 #include "ParsingIterator.h"
 
 // stl
@@ -61,16 +58,9 @@ namespace common
         }
     }
 
-    layers::Map GetMap(const MapLoadArguments& mapLoadArguments)
-    {
-        // load map
-        auto inputMapFStream = utilities::OpenIfstream(mapLoadArguments.inputMapFile);
-        return utilities::JsonSerializer::Load<layers::Map>(inputMapFStream, "Base");
-    }
-
     std::unique_ptr<dataset::IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, /* out */ layers::Map& map, /* out */ layers::CoordinateList& inputCoordinates)
     {
-        map = GetMap(mapLoadArguments);
+        map = GetMap<layers::Map>(mapLoadArguments.inputMapFile);
 
         // create list of output coordinates
         inputCoordinates = GetCoordinateList(map, mapLoadArguments.coordinateListLoadArguments);

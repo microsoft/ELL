@@ -17,7 +17,7 @@ using layers::CoordinateList;
 using dataset::RowDataset;
 
 // common
-#include "Loaders.h"
+#include "DataLoaders.h"
 using common::GetDataIterator;
 
 #include "MapLoadArguments.h" 

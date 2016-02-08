@@ -5,7 +5,7 @@
 // stl
 #include <stdexcept>
 
-namespace decision_tree
+namespace decisionTree
 {
     MutableDecisionTree::SplitRule::SplitRule(int index, double value) :
         _index(index), _value(value)
@@ -35,12 +35,12 @@ namespace decision_tree
         return _child1;
     }
 
-    void MutableDecisionTree::Children::set_child0(int index)
+    void MutableDecisionTree::Children::SetChild0(int index)
     {
         _child0 = index;
     }
 
-    void MutableDecisionTree::Children::set_child1(int index)
+    void MutableDecisionTree::Children::SetChild1(int index)
     {
         _child1 = index;
     }
@@ -52,42 +52,42 @@ namespace decision_tree
         _outputs[0] = root_output;
     }
 
-    MutableDecisionTree::split_rule_iterator MutableDecisionTree::SplitRuleBegin() const
+    MutableDecisionTree::SplitRuleIterator MutableDecisionTree::SplitRuleBegin() const
     {
-        return _split_rules.cbegin();
+        return _splitRules.cbegin();
     }
 
-    MutableDecisionTree::split_rule_iterator MutableDecisionTree::SplitRuleEnd() const
+    MutableDecisionTree::SplitRuleIterator MutableDecisionTree::SplitRuleEnd() const
     {
-        return _split_rules.cend();
+        return _splitRules.cend();
     }
 
-    MutableDecisionTree::parent_iterator MutableDecisionTree::ParentBegin() const
+    MutableDecisionTree::ParentIterator MutableDecisionTree::ParentBegin() const
     {
         return _parents.cbegin();
     }
 
-    MutableDecisionTree::parent_iterator MutableDecisionTree::ParentEnd() const
+    MutableDecisionTree::ParentIterator MutableDecisionTree::ParentEnd() const
     {
         return _parents.cend();
     }
 
-    MutableDecisionTree::children_iterator MutableDecisionTree::ChildrenBegin() const
+    MutableDecisionTree::ChildrenIterator MutableDecisionTree::ChildrenBegin() const
     {
         return _children.cbegin();
     }
 
-    MutableDecisionTree::children_iterator MutableDecisionTree::ChildrenEnd() const
+    MutableDecisionTree::ChildrenIterator MutableDecisionTree::ChildrenEnd() const
     {
         return _children.cend();
     }
 
-    MutableDecisionTree::output_iterator MutableDecisionTree::OutputBegin() const
+    MutableDecisionTree::OutputIterator MutableDecisionTree::OutputBegin() const
     {
         return _outputs.cbegin();
     }
 
-    MutableDecisionTree::output_iterator MutableDecisionTree::OutputEnd() const
+    MutableDecisionTree::OutputIterator MutableDecisionTree::OutputEnd() const
     {
         return _outputs.cend();
     }
@@ -99,7 +99,7 @@ namespace decision_tree
 
     int MutableDecisionTree::GetNumInteriorVertices() const
     {
-        return (int)_split_rules.size();
+        return (int)_splitRules.size();
     }
 
     void MutableDecisionTree::SplitLeaf(
@@ -131,19 +131,19 @@ namespace decision_tree
 
             if (_children[parent_of_leaf].GetChild0() == leaf_index)
             {
-                _children[parent_of_leaf].set_child0(new_interior_index);
+                _children[parent_of_leaf].SetChild0(new_interior_index);
             }
             else
             {
-                _children[parent_of_leaf].set_child1(new_interior_index);
+                _children[parent_of_leaf].SetChild1(new_interior_index);
             }
             if (_children[parent_of_new_interior].GetChild0() == new_interior_index)
             {
-                _children[parent_of_new_interior].set_child0(leaf_index);
+                _children[parent_of_new_interior].SetChild0(leaf_index);
             }
             else
             {
-                _children[parent_of_new_interior].set_child1(leaf_index);
+                _children[parent_of_new_interior].SetChild1(leaf_index);
             }
             
             // std::swap the vertices
@@ -159,6 +159,6 @@ namespace decision_tree
 
         // Add new interior node
         _children.emplace_back(child0_index, child1_index);
-        _split_rules.emplace_back(input_index, threshold);
+        _splitRules.emplace_back(input_index, threshold);
     }
 }
