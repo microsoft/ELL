@@ -2,7 +2,7 @@
 //
 //  Project:  [projectName]
 //  File:     CompressedIntegerList.h (dataset)
-//  Authors:  Ofer Dekel
+//  Authors:  Chuck Jacobs
 //
 //  [copyright]
 //
@@ -21,7 +21,7 @@ namespace dataset
 {
     /// A non-decreasing list of nonegative integers, with a forward Iterator, stored in a compressed delta enconding.
     ///
-    class CompressedIntegerList
+    class CompressedIntegerList // TODO move to utilities
     {
     public:
 

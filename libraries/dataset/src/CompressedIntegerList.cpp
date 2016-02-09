@@ -2,7 +2,7 @@
 //
 //  Project:  [projectName]
 //  File:     CompressedIntegerList.cpp (dataset)
-//  Authors:  Ofer Dekel
+//  Authors:  Chuck Jacobs
 //
 //  [copyright]
 //
