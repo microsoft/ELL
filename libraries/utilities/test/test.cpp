@@ -21,14 +21,16 @@ void testIteratorAdapter()
     std::vector<int> vec { 1, 2, 3, 4, 5, 6 };
     auto it = utilities::MakeIterator(vec.begin(), vec.end());
     
+    bool passed = true;
     int index = 0;
     while(it.IsValid())
     {
-        testing::processTest("utilities::IteratorAdapter.Get", it.Get() == vec[index]);
+        passed == passed && (it.Get() == vec[index]);
         it.Next();
         index++;
     }
             
+    testing::processTest("utilities::IteratorAdapter.Get", passed);
     testing::processTest("utilities::IteratorAdapter length", index == vec.size());
 }
 
@@ -89,13 +91,16 @@ void testTransformIterator()
     auto transIt = MakeTransform(srcIt, twoPointFiveTimes);
 
     MillisecondTimer timer;
+    bool passed = true;
     int index = 0;
     while(transIt.IsValid())
     {
-        testing::processTest("utilities::TransformIterator.Get", transIt.Get() == float(2.5*vec[index]));
+        passed = passed && transIt.Get() == float(2.5*vec[index]);
         transIt.Next();
         index++;
     }
+
+    testing::processTest("utilities::TransformIterator.Get", passed);
     auto elapsed = timer.Elapsed();
     std::cout << "Elapsed time: " << elapsed << " ms" << std::endl;
 }
@@ -108,14 +113,16 @@ void testParallelTransformIterator()
     auto srcIt = utilities::MakeIterator(vec.begin(), vec.end());
     auto transIt = MakeParallelTransform(srcIt, twoPointFiveTimes);
 
+    bool passed = true;
     MillisecondTimer timer;
     int index = 0;
     while(transIt.IsValid())
     {
-        testing::processTest("utilities::ParallelTransformIterator.Get", transIt.Get() == float(2.5*vec[index]));
+        passed = passed && transIt.Get() == float(2.5*vec[index]);
         transIt.Next();
         index++;
     }
+    testing::processTest("utilities::ParallelTransformIterator.Get", passed);
     auto elapsed = timer.Elapsed();
     std::cout << "Elapsed time: " << elapsed << " ms" << std::endl;
 }
