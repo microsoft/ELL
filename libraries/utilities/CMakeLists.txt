@@ -28,7 +28,8 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/TransformIterator.h
                        include/files.h
                        include/StringFormat.h
-                       include/randomEngines.h)
+                       include/randomEngines.h
+                       include/VectorIterator.h)
 
 set (TCC tcc/BinaryClassificationEvaluator.tcc
                    tcc/CommandLineParser.tcc

@@ -1,44 +1,26 @@
-// main.cpp
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  [projectName]
+//  File:     main.cpp (apply)
+//  Authors:  Ofer Dekel
+//
+//  [copyright]
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CommandLineParser.h" 
-using utilities::CommandLineParser;
-using utilities::CommandLineParserErrorException;
-using utilities::CommandLineParserPrintHelpException;
-
-// layers
-#include "Map.h"
-using layers::Map;
-
-#include "Coordinate.h"
-using layers::CoordinateList;
-
-// dataset
-#include "SupervisedExample.h"
-using dataset::RowDataset;
 
 // common
 #include "DataLoaders.h"
-using common::GetDataIterator;
-
 #include "MapLoadArguments.h" 
-using common::ParsedMapLoadArguments;
-
 #include "DataLoadArguments.h" 
-using common::ParsedDataLoadArguments;
-
 #include "DataSaveArguments.h" 
-using common::ParsedDataSaveArguments;
 
 // utilities
 #include "files.h"
-using utilities::OpenOfstream;
 
 // stl
 #include <iostream>
-using std::ofstream;
-using std::cerr;
-using std::cout;
-using std::endl;
 
 #include <stdexcept>
 using std::runtime_error;
@@ -48,12 +30,12 @@ int main(int argc, char* argv[])
     try
     {
         // create a command line parser
-        CommandLineParser commandLineParser(argc, argv);
+        utilities::CommandLineParser commandLineParser(argc, argv);
 
         // add arguments to the command line parser
-        ParsedMapLoadArguments mapLoadArguments;
-        ParsedDataLoadArguments dataLoadArguments;
-        ParsedDataSaveArguments dataSaveArguments;
+        common::ParsedMapLoadArguments mapLoadArguments;
+        common::ParsedDataLoadArguments dataLoadArguments;
+        common::ParsedDataSaveArguments dataSaveArguments;
 
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
@@ -66,11 +48,11 @@ int main(int argc, char* argv[])
         auto dataIterator = GetDataIterator(dataLoadArguments, mapLoadArguments);
 
         // if output file specified, replace stdout with it 
-        ofstream outputDataStream;
+        std::ofstream outputDataStream;
         if (dataSaveArguments.outputDataFile != "")
         {
-            outputDataStream = OpenOfstream(dataSaveArguments.outputDataFile);
-            cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
+            outputDataStream = utilities::OpenOfstream(dataSaveArguments.outputDataFile);
+            std::cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
         }
 
         // Load row by row
@@ -80,28 +62,27 @@ int main(int argc, char* argv[])
             auto supervisedExample = dataIterator->Get();
 
             // print the example
-            supervisedExample.Print(cout);
+            supervisedExample.Print(std::cout);
 
             // move on 
             dataIterator->Next();
         }
     }
-    catch(CommandLineParserErrorException exception)
+    catch(utilities::CommandLineParserErrorException exception)
     {
-        cerr << "Command line parse error:" << endl;
+        std::cerr << "Command line parse error:" << std::endl;
         for(const auto& error : exception.GetParseErrors())
         {
-            cerr << error.GetMessage() << endl;
+            std::cerr << error.GetMessage() << std::endl;
         }
         return 0;
     }
-    catch (CommandLineParserPrintHelpException)
-    {
-    }
+    catch (utilities::CommandLineParserPrintHelpException)
+    {}
     catch(runtime_error exception)
     {
-        cerr << "Runtime error:" << endl;
-        cerr << exception.what() << endl;
+        std::cerr << "Runtime error:" << std::endl;
+        std::cerr << exception.what() << std::endl;
         return 1;
     }
 
