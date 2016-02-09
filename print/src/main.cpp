@@ -9,9 +9,6 @@
 #include "files.h"
 #include "CommandLineParser.h"
 
-// common
-#include "MapLoaders.h"
-
 // layers
 #include "Map.h"
 
@@ -32,8 +29,8 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // open map file
-        auto map = common::GetMap<PrintableMap>(printArguments.inputMapFile);
-        
+        auto map = layers::Map::Load<PrintableMap>(printArguments.inputMapFile);
+
         // open svg file
         auto outputSvgFStream = utilities::OpenOfstream(printArguments.outputSvgFile);
         

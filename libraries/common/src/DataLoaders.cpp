@@ -60,7 +60,7 @@ namespace common
 
     std::unique_ptr<dataset::IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, /* out */ layers::Map& map, /* out */ layers::CoordinateList& inputCoordinates)
     {
-        map = GetMap<layers::Map>(mapLoadArguments.inputMapFile);
+        map = layers::Map::Load(mapLoadArguments.inputMapFile);
 
         // create list of output coordinates
         inputCoordinates = GetCoordinateList(map, mapLoadArguments.coordinateListLoadArguments);

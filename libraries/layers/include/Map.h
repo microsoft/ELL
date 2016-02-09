@@ -100,6 +100,11 @@ namespace layers
         template<typename LayerType = Layer>
         std::shared_ptr<const LayerType> GetLayer(uint64 layerIndex) const;
 
+        /// Static function that loads a Map from file
+        ///
+        template<typename MapType = Map>
+        static MapType Load(const std::string& inputMapFile);
+
         /// \returns A list of the coordinates in this layer
         ///
         CoordinateList GetCoordinateList(uint64 layerIndex) const;

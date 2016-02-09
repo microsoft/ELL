@@ -2,8 +2,11 @@
 
 #include "JsonSerializer.h"
 
-#include <string>
+// utilities
+#include "files.h"
 
+// stl
+#include <string>
 #include <memory>
 
 namespace layers
@@ -31,4 +34,12 @@ namespace layers
     {
         return std::dynamic_pointer_cast<LayerType>(_layers[layerIndex]);
     }
+
+    template<typename MapType>
+    MapType Map::Load(const std::string& inputMapFile)
+    {
+        auto inputMapFStream = utilities::OpenIfstream(inputMapFile);
+        return utilities::JsonSerializer::Load<MapType>(inputMapFStream, "Base");
+    }
+
 }

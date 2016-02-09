@@ -24,24 +24,19 @@ set (INCLUDE include/CoordinateListTools.h
              include/DataSaveArguments.h
              include/DataLoaders.h
              include/MapLoadArguments.h
-             include/MapLoaders.h
              include/MapSaveArguments.h)
-
-set (TCC tcc/MapLoaders.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
-source_group("tcc" FILES ${TCC})
 
 include_directories(include)
-include_directories(tcc)
 include_directories(../dataset/include)
 include_directories(../layers/include)
 include_directories(../linear/include)
 include_directories(../types/include)
 include_directories(../utilities/include)
 
-add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
+add_library(${PROJ_NAME} ${SRC} ${INCLUDE})
 target_link_libraries(${PROJ_NAME} dataset layers utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")

@@ -4,7 +4,6 @@
 
 #include "MapLoadArguments.h"
 #include "DataLoadArguments.h" 
-#include "MapLoaders.h"
 
 // dataset
 #include "SupervisedExample.h"
