@@ -1,4 +1,12 @@
-// DataLoaders.cpp
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  [projectName]
+//  File:     DataLoaders.cpp (common)
+//  Authors:  Ofer Dekel
+//
+//  [copyright]
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DataLoaders.h"
 #include "CoordinateListTools.h"
@@ -60,7 +68,7 @@ namespace common
 
     std::unique_ptr<dataset::IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, /* out */ layers::Map& map, /* out */ layers::CoordinateList& inputCoordinates)
     {
-        map = GetMap<layers::Map>(mapLoadArguments.inputMapFile);
+        map = layers::Map::Load(mapLoadArguments.inputMapFile);
 
         // create list of output coordinates
         inputCoordinates = GetCoordinateList(map, mapLoadArguments.coordinateListLoadArguments);
@@ -102,7 +110,7 @@ namespace common
             map = layers::Map(numColumns);
 
             // create a coordinate list of this map
-            inputCoordinates = CoordinateSequence(0, numColumns);
+            inputCoordinates = GetCoordinateSequence(0, numColumns);
         }
         else
         {

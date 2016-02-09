@@ -1,4 +1,12 @@
-// CoordinateListFactory.h
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  [projectName]
+//  File:     CoordinateListTools.h (common)
+//  Authors:  Ofer Dekel
+//
+//  [copyright]
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
@@ -16,9 +24,9 @@ namespace common
 
     /// TODO
     ///
-    layers::CoordinateList CoordinateSequence(uint64 row, uint64 numColumns);
+    layers::CoordinateList GetCoordinateSequence(uint64 row, uint64 numColumns);
 
     /// TODO
     ///
-    layers::CoordinateList CoordinateListIgnoreMapSuffix(const layers::Map& map, uint64 numLayersToDrop);
+    layers::CoordinateList GetCoordinateListIgnoreMapSuffix(const layers::Map& map, uint64 numLayersToDrop);
 }

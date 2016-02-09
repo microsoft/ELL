@@ -1,4 +1,12 @@
-// CompressedIntegerList.h
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  [projectName]
+//  File:     CompressedIntegerList.h (dataset)
+//  Authors:  Chuck Jacobs
+//
+//  [copyright]
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
@@ -13,7 +21,7 @@ namespace dataset
 {
     /// A non-decreasing list of nonegative integers, with a forward Iterator, stored in a compressed delta enconding.
     ///
-    class CompressedIntegerList
+    class CompressedIntegerList // TODO move to utilities
     {
     public:
 

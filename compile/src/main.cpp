@@ -1,4 +1,12 @@
-// main.cpp
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  [projectName]
+//  File:     main.cpp (compile)
+//  Authors:  Ofer Dekel
+//
+//  [copyright]
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CompilableMap.h"
 #include "CompileArguments.h"
@@ -12,7 +20,6 @@
 // common
 #include "CoordinateListTools.h"
 #include "MapLoadArguments.h"
-#include "MapLoaders.h"
 
 // stl
 #include<iostream>
@@ -37,7 +44,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // open file
-        auto map = common::GetMap<CompilableMap>(mapLoadArguments.inputMapFile);
+        auto map = layers::Map::Load<CompilableMap>(mapLoadArguments.inputMapFile);
 
         // construct coordinate list
         auto coordinateList = GetCoordinateList(map, mapLoadArguments.coordinateListLoadArguments);

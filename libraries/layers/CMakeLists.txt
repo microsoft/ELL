@@ -30,8 +30,7 @@ set (INCLUDE include/Coordinate.h
              include/Shift.h
              include/Sum.h)
 
-set (TCC tcc/DecisionTreePath.tcc
-         tcc/Map.tcc)
+set (TCC tcc/Map.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

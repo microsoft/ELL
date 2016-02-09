@@ -1,15 +1,23 @@
-// CoordinateListFactory.cpp
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  [projectName]
+//  File:     CoordinateListTools.cpp (common)
+//  Authors:  Ofer Dekel
+//
+//  [copyright]
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "CoordinateListFactory.h"
+#include "CoordinateListTools.h"
 
 namespace common
 {
     layers::CoordinateList GetCoordinateList(const layers::Map& map, const CoordinateListLoadArguments& coordinateListLoadArguments)
     {
-        return CoordinateListIgnoreMapSuffix(map, coordinateListLoadArguments.ignoreSuffix);
+        return GetCoordinateListIgnoreMapSuffix(map, coordinateListLoadArguments.ignoreSuffix);
     }
 
-    layers::CoordinateList CoordinateSequence(uint64 row, uint64 numColumns)
+    layers::CoordinateList GetCoordinateSequence(uint64 row, uint64 numColumns)
     {
         layers::CoordinateList coordinateList;
         for (uint64 column = 0; column < numColumns; ++column)
@@ -19,7 +27,7 @@ namespace common
         return coordinateList;
     }
 
-    layers::CoordinateList CoordinateListIgnoreMapSuffix(const layers::Map& map, uint64 numLayersToDrop)
+    layers::CoordinateList GetCoordinateListIgnoreMapSuffix(const layers::Map& map, uint64 numLayersToDrop)
     {
         return map.GetCoordinateList(map.NumLayers() - numLayersToDrop);
     }

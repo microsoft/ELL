@@ -1,7 +1,14 @@
-// LayerLayout.cpp
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  [projectName]
+//  File:     LayerLayout.cpp (print)
+//  Authors:  Ofer Dekel
+//
+//  [copyright]
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "LayerLayout.h"
-
 
 LayerLayout::LayerLayout(double left, double top, uint64 size, double layerMaxWidth, ElementLayoutArguments Arguments) : _elementMidX(size)
 {

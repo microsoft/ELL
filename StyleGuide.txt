@@ -58,12 +58,15 @@ Next, indicate all "#include" statements. First, include files from the local pr
 ******** begin example ********
 //////////////////////////////////////////////////////////////////////////////////////////////////// 
 // 
-// Project:      thisProjectName
-// File:         FileName.h
-// Authors:      Malcolm Smith
-//               Von Miller
+//  Project:  [projectName]
+//  File:     FileName.h (libraryName)
+//  Authors:  Malcolm Smith
+//            Von Miller
+//
+//  [copyright]
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////// 
+
 #pragma once
 
 #include "OtherClassFromThisProject.h"
@@ -83,17 +86,27 @@ Next, indicate all "#include" statements. First, include files from the local pr
 
 Setting up Automineer
 =====================
-Run the Quick Setup wizard. Choose: DocXML, TripleSlash(Plain), Flowing left-aligned text, Tabular for the entire group (inline end tag)
-Doc Style: enforce blank lines 1 before and 0 below
-Doc Formatting: between the tag and the entry text insert a space
-Doc General: change User Name to you full name, uncheck add author entries, uncheck ad date emtries; check suppress brief tag
+Doc Style -> Quick Setup: (0) Next (1) Document XML (2) TripleSlash(Plain) (3)  Symmetric left-aligned text (4) Tabular for the entire group inline end tag
+Doc Style -> enforce blank lines 1 before and 0 below
+Doc Formatting -> between the tag and the entry text insert a space
+Doc General -> change User Name to you full name
+Doc General -> uncheck add author entries
+Doc General -> uncheck ad date emtries
+Doc General -> check suppress brief tag
 Doc Advanced:
 
 		<!-- File Header: Catch-all plain-text Atomineer headers. See below for other examples -->
 		<file>
-			// Project:     %project%
-			// File:        %leafname%%extension%
-			// Authors:     %user%
+			//////////////////////////////////////////////////////////////////////////////////////////////////// 
+			// 
+			//  Project:  [projectName]
+			//  File:     %leafname%%extension% (%project%)
+			//  Authors:  %user%
+			//
+			//  [copyright]
+			//
+			//////////////////////////////////////////////////////////////////////////////////////////////////// 
+			
 		</file>
 
 

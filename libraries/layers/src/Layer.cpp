@@ -1,10 +1,17 @@
-// Layer.cpp
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  [projectName]
+//  File:     Layer.cpp (layers)
+//  Authors:  Ofer Dekel
+//
+//  [copyright]
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Layer.h"
 
 namespace layers
 {
-
     const std::string Layer::typeName[] = { "Input", "Scale", "Shift", "Sum", "DecisionTreePath" };
 
     Layer::Layer(Type type) : _type(type)
