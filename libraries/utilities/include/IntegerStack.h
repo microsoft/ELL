@@ -36,13 +36,13 @@ namespace utilities
 
         /// <summary> Pushes an object onto this stack. </summary>
         ///
-        /// <param name="value"> The value to push. </param>
+        /// <param name="value"> The value to push. This must be a value that was previously popped. </param>
         void Push(uint64 value);
 
-        /// <summary> Gets the smallest integer that has never been popped, since the IntegerStack was created. </summary>
+        /// <summary> Query if the top value in the stack is novel, which means that it has never been popped before. </summary>
         ///
-        /// <returns> The smallest unpopped value. </returns>
-        uint64 GetSmallestUnpoppedValue() const;
+        /// <returns> true if it succeeds, false if it fails. </returns>
+        bool IsTopValueNovel() const;
 
     private:
         uint64 _smallestUnpopped = 0;

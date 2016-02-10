@@ -10,6 +10,9 @@
 
 #include "IntegerStack.h"
 
+// stl
+#include <cassert>
+
 namespace utilities
 {
     uint64 IntegerStack::Pop()
@@ -43,10 +46,12 @@ namespace utilities
     void IntegerStack::Push(uint64 value)
     {
         _stack.push(value);
+
+        assert(value < _smallestUnpopped);
     }
 
-    uint64 IntegerStack::GetSmallestUnpoppedValue() const
+    bool IntegerStack::IsTopValueNovel() const
     {
-        return _smallestUnpopped;
+        return _stack.empty();
     }
 }
