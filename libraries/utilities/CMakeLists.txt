@@ -14,14 +14,16 @@ endif()
 
 set (SRC src/BinaryClassificationEvaluator.cpp
                    src/CommandLineParser.cpp
-                   src/JsonSerializer.cpp
                    src/files.cpp
+                   src/IntegerStack.cpp
+                   src/JsonSerializer.cpp
                    src/randomEngines.cpp
                    ../amalgamated_jsoncpp/jsoncpp.cpp)
 
 set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/CommandLineParser.h
                        include/IIterator.h
+                       include/IntegerStack.h
                        include/JsonSerializer.h
                        include/ParallelTransformIterator.h
                        include/Parser.h
