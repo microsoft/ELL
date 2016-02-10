@@ -42,7 +42,7 @@ namespace utilities
         /// <summary> Query if the top value in the stack is novel, which means that it has never been popped before. </summary>
         ///
         /// <returns> true if it succeeds, false if it fails. </returns>
-        bool IsTopValueNovel() const;
+        bool IsTopNovel() const;
 
     private:
         uint64 _smallestUnpopped = 0;
