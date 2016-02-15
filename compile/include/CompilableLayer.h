@@ -11,6 +11,7 @@
 #pragma once
 
 #include "AddToAction.h"
+#include "DataFlowGraph.h"
 
 // types
 #include "types.h"
@@ -26,7 +27,7 @@ class CompilableLayer
 public:
     /// This function is called for each layer, from the bottom up
     ///
-    virtual void BackwardPass(uint64 currentLayerIndex, std::vector<std::vector<std::vector<AddToAction>>>& actions) const = 0;
+    virtual void BackwardPass(uint64 currentLayerIndex, DataFlowGraph& graph) const = 0;
 
     //virtual void ProcessForward() = 0;
 

@@ -10,13 +10,13 @@
 
 #include "CompilableShift.h"
 
-void CompilableShift::BackwardPass(uint64 currentLayerIndex, vector<vector<vector<AddToAction>>>& actions) const
+void CompilableShift::BackwardPass(uint64 currentLayerIndex, DataFlowGraph& graph) const
 {
     for(uint64 column = 0; column < Size(); ++column)
     {
         auto coordinate = _coordinates[column];
-        auto& inputActionList = actions[coordinate.GetRow()][coordinate.GetColumn()];
-        const auto& outputActionList = actions[currentLayerIndex][column];
+        auto& inputActionList = graph[coordinate.GetRow()][coordinate.GetColumn()].Actions;
+        const auto& outputActionList = graph[currentLayerIndex][column].Actions;
 
         //create the linear operation
         LinearOperation inputOperation(1.0, _values[column]);

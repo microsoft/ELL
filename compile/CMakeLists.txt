@@ -21,6 +21,7 @@ set (SRC src/main.cpp
                  src/CompilableScale.cpp
                  src/CompilableShift.cpp
                  src/CompilableSum.cpp
+                 src/DataFlowGraph.cpp
                  src/LinearOperation.cpp)
 
 set (INCLUDE include/AddToAction.h
@@ -31,6 +32,8 @@ set (INCLUDE include/AddToAction.h
              include/CompilableScale.h
              include/CompilableShift.h
              include/CompilableSum.h
+             include/DataFlowGraph.h
+             include/DataFlowNode.h
              include/LinearOperation.h)
 
 set (TCC tcc/LinearOperation.tcc)

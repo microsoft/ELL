@@ -18,5 +18,5 @@
 ///
 struct CompilableInput : public layers::Input, public CompilableLayer
 {
-    virtual void BackwardPass(uint64 currentLayerIndex, vector<vector<vector<AddToAction>>>& actions) const override;
+    virtual void BackwardPass(uint64 currentLayerIndex, DataFlowGraph& graph) const override;
 };

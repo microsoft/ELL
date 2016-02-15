@@ -10,13 +10,13 @@
 
 #include "CompilableScale.h"
 
-void CompilableScale::BackwardPass(uint64 currentLayerIndex, vector<vector<vector<AddToAction>>>& actions) const // TODO move this function to common coordinatewise class
+void CompilableScale::BackwardPass(uint64 currentLayerIndex, DataFlowGraph& graph) const // TODO move this function to common coordinatewise class
 {
     for(uint64 column = 0; column < Size(); ++column)
     {
         auto coordinate = _coordinates[column];
-        auto& inputActionList = actions[coordinate.GetRow()][coordinate.GetColumn()];
-        const auto& outputActionList = actions[currentLayerIndex][column];
+        auto& inputActionList = graph[coordinate.GetRow()][coordinate.GetColumn()].Actions;
+        const auto& outputActionList = graph[currentLayerIndex][column].Actions;
 
         //create the linear operation
         LinearOperation inputOperation(_values[column], 0.0);

@@ -13,6 +13,7 @@
 #include "CompilableScale.h"
 #include "CompilableShift.h"
 #include "CompilableSum.h"
+#include "DataFlowNode.h"
 
 // stl
 #include <string>
@@ -22,22 +23,22 @@
 void CompilableMap::ToCode(layers::CoordinateList coordinateList) const
 {
     // allocate datastructure to hold actions
-    vector<vector<vector<AddToAction>>> actions(NumLayers());
+    DataFlowGraph graph;
     for(uint64 layerIndex = 0; layerIndex < NumLayers(); ++layerIndex)
     {
-        actions[layerIndex].resize(_layers[layerIndex]->Size());
+        graph.AddLayer(_layers[layerIndex]->Size());
     }
 
     // backwards pass to assign actions
     for(uint64 layerIndex = NumLayers() - 1; layerIndex > 0; --layerIndex)
     {
         auto compilableLayer = GetLayer<CompilableLayer>(layerIndex);
-        compilableLayer->BackwardPass(layerIndex, actions);
+        compilableLayer->BackwardPass(layerIndex, graph);
     }
 
-    // forwards pass, to output code
-    for(uint64 layer = 0; layer < NumLayers(); ++layer)
-    { }
+    //// forwards pass, to output code
+    //for(uint64 layer = 0; layer < NumLayers(); ++layer)
+    //{ }
 
 }
 

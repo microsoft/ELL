@@ -10,11 +10,11 @@
 
 #include "CompilableSum.h"
 
-void CompilableSum::BackwardPass(uint64 currentLayerIndex, vector<vector<vector<AddToAction>>>& actions) const
+void CompilableSum::BackwardPass(uint64 currentLayerIndex, DataFlowGraph& graph) const
 {
     for(uint64 column = 0; column < Size(); ++column)
     {
-        const auto& outputActionList = actions[currentLayerIndex][column];
+        const auto& outputActionList = graph[currentLayerIndex][column].Actions;
 
         // skip empty action lists
         if(outputActionList.size() == 0)
@@ -28,7 +28,7 @@ void CompilableSum::BackwardPass(uint64 currentLayerIndex, vector<vector<vector<
         for(uint64 i = 0; i < _coordinates[column].size(); ++i)
         {
             auto coordinate = _coordinates[column][i];
-            auto& inputActionList = actions[coordinate.GetRow()][coordinate.GetColumn()];
+            auto& inputActionList = graph[coordinate.GetRow()][coordinate.GetColumn()].Actions;
             inputActionList.emplace_back(targetName);
         }
     }
