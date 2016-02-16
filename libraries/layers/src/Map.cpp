@@ -35,8 +35,8 @@ namespace layers
     IndexValue Map::Iterator::Get() const
     {
         auto coordinate = _outputCoordinates[_index];
-        uint64 row = coordinate.GetRow();
-        uint64 column = coordinate.GetColumn();
+        uint64 row = coordinate.GetLayerIndex();
+        uint64 column = coordinate.GetElementIndex();
         return IndexValue{ _index, (*_spOutputs)[row][column] };
     }
 

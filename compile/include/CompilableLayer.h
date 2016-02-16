@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include "AddToAction.h"
 #include "DataFlowGraph.h"
 
 // types
@@ -30,19 +29,6 @@ public:
     virtual void BackwardPass(uint64 currentLayerIndex, DataFlowGraph& graph) const = 0;
 
     //virtual void ProcessForward() = 0;
-
-    /// \returns The number of temp variable names allocated
-    ///
-    static uint64 NumTempVariableNames();
-
-protected:
-    /// \returns The next available variable name
-    ///
-    static std::string GetNextTempVariableName(); 
-
-private:
-    static uint64 _tempVariableCounter;
-    std::vector<std::vector<AddToAction>> _actions;
 };
 
  

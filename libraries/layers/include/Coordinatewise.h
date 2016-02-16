@@ -67,7 +67,7 @@ namespace layers
 
     protected:
         std::vector<double> _values;
-        CoordinateList _coordinates;
+        CoordinateList _inputCoordinates;
         DoubleOperation _operation;
         static const int _currentVersion = 1;
     };

@@ -165,10 +165,10 @@ void PrintableMap::Print(ostream & os, const PrintArguments& Arguments)
                     while (inputCoordinates.IsValid()) // foreach incoming edge
                     {
                         auto coordinate = inputCoordinates.Get();
-                        const auto& inputLayout = layouts[coordinate.GetRow()];
-                        if (!inputLayout.IsHidden(coordinate.GetColumn())) // if input is hidden, hide edge
+                        const auto& inputLayout = layouts[coordinate.GetLayerIndex()];
+                        if (!inputLayout.IsHidden(coordinate.GetElementIndex())) // if input is hidden, hide edge
                         {
-                            SvgEdge(os, 2, inputLayout.GetOutputPoint(coordinate.GetColumn()), layout.GetInputPoint(column), Arguments.edgeStyle.flattness);
+                            SvgEdge(os, 2, inputLayout.GetOutputPoint(coordinate.GetElementIndex()), layout.GetInputPoint(column), Arguments.edgeStyle.flattness);
                         }
 
                         // on to the next input

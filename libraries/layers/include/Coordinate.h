@@ -41,11 +41,11 @@ namespace layers
 
         /// \returns the i index
         ///
-        uint64 GetRow() const;
+        uint64 GetLayerIndex() const;
 
         /// \returns the j index
         ///
-        uint64 GetColumn() const; 
+        uint64 GetElementIndex() const; 
 
         /// Serializes an index value pair
         ///
@@ -56,9 +56,9 @@ namespace layers
         void Deserialize(utilities::JsonSerializer& serializer);
 
     private:
-        uint64 _row = 0;
-        uint64 _column = 0;
+        uint64 _layerIndex = 0;
+        uint64 _elementIndex = 0;
     };
 
-    using  CoordinateList = std::vector<Coordinate>;
+    typedef std::vector<Coordinate> CoordinateList;
 }

@@ -64,7 +64,7 @@ namespace layers
         virtual void Deserialize(utilities::JsonSerializer& serializer, int version = _currentVersion) override;
 
     protected:
-        std::vector<CoordinateList> _coordinates;
+        std::vector<CoordinateList> _inputCoordinates;
         static const int _currentVersion = 1;
     };
 }

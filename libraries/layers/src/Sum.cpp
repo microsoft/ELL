@@ -19,12 +19,12 @@ namespace layers
     Sum::Sum() : Layer(Type::sum) 
     {}
 
-    Sum::Sum(const CoordinateList & coordinates) : Layer(Type::sum), _coordinates(0)
+    Sum::Sum(const CoordinateList & coordinates) : Layer(Type::sum), _inputCoordinates(0)
     {
-        _coordinates.push_back(coordinates);
+        _inputCoordinates.push_back(coordinates);
     }
 
-    Sum::Sum(const std::vector<CoordinateList>& coordinates) : Layer(Type::sum), _coordinates(coordinates)
+    Sum::Sum(const std::vector<CoordinateList>& coordinates) : Layer(Type::sum), _inputCoordinates(coordinates)
     {}
 
     uint64 Sum::Size() const
@@ -33,12 +33,12 @@ namespace layers
     }
     void Sum::Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const
     {
-        for (uint64 k = 0; k<_coordinates.size(); ++k)
+        for (uint64 k = 0; k<_inputCoordinates.size(); ++k)
         {
             double output = 0;
-            for (auto coordinate : _coordinates[k])
+            for (auto coordinate : _inputCoordinates[k])
             {
-                output += outputs[coordinate.GetRow()][coordinate.GetColumn()];
+                output += outputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
             }
             outputs[rowIndex][k] = output;
         }
@@ -46,21 +46,21 @@ namespace layers
 
     utilities::VectorIterator<Coordinate> Sum::GetInputCoordinates(uint64 index) const
     {
-        return utilities::VectorIterator<Coordinate>(_coordinates[index].cbegin(), _coordinates[index].cend());
+        return utilities::VectorIterator<Coordinate>(_inputCoordinates[index].cbegin(), _inputCoordinates[index].cend());
     }
 
     void Sum::Serialize(utilities::JsonSerializer & serializer) const
     {
         // version 1
         Layer::SerializeHeader(serializer, 1);
-        serializer.Write("coordinates", _coordinates);
+        serializer.Write("coordinates", _inputCoordinates);
     }
 
     void Sum::Deserialize(utilities::JsonSerializer & serializer, int version)
     {
         if (version == 1)
         {
-            serializer.Read("coordinates", _coordinates);
+            serializer.Read("coordinates", _inputCoordinates);
         }
         else
         {

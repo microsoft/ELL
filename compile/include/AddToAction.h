@@ -15,6 +15,9 @@
 // types
 #include "types.h"
 
+// layers
+#include "Coordinate.h"
+
 // stl
 #include <string>
 #include <iostream>
@@ -26,11 +29,11 @@ class AddToAction
 public:
     ///
     ///
-    AddToAction(std::string targetVariableName);
+    AddToAction(layers::Coordinate targetCoordinate);
 
     ///
     ///
-    AddToAction(const LinearOperation& operation, std::string targetVariableName);
+    AddToAction(const LinearOperation& operation, layers::Coordinate targetCoordinate);
 
     /// \returns The operation that is applied to the input variable, before it is added to the target variable
     ///
@@ -38,22 +41,18 @@ public:
 
     ///
     ///
-    const std::string& GetTargetVariableName() const;
+    const layers::Coordinate& GetTarget() const;
 
-    ///
-    ///
-    void SetInputCoordinates(std::string inputVariableName);
 
-    /// \returns True if the action is not a null operations, namely, if it actually modifies the target in some way
+    /// \returns True if the action is a null operation, namely, if it does not modify the target in any way
     ///
     bool IsNull() const;
 
     ///
     ///
-    void Print(std::ostream& os) const;
+   // void Print(std::ostream& os) const;
 
 private:
     LinearOperation _operation;
-    std::string _inputVariableName = "";
-    std::string _targetVariableName = "";
+    layers::Coordinate _targetCoordinate;
 };
