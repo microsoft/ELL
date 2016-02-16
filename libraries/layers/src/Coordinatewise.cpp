@@ -33,7 +33,7 @@ namespace layers
         return _inputCoordinates.size();
     }
 
-    void Coordinatewise::Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const
+    void Coordinatewise::Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const // TODO change row -> layer
     {
         for(uint64 k=0; k<_values.size(); ++k)
         {
