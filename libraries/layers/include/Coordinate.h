@@ -29,7 +29,7 @@ namespace layers
 
         /// Ctor
         ///
-        Coordinate(uint64 row=0, uint64 column=0);
+        Coordinate(uint64 layerIndex=0, uint64 elementIndex=0);
 
         /// Copy ctor
         ///

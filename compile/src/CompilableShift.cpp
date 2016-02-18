@@ -10,7 +10,7 @@
 
 #include "CompilableShift.h"
 
-void CompilableShift::BackwardPass(uint64 currentLayerIndex, DataFlowGraph& graph) const
+void CompilableShift::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const
 {
     for(uint64 column = 0; column < Size(); ++column)
     {

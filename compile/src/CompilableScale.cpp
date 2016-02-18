@@ -10,7 +10,7 @@
 
 #include "CompilableScale.h"
 
-void CompilableScale::BackwardPass(uint64 currentLayerIndex, DataFlowGraph& graph) const // TODO move this function to common coordinatewise class
+void CompilableScale::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const // TODO move this function to common coordinatewise class
 {
     for(uint64 column = 0; column < Size(); ++column)
     {

@@ -15,6 +15,7 @@
 #include "files.h"
 #include "CommandLineParser.h" 
 
+// layers
 #include "Map.h"
 
 // common
@@ -49,8 +50,8 @@ int main(int argc, char* argv[])
         // construct coordinate list
         auto coordinateList = GetCoordinateList(map, mapLoadArguments.coordinateListLoadArguments);
 
-        // 
-        map.ToCode(coordinateList);
+        // TODO - allow output to cout or file
+        map.ToCode(coordinateList, std::cout);
 
     }
     catch(const utilities::CommandLineParserPrintHelpException& ex)

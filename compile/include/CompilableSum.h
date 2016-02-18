@@ -20,5 +20,5 @@
 struct CompilableSum : public layers::Sum, public CompilableLayer
 {
 public:
-    virtual void BackwardPass(uint64 currentLayerIndex, DataFlowGraph& graph) const override;
+    virtual void SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const override;
 };

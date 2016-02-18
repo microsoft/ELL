@@ -10,7 +10,7 @@
 
 #include "CompilableSum.h"
 
-void CompilableSum::BackwardPass(uint64 currentLayerIndex, DataFlowGraph& graph) const
+void CompilableSum::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const
 {
     for(uint64 elementIndex = 0; elementIndex < Size(); ++elementIndex)
     {

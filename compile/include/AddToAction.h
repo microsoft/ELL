@@ -48,10 +48,6 @@ public:
     ///
     bool IsNull() const;
 
-    ///
-    ///
-   // void Print(std::ostream& os) const;
-
 private:
     LinearOperation _operation;
     layers::Coordinate _targetCoordinate;
