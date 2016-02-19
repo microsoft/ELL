@@ -12,7 +12,6 @@
 #include "CompileArguments.h"
 
 // utilities
-#include "files.h"
 #include "CommandLineParser.h" 
 
 // layers
