@@ -25,32 +25,65 @@
 #include <cassert>
 namespace
 {
-    void ProcessNode(const layers::Coordinate& currentCoordinate, DataFlowGraph& graph, std::ostream& os) 
+    // TODO signature needs output stream and intgereStack
+    void ProcessNode(const layers::Coordinate& currentCoordinate, DataFlowGraph& graph, utilities::IntegerStack& stack, std::ostream& os)
     {
         auto& currentNode = graph[currentCoordinate.GetLayerIndex()][currentCoordinate.GetElementIndex()];
-        const auto& currentVariableName = currentNode.VariableName;
-        assert(currentVariableName != "");
+        auto currentNodeVariableName = currentNode.GetVariableName();
 
         // for each action
-        while (!currentNode.Actions.empty())
+        while(!currentNode.Actions.empty())
         {
+            // get the next action in the current node
             const auto& action = currentNode.Actions.back();
 
-            // get target
-            
-            // check if it has a name, if not: get a temp name, set the name in the node, check if the name is new and write "double", print the name
-            
-            // check if it is initialized: yes then pring "+=", no then use "="
+            // get the target coordinate and node
+            auto targetCoordinate = action.GetTarget();
+            auto& targetNode = graph[targetCoordinate.GetLayerIndex()][targetCoordinate.GetElementIndex()];
 
-            // get the operaiton and print it with currentVariableName
+            if(!targetNode.HasVariableName())
+            {
+                if(stack.IsTopNovel())
+                {
+                    os << "double ";
+                }
+
+                // assign name from int stack
+                targetNode.SetTempVariableIndex(stack.Pop());
+            }
+
+            // print variable name
+            os << targetNode.GetVariableName() << ' ';
+
+            // print either '=' or '+='
+            if(targetNode.IsInitialized)
+            {
+                os << "+= ";
+            }
+            else
+            {
+                os << "= ";
+                targetNode.IsInitialized = true;
+            }
+
+            // print the right hand side
+            action.GetOperation().Print(currentNodeVariableName, os);
 
             // remove the action
             currentNode.Actions.pop_back();
 
-            // if empty and temporary, release the temp name
+            if(currentNode.Actions.empty())
+            {
+                // release temp variable
+                stack.Push(currentNode.GetTempVariableIndex());
+            }
 
-            // subtract 1 from target counter; if reached zero, call ProcessNode
+            --(targetNode.NumUncomputedInputs);
 
+            if(targetNode.NumUncomputedInputs == 0)
+            {
+                ProcessNode(targetCoordinate, graph, stack, os);
+            }
         }
     }
 }
@@ -66,10 +99,10 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
 
     // set names on input layer
     uint64 inputLayerSize = _layers[0]->Size();
-    const std::string inputVariableName = "input";
+    const std::string inputFixedVariableName = "input";
     for (uint64 elementIndex = 0; elementIndex < inputLayerSize; ++elementIndex)
     {
-        graph[0][elementIndex].VariableName = inputVariableName + "[" + std::to_string(elementIndex) + "]";
+        graph[0][elementIndex].FixedVariableName = inputFixedVariableName + "[" + std::to_string(elementIndex) + "]";
     }
 
     // add extra layer for outputs
@@ -78,10 +111,10 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
     graph.AddLayer(outputLayerSize);
 
     // set names on output layer
-    const std::string outputVariableName = "output";
+    const std::string outputFixedVariableName = "output";
     for (uint64 elementIndex = 0; elementIndex < outputLayerSize; ++elementIndex)
     {
-        graph[outputLayerIndex][elementIndex].VariableName = outputVariableName + "[" + std::to_string(elementIndex) + "]";
+        graph[outputLayerIndex][elementIndex].FixedVariableName = outputFixedVariableName + "[" + std::to_string(elementIndex) + "]";
     }
 
     // set the actions that generate the output coordinates
@@ -100,13 +133,13 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
     }
 
     // allocate integer stack, to manage temp variable names;
-    utilities::IntegerStack integerStack;
+    utilities::IntegerStack stack;
 
     // forwards pass, to generate code
     for (uint64 inputElementIndex = 0; inputElementIndex < inputLayerSize; ++inputElementIndex)
     {
         layers::Coordinate inputCoordinate(0, inputElementIndex);
-        ProcessNode(inputCoordinate, graph, os);
+        ProcessNode(inputCoordinate, graph, stack, os);
     }
 }
 

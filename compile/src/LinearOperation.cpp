@@ -30,3 +30,10 @@ bool LinearOperation::IsNull() const
     }
     return true;
 }
+
+void LinearOperation::Print(std::string sourceVariableName, std::ostream & os) const
+{
+    os << _a << " * ";
+    os << sourceVariableName;
+    os << " + " << _b;
+}

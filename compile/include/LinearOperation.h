@@ -12,6 +12,7 @@
 
 // stl
 #include <iostream>
+#include <string>
 
 class LinearOperation
 {
@@ -30,12 +31,10 @@ public:
 
     ///
     ///
-    template<typename PrintableInputType>
-    void Print(std::ostream& os, const PrintableInputType& printableInput) const;
+    void Print(std::string sourceVariableName, std::ostream& os) const;
 
 private:
     double _a = 0;
     double _b = 0;
 };
 
-#include "../tcc/LinearOperation.tcc"

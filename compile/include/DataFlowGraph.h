@@ -27,4 +27,6 @@ public:
     /// <param name="numNodes"> Number of nodes in the layer
     ///                         . </param>
     void AddLayer(uint64 numNodes);
+
+    // TODO add operator[] with coordinate
 };

@@ -29,6 +29,6 @@ namespace common
 
     layers::CoordinateList GetCoordinateListIgnoreMapSuffix(const layers::Map& map, uint64 numLayersToDrop)
     {
-        return map.GetCoordinateList(map.NumLayers() - numLayersToDrop);
+        return map.GetCoordinateList(map.NumLayers() - 1 - numLayersToDrop);
     }
 }
