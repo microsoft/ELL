@@ -31,9 +31,22 @@ bool LinearOperation::IsNull() const
     return true;
 }
 
-void LinearOperation::Print(std::string sourceVariableName, std::ostream & os) const
+void LinearOperation::Print(const std::string& sourceVariableName, std::ostream& os) const
 {
-    os << _a << " * ";
-    os << sourceVariableName;
-    os << " + " << _b;
+    if (_a != 0)
+    {
+        if (_a != 1.0)
+        {
+            os << _a << " * ";
+        }
+        os << sourceVariableName;
+        if (_b != 0)
+        {
+            os << " + ";
+        }
+    }
+    if (_b != 0)
+    {
+        os << _b;
+    }
 }

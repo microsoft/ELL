@@ -26,6 +26,23 @@ struct DataFlowNode
 public:
 
 
+    void SetFixedFixedVariableName(const std::string& name)
+    {
+        FixedVariableName = name;
+    }
+
+    bool HasTempVariableName() const
+    {
+        if(TempVariableIndex >= 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     bool HasVariableName() const
     {
         if(FixedVariableName != "" || TempVariableIndex >= 0)
@@ -71,10 +88,7 @@ public:
         TempVariableIndex = (int)index;
     }
 
-    void SetFixedFixedVariableName(const std::string& name)
-    {
-        FixedVariableName = name;
-    }
+
 
     // TODO, make members private and add accessors
 

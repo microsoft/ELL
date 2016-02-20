@@ -31,7 +31,7 @@ public:
 
     ///
     ///
-    void Print(std::string sourceVariableName, std::ostream& os) const;
+    void Print(const std::string& sourceVariableName, std::ostream& os) const;
 
 private:
     double _a = 0;

@@ -45,11 +45,19 @@ namespace
             {
                 if(stack.IsTopNovel())
                 {
-                    os << "double ";
+                    os << "    // allocating temporary variable for element (" << targetCoordinate.GetLayerIndex() << ',' << targetCoordinate.GetElementIndex() << ")\n    double ";
+                }
+                else
+                {
+                    os << "    // reassigning temp variable to element(" << targetCoordinate.GetLayerIndex() << ',' << targetCoordinate.GetElementIndex() << ")\n    ";
                 }
 
                 // assign name from int stack
                 targetNode.SetTempVariableIndex(stack.Pop());
+            }
+            else
+            {
+                os << "    ";
             }
 
             // print variable name
@@ -68,11 +76,12 @@ namespace
 
             // print the right hand side
             action.GetOperation().Print(currentNodeVariableName, os);
+            os << ";\n";
 
             // remove the action
             currentNode.Actions.pop_back();
 
-            if(currentNode.Actions.empty())
+            if(currentNode.Actions.empty() && currentNode.HasTempVariableName())
             {
                 // release temp variable
                 stack.Push(currentNode.GetTempVariableIndex());
@@ -135,12 +144,17 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
     // allocate integer stack, to manage temp variable names;
     utilities::IntegerStack stack;
 
+    // print function declaration
+    os << "void Predict(const double* input, double* output)\n{\n";
+
     // forwards pass, to generate code
     for (uint64 inputElementIndex = 0; inputElementIndex < inputLayerSize; ++inputElementIndex)
     {
         layers::Coordinate inputCoordinate(0, inputElementIndex);
         ProcessNode(inputCoordinate, graph, stack, os);
     }
+
+    os << "}\n";
 }
 
 void CompilableMap::Deserialize(utilities::JsonSerializer& serializer)
