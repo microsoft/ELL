@@ -20,89 +20,48 @@
 #include <string>
 #include <stdexcept>
 
-struct DataFlowNode
+class DataFlowNode
 {
 
 public:
 
 
-    void SetFixedFixedVariableName(const std::string& name)
-    {
-        FixedVariableName = name;
-    }
+    void SetFixedVariableName(const std::string& name);
 
-    bool HasTempVariableName() const
-    {
-        if(TempVariableIndex >= 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+    bool IsInitialized() const;
 
-    bool HasVariableName() const
-    {
-        if(FixedVariableName != "" || TempVariableIndex >= 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+    void SetInitialized();
 
-    std::string GetVariableName() const
-    {
-        if(FixedVariableName != "")
-        {
-            return FixedVariableName;
-        }
-        else if(TempVariableIndex >= 0)
-        {
-            return "tmp" + std::to_string(TempVariableIndex);
-        }
-        else
-        {
-            throw std::runtime_error("this should never happen");
-        }
-    }
+    bool HasVariableName() const;
 
-    uint64 GetTempVariableIndex() const
-    {
-        if(TempVariableIndex >= 0)
-        {
-            return (uint64)TempVariableIndex;
-        }
-        else
-        {
-            throw std::runtime_error("this should never happen");
-        }
-    }
+    std::string GetVariableName() const;
 
-    void SetTempVariableIndex(uint64 index)
-    {
-        TempVariableIndex = (int)index;
-    }
+    uint64 GetTempVariableIndex() const;
+
+    bool HasTempVariableName() const;
+
+    void SetTempVariableIndex(uint64 index);
+
+    bool HasActions() const;
+
+    const std::vector<AddToAction>& GetActions() const;
+
+    std::vector<AddToAction>& GetActions();
+
+    bool HasUncomputedInputs() const;
+
+    void IncrementUncomputedInputs();
+
+    void DecrementUncomputedInputs();
 
 
 
     // TODO, make members private and add accessors
 
-    /// <summary> The actions. </summary>
-    std::vector<AddToAction> Actions;
-
-    /// <summary> Name of the variable that represents this node. </summary>
-    std::string FixedVariableName = "";
-
-    /// <summary> true if the variable associated with this node is initialized initialized. </summary>
-    bool IsInitialized = false;
-
-    int TempVariableIndex = -1;
-
-    /// <summary> Number of inputs that need to be computed before the value of this node is ready. </summary>
-    uint64 NumUncomputedInputs = 0;
+private:
+    std::vector<AddToAction> _actions;
+    std::string _fixedVariableName = "";
+    bool _isInitialized = false;
+    int _tempVariableIndex = -1;
+    uint64 _numUncomputedInputs = 0;
 };

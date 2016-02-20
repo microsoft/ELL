@@ -15,8 +15,8 @@ void CompilableScale::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph)
     for(uint64 column = 0; column < Size(); ++column)
     {
         auto coordinate = _inputCoordinates[column];
-        auto& inputActionList = graph[coordinate.GetLayerIndex()][coordinate.GetElementIndex()].Actions;
-        const auto& outputActionList = graph[currentLayerIndex][column].Actions;
+        auto& inputActionList = graph.GetNode(coordinate).GetActions();
+        const auto& outputActionList = graph.GetNode(currentLayerIndex, column).GetActions();
 
         //create the linear operation
         LinearOperation inputOperation(_values[column], 0.0);
@@ -25,11 +25,16 @@ void CompilableScale::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph)
         {
             const LinearOperation& outputOperation = action.GetOperation();
             LinearOperation compoundOperation = outputOperation.Compound(inputOperation);
+            const auto target = action.GetTarget();
             if (!compoundOperation.IsNull())
             {
-                const auto target = action.GetTarget();
                 inputActionList.emplace_back(compoundOperation, target);
             }
+            else
+            {
+                graph.GetNode(target).DecrementUncomputedInputs();
+            }
+
         }
     }
 }

@@ -18,7 +18,7 @@
 // stl
 #include <vector>
 
-class DataFlowGraph : public std::vector<std::vector<DataFlowNode>>
+class DataFlowGraph 
 {
 public:
 
@@ -28,5 +28,14 @@ public:
     ///                         . </param>
     void AddLayer(uint64 numNodes);
 
-    // TODO add operator[] with coordinate
+    const DataFlowNode& GetNode(layers::Coordinate coordinate) const;
+
+    DataFlowNode& GetNode(layers::Coordinate coordinate);
+
+    const DataFlowNode& GetNode(uint64 layerIndex, uint64 elementIndex) const;
+
+    DataFlowNode& GetNode(uint64 layerIndex, uint64 elementIndex);
+
+private:
+    std::vector<std::vector<DataFlowNode>> _nodes;
 };

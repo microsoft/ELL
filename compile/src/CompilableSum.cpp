@@ -16,10 +16,10 @@ void CompilableSum::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) c
     {
         layers::Coordinate thisCoordinate(currentLayerIndex, elementIndex);
 
-        auto& thisNode = graph[currentLayerIndex][elementIndex];
+        auto& thisNode = graph.GetNode(currentLayerIndex, elementIndex);
 
         // skip empty action lists
-        if(thisNode.Actions.size() == 0)
+        if(thisNode.HasActions() == false)
         {
             continue;
         }
@@ -27,11 +27,11 @@ void CompilableSum::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) c
         for(uint64 i = 0; i < _inputCoordinates[elementIndex].size(); ++i)
         {
             auto inputCoordinate = _inputCoordinates[elementIndex][i];
-            auto& inputNode = graph[inputCoordinate.GetLayerIndex()][inputCoordinate.GetElementIndex()];
-            inputNode.Actions.emplace_back(thisCoordinate);
+            auto& inputNode = graph.GetNode(inputCoordinate);
+            inputNode.GetActions().emplace_back(thisCoordinate);
             
             // increment the input counter
-            ++(thisNode.NumUncomputedInputs);
+            thisNode.IncrementUncomputedInputs();
         }
     }
 }

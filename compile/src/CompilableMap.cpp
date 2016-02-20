@@ -17,6 +17,7 @@
 
 // utilities
 #include "IntegerStack.h"
+#include "StringFormat.h"
 
 // stl
 #include <string>
@@ -25,35 +26,41 @@
 #include <cassert>
 namespace
 {
-    // TODO signature needs output stream and intgereStack
     void ProcessNode(const layers::Coordinate& currentCoordinate, DataFlowGraph& graph, utilities::IntegerStack& stack, std::ostream& os)
     {
-        auto& currentNode = graph[currentCoordinate.GetLayerIndex()][currentCoordinate.GetElementIndex()];
+        auto& currentNode = graph.GetNode(currentCoordinate);
+        auto& currentNodeActions = currentNode.GetActions();
         auto currentNodeVariableName = currentNode.GetVariableName();
 
         // for each action
-        while(!currentNode.Actions.empty())
+        while(!currentNodeActions.empty())
         {
             // get the next action in the current node
-            const auto& action = currentNode.Actions.back();
+            const auto& action = currentNodeActions.back();
+            currentNodeActions.pop_back();
 
             // get the target coordinate and node
             auto targetCoordinate = action.GetTarget();
-            auto& targetNode = graph[targetCoordinate.GetLayerIndex()][targetCoordinate.GetElementIndex()];
+            auto& targetNode = graph.GetNode(targetCoordinate);
 
             if(!targetNode.HasVariableName())
             {
+                // get next available temp variable index
+                uint64 tempVariableIndex = stack.Pop();
+
                 if(stack.IsTopNovel())
                 {
-                    os << "    // allocating temporary variable for element (" << targetCoordinate.GetLayerIndex() << ',' << targetCoordinate.GetElementIndex() << ")\n    double ";
+                    auto msg = "    // allocating temporary variable %i to element (%i,%i)\n    double ";
+                    utilities::StringFormat(os, msg, tempVariableIndex, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
                 }
                 else
                 {
-                    os << "    // reassigning temp variable to element(" << targetCoordinate.GetLayerIndex() << ',' << targetCoordinate.GetElementIndex() << ")\n    ";
+                    auto msg = "    // reassigning temporary variable %i to element (%i,%i)\n";
+                    utilities::StringFormat(os, msg, tempVariableIndex, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
                 }
 
                 // assign name from int stack
-                targetNode.SetTempVariableIndex(stack.Pop());
+                targetNode.SetTempVariableIndex(tempVariableIndex);
             }
             else
             {
@@ -64,32 +71,29 @@ namespace
             os << targetNode.GetVariableName() << ' ';
 
             // print either '=' or '+='
-            if(targetNode.IsInitialized)
+            if(targetNode.IsInitialized())
             {
                 os << "+= ";
             }
             else
             {
                 os << "= ";
-                targetNode.IsInitialized = true;
+                targetNode.SetInitialized();
             }
 
             // print the right hand side
             action.GetOperation().Print(currentNodeVariableName, os);
             os << ";\n";
 
-            // remove the action
-            currentNode.Actions.pop_back();
-
-            if(currentNode.Actions.empty() && currentNode.HasTempVariableName())
+            if(currentNodeActions.empty() && currentNode.HasTempVariableName())
             {
                 // release temp variable
                 stack.Push(currentNode.GetTempVariableIndex());
             }
 
-            --(targetNode.NumUncomputedInputs);
+            targetNode.DecrementUncomputedInputs();
 
-            if(targetNode.NumUncomputedInputs == 0)
+            if(targetNode.HasUncomputedInputs() == false)
             {
                 ProcessNode(targetCoordinate, graph, stack, os);
             }
@@ -111,7 +115,7 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
     const std::string inputFixedVariableName = "input";
     for (uint64 elementIndex = 0; elementIndex < inputLayerSize; ++elementIndex)
     {
-        graph[0][elementIndex].FixedVariableName = inputFixedVariableName + "[" + std::to_string(elementIndex) + "]";
+        graph.GetNode(0, elementIndex).SetFixedVariableName(inputFixedVariableName + "[" + std::to_string(elementIndex) + "]");
     }
 
     // add extra layer for outputs
@@ -119,19 +123,14 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
     uint64 outputLayerIndex = NumLayers();
     graph.AddLayer(outputLayerSize);
 
-    // set names on output layer
+    // set names on output layer and set the actions that generate the output coordinates
     const std::string outputFixedVariableName = "output";
-    for (uint64 elementIndex = 0; elementIndex < outputLayerSize; ++elementIndex)
-    {
-        graph[outputLayerIndex][elementIndex].FixedVariableName = outputFixedVariableName + "[" + std::to_string(elementIndex) + "]";
-    }
-
-    // set the actions that generate the output coordinates
     for (uint64 outputElementIndex = 0; outputElementIndex < outputLayerSize; ++outputElementIndex)
     {
         auto inputCoordinate = coordinateList[outputElementIndex];
         layers::Coordinate outputCoordinate(outputLayerIndex, outputElementIndex);
-        graph[inputCoordinate.GetLayerIndex()][inputCoordinate.GetElementIndex()].Actions.emplace_back(outputCoordinate);
+        graph.GetNode(outputCoordinate).SetFixedVariableName(outputFixedVariableName + "[" + std::to_string(outputElementIndex) + "]");
+        graph.GetNode(inputCoordinate).GetActions().emplace_back(outputCoordinate);
     }
 
     // backwards pass to assign actions

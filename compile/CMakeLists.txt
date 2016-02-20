@@ -22,6 +22,7 @@ set (SRC src/main.cpp
                  src/CompilableShift.cpp
                  src/CompilableSum.cpp
                  src/DataFlowGraph.cpp
+                 src/DataFlowNode.cpp
                  src/LinearOperation.cpp)
 
 set (INCLUDE include/AddToAction.h

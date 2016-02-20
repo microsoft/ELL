@@ -35,12 +35,17 @@ namespace utilities
 
         // if reached '%' character, print an arg
         char specifier = *(++ptr);
-        auto prec = os.precision();
+        auto precision = os.precision();
+        auto flags = os.flags();
 
         switch(specifier)
         {
         case 'i':
-            os << std::fixed << std::setprecision(0) << arg << std::setprecision(prec);
+            os.precision(0);
+            os.flags(std::ios::fixed);
+            os << arg;
+            os.flags(flags);
+            os.precision(precision);
             break;
 
         case 'f':
