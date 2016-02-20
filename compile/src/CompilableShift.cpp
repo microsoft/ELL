@@ -24,8 +24,12 @@ void CompilableShift::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph)
         for(const auto& action : outputActionList)
         {
             const LinearOperation& outputOperation = action.GetOperation();
-            const auto target = action.GetTarget();
-            inputActionList.emplace_back(outputOperation.Compound(inputOperation), target);
+            LinearOperation compoundOperation = outputOperation.Compound(inputOperation);
+            if (!compoundOperation.IsNull())
+            {
+                const auto target = action.GetTarget();
+                inputActionList.emplace_back(compoundOperation, target);
+            }
         }
     }
 }
