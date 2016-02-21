@@ -15,7 +15,7 @@ void CompilableShift::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph)
     for(uint64 column = 0; column < Size(); ++column)
     {
         auto coordinate = _inputCoordinates[column];
-        auto& inputActionList = graph.GetNode(coordinate).GetActions();
+        auto& inputNode = graph.GetNode(coordinate);
         const auto& outputActionList = graph.GetNode(currentLayerIndex, column).GetActions();
 
         //create the linear operation
@@ -28,7 +28,7 @@ void CompilableShift::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph)
             const auto target = action.GetTarget();
             if (!compoundOperation.IsNull())
             {
-                inputActionList.emplace_back(compoundOperation, target);
+                inputNode.EmplaceAction(compoundOperation, target);
             }
             else
             {

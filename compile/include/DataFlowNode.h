@@ -44,19 +44,19 @@ public:
 
     bool HasActions() const;
 
+    AddToAction PopAction();
+
+    void EmplaceAction(layers::Coordinate targetCoordinate);
+
+    void EmplaceAction(const LinearOperation& operation, layers::Coordinate targetCoordinate);
+
     const std::vector<AddToAction>& GetActions() const;
 
-    std::vector<AddToAction>& GetActions();
-
-    bool HasUncomputedInputs() const;
+    bool IsWaitingForInputs() const;
 
     void IncrementUncomputedInputs();
 
     void DecrementUncomputedInputs();
-
-
-
-    // TODO, make members private and add accessors
 
 private:
     std::vector<AddToAction> _actions;

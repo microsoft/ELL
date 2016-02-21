@@ -28,7 +28,7 @@ void CompilableSum::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) c
         {
             auto inputCoordinate = _inputCoordinates[elementIndex][i];
             auto& inputNode = graph.GetNode(inputCoordinate);
-            inputNode.GetActions().emplace_back(thisCoordinate);
+            inputNode.EmplaceAction(thisCoordinate);
             
             // increment the input counter
             thisNode.IncrementUncomputedInputs();

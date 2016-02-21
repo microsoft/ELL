@@ -29,20 +29,19 @@ namespace
     void ProcessNode(const layers::Coordinate& currentCoordinate, DataFlowGraph& graph, utilities::IntegerStack& stack, std::ostream& os)
     {
         auto& currentNode = graph.GetNode(currentCoordinate);
-        auto& currentNodeActions = currentNode.GetActions();
         auto currentNodeVariableName = currentNode.GetVariableName();
 
         // for each action
-        while(!currentNodeActions.empty())
+        while(currentNode.HasActions())
         {
             // get the next action in the current node
-            const auto& action = currentNodeActions.back();
-            currentNodeActions.pop_back();
+            auto action = currentNode.PopAction();
 
             // get the target coordinate and node
             auto targetCoordinate = action.GetTarget();
             auto& targetNode = graph.GetNode(targetCoordinate);
 
+            // check if temp variable allocation needed
             if(!targetNode.HasVariableName())
             {
                 // get next available temp variable index
@@ -85,15 +84,15 @@ namespace
             action.GetOperation().Print(currentNodeVariableName, os);
             os << ";\n";
 
-            if(currentNodeActions.empty() && currentNode.HasTempVariableName())
+            // check if temp variable can be released
+            if(currentNode.HasActions() == false && currentNode.HasTempVariableName())
             {
-                // release temp variable
                 stack.Push(currentNode.GetTempVariableIndex());
             }
 
+            // if target node is ready, process it 
             targetNode.DecrementUncomputedInputs();
-
-            if(targetNode.HasUncomputedInputs() == false)
+            if(targetNode.IsWaitingForInputs() == false)
             {
                 ProcessNode(targetCoordinate, graph, stack, os);
             }
@@ -130,7 +129,7 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
         auto inputCoordinate = coordinateList[outputElementIndex];
         layers::Coordinate outputCoordinate(outputLayerIndex, outputElementIndex);
         graph.GetNode(outputCoordinate).SetFixedVariableName(outputFixedVariableName + "[" + std::to_string(outputElementIndex) + "]");
-        graph.GetNode(inputCoordinate).GetActions().emplace_back(outputCoordinate);
+        graph.GetNode(inputCoordinate).EmplaceAction(outputCoordinate);
     }
 
     // backwards pass to assign actions

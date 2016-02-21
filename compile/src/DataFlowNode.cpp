@@ -94,17 +94,34 @@ bool DataFlowNode::HasActions() const
     }
 }
 
+AddToAction DataFlowNode::PopAction()
+{
+    AddToAction last = std::move(_actions.back());
+    _actions.pop_back();
+    return last;
+}
+
+void DataFlowNode::EmplaceAction(layers::Coordinate targetCoordinate)
+{
+    _actions.emplace_back(targetCoordinate);
+}
+
+void DataFlowNode::EmplaceAction(const LinearOperation& operation, layers::Coordinate targetCoordinate)
+{
+    _actions.emplace_back(operation, targetCoordinate);
+}
+
 const std::vector<AddToAction>& DataFlowNode::GetActions() const
 {
     return _actions;
 }
+//
+//std::vector<AddToAction>& DataFlowNode::GetActions()
+//{
+//    return _actions;
+//}
 
-std::vector<AddToAction>& DataFlowNode::GetActions()
-{
-    return _actions;
-}
-
-bool DataFlowNode::HasUncomputedInputs() const
+bool DataFlowNode::IsWaitingForInputs() const
 {
     if (_numUncomputedInputs == 0)
     {
