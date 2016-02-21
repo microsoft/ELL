@@ -27,25 +27,31 @@
 class AddToAction
 {
 public:
+
+    /// <summary> Constructs an instance of AddToAction. </summary>
     ///
-    ///
+    /// <param name="targetCoordinate"> The action's target coordinate. </param>
     AddToAction(layers::Coordinate targetCoordinate);
 
+    /// <summary> Constructs an instance of AddToAction. </summary>
     ///
-    ///
+    /// <param name="operation"> The action's operation. </param>
+    /// <param name="targetCoordinate"> The actions target coordinate. </param>
     AddToAction(const LinearOperation& operation, layers::Coordinate targetCoordinate);
 
-    /// \returns The operation that is applied to the input variable, before it is added to the target variable
+    /// <summary> Gets the action's operation. </summary>
     ///
+    /// <returns> The operation. </returns>
     const LinearOperation& GetOperation() const;
 
+    /// <summary> Gets the action's target coordinate. </summary>
     ///
-    ///
+    /// <returns> The target coordinate. </returns>
     const layers::Coordinate& GetTarget() const;
 
-
-    /// \returns True if the action is a null operation, namely, if it does not modify the target in any way
+    /// <summary> Query if this action is a null action (a null action does not change its target). </summary>
     ///
+    /// <returns> true if the action is a null action. </returns>
     bool IsNull() const;
 
 private:

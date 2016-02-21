@@ -24,11 +24,11 @@
 class CompilableLayer 
 {
 public:
-    /// This function is called for each layer, from the bottom up
+    /// <summary> Pushes actions upward in the graph </summary>
     ///
+    /// <param name="currentLayerIndex"> The index of the current layer. </param>
+    /// <param name="graph"> [in,out] The data flow graph. </param>
     virtual void SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const = 0;
-
-    //virtual void ProcessForward() = 0;
 };
 
  
