@@ -43,32 +43,41 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
 
+        // if output file specified, replace stdout with it 
+        std::ofstream outputDataStream;
+        if (compileArguments.outputCodeFile != "")
+        {
+            outputDataStream = utilities::OpenOfstream(compileArguments.outputCodeFile);
+            std::cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
+        }
+
         // open file
         auto map = layers::Map::Load<CompilableMap>(mapLoadArguments.inputMapFile);
 
         // construct coordinate list
         auto coordinateList = GetCoordinateList(map, mapLoadArguments.coordinateListLoadArguments);
 
-        // TODO - allow output to cout or file
+        // output code
         map.ToCode(coordinateList, std::cout);
-
     }
-    catch(const utilities::CommandLineParserPrintHelpException& ex)
+    catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
-        std::cout << ex.GetHelpText() << std::endl;
+        std::cout << exception.GetHelpText() << std::endl;
+        return 0;
     }
-    catch(const utilities::CommandLineParserErrorException& exception)
+    catch (const utilities::CommandLineParserErrorException& exception)
     {
         std::cerr << "Command line parse error:" << std::endl;
-        for(const auto& error : exception.GetParseErrors())
+        for (const auto& error : exception.GetParseErrors())
         {
             std::cerr << error.GetMessage() << std::endl;
         }
-        return 0;
+        return 1;
     }
-    catch(std::runtime_error e)
+    catch (std::runtime_error exception)
     {
-        std::cerr << "runtime error: " << e.what() << std::endl;
+        std::cerr << "runtime error: " << exception.what() << std::endl;
+        return 1;
     }
 
     // the end

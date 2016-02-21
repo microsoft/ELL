@@ -61,6 +61,14 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
 
+        // if output file specified, replace stdout with it 
+        std::ofstream outputDataStream;
+        if (mapSaveArguments.outputMapFile != "")
+        {
+            outputDataStream = utilities::OpenOfstream(mapSaveArguments.outputMapFile);
+            std::cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
+        }
+
         // create and load a dataset, a map, and a coordinate list
         dataset::RowDataset dataset;
         layers::Map map;
@@ -95,18 +103,19 @@ int main(int argc, char* argv[])
         }
 
         // print loss and errors
-        std::cout << "training error\n" << evaluator << std::endl;
+        std::cerr << "training error\n" << evaluator << std::endl;
 
         // update the map with the newly learned layers
         auto predictor = optimizer.GetPredictor();
         predictor.AddTo(map, inputCoordinates);
 
-        // save map to output file
-        if (mapSaveArguments.outputMapFile != "")
-        {
-            auto outputMapFStream = utilities::OpenOfstream(mapSaveArguments.outputMapFile);
-            map.Serialize(outputMapFStream);
-        }
+        // output map
+        map.Serialize(std::cout);
+    }
+    catch (const utilities::CommandLineParserPrintHelpException& exception)
+    {
+        std::cout << exception.GetHelpText() << std::endl;
+        return 0;
     }
     catch (const utilities::CommandLineParserErrorException& exception)
     {
@@ -115,16 +124,11 @@ int main(int argc, char* argv[])
         {
             std::cerr << error.GetMessage() << std::endl;
         }
-        return 0;
-    }
-    catch (const utilities::CommandLineParserPrintHelpException& exception)
-    {
-        std::cerr << exception.GetHelpText() << std::endl;
+        return 1;
     }
     catch (std::runtime_error exception)
     {
-        std::cerr << "Runtime error:" << std::endl;
-        std::cerr << exception.what() << std::endl;
+        std::cerr << "runtime error: " << exception.what() << std::endl;
         return 1;
     }
 

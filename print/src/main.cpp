@@ -30,8 +30,10 @@ int main(int argc, char* argv[])
 {
     try
     {
-        // parse the command line
+        // create a command line parser
         utilities::CommandLineParser commandLineParser(argc, argv);
+
+        // add arguments to the command line parser
         ParsedPrintArguments printArguments;
         commandLineParser.AddOptionSet(printArguments);
         commandLineParser.Parse();
@@ -45,9 +47,9 @@ int main(int argc, char* argv[])
         // print to svg file
         map.Print(outputSvgFStream, printArguments);
     }
-    catch (const utilities::CommandLineParserPrintHelpException& ex)
+    catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
-        std::cout << ex.GetHelpText() << std::endl;
+        std::cout << exception.GetHelpText() << std::endl;
         return 0;
     }
     catch (const utilities::CommandLineParserErrorException& exception)
@@ -59,9 +61,9 @@ int main(int argc, char* argv[])
         }
         return 1;
     }
-    catch (std::runtime_error e)
+    catch (std::runtime_error exception)
     {
-        std::cerr << "runtime error: " << e.what() << std::endl;
+        std::cerr << "runtime error: " << exception.what() << std::endl;
         return 1;
     }
 
