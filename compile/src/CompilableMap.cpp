@@ -26,6 +26,35 @@
 #include <cassert>
 namespace
 {
+    void ConfirmNodeHasVariableName(DataFlowNode& targetNode, layers::Coordinate targetCoordinate, utilities::IntegerStack& stack, std::ostream& os)
+    {
+        // check if temp variable allocation needed
+        if (!targetNode.HasVariableName())
+        {
+            // get next available temp variable index
+            uint64 tempVariableIndex = stack.Pop();
+
+            if (stack.IsTopNovel())
+            {
+                auto msg = "    // allocating temporary variable %i to element (%i,%i)\n    double ";
+                utilities::StringFormat(os, msg, tempVariableIndex, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
+            }
+            else
+            {
+                auto msg = "    // reassigning temporary variable %i to element (%i,%i)\n";
+                utilities::StringFormat(os, msg, tempVariableIndex, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
+            }
+
+            // assign name from int stack
+            targetNode.SetTempVariableIndex(tempVariableIndex);
+        }
+        else
+        {
+            os << "    ";
+        }
+
+    }
+
     void ProcessNode(const layers::Coordinate& currentCoordinate, DataFlowGraph& graph, utilities::IntegerStack& stack, std::ostream& os)
     {
         auto& currentNode = graph.GetNode(currentCoordinate);
@@ -37,34 +66,12 @@ namespace
             // get the next action in the current node
             auto action = currentNode.PopAction();
 
-            // get the target coordinate and node
+            // get the target coordinate and target node
             auto targetCoordinate = action.GetTarget();
             auto& targetNode = graph.GetNode(targetCoordinate);
 
-            // check if temp variable allocation needed
-            if(!targetNode.HasVariableName())
-            {
-                // get next available temp variable index
-                uint64 tempVariableIndex = stack.Pop();
-
-                if(stack.IsTopNovel())
-                {
-                    auto msg = "    // allocating temporary variable %i to element (%i,%i)\n    double ";
-                    utilities::StringFormat(os, msg, tempVariableIndex, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
-                }
-                else
-                {
-                    auto msg = "    // reassigning temporary variable %i to element (%i,%i)\n";
-                    utilities::StringFormat(os, msg, tempVariableIndex, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
-                }
-
-                // assign name from int stack
-                targetNode.SetTempVariableIndex(tempVariableIndex);
-            }
-            else
-            {
-                os << "    ";
-            }
+            // confirm that the target node as a variable name
+            ConfirmNodeHasVariableName(targetNode, targetCoordinate, stack, os);
 
             // print variable name
             os << targetNode.GetVariableName() << ' ';
@@ -90,7 +97,7 @@ namespace
                 stack.Push(currentNode.GetTempVariableIndex());
             }
 
-            // if target node is ready, process it 
+            // if target node has all of its inputs, process it 
             targetNode.DecrementUncomputedInputs();
             if(targetNode.IsWaitingForInputs() == false)
             {
@@ -102,7 +109,7 @@ namespace
 
 void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& os) const
 {
-    // allocate datastructure to hold actions
+    // create data flow graph datastructure
     DataFlowGraph graph;
     for(uint64 layerIndex = 0; layerIndex < NumLayers(); ++layerIndex)
     {
@@ -132,20 +139,21 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
         graph.GetNode(inputCoordinate).EmplaceAction(outputCoordinate);
     }
 
-    // backwards pass to assign actions
+    // backwards pass to assign actions to nodes
     for(uint64 layerIndex = NumLayers() - 1; layerIndex > 0; --layerIndex)
     {
         auto compilableLayer = GetLayer<CompilableLayer>(layerIndex);
         compilableLayer->SetActions(layerIndex, graph);
     }
 
-    // allocate integer stack, to manage temp variable names;
+    // construct an integer stack, to manage temp variable names;
     utilities::IntegerStack stack;
 
     // print function declaration
-    os << "void Predict(const double* input, double* output)\n{\n";
+    auto str = "// Predict function\n// input dimension is %i\n// output dimension is %i\nvoid Predict(const double* input, double* output)\n{\n";
+    utilities::StringFormat(os, str, inputLayerSize, outputLayerSize);
 
-    // forwards pass, to generate code
+    // forwards pass to generate code
     for (uint64 inputElementIndex = 0; inputElementIndex < inputLayerSize; ++inputElementIndex)
     {
         layers::Coordinate inputCoordinate(0, inputElementIndex);
