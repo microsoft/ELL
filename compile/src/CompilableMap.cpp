@@ -149,9 +149,16 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
     // construct an integer stack, to manage temp variable names;
     utilities::IntegerStack stack;
 
-    // print function declaration
-    auto str = "// Predict function\n// input dimension is %i\n// output dimension is %i\nvoid Predict(const double* input, double* output)\n{\n";
+    // print comment
+    auto str = "// Predict function\n// Input dimension: %i\n// Output dimension: %i\n// Output coordinates:";
     utilities::StringFormat(os, str, inputLayerSize, outputLayerSize);
+    for (uint64 i = 0; i < coordinateList.size(); ++i)
+    {
+        os << ' ' << coordinateList[i];
+    }
+
+    // print function declaration
+    os << "\nvoid Predict(const double* input, double* output)\n{\n";
 
     // forwards pass to generate code
     for (uint64 inputElementIndex = 0; inputElementIndex < inputLayerSize; ++inputElementIndex)

@@ -18,6 +18,7 @@
 
 // stl
 #include <vector>
+#include <iostream>
 
 namespace layers
 {
@@ -59,6 +60,14 @@ namespace layers
         uint64 _layerIndex = 0;
         uint64 _elementIndex = 0;
     };
+
+    /// <summary> Prints a Coordinate to a stream. </summary>
+    ///
+    /// <param name="os"> [in,out] Stream to write data to. </param>
+    /// <param name="coordinate"> The coordinate. </param>
+    ///
+    /// <returns> The shifted ostream. </returns>
+    std::ostream& operator<< (std::ostream& os, const Coordinate& coordinate);
 
     typedef std::vector<Coordinate> CoordinateList;
 }

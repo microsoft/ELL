@@ -36,4 +36,10 @@ namespace layers
         serializer.Read("l", _layerIndex);
         serializer.Read("e", _elementIndex);
     }
+
+    std::ostream & operator<<(std::ostream & os, const Coordinate & coordinate)
+    {
+        os << '(' << coordinate.GetLayerIndex() << ',' << coordinate.GetElementIndex() << ')';
+        return os;
+    }
 }

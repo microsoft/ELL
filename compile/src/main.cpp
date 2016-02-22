@@ -57,13 +57,6 @@ int main(int argc, char* argv[])
         // construct coordinate list
         auto coordinateList = common::GetCoordinateList(map, mapLoadArguments.coordinateList);
 
-        for (auto x : coordinateList)
-        {
-            std::cout << "(" << x.GetLayerIndex() << "," << x.GetElementIndex() << ") ";
-        }
-        std::cout << "\n";
-        return 0;
-
         // output code
         map.ToCode(coordinateList, std::cout);
     }
