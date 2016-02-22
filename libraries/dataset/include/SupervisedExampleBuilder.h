@@ -35,7 +35,7 @@ namespace dataset
         SupervisedExample Build(std::shared_ptr<const std::string> spExampleString);
 
     private:
-        void handleErrors(utilities::Parser::Result result, const std::string& str);
+        void HandleErrors(utilities::Parser::Result result, const std::string& str);
 
         VectorEntryParserType _instanceParser;
         bool _hasWeight;

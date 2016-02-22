@@ -63,7 +63,7 @@ namespace layers
         return _layers.size();
     }
 
-    CoordinateList Map::GetCoordinateList(uint64 layerIndex) const
+    CoordinateList Map::GetCoordinateList(uint64 layerIndex) const // TODO remove this
     {
         CoordinateList coordinateList;
         uint64 numColumns = _layers[layerIndex]->Size();

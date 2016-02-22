@@ -13,6 +13,7 @@
 // stl
 #include <cstdlib>
 #include <stdexcept>
+#include <cctype>
 
 namespace utilities
 {
@@ -153,7 +154,7 @@ namespace utilities
 
     void Parser::Trim(const char*& pStr)
     {
-        while (isspace(*pStr))
+        while (std::isspace(*pStr))
         {
             ++pStr;
         }

@@ -71,7 +71,7 @@ namespace common
         map = layers::Map::Load(mapLoadArguments.inputMapFile);
 
         // create list of output coordinates
-        inputCoordinates = GetCoordinateList(map, mapLoadArguments.coordinateListLoadArguments);
+        inputCoordinates = GetCoordinateList(map, mapLoadArguments.coordinateList);
 
         // get data iterator
         return GetDataIterator(dataLoadArguments, map, inputCoordinates);
@@ -110,7 +110,7 @@ namespace common
             map = layers::Map(numColumns);
 
             // create a coordinate list of this map
-            inputCoordinates = GetCoordinateSequence(0, numColumns);
+            inputCoordinates = GetCoordinateList(0, 0, numColumns-1);
         }
         else
         {

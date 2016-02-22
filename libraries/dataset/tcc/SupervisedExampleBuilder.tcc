@@ -34,7 +34,7 @@ namespace dataset
 
             if(result != utilities::Parser::Result::success)
             {
-                handleErrors(result, *spExampleString);
+                HandleErrors(result, *spExampleString);
             }
         }
 
@@ -43,7 +43,7 @@ namespace dataset
 
         if(result != utilities::Parser::Result::success)
         {
-            handleErrors(result, *spExampleString);
+            HandleErrors(result, *spExampleString);
         }
 
         // create index-value iterator from the rest of the std::string
@@ -57,7 +57,7 @@ namespace dataset
     }
 
     template<typename VectorEntryParserType, typename DefaultDataVectorType>
-    void dataset::SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::handleErrors(utilities::Parser::Result result, const std::string & str)
+    void dataset::SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::HandleErrors(utilities::Parser::Result result, const std::string & str)
     {
         if (result == utilities::Parser::Result::badFormat)
         {
