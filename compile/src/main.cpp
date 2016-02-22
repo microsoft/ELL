@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
         auto map = layers::Map::Load<CompilableMap>(mapLoadArguments.inputMapFile);
 
         // construct coordinate list
-        auto coordinateList = common::GetCoordinateList(map, mapLoadArguments.coordinateList);
+        auto coordinateList = layers::GetCoordinateList(map, mapLoadArguments.coordinateList);
 
         // output code
         map.ToCode(coordinateList, std::cout);

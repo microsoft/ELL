@@ -10,16 +10,13 @@
 
 #pragma once
 
-#include "MapLoadArguments.h"
-
-// layers
 #include "Coordinate.h"
 #include "Map.h"
 
 // stl
 #include <string>
 
-namespace common
+namespace layers
 {
     /// <summary>
     /// Gets a coordinate list from a coordinate list definition string. The string has the following format

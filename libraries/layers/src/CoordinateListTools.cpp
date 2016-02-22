@@ -67,7 +67,7 @@ namespace
     }
 }
 
-namespace common
+namespace layers
 {
     layers::CoordinateList GetCoordinateList(const layers::Map& map, const std::string& coordinateListString)
     {

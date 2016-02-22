@@ -110,7 +110,7 @@ namespace common
             map = layers::Map(numColumns);
 
             // create a coordinate list of this map
-            inputCoordinates = GetCoordinateList(0, 0, numColumns-1);
+            inputCoordinates = layers::GetCoordinateList(0, 0, numColumns-1);
         }
         else
         {
