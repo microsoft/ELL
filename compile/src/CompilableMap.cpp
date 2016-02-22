@@ -31,22 +31,19 @@ namespace
         // check if temp variable allocation needed
         if (!targetNode.HasVariableName())
         {
-            // get next available temp variable index
-            uint64 tempVariableIndex = stack.Pop();
-
             if (stack.IsTopNovel())
             {
-                auto msg = "    // allocating temporary variable %i to element (%i,%i)\n    double ";
-                utilities::StringFormat(os, msg, tempVariableIndex, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
+                auto msg = "    // allocating temporary variable for coordinate (%i,%i)\n    double ";
+                utilities::StringFormat(os, msg, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
             }
             else
             {
-                auto msg = "    // reassigning temporary variable %i to element (%i,%i)\n";
-                utilities::StringFormat(os, msg, tempVariableIndex, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
+                auto msg = "    // reassigning temporary variable to coordinate (%i,%i)\n";
+                utilities::StringFormat(os, msg, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
             }
 
             // assign name from int stack
-            targetNode.SetTempVariableIndex(tempVariableIndex);
+            targetNode.SetTempVariableIndex(stack.Pop());
         }
         else
         {
@@ -55,9 +52,8 @@ namespace
 
     }
 
-    void ProcessNode(const layers::Coordinate& currentCoordinate, DataFlowGraph& graph, utilities::IntegerStack& stack, std::ostream& os)
+    void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::IntegerStack& stack, std::ostream& os)
     {
-        auto& currentNode = graph.GetNode(currentCoordinate);
         auto currentNodeVariableName = currentNode.GetVariableName();
 
         // for each action
@@ -101,7 +97,7 @@ namespace
             targetNode.DecrementUncomputedInputs();
             if(targetNode.IsWaitingForInputs() == false)
             {
-                ProcessNode(targetCoordinate, graph, stack, os);
+                ProcessNode(targetNode, graph, stack, os);
             }
         }
     }
@@ -114,14 +110,6 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
     for(uint64 layerIndex = 0; layerIndex < NumLayers(); ++layerIndex)
     {
         graph.AddLayer(_layers[layerIndex]->Size());
-    }
-
-    // set names on input layer
-    uint64 inputLayerSize = _layers[0]->Size();
-    const std::string inputFixedVariableName = "input";
-    for (uint64 elementIndex = 0; elementIndex < inputLayerSize; ++elementIndex)
-    {
-        graph.GetNode(0, elementIndex).SetFixedVariableName(inputFixedVariableName + "[" + std::to_string(elementIndex) + "]");
     }
 
     // add extra layer for outputs
@@ -151,6 +139,7 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
 
     // print comment
     auto str = "// Predict function\n// Input dimension: %i\n// Output dimension: %i\n// Output coordinates:";
+    uint64 inputLayerSize = _layers[0]->Size();
     utilities::StringFormat(os, str, inputLayerSize, outputLayerSize);
     for (uint64 i = 0; i < coordinateList.size(); ++i)
     {
@@ -161,10 +150,37 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
     os << "\nvoid Predict(const double* input, double* output)\n{\n";
 
     // forwards pass to generate code
+    const std::string inputNamePrefix = "input";
     for (uint64 inputElementIndex = 0; inputElementIndex < inputLayerSize; ++inputElementIndex)
     {
         layers::Coordinate inputCoordinate(0, inputElementIndex);
-        ProcessNode(inputCoordinate, graph, stack, os);
+        auto& inputNode = graph.GetNode(inputCoordinate);
+
+        std::string inputVariableName = inputNamePrefix + "[" + std::to_string(inputElementIndex) + "]";
+
+        // if input has multiple actions, first copy it to a temp variable. Otherwise, operate directly on the input array
+        if (inputNode.GetActions().size() <= 1)
+        {
+            inputNode.SetFixedVariableName(inputVariableName);
+        }
+        else
+        {
+            if (stack.IsTopNovel())
+            {
+                auto msg = "    // allocating temporary variable for coordinate (0,%i)\n    double "; // TODO unify this with similar code above
+                utilities::StringFormat(os, msg, inputElementIndex);                                  // TODO put comment after code, not above
+            }
+            else
+            {
+                auto msg = "    // reassigning temporary variable to coordinate (0,%i)\n    ";
+                utilities::StringFormat(os, msg, inputElementIndex);
+            }
+
+            inputNode.SetTempVariableIndex(stack.Pop());
+            os << inputNode.GetVariableName() << " = " << inputVariableName << ";\n";
+        }
+
+        ProcessNode(inputNode, graph, stack, os);
     }
 
     os << "}\n";
