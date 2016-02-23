@@ -10,6 +10,9 @@
 
 #include "DataFlowNode.h"
 
+// stl
+#include <cassert>
+
 void DataFlowNode::SetFixedVariableName(const std::string & name)
 {
     _fixedVariableName = name;
@@ -37,9 +40,9 @@ bool DataFlowNode::HasTempVariableName() const
     }
 }
 
-bool DataFlowNode::HasVariableName() const
+bool DataFlowNode::HasFixedVariableName() const
 {
-    if (_fixedVariableName != "" || _tempVariableIndex >= 0)
+    if (_fixedVariableName != "")
     {
         return true;
     }
@@ -79,6 +82,8 @@ uint64 DataFlowNode::GetTempVariableIndex() const
 
 void DataFlowNode::SetTempVariableIndex(uint64 index)
 {
+    assert(_tempVariableIndex < 0);
+
     _tempVariableIndex = (int)index;
 }
 

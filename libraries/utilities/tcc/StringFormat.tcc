@@ -11,6 +11,7 @@
 // stl
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 namespace utilities
 {
@@ -49,15 +50,19 @@ namespace utilities
             break;
 
         case 'f':
-            os << std::fixed << arg;
+            os.flags(std::ios::fixed);
+            os << arg;
+            os.flags(flags);
             break;
 
         case 'e':
-            os << std::scientific << arg;
+            os.flags(std::ios::scientific);
+            os << arg;
+            os.flags(flags);
             break;
 
         case 's':
-            os << std::defaultfloat << arg;
+            os << arg;
             break;
 
         case '%':
@@ -81,5 +86,11 @@ namespace utilities
         os << cstr;
     }
 
-
+    template<typename ... ArgTypes>
+    std::string StringFormat(const char* cstr, ArgTypes ...args)
+    {
+        std::stringstream ss;
+        StringFormat(ss, cstr, args...);
+        return ss.str();
+    }
 }

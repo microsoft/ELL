@@ -39,9 +39,11 @@ public:
 
     /// <summary> Prints the operation. </summary>
     ///
-    /// <param name="sourceVariableName"> Name of the source variable to which this operation is applied. </param>
-    /// <param name="os"> [in,out] Output stream to write data to. </param>
-    void Print(const std::string& sourceVariableName, std::ostream& os) const;
+    /// <param name="sourceVariableName"> Name of the source variable to which this operation is
+    ///                                   applied. </param>
+    ///
+    /// <returns> A std::string that represents this LinearOperation. </returns>
+    std::string ToString(const std::string& sourceVariableName) const;
 
 private:
     double _a = 0;

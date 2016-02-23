@@ -40,8 +40,8 @@ public:
 
     /// <summary> Query if this object has a variable name. </summary>
     ///
-    /// <returns> true if the node has a variable name. </returns>
-    bool HasVariableName() const;
+    /// <returns> true if the node has a fixed variable name. </returns>
+    bool HasFixedVariableName() const;
 
     /// <summary> Gets the node's variable name. </summary>
     ///

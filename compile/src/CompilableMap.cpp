@@ -24,81 +24,71 @@
 #include <memory>
 #include <stdexcept>
 #include <cassert>
-namespace
+
+const char* assignmentFormat = "    %s = %s; // coordinate (%i,%i)\n";
+const char* incrementFormat = "    %s += %s; // coordinate (%i,%i)\n";
+const char* allocationFormat = "    double %s = %s; // coordinate (%i,%i), allocating new temporary variable\n";
+const char* reallocationFormat = "    %s = %s; // coordinate (%i,%i), reassigning temporary variable\n";
+
+const char* AllocateTempVariableAndGetFormat(DataFlowNode& targetNode, utilities::IntegerStack& stack)
 {
-    void ConfirmNodeHasVariableName(DataFlowNode& targetNode, layers::Coordinate targetCoordinate, utilities::IntegerStack& stack, std::ostream& os)
+    if (targetNode.IsInitialized() == true)
     {
-        // check if temp variable allocation needed
-        if (!targetNode.HasVariableName())
-        {
-            if (stack.IsTopNovel())
-            {
-                auto msg = "    // allocating temporary variable for coordinate (%i,%i)\n    double ";
-                utilities::StringFormat(os, msg, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
-            }
-            else
-            {
-                auto msg = "    // reassigning temporary variable to coordinate (%i,%i)\n";
-                utilities::StringFormat(os, msg, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
-            }
-
-            // assign name from int stack
-            targetNode.SetTempVariableIndex(stack.Pop());
-        }
-        else
-        {
-            os << "    ";
-        }
-
+        return incrementFormat;
     }
 
-    void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::IntegerStack& stack, std::ostream& os)
+    if (targetNode.HasFixedVariableName() == true)
     {
-        auto currentNodeVariableName = currentNode.GetVariableName();
+        return assignmentFormat;
+    }
 
-        // for each action
-        while(currentNode.HasActions())
+    bool isNovel = stack.IsTopNovel();
+    targetNode.SetTempVariableIndex(stack.Pop());
+
+    if (isNovel)
+    {
+        return allocationFormat;
+    }
+    else
+    {
+        return reallocationFormat;
+    }
+}
+
+void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::IntegerStack& stack, std::ostream& os)
+{
+    auto currentNodeVariableName = currentNode.GetVariableName();
+
+    // for each action
+    while(currentNode.HasActions())
+    {
+        // get the next action in the current node
+        auto action = currentNode.PopAction();
+
+        // get the target coordinate and target node
+        auto targetCoordinate = action.GetTarget();
+        auto& targetNode = graph.GetNode(targetCoordinate);
+
+        const char* format = AllocateTempVariableAndGetFormat(targetNode, stack);
+        auto targetVariableName = targetNode.GetVariableName();
+        auto rhs = action.GetOperation().ToString(currentNodeVariableName);
+
+        utilities::StringFormat(os, format, targetVariableName, rhs, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
+
+        // indicate that the target node is initialized
+        targetNode.SetInitialized();
+
+        // check if temp variable can be released
+        if(currentNode.HasActions() == false && currentNode.HasTempVariableName())
         {
-            // get the next action in the current node
-            auto action = currentNode.PopAction();
+            stack.Push(currentNode.GetTempVariableIndex());
+        }
 
-            // get the target coordinate and target node
-            auto targetCoordinate = action.GetTarget();
-            auto& targetNode = graph.GetNode(targetCoordinate);
-
-            // confirm that the target node as a variable name
-            ConfirmNodeHasVariableName(targetNode, targetCoordinate, stack, os);
-
-            // print variable name
-            os << targetNode.GetVariableName() << ' ';
-
-            // print either '=' or '+='
-            if(targetNode.IsInitialized())
-            {
-                os << "+= ";
-            }
-            else
-            {
-                os << "= ";
-                targetNode.SetInitialized();
-            }
-
-            // print the right hand side
-            action.GetOperation().Print(currentNodeVariableName, os);
-            os << ";\n";
-
-            // check if temp variable can be released
-            if(currentNode.HasActions() == false && currentNode.HasTempVariableName())
-            {
-                stack.Push(currentNode.GetTempVariableIndex());
-            }
-
-            // if target node has all of its inputs, process it 
-            targetNode.DecrementUncomputedInputs();
-            if(targetNode.IsWaitingForInputs() == false)
-            {
-                ProcessNode(targetNode, graph, stack, os);
-            }
+        // if target node has all of its inputs, process it 
+        targetNode.DecrementUncomputedInputs();
+        if(targetNode.IsWaitingForInputs() == false)
+        {
+            ProcessNode(targetNode, graph, stack, os);
         }
     }
 }
@@ -165,19 +155,8 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
         }
         else
         {
-            if (stack.IsTopNovel())
-            {
-                auto msg = "    // allocating temporary variable for coordinate (0,%i)\n    double "; // TODO unify this with similar code above
-                utilities::StringFormat(os, msg, inputElementIndex);                                  // TODO put comment after code, not above
-            }
-            else
-            {
-                auto msg = "    // reassigning temporary variable to coordinate (0,%i)\n    ";
-                utilities::StringFormat(os, msg, inputElementIndex);
-            }
-
-            inputNode.SetTempVariableIndex(stack.Pop());
-            os << inputNode.GetVariableName() << " = " << inputVariableName << ";\n";
+            const char* format = AllocateTempVariableAndGetFormat(inputNode, stack);
+            utilities::StringFormat(os, format, inputNode.GetVariableName(), inputVariableName, 0, inputElementIndex);
         }
 
         ProcessNode(inputNode, graph, stack, os);

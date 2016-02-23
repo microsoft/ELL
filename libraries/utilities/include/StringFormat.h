@@ -27,6 +27,9 @@ namespace utilities
     ///
     template<typename ... ArgTypes>
     void StringFormat(std::ostream& os, const char* cstr, ArgTypes ...args);
+
+    template<typename ... ArgTypes>
+    std::string StringFormat(const char* cstr, ArgTypes ...args);
 }
 
 #include "../tcc/StringFormat.tcc"
