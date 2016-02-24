@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     CompilableScale.h (compile)
+//  File:     CompilableCoordinatewise.h (compile)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
@@ -17,12 +17,11 @@
 
 /// A struct that adds printing capabilities to a layer
 ///
-class CompilableScale : public layers::Coordinatewise, public CompilableLayer
+class CompilableCoordinatewise : public layers::Coordinatewise, public CompilableLayer
 {
 public:
 
-    CompilableScale();
-
+    CompilableCoordinatewise(layers::Layer::Type type);
 
     /// <summary> Pushes actions upward in the graph </summary>
     ///

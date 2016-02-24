@@ -1,30 +1,42 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     CompilableShift.cpp (compile)
+//  File:     CompilableCoordinatewise.cpp (compile)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "CompilableShift.h"
+#include "CompilableCoordinatewise.h"
 
-CompilableShift::CompilableShift() : Coordinatewise(layers::Layer::Type::shift)
+CompilableCoordinatewise::CompilableCoordinatewise(layers::Layer::Type type) : Coordinatewise(type)
 {}
 
-void CompilableShift::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const
+void CompilableCoordinatewise::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const 
 {
-    for(uint64 column = 0; column < Size(); ++column)
+    for (uint64 column = 0; column < Size(); ++column)
     {
         auto coordinate = _inputCoordinates[column];
         auto& inputNode = graph.GetNode(coordinate);
         const auto& outputActionList = graph.GetNode(currentLayerIndex, column).GetActions();
 
         //create the linear operation
-        LinearOperation inputOperation(1.0, _values[column]);
+        LinearOperation inputOperation; 
+        if (_type == layers::Layer::Type::scale)
+        {
+            inputOperation = LinearOperation(_values[column], 0.0);
+        }
+        else if (_type == layers::Layer::Type::shift)
+        {
+            inputOperation = LinearOperation(1.0, _values[column]);
+        }
+        else
+        {
+            throw std::runtime_error("unsupported operation");
+        }
 
-        for(const auto& action : outputActionList)
+        for (const auto& action : outputActionList)
         {
             const LinearOperation& outputOperation = action.GetOperation();
             LinearOperation compoundOperation = outputOperation.Compound(inputOperation);

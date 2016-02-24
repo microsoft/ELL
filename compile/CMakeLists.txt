@@ -15,11 +15,10 @@ endif()
 
 set (SRC src/main.cpp
                  src/AddToAction.cpp
+                 src/CompilableCoordinatewise.cpp
                  src/CompilableInput.cpp
                  src/CompilableLayer.cpp
                  src/CompilableMap.cpp
-                 src/CompilableScale.cpp
-                 src/CompilableShift.cpp
                  src/CompilableSum.cpp
                  src/DataFlowGraph.cpp
                  src/DataFlowNode.cpp
@@ -27,11 +26,10 @@ set (SRC src/main.cpp
 
 set (INCLUDE include/AddToAction.h
              include/CompileArguments.h
+             include/CompilableCoordinatewise.h
              include/CompilableInput.h
              include/CompilableLayer.h
              include/CompilableMap.h
-             include/CompilableScale.h
-             include/CompilableShift.h
              include/CompilableSum.h
              include/DataFlowGraph.h
              include/DataFlowNode.h

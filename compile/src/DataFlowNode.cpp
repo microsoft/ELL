@@ -120,11 +120,6 @@ const std::vector<AddToAction>& DataFlowNode::GetActions() const
 {
     return _actions;
 }
-//
-//std::vector<AddToAction>& DataFlowNode::GetActions()
-//{
-//    return _actions;
-//}
 
 bool DataFlowNode::IsWaitingForInputs() const
 {

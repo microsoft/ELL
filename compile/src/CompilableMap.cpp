@@ -10,8 +10,7 @@
 
 #include "CompilableMap.h"
 #include "CompilableInput.h"
-#include "CompilableScale.h"
-#include "CompilableShift.h"
+#include "CompilableCoordinatewise.h"
 #include "CompilableSum.h"
 #include "DataFlowNode.h"
 
@@ -158,7 +157,6 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
             const char* format = AllocateTempVariableAndGetFormat(inputNode, stack);
             utilities::StringFormat(os, format, inputNode.GetVariableName(), inputVariableName, 0, inputElementIndex);
         }
-
         ProcessNode(inputNode, graph, stack, os);
     }
 
@@ -183,13 +181,13 @@ void CompilableMap::DeserializeLayers(utilities::JsonSerializer& serializer, std
     }
     else if (type == "Scale")
     {
-        auto upScale = std::make_shared<CompilableScale>();
+        auto upScale = std::make_shared<CompilableCoordinatewise>(layers::Layer::Type::scale);
         upScale->Deserialize(serializer, version);
         up = upScale;
     }
     else if (type == "Shift")
     {
-        auto upShift = std::make_shared<CompilableShift>();
+        auto upShift = std::make_shared<CompilableCoordinatewise>(layers::Layer::Type::shift);
         upShift->Deserialize(serializer, version);
         up = upShift;
     }

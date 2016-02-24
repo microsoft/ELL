@@ -42,7 +42,7 @@ std::string LinearOperation::ToString(const std::string & sourceVariableName) co
     {
         if (_a != 1)
         {
-            return utilities::StringFormat("%f * %s", _a, sourceVariableName);
+            return utilities::StringFormat("%e * %s", _a, sourceVariableName);
         }
         else
         {
@@ -57,11 +57,11 @@ std::string LinearOperation::ToString(const std::string & sourceVariableName) co
         }
         else if (_a == 1)
         {
-            return utilities::StringFormat("%s + %f", sourceVariableName, _b);
+            return utilities::StringFormat("%s + %e", sourceVariableName, _b);
         }
         else
         {
-            return utilities::StringFormat("%s * %f + %s", _a, sourceVariableName, _b);
+            return utilities::StringFormat("%e * %s + %e", _a, sourceVariableName, _b);
         }
     }
 }
