@@ -23,45 +23,51 @@
 
 namespace dataset
 {
-    /// Implements a sparse binary vector as an increasing list of the coordinates where the value is 1.0
+    /// <summary> Implements a sparse binary vector as an increasing list of the coordinates where the
+    /// value is 1.0. </summary>
     ///
+    /// <typeparam name="tegerListType"> Type of the teger list type. </typeparam>
     template<typename IntegerListType>
     class SparseBinaryDataVectorBase : public IDataVector
     {
     public:
 
-        /// A read-only forward iterator for the sparse binary vector.
-        ///
+        /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
         class Iterator : public IIndexValueIterator
         {
         public:
 
-            /// Default copy ctor
+            /// <summary> Default copy ctor. </summary>
             ///
+            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
-            /// Default move ctor
+            /// <summary> Default move ctor. </summary>
             ///
+            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
-            /// \returns True if the iterator is currently pointing to a valid iterate
+            /// <summary> \returns True if the iterator is currently pointing to a valid iterate. </summary>
             ///
+            /// <returns> true if it succeeds, false if it fails. </returns>
             bool IsValid() const;
 
-            /// Proceeds to the Next iterate
-            ///
+            /// <summary> Proceeds to the Next iterate. </summary>
             void Next();
 
-            /// \returns The current value
+            /// <summary> \returns The current value. </summary>
             ///
+            /// <returns> An IndexValue. </returns>
             IndexValue Get() const;
 
         private:
 
-            // define typename to improve readability
+            /// <summary> define typename to improve readability. </summary>
             using IndexIteratorType = typename IntegerListType::Iterator;
 
-            // private ctor, can only be called from SparseBinaryDataVectorBase class
+            /// <summary> private ctor, can only be called from SparseBinaryDataVectorBase class. </summary>
+            ///
+            /// <param name="list_iterator"> The list iterator. </param>
             Iterator(const typename IntegerListType::Iterator& list_iterator);
             friend SparseBinaryDataVectorBase<IntegerListType>;
 
@@ -69,82 +75,104 @@ namespace dataset
             IndexIteratorType _list_iterator;
         };
 
-        /// Constructs an empty sparse binary vector
-        ///
+        /// <summary> Constructs an empty sparse binary vector. </summary>
         SparseBinaryDataVectorBase();
 
-        /// Converting constructor
+        /// <summary> Converting constructor. </summary>
         ///
+        /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
+        /// <typeparam name="IIndexValueIterator">  Type of the index value iterator. </typeparam>
+        /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
+        /// <param name="IndexValueIterator"> The index value iterator. </param>
         template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         SparseBinaryDataVectorBase(IndexValueIteratorType IndexValueIterator);
 
-        /// Move constructor
+        /// <summary> Move constructor. </summary>
         ///
+        /// <param name="other"> [in,out] The other. </param>
         SparseBinaryDataVectorBase(SparseBinaryDataVectorBase<IntegerListType>&& other) = default;
 
-        /// Deleted copy constructor
+        /// <summary> Deleted copy constructor. </summary>
         ///
+        /// <param name="other"> The other. </param>
         SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = delete;
 
-        /// Sets the element at the given index to 1.0. Calls to this function must have a monotonically increasing argument. 
-        /// The value argument must equal 1.0
+        /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
+        /// monotonically increasing argument. The value argument must equal 1.0. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the. </param>
+        /// <param name="value"> The value. </param>
         virtual void PushBack(uint64 index, double value = 1.0) override;
 
-        /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its memory
-        ///
+        /// <summary> Deletes all of the vector content and sets its Size to zero, but does not deallocate
+        /// its memory. </summary>
         virtual void Reset() override;
 
-        /// \returns The largest index of a non-zero entry plus one
+        /// <summary> \returns The largest index of a non-zero entry plus one. </summary>
         ///
+        /// <returns> An uint64. </returns>
         virtual uint64 Size() const override;
 
-        /// \returns The number of non-zeros
+        /// <summary> \returns The number of non-zeros. </summary>
         ///
+        /// <returns> The total number of nonzeros. </returns>
         virtual uint64 NumNonzeros() const override;
 
-        /// Computes the vector squared 2-norm
+        /// <summary> Computes the vector squared 2-norm. </summary>
         ///
+        /// <returns> A double. </returns>
         virtual double Norm2() const override;
 
-        /// Performs (*p_other) += scalar * (*this), where other a dense vector
+        /// <summary> Performs (*p_other) += scalar * (*this), where other a dense vector. </summary>
         ///
+        /// <param name="p_other"> [in,out] If non-null, the other. </param>
+        /// <param name="scalar">  The scalar. </param>
         virtual void AddTo(double* p_other, double scalar = 1.0) const override;
         using IVector::AddTo;
 
-        /// Computes the Dot product
+        /// <summary> Computes the Dot product. </summary>
         ///
+        /// <param name="p_other"> The other. </param>
+        ///
+        /// <returns> A double. </returns>
         virtual double Dot(const double* p_other) const override;
         using IVector::Dot;
 
-        /// \Returns a Iterator that traverses the non-zero entries of the sparse vector
+        /// <summary> \Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
         ///
+        /// <returns> The iterator. </returns>
         Iterator GetIterator() const;
 
-        /// Prints the datavector to an output stream
+        /// <summary> Prints the datavector to an output stream. </summary>
         ///
+        /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
 
     private:
         IntegerListType _indices;
     };
 
+    /// <summary> A sparse binary data vector. </summary>
     class  SparseBinaryDataVector : public SparseBinaryDataVectorBase<CompressedIntegerList>
     {
     public:
         using SparseBinaryDataVectorBase<CompressedIntegerList>::SparseBinaryDataVectorBase;
 
-        /// \returns The type of the vector
+        /// <summary> \returns The type of the vector. </summary>
         ///
+        /// <returns> The type. </returns>
         virtual type GetType() const override;
     };
 
+    /// <summary> An uncompressed sparse binary data vector. </summary>
     class UncompressedSparseBinaryDataVector : public SparseBinaryDataVectorBase<IntegerList>
     {
     public:
         using SparseBinaryDataVectorBase<IntegerList>::SparseBinaryDataVectorBase;
 
-        /// \returns The type of the vector
+        /// <summary> \returns The type of the vector. </summary>
         ///
+        /// <returns> The type. </returns>
         virtual type GetType() const override;
     };
 }

@@ -19,43 +19,45 @@
 
 namespace dataset
 {
-    /// A non-decreasing list of nonegative integers, with a forward Iterator.
-    ///
+    /// <summary> A non-decreasing list of nonegative integers, with a forward Iterator. </summary>
     class IntegerList
     {
     public:
 
+        /// <summary> Defines an alias representing the vector iterator. </summary>
         typedef std::vector<uint64>::const_iterator vector_iterator;
 
-        /// A read-only forward iterator for the IntegerList.
-        ///
+        /// <summary> A read-only forward iterator for the IntegerList. </summary>
         class Iterator 
         {
         public:
 
-            /// Default copy ctor
+            /// <summary> Default copy ctor. </summary>
             ///
+            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
-            /// Default move ctor
+            /// <summary> Default move ctor. </summary>
             ///
+            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
-            /// \returns True if the iterator is currently pointing to a valid iterate
+            /// <summary> \returns True if the iterator is currently pointing to a valid iterate. </summary>
             ///
+            /// <returns> true if it succeeds, false if it fails. </returns>
             bool IsValid() const;
 
-            /// Proceeds to the Next iterate
-            ///
+            /// <summary> Proceeds to the Next iterate. </summary>
             void Next();
 
-            /// Returns the value of the current iterate
+            /// <summary> Returns the value of the current iterate. </summary>
             ///
+            /// <returns> An uint64. </returns>
             uint64 Get() const;
 
         private:
 
-            /// private ctor, can only be called from IntegerList class
+            // private ctor, can only be called from IntegerList class. 
             Iterator(const vector_iterator& begin, const vector_iterator& end);
             friend class IntegerList;
 
@@ -64,51 +66,58 @@ namespace dataset
             vector_iterator _end;
         };
 
-        /// Default Constructor. Constructs an empty list.
-        ///
+        /// <summary> Default Constructor. Constructs an empty list. </summary>
         IntegerList();
 
-        /// Move Constructor
+        /// <summary> Move Constructor. </summary>
         ///
+        /// <param name="other"> [in,out] The other. </param>
         IntegerList(IntegerList&& other) = default;
 
-        /// Deleted copy constructor
+        /// <summary> Deleted copy constructor. </summary>
         ///
+        /// <param name="parameter1"> The first parameter. </param>
         IntegerList(const IntegerList&) = delete;
 
-        /// Default Destructor.
-        ///
+        /// <summary> Default Destructor. </summary>
         ~IntegerList() = default;
 
-        /// \returns The number of entries in the list
+        /// <summary> Deleted assignment operator. </summary>
         ///
+        /// <param name="parameter1"> The first parameter. </param>
+        void operator= (const IntegerList&) = delete;
+
+        /// <summary> Gets the number of entries in the list. </summary>
+        ///
+        /// <returns> An uint64. </returns>
         uint64 Size() const;
 
-        /// Allocates a specified number of entires to the list
+        /// <summary> Allocates a specified number of entires to the list. </summary>
         ///
+        /// <param name="size"> The size. </param>
         void Reserve(uint64 size);
 
-        /// \returns The maximal integer in the list
+        /// <summary> Gets the maximal integer in the list. </summary>
         ///
+        /// <returns> The maximum value. </returns>
         uint64 Max() const;
 
-        /// Appends an integer to the end of the list.
+        /// <summary> Appends an integer to the end of the list. </summary>
         ///
+        /// <param name="value"> The value. </param>
         void PushBack(uint64 value);
 
-        /// Deletes all of the vector content and sets its Size to zero
-        ///
+        /// <summary> Deletes all of the vector content and sets its Size to zero. </summary>
         void Reset();
 
-        /// \Returns a Iterator that points to the beginning of the list.
+        /// <summary> Gets Iterator that points to the beginning of the list. </summary>
         ///
+        /// <returns> The iterator. </returns>
         Iterator GetIterator() const;
 
-        ///@{
-        void operator= (const IntegerList&) = delete;
-        ///@}
 
     private:
+        // The list
         std::vector<uint64> _list;
     };
 }
