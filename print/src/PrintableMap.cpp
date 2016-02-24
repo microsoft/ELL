@@ -205,13 +205,13 @@ void PrintableMap::DeserializeLayers(utilities::JsonSerializer & serializer, std
     }
     else if (type == "Scale")
     {
-        auto upScale = std::make_shared<PrintableCoordinatewise>(std::multiplies<double>(), layers::Layer::Type::scale);
+        auto upScale = std::make_shared<PrintableCoordinatewise>(layers::Layer::Type::scale);
         upScale->Deserialize(serializer, version);
         up = upScale;
     }
     else if (type == "Shift")
     {
-        auto upCoordinatewise = std::make_shared<PrintableCoordinatewise>(std::plus<double>(), layers::Layer::Type::shift);
+        auto upCoordinatewise = std::make_shared<PrintableCoordinatewise>(layers::Layer::Type::shift);
         upCoordinatewise->Deserialize(serializer, version);
         up = upCoordinatewise;
     }

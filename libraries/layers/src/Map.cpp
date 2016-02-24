@@ -9,8 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Map.h"
-#include "Scale.h"
-#include "Shift.h"
+#include "Coordinatewise.h"
 #include "Input.h"
 #include "Sum.h"
 
@@ -103,11 +102,11 @@ namespace layers
         }
         else if (type == "Scale")
         {
-            up = std::make_shared<Scale>();
+            up = std::make_shared<Coordinatewise>(layers::Layer::Type::scale);
         }
         else if (type == "Shift")
         {
-            up = std::make_shared<Shift>();
+            up = std::make_shared<Coordinatewise>(layers::Layer::Type::shift);
         }
         else if (type == "Sum")
         {

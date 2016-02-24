@@ -22,7 +22,7 @@ struct PrintableCoordinatewise : public layers::Coordinatewise, public Printable
 public:
     /// Ctor
     ///
-    PrintableCoordinatewise(const layers::Coordinatewise::DoubleOperation& operation, layers::Layer::Type type);
+    PrintableCoordinatewise(layers::Layer::Type type);
 
     /// Prints a human-firiendly description of the underlying class to an output stream
     ///

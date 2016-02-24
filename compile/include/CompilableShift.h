@@ -13,13 +13,16 @@
 #include "CompilableLayer.h"
 
 // layers
-#include "Shift.h"
+#include "Coordinatewise.h"
 
 /// A struct that adds printing capabilities to a layer
 ///
-class CompilableShift : public layers::Shift, public CompilableLayer
+class CompilableShift : public layers::Coordinatewise, public CompilableLayer
 {
 public:
+
+    CompilableShift();
+
     /// <summary> Pushes actions upward in the graph </summary>
     ///
     /// <param name="currentLayerIndex"> The index of the current layer. </param>

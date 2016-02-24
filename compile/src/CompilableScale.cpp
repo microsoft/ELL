@@ -10,6 +10,9 @@
 
 #include "CompilableScale.h"
 
+CompilableScale::CompilableScale() : Coordinatewise(layers::Layer::Type::scale) 
+{}
+
 void CompilableScale::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const // TODO move this function to common coordinatewise class
 {
     for(uint64 column = 0; column < Size(); ++column)

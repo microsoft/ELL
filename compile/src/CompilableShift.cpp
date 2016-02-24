@@ -10,6 +10,9 @@
 
 #include "CompilableShift.h"
 
+CompilableShift::CompilableShift() : Coordinatewise(layers::Layer::Type::shift)
+{}
+
 void CompilableShift::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const
 {
     for(uint64 column = 0; column < Size(); ++column)

@@ -13,13 +13,17 @@
 #include "CompilableLayer.h"
 
 // layers
-#include "Scale.h"
+#include "Coordinatewise.h"
 
 /// A struct that adds printing capabilities to a layer
 ///
-class CompilableScale : public layers::Scale, public CompilableLayer
+class CompilableScale : public layers::Coordinatewise, public CompilableLayer
 {
 public:
+
+    CompilableScale();
+
+
     /// <summary> Pushes actions upward in the graph </summary>
     ///
     /// <param name="currentLayerIndex"> The index of the current layer. </param>

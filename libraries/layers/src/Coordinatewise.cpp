@@ -16,30 +16,46 @@
 
 namespace layers
 {
-    Coordinatewise::Coordinatewise(const DoubleOperation& operation, Type type) : Layer(type), _operation(operation)
-    {}
+    Coordinatewise::Coordinatewise(Type type) : Layer(type)
+    {
+        if (type == Type::scale)
+        {
+            _operation = std::multiplies<double>();
+        }
+        else if (type == Type::shift)
+        {
+            _operation = std::plus<double>();
+        }
+        else
+        {
+            throw std::runtime_error("this place in the code should never be reached");
+        }
+    }
 
-    Coordinatewise::Coordinatewise(double value, Coordinate coordinate, const DoubleOperation & operation, Type type) : Layer(type), _values(0), _inputCoordinates(0), _operation(operation)
+    Coordinatewise::Coordinatewise(double value, Coordinate coordinate, Type type) : Coordinatewise(type)
     {
         _values.push_back(value);
         _inputCoordinates.push_back(coordinate);
     }
 
-    Coordinatewise::Coordinatewise(const std::vector<double> & values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type) : Layer(type), _values(values), _inputCoordinates(coordinates), _operation(operation)
-    {}
+    Coordinatewise::Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, Type type) : Coordinatewise(type)
+    {
+        _values = values;
+        _inputCoordinates = coordinates;
+    }
 
     uint64 Coordinatewise::Size() const
     {
         return _inputCoordinates.size();
     }
 
-    void Coordinatewise::Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const // TODO change row -> layer
+    void Coordinatewise::Compute(uint64 layerIndex, std::vector<types::DoubleArray>& outputs) const 
     {
         for(uint64 k=0; k<_values.size(); ++k)
         {
             Coordinate coordinate = _inputCoordinates[k];
             double input = outputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
-            outputs[rowIndex][k] = _operation(_values[k], input);
+            outputs[layerIndex][k] = _operation(_values[k], input);
         }
     }
 

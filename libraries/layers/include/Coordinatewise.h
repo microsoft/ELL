@@ -31,15 +31,15 @@ namespace layers
 
         /// Ctor
         ///
-        Coordinatewise(const DoubleOperation& operation, Type type);
+        Coordinatewise(Type type);
 
         /// Ctor
         ///
-        Coordinatewise(double value, Coordinate coordinate, const DoubleOperation& operation, Type type);
+        Coordinatewise(double value, Coordinate coordinate, Type type);
 
         /// Ctor
         ///
-        Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type);
+        Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, Type type);
 
         /// Default virtual destructor
         ///
@@ -51,7 +51,7 @@ namespace layers
 
         /// Computes the layer output
         ///
-        virtual void Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const override;
+        virtual void Compute(uint64 layerIndex, std::vector<types::DoubleArray>& outputs) const override;
 
         /// \Returns An Iterator to the inputs that the specified output depends on
         ///

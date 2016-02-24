@@ -32,14 +32,6 @@ namespace layers
         ///
         Coordinate(uint64 layerIndex=0, uint64 elementIndex=0);
 
-        /// Copy ctor
-        ///
-        Coordinate(const Coordinate&) = default;
-
-        /// Move ctor
-        ///
-        Coordinate(Coordinate&&) = default;
-
         /// \returns the i index
         ///
         uint64 GetLayerIndex() const;
