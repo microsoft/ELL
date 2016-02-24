@@ -21,23 +21,25 @@
 
 namespace common
 {
-    /// A struct that holds command line parameters for loading maps
-    ///
+    /// <summary> A struct that holds command line parameters for loading maps. </summary>
     struct DataSaveArguments
     {
         std::string outputDataFile = "";
     };
 
-    /// A version of DataSaveArguments that adds its members to the command line parser
-    ///
+    /// <summary> A version of DataSaveArguments that adds its members to the command line parser. </summary>
     struct ParsedDataSaveArguments : public DataSaveArguments, public utilities::ParsedArgSet
     {
-        /// Adds the arguments to the command line parser
+        /// <summary> Adds the arguments to the command line parser. </summary>
         ///
+        /// <param name="parser"> [in,out] The parser. </param>
         virtual void AddArgs(utilities::CommandLineParser& parser);
 
-        /// Check arguments
+        /// <summary> Check arguments. </summary>
         ///
+        /// <param name="parser"> The parser. </param>
+        ///
+        /// <returns> An utilities::ParseResult. </returns>
         virtual utilities::ParseResult PostProcess(const utilities::CommandLineParser& parser);
     };
 }
