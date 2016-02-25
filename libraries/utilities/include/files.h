@@ -16,15 +16,24 @@
 
 namespace utilities
 {
-    /// Opens an std::ifstream and throws an exception if a problem occurs
+    /// <summary> Opens an std::ifstream and throws an exception if a problem occurs. </summary>
     ///
+    /// <param name="filepath"> The filepath. </param>
+    ///
+    /// <returns> The stream. </returns>
     std::ifstream OpenIfstream(std::string filepath);
-    
-    /// Opens an std::ofstream and throws an exception if a problem occurs
+
+    /// <summary> Opens an std::ofstream and throws an exception if a problem occurs. </summary>
     ///
+    /// <param name="filepath"> The filepath. </param>
+    ///
+    /// <returns> The stream. </returns>
     std::ofstream OpenOfstream(std::string filepath);
 
-    /// \returns True if the file exists and can be opened
+    /// <summary> Returns true if the file exists and can be opened. </summary>
     ///
+    /// <param name="filepath"> The filepath. </param>
+    ///
+    /// <returns> true if the fo;e exists and is readable. </returns>
     bool IsFileReadable(std::string filepath);
 }

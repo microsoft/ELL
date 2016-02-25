@@ -40,7 +40,7 @@ namespace dataset
         /// <param name="parser"> The parser. </param>
         ParsingIterator(RowIteratorType&& row_iter, const VectorEntryParserType& parser);
 
-        /// <summary> \returns True if the iterator is currently pointing to a valid iterate. </summary>
+        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if it succeeds, false if it fails. </returns>
         virtual bool IsValid() const;

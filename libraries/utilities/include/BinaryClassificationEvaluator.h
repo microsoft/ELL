@@ -20,7 +20,8 @@ namespace utilities
     {
     public:
 
-        struct Evaluation
+        /// <summary> The result of an evaluation. </summary>
+        struct Evaluation // TODO change to Result?
         {
             double loss = 0;
             double error = 0;
@@ -28,18 +29,30 @@ namespace utilities
         
         BinaryClassificationEvaluator();
 
+        /// <summary> Evaluates a binary classifier </summary>
+        ///
+        /// <typeparam name="ExampleIteratorType"> Type of the example iterator type. </typeparam>
+        /// <typeparam name="PredictorType"> Type of the predictor type. </typeparam>
+        /// <typeparam name="LossFunctionType"> Type of the loss function type. </typeparam>
+        /// <param name="data_iter"> [in,out] The data iterator. </param>
+        /// <param name="predictor"> The predictor. </param>
+        /// <param name="loss_function"> The loss function. </param>
         template<typename ExampleIteratorType, typename PredictorType, typename LossFunctionType>
         void Evaluate(ExampleIteratorType& data_iter, const PredictorType& predictor, const LossFunctionType& loss_function);
 
-        /// \returns The average weighted loss
+        /// <summary> Returns the average weighted loss. </summary>
         ///
+        /// <returns> The last loss. </returns>
         double GetLastLoss() const;
 
-        /// \returns The weighted error rate
+        /// <summary> Returns the weighted error rate. </summary>
         ///
+        /// <returns> The last error. </returns>
         double GetLastError() const;
 
-        /// Prints losses and errors to an std::ostream
+        /// <summary> Prints losses and errors to an std::ostream. </summary>
+        ///
+        /// <param name="os"> [in,out] Stream to write data to. </param>
         void Print(std::ostream& os) const;
 
     private:

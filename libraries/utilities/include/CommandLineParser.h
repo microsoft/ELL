@@ -8,7 +8,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// cjacobs: Next steps to do:
+// cjacobs: Next steps to do: // TODO - chuck, please move this out of the code before we release
 // * Add policy field for options (required, std::set only once, std::set at least once, last wins, collect all, ...)
 // * Add more flexible constraints (using a callback?) for non-enum parameters
 // * have one "master" parser that has subordinate parsers to handle parameters for different modules (e.g., tree learner vs. booster vs. global optimizer)
@@ -31,8 +31,8 @@
 
 namespace utilities
 {
-    /// TODO: document
-    ///
+    // TODO: document
+    //
     struct OptionInfo
     {
         std::string name;
@@ -50,8 +50,8 @@ namespace utilities
         OptionInfo()
         {}
 
-        /// TODO: document
-        ///
+        // TODO: document
+        //
         OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback);
 
         // TODO: either have get_help_string() or print_help() methods for help and current value
@@ -101,72 +101,72 @@ namespace utilities
     {
     public:
     
-        /// Constructor, takes arg list
-        ///
+        // Constructor, takes arg list
+        //
         CommandLineParser(int argc, char* argv[]);
         CommandLineParser(int argc, const char* argv[]);
         
-        /// AddOption adds a new option to the commandline parser
-        ///
+        // AddOption adds a new option to the commandline parser
+        //
         template <typename T, typename U>
         void AddOption(T& option, std::string name, std::string shortName, std::string description, const U& defaultValue);
 
-        /// AddOptionSet adds a ParsedArgSet to the commandline parser
-        ///
+        // AddOptionSet adds a ParsedArgSet to the commandline parser
+        //
         void AddOptionSet(ParsedArgSet& options);
 
-        /// Adds a std::string that gets printed out when pring_usage() is called
-        ///
+        // Adds a std::string that gets printed out when pring_usage() is called
+        //
         virtual void AddDocumentationString(std::string str);
 
-        /// Parses the commandline. Call this after setting up the options with AddOption
-        ///
+        // Parses the commandline. Call this after setting up the options with AddOption
+        //
         void Parse();
 
-        /// TODO: document
-        ///
+        // TODO: document
+        //
         std::string GetHelpString();
 
-        /// TODO: document
-        ///
+        // TODO: document
+        //
         std::string GetCurrentValuesString();
 
         std::string GetCommandLine() const;
 
         std::string GetOptionValue(const std::string& option);
 
-        /// TODO: document
-        ///
+        // TODO: document
+        //
         bool HasOption(std::string option);
 
         bool HasShortName(std::string shortName);
 
-        /// Adds a callback std::function that gets invoked after Parse() is called
+        // Adds a callback std::function that gets invoked after Parse() is called
         using PostParseCallback = std::function<ParseResult(CommandLineParser&)>;
         void AddPostParseCallback(const PostParseCallback& callback);
 
     protected:
 
-        /// TODO: document
-        ///
+        // TODO: document
+        //
         CommandLineParser(const CommandLineParser&) = delete;
 
-        /// TODO: document
-        ///
+        // TODO: document
+        //
         void SetArgs(int argc, const char* argv[]);
 
-        /// TODO: document
-        ///
+        // TODO: document
+        //
         template <typename T>
         static bool ParseVal(std::string str, T& result);
 
-        /// TODO: document
-        ///
+        // TODO: document
+        //
         template <typename T>
         static bool ParseVal(std::string str, std::vector<std::pair<std::string, T>> val_names, T& result, std::string& resultString);
 
-        /// TODO: document
-        ///
+        // TODO: document
+        //
         template <typename T>
         static std::string ToString(const T& val);
 
@@ -192,8 +192,8 @@ namespace utilities
         bool SetDefaultArgs(const std::set<std::string>& unset_args); // returns true if we need to reparse
     };
 
-    /// ParsedArgSet class
-    ///
+    // ParsedArgSet class
+    //
     class ParsedArgSet
     {
     public:
@@ -203,8 +203,8 @@ namespace utilities
         virtual ParseResult PostProcess(const CommandLineParser& parser);
     };
 
-    /// Exceptions thrown by CommandLineParser: 
-    ///
+    // Exceptions thrown by CommandLineParser: 
+    //
     class CommandLineParserException : public std::runtime_error
     {
     public:

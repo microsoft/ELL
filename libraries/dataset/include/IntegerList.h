@@ -42,7 +42,7 @@ namespace dataset
             /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
-            /// <summary> \returns True if the iterator is currently pointing to a valid iterate. </summary>
+            /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if it succeeds, false if it fails. </returns>
             bool IsValid() const;

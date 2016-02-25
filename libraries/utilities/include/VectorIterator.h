@@ -17,38 +17,43 @@
 
 namespace utilities
 {
-    /// A read-only forward iterator for vectors.
-    ///
+    // A read-only forward iterator for vectors.
+    //
     template <typename ValueType>
     class VectorIterator
     {
     public:
 
-        // abbreviate iterator type, for improved readability 
+        /// <summary> abbreviate iterator type, for improved readability. </summary>
         using StlVectorIteratorType = typename std::vector<ValueType>::const_iterator;
 
-        /// Ctor
+        /// <summary> Ctor. </summary>
         ///
+        /// <param name="begin"> The begin. </param>
+        /// <param name="end"> The end. </param>
         VectorIterator(const StlVectorIteratorType& begin, const StlVectorIteratorType& end);
 
-        /// Default copy ctor
+        /// <summary> Default copy ctor. </summary>
         ///
+        /// <param name="parameter1"> The first parameter. </param>
         VectorIterator(const VectorIterator&) = default;
 
-        /// Default move ctor
+        /// <summary> Default move ctor. </summary>
         ///
+        /// <param name="parameter1"> [in,out] The first parameter. </param>
         VectorIterator(VectorIterator&&) = default;
 
-        /// \returns True if the iterator is currently pointing to a valid iterate
+        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
+        /// <returns> True if the iterator is currently pointing to a valid iterate. </returns>
         bool IsValid() const;
 
-        /// Proceeds to the Next iterate
-        ///
+        /// <summary> Proceeds to the Next iterate. </summary>
         void Next();
 
-        /// \returns The current index-value pair
+        /// <summary> Returns the current iterate. </summary>
         ///
+        /// <returns> A ValueType. </returns>
         ValueType Get() const;
 
     protected:

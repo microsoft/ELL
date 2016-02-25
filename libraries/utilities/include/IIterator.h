@@ -24,7 +24,7 @@ namespace utilities
         ///
         virtual ~IIterator() = default;
 
-        /// \returns True if the iterator is currently pointing to a valid iterate
+        /// Returns true if the iterator is currently pointing to a valid iterate
         ///
         virtual bool IsValid() const = 0;
 
@@ -32,7 +32,7 @@ namespace utilities
         ///
         virtual void Next() = 0;
 
-        /// \returns The weight of the current example
+        /// Returns the weight of the current example
         ///
         virtual T Get() = 0;
     };

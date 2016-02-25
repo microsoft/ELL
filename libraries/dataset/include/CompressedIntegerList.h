@@ -40,7 +40,7 @@ namespace dataset
             /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
-            // \returns True if the std::iterator is currently pointing to a valid iterate
+            // Returns true if the std::iterator is currently pointing to a valid iterate
 
             /// <summary> Query if this object input stream valid. </summary>
             ///
