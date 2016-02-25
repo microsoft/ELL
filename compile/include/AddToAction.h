@@ -22,8 +22,7 @@
 #include <string>
 #include <iostream>
 
-/// Encodes the operation: "variable_targetID += a*x + b"
-///
+/// <summary> Encodes the operation: "variable_targetID += a*x + b". </summary>
 class AddToAction
 {
 public:

@@ -18,6 +18,7 @@
 // stl
 #include <string>
 
+/// <summary> Arguments for element layout. </summary>
 struct ElementLayoutArguments
 {
     double width;                       // element width
@@ -29,6 +30,7 @@ struct ElementLayoutArguments
     double dotsWidth;                   // width of the "dots" that represent the hidden elements
 };
 
+/// <summary> Arguments for map layout. </summary>
 struct MapLayoutArguments
 {
     double horizontalMargin;            // space to the left of the first layer
@@ -36,29 +38,34 @@ struct MapLayoutArguments
     double verticalSpacing;             // space between consecutive layers
 };
 
+/// <summary> Arguments for element style. </summary>
 struct ElementStyleArguments
 {
     double cornerRadius;                // radius of the element corners
     double connectorRadius;             // radius of the input/output connectors
 };
 
+/// <summary> Arguments for value element style. </summary>
 struct ValueElementStyleArguments : public ElementStyleArguments
 {
     uint64 maxChars;
 };
 
+/// <summary> Arguments for edge style. </summary>
 struct EdgeStyleArguments
 {
     std::string dashStyle;
     double flattness;
 };
 
+/// <summary> Arguments for layer style. </summary>
 struct LayerStyleArguments
 {
     double maxWidth;                    // maximal layer width
     double cornerRadius;
 };
 
+/// <summary> Arguments for print. </summary>
 struct PrintArguments
 {
     std::string inputMapFile; // TODO use common Arguments
@@ -73,6 +80,7 @@ struct PrintArguments
     EdgeStyleArguments edgeStyle;
 };
 
+/// <summary> Arguments for parsed print. </summary>
 struct ParsedPrintArguments : public PrintArguments, public utilities::ParsedArgSet
 {
     virtual void AddArgs(utilities::CommandLineParser& parser)

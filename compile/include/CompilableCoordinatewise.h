@@ -15,8 +15,7 @@
 // layers
 #include "Coordinatewise.h"
 
-/// A struct that adds printing capabilities to a layer
-///
+/// <summary> A struct that adds printing capabilities to a layer. </summary>
 class CompilableCoordinatewise : public layers::Coordinatewise, public CompilableLayer
 {
 public:

@@ -19,8 +19,7 @@
 #include <vector>
 #include <string>
 
-/// An interface for classes that can print human-friendly descriptions of themselves
-///
+/// <summary> An interface for classes that can print human-friendly descriptions of themselves. </summary>
 class CompilableLayer 
 {
 public:

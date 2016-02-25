@@ -23,18 +23,25 @@
 #include <memory>
 #include <iostream>
 
+/// <summary> A compilable map. </summary>
 class CompilableMap : public layers::Map
 {
 public:
-    /// Generates C code that encodes the map
+
+    /// <summary> Generates C code that encodes the map. </summary>
     ///
+    /// <param name="coordinateList"> List of coordinates. </param>
+    /// <param name="os"> [in,out] Stream to write data to. </param>
     void ToCode(layers::CoordinateList coordinateList, ostream& os) const;
 
-    /// Deserializes the Map in json format
+    /// <summary> Deserializes the Map in json format. </summary>
     ///
+    /// <param name="serializer"> [in,out] The serializer. </param>
     void Deserialize(utilities::JsonSerializer& serializer);
 
-    /// Static function for deserializing shared_ptr<Layer>
+    /// <summary> Static function for deserializing shared_ptr<Layer> </summary>
     ///
+    /// <param name="serializer"> [in,out] The serializer. </param>
+    /// <param name="up"> [in,out] The up. </param>
     static void DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<layers::Layer>& up);
 };

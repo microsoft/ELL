@@ -24,52 +24,76 @@ struct Point
 // stl
 #include <vector>
 
+/// <summary> A layer layout. </summary>
 class LayerLayout
 {
 public:
 
-    /// Ctor
+    /// <summary> Constructs an instance of LayerLayout. </summary>
     ///
+    /// <param name="left"> The left. </param>
+    /// <param name="top"> The top. </param>
+    /// <param name="size"> The size. </param>
+    /// <param name="layerMaxWidth"> Width of the layer maximum. </param>
+    /// <param name="Arguments"> The arguments. </param>
     LayerLayout(double left, double top, uint64 size, double layerMaxWidth, ElementLayoutArguments Arguments);
 
-    /// \returns the layer width
+    /// <summary> Gets the width. </summary>
     ///
+    /// <returns> The width. </returns>
     double GetWidth() const;
 
-    /// \returns the layer height
+    /// <summary> Gets the height. </summary>
     ///
+    /// <returns> The height. </returns>
     double GetHeight() const;
 
-    /// Returns true if the layer is presented in abbreviated form
-    /// 
+    /// <summary> Query if this object has hidden. </summary>
+    ///
+    /// <returns> true if hidden, false if not. </returns>
     bool HasHidden() const;
 
-    /// \returns The number of visible (non-hidden) elements
+    /// <summary> Number visible elements. </summary>
     ///
+    /// <returns> The total number of visible elements. </returns>
     uint64 NumVisibleElements() const;
 
-    /// Returns true if the specified element is hidden
+    /// <summary> Query if 'index' input stream hidden. </summary>
     ///
+    /// <param name="index"> Zero-based index of the. </param>
+    ///
+    /// <returns> true if it succeeds, false if it fails. </returns>
     bool IsHidden(uint64 index) const;
 
-    /// \returns the x-axis value of the middle of the requested element
+    /// <summary> Gets middle y coordinate. </summary>
     ///
+    /// <returns> The middle y coordinate. </returns>
     double GetMidY() const;
 
-    /// \returns the x-axis value of the middle of the requested element
+    /// <summary> Gets middle x coordinate. </summary>
     ///
+    /// <param name="index"> Zero-based index of the. </param>
+    ///
+    /// <returns> The middle x coordinate. </returns>
     double GetMidX(uint64 index) const;
 
-    /// \returns the x-axis value of the middle of the dots
+    /// <summary> Gets dots middle x coordinate. </summary>
     ///
+    /// <returns> The dots middle x coordinate. </returns>
     double GetDotsMidX() const;
 
-    /// Returns the begin-point of an arrow
+    /// <summary> Gets output point. </summary>
     ///
+    /// <param name="index"> Zero-based index of the. </param>
+    ///
+    /// <returns> The output point. </returns>
     Point GetOutputPoint(uint64 index) const;
 
-    /// Returns the end-point of an arrow
+    /// <summary> Gets input point. </summary>
     ///
+    /// <param name="index"> Zero-based index of the. </param>
+    ///
+    /// <returns> The input point. </returns>
     Point GetInputPoint(uint64 index) const;
 
 private:

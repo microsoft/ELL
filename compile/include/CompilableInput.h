@@ -15,8 +15,7 @@
 // layers
 #include "Input.h"
 
-/// A struct that adds printing capabilities to a layer
-///
+/// <summary> A struct that adds printing capabilities to a layer. </summary>
 class CompilableInput : public layers::Input, public CompilableLayer
 {
 public:
