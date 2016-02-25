@@ -119,13 +119,6 @@ namespace layers
         template<typename MapType = Map>
         static MapType Load(const std::string& inputMapFile);
 
-        /// <summary> Returns a list of the coordinates in this layer. </summary>
-        ///
-        /// <param name="layerIndex"> Zero-based index of the layer. </param>
-        ///
-        /// <returns> The coordinate list. </returns>
-        CoordinateList GetCoordinateList(uint64 layerIndex) const;
-
         /// <summary> Serializes the Map in json format. </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>

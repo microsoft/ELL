@@ -117,6 +117,11 @@ namespace layers
         return coordinateList;
     }
 
+    layers::CoordinateList GetCoordinateList(const layers::Map& map, uint64 layerIndex)
+    {
+        return GetCoordinateList(layerIndex, 0, map.GetLayer(layerIndex)->Size()-1);
+    }
+
     layers::CoordinateList GetCoordinateList(uint64 layerIndex, uint64 fromElementIndex, uint64 toElementIndex)
     {
         layers::CoordinateList coordinateList;
