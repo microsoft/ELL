@@ -10,9 +10,10 @@
 
 #pragma once
 
-#include "types.h"
-
 #include "Base.h"
+
+// types
+#include "types.h"
 
 // stl
 #include <vector>

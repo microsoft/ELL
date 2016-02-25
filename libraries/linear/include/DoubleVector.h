@@ -12,6 +12,7 @@
 
 #include "IVector.h"
 
+// types
 #include "types.h"
 #include "RealArray.h"
 

@@ -12,7 +12,6 @@
 
 namespace linear
 {
-
     DoubleVector::DoubleVector(uint64 size) : types::DoubleArray(size)
     {}
 

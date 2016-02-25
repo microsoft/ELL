@@ -10,11 +10,12 @@
 
 #pragma once
 
+// stl
 #include <iostream>
 
 namespace linear
 {
-    /// <summary> Base class for all othre classes in the linear library. </summary>
+    /// <summary> Base class for all other classes in the linear library. </summary>
     class Base
     {
     public:

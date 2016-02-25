@@ -10,7 +10,6 @@
 
 namespace linear
 {
-
     template<typename RowMatrixType>
     const typename BiMatrix<RowMatrixType>::RowType& BiMatrix<RowMatrixType>::GetColumn(uint64 index) const
     {

@@ -26,6 +26,6 @@ include_directories(../linear/include)
 include_directories(../types/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_link_libraries(${PROJ_NAME} linear)
+# target_link_libraries(${PROJ_NAME} linear)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")

@@ -10,17 +10,18 @@
 
 #pragma once
 
+// types
 #include "types.h"
 
 // layers
 #include "Map.h"
 #include "Coordinate.h"
 
-// stl
-#include <memory>
-
 // linear
 #include "DoubleVector.h"
+
+// stl
+#include <memory>
 
 namespace predictors
 {

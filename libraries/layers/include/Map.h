@@ -13,7 +13,7 @@
 #include "Layer.h"
 #include "Coordinate.h"
 
-// common
+// types
 #include "types.h"
 #include "RealArray.h"
 

@@ -13,8 +13,8 @@
 #include "IVector.h"
 #include "DoubleVector.h"
 
+// stl
 #include <functional>
-
 #include <vector>
 
 namespace linear

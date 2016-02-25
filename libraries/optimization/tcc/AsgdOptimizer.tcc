@@ -11,7 +11,6 @@
 // stl
 #include <stdexcept>
 #include <cmath>
-
 #include <cassert>
 
 namespace optimization

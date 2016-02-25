@@ -13,10 +13,9 @@
 #include "RowMatrix.h"
 #include "IMatrix.h"
 
+// stl
 #include <vector>
-
 #include <iostream>
-
 #include <random>
 
 namespace linear
