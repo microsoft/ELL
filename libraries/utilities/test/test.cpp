@@ -32,12 +32,12 @@ void testIteratorAdapter()
     int index = 0;
     while(it.IsValid())
     {
-        testing::processTest("utilities::IteratorAdapter.Get", it.Get() == vec[index]);
+        testing::ProcessTest("utilities::IteratorAdapter.Get", it.Get() == vec[index]);
         it.Next();
         index++;
     }
             
-    testing::processTest("utilities::IteratorAdapter length", index == vec.size());
+    testing::ProcessTest("utilities::IteratorAdapter length", index == vec.size());
 }
 
 float twoPointFiveTimes(int x)
@@ -100,7 +100,7 @@ void testTransformIterator()
     int index = 0;
     while(transIt.IsValid())
     {
-        testing::processTest("utilities::TransformIterator.Get", transIt.Get() == float(2.5*vec[index]));
+        testing::ProcessTest("utilities::TransformIterator.Get", transIt.Get() == float(2.5*vec[index]));
         transIt.Next();
         index++;
     }
@@ -120,7 +120,7 @@ void testParallelTransformIterator()
     int index = 0;
     while(transIt.IsValid())
     {
-        testing::processTest("utilities::ParallelTransformIterator.Get", transIt.Get() == float(2.5*vec[index]));
+        testing::ProcessTest("utilities::ParallelTransformIterator.Get", transIt.Get() == float(2.5*vec[index]));
         transIt.Next();
         index++;
     }
@@ -138,7 +138,7 @@ int main()
     testTransformIterator();
     testParallelTransformIterator();
 
-    if (testing::testFailed())
+    if (testing::DidTestFail())
     {
         return 1;
     }

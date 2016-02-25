@@ -19,7 +19,7 @@
 
 namespace testing
 {
-    bool isEqual(double a, double b, double tolerance)
+    bool IsEqual(double a, double b, double tolerance)
     {
         if (a - b < tolerance && b - a < tolerance)
         {
@@ -31,7 +31,7 @@ namespace testing
         }
     }
 
-    bool isEqual(const std::vector<double>& a, const std::vector<double>& b, double tolerance)
+    bool IsEqual(const std::vector<double>& a, const std::vector<double>& b, double tolerance)
     {
         // allow vectors of different size, provided that they differ by a suffix of zeros
         uint64 size = a.size();
@@ -42,7 +42,7 @@ namespace testing
 
         for (uint64 i = 0; i < size; ++i)
         {
-            if (isEqual(a[i], b[i], tolerance) == false)
+            if (IsEqual(a[i], b[i], tolerance) == false)
             {
                 return false;
             }
@@ -51,7 +51,7 @@ namespace testing
         // confirm suffix of zeros
         for (uint64 i = size; i < a.size(); ++i)
         {
-            if (isEqual(a[i], 0, tolerance) == false)
+            if (IsEqual(a[i], 0, tolerance) == false)
             {
                 return false;
             }
@@ -59,7 +59,7 @@ namespace testing
 
         for (uint64 i = size; i < b.size(); ++i)
         {
-            if (isEqual(b[i], 0, tolerance) == false)
+            if (IsEqual(b[i], 0, tolerance) == false)
             {
                 return false;
             }
@@ -70,7 +70,7 @@ namespace testing
 
     bool testFailedFlag = false;
 
-    void processTest(const std::string& testDescription, bool success)
+    void ProcessTest(const std::string& testDescription, bool success)
     {
         std::cout << testDescription << " ... ";
 
@@ -85,7 +85,7 @@ namespace testing
         }
     }
 
-    bool testFailed()
+    bool DidTestFail()
     {
         return testFailedFlag;
     }
