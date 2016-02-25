@@ -48,7 +48,7 @@ namespace linear
     }
     
     template<typename DataVectorType>
-    uint64_t RowMatrix<DataVectorType>::NumRows() const
+    uint64 RowMatrix<DataVectorType>::NumRows() const
     {
         return _rows.size();
     }
@@ -60,7 +60,7 @@ namespace linear
     }
 
     template<typename DataVectorType>
-    const DataVectorType& RowMatrix<DataVectorType>::GetRow(uint64_t index) const
+    const DataVectorType& RowMatrix<DataVectorType>::GetRow(uint64 index) const
     {
         return _rows[index];
     }
@@ -109,14 +109,14 @@ namespace linear
     }
 
     template<typename DataVectorType>
-    void RowMatrix<DataVectorType>::RandPerm(std::default_random_engine& rng, uint64_t count)
+    void RowMatrix<DataVectorType>::RandPerm(std::default_random_engine& rng, uint64 count)
     {
-        uint64_t max_row = NumRows()-1;
+        uint64 max_row = NumRows()-1;
 
-        for(uint64_t i = 0; i < count; ++i)
+        for(uint64 i = 0; i < count; ++i)
         {
-            std::uniform_int_distribution<uint64_t> dist(i, max_row);
-            uint64_t j = dist(rng);
+            std::uniform_int_distribution<uint64> dist(i, max_row);
+            uint64 j = dist(rng);
             std::swap(_rows[i], _rows[j]);
         }
     }

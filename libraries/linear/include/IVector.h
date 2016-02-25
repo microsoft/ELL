@@ -19,34 +19,51 @@
 
 namespace linear
 {
-    /// Base class for infinite-dimensional vectors of double numbers. Each implementation of this class has a mathematical dimension of
-    /// infinity and includes an explicitly specified prefix followed by an implicit suffix of zeros. 
+    /// <summary>
+    /// Base class for infinite-dimensional vectors of double numbers. Each implementation of this
+    /// class has a mathematical dimension of infinity and includes an explicitly specified prefix
+    /// followed by an implicit suffix of zeros.
+    /// </summary>
     class IVector : public Base
     {
     public:
 
-        /// \returns The Size of the std::vector
+        /// <summary> Returns the Size of the std::vector. </summary>
         ///
+        /// <returns> An uint64. </returns>
         virtual uint64 Size() const =0;
 
-        /// Computes the std::vector squared 2-norm
+        /// <summary> Computes the std::vector squared 2-norm. </summary>
         ///
+        /// <returns> A double. </returns>
         virtual double Norm2() const =0;
 
-        /// Performs other += scalar * (*this), where other is a dense std::vector
+        /// <summary> Performs other += scalar * (*this), where other is a dense std::vector. </summary>
         ///
+        /// <param name="other"> [in,out] The other. </param>
+        /// <param name="scalar"> The scalar. </param>
         void AddTo(std::vector<double>& other, double scalar = 1.0) const;
 
-        /// Performs (*p_other) += scalar * (*this), where other is a dense std::vector
+        /// <summary>
+        /// Performs (*p_other) += scalar * (*this), where other is a dense std::vector.
+        /// </summary>
         ///
+        /// <param name="p_other"> [in,out] If non-null, the other. </param>
+        /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(double* p_other, double scalar = 1.0) const = 0;
 
-        /// Computes the std::vector Dot product
+        /// <summary> Computes the vector Dot product. </summary>
         ///
+        /// <param name="other"> The other. </param>
+        ///
+        /// <returns> A double. </returns>
         double Dot(const std::vector<double>& other) const;
 
-        /// Computes the std::vector Dot product
+        /// <summary> Computes the vector Dot product. </summary>
         ///
+        /// <param name="p_other"> The other. </param>
+        ///
+        /// <returns> A double. </returns>
         virtual double Dot(const double* p_other) const = 0;
     };
 }

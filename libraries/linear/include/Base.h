@@ -14,22 +14,25 @@
 
 namespace linear
 {
-    /// Base class for everything in this library
-    ///
+    /// <summary> Base class for all othre classes in the linear library. </summary>
     class Base
     {
     public:
 
-        /// default virtual destructor
-        ///
+        /// <summary> Destructor. </summary>
         virtual ~Base() = default;
 
-        /// Human readable printout to an output stream
+        /// <summary> Human readable printout to an output stream. </summary>
         ///
+        /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const = 0;
     };
 
-    /// Generic operator<< that calls each class's Print() function
+    /// <summary> Generic operator<< that calls each class's Print() function. </summary>
     ///
+    /// <param name="os"> [in,out] Stream to write data to. </param>
+    /// <param name="v"> The Base to process. </param>
+    ///
+    /// <returns> The stream. </returns>
     std::ostream& operator<<(std::ostream& os, const Base& v);
 }
