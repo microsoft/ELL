@@ -93,7 +93,7 @@ namespace layers
         ///
         /// <param name="layer"> The layer. </param>
         ///
-        /// <returns> The row index of the added layer. </returns>
+        /// <returns> The index of the added layer. </returns>
         uint64 PushBack(std::shared_ptr<Layer> layer);
 
         /// <summary> Returns the number of layers in the map. </summary>

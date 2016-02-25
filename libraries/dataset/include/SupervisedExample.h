@@ -24,7 +24,7 @@
 namespace dataset
 {
     /// <summary> A supervised example. </summary>
-    class SupervisedExample : public IDataVector // TODO - consider making this class not implement IDataVector
+    class SupervisedExample : public IDataVector
     {
     public:
 

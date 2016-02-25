@@ -43,9 +43,9 @@ namespace layers
 
         /// <summary> Computes the output of the layer. </summary>
         ///
-        /// <param name="rowIndex"> Zero-based index of the row. </param>
+        /// <param name="layerIndex"> Zero-based index of the layer. </param>
         /// <param name="outputs"> [in,out] The outputs. </param>
-        virtual void Compute(uint64 rowIndex, vector<types::DoubleArray>& outputs) const override;
+        virtual void Compute(uint64 layerIndex, vector<types::DoubleArray>& outputs) const override;
 
         /// <summary> Returns an Iterator to the inputs that the specified output depends on. </summary>
         ///

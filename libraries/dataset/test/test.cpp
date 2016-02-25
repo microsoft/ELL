@@ -368,12 +368,6 @@ int main()
     iteratorConstructorTest();
     printTest();
 
-    // TODO - test DataVector pushback and NumNonzeros
-    // TODO - test integer list and compressed integer list
-    // TODO - test data vector builder and supervised example builder
-    // TODO - test supervised example
-    // TODO - test parsing iterator, sequential line iterator, and sparse entry parser 
-
     if(testing::testFailed())
     {
         return 1;

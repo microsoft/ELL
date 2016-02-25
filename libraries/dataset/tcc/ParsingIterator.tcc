@@ -33,7 +33,6 @@ namespace dataset
     template<typename RowIteratorType, typename VectorEntryParserType>
     SupervisedExample ParsingIterator<RowIteratorType, VectorEntryParserType>::Get()
     {
-        // TODO - currently, FloatDataVector is hardcoded. Instead, use a MRU strategy
         SupervisedExampleBuilder<VectorEntryParserType, FloatDataVector> exampleBuilder(_instanceParser);
         return exampleBuilder.Build(_rowIterator.Get());
     }

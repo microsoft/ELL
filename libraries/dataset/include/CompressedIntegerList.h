@@ -21,7 +21,7 @@ namespace dataset
 {
     /// <summary> A non-decreasing list of nonegative integers, with a forward Iterator, stored in a
     /// compressed delta enconding. </summary>
-    class CompressedIntegerList // TODO move to utilities
+    class CompressedIntegerList
     {
     public:
 
