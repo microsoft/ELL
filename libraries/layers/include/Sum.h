@@ -23,44 +23,54 @@
 
 namespace layers
 {
+    /// <summary> Implements a layer of sums. </summary>
     class Sum : public Layer
     {
     public:
 
-        /// Ctor - constructs an empty sum
-        ///
+        /// <summary> Default constructor, creates an empty sum </summary>
         Sum();
 
-        /// Ctor - constructs a single sum
+        /// <summary> Constructs a single sum. </summary>
         ///
+        /// <param name="coordinates"> The coordinates. </param>
         Sum(const CoordinateList& coordinates);
 
-        /// Ctor - constructs a multi-dimensional sum
+        /// <summary> Constructs a multi-dimensional sum. </summary>
         ///
+        /// <param name="coordinates"> The coordinates. </param>
         Sum(const  std::vector<CoordinateList>& coordinates);
 
-        /// default virtual destructor
-        ///
+        /// <summary> Destructor. </summary>
         virtual ~Sum() = default;
 
-        /// \returns The size of the layer's output
+        /// <summary> Returns the size of the layer's output. </summary>
         ///
+        /// <returns> An uint64. </returns>
         virtual uint64 Size() const override;
 
-        /// Computes the layer output
+        /// <summary> Computes the layer output. </summary>
         ///
+        /// <param name="rowIndex"> Zero-based index of the row. </param>
+        /// <param name="outputs"> [in,out] The outputs. </param>
         virtual void Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const override;
 
-        /// \Returns An Iterator to the inputs that the specified output depends on
+        /// <summary> Gets an Iterator to the inputs that the specified output depends on. </summary>
         ///
+        /// <param name="index"> Zero-based index of the. </param>
+        ///
+        /// <returns> The input coordinates. </returns>
         virtual utilities::VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;
 
-        /// Serializes the Layer in json format
+        /// <summary> Serializes the Layer in json format. </summary>
         ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Serialize(utilities::JsonSerializer& serializer) const override;
 
-        /// Deserializes the Layer in json format
+        /// <summary> Deserializes the Layer in json format. </summary>
         ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
+        /// <param name="version"> The version. </param>
         virtual void Deserialize(utilities::JsonSerializer& serializer, int version = _currentVersion) override;
 
     protected:

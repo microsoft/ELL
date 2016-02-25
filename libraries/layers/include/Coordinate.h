@@ -22,30 +22,35 @@
 
 namespace layers
 {
-    /// Represents an index value pair
-    ///
+    /// <summary> Represents an index value pair. </summary>
     class Coordinate final
     {
     public:
 
-        /// Ctor
+        /// <summary> Ctor. </summary>
         ///
+        /// <param name="layerIndex"> Zero-based index of the layer. </param>
+        /// <param name="elementIndex"> Zero-based index of the element. </param>
         Coordinate(uint64 layerIndex=0, uint64 elementIndex=0);
 
-        /// \returns the i index
+        /// <summary> \returns the i index. </summary>
         ///
+        /// <returns> The layer index. </returns>
         uint64 GetLayerIndex() const;
 
-        /// \returns the j index
+        /// <summary> \returns the j index. </summary>
         ///
+        /// <returns> The element index. </returns>
         uint64 GetElementIndex() const; 
 
-        /// Serializes an index value pair
+        /// <summary> Serializes an index value pair. </summary>
         ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
         void Serialize(utilities::JsonSerializer& serializer) const;
 
-        /// Deserializes an index value pair
+        /// <summary> Deserializes an index value pair. </summary>
         ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
         void Deserialize(utilities::JsonSerializer& serializer);
 
     private:
