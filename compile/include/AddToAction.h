@@ -15,6 +15,9 @@
 // types
 #include "types.h"
 
+// layers
+#include "Coordinate.h"
+
 // stl
 #include <string>
 #include <iostream>
@@ -24,36 +27,34 @@
 class AddToAction
 {
 public:
-    ///
-    ///
-    AddToAction(std::string targetVariableName);
 
+    /// <summary> Constructs an instance of AddToAction. </summary>
     ///
-    ///
-    AddToAction(const LinearOperation& operation, std::string targetVariableName);
+    /// <param name="targetCoordinate"> The action's target coordinate. </param>
+    AddToAction(layers::Coordinate targetCoordinate);
 
-    /// \returns The operation that is applied to the input variable, before it is added to the target variable
+    /// <summary> Constructs an instance of AddToAction. </summary>
     ///
+    /// <param name="operation"> The action's operation. </param>
+    /// <param name="targetCoordinate"> The actions target coordinate. </param>
+    AddToAction(const LinearOperation& operation, layers::Coordinate targetCoordinate);
+
+    /// <summary> Gets the action's operation. </summary>
+    ///
+    /// <returns> The operation. </returns>
     const LinearOperation& GetOperation() const;
 
+    /// <summary> Gets the action's target coordinate. </summary>
     ///
-    ///
-    const std::string& GetTargetVariableName() const;
+    /// <returns> The target coordinate. </returns>
+    const layers::Coordinate& GetTarget() const;
 
+    /// <summary> Query if this action is a null action (a null action does not change its target). </summary>
     ///
-    ///
-    void SetInputCoordinates(std::string inputVariableName);
-
-    /// \returns True if the action is not a null operations, namely, if it actually modifies the target in some way
-    ///
+    /// <returns> true if the action is a null action. </returns>
     bool IsNull() const;
-
-    ///
-    ///
-    void Print(std::ostream& os) const;
 
 private:
     LinearOperation _operation;
-    std::string _inputVariableName = "";
-    std::string _targetVariableName = "";
+    layers::Coordinate _targetCoordinate;
 };

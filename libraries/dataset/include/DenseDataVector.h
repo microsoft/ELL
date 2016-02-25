@@ -24,8 +24,9 @@
 
 namespace dataset
 {
-    /// DenseDataVector Base class
+    /// <summary> DenseDataVector Base class. </summary>
     ///
+    /// <typeparam name="ValueType"> Type of the value type. </typeparam>
     template<typename ValueType>
     class DenseDataVector : public IDataVector
     {
@@ -33,59 +34,76 @@ namespace dataset
 
         using Iterator = typename types::RealArray<ValueType>::Iterator;
 
-        /// Constructor
-        ///
+        /// <summary> Constructor. </summary>
         DenseDataVector();
 
-        /// Converting constructor
-        ///
+        // Converting constructor
+        //
         template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+
+        /// <summary> Constructs an instance of DenseDataVector. </summary>
+        ///
+        /// <param name="IndexValueIterator"> The index value iterator. </param>
         DenseDataVector(IndexValueIteratorType IndexValueIterator);
 
-        /// Move constructor
+        /// <summary> Move constructor. </summary>
         ///
+        /// <param name="other"> [in,out] The other. </param>
         DenseDataVector(DenseDataVector&& other) = default;
 
-        /// Deleted copy constructor
+        /// <summary> Deleted copy constructor. </summary>
         ///
+        /// <param name="parameter1"> The first parameter. </param>
         DenseDataVector(const DenseDataVector&) = delete;
 
-        /// Sets an entry in the std::vector
+        /// <summary> Sets an entry in the std::vector. </summary>
         ///
+        /// <param name="index"> Zero-based index of the. </param>
+        /// <param name="value"> The value. </param>
         virtual void PushBack(uint64 index, double value = 1.0) override;
 
-        /// Deletes all of the std::vector content and sets its Size to zero, but does not deallocate its memory
-        ///
+        /// <summary> Deletes all of the std::vector content and sets its Size to zero, but does not
+        /// deallocate its memory. </summary>
         virtual void Reset() override;
 
-        /// \returns The largest index of a non-zero entry plus one
+        /// <summary> \returns The largest index of a non-zero entry plus one. </summary>
         ///
+        /// <returns> An uint64. </returns>
         virtual uint64 Size() const override;
 
-        /// \returns The number of non-zeros
+        /// <summary> \returns The number of non-zeros. </summary>
         ///
+        /// <returns> The total number of nonzeros. </returns>
         virtual uint64 NumNonzeros() const override;
 
-        /// Computes the std::vector squared 2-norm
+        /// <summary> Computes the std::vector squared 2-norm. </summary>
         ///
+        /// <returns> A double. </returns>
         virtual double Norm2() const override;
 
-        /// Performs (*p_other) += scalar * (*this), where other is a dense std::vector
+        /// <summary> Performs (*p_other) += scalar * (*this), where other is a dense std::vector. </summary>
         ///
+        /// <param name="p_other"> [in,out] If non-null, the other. </param>
+        /// <param name="scalar">  The scalar. </param>
         virtual void AddTo(double* p_other, double scalar = 1.0) const override;
         using IVector::AddTo;
 
-        /// Computes the Dot product
+        /// <summary> Computes the Dot product. </summary>
         ///
+        /// <param name="p_other"> The other. </param>
+        ///
+        /// <returns> A double. </returns>
         virtual double Dot(const double* p_other) const override;
         using IVector::Dot;
 
-        /// \Returns An Iterator that points to the beginning of the std::vector.
+        /// <summary> \Returns An Iterator that points to the beginning of the std::vector. </summary>
         ///
+        /// <returns> The iterator. </returns>
         Iterator GetIterator() const;
 
-        /// Prints the datavector to an output stream
+        /// <summary> Prints the datavector to an output stream. </summary>
         ///
+        /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
 
     private:
@@ -93,27 +111,29 @@ namespace dataset
         types::RealArray<ValueType> _data;
     };
 
+    /// <summary> A float data vector. </summary>
     class FloatDataVector : public DenseDataVector<float> 
     {
     public:
         using DenseDataVector<float>::DenseDataVector;
 
-        /// \returns The type of the std::vector
+        /// <summary> \returns The type of the std::vector. </summary>
         ///
+        /// <returns> The type. </returns>
         virtual type GetType() const override;
     };
 
+    /// <summary> A double data vector. </summary>
     class DoubleDataVector : public DenseDataVector<double>
     {
     public:
         using DenseDataVector<double>::DenseDataVector;
 
-        /// \returns The type of the std::vector
+        /// <summary> \returns The type of the std::vector. </summary>
         ///
+        /// <returns> The type. </returns>
         virtual type GetType() const override;
     };
 }
 
 #include "../tcc/DenseDataVector.tcc"
-
-

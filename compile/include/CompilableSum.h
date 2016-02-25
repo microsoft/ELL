@@ -17,8 +17,12 @@
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct CompilableSum : public layers::Sum, public CompilableLayer
+class CompilableSum : public layers::Sum, public CompilableLayer
 {
 public:
-    virtual void BackwardPass(uint64 currentLayerIndex, vector<vector<vector<AddToAction>>>& actions) const override;
+    /// <summary> Pushes actions upward in the graph </summary>
+    ///
+    /// <param name="currentLayerIndex"> The index of the current layer. </param>
+    /// <param name="graph"> [in,out] The data flow graph. </param>
+    virtual void SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const override;
 };

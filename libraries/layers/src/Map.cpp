@@ -9,8 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Map.h"
-#include "Scale.h"
-#include "Shift.h"
+#include "Coordinatewise.h"
 #include "Input.h"
 #include "Sum.h"
 
@@ -35,8 +34,8 @@ namespace layers
     IndexValue Map::Iterator::Get() const
     {
         auto coordinate = _outputCoordinates[_index];
-        uint64 row = coordinate.GetRow();
-        uint64 column = coordinate.GetColumn();
+        uint64 row = coordinate.GetLayerIndex();
+        uint64 column = coordinate.GetElementIndex();
         return IndexValue{ _index, (*_spOutputs)[row][column] };
     }
 
@@ -63,7 +62,7 @@ namespace layers
         return _layers.size();
     }
 
-    CoordinateList Map::GetCoordinateList(uint64 layerIndex) const
+    CoordinateList Map::GetCoordinateList(uint64 layerIndex) const // TODO remove this
     {
         CoordinateList coordinateList;
         uint64 numColumns = _layers[layerIndex]->Size();
@@ -103,11 +102,11 @@ namespace layers
         }
         else if (type == "Scale")
         {
-            up = std::make_shared<Scale>();
+            up = std::make_shared<Coordinatewise>(layers::Layer::Type::scale);
         }
         else if (type == "Shift")
         {
-            up = std::make_shared<Shift>();
+            up = std::make_shared<Coordinatewise>(layers::Layer::Type::shift);
         }
         else if (type == "Sum")
         {

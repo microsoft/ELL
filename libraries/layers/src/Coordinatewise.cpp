@@ -16,36 +16,52 @@
 
 namespace layers
 {
-    Coordinatewise::Coordinatewise(const DoubleOperation& operation, Type type) : Layer(type), _operation(operation)
-    {}
-
-    Coordinatewise::Coordinatewise(double value, Coordinate coordinate, const DoubleOperation & operation, Type type) : Layer(type), _values(0), _coordinates(0), _operation(operation)
+    Coordinatewise::Coordinatewise(Type type) : Layer(type)
     {
-        _values.push_back(value);
-        _coordinates.push_back(coordinate);
+        if (type == Type::scale)
+        {
+            _operation = std::multiplies<double>();
+        }
+        else if (type == Type::shift)
+        {
+            _operation = std::plus<double>();
+        }
+        else
+        {
+            throw std::runtime_error("this place in the code should never be reached");
+        }
     }
 
-    Coordinatewise::Coordinatewise(const std::vector<double> & values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type) : Layer(type), _values(values), _coordinates(coordinates), _operation(operation)
-    {}
+    Coordinatewise::Coordinatewise(double value, Coordinate coordinate, Type type) : Coordinatewise(type)
+    {
+        _values.push_back(value);
+        _inputCoordinates.push_back(coordinate);
+    }
+
+    Coordinatewise::Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, Type type) : Coordinatewise(type)
+    {
+        _values = values;
+        _inputCoordinates = coordinates;
+    }
 
     uint64 Coordinatewise::Size() const
     {
-        return _coordinates.size();
+        return _inputCoordinates.size();
     }
 
-    void Coordinatewise::Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const
+    void Coordinatewise::Compute(uint64 layerIndex, std::vector<types::DoubleArray>& outputs) const 
     {
         for(uint64 k=0; k<_values.size(); ++k)
         {
-            Coordinate coordinate = _coordinates[k];
-            double input = outputs[coordinate.GetRow()][coordinate.GetColumn()];
-            outputs[rowIndex][k] = _operation(_values[k], input);
+            Coordinate coordinate = _inputCoordinates[k];
+            double input = outputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
+            outputs[layerIndex][k] = _operation(_values[k], input);
         }
     }
 
     utilities::VectorIterator<Coordinate> Coordinatewise::GetInputCoordinates(uint64 index) const
     {
-        return utilities::VectorIterator<Coordinate>(_coordinates.cbegin()+index, _coordinates.cbegin()+index+1);
+        return utilities::VectorIterator<Coordinate>(_inputCoordinates.cbegin()+index, _inputCoordinates.cbegin()+index+1);
     }
 
     void Coordinatewise::Serialize(utilities::JsonSerializer& serializer) const
@@ -53,7 +69,7 @@ namespace layers
         // version 1
         Layer::SerializeHeader(serializer, 1);
         serializer.Write("values", _values);
-        serializer.Write("coordinates", _coordinates);
+        serializer.Write("coordinates", _inputCoordinates);
     }
 
     void Coordinatewise::Deserialize(utilities::JsonSerializer& serializer, int version)
@@ -61,7 +77,7 @@ namespace layers
         if(version == 1)
         {
             serializer.Read("values", _values);
-            serializer.Read("coordinates", _coordinates);
+            serializer.Read("coordinates", _inputCoordinates);
         }
         else
         {

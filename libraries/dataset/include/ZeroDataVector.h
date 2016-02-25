@@ -17,100 +17,116 @@
 
 namespace dataset
 {
-    /// ZeroDataVector Base class
-    ///
+    /// <summary> ZeroDataVector Base class. </summary>
     class ZeroDataVector : public IDataVector
     {
     public:
 
-        /// A read-only forward iterator for the sparse binary vector.
-        ///
+        /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
         class Iterator : public IIndexValueIterator
         {
         public:
 
-            /// Default copy ctor
+            /// <summary> Default copy ctor. </summary>
             ///
+            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
-            /// Default move ctor
+            /// <summary> Default move ctor. </summary>
             ///
+            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
-            /// \returns True if the iterator is currently pointing to a valid iterate
+            /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
+            /// <returns> true if it succeeds, false if it fails. </returns>
             bool IsValid() const;
 
-            /// Proceeds to the Next iterate
-            ///
+            /// <summary> Proceeds to the Next iterate. </summary>
             void Next();
 
-            /// \returns The current index-value pair
+            /// <summary> \returns The current index-value pair. </summary>
             ///
+            /// <returns> An IndexValue. </returns>
             IndexValue Get() const;
 
         private:
-            /// private ctor, can only be called from SparseDataVector class
+            // private ctor, can only be called from SparseDataVector class
             Iterator() = default;
             friend ZeroDataVector;
         };
 
-        /// Constructor
-        ///
+        /// <summary> Default constructor. </summary>
         ZeroDataVector() = default;
 
-        /// Converting constructor
+        /// <summary> Converting constructor. </summary>
         ///
+        /// <param name="other"> The other. </param>
         explicit ZeroDataVector(const IDataVector& other);
 
-        /// Move constructor
+        /// <summary> Move constructor. </summary>
         ///
+        /// <param name="other"> [in,out] The other. </param>
         ZeroDataVector(ZeroDataVector&& other) = default;
 
-        /// Deleted copy constructor
+        /// <summary> Deleted copy constructor. </summary>
         ///
+        /// <param name="parameter1"> The first parameter. </param>
         ZeroDataVector(const ZeroDataVector&) = delete;
 
-        /// \returns The type of the vector
+        /// <summary> \returns The type of the vector. </summary>
         ///
+        /// <returns> The type. </returns>
         virtual type GetType() const override;
 
-        /// Sets an entry in the vector
+        /// <summary> Sets an entry in the vector. </summary>
         ///
+        /// <param name="index"> Zero-based index of the. </param>
+        /// <param name="value"> The value. </param>
         virtual void PushBack(uint64 index, double value = 1.0) override;
 
-        /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its memory
-        ///
+        /// <summary> Deletes all of the vector content and sets its Size to zero, but does not deallocate
+        /// its memory. </summary>
         virtual void Reset() override;
 
-        /// \returns The largest index of a non-zero entry plus one
+        /// <summary> \returns The largest index of a non-zero entry plus one. </summary>
         ///
+        /// <returns> An uint64. </returns>
         virtual uint64 Size() const override;
 
-        /// \returns The number of non-zeros
+        /// <summary> \returns The number of non-zeros. </summary>
         ///
+        /// <returns> The total number of nonzeros. </returns>
         virtual uint64 NumNonzeros() const override;
 
-        /// Computes the vector squared 2-norm
+        /// <summary> Computes the vector squared 2-norm. </summary>
         ///
+        /// <returns> A double. </returns>
         virtual double Norm2() const override;
 
-        /// Performs (*p_other) += scalar * (*this), where other is a dense vector
+        /// <summary> Performs (*p_other) += scalar * (*this), where other is a dense vector. </summary>
         ///
+        /// <param name="p_other"> [in,out] If non-null, the other. </param>
+        /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(double* p_other, double scalar = 1.0) const override;
         using IVector::AddTo;
 
-        /// Computes the Dot product
+        /// <summary> Computes the Dot product. </summary>
         ///
+        /// <param name="p_other"> The other. </param>
+        ///
+        /// <returns> A double. </returns>
         virtual double Dot(const double* p_other) const override;
         using IVector::Dot;
 
-        /// \Returns a Iterator that points to the beginning of the datavector.
+        /// <summary> \Returns a Iterator that points to the beginning of the datavector. </summary>
         ///
+        /// <returns> The iterator. </returns>
         Iterator GetIterator() const;
 
-        /// Prints the datavector to an output stream
+        /// <summary> Prints the datavector to an output stream. </summary>
         ///
+        /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
     };
 }

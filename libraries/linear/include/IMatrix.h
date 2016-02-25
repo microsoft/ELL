@@ -18,34 +18,55 @@
 
 namespace linear
 {
-    /// Base class for matrices of double numbers
-    ///
+    /// <summary> Base class for matrices of double numbers. </summary>
     class IMatrix : public Base
     {
     public:
 
-        /// \returns The number of rows in the matrix
+        /// <summary> Returns the number of rows in the matrix. </summary>
         ///
+        /// <returns> The total number of rows. </returns>
         virtual uint64 NumRows() const = 0;
 
-        /// \returns The number of columns in the matrix
+        /// <summary> Returns the number of columns in the matrix. </summary>
         ///
+        /// <returns> The total number of columns. </returns>
         virtual uint64 NumColumns() const = 0;
 
-        /// Performs a general matrix std::vector product: y = alpha * M * x + beta * y
+        /// <summary>
+        /// Performs a general matrix-vector product: y = alpha * M * x + beta * y.
+        /// </summary>
         ///
+        /// <param name="x"> The x vector. </param>
+        /// <param name="y"> [in,out] The y vector. </param>
+        /// <param name="alpha"> The alpha. </param>
+        /// <param name="beta"> The beta. </param>
         void Gemv(const std::vector<double>& x, std::vector<double>& y, double alpha = 1.0, double beta = 0.0) const;
 
-        /// Performs a general matrix std::vector product: y = alpha * M * x + beta * y
+        /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>
         ///
+        /// <param name="p_x"> The x vector. </param>
+        /// <param name="p_y"> [in,out] The y vector. </param>
+        /// <param name="alpha"> The alpha. </param>
+        /// <param name="beta"> The beta. </param>
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const =0;
 
-        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y
+        /// <summary> Performs a general vector-matrix product: y = alpha * x * M + beta * y. </summary>
         ///
+        /// <param name="x"> The x vector. </param>
+        /// <param name="y"> [in,out] The y vector. </param>
+        /// <param name="alpha"> The alpha. </param>
+        /// <param name="beta"> The beta. </param>
         void Gevm(const std::vector<double>& x, std::vector<double>& y, double alpha = 1.0, double beta = 0.0) const;
 
-        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y
+        /// <summary>
+        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y.
+        /// </summary>
         ///
+        /// <param name="p_x"> The x vector. </param>
+        /// <param name="p_y"> [in,out] The y vector. </param>
+        /// <param name="alpha"> The alpha. </param>
+        /// <param name="beta"> The beta. </param>
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const =0;
     };
 }

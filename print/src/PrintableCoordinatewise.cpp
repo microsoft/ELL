@@ -11,7 +11,7 @@
 #include "PrintableCoordinatewise.h"
 #include "SvgHelpers.h"
 
-PrintableCoordinatewise::PrintableCoordinatewise(const Coordinatewise::DoubleOperation& operation, Layer::Type type) : Coordinatewise(operation, type)
+PrintableCoordinatewise::PrintableCoordinatewise(layers::Layer::Type type) : Coordinatewise(type)
 {}
 
 LayerLayout PrintableCoordinatewise::Print(ostream & os, double left, double top, uint64 layerIndex, const PrintArguments & Arguments) const

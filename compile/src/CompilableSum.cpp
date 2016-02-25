@@ -10,26 +10,28 @@
 
 #include "CompilableSum.h"
 
-void CompilableSum::BackwardPass(uint64 currentLayerIndex, vector<vector<vector<AddToAction>>>& actions) const
+void CompilableSum::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const
 {
-    for(uint64 column = 0; column < Size(); ++column)
+    for(uint64 elementIndex = 0; elementIndex < Size(); ++elementIndex)
     {
-        const auto& outputActionList = actions[currentLayerIndex][column];
+        layers::Coordinate thisCoordinate(currentLayerIndex, elementIndex);
+
+        auto& thisNode = graph.GetNode(currentLayerIndex, elementIndex);
 
         // skip empty action lists
-        if(outputActionList.size() == 0)
+        if(thisNode.HasActions() == false)
         {
             continue;
         }
 
-        // create new variable in the code
-        auto targetName = GetNextTempVariableName();
-
-        for(uint64 i = 0; i < _coordinates[column].size(); ++i)
+        for(uint64 i = 0; i < _inputCoordinates[elementIndex].size(); ++i)
         {
-            auto coordinate = _coordinates[column][i];
-            auto& inputActionList = actions[coordinate.GetRow()][coordinate.GetColumn()];
-            inputActionList.emplace_back(targetName);
+            auto inputCoordinate = _inputCoordinates[elementIndex][i];
+            auto& inputNode = graph.GetNode(inputCoordinate);
+            inputNode.EmplaceAction(thisCoordinate);
+            
+            // increment the input counter
+            thisNode.IncrementUncomputedInputs();
         }
     }
 }

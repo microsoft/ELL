@@ -12,11 +12,17 @@
 
 #include "CompilableLayer.h"
 
+// layers
 #include "Input.h"
 
 /// A struct that adds printing capabilities to a layer
 ///
-struct CompilableInput : public layers::Input, public CompilableLayer
+class CompilableInput : public layers::Input, public CompilableLayer
 {
-    virtual void BackwardPass(uint64 currentLayerIndex, vector<vector<vector<AddToAction>>>& actions) const override;
+public:
+    /// <summary> Pushes actions upward in the graph </summary>
+    ///
+    /// <param name="currentLayerIndex"> The index of the current layer. </param>
+    /// <param name="graph"> [in,out] The data flow graph. </param>
+    virtual void SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const override;
 };

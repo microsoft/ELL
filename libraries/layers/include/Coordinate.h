@@ -18,47 +18,53 @@
 
 // stl
 #include <vector>
+#include <iostream>
 
 namespace layers
 {
-    /// Represents an index value pair
-    ///
+    /// <summary> Represents an index value pair. </summary>
     class Coordinate final
     {
     public:
 
-        /// Ctor
+        /// <summary> Ctor. </summary>
         ///
-        Coordinate(uint64 row=0, uint64 column=0);
+        /// <param name="layerIndex"> Zero-based index of the layer. </param>
+        /// <param name="elementIndex"> Zero-based index of the element. </param>
+        Coordinate(uint64 layerIndex=0, uint64 elementIndex=0);
 
-        /// Copy ctor
+        /// <summary> \returns the i index. </summary>
         ///
-        Coordinate(const Coordinate&) = default;
+        /// <returns> The layer index. </returns>
+        uint64 GetLayerIndex() const;
 
-        /// Move ctor
+        /// <summary> \returns the j index. </summary>
         ///
-        Coordinate(Coordinate&&) = default;
+        /// <returns> The element index. </returns>
+        uint64 GetElementIndex() const; 
 
-        /// \returns the i index
+        /// <summary> Serializes an index value pair. </summary>
         ///
-        uint64 GetRow() const;
-
-        /// \returns the j index
-        ///
-        uint64 GetColumn() const; 
-
-        /// Serializes an index value pair
-        ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
         void Serialize(utilities::JsonSerializer& serializer) const;
 
-        /// Deserializes an index value pair
+        /// <summary> Deserializes an index value pair. </summary>
         ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
         void Deserialize(utilities::JsonSerializer& serializer);
 
     private:
-        uint64 _row = 0;
-        uint64 _column = 0;
+        uint64 _layerIndex = 0;
+        uint64 _elementIndex = 0;
     };
 
-    using  CoordinateList = std::vector<Coordinate>;
+    /// <summary> Prints a Coordinate to a stream. </summary>
+    ///
+    /// <param name="os"> [in,out] Stream to write data to. </param>
+    /// <param name="coordinate"> The coordinate. </param>
+    ///
+    /// <returns> The shifted ostream. </returns>
+    std::ostream& operator<< (std::ostream& os, const Coordinate& coordinate);
+
+    typedef std::vector<Coordinate> CoordinateList;
 }

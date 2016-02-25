@@ -19,41 +19,45 @@
 
 namespace dataset
 {
-    /// A non-decreasing list of nonegative integers, with a forward Iterator, stored in a compressed delta enconding.
-    ///
+    /// <summary> A non-decreasing list of nonegative integers, with a forward Iterator, stored in a
+    /// compressed delta enconding. </summary>
     class CompressedIntegerList // TODO move to utilities
     {
     public:
 
-        /// A read-only forward std::iterator for the CompressedIntegerList.
-        ///
+        /// <summary> A read-only forward std::iterator for the CompressedIntegerList. </summary>
         class Iterator
         {
         public:
 
-            /// Default copy ctor
+            /// <summary> Default copy ctor. </summary>
             ///
+            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
-            /// Default move ctor
+            /// <summary> Default move ctor. </summary>
             ///
+            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
-            /// \returns True if the std::iterator is currently pointing to a valid iterate
+            // Returns true if the std::iterator is currently pointing to a valid iterate
+
+            /// <summary> Query if this object input stream valid. </summary>
             ///
+            /// <returns> true if it succeeds, false if it fails. </returns>
             bool IsValid() const;
 
-            /// Proceeds to the Next iterate
-            ///
+            /// <summary> Proceeds to the Next iterate. </summary>
             void Next();
 
-            /// Returns the value of the current iterate
+            /// <summary> Returns the value of the current iterate. </summary>
             ///
+            /// <returns> An uint64. </returns>
             uint64 Get() const;
 
         private:
 
-            /// private ctor, can only be called from CompressedIntegerList class
+            // private ctor, can only be called from CompressedIntegerList class
             Iterator(const uint8 *iter, const uint8 *end);
             friend class CompressedIntegerList;
 
@@ -64,49 +68,54 @@ namespace dataset
             uint64 _iter_increment;
         };
 
-        /// Default Constructor. Constructs an empty list.
-        ///
+        /// <summary> Default Constructor. Constructs an empty list. </summary>
         CompressedIntegerList();
 
-        /// Move constructor
+        /// <summary> Move constructor. </summary>
         ///
+        /// <param name="other"> [in,out] The other. </param>
         CompressedIntegerList(CompressedIntegerList&& other) = default;
 
-        /// Deleted copy constructor
+        /// <summary> Deleted copy constructor. </summary>
         ///
+        /// <param name="parameter1"> The first parameter. </param>
         CompressedIntegerList(const CompressedIntegerList&) = delete;
 
-        /// Default Destructor.
-        ///
+        /// <summary> Default Destructor. </summary>
         ~CompressedIntegerList() = default;
 
-        /// \returns The number of entries in the list
+        /// <summary> Deleted assignment operator. </summary>
         ///
+        /// <param name="parameter1"> The first parameter. </param>
+        void operator= (const CompressedIntegerList&) = delete;
+
+        /// <summary> \returns The number of entries in the list. </summary>
+        ///
+        /// <returns> An uint64. </returns>
         uint64 Size() const;
 
-        /// Allocates a specified number of entires to the list
+        /// <summary> Allocates a specified number of entires to the list. </summary>
         ///
+        /// <param name="size"> The size. </param>
         void Reserve(uint64 size);
 
-        /// \returns The maximal integer in the list
+        /// <summary> \returns The maximal integer in the list. </summary>
         ///
+        /// <returns> The maximum value. </returns>
         uint64 Max() const;
 
-        /// Appends an integer to the end of the list.
+        /// <summary> Appends an integer to the end of the list. </summary>
         ///
+        /// <param name="value"> The value. </param>
         void PushBack(uint64 value);
 
-        /// Deletes all of the std::vector content and sets its Size to zero
-        ///
+        /// <summary> Deletes all of the std::vector content and sets its Size to zero. </summary>
         void Reset();
 
-        /// \Returns a Iterator that points to the beginning of the list.
+        /// <summary> \Returns a Iterator that points to the beginning of the list. </summary>
         ///
+        /// <returns> The iterator. </returns>
         Iterator GetIterator() const;
-
-        ///@{
-        void operator= (const CompressedIntegerList&) = delete;
-        ///@}
 
     private:
         std::vector<uint8> _data;

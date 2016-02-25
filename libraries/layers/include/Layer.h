@@ -27,49 +27,62 @@
 
 namespace layers
 {
+    /// <summary> Implements a layer. </summary>
     class Layer
     {
     public:
         enum class Type { zero, scale, shift, sum, decisionTreePath };
 
-        /// Default ctor
+        /// <summary> Default ctor. </summary>
         ///
+        /// <param name="type"> The type. </param>
         Layer(Type type);
 
-        /// Default copy ctor
+        /// <summary> Default copy ctor. </summary>
         ///
+        /// <param name="other"> The other. </param>
         Layer(const Layer& other) = default;
 
-        /// Default move ctor
+        /// <summary> Default move ctor. </summary>
         ///
+        /// <param name="parameter1"> [in,out] The first parameter. </param>
         Layer(Layer&&) = default;
 
-        /// Default virtual destructor
-        ///
+        /// <summary> Default virtual destructor. </summary>
         virtual ~Layer() = default;
 
-        /// \returns The size of the layer's output
+        /// <summary> \returns The size of the layer's output. </summary>
         ///
+        /// <returns> An uint64. </returns>
         virtual uint64 Size() const = 0;
 
-        /// \returns A std::string tha trepresents the layer type
+        /// <summary> \returns A std::string tha trepresents the layer type. </summary>
         ///
+        /// <returns> The type name. </returns>
         std::string GetTypeName() const;
 
-        /// Computes the output of the layer
+        /// <summary> Computes the output of the layer. </summary>
         ///
+        /// <param name="rowIndex"> Zero-based index of the row. </param>
+        /// <param name="outputs"> [in,out] The outputs. </param>
         virtual void Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const = 0; // TODO - resolve the naming row vs. layer
 
-        /// \Returns An Iterator to the inputs that the specified output depends on
+        /// <summary> \Returns An Iterator to the inputs that the specified output depends on. </summary>
         ///
+        /// <param name="index"> Zero-based index of the. </param>
+        ///
+        /// <returns> The input coordinates. </returns>
         virtual utilities::VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const = 0;
 
-        /// Serializes the Layer in json format
+        /// <summary> Serializes the Layer in json format. </summary>
         ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Serialize(utilities::JsonSerializer& serializer) const = 0;
-        
-        /// Deserializes the Layer in json format
+
+        /// <summary> Deserializes the Layer in json format. </summary>
         ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
+        /// <param name="version"> The version. </param>
         virtual void Deserialize(utilities::JsonSerializer& serializer, int version) = 0;
 
     protected:

@@ -11,6 +11,7 @@
 // stl
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 namespace utilities
 {
@@ -35,24 +36,33 @@ namespace utilities
 
         // if reached '%' character, print an arg
         char specifier = *(++ptr);
-        auto prec = os.precision();
+        auto precision = os.precision();
+        auto flags = os.flags();
 
         switch(specifier)
         {
         case 'i':
-            os << std::fixed << std::setprecision(0) << arg << std::setprecision(prec);
+            os.precision(0);
+            os.flags(std::ios::fixed);
+            os << arg;
+            os.flags(flags);
+            os.precision(precision);
             break;
 
         case 'f':
-            os << std::fixed << arg;
+            os.flags(std::ios::fixed);
+            os << arg;
+            os.flags(flags);
             break;
 
         case 'e':
-            os << std::scientific << arg;
+            os.flags(std::ios::scientific);
+            os << arg;
+            os.flags(flags);
             break;
 
         case 's':
-            os << std::defaultfloat << arg;
+            os << arg;
             break;
 
         case '%':
@@ -76,5 +86,11 @@ namespace utilities
         os << cstr;
     }
 
-
+    template<typename ... ArgTypes>
+    std::string StringFormat(const char* cstr, ArgTypes ...args)
+    {
+        std::stringstream ss;
+        StringFormat(ss, cstr, args...);
+        return ss.str();
+    }
 }

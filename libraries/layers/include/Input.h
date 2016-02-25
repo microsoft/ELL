@@ -18,40 +18,51 @@
 
 namespace layers
 {
+    /// <summary> Implements an input layer. </summary>
     class Input : public Layer
     {
     public:
 
-        /// Ctor
+        /// <summary> Constructs an instance of Input. </summary>
         ///
+        /// <param name="size"> The size. </param>
         Input(uint64 size = 0);
 
-        /// Default copy ctor
+        /// <summary> Copy constructor. </summary>
         ///
+        /// <param name="parameter1"> The first parameter. </param>
         Input(const Input&) = default;
 
-        /// Default virtual destructor
-        ///
+        /// <summary> Default virtual destructor. </summary>
         virtual ~Input() = default;
 
-        /// \returns The size of the layer's output
+        /// <summary> \returns The size of the layer's output. </summary>
         ///
+        /// <returns> An uint64. </returns>
         virtual uint64 Size() const override;
 
-        /// Computes the output of the layer
+        /// <summary> Computes the output of the layer. </summary>
         ///
+        /// <param name="rowIndex"> Zero-based index of the row. </param>
+        /// <param name="outputs"> [in,out] The outputs. </param>
         virtual void Compute(uint64 rowIndex, vector<types::DoubleArray>& outputs) const override;
 
-        /// \Returns An Iterator to the inputs that the specified output depends on
+        /// <summary> Returns an Iterator to the inputs that the specified output depends on. </summary>
         ///
+        /// <param name="index"> Zero-based index of the. </param>
+        ///
+        /// <returns> The input coordinates. </returns>
         virtual utilities::VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;
 
-        /// Serializes the Layer in json format
+        /// <summary> Serializes the Layer in json format. </summary>
         ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Serialize(utilities::JsonSerializer & serializer) const override;
 
-        /// Deserializes the Layer in json format
+        /// <summary> Deserializes the Layer in json format. </summary>
         ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
+        /// <param name="version"> The version. </param>
         virtual void Deserialize(utilities::JsonSerializer & serializer, int version) override;
 
     private:

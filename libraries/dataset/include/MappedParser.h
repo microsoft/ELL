@@ -22,18 +22,27 @@
 
 namespace dataset
 {
-    /// Wraps any other parser and passes it through a map
+    /// <summary> Wraps any other parser and passes it through a map. </summary>
     ///
+    /// <typeparam name="ternalParserType"> Type of the ternal parser type. </typeparam>
     template<typename InternalParserType>
     class MappedParser
     {
     public:
-        /// Ctor
+
+        /// <summary> Constructs an instance of MappedParser. </summary>
         ///
+        /// <param name="internalParser"> The internal parser. </param>
+        /// <param name="map"> The map. </param>
+        /// <param name="outputCoordinates"> The output coordinates. </param>
         MappedParser(const InternalParserType& internalParser, const layers::Map& map, layers::CoordinateList outputCoordinates);
 
-        /// \returns An iterator that parses the given std::string
+        /// <summary> Gets an iterator that parses the given std::string. </summary>
         ///
+        /// <param name="spExampleString"> The sp example string. </param>
+        /// <param name="pStr"> The string. </param>
+        ///
+        /// <returns> The iterator. </returns>
         layers::Map::Iterator GetIterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) const;
 
     private:

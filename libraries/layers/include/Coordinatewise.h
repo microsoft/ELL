@@ -23,51 +23,67 @@
 
 namespace layers
 {
+    /// <summary> A coordinatewise. </summary>
     class Coordinatewise : public Layer
     {
     public:
 
         using DoubleOperation = std::function<double(double, double)>;
 
-        /// Ctor
+        /// <summary> Constructs an instance of Coordinatewise. </summary>
         ///
-        Coordinatewise(const DoubleOperation& operation, Type type);
+        /// <param name="type"> The type. </param>
+        Coordinatewise(Type type);
 
-        /// Ctor
+        /// <summary> Constructs an instance of Coordinatewise. </summary>
         ///
-        Coordinatewise(double value, Coordinate coordinate, const DoubleOperation& operation, Type type);
+        /// <param name="value"> The value. </param>
+        /// <param name="coordinate"> The coordinate. </param>
+        /// <param name="type"> The type. </param>
+        Coordinatewise(double value, Coordinate coordinate, Type type);
 
-        /// Ctor
+        /// <summary> Constructs an instance of Coordinatewise. </summary>
         ///
-        Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, const DoubleOperation& operation, Type type);
+        /// <param name="values"> The values. </param>
+        /// <param name="coordinates"> The coordinates. </param>
+        /// <param name="type"> The type. </param>
+        Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, Type type);
 
-        /// Default virtual destructor
-        ///
+        /// <summary> Default virtual destructor. </summary>
         virtual ~Coordinatewise() = default;
 
-        /// \returns The size of the layer's output
+        /// <summary> \returns The size of the layer's output. </summary>
         ///
+        /// <returns> An uint64. </returns>
         virtual uint64 Size() const override;
 
-        /// Computes the layer output
+        /// <summary> Computes the layer output. </summary>
         ///
-        virtual void Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const override;
+        /// <param name="layerIndex"> Zero-based index of the layer. </param>
+        /// <param name="outputs"> [in,out] The outputs. </param>
+        virtual void Compute(uint64 layerIndex, std::vector<types::DoubleArray>& outputs) const override;
 
-        /// \Returns An Iterator to the inputs that the specified output depends on
+        /// <summary> \Returns An Iterator to the inputs that the specified output depends on. </summary>
         ///
+        /// <param name="index"> Zero-based index of the. </param>
+        ///
+        /// <returns> The input coordinates. </returns>
         virtual utilities::VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;
 
-        /// Serializes the Layer in json format
+        /// <summary> Serializes the Layer in json format. </summary>
         ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Serialize(utilities::JsonSerializer& serializer) const override;
 
-        /// Deserializes the Layer in json format
+        /// <summary> Deserializes the Layer in json format. </summary>
         ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
+        /// <param name="version"> The version. </param>
         virtual void Deserialize(utilities::JsonSerializer& serializer, int version = _currentVersion) override;
 
     protected:
         std::vector<double> _values;
-        CoordinateList _coordinates;
+        CoordinateList _inputCoordinates;
         DoubleOperation _operation;
         static const int _currentVersion = 1;
     };

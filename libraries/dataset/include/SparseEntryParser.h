@@ -20,8 +20,7 @@
 
 namespace dataset
 {
-    /// Parses and iterates over a stringstream of index-value pairs
-    ///
+    /// <summary> Parses and iterates over a stringstream of index-value pairs. </summary>
     class SparseEntryParser
     {
     public:
@@ -29,24 +28,28 @@ namespace dataset
         class Iterator : public IIndexValueIterator
         {
         public:
-            /// default copy ctor
+
+            /// <summary> default copy ctor. </summary>
             ///
+            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&) = default;
 
-            /// Default move ctor
+            /// <summary> Default move ctor. </summary>
             ///
+            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
-            /// \returns True if the iterator is currently pointing to a valid iterate
+            /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
+            /// <returns> true if it succeeds, false if it fails. </returns>
             bool IsValid() const;
 
-            /// Proceeds to the Next iterate
-            ///
+            /// <summary> Proceeds to the Next iterate. </summary>
             void Next();
 
-            /// \returns The current index-value pair
+            /// <summary> \returns The current index-value pair. </summary>
             ///
+            /// <returns> An IndexValue. </returns>
             IndexValue Get() const;
 
         private:
@@ -60,6 +63,12 @@ namespace dataset
             friend class SparseEntryParser;
         };
 
+        /// <summary> Gets an iterator. </summary>
+        ///
+        /// <param name="spExampleString"> The sp example string. </param>
+        /// <param name="pStr"> The string. </param>
+        ///
+        /// <returns> The iterator. </returns>
         Iterator GetIterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) const;
     };
 

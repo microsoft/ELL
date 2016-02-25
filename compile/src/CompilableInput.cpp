@@ -13,7 +13,7 @@
 // stl
 #include <stdexcept>
 
-void CompilableInput::BackwardPass(uint64 currentLayerIndex, vector<vector<vector<AddToAction>>>& actions) const 
+void CompilableInput::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const 
 {
     throw std::runtime_error("this place in the code should bever be reached");
 }

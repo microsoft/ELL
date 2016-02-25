@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "AddToAction.h"
+#include "DataFlowGraph.h"
 
 // types
 #include "types.h"
@@ -24,24 +24,11 @@
 class CompilableLayer 
 {
 public:
-    /// This function is called for each layer, from the bottom up
+    /// <summary> Pushes actions upward in the graph </summary>
     ///
-    virtual void BackwardPass(uint64 currentLayerIndex, std::vector<std::vector<std::vector<AddToAction>>>& actions) const = 0;
-
-    //virtual void ProcessForward() = 0;
-
-    /// \returns The number of temp variable names allocated
-    ///
-    static uint64 NumTempVariableNames();
-
-protected:
-    /// \returns The next available variable name
-    ///
-    static std::string GetNextTempVariableName(); 
-
-private:
-    static uint64 _tempVariableCounter;
-    std::vector<std::vector<AddToAction>> _actions;
+    /// <param name="currentLayerIndex"> The index of the current layer. </param>
+    /// <param name="graph"> [in,out] The data flow graph. </param>
+    virtual void SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const = 0;
 };
 
  

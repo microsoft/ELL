@@ -40,7 +40,7 @@ public:
     ///
     double GetHeight() const;
 
-    /// \returns True if the layer is presented in abbreviated form
+    /// Returns true if the layer is presented in abbreviated form
     /// 
     bool HasHidden() const;
 
@@ -48,7 +48,7 @@ public:
     ///
     uint64 NumVisibleElements() const;
 
-    /// \returns True if the specified element is hidden
+    /// Returns true if the specified element is hidden
     ///
     bool IsHidden(uint64 index) const;
 

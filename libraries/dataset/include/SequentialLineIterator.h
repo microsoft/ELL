@@ -17,33 +17,38 @@
 
 namespace dataset
 {
-    /// An iterator that reads a long text line by line
-    ///
+    /// <summary> An iterator that reads a long text line by line. </summary>
     class SequentialLineIterator 
     {
     public:
-        /// Constructs a sequential line iterator
+
+        /// <summary> Constructs a sequential line iterator. </summary>
         ///
+        /// <param name="filepath"> The filepath. </param>
+        /// <param name="delim"> The delimiter. </param>
         SequentialLineIterator(const std::string& filepath, char delim = '\n');
 
-        /// deleted copy Ctor
+        /// <summary> Deleted copy constructor. </summary>
         ///
+        /// <param name="parameter1"> The first parameter. </param>
         SequentialLineIterator(const SequentialLineIterator&) = delete; // this ctor is deleted because a provate member of this class cannot be copied
 
-        /// default move Ctor
+        /// <summary> default move Ctor. </summary>
         ///
+        /// <param name="parameter1"> [in,out] The first parameter. </param>
         SequentialLineIterator(SequentialLineIterator&&) = default;
 
-        /// \returns True if the iterator is currently pointing to a valid iterate
+        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
+        /// <returns> true if it succeeds, false if it fails. </returns>
         bool IsValid() const;
 
-        /// Proceeds to the Next row
-        ///
+        /// <summary> Proceeds to the Next row. </summary>
         void Next();
 
-        /// \returns A const reference to the row
+        /// <summary> \returns A const reference to the row. </summary>
         ///
+        /// <returns> A std::shared_ptr&lt;const std::string&gt; </returns>
         std::shared_ptr<const std::string> Get() const;
 
     private:

@@ -1,0 +1,485 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{algorithm}
+\usepackage[capitalize]{cleveref}
+\usepackage[noend]{algpseudocode}
+
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\bw}{\mathbf{w}}
+\newcommand{\bomega}{\mathbf{\omega}}
+\newcommand{\ow}{\overline \bw}
+\newcommand{\oomega}{\overline \bomega}
+\newcommand{\ov}{\overline \bv}
+\newcommand{\ob}{\overline b}
+\newcommand{\obeta}{\overline \beta}
+\newcommand{\oa}{\overline a}
+\newcommand{\bv}{\mathbf{v}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\ox}{\overline \bx}
+\newcommand{\oq}{\overline q}
+\newcommand{\omu}{\overline \mu}
+\renewcommand {\tfrac}[2]{{\textstyle \frac{#1}{#2}}}
+\newcommand{\brac}[1]{[#1]}
+
+\title{Efficient Linear Learning with Sparse Data}
+\author{Ofer Dekel}
+
+\begin{document}
+\maketitle
+
+\section{Setting}
+
+Let $\{(x_i,y_i)\}_{i=1}^m$ be a training set of instance-label pairs,
+where each $x_i \in \reals^n$ and each $y \in \reals$.  For any $y \in
+\reals$, let $\ell(\alpha ; y) : \reals \mapsto \reals$ be a convex
+function in $\alpha$, with subderivative $\ell'(\alpha ; y)$. Our goal
+is to approximate the solution to
+\begin{equation}\label{eqn:objective}
+\min_{\bw \in \reals^n, b \in \reals} ~ \frac{\lambda}{2} \big( \norm{\bw}^2 + b^2 \big) ~+~ \frac{1}{m}\sum_{i=1}^m \ell(\bw \cdot x_i + b\,;\, y_i)~~.
+\end{equation}
+%
+Examples of popular loss functions:
+
+\begin{center}
+\fbox{
+\begin{minipage}{14cm}
+\begin{align*}
+\text{absolute loss} &&& \ell(\alpha ; y) = |\alpha - y| && \ell'(\alpha ; y) = \begin{cases} -1 &\text{if~} \alpha \leq y \\ 1 & \text{otherwise}\end{cases} \\
+\text{squared loss} &&& \ell(\alpha ; y) = \frac{1}{2}(\alpha - y)^2 && \ell'(\alpha ; y) = \alpha - y \\
+\text{hinge loss} &&& \ell(\alpha ; y) = \max\big\{1 - \alpha y, 0\big\} &&  \ell'(\alpha ; y) = \begin{cases} -y &\text{if~} \alpha y \leq 1 \\ 0 & \text{otherwise}\end{cases} \\
+\text{log-loss} &&& \ell(\alpha ; y) = \log\big(1 + \exp(-\alpha y)\big) && \ell'(\alpha ; y) = \frac{-y}{1 + \exp(\alpha y)} \\
+\end{align*}
+\end{minipage}}
+\end{center}
+
+\section{Averaged Stochastic Gradient Descent}
+
+We use an iterative randomized algorithm that constructs a sequence of
+$T$ approximations $\bw_1,\ldots,\bw_T$. The gradient of the objective
+function is
+$$
+\lambda \brac{\bw, b} ~+~ \frac{1}{m}\sum_{i=1}^m \ell'(\bw \cdot x_i + b\,;\, y_i) \; \brac{x_i, 1}~~.
+$$ 
+%
+If $\pi$ is a random variable chosen uniformly in $\{1,\ldots,m\}$,
+then $\ell'(\bw \cdot x_\pi + b; y_\pi) \brac{x_\pi, 1}$ is an unbiased
+gradient estimator. We use this estimator to perform stochastic
+gradient descent, with a step size of $\frac{1}{\lambda t}$.  Namely,
+we draw a sequence of random indices $\pi_1,\pi_2,\ldots$, initialize
+$\brac{\bw_0, b_0}=0$, and iteratively define
+\begin{align}\label{eqn:step}
+  \brac{\bw_t, b_t} ~=~& \left(1 - {\tfrac{1}{t}}\right) \brac{\bw_{t-1}, b_{t-1}} ~-~ \frac{g_t}{\lambda t} \; \brac{x_{\pi_t}, 1}
+  \quad\text{where}\quad g_t~=~ \ell'(\bw_{t-1} \cdot x_{\pi_t} \,;\, y_{\pi_t})~~.
+\end{align}
+
+Often, the goal is to compute the average solution $\brac{\ow_T,
+  \ob_T} = \frac{1}{T} \sum_{t=1}^{T} \brac{\bw_t, b_t}$. The
+theory behind stochastic gradient descent guarantees that $\brac{\ow_t, \ob_t}$ (not $\brac{\bw_t, b_t}$) converges to the
+optimizer of \cref{eqn:objective}. The average solution also has the
+practical advantage that it is more stable and reliable than the last
+solution $\brac{\bw_T, b_T}$. The algorithm that computes both $\brac{\ow_T, \ob_T}$ and $\brac{\bw_T, b_T}$ is called Averaged
+Stochastic Gradient Descent (ASGD), and its trivial implementation is
+given in \cref{alg:trivial}.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\algsetblock[Name]{rename}{}{0}{1cm}
+\Procedure{ASGD}{$T, \lambda, \{(x_{\pi_t}, y_{\pi_t})\}_{t=1}^T$}
+\State $\brac{\bw_0, b_0} ~\leftarrow~ 0$ \vbox to 12pt{\vfill}
+\State $\brac{\ow_0, \ob_0} ~\leftarrow~ 0$ \vbox to 12pt{\vfill}
+\For {$t = 1,\ldots,T$ \vbox to 12pt{\vfill}} 
+   \State $p_t ~\leftarrow~ \bw_{t-1} \cdot x_{\pi_t} + b_{t-1}$ \vbox to 12pt{\vfill}
+   \State $g_t ~\leftarrow~ \ell'(p_t \,;\, y_{\pi_t})$ \vbox to 12pt{\vfill}
+   \State $\brac{\bw_t, b_t} ~\leftarrow~ (1 - \frac{1}{t}) \brac{\bw_{t-1}, b_{t-1}} ~-~ \frac{g_t}{\lambda t} \brac{x_{\pi_t}, 1}$ \vbox to 12pt{\vfill}
+   \State $\brac{ \ow_t, \ob_t} ~\leftarrow~ (1 - \frac{1}{t}) \brac{ \ow_{t-1}, \ob_{t-1} } ~+~ \frac{1}{t} \brac{ \bw_t, b_t }$ \vbox to 12pt{\vfill}
+ \EndFor
+\State \Return $\big(\brac{\bw_T, b_T}, \brac{\ow_T, \ob_T}\big)$ \vbox to 12pt{\vfill}
+\EndProcedure
+\end{algorithmic}
+\caption{Trivial implementation of ASGD for regularized linear learning}
+\label{alg:trivial}
+\end{algorithm}
+
+It is often convenient to break the ASGD loop into batches. The
+algorithm remains exactly the same, but the end of each batch is a
+good opportunity to evaluate the current solution and perform other
+periodic tasks. Within each batch, we assume that the previous batch
+ended on step $T_P$ (where $P$ is short for \emph{previous}) and that
+the intermediate solution $\big(\brac{\bw_{T_P}, b_{T_P}}, \brac{\ow_{T_P}, \ob_{T_P}}\big)$ is
+available. The task for the current batch is to compute the next
+intermediate solution $\big(\brac{\bw_{T_N}, b_{T_N}}, \brac{\ow_{T_N}, \ob_{T_N}}\big)$, where $T_N >
+T_P$ (and where $N$ is short for \emph{next}). Later on, we will see
+that an annoying edge-case occurs when $T_P = 0$, so we perform the
+very first gradient step separately and start processing the data in
+batches starting from $T_P = 1$. Also, to avoid introducing additional
+parameters, assume that each batch is of size $1000$. The pseudocode
+for the batched version of ASGD is given \cref{alg:batched}.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\Procedure{ASGD}{$T, \lambda, \{(x_{\pi_t}, y_{\pi_t})\}_{t=1}^T$}
+\State $\brac{\bw_1,b_1} ~\leftarrow~ \frac{\ell'(0 \,;\, y_{\pi_1})}{\lambda} \brac{x_{\pi_1},1}$ \vbox to 12pt{\vfill}
+\State $\brac{\ow_1, \ob_1} ~\leftarrow~ \bw_1$ \vbox to 12pt{\vfill}
+\State $T_P ~\leftarrow~ 1$ \vbox to 12pt{\vfill} 
+\While{$T_P < T$ \vbox to 12pt{\vfill}} 
+   \State $T_N ~\leftarrow~ \min\big( T_P+1000, ~T\big)$ \vbox to 12pt{\vfill}
+   \State $\big( \brac{\bw_{T_N},b_{T_N}}, \brac{\ow_{T_N}, \ob_{T_N}} \big) ~\leftarrow~  \textsc{SGD-batch}\big(T_P, T_N, \lambda, \brac{\bw_{T_P},b_{T_P}}, \brac{\ow_{T_P}, \ob_{T_P}}, \{(x_{\pi_t}, y_{\pi_t})\}_{t=T_P+1}^{T_N}\big)$ \vbox to 12pt{\vfill}
+   \State $T_P ~\leftarrow~ T_N$ \vbox to 12pt{\vfill}
+\EndWhile
+\State \Return $(\bw_T, \ow_T)$ \vbox to 12pt{\vfill}
+\EndProcedure
+\Procedure{ASGD-batch}{$T_P, T_N,  \brac{\bw_{T_P},b_{T_P}}, \brac{\ow_{T_P}, \ob_{T_P}}, \lambda, \{(x_{\pi_t}, y_{\pi_t})\}_{t=T_P+1}^{T_N}$ \vbox to 22pt{\vfill}}
+\For {$t ~\leftarrow~ (T_P+1),\ldots,T_N$ \vbox to 12pt{\vfill}} 
+   \State $p_t ~\leftarrow~ \bw_{t-1} \cdot x_{\pi_t} + b_{t-1}$ \vbox to 12pt{\vfill}
+   \State $g_t ~\leftarrow~ \ell'(p_t \,;\, y_{\pi_t})$ \vbox to 12pt{\vfill}
+   \State $\brac{\bw_t,b_t} ~\leftarrow~ (1 - \frac{1}{t}) \brac{\bw_{t-1}, b_{t-1}} ~-~ \frac{g_t}{\lambda t} \brac{x_{\pi_t},1}$ \vbox to 12pt{\vfill}
+   \State $\brac{\ow_t,\ob_t} ~\leftarrow~ (1 - \frac{1}{t}) \brac{\ow_{t-1},\ob_{t-1}} ~+~ \frac{1}{t}\brac{\bw_t,b_t}$ \vbox to 12pt{\vfill}
+\EndFor
+\State \Return $\big( \brac{\bw_{T_N},b_{T_N}}, \brac{\ow_{T_N},\ob_{T_N}} \big)$ \vbox to 12pt{\vfill}
+\EndProcedure
+\end{algorithmic}
+\caption{Batched implementation of ASGD for regularized linear learning}
+\label{alg:batched}
+\end{algorithm}
+
+\section{Efficient Implementation with Sparse Instances}
+In many machine learning applications, the instances are sparse
+vectors, namely, only a small subset of their entries are
+non-zero. Sparse vectors can be stored using a space-efficient
+representation, such as a list of index-values pairs. Concretely, we
+assume that each instance has at most $k$ non-zero entries, where $k
+\ll n$. Although the instances are sparse, we consider $\bw_t$ and
+$\ow_t$ to be arbitrary dense vectors. To emphasize that
+some of the vectors in our setting are sparse and others are dense, we
+denote dense vectors using boldface roman letters. We distinguish
+between \emph{sparse vector operations} and \emph{dense vector
+  operations}. Sparse operations usually involve a sparse vector and a
+dense vector, and their execution time is proportional to $k$
+(independent of $n$). For example, if $\bv$ is a dense vector stored
+in a random-access representation (such as an array) and $\alpha$ is a
+scalar, the operation $\bv \leftarrow \bv + \alpha x_i$ is a sparse
+operation: simply iterate over the non-zero entries in $x_i$ and
+update the corresponding entries in $\bv$. Similarly, calculating the
+dot product $\bv \cdot x_i$ is a sparse operation.  On the other hand,
+a dense operation is one whose execution time is proportional to $n$,
+such as $\bv \leftarrow \alpha \bv$.
+
+Since sparse operations are much faster than dense operations, we want
+to implement ASGD using as few dense operations as possible. Ideally,
+the number of dense operations will be independent of the number of
+examples $m$ or the number of gradient descent steps $T$. Observe that
+the na\"ive implementation in \cref{alg:batched} performs $\Theta(T)$
+dense operations and does not take advantage of sparsity. We can do
+better.
+
+First, we shown, by induction, that for any $s > 0$ it holds that
+\begin{equation}\label{eqn:induction}
+\brac{\bw_s, b_s} ~=~ \frac{-1}{\lambda s} \sum_{j = 1}^s g_j \brac{x_{\pi_j}, 1}~~.
+\end{equation}
+More precisely, first note that \cref{eqn:induction} holds for
+$s=1$. Then, by induction, assume that \cref{eqn:induction} holds for
+$s-1$, plug it into \cref{eqn:step}, and conclude that
+\cref{eqn:induction} also holds for $s$.
+
+As before, we focus on the batch that starts on step $T_P+1$.  Using
+\cref{eqn:induction} twice, once with $s = T_P$ and once with $s = t$
+(where $t > T_P$), we can rewrite
+\begin{equation}\label{eqn:incremental}
+\brac{\bw_t, b_t} =  \frac{T_P}{t} \left(  \brac{\bw_{T_P}, b_{T_P}} ~-~ \frac{1}{\lambda T_P} \sum_{j = T_P+1}^{t} g_j \brac{x_{\pi_j},1} \right)~~.
+\end{equation}
+Next, let 
+\begin{equation}\label{eqn:def_v}
+\brac{\bv_t, a_t} ~=~ \brac{\bw_{T_P}, b_{T_P}} -  \frac{1}{\lambda T_P} \sum_{j = T_P+1}^{t} g_j \brac{x_{\pi_j}, 1}~~.
+\end{equation}
+%
+Using \cref{eqn:incremental}, it is immediate to see that
+$\brac{\bv_t, a_t}$ is a scaled version of $\brac{\bw_t, b_t}$, and
+more specifically, that $\brac{\bw_t, b_t} = \frac{T_P}{t}$. When we
+apply the predictor $\brac{\bw_{t-1}, b_{t-1}}$ to the instance
+$x_{\pi_t}$, we get
+$$
+  p_t ~=~ \bw_{t-1} \cdot x_{\pi_t} + b_{t-1} ~=~ \frac{T_P}{t} \big( \bv_{t-1} \cdot x_{\pi_t} + a_{t-1} \big) ~~.
+$$
+%
+The vector $\bv_t$ is dense, but updating it uses only sparse
+operations. Moreover, calculating $p_t$ requires only sparse
+operations. \cref{alg:sparse2} (for now, ignoring lines
+\ref{line:ovinit}, \ref{line:ov}, \ref{line:ow}) uses these simple
+ideas to perform a batch of ASGD steps using a single dense operation,
+which appears on line \ref{line:bw}. The predictor $\brac{\bw_{T_N},
+  b_{T_N}}$ returned by \cref{alg:sparse2} is identical to the one
+constructed in \cref{alg:trivial}.
+
+The next step is to compute the averaged solution. From the
+definitions of $\brac{\ow_{T_P}, \ob_{T_P}}$ and $\brac{\ow_{T_N}, \ob_{T_P}}$,
+$$
+\brac{\ow_{T_N}, \ob_{T_N}} ~=~  \frac{T_P}{T_N} \left( \brac{\ow_{T_P}, \ob_{T_P}} ~+~ \frac{1}{T_P} \sum_{t=T_P+1}^{T_N} \brac{\bw_t, b_t} \right)~~.
+$$
+Using \cref{eqn:incremental} to expand each of the terms of the form $[\bw_t, b_t]$ above, we get
+$$
+\brac{\ow_{T_N}, \ob_{T_N}} ~=~ 
+\frac{T_P}{T_N} \left( \brac{\ow_{T_P}, \ob_{T_P}}
+~+~ \sum_{t=T_P+1}^{T_N} \frac{1}{t} \Big( \bw_{T_P} ~-~ \frac{1}{\lambda T_P} \sum_{j = T_P+1}^{t} g_j \brac{x_{\pi_j},1}  \Big)\right) ~~.
+$$
+Rearranging terms above gives
+$$
+\brac{\ow_{T_N}, \ob_{T_N}} ~=~ 
+\frac{T_P}{T_N} \left( \brac{\ow_{T_P}, \ob_{T_P}} 
+~+~ \left( \sum_{t=T_P+1}^{T_N} \frac{1}{t}\right) \brac{\bw_{T_P}, b_{T_P}}
+~-~ \frac{1}{\lambda T_P} \sum_{j=T_P+1}^{T_N} \left( \sum_{t = j}^{T_N} \frac{1}{t} \right)  g_j \brac{x_{\pi_j},1} \right)~~.
+$$
+Letting $H_j = \sum_{t=1}^j \frac{1}{t}$ denote the $j$'th harmonic number, we rewrite the above as
+$$
+\brac{\ow_{T_N}, \ob_{T_N}} ~=~ 
+\frac{T_P}{T_N} \left(
+\brac{\ow_{T_P}, \ob_{T_P}} 
+~+~ \big(H_{T_N} - H_{T_P}\big) \brac{\bw_{T_P}, b_{T_P}}
+~-~ \frac{1}{\lambda T_P} \sum_{j=T_P+1}^{T_N} \big(H_{T_N} - H_{j-1}\big)\,  g_j \brac{x_{\pi_j},1} \right)~~.
+$$
+Next, for any positive $k$ and $s$, let 
+$$
+\Theta_{k,s} = \ln(k) - \ln(s) + \frac{1}{2k} - \frac{1}{2s} ~~,
+$$ 
+%
+and note that $\Theta_{k,s}$ is an excellent approximation to $H_k -
+H_s$ (in fact, if $k>s$, the error of this approximation diminishes
+like $O(s^{-2})$). Using $\Theta_{k,s}$ in our expression for
+$\ow_{T_N}$ gives
+\begin{equation} \label{eqn:incremental_bar}
+\brac{\ow_{T_N}, \ob_{T_N}} ~=~ 
+\frac{T_P}{T_N} \Big( 
+\brac{\ow_{T_P}, \ob_{T_P}} ~+~ \Theta_{T_N,T_P}\, \brac{\bw_{T_P},b_{T_P}} ~-~ \frac{1}{\lambda T_P} \sum_{j=T_P+1}^{T_N} \Theta_{T_N, j-1} \,  g_j \brac{x_{\pi_j},1} 
+\Big)~~.
+\end{equation}
+%
+As before, we find it more convenient to work with rescaled versions
+of our variables, $\brac{\ov_{T_N}, \oa_{T_N}} = \frac{T_N}{T_P}
+\brac{\ow_{T_N}, \ob_{T_N}}$. Specifically, we take advantage of the
+fact that the rescaled vectors can be updated using sparse vector
+operations. The pseudo-code in \cref{alg:sparse2} uses these ideas to
+construct $\brac{\ow_{T_N}, \ob_{T_N}}$.
+
+Previously, we mentioned a technical difficulty that requires us to
+perform the first stochastic gradient step outside of the main loop,
+to ensure that $T_p > 0$. This technical difficulty can be observed in
+lines \ref{line:constants} and \ref{line:ovinit}
+of \cref{alg:sparse2}, where we divide by $T_P$.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\algsetblock[Name]{rename}{}{0}{1cm}
+\Procedure{ASGD-sparse-batch}{$T_P, T_N, \brac{\bw_{T_P}, b_{T_P}}, \brac{\ow_{T_P}, \ob_{T_P}}, \lambda, \{(x_{\pi_t}, y_{\pi_t})\}_{t=T_P+1}^{T_N}$}
+\State $\psi \leftarrow \ln(T_N) + \frac{1}{2T_N}$,~ $\phi \leftarrow \frac{1}{\lambda T_P}$ \vbox to 10pt{\vfill} \label{line:constants}
+\State $\brac{\ov_{T_P}, \oa_{T_P}} ~\leftarrow~ \brac{\ow_{T_P}, \ob_{T_P}} + \big( \psi - \ln(T_P) - \frac{1}{2T_P} \big)\,  \brac{\bw_{T_P}, b_{T_P}}$ \Comment{dense operation} \vbox to 12pt{\vfill} \label{line:ovinit}
+\rename~ $\brac{\bv_{T_P}, a_{T_P}} ~\leftarrow~ \brac{\bw_{T_P}, b_{T_P}}$ \vbox to 12pt{\vfill}
+\For {$t = (T_P+1),\ldots,T_N$ \vbox to 15pt{\vfill}}
+   \State $d_t ~\leftarrow~ \bv_{t-1} \cdot x_{\pi_t}$ \Comment{sparse operation} \vbox to 12pt{\vfill}
+   \State $p_t ~\leftarrow~ \frac{T_P}{t-1} (d_t + a_{t-1}) $ \vbox to 12pt{\vfill} \Comment{$p_t = \bw_{t-1} \cdot x_{\pi_t} + b_{t-1}$} \label{line:p2} 
+   \State $g_t ~\leftarrow~ \ell'(p_t \,;\, y_{\pi_t})$  \vbox to 12pt{\vfill}
+   \State $\brac{\bv_t, a_t} ~\leftarrow~ \brac{\bv_{t-1}, a_{t-1}} - (\phi g_t) \; \brac{x_{\pi_t}, 1}$ \Comment{sparse operation} \vbox to 12pt{\vfill} \label{line:v2}
+   \State $\brac{\ov_t, \oa_t} ~\leftarrow~ \brac{\ov_{t-1}, \oa_{t-1}} - \big(\phi g_t (\psi - \ln(t) - \frac{1}{2t}) \big)\; \brac{x_{\pi_t}, 1}$ \Comment{sparse operation} \vbox to 12pt{\vfill} \label{line:ov}
+\EndFor
+\State $\brac{\bw_{T_N}, b_{T_N}} ~\leftarrow~ \frac{T_P}{T_N} \brac{\bv_{T_N}, a_{T_N}}$ \Comment{dense operation} \vbox to 15pt{\vfill} \label{line:bw}
+\State $\brac{\ow_{T_N}, \ob_{T_N}} ~\leftarrow~ \frac{T_P}{T_N} \brac{\ov_{T_N}, \oa_{T_N}}$ \Comment{dense operation} \vbox to 12pt{\vfill} \label{line:ow} 
+\State \Return $\big( \brac{\bw_{T_N},b_{T_N}}, \brac{\ow_{T_N}, \ob_{T_N}} \big)$ \vbox to 12pt{\vfill}
+\EndProcedure
+\end{algorithmic}
+\caption{Efficient implementation of one batch of ASGD with sparse instances}
+\label{alg:sparse2}
+\end{algorithm}
+
+%%==============================================================================
+
+\section{Centering and Translation Invariance}
+A disadvantage of the problem formulation in \cref{eqn:objective} is
+that it is sensitive to translations of the training instances
+(namely, adding a constant vector to each instance vector). Specifically, 
+if the training data is moved far away from the origin, the resulting
+predictor and its accuracy could change drastically. The root of the
+problem is the term $b^2$ in \cref{eqn:objective}, which discourages
+large values of the bias term.
+
+Translation invariance is a desireable property and there are several
+ways to modify \cref{eqn:objective} to achieve it. One idea is to
+simply remove the term $b^2$ from the objective function, however, the
+theory tells us that doing that would require us to change the
+gradient descent step size from $(\lambda t)^{-1}$ to the more
+conservative $t^{-1/2}$. This change would have the undesireable
+effect of slowing the algorithm's convergence. Another idea is to
+approximately find the optimal value of the bias term using binary
+search: in each iteration of the search, we would fix $b$ to some
+value, find the vector $\bw$ that optimizes \eqref{eqn:objective} for
+that value of $b$, and evaluate the result. This approach would give
+an $\epsilon$-approximation of the optimal $b$ in $\log(1/\epsilon)$
+steps. The drawback of approach is that we would have to solve
+\eqref{eqn:objective} multiple times.
+
+We take a third approach, designed to have the smallest possible
+impact on the algorithm's training time. We keep the term $b^2$ as a
+variable in the objective function, and we achieve translation
+invariance by centering the training instances before
+training. Centering is the process of computing the mean of the
+training instances $\ox = \frac{1}{m} \sum_{i=1}^m x_i$ and then
+subtracting that mean from each instance. In other words, centering
+translates the data's center-of-mass to the origin. If we think of
+centering as a required preprocessing step in our algorithm, then our
+approach becomes translation invariant by construction. Notice that
+once we center the data, a predictor with a bias of $b=0$ is one that
+passes through the data's center-of-mass.
+
+However, we do not want to center the data na\"ively. While each $x_i$
+is sparse, the mean vector $\ox$ is typically dense, so the centered
+instance $(x_i - \ox)$ would also become dense. If we were to center
+the data before running ASGD, we would not be able to take advantage
+of sparse operations. In this section, we show how to implement
+centering efficiently.
+
+First, note that computing $\ox$ itself requires $m$ sparse
+operations, and no dense operations. Therefore, we can assume that
+$\ox$ is efficiently precomputed and given as an additional input to
+our procedure. Additionally, it turns out that our update rules needs
+to know $\norm{\ox}^2$, which can be computed ahead of time with one
+dense operation.
+
+Next, we distinguish between two equivalent representations of a
+centered predictor: \emph{explicit centering} and \emph{implicit
+  centering}. Explicit centering involves centering each instance and
+applying the predictor $\brac{\bw,b}$, to get the prediction $\bw
+\cdot (x - \ox) + b$. Implicit centering involves modifying the bias
+term of the predictor to $\beta = b - \bw \cdot \ox$ and applying the
+predictor $\brac{\bw,\beta}$ to the original (uncentered) instances. Both
+approaches produce the same predictions, since 
+$$
+\bw \cdot (x - \ox) + b ~=~ \bw \cdot x + \beta~~.
+$$ 
+%
+The explicit representation turns out to be convenient during the
+training phase and our algorithm uses this representation
+internally. However, the implicit representation has the advantage of
+being more efficient, because computing the prediction does not
+involve the dense vector $\ox$ . Therefore, our algorithm for a batch
+of ASGD inputs and outputs predictors in the implicit representation.
+
+In this section, let $p_t$ denote the prediction of the predictor
+parameterized by $\brac{\bw_{t-1}, b_{t-1}}$ on the centered instance
+$x_{\pi_t} - \ox$, namely, $p_t = \bw_{t-1} \cdot(x_{\pi_t} - \ox) +
+b_{t-1}$. As before, we denote the derivative of the loss funtion at that
+point is $g_t = \ell'( p_t\,;\, y_{\pi_t})$. Refering back to \cref{eqn:incremental}, we have
+\begin{equation}\label{eqn:centered1}
+\brac{\bw_{t-1}, b_{t-1}} ~=~ \frac{T_P}{t-1} \left([\bw_{T_P}, b_{T_P}] - \frac{1}{\lambda T_P} \sum_{j = T_P + 1}^{t-1} g_j [(x_{\pi_j} - \ox), 1] \right) ~~.
+\end{equation}
+%
+As in \cref{eqn:def_v}, we define
+$$
+\bv_{t-1} ~=~ \bw_{T_P} - \frac{1}{\lambda T_P} \sum_{j = T_P + 1}^{t-1} g_j x_{\pi_j}~~,
+$$
+but instead of using $a_t$, we use a slightly different quantity
+$$
+q_{t-1} ~=~ - \frac{1}{\lambda T_P} \sum_{j = T_P + 1}^{t-1} g_j ~~.
+$$
+\cref{eqn:centered1} becomes
+$$
+\bw_{t-1} ~=~ \frac{T_P}{t-1} (\bv_{t-1} - q_{t-1} \ox) \quad\text{and}\quad
+b_{t-1} ~=~ \frac{T_P}{t-1} ( b_{T_P} + q_{t-1} ) ~~.
+$$
+
+Plugging the above into the equation $p_t = \bw_{t-1} \cdot
+(x_{\pi_t} - \ox) + b_{t-1}$ and rearranging terms gives
+\begin{equation} \label{eqn:breakup}
+p_t ~=~ \frac{T_P}{t-1} \Big( \bv_{t-1}  \cdot x_{\pi_t} ~-~ q_{t-1} \Big( \ox \cdot x_{\pi_t} - \norm{\ox}^2 - 1 \Big) ~-~ \bv_{t-1} \cdot \ox ~+~  b_{T_P} \Big)~~.
+\end{equation}
+%
+By the time we need to compute $p_t$, the dense vector
+$\bv_{t-1}$ and the scalar $q_{t-1}$ will already be computed.  Examining
+each of the terms in parenthesis above, we note that $\bv_{t-1} \cdot
+x_{\pi_t}$ and $\ox \cdot x_{\pi_t}$ are sparse operations, and that 
+$\norm{\ox}^2$ can be precomputed. The only term in
+\eqref{eqn:breakup} that seems a bit tricky is $\bv_{t-1} \cdot \ox$,
+since both $\bv_{t-1}$ and $\ox$ are dense vectors.
+
+However, we solve this problem by introducing an additional variable
+$c_{t-1}$ and ensuring that $c_{t-1} = \bv_{t-1} \cdot \ox$ at the
+beginning of iteration $t$. To obtain $c_t$ from $c_{t-1}$, we use the
+equality
+$$
+c_t ~=~ \bv_t \cdot \ox ~=~ \left( \bv_{t-1} ~-~ \frac{g_t}{\lambda T_P} x_{\pi_t} \right) \cdot \ox ~=~ c_{t-1}
+~-~ \frac{g_t}{\lambda T_P} \ox \cdot x_{\pi_t} ~~,
+$$ 
+%
+and notice that the sparse product $\ox \cdot x_{\pi_t}$ on the
+right-hand side of the above was already needed in
+\eqref{eqn:breakup}, and can be reused here. Overall, with $\bv_{t-1}$
+and $q_{t-1}$ handy, we can compute $p_t$ using sparse operations. In
+turn, $p_t$ can be used to update $\bv_{t-1}$ and $q_{t-1}$.
+
+The averaged solution can be computed similarly. Replacing $x_{\pi_t}$ with the centered instance $x_{\pi_t} - \ox$ in \cref{eqn:incremental_bar} gives
+\begin{align}
+\ow_{T_N} &~=~ \frac{T_P}{T_N} \Big( \ow_{T_P} ~+~ \Theta_{T_N,T_P}\, \bw_{T_P} ~-~ \frac{1}{\lambda T_P} \sum_{j=T_P+1}^{T_N} \Theta_{T_N, j-1} \,  g_j (x_{\pi_j} - \ox) \Big) \label{eqn:cent_avg}\\
+\ob_{T_N} &~=~ \frac{T_P}{T_N} \Big( \ob_{T_P} ~+~ \Theta_{T_N,T_P}\, b_{T_P} ~-~ \frac{1}{\lambda T_P} \sum_{j=T_P+1}^{T_N} \Theta_{T_N, j-1} \,  g_j \Big) \label{eqn:cent_avgb}
+\end{align}
+Let 
+$$
+\ov_t ~=~ \ow_{T_P} ~+~ \Theta_{T_N,T_P}\, \bw_{T_P} ~-~ \frac{1}{\lambda T_P} \sum_{j=T_P+1}^{T_N} \Theta_{T_N, j-1} \,  g_j x_{\pi_j} 
+\quad \text{and} \quad
+\oq_t ~=~ 
+~-~ \frac{1}{\lambda T_P} \sum_{j=T_P+1}^{T_N} \Theta_{T_N, j-1} \,  g_j 
+~~. 
+$$
+Plugging these definitions into \cref{eqn:cent_avg,eqn:cent_avgb} gives
+$$
+\ow_{T_N} ~=~ \frac{T_P}{T_N} \big( \ov_{T_N} ~-~ \oq_{T_N} \ox \big)~~\quad\text{and}\quad
+\ob_{T_N} ~=~ \frac{T_P}{T_N} \big( \ob_{T_P} ~+~ \Theta_{T_N,T_P}\, b_{T_P} ~+~ \oq_{T_N} \big) ~~.
+$$
+
+
+
+
+The pseudo-code that implements this is
+given in \cref{alg:sparse3}.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\algsetblock[Name]{rename}{}{0}{1cm}
+\algsetblock[Name]{precompute}{}{0}{1cm}
+\Procedure{ASGD-sparse-centered-batch}{$T_P, T_N, \brac{\bw_{T_P}, \beta_{T_P}}, \brac{\ow_{T_P}, \obeta_{T_P}}, \ox, \lambda, \{(x_{\pi_t}, y_{\pi_t})\}_{t=T_P+1}^{T_N}$}
+\State $\sigma ~\leftarrow~ \| \ox \|^2$ \Comment{can be done once before calling this procedure} \vbox to 10pt{\vfill}
+\State $\psi ~\leftarrow~ \ln(T_N) + (2T_N)^{-1}$ \vbox to 10pt{\vfill}
+\State $\phi ~\leftarrow~ (\lambda T_P)^{-1}$ \vbox to 10pt{\vfill}
+\State $\ob_{T_P} ~\leftarrow~ \obeta_{T_P} + \ow_{T_P} \cdot \ox$ \Comment{available from previous batch, implicit to explicit} \vbox to 10pt{\vfill}
+\State $b_{T_P} ~\leftarrow~ \beta_{T_P} + \bw_{T_P} \cdot \ox$ \Comment{available from previous batch, implicit to explicit} \vbox to 10pt{\vfill}
+\State $\ov_{T_P} ~\leftarrow~ \ow_{T_P} + \big( \psi - \ln(T_P) - \frac{1}{2T_P} \big)\, \bw_{T_P}$ \Comment{dense operation} \vbox to 10pt{\vfill}
+\State $\bv_{T_P} ~\leftarrow~ \bw_{T_P}$ \Comment{renaming} \vbox to 10pt{\vfill} 
+\State $\oq_{T_P} ~\leftarrow~ 0$ \vbox to 10pt{\vfill}
+\State $q_{T_P} ~\leftarrow~ 0$ \vbox to 10pt{\vfill}
+\State $c_{T_P} ~\leftarrow~ \bv_{T_P} \cdot \ox$ \Comment{can be extracted from previous batch} \vbox to 10pt{\vfill}
+\For {$t = (T_P+1),\ldots,T_N$ \vbox to 15pt{\vfill}}
+   \State $r_t ~\leftarrow~ \ox \cdot x_{\pi_t}$ \Comment{sparse operation} \vbox to 10pt{\vfill}
+   \State $d_t ~\leftarrow~ \bv_{t-1} \cdot x_{\pi_t}$ \Comment{sparse operation} \vbox to 10pt{\vfill}
+   \State $p_t ~\leftarrow~ \frac{T_P}{t-1} \big( d_t - q_{t-1} (r_t - \sigma - 1) - c_t + b_{T_P} \big)$ \Comment{$p_t = \bw_{t-1} \cdot (x_{\pi_t} - \ox) + b_{t+1}$} \vbox to 10pt{\vfill}
+   \State $g_t ~\leftarrow~ \ell'(p_t \,;\, y_{\pi_t})$  \vbox to 8pt{\vfill}
+   \State $h_t ~\leftarrow~ \psi - \ln(t) - \frac{1}{2t}$ \vbox to 10pt{\vfill}
+   \State $\oq_t ~\leftarrow~ q_{t-1} - \phi g_t h_t$ \vbox to 10pt{\vfill}
+   \State $\ov_t ~\leftarrow~ \ov_{t-1} - (\phi g_t h_t)\; x_{\pi_t}$ \Comment{sparse operation} \vbox to 10pt{\vfill}
+   \State $q_t ~\leftarrow~ q_{t-1} - \phi g_t$ \vbox to 10pt{\vfill}
+   \State $\bv_t ~\leftarrow~ \bv_{t-1} - (\phi g_t) \; x_{\pi_t}$ \Comment{sparse operation; $\bv_t = \frac{t}{T_P} \bw_t$} \vbox to 10pt{\vfill}
+   \State $c_t ~\leftarrow~ c_{t-1} - \phi g_t r_t$ \Comment{$c_t = \bv_t \cdot \ox$} \vbox to 8pt{\vfill}
+\EndFor
+\State $\ow_{T_N} ~\leftarrow~ \frac{T_P}{T_N} (\ov_{T_N} - \oq_{T_N} \ox)$ \Comment{dense operation} \vbox to 10pt{\vfill}
+\State $\ob_{T_N} ~\leftarrow~ \frac{T_P}{T_N} (\oq_{T_N} + \ob_{T_P})$ \vbox to 10pt{\vfill}
+\State $\obeta_{T_N} ~\leftarrow~ \ob_{T_P} -  \ow_{T_N} \cdot \ox$ \Comment{dense operation} \vbox to 10pt{\vfill}
+\State $\bw_{T_N} ~\leftarrow~ \frac{T_P}{T_N} (\bv_{T_N} - q_{T_N} \ox)$ \Comment{dense operation, explicit to implicit} \vbox to 10pt{\vfill}
+\State $b_{T_N} ~\leftarrow~ \frac{T_P}{T_N} (q_{T_N} + b_{T_P})$ \vbox to 10pt{\vfill}
+\State $\beta_{T_N} ~\leftarrow~ b_{T_N}) - \bw_{T_N} \cdot \ox$ \Comment{dense operation, explicit to implicit} \vbox to 10pt{\vfill}
+\State \Return $(\bw_{T_N}, \beta_{T_N}, \ow_{T_N}, \obeta_{T_N})$ \vbox to 12pt{\vfill}
+\EndProcedure
+\end{algorithmic}
+\caption{Efficient implementation of one batch of centered ASGD with sparse instances}
+\label{alg:sparse3}
+\end{algorithm}
+% TODO - revert from \oa to \oq, needed to compute final \ow_T_N
+ 
+\end{document}

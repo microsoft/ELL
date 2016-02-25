@@ -17,71 +17,91 @@
 
 namespace treeLayout
 {
-    /// An algorithhm for laying out a tree based on a springs and constraints physical system, which is minimized with gradient descent
-    ///
+    /// <summary>
+    /// An algorithhm for laying out a tree based on a springs and constraints physical system, which
+    /// is minimized with gradient descent.
+    /// </summary>
     class QpLayoutGenerator
     {
     public:
 
-        /// User configurable parameters of the Layout algorithm
+        /// <summary> User configurable parameters of the Layout algorithm. </summary>
         struct Params
         {
+            /// <summary> Default constructor. </summary>
             Params();
 
-            /// The maximum number of gradient descent steps to take. The more steps, the longer the running time, and the better the solution
-            ///
+            /// <summary>
+            /// The maximum number of gradient descent steps to take. The more steps, the longer the running
+            /// time, and the better the solution.
+            /// </summary>
             int gdNumSteps = 5000;
 
-            /// The gradient descent step Size
-            ///
+            /// <summary> The gradient descent step Size. </summary>
             double gd_learning_rate = 0.01;
 
-            /// The space between vertices at depth k and vertices at depth k+1 (if the tree is top down, this is the vertical spacing)
-            ///
+            /// <summary>
+            /// The space between vertices at depth k and vertices at depth k+1 (if the tree is top down,
+            /// this is the vertical spacing)
+            /// </summary>
             double depthSpace = 1.0;
 
-            /// The depth spacing closer to the root is larger. This is the multiplier that determines the spacing depth spacing at different levels
-            ///
+            /// <summary>
+            /// The depth spacing closer to the root is larger. This is the multiplier that determines the
+            /// spacing depth spacing at different levels.
+            /// </summary>
             double depthSpaceGrowthFactor = 1.04;
 
-            /// The default space between adjacent vertices at the same depth (if the tree is top down, this is the default horizontal spacing)
-            ///
+            /// <summary>
+            /// The default space between adjacent vertices at the same depth (if the tree is top down, this
+            /// is the default horizontal spacing)
+            /// </summary>
             double offsetSpace = 1.0;
 
-            /// This parameters controls the space between adjacent vertices at the same depth that have a large tree distance 
-            ///
+            /// <summary>
+            /// This parameters controls the space between adjacent vertices at the same depth that have a
+            /// large tree distance.
+            /// </summary>
             double offsetSpaceGrowthFactor = 0.5;
 
+            /// <summary>
             /// Springs at greater depth have higher spring coefficients, by pow(depth, spring_coeff_growth)
-            ///
+            /// </summary>
             double spring_coeff_growth = 1.0;
 
-            /// Natural rest length of springs connecting Children. 
-            ///
+            /// <summary> Natural rest length of springs connecting Children. </summary>
             double springRestLength = 0;
 
-            /// If true, try to move parent nodes toward midpoint of Children at end
+            /// <summary> If true, try to move parent nodes toward midpoint of Children at end. </summary>
             bool postprocess = false;
 
-            /// If true, use simple non-iterative Layout alg that scrunches trees as close as they can be without distorting them
+            /// <summary>
+            /// If true, use simple non-iterative Layout alg that scrunches trees as close as they can be
+            /// without distorting them.
+            /// </summary>
             bool SimpleLayout = false;
         };
 
-        /// Constructs a generator with default parameters
-        ///
+        /// <summary> Constructs a generator with default parameters. </summary>
         QpLayoutGenerator();
 
-        /// Constructs a generator with user defined parameters
+        /// <summary> Constructs a generator with user defined parameters. </summary>
         ///
+        /// <param name="p"> Variable arguments providing additional information. </param>
         QpLayoutGenerator(Params p);
 
-        /// Calculates the tree Layout
+        /// <summary> Calculates the tree Layout. </summary>
         ///
+        /// <typeparam name="ChildrenVectorType"> Type of the children vector type. </typeparam>
+        /// <param name="Children"> The children. </param>
+        ///
+        /// <returns> A Layout. </returns>
         template<typename ChildrenVectorType>
         Layout generate(const ChildrenVectorType& Children);
 
     private:
 
+        // Information about the vertex.
         struct VertexInfo
         {
             VertexInfo(uint64 i, double s);
@@ -95,7 +115,7 @@ namespace treeLayout
 
         template<typename ChildrenVectorType>
         void BuildLayers(const ChildrenVectorType& Children, uint64 index, std::vector<uint64>& ancestors, std::vector<std::vector<uint64>>& prev_layer_ancestors);
-        
+
         template<typename ChildrenVectorType>
         void Optimize(const ChildrenVectorType& Children);
 
@@ -115,7 +135,9 @@ namespace treeLayout
         void IncrementOffsets(const ChildrenVectorType& Children, uint64 node_index, double displacement);
 
         void Project();
+
         void Project(uint64 layer_index);
+
         Layout GetLayout() const;
 
         std::vector<std::vector<VertexInfo>> _layers;

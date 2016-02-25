@@ -20,12 +20,12 @@ namespace common
             "imf",
             "Path to the input map file",
             "");
-        
+
         parser.AddOption(
-            coordinateListLoadArguments.ignoreSuffix,
-            "ignoreSuffix",
-            "clis",
-            "The number of layers from the bottom of the input map to ignore",
-            0);
+            coordinateList,
+            "coordinateList",
+            "cl",
+            "Coordinate list definition string (see README)",
+            "e");
     }
 }

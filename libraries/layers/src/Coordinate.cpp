@@ -12,28 +12,34 @@
 
 namespace layers
 {
-    Coordinate::Coordinate(uint64 row, uint64 column) : _row(row), _column(column)
+    Coordinate::Coordinate(uint64 layerIndex, uint64 elementIndex) : _layerIndex(layerIndex), _elementIndex(elementIndex)
     {}
 
-    uint64 Coordinate::GetRow() const
+    uint64 Coordinate::GetLayerIndex() const
     {
-        return _row;
+        return _layerIndex;
     }
 
-    uint64 Coordinate::GetColumn() const
+    uint64 Coordinate::GetElementIndex() const
     {
-        return _column;
+        return _elementIndex;
     }
 
     void Coordinate::Serialize(utilities::JsonSerializer& serializer) const
     {
-      serializer.Write("r", (Json::UInt64)_row); 
-      serializer.Write("c", (Json::UInt64)_column);
+      serializer.Write("l", (Json::UInt64)_layerIndex); 
+      serializer.Write("e", (Json::UInt64)_elementIndex);
     }
 
     void Coordinate::Deserialize(utilities::JsonSerializer& serializer)
     {
-        serializer.Read("r", _row);
-        serializer.Read("c", _column);
+        serializer.Read("l", _layerIndex);
+        serializer.Read("e", _elementIndex);
+    }
+
+    std::ostream & operator<<(std::ostream & os, const Coordinate & coordinate)
+    {
+        os << '(' << coordinate.GetLayerIndex() << ',' << coordinate.GetElementIndex() << ')';
+        return os;
     }
 }

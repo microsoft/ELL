@@ -13,21 +13,19 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/Coordinate.cpp
+         src/CoordinateListTools.cpp
          src/Coordinatewise.cpp
          src/Input.cpp
          src/Layer.cpp
          src/Map.cpp
-         src/Scale.cpp
-         src/Shift.cpp
          src/Sum.cpp)
 
 set (INCLUDE include/Coordinate.h
+             include/CoordinateListTools.h
              include/Coordinatewise.h
              include/Input.h
              include/Layer.h
              include/Map.h
-             include/Scale.h
-             include/Shift.h
              include/Sum.h)
 
 set (TCC tcc/Map.tcc)
