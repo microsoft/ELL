@@ -96,7 +96,7 @@ namespace treeLayout
         /// <summary> \return The number of vertices. </summary>
         ///
         /// <returns> An uint64. </returns>
-        uint64 size() const; // TODO capitalize
+        uint64 Size() const;
 
         /// <summary>
         ///Returns the min offset (if the tree is top down, this is the left of its bounding box)

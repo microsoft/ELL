@@ -23,7 +23,7 @@ namespace testing
     /// <param name="tolerance"> The tolerance. </param>
     ///
     /// <returns> true if equal, false if not. </returns>
-    bool IsEqual(double a, double b, double tolerance = 1.0e-8);    // TODO capitalize names in this library
+    bool IsEqual(double a, double b, double tolerance = 1.0e-8);
 
     /// <summary>
     /// Checks if two vectors are equal, up to a small numerical error in each coordinate.
