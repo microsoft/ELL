@@ -19,18 +19,19 @@ set (SRC src/LayerLayout.cpp
          src/PrintableMap.cpp
          src/PrintableCoordinatewise.cpp
          src/PrintableSum.cpp
+         src/PrintArguments.cpp
          src/main.cpp
          src/SvgHelpers.cpp)
 
-set (INCLUDE include/PrintArguments.h
-             include/LayerLayout.h
+set (INCLUDE include/LayerLayout.h
              include/PrintableLayer.h
              include/PrintableInput.h
              include/PrintableMap.h
              include/PrintableCoordinatewise.h
              include/PrintableSum.h
+             include/PrintArguments.h
              include/SvgHelpers.h)
-         
+
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 

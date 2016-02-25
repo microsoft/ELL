@@ -130,7 +130,6 @@ void testGemv()
 int main()
 {
     testGemv();
-    // TODO test subvectorCref
 
     if(testing::testFailed())
     {

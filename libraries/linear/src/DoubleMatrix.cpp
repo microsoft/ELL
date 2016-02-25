@@ -271,13 +271,13 @@ namespace linear
 
     void DoubleMatrix<MatrixStructure::rowSquareUptriangular>::Gemv(const double* p_x, double* p_y, double alpha, double beta) const
     {
-        // TODO - replace the line below with optimized code for this type of matrix
+        // TODO (oferd) - replace the line below with optimized code for this type of matrix
         DoubleMatrixBase::Gemv(p_x, p_y, alpha, beta);
     }
 
     void DoubleMatrix<MatrixStructure::rowSquareUptriangular>::Gevm(const double* p_x, double* p_y, double alpha, double beta) const
     {
-        // TODO - replace the line below with optimized code for this type of matrix
+        // TODO (oferd)- replace the line below with optimized code for this type of matrix
         DoubleMatrixBase::Gevm(p_x, p_y, alpha, beta);
     }
 
@@ -314,13 +314,13 @@ namespace linear
 
     void DoubleMatrix<MatrixStructure::diagonal>::Gemv(const double* p_x, double* p_y, double alpha, double beta) const
     {
-        // TODO - replace the line below with optimized code for this type of matrix
+        // TODO (oferd) - replace the line below with optimized code for this type of matrix
         DoubleMatrixBase::Gemv(p_x, p_y, alpha, beta);
     }
 
     void DoubleMatrix<MatrixStructure::diagonal>::Gevm(const double* p_x, double* p_y, double alpha, double beta) const
     {        
-        // TODO - replace the line below with optimized code for this type of matrix
+        // TODO (oferd) - replace the line below with optimized code for this type of matrix
         DoubleMatrixBase::Gevm(p_x, p_y, alpha, beta);
     }
 }

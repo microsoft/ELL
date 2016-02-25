@@ -23,7 +23,7 @@ namespace optimization
         // get references to the vector and biases
         auto& v = _w;
         auto& v_avg = _predictor.GetVector();
-        //double& b = _b;   // TODO add learning of bias term
+        //double& b = _b;   // TODO (ofer) add learning of bias term
         //double& b_avg = _predictor.GetBias();
 
         // define some constants
