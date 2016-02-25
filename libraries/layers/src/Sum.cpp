@@ -31,7 +31,7 @@ namespace layers
     {
         return 1;
     }
-    void Sum::Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const
+    void Sum::Compute(uint64 layerIndex, std::vector<types::DoubleArray>& outputs) const
     {
         for (uint64 k = 0; k<_inputCoordinates.size(); ++k)
         {
@@ -40,7 +40,7 @@ namespace layers
             {
                 output += outputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
             }
-            outputs[rowIndex][k] = output;
+            outputs[layerIndex][k] = output;
         }
     }
 

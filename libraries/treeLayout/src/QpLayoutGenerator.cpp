@@ -97,7 +97,7 @@ namespace treeLayout
         Layout l(_offsets.size(), min_offset, max_offset, 0.0, max_depth);
 
         // fill Layout positions
-        for (uint64 i = 0; i < (uint64)l.size(); ++i)
+        for (uint64 i = 0; i < (uint64)l.Size(); ++i)
         {
             l[i].SetDepth(depths[_depth_index[i]]);
             l[i].SetOffset(_offsets[i]);

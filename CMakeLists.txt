@@ -28,8 +28,6 @@ add_subdirectory(libraries/utilities)
 add_subdirectory(apply)
 add_subdirectory(compile)
 add_subdirectory(print)
-add_subdirectory(tests/standalone_treeLayout)
-add_subdirectory(tests/test)
 add_subdirectory(trainers/sgd)
 add_subdirectory(scripts)
 

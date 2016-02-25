@@ -21,7 +21,7 @@ namespace utilities
     public:
 
         /// <summary> The result of an evaluation. </summary>
-        struct Evaluation // TODO change to Result?
+        struct Result
         {
             double loss = 0;
             double error = 0;
@@ -56,7 +56,7 @@ namespace utilities
         void Print(std::ostream& os) const;
 
     private:
-        std::vector<Evaluation> _evals;
+        std::vector<Result> _evals;
     };
 
     std::ostream& operator<<(std::ostream& os, const BinaryClassificationEvaluator& evaluation);

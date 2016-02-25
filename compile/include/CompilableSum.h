@@ -15,8 +15,7 @@
 // layers
 #include "Sum.h"
 
-/// A struct that adds printing capabilities to a layer
-///
+/// <summary> A struct that adds printing capabilities to a layer. </summary>
 class CompilableSum : public layers::Sum, public CompilableLayer
 {
 public:

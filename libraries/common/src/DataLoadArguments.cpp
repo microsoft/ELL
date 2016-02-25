@@ -27,13 +27,6 @@ namespace common
             "idf",
             "Path to the input data file",
             "");
-
-        parser.AddOption(       // TODO this parameter is not used anywhere
-            inputDataFileHasWeights,
-            "inputDataFileHasWeights",
-            "idfhw",
-            "Indicates whether the input data file format specifies a weight per example",
-            false);
     }
 
     utilities::ParseResult ParsedDataLoadArguments::PostProcess(const utilities::CommandLineParser & parser)

@@ -93,7 +93,7 @@ namespace layers
         ///
         /// <param name="layer"> The layer. </param>
         ///
-        /// <returns> The row index of the added layer. </returns>
+        /// <returns> The index of the added layer. </returns>
         uint64 PushBack(std::shared_ptr<Layer> layer);
 
         /// <summary> Returns the number of layers in the map. </summary>
@@ -118,13 +118,6 @@ namespace layers
         /// <returns> A MapType. </returns>
         template<typename MapType = Map>
         static MapType Load(const std::string& inputMapFile);
-
-        /// <summary> Returns a list of the coordinates in this layer. </summary>
-        ///
-        /// <param name="layerIndex"> Zero-based index of the layer. </param>
-        ///
-        /// <returns> The coordinate list. </returns>
-        CoordinateList GetCoordinateList(uint64 layerIndex) const;
 
         /// <summary> Serializes the Map in json format. </summary>
         ///

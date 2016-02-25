@@ -24,18 +24,25 @@
 #include <vector>
 #include <memory>
 
+/// <summary> A printable map. </summary>
 class PrintableMap : public layers::Map
 {
 public:
-    /// Prints a human-friendly description of the layer to a stream
+
+    /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///
+    /// <param name="os"> [in,out] Stream to write data to. </param>
+    /// <param name="Arguments"> The arguments. </param>
     void Print(ostream& os, const PrintArguments& Arguments);
 
-    /// Deserializes the Map in json format
+    /// <summary> Deserializes the Map in json format. </summary>
     ///
+    /// <param name="serializer"> [in,out] The serializer. </param>
     void Deserialize(utilities::JsonSerializer& serializer);
 
-    /// Static function for deserializing shared_ptr<Layer>
+    /// <summary> Static function for deserializing shared_ptr<Layer> </summary>
     ///
+    /// <param name="serializer"> [in,out] The serializer. </param>
+    /// <param name="up"> [in,out] The up. </param>
     static void DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<layers::Layer>& up);
 };

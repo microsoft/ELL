@@ -34,9 +34,9 @@ namespace layers
     IndexValue Map::Iterator::Get() const
     {
         auto coordinate = _outputCoordinates[_index];
-        uint64 row = coordinate.GetLayerIndex();
-        uint64 column = coordinate.GetElementIndex();
-        return IndexValue{ _index, (*_spOutputs)[row][column] };
+        uint64 layerIndex = coordinate.GetLayerIndex();
+        uint64 elementIndex = coordinate.GetElementIndex();
+        return IndexValue{ _index, (*_spOutputs)[layerIndex][elementIndex] };
     }
 
     Map::Iterator::Iterator(std::shared_ptr<std::vector<types::DoubleArray>> spOutput, const CoordinateList& outputCoordinates) :
@@ -52,25 +52,14 @@ namespace layers
 
     uint64 Map::PushBack(std::shared_ptr<Layer> layer)
     {
-        uint64 row = _layers.size();
+        uint64 layerIndex = _layers.size();
         _layers.push_back(layer);
-        return row;
+        return layerIndex;
     }
 
     uint64 Map::NumLayers() const
     {
         return _layers.size();
-    }
-
-    CoordinateList Map::GetCoordinateList(uint64 layerIndex) const // TODO remove this
-    {
-        CoordinateList coordinateList;
-        uint64 numColumns = _layers[layerIndex]->Size();
-        for (uint64 column = 0; column < numColumns; ++column)
-        {
-            coordinateList.emplace_back(layerIndex, column);
-        }
-        return coordinateList;
     }
 
     void Map::Serialize(utilities::JsonSerializer & serializer) const

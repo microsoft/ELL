@@ -18,6 +18,7 @@
 // stl
 #include <vector>
 
+/// <summary> A data flow graph. </summary>
 class DataFlowGraph 
 {
 public:

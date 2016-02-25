@@ -13,6 +13,7 @@
 // layers
 #include "Coordinate.h"
 #include "Coordinatewise.h"
+#include "CoordinateListTools.h"
 #include "Sum.h"
 
 // stl
@@ -50,10 +51,10 @@ namespace predictors
 
     void SharedLinearBinaryPredictor::AddTo(layers::Map& map, const layers::CoordinateList& inputCoordinates) const
     {
-        uint64 rowIndex = map.PushBack(std::make_shared<layers::Coordinatewise>(_sp_predictor->w, inputCoordinates, layers::Layer::Type::scale));
-        auto coordinates = map.GetCoordinateList(rowIndex);
-        rowIndex = map.PushBack(std::make_shared<layers::Sum>(coordinates));
+        uint64 layerIndex = map.PushBack(std::make_shared<layers::Coordinatewise>(_sp_predictor->w, inputCoordinates, layers::Layer::Type::scale));
+        auto coordinates = layers::GetCoordinateList(map, layerIndex);
+        layerIndex = map.PushBack(std::make_shared<layers::Sum>(coordinates));
 
-        map.PushBack(std::make_shared<layers::Coordinatewise>(_sp_predictor->b, layers::Coordinate{rowIndex, 0}, layers::Layer::Type::shift));
+        map.PushBack(std::make_shared<layers::Coordinatewise>(_sp_predictor->b, layers::Coordinate{layerIndex, 0}, layers::Layer::Type::shift));
     }
 }

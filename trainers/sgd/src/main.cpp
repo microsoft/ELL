@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
         ParsedSgdArguments sgdArguments;
 
         commandLineParser.AddOptionSet(mapLoadArguments);
-        commandLineParser.AddOptionSet(dataLoadArguments); // TODO - currently, hasWeights is ignored
+        commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(sgdArguments);
         

@@ -63,9 +63,9 @@ namespace layers
 
         /// <summary> Computes the output of the layer. </summary>
         ///
-        /// <param name="rowIndex"> Zero-based index of the row. </param>
+        /// <param name="layerIndex"> Zero-based index of the layer. </param>
         /// <param name="outputs"> [in,out] The outputs. </param>
-        virtual void Compute(uint64 rowIndex, std::vector<types::DoubleArray>& outputs) const = 0; // TODO - resolve the naming row vs. layer
+        virtual void Compute(uint64 layerIndex, std::vector<types::DoubleArray>& outputs) const = 0;
 
         /// <summary> \Returns An Iterator to the inputs that the specified output depends on. </summary>
         ///

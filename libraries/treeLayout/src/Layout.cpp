@@ -56,7 +56,7 @@ namespace treeLayout
         return _positions[index];
     }
 
-    uint64 Layout::size() const
+    uint64 Layout::Size() const
     {
         return (uint64)_positions.size();
     }

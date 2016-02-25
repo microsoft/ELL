@@ -18,17 +18,22 @@
 #include <iostream>
 #include <memory>
 
-/// An interface for classes that can print human-friendly descriptions of themselves
-///
+/// <summary> An interface for classes that can print human-friendly descriptions of themselves. </summary>
 class PrintableLayer 
 {
 public:
-    /// default virtual destructor
-    ///
+    /// <summary> default virtual destructor. </summary>
     virtual ~PrintableLayer() = default;
 
-    /// Prints a human-firiendly description of the underlying class to an output stream
+    /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///
+    /// <param name="os"> [in,out] Stream to write data to. </param>
+    /// <param name="left"> The left. </param>
+    /// <param name="top"> The top. </param>
+    /// <param name="layerIndex"> Zero-based index of the layer. </param>
+    /// <param name="Arguments"> The arguments. </param>
+    ///
+    /// <returns> A LayerLayout. </returns>
     virtual LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const = 0;
 
 protected:

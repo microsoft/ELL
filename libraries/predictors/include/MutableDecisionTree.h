@@ -51,7 +51,7 @@ namespace decisionTree
         };
 
         /// <summary> Represents a pair of Children of a binary tree. </summary>
-        class Children // TODO rename to ChildPair
+        class ChildPair 
         {
         public:
 
@@ -59,7 +59,7 @@ namespace decisionTree
             ///
             /// <param name="child0"> Child 0. </param>
             /// <param name="child1"> Child 1. </param>
-            Children(int child0, int child1);
+            ChildPair(int child0, int child1);
 
             /// <summary> Returns Child 0. </summary>
             ///
@@ -127,16 +127,16 @@ namespace decisionTree
         /// <returns> A ParentIterator. </returns>
         ParentIterator ParentEnd() const;
 
-        /// <summary> An iterator used to expose the Children values of the tree. </summary>
-        using ChildrenIterator = std::vector<Children>::const_iterator;
+        /// <summary> An iterator used to expose the ChildPair values of the tree. </summary>
+        using ChildrenIterator = std::vector<ChildPair>::const_iterator;
 
-        /// <summary> Returns An iterator over Children values that points to the first vertex. </summary>
+        /// <summary> Returns An iterator over ChildPair values that points to the first vertex. </summary>
         ///
         /// <returns> A ChildrenIterator. </returns>
         ChildrenIterator ChildrenBegin() const;
 
         /// <summary>
-        /// Returns An iterator over Children values that points beyond the last vertex.
+        /// Returns An iterator over ChildPair values that points beyond the last vertex.
         /// </summary>
         ///
         /// <returns> A ChildrenIterator. </returns>
@@ -183,7 +183,7 @@ namespace decisionTree
     private:
         
         std::vector<SplitRule> _splitRules;
-        std::vector<Children> _children;
+        std::vector<ChildPair> _children;
         std::vector<int> _parents;
         std::vector<double> _outputs;
     };

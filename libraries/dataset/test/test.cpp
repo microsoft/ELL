@@ -78,7 +78,7 @@ void dotTest()
     double result = c.Dot(a);
     const double expectedResult = 2.2;
 
-    testing::processTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::isEqual(result, expectedResult));
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(result, expectedResult));
 }
 
 /// Tests the Dot() member of ZeroDataVector
@@ -88,7 +88,7 @@ void dotTestZeroDataVector()
     auto a = getVector();
     dataset::ZeroDataVector z;
     double result = z.Dot(a);
-    testing::processTest("Testing dataset::ZeroDataVector::Dot()", testing::isEqual(result, 0.0));
+    testing::ProcessTest("Testing dataset::ZeroDataVector::Dot()", testing::IsEqual(result, 0.0));
 }
 
 /// Tests the Dot() member of OnesDataVector
@@ -98,7 +98,7 @@ void dotTestOnesDataVector()
     auto a = getVector();
     dataset::OnesDataVector o(4);
     double result = o.Dot(a);
-    testing::processTest("Testing dataset::OnesDataVector::Dot()", testing::isEqual(result, 7.0));
+    testing::ProcessTest("Testing dataset::OnesDataVector::Dot()", testing::IsEqual(result, 7.0));
 }
 
 /// Tests the Dot() member of DataVectors
@@ -139,7 +139,7 @@ void addToTest()
     std::string name1 = typeid(DataVectorType1).name();
     std::string name2 = typeid(DataVectorType2).name();
     
-    testing::processTest("Comparing AddTo() in " + name1 + " and " + name2, testing::isEqual(a1, a2));
+    testing::ProcessTest("Comparing AddTo() in " + name1 + " and " + name2, testing::IsEqual(a1, a2));
 }
 
 /// Tests the AddTo() member of ZeroDataVector
@@ -153,7 +153,7 @@ void addToTestZeroDataVector()
 
     z.AddTo(a1);
 
-    testing::processTest("Testing dataset::ZeroDataVector::AddTo()", testing::isEqual(a1, a2));
+    testing::ProcessTest("Testing dataset::ZeroDataVector::AddTo()", testing::IsEqual(a1, a2));
 }
 
 /// Tests the AddTo() member of OnesDataVector
@@ -170,7 +170,7 @@ void addToTestOnesDataVector()
     double norm1 = a1.Norm2();
     double norm2 = a2.Norm2() + 2 * o.Dot(a2) + a2.Size();
 
-    testing::processTest("Testing dataset::OnesDataVector::AddTo()", testing::isEqual(norm1, norm2));
+    testing::ProcessTest("Testing dataset::OnesDataVector::AddTo()", testing::IsEqual(norm1, norm2));
 }
 
 /// Tests the AddTo() member of DataVectors
@@ -200,7 +200,7 @@ void iteratorConstructorTest(const linear::DoubleVector& a)
     std::string name1 = typeid(DataVectorType1).name();
     std::string name2 = typeid(DataVectorType2).name();
 
-    testing::processTest("Casting " + name1 + " to " + name2, testing::isEqual(a, d, 1.0e-6));
+    testing::ProcessTest("Casting " + name1 + " to " + name2, testing::IsEqual(a, d, 1.0e-6));
 }
 
 /// Tests the GetIterator() and Constructors
@@ -297,7 +297,7 @@ void printTest(const linear::DoubleVector& a)
     std::string name1 = typeid(DataVectorType1).name();
     std::string name2 = typeid(DataVectorType2).name();
 
-    testing::processTest("Comparing " + name1 + "::Print() and " + name2 + "::Print()", s1 == s2);
+    testing::ProcessTest("Comparing " + name1 + "::Print() and " + name2 + "::Print()", s1 == s2);
 }
 
 void printTestOnesDataVector()
@@ -319,7 +319,7 @@ void printTestOnesDataVector()
     std::string as = ass.str();
     std::string bs = bss.str();
 
-    testing::processTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::OnesDataVector::Print()", as == bs);
+    testing::ProcessTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::OnesDataVector::Print()", as == bs);
 }
 
 void printTestZeroDataVector()
@@ -336,7 +336,7 @@ void printTestZeroDataVector()
     std::string as = ass.str();
     std::string bs = bss.str();
 
-    testing::processTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::ZeroDataVector::Print()", as == bs);
+    testing::ProcessTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::ZeroDataVector::Print()", as == bs);
 }
 
 void printTest()
@@ -368,13 +368,7 @@ int main()
     iteratorConstructorTest();
     printTest();
 
-    // TODO - test DataVector pushback and NumNonzeros
-    // TODO - test integer list and compressed integer list
-    // TODO - test data vector builder and supervised example builder
-    // TODO - test supervised example
-    // TODO - test parsing iterator, sequential line iterator, and sparse entry parser 
-
-    if(testing::testFailed())
+    if(testing::DidTestFail())
     {
         return 1;
     }

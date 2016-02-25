@@ -29,26 +29,26 @@ namespace decisionTree
         return _value;
     }
 
-    MutableDecisionTree::Children::Children(int child0, int child1) :
+    MutableDecisionTree::ChildPair::ChildPair(int child0, int child1) :
         _child0(child0), _child1(child1)
     {}
 
-    int MutableDecisionTree::Children::GetChild0() const
+    int MutableDecisionTree::ChildPair::GetChild0() const
     {
         return _child0;
     }
 
-    int MutableDecisionTree::Children::GetChild1() const
+    int MutableDecisionTree::ChildPair::GetChild1() const
     {
         return _child1;
     }
 
-    void MutableDecisionTree::Children::SetChild0(int index)
+    void MutableDecisionTree::ChildPair::SetChild0(int index)
     {
         _child0 = index;
     }
 
-    void MutableDecisionTree::Children::SetChild1(int index)
+    void MutableDecisionTree::ChildPair::SetChild1(int index)
     {
         _child1 = index;
     }

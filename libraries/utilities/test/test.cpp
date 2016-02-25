@@ -38,8 +38,8 @@ void testIteratorAdapter()
         index++;
     }
             
-    testing::processTest("utilities::IteratorAdapter.Get", passed);
-    testing::processTest("utilities::IteratorAdapter length", index == vec.size());
+    testing::ProcessTest("utilities::IteratorAdapter.Get", passed);
+    testing::ProcessTest("utilities::IteratorAdapter length", index == vec.size());
 }
 
 float twoPointFiveTimes(int x)
@@ -108,7 +108,7 @@ void testTransformIterator()
         index++;
     }
 
-    testing::processTest("utilities::TransformIterator.Get", passed);
+    testing::ProcessTest("utilities::TransformIterator.Get", passed);
     auto elapsed = timer.Elapsed();
     std::cout << "Elapsed time: " << elapsed << " ms" << std::endl;
 }
@@ -130,7 +130,7 @@ void testParallelTransformIterator()
         transIt.Next();
         index++;
     }
-    testing::processTest("utilities::ParallelTransformIterator.Get", passed);
+    testing::ProcessTest("utilities::ParallelTransformIterator.Get", passed);
     auto elapsed = timer.Elapsed();
     std::cout << "Elapsed time: " << elapsed << " ms" << std::endl;
 }
@@ -139,13 +139,11 @@ void testParallelTransformIterator()
 ///
 int main()
 {
-    // TODO test parser
-
     testIteratorAdapter();
     testTransformIterator();
     testParallelTransformIterator();
 
-    if (testing::testFailed())
+    if (testing::DidTestFail())
     {
         return 1;
     }

@@ -25,7 +25,6 @@ namespace common
     struct DataLoadArguments
     {
         std::string inputDataFile = "";
-        bool inputDataFileHasWeights = false;
     };
 
     /// <summary> A version of DataLoadArguments that adds its members to the command line parser. </summary>
