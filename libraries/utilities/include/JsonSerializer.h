@@ -50,7 +50,6 @@ namespace utilities
         /// <param name="concept"> [in,out] (Optional) If non-null, the concept. </param>
         template<typename KeyType, typename ValueType>
         void Write(KeyType key, const std::shared_ptr<ValueType>& ptr, typename std::enable_if<std::is_class<ValueType>::value>::type* concept = nullptr);
-        // TODO there are two styles of adding "concepts" in this solution. One of them appears above. unify.
 
         /// <summary> write classes. </summary>
         ///

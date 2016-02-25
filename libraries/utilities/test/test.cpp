@@ -132,8 +132,6 @@ void testParallelTransformIterator()
 ///
 int main()
 {
-    // TODO test parser
-
     testIteratorAdapter();
     testTransformIterator();
     testParallelTransformIterator();
