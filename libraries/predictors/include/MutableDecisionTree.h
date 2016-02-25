@@ -15,29 +15,34 @@
 
 namespace decisionTree
 {
-    /// Represents a growable binary decision tree with interval splitting rules and outputs in all vertices
-    ///
+    /// <summary>
+    /// Represents a growable binary decision tree with interval splitting rules and outputs in all
+    /// vertices.
+    /// </summary>
     class MutableDecisionTree
     {
 
     public:
         
-        /// Represents an index value pair, used to store the split rules
-        ///
+        /// <summary> Represents an index value pair, used to store the split rules. </summary>
         class SplitRule
         {
         public:
 
-            /// Constructs an index value
+            /// <summary> Constructs an index value. </summary>
             ///
+            /// <param name="index"> Zero-based index of the. </param>
+            /// <param name="value"> The value. </param>
             SplitRule(int index, double value);
 
-            /// \return The index
+            /// <summary> Returns the index. </summary>
             ///
+            /// <returns> The index. </returns>
             int GetIndex() const;
 
-            /// \returns The value
+            /// <summary> Returns the value. </summary>
             ///
+            /// <returns> A double. </returns>
             double Get() const;
 
         private:
@@ -45,30 +50,35 @@ namespace decisionTree
             double _value;
         };
 
-        /// Represents a pair of Children of a binary tree
-        ///
+        /// <summary> Represents a pair of Children of a binary tree. </summary>
         class Children // TODO rename to ChildPair
         {
         public:
 
-            /// Constructs the pair of Children
+            /// <summary> Constructs the pair of Children. </summary>
             ///
+            /// <param name="child0"> Child 0. </param>
+            /// <param name="child1"> Child 1. </param>
             Children(int child0, int child1);
 
-            /// \returns Child 0
+            /// <summary> Returns Child 0. </summary>
             ///
+            /// <returns> The child 0. </returns>
             int GetChild0() const;
 
-            /// \returns Child 1
+            /// <summary> Returns Child 1. </summary>
             ///
+            /// <returns> The child 1. </returns>
             int GetChild1() const;
 
-            /// Sets child 0
+            /// <summary> Sets child 0. </summary>
             ///
+            /// <param name="index"> Zero-based index of the. </param>
             void SetChild0(int index);
 
-            /// Sets child 1
+            /// <summary> Sets child 1. </summary>
             ///
+            /// <param name="index"> Zero-based index of the. </param>
             void SetChild1(int index);
 
         private:
@@ -76,68 +86,92 @@ namespace decisionTree
             int _child1;
         };
 
-        /// Constructs an empty mutable decision tree with one leaf, the root. 
+        /// <summary> Constructs an empty mutable decision tree with one leaf, the root. </summary>
         ///
+        /// <param name="root_output"> The root output. </param>
         MutableDecisionTree(double root_output = 0.0);
 
-        /// An iterator used to expose the tree split rules
-        ///
+        /// <summary> An iterator used to expose the tree split rules. </summary>
         using SplitRuleIterator = std::vector<SplitRule>::const_iterator;
 
-        /// \returns An iterator over the split rules that points to the first SplitRule
+        /// <summary>
+        /// Returns An iterator over the split rules that points to the first SplitRule.
+        /// </summary>
         ///
+        /// <returns> A SplitRuleIterator. </returns>
         SplitRuleIterator SplitRuleBegin() const;
 
-        /// \returns An iterator over the split rules that points beyond the last SplitRule
+        /// <summary>
+        /// Returns An iterator over the split rules that points beyond the last SplitRule.
+        /// </summary>
         ///
+        /// <returns> A SplitRuleIterator. </returns>
         SplitRuleIterator SplitRuleEnd() const;
 
-        /// An iterator used to expose the parent identities of vertices in the the tree
-        ///
+        /// <summary>
+        /// An iterator used to expose the parent identities of vertices in the the tree.
+        /// </summary>
         using ParentIterator = std::vector<int>::const_iterator;
 
-        /// \returns An iterator over parent indentities that points to the first vertex
+        /// <summary>
+        /// Returns An iterator over parent indentities that points to the first vertex.
+        /// </summary>
         ///
+        /// <returns> A ParentIterator. </returns>
         ParentIterator ParentBegin() const;
 
-        /// \returns An iterator over parent identities that points beyond the last vertex
+        /// <summary>
+        /// Returns An iterator over parent identities that points beyond the last vertex.
+        /// </summary>
         ///
+        /// <returns> A ParentIterator. </returns>
         ParentIterator ParentEnd() const;
 
-        /// An iterator used to expose the Children values of the tree
-        ///
+        /// <summary> An iterator used to expose the Children values of the tree. </summary>
         using ChildrenIterator = std::vector<Children>::const_iterator;
 
-        /// \returns An iterator over Children values that points to the first vertex
+        /// <summary> Returns An iterator over Children values that points to the first vertex. </summary>
         ///
+        /// <returns> A ChildrenIterator. </returns>
         ChildrenIterator ChildrenBegin() const;
 
-        /// \returns An iterator over Children values that points beyond the last vertex
+        /// <summary>
+        /// Returns An iterator over Children values that points beyond the last vertex.
+        /// </summary>
         ///
+        /// <returns> A ChildrenIterator. </returns>
         ChildrenIterator ChildrenEnd() const;
 
-        /// An iterator used to expose the output values of the tree
-        ///
+        /// <summary> An iterator used to expose the output values of the tree. </summary>
         using OutputIterator = std::vector<double>::const_iterator;
 
-        /// \returns An iterator over output values that points to the first vertex
+        /// <summary> Returns An iterator over output values that points to the first vertex. </summary>
         ///
+        /// <returns> An OutputIterator. </returns>
         OutputIterator OutputBegin() const;
 
-        /// \returns An iterator over output values that points beyond the last vertex
+        /// <summary> Returns An iterator over output values that points beyond the last vertex. </summary>
         ///
+        /// <returns> An OutputIterator. </returns>
         OutputIterator OutputEnd() const;
 
-        /// \returns The number of vertices
+        /// <summary> Returns the number of vertices. </summary>
         ///
+        /// <returns> The number vertices. </returns>
         int GetNumVertices() const;
 
-        /// \returns The number of interior vertices
+        /// <summary> Returns the number of interior vertices. </summary>
         ///
+        /// <returns> The number interior vertices. </returns>
         int GetNumInteriorVertices() const;
 
-        /// Performs a split of a leaf
+        /// <summary> Performs a split of a leaf. </summary>
         ///
+        /// <param name="leaf_index"> Zero-based index of the leaf. </param>
+        /// <param name="input_index"> Zero-based index of the input. </param>
+        /// <param name="treshold"> The treshold. </param>
+        /// <param name="child0_output"> The child 0 output. </param>
+        /// <param name="child1_output"> The child 1 output. </param>
         void SplitLeaf(int leaf_index, 
                       int input_index, 
                       double treshold, 

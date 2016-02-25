@@ -25,34 +25,45 @@
 namespace predictors
 {
 
+    /// <summary> A shared linear binary predictor. </summary>
     class SharedLinearBinaryPredictor
     {
     public:
         SharedLinearBinaryPredictor(uint64 dim);
 
-        /// \returns the underlying DoubleVector
+        /// <summary> Returns the underlying DoubleVector. </summary>
         ///
+        /// <returns> The vector. </returns>
         linear::DoubleVector& GetVector();
 
-        /// \returns the const reference underlying DoubleVector
+        /// <summary> Returns the const reference underlying DoubleVector. </summary>
         ///
+        /// <returns> The vector. </returns>
         const linear::DoubleVector& GetVector() const;
 
-        /// \returns the underlying bias
+        /// <summary> Returns the underlying bias. </summary>
         ///
+        /// <returns> The bias. </returns>
         double& GetBias();
 
-        /// \returns the underlying bias
+        /// <summary> Returns the underlying bias. </summary>
         ///
+        /// <returns> The bias. </returns>
         double GetBias() const;
 
-        /// \returns the output of the predictor for a given example
+        /// <summary> Returns the output of the predictor for a given example. </summary>
         ///
+        /// <typeparam name="DataVectorType"> Type of the data vector type. </typeparam>
+        /// <param name="example"> The example. </param>
+        ///
+        /// <returns> A double. </returns>
         template<typename DataVectorType>
         double Predict(const DataVectorType& example) const;
 
-        /// Adds the predictor to a map
+        /// <summary> Adds the predictor to a map. </summary>
         ///
+        /// <param name="map"> [in,out] The map. </param>
+        /// <param name="inputCoordinates"> The input coordinates. </param>
         void AddTo(layers::Map& map, const layers::CoordinateList& inputCoordinates) const;
 
     private:
