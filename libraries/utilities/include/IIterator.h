@@ -34,6 +34,6 @@ namespace utilities
 
         /// Returns the weight of the current example
         ///
-        virtual T Get() = 0;
+        virtual T Get() const = 0;
     };
 }

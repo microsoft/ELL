@@ -30,8 +30,14 @@ namespace utilities
     };
     
     template <typename InType, typename OutType, typename Func>
-    OutType TransformIterator<InType, OutType, Func>::Get() 
+    OutType TransformIterator<InType, OutType, Func>::Get() const
     {
         return _transformFn(_inIter.Get()); 
+    }
+
+    template <typename InType, typename FnType>
+    auto MakeTransform(IIterator<InType>& inIterator, FnType transformFn) -> TransformIterator<InType, decltype(transformFn(std::declval<InType>())), FnType>
+    {
+        return TransformIterator<InType, decltype(transformFn(std::declval<InType>())), FnType>(inIterator, transformFn);
     }
 }

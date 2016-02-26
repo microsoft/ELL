@@ -74,7 +74,7 @@ namespace utilities
     };
     
     template <typename InType, typename OutType, typename Func, int MaxTasks>
-    OutType ParallelTransformIterator<InType, OutType, Func, MaxTasks>::Get()
+    OutType ParallelTransformIterator<InType, OutType, Func, MaxTasks>::Get() const
     {
         // Need to cache output of current std::future, because calling std::future::get() twice is an error
         if(!_currentOutputValid)
@@ -85,4 +85,11 @@ namespace utilities
 
         return _currentOutput;
     }
+
+    template <typename InType, typename FnType>
+    auto MakeParallelTransform(IIterator<InType>& inIterator, FnType transformFn) -> ParallelTransformIterator<InType, decltype(transformFn(std::declval<InType>())), FnType>
+    {
+        return ParallelTransformIterator<InType, decltype(transformFn(std::declval<InType>())), FnType>(inIterator, transformFn);
+    }
+
 }

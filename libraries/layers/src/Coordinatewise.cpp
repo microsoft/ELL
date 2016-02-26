@@ -59,9 +59,9 @@ namespace layers
         }
     }
 
-    utilities::VectorIterator<Coordinate> Coordinatewise::GetInputCoordinates(uint64 index) const
+    Layer::Iterator Coordinatewise::GetInputCoordinates(uint64 index) const
     {
-        return utilities::VectorIterator<Coordinate>(_inputCoordinates.cbegin()+index, _inputCoordinates.cbegin()+index+1);
+        return Layer::Iterator(_inputCoordinates.cbegin()+index, _inputCoordinates.cbegin()+index+1);
     }
 
     void Coordinatewise::Serialize(utilities::JsonSerializer& serializer) const

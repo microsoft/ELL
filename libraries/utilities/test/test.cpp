@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IIterator.h"
-#include "IteratorAdapter.h"
+#include "StlIteratorAdapter.h"
 #include "TransformIterator.h"
 #include "ParallelTransformIterator.h"
 
@@ -28,7 +28,7 @@ void testIteratorAdapter()
 {
     // utilities::IteratorAdapter test
     std::vector<int> vec { 1, 2, 3, 4, 5, 6 };
-    auto it = utilities::MakeIterator(vec.begin(), vec.end());
+    auto it = utilities::MakeIteratorAdapter(vec.begin(), vec.end());
     
     bool passed = true;
     int index = 0;
@@ -96,7 +96,7 @@ void testTransformIterator()
     std::vector<int> vec(64);
     std::iota(vec.begin(), vec.end(), 5);
 
-    auto srcIt = utilities::MakeIterator(vec.begin(), vec.end());
+    auto srcIt = utilities::MakeIteratorAdapter(vec.begin(), vec.end());
     auto transIt = MakeTransform(srcIt, twoPointFiveTimes);
 
     MillisecondTimer timer;
@@ -119,7 +119,7 @@ void testParallelTransformIterator()
     std::vector<int> vec(64);
     std::iota(vec.begin(), vec.end(), 5);
 
-    auto srcIt = utilities::MakeIterator(vec.begin(), vec.end());
+    auto srcIt = utilities::MakeIteratorAdapter(vec.begin(), vec.end());
     auto transIt = MakeParallelTransform(srcIt, twoPointFiveTimes);
 
     bool passed = true;
