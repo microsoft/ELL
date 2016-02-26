@@ -79,7 +79,7 @@ namespace layers
 
         /// <summary> Computes the Map. </summary>
         ///
-        /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
+        /// <typeparam name="IndexValueIteratorType"> Type of the index value iterator type. </typeparam>
         /// <typeparam name="IIndexValueIterator"> Type of the index value iterator. </typeparam>
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
