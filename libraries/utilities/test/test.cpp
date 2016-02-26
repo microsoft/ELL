@@ -33,7 +33,7 @@ void testIteratorAdapter()
     int index = 0;
     while(it.IsValid())
     {
-        passed == passed && (it.Get() == vec[index]);
+        passed = passed && (it.Get() == vec[index]);
         it.Next();
         index++;
     }
