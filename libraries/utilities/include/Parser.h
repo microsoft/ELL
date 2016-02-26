@@ -12,10 +12,8 @@
 
 namespace utilities
 {
-    class Parser
+    namespace Parser
     {
-    public:
-
         /// <summary> The results of the parse command: success = Parsing succeeded; badFormat = The string
         /// was not formatted correctly; endOfString = The pointer pStr points \0 or to whitespace
         /// followed by \0; outOfRange = The number was in correct format but its value exceeds the range
@@ -31,12 +29,12 @@ namespace utilities
         ///
         /// <returns> A Result. </returns>
         template<typename ValueType>
-        static Result Parse(const char*& pStr, /* out */ ValueType& value);
+        Result Parse(const char*& pStr, /* out */ ValueType& value);
 
         /// <summary> Advances pStr until it points to a non-whitespace character. </summary>
         ///
         /// <param name="pStr"> The string pointer. </param>
-        static inline void Trim(const char*& pStr);
+        inline void Trim(const char*& pStr);
     };
 }
 

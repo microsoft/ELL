@@ -11,7 +11,7 @@
 #include "LinearOperation.h"
 
 // utilities
-#include "StringFormat.h"
+#include "Format.h"
 
 LinearOperation::LinearOperation(double a, double b) : _a(a), _b(b)
 {}
@@ -42,7 +42,7 @@ std::string LinearOperation::ToString(const std::string & sourceVariableName) co
     {
         if (_a != 1)
         {
-            return utilities::StringFormat("%e * %s", _a, sourceVariableName);
+            return utilities::Format::Printf("%e * %s", _a, sourceVariableName);
         }
         else
         {
@@ -57,11 +57,11 @@ std::string LinearOperation::ToString(const std::string & sourceVariableName) co
         }
         else if (_a == 1)
         {
-            return utilities::StringFormat("%s + %e", sourceVariableName, _b);
+            return utilities::Format::Printf("%s + %e", sourceVariableName, _b);
         }
         else
         {
-            return utilities::StringFormat("%e * %s + %e", _a, sourceVariableName, _b);
+            return utilities::Format::Printf("%e * %s + %e", _a, sourceVariableName, _b);
         }
     }
 }
