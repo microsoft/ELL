@@ -24,6 +24,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/CommandLineParser.h
                        include/IIterator.h
                        include/IntegerStack.h
+					   include/IteratorAdapter.h
                        include/JsonSerializer.h
                        include/ParallelTransformIterator.h
                        include/Parser.h
