@@ -16,22 +16,22 @@
 namespace utilities
 {
     template<typename ArgType, typename ... ArgTypes>
-    void StringFormat(std::ostream& os, const char* cstr, ArgType arg, ArgTypes ...args)
+    Format::Result Format::Printf(std::ostream& os, const char* format, ArgType arg, ArgTypes ...args)
     {
         int n=0;
-        const char* ptr = cstr;
+        const char* ptr = format;
         while(*ptr != '%' && *ptr != '\0')
         {
             ++n;
             ++ptr;
         }
 
-        os.write(cstr, n);
+        os.write(format, n);
 
         // if reached end of string, exit
         if(*ptr == '\0')
         {
-            return;
+            return Result::earlyEndOfFormat;
         }
 
         // if reached '%' character, print an arg
@@ -72,25 +72,24 @@ namespace utilities
 
         // if end of string reached, exit
         ++ptr;
-        if(*ptr == '\0')
-        {
-            return;
-        }
-
-        StringFormat(os, ptr, args...);
+        return Format::Printf(os, ptr, args...);
     }
 
     template<typename ... ArgTypes>
-    void StringFormat(std::ostream& os, const char* cstr, ArgTypes ...args)
+    Format::Result Format::Printf(std::ostream& os, const char* format, ArgTypes ...args)
     {
-        os << cstr;
+        if(*format != '\0')
+        {
+            os << format;
+        }
+        return Result::success;
     }
 
     template<typename ... ArgTypes>
-    std::string StringFormat(const char* cstr, ArgTypes ...args)
+    std::string Format::Printf(const char* format, ArgTypes ...args)
     {
         std::stringstream ss;
-        StringFormat(ss, cstr, args...);
+        Format::Printf(ss, format, args...);
         return ss.str();
     }
 }
