@@ -15,6 +15,7 @@ endif()
 set (SRC src/BinaryClassificationEvaluator.cpp
                    src/CommandLineParser.cpp
                    src/Files.cpp
+                   src/Format.cpp
                    src/IntegerStack.cpp
                    src/JsonSerializer.cpp
                    src/RandomEngines.cpp
@@ -71,9 +72,9 @@ include_directories(../testing/include)
 add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-target_link_libraries(${TEST_NAME} dataset linear testing -pthread)
+target_link_libraries(${TEST_NAME} utilities dataset linear testing -pthread)
 else()
-target_link_libraries(${TEST_NAME} dataset linear testing)
+target_link_libraries(${TEST_NAME} utilities dataset linear testing)
 endif()
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")

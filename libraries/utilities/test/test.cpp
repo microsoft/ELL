@@ -12,6 +12,7 @@
 #include "StlIteratorAdapter.h"
 #include "TransformIterator.h"
 #include "ParallelTransformIterator.h"
+#include "Format.h"
 
 // testing
 #include "testing.h"
@@ -136,13 +137,65 @@ void testParallelTransformIterator()
     std::cout << "Elapsed time: " << elapsed << " ms" << std::endl;
 }
 
+template <typename ... Args>
+void testMatchScanf(const char* content, const char* format, utilities::Format::Result expectedResult, Args ...args)
+{
+    auto result = utilities::Format::MatchScanf(content, format, args...);
+    testing::ProcessTest("utilities::Format:MatchScanf", result == expectedResult);
+}
+
+void testMatchScanf()
+{
+    using utilities::Format::Result;
+
+    // standard match
+    testMatchScanf("integer 123 and float -33.3", "integer % and float %", Result::success, int(), double());
+
+    // tolerate extra spaces in content
+    testMatchScanf("    integer    123   and float    -33.3     ", "integer % and float %", Result::success, int(), double());
+
+    // tolerate extra whitespace in content
+    testMatchScanf("    integer \t   123 \t  and float    -33.3   \t  ", "integer % and float %", Result::success, int(), double());
+
+    // tolerate extra spaces in format
+    testMatchScanf("integer 123 and float -33.3", "     integer  %  and     float  %    ", Result::success, int(), double());
+
+    // early end of content
+    testMatchScanf("integer 123 and ", "integer % and float %", Result::earlyEndOfContent, int(), double());
+
+    // early end of content
+    testMatchScanf("integer 123 and float -33.3", "integer % and float %X", Result::earlyEndOfContent, int(), double());
+
+    // early end of format
+    testMatchScanf("integer 123 and float -33.3", "integer % and ", Result::earlyEndOfFormat, int(), double());
+
+    // early end of format
+    testMatchScanf("integer 123 and float -33.3X", "integer % and float %", Result::earlyEndOfFormat, int(), double());
+
+    // mismatch
+    testMatchScanf("integer 123 and X float -33.3", "integer % and float %", Result::mismatch, int(), double());
+
+    // mismatch
+    testMatchScanf("Xinteger 123 and float -33.3", "integer % and float %", Result::mismatch, int(), double());
+
+    // mismatch
+    testMatchScanf("integer 123 and float -33.3", "integer % and X float %", Result::mismatch, int(), double());
+
+    // mismatch
+    testMatchScanf("integer 123 and float -33.3", "Xinteger % and float %", Result::mismatch, int(), double());
+
+    // parser error
+    testMatchScanf("integer X and float -33.3", "integer % and float %", Result::parserError, int(), double());
+}
+
 /// Runs all tests
 ///
 int main()
 {
-    testIteratorAdapter();
-    testTransformIterator();
-    testParallelTransformIterator();
+//    testIteratorAdapter();
+  //  testTransformIterator();
+  //  testParallelTransformIterator();
+    testMatchScanf();
 
     if (testing::DidTestFail())
     {
