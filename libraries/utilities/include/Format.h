@@ -20,7 +20,15 @@ namespace utilities
 {
     namespace Format
     {
-        enum class Result {success, earlyEndOfFormat, earlyEndOfContent, mismatch, parserError};
+        /// <summary>
+        /// Results of Match and Scanf. success = match and parse of all arguments successful,
+        /// formatEndDoesNotMatchSpace = end of format must match end of content or whitespace,
+        /// earlyEndOfContent = content ended before format, mismatch = character in content does not
+        /// match the one in format, parserError = parse failed, missingArgument = format has more %
+        /// symbols than arguments provided, unexpectedPercentSymbol = when an argument of Match contains
+        /// the % symbol.
+        /// </summary>
+        enum class Result {success, formatEndDoesNotMatchSpace, earlyEndOfContent, mismatch, parserError, missingArgument, unexpectedPercentSymbol};
 
         /// <summary> Formats a string, similar to printf. </summary>
         ///
@@ -52,13 +60,17 @@ namespace utilities
         template<typename ... ArgTypes>
         std::string Printf(const char* format, ArgTypes ...args);
 
-        Result MatchStrings(const char*& content, const char*& format);
+        template<typename ... ArgTypes>
+        Result Match(const char*& content, const char* format, const char* cStr, ArgTypes ...args);
 
         template<typename ArgType, typename ... ArgTypes>
         Result MatchScanf(const char* content, const char* format, ArgType& arg, ArgTypes& ...args);
 
         template<typename ... ArgTypes>
         Result MatchScanf(const char* content, const char* format, ArgTypes& ...args);
+
+        Result Match(const char*& content, const char*& format);
+
 
     }
 }

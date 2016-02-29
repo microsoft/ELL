@@ -12,7 +12,7 @@
 
 namespace utilities
 {
-    Format::Result Format::MatchStrings(const char*& content, const char*& format)
+    Format::Result Format::Match(const char*& content, const char*& format)
     {
         Parser::Trim(content);
         Parser::Trim(format);
@@ -31,24 +31,20 @@ namespace utilities
             }
             else if (*content == '\0')
             {
-                return Format::Result::earlyEndOfContent;
+                return Result::earlyEndOfContent;
             }
             else
             {
-                return Format::Result::mismatch;
+                return Result::mismatch;
             }
         }
 
-        while (std::isspace(*content))
+        // the end of a format string must match either the end of content or whitespace in content
+        if (*format == '\0' && *content != '\0' && std::isspace(*content) == false)
         {
-            ++content;
+            return Result::formatEndDoesNotMatchSpace;
         }
 
-        if (*format == '\0' && *content != '\0')
-        {
-            return Format::Result::earlyEndOfFormat;
-        }
-
-        return Format::Result::success;
+        return Result::success;
     }
 }

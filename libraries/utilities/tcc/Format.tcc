@@ -35,7 +35,7 @@ namespace utilities
         // if reached end of string, exit
         if(*ptr == '\0')
         {
-            return Result::earlyEndOfFormat;
+            return Result::formatEndDoesNotMatchSpace;
         }
 
         // if reached '%' character, print an arg
@@ -97,21 +97,52 @@ namespace utilities
         return ss.str();
     }
 
-    template<typename ArgType, typename ... ArgTypes>
-    Format::Result Format::MatchScanf(const char* content, const char* format, ArgType& arg, ArgTypes& ...args)
-    {
-        auto matchResult = MatchStrings(content, format);
 
-        if (matchResult != Format::Result::success)
+    template<typename ... ArgTypes>
+    Format::Result Format::Match(const char*& content, const char* format, const char* cStr, ArgTypes ...args)
+    {
+        auto matchResult = Match(content, format);
+
+        if (matchResult != Result::success)
         {
             return matchResult;
         }
         if (*format == '\0')
         {
-            return Format::Result::earlyEndOfFormat;
+            return Result::success;
         }
 
         ++format;
+
+        matchResult = Match(content, cStr);
+        if (matchResult != Result::success)
+        {
+            return matchResult;
+        }
+        if (*cStr != '\0')
+        {
+            return Result::unexpectedPercentSymbol;
+        }
+
+        return Match(content, format, args...);
+    }
+
+    template<typename ArgType, typename ... ArgTypes>
+    Format::Result Format::MatchScanf(const char* content, const char* format, ArgType& arg, ArgTypes& ...args)
+    {
+        auto matchResult = Match(content, format);
+
+        if (matchResult != Result::success)
+        {
+            return matchResult;
+        }
+        if (*format == '\0')
+        {
+            return Result::success;
+        }
+
+        ++format;
+
         auto parserResult = Parser::Parse<std::remove_reference_t<ArgType>>(content, arg);
         if (parserResult != Parser::Result::success)
         {
@@ -124,15 +155,16 @@ namespace utilities
     template<typename ... ArgTypes>
     Format::Result Format::MatchScanf(const char* content, const char* format, ArgTypes& ...args)
     {
-        auto result = MatchStrings(content, format);
-        if (result != Format::Result::success)
+        auto result = Match(content, format);
+        if (result != Result::success)
         {
             return result;
         }
-        if (*content != '\0' || *format != '\0')
+
+        if (*format != '\0')
         {
-            return Format::Result::mismatch;
+            return Result::missingArgument;
         }
-        return Format::Result::success;
+        return Result::success;
     }
 }
