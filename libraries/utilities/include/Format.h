@@ -43,12 +43,9 @@ namespace utilities
 
         /// <summary> Formats a string, similar to printf (end condition in the template recurrsion). </summary>
         ///
-        /// <typeparam name="ArgTypes"> Type of the argument types. </typeparam>
         /// <param name="os"> [in,out] Stream to write to. </param>
         /// <param name="format"> The format. </param>
-        /// <param name="...args"> The arguments that are inserted in the format. </param>
-        template<typename ... ArgTypes>
-        Result Printf(std::ostream& os, const char* format, ArgTypes ...args);
+        Result Printf(std::ostream& os, const char* format);
 
         /// <summary> Formats a string, similar to printf </summary>
         ///
@@ -66,8 +63,7 @@ namespace utilities
         template<typename ArgType, typename ... ArgTypes>
         Result MatchScanf(const char* content, const char* format, ArgType& arg, ArgTypes& ...args);
 
-        template<typename ... ArgTypes>
-        Result MatchScanf(const char* content, const char* format, ArgTypes& ...args);
+        Result MatchScanf(const char* content, const char* format);
 
         Result Match(const char*& content, const char*& format);
 

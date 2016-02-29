@@ -12,6 +12,15 @@
 
 namespace utilities
 {
+    Format::Result Format::Printf(std::ostream& os, const char* format)
+    {
+        if (*format != '\0')
+        {
+            os << format;
+        }
+        return Result::success;
+    }
+
     Format::Result Format::Match(const char*& content, const char*& format)
     {
         Parser::Trim(content);
@@ -45,6 +54,21 @@ namespace utilities
             return Result::formatEndDoesNotMatchSpace;
         }
 
+        return Result::success;
+    }
+
+    Format::Result Format::MatchScanf(const char* content, const char* format)
+    {
+        auto result = Match(content, format);
+        if (result != Result::success)
+        {
+            return result;
+        }
+
+        if (*format != '\0')
+        {
+            return Result::missingArgument;
+        }
         return Result::success;
     }
 }

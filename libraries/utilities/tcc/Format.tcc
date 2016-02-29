@@ -80,16 +80,6 @@ namespace utilities
     }
 
     template<typename ... ArgTypes>
-    Format::Result Format::Printf(std::ostream& os, const char* format, ArgTypes ...args)
-    {
-        if(*format != '\0')
-        {
-            os << format;
-        }
-        return Result::success;
-    }
-
-    template<typename ... ArgTypes>
     std::string Format::Printf(const char* format, ArgTypes ...args)
     {
         std::stringstream ss;
@@ -152,19 +142,4 @@ namespace utilities
         return MatchScanf(content, format, args...);
     }
 
-    template<typename ... ArgTypes>
-    Format::Result Format::MatchScanf(const char* content, const char* format, ArgTypes& ...args)
-    {
-        auto result = Match(content, format);
-        if (result != Result::success)
-        {
-            return result;
-        }
-
-        if (*format != '\0')
-        {
-            return Result::missingArgument;
-        }
-        return Result::success;
-    }
 }
