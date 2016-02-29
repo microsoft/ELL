@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "IIterator.h"
-
 // stl
 #include <vector>
 #include <future>
@@ -21,17 +19,17 @@ namespace utilities
     //
     // ParallelTransformIterator
     //
-    template <typename InType, typename OutType, typename Func, int MaxTasks=0>
-    class ParallelTransformIterator : public IIterator<OutType>
+    template <typename InputIteratorType, typename OutType, typename Func, int MaxTasks=0>
+    class ParallelTransformIterator
     {
     public:
-        ParallelTransformIterator(IIterator<InType>& inIter, Func transformFn);
-        virtual bool IsValid() const override;
-        virtual void Next() override;
-        virtual OutType Get() const override;
+        ParallelTransformIterator(InputIteratorType& inIter, Func transformFn);
+        bool IsValid() const;
+        void Next();
+        OutType Get() const;
 
     private:
-        IIterator<InType>& _inIter;
+        InputIteratorType& _inIter;
         Func _transformFn;
 
         mutable std::vector<std::future<OutType>> _futures; // mutable because future::get() isn't const
@@ -42,8 +40,8 @@ namespace utilities
     };
 
     // Convenience function for creating ParallelTransformIterators
-    template <typename InType, typename FnType>
-    auto MakeParallelTransform(IIterator<InType>& inIterator, FnType transformFn)->ParallelTransformIterator<InType, decltype(transformFn(std::declval<InType>())), FnType>;
+    template <typename InputIteratorType, typename FnType>
+    auto MakeParallelTransform(InputIteratorType& inIterator, FnType transformFn)->ParallelTransformIterator<InputIteratorType, decltype(transformFn(inIterator.Get())), FnType>;
 }
 
 #include "ParallelTransformIterator.tcc"

@@ -2,7 +2,7 @@
 //
 //  Project:  [projectName]
 //  File:     StlIteratorAdapter.h (utilities)
-//  Authors:  Chuck Jacobs
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //
@@ -10,22 +10,20 @@
 
 #pragma once
 
-#include "IIterator.h"
-
 // stl
 #include <vector>
 
 namespace utilities
 {
     template <typename IteratorType, typename ValueType> // = decltype(*std::declval<IteratorType>())>
-    class StlIteratorAdapter : public IIterator<ValueType>
+    class StlIteratorAdapter
     {
     public:
         StlIteratorAdapter(IteratorType begin, IteratorType end);
-
-        virtual bool IsValid() const override;
-        virtual void Next() override;
-        virtual ValueType Get() const override;
+        
+        bool IsValid() const;
+        void Next();
+        ValueType Get() const;
 
     private:
         IteratorType _current;

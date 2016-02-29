@@ -19,8 +19,8 @@ namespace utilities
     // ParallelTransformIterator definitions
     //
 
-    template <typename InType, typename OutType, typename Func, int MaxTasks>
-    ParallelTransformIterator<InType, OutType, Func, MaxTasks>::ParallelTransformIterator(IIterator<InType>& inIter, Func transformFn) : _inIter(inIter), _transformFn(transformFn), _currentIndex(0), _endIndex(-1), _currentOutputValid(false)
+    template <typename InputIteratorType, typename OutType, typename Func, int MaxTasks>
+    ParallelTransformIterator<InputIteratorType, OutType, Func, MaxTasks>::ParallelTransformIterator(InputIteratorType& inIter, Func transformFn) : _inIter(inIter), _transformFn(transformFn), _currentIndex(0), _endIndex(-1), _currentOutputValid(false)
     {
         // Fill the buffer with futures that are the result of calling std::async(transformFn) on inIter
         int maxTasks = MaxTasks == 0 ? std::thread::hardware_concurrency() : MaxTasks;
@@ -42,14 +42,14 @@ namespace utilities
         }
     }
     
-    template <typename InType, typename OutType, typename Func, int MaxTasks>
-    bool ParallelTransformIterator<InType, OutType, Func, MaxTasks>::IsValid() const
+    template <typename InputIteratorType, typename OutType, typename Func, int MaxTasks>
+    bool ParallelTransformIterator<InputIteratorType, OutType, Func, MaxTasks>::IsValid() const
     {
         return _currentIndex != _endIndex;
     }
 
-    template <typename InType, typename OutType, typename Func, int MaxTasks>
-    void ParallelTransformIterator<InType, OutType, Func, MaxTasks>::Next()
+    template <typename InputIteratorType, typename OutType, typename Func, int MaxTasks>
+    void ParallelTransformIterator<InputIteratorType, OutType, Func, MaxTasks>::Next()
     {
         if(!IsValid())
         {
@@ -73,8 +73,8 @@ namespace utilities
         _currentIndex = (_currentIndex+1)%_futures.size();
     };
     
-    template <typename InType, typename OutType, typename Func, int MaxTasks>
-    OutType ParallelTransformIterator<InType, OutType, Func, MaxTasks>::Get() const
+    template <typename InputIteratorType, typename OutType, typename Func, int MaxTasks>
+    OutType ParallelTransformIterator<InputIteratorType, OutType, Func, MaxTasks>::Get() const
     {
         // Need to cache output of current std::future, because calling std::future::get() twice is an error
         if(!_currentOutputValid)
@@ -86,10 +86,10 @@ namespace utilities
         return _currentOutput;
     }
 
-    template <typename InType, typename FnType>
-    auto MakeParallelTransform(IIterator<InType>& inIterator, FnType transformFn) -> ParallelTransformIterator<InType, decltype(transformFn(std::declval<InType>())), FnType>
+    template <typename InputIteratorType, typename FnType>
+    auto MakeParallelTransform(InputIteratorType& inIterator, FnType transformFn) -> ParallelTransformIterator<InputIteratorType, decltype(transformFn(inIterator.Get())), FnType>
     {
-        return ParallelTransformIterator<InType, decltype(transformFn(std::declval<InType>())), FnType>(inIterator, transformFn);
+        using OutType = decltype(transformFn(inIterator.Get()));
+        return ParallelTransformIterator<InputIteratorType, OutType, FnType>(inIterator, transformFn);
     }
-
 }

@@ -10,30 +10,28 @@
 
 #pragma once
 
-#include "IIterator.h"
-
 // stl
 #include <utility>
 
 namespace utilities
 {
-    template <typename InType, typename OutType, typename Func>
-    class TransformIterator : public IIterator<OutType>
+    template <typename InputIteratorType, typename OutType, typename Func>
+    class TransformIterator
     {
     public:
-        TransformIterator(IIterator<InType>& inIter, Func transformFn);
-        virtual bool IsValid() const override;
-        virtual void Next() override;
-        virtual OutType Get() const override;
+        TransformIterator(InputIteratorType& inIter, Func transformFn);
+        bool IsValid() const;
+        void Next();
+        OutType Get() const;
 
     private:
-        IIterator<InType>& _inIter;
+        InputIteratorType& _inIter;
         Func _transformFn;
     };
 
     // Convenience function for creating TransformIterators
-    template <typename InType, typename FnType>
-    auto MakeTransform(IIterator<InType>& inIterator, FnType transformFn)->TransformIterator<InType, decltype(transformFn(std::declval<InType>())), FnType>;
+    template <typename InputIteratorType, typename FnType>
+    auto MakeTransform(InputIteratorType& inIterator, FnType transformFn)->TransformIterator<InputIteratorType, decltype(transformFn(inIterator.Get())), FnType>;
 }
 
 #include "TransformIterator.tcc"

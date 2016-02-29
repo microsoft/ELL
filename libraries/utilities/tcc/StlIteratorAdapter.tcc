@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     VectorIterator.tcc (utilities)
-//  Authors:  Ofer Dekel
+//  File:     StlIteratorAdapter.tcc (utilities)
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //
