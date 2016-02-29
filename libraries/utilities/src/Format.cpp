@@ -57,7 +57,7 @@ namespace utilities
         return Result::success;
     }
 
-    Format::Result Format::MatchScanf(const char* content, const char* format)
+    Format::Result Format::MatchScanf(const char*& content, const char* format)
     {
         auto result = Match(content, format);
         if (result != Result::success)

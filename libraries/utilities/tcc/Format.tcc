@@ -20,7 +20,7 @@
 namespace utilities
 {
     template<typename ArgType, typename ... ArgTypes>
-    Format::Result Format::Printf(std::ostream& os, const char* format, ArgType arg, ArgTypes ...args)
+    Format::Result Format::Printf(std::ostream& os, const char* format, const ArgType& arg, const ArgTypes& ...args)
     {
         int n=0;
         const char* ptr = format;
@@ -80,7 +80,7 @@ namespace utilities
     }
 
     template<typename ... ArgTypes>
-    std::string Format::Printf(const char* format, ArgTypes ...args)
+    std::string Format::Printf(const char* format, const ArgTypes& ...args)
     {
         std::stringstream ss;
         Format::Printf(ss, format, args...);
@@ -118,7 +118,7 @@ namespace utilities
     }
 
     template<typename ArgType, typename ... ArgTypes>
-    Format::Result Format::MatchScanf(const char* content, const char* format, ArgType& arg, ArgTypes& ...args)
+    Format::Result Format::MatchScanf(const char*& content, const char* format, ArgType& arg, ArgTypes& ...args)
     {
         auto matchResult = Match(content, format);
 
