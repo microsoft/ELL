@@ -22,7 +22,7 @@ namespace utilities
     class XMLBase
     {
     protected:
-        const char* _doubleFormat = "<Double name=\"%s\"> %e </Double>";
+        const char* _doubleFormat = "<Double name=\"%\"> % </Double>";
     };
 
     class XMLSerializer

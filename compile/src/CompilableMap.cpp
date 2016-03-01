@@ -24,10 +24,10 @@
 #include <stdexcept>
 #include <cassert>
 
-const char* assignmentFormat = "    %s = %s; // coordinate (%i,%i)\n";
-const char* incrementFormat = "    %s += %s; // coordinate (%i,%i)\n";
-const char* allocationFormat = "    double %s = %s; // coordinate (%i,%i), allocating new temporary variable\n";
-const char* reallocationFormat = "    %s = %s; // coordinate (%i,%i), reassigning temporary variable\n";
+const char* assignmentFormat = "    % = %; // coordinate (%,%)\n";
+const char* incrementFormat = "    % += %; // coordinate (%,%)\n";
+const char* allocationFormat = "    double % = %; // coordinate (%,%), allocating new temporary variable\n";
+const char* reallocationFormat = "    % = %; // coordinate (%,%), reassigning temporary variable\n";
 
 const char* AllocateTempVariableAndGetFormat(DataFlowNode& targetNode, utilities::IntegerStack& stack)
 {

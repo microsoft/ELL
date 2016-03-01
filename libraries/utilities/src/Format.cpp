@@ -12,63 +12,76 @@
 
 namespace utilities
 {
-    Format::Result Format::Printf(std::ostream& os, const char* format)
+    namespace Format
     {
-        if (*format != '\0')
+        void Printf(std::ostream& os, const char* format)
         {
-            os << format;
-        }
-        return Result::success;
-    }
+            if(*format == '\0')
+            {
+                return;
+            }
 
-    Format::Result Format::Match(const char*& content, const char*& format)
-    {
-        Parser::Trim(content);
-        Parser::Trim(format);
+            const char* ptr = format;
+            while(*ptr != '^' && *ptr != '\0')
+            {
+                ++ptr;
+            }
 
-        while (*format != '\0' && *format != '%')
-        {
-            if (std::isspace(*format) && std::isspace(*content))
+            os.write(format, (ptr - format));
+
+            if(*ptr == '^')
             {
-                Parser::Trim(content);
-                Parser::Trim(format);
-            }
-            else if (*format == *content)
-            {
-                ++format;
-                ++content;
-            }
-            else if (*content == '\0')
-            {
-                return Result::earlyEndOfContent;
-            }
-            else
-            {
-                return Result::mismatch;
+                ++ptr;
+                return Printf(os, ptr);
             }
         }
 
-        // the end of a format string must match either the end of content or whitespace in content
-        if (*format == '\0' && *content != '\0' && std::isspace(*content) == false)
+        Result FindPercent(const char*& content, const char*& format)
         {
-            return Result::formatEndDoesNotMatchSpace;
+            while(*format != '\0' && *format != '%')
+            {
+                if(std::isspace(*format) && std::isspace(*content))
+                {
+                    Parser::Trim(content);
+                    Parser::Trim(format);
+                }
+                else if(*format == '^')
+                {
+                    Parser::Trim(content);
+                    ++format;
+                }
+                else if(*format == *content)
+                {
+                    ++format;
+                    ++content;
+                }
+                else if(*content == '\0')
+                {
+                    return Result::earlyEndOfContent;
+                }
+                else
+                {
+                    return Result::mismatch;
+                }
+            }
+
+            return Result::success;
         }
 
-        return Result::success;
-    }
-
-    Format::Result Format::MatchScanf(const char*& content, const char* format)
-    {
-        auto result = Match(content, format);
-        if (result != Result::success)
+        Result MatchScanf(const char*& content, const char* format)
         {
-            return result;
-        }
+            auto result = FindPercent(content, format);
+            if(result != Result::success)
+            {
+                return result;
+            }
 
-        if (*format != '\0')
-        {
-            return Result::missingArgument;
+            if(*format != '\0')
+            {
+                return Result::missingArgument;
+            }
+
+            return Result::success;
         }
-        return Result::success;
     }
 }

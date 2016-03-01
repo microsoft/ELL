@@ -19,127 +19,108 @@
 
 namespace utilities
 {
-    template<typename ArgType, typename ... ArgTypes>
-    Format::Result Format::Printf(std::ostream& os, const char* format, const ArgType& arg, const ArgTypes& ...args)
+    namespace Format
     {
-        int n=0;
-        const char* ptr = format;
-        while(*ptr != '%' && *ptr != '\0')
+        Match::Match(const char* pStr) : _pStr(pStr)
+        {}
+
+        Match::operator const char*()
         {
-            ++n;
-            ++ptr;
+            return _pStr;
         }
 
-        os.write(format, n);
-
-        // if reached end of string, exit
-        if(*ptr == '\0')
+        template<typename ArgType, typename ... ArgTypes>
+        void Printf(std::ostream& os, const char* format, const ArgType& arg, const ArgTypes& ...args)
         {
-            return Result::formatEndDoesNotMatchSpace;
+            if(*format == '\0')
+            {
+                return;
+            }
+
+            const char* ptr = format;
+            while(*ptr != '%' && *ptr != '^' && *ptr != '\0')
+            {
+                ++ptr;
+            }
+
+            os.write(format, (ptr - format));
+
+            if(*ptr == '%')
+            {
+                ++ptr;
+                os << arg;
+            }
+            else if(*ptr == '^')
+            {
+                ++ptr;
+            }
+
+            return Printf(os, ptr, args...);
         }
 
-        // if reached '%' character, print an arg
-        char specifier = *(++ptr);
-        auto precision = os.precision();
-        auto flags = os.flags();
-
-        switch(specifier)
+        template<typename ... ArgTypes>
+        std::string Printf(const char* format, const ArgTypes& ...args)
         {
-        case 'i':
-            os.precision(0);
-            os.flags(std::ios::fixed);
-            os << arg;
-            os.flags(flags);
-            os.precision(precision);
-            break;
-
-        case 'f':
-            os.flags(std::ios::fixed);
-            os << arg;
-            os.flags(flags);
-            break;
-
-        case 'e':
-            os.flags(std::ios::scientific);
-            os << arg;
-            os.flags(flags);
-            break;
-
-        case 's':
-            os << arg;
-            break;
-
-        case '%':
-            os << '%';
-            break;
+            std::stringstream ss;
+            Printf(ss, format, args...);
+            return ss.str();
         }
 
-        // if end of string reached, exit
-        ++ptr;
-        return Format::Printf(os, ptr, args...);
+        template<typename ... ArgTypes>
+        Result MatchScanf(const char*& content, const char* format, Match match, ArgTypes& ...args)
+        {
+            auto matchResult = FindPercent(content, format);
+
+            if(matchResult != Result::success)
+            {
+                return matchResult;
+            }
+            if(*format == '\0')
+            {
+                return Result::success;
+            }
+
+            // *format = '%'
+            ++format;
+
+            const char* cStr = match;
+            matchResult = FindPercent(content, cStr);
+            if(matchResult != Result::success)
+            {
+                return matchResult;
+            }
+            if(*cStr != '\0')
+            {
+                return Result::unexpectedPercentSymbol;
+            }
+
+            return MatchScanf(content, format, args...);
+        }
+
+        template<typename ArgType, typename ... ArgTypes>
+        Result MatchScanf(const char*& content, const char* format, ArgType& arg, ArgTypes& ...args)
+        {
+            auto matchResult = FindPercent(content, format);
+
+            if(matchResult != Result::success)
+            {
+                return matchResult;
+            }
+            if(*format == '\0')
+            {
+                return Result::success;
+            }
+
+            // *format = '%'
+            ++format;
+
+            auto parserResult = Parser::Parse<std::remove_reference_t<ArgType>>(content, arg);
+            if(parserResult != Parser::Result::success)
+            {
+                return Result::parserError;
+            }
+
+            return MatchScanf(content, format, args...);
+        }
     }
-
-    template<typename ... ArgTypes>
-    std::string Format::Printf(const char* format, const ArgTypes& ...args)
-    {
-        std::stringstream ss;
-        Format::Printf(ss, format, args...);
-        return ss.str();
-    }
-
-
-    template<typename ... ArgTypes>
-    Format::Result Format::Match(const char*& content, const char* format, const char* cStr, ArgTypes ...args)
-    {
-        auto matchResult = Match(content, format);
-
-        if (matchResult != Result::success)
-        {
-            return matchResult;
-        }
-        if (*format == '\0')
-        {
-            return Result::success;
-        }
-
-        ++format;
-
-        matchResult = Match(content, cStr);
-        if (matchResult != Result::success)
-        {
-            return matchResult;
-        }
-        if (*cStr != '\0')
-        {
-            return Result::unexpectedPercentSymbol;
-        }
-
-        return Match(content, format, args...);
-    }
-
-    template<typename ArgType, typename ... ArgTypes>
-    Format::Result Format::MatchScanf(const char*& content, const char* format, ArgType& arg, ArgTypes& ...args)
-    {
-        auto matchResult = Match(content, format);
-
-        if (matchResult != Result::success)
-        {
-            return matchResult;
-        }
-        if (*format == '\0')
-        {
-            return Result::success;
-        }
-
-        ++format;
-
-        auto parserResult = Parser::Parse<std::remove_reference_t<ArgType>>(content, arg);
-        if (parserResult != Parser::Result::success)
-        {
-            return Result::parserError;
-        }
-
-        return MatchScanf(content, format, args...);
-    }
-
 }
