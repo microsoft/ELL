@@ -44,6 +44,7 @@ set (TCC tcc/BinaryClassificationEvaluator.tcc
                    tcc/TransformIterator.tcc
                    tcc/Format.tcc
                    tcc/StlIteratorAdapter.tcc)
+                   tcc/XMLSerialization.tcc)
                    
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

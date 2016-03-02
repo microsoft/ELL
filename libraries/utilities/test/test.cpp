@@ -151,20 +151,28 @@ void testMatchScanf()
     // standard match
     testMatchScanf(Result::success, "integer 123 and float -33.3", "integer % and float %", int(), double());
 
-    // tolerate extra spaces in content
+    // tolerate extra spaces in content, in places where format has a single space
     testMatchScanf(Result::success, "integer    123   and float    -33.3     ", "integer % and float %", int(), double());
 
-    // tolerate extra spaces in content
+    // tolerate extra spaces in content, with the whitespace symbol ^
     testMatchScanf(Result::success, "       integer    123   and float    -33.3     ", "^integer % and float %", int(), double());
 
-    // tolerate extra whitespace in content
+    // tolerate extra whitespace in content, tabs
     testMatchScanf(Result::success, "integer \t   123 \t  and float    -33.3   \t  ", "integer % and float %", int(), double());
 
     // tolerate extra spaces in format
     testMatchScanf(Result::success, " integer 123 and float -33.3 ", "     integer  %  and     float  %    ", int(), double());
 
-    // match 
-    testMatchScanf(Result::success, "integer 123 and float -33.3", "integer % and % %", int(), utilities::Format::Match("float") , double());
+    using utilities::Format::Match;
+
+    // match a string 
+    testMatchScanf(Result::success, "integer 123 and float -33.3", "integer % and % %", int(), Match("float") , double());
+
+    // match two strings in a row
+    testMatchScanf(Result::success, "integer hello float", "integer %% float", Match("he"), Match("llo"));
+
+    // match two strings in a row with optional whitespace
+    testMatchScanf(Result::success, "integer hello float", "integer %^^% float", Match("he"), Match("llo"));
 
     // early end of content
     testMatchScanf(Result::earlyEndOfContent, "integer 123 and ", "integer % and float %", int(), double());

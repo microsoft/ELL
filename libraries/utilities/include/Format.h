@@ -21,11 +21,19 @@ namespace utilities
     namespace Format
     {
 
+        /// <summary> A class used to indicate which arguments to MatchScanf are matched, rather than extracted from the content. </summary>
         class Match 
         {
         public:
-            inline Match(const char* pStr);
 
+            /// <summary> Constructs an instance of Match. </summary>
+            ///
+            /// <param name="pStr"> The string to match. </param>
+            inline explicit Match(const char* pStr);
+
+            /// <summary> Cast operator to const char*. </summary>
+            ///
+            /// <returns> A const char*. </returns>
             inline operator const char*();
 
         private:
