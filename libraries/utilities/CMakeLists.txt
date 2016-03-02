@@ -30,7 +30,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/TransformIterator.h
                        include/files.h
                        include/Format.h
-					   include/StlIteratorAdapter.h
+                       include/StlIteratorAdapter.h
                        include/randomEngines.h)
 
 set (TCC tcc/BinaryClassificationEvaluator.tcc
