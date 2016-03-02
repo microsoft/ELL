@@ -13,32 +13,32 @@ namespace utilities
     //
     // TransformIterator definitions
     //
-    template <typename InputIteratorType, typename OutType, typename Func>
-    TransformIterator<InputIteratorType, OutType, Func>::TransformIterator(InputIteratorType& inIter, Func transformFn) : _inIter(inIter), _transformFn(transformFn)
+    template <typename InputIteratorType, typename OutType, typename FuncType>
+    TransformIterator<InputIteratorType, OutType, FuncType>::TransformIterator(InputIteratorType& inIter, FuncType transformFunction) : _inIter(inIter), _transformFunction(transformFunction)
     {}
     
-    template <typename InputIteratorType, typename OutType, typename Func>
-    bool TransformIterator<InputIteratorType, OutType, Func>::IsValid() const
+    template <typename InputIteratorType, typename OutType, typename FuncType>
+    bool TransformIterator<InputIteratorType, OutType, FuncType>::IsValid() const
     {
         return _inIter.IsValid();
     }
 
-    template <typename InputIteratorType, typename OutType, typename Func>
-    void TransformIterator<InputIteratorType, OutType, Func>::Next() 
+    template <typename InputIteratorType, typename OutType, typename FuncType>
+    void TransformIterator<InputIteratorType, OutType, FuncType>::Next() 
     {
         _inIter.Next(); 
     };
     
-    template <typename InputIteratorType, typename OutType, typename Func>
-    OutType TransformIterator<InputIteratorType, OutType, Func>::Get() const
+    template <typename InputIteratorType, typename OutType, typename FuncType>
+    OutType TransformIterator<InputIteratorType, OutType, FuncType>::Get() const
     {
-        return _transformFn(_inIter.Get()); 
+        return _transformFunction(_inIter.Get()); 
     }
 
     template <typename InputIteratorType, typename FnType>
-    auto MakeTransform(InputIteratorType& inIterator, FnType transformFn) -> TransformIterator<InputIteratorType, decltype(transformFn(inIterator.Get())), FnType>
+    auto MakeTransformIterator(InputIteratorType& inIterator, FnType transformFunction) -> TransformIterator<InputIteratorType, decltype(transformFunction(inIterator.Get())), FnType>
     {
-        using OutType = decltype(transformFn(inIterator.Get()));
-        return TransformIterator<InputIteratorType, OutType, FnType>(inIterator, transformFn);
+        using OutType = decltype(transformFunction(inIterator.Get()));
+        return TransformIterator<InputIteratorType, OutType, FnType>(inIterator, transformFunction);
     }
 }

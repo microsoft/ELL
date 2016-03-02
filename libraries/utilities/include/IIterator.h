@@ -15,6 +15,9 @@
 
 namespace utilities
 {
+    /// <summary> Abstract base class for an iterator over a collection of objects of type T.
+    ///
+    /// <typeparam name="T"> Type of the elements being iterated over. </typeparam>
     template <typename T>
     class IIterator
     {
@@ -28,11 +31,11 @@ namespace utilities
         ///
         virtual bool IsValid() const = 0;
 
-        /// Proceeds to the Next row
+        /// Proceeds to the Next item
         ///
         virtual void Next() = 0;
 
-        /// Returns the weight of the current example
+        /// Returns the current item
         ///
         virtual T Get() const = 0;
     };

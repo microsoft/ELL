@@ -19,10 +19,10 @@ namespace utilities
     // ParallelTransformIterator definitions
     //
 
-    template <typename InputIteratorType, typename OutType, typename Func, int MaxTasks>
-    ParallelTransformIterator<InputIteratorType, OutType, Func, MaxTasks>::ParallelTransformIterator(InputIteratorType& inIter, Func transformFn) : _inIter(inIter), _transformFn(transformFn), _currentIndex(0), _endIndex(-1), _currentOutputValid(false)
+    template <typename InputIteratorType, typename OutType, typename FuncType, int MaxTasks>
+    ParallelTransformIterator<InputIteratorType, OutType, FuncType, MaxTasks>::ParallelTransformIterator(InputIteratorType& inIter, FuncType transformFunction) : _inIter(inIter), _transformFunction(transformFunction), _currentIndex(0), _endIndex(-1), _currentOutputValid(false)
     {
-        // Fill the buffer with futures that are the result of calling std::async(transformFn) on inIter
+        // Fill the buffer with futures that are the result of calling std::async(transformFunction) on inIter
         int maxTasks = MaxTasks == 0 ? std::thread::hardware_concurrency() : MaxTasks;
         if (maxTasks == 0) // if std::thread::hardware_concurrency isn't implemented, use DEFAULT_MAX_TASKS tasks (maybe this should be 1)
         {
@@ -37,19 +37,19 @@ namespace utilities
                 break;
             }
 
-            _futures.emplace_back(std::async(std::launch::async, _transformFn, _inIter.Get()));
+            _futures.emplace_back(std::async(std::launch::async, _transformFunction, _inIter.Get()));
             _inIter.Next();
         }
     }
     
-    template <typename InputIteratorType, typename OutType, typename Func, int MaxTasks>
-    bool ParallelTransformIterator<InputIteratorType, OutType, Func, MaxTasks>::IsValid() const
+    template <typename InputIteratorType, typename OutType, typename FuncType, int MaxTasks>
+    bool ParallelTransformIterator<InputIteratorType, OutType, FuncType, MaxTasks>::IsValid() const
     {
         return _currentIndex != _endIndex;
     }
 
-    template <typename InputIteratorType, typename OutType, typename Func, int MaxTasks>
-    void ParallelTransformIterator<InputIteratorType, OutType, Func, MaxTasks>::Next()
+    template <typename InputIteratorType, typename OutType, typename FuncType, int MaxTasks>
+    void ParallelTransformIterator<InputIteratorType, OutType, FuncType, MaxTasks>::Next()
     {
         if(!IsValid())
         {
@@ -60,7 +60,7 @@ namespace utilities
         // If necessary, create new std::future to handle next input
         if(_inIter.IsValid())
         {
-            _futures[_currentIndex] = std::async(std::launch::async, _transformFn, _inIter.Get());
+            _futures[_currentIndex] = std::async(std::launch::async, _transformFunction, _inIter.Get());
             _inIter.Next();
         }
         else
@@ -73,8 +73,8 @@ namespace utilities
         _currentIndex = (_currentIndex+1)%_futures.size();
     };
     
-    template <typename InputIteratorType, typename OutType, typename Func, int MaxTasks>
-    OutType ParallelTransformIterator<InputIteratorType, OutType, Func, MaxTasks>::Get() const
+    template <typename InputIteratorType, typename OutType, typename FuncType, int MaxTasks>
+    OutType ParallelTransformIterator<InputIteratorType, OutType, FuncType, MaxTasks>::Get() const
     {
         // Need to cache output of current std::future, because calling std::future::get() twice is an error
         if(!_currentOutputValid)
@@ -86,10 +86,10 @@ namespace utilities
         return _currentOutput;
     }
 
-    template <typename InputIteratorType, typename FnType>
-    auto MakeParallelTransform(InputIteratorType& inIterator, FnType transformFn) -> ParallelTransformIterator<InputIteratorType, decltype(transformFn(inIterator.Get())), FnType>
+    template <typename InputIteratorType, typename FuncType>
+    auto MakeParallelTransformIterator(InputIteratorType& inIterator, FuncType transformFunction) -> ParallelTransformIterator<InputIteratorType, decltype(transformFunction(inIterator.Get())), FuncType>
     {
-        using OutType = decltype(transformFn(inIterator.Get()));
-        return ParallelTransformIterator<InputIteratorType, OutType, FnType>(inIterator, transformFn);
+        using OutType = decltype(transformFunction(inIterator.Get()));
+        return ParallelTransformIterator<InputIteratorType, OutType, FuncType>(inIterator, transformFunction);
     }
 }

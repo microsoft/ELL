@@ -28,7 +28,7 @@ void testIteratorAdapter()
 {
     // utilities::IteratorAdapter test
     std::vector<int> vec { 1, 2, 3, 4, 5, 6 };
-    auto it = utilities::MakeIteratorAdapter(vec.begin(), vec.end());
+    auto it = utilities::MakeStlIteratorAdapter(vec.begin(), vec.end());
     
     bool passed = true;
     int index = 0;
@@ -49,8 +49,8 @@ float twoPointFiveTimes(int x)
     return float(2.5*x);
 }
 
-template <typename Func>
-std::chrono::milliseconds::rep timeIt(Func fn)
+template <typename FuncType>
+std::chrono::milliseconds::rep timeIt(FuncType fn)
 {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
     fn();
@@ -96,8 +96,8 @@ void testTransformIterator()
     std::vector<int> vec(64);
     std::iota(vec.begin(), vec.end(), 5);
 
-    auto srcIt = utilities::MakeIteratorAdapter(vec.begin(), vec.end());
-    auto transIt = MakeTransform(srcIt, twoPointFiveTimes);
+    auto srcIt = utilities::MakeStlIteratorAdapter(vec.begin(), vec.end());
+    auto transIt = MakeTransformIterator(srcIt, twoPointFiveTimes);
 
     MillisecondTimer timer;
     bool passed = true;
@@ -119,8 +119,8 @@ void testParallelTransformIterator()
     std::vector<int> vec(64);
     std::iota(vec.begin(), vec.end(), 5);
 
-    auto srcIt = utilities::MakeIteratorAdapter(vec.begin(), vec.end());
-    auto transIt = MakeParallelTransform(srcIt, twoPointFiveTimes);
+    auto srcIt = utilities::MakeStlIteratorAdapter(vec.begin(), vec.end());
+    auto transIt = MakeParallelTransformIterator(srcIt, twoPointFiveTimes);
 
     bool passed = true;
     MillisecondTimer timer;

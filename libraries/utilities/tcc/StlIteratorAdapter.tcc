@@ -36,13 +36,13 @@ namespace utilities
     }
 
     template <typename IteratorType>
-    auto MakeIteratorAdapter(IteratorType begin, IteratorType end) -> StlIteratorAdapter<IteratorType, decltype(*begin)>
+    auto MakeStlIteratorAdapter(IteratorType begin, IteratorType end) -> StlIteratorAdapter<IteratorType, decltype(*begin)>
     {
         return StlIteratorAdapter<IteratorType, decltype(*begin)>(begin, end);
     }
 
     template <typename ContainerType>
-    auto MakeIteratorAdapter(ContainerType& container) -> StlIteratorAdapter<typename ContainerType::iterator, typename ContainerType::value_type>
+    auto MakeStlIteratorAdapter(ContainerType& container) -> StlIteratorAdapter<typename ContainerType::iterator, typename ContainerType::value_type>
     {
         return StlIteratorAdapter<typename ContainerType::iterator, typename ContainerType::value_type>(container.begin(), container.end());
     }

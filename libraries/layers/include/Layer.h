@@ -72,8 +72,8 @@ namespace layers
         /// <param name="index"> Zero-based index of the. </param>
         ///
         /// <returns> The input coordinates. </returns>
-        using Iterator = utilities::StlIteratorAdapter<std::vector<Coordinate>::const_iterator, Coordinate>;
-        virtual Iterator GetInputCoordinates(uint64 index) const = 0;
+        using InputCoordinateIterator = utilities::StlIteratorAdapter<std::vector<Coordinate>::const_iterator, Coordinate>;
+        virtual InputCoordinateIterator GetInputCoordinates(uint64 index) const = 0;
 
         /// <summary> Serializes the Layer in json format. </summary>
         ///
