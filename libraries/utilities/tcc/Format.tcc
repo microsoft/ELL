@@ -15,6 +15,7 @@
 #include <iomanip>
 #include <sstream>
 #include <cctype>
+#include <stdexcept>
 #include <type_traits>
 
 namespace utilities
@@ -37,25 +38,22 @@ namespace utilities
                 return;
             }
 
-            const char* ptr = format;
-            while(*ptr != '%' && *ptr != '^' && *ptr != '\0')
+            while(*format != '%' && *format != '\0')
             {
-                ++ptr;
+                if(*format != '^')
+                {
+                    os << *format;
+                }
+                ++format;
             }
 
-            os.write(format, (ptr - format));
-
-            if(*ptr == '%')
+            if(*format == '%')
             {
-                ++ptr;
+                ++format;
                 os << arg;
             }
-            else if(*ptr == '^')
-            {
-                ++ptr;
-            }
 
-            return Printf(os, ptr, args...);
+            Printf(os, format, args...);
         }
 
         template<typename ... ArgTypes>
@@ -121,6 +119,38 @@ namespace utilities
             }
 
             return MatchScanf(content, format, args...);
+        }
+
+        template<typename ... ArgTypes>
+        void MatchScanfThrowsExceptions(const char*& content, const char* format, ArgTypes& ...args)
+        {
+            auto result = MatchScanf(content, format, args...);
+
+            if(result == Result::success)
+            {
+                return;
+            }
+
+            std::string contentSnippet(content, 30);
+            std::string formatSnippet(format,30);
+
+            switch(result)
+            {
+            case Result::earlyEndOfContent:
+                throw std::runtime_error("Error scanning text: content ended before format near");
+
+            case Result::mismatch:
+                throw std::runtime_error("Error scanning text: mismatch between content and format");
+
+            case Result::parserError:
+                throw std::runtime_error("Error scanning text: parser error");
+
+            case Result::missingArgument:
+                throw std::runtime_error("Error scanning text: missing argument");
+
+            case Result::unexpectedPercentSymbol:
+                throw std::runtime_error("Error scanning text: unexpected symbol '%' in string argument");
+            }
         }
     }
 }

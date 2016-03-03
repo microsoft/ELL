@@ -15,8 +15,10 @@ namespace utilities
 {
     XMLDeserializer::XMLDeserializer(std::istream& is)
     {
-        _stream << is.rdbuf();
-        _pStr = _stream.str().c_str();
+        std::stringstream stream;
+        stream << is.rdbuf();
+        _string = stream.str();
+        _pStr = _string.c_str();
     }
 
     // int
@@ -31,22 +33,22 @@ namespace utilities
 
     void XMLDeserializer::Deserialize(const char * name, int & value)
     {
-        Format::MatchScanf(_pStr, intFormat, Format::Match(name), value);
+        Format::MatchScanfThrowsExceptions(_pStr, intFormat, Format::Match(name), value);
     }
 
     // uint64
 
     const char* uint64Format = "<^UInt64 name^=^\"%\"^> % <^/UInt64^>\n";
 
-    void utilities::XMLSerializer::Serialize(const char * name, const uint64 & value)
+    void XMLSerializer::Serialize(const char * name, const uint64 & value)
     {
         Indent();
         Format::Printf(_stream, uint64Format, name, value);
     }
 
-    void utilities::XMLDeserializer::Deserialize(const char * name, uint64 & value)
+    void XMLDeserializer::Deserialize(const char * name, uint64 & value)
     {
-        Format::MatchScanf(_pStr, uint64Format, Format::Match(name), value);
+        Format::MatchScanfThrowsExceptions(_pStr, uint64Format, Format::Match(name), value);
     }
 
     // double
@@ -61,7 +63,7 @@ namespace utilities
 
     void XMLDeserializer::Deserialize(const char * name, double& value)
     {
-        Format::MatchScanf(_pStr, doubleFormat, Format::Match(name), value);
+        Format::MatchScanfThrowsExceptions(_pStr, doubleFormat, Format::Match(name), value);
     }
 
     void XMLSerializer::WriteToStream(std::ostream& os) const

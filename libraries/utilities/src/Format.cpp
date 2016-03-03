@@ -21,18 +21,13 @@ namespace utilities
                 return;
             }
 
-            const char* ptr = format;
-            while(*ptr != '^' && *ptr != '\0')
+            while(*format != '\0')
             {
-                ++ptr;
-            }
-
-            os.write(format, (ptr - format));
-
-            if(*ptr == '^')
-            {
-                ++ptr;
-                return Printf(os, ptr);
+                if(*format != '^')
+                {
+                    os << *format;
+                }
+                ++format;
             }
         }
 

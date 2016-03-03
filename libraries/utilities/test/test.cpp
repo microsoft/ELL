@@ -13,6 +13,7 @@
 #include "TransformIterator.h"
 #include "ParallelTransformIterator.h"
 #include "Format.h"
+#include "XMLSerialization.h"
 
 // testing
 #include "testing.h"
@@ -196,6 +197,48 @@ void testMatchScanf()
     testMatchScanf(Result::parserError, "integer X and float -33.3", "integer % and float %", int(), double());
 }
 
+struct SerializationTest
+{
+    const char* GetSerializationName() const
+    {
+        return "SerializationTest";
+    }
+
+    template<typename SerializerType>
+    void Write(SerializerType& serializer) const
+    {
+        serializer.Serialize("x", x);
+        serializer.Serialize("y", y);
+    }
+
+    template<typename DeserializerType>
+    void Read(DeserializerType& deserializer)
+    {
+        deserializer.Deserialize("x", x);
+        deserializer.Deserialize("y", y);
+    }
+
+    int x;
+    double y; 
+};
+
+void XMLSerializationTest()
+{
+    utilities::XMLSerializer serializer;
+    SerializationTest test;
+    test.x = 17;
+    test.y = -33.44;
+    
+    serializer.Serialize("test", test);
+
+    std::stringstream ss;
+    serializer.WriteToStream(ss);
+
+    utilities::XMLDeserializer deserializer(ss);
+    SerializationTest test2;
+    deserializer.Deserialize("test", test2);
+}
+
 /// Runs all tests
 ///
 int main()
@@ -203,7 +246,8 @@ int main()
 //    testIteratorAdapter();
   //  testTransformIterator();
   //  testParallelTransformIterator();
-    testMatchScanf();
+//    testMatchScanf();
+    XMLSerializationTest();
 
     if (testing::DidTestFail())
     {

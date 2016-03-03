@@ -56,7 +56,7 @@ namespace utilities
         void Deserialize(const char* name, Type& value);
 
     private:
-        std::stringstream _stream;
+        std::string _string;
         const char* _pStr;
     };
 }
