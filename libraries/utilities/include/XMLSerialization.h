@@ -16,20 +16,26 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <vector>
+#include <type_traits>
+#include <memory>
 
 namespace utilities
 {
     class XMLSerializer
     {
     public:
-        void Serialize(const char* name, const int& value);
+        template<typename ValueType>
+        void Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
 
-        void Serialize(const char* name, const uint64& value);
+        template<typename ElementType>
+        void Serialize(const char* name, const std::vector<ElementType>& value);
 
-        void Serialize(const char* name, const double& value);
+        template<typename ValueType>
+        void Serialize(const char* name, const std::shared_ptr<ValueType>& spValue);
 
-        template<typename Type>
-        void Serialize(const char* name, const Type& value);
+        template<typename ValueType>
+        void Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
         void WriteToStream(std::ostream& os) const;
         
@@ -46,14 +52,17 @@ namespace utilities
     public:
         XMLDeserializer(std::istream& is);
 
-        void Deserialize(const char* name, int& value);
+        template<typename ValueType>
+        void Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
 
-        void Deserialize(const char* name, uint64& value);
+        template<typename ElementType>
+        void Deserialize(const char* name, std::vector<ElementType>& value);
 
-        void Deserialize(const char* name, double& value);
+        template<typename ValueType>
+        void Deserialize(const char* name, std::shared_ptr<ValueType>& spValue);
 
-        template<typename Type>
-        void Deserialize(const char* name, Type& value);
+        template<typename ValueType>
+        void Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
     private:
         std::string _string;

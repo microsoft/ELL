@@ -197,9 +197,10 @@ void testMatchScanf()
     testMatchScanf(Result::parserError, "integer X and float -33.3", "integer % and float %", int(), double());
 }
 
-struct SerializationTest
+class SerializationTest
 {
-    const char* GetSerializationName() const
+public:
+    static const char* GetSerializationName() 
     {
         return "SerializationTest";
     }
@@ -209,6 +210,8 @@ struct SerializationTest
     {
         serializer.Serialize("x", x);
         serializer.Serialize("y", y);
+        serializer.Serialize("v", v);
+        serializer.Serialize("p", p);
     }
 
     template<typename DeserializerType>
@@ -216,10 +219,14 @@ struct SerializationTest
     {
         deserializer.Deserialize("x", x);
         deserializer.Deserialize("y", y);
+        deserializer.Deserialize("v", v);
+        deserializer.Deserialize("p", p);
     }
 
     int x;
     double y; 
+    std::vector<uint64> v;
+    std::vector<std::shared_ptr<int>> p;
 };
 
 void XMLSerializationTest()
@@ -228,11 +235,21 @@ void XMLSerializationTest()
     SerializationTest test;
     test.x = 17;
     test.y = -33.44;
-    
+    test.v.resize(4);
+    test.v[0] = 6;
+    test.v[1] = 7;
+    test.v[2] = 8;
+    test.v[3] = 9;
+    test.p.resize(2);
+    test.p[0] = std::make_shared<int>(99);
+    test.p[1] = std::make_shared<int>(88);
+
     serializer.Serialize("test", test);
 
     std::stringstream ss;
     serializer.WriteToStream(ss);
+
+    std::cout << ss.str() << std::endl;
 
     utilities::XMLDeserializer deserializer(ss);
     SerializationTest test2;

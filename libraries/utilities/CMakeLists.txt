@@ -31,6 +31,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/Parser.h
                        include/TransformIterator.h
                        include/Files.h
+                       include/TypeInfo.h
                        include/Format.h
                        include/XMLSerialization.h)
                        include/RandomEngines.h
