@@ -133,23 +133,24 @@ namespace utilities
 
             std::string contentSnippet(content, 30);
             std::string formatSnippet(format,30);
+            auto snippets = "\"" + contentSnippet + "\" and \"" + formatSnippet + "\"";
 
             switch(result)
             {
             case Result::earlyEndOfContent:
-                throw std::runtime_error("Error scanning text: content ended before format near");
+                throw std::runtime_error("Error scanning text: content ended before format near: \"" + formatSnippet + "\"");
 
             case Result::mismatch:
-                throw std::runtime_error("Error scanning text: mismatch between content and format");
+                throw std::runtime_error("Error scanning text: mismatch between content and format near: " + snippets);
 
             case Result::parserError:
-                throw std::runtime_error("Error scanning text: parser error");
+                throw std::runtime_error("Error scanning text: parser error near: " + snippets);
 
             case Result::missingArgument:
-                throw std::runtime_error("Error scanning text: missing argument");
+                throw std::runtime_error("Error scanning text: missing argument near: " + snippets);
 
             case Result::unexpectedPercentSymbol:
-                throw std::runtime_error("Error scanning text: unexpected symbol '%' in string argument");
+                throw std::runtime_error("Error scanning text: unexpected symbol '%' in string argument near: " + snippets);
             }
         }
     }
