@@ -20,7 +20,7 @@ namespace linear
     {
     public:
 
-        /// <summary> Destructor. </summary>
+        /// <summary> Virtual destructor. </summary>
         virtual ~Base() = default;
 
         /// <summary> Human readable printout to an output stream. </summary>
@@ -29,10 +29,10 @@ namespace linear
         virtual void Print(std::ostream& os) const = 0;
     };
 
-    /// <summary> Generic operator<< that calls each class's Print() function. </summary>
+    /// <summary> Generic streaming operator that calls each class's Print() function. </summary>
     ///
     /// <param name="os"> [in,out] Stream to write data to. </param>
-    /// <param name="v"> The Base to process. </param>
+    /// <param name="v"> The object to print. </param>
     ///
     /// <returns> The stream. </returns>
     std::ostream& operator<<(std::ostream& os, const Base& v);
