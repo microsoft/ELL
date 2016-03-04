@@ -11,7 +11,7 @@
 #include "PrintArguments.h"
 
 // utilities
-#include "files.h"
+#include "Files.h"
 
 void ParsedPrintArguments::AddArgs(utilities::CommandLineParser & parser)
 {

@@ -14,7 +14,7 @@
 
 // utilities
 #include "JsonSerializer.h"
-#include "files.h"
+#include "Files.h"
 #include "CommandLineParser.h"
 
 // layers

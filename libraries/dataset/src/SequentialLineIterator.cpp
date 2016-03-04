@@ -11,7 +11,7 @@
 #include "SequentialLineIterator.h"
 
 // utilities
-#include "files.h"
+#include "Files.h"
 
 namespace dataset
 {

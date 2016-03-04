@@ -11,7 +11,7 @@
 #include "DataLoadArguments.h"
 
 // utilities
-#include "files.h"
+#include "Files.h"
 
 // stl
 #include <vector>

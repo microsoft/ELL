@@ -12,7 +12,7 @@
 #include "CoordinateListTools.h"
 
 // utilities
-#include "files.h"
+#include "Files.h"
 
 // dataset
 #include "SequentialLineIterator.h"

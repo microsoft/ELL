@@ -11,9 +11,9 @@
 #include "SGDArguments.h"
 
 // utilities
-#include "files.h"
+#include "Files.h"
 #include "CommandLineParser.h" 
-#include "randomEngines.h"
+#include "RandomEngines.h"
 #include "BinaryClassificationEvaluator.h"
 
 // layers

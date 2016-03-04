@@ -14,10 +14,10 @@ endif()
 
 set (SRC src/BinaryClassificationEvaluator.cpp
                    src/CommandLineParser.cpp
-                   src/files.cpp
+                   src/Files.cpp
                    src/IntegerStack.cpp
                    src/JsonSerializer.cpp
-                   src/randomEngines.cpp
+                   src/RandomEngines.cpp
                    ../amalgamated_jsoncpp/jsoncpp.cpp)
 
 set (INCLUDE include/BinaryClassificationEvaluator.h
@@ -28,10 +28,10 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/ParallelTransformIterator.h
                        include/Parser.h
                        include/TransformIterator.h
-                       include/files.h
+                       include/Files.h
                        include/Format.h
-                       include/StlIteratorAdapter.h
-                       include/randomEngines.h)
+                       include/RandomEngines.h
+                       include/StlIteratorAdapter.h)
 
 set (TCC tcc/BinaryClassificationEvaluator.tcc
                    tcc/CommandLineParser.tcc
