@@ -31,6 +31,11 @@ namespace utilities
             /// <param name="pStr"> The string to match. </param>
             inline explicit Match(const char* pStr);
 
+            /// <summary> Constructs an instance of Match. </summary>
+            ///
+            /// <param name="str"> The string to match. </param>
+            inline explicit Match(const std::string& str);
+
             /// <summary> Cast operator to const char*. </summary>
             ///
             /// <returns> A const char*. </returns>

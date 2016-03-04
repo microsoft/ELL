@@ -223,6 +223,43 @@ public:
         deserializer.Deserialize("p", p);
     }
 
+    void Set()
+    {
+        x = 17;
+        y = -33.44;
+        v.resize(4);
+        v[0] = 6;
+        v[1] = 7;
+        v[2] = 8;
+        v[3] = 9;
+        p.resize(2);
+        p[0] = std::make_shared<int>(99);
+        p[1] = std::make_shared<int>(88);
+    }
+
+    bool Check()
+    {
+        if (x == 17 &&
+            y == -33.44 &&
+            v.size() == 4 &&
+            v[0] == 6 &&
+            v[1] == 7 &&
+            v[2] == 8 &&
+            v[3] == 9 &&
+            p.size() == 2 &&
+            p[0] != nullptr &&
+            *(p[0]) == 99 &&
+            p[1] != nullptr &&
+            *(p[1]) == 88)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     int x;
     double y; 
     std::vector<uint64> v;
@@ -233,37 +270,28 @@ void XMLSerializationTest()
 {
     utilities::XMLSerializer serializer;
     SerializationTest test;
-    test.x = 17;
-    test.y = -33.44;
-    test.v.resize(4);
-    test.v[0] = 6;
-    test.v[1] = 7;
-    test.v[2] = 8;
-    test.v[3] = 9;
-    test.p.resize(2);
-    test.p[0] = std::make_shared<int>(99);
-    test.p[1] = std::make_shared<int>(88);
+    test.Set();
 
     serializer.Serialize("test", test);
 
     std::stringstream ss;
     serializer.WriteToStream(ss);
 
-    std::cout << ss.str() << std::endl;
-
     utilities::XMLDeserializer deserializer(ss);
     SerializationTest test2;
     deserializer.Deserialize("test", test2);
+
+    testing::ProcessTest("utilities::XMLSerialization", test2.Check());
 }
 
 /// Runs all tests
 ///
 int main()
 {
-//    testIteratorAdapter();
-  //  testTransformIterator();
-  //  testParallelTransformIterator();
-//    testMatchScanf();
+    testIteratorAdapter();
+    testTransformIterator();
+    testParallelTransformIterator();
+    testMatchScanf();
     XMLSerializationTest();
 
     if (testing::DidTestFail())

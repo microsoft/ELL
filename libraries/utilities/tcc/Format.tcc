@@ -17,12 +17,16 @@
 #include <cctype>
 #include <stdexcept>
 #include <type_traits>
+#include "..\include\Format.h"
 
 namespace utilities
 {
     namespace Format
     {
         Match::Match(const char* pStr) : _pStr(pStr)
+        {}
+
+        inline Match::Match(const std::string & str) : _pStr(str.c_str())
         {}
 
         Match::operator const char*()

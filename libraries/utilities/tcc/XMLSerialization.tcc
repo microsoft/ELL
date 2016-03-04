@@ -12,16 +12,17 @@
 
 namespace
 {
+    // format strings
+
     const char* typeFormatOneLine = "<^% name^=^\"%\"^> % <^/%^>\n";
+    const char* unnamedTypeFormatOneLine = "<^%^> % <^/%^>\n";
 
     const char* typeFormatBegin = "<^% name^=^\"%\"^>\n";
+    const char* unnamedTypeFormatBegin = "<^%^>\n";
     const char* typeFormatEnd = "<^/%^>\n";
 
-    const char* pointerFormatBegin = "<^* type=\"%\" name^=^\"%\"^>\n";
-    const char* pointerFormatEnd = "<^/*^>\n";
-
-    const char* vectorFormatBegin = "<^Vector name^=^\"%\" type=\"%\" size=\"%\"^>\n";
-    const char* vectorFormatEnd = "<^/Vector^>\n";
+    const char* vectorFormatBegin = "<^% name^=^\"%\" size^=^\"%\"^>\n";
+    const char* unnamedVectorFormatBegin = "<^% size^=^\"%\"^>\n";
 }
 
 namespace utilities
@@ -29,9 +30,16 @@ namespace utilities
     template<typename ValueType>
     void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
     {
-        auto className = TypeInfo<ValueType>::GetSerializationName();
+        auto typeName = TypeInfo<ValueType>::GetSerializationName();
         Indent();
-        Format::Printf(_stream, typeFormatOneLine, className, name, value, className);
+        if (*name != '\0')
+        {
+            Format::Printf(_stream, typeFormatOneLine, typeName, name, value, typeName);
+        }
+        else
+        {
+            Format::Printf(_stream, unnamedTypeFormatOneLine, typeName, value, typeName);
+        }
     }
 
     template<typename ElementType>
@@ -39,8 +47,16 @@ namespace utilities
     {
         Indent();
         uint64 size = value.size();
-        auto typeName = TypeInfo<ElementType>::GetSerializationName();
-        Format::Printf(_stream, vectorFormatBegin, name, typeName, size);
+        auto typeName = TypeInfo<std::vector<ElementType>>::GetSerializationName();
+
+        if (*name != '\0')
+        {
+            Format::Printf(_stream, vectorFormatBegin, typeName, name, size);
+        }
+        else
+        {
+            Format::Printf(_stream, unnamedVectorFormatBegin, typeName, size);
+        }
 
         ++_indentation;
 
@@ -51,48 +67,67 @@ namespace utilities
 
         --_indentation;
         Indent();
-        Format::Printf(_stream, vectorFormatEnd);
+        Format::Printf(_stream, typeFormatEnd, typeName);
     }
 
     template<typename ValueType>
     void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
-        auto className = TypeInfo<ValueType>::GetSerializationName();
+        auto typeName = TypeInfo<ValueType>::GetSerializationName();
 
         Indent();
-        Format::Printf(_stream, typeFormatBegin, className.c_str(), name);
-
+        if (*name != '\0')
+        {
+            Format::Printf(_stream, typeFormatBegin, typeName, name);
+        }
+        else
+        {
+            Format::Printf(_stream, unnamedTypeFormatBegin, typeName);
+        }
         ++_indentation;
 
         value.Write(*this);
 
         --_indentation;
         Indent();
-        Format::Printf(_stream, typeFormatEnd, className);
+        Format::Printf(_stream, typeFormatEnd, typeName);
     }
 
     template<typename ValueType>
     void XMLSerializer::Serialize(const char* name, const std::shared_ptr<ValueType>& spValue)
     {
-        auto className = TypeInfo<ValueType>::GetSerializationName();
+        auto typeName = TypeInfo<std::shared_ptr<ValueType>>::GetSerializationName();
         Indent();
 
-        Format::Printf(_stream, pointerFormatBegin, className, name);
-
+        if (*name != '\0')
+        {
+            Format::Printf(_stream, typeFormatBegin, typeName, name);
+        }
+        else
+        {
+            Format::Printf(_stream, unnamedTypeFormatBegin, typeName);
+        }
         ++_indentation;
 
         Serialize("", *spValue);
 
         --_indentation;
         Indent();
-        Format::Printf(_stream, pointerFormatEnd, className);
+        Format::Printf(_stream, typeFormatEnd, typeName);
     }
 
     template<typename ValueType>
     void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
     {
-        auto className = TypeInfo<ValueType>::GetSerializationName();
-        Format::MatchScanfThrowsExceptions(_pStr, typeFormatOneLine, Format::Match(className.c_str()), Format::Match(name), value, Format::Match(className.c_str()));
+        auto typeName = TypeInfo<ValueType>::GetSerializationName();
+        if (*name != '\0')
+        {
+            Format::MatchScanfThrowsExceptions(_pStr, typeFormatOneLine, Format::Match(typeName), Format::Match(name), value, Format::Match(typeName));
+        }
+        else
+        {
+            Format::MatchScanfThrowsExceptions(_pStr, unnamedTypeFormatOneLine, Format::Match(typeName), value, Format::Match(typeName));
+        }
     }
 
     template<typename ElementType>
@@ -101,8 +136,16 @@ namespace utilities
         value.clear();
 
         uint64 size = 0;
-        auto typeName = TypeInfo<ElementType>::GetSerializationName();
-        Format::MatchScanfThrowsExceptions(_pStr, vectorFormatBegin, Format::Match(name), Format::Match(typeName.c_str()), size);
+        auto typeName = TypeInfo<std::vector<ElementType>>::GetSerializationName();
+        if (*name != '\0')
+        {
+            Format::MatchScanfThrowsExceptions(_pStr, vectorFormatBegin, Format::Match(typeName), Format::Match(name), size);
+        }
+        else
+        {
+            Format::MatchScanfThrowsExceptions(_pStr, unnamedVectorFormatBegin, Format::Match(typeName), size);
+        }
+
         value.resize(size);
 
         for (uint64 i = 0; i < value.size(); ++i)
@@ -110,27 +153,43 @@ namespace utilities
             Deserialize("", value[i]);
         }
 
-        Format::MatchScanfThrowsExceptions(_pStr, vectorFormatEnd);
+        Format::MatchScanfThrowsExceptions(_pStr, typeFormatEnd, Format::Match(typeName));
     }
 
     template<typename ValueType>
     void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
-        auto className = TypeInfo<ValueType>::GetSerializationName();
-        Format::MatchScanfThrowsExceptions(_pStr, typeFormatBegin, Format::Match(className.c_str()), Format::Match(name));
+        auto typeName = TypeInfo<ValueType>::GetSerializationName();
+        if (*name != '\0')
+        {
+            Format::MatchScanfThrowsExceptions(_pStr, typeFormatBegin, Format::Match(typeName), Format::Match(name));
+        }
+        else
+        {
+            Format::MatchScanfThrowsExceptions(_pStr, unnamedTypeFormatBegin, Format::Match(typeName));
+        }
 
         value.Read(*this);
 
-        Format::MatchScanfThrowsExceptions(_pStr, typeFormatEnd, Format::Match(className.c_str()));
+        Format::MatchScanfThrowsExceptions(_pStr, typeFormatEnd, Format::Match(typeName));
     }
 
     template<typename ValueType>
     void XMLDeserializer::Deserialize(const char* name, std::shared_ptr<ValueType>& spValue)
     {
-        auto className = TypeInfo<ValueType>::GetSerializationName();
-        Format::MatchScanfThrowsExceptions(_pStr, pointerFormatBegin, Format::Match(className.c_str()), Format::Match(name));
+        auto typeName = TypeInfo<std::shared_ptr<ValueType>>::GetSerializationName();
+        
+        if (*name != '\0')
+        {
+            Format::MatchScanfThrowsExceptions(_pStr, typeFormatBegin, Format::Match(typeName), Format::Match(name));
+        }
+        else
+        {
+            Format::MatchScanfThrowsExceptions(_pStr, unnamedTypeFormatBegin, Format::Match(typeName));
+        }
+
         spValue = std::make_shared<ValueType>();
         Deserialize("", *spValue);
-        Format::MatchScanfThrowsExceptions(_pStr, pointerFormatEnd, Format::Match(className.c_str()));
+        Format::MatchScanfThrowsExceptions(_pStr, typeFormatEnd, Format::Match(typeName));
     }
 }
