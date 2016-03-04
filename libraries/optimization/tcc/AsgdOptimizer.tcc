@@ -16,7 +16,7 @@
 namespace optimization
 {
     template<typename ExampleIteratorType, typename LossFunctionType>
-    void AsgdOptimizer::Update(ExampleIteratorType& data_iter, const LossFunctionType& loss_function, double lambda)
+    void AsgdOptimizer::Update(ExampleIteratorType& exampleIterator, const LossFunctionType& lossFunction, double lambda)
     {
 
         // get references to the vector and biases
@@ -27,19 +27,19 @@ namespace optimization
 
         // define some constants
         const double T_prev = double(_total_iterations);
-        const double T_next = T_prev + data_iter.NumIteratesLeft();
+        const double T_next = T_prev + exampleIterator.NumIteratesLeft();
         const double eta = 1.0 / lambda / T_prev;
         const double sigma = std::log(T_next) + 0.5 / T_next;
 
         v.AddTo(v_avg, sigma - std::log(T_prev) - 0.5 / T_prev);
 
-        while(data_iter.IsValid())
+        while(exampleIterator.IsValid())
         {
             ++_total_iterations;
             double t = (double)_total_iterations;
 
             // get the Next example
-            const auto& example = data_iter.Get();
+            const auto& example = exampleIterator.Get();
             double label = example.GetLabel();
             double weight = example.GetWeight();
 
@@ -47,14 +47,14 @@ namespace optimization
             double alpha = T_prev / (t-1) * example.Dot(v);
 
             // calculate the loss derivative
-            double beta = weight * loss_function.GetDerivative(alpha, label);
+            double beta = weight * lossFunction.GetDerivative(alpha, label);
 
             // Update v and v_avg
             example.AddTo(v, -eta*beta);
             example.AddTo(v_avg, -eta*beta*(sigma - log(t) - 0.5/t));
 
             // move on
-            data_iter.Next();
+            exampleIterator.Next();
         }
 
         assert((double)_total_iterations == T_next);

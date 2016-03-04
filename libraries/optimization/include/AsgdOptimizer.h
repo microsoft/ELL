@@ -36,17 +36,17 @@ namespace optimization
 
         /// <summary> Performs a given number of learning iterations. </summary>
         ///
-        /// <typeparam name="ExampleIteratorType"> Type of the example iterator type. </typeparam>
-        /// <typeparam name="LossFunctionType"> Type of the loss function type. </typeparam>
-        /// <param name="data_iter"> [in,out] The data iterator. </param>
-        /// <param name="loss_function"> The loss function. </param>
-        /// <param name="l2Regularization"> The 2 regularization. </param>
+        /// <typeparam name="ExampleIteratorType"> Type of example iterator to use. </typeparam>
+        /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
+        /// <param name="exampleIterator"> [in,out] The data iterator. </param>
+        /// <param name="lossFunction"> The loss function. </param>
+        /// <param name="l2Regularization"> The L2 regularization parameter. </param>
         template<typename ExampleIteratorType, typename LossFunctionType>
-        void Update(ExampleIteratorType& data_iter, const LossFunctionType& loss_function, double l2Regularization);
+        void Update(ExampleIteratorType& exampleIterator, const LossFunctionType& lossFunction, double l2Regularization);
 
-        /// <summary> \returns The averaged predictor. </summary>
+        /// <summary> Returns The averaged predictor. </summary>
         ///
-        /// <returns> The predictor. </returns>
+        /// <returns> The averaged predictor. </returns>
         const predictors::SharedLinearBinaryPredictor GetPredictor() const;
             
     private:
