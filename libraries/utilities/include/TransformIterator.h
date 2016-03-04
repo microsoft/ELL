@@ -10,33 +10,48 @@
 
 #pragma once
 
-#include "IIterator.h"
-
 // stl
 #include <utility>
 
 namespace utilities
 {
-    template <typename InType, typename OutType, typename Func>
-    class TransformIterator : public IIterator<OutType>
+    /// <summary> A read-only forward iterator that transforms the items from an input collection </summary>
+    template <typename InputIteratorType, typename OutType, typename FuncType>
+    class TransformIterator
     {
     public:
-        TransformIterator(IIterator<InType>& inIter, Func transformFn);
-        virtual bool IsValid() const override;
-        virtual void Next() override;
-        virtual OutType Get() override;
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="inIter"> An iterator for the input collection </param>
+        /// <param name="transformFunction"> The function to apply to transform the input items</param>
+        TransformIterator(InputIteratorType& inIter, FuncType transformFunction);
+
+        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
+        ///
+        /// <returns> true if it succeeds, false if it fails. </returns>
+        bool IsValid() const;
+
+        /// <summary> Proceeds to the Next iterate. </summary>
+        void Next();
+
+        /// <summary> Returns the value of the current iterate. </summary>
+        ///
+        /// <returns> The result of applying the transformFunction on the current item in the input iterator </returns>
+        OutType Get() const;
 
     private:
-        IIterator<InType>& _inIter;
-        Func _transformFn;
+        InputIteratorType& _inIter;
+        FuncType _transformFunction;
     };
 
-    // Convenience function for creating TransformIterators
-    template <typename InType, typename FnType>
-    auto MakeTransform(IIterator<InType>& inIterator, FnType transformFn) -> TransformIterator<InType, decltype(transformFn(std::declval<InType>())), FnType>
-    {
-        return TransformIterator<InType, decltype(transformFn(std::declval<InType>())), FnType>(inIterator, transformFn);
-    }
+    /// <summary> Convenience function for creating TransformIterators </summary>
+    ///
+    /// <param name="inIter"> An iterator for the input collection </param>
+    /// <param name="transformFunction"> The function to apply to transform the input items</param>
+    ///
+    /// <returns> A TransformIterator over the input sequence using the specified transform function</returns>
+    template <typename InputIteratorType, typename FnType>
+    auto MakeTransformIterator(InputIteratorType& inIterator, FnType transformFunction)->TransformIterator<InputIteratorType, decltype(transformFunction(inIterator.Get())), FnType>;
 }
 
-#include "TransformIterator.tcc"
+#include "../tcc/TransformIterator.tcc"

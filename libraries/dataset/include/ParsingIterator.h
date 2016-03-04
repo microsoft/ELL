@@ -51,7 +51,7 @@ namespace dataset
         /// <summary> \returns The weight of the current example. </summary>
         ///
         /// <returns> A SupervisedExample. </returns>
-        virtual SupervisedExample Get();
+        virtual SupervisedExample Get() const;
 
     private:
         RowIteratorType _rowIterator;

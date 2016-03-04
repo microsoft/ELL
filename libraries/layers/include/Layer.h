@@ -17,8 +17,8 @@
 #include "RealArray.h"
 
 // utilities
-#include "VectorIterator.h"
 #include "JsonSerializer.h"
+#include "StlIteratorAdapter.h"
 
 // stl
 #include <vector>
@@ -72,7 +72,8 @@ namespace layers
         /// <param name="index"> Zero-based index of the. </param>
         ///
         /// <returns> The input coordinates. </returns>
-        virtual utilities::VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const = 0;
+        using InputCoordinateIterator = utilities::StlIteratorAdapter<std::vector<Coordinate>::const_iterator, Coordinate>;
+        virtual InputCoordinateIterator GetInputCoordinates(uint64 index) const = 0;
 
         /// <summary> Serializes the Layer in json format. </summary>
         ///

@@ -13,25 +13,32 @@ namespace utilities
     //
     // TransformIterator definitions
     //
-    template <typename InType, typename OutType, typename Func>
-    TransformIterator<InType, OutType, Func>::TransformIterator(IIterator<InType>& inIter, Func transformFn) : _inIter(inIter), _transformFn(transformFn)
+    template <typename InputIteratorType, typename OutType, typename FuncType>
+    TransformIterator<InputIteratorType, OutType, FuncType>::TransformIterator(InputIteratorType& inIter, FuncType transformFunction) : _inIter(inIter), _transformFunction(transformFunction)
     {}
     
-    template <typename InType, typename OutType, typename Func>
-    bool TransformIterator<InType, OutType, Func>::IsValid() const
+    template <typename InputIteratorType, typename OutType, typename FuncType>
+    bool TransformIterator<InputIteratorType, OutType, FuncType>::IsValid() const
     {
         return _inIter.IsValid();
     }
 
-    template <typename InType, typename OutType, typename Func>
-    void TransformIterator<InType, OutType, Func>::Next() 
+    template <typename InputIteratorType, typename OutType, typename FuncType>
+    void TransformIterator<InputIteratorType, OutType, FuncType>::Next() 
     {
         _inIter.Next(); 
     };
     
-    template <typename InType, typename OutType, typename Func>
-    OutType TransformIterator<InType, OutType, Func>::Get() 
+    template <typename InputIteratorType, typename OutType, typename FuncType>
+    OutType TransformIterator<InputIteratorType, OutType, FuncType>::Get() const
     {
-        return _transformFn(_inIter.Get()); 
+        return _transformFunction(_inIter.Get()); 
+    }
+
+    template <typename InputIteratorType, typename FnType>
+    auto MakeTransformIterator(InputIteratorType& inIterator, FnType transformFunction) -> TransformIterator<InputIteratorType, decltype(transformFunction(inIterator.Get())), FnType>
+    {
+        using OutType = decltype(transformFunction(inIterator.Get()));
+        return TransformIterator<InputIteratorType, OutType, FnType>(inIterator, transformFunction);
     }
 }

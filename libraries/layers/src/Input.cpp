@@ -30,7 +30,7 @@ namespace layers
         throw std::runtime_error("this code should never be reached");
     }
 
-    utilities::VectorIterator<Coordinate> Input::GetInputCoordinates(uint64 index) const
+    Layer::InputCoordinateIterator Input::GetInputCoordinates(uint64 index) const
     {
         throw std::runtime_error("this code should never be reached");
     }
