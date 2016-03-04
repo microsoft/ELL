@@ -33,7 +33,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/Files.h
                        include/TypeInfo.h
                        include/Format.h
-                       include/XMLSerialization.h)
+                       include/XMLSerialization.h
                        include/RandomEngines.h
                        include/StlIteratorAdapter.h)
 
@@ -44,7 +44,7 @@ set (TCC tcc/BinaryClassificationEvaluator.tcc
                    tcc/Parser.tcc
                    tcc/TransformIterator.tcc
                    tcc/Format.tcc
-                   tcc/StlIteratorAdapter.tcc)
+                   tcc/StlIteratorAdapter.tcc
                    tcc/XMLSerialization.tcc)
                    
 source_group("src" FILES ${SRC})
