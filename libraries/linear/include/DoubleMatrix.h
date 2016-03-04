@@ -21,13 +21,14 @@
 
 namespace linear
 {
+    /// <summary> Values that represent different matrix structures. </summary>
     enum class MatrixStructure { column, row, columnSquare, rowSquare, rowSquareUptriangular, diagonal };
 
     /// <summary>
-    /// Templated DoubleMatrix class with ElementType and StructureType template arguments.
+    /// Templated DoubleMatrix class with StructureType template arguments.
     /// </summary>
     ///
-    /// <typeparam name="StructureType"> Type of the structure type. </typeparam>
+    /// <typeparam name="StructureType"> Type of the matrix structure to use. </typeparam>
     template<MatrixStructure StructureType = MatrixStructure::row>
     class DoubleMatrix
     {};
@@ -38,74 +39,62 @@ namespace linear
     public:
 
         /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
-        DoubleMatrixBase(DoubleMatrixBase&& other) = default;
+        DoubleMatrixBase(DoubleMatrixBase&&) = default;
 
         /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="other"> The other. </param>
-        DoubleMatrixBase(const DoubleMatrixBase& other) = delete;
+        DoubleMatrixBase(const DoubleMatrixBase&) = delete;
 
         /// <summary> Returns the number of rows in the matrix. </summary>
         ///
-        /// <returns> The total number of rows. </returns>
+        /// <returns> The number of rows. </returns>
         virtual uint64 NumRows() const override;
 
         /// <summary> Returns the number of columns in the matrix. </summary>
         ///
-        /// <returns> The total number of columns. </returns>
+        /// <returns> The number of columns. </returns>
         virtual uint64 NumColumns() const override;
 
         /// <summary> Sets an entry in the matrix. </summary>
         ///
-        /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
-        /// <param name="value"> The value. </param>
+        /// <param name="i"> Zero-based row index. </param>
+        /// <param name="j"> Zero-based column index. </param>
+        /// <param name="value"> The value to set, or 1.0 by default. </param>
         virtual void Set(uint64 i, uint64 j, double value = 1.0);
 
         /// <summary> Sets all of the matrix elements to zero. </summary>
         void Reset();
 
-        /// <summary>
-        /// Returns a reference to an element of the matrix, specified by coordinates i,j.
-        /// </summary>
+        /// <summary> Returns a reference to the a matrix element </summary>
         ///
-        /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
+        /// <param name="i"> Zero-based row index. </param>
+        /// <param name="j"> Zero-based column index. </param>
         ///
-        /// <returns> The result of the operation. </returns>
+        /// <returns> A reference to the specified element. </returns>
         virtual double& operator()(uint64 i, uint64 j) =0;
 
-        /// <summary>
-        /// Returns a constant reference to an element of the matrix, specified by coordinates i,j.
-        /// </summary>
+        /// <summary> Returns a reference to the a matrix element </summary>
         ///
-        /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
+        /// <param name="i"> Zero-based row index. </param>
+        /// <param name="j"> Zero-based column index. </param>
         ///
-        /// <returns> The result of the operation. </returns>
+        /// <returns> A reference to the specified element. </returns>
         virtual double operator()(uint64 i, uint64 j) const =0;    
 
-        /// <summary>
-        /// Performs a general matrix std::vector product: y = alpha * M * x + beta * y.
-        /// </summary>
+        /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>
         ///
-        /// <param name="p_x"> The x coordinate. </param>
-        /// <param name="p_y"> [in,out] If non-null, the y coordinate. </param>
-        /// <param name="alpha"> The alpha. </param>
-        /// <param name="beta"> The beta. </param>
+        /// <param name="p_x"> The x vector. </param>
+        /// <param name="p_y"> [in,out] The y vector. </param>
+        /// <param name="alpha"> The alpha parameter. </param>
+        /// <param name="beta"> The beta parameter. </param>
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
         using IMatrix::Gemv;
 
-        /// <summary>
-        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y.
-        /// </summary>
+        /// <summary> Performs a general vector-matrix product: y = alpha * x * M + beta * y. </summary>
         ///
-        /// <param name="p_x"> The x coordinate. </param>
-        /// <param name="p_y"> [in,out] If non-null, the y coordinate. </param>
-        /// <param name="alpha"> The alpha. </param>
-        /// <param name="beta"> The beta. </param>
+        /// <param name="p_x"> The x vector. </param>
+        /// <param name="p_y"> [in,out] The y vector. </param>
+        /// <param name="alpha"> The alpha parameter. </param>
+        /// <param name="beta"> The beta parameter. </param>
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
         using IMatrix::Gevm;
 
@@ -257,25 +246,21 @@ namespace linear
         /// <returns> The result of the operation. </returns>
         virtual double operator()(uint64 i, uint64 j) const override;
 
-        /// <summary>
-        /// Performs a general matrix std::vector product: y = alpha * M * x + beta * y.
-        /// </summary>
+        /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>
         ///
         /// <param name="p_x"> The x vector. </param>
         /// <param name="p_y"> [in,out] The y vector. </param>
-        /// <param name="alpha"> The alpha. </param>
-        /// <param name="beta"> The beta. </param>
+        /// <param name="alpha"> The alpha parameter. </param>
+        /// <param name="beta"> The beta parameter. </param>
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
         using IMatrix::Gemv;
 
-        /// <summary>
-        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y.
-        /// </summary>
+        /// <summary> Performs a general vector-matrix product: y = alpha * x * M + beta * y. </summary>
         ///
         /// <param name="p_x"> The x vector. </param>
         /// <param name="p_y"> [in,out] The y vector. </param>
-        /// <param name="alpha"> The alpha. </param>
-        /// <param name="beta"> The beta. </param>
+        /// <param name="alpha"> The alpha parameter. </param>
+        /// <param name="beta"> The beta parameter. </param>
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
         using IMatrix::Gevm;
 
@@ -321,25 +306,21 @@ namespace linear
         /// <returns> The result of the operation. </returns>
         virtual double operator()(uint64 i, uint64 j) const override;
 
-        /// <summary>
-        /// Performs a general matrix std::vector product: y = alpha * M * x + beta * y.
-        /// </summary>
+        /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>
         ///
-        /// <param name="p_x"> The x coordinate. </param>
-        /// <param name="p_y"> [in,out] If non-null, the y coordinate. </param>
-        /// <param name="alpha"> The alpha. </param>
-        /// <param name="beta"> The beta. </param>
+        /// <param name="p_x"> The x vector. </param>
+        /// <param name="p_y"> [in,out] The y vector. </param>
+        /// <param name="alpha"> The alpha parameter. </param>
+        /// <param name="beta"> The beta parameter. </param>
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
         using IMatrix::Gemv;
 
-        /// <summary>
-        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y.
-        /// </summary>
+        /// <summary> Performs a general vector-matrix product: y = alpha * x * M + beta * y. </summary>
         ///
-        /// <param name="p_x"> The x coordinate. </param>
-        /// <param name="p_y"> [in,out] If non-null, the y coordinate. </param>
-        /// <param name="alpha"> The alpha. </param>
-        /// <param name="beta"> The beta. </param>
+        /// <param name="p_x"> The x vector. </param>
+        /// <param name="p_y"> [in,out] The y vector. </param>
+        /// <param name="alpha"> The alpha parameter. </param>
+        /// <param name="beta"> The beta parameter. </param>
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
         using IMatrix::Gevm;
 

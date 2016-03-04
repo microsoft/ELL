@@ -15,8 +15,12 @@
 
 namespace linear
 {
-    // A matrix type that stores two identical copies of the entries, one in row major orientation and one in column major
-    //
+    /// <summary>
+    /// A matrix type that stores two identical copies of the entries, one in row major orientation
+    /// and one in column major.
+    /// </summary>
+    ///
+    /// <typeparam name="RowMatrixType"> The type used to store each copy of the matrix. </typeparam>
     template<typename RowMatrixType>
     class BiMatrix : public RowMatrixType
     {
@@ -29,13 +33,9 @@ namespace linear
         BiMatrix() = default;
 
         /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="parameter1"> [in,out] The first parameter. </param>
         BiMatrix(BiMatrix<RowMatrixType>&&) = default;
 
         /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
         BiMatrix(const BiMatrix<RowMatrixType>&) = delete;
 
         /// <summary> Gets a reference to a column. </summary>
@@ -45,14 +45,12 @@ namespace linear
         /// <returns> A reference to the column. </returns>
         const RowType& GetColumn(uint64 index) const;
 
-        /// <summary>
-        /// Performs a general vector-matrix product: y = alpha * x * M + beta * y.
-        /// </summary>
+        /// <summary> Performs a general vector-matrix product: y = alpha * x * M + beta * y. </summary>
         ///
         /// <param name="p_x"> The x vector. </param>
-        /// <param name="p_y"> [in,out] the y vector. </param>
-        /// <param name="alpha"> The alpha. </param>
-        /// <param name="beta"> The beta. </param>
+        /// <param name="p_y"> [in,out] The y vector. </param>
+        /// <param name="alpha"> The alpha parameter. </param>
+        /// <param name="beta"> The beta parameter. </param>
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
 
     private:

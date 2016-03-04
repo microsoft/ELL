@@ -29,7 +29,7 @@ namespace linear
         virtual void Print(std::ostream& os) const = 0;
     };
 
-    /// <summary> Generic streaming operator that calls each class's Print() function. </summary>
+    /// <summary> Generic streaming operator that calls the derived class's Print() function. </summary>
     ///
     /// <param name="os"> [in,out] Stream to write data to. </param>
     /// <param name="v"> The object to print. </param>
