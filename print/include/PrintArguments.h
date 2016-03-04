@@ -92,7 +92,7 @@ struct ParsedPrintArguments : public PrintArguments, public utilities::ParsedArg
     ///
     /// <param name="parser"> The parser. </param>
     ///
-    /// <returns> An utilities::ParseResult. </returns>
-    virtual utilities::ParseResult PostProcess(const utilities::CommandLineParser& parser);
+    /// <returns> An utilities::CommandLineParseResult. </returns>
+    virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
 
 };

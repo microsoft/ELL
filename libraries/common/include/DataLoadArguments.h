@@ -35,11 +35,11 @@ namespace common
         /// <param name="parser"> [in,out] The parser. </param>
         virtual void AddArgs(utilities::CommandLineParser& parser);
 
-        /// <summary> Check arguments. </summary>
+        /// <summary> Checks the parsed arguments. </summary>
         ///
         /// <param name="parser"> The parser. </param>
         ///
-        /// <returns> An utilities::ParseResult. </returns>
-        virtual utilities::ParseResult PostProcess(const utilities::CommandLineParser& parser);
+        /// <returns> An utilities::CommandLineParseResult. </returns>
+        virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
     };
 }

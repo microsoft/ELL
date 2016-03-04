@@ -24,23 +24,20 @@
 
 namespace layers
 {
-    /// <summary> Implemenets a map. </summary>
+    /// <summary> Implements a map. </summary>
     class Map
     {
     public:
 
+        /// <summary> An iterator over the output values of the map. </summary>
         class Iterator : public IIndexValueIterator
         {
         public:
 
             /// <summary> Copy constructor. </summary>
-            ///
-            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
             /// <summary> Move constructor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
@@ -51,9 +48,9 @@ namespace layers
             /// <summary> Proceeds to the Next iterate. </summary>
             void Next();
 
-            /// <summary> \returns The current index-value pair. </summary>
+            /// <summary> Gets the current index-value pair. </summary>
             ///
-            /// <returns> An IndexValue. </returns>
+            /// <returns> The current index-value pair. </returns>
             IndexValue Get() const;
 
         protected:
@@ -71,49 +68,47 @@ namespace layers
 
         /// <summary> Constructs an instance of Map. </summary>
         ///
-        /// <param name="inputLayerSize"> Size of the input layer. </param>
+        /// <param name="inputLayerSize"> Input dimension. </param>
         Map(uint64 inputLayerSize);
 
-        /// <summary> Destructor. </summary>
+        /// <summary> Virtual destructor. </summary>
         virtual ~Map() = default;
 
         /// <summary> Computes the Map. </summary>
         ///
-        /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
-        /// <typeparam name="IIndexValueIterator"> Type of the index value iterator. </typeparam>
-        /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
-        /// <param name="IndexValueIterator"> The index value iterator. </param>
+        /// <typeparam name="IndexValueIteratorType"> Input iterator type. </typeparam>
+        /// <param name="IndexValueIterator"> The input value iterator. </param>
         /// <param name="outputCoordinates"> The output coordinates. </param>
         ///
-        /// <returns> An Iterator. </returns>
+        /// <returns> An Iterator over output values. </returns>
         template <typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         Iterator Compute(IndexValueIteratorType IndexValueIterator, const CoordinateList& outputCoordinates) const;
 
-        /// <summary> Adds a shared layer to the map. </summary>
+        /// <summary> Adds a layer to the map. </summary>
         ///
-        /// <param name="layer"> The layer. </param>
+        /// <param name="layer"> The layer to add to the map. </param>
         ///
         /// <returns> The index of the added layer. </returns>
         uint64 PushBack(std::shared_ptr<Layer> layer);
 
         /// <summary> Returns the number of layers in the map. </summary>
         ///
-        /// <returns> The total number of layers. </returns>
+        /// <returns> The total number of layers in the map. </returns>
         uint64 NumLayers() const;
 
-        /// <summary> Gets a Layer of a specified template type. </summary>
+        /// <summary> Gets a Layer cast as a specified layer type, used when derived classes add functionality to layers </summary>
         ///
-        /// <typeparam name="LayerType"> Type of the layer to return. </typeparam>
+        /// <typeparam name="LayerType"> Layer type to return. </typeparam>
         /// <param name="layerIndex"> Zero-based index of the layer. </param>
         ///
-        /// <returns> The layer. </returns>
+        /// <returns> The requested layer, cast to the requested type. </returns>
         template<typename LayerType = Layer>
         std::shared_ptr<const LayerType> GetLayer(uint64 layerIndex) const;
 
         /// <summary> Static function that loads a Map from file. </summary>
         ///
-        /// <typeparam name="MapType"> Type of the map type. </typeparam>
-        /// <param name="inputMapFile"> The input map file. </param>
+        /// <typeparam name="MapType"> Map type to load. </typeparam>
+        /// <param name="inputMapFile"> Name of the map file to load. </param>
         ///
         /// <returns> A MapType. </returns>
         template<typename MapType = Map>
@@ -134,11 +129,11 @@ namespace layers
         /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Deserialize(utilities::JsonSerializer& serializer);
 
-        /// <summary> Static function for deserializing std::shared_ptr<Layer> </summary>
+        /// <summary> Static function for deserializing a std::shared_ptr that points to a Layer </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
-        /// <param name="up"> [in,out] The up. </param>
-        static void DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<Layer>& up);
+        /// <param name="up"> [in,out] The pointer to the layer. </param>
+        static void DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<Layer>& spLayer);
 
     protected:
         std::shared_ptr<std::vector<types::DoubleArray>> AllocateOutputs() const;

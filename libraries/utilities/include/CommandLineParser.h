@@ -58,14 +58,14 @@ namespace utilities
     };
 
 
-    class ParseResult
+    class CommandLineParseResult
     {
     public:
-        ParseResult(); // No error
-        ParseResult(bool ok); // Error (if ok == false), no message
-        ParseResult(const char *message); // Error
-        ParseResult(const std::string& message); // Error
-        ParseResult(const std::vector<std::string>& messages); // list of errors (or success, if empty)
+        CommandLineParseResult(); // No error
+        CommandLineParseResult(bool ok); // Error (if ok == false), no message
+        CommandLineParseResult(const char *message); // Error
+        CommandLineParseResult(const std::string& message); // Error
+        CommandLineParseResult(const std::vector<std::string>& messages); // list of errors (or success, if empty)
         operator bool();
 
         friend class CommandLineParser;
@@ -142,7 +142,7 @@ namespace utilities
         bool HasShortName(std::string shortName);
 
         // Adds a callback std::function that gets invoked after Parse() is called
-        using PostParseCallback = std::function<ParseResult(CommandLineParser&)>;
+        using PostParseCallback = std::function<CommandLineParseResult(CommandLineParser&)>;
         void AddPostParseCallback(const PostParseCallback& callback);
 
     protected:
@@ -200,7 +200,7 @@ namespace utilities
         ParsedArgSet();
 
         virtual void AddArgs(CommandLineParser& parser);
-        virtual ParseResult PostProcess(const CommandLineParser& parser);
+        virtual CommandLineParseResult PostProcess(const CommandLineParser& parser);
     };
 
     // Exceptions thrown by CommandLineParser: 

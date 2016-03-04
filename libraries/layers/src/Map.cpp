@@ -67,7 +67,7 @@ namespace layers
         serializer.Write("layers", _layers);
     }
 
-    void Map::Serialize(ostream& os) const
+    void Map::Serialize(ostream& os) const // TODO erase
     {
         utilities::JsonSerializer writer;
         writer.Write("Base", *this);
@@ -80,33 +80,33 @@ namespace layers
         serializer.Read("layers", _layers, DeserializeLayers);
     }
 
-    void Map::DeserializeLayers(utilities::JsonSerializer & serializer, std::shared_ptr<Layer>& up)
+    void Map::DeserializeLayers(utilities::JsonSerializer & serializer, std::shared_ptr<Layer>& spLayer)
     {
         auto type = serializer.Read<std::string>("_type");
         auto version = serializer.Read<int>("_version");
 
         if (type == "Input")
         {
-            up = std::make_shared<Input>();
+            spLayer = std::make_shared<Input>();
         }
         else if (type == "Scale")
         {
-            up = std::make_shared<Coordinatewise>(layers::Layer::Type::scale);
+            spLayer = std::make_shared<Coordinatewise>(layers::Layer::Type::scale);
         }
         else if (type == "Shift")
         {
-            up = std::make_shared<Coordinatewise>(layers::Layer::Type::shift);
+            spLayer = std::make_shared<Coordinatewise>(layers::Layer::Type::shift);
         }
         else if (type == "Sum")
         {
-            up = std::make_shared<Sum>();
+            spLayer = std::make_shared<Sum>();
         }
         else
         {
             throw std::runtime_error("unidentified type in map file: " + type);
         }
 
-        up->Deserialize(serializer, version);
+        spLayer->Deserialize(serializer, version);
     }
 
     std::shared_ptr<std::vector<types::DoubleArray>> Map::AllocateOutputs() const

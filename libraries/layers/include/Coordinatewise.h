@@ -23,49 +23,49 @@
 
 namespace layers
 {
-    /// <summary> A coordinatewise. </summary>
+    /// <summary> A class that represents a layer that performs a coordinatewise operation. </summary>
     class Coordinatewise : public Layer
     {
     public:
 
         using DoubleOperation = std::function<double(double, double)>;
 
-        /// <summary> Constructs an instance of Coordinatewise. </summary>
+        /// <summary> Constructs an instance of a Coordinatewise layer. </summary>
         ///
-        /// <param name="type"> The type. </param>
+        /// <param name="type"> The type of Coordinatewise layer to construct. </param>
         Coordinatewise(Type type);
 
-        /// <summary> Constructs an instance of Coordinatewise. </summary>
+        /// <summary> Constructs an single-element instance of a Coordinatewise layer. </summary>
         ///
-        /// <param name="value"> The value. </param>
-        /// <param name="coordinate"> The coordinate. </param>
-        /// <param name="type"> The type. </param>
+        /// <param name="value"> The element's value. </param>
+        /// <param name="coordinate"> The element's input coordinate. </param>
+        /// <param name="type"> The type of Coordinatewise layer to construct. </param>
         Coordinatewise(double value, Coordinate coordinate, Type type);
 
-        /// <summary> Constructs an instance of Coordinatewise. </summary>
+        /// <summary> Constructs an instance of a Coordinatewise layer. </summary>
         ///
-        /// <param name="values"> The values. </param>
-        /// <param name="coordinates"> The coordinates. </param>
-        /// <param name="type"> The type. </param>
+        /// <param name="values"> The value for each element. </param>
+        /// <param name="coordinates"> The input coordinate for each element. </param>
+        /// <param name="type"> The type of Coordinatewise layer to construct. </param>
         Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, Type type);
 
         /// <summary> Default virtual destructor. </summary>
         virtual ~Coordinatewise() = default;
 
-        /// <summary> \returns The size of the layer's output. </summary>
+        /// <summary> Returns the number of elements in the layer. </summary>
         ///
-        /// <returns> An uint64. </returns>
+        /// <returns> The number of elements in the layer. </returns>
         virtual uint64 Size() const override;
 
         /// <summary> Computes the layer output. </summary>
         ///
-        /// <param name="layerIndex"> Zero-based index of the layer. </param>
-        /// <param name="outputs"> [in,out] The outputs. </param>
+        /// <param name="layerIndex"> The layer's own zero-based index in the map. </param>
+        /// <param name="outputs"> [in,out] The vector where the output values are written. </param>
         virtual void Compute(uint64 layerIndex, std::vector<types::DoubleArray>& outputs) const override;
 
-        /// <summary> \Returns An Iterator to the inputs that the specified output depends on. </summary>
+        /// <summary> Returns an iterator that enumerates the input coordinates for a specified element. </summary>
         ///
-        /// <param name="index"> Zero-based index of the. </param>
+        /// <param name="index"> Zero-based element index. </param>
         ///
         /// <returns> The input coordinates. </returns>
         virtual utilities::VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;

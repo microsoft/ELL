@@ -22,23 +22,23 @@
 
 namespace layers
 {
-    /// <summary> Represents an index value pair. </summary>
+    /// <summary> Represents an element in a layer. </summary>
     class Coordinate final
     {
     public:
 
-        /// <summary> Ctor. </summary>
+        /// <summary> Constructs a Coordinate object. </summary>
         ///
         /// <param name="layerIndex"> Zero-based index of the layer. </param>
         /// <param name="elementIndex"> Zero-based index of the element. </param>
         Coordinate(uint64 layerIndex=0, uint64 elementIndex=0);
 
-        /// <summary> \returns the i index. </summary>
+        /// <summary> Gets the layer index. </summary>
         ///
         /// <returns> The layer index. </returns>
         uint64 GetLayerIndex() const;
 
-        /// <summary> \returns the j index. </summary>
+        /// <summary> Gets the element index. </summary>
         ///
         /// <returns> The element index. </returns>
         uint64 GetElementIndex() const; 

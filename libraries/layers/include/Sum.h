@@ -44,20 +44,20 @@ namespace layers
         /// <summary> Destructor. </summary>
         virtual ~Sum() = default;
 
-        /// <summary> Returns the size of the layer's output. </summary>
+        /// <summary> Returns the number of elements in the layer. </summary>
         ///
-        /// <returns> An uint64. </returns>
+        /// <returns> The number of elements in the layer. </returns>
         virtual uint64 Size() const override;
 
         /// <summary> Computes the layer output. </summary>
         ///
-        /// <param name="layerIndex"> Zero-based index of the layer. </param>
-        /// <param name="outputs"> [in,out] The outputs. </param>
+        /// <param name="layerIndex"> The layer's own zero-based index in the map. </param>
+        /// <param name="outputs"> [in,out] The vector where the output values are written. </param>
         virtual void Compute(uint64 layerIndex, std::vector<types::DoubleArray>& outputs) const override;
 
-        /// <summary> Gets an Iterator to the inputs that the specified output depends on. </summary>
+        /// <summary> Returns an iterator that enumerates the input coordinates for a specified element. </summary>
         ///
-        /// <param name="index"> Zero-based index of the. </param>
+        /// <param name="index"> Zero-based element index. </param>
         ///
         /// <returns> The input coordinates. </returns>
         virtual utilities::VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;

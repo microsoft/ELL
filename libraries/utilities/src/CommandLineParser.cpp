@@ -28,38 +28,38 @@ namespace utilities
     {
     }
 
-    ParseResult ParsedArgSet::PostProcess(const CommandLineParser& parser)
+    CommandLineParseResult ParsedArgSet::PostProcess(const CommandLineParser& parser)
     {
-        return ParseResult();
+        return CommandLineParseResult();
     }
 
     //
-    // ParseResult class
+    // CommandLineParseResult class
     //
-    ParseResult::ParseResult() : _isOK(true)
+    CommandLineParseResult::CommandLineParseResult() : _isOK(true)
     {
     }
 
-    ParseResult::ParseResult(bool ok) : _isOK(ok)
+    CommandLineParseResult::CommandLineParseResult(bool ok) : _isOK(ok)
     {
     }
 
-    ParseResult::ParseResult(const char* message) : _isOK(false)
+    CommandLineParseResult::CommandLineParseResult(const char* message) : _isOK(false)
     {
         _messages.emplace_back(message);
     }
 
-    ParseResult::ParseResult(const std::string& message) : _isOK(false)
+    CommandLineParseResult::CommandLineParseResult(const std::string& message) : _isOK(false)
     {
         _messages.emplace_back(message);
     }
 
-    ParseResult::ParseResult(const std::vector<std::string>& messages) : _messages(messages)
+    CommandLineParseResult::CommandLineParseResult(const std::vector<std::string>& messages) : _messages(messages)
     {
         _isOK = _messages.size() == 0;
     }
 
-    ParseResult::operator bool()
+    CommandLineParseResult::operator bool()
     {
         return _isOK;
     }

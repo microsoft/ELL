@@ -52,7 +52,7 @@ void ParsedPrintArguments::AddArgs(utilities::CommandLineParser & parser)
     parser.AddOption(edgeStyle.dashStyle, "edgeDashStyle", "eds", "The dash style of the edges", "5,2");
 }
 
-utilities::ParseResult ParsedPrintArguments::PostProcess(const utilities::CommandLineParser & parser)
+utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilities::CommandLineParser & parser)
 {
     std::vector<std::string> parseErrorMessages;
 

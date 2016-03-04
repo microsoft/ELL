@@ -25,7 +25,7 @@ namespace common
             "");
     }
 
-    utilities::ParseResult ParsedDataSaveArguments::PostProcess(const utilities::CommandLineParser & parser)
+    utilities::CommandLineParseResult ParsedDataSaveArguments::PostProcess(const utilities::CommandLineParser & parser)
     {
         std::vector<std::string> parseErrorMessages;
 
