@@ -114,12 +114,12 @@ namespace linear
         /// <summary> Returns an iterator that traverses the rows. </summary>
         ///
         /// <param name="firstRow"> Zero-based index of the first row to iterate over. </param>
-        /// <param name="size"> The number of rows to iterate over, all rows by default. </param>
+        /// <param name="size"> The number of rows to iterate over, a value of zero means all rows. </param>
         ///
         /// <returns> The iterator. </returns>
         Iterator GetIterator(uint64 firstRow = 0, uint64 numRows = 0) const;
 
-        /// <summary> Moves a row into the bottom of the matrix. </summary>
+        /// <summary> Pushes a row into the bottom of the matrix. </summary>
         ///
         /// <param name="row"> [in,out] The row. </param>
         void PushBackRow(DataVectorType&& row);
@@ -128,8 +128,8 @@ namespace linear
         /// Constructs a new row at the bottom of the matrix with given constructor arguments.
         /// </summary>
         ///
-        /// <typeparam name="Args"> Type of the arguments. </typeparam>
-        /// <param name="args"> Variable arguments providing [in,out] The arguments. </param>
+        /// <typeparam name="Args"> Types for the row constructor. </typeparam>
+        /// <param name="args"> Variables for the row constructor. </param>
         template<typename... Args >
         void EmplaceBackRow(Args&&... args);
 
@@ -139,32 +139,28 @@ namespace linear
         void RandPerm(std::default_random_engine& rng);
 
         /// <summary>
-        /// Permutes the matrix so that the first numRows of the matrix are uniform, and the rest of the
+        /// Permutes the matrix so that the first numRows of the matrix are chosen uniformly, and the rest of the
         /// rows are arbitrary.
         /// </summary>
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
-        /// <param name="count"> Number of. </param>
+        /// <param name="count"> Number of rows to permute. </param>
         void RandPerm(std::default_random_engine& rng, uint64 count);
 
-        /// <summary>
-        /// Performs a general matrix std::vector product: y = alpha * M * x + beta * y.
-        /// </summary>
+        /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>
         ///
-        /// <param name="p_x"> The x coordinate. </param>
-        /// <param name="p_y"> [in,out] If non-null, the y coordinate. </param>
-        /// <param name="alpha"> The alpha. </param>
-        /// <param name="beta"> The beta. </param>
+        /// <param name="p_x"> The x vector. </param>
+        /// <param name="p_y"> [in,out] The y vector. </param>
+        /// <param name="alpha"> The alpha parameter. </param>
+        /// <param name="beta"> The beta parameter. </param>
         virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
 
-        /// <summary>
-        /// Performs a general std::vector matrix product: y = alpha * x * M + beta * y.
-        /// </summary>
+        /// <summary> Performs a general vector-matrix product: y = alpha * x * M + beta * y. </summary>
         ///
-        /// <param name="p_x"> The x coordinate. </param>
-        /// <param name="p_y"> [in,out] If non-null, the y coordinate. </param>
-        /// <param name="alpha"> The alpha. </param>
-        /// <param name="beta"> The beta. </param>
+        /// <param name="p_x"> The x vector. </param>
+        /// <param name="p_y"> [in,out] The y vector. </param>
+        /// <param name="alpha"> The alpha parameter. </param>
+        /// <param name="beta"> The beta parameter. </param>
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const override;
 
         /// <summary> Human readable printout to an output stream. </summary>
