@@ -64,7 +64,7 @@ namespace linear
         /// <summary> Sets all of the matrix elements to zero. </summary>
         void Reset();
 
-        /// <summary> Returns a reference to the a matrix element </summary>
+        /// <summary> Returns a reference to a matrix element </summary>
         ///
         /// <param name="i"> Zero-based row index. </param>
         /// <param name="j"> Zero-based column index. </param>
@@ -72,7 +72,7 @@ namespace linear
         /// <returns> A reference to the specified element. </returns>
         virtual double& operator()(uint64 i, uint64 j) =0;
 
-        /// <summary> Returns a reference to the a matrix element </summary>
+        /// <summary> Returns a reference to a matrix element </summary>
         ///
         /// <param name="i"> Zero-based row index. </param>
         /// <param name="j"> Zero-based column index. </param>
@@ -126,24 +126,20 @@ namespace linear
         /// <param name="numColumns"> Number of columns. </param>
         DoubleMatrix(uint64 numRows, uint64 numColumns);
 
-        /// <summary>
-        /// Returns a reference to an element of the matrix, specified by coordinates i,j.
-        /// </summary>
+        /// <summary> Returns a reference to a matrix element </summary>
         ///
-        /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
+        /// <param name="i"> Zero-based row index. </param>
+        /// <param name="j"> Zero-based column index. </param>
         ///
-        /// <returns> The result of the operation. </returns>
+        /// <returns> A reference to the specified element. </returns>
         virtual double& operator()(uint64 i, uint64 j) override;
 
-        /// <summary>
-        /// Returns a constant reference to an element of the matrix, specified by coordinates i,j.
-        /// </summary>
+        /// <summary> Returns a reference to a matrix element </summary>
         ///
-        /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
+        /// <param name="i"> Zero-based row index. </param>
+        /// <param name="j"> Zero-based column index. </param>
         ///
-        /// <returns> The result of the operation. </returns>
+        /// <returns> A reference to the specified element. </returns>
         virtual double operator()(uint64 i, uint64 j) const override;
     };
 
@@ -159,24 +155,20 @@ namespace linear
         /// <param name="numColumns"> Number of columns. </param>
         DoubleMatrix(uint64 numRows, uint64 numColumns);
 
-        /// <summary>
-        /// Returns a reference to an element of the matrix, specified by coordinates i,j.
-        /// </summary>
+        /// <summary> Returns a reference to a matrix element </summary>
         ///
-        /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
+        /// <param name="i"> Zero-based row index. </param>
+        /// <param name="j"> Zero-based column index. </param>
         ///
-        /// <returns> The result of the operation. </returns>
+        /// <returns> A reference to the specified element. </returns>
         virtual double& operator()(uint64 i, uint64 j) override;
 
-        /// <summary>
-        /// Returns a constant reference to an element of the matrix, specified by coordinates i,j.
-        /// </summary>
+        /// <summary> Returns a reference to a matrix element </summary>
         ///
-        /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
+        /// <param name="i"> Zero-based row index. </param>
+        /// <param name="j"> Zero-based column index. </param>
         ///
-        /// <returns> The result of the operation. </returns>
+        /// <returns> A reference to the specified element. </returns>
         virtual double operator()(uint64 i, uint64 j) const override;
     };
 
@@ -223,27 +215,23 @@ namespace linear
         ///
         /// <param name="i"> Zero-based index of the. </param>
         /// <param name="j"> The uint64 to process. </param>
-        /// <param name="value"> The value. </param>
+        /// <param name="value"> The value to set, 1.0 by default. </param>
         virtual void Set(uint64 i, uint64 j, double value = 1.0) override;
 
-        /// <summary>
-        /// Returns a reference to an element of the matrix, specified by coordinates i,j.
-        /// </summary>
+        /// <summary> Returns a reference to a matrix element </summary>
         ///
-        /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
+        /// <param name="i"> Zero-based row index. </param>
+        /// <param name="j"> Zero-based column index. </param>
         ///
-        /// <returns> The result of the operation. </returns>
+        /// <returns> A reference to the specified element. </returns>
         virtual double& operator()(uint64 i, uint64 j) override;
 
-        /// <summary>
-        /// Returns a constant reference to an element of the matrix, specified by coordinates i,j.
-        /// </summary>
+        /// <summary> Returns a reference to a matrix element </summary>
         ///
-        /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
+        /// <param name="i"> Zero-based row index. </param>
+        /// <param name="j"> Zero-based column index. </param>
         ///
-        /// <returns> The result of the operation. </returns>
+        /// <returns> A reference to the specified element. </returns>
         virtual double operator()(uint64 i, uint64 j) const override;
 
         /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>
@@ -283,27 +271,23 @@ namespace linear
         ///
         /// <param name="i"> Zero-based index of the. </param>
         /// <param name="j"> The uint64 to process. </param>
-        /// <param name="value"> The value. </param>
+        /// <param name="value"> The value to set, 1.0 by default. </param>
         virtual void Set(uint64 i, uint64 j, double value = 1.0) override;
 
-        /// <summary>
-        /// Returns a reference to an element of the matrix, specified by coordinates i,j.
-        /// </summary>
+        /// <summary> Returns a reference to a matrix element </summary>
         ///
-        /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
+        /// <param name="i"> Zero-based row index. </param>
+        /// <param name="j"> Zero-based column index. </param>
         ///
-        /// <returns> The result of the operation. </returns>
+        /// <returns> A reference to the specified element. </returns>
         virtual double& operator()(uint64 i, uint64 j) override;
 
-        /// <summary>
-        /// Returns a constant reference to an element of the matrix, specified by coordinates i,j.
-        /// </summary>
+        /// <summary> Returns a reference to a matrix element </summary>
         ///
-        /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
+        /// <param name="i"> Zero-based row index. </param>
+        /// <param name="j"> Zero-based column index. </param>
         ///
-        /// <returns> The result of the operation. </returns>
+        /// <returns> A reference to the specified element. </returns>
         virtual double operator()(uint64 i, uint64 j) const override;
 
         /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>

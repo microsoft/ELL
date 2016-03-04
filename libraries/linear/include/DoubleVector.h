@@ -47,41 +47,40 @@ namespace linear
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         DoubleVector(IndexValueIteratorType indexValueIterator) : types::DoubleArray(indexValueIterator) {}
 
-        using IVector::AddTo;
-
         /// <summary>
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its
         /// memory.
         /// </summary>
         void Reset();
 
-        /// <summary> Computes the vector squared 2-norm. </summary>
+        /// <summary> Returns the Size of the vector. </summary>
         ///
-        /// <returns> A double. </returns>
+        /// <returns> The size of the vector. </returns>
+        virtual uint64 Size() const override;
+
+        /// <summary> Computes the squared 2-norm. </summary>
+        ///
+        /// <returns> The squared 2-norm. </returns>
         virtual double Norm2() const override;
 
-        /// <summary> Performs (*p_other) += scalar * (*this), where other is a dense vector. </summary>
+        /// <summary> Performs the operation: other += scalar * (*this), where other is a std::vector. </summary>
         ///
-        /// <param name="p_other"> [in,out] If non-null, the other. </param>
+        /// <param name="other"> [in,out] The other vector. </param>
         /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(double* p_other, double scalar = 1.0) const override;
+        using IVector::AddTo;
 
         /// <summary> Scales the vector by a scalar. </summary>
         ///
-        /// <param name="s"> The double to process. </param>
+        /// <param name="s"> The scalar. </param>
         void Scale(double s);
 
-        /// <summary> Computes the Dot product. </summary>
+        /// <summary> Computes the dot product with another vector. </summary>
         ///
-        /// <param name="p_other"> The other. </param>
+        /// <param name="other"> The other vector. </param>
         ///
-        /// <returns> A double. </returns>
+        /// <returns> The dot product. </returns>
         virtual double Dot(const double* p_other) const override;
-
-        /// <summary> Returns the Size of the vector. </summary>
-        ///
-        /// <returns> An uint64. </returns>
-        virtual uint64 Size() const override;
 
         /// <summary> Prints the vector to an output stream. </summary>
         ///

@@ -16,19 +16,19 @@
 namespace linear
 {
     template<typename DataVectorType>
-    RowMatrix<DataVectorType>::Iterator::Iterator(const RowMatrix& table, uint64 row, uint64 max_row) : _table(table), _row(row), _max_row(max_row)
+    RowMatrix<DataVectorType>::Iterator::Iterator(const RowMatrix& table, uint64 firstRow, uint64 maxRow) : _table(table), _row(firstRow), _maxRow(maxRow)
     {}
 
     template<typename DataVectorType>
     bool RowMatrix<DataVectorType>::Iterator::IsValid() const
     {
-        return _row < _max_row;
+        return _row < _maxRow;
     }
 
     template<typename DataVectorType>
     uint64 RowMatrix<DataVectorType>::Iterator::NumIteratesLeft() const
     {
-        return _max_row - _row;
+        return _maxRow - _row;
     }
     
     template<typename DataVectorType>
@@ -40,7 +40,7 @@ namespace linear
     template<typename DataVectorType>
     const DataVectorType& RowMatrix<DataVectorType>::Iterator::Get() const
     {
-        assert(_row < _table.NumRows() && _row < _max_row);
+        assert(_row < _table.NumRows() && _row < _maxRow);
     
         return _table.GetRow(_row);
     }
@@ -64,15 +64,15 @@ namespace linear
     }
 
     template<typename DataVectorType>
-    typename RowMatrix<DataVectorType>::Iterator RowMatrix<DataVectorType>::GetIterator(uint64 row, uint64 size) const
+    typename RowMatrix<DataVectorType>::Iterator RowMatrix<DataVectorType>::GetIterator(uint64 firstRow, uint64 numRows) const
     {
-        uint64 max_row = row + size;
-        if(max_row > NumRows() || size == 0)
+        uint64 maxRow = firstRow + numRows;
+        if(maxRow > NumRows() || numRows == 0)
         {
-            max_row = NumRows();
+            maxRow = NumRows();
         }
 
-        return Iterator(*this, row, max_row);
+        return Iterator(*this, firstRow, maxRow);
     }
 
     template<typename DataVectorType>
@@ -109,11 +109,11 @@ namespace linear
     template<typename DataVectorType>
     void RowMatrix<DataVectorType>::RandPerm(std::default_random_engine& rng, uint64 count)
     {
-        uint64 max_row = NumRows()-1;
+        uint64 maxRow = NumRows()-1;
 
         for(uint64 i = 0; i < count; ++i)
         {
-            std::uniform_int_distribution<uint64> dist(i, max_row);
+            std::uniform_int_distribution<uint64> dist(i, maxRow);
             uint64 j = dist(rng);
             std::swap(_rows[i], _rows[j]);
         }

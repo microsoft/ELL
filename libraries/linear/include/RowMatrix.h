@@ -37,13 +37,9 @@ namespace linear
         public:
 
             /// <summary> Copy constructor. </summary>
-            ///
-            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
             /// <summary> Move constructor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
@@ -61,21 +57,21 @@ namespace linear
             /// <summary> Proceeds to the Next row. </summary>
             void Next();
 
-            /// <summary> Returns a const reference to the row. </summary>
+            /// <summary> Returns a const reference to the current row. </summary>
             ///
-            /// <returns> A DataVectorType&amp; </returns>
+            /// <returns> A const reference to the current row; </returns>
             const DataVectorType& Get() const;
 
         private:
 
             // private ctor, can only be called from RowMatrix class
-            Iterator(const RowMatrix& table, uint64 row, uint64 max_row);
+            Iterator(const RowMatrix& table, uint64 firstRow, uint64 maxRow);
             friend RowMatrix<DataVectorType>;
 
             // members
             const RowMatrix& _table;
             uint64 _row;
-            uint64 _max_row;
+            uint64 _maxRow;
         };
 
         /// <summary> The type of each row. </summary>
@@ -84,54 +80,44 @@ namespace linear
         /// <summary> Default constructor. </summary>
         RowMatrix() = default;
 
-        /// <summary> Constructs an instance of RowMatrix. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
-        RowMatrix(RowMatrix<DataVectorType>&& other) = default;
+        /// <summary> Move constructor </summary>
+        RowMatrix(RowMatrix<DataVectorType>&&) = default;
 
         /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="other"> The other. </param>
-        RowMatrix(const RowMatrix<DataVectorType>& other) = delete;
+        RowMatrix(const RowMatrix<DataVectorType>&) = delete;
 
         /// <summary> Default move assignment operator. </summary>
         ///
-        /// <param name="other"> [in,out] The other. </param>
-        ///
-        /// <returns> A shallow copy of this RowMatrix. </returns>
-        RowMatrix<DataVectorType>& operator=(RowMatrix<DataVectorType>&& other) = default;
+        /// <param name="other"> [in,out] The other vector. </param>
+        RowMatrix<DataVectorType>& operator=(RowMatrix<DataVectorType>&&) = default;
 
         /// <summary> Deleted asignment operator. </summary>
-        ///
-        /// <param name="other"> The other. </param>
-        ///
-        /// <returns> A shallow copy of this RowMatrix. </returns>
-        RowMatrix<DataVectorType>& operator=(const RowMatrix<DataVectorType>& other) = delete;
+        RowMatrix<DataVectorType>& operator=(const RowMatrix<DataVectorType>&) = delete;
 
         /// <summary> Returns the number of rows in the matrix. </summary>
         ///
-        /// <returns> The total number of rows. </returns>
+        /// <returns> The number of rows. </returns>
         virtual uint64 NumRows() const override;
 
         /// <summary> Returns the number of columns in the matrix. </summary>
         ///
-        /// <returns> The total number of columns. </returns>
+        /// <returns> The number of columns. </returns>
         virtual uint64 NumColumns() const override;
 
         /// <summary> Returns a reference to a row. </summary>
         ///
-        /// <param name="index"> Zero-based index of the. </param>
+        /// <param name="index"> Zero-based index of the row. </param>
         ///
-        /// <returns> The row. </returns>
+        /// <returns> Refence to the specified row. </returns>
         const RowType& GetRow(uint64 index) const;
 
         /// <summary> Returns an iterator that traverses the rows. </summary>
         ///
-        /// <param name="row"> The row. </param>
-        /// <param name="size"> The size. </param>
+        /// <param name="firstRow"> Zero-based index of the first row to iterate over. </param>
+        /// <param name="size"> The number of rows to iterate over, all rows by default. </param>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator(uint64 row = 0, uint64 size = 0) const;
+        Iterator GetIterator(uint64 firstRow = 0, uint64 numRows = 0) const;
 
         /// <summary> Moves a row into the bottom of the matrix. </summary>
         ///

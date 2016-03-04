@@ -34,10 +34,10 @@ namespace linear
 
         /// <summary> Computes the squared 2-norm. </summary>
         ///
-        /// <returns> A double. </returns>
+        /// <returns> The squared 2-norm. </returns>
         virtual double Norm2() const =0;
 
-        /// <summary> Performs the operation: other += scalar * (*this), where other is a dense std::vector. </summary>
+        /// <summary> Performs the operation: other += scalar * (*this), where other is a std::vector. </summary>
         ///
         /// <param name="other"> [in,out] The other vector. </param>
         /// <param name="scalar"> The scalar. </param>
