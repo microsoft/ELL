@@ -12,10 +12,11 @@
 
 #include "IDataVector.h"
 
+// types
 #include "types.h"
 #include "RealArray.h"
 
-//stl
+// stl
 #include <vector>
 #include <iostream>
 #include <type_traits>

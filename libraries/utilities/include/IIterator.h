@@ -15,6 +15,9 @@
 
 namespace utilities
 {
+    /// <summary> Abstract base class for an iterator over a collection of objects of type T.
+    ///
+    /// <typeparam name="T"> Type of the elements being iterated over. </typeparam>
     template <typename T>
     class IIterator
     {
@@ -28,41 +31,12 @@ namespace utilities
         ///
         virtual bool IsValid() const = 0;
 
-        /// Proceeds to the Next row
+        /// Proceeds to the Next item
         ///
         virtual void Next() = 0;
 
-        /// Returns the weight of the current example
+        /// Returns the current item
         ///
-        virtual T Get() = 0;
+        virtual T Get() const = 0;
     };
-
-    template <typename T, typename IteratorType>
-    class IteratorAdapter : public IIterator<T>
-    {
-    public:
-        IteratorAdapter(IteratorType begin, IteratorType end) : _current(begin), _end(end)
-        {
-        }
-
-        virtual bool IsValid() const override { return _current != _end; }
-        virtual void Next() override { if (IsValid()) _current++; }
-        virtual T Get() override { return *_current; }
-
-    private:
-        IteratorType _current;
-        IteratorType _end;
-    };
-
-    template <typename IteratorType>
-    auto MakeIterator(IteratorType begin, IteratorType end) -> IteratorAdapter<decltype(*begin), IteratorType>
-    {
-        return IteratorAdapter<decltype(*begin), IteratorType>(begin, end);
-    }
-
-    template <typename ContainerType>
-    auto MakeIterator(ContainerType& container) -> IteratorAdapter<typename ContainerType::value_type, typename ContainerType::iterator>
-    {
-        return IteratorAdapter<typename ContainerType::value_type, typename ContainerType::iterator>(container.begin(), container.end());
-    }
 }

@@ -79,11 +79,11 @@ namespace dataset
 
         // Converting constructor
         //
-        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
 
         /// <summary> Constructs an instance of SparseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
+        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         SparseDataVector(IndexValueIteratorType IndexValueIterator);
 
         /// <summary> Move constructor. </summary>

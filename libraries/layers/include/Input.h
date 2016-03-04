@@ -50,7 +50,7 @@ namespace layers
         /// <param name="index"> Zero-based element index. </param>
         ///
         /// <returns> The input coordinates. </returns>
-        virtual utilities::VectorIterator<Coordinate> GetInputCoordinates(uint64 index) const override;
+        virtual Layer::InputCoordinateIterator GetInputCoordinates(uint64 index) const override;
 
         /// <summary> Serializes the Layer in json format. </summary>
         ///

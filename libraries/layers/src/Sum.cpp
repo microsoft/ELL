@@ -44,9 +44,9 @@ namespace layers
         }
     }
 
-    utilities::VectorIterator<Coordinate> Sum::GetInputCoordinates(uint64 index) const
+    Layer::InputCoordinateIterator Sum::GetInputCoordinates(uint64 index) const
     {
-        return utilities::VectorIterator<Coordinate>(_inputCoordinates[index].cbegin(), _inputCoordinates[index].cend());
+        return Layer::InputCoordinateIterator(_inputCoordinates[index].cbegin(), _inputCoordinates[index].cend());
     }
 
     void Sum::Serialize(utilities::JsonSerializer & serializer) const
