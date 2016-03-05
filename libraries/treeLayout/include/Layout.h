@@ -28,7 +28,7 @@ namespace treeLayout
     public:
         
         /// <summary> Constructs a default vertex position. </summary>
-        VertexPosition();        
+        VertexPosition();
 
         /// <summary> Constructs a vertex position with specific depth and offset. </summary>
         ///
@@ -48,12 +48,12 @@ namespace treeLayout
 
         /// <summary> Sets the depth. </summary>
         ///
-        /// <param name="value"> The value. </param>
+        /// <param name="value"> The depth. </param>
         void SetDepth(double value);
 
         /// <summary> Sets the offset. </summary>
         ///
-        /// <param name="value"> The value. </param>
+        /// <param name="value"> The offset. </param>
         void SetOffset(double value);
 
     private:
@@ -67,7 +67,8 @@ namespace treeLayout
     class Layout {
 
     public:
-        /// <summary> default constructor. </summary>
+
+        /// <summary> Constructs a layout. </summary>
         Layout(){};
 
         /// <summary> Constructs a layout with given parameters. </summary>
@@ -79,51 +80,53 @@ namespace treeLayout
         /// <param name="max_depth"> The maximum depth. </param>
         Layout(size_t size, double min_offset, double max_offset, double min_depth, double max_depth);
 
-        /// <summary> \returns A reference to the position of a specified vertex. </summary>
+        /// <summary> Returns a reference to the position of a specified vertex. </summary>
         ///
-        /// <param name="index"> Zero-based index of the. </param>
+        /// <param name="index"> Zero-based index of the vertex. </param>
         ///
-        /// <returns> The indexed value. </returns>
+        /// <returns> The vertex position. </returns>
         VertexPosition& operator[](uint64 index);
 
-        /// <summary> \returns A reference to the position of a specified vertex. </summary>
+        /// <summary> Returns a reference to the position of a specified vertex. </summary>
         ///
-        /// <param name="index"> Zero-based index of the. </param>
+        /// <param name="index"> Zero-based index of the vertex. </param>
         ///
-        /// <returns> The indexed value. </returns>
+        /// <returns> The vertex position. </returns>
         const VertexPosition& operator[](uint64 index) const;
 
-        /// <summary> \return The number of vertices. </summary>
+        /// <summary> Returns The number of vertices. </summary>
         ///
-        /// <returns> An uint64. </returns>
+        /// <returns> The number of vertices. </returns>
         uint64 Size() const;
 
         /// <summary>
-        ///Returns the min offset (if the tree is top down, this is the left of its bounding box)
+        /// Returns the min offset (if the tree is top down, this is the left of its bounding box)
         /// </summary>
         ///
         /// <returns> The minimum offset. </returns>
         double GetMinOffset() const;
 
         /// <summary>
-        ///Returns the max offset (if the tree is top down, this is the right of its bounding box)
+        /// Returns the max offset (if the tree is top down, this is the right of its bounding box)
         /// </summary>
         ///
         /// <returns> The maximum offset. </returns>
         double GetMaxOffset() const;
 
         /// <summary>
-        ///Returns the min depth (if the tree is top down, this is the top of its bounding box)
+        /// Returns the min depth (if the tree is top down, this is the top of its bounding box)
         /// </summary>
         ///
         /// <returns> The minimum depth. </returns>
         double GetMinDepth() const;
-        
-        //Returns the max depth (if the tree is top down, this is the bottom of its bounding box)
-        //
+
+        /// <summary> Returns the max depth (if the tree is top down, this is the bottom of its bounding
+        /// box) </summary>
+        ///
+        /// <returns> The maximum depth. </returns>
         double GetMaxDepth() const;
 
-        /// <summary> Gets the vertices. </summary>
+        /// <summary> Gets the vector of vertex positions. </summary>
         ///
         /// <returns> The vertices. </returns>
         const std::vector<VertexPosition>& GetVertices() const;

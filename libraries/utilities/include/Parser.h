@@ -24,16 +24,16 @@ namespace utilities
         /// <summary> Parses numbers in a c-string and advances the string pointer. </summary>
         ///
         /// <typeparam name="ValueType"> Type of number to output. </typeparam>
-        /// <param name="pStr"> The string pointer. </param>
-        /// <param name="value"> [in,out] The value. </param>
+        /// <param name="pStr"> The reference to a c-style string. </param>
+        /// <param name="value"> [in,out] The value being set. </param>
         ///
-        /// <returns> A Result. </returns>
+        /// <returns> A parser result. </returns>
         template<typename ValueType>
         Result Parse(const char*& pStr, /* out */ ValueType& value);
 
         /// <summary> Advances pStr until it points to a non-whitespace character. </summary>
         ///
-        /// <param name="pStr"> The string pointer. </param>
+        /// <param name="pStr"> The reference to a c-style string. </param>
         inline void Trim(const char*& pStr);
     };
 }

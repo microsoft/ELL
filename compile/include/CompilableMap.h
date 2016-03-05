@@ -30,7 +30,7 @@ public:
 
     /// <summary> Generates C code that encodes the map. </summary>
     ///
-    /// <param name="coordinateList"> List of coordinates. </param>
+    /// <param name="coordinateList"> List of output coordinates, whose values must be computed. </param>
     /// <param name="os"> [in,out] Stream to write data to. </param>
     void ToCode(layers::CoordinateList coordinateList, ostream& os) const;
 
@@ -42,6 +42,6 @@ public:
     /// <summary> Static function for deserializing shared_ptr<Layer> </summary>
     ///
     /// <param name="serializer"> [in,out] The serializer. </param>
-    /// <param name="up"> [in,out] The up. </param>
-    static void DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<layers::Layer>& up);
+    /// <param name="up"> [in,out] A pointer to the layer being deserialized. </param>
+    static void DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<layers::Layer>& spLayer);
 };

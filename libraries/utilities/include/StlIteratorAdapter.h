@@ -22,8 +22,8 @@ namespace utilities
     public:
         /// <summary> Constructor </summary>
         ///
-        /// <param name="begin"> The STL iterator pointing to the beginning of the range to iterate over</param>
-        /// <param name="end"> The STL iterator pointing just past the end of the range to iterate over</param>
+        /// <param name="begin"> The STL iterator pointing to the beginning of the range to iterate over. </param>
+        /// <param name="end"> The STL iterator pointing just past the end of the range to iterate over. </param>
         StlIteratorAdapter(IteratorType begin, IteratorType end);
         
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
@@ -36,7 +36,7 @@ namespace utilities
 
         /// <summary> Returns the value of the current iterate. </summary>
         ///
-        /// <returns> The value of the current iterate</returns>
+        /// <returns> The value of the current iterate. </returns>
         ValueType Get() const;
 
     private:
@@ -46,16 +46,16 @@ namespace utilities
 
     /// <summary> Convenience function for creating StlIteratorAdapters </summary>
     ///
-    /// <param name="begin"> The STL iterator pointing to the beginning of the range to iterate over</param>
-    /// <param name="end"> The STL iterator pointing just past the end of the range to iterate over</param>
+    /// <param name="begin"> The STL iterator pointing to the beginning of the range to iterate over. </param>
+    /// <param name="end"> The STL iterator pointing just past the end of the range to iterate over. </param>
     ///
-    /// <returns> A StlIteratorAdapter over the range specified by the begin and end iterators</returns>
+    /// <returns> A StlIteratorAdapter over the range specified by the begin and end iterators. </returns>
     template <typename IteratorType>
     auto MakeStlIteratorAdapter(IteratorType begin, IteratorType end)->StlIteratorAdapter<IteratorType, decltype(*begin)>;
 
     /// <summary> Convenience function for creating StlIteratorAdapters </summary>
     ///
-    /// <param name="container"> The C++-confoming iterable container to iterate over</param>
+    /// <param name="container"> The C++-conforming iterable container to iterate over. </param>
     ///
     /// <returns> A StlIteratorAdapter over the container</returns>
     template <typename ContainerType>

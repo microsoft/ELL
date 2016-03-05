@@ -18,8 +18,8 @@ namespace testing
 {
     /// <summary> Checks if two doubles are equal, up to a small numerical error. </summary>
     ///
-    /// <param name="a"> The double to process. </param>
-    /// <param name="b"> The double to process. </param>
+    /// <param name="a"> The first number. </param>
+    /// <param name="b"> The second number. </param>
     /// <param name="tolerance"> The tolerance. </param>
     ///
     /// <returns> true if equal, false if not. </returns>
@@ -29,8 +29,8 @@ namespace testing
     /// Checks if two vectors are equal, up to a small numerical error in each coordinate.
     /// </summary>
     ///
-    /// <param name="a"> The std::vector&lt;double&gt; to process. </param>
-    /// <param name="b"> The std::vector&lt;double&gt; to process. </param>
+    /// <param name="a"> The first vector. </param>
+    /// <param name="b"> The second vector. </param>
     /// <param name="tolerance"> The tolerance. </param>
     ///
     /// <returns> true if equal, false if not. </returns>
@@ -39,7 +39,7 @@ namespace testing
     /// <summary> Process the test. </summary>
     ///
     /// <param name="testDescription"> Information describing the test. </param>
-    /// <param name="success"> true if the operation was a success, false if it failed. </param>
+    /// <param name="success"> true if the test was a success, false if it failed. </param>
     void ProcessTest(const std::string& testDescription, bool success);
 
     /// <summary> Checks if one of the tests failed. </summary>

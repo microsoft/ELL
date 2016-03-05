@@ -24,12 +24,12 @@ namespace decisionTree
 
     public:
         
-        /// <summary> Represents an index value pair, used to store the split rules. </summary>
+        /// <summary> Represents a SplitRule in a decision tree. </summary>
         class SplitRule
         {
         public:
 
-            /// <summary> Constructs an index value. </summary>
+            /// <summary> Constructs a SplitRule. </summary>
             ///
             /// <param name="index"> Zero-based index of the. </param>
             /// <param name="value"> The value. </param>
@@ -50,7 +50,7 @@ namespace decisionTree
             double _value;
         };
 
-        /// <summary> Represents a pair of Children of a binary tree. </summary>
+        /// <summary> Represents a pair of Children of a node in a binary tree. </summary>
         class ChildPair 
         {
         public:
@@ -63,22 +63,22 @@ namespace decisionTree
 
             /// <summary> Returns Child 0. </summary>
             ///
-            /// <returns> The child 0. </returns>
+            /// <returns> Child 0. </returns>
             int GetChild0() const;
 
             /// <summary> Returns Child 1. </summary>
             ///
-            /// <returns> The child 1. </returns>
+            /// <returns> Child 1. </returns>
             int GetChild1() const;
 
             /// <summary> Sets child 0. </summary>
             ///
-            /// <param name="index"> Zero-based index of the. </param>
+            /// <param name="index"> Child 0. </param>
             void SetChild0(int index);
 
             /// <summary> Sets child 1. </summary>
             ///
-            /// <param name="index"> Zero-based index of the. </param>
+            /// <param name="index"> Child 1. </param>
             void SetChild1(int index);
 
         private:
@@ -88,7 +88,7 @@ namespace decisionTree
 
         /// <summary> Constructs an empty mutable decision tree with one leaf, the root. </summary>
         ///
-        /// <param name="root_output"> The root output. </param>
+        /// <param name="root_output"> The root output value. </param>
         MutableDecisionTree(double root_output = 0.0);
 
         /// <summary> An iterator used to expose the tree split rules. </summary>
@@ -178,6 +178,7 @@ namespace decisionTree
                       double child0_output, 
                       double child1_output);
 
+        /// <summary> Deleted copy constructor. </summary>
         MutableDecisionTree(const MutableDecisionTree&) = delete;
 
     private:

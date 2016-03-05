@@ -40,17 +40,17 @@ namespace utilities
         template<typename ExampleIteratorType, typename PredictorType, typename LossFunctionType>
         void Evaluate(ExampleIteratorType& data_iter, const PredictorType& predictor, const LossFunctionType& loss_function);
 
-        /// <summary> Returns the average weighted loss. </summary>
+        /// <summary> Returns the most recent average weighted loss. </summary>
         ///
-        /// <returns> The last loss. </returns>
+        /// <returns> The most recent loss. </returns>
         double GetLastLoss() const;
 
-        /// <summary> Returns the weighted error rate. </summary>
+        /// <summary> Returns the most recent weighted error rate. </summary>
         ///
-        /// <returns> The last error. </returns>
+        /// <returns> The most recent error rate. </returns>
         double GetLastError() const;
 
-        /// <summary> Prints losses and errors to an std::ostream. </summary>
+        /// <summary> Prints losses and errors to an ostream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         void Print(std::ostream& os) const;

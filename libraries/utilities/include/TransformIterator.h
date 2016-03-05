@@ -36,7 +36,7 @@ namespace utilities
 
         /// <summary> Returns the value of the current iterate. </summary>
         ///
-        /// <returns> The result of applying the transformFunction on the current item in the input iterator </returns>
+        /// <returns> The result of applying the transformFunction on the current item in the input iterator. </returns>
         OutType Get() const;
 
     private:

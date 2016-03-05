@@ -24,7 +24,7 @@ struct CompileArguments
     std::string outputCodeFile;
 };
 
-/// <summary> Arguments for parsed compile. </summary>
+/// <summary> Parsed command line arguments for the compile executable. </summary>
 struct ParsedCompileArguments : public CompileArguments, public utilities::ParsedArgSet
 {
     /// <summary> Adds the arguments. </summary>
