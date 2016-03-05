@@ -45,7 +45,7 @@ namespace linear
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
         /// <param name="indexValueIterator"> The index value iterator. </param>
         template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        DoubleVector(IndexValueIteratorType indexValueIterator) : types::DoubleArray(indexValueIterator) {}
+        DoubleVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary>
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its
@@ -89,5 +89,5 @@ namespace linear
     };
 }
 
-
+#include "../tcc/DoubleVector.tcc"
 

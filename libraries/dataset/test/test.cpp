@@ -17,15 +17,12 @@
 // testing
 #include "testing.h"
 
-// types
-#include "RealArray.h"
-
 // linear
 #include "DoubleVector.h"
 
 // stl
 #include <iostream>
-#include<string>
+#include <string>
 #include <sstream>
 
 /// Generates a linear::DoubleVector

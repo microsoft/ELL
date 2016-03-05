@@ -42,69 +42,8 @@ namespace types
     RealArray<ValueType>::RealArray(uint64 size) : std::vector<ValueType>(size) {}
 
     template<typename ValueType>
-    template<typename IndexValueIteratorType, typename concept>
-    RealArray<ValueType>::RealArray(IndexValueIteratorType IndexValueIterator) : vector<ValueType>(0)
-    {
-        while(IndexValueIterator.IsValid())
-        {
-            auto entry = IndexValueIterator.Get();
-            this->resize(entry.index+1);
-            (*this)[entry.index] = entry.value;
-            IndexValueIterator.Next();
-        }
-    }
-    
-    template<typename ValueType>
-    void RealArray<ValueType>::Clear()
-    {
-        fill(this->begin(), this->end(), 0);
-    }
-
-    template<typename ValueType>
-    template<typename IndexValueIteratorType, typename concept>
-    void RealArray<ValueType>::Set(IndexValueIteratorType IndexValueIterator)
-    {
-        Clear();
-        while (IndexValueIterator.IsValid())
-        {
-            auto entry = IndexValueIterator.Get();
-            if (entry.index >= this->size())
-            {
-                break;
-            }
-            (*this)[entry.index] = entry.value;
-            IndexValueIterator.Next();
-        }
-    }
-
-    template<typename ValueType>
-    uint64 RealArray<ValueType>::Size() const
-    {
-        return this->size();
-    }
-
-    template<typename ValueType>
     typename RealArray<ValueType>::Iterator RealArray<ValueType>::GetIterator() const
     {
         return Iterator(this->cbegin(), this->cend());
-    }
-
-    template<typename ValueType>
-    void RealArray<ValueType>::Print(ostream& os) const
-    {
-        auto iterator = GetIterator();
-
-        while(iterator.IsValid())
-        {
-            auto indexValue = iterator.Get();
-            os << indexValue.index << ':' << indexValue.value << '\t';
-            iterator.Next();
-        }
-    }
-
-    template<typename ValueType>
-    ostream& operator<<(ostream& os, const RealArray<ValueType>& array)
-    {
-        array.Print(os);
     }
 }

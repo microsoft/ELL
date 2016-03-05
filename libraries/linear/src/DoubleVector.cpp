@@ -64,6 +64,12 @@ namespace linear
 
     void DoubleVector::Print(ostream & os) const
     {
-        types::DoubleArray::Print(os);
+        auto iterator = GetIterator();
+        while (iterator.IsValid())
+        {
+            auto indexValue = iterator.Get();
+            os << indexValue.index << ':' << indexValue.value << '\t';
+            iterator.Next();
+        }
     }
 }

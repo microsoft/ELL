@@ -13,11 +13,28 @@
 #include "Files.h"
 
 // stl
+#include <algorithm>
 #include <string>
 #include <memory>
 
 namespace layers
 {
+    template<typename IndexValueIteratorType>
+    void SetArray(types::DoubleArray& array, IndexValueIteratorType indexValueIterator)
+    {
+        std::fill(array.begin(), array.end(), 0);
+        while (indexValueIterator.IsValid())
+        {
+            auto entry = indexValueIterator.Get();
+            if (entry.index >= array.size())
+            {
+                break;
+            }
+            array[entry.index] = entry.value;
+            indexValueIterator.Next();
+        }
+    }
+
     template<typename IndexValueIteratorType, typename concept>
     Map::Iterator Map::Compute(IndexValueIteratorType indexValueIterator, const CoordinateList& outputCoordinates) const
     {
@@ -25,7 +42,7 @@ namespace layers
         auto outputs = AllocateOutputs(); // Does AllocateOutputs have to return std::shared_ptr? 
         
         // set the input 
-        (*outputs)[0].Set(indexValueIterator);
+        SetArray( (*outputs)[0], indexValueIterator);
 
         // compute layers 1,2,... in order
         for(uint64 i = 1; i<_layers.size(); ++i)
