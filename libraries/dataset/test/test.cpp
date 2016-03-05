@@ -121,7 +121,7 @@ void addToTest()
     auto a1 = getVector();
     auto a2 = getVector();
 
-    types::DoubleArray b(15);
+    std::vector<double> b(15);
     b[3] = 1.0;
     b[4] = 1.0;
     b[12] = 1.0;

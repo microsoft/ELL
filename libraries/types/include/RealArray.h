@@ -49,9 +49,6 @@ namespace types
     
     template <typename ValueType>
     StlIndexValueIterator<ValueType> GetIndexValueIterator(const std::vector<ValueType>& arr);
-
-    // nice name for vector<double>
-    typedef std::vector<double> DoubleArray;
 }
 
 

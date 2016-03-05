@@ -20,7 +20,7 @@
 namespace layers
 {
     template<typename IndexValueIteratorType>
-    void SetArray(types::DoubleArray& array, IndexValueIteratorType indexValueIterator)
+    void SetArray(std::vector<double>& array, IndexValueIteratorType indexValueIterator)
     {
         std::fill(array.begin(), array.end(), 0);
         while (indexValueIterator.IsValid())

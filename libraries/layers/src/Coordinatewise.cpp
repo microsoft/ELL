@@ -49,7 +49,7 @@ namespace layers
         return _inputCoordinates.size();
     }
 
-    void Coordinatewise::Compute(uint64 layerIndex, std::vector<types::DoubleArray>& outputs) const 
+    void Coordinatewise::Compute(uint64 layerIndex, std::vector<std::vector<double>>& outputs) const 
     {
         for(uint64 k=0; k<_values.size(); ++k)
         {

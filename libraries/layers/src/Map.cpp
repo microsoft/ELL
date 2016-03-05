@@ -39,7 +39,7 @@ namespace layers
         return IndexValue{ _index, (*_spOutputs)[layerIndex][elementIndex] };
     }
 
-    Map::Iterator::Iterator(std::shared_ptr<std::vector<types::DoubleArray>> spOutput, const CoordinateList& outputCoordinates) :
+    Map::Iterator::Iterator(std::shared_ptr<std::vector<std::vector<double>>> spOutput, const CoordinateList& outputCoordinates) :
         _spOutputs(spOutput),
         _outputCoordinates(outputCoordinates),
         _index(0)
@@ -109,9 +109,9 @@ namespace layers
         spLayer->Deserialize(serializer, version);
     }
 
-    std::shared_ptr<std::vector<types::DoubleArray>> Map::AllocateOutputs() const
+    std::shared_ptr<std::vector<std::vector<double>>> Map::AllocateOutputs() const
     {
-        auto outputs = std::make_shared<std::vector<types::DoubleArray>>();
+        auto outputs = std::make_shared<std::vector<std::vector<double>>>();
         for (uint64 i = 0; i < _layers.size(); ++i)
         {
             outputs->emplace_back(_layers[i]->Size());

@@ -60,7 +60,6 @@ namespace linear
         template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         DoubleVector(IndexValueIteratorType indexValueIterator);
 
-
         /// <summary> Type-conversion operator into a std::vector<double>
         operator std::vector<double>() const &;
 
