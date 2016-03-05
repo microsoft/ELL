@@ -14,7 +14,6 @@
 
 // types
 #include "types.h"
-#include "RealArray.h"
 
 // stl
 #include <vector>
@@ -40,12 +39,6 @@ namespace linear
         /// <returns> The squared 2-norm. </returns>
         virtual double Norm2() const = 0;
 
-        /// <summary> Performs the operation: other += scalar * (*this), where other is a DoubleVector. </summary>
-        ///
-        /// <param name="other"> [in,out] The other vector. </param>
-        /// <param name="scalar"> The scalar. </param>
-        void AddTo(DoubleVector& other, double scalar = 1.0) const;
-
         /// <summary> Performs the operation: other += scalar * (*this), where other is a std::vector. </summary>
         ///
         /// <param name="other"> [in,out] The other vector. </param>
@@ -59,13 +52,6 @@ namespace linear
         /// <param name="p_other"> [in,out] The other vector. </param>
         /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(double* p_other, double scalar = 1.0) const = 0;
-
-        /// <summary> Computes the dot product with another vector. </summary>
-        ///
-        /// <param name="other"> The other vector. </param>
-        ///
-        /// <returns> The dot product. </returns>
-        double Dot(const DoubleVector& other) const;
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///

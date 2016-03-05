@@ -33,13 +33,20 @@ namespace linear
         operator std::vector<double>() const &
         {
             return _data;
-        } // copy
+        } // const ref
+
+        operator std::vector<double> & () &
+        {
+            return std::ref(_data);
+        }; // ref
 
         operator std::vector<double> && () &&
         {
             return std::move(_data);
         }; // move
         // ####
+
+
 
         /// <summary> Constructs an instance of DoubleVector. </summary>
         ///

@@ -25,15 +25,6 @@ namespace linear
         }
     }
 
-    void IVector::AddTo(DoubleVector& other, double scalar) const
-    {
-        assert(Size() <= other.size());
-        if (Size() > 0)
-        {
-            AddTo(other.GetDataPointer(), scalar);
-        }
-    }
-
     double IVector::Dot(const std::vector<double>& other) const
     {
         assert(Size() <= other.size());
@@ -45,14 +36,4 @@ namespace linear
         return Dot(other.data());
     }
 
-    double IVector::Dot(const DoubleVector& other) const
-    {
-        assert(Size() <= other.size());
-        if (Size() == 0)
-        {
-            return 0;
-        }
-
-        return Dot(other.GetDataPointer());
-    }
 }

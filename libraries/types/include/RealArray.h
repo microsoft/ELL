@@ -18,8 +18,10 @@ using std::is_base_of;
 
 namespace types
 {
-    /// A read-only forward iterator for the sparse binary vector.
+    /// A read-only forward index-value iterator for an STL container
     ///
+
+    // TODO: rename to something more correct
     template <typename ValueType>
     class SparseStlIterator : public IIndexValueIterator
     {
@@ -56,7 +58,6 @@ namespace types
         uint64 _index = 0;
         void SkipZeros();
     };
-
 
     // #### TODO: put in tcc file
     template <typename ValueType>
