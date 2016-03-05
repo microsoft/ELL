@@ -6,15 +6,6 @@
 
 // stl
 #include <vector>
-using std::vector;
-
-#include <iostream>
-using std::ostream;
-
-#include <type_traits>
-using std::enable_if;
-using std::enable_if_t;
-using std::is_base_of;
 
 namespace types
 {
@@ -27,7 +18,7 @@ namespace types
     {
     public:
         // abbreviate iterator type, for improved readability
-        using StlIteratorType = typename vector<ValueType>::const_iterator;
+        using StlIteratorType = typename std::vector<ValueType>::const_iterator;
 
         /// Default copy ctor
         ///
