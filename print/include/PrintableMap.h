@@ -21,7 +21,6 @@
 
 // stl
 #include <iostream>
-#include <vector>
 #include <memory>
 
 /// <summary> A printable map. </summary>
@@ -33,7 +32,7 @@ public:
     ///
     /// <param name="os"> [in,out] Stream to write data to. </param>
     /// <param name="Arguments"> The arguments. </param>
-    void Print(ostream& os, const PrintArguments& Arguments);
+    void Print(std::ostream& os, const PrintArguments& Arguments);
 
     /// <summary> Deserializes the Map in json format. </summary>
     ///

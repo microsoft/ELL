@@ -14,6 +14,7 @@
 #include "DoubleVector.h"
 
 // stl
+#include <iostream>
 #include <functional>
 #include <vector>
 
@@ -58,7 +59,7 @@ namespace linear
         /// <summary> Prints the vector to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
-        virtual void Print(ostream & os) const override;
+        virtual void Print(std::ostream & os) const override;
 
         /// <summary> Returns the Size of the vector. </summary>
         ///

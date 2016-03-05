@@ -16,6 +16,10 @@
 #include "types.h"
 #include "RealArray.h"
 
+// stl
+#include <iostream>
+#include <type_traits>
+
 namespace linear
 {
     /// <summary> A double vector. </summary>
@@ -69,7 +73,7 @@ namespace linear
         /// <typeparam name="IIndexValueIterator"> Type of the index value iterator. </typeparam>
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
         /// <param name="indexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, typename concept = enable_if_t<is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         DoubleVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary>
@@ -117,7 +121,7 @@ namespace linear
         /// <summary> Prints the vector to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
-        virtual void Print(ostream& os) const override;
+        virtual void Print(std::ostream& os) const override;
 
     private:
         std::vector<double> _data;

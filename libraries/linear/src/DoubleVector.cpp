@@ -65,7 +65,7 @@ namespace linear
         return _data.size();
     }
 
-    void DoubleVector::Print(ostream & os) const
+    void DoubleVector::Print(std::ostream & os) const
     {
         auto iterator = GetIterator();
         while (iterator.IsValid())

@@ -13,7 +13,11 @@
 #include "PrintableLayer.h"
 #include "LayerLayout.h"
 
+// layers
 #include "Input.h"
+
+// stl
+#include <iostream>
 
 /// <summary> A printable input. </summary>
 struct PrintableInput : public layers::Input, public PrintableLayer
@@ -29,5 +33,5 @@ public:
     /// <param name="Arguments"> The arguments. </param>
     ///
     /// <returns> A LayerLayout. </returns>
-    virtual LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const override;
+    virtual LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const override;
 };

@@ -54,7 +54,7 @@ namespace linear
         return result;
     }
 
-    void DoubleSubvectorCref::Print(ostream & os) const
+    void DoubleSubvectorCref::Print(std::ostream & os) const
     {
         for(uint64 i = 0; i<_size; ++i)
         {

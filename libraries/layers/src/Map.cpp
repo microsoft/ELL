@@ -67,7 +67,7 @@ namespace layers
         serializer.Write("layers", _layers);
     }
 
-    void Map::Serialize(ostream& os) const // TODO erase
+    void Map::Serialize(std::ostream& os) const // TODO erase
     {
         utilities::JsonSerializer writer;
         writer.Write("Base", *this);
