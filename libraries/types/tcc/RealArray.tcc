@@ -41,4 +41,15 @@ namespace types
         }
     }
 
+
+    //
+    // GetIterator function
+    //
+    template <typename ValueType>
+    SparseStlIterator<ValueType> inline GetIterator(const std::vector<ValueType>& arr)
+    {
+        return SparseStlIterator<ValueType>(arr.cbegin(), arr.cend());
+    }
+
+
 }

@@ -26,32 +26,6 @@ namespace linear
     class DoubleVector : public IVector
     {
     public:
-
-        // ####
-        // copy / move from std::vector
-        DoubleVector(const std::vector<double>& v) : _data(v) {};
-
-        DoubleVector(std::vector<double>&& v) : _data(std::forward<std::vector<double>>(v)) {};
-
-        // op std::vector
-        operator std::vector<double>() const &
-        {
-            return _data;
-        } // const ref
-
-        operator std::vector<double> & () &
-        {
-            return std::ref(_data);
-        }; // ref
-
-        operator std::vector<double> && () &&
-        {
-            return std::move(_data);
-        }; // move
-        // ####
-
-
-
         /// <summary> Constructs an instance of DoubleVector. </summary>
         ///
         /// <param name="size"> The size. </param>
@@ -67,6 +41,16 @@ namespace linear
         /// <param name="parameter1"> [in,out] The first parameter. </param>
         DoubleVector(DoubleVector&&) = default;
 
+        /// <summary> Constructor to copy from a std::vector<double>
+        ///
+        /// <param name="v"> The vector to copy from </param>
+        DoubleVector(const std::vector<double>& v);
+
+        /// <summary> Constructor to move from a std::vector<double>
+        ///
+        /// <param name="v"> The vector to move from </param>
+        DoubleVector(std::vector<double>&& v);
+
         /// <summary> Converting constructor. </summary>
         ///
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
@@ -75,6 +59,17 @@ namespace linear
         /// <param name="indexValueIterator"> The index value iterator. </param>
         template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         DoubleVector(IndexValueIteratorType indexValueIterator);
+
+
+        /// <summary> Type-conversion operator into a std::vector<double>
+        operator std::vector<double>() const &;
+
+        /// <summary> Type-conversion operator into a std::vector<double>, allowing non-const ref
+        operator std::vector<double> & () &;
+
+        /// <summary> Type-conversion operator into a std::vector<double>, allowing move semantics
+        operator std::vector<double> && () &&;
+
 
         /// <summary>
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its

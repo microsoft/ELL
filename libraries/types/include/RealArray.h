@@ -17,17 +17,13 @@ namespace types
     class SparseStlIterator : public IIndexValueIterator
     {
     public:
-        // abbreviate iterator type, for improved readability
+        /// abbreviation of std::vector iterator type, for improved readability
         using StlIteratorType = typename std::vector<ValueType>::const_iterator;
 
-        /// Default copy ctor
+        /// Constructor
         ///
-        SparseStlIterator(const SparseStlIterator&) = default;
-
-        /// Default move ctor
-        ///
-        SparseStlIterator(SparseStlIterator&&) = default;
-
+        /// <param name="begin"> STL iterator pointing at beginning of range to iterate over </param>
+        /// <param name="end"> STL iterator pointing at end of range to iterate over </param>
         SparseStlIterator(const StlIteratorType& begin, const StlIteratorType& end);
 
         /// \returns True if the iterator is currently pointing to a valid iterate
@@ -50,14 +46,13 @@ namespace types
         void SkipZeros();
     };
 
-    // #### TODO: put in tcc file
+    
     template <typename ValueType>
-    SparseStlIterator<ValueType> inline GetIterator(const std::vector<ValueType>& arr)
-    {
-        return SparseStlIterator<ValueType>(arr.cbegin(), arr.cend());
-    }
+    SparseStlIterator<ValueType> GetIterator(const std::vector<ValueType>& arr);
 
+    // nice name for vector<double>
     typedef std::vector<double> DoubleArray;
 }
+
 
 #include "../tcc/RealArray.tcc"
