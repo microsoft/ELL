@@ -90,7 +90,7 @@ namespace utilities
         /// <param name="format"> The format to use. </param>
         ///
         /// <returns> Either Result::success or an error code. </returns>
-        Result FindPercent(const char*& content, const char*& format);
+        Result MatchToVariableSubstitution(const char*& content, const char*& format);
 
         /// <summary> Match content to a format, while parsing values in the position where the format
         /// contains the character %. </summary>

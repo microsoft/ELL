@@ -14,8 +14,8 @@ namespace
 {
     // format strings
 
-    const char* typeFormatOneLine = "<^% name^=^\"%\"^> % <^/%^>\n";
-    const char* unnamedTypeFormatOneLine = "<^%^> % <^/%^>\n";
+    const char* typeFormatOneLine = "<^% name^=^\"%\"^>^%^<^/%^>\n";
+    const char* unnamedTypeFormatOneLine = "<^%^>^%^<^/%^>\n";
 
     const char* typeFormatBegin = "<^% name^=^\"%\"^>\n";
     const char* unnamedTypeFormatBegin = "<^%^>\n";
@@ -46,7 +46,7 @@ namespace utilities
     void XMLSerializer::Serialize(const char* name, const std::vector<ElementType>& value)
     {
         Indent();
-        uint64 size = value.size();
+        auto size = value.size();
         auto typeName = TypeInfo<std::vector<ElementType>>::GetSerializationName();
 
         if (*name != '\0')

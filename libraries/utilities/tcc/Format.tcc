@@ -17,7 +17,6 @@
 #include <cctype>
 #include <stdexcept>
 #include <type_traits>
-#include "..\include\Format.h"
 
 namespace utilities
 {
@@ -26,7 +25,7 @@ namespace utilities
         Match::Match(const char* pStr) : _pStr(pStr)
         {}
 
-        inline Match::Match(const std::string & str) : _pStr(str.c_str())
+        Match::Match(const std::string & str) : _pStr(str.c_str())
         {}
 
         Match::operator const char*()
@@ -71,7 +70,7 @@ namespace utilities
         template<typename ... ArgTypes>
         Result MatchScanf(const char*& content, const char* format, Match match, ArgTypes& ...args)
         {
-            auto matchResult = FindPercent(content, format);
+            auto matchResult = MatchToVariableSubstitution(content, format);
 
             if(matchResult != Result::success)
             {
@@ -86,7 +85,7 @@ namespace utilities
             ++format;
 
             const char* cStr = match;
-            matchResult = FindPercent(content, cStr);
+            matchResult = MatchToVariableSubstitution(content, cStr);
             if(matchResult != Result::success)
             {
                 return matchResult;
@@ -102,7 +101,7 @@ namespace utilities
         template<typename ArgType, typename ... ArgTypes>
         Result MatchScanf(const char*& content, const char* format, ArgType& arg, ArgTypes& ...args)
         {
-            auto matchResult = FindPercent(content, format);
+            auto matchResult = MatchToVariableSubstitution(content, format);
 
             if(matchResult != Result::success)
             {

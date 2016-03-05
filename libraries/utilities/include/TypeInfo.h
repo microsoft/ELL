@@ -19,13 +19,6 @@
 
 namespace utilities
 {
-    // constants that are only visible from within this file
-    namespace
-    {
-        const std::string lt = "(";
-        const std::string rt = ")";
-    }
-
     /// <summary> Class used to get information about class types. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
@@ -35,7 +28,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static std::string GetSerializationName() { return std::string(T::GetSerializationName()); }
+        static std::string GetSerializationName();
     };
 
     /// <summary> Class used to get information about shared_ptr types. </summary>
@@ -47,7 +40,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static std::string GetSerializationName() { return "ptr" + lt + TypeInfo<T>::GetSerializationName() + rt; }
+        static std::string GetSerializationName();
     };
 
     /// <summary> Class used to get information about std::vector types. </summary>
@@ -59,7 +52,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static std::string GetSerializationName() { return "vector" + lt + TypeInfo<T>::GetSerializationName() + rt; }
+        static std::string GetSerializationName();
     };
 
     /// <summary> Class used to get information about the char type. </summary>
@@ -182,3 +175,5 @@ namespace utilities
         static std::string GetSerializationName() { return "double"; }
     };
 }
+
+#include "../tcc/TypeInfo.tcc"

@@ -31,7 +31,7 @@ namespace utilities
             }
         }
 
-        Result FindPercent(const char*& content, const char*& format)
+        Result MatchToVariableSubstitution(const char*& content, const char*& format)
         {
             while(*format != '\0' && *format != '%')
             {
@@ -65,7 +65,7 @@ namespace utilities
 
         Result MatchScanf(const char*& content, const char* format)
         {
-            auto result = FindPercent(content, format);
+            auto result = MatchToVariableSubstitution(content, format);
             if(result != Result::success)
             {
                 return result;

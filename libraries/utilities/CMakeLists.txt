@@ -24,27 +24,28 @@ set (SRC src/BinaryClassificationEvaluator.cpp
 
 set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/CommandLineParser.h
+                       include/Files.h
+                       include/Format.h
                        include/IIterator.h
                        include/IntegerStack.h
                        include/JsonSerializer.h
                        include/ParallelTransformIterator.h
                        include/Parser.h
-                       include/TransformIterator.h
-                       include/Files.h
-                       include/TypeInfo.h
-                       include/Format.h
-                       include/XMLSerialization.h
                        include/RandomEngines.h
-                       include/StlIteratorAdapter.h)
+                       include/StlIteratorAdapter.h
+                       include/TransformIterator.h
+                       include/TypeInfo.h
+                       include/XMLSerialization.h)
 
 set (TCC tcc/BinaryClassificationEvaluator.tcc
                    tcc/CommandLineParser.tcc
+                   tcc/Format.tcc
                    tcc/JsonSerializer.tcc
                    tcc/ParallelTransformIterator.tcc
                    tcc/Parser.tcc
-                   tcc/TransformIterator.tcc
-                   tcc/Format.tcc
                    tcc/StlIteratorAdapter.tcc
+                   tcc/TransformIterator.tcc
+                   tcc/TypeInfo.tcc
                    tcc/XMLSerialization.tcc)
                    
 source_group("src" FILES ${SRC})
