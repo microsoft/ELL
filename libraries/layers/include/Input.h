@@ -14,7 +14,7 @@
 
 // types
 #include "types.h"
-#include "RealArray.h"
+#include "IndexValueIterator.h"
 
 // stl
 #include <vector>
