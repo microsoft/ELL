@@ -23,7 +23,7 @@ namespace linear
     {
     public:
 
-
+        // ####
         // copy / move from std::vector
         DoubleVector(const std::vector<double>& v) : _data(v) {};
 
@@ -39,7 +39,7 @@ namespace linear
         {
             return std::move(_data);
         }; // move
-
+        // ####
 
         /// <summary> Constructs an instance of DoubleVector. </summary>
         ///
@@ -70,7 +70,6 @@ namespace linear
         /// memory.
         /// </summary>
         void Reset();
-
 
         /// #### TODO: document
         double& operator[](size_t index) { return _data[index]; }

@@ -127,8 +127,8 @@ void addToTest()
     b[12] = 1.0;
     b[13] = 1.0;
 
-    DataVectorType1 c1(b.GetIterator());
-    DataVectorType2 c2(b.GetIterator());
+    DataVectorType1 c1(types::GetIterator(b));
+    DataVectorType2 c2(types::GetIterator(b));
 
     c1.AddTo(a1);
     c2.AddTo(a2);

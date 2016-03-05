@@ -3,31 +3,7 @@
 namespace types
 {
     //
-    // RealArray implementation
-    //
-    template<typename ValueType>
-    RealArray<ValueType>::RealArray(uint64 size) : std::vector<ValueType>(size) {}
-
-    template<typename ValueType>
-    typename RealArray<ValueType>::Iterator RealArray<ValueType>::GetIterator() const
-    {
-        return SparseStlIterator<ValueType>(this->cbegin(), this->cend());
-    }
-
-    template<typename ValueType>
-    ValueType* RealArray<ValueType>::GetDataPointer()
-    {
-        return data();
-    }
-
-    template<typename ValueType>
-    const ValueType* RealArray<ValueType>::GetDataPointer() const
-    {
-        return data();
-    }
-
-    //
-    //
+    // SparseStlIterator implementation
     //
     template<typename ValueType>
     bool SparseStlIterator<ValueType>::IsValid() const

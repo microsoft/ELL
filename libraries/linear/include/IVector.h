@@ -40,12 +40,6 @@ namespace linear
         /// <returns> The squared 2-norm. </returns>
         virtual double Norm2() const = 0;
 
-        /// <summary> Performs the operation: other += scalar * (*this), where other is a types::RealArray. </summary>
-        ///
-        /// <param name="other"> [in,out] The other vector. </param>
-        /// <param name="scalar"> The scalar. </param>
-        void AddTo(types::RealArray<double>& other, double scalar = 1.0) const;
-
         /// <summary> Performs the operation: other += scalar * (*this), where other is a DoubleVector. </summary>
         ///
         /// <param name="other"> [in,out] The other vector. </param>
@@ -59,7 +53,7 @@ namespace linear
         void AddTo(std::vector<double>& other, double scalar = 1.0) const;
 
         /// <summary>
-        /// Performs the operation: (*p_other) += scalar * (*this), where other is a dense std::vector.
+        /// Performs the operation: (*p_other) += scalar * (*this), where other is an array of doubles.
         /// </summary>
         ///
         /// <param name="p_other"> [in,out] The other vector. </param>
@@ -72,13 +66,6 @@ namespace linear
         ///
         /// <returns> The dot product. </returns>
         double Dot(const DoubleVector& other) const;
-
-        /// <summary> Computes the dot product with another vector. </summary>
-        ///
-        /// <param name="other"> The other vector. </param>
-        ///
-        /// <returns> The dot product. </returns>
-        double Dot(const types::RealArray<double>& other) const;
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///

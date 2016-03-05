@@ -67,7 +67,7 @@ namespace linear
 
     void DoubleVector::Print(ostream & os) const
     {
-        auto iterator = types::GetIterator(_data);
+        auto iterator = GetIterator();
         while (iterator.IsValid())
         {
             auto indexValue = iterator.Get();

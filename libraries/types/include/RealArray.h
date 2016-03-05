@@ -51,7 +51,6 @@ namespace types
 
     protected:
 
-        // members
         StlIteratorType _begin;
         StlIteratorType _end;
         uint64 _index = 0;
@@ -59,42 +58,14 @@ namespace types
     };
 
 
+    // #### TODO: put in tcc file
     template <typename ValueType>
     SparseStlIterator<ValueType> inline GetIterator(const std::vector<ValueType>& arr)
     {
         return SparseStlIterator<ValueType>(arr.cbegin(), arr.cend());
     }
 
-
-    template <typename ValueType>
-    class RealArray : public vector<ValueType>
-    {
-    public:
-       
-        /// Ctor
-        ///
-        RealArray(uint64 size = 0);
-
-        /// Default copy ctor
-        ///
-        RealArray(const RealArray<ValueType>&) = default;
-
-        /// Default move ctor
-        ///
-        RealArray(RealArray<ValueType>&&) = default;
-
-        ValueType* GetDataPointer();
-        const ValueType* GetDataPointer() const;
-
-        /// \returns An Iterator that points to the beginning of the array.
-        ///
-        using Iterator = SparseStlIterator<ValueType>;
-        Iterator GetIterator() const;
-    };
-
-
-    typedef RealArray<double> DoubleArray;
-    typedef RealArray<float> FloatArray;
+    typedef std::vector<double> DoubleArray;
 }
 
 #include "../tcc/RealArray.tcc"

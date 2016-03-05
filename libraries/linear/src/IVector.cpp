@@ -25,15 +25,6 @@ namespace linear
         }
     }
 
-    void IVector::AddTo(types::RealArray<double>& other, double scalar) const
-    {
-        assert(Size() <= other.size());
-        if (Size() > 0)
-        {
-            AddTo(other.GetDataPointer(), scalar);
-        }
-    }
-
     void IVector::AddTo(DoubleVector& other, double scalar) const
     {
         assert(Size() <= other.size());
@@ -52,17 +43,6 @@ namespace linear
         }
 
         return Dot(other.data());
-    }
-
-    double IVector::Dot(const types::RealArray<double>& other) const
-    {
-        assert(Size() <= other.size());
-        if (Size() == 0)
-        {
-            return 0;
-        }
-
-        return Dot(other.GetDataPointer());
     }
 
     double IVector::Dot(const DoubleVector& other) const
