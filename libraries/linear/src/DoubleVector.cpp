@@ -10,20 +10,23 @@
 
 #include "DoubleVector.h"
 
+// stl
+#include <algorithm>
+
 namespace linear
 {
-    DoubleVector::DoubleVector(uint64 size) : types::DoubleArray(size)
+    DoubleVector::DoubleVector(uint64 size) : _data(size)
     {}
 
     void DoubleVector::Reset()
     {
-        fill(begin(), end(), 0);
+        std::fill(_data.begin(), _data.end(), 0);
     }
 
     double DoubleVector::Norm2() const
     {
         double result = 0.0;
-        for(double element : *this)
+        for(double element : _data)
         {
             result += element * element;
         }
@@ -34,7 +37,7 @@ namespace linear
     {
         for(uint64 i = 0; i<Size(); ++i)
         {
-            p_other[i] += scalar * (*this)[i];
+            p_other[i] += scalar * _data[i];
         }
     }
 
@@ -59,12 +62,12 @@ namespace linear
 
     uint64 DoubleVector::Size() const
     {
-        return types::DoubleArray::size();
+        return _data.size();
     }
 
     void DoubleVector::Print(ostream & os) const
     {
-        auto iterator = GetIterator();
+        auto iterator = types::GetIterator(_data);
         while (iterator.IsValid())
         {
             auto indexValue = iterator.Get();

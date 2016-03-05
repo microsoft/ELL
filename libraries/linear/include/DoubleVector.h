@@ -19,9 +19,27 @@
 namespace linear
 {
     /// <summary> A double vector. </summary>
-    class DoubleVector : public types::DoubleArray, public IVector
+    class DoubleVector : public IVector
     {
     public:
+
+
+        // copy / move from std::vector
+        DoubleVector(const std::vector<double>& v) : _data(v) {};
+
+        DoubleVector(std::vector<double>&& v) : _data(std::forward<std::vector<double>>(v)) {};
+
+        // op std::vector
+        operator std::vector<double>() const &
+        {
+            return _data;
+        } // copy
+
+        operator std::vector<double> && () &&
+        {
+            return std::move(_data);
+        }; // move
+
 
         /// <summary> Constructs an instance of DoubleVector. </summary>
         ///
@@ -52,6 +70,14 @@ namespace linear
         /// memory.
         /// </summary>
         void Reset();
+
+
+        /// #### TODO: document
+        double& operator[](size_t index) { return _data[index]; }
+        double operator[](size_t index) const { return _data[index]; }
+        double* GetDataPointer() { return _data.data(); }
+        const double* GetDataPointer() const { return _data.data(); }
+        types::SparseStlIterator<double> GetIterator() const { return types::GetIterator(_data); }
 
         /// <summary> Returns the Size of the vector. </summary>
         ///
@@ -86,6 +112,9 @@ namespace linear
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(ostream& os) const override;
+
+    private:
+        std::vector<double> _data;
     };
 }
 

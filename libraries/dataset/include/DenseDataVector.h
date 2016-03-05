@@ -33,7 +33,8 @@ namespace dataset
     {
     public:
 
-        using Iterator = typename types::RealArray<ValueType>::Iterator;
+        using Iterator = types::SparseStlIterator<ValueType>;
+//        using Iterator = typename types::RealArray<ValueType>::Iterator;
 
         /// <summary> Constructor. </summary>
         DenseDataVector();
@@ -109,7 +110,7 @@ namespace dataset
 
     private:
         uint64 _num_nonzeros;
-        types::RealArray<ValueType> _data;
+        typename types::RealArray<ValueType> _data;
     };
 
     /// <summary> A float data vector. </summary>

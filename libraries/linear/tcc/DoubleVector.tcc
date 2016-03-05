@@ -11,13 +11,13 @@
 namespace linear
 {
     template<typename IndexValueIteratorType, typename concept>
-    DoubleVector::DoubleVector(IndexValueIteratorType indexValueIterator) : types::DoubleArray()
+    DoubleVector::DoubleVector(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())
         {
             auto entry = indexValueIterator.Get();
-            this->resize(entry.index + 1);
-            (*this)[entry.index] = entry.value;
+            _data.resize(entry.index + 1);
+            _data[entry.index] = entry.value;
             indexValueIterator.Next();
         }
     }

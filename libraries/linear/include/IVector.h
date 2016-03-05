@@ -14,12 +14,15 @@
 
 // types
 #include "types.h"
+#include "RealArray.h"
 
 // stl
 #include <vector>
 
 namespace linear
 {
+    class DoubleVector;
+
     /// <summary>
     /// Base class for double precision algebraic vectors.
     /// </summary>
@@ -30,12 +33,24 @@ namespace linear
         /// <summary> Returns the Size of the vector. </summary>
         ///
         /// <returns> The size of the vector. </returns>
-        virtual uint64 Size() const =0;
+        virtual uint64 Size() const = 0;
 
         /// <summary> Computes the squared 2-norm. </summary>
         ///
         /// <returns> The squared 2-norm. </returns>
-        virtual double Norm2() const =0;
+        virtual double Norm2() const = 0;
+
+        /// <summary> Performs the operation: other += scalar * (*this), where other is a types::RealArray. </summary>
+        ///
+        /// <param name="other"> [in,out] The other vector. </param>
+        /// <param name="scalar"> The scalar. </param>
+        void AddTo(types::RealArray<double>& other, double scalar = 1.0) const;
+
+        /// <summary> Performs the operation: other += scalar * (*this), where other is a DoubleVector. </summary>
+        ///
+        /// <param name="other"> [in,out] The other vector. </param>
+        /// <param name="scalar"> The scalar. </param>
+        void AddTo(DoubleVector& other, double scalar = 1.0) const;
 
         /// <summary> Performs the operation: other += scalar * (*this), where other is a std::vector. </summary>
         ///
@@ -50,6 +65,20 @@ namespace linear
         /// <param name="p_other"> [in,out] The other vector. </param>
         /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(double* p_other, double scalar = 1.0) const = 0;
+
+        /// <summary> Computes the dot product with another vector. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        ///
+        /// <returns> The dot product. </returns>
+        double Dot(const DoubleVector& other) const;
+
+        /// <summary> Computes the dot product with another vector. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        ///
+        /// <returns> The dot product. </returns>
+        double Dot(const types::RealArray<double>& other) const;
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///

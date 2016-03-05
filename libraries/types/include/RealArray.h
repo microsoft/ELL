@@ -18,70 +18,6 @@ using std::is_base_of;
 
 namespace types
 {
-    template <typename ValueType>
-    class RealArray : public vector<ValueType>
-    {
-    public:
-
-        /// A read-only forward iterator for the sparse binary vector.
-        ///
-        class Iterator : public IIndexValueIterator
-        {
-        public:
-
-            /// Default copy ctor
-            ///
-            Iterator(const Iterator&) = default;
-
-            /// Default move ctor
-            ///
-            Iterator(Iterator&&) = default;
-
-            /// \returns True if the iterator is currently pointing to a valid iterate
-            ///
-            bool IsValid() const;
-
-            /// Proceeds to the Next iterate
-            ///
-            void Next();
-
-            /// \returns The current index-value pair
-            ///
-            IndexValue Get() const;
-
-        protected:
-            // abbreviate iterator type, for improved readability 
-            using StlIteratorType = typename vector<ValueType>::const_iterator;
-
-            /// private ctor, can only be called from RealArray class
-            Iterator(const StlIteratorType& begin, const StlIteratorType& end);
-            friend RealArray<ValueType>;
-
-            // members
-            StlIteratorType _begin;
-            StlIteratorType _end;
-            uint64 _index = 0;
-            void SkipZeros();
-        };
-
-        /// Ctor
-        ///
-        RealArray(uint64 size = 0);
-
-        /// Default copy ctor
-        ///
-        RealArray(const RealArray<ValueType>&) = default;
-
-        /// Default move ctor
-        ///
-        RealArray(RealArray<ValueType>&&) = default;
-
-        /// \returns An Iterator that points to the beginning of the array.
-        ///
-        Iterator GetIterator() const;
-    };
-
-
     /// A read-only forward iterator for the sparse binary vector.
     ///
     template <typename ValueType>
@@ -102,7 +38,7 @@ namespace types
         SparseStlIterator(const StlIteratorType& begin, const StlIteratorType& end);
 
         /// \returns True if the iterator is currently pointing to a valid iterate
-       ///
+        ///
         bool IsValid() const;
 
         /// Proceeds to the Next iterate
@@ -123,6 +59,38 @@ namespace types
     };
 
 
+    template <typename ValueType>
+    SparseStlIterator<ValueType> inline GetIterator(const std::vector<ValueType>& arr)
+    {
+        return SparseStlIterator<ValueType>(arr.cbegin(), arr.cend());
+    }
+
+
+    template <typename ValueType>
+    class RealArray : public vector<ValueType>
+    {
+    public:
+       
+        /// Ctor
+        ///
+        RealArray(uint64 size = 0);
+
+        /// Default copy ctor
+        ///
+        RealArray(const RealArray<ValueType>&) = default;
+
+        /// Default move ctor
+        ///
+        RealArray(RealArray<ValueType>&&) = default;
+
+        ValueType* GetDataPointer();
+        const ValueType* GetDataPointer() const;
+
+        /// \returns An Iterator that points to the beginning of the array.
+        ///
+        using Iterator = SparseStlIterator<ValueType>;
+        Iterator GetIterator() const;
+    };
 
 
     typedef RealArray<double> DoubleArray;

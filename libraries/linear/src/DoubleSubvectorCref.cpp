@@ -12,7 +12,7 @@
 
 namespace linear
 {
-    DoubleSubvectorCref::DoubleSubvectorCref(const DoubleVector& vec, uint64 offset, uint64 size) : _ptr(&vec[offset]), _size(size)
+    DoubleSubvectorCref::DoubleSubvectorCref(const DoubleVector& vec, uint64 offset, uint64 size) : _ptr(vec.GetDataPointer() + offset), _size(size)
     {
         if (_size > vec.Size())
         {
