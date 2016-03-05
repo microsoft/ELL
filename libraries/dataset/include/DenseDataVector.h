@@ -32,7 +32,7 @@ namespace dataset
     class DenseDataVector : public IDataVector
     {
     public:
-        using Iterator = types::SparseStlIterator<ValueType>;
+        using Iterator = types::StlIndexValueIterator<ValueType>;
 
         /// <summary> Constructor. </summary>
         DenseDataVector();

@@ -6,13 +6,13 @@ namespace types
     // SparseStlIterator implementation
     //
     template<typename ValueType>
-    bool SparseStlIterator<ValueType>::IsValid() const
+    bool StlIndexValueIterator<ValueType>::IsValid() const
     {
         return (_begin != _end);
     }
 
     template<typename ValueType>
-    void SparseStlIterator<ValueType>::Next()
+    void StlIndexValueIterator<ValueType>::Next()
     {
         ++_begin;
         ++_index;
@@ -20,19 +20,19 @@ namespace types
     }
 
     template<typename ValueType>
-    IndexValue SparseStlIterator<ValueType>::Get() const
+    IndexValue StlIndexValueIterator<ValueType>::Get() const
     {
         return IndexValue{ _index, (double)*_begin };
     }
 
     template<typename ValueType>
-    SparseStlIterator<ValueType>::SparseStlIterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end), _index(0)
+    StlIndexValueIterator<ValueType>::StlIndexValueIterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end), _index(0)
     {
         SkipZeros();
     }
 
     template<typename ValueType>
-    void SparseStlIterator<ValueType>::SkipZeros()
+    void StlIndexValueIterator<ValueType>::SkipZeros()
     {
         while (_begin < _end && *_begin == 0)
         {
@@ -46,9 +46,9 @@ namespace types
     // GetIterator function
     //
     template <typename ValueType>
-    SparseStlIterator<ValueType> inline GetIterator(const std::vector<ValueType>& arr)
+    StlIndexValueIterator<ValueType> inline GetIndexValueIterator(const std::vector<ValueType>& arr)
     {
-        return SparseStlIterator<ValueType>(arr.cbegin(), arr.cend());
+        return StlIndexValueIterator<ValueType>(arr.cbegin(), arr.cend());
     }
 
 

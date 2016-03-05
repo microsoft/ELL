@@ -60,11 +60,11 @@ namespace linear
         return result;
     }
 
-    uint64 DoubleVector::Size() const
+    types::StlIndexValueIterator<double> DoubleVector::GetIterator() const
     {
-        return _data.size();
+        return types::GetIndexValueIterator(_data);
     }
-
+    
     void DoubleVector::Print(std::ostream & os) const
     {
         auto iterator = GetIterator();

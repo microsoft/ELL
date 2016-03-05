@@ -70,7 +70,6 @@ namespace linear
         /// <summary> Type-conversion operator into a std::vector<double>, allowing move semantics
         operator std::vector<double> && () &&;
 
-
         /// <summary>
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its
         /// memory.
@@ -78,11 +77,11 @@ namespace linear
         void Reset();
 
         /// #### TODO: document
-        double& operator[](size_t index) { return _data[index]; }
-        double operator[](size_t index) const { return _data[index]; }
-        double* GetDataPointer() { return _data.data(); }
-        const double* GetDataPointer() const { return _data.data(); }
-        types::SparseStlIterator<double> GetIterator() const { return types::GetIterator(_data); }
+        double& operator[](size_t index);
+        double operator[](size_t index) const;
+        double* GetDataPointer();
+        const double* GetDataPointer() const;
+        types::StlIndexValueIterator<double> GetIterator() const;
 
         /// <summary> Returns the Size of the vector. </summary>
         ///

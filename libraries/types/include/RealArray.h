@@ -14,7 +14,7 @@ namespace types
 
     // TODO: rename to something more correct
     template <typename ValueType>
-    class SparseStlIterator : public IIndexValueIterator
+    class StlIndexValueIterator : public IIndexValueIterator
     {
     public:
         /// abbreviation of std::vector iterator type, for improved readability
@@ -24,7 +24,7 @@ namespace types
         ///
         /// <param name="begin"> STL iterator pointing at beginning of range to iterate over </param>
         /// <param name="end"> STL iterator pointing at end of range to iterate over </param>
-        SparseStlIterator(const StlIteratorType& begin, const StlIteratorType& end);
+        StlIndexValueIterator(const StlIteratorType& begin, const StlIteratorType& end);
 
         /// \returns True if the iterator is currently pointing to a valid iterate
         ///
@@ -48,7 +48,7 @@ namespace types
 
     
     template <typename ValueType>
-    SparseStlIterator<ValueType> GetIterator(const std::vector<ValueType>& arr);
+    StlIndexValueIterator<ValueType> GetIndexValueIterator(const std::vector<ValueType>& arr);
 
     // nice name for vector<double>
     typedef std::vector<double> DoubleArray;

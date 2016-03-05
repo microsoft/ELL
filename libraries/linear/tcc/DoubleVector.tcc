@@ -30,7 +30,7 @@ namespace linear
     };
 
     template<typename IndexValueIteratorType, typename concept>
-    DoubleVector::DoubleVector(IndexValueIteratorType indexValueIterator)
+    inline DoubleVector::DoubleVector(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())
         {
@@ -40,5 +40,32 @@ namespace linear
             indexValueIterator.Next();
         }
     }
+
+
+    inline double& DoubleVector::operator[](size_t index)
+    {
+        return _data[index]; 
+    }
+    
+    inline double DoubleVector::operator[](size_t index) const
+    {
+        return _data[index];
+    }
+    
+    inline double* DoubleVector::GetDataPointer()
+    {
+        return _data.data();
+    }
+    
+    inline const double* DoubleVector::GetDataPointer() const
+    {
+        return _data.data();
+    }
+
+    inline uint64 DoubleVector::Size() const
+    {
+        return _data.size();
+    }
+
 }
 
