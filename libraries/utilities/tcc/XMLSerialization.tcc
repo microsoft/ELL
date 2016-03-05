@@ -59,13 +59,12 @@ namespace utilities
         }
 
         ++_indentation;
-
         for (uint64 i = 0; i < value.size(); ++i)
         {
             Serialize("", value[i]);
         }
-
         --_indentation;
+
         Indent();
         Format::Printf(_stream, typeFormatEnd, typeName);
     }
@@ -84,11 +83,11 @@ namespace utilities
         {
             Format::Printf(_stream, unnamedTypeFormatBegin, typeName);
         }
+
         ++_indentation;
-
         value.Write(*this);
-
         --_indentation;
+
         Indent();
         Format::Printf(_stream, typeFormatEnd, typeName);
     }
@@ -107,11 +106,11 @@ namespace utilities
         {
             Format::Printf(_stream, unnamedTypeFormatBegin, typeName);
         }
+
         ++_indentation;
-
         Serialize("", *spValue);
-
         --_indentation;
+
         Indent();
         Format::Printf(_stream, typeFormatEnd, typeName);
     }
