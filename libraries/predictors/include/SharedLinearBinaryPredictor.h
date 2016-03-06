@@ -30,16 +30,20 @@ namespace predictors
     class SharedLinearBinaryPredictor
     {
     public:
+
+        /// <summary> Constructs an instance of SharedLinearBinaryPredictor. </summary>
+        ///
+        /// <param name="dim"> The dimension. </param>
         SharedLinearBinaryPredictor(uint64 dim);
 
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
-        /// <returns> The vector. </returns>
+        /// <returns> The underlying vector. </returns>
         linear::DoubleVector& GetVector();
 
-        /// <summary> Returns the const reference underlying DoubleVector. </summary>
+        /// <summary> Returns the underlying DoubleVector. </summary>
         ///
-        /// <returns> The vector. </returns>
+        /// <returns> The underlying vector. </returns>
         const linear::DoubleVector& GetVector() const;
 
         /// <summary> Returns the underlying bias. </summary>
@@ -55,7 +59,7 @@ namespace predictors
         /// <summary> Returns the output of the predictor for a given example. </summary>
         ///
         /// <typeparam name="DataVectorType"> Type of the data vector type. </typeparam>
-        /// <param name="example"> The example. </param>
+        /// <param name="example"> The data vector. </param>
         ///
         /// <returns> A double. </returns>
         template<typename DataVectorType>

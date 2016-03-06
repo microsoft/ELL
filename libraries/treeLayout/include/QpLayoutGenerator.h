@@ -92,8 +92,8 @@ namespace treeLayout
 
         /// <summary> Calculates the tree Layout. </summary>
         ///
-        /// <typeparam name="ChildrenVectorType"> Type of the children vector type. </typeparam>
-        /// <param name="Children"> The children. </param>
+        /// <typeparam name="ChildrenVectorType"> Type of the children vector. </typeparam>
+        /// <param name="Children"> The children vector. </param>
         ///
         /// <returns> A Layout. </returns>
         template<typename ChildrenVectorType>
@@ -101,7 +101,6 @@ namespace treeLayout
 
     private:
 
-        // Information about the vertex.
         struct VertexInfo
         {
             VertexInfo(uint64 i, double s);

@@ -15,7 +15,7 @@
 
 namespace utilities
 {
-    /// <summary> Abstract base class for an iterator over a collection of objects of type T.
+    /// <summary> Abstract base class for an iterator over a collection of objects of type T. </summary>
     ///
     /// <typeparam name="T"> Type of the elements being iterated over. </typeparam>
     template <typename T>

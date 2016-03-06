@@ -168,34 +168,34 @@ void CompilableMap::Deserialize(utilities::JsonSerializer& serializer)
     serializer.Read("layers", _layers, CompilableMap::DeserializeLayers);
 }
 
-void CompilableMap::DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<layers::Layer>& up)
+void CompilableMap::DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<layers::Layer>& spLayer)
 {
     auto type = serializer.Read<std::string>("_type");
     auto version = serializer.Read<int>("_version");
 
     if (type == "Input")
     {
-        auto upZero = std::make_shared<CompilableInput>();
-        upZero->Deserialize(serializer, version);
-        up = upZero;
+        auto spZero = std::make_shared<CompilableInput>();
+        spZero->Deserialize(serializer, version);
+        spLayer = spZero;
     }
     else if (type == "Scale")
     {
-        auto upScale = std::make_shared<CompilableCoordinatewise>(layers::Layer::Type::scale);
-        upScale->Deserialize(serializer, version);
-        up = upScale;
+        auto spScale = std::make_shared<CompilableCoordinatewise>(layers::Layer::Type::scale);
+        spScale->Deserialize(serializer, version);
+        spLayer = spScale;
     }
     else if (type == "Shift")
     {
-        auto upShift = std::make_shared<CompilableCoordinatewise>(layers::Layer::Type::shift);
-        upShift->Deserialize(serializer, version);
-        up = upShift;
+        auto spShift = std::make_shared<CompilableCoordinatewise>(layers::Layer::Type::shift);
+        spShift->Deserialize(serializer, version);
+        spLayer = spShift;
     }
     else if (type == "Sum")
     {
-        auto upSum = std::make_shared<CompilableSum>();
-        upSum->Deserialize(serializer, version);
-        up = upSum;
+        auto spSum = std::make_shared<CompilableSum>();
+        spSum->Deserialize(serializer, version);
+        spLayer = spSum;
     }
     else
     {

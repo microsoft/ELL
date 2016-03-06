@@ -41,7 +41,7 @@ namespace utilities
 
         /// <summary> Query if the top value in the stack is novel, which means that it has never been popped before. </summary>
         ///
-        /// <returns> true if it succeeds, false if it fails. </returns>
+        /// <returns> true if the top value is novel, false otherwise. </returns>
         bool IsTopNovel() const;
 
     private:
