@@ -19,12 +19,12 @@ namespace utilities
     template<typename T>
     std::string TypeName<std::shared_ptr<T>>::GetSerializationName()
     {
-        return "ptr(" + TypeName<T>::GetSerializationName() + ")";
+        return std::string("ptr") + typeNameLeftBracket + TypeName<T>::GetSerializationName() + typeNameRightBracket;
     }
 
     template<typename T>
     std::string TypeName<std::vector<T>>::GetSerializationName()
     { 
-        return "vector(" + TypeName<T>::GetSerializationName() + ")"; 
+        return std::string("vector") + typeNameLeftBracket + TypeName<T>::GetSerializationName() + typeNameRightBracket; 
     }
 }

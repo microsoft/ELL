@@ -19,6 +19,10 @@
 
 namespace utilities
 {
+
+    const char typeNameLeftBracket = '(';
+    const char typeNameRightBracket = ')';
+
     /// <summary> Class used to get information about class types. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>

@@ -276,6 +276,7 @@ void XMLSerializationTest()
 
     std::stringstream ss;
     serializer.WriteToStream(ss);
+    std::cout << ss.str() << std::endl;
 
     utilities::XMLDeserializer deserializer(ss);
     SerializationTest test2;
