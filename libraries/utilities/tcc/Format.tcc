@@ -123,7 +123,7 @@ namespace utilities
     }
 
     template<typename ... ArgTypes>
-    void MatchFormatThrowsExceptions(const char*& content, const char* format, ArgTypes& ...args)
+    void MatchFormatThrowsExceptions(const char*& content, const char* format, ArgTypes&& ...args)
     {
         auto result = MatchFormat(content, format, args...);
 
@@ -152,6 +152,9 @@ namespace utilities
 
         case MatchResult::unexpectedPercentSymbol:
             throw std::runtime_error("Error scanning text: unexpected symbol '" + std::to_string(substitutionSymbol) + "' in string argument near: " + snippets);
+
+        case MatchResult::success:
+            ; // nothing
         }
     }
 }
