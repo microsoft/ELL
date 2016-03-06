@@ -24,10 +24,10 @@
 #include <stdexcept>
 #include <cassert>
 
-const char* assignmentFormat = "    %s = %s; // coordinate (%i,%i)\n";
-const char* incrementFormat = "    %s += %s; // coordinate (%i,%i)\n";
-const char* allocationFormat = "    double %s = %s; // coordinate (%i,%i), allocating new temporary variable\n";
-const char* reallocationFormat = "    %s = %s; // coordinate (%i,%i), reassigning temporary variable\n";
+const char* assignmentFormat = "    % = %; // coordinate (%,%)\n";
+const char* incrementFormat = "    % += %; // coordinate (%,%)\n";
+const char* allocationFormat = "    double % = %; // coordinate (%,%), allocating new temporary variable\n";
+const char* reallocationFormat = "    % = %; // coordinate (%,%), reassigning temporary variable\n";
 
 const char* AllocateTempVariableAndGetFormat(DataFlowNode& targetNode, utilities::IntegerStack& stack)
 {
@@ -72,7 +72,7 @@ void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::Int
         auto targetVariableName = targetNode.GetVariableName();
         auto rhs = action.GetOperation().ToString(currentNodeVariableName);
 
-        utilities::Format::Printf(os, format, targetVariableName, rhs, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
+        utilities::PrintFormat(os, format, targetVariableName, rhs, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
 
         // indicate that the target node is initialized
         targetNode.SetInitialized();
@@ -129,7 +129,7 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
     // print comment
     auto str = "// Predict function\n// Input dimension: %i\n// Output dimension: %i\n// Output coordinates:";
     uint64 inputLayerSize = _layers[0]->Size();
-    utilities::Format::Printf(os, str, inputLayerSize, outputLayerSize);
+    utilities::PrintFormat(os, str, inputLayerSize, outputLayerSize);
     for (uint64 i = 0; i < coordinateList.size(); ++i)
     {
         os << ' ' << coordinateList[i];
@@ -155,7 +155,7 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
         else
         {
             const char* format = AllocateTempVariableAndGetFormat(inputNode, stack);
-            utilities::Format::Printf(os, format, inputNode.GetVariableName(), inputVariableName, 0, inputElementIndex);
+            utilities::PrintFormat(os, format, inputNode.GetVariableName(), inputVariableName, 0, inputElementIndex);
         }
         ProcessNode(inputNode, graph, stack, os);
     }

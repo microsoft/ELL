@@ -12,6 +12,8 @@
 #include "StlIteratorAdapter.h"
 #include "TransformIterator.h"
 #include "ParallelTransformIterator.h"
+#include "Format.h"
+#include "XMLSerialization.h"
 
 // testing
 #include "testing.h"
@@ -136,6 +138,153 @@ void testParallelTransformIterator()
     std::cout << "Elapsed time: " << elapsed << " ms" << std::endl;
 }
 
+template <typename ... Args>
+void testMatchFormat(utilities::MatchResult expectedResult, const char* content, const char* format, Args ...args)
+{
+    auto result = utilities::MatchFormat(content, format, args...);
+    testing::ProcessTest("utilities::Format:MatchFormat", result == expectedResult);
+}
+
+void testMatchFormat()
+{
+    using utilities::MatchResult;
+
+    // standard match
+    testMatchFormat(MatchResult::success, "integer 123 and float -33.3", "integer % and float %", int(), double());
+
+    // tolerate extra spaces in content, in places where format has a single space
+    testMatchFormat(MatchResult::success, "integer    123   and float    -33.3     ", "integer % and float %", int(), double());
+
+    // tolerate extra spaces in content, with the whitespace symbol ^
+    testMatchFormat(MatchResult::success, "       integer    123   and float    -33.3     ", "^integer % and float %", int(), double());
+
+    // tolerate extra whitespace in content, tabs
+    testMatchFormat(MatchResult::success, "integer \t   123 \t  and float    -33.3   \t  ", "integer % and float %", int(), double());
+
+    // tolerate extra spaces in format
+    testMatchFormat(MatchResult::success, " integer 123 and float -33.3 ", "     integer  %  and     float  %    ", int(), double());
+
+    using utilities::Match;
+
+    // match a string 
+    testMatchFormat(MatchResult::success, "integer 123 and float -33.3", "integer % and % %", int(), Match("float") , double());
+
+    // match two strings in a row
+    testMatchFormat(MatchResult::success, "integer hello float", "integer %% float", Match("he"), Match("llo"));
+
+    // match two strings in a row with optional whitespace
+    testMatchFormat(MatchResult::success, "integer hello float", "integer %^^% float", Match("he"), Match("llo"));
+
+    // early end of content
+    testMatchFormat(MatchResult::earlyEndOfContent, "integer 123 and ", "integer % and float %", int(), double());
+
+    // early end of content
+    testMatchFormat(MatchResult::earlyEndOfContent, "integer 123 and float -33.3", "integer % and float %X", int(), double());
+
+    // mismatch
+    testMatchFormat(MatchResult::mismatch, "integer 123 and X float -33.3", "integer % and float %", int(), double());
+
+    // mismatch
+    testMatchFormat(MatchResult::mismatch, "Xinteger 123 and float -33.3", "integer % and float %", int(), double());
+
+    // mismatch
+    testMatchFormat(MatchResult::mismatch, "integer 123 and float -33.3", "integer % and X float %", int(), double());
+
+    // mismatch
+    testMatchFormat(MatchResult::mismatch, "integer 123 and float -33.3", "Xinteger % and float %", int(), double());
+
+    // parser error
+    testMatchFormat(MatchResult::parserError, "integer X and float -33.3", "integer % and float %", int(), double());
+}
+
+class SerializationTest
+{
+public:
+    static const char* GetSerializationName() 
+    {
+        return "SerializationTest";
+    }
+
+    template<typename SerializerType>
+    void Write(SerializerType& serializer) const
+    {
+        serializer.Serialize("x", x);
+        serializer.Serialize("y", y);
+        serializer.Serialize("v", v);
+        serializer.Serialize("p", p);
+    }
+
+    template<typename DeserializerType>
+    void Read(DeserializerType& deserializer)
+    {
+        deserializer.Deserialize("x", x);
+        deserializer.Deserialize("y", y);
+        deserializer.Deserialize("v", v);
+        deserializer.Deserialize("p", p);
+    }
+
+    void Set()
+    {
+        x = 17;
+        y = -33.44;
+        v.resize(4);
+        v[0] = 6;
+        v[1] = 7;
+        v[2] = 8;
+        v[3] = 9;
+        p.resize(2);
+        p[0] = std::make_shared<int>(99);
+        p[1] = std::make_shared<int>(88);
+    }
+
+    bool Check()
+    {
+        if (x == 17 &&
+            y == -33.44 &&
+            v.size() == 4 &&
+            v[0] == 6 &&
+            v[1] == 7 &&
+            v[2] == 8 &&
+            v[3] == 9 &&
+            p.size() == 2 &&
+            p[0] != nullptr &&
+            *(p[0]) == 99 &&
+            p[1] != nullptr &&
+            *(p[1]) == 88)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    int x;
+    double y; 
+    std::vector<uint64> v;
+    std::vector<std::shared_ptr<int>> p;
+};
+
+void XMLSerializationTest()
+{
+    utilities::XMLSerializer serializer;
+    SerializationTest test;
+    test.Set();
+
+    serializer.Serialize("test", test);
+
+    std::stringstream ss;
+    serializer.WriteToStream(ss);
+    std::cout << ss.str() << std::endl;
+
+    utilities::XMLDeserializer deserializer(ss);
+    SerializationTest test2;
+    deserializer.Deserialize("test", test2);
+
+    testing::ProcessTest("utilities::XMLSerialization", test2.Check());
+}
+
 /// Runs all tests
 ///
 int main()
@@ -143,6 +292,8 @@ int main()
     testIteratorAdapter();
     testTransformIterator();
     testParallelTransformIterator();
+    testMatchFormat();
+    XMLSerializationTest();
 
     if (testing::DidTestFail())
     {

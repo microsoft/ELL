@@ -15,32 +15,38 @@ endif()
 set (SRC src/BinaryClassificationEvaluator.cpp
                    src/CommandLineParser.cpp
                    src/Files.cpp
+                   src/Format.cpp
                    src/IntegerStack.cpp
                    src/JsonSerializer.cpp
                    src/RandomEngines.cpp
+                   src/XMLSerialization.cpp
                    ../amalgamated_jsoncpp/jsoncpp.cpp)
 
 set (INCLUDE include/BinaryClassificationEvaluator.h
                        include/CommandLineParser.h
+                       include/Files.h
+                       include/Format.h
                        include/IIterator.h
                        include/IntegerStack.h
                        include/JsonSerializer.h
                        include/ParallelTransformIterator.h
                        include/Parser.h
-                       include/TransformIterator.h
-                       include/Files.h
-                       include/Format.h
                        include/RandomEngines.h
-                       include/StlIteratorAdapter.h)
+                       include/StlIteratorAdapter.h
+                       include/TransformIterator.h
+                       include/TypeName.h
+                       include/XMLSerialization.h)
 
 set (TCC tcc/BinaryClassificationEvaluator.tcc
                    tcc/CommandLineParser.tcc
+                   tcc/Format.tcc
                    tcc/JsonSerializer.tcc
                    tcc/ParallelTransformIterator.tcc
                    tcc/Parser.tcc
+                   tcc/StlIteratorAdapter.tcc
                    tcc/TransformIterator.tcc
-                   tcc/Format.tcc
-                   tcc/StlIteratorAdapter.tcc)
+                   tcc/TypeName.tcc
+                   tcc/XMLSerialization.tcc)
                    
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -71,9 +77,9 @@ include_directories(../testing/include)
 add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-target_link_libraries(${TEST_NAME} dataset linear testing -pthread)
+target_link_libraries(${TEST_NAME} utilities dataset linear testing -pthread)
 else()
-target_link_libraries(${TEST_NAME} dataset linear testing)
+target_link_libraries(${TEST_NAME} utilities dataset linear testing)
 endif()
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")

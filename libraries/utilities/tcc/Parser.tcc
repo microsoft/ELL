@@ -99,7 +99,7 @@ namespace utilities
     }
 
     template<typename ValueType>
-    Parser::Result Parser::Parse(const char*& pStr, /* out */ ValueType& value)
+    ParseResult Parse(const char*& pStr, /* out */ ValueType& value)
     { 
         // trim whitespace
         Trim(pStr);
@@ -107,7 +107,7 @@ namespace utilities
         // check for eof
         if(*pStr == '\0')
         {
-            return Result::endOfString;
+            return ParseResult::endOfString;
         }
 
         // check for "//" comment indicator
@@ -115,14 +115,14 @@ namespace utilities
         {
             if(*(pStr+1) == '/')
             {
-                return Result::beginComment;
+                return ParseResult::beginComment;
             }
         }
 
         // check for "#" comment indicator
         if(*pStr == '#')
         {
-            return Result::beginComment;
+            return ParseResult::beginComment;
         }
 
         char* pEnd = 0;
@@ -137,11 +137,11 @@ namespace utilities
         // check for parse errors
         if(pStr == pEnd)
         {
-            return Result::badFormat;
+            return ParseResult::badFormat;
         }
         if(errno == ERANGE)
         {
-            return Result::outOfRange;
+            return ParseResult::outOfRange;
         }
 
         // restore state
@@ -150,10 +150,10 @@ namespace utilities
         // increment pointer
         pStr = pEnd; 
 
-        return Result::success;
+        return ParseResult::success;
     }
 
-    void Parser::Trim(const char*& pStr)
+    void Trim(const char*& pStr)
     {
         while (std::isspace(*pStr))
         {

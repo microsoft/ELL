@@ -58,24 +58,24 @@ int GetPrecision(double number, uint64 maxChars)
 void SvgRect(std::ostream& os, uint64 numTabs, const std::string& SvgClass, double x, double y, double width, double height, double radius)
 {
     SvgTab(os, numTabs);
-    auto format = R"aw(<rect class="%s" x="%f" y="%f" width="%f" height="%f" rx="%f" ry="%f" />)aw";
-    utilities::Format::Printf(os, format, SvgClass, x, y, width, height, radius, radius);
+    auto format = R"aw(<rect class="%" x="%" y="%" width="%" height="%" rx="%" ry="%" />)aw";
+    utilities::PrintFormat(os, format, SvgClass, x, y, width, height, radius, radius);
     os << std::endl;
 }
 
 void SvgCircle(std::ostream& os, uint64 numTabs, const std::string& SvgClass, double cx, double cy, double radius)
 {
     SvgTab(os, numTabs);
-    auto format = R"aw(<ellipse class="%s" cx="%f" cy="%f" rx="%f" ry="%f" />)aw";
-    utilities::Format::Printf(os, format, SvgClass, cx, cy, radius, radius);
+    auto format = R"aw(<ellipse class="%" cx="%" cy="%" rx="%" ry="%" />)aw";
+    utilities::PrintFormat(os, format, SvgClass, cx, cy, radius, radius);
     os << std::endl;
 }
 
 void SvgText(std::ostream& os, uint64 numTabs, const std::string& SvgClass, double cx, double cy, const std::string& text, double rotate)
 {
     SvgTab(os, numTabs);
-    auto format = R"aw(<text class="%s" x="%f" y="%f" text-anchor="middle" dy=".4em"  transform="rotate(%f,%f,%f)">)aw";
-    utilities::Format::Printf(os, format, SvgClass, cx, cy, rotate, cx, cy);
+    auto format = R"aw(<text class="%" x="%" y="%" text-anchor="middle" dy=".4em"  transform="rotate(%,%,%)">)aw";
+    utilities::PrintFormat(os, format, SvgClass, cx, cy, rotate, cx, cy);
     os << text << "</text>\n";
 }
 
@@ -89,8 +89,8 @@ void SvgNumber(std::ostream& os, uint64 numTabs, const std::string& SvgClass, do
 void SvgUse(std::ostream& os, uint64 numTabs, const std::string& id, double x, double y)
 {
     SvgTab(os, numTabs);
-    auto format = R"aw(<use xlink:href="#%s" x="%f" y="%f" />)aw";
-    utilities::Format::Printf(os, format, id, x, y);
+    auto format = R"aw(<use xlink:href="#%" x="%" y="%" />)aw";
+    utilities::PrintFormat(os, format, id, x, y);
     os << std::endl;
 }
 
@@ -109,8 +109,8 @@ void SvgEdge(std::ostream & os, uint64 numTabs, Point from, Point to, double edg
     if (xDist == 0)
     {
         SvgTab(os, numTabs);
-        const char* format = R"aw(<path class="Edge" d="M %f %f L %f %f" />)aw";
-        utilities::Format::Printf(os, format, from.x, from.y, to.x, to.y);
+        const char* format = R"aw(<path class="Edge" d="M % % L % %" />)aw";
+        utilities::PrintFormat(os, format, from.x, from.y, to.x, to.y);
     }
 
     else
@@ -124,8 +124,8 @@ void SvgEdge(std::ostream & os, uint64 numTabs, Point from, Point to, double edg
         const double slopeDy = yDist - 2.0 * drop;
 
         SvgTab(os, numTabs);
-        const char* format = R"aw(<path class="Edge" d="M %f %f q 0 %f %f %f l %f %f q %f %f %f %f" />)aw";
-        utilities::Format::Printf(os, format, 
+        const char* format = R"aw(<path class="Edge" d="M % % q 0 % % % l % % q % % % %" />)aw";
+        utilities::PrintFormat(os, format, 
             from.x, from.y, 
             drop, xDist*qFrac, drop+slopeDy*qFrac, 
             xDist*slopeFrac, slopeDy*slopeFrac, 
