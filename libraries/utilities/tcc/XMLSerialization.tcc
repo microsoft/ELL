@@ -8,7 +8,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "TypeInfo.h"
+#include "TypeName.h"
 
 namespace
 {
@@ -30,7 +30,7 @@ namespace utilities
     template<typename ValueType>
     void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
     {
-        auto typeName = TypeInfo<ValueType>::GetSerializationName();
+        auto typeName = TypeName<ValueType>::GetSerializationName();
         Indent();
         if (*name != '\0')
         {
@@ -47,7 +47,7 @@ namespace utilities
     {
         Indent();
         auto size = value.size();
-        auto typeName = TypeInfo<std::vector<ElementType>>::GetSerializationName();
+        auto typeName = TypeName<std::vector<ElementType>>::GetSerializationName();
 
         if (*name != '\0')
         {
@@ -72,7 +72,7 @@ namespace utilities
     template<typename ValueType>
     void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
-        auto typeName = TypeInfo<ValueType>::GetSerializationName();
+        auto typeName = TypeName<ValueType>::GetSerializationName();
 
         Indent();
         if (*name != '\0')
@@ -95,7 +95,7 @@ namespace utilities
     template<typename ValueType>
     void XMLSerializer::Serialize(const char* name, const std::shared_ptr<ValueType>& spValue)
     {
-        auto typeName = TypeInfo<std::shared_ptr<ValueType>>::GetSerializationName();
+        auto typeName = TypeName<std::shared_ptr<ValueType>>::GetSerializationName();
         Indent();
 
         if (*name != '\0')
@@ -118,7 +118,7 @@ namespace utilities
     template<typename ValueType>
     void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
     {
-        auto typeName = TypeInfo<ValueType>::GetSerializationName();
+        auto typeName = TypeName<ValueType>::GetSerializationName();
         if (*name != '\0')
         {
             MatchFormatThrowsExceptions(_pStr, typeFormatOneLine, Match(typeName), Match(name), value, Match(typeName));
@@ -135,7 +135,7 @@ namespace utilities
         value.clear();
 
         uint64 size = 0;
-        auto typeName = TypeInfo<std::vector<ElementType>>::GetSerializationName();
+        auto typeName = TypeName<std::vector<ElementType>>::GetSerializationName();
         if (*name != '\0')
         {
             MatchFormatThrowsExceptions(_pStr, vectorFormatBegin, Match(typeName), Match(name), size);
@@ -158,7 +158,7 @@ namespace utilities
     template<typename ValueType>
     void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
-        auto typeName = TypeInfo<ValueType>::GetSerializationName();
+        auto typeName = TypeName<ValueType>::GetSerializationName();
         if (*name != '\0')
         {
             MatchFormatThrowsExceptions(_pStr, typeFormatBegin, Match(typeName), Match(name));
@@ -176,7 +176,7 @@ namespace utilities
     template<typename ValueType>
     void XMLDeserializer::Deserialize(const char* name, std::shared_ptr<ValueType>& spValue)
     {
-        auto typeName = TypeInfo<std::shared_ptr<ValueType>>::GetSerializationName();
+        auto typeName = TypeName<std::shared_ptr<ValueType>>::GetSerializationName();
         
         if (*name != '\0')
         {

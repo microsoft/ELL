@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     TypeInfo.h (utilities)
+//  File:     TypeName.h (utilities)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
@@ -23,7 +23,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<typename T>
-    struct TypeInfo
+    struct TypeName
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -35,7 +35,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<typename T>
-    struct TypeInfo<std::shared_ptr<T>>
+    struct TypeName<std::shared_ptr<T>>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -47,7 +47,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<typename T>
-    struct TypeInfo<std::vector<T>>
+    struct TypeName<std::vector<T>>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -59,7 +59,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeInfo<char>
+    struct TypeName<char>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -71,7 +71,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeInfo<short>
+    struct TypeName<short>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -83,7 +83,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeInfo<unsigned short>
+    struct TypeName<unsigned short>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -95,7 +95,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeInfo<int>
+    struct TypeName<int>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -107,7 +107,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeInfo<unsigned int>
+    struct TypeName<unsigned int>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -119,7 +119,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeInfo<long>
+    struct TypeName<long>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -131,7 +131,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeInfo<unsigned long>
+    struct TypeName<unsigned long>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -143,7 +143,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeInfo<uint64>
+    struct TypeName<uint64>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -155,7 +155,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeInfo<float>
+    struct TypeName<float>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -167,7 +167,7 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeInfo<double>
+    struct TypeName<double>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
@@ -176,4 +176,4 @@ namespace utilities
     };
 }
 
-#include "../tcc/TypeInfo.tcc"
+#include "../tcc/TypeName.tcc"
