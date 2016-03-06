@@ -38,17 +38,17 @@ namespace utilities
         template<typename ValueType>
         void Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
 
-        /// <summary> Serialize vectors. </summary>
+        /// <summary> Serialize a positive-size vector. </summary>
         ///
         /// <typeparam name="ElementType"> The type of vector elements being serialized. </typeparam>
         /// <param name="name"> Name of the variable being serialized. </param>
-        /// <param name="value"> The variable being serialized. </param>
+        /// <param name="value"> The vector being serialized, must have size>0. </param>
         template<typename ElementType>
         void Serialize(const char* name, const std::vector<ElementType>& value);
 
-        /// <summary> Serialize shared pointers. </summary>
+        /// <summary> Serialize a shared pointer to a polymorphic class. </summary>
         ///
-        /// <typeparam name="ValueType"> The type pointed to. </typeparam>
+        /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
         /// <param name="name"> Name of the variable being serialized. </param>
         /// <param name="value"> The variable being serialized. </param>
         template<typename ValueType>
@@ -101,9 +101,9 @@ namespace utilities
         template<typename ElementType>
         void Deserialize(const char* name, std::vector<ElementType>& value);
 
-        /// <summary> Deserialize shared pointers. </summary>
+        /// <summary> Deserialize a shared pointer to a polymorphic class. </summary>
         ///
-        /// <typeparam name="ValueType"> The type pointed to. </typeparam>
+        /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
         /// <param name="name"> Name of the variable being deserialized, which is compared to the serialized version. </param>
         /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
         template<typename ValueType>

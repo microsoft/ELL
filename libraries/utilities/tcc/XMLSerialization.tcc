@@ -45,6 +45,11 @@ namespace utilities
     template<typename ElementType>
     void XMLSerializer::Serialize(const char* name, const std::vector<ElementType>& value)
     {
+        if (value.size() == 0)
+        {
+            throw std::runtime_error("cannot serialize a zero-size vector");
+        }
+
         Indent();
         auto size = value.size();
         auto typeName = TypeName<std::vector<ElementType>>::GetSerializationName();
@@ -95,6 +100,12 @@ namespace utilities
     template<typename ValueType>
     void XMLSerializer::Serialize(const char* name, const std::shared_ptr<ValueType>& spValue)
     {
+        static_assert(std::is_polymorphic<ValueType>::value, "can only serialize shared_ptr to polymorphic classes");
+        if (spValue == nullptr)
+        {
+            throw std::runtime_error("cannot serialize a null pointer");
+        }
+
         auto typeName = TypeName<std::shared_ptr<ValueType>>::GetSerializationName();
         Indent();
 
@@ -176,6 +187,8 @@ namespace utilities
     template<typename ValueType>
     void XMLDeserializer::Deserialize(const char* name, std::shared_ptr<ValueType>& spValue)
     {
+        static_assert(std::is_polymorphic<ValueType>::value, "can only serialize shared_ptr to polymorphic classes");
+
         auto typeName = TypeName<std::shared_ptr<ValueType>>::GetSerializationName();
         
         if (*name != '\0')

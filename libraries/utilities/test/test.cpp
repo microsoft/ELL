@@ -211,7 +211,6 @@ public:
         serializer.Serialize("x", x);
         serializer.Serialize("y", y);
         serializer.Serialize("v", v);
-        serializer.Serialize("p", p);
     }
 
     template<typename DeserializerType>
@@ -220,7 +219,6 @@ public:
         deserializer.Deserialize("x", x);
         deserializer.Deserialize("y", y);
         deserializer.Deserialize("v", v);
-        deserializer.Deserialize("p", p);
     }
 
     void Set()
@@ -232,9 +230,6 @@ public:
         v[1] = 7;
         v[2] = 8;
         v[3] = 9;
-        p.resize(2);
-        p[0] = std::make_shared<int>(99);
-        p[1] = std::make_shared<int>(88);
     }
 
     bool Check()
@@ -245,12 +240,7 @@ public:
             v[0] == 6 &&
             v[1] == 7 &&
             v[2] == 8 &&
-            v[3] == 9 &&
-            p.size() == 2 &&
-            p[0] != nullptr &&
-            *(p[0]) == 99 &&
-            p[1] != nullptr &&
-            *(p[1]) == 88)
+            v[3] == 9)
         {
             return true;
         }
@@ -263,7 +253,6 @@ public:
     int x;
     double y; 
     std::vector<uint64> v;
-    std::vector<std::shared_ptr<int>> p;
 };
 
 void XMLSerializationTest()
