@@ -115,7 +115,7 @@ void PrintElementDefinition(ostream& os, const std::string& id, double width, do
 void PrintableMap::Print(ostream & os, const PrintArguments& Arguments)
 {
     os << "<html>\n<body>\n";
-    utilities::Format::Printf(os, styleDefinitionFormat, Arguments.edgeStyle.dashStyle);
+    utilities::PrintFormat(os, styleDefinitionFormat, Arguments.edgeStyle.dashStyle);
 
     os << "    <Svg>\n\n        <defs>\n";
     PrintElementDefinition(os,

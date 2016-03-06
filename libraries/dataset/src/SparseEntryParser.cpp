@@ -40,21 +40,21 @@ namespace dataset
     {
         // parse index
         uint64 index;
-        auto result = utilities::Parser::Parse(_currentPos, index);
+        auto result = utilities::Parse(_currentPos, index);
 
         // handle errors
-        if(result != utilities::Parser::Result::success)
+        if(result != utilities::ParseResult::success)
         {
-            if(result == utilities::Parser::Result::endOfString || result == utilities::Parser::Result::beginComment)
+            if(result == utilities::ParseResult::endOfString || result == utilities::ParseResult::beginComment)
             {
                 _isValid = false;
                 return;
             }
-            if(result == utilities::Parser::Result::badFormat)
+            if(result == utilities::ParseResult::badFormat)
             {
                 throw std::runtime_error("bad format, expected unsigned integer near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
-            else if(result == utilities::Parser::Result::outOfRange)
+            else if(result == utilities::ParseResult::outOfRange)
             {
                 throw std::runtime_error("index out of unsigned integer range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
@@ -68,19 +68,19 @@ namespace dataset
         ++_currentPos;
 
         double value;
-        result = utilities::Parser::Parse(_currentPos, value);
+        result = utilities::Parse(_currentPos, value);
 
-        if(result != utilities::Parser::Result::success)
+        if(result != utilities::ParseResult::success)
         {
-            if(result == utilities::Parser::Result::endOfString || result == utilities::Parser::Result::beginComment)
+            if(result == utilities::ParseResult::endOfString || result == utilities::ParseResult::beginComment)
             {
                 throw std::runtime_error("bad format, std::string ended prematurely in " + *_spExampleString);
             }
-            if(result == utilities::Parser::Result::badFormat)
+            if(result == utilities::ParseResult::badFormat)
             {
                 throw std::runtime_error("bad format, expected double near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
-            else if(result == utilities::Parser::Result::outOfRange)
+            else if(result == utilities::ParseResult::outOfRange)
             {
                 throw std::runtime_error("index out of double range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }

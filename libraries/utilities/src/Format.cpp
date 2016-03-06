@@ -12,71 +12,69 @@
 
 namespace utilities
 {
-    namespace Format
+    void PrintFormat(std::ostream& os, const char* format)
     {
-        void Printf(std::ostream& os, const char* format)
+        if(*format == '\0')
         {
-            if(*format == '\0')
-            {
-                return;
-            }
-
-            while(*format != '\0')
-            {
-                if(*format != '^')
-                {
-                    os << *format;
-                }
-                ++format;
-            }
+            return;
         }
 
-        Result MatchToVariableSubstitution(const char*& content, const char*& format)
+        while(*format != '\0')
         {
-            while(*format != '\0' && *format != '%')
+            if(*format != whitespaceSymbol)
             {
-                if(std::isspace(*format) && std::isspace(*content))
-                {
-                    Parser::Trim(content);
-                    Parser::Trim(format);
-                }
-                else if(*format == '^')
-                {
-                    Parser::Trim(content);
-                    ++format;
-                }
-                else if(*format == *content)
-                {
-                    ++format;
-                    ++content;
-                }
-                else if(*content == '\0')
-                {
-                    return Result::earlyEndOfContent;
-                }
-                else
-                {
-                    return Result::mismatch;
-                }
+                os << *format;
             }
-
-            return Result::success;
-        }
-
-        Result MatchScanf(const char*& content, const char* format)
-        {
-            auto result = MatchToVariableSubstitution(content, format);
-            if(result != Result::success)
-            {
-                return result;
-            }
-
-            if(*format != '\0')
-            {
-                return Result::missingArgument;
-            }
-
-            return Result::success;
+            ++format;
         }
     }
+
+    MatchResult MatchToSubstitutionSymbol(const char*& content, const char*& format)
+    {
+        while(*format != '\0' && *format != substitutionSymbol)
+        {
+            if(std::isspace(*format) && std::isspace(*content))
+            {
+                Trim(content);
+                Trim(format);
+            }
+            else if(*format == whitespaceSymbol)
+            {
+                Trim(content);
+                ++format;
+            }
+            else if(*format == *content)
+            {
+                ++format;
+                ++content;
+            }
+            else if(*content == '\0')
+            {
+                return MatchResult::earlyEndOfContent;
+            }
+            else
+            {
+                return MatchResult::mismatch;
+            }
+        }
+
+        return MatchResult::success;
+    }
+
+    MatchResult MatchFormat(const char*& content, const char* format)
+    {
+        auto MatchResult = MatchToSubstitutionSymbol(content, format);
+        if(MatchResult != MatchResult::success)
+        {
+            return MatchResult;
+        }
+
+        if(*format != '\0')
+        {
+            return MatchResult::missingArgument;
+        }
+
+        return MatchResult::success;
+    }
 }
+

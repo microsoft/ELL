@@ -59,7 +59,7 @@ void SvgRect(std::ostream& os, uint64 numTabs, const std::string& SvgClass, doub
 {
     SvgTab(os, numTabs);
     auto format = R"aw(<rect class="%" x="%" y="%" width="%" height="%" rx="%" ry="%" />)aw";
-    utilities::Format::Printf(os, format, SvgClass, x, y, width, height, radius, radius);
+    utilities::PrintFormat(os, format, SvgClass, x, y, width, height, radius, radius);
     os << std::endl;
 }
 
@@ -67,7 +67,7 @@ void SvgCircle(std::ostream& os, uint64 numTabs, const std::string& SvgClass, do
 {
     SvgTab(os, numTabs);
     auto format = R"aw(<ellipse class="%" cx="%" cy="%" rx="%" ry="%" />)aw";
-    utilities::Format::Printf(os, format, SvgClass, cx, cy, radius, radius);
+    utilities::PrintFormat(os, format, SvgClass, cx, cy, radius, radius);
     os << std::endl;
 }
 
@@ -75,7 +75,7 @@ void SvgText(std::ostream& os, uint64 numTabs, const std::string& SvgClass, doub
 {
     SvgTab(os, numTabs);
     auto format = R"aw(<text class="%" x="%" y="%" text-anchor="middle" dy=".4em"  transform="rotate(%,%,%)">)aw";
-    utilities::Format::Printf(os, format, SvgClass, cx, cy, rotate, cx, cy);
+    utilities::PrintFormat(os, format, SvgClass, cx, cy, rotate, cx, cy);
     os << text << "</text>\n";
 }
 
@@ -90,7 +90,7 @@ void SvgUse(std::ostream& os, uint64 numTabs, const std::string& id, double x, d
 {
     SvgTab(os, numTabs);
     auto format = R"aw(<use xlink:href="#%" x="%" y="%" />)aw";
-    utilities::Format::Printf(os, format, id, x, y);
+    utilities::PrintFormat(os, format, id, x, y);
     os << std::endl;
 }
 
@@ -110,7 +110,7 @@ void SvgEdge(std::ostream & os, uint64 numTabs, Point from, Point to, double edg
     {
         SvgTab(os, numTabs);
         const char* format = R"aw(<path class="Edge" d="M % % L % %" />)aw";
-        utilities::Format::Printf(os, format, from.x, from.y, to.x, to.y);
+        utilities::PrintFormat(os, format, from.x, from.y, to.x, to.y);
     }
 
     else
@@ -125,7 +125,7 @@ void SvgEdge(std::ostream & os, uint64 numTabs, Point from, Point to, double edg
 
         SvgTab(os, numTabs);
         const char* format = R"aw(<path class="Edge" d="M % % q 0 % % % l % % q % % % %" />)aw";
-        utilities::Format::Printf(os, format, 
+        utilities::PrintFormat(os, format, 
             from.x, from.y, 
             drop, xDist*qFrac, drop+slopeDy*qFrac, 
             xDist*slopeFrac, slopeDy*slopeFrac, 

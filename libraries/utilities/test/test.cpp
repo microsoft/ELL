@@ -139,62 +139,62 @@ void testParallelTransformIterator()
 }
 
 template <typename ... Args>
-void testMatchScanf(utilities::Format::Result expectedResult, const char* content, const char* format, Args ...args)
+void testMatchFormat(utilities::MatchResult expectedResult, const char* content, const char* format, Args ...args)
 {
-    auto result = utilities::Format::MatchScanf(content, format, args...);
-    testing::ProcessTest("utilities::Format:MatchScanf", result == expectedResult);
+    auto result = utilities::MatchFormat(content, format, args...);
+    testing::ProcessTest("utilities::Format:MatchFormat", result == expectedResult);
 }
 
-void testMatchScanf()
+void testMatchFormat()
 {
-    using utilities::Format::Result;
+    using utilities::MatchResult;
 
     // standard match
-    testMatchScanf(Result::success, "integer 123 and float -33.3", "integer % and float %", int(), double());
+    testMatchFormat(MatchResult::success, "integer 123 and float -33.3", "integer % and float %", int(), double());
 
     // tolerate extra spaces in content, in places where format has a single space
-    testMatchScanf(Result::success, "integer    123   and float    -33.3     ", "integer % and float %", int(), double());
+    testMatchFormat(MatchResult::success, "integer    123   and float    -33.3     ", "integer % and float %", int(), double());
 
     // tolerate extra spaces in content, with the whitespace symbol ^
-    testMatchScanf(Result::success, "       integer    123   and float    -33.3     ", "^integer % and float %", int(), double());
+    testMatchFormat(MatchResult::success, "       integer    123   and float    -33.3     ", "^integer % and float %", int(), double());
 
     // tolerate extra whitespace in content, tabs
-    testMatchScanf(Result::success, "integer \t   123 \t  and float    -33.3   \t  ", "integer % and float %", int(), double());
+    testMatchFormat(MatchResult::success, "integer \t   123 \t  and float    -33.3   \t  ", "integer % and float %", int(), double());
 
     // tolerate extra spaces in format
-    testMatchScanf(Result::success, " integer 123 and float -33.3 ", "     integer  %  and     float  %    ", int(), double());
+    testMatchFormat(MatchResult::success, " integer 123 and float -33.3 ", "     integer  %  and     float  %    ", int(), double());
 
-    using utilities::Format::Match;
+    using utilities::Match;
 
     // match a string 
-    testMatchScanf(Result::success, "integer 123 and float -33.3", "integer % and % %", int(), Match("float") , double());
+    testMatchFormat(MatchResult::success, "integer 123 and float -33.3", "integer % and % %", int(), Match("float") , double());
 
     // match two strings in a row
-    testMatchScanf(Result::success, "integer hello float", "integer %% float", Match("he"), Match("llo"));
+    testMatchFormat(MatchResult::success, "integer hello float", "integer %% float", Match("he"), Match("llo"));
 
     // match two strings in a row with optional whitespace
-    testMatchScanf(Result::success, "integer hello float", "integer %^^% float", Match("he"), Match("llo"));
+    testMatchFormat(MatchResult::success, "integer hello float", "integer %^^% float", Match("he"), Match("llo"));
 
     // early end of content
-    testMatchScanf(Result::earlyEndOfContent, "integer 123 and ", "integer % and float %", int(), double());
+    testMatchFormat(MatchResult::earlyEndOfContent, "integer 123 and ", "integer % and float %", int(), double());
 
     // early end of content
-    testMatchScanf(Result::earlyEndOfContent, "integer 123 and float -33.3", "integer % and float %X", int(), double());
+    testMatchFormat(MatchResult::earlyEndOfContent, "integer 123 and float -33.3", "integer % and float %X", int(), double());
 
     // mismatch
-    testMatchScanf(Result::mismatch, "integer 123 and X float -33.3", "integer % and float %", int(), double());
+    testMatchFormat(MatchResult::mismatch, "integer 123 and X float -33.3", "integer % and float %", int(), double());
 
     // mismatch
-    testMatchScanf(Result::mismatch, "Xinteger 123 and float -33.3", "integer % and float %", int(), double());
+    testMatchFormat(MatchResult::mismatch, "Xinteger 123 and float -33.3", "integer % and float %", int(), double());
 
     // mismatch
-    testMatchScanf(Result::mismatch, "integer 123 and float -33.3", "integer % and X float %", int(), double());
+    testMatchFormat(MatchResult::mismatch, "integer 123 and float -33.3", "integer % and X float %", int(), double());
 
     // mismatch
-    testMatchScanf(Result::mismatch, "integer 123 and float -33.3", "Xinteger % and float %", int(), double());
+    testMatchFormat(MatchResult::mismatch, "integer 123 and float -33.3", "Xinteger % and float %", int(), double());
 
     // parser error
-    testMatchScanf(Result::parserError, "integer X and float -33.3", "integer % and float %", int(), double());
+    testMatchFormat(MatchResult::parserError, "integer X and float -33.3", "integer % and float %", int(), double());
 }
 
 class SerializationTest
@@ -291,7 +291,7 @@ int main()
     testIteratorAdapter();
     testTransformIterator();
     testParallelTransformIterator();
-    testMatchScanf();
+    testMatchFormat();
     XMLSerializationTest();
 
     if (testing::DidTestFail())

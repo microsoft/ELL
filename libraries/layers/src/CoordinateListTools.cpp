@@ -15,13 +15,13 @@
 
 namespace
 {
-    void HandleErrors(utilities::Parser::Result result)
+    void HandleErrors(utilities::ParseResult result)
     {
-        if (result == utilities::Parser::Result::badFormat)
+        if (result == utilities::ParseResult::badFormat)
         {
             throw std::runtime_error("bad format in coordinate list definition string");
         }
-        else if (result == utilities::Parser::Result::endOfString || result == utilities::Parser::Result::beginComment)
+        else if (result == utilities::ParseResult::endOfString || result == utilities::ParseResult::beginComment)
         {
             throw std::runtime_error("premature end of coordinate list definition string");
         }
@@ -40,13 +40,13 @@ namespace
             {
                 ++pStr;
                 uint64 diff;
-                HandleErrors(utilities::Parser::Parse<uint64>(pStr, /* out */ diff));
+                HandleErrors(utilities::Parse<uint64>(pStr, /* out */ diff));
                 index -= diff;
             }
         }
         else
         {
-            HandleErrors(utilities::Parser::Parse<uint64>(pStr, /* out */ index));
+            HandleErrors(utilities::Parse<uint64>(pStr, /* out */ index));
         }
 
         if (index > maxIndex)

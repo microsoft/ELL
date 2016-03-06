@@ -20,141 +20,138 @@
 
 namespace utilities
 {
-    namespace Format
+    Match::Match(const char* pStr) : _pStr(pStr)
+    {}
+
+    Match::Match(const std::string & str) : _pStr(str.c_str())
+    {}
+
+    Match::operator const char*()
     {
-        Match::Match(const char* pStr) : _pStr(pStr)
-        {}
+        return _pStr;
+    }
 
-        Match::Match(const std::string & str) : _pStr(str.c_str())
-        {}
-
-        Match::operator const char*()
+    template<typename ArgType, typename ... ArgTypes>
+    void PrintFormat(std::ostream& os, const char* format, const ArgType& arg, const ArgTypes& ...args)
+    {
+        if(*format == '\0')
         {
-            return _pStr;
+            return;
         }
 
-        template<typename ArgType, typename ... ArgTypes>
-        void Printf(std::ostream& os, const char* format, const ArgType& arg, const ArgTypes& ...args)
+        while(*format != substitutionSymbol && *format != '\0')
         {
-            if(*format == '\0')
+            if(*format != whitespaceSymbol)
             {
-                return;
+                os << *format;
             }
-
-            while(*format != '%' && *format != '\0')
-            {
-                if(*format != '^')
-                {
-                    os << *format;
-                }
-                ++format;
-            }
-
-            if(*format == '%')
-            {
-                ++format;
-                os << arg;
-            }
-
-            Printf(os, format, args...);
-        }
-
-        template<typename ... ArgTypes>
-        std::string Printf(const char* format, const ArgTypes& ...args)
-        {
-            std::stringstream ss;
-            Printf(ss, format, args...);
-            return ss.str();
-        }
-
-        template<typename ... ArgTypes>
-        Result MatchScanf(const char*& content, const char* format, Match match, ArgTypes& ...args)
-        {
-            auto matchResult = MatchToVariableSubstitution(content, format);
-
-            if(matchResult != Result::success)
-            {
-                return matchResult;
-            }
-            if(*format == '\0')
-            {
-                return Result::success;
-            }
-
-            // *format = '%'
             ++format;
-
-            const char* cStr = match;
-            matchResult = MatchToVariableSubstitution(content, cStr);
-            if(matchResult != Result::success)
-            {
-                return matchResult;
-            }
-            if(*cStr != '\0')
-            {
-                return Result::unexpectedPercentSymbol;
-            }
-
-            return MatchScanf(content, format, args...);
         }
 
-        template<typename ArgType, typename ... ArgTypes>
-        Result MatchScanf(const char*& content, const char* format, ArgType& arg, ArgTypes& ...args)
+        if(*format == substitutionSymbol)
         {
-            auto matchResult = MatchToVariableSubstitution(content, format);
-
-            if(matchResult != Result::success)
-            {
-                return matchResult;
-            }
-            if(*format == '\0')
-            {
-                return Result::success;
-            }
-
-            // *format = '%'
             ++format;
-
-            auto parserResult = Parser::Parse<std::remove_reference_t<ArgType>>(content, arg);
-            if(parserResult != Parser::Result::success)
-            {
-                return Result::parserError;
-            }
-
-            return MatchScanf(content, format, args...);
+            os << arg;
         }
 
-        template<typename ... ArgTypes>
-        void MatchScanfThrowsExceptions(const char*& content, const char* format, ArgTypes& ...args)
+        PrintFormat(os, format, args...);
+    }
+
+    template<typename ... ArgTypes>
+    std::string PrintFormat(const char* format, const ArgTypes& ...args)
+    {
+        std::stringstream ss;
+        PrintFormat(ss, format, args...);
+        return ss.str();
+    }
+
+    template<typename ... ArgTypes>
+    MatchResult MatchFormat(const char*& content, const char* format, Match match, ArgTypes& ...args)
+    {
+        auto matchResult = MatchToSubstitutionSymbol(content, format);
+
+        if(matchResult != MatchResult::success)
         {
-            auto result = MatchScanf(content, format, args...);
+            return matchResult;
+        }
+        if(*format == '\0')
+        {
+            return MatchResult::success;
+        }
 
-            if(result == Result::success)
-            {
-                return;
-            }
+        // *format = substitutionSymbol
+        ++format;
 
-            std::string contentSnippet(content, 30);
-            std::string formatSnippet(format,30);
-            auto snippets = "\"" + contentSnippet + "\" and \"" + formatSnippet + "\"";
+        const char* cStr = match;
+        matchResult = MatchToSubstitutionSymbol(content, cStr);
+        if(matchResult != MatchResult::success)
+        {
+            return matchResult;
+        }
+        if(*cStr != '\0')
+        {
+            return MatchResult::unexpectedPercentSymbol;
+        }
 
-            switch(result)
-            {
-            case Result::earlyEndOfContent:
-                throw std::runtime_error("Error scanning text: content ended before format near: \"" + formatSnippet + "\"");
+        return MatchFormat(content, format, args...);
+    }
 
-            case Result::mismatch:
-                throw std::runtime_error("Error scanning text: mismatch between content and format near: " + snippets);
+    template<typename ArgType, typename ... ArgTypes>
+    MatchResult MatchFormat(const char*& content, const char* format, ArgType& arg, ArgTypes& ...args)
+    {
+        auto matchResult = MatchToSubstitutionSymbol(content, format);
 
-            case Result::parserError:
-                throw std::runtime_error("Error scanning text: parser error near: " + snippets);
+        if(matchResult != MatchResult::success)
+        {
+            return matchResult;
+        }
+        if(*format == '\0')
+        {
+            return MatchResult::success;
+        }
 
-            case Result::missingArgument:
-                throw std::runtime_error("Error scanning text: missing argument near: " + snippets);
+        // *format = substitutionSymbol
+        ++format;
 
-            case Result::unexpectedPercentSymbol:
-                throw std::runtime_error("Error scanning text: unexpected symbol '%' in string argument near: " + snippets);
-            }
+        auto parserResult = Parse<std::remove_reference_t<ArgType>>(content, arg);
+        if(parserResult != ParseResult::success)
+        {
+            return MatchResult::parserError;
+        }
+
+        return MatchFormat(content, format, args...);
+    }
+
+    template<typename ... ArgTypes>
+    void MatchFormatThrowsExceptions(const char*& content, const char* format, ArgTypes& ...args)
+    {
+        auto result = MatchFormat(content, format, args...);
+
+        if(result == MatchResult::success)
+        {
+            return;
+        }
+
+        std::string contentSnippet(content, 30);
+        std::string formatSnippet(format,30);
+        auto snippets = "\"" + contentSnippet + "\" and \"" + formatSnippet + "\"";
+
+        switch(result)
+        {
+        case MatchResult::earlyEndOfContent:
+            throw std::runtime_error("Error scanning text: content ended before format near: \"" + formatSnippet + "\"");
+
+        case MatchResult::mismatch:
+            throw std::runtime_error("Error scanning text: mismatch between content and format near: " + snippets);
+
+        case MatchResult::parserError:
+            throw std::runtime_error("Error scanning text: parser error near: " + snippets);
+
+        case MatchResult::missingArgument:
+            throw std::runtime_error("Error scanning text: missing argument near: " + snippets);
+
+        case MatchResult::unexpectedPercentSymbol:
+            throw std::runtime_error("Error scanning text: unexpected symbol '" + std::to_string(substitutionSymbol) + "' in string argument near: " + snippets);
         }
     }
 }

@@ -30,18 +30,18 @@ namespace dataset
         // parse weight
         if(_hasWeight)
         {
-            auto result = utilities::Parser::Parse(pStr, /* out */ weight);
+            auto result = utilities::Parse(pStr, /* out */ weight);
 
-            if(result != utilities::Parser::Result::success)
+            if(result != utilities::ParseResult::success)
             {
                 HandleErrors(result, *spExampleString);
             }
         }
 
         // parse label
-        auto result = utilities::Parser::Parse(pStr, /* out */ label);
+        auto result = utilities::Parse(pStr, /* out */ label);
 
-        if(result != utilities::Parser::Result::success)
+        if(result != utilities::ParseResult::success)
         {
             HandleErrors(result, *spExampleString);
         }
@@ -57,17 +57,17 @@ namespace dataset
     }
 
     template<typename VectorEntryParserType, typename DefaultDataVectorType>
-    void dataset::SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::HandleErrors(utilities::Parser::Result result, const std::string & str)
+    void dataset::SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::HandleErrors(utilities::ParseResult result, const std::string & str)
     {
-        if (result == utilities::Parser::Result::badFormat)
+        if (result == utilities::ParseResult::badFormat)
         {
             throw std::runtime_error("bad format real value in '" + str + "'");
         }
-        else if (result == utilities::Parser::Result::endOfString || result == utilities::Parser::Result::beginComment)
+        else if (result == utilities::ParseResult::endOfString || result == utilities::ParseResult::beginComment)
         {
             throw std::runtime_error("premature end-of-std::string or comment in '" + str + "'");
         }
-        else if (result == utilities::Parser::Result::outOfRange)
+        else if (result == utilities::ParseResult::outOfRange)
         {
             throw std::runtime_error("real value out of double precision range in '" + str + "'");
         }

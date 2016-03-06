@@ -34,11 +34,11 @@ namespace utilities
         Indent();
         if (*name != '\0')
         {
-            Format::Printf(_stream, typeFormatOneLine, typeName, name, value, typeName);
+            PrintFormat(_stream, typeFormatOneLine, typeName, name, value, typeName);
         }
         else
         {
-            Format::Printf(_stream, unnamedTypeFormatOneLine, typeName, value, typeName);
+            PrintFormat(_stream, unnamedTypeFormatOneLine, typeName, value, typeName);
         }
     }
 
@@ -51,11 +51,11 @@ namespace utilities
 
         if (*name != '\0')
         {
-            Format::Printf(_stream, vectorFormatBegin, typeName, name, size);
+            PrintFormat(_stream, vectorFormatBegin, typeName, name, size);
         }
         else
         {
-            Format::Printf(_stream, unnamedVectorFormatBegin, typeName, size);
+            PrintFormat(_stream, unnamedVectorFormatBegin, typeName, size);
         }
 
         ++_indentation;
@@ -66,7 +66,7 @@ namespace utilities
         --_indentation;
 
         Indent();
-        Format::Printf(_stream, typeFormatEnd, typeName);
+        PrintFormat(_stream, typeFormatEnd, typeName);
     }
 
     template<typename ValueType>
@@ -77,11 +77,11 @@ namespace utilities
         Indent();
         if (*name != '\0')
         {
-            Format::Printf(_stream, typeFormatBegin, typeName, name);
+            PrintFormat(_stream, typeFormatBegin, typeName, name);
         }
         else
         {
-            Format::Printf(_stream, unnamedTypeFormatBegin, typeName);
+            PrintFormat(_stream, unnamedTypeFormatBegin, typeName);
         }
 
         ++_indentation;
@@ -89,7 +89,7 @@ namespace utilities
         --_indentation;
 
         Indent();
-        Format::Printf(_stream, typeFormatEnd, typeName);
+        PrintFormat(_stream, typeFormatEnd, typeName);
     }
 
     template<typename ValueType>
@@ -100,11 +100,11 @@ namespace utilities
 
         if (*name != '\0')
         {
-            Format::Printf(_stream, typeFormatBegin, typeName, name);
+            PrintFormat(_stream, typeFormatBegin, typeName, name);
         }
         else
         {
-            Format::Printf(_stream, unnamedTypeFormatBegin, typeName);
+            PrintFormat(_stream, unnamedTypeFormatBegin, typeName);
         }
 
         ++_indentation;
@@ -112,7 +112,7 @@ namespace utilities
         --_indentation;
 
         Indent();
-        Format::Printf(_stream, typeFormatEnd, typeName);
+        PrintFormat(_stream, typeFormatEnd, typeName);
     }
 
     template<typename ValueType>
@@ -121,11 +121,11 @@ namespace utilities
         auto typeName = TypeInfo<ValueType>::GetSerializationName();
         if (*name != '\0')
         {
-            Format::MatchScanfThrowsExceptions(_pStr, typeFormatOneLine, Format::Match(typeName), Format::Match(name), value, Format::Match(typeName));
+            MatchFormatThrowsExceptions(_pStr, typeFormatOneLine, Match(typeName), Match(name), value, Match(typeName));
         }
         else
         {
-            Format::MatchScanfThrowsExceptions(_pStr, unnamedTypeFormatOneLine, Format::Match(typeName), value, Format::Match(typeName));
+            MatchFormatThrowsExceptions(_pStr, unnamedTypeFormatOneLine, Match(typeName), value, Match(typeName));
         }
     }
 
@@ -138,11 +138,11 @@ namespace utilities
         auto typeName = TypeInfo<std::vector<ElementType>>::GetSerializationName();
         if (*name != '\0')
         {
-            Format::MatchScanfThrowsExceptions(_pStr, vectorFormatBegin, Format::Match(typeName), Format::Match(name), size);
+            MatchFormatThrowsExceptions(_pStr, vectorFormatBegin, Match(typeName), Match(name), size);
         }
         else
         {
-            Format::MatchScanfThrowsExceptions(_pStr, unnamedVectorFormatBegin, Format::Match(typeName), size);
+            MatchFormatThrowsExceptions(_pStr, unnamedVectorFormatBegin, Match(typeName), size);
         }
 
         value.resize(size);
@@ -152,7 +152,7 @@ namespace utilities
             Deserialize("", value[i]);
         }
 
-        Format::MatchScanfThrowsExceptions(_pStr, typeFormatEnd, Format::Match(typeName));
+        MatchFormatThrowsExceptions(_pStr, typeFormatEnd, Match(typeName));
     }
 
     template<typename ValueType>
@@ -161,16 +161,16 @@ namespace utilities
         auto typeName = TypeInfo<ValueType>::GetSerializationName();
         if (*name != '\0')
         {
-            Format::MatchScanfThrowsExceptions(_pStr, typeFormatBegin, Format::Match(typeName), Format::Match(name));
+            MatchFormatThrowsExceptions(_pStr, typeFormatBegin, Match(typeName), Match(name));
         }
         else
         {
-            Format::MatchScanfThrowsExceptions(_pStr, unnamedTypeFormatBegin, Format::Match(typeName));
+            MatchFormatThrowsExceptions(_pStr, unnamedTypeFormatBegin, Match(typeName));
         }
 
         value.Read(*this);
 
-        Format::MatchScanfThrowsExceptions(_pStr, typeFormatEnd, Format::Match(typeName));
+        MatchFormatThrowsExceptions(_pStr, typeFormatEnd, Match(typeName));
     }
 
     template<typename ValueType>
@@ -180,15 +180,15 @@ namespace utilities
         
         if (*name != '\0')
         {
-            Format::MatchScanfThrowsExceptions(_pStr, typeFormatBegin, Format::Match(typeName), Format::Match(name));
+            MatchFormatThrowsExceptions(_pStr, typeFormatBegin, Match(typeName), Match(name));
         }
         else
         {
-            Format::MatchScanfThrowsExceptions(_pStr, unnamedTypeFormatBegin, Format::Match(typeName));
+            MatchFormatThrowsExceptions(_pStr, unnamedTypeFormatBegin, Match(typeName));
         }
 
         spValue = std::make_shared<ValueType>();
         Deserialize("", *spValue);
-        Format::MatchScanfThrowsExceptions(_pStr, typeFormatEnd, Format::Match(typeName));
+        MatchFormatThrowsExceptions(_pStr, typeFormatEnd, Match(typeName));
     }
 }
