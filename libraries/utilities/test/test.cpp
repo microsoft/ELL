@@ -200,7 +200,12 @@ void testMatchFormat()
 class SerializationTest
 {
 public:
-    static const char* GetSerializationName() 
+    static const char* GetTypeName()
+    {
+        return "SerializationTest";
+    }
+
+    virtual const char* GetDerivedTypeName() const
     {
         return "SerializationTest";
     }
@@ -258,8 +263,12 @@ public:
 void XMLSerializationTest()
 {
     utilities::XMLSerializer serializer;
-    SerializationTest test;
-    test.Set();
+    auto test = std::make_shared<SerializationTest>();
+    test->Set();
+    
+    
+    //SerializationTest test;
+    //test.Set();
 
     serializer.Serialize("test", test);
 
@@ -268,10 +277,12 @@ void XMLSerializationTest()
     std::cout << ss.str() << std::endl;
 
     utilities::XMLDeserializer deserializer(ss);
-    SerializationTest test2;
+//    SerializationTest test2;
+    auto test2 = std::make_shared<SerializationTest>();
+
     deserializer.Deserialize("test", test2);
 
-    testing::ProcessTest("utilities::XMLSerialization", test2.Check());
+    testing::ProcessTest("utilities::XMLSerialization", test2->Check());
 }
 
 /// Runs all tests

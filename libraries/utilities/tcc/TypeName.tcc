@@ -11,20 +11,20 @@
 namespace utilities
 {
     template<typename T>
-    std::string TypeName<T>::GetSerializationName()
+    std::string TypeName<T>::GetName()
     {
-        return std::string(T::GetSerializationName());
+        return std::string(T::GetTypeName());
     }
 
     template<typename T>
-    std::string TypeName<std::shared_ptr<T>>::GetSerializationName()
+    std::string TypeName<std::shared_ptr<T>>::GetName()
     {
-        return std::string("ptr") + typeNameLeftBracket + TypeName<T>::GetSerializationName() + typeNameRightBracket;
+        return std::string("ptr") + typeNameLeftBracket + TypeName<T>::GetName() + typeNameRightBracket;
     }
 
     template<typename T>
-    std::string TypeName<std::vector<T>>::GetSerializationName()
+    std::string TypeName<std::vector<T>>::GetName()
     { 
-        return std::string("vector") + typeNameLeftBracket + TypeName<T>::GetSerializationName() + typeNameRightBracket; 
+        return std::string("vector") + typeNameLeftBracket + TypeName<T>::GetName() + typeNameRightBracket; 
     }
 }
