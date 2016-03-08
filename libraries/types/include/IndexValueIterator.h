@@ -52,7 +52,7 @@ namespace types
     };
 
     template <typename ValueType>
-    StlIndexValueIterator<ValueType> GetIndexValueIterator(const std::vector<ValueType>& arr);
+    StlIndexValueIterator<ValueType> GetStlIndexValueIterator(const std::vector<ValueType>& arr);
 }
 
 

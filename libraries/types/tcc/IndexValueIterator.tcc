@@ -54,7 +54,7 @@ namespace types
     // GetIterator function
     //
     template <typename ValueType>
-    StlIndexValueIterator<ValueType> inline GetIndexValueIterator(const std::vector<ValueType>& arr)
+    StlIndexValueIterator<ValueType> inline GetStlIndexValueIterator(const std::vector<ValueType>& arr)
     {
         return StlIndexValueIterator<ValueType>(arr.cbegin(), arr.cend());
     }
