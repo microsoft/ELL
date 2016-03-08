@@ -1,4 +1,12 @@
-// IndexValueIterator.h
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  [projectName]
+//  File:     IndexValueIterator.h (types)
+//  Authors:  Chuck Jacobs
+//
+//  [copyright]
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
@@ -9,44 +17,40 @@
 
 namespace types
 {
-    /// A read-only forward index-value iterator for an STL container
-    ///
+    /// <summary> A read-only forward index-value iterator for an STL container </summary>
 
-    // TODO: rename to something more correct
     template <typename ValueType>
     class StlIndexValueIterator : public IIndexValueIterator
     {
     public:
-        /// abbreviation of std::vector iterator type, for improved readability
         using StlIteratorType = typename std::vector<ValueType>::const_iterator;
 
-        /// Constructor
+        /// <summary> Constructs an instance of StlIndexValueIterator. </summary>
         ///
         /// <param name="begin"> STL iterator pointing at beginning of range to iterate over </param>
         /// <param name="end"> STL iterator pointing at end of range to iterate over </param>
         StlIndexValueIterator(const StlIteratorType& begin, const StlIteratorType& end);
 
-        /// \returns True if the iterator is currently pointing to a valid iterate
+        /// <summary> \returns The number of non-zeros. </summary>
         ///
+        /// <returns> True if the iterator is currently pointing to a valid iterate. </returns>
         bool IsValid() const;
 
-        /// Proceeds to the Next iterate
-        ///
+        /// <summary> Proceeds to the Next iterate </summary>
         void Next();
 
-        /// \returns The current index-value pair
+        /// <summary> \returns The current index-value pair </summary>
         ///
+        /// <returns> The current index-value pair </returns>
         IndexValue Get() const;
 
     protected:
-
         StlIteratorType _begin;
         StlIteratorType _end;
         uint64 _index = 0;
         void SkipZeros();
     };
 
-    
     template <typename ValueType>
     StlIndexValueIterator<ValueType> GetIndexValueIterator(const std::vector<ValueType>& arr);
 }

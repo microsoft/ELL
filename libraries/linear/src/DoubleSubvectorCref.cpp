@@ -26,7 +26,7 @@ namespace linear
     double DoubleSubvectorCref::Norm2() const
     {
         double result = 0.0;
-        for(uint64 i=0; i<_size; ++i)
+        for (uint64 i = 0; i < _size; ++i)
         {
             double x = _ptr[i];
             result += x * x;
@@ -36,7 +36,7 @@ namespace linear
 
     void DoubleSubvectorCref::AddTo(double* p_other, double scalar) const
     {
-        for(uint64 i = 0; i<_size; ++i)
+        for (uint64 i = 0; i < _size; ++i)
         {
             p_other[i] += scalar * _ptr[i];
         }
@@ -46,19 +46,19 @@ namespace linear
     double DoubleSubvectorCref::Dot(const double* p_other) const
     {
         double result = 0.0;
-        for(uint64 i = 0; i<_size; ++i)
+        for (uint64 i = 0; i < _size; ++i)
         {
             result += _ptr[i] * p_other[i];
         }
-        
+
         return result;
     }
 
     void DoubleSubvectorCref::Print(std::ostream & os) const
     {
-        for(uint64 i = 0; i<_size; ++i)
+        for (uint64 index = 0; index < _size; ++index)
         {
-            os << _ptr[i] << '\t';
+            os << index << ':' << _ptr[index] << '\t';
         }
     }
 

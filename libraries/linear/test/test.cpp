@@ -63,8 +63,8 @@ void testGemv(const MatrixType1& M1, const MatrixType2& M2, double alpha, double
     auto output1 = getVector(M1.NumRows(), 567);
     auto output2 = getVector(M1.NumRows(), 567);
 
-    M1.Gemv(v.GetDataPointer(), output1.GetDataPointer(), alpha, beta);
-    M2.Gemv(v.GetDataPointer(), output2.GetDataPointer(), alpha, beta);
+    M1.Gemv(v, output1, alpha, beta);
+    M2.Gemv(v, output2, alpha, beta);
 
     std::string name1 = typeid(MatrixType1).name();
     std::string name2 = typeid(MatrixType2).name();

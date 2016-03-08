@@ -1,9 +1,17 @@
-// RealArray.tcc
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  [projectName]
+//  File:     IndexValueIterator.h (types)
+//  Authors:  Chuck Jacobs
+//
+//  [copyright]
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace types
 {
     //
-    // SparseStlIterator implementation
+    // StlIndexValueIterator implementation
     //
     template<typename ValueType>
     bool StlIndexValueIterator<ValueType>::IsValid() const

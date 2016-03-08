@@ -37,13 +37,10 @@ namespace dataset
         /// <summary> Constructor. </summary>
         DenseDataVector();
 
-        // Converting constructor
-        //
-        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-
         /// <summary> Constructs an instance of DenseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
+        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         DenseDataVector(IndexValueIteratorType IndexValueIterator);
 
         /// <summary> Move constructor. </summary>
