@@ -77,32 +77,30 @@ class Derived2 : public Base
 
     virtual void Read(utilities::XMLDeserializer& deserializer) override
     {
-        deserializer.Deserialize("a", a);
-        deserializer.Deserialize("b", b);
+        deserializer.Deserialize("v", v);
     }
 
     virtual void Write(utilities::XMLSerializer& serializer) const override
     {
-        serializer.Serialize("a", a);
-        serializer.Serialize("b", b);
+        serializer.Serialize("v", v);
     }
 
     // for the purpose of testing
     virtual void Set() override
     {
-        a = 99.9f;
-        b = 100000;
+        v.push_back(7.0f);
+        v.push_back(8.0f);
     }
 
     virtual bool Check() override
     {
-        if (a == 99.9f && b == 100000) return true;
+        if(v.size() != 2) return false;
+        if (v[0] == 7.0f && v[1] == 8.0f) return true;
         return false;
     }
 
 private:
-    float a = 0;
-    unsigned long b = 0;
+    std::vector<float> v;
 };
 
 void Read(std::string derivedTypeName, std::shared_ptr<Base>& spValue)
