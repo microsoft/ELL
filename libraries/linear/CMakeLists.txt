@@ -14,7 +14,7 @@ endif()
 
 set (SRC src/Base.cpp
          src/DoubleMatrix.cpp
-         src/DoubleSubvectorCref.cpp
+         src/DoubleSubvector.cpp
          src/DoubleVector.cpp
          src/IMatrix.cpp
          src/IVector.cpp)
@@ -22,7 +22,7 @@ set (SRC src/Base.cpp
 set (INCLUDE include/Base.h
              include/BiMatrix.h
              include/DoubleMatrix.h
-             include/DoubleSubvectorCref.h
+             include/DoubleSubvector.h
              include/DoubleVector.h
              include/IMatrix.h
              include/IVector.h

@@ -75,11 +75,31 @@ namespace linear
         /// </summary>
         void Reset();
 
-        /// #### TODO: document
+        /// <summary> Returns a reference to an element in the vector. </summary>
+        ///
+        /// <param name="index"> The index of the element to return </param>
+        /// <returns> The element at position index. </returns>
         double& operator[](size_t index);
+
+        /// <summary> Returns a const reference to an element in the vector. </summary>
+        ///
+        /// <param name="index"> The index of the element to return </param>
+        /// <returns> The element at position index. </returns>
         double operator[](size_t index) const;
+
+        /// <summary> Returns a pointer to the beginning of the vector</summary>
+        ///
+        /// <returns> A pointer to the first element in the vector. </returns>
         double* GetDataPointer();
+
+        /// <summary> Returns a const pointer to the beginning of the vector</summary>
+        ///
+        /// <returns> A pointer to the first element in the vector. </returns>
         const double* GetDataPointer() const;
+
+        /// <summary> Returns an IndexValueIterator for the vector. </summary>
+        ///
+        /// <returns> An IndexValueIterator. </returns>
         types::StlIndexValueIterator<double> GetIterator() const;
 
         /// <summary> Returns the Size of the vector. </summary>
