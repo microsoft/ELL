@@ -14,7 +14,7 @@
 
 // types
 #include "types.h"
-#include "IndexValueIterator.h"
+#include "StlIndexValueIteratorAdapter.h"
 
 // utilities
 #include "JsonSerializer.h"

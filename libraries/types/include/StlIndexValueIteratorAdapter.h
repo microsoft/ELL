@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     IndexValueIterator.h (types)
+//  File:     StlIndexValueIteratorAdapter.h (types)
 //  Authors:  Chuck Jacobs
 //
 //  [copyright]
@@ -20,7 +20,7 @@ namespace types
     /// <summary> A read-only forward index-value iterator for an STL container </summary>
 
     template <typename ValueType>
-    class StlIndexValueIterator : public IIndexValueIterator
+    class StlIndexValueIteratorAdapter : public IIndexValueIterator
     {
     public:
         using StlIteratorType = typename std::vector<ValueType>::const_iterator;
@@ -29,9 +29,9 @@ namespace types
         ///
         /// <param name="begin"> STL iterator pointing at beginning of range to iterate over </param>
         /// <param name="end"> STL iterator pointing at end of range to iterate over </param>
-        StlIndexValueIterator(const StlIteratorType& begin, const StlIteratorType& end);
+        StlIndexValueIteratorAdapter(const StlIteratorType& begin, const StlIteratorType& end);
 
-        /// <summary> \returns The number of non-zeros. </summary>
+        /// <summary> \returns True if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> True if the iterator is currently pointing to a valid iterate. </returns>
         bool IsValid() const;
@@ -51,9 +51,13 @@ namespace types
         void SkipZeros();
     };
 
+    /// <summary> Creates an StlIndexValueIteratorAdapter for a std::vector </summary>
+    ///
+    /// <param name="container"> A std::vector to iterate over </param>
+    /// <returns> An StlIndexValueIteratorAdapter that iterates over the given vector </returns>
     template <typename ValueType>
-    StlIndexValueIterator<ValueType> GetStlIndexValueIterator(const std::vector<ValueType>& arr);
+    StlIndexValueIteratorAdapter<ValueType> MakeStlIndexValueIteratorAdapter(const std::vector<ValueType>& container);
 }
 
 
-#include "../tcc/IndexValueIterator.tcc"
+#include "../tcc/StlIndexValueIteratorAdapter.tcc"

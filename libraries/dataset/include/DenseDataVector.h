@@ -14,7 +14,7 @@
 
 // types
 #include "types.h"
-#include "IndexValueIterator.h"
+#include "StlIndexValueIteratorAdapter.h"
 
 // stl
 #include <vector>
@@ -32,7 +32,7 @@ namespace dataset
     class DenseDataVector : public IDataVector
     {
     public:
-        using Iterator = types::StlIndexValueIterator<ValueType>;
+        using Iterator = types::StlIndexValueIteratorAdapter<ValueType>;
 
         /// <summary> Constructor. </summary>
         DenseDataVector();

@@ -60,9 +60,9 @@ namespace linear
         return result;
     }
 
-    types::StlIndexValueIterator<double> DoubleVector::GetIterator() const
+    types::StlIndexValueIteratorAdapter<double> DoubleVector::GetIterator() const
     {
-        return types::GetStlIndexValueIterator(_data);
+        return types::MakeStlIndexValueIteratorAdapter(_data);
     }
     
     void DoubleVector::Print(std::ostream & os) const

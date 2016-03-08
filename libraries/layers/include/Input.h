@@ -14,7 +14,6 @@
 
 // types
 #include "types.h"
-#include "IndexValueIterator.h"
 
 // stl
 #include <vector>

@@ -20,6 +20,9 @@
 // linear
 #include "DoubleVector.h"
 
+// types
+#include "StlIndexValueIteratorAdapter.h"
+
 // stl
 #include <iostream>
 #include <string>
@@ -127,8 +130,8 @@ void addToTest()
     b[12] = 1.0;
     b[13] = 1.0;
 
-    DataVectorType1 c1(types::GetStlIndexValueIterator(b));
-    DataVectorType2 c2(types::GetStlIndexValueIterator(b));
+    DataVectorType1 c1(types::MakeStlIndexValueIteratorAdapter(b));
+    DataVectorType2 c2(types::MakeStlIndexValueIteratorAdapter(b));
 
     c1.AddTo(a1);
     c2.AddTo(a2);

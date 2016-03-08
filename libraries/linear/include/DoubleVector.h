@@ -14,7 +14,7 @@
 
 // types
 #include "types.h"
-#include "IndexValueIterator.h"
+#include "StlIndexValueIteratorAdapter.h"
 
 // stl
 #include <iostream>
@@ -100,7 +100,7 @@ namespace linear
         /// <summary> Returns an IndexValueIterator for the vector. </summary>
         ///
         /// <returns> An IndexValueIterator. </returns>
-        types::StlIndexValueIterator<double> GetIterator() const;
+        types::StlIndexValueIteratorAdapter<double> GetIterator() const;
 
         /// <summary> Returns the Size of the vector. </summary>
         ///

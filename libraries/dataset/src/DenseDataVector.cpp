@@ -90,7 +90,7 @@ namespace dataset
     template<typename ValueType>
     typename DenseDataVector<ValueType>::Iterator DenseDataVector<ValueType>::GetIterator() const
     {
-        return types::GetStlIndexValueIterator(_data);
+        return types::MakeStlIndexValueIteratorAdapter(_data);
     }
 
     template<typename ValueType>

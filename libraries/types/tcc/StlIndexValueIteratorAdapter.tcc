@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     IndexValueIterator.h (types)
+//  File:     StlIndexValueIteratorAdapter.h (types)
 //  Authors:  Chuck Jacobs
 //
 //  [copyright]
@@ -11,16 +11,16 @@
 namespace types
 {
     //
-    // StlIndexValueIterator implementation
+    // StlIndexValueIteratorAdapter implementation
     //
     template<typename ValueType>
-    bool StlIndexValueIterator<ValueType>::IsValid() const
+    bool StlIndexValueIteratorAdapter<ValueType>::IsValid() const
     {
         return (_begin != _end);
     }
 
     template<typename ValueType>
-    void StlIndexValueIterator<ValueType>::Next()
+    void StlIndexValueIteratorAdapter<ValueType>::Next()
     {
         ++_begin;
         ++_index;
@@ -28,19 +28,19 @@ namespace types
     }
 
     template<typename ValueType>
-    IndexValue StlIndexValueIterator<ValueType>::Get() const
+    IndexValue StlIndexValueIteratorAdapter<ValueType>::Get() const
     {
         return IndexValue{ _index, (double)*_begin };
     }
 
     template<typename ValueType>
-    StlIndexValueIterator<ValueType>::StlIndexValueIterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end), _index(0)
+    StlIndexValueIteratorAdapter<ValueType>::StlIndexValueIteratorAdapter(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end), _index(0)
     {
         SkipZeros();
     }
 
     template<typename ValueType>
-    void StlIndexValueIterator<ValueType>::SkipZeros()
+    void StlIndexValueIteratorAdapter<ValueType>::SkipZeros()
     {
         while (_begin < _end && *_begin == 0)
         {
@@ -49,14 +49,13 @@ namespace types
         }
     }
 
-
     //
-    // GetIterator function
+    // Convenience function to create iterator
     //
     template <typename ValueType>
-    StlIndexValueIterator<ValueType> inline GetStlIndexValueIterator(const std::vector<ValueType>& arr)
+    StlIndexValueIteratorAdapter<ValueType> inline MakeStlIndexValueIteratorAdapter(const std::vector<ValueType>& arr)
     {
-        return StlIndexValueIterator<ValueType>(arr.cbegin(), arr.cend());
+        return StlIndexValueIteratorAdapter<ValueType>(arr.cbegin(), arr.cend());
     }
 
 
