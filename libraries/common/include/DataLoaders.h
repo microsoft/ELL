@@ -59,14 +59,14 @@ namespace common
     /// <param name="inputCoordinates"> [in,out] The list of input coordinates. </param>
     ///
     /// <returns> The data iterator. </returns>
-    std::unique_ptr<dataset::IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, /* out */ layers::Map& map, /* out */ layers::CoordinateList& inputCoordinates);
+    std::unique_ptr<dataset::IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, layers::Map& map, layers::CoordinateList& inputCoordinates);
 
     /// <summary> Converts a data iterator (one that gets supervised examples) into a
     /// dataset::RowDataset. </summary>
     ///
     /// <param name="parsingIterator"> [in,out] The parsing iterator. </param>
     /// <param name="dataset"> [in,out] The dataset. </param>
-    void DataIteratorToRowDataset(dataset::IParsingIterator& parsingIterator, /* out */ dataset::RowDataset& dataset);
+    void DataIteratorToRowDataset(dataset::IParsingIterator& parsingIterator, dataset::RowDataset& dataset);
 
     /// <summary> Loads a dataset, a map, and a coordinate list based on command line parameters. </summary>
     ///
@@ -78,8 +78,8 @@ namespace common
     void GetRowDatasetMapCoordinates(
         const DataLoadArguments& dataLoadArguments,
         const MapLoadArguments& mapLoadArguments,
-        /* out */ dataset::RowDataset& rowDataset,
-        /* out */ layers::Map& map,
-        /* out */ layers::CoordinateList& inputCoordinates);
+        dataset::RowDataset& rowDataset,
+        layers::Map& map,
+        layers::CoordinateList& inputCoordinates);
 }
 

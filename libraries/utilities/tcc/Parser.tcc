@@ -99,7 +99,7 @@ namespace utilities
     }
 
     template<typename ValueType>
-    ParseResult Parse(const char*& pStr, /* out */ ValueType& value)
+    ParseResult Parse(const char*& pStr, ValueType& value)
     { 
         // trim whitespace
         Trim(pStr);
@@ -132,7 +132,7 @@ namespace utilities
         errno = 0;
 
         // try to parse
-        cParse(pStr, pEnd, /* out */ value);
+        cParse(pStr, pEnd, value);
         
         // check for parse errors
         if(pStr == pEnd)

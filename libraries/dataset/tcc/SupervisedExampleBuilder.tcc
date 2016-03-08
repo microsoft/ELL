@@ -30,7 +30,7 @@ namespace dataset
         // parse weight
         if(_hasWeight)
         {
-            auto result = utilities::Parse(pStr, /* out */ weight);
+            auto result = utilities::Parse(pStr, weight);
 
             if(result != utilities::ParseResult::success)
             {
@@ -39,7 +39,7 @@ namespace dataset
         }
 
         // parse label
-        auto result = utilities::Parse(pStr, /* out */ label);
+        auto result = utilities::Parse(pStr, label);
 
         if(result != utilities::ParseResult::success)
         {
