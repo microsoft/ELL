@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "TypeName.h"
+#include "Format.h"
 
 namespace
 {
@@ -202,7 +203,7 @@ namespace utilities
             MatchFormatThrowsExceptions(_pStr, formatBegin1, Match(typeName), Match("type"), derivedTypeName);
         }
 
-        spValue = std::make_shared<ValueType>();
+        Read(derivedTypeName, spValue);
         Deserialize("", *spValue);
         MatchFormatThrowsExceptions(_pStr, formatEnd, Match(typeName));
     }

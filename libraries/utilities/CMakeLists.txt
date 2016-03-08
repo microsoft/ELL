@@ -13,41 +13,41 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/BinaryClassificationEvaluator.cpp
-                   src/CommandLineParser.cpp
-                   src/Files.cpp
-                   src/Format.cpp
-                   src/IntegerStack.cpp
-                   src/JsonSerializer.cpp
-                   src/RandomEngines.cpp
-                   src/XMLSerialization.cpp
-                   ../amalgamated_jsoncpp/jsoncpp.cpp)
+         src/CommandLineParser.cpp
+         src/Files.cpp
+         src/Format.cpp
+         src/IntegerStack.cpp
+         src/JsonSerializer.cpp
+         src/RandomEngines.cpp
+         src/XMLSerialization.cpp
+         ../amalgamated_jsoncpp/jsoncpp.cpp)
 
 set (INCLUDE include/BinaryClassificationEvaluator.h
-                       include/CommandLineParser.h
-                       include/Files.h
-                       include/Format.h
-                       include/IIterator.h
-                       include/IntegerStack.h
-                       include/JsonSerializer.h
-                       include/ParallelTransformIterator.h
-                       include/Parser.h
-                       include/RandomEngines.h
-                       include/StlIteratorAdapter.h
-                       include/TransformIterator.h
-                       include/TypeName.h
-                       include/XMLSerialization.h)
+             include/CommandLineParser.h
+             include/Files.h
+             include/Format.h
+             include/IIterator.h
+             include/IntegerStack.h
+             include/JsonSerializer.h
+             include/ParallelTransformIterator.h
+             include/Parser.h
+             include/RandomEngines.h
+             include/StlIteratorAdapter.h
+             include/TransformIterator.h
+             include/TypeName.h
+             include/XMLSerialization.h)
 
 set (TCC tcc/BinaryClassificationEvaluator.tcc
-                   tcc/CommandLineParser.tcc
-                   tcc/Format.tcc
-                   tcc/JsonSerializer.tcc
-                   tcc/ParallelTransformIterator.tcc
-                   tcc/Parser.tcc
-                   tcc/StlIteratorAdapter.tcc
-                   tcc/TransformIterator.tcc
-                   tcc/TypeName.tcc
-                   tcc/XMLSerialization.tcc)
-                   
+         tcc/CommandLineParser.tcc
+         tcc/Format.tcc
+         tcc/JsonSerializer.tcc
+         tcc/ParallelTransformIterator.tcc
+         tcc/Parser.tcc
+         tcc/StlIteratorAdapter.tcc
+         tcc/TransformIterator.tcc
+         tcc/TypeName.tcc
+         tcc/XMLSerialization.tcc)
+
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
@@ -67,21 +67,21 @@ endif()
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 #
-# test project
+# test projects
 #
-
-set (TEST_NAME ${PROJ_NAME}_test)
 
 include_directories(../testing/include)
 
-add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
-
+add_executable(utilities_test test/test.cpp ${INCLUDE})
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-target_link_libraries(${TEST_NAME} utilities dataset linear testing -pthread)
+target_link_libraries(utilities_test utilities dataset linear testing -pthread)
 else()
-target_link_libraries(${TEST_NAME} utilities dataset linear testing)
+target_link_libraries(utilities_test utilities dataset linear testing)
 endif()
+set_property(TARGET utilities_test PROPERTY FOLDER "tests")
+add_test(NAME utilities_test COMMAND utilities_test)
 
-set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
-
-add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+add_executable(XMLSerialization_test test/XMLSerialization_test.cpp ${INCLUDE})
+target_link_libraries(XMLSerialization_test utilities testing)
+set_property(TARGET XMLSerialization_test PROPERTY FOLDER "tests")
+add_test(NAME XMLSerialization_test COMMAND XMLSerialization_test)
