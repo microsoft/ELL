@@ -14,11 +14,11 @@
 
 // types
 #include "types.h"
-#include "StlIndexValueIteratorAdapter.h"
+#include "StlIndexValueIterator.h"
 
 // utilities
 #include "JsonSerializer.h"
-#include "StlIteratorAdapter.h"
+#include "StlIterator.h"
 
 // stl
 #include <vector>
@@ -72,7 +72,7 @@ namespace layers
         /// <param name="index"> Zero-based element index. </param>
         ///
         /// <returns> The input coordinates. </returns>
-        using InputCoordinateIterator = utilities::StlIteratorAdapter<std::vector<Coordinate>::const_iterator, Coordinate>;
+        using InputCoordinateIterator = utilities::StlIterator<std::vector<Coordinate>::const_iterator, Coordinate>;
         virtual InputCoordinateIterator GetInputCoordinates(uint64 index) const = 0;
 
         /// <summary> Serializes the Layer in json format. </summary>

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     StlIndexValueIteratorAdapter.h (types)
+//  File:     StlIndexValueIterator.h (types)
 //  Authors:  Chuck Jacobs
 //
 //  [copyright]
@@ -20,7 +20,7 @@ namespace types
     /// <summary> A read-only forward index-value iterator for an STL container </summary>
 
     template <typename ValueType>
-    class StlIndexValueIteratorAdapter : public IIndexValueIterator
+    class StlIndexValueIterator: public IIndexValueIterator
     {
     public:
         using StlIteratorType = typename std::vector<ValueType>::const_iterator;
@@ -29,7 +29,7 @@ namespace types
         ///
         /// <param name="begin"> STL iterator pointing at beginning of range to iterate over </param>
         /// <param name="end"> STL iterator pointing at end of range to iterate over </param>
-        StlIndexValueIteratorAdapter(const StlIteratorType& begin, const StlIteratorType& end);
+        StlIndexValueIterator(const StlIteratorType& begin, const StlIteratorType& end);
 
         /// <summary> \returns True if the iterator is currently pointing to a valid iterate. </summary>
         ///
@@ -56,8 +56,8 @@ namespace types
     /// <param name="container"> A std::vector to iterate over </param>
     /// <returns> An StlIndexValueIteratorAdapter that iterates over the given vector </returns>
     template <typename ValueType>
-    StlIndexValueIteratorAdapter<ValueType> MakeStlIndexValueIteratorAdapter(const std::vector<ValueType>& container);
+    StlIndexValueIterator<ValueType> MakeStlIndexValueIterator(const std::vector<ValueType>& container);
 }
 
 
-#include "../tcc/StlIndexValueIteratorAdapter.tcc"
+#include "../tcc/StlIndexValueIterator.tcc"
