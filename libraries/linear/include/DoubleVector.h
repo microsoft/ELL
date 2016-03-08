@@ -79,13 +79,13 @@ namespace linear
         ///
         /// <param name="index"> The index of the element to return </param>
         /// <returns> The element at position index. </returns>
-        double& operator[](size_t index);
+        double& operator[](uint64 index);
 
         /// <summary> Returns a const reference to an element in the vector. </summary>
         ///
         /// <param name="index"> The index of the element to return </param>
         /// <returns> The element at position index. </returns>
-        double operator[](size_t index) const;
+        double operator[](uint64 index) const;
 
         /// <summary> Returns a pointer to the beginning of the vector</summary>
         ///

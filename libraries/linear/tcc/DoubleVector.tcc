@@ -42,12 +42,12 @@ namespace linear
     }
 
 
-    inline double& DoubleVector::operator[](size_t index)
+    inline double& DoubleVector::operator[](uint64 index)
     {
         return _data[index]; 
     }
     
-    inline double DoubleVector::operator[](size_t index) const
+    inline double DoubleVector::operator[](uint64 index) const
     {
         return _data[index];
     }

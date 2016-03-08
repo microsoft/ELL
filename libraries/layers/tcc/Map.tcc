@@ -39,7 +39,7 @@ namespace layers
     Map::Iterator Map::Compute(IndexValueIteratorType indexValueIterator, const CoordinateList& outputCoordinates) const
     {
         // allocate memory to store the output of the map calculation
-        auto outputs = AllocateOutputs(); // Does AllocateOutputs have to return std::shared_ptr? 
+        auto outputs = AllocateOutputs();
         
         // set the input 
         SetArray( outputs[0], indexValueIterator);
