@@ -77,7 +77,7 @@ namespace utilities
     template<typename ValueType>
     void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
-        auto typeName = TypeName<ValueType>::GetName();
+        auto typeName = value.GetRuntimeTypeName();
 
         Indent();
         if (*name != '\0')
@@ -107,7 +107,7 @@ namespace utilities
         }
 
         auto typeName = TypeName<std::shared_ptr<ValueType>>::GetName();
-        auto derivedTypeName = spValue->GetDerivedTypeName();
+        auto derivedTypeName = spValue->GetRuntimeTypeName();
 
         Indent();
 
@@ -171,7 +171,7 @@ namespace utilities
     template<typename ValueType>
     void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
-        auto typeName = TypeName<ValueType>::GetName();
+        auto typeName = value.GetRuntimeTypeName();
         if (*name != '\0')
         {
             MatchFormatThrowsExceptions(_pStr, formatBegin1, Match(typeName), Match("name"), Match(name));

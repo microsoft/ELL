@@ -22,7 +22,7 @@ class Base
 public:
     static std::string GetTypeName() { return std::string("Base"); }
     
-    virtual std::string GetDerivedTypeName() = 0;
+    virtual std::string GetRuntimeTypeName() const = 0;
     
     virtual void Read(utilities::XMLDeserializer& deserializer) = 0;
     
@@ -37,7 +37,7 @@ class Derived1 : public Base
 {
     static std::string GetTypeName() { return std::string("Derived1"); }
 
-    virtual std::string GetDerivedTypeName() override { return GetTypeName(); };
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); };
 
     virtual void Read(utilities::XMLDeserializer& deserializer) override
     {
@@ -73,7 +73,7 @@ class Derived2 : public Base
 {
     static std::string GetTypeName() { return std::string("Derived2"); }
 
-    virtual std::string GetDerivedTypeName() override { return GetTypeName(); };
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); };
 
     virtual void Read(utilities::XMLDeserializer& deserializer) override
     {
@@ -105,6 +105,22 @@ private:
     unsigned long b = 0;
 };
 
+void Read(std::string derivedTypeName, std::shared_ptr<Base>& spValue)
+{
+    if(derivedTypeName == "Derived1")
+    {
+        spValue = std::make_shared<Derived1>();
+    }
+    else if(derivedTypeName == "Derived2")
+    {
+        spValue = std::make_shared<Derived2>();
+    }
+    else
+    {
+        throw std::runtime_error("attempted to deserialize an unrecognized class type");
+    }
+}
+
 void XMLSerializationTest()
 {
     std::vector<std::shared_ptr<Base>> vec;
@@ -125,22 +141,6 @@ void XMLSerializationTest()
     deserializer.Deserialize("vec", vec2);
 
     testing::ProcessTest("utilities::XMLSerialization", vec2[0]->Check() && vec[1]->Check());
-}
-
-void Read(std::string derivedTypeName, std::shared_ptr<Base>& spValue)
-{
-    if (derivedTypeName == "Derived1")
-    {
-        spValue = std::make_shared<Derived1>();
-    }
-    else if (derivedTypeName == "Derived2")
-    {
-        spValue = std::make_shared<Derived2>();
-    }
-    else
-    {
-        throw std::runtime_error("attempted to deserialize an unrecognized class type");
-    }
 }
 
 int main()
