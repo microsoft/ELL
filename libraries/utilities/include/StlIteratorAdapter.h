@@ -16,7 +16,7 @@
 namespace utilities
 {
     /// <summary> An adapter that transforms a pair of STL iterators into a read-only forward iterator with IsValid, Next, and Get functions</summary>
-    template <typename IteratorType, typename ValueType> // = decltype(*std::declval<IteratorType>())>
+    template <typename IteratorType, typename ValueType = decltype(*std::declval<IteratorType>())>
     class StlIteratorAdapter
     {
     public:
