@@ -10,6 +10,9 @@
 
 #include "CommandLineParser.h"
 
+// types
+#include "types.h"
+
 // stl
 #include <iostream>
 #include <algorithm>
@@ -102,7 +105,7 @@ namespace utilities
         _originalArgs.insert(_originalArgs.end(), &argv[0], &argv[argc]);
 
         std::string exe_path = _originalArgs[0];
-        size_t slashPos = exe_path.find_last_of("/\\");
+        uint64 slashPos = exe_path.find_last_of("/\\");
         if (slashPos == std::string::npos)
         {
             _exeName = exe_path;
@@ -146,7 +149,7 @@ namespace utilities
             }
 
             needsReparse = false;
-            size_t argc = _originalArgs.size();
+            uint64 argc = _originalArgs.size();
             for (int index = 1; index < argc; index++)
             {
                 std::string arg = _originalArgs[index];
@@ -368,9 +371,9 @@ namespace utilities
         }
     }
 
-    size_t optionNameHelpLength(const OptionInfo& option)
+    uint64 optionNameHelpLength(const OptionInfo& option)
     {
-        size_t len = option.name.size() + 2;
+        uint64 len = option.name.size() + 2;
         if (option.shortName != "")
         {
             len += (option.shortName.size() + 4);
@@ -378,7 +381,7 @@ namespace utilities
 
         len += option.defaultValueString.size() + 3; // 3 for " [" + "]" at begin/end
 
-        const size_t maxNameLen = 32;
+        const uint64 maxNameLen = 32;
         return std::min(maxNameLen, len);
     }
 
@@ -386,7 +389,7 @@ namespace utilities
     {
         std::stringstream out;
         // Find longest option name so we can align descriptions
-        size_t longest_name = 0;
+        uint64 longest_name = 0;
         for (const auto& iter : _options)
         {
             if (iter.first == iter.second.name) // wasn't a previously-undefined option
@@ -406,8 +409,8 @@ namespace utilities
             {
                 const OptionInfo& info = _options[entry.EntryString];
                 std::string option_name = option_name_string(info);
-                size_t thisOptionNameLen = optionNameHelpLength(info);
-                size_t pad_len = 2 + (longest_name - thisOptionNameLen);
+                uint64 thisOptionNameLen = optionNameHelpLength(info);
+                uint64 pad_len = 2 + (longest_name - thisOptionNameLen);
                 std::string padding(pad_len, ' ');
                 out << "\t--" << option_name << padding << info.description;
                 if (info.enum_values.size() > 0)

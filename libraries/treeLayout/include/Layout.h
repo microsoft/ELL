@@ -15,7 +15,6 @@
 
 // stl
 #include <vector>
-#include <cstring> // for size_t
 
 namespace treeLayout
 {
@@ -78,7 +77,7 @@ namespace treeLayout
         /// <param name="max_offset"> The maximum offset. </param>
         /// <param name="min_depth"> The minimum depth. </param>
         /// <param name="max_depth"> The maximum depth. </param>
-        Layout(size_t size, double min_offset, double max_offset, double min_depth, double max_depth);
+        Layout(uint64 size, double min_offset, double max_offset, double min_depth, double max_depth);
 
         /// <summary> Returns a reference to the position of a specified vertex. </summary>
         ///
