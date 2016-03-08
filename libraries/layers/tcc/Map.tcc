@@ -42,15 +42,15 @@ namespace layers
         auto outputs = AllocateOutputs(); // Does AllocateOutputs have to return std::shared_ptr? 
         
         // set the input 
-        SetArray( (*outputs)[0], indexValueIterator);
+        SetArray( outputs[0], indexValueIterator);
 
         // compute layers 1,2,... in order
         for(uint64 i = 1; i<_layers.size(); ++i)
         {
-            _layers[i]->Compute(i, *outputs);
+            _layers[i]->Compute(i, outputs);
         }
         
-        return Iterator(outputs, outputCoordinates);
+        return Iterator(std::move(outputs), outputCoordinates);
     }
 
     template<typename LayerType>

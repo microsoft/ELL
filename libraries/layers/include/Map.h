@@ -55,12 +55,12 @@ namespace layers
             IndexValue Get() const;
 
         protected:
-            std::shared_ptr<std::vector<std::vector<double>>> _spOutputs;
+            std::vector<std::vector<double>> _outputs;
             const CoordinateList _outputCoordinates;
             uint64 _index;
 
             // private ctor, can only be called from Map class
-            Iterator(std::shared_ptr<std::vector<std::vector<double>>> spOutput, const CoordinateList& outputCoordinates);
+            Iterator(std::vector<std::vector<double>>&& spOutput, const CoordinateList& outputCoordinates);
             friend Map;
         };
 
@@ -137,7 +137,7 @@ namespace layers
         static void DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<Layer>& spLayer);
 
     protected:
-        std::shared_ptr<std::vector<std::vector<double>>> AllocateOutputs() const;
+        std::vector<std::vector<double>> AllocateOutputs() const;
 
         // members
         std::vector<std::shared_ptr<Layer>> _layers;
