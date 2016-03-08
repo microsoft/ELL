@@ -45,11 +45,6 @@ namespace utilities
     template<typename ElementType>
     void XMLSerializer::Serialize(const char* name, const std::vector<ElementType>& value)
     {
-        if (value.size() == 0)
-        {
-            throw std::runtime_error("cannot serialize a zero-size vector");
-        }
-
         Indent();
         auto size = value.size();
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
