@@ -16,6 +16,9 @@
 // layers
 #include "Sum.h"
 
+// stl
+#include <iostream>
+
 /// <summary> A struct that adds printing capabilities to a layer. </summary>
 struct PrintableSum : public layers::Sum, public PrintableLayer
 {
@@ -30,5 +33,5 @@ public:
     /// <param name="Arguments"> The arguments. </param>
     ///
     /// <returns> A LayerLayout. </returns>
-    virtual LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const override;
+    virtual LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const override;
 };

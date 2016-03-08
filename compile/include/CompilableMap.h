@@ -32,7 +32,7 @@ public:
     ///
     /// <param name="coordinateList"> List of output coordinates, whose values must be computed. </param>
     /// <param name="os"> [in,out] Stream to write data to. </param>
-    void ToCode(layers::CoordinateList coordinateList, ostream& os) const;
+    void ToCode(layers::CoordinateList coordinateList, std::ostream& os) const;
 
     /// <summary> Deserializes the Map in json format. </summary>
     ///

@@ -13,7 +13,11 @@
 #include "PrintableLayer.h"
 #include "LayerLayout.h"
 
+// layer
 #include "Coordinatewise.h"
+
+// stl
+#include <iostream>
 
 /// <summary> A printable coordinatewise. </summary>
 struct PrintableCoordinatewise : public layers::Coordinatewise, public PrintableLayer
@@ -34,5 +38,5 @@ public:
     /// <param name="Arguments"> The arguments. </param>
     ///
     /// <returns> A LayerLayout. </returns>
-    virtual LayerLayout Print(ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const override;
+    virtual LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const override;
 };

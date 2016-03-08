@@ -69,7 +69,7 @@ void testGemv(const MatrixType1& M1, const MatrixType2& M2, double alpha, double
     std::string name1 = typeid(MatrixType1).name();
     std::string name2 = typeid(MatrixType2).name();
 
-    testing::ProcessTest("Comapring " + name1 + "::Gemv() and " + name2 + "::Gemv() with arguments " + std::to_string(alpha) + ", " + std::to_string(beta), testing::IsEqual(output1, output2, 1.0e-8));
+    testing::ProcessTest("Comparing " + name1 + "::Gemv() and " + name2 + "::Gemv() with arguments " + std::to_string(alpha) + ", " + std::to_string(beta), testing::IsEqual(output1, output2, 1.0e-8));
 }
 
 /// Tests Gemv() for all matrix types

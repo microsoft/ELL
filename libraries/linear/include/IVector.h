@@ -20,6 +20,8 @@
 
 namespace linear
 {
+    class DoubleVector;
+
     /// <summary>
     /// Base class for double precision algebraic vectors.
     /// </summary>
@@ -30,12 +32,12 @@ namespace linear
         /// <summary> Returns the Size of the vector. </summary>
         ///
         /// <returns> The size of the vector. </returns>
-        virtual uint64 Size() const =0;
+        virtual uint64 Size() const = 0;
 
         /// <summary> Computes the squared 2-norm. </summary>
         ///
         /// <returns> The squared 2-norm. </returns>
-        virtual double Norm2() const =0;
+        virtual double Norm2() const = 0;
 
         /// <summary> Performs the operation: other += scalar * (*this), where other is a std::vector. </summary>
         ///
@@ -44,7 +46,7 @@ namespace linear
         void AddTo(std::vector<double>& other, double scalar = 1.0) const;
 
         /// <summary>
-        /// Performs the operation: (*p_other) += scalar * (*this), where other is a dense std::vector.
+        /// Performs the operation: (*p_other) += scalar * (*this), where other is an array of doubles.
         /// </summary>
         ///
         /// <param name="p_other"> [in,out] The other vector. </param>

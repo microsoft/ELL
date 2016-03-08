@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     DoubleSubvectorCref.h (linear)
+//  File:     DoubleSubvector.h (linear)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
@@ -14,28 +14,29 @@
 #include "DoubleVector.h"
 
 // stl
+#include <iostream>
 #include <functional>
 #include <vector>
 
 namespace linear
 {
     /// <summary> Implements a class that references a subvector. </summary>
-    class DoubleSubvectorCref : public IVector
+    class DoubleSubvector: public IVector
     {
     public:
 
-        /// <summary> Constructs a DoubleSubvectorCref. </summary>
+        /// <summary> Constructs a DoubleSubvector. </summary>
         ///
         /// <param name="vec"> The vector to reference. </param>
         /// <param name="offset"> The offset, 0 by default. </param>
         /// <param name="size"> The nmumber of elements in the subvector, the end of the vector by default. </param>
-        DoubleSubvectorCref(const DoubleVector& vec, uint64 offset = 0, uint64 size = UINT64_MAX);
+        DoubleSubvector(const DoubleVector& vec, uint64 offset = 0, uint64 size = UINT64_MAX);
 
-        /// <summary> Constructs a DoubleSubvectorCref. </summary>
+        /// <summary> Constructs a DoubleSubvector. </summary>
         ///
         /// <param name="ptr"> A pointer to the first element to reference. </param>
         /// <param name="size"> The number of elements in the subvector. </param>
-        DoubleSubvectorCref(const double* ptr, uint64 size);
+        DoubleSubvector(const double* ptr, uint64 size);
 
         /// <summary> Computes the squared 2-norm. </summary>
         ///
@@ -58,7 +59,7 @@ namespace linear
         /// <summary> Prints the vector to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
-        virtual void Print(ostream & os) const override;
+        virtual void Print(std::ostream & os) const override;
 
         /// <summary> Returns the Size of the vector. </summary>
         ///

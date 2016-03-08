@@ -21,6 +21,7 @@
 #include <string>
 #include <memory>
 #include <functional>
+#include <vector>
 
 namespace
 {
@@ -100,7 +101,7 @@ R"aw(
 )aw";
 }
 
-void PrintElementDefinition(ostream& os, const std::string& id, double width, double height, double connectorRadius, double cornerRadius, bool hasInputConnector=true)
+void PrintElementDefinition(std::ostream& os, const std::string& id, double width, double height, double connectorRadius, double cornerRadius, bool hasInputConnector=true)
 {
     os << "            <g id=\"" << id << "\">\n";
     if (hasInputConnector)
@@ -112,7 +113,7 @@ void PrintElementDefinition(ostream& os, const std::string& id, double width, do
     os << "            </g>\n";
 }
 
-void PrintableMap::Print(ostream & os, const PrintArguments& Arguments)
+void PrintableMap::Print(std::ostream & os, const PrintArguments& Arguments)
 {
     os << "<html>\n<body>\n";
     utilities::PrintFormat(os, styleDefinitionFormat, Arguments.edgeStyle.dashStyle);
@@ -144,7 +145,7 @@ void PrintableMap::Print(ostream & os, const PrintArguments& Arguments)
 
     // print layer by layer
     double layerTop = Arguments.mapLayout.verticalMargin;
-    vector<LayerLayout> layouts;
+    std::vector<LayerLayout> layouts;
 
     for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
     {

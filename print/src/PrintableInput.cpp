@@ -11,7 +11,7 @@
 #include "PrintableInput.h"
 #include "SvgHelpers.h"
 
-LayerLayout PrintableInput::Print(ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const
+LayerLayout PrintableInput::Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const
 {
     // calculate the layout
     auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetTypeName(), Size(), Arguments.emptyElementLayout, Arguments.layerStyle);

@@ -17,15 +17,15 @@
 // testing
 #include "testing.h"
 
-// types
-#include "RealArray.h"
-
 // linear
 #include "DoubleVector.h"
 
+// types
+#include "StlIndexValueIteratorAdapter.h"
+
 // stl
 #include <iostream>
-#include<string>
+#include <string>
 #include <sstream>
 
 /// Generates a linear::DoubleVector
@@ -124,14 +124,14 @@ void addToTest()
     auto a1 = getVector();
     auto a2 = getVector();
 
-    types::DoubleArray b(15);
+    std::vector<double> b(15);
     b[3] = 1.0;
     b[4] = 1.0;
     b[12] = 1.0;
     b[13] = 1.0;
 
-    DataVectorType1 c1(b.GetIterator());
-    DataVectorType2 c2(b.GetIterator());
+    DataVectorType1 c1(types::MakeStlIndexValueIteratorAdapter(b));
+    DataVectorType2 c2(types::MakeStlIndexValueIteratorAdapter(b));
 
     c1.AddTo(a1);
     c2.AddTo(a2);

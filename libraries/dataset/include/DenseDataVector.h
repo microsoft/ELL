@@ -14,7 +14,7 @@
 
 // types
 #include "types.h"
-#include "RealArray.h"
+#include "StlIndexValueIteratorAdapter.h"
 
 // stl
 #include <vector>
@@ -32,19 +32,15 @@ namespace dataset
     class DenseDataVector : public IDataVector
     {
     public:
-
-        using Iterator = typename types::RealArray<ValueType>::Iterator;
+        using Iterator = types::StlIndexValueIteratorAdapter<ValueType>;
 
         /// <summary> Constructor. </summary>
         DenseDataVector();
 
-        // Converting constructor
-        //
-        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-
         /// <summary> Constructs an instance of DenseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
+        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         DenseDataVector(IndexValueIteratorType IndexValueIterator);
 
         /// <summary> Move constructor. </summary>
@@ -109,7 +105,7 @@ namespace dataset
 
     private:
         uint64 _num_nonzeros;
-        types::RealArray<ValueType> _data;
+        std::vector<ValueType> _data;
     };
 
     /// <summary> A float data vector. </summary>

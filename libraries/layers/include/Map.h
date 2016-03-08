@@ -15,9 +15,9 @@
 
 // types
 #include "types.h"
-#include "RealArray.h"
 
 // stl
+#include <iostream>
 #include <vector>
 #include <memory>
 #include <type_traits>
@@ -54,12 +54,12 @@ namespace layers
             IndexValue Get() const;
 
         protected:
-            std::shared_ptr<std::vector<types::DoubleArray>> _spOutputs;
+            std::vector<std::vector<double>> _outputs;
             const CoordinateList _outputCoordinates;
             uint64 _index;
 
             // private ctor, can only be called from Map class
-            Iterator(std::shared_ptr<std::vector<types::DoubleArray>> spOutput, const CoordinateList& outputCoordinates);
+            Iterator(std::vector<std::vector<double>>&& spOutput, const CoordinateList& outputCoordinates);
             friend Map;
         };
 
@@ -122,7 +122,7 @@ namespace layers
         /// <summary> Serializes the Map in json format. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
-        void Serialize(ostream& os) const;
+        void Serialize(std::ostream& os) const;
 
         /// <summary> Deserializes the Map in json format. </summary>
         ///
@@ -136,7 +136,7 @@ namespace layers
         static void DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<Layer>& spLayer);
 
     protected:
-        std::shared_ptr<std::vector<types::DoubleArray>> AllocateOutputs() const;
+        std::vector<std::vector<double>> AllocateOutputs() const;
 
         // members
         std::vector<std::shared_ptr<Layer>> _layers;

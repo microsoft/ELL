@@ -36,11 +36,11 @@ namespace layers
         auto coordinate = _outputCoordinates[_index];
         uint64 layerIndex = coordinate.GetLayerIndex();
         uint64 elementIndex = coordinate.GetElementIndex();
-        return IndexValue{ _index, (*_spOutputs)[layerIndex][elementIndex] };
+        return IndexValue{ _index, _outputs[layerIndex][elementIndex] };
     }
 
-    Map::Iterator::Iterator(std::shared_ptr<std::vector<types::DoubleArray>> spOutput, const CoordinateList& outputCoordinates) :
-        _spOutputs(spOutput),
+    Map::Iterator::Iterator(std::vector<std::vector<double>>&& outputs, const CoordinateList& outputCoordinates) :
+        _outputs(std::move(outputs)),
         _outputCoordinates(outputCoordinates),
         _index(0)
     {}
@@ -67,7 +67,7 @@ namespace layers
         serializer.Write("layers", _layers);
     }
 
-    void Map::Serialize(ostream& os) const // TODO erase
+    void Map::Serialize(std::ostream& os) const // TODO erase
     {
         utilities::JsonSerializer writer;
         writer.Write("Base", *this);
@@ -109,12 +109,12 @@ namespace layers
         spLayer->Deserialize(serializer, version);
     }
 
-    std::shared_ptr<std::vector<types::DoubleArray>> Map::AllocateOutputs() const
+    std::vector<std::vector<double>> Map::AllocateOutputs() const
     {
-        auto outputs = std::make_shared<std::vector<types::DoubleArray>>();
+        auto outputs = std::vector<std::vector<double>>{};
         for (uint64 i = 0; i < _layers.size(); ++i)
         {
-            outputs->emplace_back(_layers[i]->Size());
+            outputs.emplace_back(_layers[i]->Size());
         }
         return outputs;
     }

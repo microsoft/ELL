@@ -14,7 +14,7 @@
 PrintableCoordinatewise::PrintableCoordinatewise(layers::Layer::Type type) : Coordinatewise(type)
 {}
 
-LayerLayout PrintableCoordinatewise::Print(ostream & os, double left, double top, uint64 layerIndex, const PrintArguments & Arguments) const
+LayerLayout PrintableCoordinatewise::Print(std::ostream & os, double left, double top, uint64 layerIndex, const PrintArguments & Arguments) const
 {
     auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetTypeName(), Size(), Arguments.valueElementLayout, Arguments.layerStyle);
 

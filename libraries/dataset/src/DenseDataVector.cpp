@@ -46,7 +46,7 @@ namespace dataset
     template<typename ValueType>
     uint64 DenseDataVector<ValueType>::Size() const
     {
-        return _data.Size();
+        return _data.size();
     }
 
     template<typename ValueType>
@@ -90,13 +90,19 @@ namespace dataset
     template<typename ValueType>
     typename DenseDataVector<ValueType>::Iterator DenseDataVector<ValueType>::GetIterator() const
     {
-        return _data.GetIterator();
+        return types::MakeStlIndexValueIteratorAdapter(_data);
     }
 
     template<typename ValueType>
     void DenseDataVector<ValueType>::Print(std::ostream & os) const
     {
-        _data.Print(os);
+        auto iterator = GetIterator();
+        while (iterator.IsValid())
+        {
+            auto indexValue = iterator.Get();
+            os << indexValue.index << ':' << indexValue.value << '\t';
+            iterator.Next();
+        }
     }
 
     template class DenseDataVector<float>;
