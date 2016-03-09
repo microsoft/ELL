@@ -127,11 +127,10 @@ void XMLSerializationTest()
     vec[0]->Set();
     vec[1]->Set();
 
-    utilities::XMLSerializer serializer;
+    std::stringstream ss;
+    utilities::XMLSerializer serializer(ss);
     serializer.Serialize("vec", vec);
 
-    std::stringstream ss;
-    serializer.WriteToStream(ss);
     std::cout << ss.str() << std::endl;
 
     utilities::XMLDeserializer deserializer(ss);

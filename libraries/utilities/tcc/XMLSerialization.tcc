@@ -27,6 +27,7 @@ namespace
 
 namespace utilities
 {
+    // serialize fundamental types
     template<typename ValueType>
     void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
     {
@@ -42,6 +43,7 @@ namespace utilities
         }
     }
 
+    // serialize std::vector
     template<typename ElementType>
     void XMLSerializer::Serialize(const char* name, const std::vector<ElementType>& value)
     {
@@ -69,29 +71,7 @@ namespace utilities
         PrintFormat(_stream, formatEnd, typeName);
     }
 
-    template<typename ValueType>
-    void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
-    {
-        auto typeName = value.GetRuntimeTypeName();
-
-        Indent();
-        if (*name != '\0')
-        {
-            PrintFormat(_stream, formatBegin1, typeName, "name", name);
-        }
-        else
-        {
-            PrintFormat(_stream, formatBegin0, typeName);
-        }
-
-        ++_indentation;
-        value.Write(*this);
-        --_indentation;
-
-        Indent();
-        PrintFormat(_stream, formatEnd, typeName);
-    }
-
+    // serialize pointers to polymorphic classes
     template<typename ValueType>
     void XMLSerializer::Serialize(const char* name, const std::shared_ptr<ValueType>& spValue)
     {
@@ -123,6 +103,31 @@ namespace utilities
         PrintFormat(_stream, formatEnd, typeName);
     }
 
+    // serialize classes
+    template<typename ValueType>
+    void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
+    {
+        auto typeName = value.GetRuntimeTypeName();
+
+        Indent();
+        if (*name != '\0')
+        {
+            PrintFormat(_stream, formatBegin1, typeName, "name", name);
+        }
+        else
+        {
+            PrintFormat(_stream, formatBegin0, typeName);
+        }
+
+        ++_indentation;
+        value.Write(*this);
+        --_indentation;
+
+        Indent();
+        PrintFormat(_stream, formatEnd, typeName);
+    }
+
+    // deserialize fundamental types
     template<typename ValueType>
     void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
     {
@@ -137,6 +142,7 @@ namespace utilities
         }
     }
 
+    // deserialize std::vectors
     template<typename ElementType>
     void XMLDeserializer::Deserialize(const char* name, std::vector<ElementType>& value)
     {
@@ -163,6 +169,30 @@ namespace utilities
         MatchFormatThrowsExceptions(_pStr, formatEnd, Match(typeName));
     }
 
+    // deserialize pointers to polymorphic classes
+    template<typename ValueType>
+    void XMLDeserializer::Deserialize(const char* name, std::shared_ptr<ValueType>& spValue)
+    {
+        static_assert(std::is_polymorphic<ValueType>::value, "can only serialize shared_ptr to polymorphic classes");
+
+        auto typeName = TypeName<std::shared_ptr<ValueType>>::GetName();
+        std::string derivedTypeName;
+
+        if (*name != '\0')
+        {
+            MatchFormatThrowsExceptions(_pStr, formatBegin2, Match(typeName), Match("name"), Match(name), Match("type"), derivedTypeName);
+        }
+        else
+        {
+            MatchFormatThrowsExceptions(_pStr, formatBegin1, Match(typeName), Match("type"), derivedTypeName);
+        }
+
+        Read(derivedTypeName, spValue);
+        Deserialize("", *spValue);
+        MatchFormatThrowsExceptions(_pStr, formatEnd, Match(typeName));
+    }
+
+    // deserialize classes
     template<typename ValueType>
     void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
@@ -178,28 +208,6 @@ namespace utilities
 
         value.Read(*this);
 
-        MatchFormatThrowsExceptions(_pStr, formatEnd, Match(typeName));
-    }
-
-    template<typename ValueType>
-    void XMLDeserializer::Deserialize(const char* name, std::shared_ptr<ValueType>& spValue)
-    {
-        static_assert(std::is_polymorphic<ValueType>::value, "can only serialize shared_ptr to polymorphic classes");
-
-        auto typeName = TypeName<std::shared_ptr<ValueType>>::GetName();
-        std::string derivedTypeName; 
-
-        if (*name != '\0')
-        {
-            MatchFormatThrowsExceptions(_pStr, formatBegin2, Match(typeName), Match("name"), Match(name), Match("type"), derivedTypeName);
-        }
-        else
-        {
-            MatchFormatThrowsExceptions(_pStr, formatBegin1, Match(typeName), Match("type"), derivedTypeName);
-        }
-
-        Read(derivedTypeName, spValue);
-        Deserialize("", *spValue);
         MatchFormatThrowsExceptions(_pStr, formatEnd, Match(typeName));
     }
 }

@@ -30,6 +30,8 @@ namespace utilities
     {
     public:
 
+        XMLSerializer(std::ostream& stream);
+
         /// <summary> Serialize fundamental types. </summary>
         ///
         /// <typeparam name="ValueType"> The type being serialized. </typeparam>
@@ -62,17 +64,12 @@ namespace utilities
         template<typename ValueType>
         void Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
-        /// <summary> Writes the serialization to a stream. </summary>
-        ///
-        /// <param name="os"> [in,out] Stream to write data to. </param>
-        void WriteToStream(std::ostream& os) const;
-        
     private:
 
         void Indent();
 
         uint64 _indentation = 0;
-        std::stringstream _stream;
+        std::ostream& _stream;
     };
 
     /// <summary> An XML deserializer. </summary>
@@ -82,8 +79,8 @@ namespace utilities
 
         /// <summary> Constructs a XMLDeserializer. </summary>
         ///
-        /// <param name="is"> [in,out] The input stream. </param>
-        XMLDeserializer(std::istream& is);
+        /// <param name="iStream"> [in,out] The input stream. </param>
+        XMLDeserializer(std::istream& stream);
 
         /// <summary> Deserialize fundamental types. </summary>
         ///
