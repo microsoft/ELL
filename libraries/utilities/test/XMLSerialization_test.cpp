@@ -103,13 +103,13 @@ private:
     std::vector<float> v;
 };
 
-void Read(std::string derivedTypeName, std::shared_ptr<Base>& spValue)
+void Read(std::string runtimeTypeName, std::shared_ptr<Base>& spValue)
 {
-    if(derivedTypeName == "Derived1")
+    if(runtimeTypeName == "Derived1")
     {
         spValue = std::make_shared<Derived1>();
     }
-    else if(derivedTypeName == "Derived2")
+    else if(runtimeTypeName == "Derived2")
     {
         spValue = std::make_shared<Derived2>();
     }

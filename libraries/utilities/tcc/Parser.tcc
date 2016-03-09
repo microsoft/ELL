@@ -98,11 +98,11 @@ namespace utilities
         value = (short)x;
     }
 
-    // parser for std:string, scans until finding the \" character or until end of pStr
+    // parser for std:string, scans until finding the a character other than alphanumeric or '_'
     inline void cParse(const char* pStr, char*& pEnd, std::string& value)
     {
         const char* iter = pStr;
-        while (*iter != '\"' && *iter != '\0')
+        while (std::isalnum(*iter) || *iter == '_')
         {
             ++iter;
         }

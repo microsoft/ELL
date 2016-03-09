@@ -82,17 +82,17 @@ namespace utilities
         }
 
         auto typeName = TypeName<std::shared_ptr<ValueType>>::GetName();
-        auto derivedTypeName = spValue->GetRuntimeTypeName();
+        auto runtimeTypeName = spValue->GetRuntimeTypeName();
 
         Indent();
 
         if (*name != '\0')
         {
-            PrintFormat(_stream, formatBegin2, typeName, "name", name, "type", derivedTypeName);
+            PrintFormat(_stream, formatBegin1, typeName, "name", name);
         }
         else
         {
-            PrintFormat(_stream, formatBegin1, typeName, "type", derivedTypeName);
+            PrintFormat(_stream, formatBegin0, typeName);
         }
 
         ++_indentation;
@@ -176,19 +176,23 @@ namespace utilities
         static_assert(std::is_polymorphic<ValueType>::value, "can only serialize shared_ptr to polymorphic classes");
 
         auto typeName = TypeName<std::shared_ptr<ValueType>>::GetName();
-        std::string derivedTypeName;
+        std::string runtimeTypeName;
 
         if (*name != '\0')
         {
-            MatchFormatThrowsExceptions(_pStr, formatBegin2, Match(typeName), Match("name"), Match(name), Match("type"), derivedTypeName);
+            MatchFormatThrowsExceptions(_pStr, formatBegin1, Match(typeName), Match("name"), Match(name));
+            MatchFormatThrowsExceptions(_pStr, formatBegin0, runtimeTypeName);
         }
         else
         {
-            MatchFormatThrowsExceptions(_pStr, formatBegin1, Match(typeName), Match("type"), derivedTypeName);
+            MatchFormatThrowsExceptions(_pStr, formatBegin0, Match(typeName));
+            MatchFormatThrowsExceptions(_pStr, formatBegin0, runtimeTypeName);
         }
 
-        Read(derivedTypeName, spValue);
-        Deserialize("", *spValue);
+        Read(runtimeTypeName, spValue);
+        spValue->Read(*this);
+
+        MatchFormatThrowsExceptions(_pStr, formatEnd, Match(runtimeTypeName));
         MatchFormatThrowsExceptions(_pStr, formatEnd, Match(typeName));
     }
 
