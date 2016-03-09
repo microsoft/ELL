@@ -13,34 +13,34 @@ namespace types
     //
     // StlIndexValueIterator implementation
     //
-    template<typename ValueType>
-    StlIndexValueIterator<ValueType>::StlIndexValueIterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end), _index(0)
+    template <typename IteratorType, typename ValueType>
+    StlIndexValueIterator<IteratorType, ValueType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end) : _begin(begin), _end(end), _index(0)
     {
         SkipZeros();
     }
 
-    template<typename ValueType>
-    bool StlIndexValueIterator<ValueType>::IsValid() const
+    template <typename IteratorType, typename ValueType>
+    bool StlIndexValueIterator<IteratorType, ValueType>::IsValid() const
     {
         return (_begin != _end);
     }
 
-    template<typename ValueType>
-    void StlIndexValueIterator<ValueType>::Next()
+    template <typename IteratorType, typename ValueType>
+    void StlIndexValueIterator<IteratorType, ValueType>::Next()
     {
         ++_begin;
         ++_index;
         SkipZeros();
     }
 
-    template<typename ValueType>
-    IndexValue StlIndexValueIterator<ValueType>::Get() const
+    template <typename IteratorType, typename ValueType>
+    IndexValue StlIndexValueIterator<IteratorType, ValueType>::Get() const
     {
         return IndexValue{ _index, (double)*_begin };
     }
 
-    template<typename ValueType>
-    void StlIndexValueIterator<ValueType>::SkipZeros()
+    template <typename IteratorType, typename ValueType>
+    void StlIndexValueIterator<IteratorType, ValueType>::SkipZeros()
     {
         while (_begin < _end && *_begin == 0)
         {
@@ -53,10 +53,8 @@ namespace types
     // Convenience function to create iterator
     //
     template <typename ValueType>
-    StlIndexValueIterator<ValueType> inline MakeStlIndexValueIterator(const std::vector<ValueType>& arr)
+    VectorIndexValueIterator<ValueType> inline MakeStlIndexValueIterator(const std::vector<ValueType>& arr)
     {
-        return StlIndexValueIterator<ValueType>(arr.cbegin(), arr.cend());
+        return VectorIndexValueIterator<ValueType>(arr.cbegin(), arr.cend());
     }
-
-
 }

@@ -26,6 +26,8 @@ namespace linear
     class DoubleVector : public IVector
     {
     public:
+        using Iterator = types::VectorIndexValueIterator<double>;
+
         /// <summary> Constructs an instance of DoubleVector. </summary>
         ///
         /// <param name="size"> The size. </param>
@@ -100,7 +102,7 @@ namespace linear
         /// <summary> Returns an IndexValueIterator for the vector. </summary>
         ///
         /// <returns> An IndexValueIterator. </returns>
-        types::StlIndexValueIterator<double> GetIterator() const;
+        Iterator GetIterator() const;
 
         /// <summary> Returns the Size of the vector. </summary>
         ///

@@ -13,6 +13,10 @@
 #include "IVector.h"
 #include "DoubleVector.h"
 
+// types
+#include "types.h"
+#include "StlIndexValueIterator.h"
+
 // stl
 #include <iostream>
 #include <functional>
@@ -24,7 +28,7 @@ namespace linear
     class DoubleSubvector: public IVector
     {
     public:
-
+        using Iterator = types::StlIndexValueIterator<const double*, double>;
         /// <summary> Constructs a DoubleSubvector. </summary>
         ///
         /// <param name="vec"> The vector to reference. </param>
@@ -37,6 +41,16 @@ namespace linear
         /// <param name="ptr"> A pointer to the first element to reference. </param>
         /// <param name="size"> The number of elements in the subvector. </param>
         DoubleSubvector(const double* ptr, uint64 size);
+
+        /// <summary> Returns an IndexValueIterator for the vector. </summary>
+        ///
+        /// <returns> An IndexValueIterator. </returns>
+        Iterator GetIterator() const;
+
+        /// <summary> Returns the Size of the vector. </summary>
+        ///
+        /// <returns> An uint64. </returns>
+        virtual uint64 Size() const override;
 
         /// <summary> Computes the squared 2-norm. </summary>
         ///
@@ -60,11 +74,6 @@ namespace linear
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream & os) const override;
-
-        /// <summary> Returns the Size of the vector. </summary>
-        ///
-        /// <returns> An uint64. </returns>
-        virtual uint64 Size() const override;
 
     private:
         const double* _ptr;

@@ -23,6 +23,16 @@ namespace linear
     DoubleSubvector::DoubleSubvector(const double * ptr, uint64 size) : _ptr(ptr), _size(size)
     {}
 
+    DoubleSubvector::Iterator DoubleSubvector::GetIterator() const
+    {
+        return Iterator(_ptr, _ptr+_size);
+    }
+
+    uint64 DoubleSubvector::Size() const
+    {
+        return _size;
+    }
+
     double DoubleSubvector::Norm2() const
     {
         double result = 0.0;
@@ -56,14 +66,12 @@ namespace linear
 
     void DoubleSubvector::Print(std::ostream & os) const
     {
-        for (uint64 index = 0; index < _size; ++index)
+        auto iterator = GetIterator();
+        while (iterator.IsValid())
         {
-            os << index << ':' << _ptr[index] << '\t';
+            auto indexValue = iterator.Get();
+            os << indexValue.index << ':' << indexValue.value << '\t';
+            iterator.Next();
         }
-    }
-
-    uint64 DoubleSubvector::Size() const
-    {
-        return _size;
     }
 }

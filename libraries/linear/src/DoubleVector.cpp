@@ -60,7 +60,7 @@ namespace linear
         return result;
     }
 
-    types::StlIndexValueIterator<double> DoubleVector::GetIterator() const
+    DoubleVector::Iterator DoubleVector::GetIterator() const
     {
         return types::MakeStlIndexValueIterator(_data);
     }
