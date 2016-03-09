@@ -73,15 +73,15 @@ namespace utilities
 
     // serialize pointers to polymorphic classes
     template<typename ValueType>
-    void XMLSerializer::Serialize(const char* name, const std::shared_ptr<ValueType>& spValue)
+    void XMLSerializer::Serialize(const char* name, const std::unique_ptr<ValueType>& spValue)
     {
-        static_assert(std::is_polymorphic<ValueType>::value, "can only serialize shared_ptr to polymorphic classes");
+        static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
         if (spValue == nullptr)
         {
             throw std::runtime_error("cannot serialize a null pointer");
         }
 
-        auto typeName = TypeName<std::shared_ptr<ValueType>>::GetName();
+        auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
         auto runtimeTypeName = spValue->GetRuntimeTypeName();
 
         Indent();
@@ -171,11 +171,11 @@ namespace utilities
 
     // deserialize pointers to polymorphic classes
     template<typename ValueType>
-    void XMLDeserializer::Deserialize(const char* name, std::shared_ptr<ValueType>& spValue)
+    void XMLDeserializer::Deserialize(const char* name, std::unique_ptr<ValueType>& spValue)
     {
-        static_assert(std::is_polymorphic<ValueType>::value, "can only serialize shared_ptr to polymorphic classes");
+        static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
 
-        auto typeName = TypeName<std::shared_ptr<ValueType>>::GetName();
+        auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
         std::string runtimeTypeName;
 
         if (*name != '\0')

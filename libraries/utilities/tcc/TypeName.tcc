@@ -17,7 +17,7 @@ namespace utilities
     }
 
     template<typename T>
-    std::string TypeName<std::shared_ptr<T>>::GetName()
+    std::string TypeName<std::unique_ptr<T>>::GetName()
     {
         return std::string("ptr") + typeNameLeftBracket + TypeName<T>::GetName() + typeNameRightBracket;
     }

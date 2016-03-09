@@ -103,15 +103,15 @@ private:
     std::vector<float> v;
 };
 
-void Read(std::string runtimeTypeName, std::shared_ptr<Base>& spValue)
+void Read(std::string runtimeTypeName, std::unique_ptr<Base>& spValue)
 {
     if(runtimeTypeName == "Derived1")
     {
-        spValue = std::make_shared<Derived1>();
+        spValue = std::make_unique<Derived1>();
     }
     else if(runtimeTypeName == "Derived2")
     {
-        spValue = std::make_shared<Derived2>();
+        spValue = std::make_unique<Derived2>();
     }
     else
     {
@@ -121,9 +121,9 @@ void Read(std::string runtimeTypeName, std::shared_ptr<Base>& spValue)
 
 void XMLSerializationTest()
 {
-    std::vector<std::shared_ptr<Base>> vec;
-    vec.push_back(std::make_shared<Derived1>());
-    vec.push_back(std::make_shared<Derived2>());
+    std::vector<std::unique_ptr<Base>> vec;
+    vec.push_back(std::make_unique<Derived1>());
+    vec.push_back(std::make_unique<Derived2>());
     vec[0]->Set();
     vec[1]->Set();
 
@@ -134,7 +134,7 @@ void XMLSerializationTest()
     std::cout << ss.str() << std::endl;
 
     utilities::XMLDeserializer deserializer(ss);
-    std::vector<std::shared_ptr<Base>> vec2;
+    std::vector<std::unique_ptr<Base>> vec2;
     deserializer.Deserialize("vec", vec2);
 
     testing::ProcessTest("utilities::XMLSerialization", vec2[0]->Check() && vec[1]->Check());

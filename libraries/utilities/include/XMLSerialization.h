@@ -54,7 +54,7 @@ namespace utilities
         /// <param name="name"> Name of the variable being serialized. </param>
         /// <param name="value"> The variable being serialized. </param>
         template<typename ValueType>
-        void Serialize(const char* name, const std::shared_ptr<ValueType>& spValue);
+        void Serialize(const char* name, const std::unique_ptr<ValueType>& spValue);
 
         /// <summary> Serialize class types. </summary>
         ///
@@ -104,7 +104,7 @@ namespace utilities
         /// <param name="name"> Name of the variable being deserialized, which is compared to the serialized version. </param>
         /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
         template<typename ValueType>
-        void Deserialize(const char* name, std::shared_ptr<ValueType>& spValue);
+        void Deserialize(const char* name, std::unique_ptr<ValueType>& spValue);
 
         /// <summary> Deserialize class types. </summary>
         ///

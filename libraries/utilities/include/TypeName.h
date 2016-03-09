@@ -35,11 +35,11 @@ namespace utilities
         static std::string GetName();
     };
 
-    /// <summary> Class used to get information about shared_ptr types. </summary>
+    /// <summary> Class used to get information about unique_ptr types. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<typename T>
-    struct TypeName<std::shared_ptr<T>>
+    struct TypeName<std::unique_ptr<T>>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
