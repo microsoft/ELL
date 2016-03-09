@@ -234,7 +234,7 @@ namespace utilities
     template<typename ValueType>
     void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
-        auto typeName = value.GetRuntimeTypeName();
+        auto typeName = ValueType::GetTypeName();
         MatchFormatThrowsExceptions(_pStr, formatOpenTag1, Match(typeName), Match("name"), Match(name));
 
         value.Read(*this);
@@ -293,7 +293,7 @@ namespace utilities
     template<typename ValueType>
     void XMLDeserializer::DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
-        auto typeName = value.GetRuntimeTypeName();
+        auto typeName = ValueType::GetTypeName();
         MatchFormatThrowsExceptions(_pStr, formatOpenTag0, Match(typeName));
 
         value.Read(*this);

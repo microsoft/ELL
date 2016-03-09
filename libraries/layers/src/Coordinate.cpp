@@ -30,6 +30,18 @@ namespace layers
         return "Coordinate";
     }
 
+    void Coordinate::Read(utilities::XMLDeserializer& deserializer)
+    {
+        deserializer.Deserialize("l", _layerIndex);
+        deserializer.Deserialize("e", _elementIndex);
+    }
+
+    void Coordinate::Write(utilities::XMLSerializer& serializer) const
+    {
+        serializer.Serialize("l", _layerIndex);
+        serializer.Serialize("e", _elementIndex);
+    }
+
     void Coordinate::Serialize(utilities::JsonSerializer& serializer) const
     {
       serializer.Write("l", (Json::UInt64)_layerIndex); 

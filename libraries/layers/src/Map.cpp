@@ -67,7 +67,27 @@ namespace layers
         return "Map";
     }
 
-    void Map::Serialize(utilities::JsonSerializer & serializer) const
+    void Map::Read(utilities::XMLDeserializer& deserializer)
+    {
+        //int version = 0;
+        //deserializer.Deserialize("version", version);
+        //if (version == 1)
+        //{
+        //    deserializer.Deserialize("layers", _layers);
+        //}
+        //else
+        //{
+        //    throw std::runtime_error("unsupported version: " + std::to_string(version));
+        //}
+    }
+
+    void Map::Write(utilities::XMLSerializer& serializer) const
+    {
+        //serializer.Serialize("version", _currentVersion);
+        //serializer.Serialize("layers", _layers);
+    }
+
+    void Map::Serialize(utilities::JsonSerializer& serializer) const
     {
         serializer.Write("layers", _layers);
     }

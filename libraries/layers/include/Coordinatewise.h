@@ -79,6 +79,9 @@ namespace layers
         /// <returns> The name of this type. </returns>
         virtual const char* GetRuntimeTypeName() const override;
 
+        virtual void Read(utilities::XMLDeserializer& deserializer) override;
+        virtual void Write(utilities::XMLSerializer& serializer) const override;
+
         // TODO: remove JSON serializaiton
 
         /// <summary> Serializes the Layer in json format. </summary>

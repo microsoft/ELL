@@ -15,6 +15,7 @@
 
 // utilities
 #include "JsonSerializer.h"
+#include "XMLSerialization.h"
 
 // stl
 #include <vector>
@@ -47,6 +48,9 @@ namespace layers
         ///
         /// <returns> The name of this type. </returns>
         static const char* GetTypeName();
+
+        void Read(utilities::XMLDeserializer& deserializer);
+        void Write(utilities::XMLSerializer& serializer) const;
 
         // TODO: remove JSON serializaiton
 
