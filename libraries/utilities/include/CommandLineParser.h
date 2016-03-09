@@ -10,6 +10,9 @@
 
 #pragma once
 
+// types
+#include "types.h"
+
 // stl
 #include <iostream>
 #include <vector>
@@ -21,28 +24,11 @@
 
 namespace utilities
 {
-    /// <summary> A struct containing all the information about a particular command-line option. </summary>
-    struct OptionInfo
-    {
-        std::string name;
-        std::string shortName;
-        std::string description;
-        std::string defaultValueString;
-        std::string currentValueString;
-        std::vector<std::string> enum_values;
-
-        std::vector<std::function<bool(std::string)>> set_value_callbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
-        std::vector<std::function<bool(std::string)>> didSetValueCallbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
-
-        OptionInfo()
-        {}
-
-        // TODO: document
-        //
-        OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback);
-    };
-
-    /// <summary> The result returned from parser callback routines. </summary>
+    /// <summary>
+    /// The result returned from post-parse callback routines.
+    /// A user-specified post-parse validation routine should return an instance of this class
+    /// to indicate whether or not there was an error with the parameter configuration.
+    /// </summary>
     class CommandLineParseResult
     {
     public:
@@ -78,7 +64,6 @@ namespace utilities
         std::vector<std::string> _messages;
         bool _isOK;
     };
-
 
     class ParsedArgSet;
 
@@ -174,6 +159,27 @@ namespace utilities
             std::string EntryString; // option name for option, docstring for std::string
 
             DocumentationEntry(Type t, std::string str) : EntryType(t), EntryString(str) {}
+        };
+
+        struct OptionInfo
+        {
+            std::string name;
+            std::string shortName;
+            std::string description;
+            std::string defaultValueString;
+            std::string currentValueString;
+            std::vector<std::string> enum_values;
+            
+            std::vector<std::function<bool(std::string)>> set_value_callbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
+            std::vector<std::function<bool(std::string)>> didSetValueCallbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
+            
+            OptionInfo()
+            {}
+            
+            OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback);
+
+            std::string optionNameString() const;
+            uint64 optionNameHelpLength() const;
         };
 
         std::vector<std::string> _originalArgs;

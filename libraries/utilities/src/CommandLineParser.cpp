@@ -81,10 +81,36 @@ namespace utilities
     }
 
     //
-    // OptionInfo class
+    // OptionInfo internal class
     //
-    OptionInfo::OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback) : name(name), shortName(shortName), description(description), defaultValueString(defaultValue), set_value_callbacks({ set_value_callback })
+    CommandLineParser::OptionInfo::OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback) : name(name), shortName(shortName), description(description), defaultValueString(defaultValue), set_value_callbacks({ set_value_callback })
     {}
+
+    std::string CommandLineParser::OptionInfo::optionNameString() const
+    {
+        if (shortName == "")
+        {
+            return name + " [" + defaultValueString + "]";
+        }
+        else
+        {
+            return name + " (-" + shortName + ") [" + defaultValueString + "]";
+        }
+    }
+
+    uint64 CommandLineParser::OptionInfo::optionNameHelpLength() const
+    {
+        uint64 len = name.size() + 2;
+        if (shortName != "")
+        {
+            len += (shortName.size() + 4);
+        }
+
+        len += defaultValueString.size() + 3; // 3 for " [" + "]" at begin/end
+
+        const uint64 maxNameLen = 32;
+        return std::min(maxNameLen, len);
+    }
 
     //
     // CommandLineParser class
@@ -359,32 +385,6 @@ namespace utilities
         _docEntries.emplace_back(DocumentationEntry::Type::str, str);
     }
 
-    std::string option_name_string(const OptionInfo& option)
-    {
-        if (option.shortName == "")
-        {
-            return option.name + " [" + option.defaultValueString + "]";
-        }
-        else
-        {
-            return option.name + " (-" + option.shortName + ") [" + option.defaultValueString + "]";
-        }
-    }
-
-    uint64 optionNameHelpLength(const OptionInfo& option)
-    {
-        uint64 len = option.name.size() + 2;
-        if (option.shortName != "")
-        {
-            len += (option.shortName.size() + 4);
-        }
-
-        len += option.defaultValueString.size() + 3; // 3 for " [" + "]" at begin/end
-
-        const uint64 maxNameLen = 32;
-        return std::min(maxNameLen, len);
-    }
-
     std::string CommandLineParser::GetHelpString()
     {
         std::stringstream out;
@@ -394,7 +394,7 @@ namespace utilities
         {
             if (iter.first == iter.second.name) // wasn't a previously-undefined option
             {
-                longest_name = std::max(longest_name, optionNameHelpLength(iter.second));
+                longest_name = std::max(longest_name, iter.second.optionNameHelpLength());
             }
         }
 
@@ -408,8 +408,8 @@ namespace utilities
             case DocumentationEntry::Type::option:
             {
                 const OptionInfo& info = _options[entry.EntryString];
-                std::string option_name = option_name_string(info);
-                uint64 thisOptionNameLen = optionNameHelpLength(info);
+                std::string option_name = info.optionNameString();
+                uint64 thisOptionNameLen = info.optionNameHelpLength();
                 uint64 pad_len = 2 + (longest_name - thisOptionNameLen);
                 std::string padding(pad_len, ' ');
                 out << "\t--" << option_name << padding << info.description;
