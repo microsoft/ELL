@@ -65,6 +65,21 @@ namespace utilities
         void Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
     private:
+        template<typename ValueType>
+        void WriteSingleLineTags(const std::string& tagName, const ValueType& value);
+
+        template<typename ValueType>
+        void WriteSingleLineTags(const std::string& tagName, const std::string& name, const ValueType& value);
+
+        void WriteOpenTag(const std::string& tagName);
+
+        template <typename ValueType>
+        void WriteOpenTag(const std::string& tagName, const std::string& attributeName, const ValueType& attributeValue);
+
+        template <typename ValueType1, typename ValueType2>
+        void WriteOpenTag(const std::string& tagName, const std::string& attributeName1, const ValueType1& attributeValue1, const std::string& attributeName2, const ValueType2& attributeValue2);
+
+        void WriteCloseTag(const std::string& tagName);
 
         void Indent();
 
@@ -129,6 +144,18 @@ namespace utilities
 
     private:
 
+        template <typename TagType>
+        void ReadOpenTag(TagType&& tagName);
+
+        template <typename TagType, typename NameType, typename ValueType>
+        void ReadOpenTag(TagType&& tagName, NameType&& attributeName, ValueType&& attributeValue);
+
+        template <typename TagType, typename NameType1, typename ValueType1, typename NameType2, typename ValueType2>
+        void ReadOpenTag(TagType&& tagName, NameType1&& attributeName1, ValueType1&& attributeValue1, NameType2&& attributeName2, ValueType2&& attributeValue2);
+
+        template <typename TagType>
+        void ReadCloseTag(TagType&& tagName);            
+            
         template<typename ValueType>
         void DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
 

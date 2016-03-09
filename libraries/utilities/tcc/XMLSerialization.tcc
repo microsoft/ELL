@@ -27,33 +27,73 @@ namespace
 
 namespace utilities
 {
-    // serialize fundamental types
     template<typename ValueType>
-    void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
+    void XMLSerializer::WriteSingleLineTags(const std::string& tagName, const ValueType& value)
+    {
+        auto typeName = TypeName<ValueType>::GetName();
+        Indent();
+        PrintFormat(_stream, formatOneLine0, typeName, value, typeName);
+    }
+
+    template<typename ValueType>
+    void XMLSerializer::WriteSingleLineTags(const std::string& tagName, const std::string& name, const ValueType& value)
     {
         auto typeName = TypeName<ValueType>::GetName();
         Indent();
         PrintFormat(_stream, formatOneLine1, typeName, "name", name, value, typeName);
     }
 
+    inline void XMLSerializer::WriteOpenTag(const std::string& tagName)
+    {
+        Indent();
+        PrintFormat(_stream, formatOpenTag0, tagName);
+        ++_indentation;
+    }
+
+    template <typename ValueType>
+    void XMLSerializer::WriteOpenTag(const std::string& tagName, const std::string& attributeName, const ValueType& attributeValue)
+    {
+        Indent();
+        PrintFormat(_stream, formatOpenTag1, tagName, attributeName, attributeValue);
+        ++_indentation;
+    }
+
+    template <typename ValueType1, typename ValueType2>
+    void XMLSerializer::WriteOpenTag(const std::string& tagName, const std::string& attributeName1, const ValueType1& attributeValue1, const std::string& attributeName2, const ValueType2& attributeValue2)
+    {
+        Indent();
+        PrintFormat(_stream, formatOpenTag2, tagName, attributeName1, attributeValue1, attributeName2, attributeValue2);
+        ++_indentation;
+    }
+
+    inline void XMLSerializer::WriteCloseTag(const std::string& tagName)
+    {
+        --_indentation;
+        Indent();
+        PrintFormat(_stream, formatCloseTag, tagName);
+    }
+
+    // serialize fundamental types
+    template<typename ValueType>
+    void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
+    {
+        auto typeName = TypeName<ValueType>::GetName();
+        WriteSingleLineTags(typeName, name, value);
+    }
+
     // serialize std::vector
     template<typename ElementType>
     void XMLSerializer::Serialize(const char* name, const std::vector<ElementType>& value)
     {
-        Indent();
         auto size = value.size();
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
-        PrintFormat(_stream, formatOpenTag2, typeName, "name", name, "size", size);
 
-        ++_indentation;
+        WriteOpenTag(typeName, "name", name, "size", size);
         for (uint64 i = 0; i < value.size(); ++i)
         {
             SerializeUnnamed(value[i]);
         }
-        --_indentation;
-
-        Indent();
-        PrintFormat(_stream, formatCloseTag, typeName);
+        WriteCloseTag(typeName);
     }
 
     // serialize pointers to polymorphic classes
@@ -69,23 +109,11 @@ namespace utilities
         auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
         auto runtimeTypeName = value->GetRuntimeTypeName();
 
-        Indent();
-        PrintFormat(_stream, formatOpenTag1, typeName, "name", name);
-
-        ++_indentation;
-        Indent();
-        PrintFormat(_stream, formatOpenTag0, runtimeTypeName);
-
-        ++_indentation;
+        WriteOpenTag(typeName, "name", name);
+        WriteOpenTag(runtimeTypeName);
         value->Write(*this);
-
-        --_indentation;
-        Indent();
-        PrintFormat(_stream, formatCloseTag, runtimeTypeName);
-
-        --_indentation;
-        Indent();
-        PrintFormat(_stream, formatCloseTag, typeName);
+        WriteCloseTag(runtimeTypeName);
+        WriteCloseTag(typeName);
     }
 
     // serialize classes
@@ -94,15 +122,9 @@ namespace utilities
     {
         auto typeName = ValueType::GetTypeName();
 
-        Indent();
-        PrintFormat(_stream, formatOpenTag1, typeName, "name", name);
-
-        ++_indentation;
+        WriteOpenTag(typeName, "name", name);
         value.Write(*this);
-        --_indentation;
-
-        Indent();
-        PrintFormat(_stream, formatCloseTag, typeName);
+        WriteCloseTag(typeName);
     }
 
     // serialize fundamental types
@@ -110,28 +132,22 @@ namespace utilities
     void XMLSerializer::SerializeUnnamed(const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
     {
         auto typeName = TypeName<ValueType>::GetName();
-        Indent();
-        PrintFormat(_stream, formatOneLine0, typeName, value, typeName);
+        WriteSingleLineTags(typeName, value);
     }
 
     // serialize std::vector
     template<typename ElementType>
     void XMLSerializer::SerializeUnnamed(const std::vector<ElementType>& value)
     {
-        Indent();
         auto size = value.size();
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
-        PrintFormat(_stream, formatOpenTag1, typeName, "size", size);
 
-        ++_indentation;
-        for (uint64 i = 0; i < value.size(); ++i)
+        WriteOpenTag(typeName, "size", size);
+        for (uint64 i = 0; i < size; ++i)
         {
             SerializeUnnamed(value[i]);
         }
-        --_indentation;
-
-        Indent();
-        PrintFormat(_stream, formatCloseTag, typeName);
+        WriteCloseTag(typeName);
     }
 
     // serialize pointers to polymorphic classes
@@ -147,23 +163,11 @@ namespace utilities
         auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
         auto runtimeTypeName = value->GetRuntimeTypeName();
 
-        Indent();
-        PrintFormat(_stream, formatOpenTag0, typeName);
-
-        ++_indentation;
-        Indent();
-        PrintFormat(_stream, formatOpenTag0, runtimeTypeName);
-
-        ++_indentation;
+        WriteOpenTag(typeName);
+        WriteOpenTag(runtimeTypeName);
         value->Write(*this);
-
-        --_indentation;
-        Indent();
-        PrintFormat(_stream, formatCloseTag, runtimeTypeName);
-
-        --_indentation;
-        Indent();
-        PrintFormat(_stream, formatCloseTag, typeName);
+        WriteCloseTag(runtimeTypeName);
+        WriteCloseTag(typeName);
     }
 
     // serialize classes
@@ -172,15 +176,37 @@ namespace utilities
     {
         auto typeName = ValueType::GetTypeName();
 
-        Indent();
-        PrintFormat(_stream, formatOpenTag0, typeName);
-
-        ++_indentation;
+        WriteOpenTag(typeName);
         value.Write(*this);
-        --_indentation;
+        WriteCloseTag(typeName);
+    }
 
-        Indent();
-        PrintFormat(_stream, formatCloseTag, typeName);
+    //
+    // XMLDeserializer
+    //
+
+    template <typename TagType>
+    void XMLDeserializer::ReadOpenTag(TagType&& tagName)
+    {
+        MatchFormatThrowsExceptions(_pStr, formatOpenTag0, tagName);
+    }
+
+    template <typename TagType, typename NameType, typename ValueType>
+    void XMLDeserializer::ReadOpenTag(TagType&& tagName, NameType&& attributeName, ValueType&& attributeValue)
+    {
+        MatchFormatThrowsExceptions(_pStr, formatOpenTag1, tagName, attributeName, attributeValue);
+    }
+
+    template <typename TagType, typename NameType1, typename ValueType1, typename NameType2, typename ValueType2>
+    void XMLDeserializer::ReadOpenTag(TagType&& tagName, NameType1&& attributeName1, ValueType1&& attributeValue1, NameType2&& attributeName2, ValueType2&& attributeValue2)
+    {
+        MatchFormatThrowsExceptions(_pStr, formatOpenTag2, tagName, attributeName1, attributeValue1, attributeName2, attributeValue2);
+    }
+
+    template <typename TagType>
+    void XMLDeserializer::ReadCloseTag(TagType&& tagName)
+    {
+        MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(tagName));
     }
 
     // deserialize fundamental types
@@ -199,7 +225,7 @@ namespace utilities
 
         uint64 size = 0;
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
-        MatchFormatThrowsExceptions(_pStr, formatOpenTag2, Match(typeName), Match("name"), Match(name), Match("size"), size);
+        ReadOpenTag(Match(typeName), Match("name"), Match(name), Match("size"), size);
 
         value.resize(size);
 
@@ -207,8 +233,7 @@ namespace utilities
         {
             DeserializeUnnamed(value[i]);
         }
-
-        MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(typeName));
+        ReadCloseTag(Match(typeName));
     }
 
     // deserialize pointers to polymorphic classes
@@ -220,14 +245,14 @@ namespace utilities
         auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
         std::string runtimeTypeName;
 
-        MatchFormatThrowsExceptions(_pStr, formatOpenTag1, Match(typeName), Match("name"), Match(name));
-        MatchFormatThrowsExceptions(_pStr, formatOpenTag0, runtimeTypeName);
+        ReadOpenTag(Match(typeName), Match("name"), Match(name));
+        ReadOpenTag(runtimeTypeName);
 
-        Read(runtimeTypeName, value);
+        Read(runtimeTypeName, value); 
         value->Read(*this);
 
-        MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(runtimeTypeName));
-        MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(typeName));
+        ReadCloseTag(Match(runtimeTypeName));
+        ReadCloseTag(Match(typeName));
     }
 
     // deserialize classes
@@ -235,11 +260,11 @@ namespace utilities
     void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
         auto typeName = ValueType::GetTypeName();
-        MatchFormatThrowsExceptions(_pStr, formatOpenTag1, Match(typeName), Match("name"), Match(name));
+        ReadOpenTag(Match(typeName), Match("name"), Match(name));
 
         value.Read(*this);
 
-        MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(typeName));
+        ReadCloseTag(Match(typeName));
     }
 
     // deserialize fundamental types
@@ -258,7 +283,7 @@ namespace utilities
 
         uint64 size = 0;
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
-        MatchFormatThrowsExceptions(_pStr, formatOpenTag1, Match(typeName), Match("size"), size);
+        ReadOpenTag(Match(typeName), Match("size"), size);
 
         value.resize(size);
 
@@ -267,7 +292,7 @@ namespace utilities
             DeserializeUnnamed(value[i]);
         }
 
-        MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(typeName));
+        ReadCloseTag(Match(typeName));
     }
 
     // deserialize pointers to polymorphic classes
@@ -279,14 +304,14 @@ namespace utilities
         auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
         std::string runtimeTypeName;
 
-        MatchFormatThrowsExceptions(_pStr, formatOpenTag0, Match(typeName));
-        MatchFormatThrowsExceptions(_pStr, formatOpenTag0, runtimeTypeName);
+        ReadOpenTag(Match(typeName));
+        ReadOpenTag(runtimeTypeName); 
 
-        Read(runtimeTypeName, value);
+        Read(runtimeTypeName, value); 
         value->Read(*this);
 
-        MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(runtimeTypeName));
-        MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(typeName));
+        ReadCloseTag(Match(runtimeTypeName));
+        ReadCloseTag(Match(typeName));
     }
 
     // deserialize classes
@@ -294,10 +319,10 @@ namespace utilities
     void XMLDeserializer::DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
         auto typeName = ValueType::GetTypeName();
-        MatchFormatThrowsExceptions(_pStr, formatOpenTag0, Match(typeName));
+        ReadOpenTag(Match(typeName));
 
         value.Read(*this);
 
-        MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(typeName));
+        ReadCloseTag(Match(typeName));
     }
 }
