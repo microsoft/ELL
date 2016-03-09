@@ -27,20 +27,21 @@ namespace
 
 namespace utilities
 {
+    //
+    // XMLSerializer class
+    //
     template<typename ValueType>
     void XMLSerializer::WriteSingleLineTags(const std::string& tagName, const ValueType& value)
     {
-        auto typeName = TypeName<ValueType>::GetName();
         Indent();
-        PrintFormat(_stream, formatOneLine0, typeName, value, typeName);
+        PrintFormat(_stream, formatOneLine0, tagName, value, tagName);
     }
 
     template<typename ValueType>
     void XMLSerializer::WriteSingleLineTags(const std::string& tagName, const std::string& name, const ValueType& value)
     {
-        auto typeName = TypeName<ValueType>::GetName();
         Indent();
-        PrintFormat(_stream, formatOneLine1, typeName, "name", name, value, typeName);
+        PrintFormat(_stream, formatOneLine1, tagName, "name", name, value, tagName);
     }
 
     inline void XMLSerializer::WriteOpenTag(const std::string& tagName)
@@ -89,7 +90,7 @@ namespace utilities
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
 
         WriteOpenTag(typeName, "name", name, "size", size);
-        for (uint64 i = 0; i < value.size(); ++i)
+        for (uint64 i = 0; i < size; ++i)
         {
             SerializeUnnamed(value[i]);
         }
@@ -182,7 +183,7 @@ namespace utilities
     }
 
     //
-    // XMLDeserializer
+    // XMLDeserializer class
     //
 
     template <typename TagType>
@@ -206,7 +207,19 @@ namespace utilities
     template <typename TagType>
     void XMLDeserializer::ReadCloseTag(TagType&& tagName)
     {
-        MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(tagName));
+        MatchFormatThrowsExceptions(_pStr, formatCloseTag, tagName);
+    }
+
+    template<typename TagType, typename ValueType>
+    void XMLDeserializer::ReadSingleLineTags(TagType&& tagName, ValueType&& value)
+    {
+        MatchFormatThrowsExceptions(_pStr, formatOneLine0, tagName, value, tagName);
+    }
+
+    template<typename TagType, typename NameType, typename AttributeType, typename ValueType>
+    void XMLDeserializer::ReadSingleLineTags(TagType&& tagName, NameType&& attributeName, AttributeType attributeValue, ValueType&& value)
+    {
+        MatchFormatThrowsExceptions(_pStr, formatOneLine1, tagName, attributeName, attributeValue, value, tagName);
     }
 
     // deserialize fundamental types
@@ -214,7 +227,7 @@ namespace utilities
     void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
     {
         auto typeName = TypeName<ValueType>::GetName();
-        MatchFormatThrowsExceptions(_pStr, formatOneLine1, Match(typeName), Match("name"), Match(name), value, Match(typeName));
+        ReadSingleLineTags(Match(typeName), Match("name"), Match(name), value);
     }
 
     // deserialize std::vectors
@@ -226,10 +239,8 @@ namespace utilities
         uint64 size = 0;
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
         ReadOpenTag(Match(typeName), Match("name"), Match(name), Match("size"), size);
-
         value.resize(size);
-
-        for (uint64 i = 0; i < value.size(); ++i)
+        for (uint64 i = 0; i < size; ++i)
         {
             DeserializeUnnamed(value[i]);
         }
@@ -248,7 +259,7 @@ namespace utilities
         ReadOpenTag(Match(typeName), Match("name"), Match(name));
         ReadOpenTag(runtimeTypeName);
 
-        Read(runtimeTypeName, value); 
+        Read(runtimeTypeName, value);
         value->Read(*this);
 
         ReadCloseTag(Match(runtimeTypeName));
@@ -261,9 +272,7 @@ namespace utilities
     {
         auto typeName = ValueType::GetTypeName();
         ReadOpenTag(Match(typeName), Match("name"), Match(name));
-
         value.Read(*this);
-
         ReadCloseTag(Match(typeName));
     }
 
@@ -272,7 +281,7 @@ namespace utilities
     void XMLDeserializer::DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
     {
         auto typeName = TypeName<ValueType>::GetName();
-        MatchFormatThrowsExceptions(_pStr, formatOneLine0, Match(typeName), value, Match(typeName));
+        ReadSingleLineTags(Match(typeName), value);
     }
 
     // deserialize std::vectors
@@ -283,15 +292,13 @@ namespace utilities
 
         uint64 size = 0;
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
+
         ReadOpenTag(Match(typeName), Match("size"), size);
-
         value.resize(size);
-
-        for (uint64 i = 0; i < value.size(); ++i)
+        for (uint64 i = 0; i < size; ++i)
         {
             DeserializeUnnamed(value[i]);
         }
-
         ReadCloseTag(Match(typeName));
     }
 
@@ -305,9 +312,9 @@ namespace utilities
         std::string runtimeTypeName;
 
         ReadOpenTag(Match(typeName));
-        ReadOpenTag(runtimeTypeName); 
+        ReadOpenTag(runtimeTypeName);
 
-        Read(runtimeTypeName, value); 
+        Read(runtimeTypeName, value);
         value->Read(*this);
 
         ReadCloseTag(Match(runtimeTypeName));
@@ -319,10 +326,9 @@ namespace utilities
     void XMLDeserializer::DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
         auto typeName = ValueType::GetTypeName();
+
         ReadOpenTag(Match(typeName));
-
         value.Read(*this);
-
         ReadCloseTag(Match(typeName));
     }
 }

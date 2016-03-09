@@ -95,7 +95,6 @@ namespace utilities
         template<typename ValueType>
         void SerializeUnnamed(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
-
         uint64 _indentation = 0;
         std::ostream& _stream;
     };
@@ -147,15 +146,21 @@ namespace utilities
         template <typename TagType>
         void ReadOpenTag(TagType&& tagName);
 
-        template <typename TagType, typename NameType, typename ValueType>
-        void ReadOpenTag(TagType&& tagName, NameType&& attributeName, ValueType&& attributeValue);
+        template <typename TagType, typename NameType, typename AttributeType>
+        void ReadOpenTag(TagType&& tagName, NameType&& attributeName, AttributeType&& attributeValue);
 
-        template <typename TagType, typename NameType1, typename ValueType1, typename NameType2, typename ValueType2>
-        void ReadOpenTag(TagType&& tagName, NameType1&& attributeName1, ValueType1&& attributeValue1, NameType2&& attributeName2, ValueType2&& attributeValue2);
+        template <typename TagType, typename NameType1, typename AttributeType1, typename NameType2, typename AttributeType2>
+        void ReadOpenTag(TagType&& tagName, NameType1&& attributeName1, AttributeType1&& attributeValue1, NameType2&& attributeName2, AttributeType2&& attributeValue2);
 
         template <typename TagType>
-        void ReadCloseTag(TagType&& tagName);            
-            
+        void ReadCloseTag(TagType&& tagName);
+
+        template<typename TagType, typename ValueType>
+        void ReadSingleLineTags(TagType&& tagName, ValueType&& value);
+
+        template<typename TagType, typename NameType, typename AttributeType, typename ValueType>
+        void ReadSingleLineTags(TagType&& tagName, NameType&& attributeName, AttributeType attributeValue, ValueType&& value);
+
         template<typename ValueType>
         void DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
 
