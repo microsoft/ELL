@@ -27,7 +27,7 @@ namespace utilities
     ///
     /// <returns> A Result. </returns>
     template<typename ValueType>
-    ParseResult Parse(const char*& pStr, /* out */ ValueType& value);
+    ParseResult Parse(const char*& pStr, ValueType& value);
 
     /// <summary> Advances pStr until it points to a non-whitespace character. </summary>
     ///

@@ -8,17 +8,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// cjacobs: Next steps to do: // TODO - chuck, please move this out of the code before we release
-// * Add policy field for options (required, std::set only once, std::set at least once, last wins, collect all, ...)
-// * Add more flexible constraints (using a callback?) for non-enum parameters
-// * have one "master" parser that has subordinate parsers to handle parameters for different modules (e.g., tree learner vs. booster vs. global optimizer)
-// * have conditional parsers whose std::set of known options depends on some other option --- maybe via polymorphism (so, have a gradient_descent parser and 
-//   a sdca parser, both of which are subclasses of a global_descent parser, the choice of which to use is conditional on the gd_alg option
-// * tokenize the input stream based on whitespace, then split on entries starting with '-' --- the first item will be the option, followed by zero or more values
-//   in this case, we maybe need to use the special '--' option to specify positional / unnamed arguments (and/or have them appear first)
-// * (optionally?) accept /arg instead of -arg or --arg
-
 #pragma once
+
+// types
+#include "types.h"
 
 // stl
 #include <iostream>
@@ -31,41 +24,38 @@
 
 namespace utilities
 {
-    // TODO: document
-    //
-    struct OptionInfo
-    {
-        std::string name;
-        std::string shortName;
-        std::string description;
-        std::string defaultValueString; // for printing
-        std::string currentValueString;
-        std::vector<std::string> enum_values; // for enumerated values // TODO: make this into a more general constraint mechanism (?)
-
-        std::vector<std::function<bool(std::string)>> set_value_callbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
-        std::vector<std::function<bool(std::string)>> didSetValueCallbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
-
-        // TODO: Add "policy" member (required, set_once, last_wins, etc.)
-
-        OptionInfo()
-        {}
-
-        // TODO: document
-        //
-        OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback);
-
-        // TODO: either have get_help_string() or print_help() methods for help and current value
-    };
-
-
+    /// <summary>
+    /// The result returned from post-parse callback routines.
+    /// A user-specified post-parse validation routine should return an instance of this class
+    /// to indicate whether or not there was an error with the parameter configuration.
+    /// </summary>
     class CommandLineParseResult
     {
     public:
-        CommandLineParseResult(); // No error
-        CommandLineParseResult(bool ok); // Error (if ok == false), no message
-        CommandLineParseResult(const char *message); // Error
-        CommandLineParseResult(const std::string& message); // Error
-        CommandLineParseResult(const std::vector<std::string>& messages); // list of errors (or success, if empty)
+        /// <summary> Result indicating no error </summary>
+        CommandLineParseResult();
+
+        /// <summary> Result indicating result with no message </summary>
+        ///
+        /// <param name="ok"> If false, this result indicates an error </param>
+        CommandLineParseResult(bool ok);
+
+        /// <summary> Result indicating an error with a message</summary>
+        ///
+        /// <param name="message"> The message accompanying this result </param>
+        CommandLineParseResult(const char *message);
+
+        /// <summary> Result indicating an error with a message</summary>
+        ///
+        /// <param name="message"> The message accompanying this result </param>
+        CommandLineParseResult(const std::string& message);
+
+        /// <summary> Result indicating a collection of zero or more errors with messages</summary>
+        ///
+        /// <param name="message"> The messages accompanying this result </param>
+        CommandLineParseResult(const std::vector<std::string>& messages);
+
+        /// <summary> Returns true if result is OK (there were no errors) </summary>
         operator bool();
 
         friend class CommandLineParser;
@@ -75,98 +65,90 @@ namespace utilities
         bool _isOK;
     };
 
-    class ParseError
-    {
-    public:
-        ParseError(const std::string& message);
-        std::string GetMessage() const;
-
-    private:
-        std::string _message;
-    };
-
-    // format of argv: Main.exe [options]
-    // where options are of the form "-<std::string> <option>" where the <option> part is mandatory (defaulting to 'true')
-    // options have two names, the short name is used with a single hyphen, and the long name with two
-    // e.g., "-s true" and "--serial_mode true" can mean the same thing
-    // options are queried by the long name
-    // short name is optional
-    // args are just strings at the end
-    // ex of valid commandlines:
-    // myexe.exe foo.tsv
-    // myexe.exe foo.tsv bar.tsv
-    // myexe.exe -t 8 -x blah foo.tsv bar.tsv
     class ParsedArgSet;
+
+    /// <summary> The command line parser class </summary>
     class CommandLineParser
     {
     public:
-    
-        // Constructor, takes arg list
-        //
+
+        /// <summary> Constructs a new CommandLineParser with the given argument strings </summary>
+        ///
+        /// <param name="argc"> The number of argument strings in the array of arguments </param>
+        /// <param name="argv"> The array of argument strings </param>
         CommandLineParser(int argc, char* argv[]);
         CommandLineParser(int argc, const char* argv[]);
-        
-        // AddOption adds a new option to the commandline parser
-        //
-        template <typename T, typename U>
-        void AddOption(T& option, std::string name, std::string shortName, std::string description, const U& defaultValue);
 
-        // AddOptionSet adds a ParsedArgSet to the commandline parser
-        //
+        /// <summary> Adds a new option to the command-line parser </summary>
+        ///
+        /// <param name="optionValue"> [out] A reference to the variable to get filled in by the parser </param> 
+        /// <param name="name"> The long name for the option. The option will be specified by '--' plus the long name (e.g., '--help') </param>
+        /// <param name="shortName"> [optional] The short name for the option. The option will be secified by '-' plus the short name (e.g., '-h') </param>
+        /// <param name="description"> The descriptive text that appears when help is requested </param>
+        /// <param name="defaultValue"> The default value for the option. The optionVal argument gets set to this if no value is specified on the command line </param>
+        template <typename T, typename U>
+        void AddOption(T& optionValue, std::string name, std::string shortName, std::string description, const U& defaultValue);
+
+        /// <summary> Adds a ParsedArgSet representing a bundle of options to the commandline parser </summary>
+        ///
+        /// <param name="options"> The ParsedArgSet containing the options </param>
         void AddOptionSet(ParsedArgSet& options);
 
-        // Adds a std::string that gets printed out when pring_usage() is called
-        //
-        virtual void AddDocumentationString(std::string str);
+        /// <summary> Adds a string that gets printed out help is requested </summary>
+        ///
+        /// <param name="docString"> The string to be printed </param>
+        virtual void AddDocumentationString(std::string docString);
 
-        // Parses the commandline. Call this after setting up the options with AddOption
-        //
-        void Parse();
-
-        // TODO: document
-        //
-        std::string GetHelpString();
-
-        // TODO: document
-        //
-        std::string GetCurrentValuesString();
-
-        std::string GetCommandLine() const;
-
-        std::string GetOptionValue(const std::string& option);
-
-        // TODO: document
-        //
-        bool HasOption(std::string option);
-
-        bool HasShortName(std::string shortName);
-
-        // Adds a callback std::function that gets invoked after Parse() is called
         using PostParseCallback = std::function<CommandLineParseResult(CommandLineParser&)>;
+
+        /// <summary> Adds a callback function that gets invoked after Parse() is called </summary>
+        ///
+        /// <param name="callback"> The callback function to invoke after parsing is done </param>
         void AddPostParseCallback(const PostParseCallback& callback);
 
-    protected:
+        /// <summary> Parses the commandline. Call this after setting up the options with AddOption and/or AddOptionSet </summary>
+        void Parse();
 
-        // TODO: document
-        //
+        /// <summary> Returns the help string </summary>
+        ///
+        /// <returns> The help string </returns>
+        std::string GetHelpString();
+
+        /// <summary> Returns a string describing the current values assigned to the options </summary>
+        ///
+        /// <returns> A string describing the current values assigned to the options </returns>
+        std::string GetCurrentValuesString();
+
+        /// <summary> Returns a copy of the original options passed to the command line </summary>
+        std::string GetCommandLine() const;
+
+        /// <summary> Returns the value of a given option (as a string) </summary>
+        std::string GetOptionValue(const std::string& option);
+
+        /// <summary> Returns true if the given option has been registered </summary>
+        ///
+        /// <param name="option"> The long name for the option </param>
+        /// <returns> true if the given option has been registered </returns>
+        bool HasOption(std::string option);
+
+        /// <summary> Returns true if the given short name has been registered </summary>
+        ///
+        /// <param name="shortName"> The short name </param>
+        /// <returns> true if the given short name has been registered </returns>
+        bool HasShortName(std::string shortName);
+
+    private:
+
         CommandLineParser(const CommandLineParser&) = delete;
 
-        // TODO: document
-        //
         void SetArgs(int argc, const char* argv[]);
 
-        // TODO: document
-        //
         template <typename T>
         static bool ParseVal(std::string str, T& result);
 
-        // TODO: document
-        //
         template <typename T>
         static bool ParseVal(std::string str, std::vector<std::pair<std::string, T>> val_names, T& result, std::string& resultString);
 
-        // TODO: document
-        //
         template <typename T>
         static std::string ToString(const T& val);
 
@@ -177,6 +159,27 @@ namespace utilities
             std::string EntryString; // option name for option, docstring for std::string
 
             DocumentationEntry(Type t, std::string str) : EntryType(t), EntryString(str) {}
+        };
+
+        struct OptionInfo
+        {
+            std::string name;
+            std::string shortName;
+            std::string description;
+            std::string defaultValueString;
+            std::string currentValueString;
+            std::vector<std::string> enum_values;
+            
+            std::vector<std::function<bool(std::string)>> set_value_callbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
+            std::vector<std::function<bool(std::string)>> didSetValueCallbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
+            
+            OptionInfo()
+            {}
+            
+            OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback);
+
+            std::string optionNameString() const;
+            uint64 optionNameHelpLength() const;
         };
 
         std::vector<std::string> _originalArgs;
@@ -192,47 +195,83 @@ namespace utilities
         bool SetDefaultArgs(const std::set<std::string>& unset_args); // returns true if we need to reparse
     };
 
-    // ParsedArgSet class
-    //
+    /// <summary> A mixin class to make parameter structs be parseable. </summary>
     class ParsedArgSet
     {
     public:
         ParsedArgSet();
 
+        /// <summary> 
+        /// Adds the arguments stored in this arg set to the command-line parser.
+        /// Subclasses should override this method and add their arguments to the parser.
+        /// </summary>
+        ///
+        /// <param name="parser"> The command-line parser to register arguments with </param>
         virtual void AddArgs(CommandLineParser& parser);
+
+        /// <summary> Called by the parser after parsing has been done. </summary>
+        ///
+        /// <param name="parser"> The command-line parser that parsed the arguments </param>
         virtual CommandLineParseResult PostProcess(const CommandLineParser& parser);
     };
 
     // Exceptions thrown by CommandLineParser: 
     //
+    /// <summary> The base class for all command-line parser-related exceptions. </summary>
     class CommandLineParserException : public std::runtime_error
     {
     public:
         CommandLineParserException(const char* message) : std::runtime_error(message) {};
     };
 
+    /// <summary> An object containing a parsing error message from the command-line parser. </summary>
+    class ParseError
+    {
+    public:
+        /// <summary> Gets the error message for this error </summary>
+        ///
+        /// <returns> The error message for this error </returns>
+        std::string GetMessage() const;
+
+        /// <summary> Constructor for ParseError class. Used by CommandLineParserErrorException. </summary>
+        ParseError(const std::string& message);
+    private:
+        std::string _message;
+    };
+
+    /// <summary> An exception representing an error during parsing. </summary>
     class CommandLineParserErrorException : CommandLineParserException
     {
     public:
-        CommandLineParserErrorException(const char* message) : CommandLineParserException(message){}
-        CommandLineParserErrorException(const char* message, std::vector<ParseError> errors) : CommandLineParserException(message), _errors(errors) {}
+        /// <summary> Returns list of parse errors that occured during parsing </summary>
+        ///
+        /// <returns> A list of parse errors that occured during parsing </returns>
         const std::vector<ParseError>& GetParseErrors() const { return _errors; }
 
+        /// <summary> Constructor. Called by command-line parser </summary>
+        CommandLineParserErrorException(const char* message) : CommandLineParserException(message) {}
+        CommandLineParserErrorException(const char* message, std::vector<ParseError> errors) : CommandLineParserException(message), _errors(errors) {}
     private:
         std::vector<ParseError> _errors;
     };
 
+    /// <summary> An exception indicating the "print help and exit" option was selected. </summary>
     class CommandLineParserPrintHelpException : public CommandLineParserException
     {
     public:
-        CommandLineParserPrintHelpException(std::string helpText) : CommandLineParserException(""), _helpText(helpText) {}
+        /// <summary> Returns help text describing the valid command-line options </summary>
+        ///
+        /// <returns> Help text describing the valid command-line options </returns>
         std::string GetHelpText() const { return _helpText; }
+
+        /// <summary> Constructor. Called by command-line parser </summary>
+        CommandLineParserPrintHelpException(std::string helpText) : CommandLineParserException(""), _helpText(helpText) {}
 
     private:
         std::string _helpText;
     };
 
-
+    /// <summary> An exception indicating an error with the supplied command-line parameters. </summary>
     class CommandLineParserInvalidOptionsException : public CommandLineParserException
     {
     public:

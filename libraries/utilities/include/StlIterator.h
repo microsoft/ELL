@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     StlIteratorAdapter.h (utilities)
+//  File:     StlIterator.h (utilities)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
@@ -17,14 +17,14 @@ namespace utilities
 {
     /// <summary> An adapter that transforms a pair of STL iterators into a read-only forward iterator with IsValid, Next, and Get functions</summary>
     template <typename IteratorType, typename ValueType = decltype(*std::declval<IteratorType>())>
-    class StlIteratorAdapter
+    class StlIterator
     {
     public:
         /// <summary> Constructor </summary>
         ///
         /// <param name="begin"> The STL iterator pointing to the beginning of the range to iterate over. </param>
         /// <param name="end"> The STL iterator pointing just past the end of the range to iterate over. </param>
-        StlIteratorAdapter(IteratorType begin, IteratorType end);
+        StlIterator(IteratorType begin, IteratorType end);
         
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
@@ -44,22 +44,22 @@ namespace utilities
         IteratorType _end;
     };
 
-    /// <summary> Convenience function for creating StlIteratorAdapters </summary>
+    /// <summary> Convenience function for creating StlIterators </summary>
     ///
     /// <param name="begin"> The STL iterator pointing to the beginning of the range to iterate over. </param>
     /// <param name="end"> The STL iterator pointing just past the end of the range to iterate over. </param>
     ///
-    /// <returns> A StlIteratorAdapter over the range specified by the begin and end iterators. </returns>
+    /// <returns> A StlIterator over the range specified by the begin and end iterators. </returns>
     template <typename IteratorType>
-    auto MakeStlIteratorAdapter(IteratorType begin, IteratorType end)->StlIteratorAdapter<IteratorType, decltype(*begin)>;
+    auto MakeStlIterator(IteratorType begin, IteratorType end)->StlIterator<IteratorType, decltype(*begin)>;
 
-    /// <summary> Convenience function for creating StlIteratorAdapters </summary>
+    /// <summary> Convenience function for creating StlIterators </summary>
     ///
     /// <param name="container"> The C++-conforming iterable container to iterate over. </param>
     ///
-    /// <returns> A StlIteratorAdapter over the container</returns>
+    /// <returns> A StlIterator over the container</returns>
     template <typename ContainerType>
-    auto MakeStlIteratorAdapter(ContainerType& container)->StlIteratorAdapter<typename ContainerType::iterator, typename ContainerType::value_type>;
+    auto MakeStlIterator(ContainerType& container)->StlIterator<typename ContainerType::iterator, typename ContainerType::value_type>;
 }
 
-#include "../tcc/StlIteratorAdapter.tcc"
+#include "../tcc/StlIterator.tcc"

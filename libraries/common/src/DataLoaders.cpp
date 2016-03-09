@@ -66,7 +66,7 @@ namespace common
         }
     }
 
-    std::unique_ptr<dataset::IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, /* out */ layers::Map& map, /* out */ layers::CoordinateList& inputCoordinates)
+    std::unique_ptr<dataset::IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, layers::Map& map, layers::CoordinateList& inputCoordinates)
     {
         map = layers::Map::Load(mapLoadArguments.inputMapFile);
 
@@ -77,7 +77,7 @@ namespace common
         return GetDataIterator(dataLoadArguments, map, inputCoordinates);
     }
 
-    void DataIteratorToRowDataset(dataset::IParsingIterator& dataIterator, /* out */ dataset::RowDataset& dataset)
+    void DataIteratorToRowDataset(dataset::IParsingIterator& dataIterator, dataset::RowDataset& dataset)
     {
         // Load row by row
         while (dataIterator.IsValid())
@@ -90,9 +90,9 @@ namespace common
     void GetRowDatasetMapCoordinates(
         const DataLoadArguments& dataLoadArguments,
         const MapLoadArguments& mapLoadArguments,
-        /* out */ dataset::RowDataset& rowDataset,
-        /* out */ layers::Map& map,
-        /* out */ layers::CoordinateList& inputCoordinates)
+        dataset::RowDataset& rowDataset,
+        layers::Map& map,
+        layers::CoordinateList& inputCoordinates)
     {
         // handle two cases - input map specified or unspecified
         if (mapLoadArguments.inputMapFile == "")

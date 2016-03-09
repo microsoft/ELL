@@ -42,7 +42,7 @@ namespace treeLayout
         _offset = value;
     }
 
-    Layout::Layout(size_t size, double min_offset, double max_offset, double min_depth, double max_depth) :
+    Layout::Layout(uint64 size, double min_offset, double max_offset, double min_depth, double max_depth) :
         _positions(size), _minOffset(min_offset), _maxOffset(max_offset), _minDepth(min_depth), _maxDepth(max_depth)
     {}
 

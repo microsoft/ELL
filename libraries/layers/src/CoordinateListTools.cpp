@@ -40,13 +40,13 @@ namespace
             {
                 ++pStr;
                 uint64 diff;
-                HandleErrors(utilities::Parse<uint64>(pStr, /* out */ diff));
+                HandleErrors(utilities::Parse<uint64>(pStr, diff));
                 index -= diff;
             }
         }
         else
         {
-            HandleErrors(utilities::Parse<uint64>(pStr, /* out */ index));
+            HandleErrors(utilities::Parse<uint64>(pStr, index));
         }
 
         if (index > maxIndex)

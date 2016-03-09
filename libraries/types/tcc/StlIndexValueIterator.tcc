@@ -11,16 +11,22 @@
 namespace types
 {
     //
-    // StlIndexValueIteratorAdapter implementation
+    // StlIndexValueIterator implementation
     //
     template<typename ValueType>
-    bool StlIndexValueIteratorAdapter<ValueType>::IsValid() const
+    StlIndexValueIterator<ValueType>::StlIndexValueIterator(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end), _index(0)
+    {
+        SkipZeros();
+    }
+
+    template<typename ValueType>
+    bool StlIndexValueIterator<ValueType>::IsValid() const
     {
         return (_begin != _end);
     }
 
     template<typename ValueType>
-    void StlIndexValueIteratorAdapter<ValueType>::Next()
+    void StlIndexValueIterator<ValueType>::Next()
     {
         ++_begin;
         ++_index;
@@ -28,19 +34,13 @@ namespace types
     }
 
     template<typename ValueType>
-    IndexValue StlIndexValueIteratorAdapter<ValueType>::Get() const
+    IndexValue StlIndexValueIterator<ValueType>::Get() const
     {
         return IndexValue{ _index, (double)*_begin };
     }
 
     template<typename ValueType>
-    StlIndexValueIteratorAdapter<ValueType>::StlIndexValueIteratorAdapter(const StlIteratorType& begin, const StlIteratorType& end) : _begin(begin), _end(end), _index(0)
-    {
-        SkipZeros();
-    }
-
-    template<typename ValueType>
-    void StlIndexValueIteratorAdapter<ValueType>::SkipZeros()
+    void StlIndexValueIterator<ValueType>::SkipZeros()
     {
         while (_begin < _end && *_begin == 0)
         {
@@ -53,9 +53,9 @@ namespace types
     // Convenience function to create iterator
     //
     template <typename ValueType>
-    StlIndexValueIteratorAdapter<ValueType> inline MakeStlIndexValueIteratorAdapter(const std::vector<ValueType>& arr)
+    StlIndexValueIterator<ValueType> inline MakeStlIndexValueIterator(const std::vector<ValueType>& arr)
     {
-        return StlIndexValueIteratorAdapter<ValueType>(arr.cbegin(), arr.cend());
+        return StlIndexValueIterator<ValueType>(arr.cbegin(), arr.cend());
     }
 
 

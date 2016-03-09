@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IIterator.h"
-#include "StlIteratorAdapter.h"
+#include "StlIterator.h"
 #include "TransformIterator.h"
 #include "ParallelTransformIterator.h"
 #include "Format.h"
@@ -28,9 +28,9 @@
 
 void testIteratorAdapter()
 {
-    // utilities::IteratorAdapter test
+    // utilities::StlIterator test
     std::vector<int> vec { 1, 2, 3, 4, 5, 6 };
-    auto it = utilities::MakeStlIteratorAdapter(vec.begin(), vec.end());
+    auto it = utilities::MakeStlIterator(vec.begin(), vec.end());
     
     bool passed = true;
     int index = 0;
@@ -41,8 +41,8 @@ void testIteratorAdapter()
         index++;
     }
             
-    testing::ProcessTest("utilities::IteratorAdapter.Get", passed);
-    testing::ProcessTest("utilities::IteratorAdapter length", index == vec.size());
+    testing::ProcessTest("utilities::StlIterator.Get", passed);
+    testing::ProcessTest("utilities::StlIteratorlength", index == vec.size());
 }
 
 float twoPointFiveTimes(int x)
@@ -98,7 +98,7 @@ void testTransformIterator()
     std::vector<int> vec(64);
     std::iota(vec.begin(), vec.end(), 5);
 
-    auto srcIt = utilities::MakeStlIteratorAdapter(vec.begin(), vec.end());
+    auto srcIt = utilities::MakeStlIterator(vec.begin(), vec.end());
     auto transIt = MakeTransformIterator(srcIt, twoPointFiveTimes);
 
     MillisecondTimer timer;
@@ -121,7 +121,7 @@ void testParallelTransformIterator()
     std::vector<int> vec(64);
     std::iota(vec.begin(), vec.end(), 5);
 
-    auto srcIt = utilities::MakeStlIteratorAdapter(vec.begin(), vec.end());
+    auto srcIt = utilities::MakeStlIterator(vec.begin(), vec.end());
     auto transIt = MakeParallelTransformIterator(srcIt, twoPointFiveTimes);
 
     bool passed = true;
