@@ -62,6 +62,11 @@ namespace layers
         return _layers.size();
     }
 
+    const char* Map::GetTypeName()
+    {
+        return "Map";
+    }
+
     void Map::Serialize(utilities::JsonSerializer & serializer) const
     {
         serializer.Write("layers", _layers);

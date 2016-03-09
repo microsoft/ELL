@@ -114,6 +114,13 @@ namespace layers
         template<typename MapType = Map>
         static MapType Load(const std::string& inputMapFile);
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static const char* GetTypeName();
+
+        // TODO: remove JSON serializaiton
+
         /// <summary> Serializes the Map in json format. </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>

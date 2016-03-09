@@ -49,6 +49,16 @@ namespace layers
         return Layer::InputCoordinateIterator(_inputCoordinates[index].cbegin(), _inputCoordinates[index].cend());
     }
 
+    const char* Sum::GetTypeName()
+    {
+        return "Sum";
+    }
+
+    const char* Sum::GetRuntimeTypeName() const
+    {
+        return GetTypeName();
+    }
+
     void Sum::Serialize(utilities::JsonSerializer & serializer) const
     {
         // version 1

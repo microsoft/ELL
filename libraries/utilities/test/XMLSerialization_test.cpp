@@ -20,9 +20,9 @@
 class Base
 {
 public:
-    static std::string GetTypeName() { return std::string("Base"); }
+    static const char* GetTypeName() { return "Base"; }
     
-    virtual std::string GetRuntimeTypeName() const = 0;
+    virtual const char* GetRuntimeTypeName() const = 0;
     
     virtual void Read(utilities::XMLDeserializer& deserializer) = 0;
     
@@ -35,9 +35,9 @@ public:
 
 class Derived1 : public Base
 {
-    static std::string GetTypeName() { return std::string("Derived1"); }
+    static const char* GetTypeName() { return "Derived1"; }
 
-    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); };
+    virtual const char* GetRuntimeTypeName() const override { return GetTypeName(); };
 
     virtual void Read(utilities::XMLDeserializer& deserializer) override
     {
@@ -71,9 +71,9 @@ private:
 
 class Derived2 : public Base
 {
-    static std::string GetTypeName() { return std::string("Derived2"); }
+    static const char* GetTypeName() { return "Derived2"; }
 
-    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); };
+    virtual const char* GetRuntimeTypeName() const override { return GetTypeName(); };
 
     virtual void Read(utilities::XMLDeserializer& deserializer) override
     {
@@ -103,15 +103,15 @@ private:
     std::vector<float> v;
 };
 
-void Read(std::string runtimeTypeName, std::unique_ptr<Base>& spValue)
+void Read(std::string runtimeTypeName, std::unique_ptr<Base>& value)
 {
     if(runtimeTypeName == "Derived1")
     {
-        spValue = std::make_unique<Derived1>();
+        value = std::make_unique<Derived1>();
     }
     else if(runtimeTypeName == "Derived2")
     {
-        spValue = std::make_unique<Derived2>();
+        value = std::make_unique<Derived2>();
     }
     else
     {

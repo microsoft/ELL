@@ -25,6 +25,11 @@ namespace layers
         return _elementIndex;
     }
 
+    const char* Coordinate::GetTypeName()
+    {
+        return "Coordinate";
+    }
+
     void Coordinate::Serialize(utilities::JsonSerializer& serializer) const
     {
       serializer.Write("l", (Json::UInt64)_layerIndex); 

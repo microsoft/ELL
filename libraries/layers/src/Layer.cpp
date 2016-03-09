@@ -22,6 +22,11 @@ namespace layers
         return typeName[(int)_type];
     }
 
+    const char* Layer::GetTypeName()
+    {
+        return "Layer";
+    }
+
     void Layer::SerializeHeader(utilities::JsonSerializer& serializer, int version) const
     {
         // to make the file more readable

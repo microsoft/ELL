@@ -75,6 +75,18 @@ namespace layers
         using InputCoordinateIterator = utilities::StlIteratorAdapter<std::vector<Coordinate>::const_iterator, Coordinate>;
         virtual InputCoordinateIterator GetInputCoordinates(uint64 index) const = 0;
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static const char* GetTypeName();
+
+        /// <summary> Gets the name of the derived type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual const char* GetRuntimeTypeName() const = 0;
+
+        // TODO: remove JSON serializaiton
+
         /// <summary> Serializes the Layer in json format. </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>

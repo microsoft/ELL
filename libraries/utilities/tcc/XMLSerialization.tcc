@@ -58,24 +58,32 @@ namespace utilities
 
     // serialize pointers to polymorphic classes
     template<typename ValueType>
-    void XMLSerializer::Serialize(const char* name, const std::unique_ptr<ValueType>& spValue)
+    void XMLSerializer::Serialize(const char* name, const std::unique_ptr<ValueType>& value)
     {
         static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
-        if (spValue == nullptr)
+        if (value == nullptr)
         {
             throw std::runtime_error("cannot serialize a null pointer");
         }
 
         auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
-        auto runtimeTypeName = spValue->GetRuntimeTypeName();
+        auto runtimeTypeName = value->GetRuntimeTypeName();
 
         Indent();
         PrintFormat(_stream, formatOpenTag1, typeName, "name", name);
 
         ++_indentation;
-        SerializeUnnamed(*spValue);
-        --_indentation;
+        Indent();
+        PrintFormat(_stream, formatOpenTag0, runtimeTypeName);
 
+        ++_indentation;
+        value->Write(*this);
+
+        --_indentation;
+        Indent();
+        PrintFormat(_stream, formatCloseTag, runtimeTypeName);
+
+        --_indentation;
         Indent();
         PrintFormat(_stream, formatCloseTag, typeName);
     }
@@ -84,7 +92,7 @@ namespace utilities
     template<typename ValueType>
     void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
-        auto typeName = value.GetRuntimeTypeName();
+        auto typeName = ValueType::GetTypeName();
 
         Indent();
         PrintFormat(_stream, formatOpenTag1, typeName, "name", name);
@@ -128,24 +136,32 @@ namespace utilities
 
     // serialize pointers to polymorphic classes
     template<typename ValueType>
-    void XMLSerializer::SerializeUnnamed(const std::unique_ptr<ValueType>& spValue)
+    void XMLSerializer::SerializeUnnamed(const std::unique_ptr<ValueType>& value)
     {
         static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
-        if (spValue == nullptr)
+        if (value == nullptr)
         {
             throw std::runtime_error("cannot serialize a null pointer");
         }
 
         auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
-        auto runtimeTypeName = spValue->GetRuntimeTypeName();
+        auto runtimeTypeName = value->GetRuntimeTypeName();
 
         Indent();
         PrintFormat(_stream, formatOpenTag0, typeName);
 
         ++_indentation;
-        SerializeUnnamed(*spValue);
-        --_indentation;
+        Indent();
+        PrintFormat(_stream, formatOpenTag0, runtimeTypeName);
 
+        ++_indentation;
+        value->Write(*this);
+
+        --_indentation;
+        Indent();
+        PrintFormat(_stream, formatCloseTag, runtimeTypeName);
+
+        --_indentation;
         Indent();
         PrintFormat(_stream, formatCloseTag, typeName);
     }
@@ -154,7 +170,7 @@ namespace utilities
     template<typename ValueType>
     void XMLSerializer::SerializeUnnamed(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
-        auto typeName = value.GetRuntimeTypeName();
+        auto typeName = ValueType::GetTypeName();
 
         Indent();
         PrintFormat(_stream, formatOpenTag0, typeName);
@@ -197,7 +213,7 @@ namespace utilities
 
     // deserialize pointers to polymorphic classes
     template<typename ValueType>
-    void XMLDeserializer::Deserialize(const char* name, std::unique_ptr<ValueType>& spValue)
+    void XMLDeserializer::Deserialize(const char* name, std::unique_ptr<ValueType>& value)
     {
         static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
 
@@ -207,8 +223,8 @@ namespace utilities
         MatchFormatThrowsExceptions(_pStr, formatOpenTag1, Match(typeName), Match("name"), Match(name));
         MatchFormatThrowsExceptions(_pStr, formatOpenTag0, runtimeTypeName);
 
-        Read(runtimeTypeName, spValue);
-        spValue->Read(*this);
+        Read(runtimeTypeName, value);
+        value->Read(*this);
 
         MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(runtimeTypeName));
         MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(typeName));
@@ -256,7 +272,7 @@ namespace utilities
 
     // deserialize pointers to polymorphic classes
     template<typename ValueType>
-    void XMLDeserializer::DeserializeUnnamed(std::unique_ptr<ValueType>& spValue)
+    void XMLDeserializer::DeserializeUnnamed(std::unique_ptr<ValueType>& value)
     {
         static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
 
@@ -266,8 +282,8 @@ namespace utilities
         MatchFormatThrowsExceptions(_pStr, formatOpenTag0, Match(typeName));
         MatchFormatThrowsExceptions(_pStr, formatOpenTag0, runtimeTypeName);
 
-        Read(runtimeTypeName, spValue);
-        spValue->Read(*this);
+        Read(runtimeTypeName, value);
+        value->Read(*this);
 
         MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(runtimeTypeName));
         MatchFormatThrowsExceptions(_pStr, formatCloseTag, Match(typeName));

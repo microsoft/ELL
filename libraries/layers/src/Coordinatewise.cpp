@@ -64,6 +64,16 @@ namespace layers
         return Layer::InputCoordinateIterator(_inputCoordinates.cbegin()+index, _inputCoordinates.cbegin()+index+1);
     }
 
+    const char* Coordinatewise::GetTypeName()
+    {
+        return "Coordinatewise";
+    }
+
+    const char* Coordinatewise::GetRuntimeTypeName() const
+    {
+        return GetTypeName();
+    }
+
     void Coordinatewise::Serialize(utilities::JsonSerializer& serializer) const
     {
         // version 1

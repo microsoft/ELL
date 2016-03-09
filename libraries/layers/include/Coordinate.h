@@ -43,6 +43,13 @@ namespace layers
         /// <returns> The element index. </returns>
         uint64 GetElementIndex() const; 
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static const char* GetTypeName();
+
+        // TODO: remove JSON serializaiton
+
         /// <summary> Serializes an index value pair. </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>

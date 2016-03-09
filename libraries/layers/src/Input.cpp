@@ -35,6 +35,16 @@ namespace layers
         throw std::runtime_error("this code should never be reached");
     }
 
+    const char* Input::GetTypeName()
+    {
+        return "Input";
+    }
+
+    const char* Input::GetRuntimeTypeName() const
+    {
+        return GetTypeName();
+    }
+
     void Input::Serialize(utilities::JsonSerializer & serializer) const
     {
         // version 1

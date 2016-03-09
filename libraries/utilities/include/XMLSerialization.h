@@ -54,7 +54,7 @@ namespace utilities
         /// <param name="name"> Name of the variable being serialized. </param>
         /// <param name="value"> The variable being serialized. </param>
         template<typename ValueType>
-        void Serialize(const char* name, const std::unique_ptr<ValueType>& spValue);
+        void Serialize(const char* name, const std::unique_ptr<ValueType>& value);
 
         /// <summary> Serialize class types. </summary>
         ///
@@ -75,7 +75,7 @@ namespace utilities
         void SerializeUnnamed(const std::vector<ElementType>& value);
 
         template<typename ValueType>
-        void SerializeUnnamed(const std::unique_ptr<ValueType>& spValue);
+        void SerializeUnnamed(const std::unique_ptr<ValueType>& value);
 
         template<typename ValueType>
         void SerializeUnnamed(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
@@ -117,7 +117,7 @@ namespace utilities
         /// <param name="name"> Name of the variable being deserialized, which is compared to the serialized version. </param>
         /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
         template<typename ValueType>
-        void Deserialize(const char* name, std::unique_ptr<ValueType>& spValue);
+        void Deserialize(const char* name, std::unique_ptr<ValueType>& value);
 
         /// <summary> Deserialize class types. </summary>
         ///
@@ -136,7 +136,7 @@ namespace utilities
         void DeserializeUnnamed(std::vector<ElementType>& value);
 
         template<typename ValueType>
-        void DeserializeUnnamed(std::unique_ptr<ValueType>& spValue);
+        void DeserializeUnnamed(std::unique_ptr<ValueType>& value);
 
         template<typename ValueType>
         void DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
