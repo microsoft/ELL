@@ -89,49 +89,49 @@ namespace layers
 
     void Map::Serialize(utilities::JsonSerializer& serializer) const
     {
-        serializer.Write("layers", _layers);
+        //serializer.Write("layers", _layers);
     }
 
     void Map::Serialize(std::ostream& os) const // TODO erase
     {
-        utilities::JsonSerializer writer;
-        writer.Write("Base", *this);
-        auto str = writer.ToString();
-        os << str;
+        //utilities::JsonSerializer writer;
+        //writer.Write("Base", *this);
+        //auto str = writer.ToString();
+        //os << str;
     }
 
     void Map::Deserialize(utilities::JsonSerializer & serializer)
     {
-        serializer.Read("layers", _layers, DeserializeLayers);
+        //serializer.Read("layers", _layers, DeserializeLayers);
     }
 
     void Map::DeserializeLayers(utilities::JsonSerializer & serializer, std::shared_ptr<Layer>& spLayer)
     {
-        auto type = serializer.Read<std::string>("_type");
-        auto version = serializer.Read<int>("_version");
+        //auto type = serializer.Read<std::string>("_type");
+        //auto version = serializer.Read<int>("_version");
 
-        if (type == "Input")
-        {
-            spLayer = std::make_shared<Input>();
-        }
-        else if (type == "Scale")
-        {
-            spLayer = std::make_shared<Coordinatewise>(layers::Layer::Type::scale);
-        }
-        else if (type == "Shift")
-        {
-            spLayer = std::make_shared<Coordinatewise>(layers::Layer::Type::shift);
-        }
-        else if (type == "Sum")
-        {
-            spLayer = std::make_shared<Sum>();
-        }
-        else
-        {
-            throw std::runtime_error("unidentified type in map file: " + type);
-        }
+        //if (type == "Input")
+        //{
+        //    spLayer = std::make_shared<Input>();
+        //}
+        //else if (type == "Scale")
+        //{
+        //    spLayer = std::make_shared<Coordinatewise>(layers::Layer::Type::scale);
+        //}
+        //else if (type == "Shift")
+        //{
+        //    spLayer = std::make_shared<Coordinatewise>(layers::Layer::Type::shift);
+        //}
+        //else if (type == "Sum")
+        //{
+        //    spLayer = std::make_shared<Sum>();
+        //}
+        //else
+        //{
+        //    throw std::runtime_error("unidentified type in map file: " + type);
+        //}
 
-        spLayer->Deserialize(serializer, version);
+        //spLayer->Deserialize(serializer, version);
     }
 
     std::vector<std::vector<double>> Map::AllocateOutputs() const
