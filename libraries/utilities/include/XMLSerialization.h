@@ -68,6 +68,19 @@ namespace utilities
 
         void Indent();
 
+        template<typename ValueType>
+        void SerializeUnnamed(const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
+
+        template<typename ElementType>
+        void SerializeUnnamed(const std::vector<ElementType>& value);
+
+        template<typename ValueType>
+        void SerializeUnnamed(const std::unique_ptr<ValueType>& spValue);
+
+        template<typename ValueType>
+        void SerializeUnnamed(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
+
+
         uint64 _indentation = 0;
         std::ostream& _stream;
     };
@@ -115,6 +128,19 @@ namespace utilities
         void Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
     private:
+
+        template<typename ValueType>
+        void DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
+
+        template<typename ElementType>
+        void DeserializeUnnamed(std::vector<ElementType>& value);
+
+        template<typename ValueType>
+        void DeserializeUnnamed(std::unique_ptr<ValueType>& spValue);
+
+        template<typename ValueType>
+        void DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
+
         std::string _string;
         const char* _pStr;
     };
