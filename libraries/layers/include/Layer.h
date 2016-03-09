@@ -56,10 +56,10 @@ namespace layers
         /// <returns> The number of elements in the layer. </returns>
         virtual uint64 Size() const = 0;
 
-        /// <summary> \returns A std::string tha trepresents the layer type. </summary>
+        /// <summary> Gets a human friendly name of the layer type. </summary>
         ///
         /// <returns> The type name. </returns>
-        std::string GetTypeName() const;
+        std::string GetFriendlyLayerName() const;
 
         /// <summary> Computes the layer output. </summary>
         ///
