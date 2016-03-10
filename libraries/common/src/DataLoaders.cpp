@@ -68,6 +68,7 @@ namespace common
 
     std::unique_ptr<dataset::IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, layers::Map& map, layers::CoordinateList& inputCoordinates)
     {
+        // #### why not say map.Load(...)
         map = layers::Map::Load(mapLoadArguments.inputMapFile);
 
         // create list of output coordinates
@@ -108,6 +109,8 @@ namespace common
 
             // create default map with single input layer
             map = layers::Map(numColumns);
+            // #### Why not say map.Init(numColumns)?
+
 
             // create a coordinate list of this map
             inputCoordinates = layers::GetCoordinateList(0, 0, numColumns-1);
