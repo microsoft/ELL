@@ -149,7 +149,7 @@ void PrintableMap::Print(std::ostream & os, const PrintArguments& Arguments)
 
     for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
     {
-        auto printableLayer = GetLayer<PrintableLayer>(layerIndex);
+        auto printableLayer = GetLayerPtr<PrintableLayer>(layerIndex);
         auto layout = printableLayer->Print(os, Arguments.mapLayout.horizontalMargin, layerTop, layerIndex, Arguments);
         layerTop += layout.GetHeight() + Arguments.mapLayout.verticalSpacing;
         os << std::endl;

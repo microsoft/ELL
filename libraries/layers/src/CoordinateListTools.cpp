@@ -82,7 +82,7 @@ namespace layers
 
             // read element index
             uint64 fromElementIndex = 0;
-            uint64 maxElementIndex = map.GetLayer(layerIndex)->Size() - 1;
+            uint64 maxElementIndex = map.GetLayer(layerIndex).Size() - 1;
             uint64 toElementIndex = maxElementIndex;
 
             // case: no elements specified - take entire layer
@@ -119,7 +119,7 @@ namespace layers
 
     layers::CoordinateList GetCoordinateList(const layers::Map& map, uint64 layerIndex)
     {
-        return GetCoordinateList(layerIndex, 0, map.GetLayer(layerIndex)->Size()-1);
+        return GetCoordinateList(layerIndex, 0, map.GetLayer(layerIndex).Size()-1);
     }
 
     layers::CoordinateList GetCoordinateList(uint64 layerIndex, uint64 fromElementIndex, uint64 toElementIndex)

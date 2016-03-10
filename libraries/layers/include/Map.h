@@ -89,7 +89,7 @@ namespace layers
         /// <param name="layer"> The layer to add to the map. </param>
         ///
         /// <returns> The index of the added layer. </returns>
-        uint64 PushBack(std::shared_ptr<Layer> layer);
+        uint64 PushBack(std::unique_ptr<Layer>&& layer);
 
         /// <summary> Returns the number of layers in the map. </summary>
         ///
@@ -102,8 +102,15 @@ namespace layers
         /// <param name="layerIndex"> Zero-based index of the layer. </param>
         ///
         /// <returns> The requested layer, cast to the requested type. </returns>
-        template<typename LayerType = Layer>
-        std::shared_ptr<const LayerType> GetLayer(uint64 layerIndex) const;
+//        template<typename LayerType = Layer>
+//        std::unique_ptr<const LayerType> GetLayer(uint64 layerIndex) const;
+        const Layer& GetLayer(uint64 layerIndex) const;
+
+        template <typename LayerType>
+        const LayerType* GetLayerPtr(uint64 layerIndex) const;
+
+        template <typename LayerType>
+        const LayerType& GetLayerRef(uint64 layerIndex) const;
 
         /// <summary> Static function that loads a Map from file. </summary>
         ///
@@ -139,17 +146,17 @@ namespace layers
         /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Deserialize(utilities::JsonSerializer& serializer);
 
-        /// <summary> Static function for deserializing a std::shared_ptr that points to a Layer </summary>
+        /// <summary> Static function for deserializing a std::unique_ptr that points to a Layer </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
         /// <param name="up"> [in,out] The pointer to the layer. </param>
-        static void DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<Layer>& spLayer);
+        static void DeserializeLayers(utilities::JsonSerializer& serializer, std::unique_ptr<Layer>& spLayer);
 
     protected:
         std::vector<std::vector<double>> AllocateOutputs() const;
 
         // members
-        std::vector<std::shared_ptr<Layer>> _layers;
+        std::vector<std::unique_ptr<Layer>> _layers;
 
     private:
         static const int _currentVersion = 1;

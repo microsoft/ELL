@@ -40,23 +40,43 @@ namespace layers
     {
         // allocate memory to store the output of the map calculation
         auto outputs = AllocateOutputs();
-        
+
         // set the input 
-        SetArray( outputs[0], indexValueIterator);
+        SetArray(outputs[0], indexValueIterator);
 
         // compute layers 1,2,... in order
-        for(uint64 i = 1; i<_layers.size(); ++i)
+        for (uint64 i = 1; i < _layers.size(); ++i)
         {
             _layers[i]->Compute(i, outputs);
         }
-        
+
         return Iterator(std::move(outputs), outputCoordinates);
     }
 
-    template<typename LayerType>
-    std::shared_ptr<const LayerType> Map::GetLayer(uint64 layerIndex) const
+    inline const Layer& Map::GetLayer(uint64 layerIndex) const
     {
-        return std::dynamic_pointer_cast<LayerType>(_layers[layerIndex]);
+        // GetLayer is only used in the following places:
+        //
+        // CompilableMap.cpp(122) : auto compilableLayer = GetLayer<CompilableLayer>(layerIndex);
+        //                          compilableLayer->SetActions(layerIndex, graph);
+        // CoordinateListTools.cpp(85) : uint64 maxElementIndex = map.GetLayer(layerIndex)->Size() - 1;
+        // CoordinateListTools.cpp(122) : return GetCoordinateList(layerIndex, 0, map.GetLayer(layerIndex)->Size() - 1);
+        // PrintableMap.cpp(152) : auto printableLayer = GetLayer<PrintableLayer>(layerIndex);
+        //                         auto layout = printableLayer->Print(os, Arguments.mapLayout.horizontalMargin, layerTop, layerIndex, Arguments);
+
+        return *_layers[layerIndex];
+    }
+
+    template <typename LayerType>
+    const LayerType* Map::GetLayerPtr(uint64 layerIndex) const
+    {
+        return dynamic_cast<const LayerType*>(_layers[layerIndex].get());
+    }
+
+    template <typename LayerType>
+    const LayerType& Map::GetLayerRef(uint64 layerIndex) const
+    {
+        return *(dynamic_cast<const LayerType*>(_layers[layerIndex].get()));
     }
 
     template<typename MapType>

@@ -47,13 +47,13 @@ namespace layers
 
     Map::Map(uint64 inputLayerSize)
     {
-        _layers.push_back(std::make_shared<Input>(inputLayerSize));
+        _layers.push_back(std::make_unique<Input>(inputLayerSize));
     }
 
-    uint64 Map::PushBack(std::shared_ptr<Layer> layer)
+    uint64 Map::PushBack(std::unique_ptr<Layer>&& layer)
     {
         uint64 layerIndex = _layers.size();
-        _layers.push_back(layer);
+        _layers.push_back(std::move(layer));
         return layerIndex;
     }
 
@@ -105,7 +105,7 @@ namespace layers
         //serializer.Read("layers", _layers, DeserializeLayers);
     }
 
-    void Map::DeserializeLayers(utilities::JsonSerializer & serializer, std::shared_ptr<Layer>& spLayer)
+    void Map::DeserializeLayers(utilities::JsonSerializer & serializer, std::unique_ptr<Layer>& spLayer)
     {
         //auto type = serializer.Read<std::string>("_type");
         //auto version = serializer.Read<int>("_version");

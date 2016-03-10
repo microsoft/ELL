@@ -119,7 +119,7 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
     // backwards pass to assign actions to nodes
     for(uint64 layerIndex = NumLayers() - 1; layerIndex > 0; --layerIndex)
     {
-        auto compilableLayer = GetLayer<CompilableLayer>(layerIndex);
+        auto compilableLayer = GetLayerPtr<CompilableLayer>(layerIndex);
         compilableLayer->SetActions(layerIndex, graph);
     }
 
