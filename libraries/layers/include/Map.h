@@ -59,7 +59,7 @@ namespace layers
             uint64 _index;
 
             // private ctor, can only be called from Map class
-            Iterator(std::vector<std::vector<double>>&& spOutput, const CoordinateList& outputCoordinates);
+            Iterator(std::vector<std::vector<double>>&& output, const CoordinateList& outputCoordinates);
             friend Map;
         };
 

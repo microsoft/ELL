@@ -55,6 +55,8 @@ namespace layers
 
     inline const Layer& Map::GetLayer(uint64 layerIndex) const
     {
+        // ####
+
         // GetLayer is only used in the following places:
         //
         // CompilableMap.cpp(122) : auto compilableLayer = GetLayer<CompilableLayer>(layerIndex);
