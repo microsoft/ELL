@@ -21,6 +21,7 @@
 
 namespace dataset
 {
+    // #### Call this ISupervisedExampleIterator or something
     using IParsingIterator = utilities::IIterator<SupervisedExample>;
 
     /// <summary> An input iterator that traverses a textual dataset row by row and applies a parser to

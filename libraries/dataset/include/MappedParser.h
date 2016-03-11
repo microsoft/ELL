@@ -24,7 +24,7 @@ namespace dataset
 {
     /// <summary> Wraps any other parser and passes it through a map. </summary>
     ///
-    /// <typeparam name="ternalParserType"> Type of the ternal parser type. </typeparam>
+    /// <typeparam name="ternalParserType"> Type of the internal parser type. </typeparam>
     template<typename InternalParserType>
     class MappedParser
     {
@@ -35,7 +35,7 @@ namespace dataset
         /// <param name="internalParser"> The internal parser. </param>
         /// <param name="map"> The map. </param>
         /// <param name="outputCoordinates"> The output coordinates. </param>
-        MappedParser(const InternalParserType& internalParser, const layers::Map& map, layers::CoordinateList outputCoordinates);
+        MappedParser(const InternalParserType& internalParser, const std::shared_ptr<layers::Map>& map, layers::CoordinateList outputCoordinates);
 
         /// <summary> Gets an iterator that parses the given std::string. </summary>
         ///
@@ -43,11 +43,11 @@ namespace dataset
         /// <param name="pStr"> The string. </param>
         ///
         /// <returns> The iterator. </returns>
-        layers::Map::Iterator GetIterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) const;
+        layers::Map::OutputIterator GetIterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) const;
 
     private:
         InternalParserType _internalParser;
-        layers::Map _map;
+        std::shared_ptr<layers::Map> _map; 
         layers::CoordinateList _outputCoordinates;
     };
 }

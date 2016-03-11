@@ -119,8 +119,8 @@ void CompilableMap::ToCode(layers::CoordinateList coordinateList, std::ostream& 
     // backwards pass to assign actions to nodes
     for(uint64 layerIndex = NumLayers() - 1; layerIndex > 0; --layerIndex)
     {
-        auto compilableLayer = GetLayerPtr<CompilableLayer>(layerIndex);
-        compilableLayer->SetActions(layerIndex, graph);
+        const auto& compilableLayer = GetLayer<CompilableLayer>(layerIndex);
+        compilableLayer.SetActions(layerIndex, graph);
     }
 
     // construct an integer stack, to manage temp variable names;
@@ -168,7 +168,7 @@ void CompilableMap::Deserialize(utilities::JsonSerializer& serializer)
     serializer.Read("layers", _layers, CompilableMap::DeserializeLayers);
 }
 
-void CompilableMap::DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<layers::Layer>& spLayer)
+void CompilableMap::DeserializeLayers(utilities::JsonSerializer& serializer, std::unique_ptr<layers::Layer>& spLayer)
 {
     //auto type = serializer.Read<std::string>("_type");
     //auto version = serializer.Read<int>("_version");

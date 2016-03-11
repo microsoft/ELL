@@ -24,21 +24,23 @@
 
 namespace layers
 {
+    // TODO: Describe what a map is here
+
     /// <summary> Implements a map. </summary>
     class Map
     {
     public:
 
         /// <summary> An iterator over the output values of the map. </summary>
-        class Iterator : public IIndexValueIterator
+        class OutputIterator : public IIndexValueIterator
         {
         public:
 
             /// <summary> Copy constructor. </summary>
-            Iterator(const Iterator&) = default;
+            OutputIterator(const OutputIterator&) = default;
 
             /// <summary> Move constructor. </summary>
-            Iterator(Iterator&&) = default;
+            OutputIterator(OutputIterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
@@ -59,12 +61,16 @@ namespace layers
             uint64 _index;
 
             // private ctor, can only be called from Map class
-            Iterator(std::vector<std::vector<double>>&& output, const CoordinateList& outputCoordinates);
+            OutputIterator(const std::vector<std::unique_ptr<Layer>>& layers, const CoordinateList& outputCoordinates);
+            void AllocateLayerOutputs(const std::vector<std::unique_ptr<Layer>>& layers);
             friend Map;
         };
 
         /// <summary> Default constructor. </summary>
         Map() = default;
+
+        Map(const Map&) = delete;
+        Map(Map&&) = default;
 
         /// <summary> Constructs an instance of Map. </summary>
         ///
@@ -74,6 +80,8 @@ namespace layers
         /// <summary> Virtual destructor. </summary>
         virtual ~Map() = default;
 
+        // #### Not a great function name. How about GetOutput or something. ProcessInput? Transform? TransformInput?
+        // #### Acutally since it returns an iterator, why not GetOutputIterator? 
         /// <summary> Computes the Map. </summary>
         ///
         /// <typeparam name="IndexValueIteratorType"> Input iterator type. </typeparam>
@@ -82,8 +90,9 @@ namespace layers
         ///
         /// <returns> An Iterator over output values. </returns>
         template <typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        Iterator Compute(IndexValueIteratorType IndexValueIterator, const CoordinateList& outputCoordinates) const;
+        OutputIterator Compute(IndexValueIteratorType inputIterator, const CoordinateList& outputCoordinates) const;
 
+        // #### Call this AddLayer
         /// <summary> Adds a layer to the map. </summary>
         ///
         /// <param name="layer"> The layer to add to the map. </param>
@@ -102,15 +111,8 @@ namespace layers
         /// <param name="layerIndex"> Zero-based index of the layer. </param>
         ///
         /// <returns> The requested layer, cast to the requested type. </returns>
-//        template<typename LayerType = Layer>
-//        std::unique_ptr<const LayerType> GetLayer(uint64 layerIndex) const;
-        const Layer& GetLayer(uint64 layerIndex) const;
-
-        template <typename LayerType>
-        const LayerType* GetLayerPtr(uint64 layerIndex) const;
-
-        template <typename LayerType>
-        const LayerType& GetLayerRef(uint64 layerIndex) const;
+        template <typename LayerType=Layer>
+        const LayerType& GetLayer(uint64 layerIndex) const;
 
         /// <summary> Static function that loads a Map from file. </summary>
         ///
@@ -153,8 +155,6 @@ namespace layers
         static void DeserializeLayers(utilities::JsonSerializer& serializer, std::unique_ptr<Layer>& spLayer);
 
     protected:
-        std::vector<std::vector<double>> AllocateOutputs() const;
-
         // members
         std::vector<std::unique_ptr<Layer>> _layers;
 

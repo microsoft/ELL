@@ -43,5 +43,5 @@ public:
     ///
     /// <param name="serializer"> [in,out] The serializer. </param>
     /// <param name="up"> [in,out] The up. </param>
-    static void DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<layers::Layer>& up);
+    static void DeserializeLayers(utilities::JsonSerializer& serializer, std::unique_ptr<layers::Layer>& up);
 };

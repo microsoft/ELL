@@ -149,8 +149,8 @@ void PrintableMap::Print(std::ostream & os, const PrintArguments& Arguments)
 
     for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
     {
-        auto printableLayer = GetLayerPtr<PrintableLayer>(layerIndex);
-        auto layout = printableLayer->Print(os, Arguments.mapLayout.horizontalMargin, layerTop, layerIndex, Arguments);
+        const auto& printableLayer = GetLayer<PrintableLayer>(layerIndex);
+        auto layout = printableLayer.Print(os, Arguments.mapLayout.horizontalMargin, layerTop, layerIndex, Arguments);
         layerTop += layout.GetHeight() + Arguments.mapLayout.verticalSpacing;
         os << std::endl;
 
@@ -193,7 +193,7 @@ void PrintableMap::Deserialize(utilities::JsonSerializer & serializer)
     serializer.Read("layers", _layers, PrintableMap::DeserializeLayers);
 }
 
-void PrintableMap::DeserializeLayers(utilities::JsonSerializer & serializer, std::shared_ptr<layers::Layer>& up)
+void PrintableMap::DeserializeLayers(utilities::JsonSerializer & serializer, std::unique_ptr<layers::Layer>& up)
 {
     //auto type = serializer.Read<std::string>("_type");
     //auto version = serializer.Read<int>("_version");

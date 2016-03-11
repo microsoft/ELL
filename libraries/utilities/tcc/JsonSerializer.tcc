@@ -34,6 +34,12 @@ namespace utilities
     }
 
     template<typename KeyType, typename ValueType>
+    void JsonSerializer::Write(KeyType key, const std::unique_ptr<ValueType>& ptr, typename std::enable_if<std::is_class<ValueType>::value>::type* concept)
+    {
+        Write(key, *ptr);
+    }
+
+    template<typename KeyType, typename ValueType>
     void JsonSerializer::Write(KeyType key, const ValueType& value, typename std::enable_if<std::is_class<ValueType>::value>::type* concept)
     {
         try
@@ -128,6 +134,21 @@ namespace utilities
         }
     }
 
+    template<typename KeyType, typename ValueType, typename DeserializerType>
+    void JsonSerializer::Read(KeyType key, std::unique_ptr<ValueType>& ptr, DeserializerType deserializer) const
+    {
+        try
+        {
+            JsonSerializer sub_serializer;
+            sub_serializer._json_value = _json_value[key];
+            deserializer(sub_serializer, ptr);
+        }
+        catch (...)    // underlying json implementation may throw an exception 
+        {
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
+        }
+    }
+
     template<typename KeyType, typename ValueType>
     void JsonSerializer::Read(KeyType key, ValueType& value, typename std::enable_if<std::is_fundamental<ValueType>::value>::type* concept) const
     {
@@ -155,6 +176,33 @@ namespace utilities
             for (size_t i = 0; i < sub_serializer._json_value.size(); ++i)
             {
                 std::shared_ptr<ValueType> val = nullptr;
+                sub_serializer.Read((int)i, val, deserializer);
+                vec.push_back(std::move(val));
+            }
+        }
+        catch (std::runtime_error e)
+        {
+            throw; // rethrow the exception
+        }
+        catch (...)    // underlying json implementation may throw an exception 
+        {
+            throw std::runtime_error("jsoncpp threw an unspecified exception during read");
+        }
+    }
+
+    template<typename KeyType, typename ValueType, typename DeserializerType>
+    void JsonSerializer::Read(KeyType key, std::vector<std::unique_ptr<ValueType>>& vec, DeserializerType deserializer) const
+    {
+        try
+        {
+            JsonSerializer sub_serializer;
+            sub_serializer._json_value = _json_value[key];
+
+            vec.clear();
+            vec.reserve(sub_serializer._json_value.size());
+            for (size_t i = 0; i < sub_serializer._json_value.size(); ++i)
+            {
+                std::unique_ptr<ValueType> val = nullptr;
                 sub_serializer.Read((int)i, val, deserializer);
                 vec.push_back(std::move(val));
             }
