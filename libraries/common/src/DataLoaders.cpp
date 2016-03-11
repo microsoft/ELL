@@ -62,7 +62,7 @@ namespace common
         {
             layers::Map map;
             layers::CoordinateList coordinateList;
-            return GetDataIteratorMapCoordinates(dataLoadArguments, mapLoadArguments, map, coordinateList);
+            return GetDataIteratorMapCoordinates(dataLoadArguments, mapLoadArguments, map, coordinateList); // #### Does this work?? 
         }
     }
 
