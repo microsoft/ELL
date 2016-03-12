@@ -35,18 +35,31 @@ namespace common
     /// <summary> Gets a (possibly) mapped data iterator, based on command line parameters. </summary>
     ///
     /// <param name="dataLoadArguments"> The data load arguments. </param>
-    /// <param name="mapLoadArguments">  The map load arguments. </param>
+    /// <param name="mapLoadArguments"> The map load arguments. </param>
     ///
     /// <returns> The data iterator. </returns>
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments);
 
-    // #### document this
+    /// <summary> Gets the map specified by the command line parameters </summary>
+    ///
+    /// <param name="mapLoadArguments"> The map load arguments. </param>
+    ///
+    /// <returns> A shared pointer to the map. </returns>
     std::shared_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments);
 
-    // #### document this
+    /// <summary> Gets the input coordinates for the given map, as specified by the command line parameters </summary>
+    ///
+    /// <param name="map">  The map. </param>
+    /// <param name="mapLoadArguments"> The map load arguments. </param>
+    ///
+    /// <returns> The input coordinates to use for the map. </returns>
     layers::CoordinateList GetInputCoordinates(const layers::Map& map, const MapLoadArguments& mapLoadArguments);
 
-    // #### document this
+    /// <summary> Loads a RowDataset from the data iterator returned by GetDataIterator </summary>
+    ///
+    /// <param name="dataIterator"> The data iterator to use to populate the dataset </param>
+    ///
+    /// <returns> The dataset. </returns>
     dataset::RowDataset LoadDataset(dataset::IParsingIterator& dataIterator);
 
     /// <summary> Gets a mapped data iterator, based on command line parameters, a map, and a
@@ -59,7 +72,7 @@ namespace common
     /// <returns> The data iterator. </returns>
     std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
 
-// TODO: this
+// TODO: this, and maybe get rid of the above
     std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const dataset::IParsingIterator& inputIterator, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
 }
 
