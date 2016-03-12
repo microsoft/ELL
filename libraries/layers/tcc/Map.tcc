@@ -19,7 +19,6 @@
 
 namespace layers
 {
-    // #### rename this --- it's not clear what it does when seen in usage context
     template<typename IndexValueIteratorType>
     void SetArray(std::vector<double>& array, IndexValueIteratorType indexValueIterator)
     {

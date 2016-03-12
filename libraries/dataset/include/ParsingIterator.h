@@ -68,7 +68,7 @@ namespace dataset
     ///
     /// <returns> The parsing iterator. </returns>
     template<typename RowIteratorType, typename VectorEntryParserType>
-    std::unique_ptr<IParsingIterator> GetParsingIterator(const RowIteratorType& row_iter, const VectorEntryParserType& parser);
+    std::unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType&& row_iter, const VectorEntryParserType& parser);
 }
 
 #include "../tcc/ParsingIterator.tcc"

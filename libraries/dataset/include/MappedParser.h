@@ -29,6 +29,8 @@ namespace dataset
     class MappedParser
     {
     public:
+        MappedParser(const MappedParser&) = default;
+        MappedParser(MappedParser&&) = default;
 
         /// <summary> Constructs an instance of MappedParser. </summary>
         ///

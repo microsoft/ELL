@@ -70,10 +70,16 @@ int main(int argc, char* argv[])
         }
 
         // create and load a dataset, a map, and a coordinate list
-        dataset::RowDataset dataset;
-        layers::Map map;
-        layers::CoordinateList inputCoordinates;
-        GetRowDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
+        //        auto inputIterator = GetDataIterator(dataLoadArguments);
+        auto map = GetMap(mapLoadArguments);
+        auto inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
+        // #### Need to handle the case when there is no map and/or no input coordinates specified
+
+
+        auto dataIterator = GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
+        dataset::RowDataset dataset = common::LoadDataset(*dataIterator);
+
+
 
         // create loss function
         lossFunctions::LogLoss loss;
@@ -107,10 +113,10 @@ int main(int argc, char* argv[])
 
         // update the map with the newly learned layers
         auto predictor = optimizer.GetPredictor();
-        predictor.AddTo(map, inputCoordinates);
+        predictor.AddTo(*map, inputCoordinates);
 
         // output map
-        map.Serialize(std::cout);
+        map->Serialize(std::cout);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

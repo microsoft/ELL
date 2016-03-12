@@ -25,9 +25,20 @@
 
 namespace common
 {
+    dataset::RowDataset LoadDataset(dataset::IParsingIterator& dataIterator)
+    {
+        dataset::RowDataset dataset;
+        while (dataIterator.IsValid())
+        {
+            dataset.PushBackRow(dataIterator.Get());
+            dataIterator.Next();
+        }
+        return dataset;
+    }
+
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
     {
-       // create line iterator - read line by line sequentially
+        // create line iterator - read line by line sequentially
         dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
 
         // create parser for sparse vectors (SVMLight format)
@@ -35,21 +46,6 @@ namespace common
 
         // Create iterator
         return dataset::GetParsingIterator(std::move(lineIterator), sparseEntryParser);
-    }
-
-    std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const layers::Map& map, const layers::CoordinateList& inputCoordinates)
-    {
-        // create parser for sparse vectors (SVMLight format)
-        dataset::SparseEntryParser sparseEntryParser;
-
-        // create mapped parser
-        dataset::MappedParser<dataset::SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
-
-        // create line iterator - read line by line sequentially
-        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
-
-        // Create iterator
-        return dataset::GetParsingIterator(std::move(lineIterator), mappedParser);
     }
 
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments)
@@ -60,68 +56,69 @@ namespace common
         }
         else
         {
-            layers::Map map;
-            layers::CoordinateList coordinateList;
-            return GetDataIteratorMapCoordinates(dataLoadArguments, mapLoadArguments, map, coordinateList); // #### Does this work?? 
+            auto map = GetMap(mapLoadArguments);
+            auto inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
+            auto dataIterator = GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
+            return dataIterator;
         }
     }
 
-    std::unique_ptr<dataset::IParsingIterator> GetDataIteratorMapCoordinates(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments, layers::Map& map, layers::CoordinateList& inputCoordinates)
+    std::shared_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments)
     {
-        // #### why not say map.Load(...)
-        map = layers::Map::Load(mapLoadArguments.inputMapFile);
-
-        // create list of output coordinates
-        inputCoordinates = GetCoordinateList(map, mapLoadArguments.coordinateList);
-
-        // get data iterator
-        return GetDataIterator(dataLoadArguments, map, inputCoordinates);
-    }
-
-    void DataIteratorToRowDataset(dataset::IParsingIterator& dataIterator, dataset::RowDataset& dataset)
-    {
-        // Load row by row
-        while (dataIterator.IsValid())
+        if (mapLoadArguments.inputMapFile != "")
         {
-            dataset.PushBackRow(dataIterator.Get());
-            dataIterator.Next();
-        }
-    }
-
-    void GetRowDatasetMapCoordinates(
-        const DataLoadArguments& dataLoadArguments,
-        const MapLoadArguments& mapLoadArguments,
-        dataset::RowDataset& rowDataset,
-        layers::Map& map,
-        layers::CoordinateList& inputCoordinates)
-    {
-        // handle two cases - input map specified or unspecified
-        if (mapLoadArguments.inputMapFile == "")
-        {
-            // get data iterator 
-            auto upDataIterator = GetDataIterator(dataLoadArguments);
-
-            // load dataset
-            DataIteratorToRowDataset(*upDataIterator, rowDataset);
-
-            // number of columns
-            uint64 numColumns = rowDataset.NumColumns();
-
-            // create default map with single input layer
-            map = layers::Map(numColumns);
-            // #### Why not say map.Init(numColumns)?
-
-
-            // create a coordinate list of this map
-            inputCoordinates = layers::GetCoordinateList(0, 0, numColumns-1);
+            return std::make_shared<layers::Map>(layers::Map::Load(mapLoadArguments.inputMapFile));
         }
         else
         {
-            // get data iterator. map, coordinates
-            auto upDataIterator = GetDataIteratorMapCoordinates(dataLoadArguments, mapLoadArguments, map, inputCoordinates);
+            return nullptr;
+        }
+    }
 
-            // load dataset
-            DataIteratorToRowDataset(*upDataIterator, rowDataset);
+    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates)
+    {
+        // create parser for sparse vectors (SVMLight format)
+        dataset::SparseEntryParser sparseEntryParser;
+
+        // create mapped parser
+        dataset::MappedParser<dataset::SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
+
+        // why not just run through the map?
+
+        // create line iterator - read line by line sequentially
+        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
+
+        // Create iterator
+        return dataset::GetParsingIterator(std::move(lineIterator), mappedParser);
+    }
+
+    layers::CoordinateList GetInputCoordinates(const layers::Map& map, const MapLoadArguments& mapLoadArguments)
+    {
+        layers::CoordinateList inputCoordinates = layers::GetCoordinateList(map, mapLoadArguments.coordinateList);
+        return inputCoordinates;
+    }
+
+    // Do this instead of calling GetRowDatasetMapCoordinates
+    void MyCodeInMain(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments)
+    {
+        auto inputIterator = GetDataIterator(dataLoadArguments);
+        auto map = GetMap(mapLoadArguments);
+        dataset::RowDataset rowDataset; // depends on map if there is one, else depends on inputIterator
+        layers::CoordinateList inputCoordinates; // depends on dataset if there is one, else depends on map
+
+        // need to set rowDataset and inputCoordinates
+        if (map == nullptr)
+        {
+            rowDataset = LoadDataset(*inputIterator);
+            auto numColumns = rowDataset.NumColumns();
+            map = std::make_unique<layers::Map>(numColumns); // :(
+            inputCoordinates = layers::GetCoordinateList(0, 0, numColumns - 1);
+        }
+        else
+        {
+            inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
+            auto dataIterator = GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
+            rowDataset = LoadDataset(*dataIterator);
         }
     }
 }
