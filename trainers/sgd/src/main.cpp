@@ -70,16 +70,10 @@ int main(int argc, char* argv[])
         }
 
         // create and load a dataset, a map, and a coordinate list
-        //        auto inputIterator = GetDataIterator(dataLoadArguments);
-        auto map = GetMap(mapLoadArguments);
-        auto inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
-        // #### Need to handle the case when there is no map and/or no input coordinates specified
-
-
-        auto dataIterator = GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
-        dataset::RowDataset dataset = common::LoadDataset(*dataIterator);
-
-
+        dataset::RowDataset dataset;
+        std::shared_ptr<layers::Map> map;
+        layers::CoordinateList inputCoordinates;
+        GetRowDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
 
         // create loss function
         lossFunctions::LogLoss loss;

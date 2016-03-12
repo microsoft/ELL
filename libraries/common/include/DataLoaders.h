@@ -40,6 +40,22 @@ namespace common
     /// <returns> The data iterator. </returns>
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments);
 
+    /// <summary> Gets a mapped data iterator, based on command line parameters, a map, and a
+    /// coordinate list. </summary>
+    ///
+    /// <param name="dataLoadArguments"> The data load arguments. </param>
+    /// <param name="mapLoadArguments"> The map load arguments. </param>
+    /// <param name="rowDataset"> [in,out] The row dataset. </param>
+    /// <param name="map"> [in,out] The map. </param>
+    /// <param name="inputCoordinates"> [in,out] The input coordinates. </param>
+    void GetRowDatasetMapCoordinates(
+        const DataLoadArguments& dataLoadArguments,
+        const MapLoadArguments& mapLoadArguments,
+        dataset::RowDataset& rowDataset,
+        std::shared_ptr<layers::Map>& map, // going to have to be a shared_ptr<Map>&
+        layers::CoordinateList& inputCoordinates);
+
+
     /// <summary> Gets the map specified by the command line parameters </summary>
     ///
     /// <param name="mapLoadArguments"> The map load arguments. </param>
@@ -73,6 +89,6 @@ namespace common
     std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
 
 // TODO: this, and maybe get rid of the above
-    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const dataset::IParsingIterator& inputIterator, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
+    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(std::unique_ptr<dataset::IParsingIterator>&& inputIterator, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
 }
 
