@@ -24,8 +24,6 @@
 
 namespace layers
 {
-    // TODO: Describe what a map is here
-
     /// <summary> Implements a map. </summary>
     class Map
     {
@@ -49,13 +47,11 @@ namespace layers
             IndexValue Get() const;
 
         protected:
-            std::vector<std::vector<double>> _layerOutputs;
-            const CoordinateList _outputCoordinates;
+            std::vector<double> _outputs;
             uint64 _index;
 
             // private ctor, can only be called from Map class
-            OutputIterator(const std::vector<std::unique_ptr<Layer>>& layers, const CoordinateList& outputCoordinates);
-            void AllocateLayerOutputs(const std::vector<std::unique_ptr<Layer>>& layers);
+            OutputIterator(std::vector<double>&& outputs);
             friend Map;
         };
 
@@ -149,6 +145,7 @@ namespace layers
         void UpdateInputLayer() const;
 
     private:
+        std::vector<std::vector<double>> AllocateLayerOutputs() const;
         static const int _currentVersion = 1;
     };
 }

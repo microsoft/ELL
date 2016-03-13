@@ -24,7 +24,7 @@ namespace layers
     //
     bool Map::OutputIterator::IsValid() const
     {
-        return _index < _outputCoordinates.size();
+        return _index < _outputs.size();
     }
 
     void Map::OutputIterator::Next()
@@ -35,32 +35,15 @@ namespace layers
         }
     }
 
-    void Map::OutputIterator::AllocateLayerOutputs(const std::vector<std::unique_ptr<Layer>>& layers)
-    {
-        _layerOutputs.clear();
-        for (uint64 i = 0; i < layers.size(); ++i)
-        {
-            _layerOutputs.emplace_back(layers[i]->Size());
-        }
-    }
-
     /// \returns The current index-value pair
     ///
     IndexValue Map::OutputIterator::Get() const
     {
-        auto coordinate = _outputCoordinates[_index];
-        uint64 layerIndex = coordinate.GetLayerIndex();
-        uint64 elementIndex = coordinate.GetElementIndex();
-        return IndexValue{ _index, _layerOutputs[layerIndex][elementIndex] };
+        return IndexValue{ _index, _outputs[_index]};
     }
 
-    Map::OutputIterator::OutputIterator(const std::vector<std::unique_ptr<Layer>>& layers, const CoordinateList& outputCoordinates) :
-        _outputCoordinates(outputCoordinates),
-        _index(0)
-    {
-        AllocateLayerOutputs(layers);
-    }
-
+    Map::OutputIterator::OutputIterator(std::vector<double>&& outputs) : _outputs(std::move(outputs)), _index(0)
+    {}
 
     //
     // Map class implementation
@@ -103,6 +86,19 @@ namespace layers
     uint64 Map::NumLayers() const
     {
         return _layers.size();
+    }
+
+    std::vector<std::vector<double>> Map::AllocateLayerOutputs() const
+    {
+        auto numLayers = _layers.size();
+        std::vector<std::vector<double>> layerOutputs;
+        layerOutputs.resize(numLayers);
+        for (uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
+        {
+            layerOutputs[layerIndex].resize(_layers[layerIndex]->Size());
+            layerOutputs[layerIndex].clear();
+        }
+        return layerOutputs;
     }
 
     const char* Map::GetTypeName()

@@ -30,7 +30,7 @@ namespace layers
         _size = size;
     }
 
-    void Input::Compute(uint64 layerIndex, std::vector<std::vector<double>>& outputs) const
+    void Input::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
     {
         throw std::runtime_error("this code should never be reached");
     }

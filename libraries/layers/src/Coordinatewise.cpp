@@ -49,13 +49,13 @@ namespace layers
         return _inputCoordinates.size();
     }
 
-    void Coordinatewise::Compute(uint64 layerIndex, std::vector<std::vector<double>>& outputs) const 
+    void Coordinatewise::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
     {
         for(uint64 k=0; k<_values.size(); ++k)
         {
             Coordinate coordinate = _inputCoordinates[k];
-            double input = outputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
-            outputs[layerIndex][k] = _operation(_values[k], input);
+            double input = inputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
+            outputs[k] = _operation(_values[k], input);
         }
     }
 

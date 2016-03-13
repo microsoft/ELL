@@ -30,16 +30,16 @@ namespace layers
         return _inputCoordinates.size();
     }
 
-    void Sum::Compute(uint64 layerIndex, std::vector<std::vector<double>>& outputs) const
+    void Sum::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
     {
-        for (uint64 k = 0; k<_inputCoordinates.size(); ++k)
+        for (uint64 k = 0; k < _inputCoordinates.size(); ++k)
         {
             double output = 0;
             for (auto coordinate : _inputCoordinates[k])
             {
-                output += outputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
+                output += inputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
             }
-            outputs[layerIndex][k] = output;
+            outputs[k] = output;
         }
     }
 
