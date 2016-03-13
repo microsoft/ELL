@@ -64,14 +64,6 @@ namespace common
             }
             auto inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
             return GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
-
-            /*
-            // TODO:
-            auto inputIterator = GetDataIterator(dataLoadArguments);
-            auto map = GetMap(mapLoadArguments);
-            auto inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
-            return GetMappedDataIterator(std::move(inputIterator), map, inputCoordinates);
-            */
         }
     }
 
@@ -83,7 +75,6 @@ namespace common
         }
         else
         {
-            // #### TODO: return empty "identity" map
             return nullptr;
         }
     }
@@ -101,8 +92,6 @@ namespace common
         // create mapped parser
         dataset::MappedParser<dataset::SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
 
-        // #### why not just run dataIterator through the map?
-
         // create line iterator - read line by line sequentially
         dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
 
@@ -110,37 +99,6 @@ namespace common
         return dataset::GetParsingIterator(std::move(lineIterator), mappedParser);
     }
 
-
-    /*    
-    class MappedDataIterator : public dataset::IParsingIterator
-    {
-    public:
-        MappedDataIterator(std::shared_ptr<layers::Map> map, const layers::CoordinateList& inputCoordinates);
-
-        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
-        ///
-        /// <returns> true if it succeeds, false if it fails. </returns>
-        virtual bool IsValid() const;
-
-        /// <summary> Proceeds to the Next row. </summary>
-        virtual void Next();
-
-        /// <summary> \returns The weight of the current example. </summary>
-        ///
-        /// <returns> A SupervisedExample. </returns>
-        virtual dataset::SupervisedExample Get() const;
-
-    private:
-        std::shared_ptr<layers::Map> _map;
-        layers::CoordinateList _inputCoordinates;
-    };
-
-    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(std::unique_ptr<dataset::IParsingIterator>&& inputIterator, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates)
-    {
-        return std::make_unique<MappedDataIterator>(inputIterator, map, inputCoordinates);
-    }
-*/
-    
     layers::CoordinateList GetInputCoordinates(const layers::Map& map, const MapLoadArguments& mapLoadArguments)
     {
         layers::CoordinateList inputCoordinates = layers::GetCoordinateList(map, mapLoadArguments.coordinateList);
@@ -183,30 +141,6 @@ namespace common
             // fill in dataset
             auto upDataIterator = GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
             rowDataset = LoadDataset(*upDataIterator);
-        }
-    }
-    
-    // Do this instead of calling GetRowDatasetMapCoordinates
-    void MyCodeInMain(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments)
-    {
-        auto inputIterator = GetDataIterator(dataLoadArguments);
-        auto map = GetMap(mapLoadArguments);
-        dataset::RowDataset rowDataset; // depends on map if there is one, else depends on inputIterator
-        layers::CoordinateList inputCoordinates; // depends on dataset if there is one, else depends on map
-
-        // need to set rowDataset and inputCoordinates
-        if (map == nullptr)
-        {
-            rowDataset = LoadDataset(*inputIterator);
-            auto numColumns = rowDataset.NumColumns();
-            map = std::make_unique<layers::Map>(numColumns); // :(
-            inputCoordinates = layers::GetCoordinateList(0, 0, numColumns - 1);
-        }
-        else
-        {
-            inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
-            auto dataIterator = GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
-            rowDataset = LoadDataset(*dataIterator);
         }
     }
 }

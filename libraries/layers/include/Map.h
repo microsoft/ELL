@@ -83,8 +83,6 @@ namespace layers
         /// <summary> Virtual destructor. </summary>
         virtual ~Map() = default;
 
-        // #### Not a great function name. How about GetOutput or something. ProcessInput? Transform? TransformInput?
-        // #### Acutally since it returns an iterator, why not GetOutputIterator? 
         /// <summary> Computes the Map. </summary>
         ///
         /// <typeparam name="IndexValueIteratorType"> Input iterator type. </typeparam>
@@ -95,7 +93,6 @@ namespace layers
         template <typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         OutputIterator Compute(IndexValueIteratorType inputIterator, const CoordinateList& outputCoordinates) const;
 
-        // #### Call this AddLayer
         /// <summary> Adds a layer to the map. </summary>
         ///
         /// <param name="layer"> The layer to add to the map. </param>
