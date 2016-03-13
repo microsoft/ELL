@@ -195,36 +195,36 @@ void PrintableMap::Deserialize(utilities::JsonSerializer & serializer)
 
 void PrintableMap::DeserializeLayers(utilities::JsonSerializer & serializer, std::shared_ptr<layers::Layer>& up)
 {
-    auto type = serializer.Read<std::string>("_type");
-    auto version = serializer.Read<int>("_version");
+    //auto type = serializer.Read<std::string>("_type");
+    //auto version = serializer.Read<int>("_version");
 
-    if (type == "Input")
-    {
-        auto upZero = std::make_shared<PrintableInput>();
-        upZero->Deserialize(serializer, version);
-        up = upZero;
-    }
-    else if (type == "Scale")
-    {
-        auto upScale = std::make_shared<PrintableCoordinatewise>(layers::Layer::Type::scale);
-        upScale->Deserialize(serializer, version);
-        up = upScale;
-    }
-    else if (type == "Shift")
-    {
-        auto upCoordinatewise = std::make_shared<PrintableCoordinatewise>(layers::Layer::Type::shift);
-        upCoordinatewise->Deserialize(serializer, version);
-        up = upCoordinatewise;
-    }
-    else if (type == "Sum")
-    {
-        auto upSum = std::make_shared<PrintableSum>();
-        upSum->Deserialize(serializer, version);
-        up = upSum;
-    }
-    else
-    {
-        throw std::runtime_error("unidentified type in map file: " + type);
-    }
+    //if (type == "Input")
+    //{
+    //    auto upZero = std::make_shared<PrintableInput>();
+    //    upZero->Deserialize(serializer, version);
+    //    up = upZero;
+    //}
+    //else if (type == "Scale")
+    //{
+    //    auto upScale = std::make_shared<PrintableCoordinatewise>(layers::Layer::Type::scale);
+    //    upScale->Deserialize(serializer, version);
+    //    up = upScale;
+    //}
+    //else if (type == "Shift")
+    //{
+    //    auto upCoordinatewise = std::make_shared<PrintableCoordinatewise>(layers::Layer::Type::shift);
+    //    upCoordinatewise->Deserialize(serializer, version);
+    //    up = upCoordinatewise;
+    //}
+    //else if (type == "Sum")
+    //{
+    //    auto upSum = std::make_shared<PrintableSum>();
+    //    upSum->Deserialize(serializer, version);
+    //    up = upSum;
+    //}
+    //else
+    //{
+    //    throw std::runtime_error("unidentified type in map file: " + type);
+    //}
 }
 

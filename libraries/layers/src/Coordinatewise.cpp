@@ -64,6 +64,38 @@ namespace layers
         return Layer::InputCoordinateIterator(_inputCoordinates.cbegin()+index, _inputCoordinates.cbegin()+index+1);
     }
 
+    const char* Coordinatewise::GetTypeName()
+    {
+        return "Coordinatewise";
+    }
+
+    const char* Coordinatewise::GetRuntimeTypeName() const
+    {
+        return GetTypeName();
+    }
+
+    void Coordinatewise::Read(utilities::XMLDeserializer& deserializer)
+    {
+        //int version = 0;
+        //deserializer.Deserialize("version", version);
+        //if (version == 1)
+        //{
+        //    deserializer.Deserialize("values", _values);
+        //    deserializer.Deserialize("coordinates", _inputCoordinates);
+        //}
+        //else
+        //{
+        //    throw std::runtime_error("unsupported version: " + std::to_string(version));
+        //}
+    }
+
+    void Coordinatewise::Write(utilities::XMLSerializer& serializer) const
+    {
+        //serializer.Serialize("version", _currentVersion);
+        //serializer.Serialize("values", _values);
+        //serializer.Serialize("coordinates", _inputCoordinates);
+    }
+
     void Coordinatewise::Serialize(utilities::JsonSerializer& serializer) const
     {
         // version 1

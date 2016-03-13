@@ -197,93 +197,6 @@ void testMatchFormat()
     testMatchFormat(MatchResult::parserError, "integer X and float -33.3", "integer % and float %", int(), double());
 }
 
-class SerializationTest
-{
-public:
-    static const char* GetSerializationName() 
-    {
-        return "SerializationTest";
-    }
-
-    template<typename SerializerType>
-    void Write(SerializerType& serializer) const
-    {
-        serializer.Serialize("x", x);
-        serializer.Serialize("y", y);
-        serializer.Serialize("v", v);
-        serializer.Serialize("p", p);
-    }
-
-    template<typename DeserializerType>
-    void Read(DeserializerType& deserializer)
-    {
-        deserializer.Deserialize("x", x);
-        deserializer.Deserialize("y", y);
-        deserializer.Deserialize("v", v);
-        deserializer.Deserialize("p", p);
-    }
-
-    void Set()
-    {
-        x = 17;
-        y = -33.44;
-        v.resize(4);
-        v[0] = 6;
-        v[1] = 7;
-        v[2] = 8;
-        v[3] = 9;
-        p.resize(2);
-        p[0] = std::make_shared<int>(99);
-        p[1] = std::make_shared<int>(88);
-    }
-
-    bool Check()
-    {
-        if (x == 17 &&
-            y == -33.44 &&
-            v.size() == 4 &&
-            v[0] == 6 &&
-            v[1] == 7 &&
-            v[2] == 8 &&
-            v[3] == 9 &&
-            p.size() == 2 &&
-            p[0] != nullptr &&
-            *(p[0]) == 99 &&
-            p[1] != nullptr &&
-            *(p[1]) == 88)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    int x;
-    double y; 
-    std::vector<uint64> v;
-    std::vector<std::shared_ptr<int>> p;
-};
-
-void XMLSerializationTest()
-{
-    utilities::XMLSerializer serializer;
-    SerializationTest test;
-    test.Set();
-
-    serializer.Serialize("test", test);
-
-    std::stringstream ss;
-    serializer.WriteToStream(ss);
-    std::cout << ss.str() << std::endl;
-
-    utilities::XMLDeserializer deserializer(ss);
-    SerializationTest test2;
-    deserializer.Deserialize("test", test2);
-
-    testing::ProcessTest("utilities::XMLSerialization", test2.Check());
-}
 
 /// Runs all tests
 ///
@@ -293,7 +206,6 @@ int main()
     testTransformIterator();
     testParallelTransformIterator();
     testMatchFormat();
-    XMLSerializationTest();
 
     if (testing::DidTestFail())
     {
