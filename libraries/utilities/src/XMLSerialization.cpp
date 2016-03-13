@@ -13,18 +13,16 @@
 
 namespace utilities
 {
-    XMLDeserializer::XMLDeserializer(std::istream& is)
+    XMLDeserializer::XMLDeserializer(std::istream& stream)
     {
-        std::stringstream stream;
-        stream << is.rdbuf();
-        _string = stream.str();
+        std::stringstream stringStream;
+        stringStream << stream.rdbuf();
+        _string = std::move(stringStream.str());
         _pStr = _string.c_str();
     }
 
-    void XMLSerializer::WriteToStream(std::ostream& os) const
-    {
-        os << _stream.str();
-    }
+    XMLSerializer::XMLSerializer(std::ostream & stream) : _stream(stream)
+    {}
 
     void XMLSerializer::Indent()
     {

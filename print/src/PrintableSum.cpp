@@ -14,7 +14,7 @@
 LayerLayout PrintableSum::Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const
 {
     // calculate the layout
-    auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetTypeName(), Size(), Arguments.emptyElementLayout, Arguments.layerStyle);
+    auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetFriendlyLayerName(), Size(), Arguments.emptyElementLayout, Arguments.layerStyle);
 
     //// print the visible elements, before the dots
     for (uint64 k = 0; k < layout.NumVisibleElements() - 1; ++k)

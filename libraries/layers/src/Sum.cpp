@@ -49,14 +49,44 @@ namespace layers
         return Layer::InputCoordinateIterator(_inputCoordinates[index].cbegin(), _inputCoordinates[index].cend());
     }
 
-    void Sum::Serialize(utilities::JsonSerializer & serializer) const
+    const char* Sum::GetTypeName()
+    {
+        return "Sum";
+    }
+
+    const char* Sum::GetRuntimeTypeName() const
+    {
+        return GetTypeName();
+    }
+
+    void Sum::Read(utilities::XMLDeserializer& deserializer)
+    {
+        //int version = 0;
+        //deserializer.Deserialize("version", version);
+        //if (version == 1)
+        //{
+        //    deserializer.Deserialize("coordinates", _inputCoordinates);
+        //}
+        //else
+        //{
+        //    throw std::runtime_error("unsupported version: " + std::to_string(version));
+        //}
+    }
+
+    void Sum::Write(utilities::XMLSerializer& serializer) const
+    {
+        //serializer.Serialize("version", _currentVersion);
+        //serializer.Serialize("coordinates", _inputCoordinates);
+    }
+
+    void Sum::Serialize(utilities::JsonSerializer& serializer) const
     {
         // version 1
         Layer::SerializeHeader(serializer, 1);
         serializer.Write("coordinates", _inputCoordinates);
     }
 
-    void Sum::Deserialize(utilities::JsonSerializer & serializer, int version)
+    void Sum::Deserialize(utilities::JsonSerializer& serializer, int version)
     {
         if (version == 1)
         {

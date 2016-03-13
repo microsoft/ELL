@@ -15,6 +15,7 @@
 
 // utilities
 #include "JsonSerializer.h"
+#include "XMLSerialization.h"
 
 // stl
 #include <vector>
@@ -42,6 +43,16 @@ namespace layers
         ///
         /// <returns> The element index. </returns>
         uint64 GetElementIndex() const; 
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static const char* GetTypeName();
+
+        void Read(utilities::XMLDeserializer& deserializer);
+        void Write(utilities::XMLSerializer& serializer) const;
+
+        // TODO: remove JSON serializaiton
 
         /// <summary> Serializes an index value pair. </summary>
         ///

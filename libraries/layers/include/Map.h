@@ -114,6 +114,16 @@ namespace layers
         template<typename MapType = Map>
         static MapType Load(const std::string& inputMapFile);
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static const char* GetTypeName();
+
+        void Read(utilities::XMLDeserializer& deserializer);
+        void Write(utilities::XMLSerializer& serializer) const;
+
+        // TODO: remove JSON serializaiton
+
         /// <summary> Serializes the Map in json format. </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
@@ -140,6 +150,9 @@ namespace layers
 
         // members
         std::vector<std::shared_ptr<Layer>> _layers;
+
+    private:
+        static const int _currentVersion = 1;
     };
 }
 

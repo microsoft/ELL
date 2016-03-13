@@ -170,35 +170,35 @@ void CompilableMap::Deserialize(utilities::JsonSerializer& serializer)
 
 void CompilableMap::DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<layers::Layer>& spLayer)
 {
-    auto type = serializer.Read<std::string>("_type");
-    auto version = serializer.Read<int>("_version");
+    //auto type = serializer.Read<std::string>("_type");
+    //auto version = serializer.Read<int>("_version");
 
-    if (type == "Input")
-    {
-        auto spZero = std::make_shared<CompilableInput>();
-        spZero->Deserialize(serializer, version);
-        spLayer = spZero;
-    }
-    else if (type == "Scale")
-    {
-        auto spScale = std::make_shared<CompilableCoordinatewise>(layers::Layer::Type::scale);
-        spScale->Deserialize(serializer, version);
-        spLayer = spScale;
-    }
-    else if (type == "Shift")
-    {
-        auto spShift = std::make_shared<CompilableCoordinatewise>(layers::Layer::Type::shift);
-        spShift->Deserialize(serializer, version);
-        spLayer = spShift;
-    }
-    else if (type == "Sum")
-    {
-        auto spSum = std::make_shared<CompilableSum>();
-        spSum->Deserialize(serializer, version);
-        spLayer = spSum;
-    }
-    else
-    {
-        throw std::runtime_error("unidentified type in map file: " + type);
-    }
+    //if (type == "Input")
+    //{
+    //    auto spZero = std::make_shared<CompilableInput>();
+    //    spZero->Deserialize(serializer, version);
+    //    spLayer = spZero;
+    //}
+    //else if (type == "Scale")
+    //{
+    //    auto spScale = std::make_shared<CompilableCoordinatewise>(layers::Layer::Type::scale);
+    //    spScale->Deserialize(serializer, version);
+    //    spLayer = spScale;
+    //}
+    //else if (type == "Shift")
+    //{
+    //    auto spShift = std::make_shared<CompilableCoordinatewise>(layers::Layer::Type::shift);
+    //    spShift->Deserialize(serializer, version);
+    //    spLayer = spShift;
+    //}
+    //else if (type == "Sum")
+    //{
+    //    auto spSum = std::make_shared<CompilableSum>();
+    //    spSum->Deserialize(serializer, version);
+    //    spLayer = spSum;
+    //}
+    //else
+    //{
+    //    throw std::runtime_error("unidentified type in map file: " + type);
+    //}
 }

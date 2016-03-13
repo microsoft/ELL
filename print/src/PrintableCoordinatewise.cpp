@@ -16,7 +16,7 @@ PrintableCoordinatewise::PrintableCoordinatewise(layers::Layer::Type type) : Coo
 
 LayerLayout PrintableCoordinatewise::Print(std::ostream & os, double left, double top, uint64 layerIndex, const PrintArguments & Arguments) const
 {
-    auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetTypeName(), Size(), Arguments.valueElementLayout, Arguments.layerStyle);
+    auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetFriendlyLayerName(), Size(), Arguments.valueElementLayout, Arguments.layerStyle);
 
    //// print the visible elements, before the dots
    for (uint64 k = 0; k < layout.NumVisibleElements()-1; ++k)

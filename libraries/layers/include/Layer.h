@@ -56,10 +56,10 @@ namespace layers
         /// <returns> The number of elements in the layer. </returns>
         virtual uint64 Size() const = 0;
 
-        /// <summary> \returns A std::string tha trepresents the layer type. </summary>
+        /// <summary> Gets a human friendly name of the layer type. </summary>
         ///
         /// <returns> The type name. </returns>
-        std::string GetTypeName() const;
+        std::string GetFriendlyLayerName() const;
 
         /// <summary> Computes the layer output. </summary>
         ///
@@ -74,6 +74,21 @@ namespace layers
         /// <returns> The input coordinates. </returns>
         using InputCoordinateIterator = utilities::StlIterator<std::vector<Coordinate>::const_iterator, Coordinate>;
         virtual InputCoordinateIterator GetInputCoordinates(uint64 index) const = 0;
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static const char* GetTypeName();
+
+        /// <summary> Gets the name of the derived type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual const char* GetRuntimeTypeName() const = 0;
+
+        virtual void Read(utilities::XMLDeserializer& deserializer) = 0;
+        virtual void Write(utilities::XMLSerializer& serializer) const = 0;
+        
+        // TODO: remove JSON serializaiton
 
         /// <summary> Serializes the Layer in json format. </summary>
         ///

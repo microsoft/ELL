@@ -54,6 +54,21 @@ namespace layers
         /// <returns> The input coordinates. </returns>
         virtual Layer::InputCoordinateIterator GetInputCoordinates(uint64 index) const override;
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static const char*  GetTypeName();
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual const char* GetRuntimeTypeName() const override;
+
+        virtual void Read(utilities::XMLDeserializer& deserializer) override;
+        virtual void Write(utilities::XMLSerializer& serializer) const override;
+
+        // TODO: remove JSON serializaiton
+
         /// <summary> Serializes the Layer in json format. </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
@@ -67,5 +82,6 @@ namespace layers
 
     private:
         uint64 _size;
+        static const int _currentVersion = 1;
     };
 }

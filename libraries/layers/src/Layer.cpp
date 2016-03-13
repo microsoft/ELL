@@ -17,15 +17,20 @@ namespace layers
     Layer::Layer(Type type) : _type(type)
     {}
 
-    std::string Layer::GetTypeName() const
+    std::string Layer::GetFriendlyLayerName() const
     {
         return typeName[(int)_type];
+    }
+
+    const char* Layer::GetTypeName()
+    {
+        return "Layer";
     }
 
     void Layer::SerializeHeader(utilities::JsonSerializer& serializer, int version) const
     {
         // to make the file more readable
-        serializer.Write("_type", GetTypeName());
+        serializer.Write("_type", GetFriendlyLayerName());
         serializer.Write("_version", version);
     }
 }
