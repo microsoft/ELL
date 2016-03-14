@@ -57,7 +57,7 @@ namespace common
         }
         else
         {
-            auto map = GetMap(mapLoadArguments);
+            auto map = std::shared_ptr<layers::Map>(GetMap(mapLoadArguments));
             if(map == nullptr)
             {
                 throw std::runtime_error("Error: couldn't load map");
@@ -67,11 +67,11 @@ namespace common
         }
     }
 
-    std::shared_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments)
+    std::unique_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments)
     {
         if (mapLoadArguments.inputMapFile != "")
         {
-            return std::make_shared<layers::Map>(layers::Map::Load(mapLoadArguments.inputMapFile));
+            return std::make_unique<layers::Map>(layers::Map::Load(mapLoadArguments.inputMapFile));
         }
         else
         {

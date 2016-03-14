@@ -61,7 +61,7 @@ namespace common
     /// <param name="mapLoadArguments"> The map load arguments. </param>
     ///
     /// <returns> A shared pointer to the map. </returns>
-    std::shared_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments);
+    std::unique_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments);
 
     /// <summary> Gets the input coordinates for the given map, as specified by the command line parameters </summary>
     ///
@@ -87,8 +87,5 @@ namespace common
     ///
     /// <returns> The data iterator. </returns>
     std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
-
-// TODO: this, and maybe get rid of the above
-    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(std::unique_ptr<dataset::IParsingIterator>&& inputIterator, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
 }
 
