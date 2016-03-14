@@ -55,7 +55,7 @@ namespace layers
     template <typename LayerType>
     const LayerType& Map::GetLayer(uint64 layerIndex) const
     {
-        return *(dynamic_cast<const LayerType*>(_layers[layerIndex].get()));
+        return dynamic_cast<const LayerType&>(*_layers[layerIndex]);
     }
 
     template<typename MapType>
