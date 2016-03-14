@@ -52,7 +52,7 @@ namespace dataset
 
     private:
         InternalParserType _internalParser;
-        std::shared_ptr<layers::Map> _map; 
+        std::shared_ptr<const layers::Map> _map; 
         layers::CoordinateList _outputCoordinates;
     };
 }
