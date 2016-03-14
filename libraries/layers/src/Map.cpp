@@ -67,7 +67,7 @@ namespace layers
         _layers.push_back(std::make_unique<Input>(inputLayerSize));
     }
 
-    uint64 Map::PushBack(std::unique_ptr<Layer>&& layer)
+    uint64 Map::AddLayer(std::unique_ptr<Layer>&& layer)
     {
         uint64 layerIndex = _layers.size();
         _layers.push_back(std::move(layer));

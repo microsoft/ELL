@@ -91,7 +91,7 @@ namespace layers
         /// <param name="layer"> The layer to add to the map. </param>
         ///
         /// <returns> The index of the added layer. </returns>
-        uint64 PushBack(std::unique_ptr<Layer>&& layer);
+        uint64 AddLayer(std::unique_ptr<Layer>&& layer);
 
         /// <summary> Returns the number of layers in the map. </summary>
         ///
