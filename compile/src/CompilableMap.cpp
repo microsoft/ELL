@@ -168,7 +168,7 @@ void CompilableMap::Deserialize(utilities::JsonSerializer& serializer)
     serializer.Read("layers", _layers, CompilableMap::DeserializeLayers);
 }
 
-void CompilableMap::DeserializeLayers(utilities::JsonSerializer& serializer, std::unique_ptr<layers::Layer>& spLayer)
+void CompilableMap::DeserializeLayers(utilities::JsonSerializer& serializer, std::unique_ptr<layers::Layer>& upLayer)
 {
     //auto type = serializer.Read<std::string>("_type");
     //auto version = serializer.Read<int>("_version");
