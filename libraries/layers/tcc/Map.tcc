@@ -26,9 +26,9 @@ namespace layers
         while (indexValueIterator.IsValid())
         {
             auto entry = indexValueIterator.Get();
-            if (entry.index >= array.size()) // assume indexValueIterator is sorted by index
+            if (entry.index >= array.size())
             {
-                break;
+                array.resize(entry.index + 1);
             }
             array[entry.index] = entry.value;
             indexValueIterator.Next();
@@ -42,6 +42,10 @@ namespace layers
 
         // set the input 
         SetArray(outputIterator._layerOutputs[0], inputIterator);
+
+        // (yuck) increment the size of the input layer if this input vector is larger than something we've seen before
+        _maxInputElement = std::max(_maxInputElement, outputIterator._layerOutputs[0].size() - 1);
+        UpdateInputLayer();
 
         // compute layers 1,2,... in order
         for (uint64 i = 1; i < _layers.size(); ++i)

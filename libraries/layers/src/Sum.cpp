@@ -19,18 +19,17 @@ namespace layers
     Sum::Sum() : Layer(Type::sum) 
     {}
 
-    Sum::Sum(const CoordinateList & coordinates) : Layer(Type::sum), _inputCoordinates(0)
-    {
-        _inputCoordinates.push_back(coordinates);
-    }
+    Sum::Sum(const CoordinateList & coordinates) : Layer(Type::sum), _inputCoordinates({ coordinates })
+    {}
 
     Sum::Sum(const std::vector<CoordinateList>& coordinates) : Layer(Type::sum), _inputCoordinates(coordinates)
     {}
 
     uint64 Sum::Size() const
     {
-        return 1;
+        return _inputCoordinates.size();
     }
+
     void Sum::Compute(uint64 layerIndex, std::vector<std::vector<double>>& outputs) const
     {
         for (uint64 k = 0; k<_inputCoordinates.size(); ++k)

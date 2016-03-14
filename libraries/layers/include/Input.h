@@ -26,9 +26,7 @@ namespace layers
     public:
 
         /// <summary> Constructs an Input layer. </summary>
-        ///
-        /// <param name="size"> The dimension of the input. </param>
-        Input(uint64 size = 0);
+        Input();
 
         /// <summary> Copy constructor. </summary>
         Input(const Input&) = default;
@@ -79,6 +77,8 @@ namespace layers
         /// <param name="serializer"> [in,out] The serializer. </param>
         /// <param name="version"> The version. </param>
         virtual void Deserialize(utilities::JsonSerializer & serializer, int version) override;
+
+        void SetSize(uint64 size);
 
     private:
         uint64 _size;

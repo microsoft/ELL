@@ -29,7 +29,10 @@ namespace layers
 
     void Map::OutputIterator::Next()
     {
-        ++_index;
+        if (IsValid())
+        {
+            ++_index;
+        }
     }
 
     void Map::OutputIterator::AllocateLayerOutputs(const std::vector<std::unique_ptr<Layer>>& layers)
@@ -62,13 +65,36 @@ namespace layers
     //
     // Map class implementation
     //
-    Map::Map(uint64 inputLayerSize)
+    Map::Map() : _maxInputElement(0)
     {
-        _layers.push_back(std::make_unique<Input>(inputLayerSize));
+        _layers.push_back(std::make_unique<Input>());
     }
 
     uint64 Map::AddLayer(std::unique_ptr<Layer>&& layer)
     {
+        // #### TODO: verify layer's input coordinates make sense
+        
+        // Keep track of the maximum input dimension requested
+        auto layerSize = layer->Size();
+        for (uint64 index = 0; index < layerSize; index++)
+        {
+            auto inputCoords = layer->GetInputCoordinates(index);
+            while (inputCoords.IsValid())
+            {
+                auto coord = inputCoords.Get();
+                auto inputLayer = coord.GetLayerIndex();
+                auto inputElement = coord.GetElementIndex();
+                if (inputLayer == 0)
+                {
+                    _maxInputElement = std::max(inputElement, _maxInputElement);
+                }
+                inputCoords.Next();
+            }
+        }
+
+        // Update input layer (layer 0)
+        UpdateInputLayer();
+
         uint64 layerIndex = _layers.size();
         _layers.push_back(std::move(layer));
         return layerIndex;
@@ -149,5 +175,10 @@ namespace layers
         //}
 
         //spLayer->Deserialize(serializer, version);
+    }
+
+    void Map::UpdateInputLayer() const
+    {
+        dynamic_cast<Input*>(_layers[0].get())->SetSize(_maxInputElement + 1);
     }
 }

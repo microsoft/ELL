@@ -59,19 +59,14 @@ namespace layers
             friend Map;
         };
 
-        /// <summary> Default constructor. </summary>
-        Map() = default;
+        /// <summary> Constructs an instance of Map. </summary>
+        Map();
 
         /// <summary> Deleted copy constructor </summary>
         Map(const Map&) = delete;
 
         /// <summary> Default move constructor </summary>
         Map(Map&&) = default;
-
-        /// <summary> Constructs an instance of Map. </summary>
-        ///
-        /// <param name="inputLayerSize"> Input dimension. </param>
-        Map(uint64 inputLayerSize);
 
         /// <summary> Virtual destructor. </summary>
         virtual ~Map() = default;
@@ -150,6 +145,8 @@ namespace layers
     protected:
         // members
         std::vector<std::unique_ptr<Layer>> _layers;
+        mutable uint64 _maxInputElement;
+        void UpdateInputLayer() const;
 
     private:
         static const int _currentVersion = 1;

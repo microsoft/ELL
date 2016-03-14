@@ -17,12 +17,17 @@
 namespace layers
 {
 
-    Input::Input(uint64 size) : Layer(Type::zero), _size(size)
+    Input::Input() : Layer(Type::zero), _size(0)
     {}
 
     uint64 Input::Size() const
     {
         return _size;
+    }
+
+    void Input::SetSize(uint64 size)
+    {
+        _size = size;
     }
 
     void Input::Compute(uint64 layerIndex, std::vector<std::vector<double>>& outputs) const
