@@ -26,17 +26,6 @@
 
 namespace common
 {
-    dataset::RowDataset LoadDataset(dataset::IParsingIterator& dataIterator)
-    {
-        dataset::RowDataset dataset;
-        while (dataIterator.IsValid())
-        {
-            dataset.PushBackRow(dataIterator.Get());
-            dataIterator.Next();
-        }
-        return dataset;
-    }
-
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
     {
         // create line iterator - read line by line sequentially
@@ -67,43 +56,6 @@ namespace common
         }
     }
 
-    std::unique_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments)
-    {
-        if (mapLoadArguments.inputMapFile != "")
-        {
-            return std::make_unique<layers::Map>(layers::Map::Load(mapLoadArguments.inputMapFile));
-        }
-        else
-        {
-            return nullptr;
-        }
-    }
-
-    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates)
-    {
-        if(map == nullptr)
-        {
-            return GetDataIterator(dataLoadArguments);
-        }
-
-        // create parser for sparse vectors (SVMLight format)
-        dataset::SparseEntryParser sparseEntryParser;
-
-        // create mapped parser
-        dataset::MappedParser<dataset::SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
-
-        // create line iterator - read line by line sequentially
-        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
-
-        // Create iterator
-        return dataset::GetParsingIterator(std::move(lineIterator), mappedParser);
-    }
-
-    layers::CoordinateList GetInputCoordinates(const layers::Map& map, const MapLoadArguments& mapLoadArguments)
-    {
-        layers::CoordinateList inputCoordinates = layers::GetCoordinateList(map, mapLoadArguments.coordinateList);
-        return inputCoordinates;
-    }
 
     void GetRowDatasetMapCoordinates(
         const DataLoadArguments& dataLoadArguments,
@@ -128,7 +80,7 @@ namespace common
             map = std::make_shared<layers::Map>(numColumns);
 
             // create a coordinate list of this map
-            inputCoordinates = layers::GetCoordinateList(0, 0, numColumns-1);
+            inputCoordinates = layers::GetCoordinateList(0, 0, numColumns - 1);
         }
         else
         {
@@ -143,4 +95,54 @@ namespace common
             rowDataset = LoadDataset(*upDataIterator);
         }
     }
+
+    std::unique_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments)
+    {
+        if (mapLoadArguments.inputMapFile != "")
+        {
+            return std::make_unique<layers::Map>(layers::Map::Load(mapLoadArguments.inputMapFile));
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    layers::CoordinateList GetInputCoordinates(const layers::Map& map, const MapLoadArguments& mapLoadArguments)
+    {
+        layers::CoordinateList inputCoordinates = layers::GetCoordinateList(map, mapLoadArguments.coordinateList);
+        return inputCoordinates;
+    }
+
+    dataset::RowDataset LoadDataset(dataset::IParsingIterator& dataIterator)
+    {
+        dataset::RowDataset dataset;
+        while (dataIterator.IsValid())
+        {
+            dataset.PushBackRow(dataIterator.Get());
+            dataIterator.Next();
+        }
+        return dataset;
+    }
+
+    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates)
+    {
+        if(map == nullptr)
+        {
+            return GetDataIterator(dataLoadArguments);
+        }
+
+        // create parser for sparse vectors (SVMLight format)
+        dataset::SparseEntryParser sparseEntryParser;
+
+        // create mapped parser
+        dataset::MappedParser<dataset::SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
+
+        // create line iterator - read line by line sequentially
+        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
+
+        // Create iterator
+        return dataset::GetParsingIterator(std::move(lineIterator), mappedParser);
+    }
+
 }
