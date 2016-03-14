@@ -49,7 +49,7 @@ namespace layers
             IndexValue Get() const;
 
         protected:
-            std::vector<std::vector<double>> _outputs;
+            std::vector<std::vector<double>> _layerOutputs;
             const CoordinateList _outputCoordinates;
             uint64 _index;
 

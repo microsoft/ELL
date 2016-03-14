@@ -34,10 +34,10 @@ namespace layers
 
     void Map::OutputIterator::AllocateLayerOutputs(const std::vector<std::unique_ptr<Layer>>& layers)
     {
-        _outputs.clear();
+        _layerOutputs.clear();
         for (uint64 i = 0; i < layers.size(); ++i)
         {
-            _outputs.emplace_back(layers[i]->Size());
+            _layerOutputs.emplace_back(layers[i]->Size());
         }
     }
 
@@ -48,7 +48,7 @@ namespace layers
         auto coordinate = _outputCoordinates[_index];
         uint64 layerIndex = coordinate.GetLayerIndex();
         uint64 elementIndex = coordinate.GetElementIndex();
-        return IndexValue{ _index, _outputs[layerIndex][elementIndex] };
+        return IndexValue{ _index, _layerOutputs[layerIndex][elementIndex] };
     }
 
     Map::OutputIterator::OutputIterator(const std::vector<std::unique_ptr<Layer>>& layers, const CoordinateList& outputCoordinates) :

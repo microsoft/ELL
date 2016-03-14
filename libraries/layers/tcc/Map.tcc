@@ -41,12 +41,12 @@ namespace layers
         OutputIterator outputIterator(_layers, outputCoordinates);
 
         // set the input 
-        SetArray(outputIterator._outputs[0], inputIterator);
+        SetArray(outputIterator._layerOutputs[0], inputIterator);
 
         // compute layers 1,2,... in order
         for (uint64 i = 1; i < _layers.size(); ++i)
         {
-            _layers[i]->Compute(i, outputIterator._outputs);
+            _layers[i]->Compute(i, outputIterator._layerOutputs);
         }
 
         return outputIterator;
