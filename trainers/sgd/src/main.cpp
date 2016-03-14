@@ -19,6 +19,7 @@
 // layers
 #include "Map.h"
 #include "Coordinate.h"
+#include "CoordinateListTools.h"
 
 // dataset
 #include "SupervisedExample.h"
@@ -74,6 +75,12 @@ int main(int argc, char* argv[])
         std::shared_ptr<layers::Map> map;
         layers::CoordinateList inputCoordinates;
         GetRowDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
+
+        // #### TODO: find a better way to fix the problem of empty inputCoordinates
+        if (inputCoordinates.size() == 0)
+        {
+            inputCoordinates = layers::GetCoordinateList(*map, 0);
+        }
 
         // create loss function
         lossFunctions::LogLoss loss;

@@ -51,7 +51,10 @@ namespace predictors
 
     void SharedLinearBinaryPredictor::AddTo(layers::Map& map, const layers::CoordinateList& inputCoordinates) const
     {
+        // #### TODO: deal with case where inputCoordinates is empty
+
         uint64 layerIndex = map.AddLayer(std::make_unique<layers::Coordinatewise>(_sp_predictor->w, inputCoordinates, layers::Layer::Type::scale));
+
         auto coordinates = layers::GetCoordinateList(map, layerIndex);
         layerIndex = map.AddLayer(std::make_unique<layers::Sum>(coordinates));
 
