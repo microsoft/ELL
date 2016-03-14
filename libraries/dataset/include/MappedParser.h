@@ -29,7 +29,10 @@ namespace dataset
     class MappedParser
     {
     public:
+        /// <summary> Copy constructor. </summary>
         MappedParser(const MappedParser&) = default;
+
+        /// <summary> Move constructor. </summary>
         MappedParser(MappedParser&&) = default;
 
         /// <summary> Constructs an instance of MappedParser. </summary>
