@@ -35,13 +35,6 @@ namespace layers
         class OutputIterator : public IIndexValueIterator
         {
         public:
-
-            /// <summary> Copy constructor. </summary>
-            OutputIterator(const OutputIterator&) = default;
-
-            /// <summary> Move constructor. </summary>
-            OutputIterator(OutputIterator&&) = default;
-
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if valid, false if not. </returns>
