@@ -19,41 +19,58 @@
 
 namespace layers
 {
-    bool Map::Iterator::IsValid() const
+    //
+    // Map::OutputIterator implementation
+    //
+    bool Map::OutputIterator::IsValid() const
     {
         return _index < _outputCoordinates.size();
     }
 
-    void Map::Iterator::Next()
+    void Map::OutputIterator::Next()
     {
         ++_index;
     }
 
+    void Map::OutputIterator::AllocateLayerOutputs(const std::vector<std::unique_ptr<Layer>>& layers)
+    {
+        _layerOutputs.clear();
+        for (uint64 i = 0; i < layers.size(); ++i)
+        {
+            _layerOutputs.emplace_back(layers[i]->Size());
+        }
+    }
+
     /// \returns The current index-value pair
     ///
-    IndexValue Map::Iterator::Get() const
+    IndexValue Map::OutputIterator::Get() const
     {
         auto coordinate = _outputCoordinates[_index];
         uint64 layerIndex = coordinate.GetLayerIndex();
         uint64 elementIndex = coordinate.GetElementIndex();
-        return IndexValue{ _index, _outputs[layerIndex][elementIndex] };
+        return IndexValue{ _index, _layerOutputs[layerIndex][elementIndex] };
     }
 
-    Map::Iterator::Iterator(std::vector<std::vector<double>>&& outputs, const CoordinateList& outputCoordinates) :
-        _outputs(std::move(outputs)),
+    Map::OutputIterator::OutputIterator(const std::vector<std::unique_ptr<Layer>>& layers, const CoordinateList& outputCoordinates) :
         _outputCoordinates(outputCoordinates),
         _index(0)
-    {}
-
-    Map::Map(uint64 inputLayerSize)
     {
-        _layers.push_back(std::make_shared<Input>(inputLayerSize));
+        AllocateLayerOutputs(layers);
     }
 
-    uint64 Map::PushBack(std::shared_ptr<Layer> layer)
+
+    //
+    // Map class implementation
+    //
+    Map::Map(uint64 inputLayerSize)
+    {
+        _layers.push_back(std::make_unique<Input>(inputLayerSize));
+    }
+
+    uint64 Map::AddLayer(std::unique_ptr<Layer>&& layer)
     {
         uint64 layerIndex = _layers.size();
-        _layers.push_back(layer);
+        _layers.push_back(std::move(layer));
         return layerIndex;
     }
 
@@ -105,7 +122,7 @@ namespace layers
         //serializer.Read("layers", _layers, DeserializeLayers);
     }
 
-    void Map::DeserializeLayers(utilities::JsonSerializer & serializer, std::shared_ptr<Layer>& spLayer)
+    void Map::DeserializeLayers(utilities::JsonSerializer & serializer, std::unique_ptr<Layer>& spLayer)
     {
         //auto type = serializer.Read<std::string>("_type");
         //auto version = serializer.Read<int>("_version");
@@ -132,15 +149,5 @@ namespace layers
         //}
 
         //spLayer->Deserialize(serializer, version);
-    }
-
-    std::vector<std::vector<double>> Map::AllocateOutputs() const
-    {
-        auto outputs = std::vector<std::vector<double>>{};
-        for (uint64 i = 0; i < _layers.size(); ++i)
-        {
-            outputs.emplace_back(_layers[i]->Size());
-        }
-        return outputs;
     }
 }

@@ -22,11 +22,11 @@ namespace layers
     template<typename IndexValueIteratorType>
     void SetArray(std::vector<double>& array, IndexValueIteratorType indexValueIterator)
     {
-        std::fill(array.begin(), array.end(), 0);
+        std::fill(array.begin(), array.end(), 0); // this isn't necessary because we always call this with a fresh array
         while (indexValueIterator.IsValid())
         {
             auto entry = indexValueIterator.Get();
-            if (entry.index >= array.size())
+            if (entry.index >= array.size()) // assume indexValueIterator is sorted by index
             {
                 break;
             }
@@ -36,27 +36,26 @@ namespace layers
     }
 
     template<typename IndexValueIteratorType, typename concept>
-    Map::Iterator Map::Compute(IndexValueIteratorType indexValueIterator, const CoordinateList& outputCoordinates) const
+    Map::OutputIterator Map::Compute(IndexValueIteratorType inputIterator, const CoordinateList& outputCoordinates) const
     {
-        // allocate memory to store the output of the map calculation
-        auto outputs = AllocateOutputs();
-        
+        OutputIterator outputIterator(_layers, outputCoordinates);
+
         // set the input 
-        SetArray( outputs[0], indexValueIterator);
+        SetArray(outputIterator._layerOutputs[0], inputIterator);
 
         // compute layers 1,2,... in order
-        for(uint64 i = 1; i<_layers.size(); ++i)
+        for (uint64 i = 1; i < _layers.size(); ++i)
         {
-            _layers[i]->Compute(i, outputs);
+            _layers[i]->Compute(i, outputIterator._layerOutputs);
         }
-        
-        return Iterator(std::move(outputs), outputCoordinates);
+
+        return outputIterator;
     }
 
-    template<typename LayerType>
-    std::shared_ptr<const LayerType> Map::GetLayer(uint64 layerIndex) const
+    template <typename LayerType>
+    const LayerType& Map::GetLayer(uint64 layerIndex) const
     {
-        return std::dynamic_pointer_cast<LayerType>(_layers[layerIndex]);
+        return dynamic_cast<const LayerType&>(*_layers[layerIndex]);
     }
 
     template<typename MapType>

@@ -51,6 +51,9 @@ namespace utilities
         template<typename KeyType, typename ValueType>
         void Write(KeyType key, const std::shared_ptr<ValueType>& ptr, typename std::enable_if<std::is_class<ValueType>::value>::type* concept = nullptr);
 
+        template<typename KeyType, typename ValueType>
+        void Write(KeyType key, const std::unique_ptr<ValueType>& ptr, typename std::enable_if<std::is_class<ValueType>::value>::type* concept = nullptr);
+
         /// <summary> write classes. </summary>
         ///
         /// <typeparam name="KeyType"> Type of the key type. </typeparam>
@@ -98,6 +101,9 @@ namespace utilities
         /// <param name="deserializer"> The deserializer. </param>
         template<typename KeyType, typename ValueType, typename DeserializerType>
         void Read(KeyType key, std::shared_ptr<ValueType>& ptr, DeserializerType deserializer) const;
+
+        template<typename KeyType, typename ValueType, typename DeserializerType>
+        void Read(KeyType key, std::unique_ptr<ValueType>& ptr, DeserializerType deserializer) const;
 
         /// <summary> Read classes. </summary>
         ///
@@ -149,6 +155,10 @@ namespace utilities
         /// <param name="deserializer"> The deserializer. </param>
         template<typename KeyType, typename ValueType, typename DeserializerType>
         void Read(KeyType key, std::vector<std::shared_ptr<ValueType>>& vec, DeserializerType deserializer) const;
+
+        template<typename KeyType, typename ValueType, typename DeserializerType>
+        void Read(KeyType key, std::vector<std::unique_ptr<ValueType>>& vec, DeserializerType deserializer) const;
+
 
         /// <summary> Read vectors. </summary>
         ///

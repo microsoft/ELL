@@ -24,22 +24,17 @@
 
 namespace layers
 {
+    // TODO: Describe what a map is here
+
     /// <summary> Implements a map. </summary>
     class Map
     {
     public:
 
         /// <summary> An iterator over the output values of the map. </summary>
-        class Iterator : public IIndexValueIterator
+        class OutputIterator : public IIndexValueIterator
         {
         public:
-
-            /// <summary> Copy constructor. </summary>
-            Iterator(const Iterator&) = default;
-
-            /// <summary> Move constructor. </summary>
-            Iterator(Iterator&&) = default;
-
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if valid, false if not. </returns>
@@ -54,17 +49,24 @@ namespace layers
             IndexValue Get() const;
 
         protected:
-            std::vector<std::vector<double>> _outputs;
+            std::vector<std::vector<double>> _layerOutputs;
             const CoordinateList _outputCoordinates;
             uint64 _index;
 
             // private ctor, can only be called from Map class
-            Iterator(std::vector<std::vector<double>>&& spOutput, const CoordinateList& outputCoordinates);
+            OutputIterator(const std::vector<std::unique_ptr<Layer>>& layers, const CoordinateList& outputCoordinates);
+            void AllocateLayerOutputs(const std::vector<std::unique_ptr<Layer>>& layers);
             friend Map;
         };
 
         /// <summary> Default constructor. </summary>
         Map() = default;
+
+        /// <summary> Deleted copy constructor </summary>
+        Map(const Map&) = delete;
+
+        /// <summary> Default move constructor </summary>
+        Map(Map&&) = default;
 
         /// <summary> Constructs an instance of Map. </summary>
         ///
@@ -82,14 +84,14 @@ namespace layers
         ///
         /// <returns> An Iterator over output values. </returns>
         template <typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        Iterator Compute(IndexValueIteratorType IndexValueIterator, const CoordinateList& outputCoordinates) const;
+        OutputIterator Compute(IndexValueIteratorType inputIterator, const CoordinateList& outputCoordinates) const;
 
         /// <summary> Adds a layer to the map. </summary>
         ///
         /// <param name="layer"> The layer to add to the map. </param>
         ///
         /// <returns> The index of the added layer. </returns>
-        uint64 PushBack(std::shared_ptr<Layer> layer);
+        uint64 AddLayer(std::unique_ptr<Layer>&& layer);
 
         /// <summary> Returns the number of layers in the map. </summary>
         ///
@@ -102,8 +104,8 @@ namespace layers
         /// <param name="layerIndex"> Zero-based index of the layer. </param>
         ///
         /// <returns> The requested layer, cast to the requested type. </returns>
-        template<typename LayerType = Layer>
-        std::shared_ptr<const LayerType> GetLayer(uint64 layerIndex) const;
+        template <typename LayerType=Layer>
+        const LayerType& GetLayer(uint64 layerIndex) const;
 
         /// <summary> Static function that loads a Map from file. </summary>
         ///
@@ -139,17 +141,15 @@ namespace layers
         /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Deserialize(utilities::JsonSerializer& serializer);
 
-        /// <summary> Static function for deserializing a std::shared_ptr that points to a Layer </summary>
+        /// <summary> Static function for deserializing a std::unique_ptr that points to a Layer </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
         /// <param name="up"> [in,out] The pointer to the layer. </param>
-        static void DeserializeLayers(utilities::JsonSerializer& serializer, std::shared_ptr<Layer>& spLayer);
+        static void DeserializeLayers(utilities::JsonSerializer& serializer, std::unique_ptr<Layer>& spLayer);
 
     protected:
-        std::vector<std::vector<double>> AllocateOutputs() const;
-
         // members
-        std::vector<std::shared_ptr<Layer>> _layers;
+        std::vector<std::unique_ptr<Layer>> _layers;
 
     private:
         static const int _currentVersion = 1;
