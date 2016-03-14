@@ -2,7 +2,7 @@
 //
 //  Project:  [projectName]
 //  File:     DataLoaders.cpp (common)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //
