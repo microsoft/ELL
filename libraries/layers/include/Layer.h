@@ -31,23 +31,6 @@ namespace layers
     class Layer
     {
     public:
-        enum class Type { zero, scale, shift, sum, decisionTreePath };
-
-        /// <summary> Default ctor. </summary>
-        ///
-        /// <param name="type"> The type. </param>
-        Layer(Type type);
-
-        /// <summary> Default copy ctor. </summary>
-        ///
-        /// <param name="other"> The other. </param>
-        Layer(const Layer& other) = default;
-
-        /// <summary> Default move ctor. </summary>
-        ///
-        /// <param name="parameter1"> [in,out] The first parameter. </param>
-        Layer(Layer&&) = default;
-
         /// <summary> Default virtual destructor. </summary>
         virtual ~Layer() = default;
 
@@ -55,11 +38,6 @@ namespace layers
         ///
         /// <returns> The number of elements in the layer. </returns>
         virtual uint64 Size() const = 0;
-
-        /// <summary> Gets a human friendly name of the layer type. </summary>
-        ///
-        /// <returns> The type name. </returns>
-        std::string GetFriendlyLayerName() const;
 
         /// <summary> Computes the layer output. </summary>
         ///
@@ -103,9 +81,6 @@ namespace layers
 
     protected:
         void SerializeHeader(utilities::JsonSerializer& serializer, int version) const;
-
-        Type _type;
-        static const std::string typeName[];
     };
 }
 

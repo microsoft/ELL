@@ -134,7 +134,7 @@ namespace layers
         /// <summary> Serializes the Map in json format. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
-        void Serialize(std::ostream& os) const;
+        void Save(std::ostream& os) const;
 
         /// <summary> Deserializes the Map in json format. </summary>
         ///

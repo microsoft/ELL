@@ -17,7 +17,7 @@
 namespace layers
 {
 
-    Input::Input(uint64 size) : Layer(Type::zero), _size(size)
+    Input::Input(uint64 size) : _size(size)
     {}
 
     uint64 Input::Size() const

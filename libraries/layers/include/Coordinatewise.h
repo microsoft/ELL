@@ -19,6 +19,7 @@
 // stl
 #include <vector>
 #include <functional>
+#include <string>
 
 namespace layers
 {
@@ -27,26 +28,24 @@ namespace layers
     {
     public:
 
-        using DoubleOperation = std::function<double(double, double)>;
+        enum class OperationType {add, multiply};
 
         /// <summary> Constructs an instance of a Coordinatewise layer. </summary>
-        ///
-        /// <param name="type"> The type of Coordinatewise layer to construct. </param>
-        Coordinatewise(Type type);
+        Coordinatewise() = default;
 
         /// <summary> Constructs an single-element instance of a Coordinatewise layer. </summary>
         ///
         /// <param name="value"> The element's value. </param>
         /// <param name="coordinate"> The element's input coordinate. </param>
-        /// <param name="type"> The type of Coordinatewise layer to construct. </param>
-        Coordinatewise(double value, Coordinate coordinate, Type type);
+        /// <param name="operationType"> The type of Coordinatewise layer to construct. </param>
+        Coordinatewise(double value, Coordinate coordinate, OperationType operationType);
 
         /// <summary> Constructs an instance of a Coordinatewise layer. </summary>
         ///
         /// <param name="values"> The value for each element. </param>
         /// <param name="coordinates"> The input coordinate for each element. </param>
-        /// <param name="type"> The type of Coordinatewise layer to construct. </param>
-        Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, Type type);
+        /// <param name="operationType"> The type of Coordinatewise layer to construct. </param>
+        Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, OperationType operationType);
 
         /// <summary> Default virtual destructor. </summary>
         virtual ~Coordinatewise() = default;
@@ -55,6 +54,11 @@ namespace layers
         ///
         /// <returns> The number of elements in the layer. </returns>
         virtual uint64 Size() const override;
+
+        static const std::string GetOperationName(OperationType type);
+        static OperationType GetOperationType(const std::string& name);
+        static std::function<double(double, double)> GetOperation(OperationType type);
+        OperationType GetOperationType() const;
 
         /// <summary> Computes the layer output. </summary>
         ///
@@ -98,7 +102,7 @@ namespace layers
     protected:
         std::vector<double> _values;
         CoordinateList _inputCoordinates;
-        DoubleOperation _operation;
+        OperationType _operationType;
         static const int _currentVersion = 1;
     };
 }

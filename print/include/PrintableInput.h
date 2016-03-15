@@ -23,7 +23,6 @@
 struct PrintableInput : public layers::Input, public PrintableLayer
 {
 public:
-
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///
     /// <param name="os"> [in,out] Stream to write data to. </param>

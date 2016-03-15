@@ -23,12 +23,6 @@
 struct PrintableCoordinatewise : public layers::Coordinatewise, public PrintableLayer
 {
 public:
-
-    /// <summary> Constructs an instance of PrintableCoordinatewise. </summary>
-    ///
-    /// <param name="type"> The type. </param>
-    PrintableCoordinatewise(layers::Layer::Type type);
-
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///
     /// <param name="os"> [in,out] Stream to write data to. </param>

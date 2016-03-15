@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
         predictor.AddTo(*map, inputCoordinates);
 
         // output map
-        map->Serialize(std::cout);
+        map->Save(std::cout);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

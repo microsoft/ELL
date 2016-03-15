@@ -16,15 +16,15 @@
 
 namespace layers
 {
-    Sum::Sum() : Layer(Type::sum) 
+    Sum::Sum() 
     {}
 
-    Sum::Sum(const CoordinateList & coordinates) : Layer(Type::sum), _inputCoordinates(0)
+    Sum::Sum(const CoordinateList & coordinates) : _inputCoordinates(0)
     {
         _inputCoordinates.push_back(coordinates);
     }
 
-    Sum::Sum(const std::vector<CoordinateList>& coordinates) : Layer(Type::sum), _inputCoordinates(coordinates)
+    Sum::Sum(const std::vector<CoordinateList>& coordinates) : _inputCoordinates(coordinates)
     {}
 
     uint64 Sum::Size() const

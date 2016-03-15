@@ -10,6 +10,9 @@
 
 #pragma once
 
+// layers
+#include "Coordinatewise.h"
+
 // stl
 #include <iostream>
 #include <string>
@@ -24,6 +27,12 @@ public:
     /// <param name="a"> The multiplicative coefficent. </param>
     /// <param name="b"> The additive coefficient. </param>
     LinearOperation(double a=1.0, double b=0.0);
+
+    /// <summary> Constructs an instance of LinearOperation that either adds or multiplies (but not both). </summary>
+    ///
+    /// <param name="operationType"> Type of the operation. </param>
+    /// <param name="coefficient"> The operation coefficient. </param>
+    LinearOperation(layers::Coordinatewise::OperationType operationType, double coefficient);
 
     /// <summary> Compounds this linear operation with an input operation. </summary>
     ///
@@ -40,7 +49,7 @@ public:
     /// <summary> Prints the operation. </summary>
     ///
     /// <param name="sourceVariableName"> Name of the source variable to which this operation is
-    ///                                   applied. </param>
+    /// applied. </param>
     ///
     /// <returns> A std::string that represents this LinearOperation. </returns>
     std::string ToString(const std::string& sourceVariableName) const;

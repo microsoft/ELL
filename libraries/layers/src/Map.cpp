@@ -110,12 +110,10 @@ namespace layers
         //serializer.Write("layers", _layers);
     }
 
-    void Map::Serialize(std::ostream& os) const // TODO erase
+    void Map::Save(std::ostream& os) const
     {
-        //utilities::JsonSerializer writer;
-        //writer.Write("Base", *this);
-        //auto str = writer.ToString();
-        //os << str;
+        utilities::XMLSerializer serializer(os);
+        serializer.Serialize("TODO", *this);
     }
 
     void Map::Deserialize(utilities::JsonSerializer & serializer)

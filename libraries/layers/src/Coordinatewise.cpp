@@ -16,32 +16,63 @@
 
 namespace layers
 {
-    Coordinatewise::Coordinatewise(Type type) : Layer(type)
-    {
-        if (type == Type::scale)
-        {
-            _operation = std::multiplies<double>();
-        }
-        else if (type == Type::shift)
-        {
-            _operation = std::plus<double>();
-        }
-        else
-        {
-            throw std::runtime_error("this place in the code should never be reached");
-        }
-    }
-
-    Coordinatewise::Coordinatewise(double value, Coordinate coordinate, Type type) : Coordinatewise(type)
+    Coordinatewise::Coordinatewise(double value, Coordinate coordinate, OperationType operationType) : _operationType(operationType)
     {
         _values.push_back(value);
         _inputCoordinates.push_back(coordinate);
     }
 
-    Coordinatewise::Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, Type type) : Coordinatewise(type)
+    Coordinatewise::Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, OperationType operationType) : _operationType(operationType)
     {
         _values = values;
         _inputCoordinates = coordinates;
+    }
+
+    const std::string Coordinatewise::GetOperationName(OperationType type)
+    {
+        switch(type)
+        {
+        case OperationType::add:
+            return "add";
+        case OperationType::multiply:
+            return "multiply";
+        }
+
+        throw std::runtime_error("unrecognized operation type");
+    }
+
+    Coordinatewise::OperationType Coordinatewise::GetOperationType(const std::string& name)
+    {
+        if(name == "add")
+        {
+            return OperationType::add;
+        }
+        else if(name == "multiply")
+        {
+            return OperationType::multiply;
+        }
+        else
+        {
+            throw std::runtime_error("unrecognized operation type");
+        }
+    }
+
+    std::function<double(double, double)> Coordinatewise::GetOperation(OperationType type)
+    {
+        switch(type)
+        {
+        case OperationType::add:
+            return std::plus<double>();
+        case OperationType::multiply:
+            return std::multiplies<double>();
+        }
+
+        throw std::runtime_error("unrecognized operation type");
+    }
+
+    Coordinatewise::OperationType Coordinatewise::GetOperationType() const
+    {
+        return _operationType;
     }
 
     uint64 Coordinatewise::Size() const
@@ -51,11 +82,13 @@ namespace layers
 
     void Coordinatewise::Compute(uint64 layerIndex, std::vector<std::vector<double>>& outputs) const 
     {
+        auto operation = GetOperation(_operationType);
+
         for(uint64 k=0; k<_values.size(); ++k)
         {
             Coordinate coordinate = _inputCoordinates[k];
             double input = outputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
-            outputs[layerIndex][k] = _operation(_values[k], input);
+            outputs[layerIndex][k] = operation(_values[k], input);
         }
     }
 
@@ -77,9 +110,12 @@ namespace layers
     void Coordinatewise::Read(utilities::XMLDeserializer& deserializer)
     {
         int version = 0;
+        std::string operationName;
         deserializer.Deserialize("version", version);
         if (version == 1)
         {
+            deserializer.Deserialize("operationType", operationName);
+            _operationType = GetOperationType(operationName);
             deserializer.Deserialize("values", _values);
             deserializer.Deserialize("coordinates", _inputCoordinates);
         }
@@ -92,6 +128,7 @@ namespace layers
     void Coordinatewise::Write(utilities::XMLSerializer& serializer) const
     {
         serializer.Serialize("version", _currentVersion);
+        serializer.Serialize("operationType", GetOperationName(_operationType));
         serializer.Serialize("values", _values);
         serializer.Serialize("coordinates", _inputCoordinates);
     }

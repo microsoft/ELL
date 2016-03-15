@@ -27,7 +27,7 @@ namespace layers
         }
         else if (runtimeTypeName == Coordinatewise::GetTypeName())
         {
-            value = std::make_unique<Coordinatewise>(Layer::Type::scale); // TODO bug
+            value = std::make_unique<Coordinatewise>(); 
         }
         else
         {

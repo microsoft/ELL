@@ -10,9 +10,6 @@
 
 #include "CompilableCoordinatewise.h"
 
-CompilableCoordinatewise::CompilableCoordinatewise(layers::Layer::Type type) : Coordinatewise(type)
-{}
-
 void CompilableCoordinatewise::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const 
 {
     for (uint64 column = 0; column < Size(); ++column)
@@ -22,19 +19,7 @@ void CompilableCoordinatewise::SetActions(uint64 currentLayerIndex, DataFlowGrap
         const auto& outputActionList = graph.GetNode(currentLayerIndex, column).GetActions();
 
         //create the linear operation
-        LinearOperation inputOperation; 
-        if (_type == layers::Layer::Type::scale)
-        {
-            inputOperation = LinearOperation(_values[column], 0.0);
-        }
-        else if (_type == layers::Layer::Type::shift)
-        {
-            inputOperation = LinearOperation(1.0, _values[column]);
-        }
-        else
-        {
-            throw std::runtime_error("unsupported operation");
-        }
+        LinearOperation inputOperation(GetOperationType(), _values[column]); 
 
         for (const auto& action : outputActionList)
         {
