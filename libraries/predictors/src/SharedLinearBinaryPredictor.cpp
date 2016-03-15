@@ -49,7 +49,7 @@ namespace predictors
         return _sp_predictor->b;
     }
 
-    void SharedLinearBinaryPredictor::AddTo(layers::Map& map, const layers::CoordinateList& inputCoordinates) const
+    void SharedLinearBinaryPredictor::AddToMap(layers::Map& map, const layers::CoordinateList& inputCoordinates) const
     {
         // #### TODO: deal with case where inputCoordinates is empty
 

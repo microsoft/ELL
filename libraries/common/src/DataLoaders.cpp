@@ -45,24 +45,6 @@ namespace common
         return GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
     }
 
-    void GetRowDatasetMapCoordinates(
-        const DataLoadArguments& dataLoadArguments,
-        const MapLoadArguments& mapLoadArguments,
-        dataset::RowDataset& rowDataset,
-        std::shared_ptr<layers::Map>& map,
-        layers::CoordinateList& inputCoordinates)
-    {
-        // read map from file
-        map = GetMap(mapLoadArguments);
-
-        // read input coordinates
-        inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
-
-        // fill in dataset
-        auto upDataIterator = GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
-        rowDataset = LoadDataset(*upDataIterator);
-    }
-
     std::unique_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments)
     {
         if (mapLoadArguments.inputMapFile != "")
@@ -81,6 +63,19 @@ namespace common
         return inputCoordinates;
     }
 
+    dataset::RowDataset GetDataset(const DataLoadArguments& dataLoadArguments)
+    {
+        auto dataIterator = GetDataIterator(dataLoadArguments);
+        return LoadDataset(*dataIterator);
+    }
+
+    dataset::RowDataset GetDataset(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates)
+    {
+        // Note, here we don't really need a shared_ptr to the map, because we're not holding on to it after the lifetime of the function
+        auto dataIterator = GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
+        return LoadDataset(*dataIterator);
+    }
+
     dataset::RowDataset LoadDataset(dataset::IParsingIterator& dataIterator)
     {
         dataset::RowDataset dataset;
@@ -97,7 +92,7 @@ namespace common
         // create parser for sparse vectors (SVMLight format)
         dataset::SparseEntryParser sparseEntryParser;
 
-        // create mapped parser
+        // create mapped parser --- Note: this keeps a shared_ptr to the map
         dataset::MappedParser<dataset::SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
 
         // create line iterator - read line by line sequentially

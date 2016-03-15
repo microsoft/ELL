@@ -70,22 +70,27 @@ int main(int argc, char* argv[])
             std::cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
         }
 
-        // create and load a dataset, a map, and a coordinate list
-        dataset::RowDataset dataset;
-        std::shared_ptr<layers::Map> map;
-        layers::CoordinateList inputCoordinates;
-        GetRowDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
+        // read map from file
+        std::shared_ptr<layers::Map> map = GetMap(mapLoadArguments);
+
+        // get the input coordinates
+        layers::CoordinateList inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
+
+        // get the dataset
+        dataset::RowDataset dataset = common::GetDataset(dataLoadArguments, map, inputCoordinates);
 
         // #### TODO: find a better way to fix the problem of empty inputCoordinates
         if (inputCoordinates.size() == 0)
         {
-            inputCoordinates = layers::GetCoordinateList(*map, 0);
+            inputCoordinates = layers::GetCoordinateList(0, 0, dataset.NumColumns() - 1);
+//            inputCoordinates = layers::GetCoordinateList(*map, 0);
         }
 
         // create loss function
         lossFunctions::LogLoss loss;
 
         // create sgd trainer
+        // #### shouldn't this be inputCoordinates.Size()?
         optimization::AsgdOptimizer optimizer(dataset.NumColumns());
 
         // create evaluator
@@ -102,10 +107,12 @@ int main(int argc, char* argv[])
 
             // iterate over the entire permuted dataset
             auto trainSetIterator = dataset.GetIterator();
+            // #### don't we need to pass this through the map? Or at least select the coordinates?
             optimizer.Update(trainSetIterator, loss, sgdArguments.l2Regularization);
 
             // Evaluate training error
             auto evaluationIterator = dataset.GetIterator();
+            // #### again, don't we have to pass through the map?
             evaluator.Evaluate(evaluationIterator, optimizer.GetPredictor(), loss);
         }
 
@@ -114,7 +121,7 @@ int main(int argc, char* argv[])
 
         // update the map with the newly learned layers
         auto predictor = optimizer.GetPredictor();
-        predictor.AddTo(*map, inputCoordinates);
+        predictor.AddToMap(*map, inputCoordinates);
 
         // output map
         map->Serialize(std::cout);
