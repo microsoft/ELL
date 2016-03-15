@@ -61,22 +61,22 @@ namespace layers
 
     void Sum::Read(utilities::XMLDeserializer& deserializer)
     {
-        //int version = 0;
-        //deserializer.Deserialize("version", version);
-        //if (version == 1)
-        //{
-        //    deserializer.Deserialize("coordinates", _inputCoordinates);
-        //}
-        //else
-        //{
-        //    throw std::runtime_error("unsupported version: " + std::to_string(version));
-        //}
+        int version = 0;
+        deserializer.Deserialize("version", version);
+        if (version == 1)
+        {
+            deserializer.Deserialize("coordinates", _inputCoordinates);
+        }
+        else
+        {
+            throw std::runtime_error("unsupported version: " + std::to_string(version));
+        }
     }
 
     void Sum::Write(utilities::XMLSerializer& serializer) const
     {
-        //serializer.Serialize("version", _currentVersion);
-        //serializer.Serialize("coordinates", _inputCoordinates);
+        serializer.Serialize("version", _currentVersion);
+        serializer.Serialize("coordinates", _inputCoordinates);
     }
 
     void Sum::Serialize(utilities::JsonSerializer& serializer) const
