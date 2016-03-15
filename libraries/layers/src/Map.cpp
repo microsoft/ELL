@@ -48,7 +48,7 @@ namespace layers
     //
     // Map class implementation
     //
-    Map::Map() : _maxInputElement(0)
+    Map::Map() : _maxInputSize(0)
     {
         _layers.push_back(std::make_unique<Input>());
     }
@@ -69,7 +69,7 @@ namespace layers
                 auto inputElement = coord.GetElementIndex();
                 if (inputLayer == 0)
                 {
-                    _maxInputElement = std::max(inputElement, _maxInputElement);
+                    _maxInputSize = std::max(inputElement+1, _maxInputSize);
                 }
                 inputCoords.Next();
             }
@@ -175,6 +175,6 @@ namespace layers
 
     void Map::UpdateInputLayer() const
     {
-        dynamic_cast<Input*>(_layers[0].get())->SetSize(_maxInputElement + 1);
+        dynamic_cast<Input*>(_layers[0].get())->SetSize(_maxInputSize);
     }
 }

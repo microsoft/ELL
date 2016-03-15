@@ -141,7 +141,7 @@ namespace layers
     protected:
         // members
         std::vector<std::unique_ptr<Layer>> _layers;
-        mutable uint64 _maxInputElement;
+        mutable uint64 _maxInputSize;
         void UpdateInputLayer() const;
 
     private:

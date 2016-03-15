@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <string>
 #include <memory>
+#include <algorithm>
 
 namespace layers
 {
@@ -45,7 +46,7 @@ namespace layers
         SetArray(layerOutputs[0], inputIterator);
         
         // (yuck) increment the size of the input layer if this input vector is larger than something we've seen before
-        _maxInputElement = std::max(_maxInputElement, layerOutputs[0].size() - 1);
+        _maxInputSize = std::max(_maxInputSize, (uint64)layerOutputs[0].size());
         UpdateInputLayer();
 
         // compute layers 1,2,... in order
