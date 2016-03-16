@@ -63,7 +63,14 @@ namespace layers
         /// <returns> The name of this type. </returns>
         virtual const char* GetRuntimeTypeName() const = 0;
 
+        /// <summary> Reads the map from an XMLDeserializer. </summary>
+        ///
+        /// <param name="deserializer"> [in,out] The deserializer. </param>
         virtual void Read(utilities::XMLDeserializer& deserializer) = 0;
+
+        /// <summary> Writes the map to an XMLSerializer. </summary>
+        ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Write(utilities::XMLSerializer& serializer) const = 0;
     };
 }
