@@ -13,7 +13,6 @@
 #include "PrintableCoordinatewise.h"
 #include "PrintableSum.h"
 #include "SvgHelpers.h"
-#include "ConstructPrintableLayer.h"
 
 // utilities
 #include "Format.h"
@@ -188,22 +187,6 @@ void PrintableMap::Print(std::ostream & os, const PrintArguments& Arguments)
 
     os << "\n    </Svg>\n\n<html>\n<body>\n";
 }
-
-void PrintableMap::Read(utilities::XMLDeserializer& deserializer)
-{
-    int version = 0;
-    deserializer.Deserialize("version", version);
-    if(version == 1)
-    {
-        deserializer.Deserialize("layers", _layers);
-    }
-    else
-    {
-        throw std::runtime_error("unsupported version: " + std::to_string(version));
-    }
-}
-
-
 
 void PrintableMap::Deserialize(utilities::JsonSerializer & serializer)
 {

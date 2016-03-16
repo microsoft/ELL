@@ -35,8 +35,6 @@ public:
     /// <param name="Arguments"> The arguments. </param>
     void Print(std::ostream& os, const PrintArguments& Arguments);
 
-    void Read(utilities::XMLDeserializer& deserializer);
-
     // TODO remove
 
     /// <summary> Deserializes the Map in json format. </summary>
