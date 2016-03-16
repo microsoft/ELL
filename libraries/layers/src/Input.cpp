@@ -64,24 +64,4 @@ namespace layers
         serializer.Serialize("version", _currentVersion);
         serializer.Serialize("size", _size);
     }
-
-    void Input::Serialize(utilities::JsonSerializer & serializer) const
-    {
-        // version 1
-        Layer::SerializeHeader(serializer, 1);
-
-        serializer.Write("size", (Json::UInt64)_size);
-    }
-
-    void Input::Deserialize(utilities::JsonSerializer & serializer, int version)
-    {
-        if (version == 1)
-        {
-            serializer.Read("size", _size);
-        }
-        else
-        {
-            throw std::runtime_error("unsupported version: " + std::to_string(version));
-        }
-    }
 }

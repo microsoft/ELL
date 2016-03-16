@@ -132,27 +132,6 @@ namespace layers
         serializer.Serialize("values", _values);
         serializer.Serialize("coordinates", _inputCoordinates);
     }
-
-    void Coordinatewise::Serialize(utilities::JsonSerializer& serializer) const
-    {
-        // version 1
-        Layer::SerializeHeader(serializer, 1);
-        serializer.Write("values", _values);
-        serializer.Write("coordinates", _inputCoordinates);
-    }
-
-    void Coordinatewise::Deserialize(utilities::JsonSerializer& serializer, int version)
-    {
-        if(version == 1)
-        {
-            serializer.Read("values", _values);
-            serializer.Read("coordinates", _inputCoordinates);
-        }
-        else
-        {
-            throw std::runtime_error("unsupported version: " + std::to_string(version));
-        }
-    }
 }
 
 

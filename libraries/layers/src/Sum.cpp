@@ -78,24 +78,4 @@ namespace layers
         serializer.Serialize("version", _currentVersion);
         serializer.Serialize("coordinates", _inputCoordinates);
     }
-
-    void Sum::Serialize(utilities::JsonSerializer& serializer) const
-    {
-        // version 1
-        Layer::SerializeHeader(serializer, 1);
-        serializer.Write("coordinates", _inputCoordinates);
-    }
-
-    void Sum::Deserialize(utilities::JsonSerializer& serializer, int version)
-    {
-        if (version == 1)
-        {
-            serializer.Read("coordinates", _inputCoordinates);
-        }
-        else
-        {
-            throw std::runtime_error("unsupported version: " + std::to_string(version));
-        }
-    }
-
 }

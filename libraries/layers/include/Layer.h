@@ -17,7 +17,7 @@
 #include "StlIndexValueIterator.h"
 
 // utilities
-#include "JsonSerializer.h"
+#include "XMLSerialization.h"
 #include "StlIterator.h"
 
 // stl
@@ -65,22 +65,6 @@ namespace layers
 
         virtual void Read(utilities::XMLDeserializer& deserializer) = 0;
         virtual void Write(utilities::XMLSerializer& serializer) const = 0;
-        
-        // TODO: remove JSON serializaiton
-
-        /// <summary> Serializes the Layer in json format. </summary>
-        ///
-        /// <param name="serializer"> [in,out] The serializer. </param>
-        virtual void Serialize(utilities::JsonSerializer& serializer) const = 0;
-
-        /// <summary> Deserializes the Layer in json format. </summary>
-        ///
-        /// <param name="serializer"> [in,out] The serializer. </param>
-        /// <param name="version"> The version. </param>
-        virtual void Deserialize(utilities::JsonSerializer& serializer, int version) = 0;
-
-    protected:
-        void SerializeHeader(utilities::JsonSerializer& serializer, int version) const;
     };
 }
 

@@ -42,18 +42,6 @@ namespace layers
         serializer.Serialize("e", _elementIndex);
     }
 
-    void Coordinate::Serialize(utilities::JsonSerializer& serializer) const
-    {
-      serializer.Write("l", (Json::UInt64)_layerIndex); 
-      serializer.Write("e", (Json::UInt64)_elementIndex);
-    }
-
-    void Coordinate::Deserialize(utilities::JsonSerializer& serializer)
-    {
-        serializer.Read("l", _layerIndex);
-        serializer.Read("e", _elementIndex);
-    }
-
     std::ostream & operator<<(std::ostream & os, const Coordinate & coordinate)
     {
         os << '(' << coordinate.GetLayerIndex() << ',' << coordinate.GetElementIndex() << ')';

@@ -74,19 +74,6 @@ namespace layers
         virtual void Read(utilities::XMLDeserializer& deserializer) override;
         virtual void Write(utilities::XMLSerializer& serializer) const override;
 
-        // TODO: remove JSON serializaiton
-
-        /// <summary> Serializes the Layer in json format. </summary>
-        ///
-        /// <param name="serializer"> [in,out] The serializer. </param>
-        virtual void Serialize(utilities::JsonSerializer& serializer) const override;
-
-        /// <summary> Deserializes the Layer in json format. </summary>
-        ///
-        /// <param name="serializer"> [in,out] The serializer. </param>
-        /// <param name="version"> The version. </param>
-        virtual void Deserialize(utilities::JsonSerializer& serializer, int version = _currentVersion) override;
-
     protected:
         std::vector<CoordinateList> _inputCoordinates;
         static const int _currentVersion = 1;

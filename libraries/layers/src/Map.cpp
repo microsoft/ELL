@@ -105,48 +105,9 @@ namespace layers
         serializer.Serialize("layers", _layers);
     }
 
-    void Map::Serialize(utilities::JsonSerializer& serializer) const
-    {
-        //serializer.Write("layers", _layers);
-    }
-
     void Map::Save(std::ostream& os) const
     {
         utilities::XMLSerializer serializer(os);
         serializer.Serialize(*this);
-    }
-
-    void Map::Deserialize(utilities::JsonSerializer & serializer)
-    {
-        //serializer.Read("layers", _layers, DeserializeLayers);
-    }
-
-    void Map::DeserializeLayers(utilities::JsonSerializer & serializer, std::unique_ptr<Layer>& spLayer)
-    {
-        //auto type = serializer.Read<std::string>("_type");
-        //auto version = serializer.Read<int>("_version");
-
-        //if (type == "Input")
-        //{
-        //    spLayer = std::make_shared<Input>();
-        //}
-        //else if (type == "Scale")
-        //{
-        //    spLayer = std::make_shared<Coordinatewise>(layers::Layer::Type::scale);
-        //}
-        //else if (type == "Shift")
-        //{
-        //    spLayer = std::make_shared<Coordinatewise>(layers::Layer::Type::shift);
-        //}
-        //else if (type == "Sum")
-        //{
-        //    spLayer = std::make_shared<Sum>();
-        //}
-        //else
-        //{
-        //    throw std::runtime_error("unidentified type in map file: " + type);
-        //}
-
-        //spLayer->Deserialize(serializer, version);
     }
 }
