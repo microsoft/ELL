@@ -55,29 +55,19 @@ namespace common
     /// <returns> The input coordinates to use for the map. </returns>
     layers::CoordinateList GetInputCoordinates(const layers::Map& map, const MapLoadArguments& mapLoadArguments);
 
-    // #### TODO: document
-        // #### TODO: ensure .h and .cpp files are in same order
-    dataset::RowDataset GetDataset(const DataLoadArguments& dataLoadArguments);
-    dataset::RowDataset GetDataset(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
-
-    /// <summary> Loads a RowDataset from the data iterator returned by GetDataIterator </summary>
-    ///
-    /// <param name="dataIterator"> The data iterator to use to populate the dataset </param>
-    ///
-    /// <returns> The dataset. </returns>
-    dataset::RowDataset LoadDataset(dataset::IParsingIterator& dataIterator);
-
-
-
-
-    /// <summary> Gets a mapped data iterator, based on command line parameters, a map, and a
-    /// coordinate list. </summary>
+    /// <summary> Gets a dataset from a data file, based on command line parameters. </summary>
     ///
     /// <param name="dataLoadArguments"> The data load arguments. </param>
-    /// <param name="map"> The map. </param>
-    /// <param name="inputCoordinates"> The list of input coordinates. </param>
     ///
-    /// <returns> The data iterator. </returns>
-    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
+    /// <returns> The dataset read in from the file. </returns>
+    dataset::RowDataset GetDataset(const DataLoadArguments& dataLoadArguments);
+
+    /// <summary> Gets a dataset by passing a dataset through a map, based on command line parameters. </summary>
+    ///
+    /// <param name="dataLoadArguments"> The data load arguments. </param>
+    /// <param name="mapLoadArguments"> The map load arguments. </param>
+    ///
+    /// <returns> The dataset produced by running the input dataset through the map. </returns>
+    dataset::RowDataset GetDataset(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
 }
 

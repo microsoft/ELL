@@ -26,6 +26,10 @@
 
 namespace common
 {
+    // internal functions used below
+    dataset::RowDataset LoadDataset(dataset::IParsingIterator& dataIterator);
+    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
+
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
     {
         // create line iterator - read line by line sequentially

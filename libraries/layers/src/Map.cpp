@@ -55,9 +55,10 @@ namespace layers
 
     uint64 Map::AddLayer(std::unique_ptr<Layer>&& layer)
     {
-        // #### TODO: verify layer's input coordinates make sense
-        
-        // Keep track of the maximum input dimension requested
+        auto numLayers = _layers.size();
+
+        // Keep track of the maximum input dimension requested and make sure new layer's inputs 
+        // are to previous layers only
         auto layerSize = layer->Size();
         for (uint64 index = 0; index < layerSize; index++)
         {
@@ -66,6 +67,10 @@ namespace layers
             {
                 auto coord = inputCoords.Get();
                 auto inputLayer = coord.GetLayerIndex();
+                if (inputLayer >= numLayers)
+                {
+                    throw std::runtime_error("Error: layer using inputs from non-previous layer");
+                }
                 auto inputElement = coord.GetElementIndex();
                 if (inputLayer == 0)
                 {

@@ -49,10 +49,17 @@ namespace predictors
         return _sp_predictor->b;
     }
 
-    void SharedLinearBinaryPredictor::AddToMap(layers::Map& map, const layers::CoordinateList& inputCoordinates) const
+    void SharedLinearBinaryPredictor::AddToMap(layers::Map& map, layers::CoordinateList inputCoordinates) const
     {
-        // #### TODO: deal with case where inputCoordinates is empty
+        if (inputCoordinates.size() == 0)
+        {
+            inputCoordinates = layers::GetCoordinateList(map, map.NumLayers() - 1);
+        }
 
+        if (inputCoordinates.size() != _sp_predictor->w.Size())
+        {
+            throw std::runtime_error("Error in SharedLinearBinaryPredictor: input coordinates size doesn't match weight vector");
+        }
         uint64 layerIndex = map.AddLayer(std::make_unique<layers::Coordinatewise>(_sp_predictor->w, inputCoordinates, layers::Layer::Type::scale));
 
         auto coordinates = layers::GetCoordinateList(map, layerIndex);

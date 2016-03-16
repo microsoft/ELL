@@ -69,7 +69,7 @@ namespace predictors
         ///
         /// <param name="map"> [in,out] The map. </param>
         /// <param name="inputCoordinates"> The input coordinates. </param>
-        void AddToMap(layers::Map& map, const layers::CoordinateList& inputCoordinates) const;
+        void AddToMap(layers::Map& map, layers::CoordinateList inputCoordinates) const;
 
     private:
         struct BiasedVector
