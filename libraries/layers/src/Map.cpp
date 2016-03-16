@@ -8,11 +8,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Map.h"
+#include "ConstructLayer.h"
 #include "Coordinatewise.h"
 #include "Input.h"
 #include "Sum.h"
-#include "ReadLayer.h"
+#include "Map.h"
 
 // stl
 #include <stdexcept>

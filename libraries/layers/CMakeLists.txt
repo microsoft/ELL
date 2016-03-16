@@ -18,7 +18,7 @@ set (SRC src/Coordinate.cpp
          src/Input.cpp
          src/Layer.cpp
          src/Map.cpp
-         src/ReadLayer.cpp
+         src/ConstructLayer.cpp
          src/Sum.cpp)
 
 set (INCLUDE include/Coordinate.h
@@ -27,7 +27,7 @@ set (INCLUDE include/Coordinate.h
              include/Input.h
              include/Layer.h
              include/Map.h
-             include/ReadLayer.h
+             include/ConstructLayer.h
              include/Sum.h)
 
 set (TCC tcc/Map.tcc)

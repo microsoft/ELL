@@ -278,8 +278,7 @@ namespace utilities
 
         ReadOpenTag(Match(typeName));
         ReadOpenTag(runtimeTypeName);
-
-        Read(runtimeTypeName, value);
+        Construct(runtimeTypeName, value);
         value->Read(*this);
 
         ReadCloseTag(Match(runtimeTypeName));

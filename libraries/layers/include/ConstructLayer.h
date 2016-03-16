@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     ReadLayer.h (layers)
+//  File:     ConstructLayer.h (layers)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
@@ -22,5 +22,5 @@ namespace layers
     ///
     /// <param name="runtimeTypeName"> Name of the type to construct. </param>
     /// <param name="value"> [in,out] Points to the newly constructed object. </param>
-    void Read(std::string runtimeTypeName, std::unique_ptr<Layer>& value);
+    void Construct(std::string runtimeTypeName, std::unique_ptr<Layer>& value);
 }

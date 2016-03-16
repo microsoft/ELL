@@ -107,7 +107,7 @@ private:
     std::vector<float> v;
 };
 
-void Read(std::string runtimeTypeName, std::unique_ptr<Base>& value)
+void Construct(std::string runtimeTypeName, std::unique_ptr<Base>& value)
 {
     if(runtimeTypeName == "Derived1")
     {

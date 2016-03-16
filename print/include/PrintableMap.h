@@ -18,6 +18,7 @@
 
 // utilities
 #include "JsonSerializer.h"
+#include "XMLSerialization.h"
 
 // stl
 #include <iostream>
@@ -33,6 +34,10 @@ public:
     /// <param name="os"> [in,out] Stream to write data to. </param>
     /// <param name="Arguments"> The arguments. </param>
     void Print(std::ostream& os, const PrintArguments& Arguments);
+
+    void Read(utilities::XMLDeserializer& deserializer);
+
+    // TODO remove
 
     /// <summary> Deserializes the Map in json format. </summary>
     ///

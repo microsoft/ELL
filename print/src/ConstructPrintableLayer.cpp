@@ -1,33 +1,33 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     ReadLayer.cpp (layers)
+//  File:     ConstructPrintableLayer.cpp (print)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ReadLayer.h"
-#include "Input.h"
-#include "Coordinatewise.h"
-#include "Sum.h"
+#include "ConstructPrintableLayer.h"
+#include "PrintableInput.h"
+#include "PrintableCoordinatewise.h"
+#include "PrintableSum.h"
 
 namespace layers
 {
-    void Read(std::string runtimeTypeName, std::unique_ptr<Layer>& value)
+    void Construct(std::string runtimeTypeName, std::unique_ptr<Layer>& value)
     {
         if (runtimeTypeName == Input::GetTypeName())
         {
-            value = std::make_unique<Input>();
+            value = std::make_unique<PrintableInput>();
         }
         else if (runtimeTypeName == Sum::GetTypeName())
         {
-            value = std::make_unique<Sum>();
+            value = std::make_unique<PrintableSum>();
         }
         else if (runtimeTypeName == Coordinatewise::GetTypeName())
         {
-            value = std::make_unique<Coordinatewise>(); 
+            value = std::make_unique<PrintableCoordinatewise>();
         }
         else
         {

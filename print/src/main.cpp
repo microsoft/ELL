@@ -38,14 +38,19 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(printArguments);
         commandLineParser.Parse();
 
+        // if output file specified, replace stdout with it 
+        std::ofstream outputDataStream;
+        if(printArguments.outputSvgFile != "")
+        {
+            outputDataStream = utilities::OpenOfstream(printArguments.outputSvgFile);
+            std::cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
+        }
+
         // open map file
         auto map = layers::Map::Load<PrintableMap>(printArguments.inputMapFile);
-
-        // open svg file
-        auto outputSvgFStream = utilities::OpenOfstream(printArguments.outputSvgFile);
         
         // print to svg file
-        map.Print(outputSvgFStream, printArguments);
+        map.Print(std::cout, printArguments);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
