@@ -70,21 +70,21 @@ namespace utilities
         template<typename ValueType>
         void Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
-    private:
         template<typename ValueType>
-        void SerializeUnnamed(const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
+        void Serialize(const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
 
         template<typename ElementType>
-        void SerializeUnnamed(const std::vector<ElementType>& value);
+        void Serialize(const std::vector<ElementType>& value);
 
         template<typename ValueType>
-        void SerializeUnnamed(const std::unique_ptr<ValueType>& value);
+        void Serialize(const std::unique_ptr<ValueType>& value);
 
-        void SerializeUnnamed(const std::string& value);
+        void Serialize(const std::string& value);
 
         template<typename ValueType>
-        void SerializeUnnamed(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
+        void Serialize(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
+    private:
         template<typename ValueType>
         void WriteSingleLineTags(const std::string& tagName, const ValueType& value);
 
@@ -155,20 +155,21 @@ namespace utilities
         template<typename ValueType>
         void Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
-    private:
         template<typename ValueType>
-        void DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
+        void Deserialize(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
 
         template<typename ElementType>
-        void DeserializeUnnamed(std::vector<ElementType>& value);
+        void Deserialize(std::vector<ElementType>& value);
 
         template<typename ValueType>
-        void DeserializeUnnamed(std::unique_ptr<ValueType>& value);
+        void Deserialize(std::unique_ptr<ValueType>& value);
 
-        void DeserializeUnnamed(std::string& value);
+        void Deserialize(std::string& value);
 
         template<typename ValueType>
-        void DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
+        void Deserialize(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
+
+    private:
 
         template <typename TagType>
         void ReadOpenTag(TagType&& tagName);

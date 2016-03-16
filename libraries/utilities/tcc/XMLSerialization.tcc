@@ -49,7 +49,7 @@ namespace utilities
         WriteOpenTag(typeName, "name", name, "size", size);
         for (uint64 i = 0; i < size; ++i)
         {
-            SerializeUnnamed(value[i]);
+            Serialize(value[i]);
         }
         WriteCloseTag(typeName);
     }
@@ -87,7 +87,7 @@ namespace utilities
 
     // serialize fundamental types
     template<typename ValueType>
-    void XMLSerializer::SerializeUnnamed(const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
+    void XMLSerializer::Serialize(const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
     {
         auto typeName = TypeName<ValueType>::GetName();
         WriteSingleLineTags(typeName, value);
@@ -95,7 +95,7 @@ namespace utilities
 
     // serialize std::vector
     template<typename ElementType>
-    void XMLSerializer::SerializeUnnamed(const std::vector<ElementType>& value)
+    void XMLSerializer::Serialize(const std::vector<ElementType>& value)
     {
         auto size = value.size();
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
@@ -103,7 +103,7 @@ namespace utilities
         WriteOpenTag(typeName, "size", size);
         for (uint64 i = 0; i < size; ++i)
         {
-            SerializeUnnamed(value[i]);
+            Serialize(value[i]);
         }
         WriteCloseTag(typeName);
     }
@@ -154,7 +154,7 @@ namespace utilities
 
     // serialize pointers to polymorphic classes
     template<typename ValueType>
-    void XMLSerializer::SerializeUnnamed(const std::unique_ptr<ValueType>& value)
+    void XMLSerializer::Serialize(const std::unique_ptr<ValueType>& value)
     {
         static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
         if (value == nullptr)
@@ -174,7 +174,7 @@ namespace utilities
 
     // serialize classes
     template<typename ValueType>
-    void XMLSerializer::SerializeUnnamed(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
+    void XMLSerializer::Serialize(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
         auto typeName = ValueType::GetTypeName();
 
@@ -207,7 +207,7 @@ namespace utilities
         value.resize(size);
         for (uint64 i = 0; i < size; ++i)
         {
-            DeserializeUnnamed(value[i]);
+            Deserialize(value[i]);
         }
         ReadCloseTag(Match(typeName));
     }
@@ -243,7 +243,7 @@ namespace utilities
 
     // deserialize fundamental types
     template<typename ValueType>
-    void XMLDeserializer::DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
+    void XMLDeserializer::Deserialize(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
     {
         auto typeName = TypeName<ValueType>::GetName();
         ReadSingleLineTags(Match(typeName), value);
@@ -251,7 +251,7 @@ namespace utilities
 
     // deserialize std::vectors
     template<typename ElementType>
-    void XMLDeserializer::DeserializeUnnamed(std::vector<ElementType>& value)
+    void XMLDeserializer::Deserialize(std::vector<ElementType>& value)
     {
         value.clear();
 
@@ -262,14 +262,14 @@ namespace utilities
         value.resize(size);
         for (uint64 i = 0; i < size; ++i)
         {
-            DeserializeUnnamed(value[i]);
+            Deserialize(value[i]);
         }
         ReadCloseTag(Match(typeName));
     }
 
     // deserialize pointers to polymorphic classes
     template<typename ValueType>
-    void XMLDeserializer::DeserializeUnnamed(std::unique_ptr<ValueType>& value)
+    void XMLDeserializer::Deserialize(std::unique_ptr<ValueType>& value)
     {
         static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
 
@@ -288,7 +288,7 @@ namespace utilities
 
     // deserialize classes
     template<typename ValueType>
-    void XMLDeserializer::DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
+    void XMLDeserializer::Deserialize(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
     {
         auto typeName = ValueType::GetTypeName();
 

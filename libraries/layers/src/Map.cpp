@@ -113,7 +113,7 @@ namespace layers
     void Map::Save(std::ostream& os) const
     {
         utilities::XMLSerializer serializer(os);
-        serializer.Serialize("TODO", *this);
+        serializer.Serialize(*this);
     }
 
     void Map::Deserialize(utilities::JsonSerializer & serializer)

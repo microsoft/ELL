@@ -65,8 +65,7 @@ namespace layers
         utilities::XMLDeserializer deserializer(inputMapFStream);
 
         MapType map;
-        deserializer.Deserialize("TODO", map);
-
+        deserializer.Deserialize(map);
         return map;
     }
 

@@ -23,7 +23,7 @@ namespace utilities
         WriteSingleLineTags("string", name, value);
     }
 
-    void utilities::XMLSerializer::SerializeUnnamed(const std::string& value)
+    void utilities::XMLSerializer::Serialize(const std::string& value)
     {
         WriteSingleLineTags("string", value);
     }
@@ -49,7 +49,7 @@ namespace utilities
         ReadSingleLineTags(Match("string"), Match("name"), Match(name), value);
     }
     
-    void XMLDeserializer::DeserializeUnnamed(std::string& value)
+    void XMLDeserializer::Deserialize(std::string& value)
     {
         ReadSingleLineTags(Match("string"), value);
     }
