@@ -71,11 +71,10 @@ namespace layers
         ///
         /// <typeparam name="IndexValueIteratorType"> Input iterator type. </typeparam>
         /// <param name="IndexValueIterator"> The input value iterator. </param>
-        /// <param name="outputCoordinates"> The output coordinates. </param>
         ///
         /// <returns> An Iterator over output values. </returns>
         template <typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
-        OutputIterator Compute(IndexValueIteratorType inputIterator, const CoordinateList& outputCoordinates) const;
+        OutputIterator Compute(IndexValueIteratorType inputIterator) const;
 
         /// <summary> Adds a layer to the map. </summary>
         ///
@@ -97,6 +96,10 @@ namespace layers
         /// <returns> The requested layer, cast to a const reference of the requested type. </returns>
         template <typename LayerType=Layer>
         const LayerType& GetLayer(uint64 layerIndex) const;
+
+        // #### TODO: document
+        CoordinateList GetOutputCoordinates() const;
+        void SetOutputCoordinates(const CoordinateList& coordinates);
 
         /// <summary> Static function that loads a Map from file. </summary>
         ///
@@ -137,6 +140,7 @@ namespace layers
         void LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const;
 
     private:
+        mutable CoordinateList _outputCoordinates; // zero-size means "use all of last layer"
         std::vector<std::vector<double>> AllocateLayerOutputs() const;
         static const int _currentVersion = 1;
     };

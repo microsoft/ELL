@@ -50,10 +50,10 @@ namespace layers
     }
 
     template<typename IndexValueIteratorType, typename concept>
-    Map::OutputIterator Map::Compute(IndexValueIteratorType inputIterator, const CoordinateList& outputCoordinatesIn) const
+    Map::OutputIterator Map::Compute(IndexValueIteratorType inputIterator) const
     {
         auto layerOutputs = AllocateLayerOutputs();
-
+        
         LoadInputLayer(inputIterator, layerOutputs[0]);
 
         // compute layers 1,2,... in order
@@ -62,18 +62,17 @@ namespace layers
             _layers[i]->Compute(layerOutputs, layerOutputs[i]);
         }
         
-        CoordinateList outputCoordinates = outputCoordinatesIn;
-        if (outputCoordinates.size() == 0)
+        if (_outputCoordinates.size() == 0)
         {
-            outputCoordinates = GetCoordinateList(*this, NumLayers() - 1);
+            _outputCoordinates = GetCoordinateList(*this, NumLayers() - 1);
         }
 
         // copy the outputs to a vector
-        auto outputSize = outputCoordinates.size();
+        auto outputSize = _outputCoordinates.size();
         std::vector<double> outputs(outputSize);
         for(uint64 index = 0; index < outputSize; ++index)
         {
-            auto coordinate = outputCoordinates[index];
+            auto coordinate = _outputCoordinates[index];
             auto layerIndex = coordinate.GetLayerIndex();
             auto elementIndex = coordinate.GetElementIndex();
             outputs[index] = layerOutputs[layerIndex][elementIndex];

@@ -69,16 +69,8 @@ int main(int argc, char* argv[])
         // read map from file
         std::shared_ptr<layers::Map> map = GetMap(mapLoadArguments);
 
-        // get the input coordinates
-        layers::CoordinateList inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
-
         // get the dataset
-        auto dataset = common::GetDataset(dataLoadArguments, map, inputCoordinates);
-
-        if (inputCoordinates.size() == 0)
-        {
-            inputCoordinates = layers::GetCoordinateList(0, 0, dataset->NumColumns() - 1);
-        }
+        auto dataset = common::GetDataset(dataLoadArguments, map);
 
         // create loss function
         lossFunctions::LogLoss loss;
@@ -112,7 +104,7 @@ int main(int argc, char* argv[])
 
         // update the map with the newly learned layers
         auto predictor = optimizer.GetPredictor();
-        predictor.AddToMap(*map, inputCoordinates);
+        predictor.AddToMap(*map);
 
         // output map
         map->Save(outStream);

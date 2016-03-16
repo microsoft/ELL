@@ -56,6 +56,7 @@ namespace layers
         _layers.push_back(std::make_unique<Input>());
     }
 
+    // #### TODO: does this reset the map outputs? Probably
     uint64 Map::AddLayer(std::unique_ptr<Layer>&& layer)
     {
         uint64 maxInputSize = 0;
@@ -95,6 +96,16 @@ namespace layers
     uint64 Map::NumLayers() const
     {
         return _layers.size();
+    }
+
+    CoordinateList Map::GetOutputCoordinates() const
+    {
+        return _outputCoordinates;
+    }
+
+    void Map::SetOutputCoordinates(const CoordinateList& coordinates)
+    {
+        _outputCoordinates = coordinates;
     }
 
     std::vector<std::vector<double>> Map::AllocateLayerOutputs() const
