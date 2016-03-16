@@ -20,6 +20,8 @@
 
 namespace layers
 {
+    const int Map::_currentVersion;
+
     //
     // Map::OutputIterator implementation
     //

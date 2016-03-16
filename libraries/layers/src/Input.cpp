@@ -16,6 +16,7 @@
 
 namespace layers
 {
+    const int Input::_currentVersion;
 
     Input::Input(uint64 size) : _size(size)
     {}

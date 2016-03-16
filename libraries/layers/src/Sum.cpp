@@ -16,6 +16,8 @@
 
 namespace layers
 {
+    const int Sum::_currentVersion;
+
     Sum::Sum() 
     {}
 

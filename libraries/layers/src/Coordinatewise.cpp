@@ -16,6 +16,8 @@
 
 namespace layers
 {
+    const int Coordinatewise::_currentVersion;
+
     Coordinatewise::Coordinatewise(double value, Coordinate coordinate, OperationType operationType) : _operationType(operationType)
     {
         _values.push_back(value);
