@@ -26,9 +26,9 @@ namespace dataset
         ++_index;
     }
 
-    IndexValue OnesDataVector::Iterator::Get() const
+    types::IndexValue OnesDataVector::Iterator::Get() const
     {
-        return IndexValue{_index, 1};
+        return types::IndexValue{_index, 1};
     }
 
     OnesDataVector::Iterator::Iterator(uint64 size) : _size(size)

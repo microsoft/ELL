@@ -12,6 +12,8 @@
 
 // types
 #include "types.h"
+#include "IndexValue.h"
+#include "StlIndexValueIterator.h"
 
 // stl
 #include <string>
@@ -25,7 +27,7 @@ namespace dataset
     {
     public:
 
-        class Iterator : public IIndexValueIterator
+        class Iterator : public types::IIndexValueIterator
         {
         public:
 
@@ -50,12 +52,12 @@ namespace dataset
             /// <summary> \returns The current index-value pair. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            IndexValue Get() const;
+            types::IndexValue Get() const;
 
         private:
             std::shared_ptr<const std::string> _spExampleString; // hold on to the shared ptr to make sure that std::string is not deleted
             const char* _currentPos = 0;
-            IndexValue _currentIndexValue;
+            types::IndexValue _currentIndexValue;
             bool _isValid = true;
 
             // Private constructor that can only be called from SparseEntryParser

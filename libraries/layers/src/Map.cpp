@@ -36,9 +36,9 @@ namespace layers
         }
     }
 
-    IndexValue Map::OutputIterator::Get() const
+    types::IndexValue Map::OutputIterator::Get() const
     {
-        return IndexValue{ _index, _outputs[_index] };
+        return { _index, _outputs[_index] };
     }
 
     Map::OutputIterator::OutputIterator(std::vector<double>&& outputs) : _outputs(std::move(outputs)), _index(0)

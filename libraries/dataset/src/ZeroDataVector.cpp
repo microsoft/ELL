@@ -24,7 +24,7 @@ namespace dataset
     void ZeroDataVector::Iterator::Next()
     {}
 
-    IndexValue ZeroDataVector::Iterator::Get() const
+    types::IndexValue ZeroDataVector::Iterator::Get() const
     {
         throw std::runtime_error("this code should bever be reached");
     }

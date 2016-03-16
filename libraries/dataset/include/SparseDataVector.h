@@ -17,6 +17,7 @@
 
 // types
 #include "types.h"
+#include "IndexValue.h"
 
 // stl
 #include <type_traits>
@@ -34,7 +35,7 @@ namespace dataset
     public:
 
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
-        class Iterator : public IIndexValueIterator
+        class Iterator : public types::IIndexValueIterator
         {
         public:
 
@@ -59,7 +60,7 @@ namespace dataset
             /// <summary> \returns The current index-value pair. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            IndexValue Get() const;
+            types::IndexValue Get() const;
 
         private:
             
@@ -85,7 +86,7 @@ namespace dataset
         /// <summary> Constructs an instance of SparseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, typename concept = IsIndexValueIterator<IndexValueIteratorType>>
+        template<typename IndexValueIteratorType, typename concept = types::IsIndexValueIterator<IndexValueIteratorType>>
         SparseDataVector(IndexValueIteratorType IndexValueIterator);
 
         /// <summary> Move constructor. </summary>

@@ -13,6 +13,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/BinaryClassificationEvaluator.cpp
+         src/CompressedIntegerList.cpp
          src/CommandLineParser.cpp
          src/CompressedIntegerList.cpp
          src/Files.cpp
@@ -35,6 +36,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
              include/ParallelTransformIterator.h
              include/Parser.h
              include/RandomEngines.h
+             include/StlIndexValueIterator.h
              include/StlIterator.h
              include/TransformIterator.h
              include/TypeFactory.h
@@ -46,6 +48,7 @@ set (TCC tcc/BinaryClassificationEvaluator.tcc
          tcc/Format.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
+         tcc/StlIndexValueIterator.tcc
          tcc/StlIterator.tcc
          tcc/TransformIterator.tcc
          tcc/TypeFactory.tcc

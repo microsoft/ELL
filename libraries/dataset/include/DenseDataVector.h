@@ -40,7 +40,7 @@ namespace dataset
         /// <summary> Constructs an instance of DenseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, typename concept = IsIndexValueIterator<IndexValueIteratorType>>
+        template<typename IndexValueIteratorType, typename concept = types::IsIndexValueIterator<IndexValueIteratorType>>
         DenseDataVector(IndexValueIteratorType IndexValueIterator);
 
         /// <summary> Move constructor. </summary>

@@ -59,7 +59,7 @@ namespace linear
         /// <typeparam name="IIndexValueIterator"> Type of the index value iterator. </typeparam>
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
         /// <param name="indexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> concept = 0>
+        template<typename IndexValueIteratorType, types::IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         DoubleVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Type-conversion operator into a std::vector<double>
