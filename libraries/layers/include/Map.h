@@ -97,8 +97,14 @@ namespace layers
         template <typename LayerType=Layer>
         const LayerType& GetLayer(uint64 layerIndex) const;
 
-        // #### TODO: document
+        /// <summary> Returns the current output coordinates for the map. </summary>
+        ///
+        /// <returns> The currently-set output coordinates. </returns>
         CoordinateList GetOutputCoordinates() const;
+
+        /// <summary> Sets the output coordinates for the map. </summary>
+        ///
+        /// <param name="coordinates"> The currently-set output coordinates. </param>
         void SetOutputCoordinates(const CoordinateList& coordinates);
 
         /// <summary> Static function that loads a Map from file. </summary>

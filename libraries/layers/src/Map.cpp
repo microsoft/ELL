@@ -56,7 +56,6 @@ namespace layers
         _layers.push_back(std::make_unique<Input>());
     }
 
-    // #### TODO: does this reset the map outputs? Probably
     uint64 Map::AddLayer(std::unique_ptr<Layer>&& layer)
     {
         uint64 maxInputSize = 0;
