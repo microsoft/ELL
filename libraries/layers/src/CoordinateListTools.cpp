@@ -70,7 +70,7 @@ namespace
 
 namespace layers
 {
-    layers::CoordinateList GetCoordinateList(const layers::Map& map, const std::string& coordinateListString)
+    layers::CoordinateList GetCoordinateList(const layers::LayerStack& map, const std::string& coordinateListString)
     {
         layers::CoordinateList coordinateList;
 
@@ -129,7 +129,7 @@ namespace layers
         return coordinateList;
     }
     
-    layers::CoordinateList GetCoordinateList(const layers::Map& map, uint64 layerIndex)
+    layers::CoordinateList GetCoordinateList(const layers::LayerStack& map, uint64 layerIndex)
     {
         return GetCoordinateList(layerIndex, 0, map.GetLayer(layerIndex).Size()-1);
     }

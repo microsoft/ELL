@@ -86,6 +86,7 @@ namespace layers
         }
 
         // Update input layer (layer 0)
+        // #### 
         UpdateInputLayer(maxInputSize);
 
         uint64 layerIndex = _layers.size();
@@ -98,12 +99,25 @@ namespace layers
         return _layers.size();
     }
 
+
+    //
+    // Map
+    //
+
+    Map::Map()
+    {
+        // #### TODO: should the default constructor keep a null layer stack, create an empty one, or be inaccessible
+    }
+
+    Map::Map(const std::shared_ptr<LayerStack>& layers) : _layerStack(layers)
+    {}
+
     CoordinateList Map::GetOutputCoordinates() const
     {
         auto outputCoordinates = _outputCoordinates;
         if (outputCoordinates.size() == 0)
         {
-            outputCoordinates = GetCoordinateList(*this, NumLayers() - 1);
+            outputCoordinates = GetCoordinateList(*_layerStack, _layerStack->NumLayers() - 1);
         }
         return outputCoordinates;
     }
@@ -115,12 +129,13 @@ namespace layers
 
     std::vector<std::vector<double>> Map::AllocateLayerOutputs() const
     {
-        auto numLayers = _layers.size();
+        auto numLayers = _layerStack->NumLayers();
         std::vector<std::vector<double>> layerOutputs;
         layerOutputs.resize(numLayers);
         for (uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
         {
-            layerOutputs[layerIndex].resize(_layers[layerIndex]->Size());
+            auto layerSize = _layerStack->GetLayer(layerIndex).Size();
+            layerOutputs[layerIndex].resize(layerSize);
             std::fill(layerOutputs[layerIndex].begin(), layerOutputs[layerIndex].end(), 0);
         }
         return layerOutputs;
@@ -161,20 +176,6 @@ namespace layers
     {
         _inputSize = std::max(minSize, _inputSize);
 //        GetLayer<Input&>(0).IncreaseSize(minSize);
-    }
-
-
-    Map Map::Load(const std::string& inputMapFile)
-    {
-        auto inputMapFStream = utilities::OpenIfstream(inputMapFile);
-        utilities::XMLDeserializer deserializer(inputMapFStream);
-
-        LayerStack layers;
-        deserializer.Deserialize(layers);
-
-        Map map;
-        map._layerStack = std::make_shared<LayerStack>(std::move(layers));
-        return map;
     }
 
 }

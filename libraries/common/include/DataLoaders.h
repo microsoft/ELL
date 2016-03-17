@@ -45,6 +45,9 @@ namespace common
     /// <param name="mapLoadArguments"> The map load arguments. </param>
     ///
     /// <returns> A shared pointer to the map. </returns>
+    std::unique_ptr<layers::LayerStack> GetLayerStack(const MapLoadArguments& mapLoadArguments);
+
+    // #### Document
     std::unique_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments);
 
     /// <summary> Gets a dataset from a data file, based on command line parameters. </summary>

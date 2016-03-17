@@ -95,6 +95,7 @@ namespace layers
     protected:
         // members
         std::vector<std::unique_ptr<Layer>> _layers;
+        void UpdateInputLayer(uint64 minSize) const;
 
     private:
         static const int _currentVersion = 1;
@@ -135,6 +136,9 @@ namespace layers
         /// <summary> Constructs an instance of Map. </summary>
         Map();
 
+        /// <summary> Constructs an instance of pointing to an existing stack of layers. </summary>
+        Map(const std::shared_ptr<LayerStack>& layers);
+
         /// <summary> Deleted copy constructor </summary>
         Map(const Map&) = delete;
 
@@ -162,14 +166,6 @@ namespace layers
         ///
         /// <param name="coordinates"> The currently-set output coordinates. </param>
         void SetOutputCoordinates(const CoordinateList& coordinates);
-
-        /// <summary> Static function that loads a Map from file. </summary>
-        ///
-        /// <typeparam name="MapType"> Map type to load. </typeparam>
-        /// <param name="inputMapFile"> Name of the map file to load. </param>
-        ///
-        /// <returns> A MapType. </returns>
-        static Map Load(const std::string& inputMapFile);
 
     protected:
         // members

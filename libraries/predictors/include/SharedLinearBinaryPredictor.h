@@ -68,7 +68,7 @@ namespace predictors
         /// <summary> Adds the predictor to a map. </summary>
         ///
         /// <param name="map"> [in,out] The map. </param>
-        void AddToMap(layers::Map& map) const;
+        void AddToMap(layers::LayerStack& map, const layers::CoordinateList& inputCoordinates) const;
 
     private:
         struct BiasedVector

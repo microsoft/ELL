@@ -77,12 +77,26 @@ namespace common
         return GetMappedDataIterator(dataLoadArguments, map);
     }
 
+    std::unique_ptr<layers::LayerStack> GetLayerStack(const MapLoadArguments& mapLoadArguments)
+    {
+        if (mapLoadArguments.inputMapFile != "")
+        {
+            auto map = std::make_unique<layers::LayerStack>(layers::LayerStack::Load(mapLoadArguments.inputMapFile));
+            return map;
+        }
+        else
+        {
+            return std::make_unique<layers::LayerStack>();
+        }
+    }
+
     std::unique_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments)
     {
         if (mapLoadArguments.inputMapFile != "")
         {
-            auto map = std::make_unique<layers::Map>(layers::Map::Load(mapLoadArguments.inputMapFile));
-            layers::CoordinateList inputCoordinates = layers::GetCoordinateList(*map, mapLoadArguments.coordinateList);
+            std::shared_ptr<layers::LayerStack> layerStack = GetLayerStack(mapLoadArguments);
+            auto map = std::make_unique<layers::Map>(layerStack);
+            layers::CoordinateList inputCoordinates = layers::GetCoordinateList(*layerStack, mapLoadArguments.coordinateList);
             map->SetOutputCoordinates(inputCoordinates);
             return map;
         }

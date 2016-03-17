@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         auto outStream = utilities::GetOutputStreamImpostor(printArguments.outputSvgFile);
 
         // open map file
-        auto map = layers::Map::Load<PrintableMap>(printArguments.inputMapFile);
+        auto map = layers::LayerStack::Load<PrintableMap>(printArguments.inputMapFile);
         
         // print to svg file
         map.Print(outStream, printArguments);
