@@ -26,7 +26,7 @@ class CompilableMap : public layers::Map
 public:
     /// <summary> Generates C code that encodes the map. </summary>
     ///
-    /// <param name="coordinateList"> List of output coordinates, whose values must be computed. </param>
     /// <param name="os"> [in,out] Stream to write data to. </param>
-    void ToCode(layers::CoordinateList coordinateList, std::ostream& os) const;
+    /// <param name="coordinateList"> List of output coordinates, whose values must be computed. </param>
+    void ToCode(std::ostream& os, layers::CoordinateList coordinateList) const;
 };

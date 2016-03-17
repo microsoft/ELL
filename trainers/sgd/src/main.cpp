@@ -61,13 +61,19 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
 
-        // if output file specified, replace stdout with it 
-        std::ofstream outputDataStream;
+        // if output file specified, use it, otherwise use std::cout
+        std::streambuf* outStreamBuf;
+        std::ofstream outputDataStream; // Note: need to keep this object around to avoid closing the file
         if (mapSaveArguments.outputMapFile != "")
         {
             outputDataStream = utilities::OpenOfstream(mapSaveArguments.outputMapFile);
-            std::cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
+            outStreamBuf = outputDataStream.rdbuf();
         }
+        else
+        {
+            outStreamBuf = std::cout.rdbuf();
+        }
+        std::ostream outStream(outStreamBuf);
 
         // create and load a dataset, a map, and a coordinate list
         dataset::RowDataset dataset;
@@ -110,7 +116,7 @@ int main(int argc, char* argv[])
         predictor.AddTo(*map, inputCoordinates);
 
         // output map
-        map->Save(std::cout);
+        map->Save(outStream);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

@@ -24,6 +24,9 @@ struct PrintableInput : public layers::Input, public PrintableLayer
 {
 public:
 
+    /// <summary> Gets a friendly layer name. </summary>
+    ///
+    /// <returns> The friendly layer name. </returns>
     virtual std::string GetFriendlyLayerName() const override;
 
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
