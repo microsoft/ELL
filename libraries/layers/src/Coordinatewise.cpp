@@ -17,6 +17,8 @@
 namespace layers
 {
     const int Coordinatewise::_currentVersion;
+    std::string addOperationName = "Add";
+    std::string multiplyOperationName = "Multiply";
 
     Coordinatewise::Coordinatewise(double value, Coordinate coordinate, OperationType operationType) : _operationType(operationType)
     {
@@ -35,9 +37,9 @@ namespace layers
         switch(type)
         {
         case OperationType::add:
-            return "add";
+            return addOperationName;
         case OperationType::multiply:
-            return "multiply";
+            return multiplyOperationName;
         }
 
         throw std::runtime_error("unrecognized operation type");
@@ -45,11 +47,11 @@ namespace layers
 
     Coordinatewise::OperationType Coordinatewise::GetOperationType(const std::string& name)
     {
-        if(name == "add")
+        if(name == addOperationName)
         {
             return OperationType::add;
         }
-        else if(name == "multiply")
+        else if(name == multiplyOperationName)
         {
             return OperationType::multiply;
         }

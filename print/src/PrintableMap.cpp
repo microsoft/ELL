@@ -40,12 +40,12 @@ R"aw(
             stroke-width:   2;
         }
     
-        rect.Scale
+        rect.%
         {
             fill:           #06aed5;
         }
 
-        rect.Shift
+        rect.%
         {
             fill:           #f15156;
         }
@@ -116,9 +116,13 @@ void PrintElementDefinition(std::ostream& os, const std::string& id, double widt
 void PrintableMap::Print(std::ostream & os, const PrintArguments& Arguments)
 {
     os << "<html>\n<body>\n";
-    utilities::PrintFormat(os, styleDefinitionFormat, Arguments.edgeStyle.dashStyle);
+    utilities::PrintFormat(os, 
+        styleDefinitionFormat, 
+        layers::Coordinatewise::GetOperationName(layers::Coordinatewise::OperationType::add),
+        layers::Coordinatewise::GetOperationName(layers::Coordinatewise::OperationType::multiply),
+        Arguments.edgeStyle.dashStyle);
 
-    os << "    <Svg>\n\n        <defs>\n";
+    os << "    <svg>\n\n        <defs>\n";
     PrintElementDefinition(os,
         "ValueElement",
         Arguments.valueElementLayout.width, 
@@ -185,6 +189,6 @@ void PrintableMap::Print(std::ostream & os, const PrintArguments& Arguments)
         os << std::endl;
     }
 
-    os << "\n    </Svg>\n\n<html>\n<body>\n";
+    os << "\n    </svg>\n\n<html>\n<body>\n";
 }
 
