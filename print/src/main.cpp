@@ -39,13 +39,13 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, use it, otherwise use std::cout
-        auto out = utilities::GetOutputStream(printArguments.outputSvgFile);
+        auto outStream = utilities::GetOutputStream(printArguments.outputSvgFile);
 
         // open map file
         auto map = layers::Map::Load<PrintableMap>(printArguments.inputMapFile);
         
         // print to svg file
-        map.Print(out, printArguments);
+        map.Print(outStream, printArguments);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

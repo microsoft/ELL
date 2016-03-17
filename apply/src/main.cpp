@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        auto out = utilities::GetOutputStream(dataSaveArguments.outputDataFile);
+        auto outStream = utilities::GetOutputStream(dataSaveArguments.outputDataFile);
 
         // create mapped data iterator based on the command line params
         auto dataIterator = GetDataIterator(dataLoadArguments, mapLoadArguments);
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
             auto supervisedExample = dataIterator->Get();
 
             // print the example
-            supervisedExample.Print(out);
+            supervisedExample.Print(outStream);
 
             // move on 
             dataIterator->Next();

@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        auto out = utilities::GetOutputStream(compileArguments.outputCodeFile);
+        auto outStream = utilities::GetOutputStream(compileArguments.outputCodeFile);
 
         // open file
         auto map = layers::Map::Load<CompilableMap>(mapLoadArguments.inputMapFile);
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
         auto coordinateList = layers::GetCoordinateList(map, mapLoadArguments.coordinateList);
 
         // output code
-        map.ToCode(coordinateList, out);
+        map.ToCode(outStream, coordinateList);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

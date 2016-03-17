@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        auto out = utilities::GetOutputStream(mapSaveArguments.outputMapFile);
+        auto outStream = utilities::GetOutputStream(mapSaveArguments.outputMapFile);
 
         // create and load a dataset, a map, and a coordinate list
         dataset::RowDataset dataset;
@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
         predictor.AddTo(*map, inputCoordinates);
 
         // output map
-        map->Save(out);
+        map->Save(outStream);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
