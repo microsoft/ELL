@@ -11,8 +11,10 @@
 #include "PrintableCoordinatewise.h"
 #include "SvgHelpers.h"
 
-PrintableCoordinatewise::PrintableCoordinatewise(layers::Layer::Type type) : Coordinatewise(type)
-{}
+std::string PrintableCoordinatewise::GetFriendlyLayerName() const
+{
+    return GetOperationName(GetOperationType());
+}
 
 LayerLayout PrintableCoordinatewise::Print(std::ostream & os, double left, double top, uint64 layerIndex, const PrintArguments & Arguments) const
 {

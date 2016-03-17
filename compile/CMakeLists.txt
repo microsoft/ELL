@@ -14,15 +14,16 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/main.cpp
-                 src/AddToAction.cpp
-                 src/CompilableCoordinatewise.cpp
-                 src/CompilableInput.cpp
-                 src/CompilableLayer.cpp
-                 src/CompilableMap.cpp
-                 src/CompilableSum.cpp
-                 src/DataFlowGraph.cpp
-                 src/DataFlowNode.cpp
-                 src/LinearOperation.cpp)
+         src/AddToAction.cpp
+         src/CompilableCoordinatewise.cpp
+         src/CompilableInput.cpp
+         src/CompilableLayer.cpp
+         src/CompilableMap.cpp
+         src/CompilableSum.cpp
+         src/ConstructLayer.cpp
+         src/DataFlowGraph.cpp
+         src/DataFlowNode.cpp
+         src/LinearOperation.cpp)
 
 set (INCLUDE include/AddToAction.h
              include/CompileArguments.h

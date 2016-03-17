@@ -56,6 +56,12 @@ namespace utilities
         template<typename ValueType>
         void Serialize(const char* name, const std::unique_ptr<ValueType>& value);
 
+        /// <summary> Serialize a std::string. </summary>
+        ///
+        /// <param name="name"> Name of the string being serialized. </param>
+        /// <param name="value"> The string being serialized. </param>
+        void Serialize(const char* name, const std::string& value);
+
         /// <summary> Serialize class types. </summary>
         ///
         /// <typeparam name="ValueType"> Type being serialized. </typeparam>
@@ -63,6 +69,20 @@ namespace utilities
         /// <param name="value"> The variable being serialized. </param>
         template<typename ValueType>
         void Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
+
+        template<typename ValueType>
+        void Serialize(const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
+
+        template<typename ElementType>
+        void Serialize(const std::vector<ElementType>& value);
+
+        template<typename ValueType>
+        void Serialize(const std::unique_ptr<ValueType>& value);
+
+        void Serialize(const std::string& value);
+
+        template<typename ValueType>
+        void Serialize(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
     private:
         template<typename ValueType>
@@ -82,18 +102,6 @@ namespace utilities
         void WriteCloseTag(const std::string& tagName);
 
         void Indent();
-
-        template<typename ValueType>
-        void SerializeUnnamed(const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
-
-        template<typename ElementType>
-        void SerializeUnnamed(const std::vector<ElementType>& value);
-
-        template<typename ValueType>
-        void SerializeUnnamed(const std::unique_ptr<ValueType>& value);
-
-        template<typename ValueType>
-        void SerializeUnnamed(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
         uint64 _indentation = 0;
         std::ostream& _stream;
@@ -133,6 +141,12 @@ namespace utilities
         template<typename ValueType>
         void Deserialize(const char* name, std::unique_ptr<ValueType>& value);
 
+        /// <summary> Deserialize a string. </summary>
+        ///
+        /// <param name="name"> Name of the string being deserialized, which is compared to the serialized version. </param>
+        /// <param name="value"> [in,out] Reference to the string being deserialized. </param>
+        void Deserialize(const char* name, std::string& value);
+
         /// <summary> Deserialize class types. </summary>
         ///
         /// <typeparam name="ValueType"> The type being deserialized. </typeparam>
@@ -140,6 +154,20 @@ namespace utilities
         /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
         template<typename ValueType>
         void Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
+
+        template<typename ValueType>
+        void Deserialize(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
+
+        template<typename ElementType>
+        void Deserialize(std::vector<ElementType>& value);
+
+        template<typename ValueType>
+        void Deserialize(std::unique_ptr<ValueType>& value);
+
+        void Deserialize(std::string& value);
+
+        template<typename ValueType>
+        void Deserialize(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
     private:
 
@@ -160,18 +188,6 @@ namespace utilities
 
         template<typename TagType, typename NameType, typename AttributeType, typename ValueType>
         void ReadSingleLineTags(TagType&& tagName, NameType&& attributeName, AttributeType attributeValue, ValueType&& value);
-
-        template<typename ValueType>
-        void DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
-
-        template<typename ElementType>
-        void DeserializeUnnamed(std::vector<ElementType>& value);
-
-        template<typename ValueType>
-        void DeserializeUnnamed(std::unique_ptr<ValueType>& value);
-
-        template<typename ValueType>
-        void DeserializeUnnamed(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
 
         std::string _string;
         const char* _pStr;

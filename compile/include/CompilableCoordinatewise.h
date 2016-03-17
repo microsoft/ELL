@@ -19,9 +19,6 @@
 class CompilableCoordinatewise : public layers::Coordinatewise, public CompilableLayer
 {
 public:
-
-    CompilableCoordinatewise(layers::Layer::Type type);
-
     /// <summary> Pushes actions upward in the graph </summary>
     ///
     /// <param name="currentLayerIndex"> The index of the current layer. </param>

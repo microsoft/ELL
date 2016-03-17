@@ -79,10 +79,13 @@ namespace layers
             return coordinateList;
         }
 
+
+        if(map.NumLayers() > 0)
+        {
         const char* pStr = coordinateListString.c_str();
         const char* pEnd = pStr + coordinateListString.size();
 
-        while (pStr < pEnd)
+            while(pStr < pEnd)
         {
             // read layer Index
             uint64 layerIndex = ParseIndex(pStr, map.NumLayers() - 1);
@@ -93,24 +96,24 @@ namespace layers
             uint64 toElementIndex = maxElementIndex;
 
             // case: no elements specified - take entire layer
-            if (*pStr == ';')
+                if(*pStr == ';')
             {
                 ++pStr;
             }
 
             // case: elements specified
-            else if (*pStr == ',')
+                else if(*pStr == ',')
             {
                 ++pStr;
                 fromElementIndex = toElementIndex = ParseIndex(pStr, maxElementIndex);
 
                 // interval of elements
-                if (*pStr == ':')
+                    if(*pStr == ':')
                 {
                     ++pStr;
                     toElementIndex = ParseIndex(pStr, maxElementIndex);
 
-                    if (toElementIndex < fromElementIndex)
+                        if(toElementIndex < fromElementIndex)
                     {
                         throw std::runtime_error("bad format in coordinate list definition string");
                     }
@@ -119,6 +122,7 @@ namespace layers
 
             // add the coordinates to the list
             AddCoordinates(coordinateList, layerIndex, fromElementIndex, toElementIndex);
+        }
         }
 
         return coordinateList;

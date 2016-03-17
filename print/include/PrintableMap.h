@@ -16,9 +16,6 @@
 #include "Layer.h"
 #include "Map.h"
 
-// utilities
-#include "JsonSerializer.h"
-
 // stl
 #include <iostream>
 #include <memory>
@@ -33,15 +30,4 @@ public:
     /// <param name="os"> [in,out] Stream to write data to. </param>
     /// <param name="Arguments"> The arguments. </param>
     void Print(std::ostream& os, const PrintArguments& Arguments);
-
-    /// <summary> Deserializes the Map in json format. </summary>
-    ///
-    /// <param name="serializer"> [in,out] The serializer. </param>
-    void Deserialize(utilities::JsonSerializer& serializer);
-
-    /// <summary> Static function for deserializing shared_ptr<Layer> </summary>
-    ///
-    /// <param name="serializer"> [in,out] The serializer. </param>
-    /// <param name="up"> [in,out] The up. </param>
-    static void DeserializeLayers(utilities::JsonSerializer& serializer, std::unique_ptr<layers::Layer>& up);
 };

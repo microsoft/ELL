@@ -18,6 +18,7 @@
 
 // utilities
 #include "Files.h"
+#include "OutputStream.h"
 
 // stl
 #include <iostream>
@@ -45,12 +46,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        std::ofstream outputDataStream;
-        if (dataSaveArguments.outputDataFile != "")
-        {
-            outputDataStream = utilities::OpenOfstream(dataSaveArguments.outputDataFile);
-            std::cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
-        }
+        auto outStream = utilities::GetOutputStream(dataSaveArguments.outputDataFile);
 
         // create mapped data iterator based on the command line params
         auto dataIterator = GetDataIterator(dataLoadArguments, mapLoadArguments);
@@ -62,7 +58,7 @@ int main(int argc, char* argv[])
             auto supervisedExample = dataIterator->Get();
 
             // print the example
-            supervisedExample.Print(std::cout);
+            supervisedExample.Print(outStream);
 
             // move on 
             dataIterator->Next();

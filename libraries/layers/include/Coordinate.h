@@ -14,7 +14,6 @@
 #include "types.h"
 
 // utilities
-#include "JsonSerializer.h"
 #include "XMLSerialization.h"
 
 // stl
@@ -49,20 +48,15 @@ namespace layers
         /// <returns> The name of this type. </returns>
         static const char* GetTypeName();
 
+        /// <summary> Reads the map from an XMLDeserializer. </summary>
+        ///
+        /// <param name="deserializer"> [in,out] The deserializer. </param>
         void Read(utilities::XMLDeserializer& deserializer);
+
+        /// <summary> Writes the map to an XMLSerializer. </summary>
+        ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
         void Write(utilities::XMLSerializer& serializer) const;
-
-        // TODO: remove JSON serializaiton
-
-        /// <summary> Serializes an index value pair. </summary>
-        ///
-        /// <param name="serializer"> [in,out] The serializer. </param>
-        void Serialize(utilities::JsonSerializer& serializer) const;
-
-        /// <summary> Deserializes an index value pair. </summary>
-        ///
-        /// <param name="serializer"> [in,out] The serializer. </param>
-        void Deserialize(utilities::JsonSerializer& serializer);
 
     private:
         uint64 _layerIndex = 0;

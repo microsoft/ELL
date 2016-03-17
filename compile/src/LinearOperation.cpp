@@ -16,6 +16,24 @@
 LinearOperation::LinearOperation(double a, double b) : _a(a), _b(b)
 {}
 
+LinearOperation::LinearOperation(layers::Coordinatewise::OperationType operationType, double coefficient)
+{
+    if(operationType == layers::Coordinatewise::OperationType::add)
+    {
+        _a = 1.0;
+        _b = coefficient;
+    }
+    else if(operationType == layers::Coordinatewise::OperationType::multiply)
+    {
+        _a = coefficient;
+        _b = 0;
+    }
+    else
+    {
+        throw std::runtime_error("unsupported operation");
+    }
+}
+
 LinearOperation LinearOperation::Compound(const LinearOperation & inputOperation) const
 {
     return LinearOperation(_a * inputOperation._a, _a * inputOperation._b + _b);
