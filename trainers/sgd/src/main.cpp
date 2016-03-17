@@ -12,6 +12,7 @@
 
 // utilities
 #include "Files.h"
+#include "OutputStream.h"
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
 #include "BinaryClassificationEvaluator.h"
@@ -62,12 +63,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        std::ofstream outputDataStream;
-        if (mapSaveArguments.outputMapFile != "")
-        {
-            outputDataStream = utilities::OpenOfstream(mapSaveArguments.outputMapFile);
-            std::cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
-        }
+        auto out = utilities::GetOutputStream(mapSaveArguments.outputMapFile);
 
         // create and load a dataset, a map, and a coordinate list
         dataset::RowDataset dataset;
@@ -110,7 +106,7 @@ int main(int argc, char* argv[])
         predictor.AddTo(*map, inputCoordinates);
 
         // output map
-        map->Save(std::cout);
+        map->Save(out);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

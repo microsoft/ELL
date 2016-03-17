@@ -14,13 +14,14 @@
 
 // utilities
 #include "Files.h"
+#include "OutputStream.h"
 #include "CommandLineParser.h"
 
 // layers
 #include "Map.h"
 
 // stl
-#include<iostream>
+#include <iostream>
 #include <fstream>
 #include <stdexcept>
 #include <memory>
@@ -37,19 +38,14 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(printArguments);
         commandLineParser.Parse();
 
-        // if output file specified, replace stdout with it 
-        std::ofstream outputDataStream;
-        if(printArguments.outputSvgFile != "")
-        {
-            outputDataStream = utilities::OpenOfstream(printArguments.outputSvgFile);
-            std::cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
-        }
+        // if output file specified, use it, otherwise use std::cout
+        auto out = utilities::GetOutputStream(printArguments.outputSvgFile);
 
         // open map file
         auto map = layers::Map::Load<PrintableMap>(printArguments.inputMapFile);
         
         // print to svg file
-        map.Print(std::cout, printArguments);
+        map.Print(out, printArguments);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
