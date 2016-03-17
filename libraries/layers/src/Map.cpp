@@ -20,7 +20,7 @@
 
 namespace layers
 {
-    const int Map::_currentVersion;
+    const int LayerStack::_currentVersion;
 
     //
     // Map::OutputIterator implementation
@@ -49,14 +49,15 @@ namespace layers
     {}
 
     //
-    // Map class implementation
+    // LayerStack class implementation
     //
-    Map::Map()
+    LayerStack::LayerStack()
     {
         _layers.push_back(std::make_unique<Input>());
     }
 
-    uint64 Map::AddLayer(std::unique_ptr<Layer>&& layer)
+   
+    uint64 LayerStack::AddLayer(std::unique_ptr<Layer>&& layer)
     {
         uint64 maxInputSize = 0;
         auto numLayers = _layers.size();
@@ -92,7 +93,7 @@ namespace layers
         return layerIndex;
     }
 
-    uint64 Map::NumLayers() const
+    uint64 LayerStack::NumLayers() const
     {
         return _layers.size();
     }
@@ -125,12 +126,12 @@ namespace layers
         return layerOutputs;
     }
 
-    const char* Map::GetTypeName()
+    const char* LayerStack::GetTypeName()
     {
         return "Map";
     }
 
-    void Map::Read(utilities::XMLDeserializer& deserializer)
+    void LayerStack::Read(utilities::XMLDeserializer& deserializer)
     {
         int version = 0;
         deserializer.Deserialize("version", version);
@@ -144,13 +145,13 @@ namespace layers
         }
     }
 
-    void Map::Write(utilities::XMLSerializer& serializer) const
+    void LayerStack::Write(utilities::XMLSerializer& serializer) const
     {
         serializer.Serialize("version", _currentVersion);
         serializer.Serialize("layers", _layers);
     }
 
-    void Map::Save(std::ostream& os) const
+    void LayerStack::Save(std::ostream& os) const
     {
         utilities::XMLSerializer serializer(os);
         serializer.Serialize(*this);
@@ -158,6 +159,22 @@ namespace layers
 
     void Map::UpdateInputLayer(uint64 minSize) const
     {
-        GetLayer<Input&>(0).IncreaseSize(minSize);
+        _inputSize = std::max(minSize, _inputSize);
+//        GetLayer<Input&>(0).IncreaseSize(minSize);
     }
+
+
+    Map Map::Load(const std::string& inputMapFile)
+    {
+        auto inputMapFStream = utilities::OpenIfstream(inputMapFile);
+        utilities::XMLDeserializer deserializer(inputMapFStream);
+
+        LayerStack layers;
+        deserializer.Deserialize(layers);
+
+        Map map;
+        map._layerStack = std::make_shared<LayerStack>(std::move(layers));
+        return map;
+    }
+
 }

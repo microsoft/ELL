@@ -21,7 +21,7 @@
 #include <memory>
 
 /// <summary> A printable map. </summary>
-class PrintableMap : public layers::Map
+class PrintableMap : public layers::LayerStack
 {
 public:
 

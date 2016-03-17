@@ -80,7 +80,6 @@ namespace layers
             return coordinateList;
         }
 
-
         if(map.NumLayers() > 0)
         {
             const char* pStr = coordinateListString.c_str();
