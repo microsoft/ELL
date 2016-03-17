@@ -25,7 +25,7 @@ namespace layers
         types::CopyToArray(inputIterator, layerOutputs);
         
         // update the input layer to handle vectors of this size
-        IncreaseInputLayerSize((uint64)layerOutputs.size());
+        IncreaseInputLayerSize((uint64_t)layerOutputs.size());
     }
 
     template <typename IndexValueIteratorType, types::IsIndexValueIterator<IndexValueIteratorType> concept>
@@ -35,7 +35,7 @@ namespace layers
         LoadInputLayer(inputIterator, _layerOutputs[0]);
 
         // compute layers 1,2,... in order
-        for (uint64 i = 1; i < _stack->NumLayers(); ++i)
+        for (uint64_t i = 1; i < _stack->NumLayers(); ++i)
         {
             _stack->GetLayer(i).Compute(_layerOutputs, _layerOutputs[i]);
         }
@@ -45,7 +45,7 @@ namespace layers
         // copy the outputs to a vector
         auto outputSize = outputCoordinates.size();
         std::vector<double> outputs(outputSize);
-        for(uint64 index = 0; index < outputSize; ++index)
+        for(uint64_t index = 0; index < outputSize; ++index)
         {
             auto coordinate = outputCoordinates[index];
             auto layerIndex = coordinate.GetLayerIndex();

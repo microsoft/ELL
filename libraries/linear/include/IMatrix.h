@@ -12,10 +12,8 @@
 
 #include "Base.h"
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <vector>
 
 namespace linear
@@ -28,12 +26,12 @@ namespace linear
         /// <summary> Returns the number of rows in the matrix. </summary>
         ///
         /// <returns> The total number of rows. </returns>
-        virtual uint64 NumRows() const = 0;
+        virtual uint64_t NumRows() const = 0;
 
         /// <summary> Returns the number of columns in the matrix. </summary>
         ///
         /// <returns> The total number of columns. </returns>
-        virtual uint64 NumColumns() const = 0;
+        virtual uint64_t NumColumns() const = 0;
 
         /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>
         ///

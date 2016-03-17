@@ -11,9 +11,7 @@
 #pragma once
 
 // types
-#include "types.h"
 #include "IndexValue.h"
-#include "StlIndexValueIterator.h"
 
 // stl
 #include <string>

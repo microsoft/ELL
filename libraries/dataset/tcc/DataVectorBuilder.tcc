@@ -14,8 +14,6 @@
 #include "OnesDataVector.h"
 #include "ZeroDataVector.h"
 
-#include "types.h"
-
 // stl
 #include <type_traits>
 
@@ -31,7 +29,7 @@ namespace dataset
 
         bool containsNonBinary = false;
         bool containsNonShorts = false;
-        uint64 numNonZeros = 0;
+        uint64_t numNonZeros = 0;
 
         while(IndexValueIterator.IsValid())
         {

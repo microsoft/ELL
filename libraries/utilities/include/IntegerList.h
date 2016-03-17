@@ -10,9 +10,6 @@
 
 #pragma once
 
-// types
-#include "types.h"
-
 // stl
 #include <cstdint>
 #include <vector>
@@ -25,7 +22,7 @@ namespace utilities
     public:
 
         /// <summary> Defines an alias representing the vector iterator. </summary>
-        typedef std::vector<uint64>::const_iterator vector_iterator;
+        typedef std::vector<uint64_t>::const_iterator vector_iterator;
 
         /// <summary> A read-only forward iterator for the IntegerList. </summary>
         class Iterator 
@@ -52,8 +49,8 @@ namespace utilities
 
             /// <summary> Returns the value of the current iterate. </summary>
             ///
-            /// <returns> An uint64. </returns>
-            uint64 Get() const;
+            /// <returns> An uint64_t. </returns>
+            uint64_t Get() const;
 
         private:
 
@@ -89,23 +86,23 @@ namespace utilities
 
         /// <summary> Gets the number of entries in the list. </summary>
         ///
-        /// <returns> An uint64. </returns>
-        uint64 Size() const;
+        /// <returns> An uint64_t. </returns>
+        uint64_t Size() const;
 
         /// <summary> Allocates a specified number of entires to the list. </summary>
         ///
         /// <param name="size"> The size. </param>
-        void Reserve(uint64 size);
+        void Reserve(uint64_t size);
 
         /// <summary> Gets the maximal integer in the list. </summary>
         ///
         /// <returns> The maximum value. </returns>
-        uint64 Max() const;
+        uint64_t Max() const;
 
         /// <summary> Appends an integer to the end of the list. </summary>
         ///
         /// <param name="value"> The value. </param>
-        void PushBack(uint64 value);
+        void PushBack(uint64_t value);
 
         /// <summary> Deletes all of the vector content and sets its Size to zero. </summary>
         void Reset();
@@ -118,6 +115,6 @@ namespace utilities
 
     private:
         // The list
-        std::vector<uint64> _list;
+        std::vector<uint64_t> _list;
     };
 }

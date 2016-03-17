@@ -10,9 +10,8 @@
 
 #pragma once
 
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <vector>
 #include <memory>
 #include <string>

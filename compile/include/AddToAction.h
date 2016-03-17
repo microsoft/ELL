@@ -12,9 +12,6 @@
 
 #include "LinearOperation.h"
 
-// types
-#include "types.h"
-
 // layers
 #include "Coordinate.h"
 

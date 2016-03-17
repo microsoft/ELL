@@ -27,14 +27,14 @@ namespace layers
     Sum::Sum(const std::vector<CoordinateList>& coordinates) : _inputCoordinates(coordinates)
     {}
 
-    uint64 Sum::Size() const
+    uint64_t Sum::Size() const
     {
         return _inputCoordinates.size();
     }
 
     void Sum::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
     {
-        for (uint64 k = 0; k < _inputCoordinates.size(); ++k)
+        for (uint64_t k = 0; k < _inputCoordinates.size(); ++k)
         {
             double output = 0;
             for (auto coordinate : _inputCoordinates[k])
@@ -45,7 +45,7 @@ namespace layers
         }
     }
 
-    Layer::InputCoordinateIterator Sum::GetInputCoordinates(uint64 index) const
+    Layer::InputCoordinateIterator Sum::GetInputCoordinates(uint64_t index) const
     {
         return Layer::InputCoordinateIterator(_inputCoordinates[index].cbegin(), _inputCoordinates[index].cend());
     }

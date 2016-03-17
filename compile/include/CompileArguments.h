@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "types.h"
-
 // utilities
 #include "CommandLineParser.h"
 

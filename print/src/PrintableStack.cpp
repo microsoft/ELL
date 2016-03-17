@@ -120,7 +120,7 @@ PrintableStack::PrintableStack(const layers::Stack& other)
     printableLayerFactory.AddType<PrintableCoordinatewise>(layers::Coordinatewise::GetTypeName());
     printableLayerFactory.AddType<PrintableSum>(layers::Sum::GetTypeName());
 
-    for (uint64 index = 0; index < other.NumLayers(); ++index)
+    for (uint64_t index = 0; index < other.NumLayers(); ++index)
     {
         const auto& layer = other.GetLayer(index);
         _printableLayers.push_back(printableLayerFactory.Construct(layer.GetRuntimeTypeName())); 
@@ -166,7 +166,7 @@ void PrintableStack::Print(std::ostream & os, const PrintArguments& arguments)
     double layerTop = arguments.stackLayout.verticalMargin;
     std::vector<LayerLayout> layouts;
 
-    for (uint64 layerIndex = 0; layerIndex < _printableLayers.size(); ++layerIndex)
+    for (uint64_t layerIndex = 0; layerIndex < _printableLayers.size(); ++layerIndex)
     {
         const auto& printableLayer = _printableLayers[layerIndex];
         auto layout = printableLayer->Print(os, arguments.stackLayout.horizontalMargin, layerTop, layerIndex, arguments);
@@ -176,8 +176,8 @@ void PrintableStack::Print(std::ostream & os, const PrintArguments& arguments)
         // print edges
         if (layerIndex > 0) // skip input layer
         {
-            uint64 layerSize = printableLayer->Size();
-            for (uint64 elementIndex = 0; elementIndex<layerSize; ++elementIndex)
+            uint64_t layerSize = printableLayer->Size();
+            for (uint64_t elementIndex = 0; elementIndex<layerSize; ++elementIndex)
             {
                 if (!layout.IsHidden(elementIndex)) // if output is hidden, hide edge
                 {

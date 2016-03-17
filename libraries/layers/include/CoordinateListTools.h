@@ -13,6 +13,7 @@
 #include "Coordinate.h"
 
 // stl
+#include <cstdint>
 #include <string>
 
 namespace layers

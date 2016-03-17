@@ -43,7 +43,7 @@ namespace dataset
     {}
 
     template<typename ValueType, typename IntegerListType>
-    void SparseDataVector<ValueType, IntegerListType>::PushBack(uint64 index, double value)
+    void SparseDataVector<ValueType, IntegerListType>::PushBack(uint64_t index, double value)
     {
         if (value == 0)
         {
@@ -62,7 +62,7 @@ namespace dataset
     }
 
     template<typename ValueType, typename IntegerListType>
-    uint64 SparseDataVector<ValueType, IntegerListType>::Size() const
+    uint64_t SparseDataVector<ValueType, IntegerListType>::Size() const
     {
         if(_indices.Size() == 0)
         {
@@ -75,7 +75,7 @@ namespace dataset
     }
 
     template<typename ValueType, typename IntegerListType>
-    uint64 SparseDataVector<ValueType, IntegerListType>::NumNonzeros() const
+    uint64_t SparseDataVector<ValueType, IntegerListType>::NumNonzeros() const
     {
         return _indices.Size();
     }

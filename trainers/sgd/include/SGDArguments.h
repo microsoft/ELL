@@ -8,8 +8,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "types.h"
-
 // utilities
 #include "CommandLineParser.h"
 
@@ -20,7 +18,7 @@
 ///
 struct SgdArguments
 {
-    uint64 numEpochs = 0;
+    uint64_t numEpochs = 0;
     double lossScale = 0;
     double l2Regularization = 0;
     std::string dataRandomPermutationSeedString = "";

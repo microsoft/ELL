@@ -8,9 +8,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// types
-#include "types.h"
-
 // stl
 #include <cstdlib>
 #include <stdexcept>
@@ -42,14 +39,14 @@ namespace utilities
     }
 
     // wrapper for strtoul
-    inline void cParse(const char* pStr, char*& pEnd, uint64& value)
+    inline void cParse(const char* pStr, char*& pEnd, uint64_t& value)
     {
         unsigned long x = strtoul(pStr, &pEnd, 0);
-        if(x != (uint64)x)
+        if(x != (uint64_t)x)
         {
             errno = ERANGE;
         }
-        value = (uint64)x;
+        value = (uint64_t)x;
     }
 
     // wrapper for strtol

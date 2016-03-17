@@ -13,6 +13,7 @@
 #include "IndexValue.h"
 
 // stl
+#include <cstdint>
 #include <vector>
 #include <type_traits>
 
@@ -46,7 +47,7 @@ namespace types
     protected:
         IteratorType _begin;
         IteratorType _end;
-        uint64 _index = 0;
+        uint64_t _index = 0;
         void SkipZeros();
     };
 

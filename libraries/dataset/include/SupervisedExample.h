@@ -12,13 +12,11 @@
 
 #include "IDataVector.h"
 
-// types
-#include "types.h"
-
 // linear
 #include "RowMatrix.h"
 
 // stl
+#include <cstdint>
 #include <memory>
 
 namespace dataset

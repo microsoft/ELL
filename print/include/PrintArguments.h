@@ -10,12 +10,11 @@
 
 #pragma once
 
-#include "types.h"
-
 // utilities
 #include "CommandLineParser.h"
 
 // stl
+#include <cstdint>
 #include <string>
 
 /// <summary> Arguments for element layout. </summary>
@@ -48,7 +47,7 @@ struct ElementStyleArguments
 /// <summary> Arguments for value element style. </summary>
 struct ValueElementStyleArguments : public ElementStyleArguments
 {
-    uint64 maxChars;
+    uint64_t maxChars;
 };
 
 /// <summary> Arguments for edge style. </summary>

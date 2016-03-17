@@ -15,10 +15,8 @@
 // testing
 #include "testing.h"
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <random>
@@ -31,23 +29,23 @@ void fillMatrix(MatrixType& M, int seed, bool lowerTriangle, bool upperTriangle)
 {
     std::default_random_engine rng(seed);
     std::normal_distribution<> dist(0,1);
-    for (uint64 row = 0; row < M.NumRows(); ++row)
+    for (uint64_t row = 0; row < M.NumRows(); ++row)
     {
-        uint64 fromColumn = lowerTriangle ? 0 : row;
-        uint64 toColumn = upperTriangle ? M.NumColumns() : row;
-        for (uint64 col = fromColumn; col < toColumn; ++col)
+        uint64_t fromColumn = lowerTriangle ? 0 : row;
+        uint64_t toColumn = upperTriangle ? M.NumColumns() : row;
+        for (uint64_t col = fromColumn; col < toColumn; ++col)
         {
             M(row, col) = dist(rng);
         }
     }
 }
 
-linear::DoubleVector getVector(uint64 size, int seed)
+linear::DoubleVector getVector(uint64_t size, int seed)
 {
     std::default_random_engine rng(seed);
     std::normal_distribution<> dist(0, 1);
     linear::DoubleVector v(size);
-    for (uint64 i = 0; i < size; ++i)
+    for (uint64_t i = 0; i < size; ++i)
     {
         v[i] = dist(rng);
     }

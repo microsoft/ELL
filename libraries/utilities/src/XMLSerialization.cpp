@@ -30,7 +30,7 @@ namespace utilities
 
     void XMLSerializer::Indent()
     {
-        for(uint64 i = 0; i < _indentation; ++i)
+        for (uint64_t i = 0; i < _indentation; ++i)
         {
             _stream << "    ";
         }

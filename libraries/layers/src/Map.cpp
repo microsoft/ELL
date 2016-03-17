@@ -38,7 +38,7 @@ namespace layers
 
     types::IndexValue Map::OutputIterator::Get() const
     {
-        return { _index, _outputs[_index] };
+        return{ _index, _outputs[_index] };
     }
 
     Map::OutputIterator::OutputIterator(std::vector<double>&& outputs) : _outputs(std::move(outputs)), _index(0)
@@ -47,7 +47,6 @@ namespace layers
     //
     // Map class implementataion
     //
-
     Map::Map()
     {
         _stack = std::make_shared<Stack>();
@@ -60,12 +59,12 @@ namespace layers
     {}
 
     CoordinateList Map::GetOutputCoordinates() const
-        {
+    {
         auto outputCoordinates = _outputCoordinates;
         if (outputCoordinates.size() == 0)
-            {
+        {
             if (_stack->NumLayers() == 1)
-                {
+            {
                 // size should be max of what we've seen and the input layer size
                 auto maxOutputSize = std::max(_maxInputSizeSeen, _stack->GetLayer(0).Size());
                 if (maxOutputSize == 0)
@@ -74,7 +73,7 @@ namespace layers
                 }
 
                 outputCoordinates = CoordinateList(maxOutputSize);
-                for (uint64 elementIndex = 0; elementIndex < maxOutputSize; ++elementIndex)
+                for (uint64_t elementIndex = 0; elementIndex < maxOutputSize; ++elementIndex)
                 {
                     outputCoordinates[elementIndex] = { 0, elementIndex };
                 }
@@ -82,24 +81,24 @@ namespace layers
             else
             {
                 outputCoordinates = _stack->GetCoordinateList(_stack->NumLayers() - 1);
+            }
         }
-    }
         return outputCoordinates;
     }
 
     void Map::SetOutputCoordinates(const CoordinateList& coordinates)
-        {
+    {
         _outputCoordinates = coordinates;
     }
 
-    const Stack& Map::GetStack() const 
-    { 
-        return *_stack; 
+    const Stack& Map::GetStack() const
+    {
+        return *_stack;
     }
 
-    Stack& Map::GetStack() 
-    { 
-        return *_stack; 
+    Stack& Map::GetStack()
+    {
+        return *_stack;
     }
 
     void Map::AllocateLayerOutputs() const
@@ -107,18 +106,18 @@ namespace layers
         auto numLayers = _stack->NumLayers();
         _layerOutputs.resize(numLayers);
 
-        for (uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
+        for (uint64_t layerIndex = 0; layerIndex < numLayers; ++layerIndex)
         {
             auto layerSize = _stack->GetLayer(layerIndex).Size();
             if (layerIndex == 0 && numLayers == 1) // input layer
-        {
+            {
                 layerSize = std::max(layerSize, _maxInputSizeSeen);
-    }
+            }
             _layerOutputs[layerIndex].resize(layerSize);
-    }
+        }
     }
 
-    void Map::IncreaseInputLayerSize(uint64 minSize) const
+    void Map::IncreaseInputLayerSize(uint64_t minSize) const
     {
         _maxInputSizeSeen = std::max(minSize, _maxInputSizeSeen);
     }

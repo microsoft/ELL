@@ -10,10 +10,8 @@
 
 #pragma once
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <vector>
 #include <iterator>
 
@@ -52,20 +50,20 @@ namespace utilities
 
             /// <summary> Returns the value of the current iterate. </summary>
             ///
-            /// <returns> An uint64. </returns>
-            uint64 Get() const;
+            /// <returns> An uint64_t. </returns>
+            uint64_t Get() const;
 
         private:
 
             // private ctor, can only be called from CompressedIntegerList class
-            Iterator(const uint8 *iter, const uint8 *end);
+            Iterator(const uint8_t *iter, const uint8_t *end);
             friend class CompressedIntegerList;
 
             // members
-            const uint8* _iter;
-            const uint8* _end;
-            uint64 _value;
-            uint64 _iter_increment;
+            const uint8_t* _iter;
+            const uint8_t* _end;
+            uint64_t _value;
+            uint64_t _iter_increment;
         };
 
         /// <summary> Default Constructor. Constructs an empty list. </summary>
@@ -91,23 +89,23 @@ namespace utilities
 
         /// <summary> \returns The number of entries in the list. </summary>
         ///
-        /// <returns> An uint64. </returns>
-        uint64 Size() const;
+        /// <returns> An uint64_t. </returns>
+        uint64_t Size() const;
 
         /// <summary> Allocates a specified number of entires to the list. </summary>
         ///
         /// <param name="size"> The size. </param>
-        void Reserve(uint64 size);
+        void Reserve(uint64_t size);
 
         /// <summary> \returns The maximal integer in the list. </summary>
         ///
         /// <returns> The maximum value. </returns>
-        uint64 Max() const;
+        uint64_t Max() const;
 
         /// <summary> Appends an integer to the end of the list. </summary>
         ///
         /// <param name="value"> The value. </param>
-        void PushBack(uint64 value);
+        void PushBack(uint64_t value);
 
         /// <summary> Deletes all of the std::vector content and sets its Size to zero. </summary>
         void Reset();
@@ -118,8 +116,8 @@ namespace utilities
         Iterator GetIterator() const;
 
     private:
-        std::vector<uint8> _data;
-        uint64 _last;
-        uint64 _size;
+        std::vector<uint8_t> _data;
+        uint64_t _last;
+        uint64_t _size;
     };
 }

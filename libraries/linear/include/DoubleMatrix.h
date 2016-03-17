@@ -12,10 +12,8 @@
 
 #include "IMatrix.h"
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <vector>
 #include <iostream>
 
@@ -47,19 +45,19 @@ namespace linear
         /// <summary> Returns the number of rows in the matrix. </summary>
         ///
         /// <returns> The number of rows. </returns>
-        virtual uint64 NumRows() const override;
+        virtual uint64_t NumRows() const override;
 
         /// <summary> Returns the number of columns in the matrix. </summary>
         ///
         /// <returns> The number of columns. </returns>
-        virtual uint64 NumColumns() const override;
+        virtual uint64_t NumColumns() const override;
 
         /// <summary> Sets an entry in the matrix. </summary>
         ///
         /// <param name="i"> Zero-based row index. </param>
         /// <param name="j"> Zero-based column index. </param>
         /// <param name="value"> The value to set, or 1.0 by default. </param>
-        virtual void Set(uint64 i, uint64 j, double value = 1.0);
+        virtual void Set(uint64_t i, uint64_t j, double value = 1.0);
 
         /// <summary> Sets all of the matrix elements to zero. </summary>
         void Reset();
@@ -70,7 +68,7 @@ namespace linear
         /// <param name="j"> Zero-based column index. </param>
         ///
         /// <returns> A reference to the specified element. </returns>
-        virtual double& operator()(uint64 i, uint64 j) =0;
+        virtual double& operator()(uint64_t i, uint64_t j) =0;
 
         /// <summary> Returns a reference to a matrix element </summary>
         ///
@@ -78,7 +76,7 @@ namespace linear
         /// <param name="j"> Zero-based column index. </param>
         ///
         /// <returns> A reference to the specified element. </returns>
-        virtual double operator()(uint64 i, uint64 j) const =0;    
+        virtual double operator()(uint64_t i, uint64_t j) const =0;    
 
         /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>
         ///
@@ -104,14 +102,14 @@ namespace linear
         virtual void Print(std::ostream& os) const override;
 
     protected:
-        DoubleMatrixBase(uint64 size, uint64 numRows, uint64 numColumns);
+        DoubleMatrixBase(uint64_t size, uint64_t numRows, uint64_t numColumns);
 
-        uint64 _num_rows;
-        uint64 _num_columns;
+        uint64_t _num_rows;
+        uint64_t _num_columns;
 
     private:
-        double RowDot(uint64 i, const double* p_x) const;
-        double ColumnDot(uint64 j, const double* p_x) const;
+        double RowDot(uint64_t i, const double* p_x) const;
+        double ColumnDot(uint64_t j, const double* p_x) const;
     };
 
     /// <summary> Templated DoubleMatrix class specialization for column-major matrices. </summary>
@@ -124,7 +122,7 @@ namespace linear
         ///
         /// <param name="numRows"> Number of rows. </param>
         /// <param name="numColumns"> Number of columns. </param>
-        DoubleMatrix(uint64 numRows, uint64 numColumns);
+        DoubleMatrix(uint64_t numRows, uint64_t numColumns);
 
         /// <summary> Returns a reference to a matrix element </summary>
         ///
@@ -132,7 +130,7 @@ namespace linear
         /// <param name="j"> Zero-based column index. </param>
         ///
         /// <returns> A reference to the specified element. </returns>
-        virtual double& operator()(uint64 i, uint64 j) override;
+        virtual double& operator()(uint64_t i, uint64_t j) override;
 
         /// <summary> Returns a reference to a matrix element </summary>
         ///
@@ -140,7 +138,7 @@ namespace linear
         /// <param name="j"> Zero-based column index. </param>
         ///
         /// <returns> A reference to the specified element. </returns>
-        virtual double operator()(uint64 i, uint64 j) const override;
+        virtual double operator()(uint64_t i, uint64_t j) const override;
     };
 
     /// <summary> Templated DoubleMatrix class specialization for row-major matrices. </summary>
@@ -153,7 +151,7 @@ namespace linear
         ///
         /// <param name="numRows"> Number of rows. </param>
         /// <param name="numColumns"> Number of columns. </param>
-        DoubleMatrix(uint64 numRows, uint64 numColumns);
+        DoubleMatrix(uint64_t numRows, uint64_t numColumns);
 
         /// <summary> Returns a reference to a matrix element </summary>
         ///
@@ -161,7 +159,7 @@ namespace linear
         /// <param name="j"> Zero-based column index. </param>
         ///
         /// <returns> A reference to the specified element. </returns>
-        virtual double& operator()(uint64 i, uint64 j) override;
+        virtual double& operator()(uint64_t i, uint64_t j) override;
 
         /// <summary> Returns a reference to a matrix element </summary>
         ///
@@ -169,7 +167,7 @@ namespace linear
         /// <param name="j"> Zero-based column index. </param>
         ///
         /// <returns> A reference to the specified element. </returns>
-        virtual double operator()(uint64 i, uint64 j) const override;
+        virtual double operator()(uint64_t i, uint64_t j) const override;
     };
 
     /// <summary>
@@ -183,7 +181,7 @@ namespace linear
         /// <summary> Constructs a column major square dense matrix. </summary>
         ///
         /// <param name="dimension"> The dimension. </param>
-        DoubleMatrix(uint64 dimension);
+        DoubleMatrix(uint64_t dimension);
     };
 
     /// <summary> Templated DoubleMatrix class specialization for row-major square matrices. </summary>
@@ -195,7 +193,7 @@ namespace linear
         /// <summary> Constructs a row major square dense matrix. </summary>
         ///
         /// <param name="dimension"> The dimension. </param>
-        DoubleMatrix(uint64 dimension);
+        DoubleMatrix(uint64_t dimension);
     };
 
     /// <summary>
@@ -209,14 +207,14 @@ namespace linear
         /// <summary> Constructs a row major square upper-triangular dense matrix. </summary>
         ///
         /// <param name="dimension"> The dimension. </param>
-        DoubleMatrix(uint64 dimension);
+        DoubleMatrix(uint64_t dimension);
 
         /// <summary> Sets an entry in the matrix. </summary>
         ///
         /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
+        /// <param name="j"> The uint64_t to process. </param>
         /// <param name="value"> The value to set, 1.0 by default. </param>
-        virtual void Set(uint64 i, uint64 j, double value = 1.0) override;
+        virtual void Set(uint64_t i, uint64_t j, double value = 1.0) override;
 
         /// <summary> Returns a reference to a matrix element </summary>
         ///
@@ -224,7 +222,7 @@ namespace linear
         /// <param name="j"> Zero-based column index. </param>
         ///
         /// <returns> A reference to the specified element. </returns>
-        virtual double& operator()(uint64 i, uint64 j) override;
+        virtual double& operator()(uint64_t i, uint64_t j) override;
 
         /// <summary> Returns a reference to a matrix element </summary>
         ///
@@ -232,7 +230,7 @@ namespace linear
         /// <param name="j"> Zero-based column index. </param>
         ///
         /// <returns> A reference to the specified element. </returns>
-        virtual double operator()(uint64 i, uint64 j) const override;
+        virtual double operator()(uint64_t i, uint64_t j) const override;
 
         /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>
         ///
@@ -265,14 +263,14 @@ namespace linear
         /// <summary> Constructs a row major square upper-triangular dense matrix. </summary>
         ///
         /// <param name="dimension"> The dimension. </param>
-        DoubleMatrix(uint64 dimension);
+        DoubleMatrix(uint64_t dimension);
 
         /// <summary> Sets an entry in the matrix. </summary>
         ///
         /// <param name="i"> Zero-based index of the. </param>
-        /// <param name="j"> The uint64 to process. </param>
+        /// <param name="j"> The uint64_t to process. </param>
         /// <param name="value"> The value to set, 1.0 by default. </param>
-        virtual void Set(uint64 i, uint64 j, double value = 1.0) override;
+        virtual void Set(uint64_t i, uint64_t j, double value = 1.0) override;
 
         /// <summary> Returns a reference to a matrix element </summary>
         ///
@@ -280,7 +278,7 @@ namespace linear
         /// <param name="j"> Zero-based column index. </param>
         ///
         /// <returns> A reference to the specified element. </returns>
-        virtual double& operator()(uint64 i, uint64 j) override;
+        virtual double& operator()(uint64_t i, uint64_t j) override;
 
         /// <summary> Returns a reference to a matrix element </summary>
         ///
@@ -288,7 +286,7 @@ namespace linear
         /// <param name="j"> Zero-based column index. </param>
         ///
         /// <returns> A reference to the specified element. </returns>
-        virtual double operator()(uint64 i, uint64 j) const override;
+        virtual double operator()(uint64_t i, uint64_t j) const override;
 
         /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>
         ///

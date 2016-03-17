@@ -12,10 +12,8 @@
 
 #include "Base.h"
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <vector>
 
 namespace linear
@@ -32,7 +30,7 @@ namespace linear
         /// <summary> Returns the Size of the vector. </summary>
         ///
         /// <returns> The size of the vector. </returns>
-        virtual uint64 Size() const = 0;
+        virtual uint64_t Size() const = 0;
 
         /// <summary> Computes the squared 2-norm. </summary>
         ///

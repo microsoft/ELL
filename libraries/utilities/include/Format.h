@@ -10,9 +10,6 @@
 
 #pragma once
 
-// types
-#include "types.h"
-
 // stl
 #include <iostream>
 

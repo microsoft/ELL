@@ -10,7 +10,7 @@
 
 #include "DataFlowGraph.h"
 
-void DataFlowGraph::AddLayer(uint64 numNodes)
+void DataFlowGraph::AddLayer(uint64_t numNodes)
 {
     _nodes.emplace_back(numNodes);
 }
@@ -25,12 +25,12 @@ DataFlowNode& DataFlowGraph::GetNode(layers::Coordinate coordinate)
     return _nodes[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
 }
 
-const DataFlowNode& DataFlowGraph::GetNode(uint64 layerIndex, uint64 elementIndex) const
+const DataFlowNode& DataFlowGraph::GetNode(uint64_t layerIndex, uint64_t elementIndex) const
 {
     return _nodes[layerIndex][elementIndex];
 }
 
-DataFlowNode& DataFlowGraph::GetNode(uint64 layerIndex, uint64 elementIndex)
+DataFlowNode& DataFlowGraph::GetNode(uint64_t layerIndex, uint64_t elementIndex)
 {
     return _nodes[layerIndex][elementIndex];
 }

@@ -10,14 +10,14 @@
 
 #pragma once
 
-// types
-#include "types.h"
-
 // predictors
 #include "LinearPredictor.h"
 
 // linear
 #include "DoubleVector.h"
+
+// stl
+#include <cstdint>
 
 namespace optimization
 {
@@ -32,7 +32,7 @@ namespace optimization
         /// <summary> Constructs the optimizer. </summary>
         ///
         /// <param name="dim"> The dimension. </param>
-        AsgdOptimizer(uint64 dim);
+        AsgdOptimizer(uint64_t dim);
 
         /// <summary> Performs a given number of learning iterations. </summary>
         ///
@@ -51,7 +51,7 @@ namespace optimization
         const predictors::LinearPredictor& GetPredictor() const;
             
     private:
-        uint64 _total_iterations;
+        uint64_t _total_iterations;
         predictors::LinearPredictor _lastPredictor;
         predictors::LinearPredictor _averagedPredictor;
     };

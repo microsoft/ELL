@@ -17,11 +17,10 @@
 #include "IntegerList.h"
 
 // types
-#include "types.h"
 #include "IndexValue.h"
-#include "StlIndexValueIterator.h"
 
 // stl
+#include <cstdint>
 #include <type_traits>
 #include <iostream>
 
@@ -106,7 +105,7 @@ namespace dataset
         ///
         /// <param name="index"> Zero-based index of the. </param>
         /// <param name="value"> The value. </param>
-        virtual void PushBack(uint64 index, double value = 1.0) override;
+        virtual void PushBack(uint64_t index, double value = 1.0) override;
 
         /// <summary> Deletes all of the vector content and sets its Size to zero, but does not deallocate
         /// its memory. </summary>
@@ -114,13 +113,13 @@ namespace dataset
 
         /// <summary> \returns The largest index of a non-zero entry plus one. </summary>
         ///
-        /// <returns> An uint64. </returns>
-        virtual uint64 Size() const override;
+        /// <returns> An uint64_t. </returns>
+        virtual uint64_t Size() const override;
 
         /// <summary> \returns The number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
-        virtual uint64 NumNonzeros() const override;
+        virtual uint64_t NumNonzeros() const override;
 
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///

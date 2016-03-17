@@ -14,11 +14,11 @@
 #include "DoubleVector.h"
 
 // types
-#include "types.h"
 #include "IndexValue.h"
 #include "StlIndexValueIterator.h"
 
 // stl
+#include <cstdint>
 #include <iostream>
 #include <functional>
 #include <vector>
@@ -35,13 +35,13 @@ namespace linear
         /// <param name="vec"> The vector to reference. </param>
         /// <param name="offset"> The offset, 0 by default. </param>
         /// <param name="size"> The nmumber of elements in the subvector, the end of the vector by default. </param>
-        DoubleSubvector(const DoubleVector& vec, uint64 offset = 0, uint64 size = UINT64_MAX);
+        DoubleSubvector(const DoubleVector& vec, uint64_t offset = 0, uint64_t size = UINT64_MAX);
 
         /// <summary> Constructs a DoubleSubvector. </summary>
         ///
         /// <param name="ptr"> A pointer to the first element to reference. </param>
         /// <param name="size"> The number of elements in the subvector. </param>
-        DoubleSubvector(const double* ptr, uint64 size);
+        DoubleSubvector(const double* ptr, uint64_t size);
 
         /// <summary> Returns an IndexValueIterator for the vector. </summary>
         ///
@@ -50,8 +50,8 @@ namespace linear
 
         /// <summary> Returns the Size of the vector. </summary>
         ///
-        /// <returns> An uint64. </returns>
-        virtual uint64 Size() const override;
+        /// <returns> An uint64_t. </returns>
+        virtual uint64_t Size() const override;
 
         /// <summary> Computes the squared 2-norm. </summary>
         ///
@@ -78,7 +78,7 @@ namespace linear
 
     private:
         const double* _ptr;
-        uint64 _size;
+        uint64_t _size;
     };
 }
 

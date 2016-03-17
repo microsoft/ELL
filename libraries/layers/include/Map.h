@@ -14,10 +14,10 @@
 #include "Stack.h"
 
 // types
-#include "types.h"
 #include "IndexValue.h"
 
 // stl
+#include <cstdint>
 #include <vector>
 #include <memory>
 #include <type_traits>
@@ -48,7 +48,7 @@ namespace layers
 
         protected:
             std::vector<double> _outputs;
-            uint64 _index;
+            uint64_t _index;
 
             // private ctor, can only be called from Map class
             OutputIterator(std::vector<double>&& outputs);
@@ -102,7 +102,7 @@ namespace layers
         // members
         std::shared_ptr<Stack> _stack;
 
-        void IncreaseInputLayerSize(uint64 minSize) const;
+        void IncreaseInputLayerSize(uint64_t minSize) const;
 
         template <typename IndexValueIteratorType>
         void LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const;
@@ -110,7 +110,7 @@ namespace layers
     private:
         CoordinateList _outputCoordinates; // default empty coordinate list means "use all of last layer"
 
-        mutable uint64 _maxInputSizeSeen = 0; // keeps track of the largest input we've seen so far
+        mutable uint64_t _maxInputSizeSeen = 0; // keeps track of the largest input we've seen so far
         mutable std::vector<std::vector<double>> _layerOutputs;
         void AllocateLayerOutputs() const;
     };

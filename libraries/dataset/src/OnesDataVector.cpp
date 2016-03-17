@@ -31,10 +31,10 @@ namespace dataset
         return types::IndexValue{_index, 1};
     }
 
-    OnesDataVector::Iterator::Iterator(uint64 size) : _size(size)
+    OnesDataVector::Iterator::Iterator(uint64_t size) : _size(size)
     {}
 
-    OnesDataVector::OnesDataVector(uint64 dim) : _size(dim)
+    OnesDataVector::OnesDataVector(uint64_t dim) : _size(dim)
     {}
 
     OnesDataVector::OnesDataVector(const IDataVector& other) : _size(other.Size())
@@ -45,7 +45,7 @@ namespace dataset
         return type::ones;
     }
 
-    void OnesDataVector::PushBack(uint64 index, double value)
+    void OnesDataVector::PushBack(uint64_t index, double value)
     {
         if(value != 1 || index != _size)
         {
@@ -59,12 +59,12 @@ namespace dataset
         _size = 0;
     }
 
-    uint64 OnesDataVector::Size() const
+    uint64_t OnesDataVector::Size() const
     {
         return _size;
     }
 
-    uint64 OnesDataVector::NumNonzeros() const
+    uint64_t OnesDataVector::NumNonzeros() const
     {
         return _size;
     }
@@ -76,7 +76,7 @@ namespace dataset
 
     void OnesDataVector::AddTo(double* p_other, double scalar) const
     {
-        for(uint64 i = 0; i<_size; ++i)
+        for(uint64_t i = 0; i<_size; ++i)
         {
             p_other[i] += (double)scalar;
         }
@@ -85,7 +85,7 @@ namespace dataset
     double OnesDataVector::Dot(const double* p_other) const
     {
         double result = 0.0;
-        for(uint64 i = 0; i<_size; ++i)
+        for(uint64_t i = 0; i<_size; ++i)
         {
             result += p_other[i];
         }

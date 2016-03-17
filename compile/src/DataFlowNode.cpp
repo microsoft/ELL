@@ -68,11 +68,11 @@ std::string DataFlowNode::GetVariableName() const
     }
 }
 
-uint64 DataFlowNode::GetTempVariableIndex() const
+uint64_t DataFlowNode::GetTempVariableIndex() const
 {
     if (_tempVariableIndex >= 0)
     {
-        return (uint64)_tempVariableIndex;
+        return (uint64_t)_tempVariableIndex;
     }
     else
     {
@@ -80,7 +80,7 @@ uint64 DataFlowNode::GetTempVariableIndex() const
     }
 }
 
-void DataFlowNode::SetTempVariableIndex(uint64 index)
+void DataFlowNode::SetTempVariableIndex(uint64_t index)
 {
     assert(_tempVariableIndex < 0);
 

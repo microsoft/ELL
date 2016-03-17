@@ -10,10 +10,8 @@
 
 #pragma once
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <iostream>
 #include <vector>
 #include <map>
@@ -179,7 +177,7 @@ namespace utilities
             OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback);
 
             std::string optionNameString() const;
-            uint64 optionNameHelpLength() const;
+            uint64_t optionNameHelpLength() const;
         };
 
         std::vector<std::string> _originalArgs;

@@ -12,10 +12,8 @@
 
 #include "DataFlowNode.h"
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <vector>
 
 /// <summary> A data flow graph. </summary>
@@ -26,7 +24,7 @@ public:
     /// <summary> Adds a layer to the data flow graph </summary>
     ///
     /// <param name="numNodes"> Number of nodes in the layer</param>
-    void AddLayer(uint64 numNodes);
+    void AddLayer(uint64_t numNodes);
 
     /// <summary> Gets the node at a specified coordinate. </summary>
     ///
@@ -48,7 +46,7 @@ public:
     /// <param name="elementIndex"> Zero-based index of the element. </param>
     ///
     /// <returns> The node. </returns>
-    const DataFlowNode& GetNode(uint64 layerIndex, uint64 elementIndex) const;
+    const DataFlowNode& GetNode(uint64_t layerIndex, uint64_t elementIndex) const;
 
     /// <summary> Gets a node at a specified coordinate. </summary>
     ///
@@ -56,7 +54,7 @@ public:
     /// <param name="elementIndex"> Zero-based index of the element. </param>
     ///
     /// <returns> The node. </returns>
-    DataFlowNode& GetNode(uint64 layerIndex, uint64 elementIndex);
+    DataFlowNode& GetNode(uint64_t layerIndex, uint64_t elementIndex);
 
 private:
     std::vector<std::vector<DataFlowNode>> _nodes;

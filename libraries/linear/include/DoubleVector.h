@@ -13,10 +13,11 @@
 #include "IVector.h"
 
 // types
-#include "types.h"
+#include "IndexValue.h"
 #include "StlIndexValueIterator.h"
 
 // stl
+#include <cstdint>
 #include <iostream>
 #include <type_traits>
 
@@ -31,7 +32,7 @@ namespace linear
         /// <summary> Constructs an instance of DoubleVector. </summary>
         ///
         /// <param name="size"> The size. </param>
-        DoubleVector(uint64 size = 0);
+        DoubleVector(uint64_t size = 0);
 
         /// <summary> Copy constructor. </summary>
         ///
@@ -84,13 +85,13 @@ namespace linear
         ///
         /// <param name="index"> The index of the element to return </param>
         /// <returns> The element at position index. </returns>
-        double& operator[](uint64 index);
+        double& operator[](uint64_t index);
 
         /// <summary> Returns a const reference to an element in the vector. </summary>
         ///
         /// <param name="index"> The index of the element to return </param>
         /// <returns> The element at position index. </returns>
-        double operator[](uint64 index) const;
+        double operator[](uint64_t index) const;
 
         /// <summary> Returns a pointer to the beginning of the vector</summary>
         ///
@@ -110,7 +111,7 @@ namespace linear
         /// <summary> Returns the Size of the vector. </summary>
         ///
         /// <returns> The size of the vector. </returns>
-        virtual uint64 Size() const override;
+        virtual uint64_t Size() const override;
 
         /// <summary> Computes the squared 2-norm. </summary>
         ///

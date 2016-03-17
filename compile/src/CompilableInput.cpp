@@ -13,7 +13,7 @@
 // stl
 #include <stdexcept>
 
-uint64 CompilableInput::Size() const
+uint64_t CompilableInput::Size() const
 {
     return Input::Size();
 }
@@ -28,7 +28,7 @@ void CompilableInput::operator=(const layers::Layer& layer)
     operator=(dynamic_cast<const layers::Input&>(layer));
 }
 
-void CompilableInput::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const
+void CompilableInput::SetActions(uint64_t currentLayerIndex, DataFlowGraph& graph) const 
 {
     throw std::runtime_error("this place in the code should bever be reached");
 }

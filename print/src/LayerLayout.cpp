@@ -10,7 +10,7 @@
 
 #include "LayerLayout.h"
 
-LayerLayout::LayerLayout(double left, double top, uint64 size, double layerMaxWidth, ElementLayoutArguments Arguments) : _elementMidX(size)
+LayerLayout::LayerLayout(double left, double top, uint64_t size, double layerMaxWidth, ElementLayoutArguments Arguments) : _elementMidX(size)
 {
     _connectorOffset = Arguments.height / 2.0;
     _layerHeight = Arguments.height + 2.0 * Arguments.verticalPadding;
@@ -28,7 +28,7 @@ LayerLayout::LayerLayout(double left, double top, uint64 size, double layerMaxWi
         _layerWidth = layerWidth;
         _numHiddenElements = 0;
 
-        for(uint64 k = 0; k<size; ++k)
+        for(uint64_t k = 0; k<size; ++k)
         {
             _elementMidX[k] = firstElementMidX + k * elementWidthPlusSpacing;
         }
@@ -40,7 +40,7 @@ LayerLayout::LayerLayout(double left, double top, uint64 size, double layerMaxWi
         _layerWidth = layerMaxWidth;
 
         double elementsWidth = layerMaxWidth - Arguments.leftPadding - Arguments.rightPadding;
-        uint64 numVisibleElements = uint64((elementsWidth - Arguments.dotsWidth) / elementWidthPlusSpacing);
+        uint64_t numVisibleElements = uint64_t((elementsWidth - Arguments.dotsWidth) / elementWidthPlusSpacing);
         
         if(elementsWidth <= Arguments.dotsWidth || numVisibleElements < 2)
         {
@@ -50,7 +50,7 @@ LayerLayout::LayerLayout(double left, double top, uint64 size, double layerMaxWi
         _numHiddenElements = size - numVisibleElements;
 
         // elements before gap
-        for(uint64 k = 0; k<numVisibleElements-1; ++k)
+        for(uint64_t k = 0; k<numVisibleElements-1; ++k)
         {
             _elementMidX[k] = firstElementMidX + k * elementWidthPlusSpacing;
         }
@@ -61,7 +61,7 @@ LayerLayout::LayerLayout(double left, double top, uint64 size, double layerMaxWi
         _dotsMidX = (dotsLeft + dotsRight) / 2.0;
         double hiddenElementsSpacing = (dotsRight - dotsLeft) / (_numHiddenElements -1);
 
-        for(uint64 k = numVisibleElements - 1; k<size-1; ++k)
+        for(uint64_t k = numVisibleElements - 1; k<size-1; ++k)
         {
             _elementMidX[k] = dotsLeft + (k - numVisibleElements + 1) * hiddenElementsSpacing;
         }
@@ -90,14 +90,14 @@ bool LayerLayout::HasHidden() const
     return false;
 }
 
-uint64 LayerLayout::NumVisibleElements() const
+uint64_t LayerLayout::NumVisibleElements() const
 {
     return _elementMidX.size() - _numHiddenElements;
 }
 
-bool LayerLayout::IsHidden(uint64 index) const
+bool LayerLayout::IsHidden(uint64_t index) const
 {
-    uint64 size = _elementMidX.size();
+    uint64_t size = _elementMidX.size();
     if (index == size - 1 || index < size - 1 - _numHiddenElements)
     {
         return false;
@@ -110,7 +110,7 @@ double LayerLayout::GetMidY() const
     return _midY;
 }
 
-double LayerLayout::GetMidX(uint64 index) const
+double LayerLayout::GetMidX(uint64_t index) const
 {
     return _elementMidX[index];
 }
@@ -120,12 +120,12 @@ double LayerLayout::GetDotsMidX() const
     return _dotsMidX;
 }
 
-Point LayerLayout::GetOutputPoint(uint64 index) const
+Point LayerLayout::GetOutputPoint(uint64_t index) const
 {
     return Point{ GetMidX(index), _midY + _connectorOffset };
 }
 
-Point LayerLayout::GetInputPoint(uint64 index) const
+Point LayerLayout::GetInputPoint(uint64_t index) const
 {
     return Point{ GetMidX(index), _midY - _connectorOffset };
 }

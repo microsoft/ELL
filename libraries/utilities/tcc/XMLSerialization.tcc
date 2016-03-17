@@ -67,7 +67,7 @@ namespace utilities
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
 
         WriteOpenTag(typeName, "name", name, "size", size);
-        for(uint64 i = 0; i < size; ++i)
+        for(uint64_t i = 0; i < size; ++i)
         {
             Serialize(value[i]);
         }
@@ -121,7 +121,7 @@ namespace utilities
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
 
         WriteOpenTag(typeName, "size", size);
-        for(uint64 i = 0; i < size; ++i)
+        for(uint64_t i = 0; i < size; ++i)
         {
             Serialize(value[i]);
         }
@@ -233,11 +233,11 @@ namespace utilities
     { 
         value.clear();
 
-        uint64 size = 0;
+        uint64_t size = 0;
         auto typeName = TypeName<std::vector<std::unique_ptr<BaseType>>>::GetName();
         ReadOpenTag(Match(typeName), Match("name"), Match(name), Match("size"), size);
         value.resize(size);
-        for(uint64 i = 0; i < size; ++i)
+        for(uint64_t i = 0; i < size; ++i)
         {
             Deserialize(value[i], factory);
         }
@@ -250,11 +250,11 @@ namespace utilities
     {
         value.clear();
 
-        uint64 size = 0;
+        uint64_t size = 0;
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
         ReadOpenTag(Match(typeName), Match("name"), Match(name), Match("size"), size);
         value.resize(size);
-        for(uint64 i = 0; i < size; ++i)
+        for(uint64_t i = 0; i < size; ++i)
         {
             Deserialize(value[i]);
         }
@@ -301,11 +301,11 @@ namespace utilities
     {
         value.clear();
 
-        uint64 size = 0;
+        uint64_t size = 0;
         auto typeName = TypeName<std::vector<std::unique_ptr<BaseType>>>::GetName();
         ReadOpenTag(Match(typeName), Match("size"), size);
         value.resize(size);
-        for(uint64 i = 0; i < size; ++i)
+        for(uint64_t i = 0; i < size; ++i)
         {
             Deserialize(value[i], factory);
         }
@@ -318,12 +318,12 @@ namespace utilities
     {
         value.clear();
 
-        uint64 size = 0;
+        uint64_t size = 0;
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
 
         ReadOpenTag(Match(typeName), Match("size"), size);
         value.resize(size);
-        for(uint64 i = 0; i < size; ++i)
+        for (uint64_t i = 0; i < size; ++i)
         {
             Deserialize(value[i]);
         }

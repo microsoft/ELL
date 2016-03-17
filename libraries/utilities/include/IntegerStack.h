@@ -10,10 +10,8 @@
 
 #pragma once
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <stack>
 
 namespace utilities
@@ -27,17 +25,17 @@ namespace utilities
         /// <summary> Removes and returns the top-of-stack object. </summary>
         ///
         /// <returns> The previous top-of-stack object. </returns>
-        uint64 Pop();
+        uint64_t Pop();
 
         /// <summary> Gets the top element in the stack. </summary>
         ///
         /// <returns> An element at the top of the stack. </returns>
-        uint64 Top() const;
+        uint64_t Top() const;
 
         /// <summary> Pushes an object onto this stack. </summary>
         ///
         /// <param name="value"> The value to push. This must be a value that was previously popped. </param>
-        void Push(uint64 value);
+        void Push(uint64_t value);
 
         /// <summary> Query if the top value in the stack is novel, which means that it has never been popped before. </summary>
         ///
@@ -45,7 +43,7 @@ namespace utilities
         bool IsTopNovel() const;
 
     private:
-        uint64 _smallestUnpopped = 0;
-        std::stack<uint64> _stack;
+        uint64_t _smallestUnpopped = 0;
+        std::stack<uint64_t> _stack;
     };
 }

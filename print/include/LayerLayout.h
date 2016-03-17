@@ -12,17 +12,15 @@
 
 #include "PrintArguments.h"
 
-// types.h
-#include "types.h"
+// stl
+#include <cstdint>
+#include <vector>
 
 struct Point
 {
     double x;
     double y;
 };
-
-// stl
-#include <vector>
 
 /// <summary> A layer layout. </summary>
 class LayerLayout
@@ -36,7 +34,7 @@ public:
     /// <param name="size"> The size. </param>
     /// <param name="layerMaxWidth"> Width of the layer maximum. </param>
     /// <param name="Arguments"> The arguments. </param>
-    LayerLayout(double left, double top, uint64 size, double layerMaxWidth, ElementLayoutArguments Arguments);
+    LayerLayout(double left, double top, uint64_t size, double layerMaxWidth, ElementLayoutArguments Arguments);
 
     /// <summary> Gets the width. </summary>
     ///
@@ -56,14 +54,14 @@ public:
     /// <summary> Number visible elements. </summary>
     ///
     /// <returns> The total number of visible elements. </returns>
-    uint64 NumVisibleElements() const;
+    uint64_t NumVisibleElements() const;
 
     /// <summary> Query if 'index' input stream hidden. </summary>
     ///
     /// <param name="index"> Zero-based index of the. </param>
     ///
     /// <returns> true if it succeeds, false if it fails. </returns>
-    bool IsHidden(uint64 index) const;
+    bool IsHidden(uint64_t index) const;
 
     /// <summary> Gets middle y coordinate. </summary>
     ///
@@ -75,7 +73,7 @@ public:
     /// <param name="index"> Zero-based index of the. </param>
     ///
     /// <returns> The middle x coordinate. </returns>
-    double GetMidX(uint64 index) const;
+    double GetMidX(uint64_t index) const;
 
     /// <summary> Gets dots middle x coordinate. </summary>
     ///
@@ -87,19 +85,19 @@ public:
     /// <param name="index"> Zero-based index of the. </param>
     ///
     /// <returns> The output point. </returns>
-    Point GetOutputPoint(uint64 index) const;
+    Point GetOutputPoint(uint64_t index) const;
 
     /// <summary> Gets input point. </summary>
     ///
     /// <param name="index"> Zero-based index of the. </param>
     ///
     /// <returns> The input point. </returns>
-    Point GetInputPoint(uint64 index) const;
+    Point GetInputPoint(uint64_t index) const;
 
 private:
     double _layerWidth = 0;
     double _layerHeight = 0;
-    uint64 _numHiddenElements = 0;
+    uint64_t _numHiddenElements = 0;
     std::vector<double> _elementMidX;
     double _dotsMidX = 0;
     double _midY = 0;

@@ -22,7 +22,7 @@ namespace dataset
     }
 
     template<typename ValueType>
-    void DenseDataVector<ValueType>::PushBack(uint64 index, double value)
+    void DenseDataVector<ValueType>::PushBack(uint64_t index, double value)
     {
         if(value == 0)
         {
@@ -44,13 +44,13 @@ namespace dataset
     }
 
     template<typename ValueType>
-    uint64 DenseDataVector<ValueType>::Size() const
+    uint64_t DenseDataVector<ValueType>::Size() const
     {
         return _data.size();
     }
 
     template<typename ValueType>
-    uint64 DenseDataVector<ValueType>::NumNonzeros() const
+    uint64_t DenseDataVector<ValueType>::NumNonzeros() const
     {
         return _num_nonzeros;
     }
@@ -69,7 +69,7 @@ namespace dataset
     template<typename ValueType>
     void DenseDataVector<ValueType>::AddTo(double* p_other, double scalar) const
     {
-        for(uint64 i = 0; i<Size(); ++i)
+        for(uint64_t i = 0; i<Size(); ++i)
         {
             p_other[i] += (double)(scalar * _data[i]);
         }
@@ -79,7 +79,7 @@ namespace dataset
     double DenseDataVector<ValueType>::Dot(const double* p_other) const
     {
         double result = 0.0;
-        for(uint64 i = 0; i<Size(); ++i)
+        for(uint64_t i = 0; i<Size(); ++i)
         {
             result += _data[i] * p_other[i];
         }

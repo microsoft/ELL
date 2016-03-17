@@ -29,9 +29,9 @@ namespace
     }
 
     // Parses the c-string pStr. Allowed values are (1) non-negative integers not greater than maxIndex, (2) "e", which translates to maxIndex, (3) "e-<uint>" which translates into maxIndex minus the integer value, as long as the outcome is in the range [0,maxValue]
-    uint64 ParseIndex(const char*& pStr, uint64 maxIndex)
+    uint64_t ParseIndex(const char*& pStr, uint64_t maxIndex)
     {
-        uint64 index;
+        uint64_t index;
         if (*pStr == 'e')
         {
             index = maxIndex;
@@ -40,14 +40,14 @@ namespace
             if (*pStr == '-')
             {
                 ++pStr;
-                uint64 diff;
-                HandleErrors(utilities::Parse<uint64>(pStr, diff));
+                uint64_t diff;
+                HandleErrors(utilities::Parse<uint64_t>(pStr, diff));
                 index -= diff;
             }
         }
         else
         {
-            HandleErrors(utilities::Parse<uint64>(pStr, index));
+            HandleErrors(utilities::Parse<uint64_t>(pStr, index));
         }
 
         if (index > maxIndex)
@@ -59,9 +59,9 @@ namespace
     }
 
     // adds an sequence of entries to a coordinateList
-    void AddCoordinates(layers::CoordinateList& coordinateList, uint64 layerIndex, uint64 fromElementIndex, uint64 toElementIndex)
+    void AddCoordinates(layers::CoordinateList& coordinateList, uint64_t layerIndex, uint64_t fromElementIndex, uint64_t toElementIndex)
     {
-        for (uint64 elementIndex = fromElementIndex; elementIndex <= toElementIndex; ++elementIndex)
+        for (uint64_t elementIndex = fromElementIndex; elementIndex <= toElementIndex; ++elementIndex)
         {
             coordinateList.emplace_back(layerIndex, elementIndex);
         }
@@ -85,16 +85,15 @@ namespace layers
             const char* pStr = coordinateListString.c_str();
             const char* pEnd = pStr + coordinateListString.size();
 
-
             while (pStr < pEnd)
             {
                 // read layer Index
-                uint64 layerIndex = ParseIndex(pStr, stack.NumLayers() - 1);
+                uint64_t layerIndex = ParseIndex(pStr, stack.NumLayers() - 1);
 
                 // read element index
-                uint64 fromElementIndex = 0;
-                uint64 maxElementIndex = stack.GetLayer(layerIndex).Size() - 1; // Fails when layer has size 0
-                uint64 toElementIndex = maxElementIndex;
+                uint64_t fromElementIndex = 0;
+                uint64_t maxElementIndex = stack.GetLayer(layerIndex).Size() - 1; // Fails when layer has size 0
+                uint64_t toElementIndex = maxElementIndex;
 
                 // case: no elements specified - take entire layer
                 if (*pStr == ';')

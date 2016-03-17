@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "types.h"
-
 // layers
 #include "Map.h"
 #include "Coordinate.h"

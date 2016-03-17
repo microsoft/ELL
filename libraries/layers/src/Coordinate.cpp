@@ -10,17 +10,19 @@
 
 #include "Coordinate.h"
 
+#include <cstdint>
+
 namespace layers
 {
-    Coordinate::Coordinate(uint64 layerIndex, uint64 elementIndex) : _layerIndex(layerIndex), _elementIndex(elementIndex)
+    Coordinate::Coordinate(uint64_t layerIndex, uint64_t elementIndex) : _layerIndex(layerIndex), _elementIndex(elementIndex)
     {}
 
-    uint64 Coordinate::GetLayerIndex() const
+    uint64_t Coordinate::GetLayerIndex() const
     {
         return _layerIndex;
     }
 
-    uint64 Coordinate::GetElementIndex() const
+    uint64_t Coordinate::GetElementIndex() const
     {
         return _elementIndex;
     }

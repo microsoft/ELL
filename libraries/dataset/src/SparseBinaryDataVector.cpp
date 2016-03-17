@@ -43,7 +43,7 @@ namespace dataset
     {}
 
     template<typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::PushBack(uint64 index, double value)
+    void SparseBinaryDataVectorBase<IntegerListType>::PushBack(uint64_t index, double value)
     {
         if (value == 0)
         {
@@ -62,7 +62,7 @@ namespace dataset
     }
 
     template<typename IntegerListType>
-    uint64 SparseBinaryDataVectorBase<IntegerListType>::Size() const
+    uint64_t SparseBinaryDataVectorBase<IntegerListType>::Size() const
     {
         if(_indices.Size() == 0)
         {
@@ -75,7 +75,7 @@ namespace dataset
     }
 
     template<typename IntegerListType>
-    uint64 SparseBinaryDataVectorBase<IntegerListType>::NumNonzeros() const
+    uint64_t SparseBinaryDataVectorBase<IntegerListType>::NumNonzeros() const
     {
         return _indices.Size();
     }

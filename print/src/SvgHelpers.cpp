@@ -20,15 +20,15 @@
 #include <cmath>
 
 // unexposed utility functions
-void SvgTab(std::ostream& os, uint64 numTabs)
+void SvgTab(std::ostream& os, uint64_t numTabs)
 {
-    for(uint64 i = 0; i<numTabs; ++i)
+    for(uint64_t i = 0; i<numTabs; ++i)
     {
         os << "    ";
     }
 }
 
-int GetPrecision(double number, uint64 maxChars)
+int GetPrecision(double number, uint64_t maxChars)
 {
     int precision;
     if(number >= 1)
@@ -55,7 +55,7 @@ int GetPrecision(double number, uint64 maxChars)
     return precision;
 }
 
-void SvgRect(std::ostream& os, uint64 numTabs, const std::string& SvgClass, double x, double y, double width, double height, double radius)
+void SvgRect(std::ostream& os, uint64_t numTabs, const std::string& SvgClass, double x, double y, double width, double height, double radius)
 {
     SvgTab(os, numTabs);
     auto format = R"aw(<rect class="%" x="%" y="%" width="%" height="%" rx="%" ry="%" />)aw";
@@ -63,7 +63,7 @@ void SvgRect(std::ostream& os, uint64 numTabs, const std::string& SvgClass, doub
     os << std::endl;
 }
 
-void SvgCircle(std::ostream& os, uint64 numTabs, const std::string& SvgClass, double cx, double cy, double radius)
+void SvgCircle(std::ostream& os, uint64_t numTabs, const std::string& SvgClass, double cx, double cy, double radius)
 {
     SvgTab(os, numTabs);
     auto format = R"aw(<ellipse class="%" cx="%" cy="%" rx="%" ry="%" />)aw";
@@ -71,7 +71,7 @@ void SvgCircle(std::ostream& os, uint64 numTabs, const std::string& SvgClass, do
     os << std::endl;
 }
 
-void SvgText(std::ostream& os, uint64 numTabs, const std::string& SvgClass, double cx, double cy, const std::string& text, double rotate)
+void SvgText(std::ostream& os, uint64_t numTabs, const std::string& SvgClass, double cx, double cy, const std::string& text, double rotate)
 {
     SvgTab(os, numTabs);
     auto format = R"aw(<text class="%" x="%" y="%" text-anchor="middle" dy=".4em"  transform="rotate(%,%,%)">)aw";
@@ -79,14 +79,14 @@ void SvgText(std::ostream& os, uint64 numTabs, const std::string& SvgClass, doub
     os << text << "</text>\n";
 }
 
-void SvgNumber(std::ostream& os, uint64 numTabs, const std::string& SvgClass, double cx, double cy, double number, uint64 maxChars, double rotate)
+void SvgNumber(std::ostream& os, uint64_t numTabs, const std::string& SvgClass, double cx, double cy, double number, uint64_t maxChars, double rotate)
 {
     std::stringstream ss;
     ss << std::fixed << std::setprecision(GetPrecision(number, maxChars)) << number;
     SvgText(os, numTabs, SvgClass, cx, cy, ss.str(), rotate);
 }
 
-void SvgUse(std::ostream& os, uint64 numTabs, const std::string& id, double x, double y)
+void SvgUse(std::ostream& os, uint64_t numTabs, const std::string& id, double x, double y)
 {
     SvgTab(os, numTabs);
     auto format = R"aw(<use xlink:href="#%" x="%" y="%" />)aw";
@@ -94,14 +94,14 @@ void SvgUse(std::ostream& os, uint64 numTabs, const std::string& id, double x, d
     os << std::endl;
 }
 
-void SvgDots(std::ostream& os, uint64 numTabs, double cx, double cy)
+void SvgDots(std::ostream& os, uint64_t numTabs, double cx, double cy)
 {
     SvgCircle(os, numTabs, "Dots", cx-8, cy, 2);
     SvgCircle(os, numTabs, "Dots", cx, cy, 2);
     SvgCircle(os, numTabs, "Dots", cx+8, cy, 2);
 }
 
-void SvgEdge(std::ostream & os, uint64 numTabs, Point from, Point to, double edgeFlattness)
+void SvgEdge(std::ostream & os, uint64_t numTabs, Point from, Point to, double edgeFlattness)
 {
     double xDist = to.x - from.x;
     double yDist = to.y - from.y;
@@ -135,20 +135,20 @@ void SvgEdge(std::ostream & os, uint64 numTabs, Point from, Point to, double edg
     os << std::endl;
 }
 
-void SvgValueElement(std::ostream& os, uint64 numTabs, double cx, double cy, double number, uint64 maxChars, uint64 index)
+void SvgValueElement(std::ostream& os, uint64_t numTabs, double cx, double cy, double number, uint64_t maxChars, uint64_t index)
 {
     SvgUse(os, 2, "ValueElement", cx, cy);
     SvgNumber(os, 2, "Element", cx, cy-5, number, maxChars, 0);
     SvgText(os, 2, "ElementIndex", cx, cy+10, std::to_string(index), 0);
 }
 
-void SvgEmptyElement(std::ostream& os, uint64 numTabs, double cx, double cy, uint64 index)
+void SvgEmptyElement(std::ostream& os, uint64_t numTabs, double cx, double cy, uint64_t index)
 {
     SvgUse(os, 2, "EmptyElement", cx, cy);
     SvgText(os, 2, "ElementIndex", cx, cy, std::to_string(index), 0);
 }
 
-void SvgInputElement(std::ostream& os, uint64 numTabs, double cx, double cy, uint64 index)
+void SvgInputElement(std::ostream& os, uint64_t numTabs, double cx, double cy, uint64_t index)
 {
     SvgUse(os, 2, "InputElement", cx, cy);
     SvgText(os, 2, "ElementIndex", cx, cy, std::to_string(index), 0);

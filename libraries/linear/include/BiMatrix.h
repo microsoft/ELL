@@ -11,6 +11,7 @@
 #pragma once
 
 // stl
+#include <cstdint>
 #include <vector>
 
 namespace linear
@@ -43,7 +44,7 @@ namespace linear
         /// <param name="index"> Zero-based index of the column. </param>
         ///
         /// <returns> A reference to the column. </returns>
-        const RowType& GetColumn(uint64 index) const;
+        const RowType& GetColumn(uint64_t index) const;
 
         /// <summary> Performs a general vector-matrix product: y = alpha * x * M + beta * y. </summary>
         ///

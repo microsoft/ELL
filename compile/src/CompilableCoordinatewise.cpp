@@ -10,7 +10,7 @@
 
 #include "CompilableCoordinatewise.h"
 
-uint64 CompilableCoordinatewise::Size() const
+uint64_t CompilableCoordinatewise::Size() const
 {
     return Coordinatewise::Size();
 }
@@ -25,9 +25,9 @@ void CompilableCoordinatewise::operator=(const layers::Layer& layer)
     operator=(dynamic_cast<const layers::Coordinatewise&>(layer));
 }
 
-void CompilableCoordinatewise::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const
+void CompilableCoordinatewise::SetActions(uint64_t currentLayerIndex, DataFlowGraph& graph) const 
 {
-    for (uint64 column = 0; column < Size(); ++column)
+    for (uint64_t column = 0; column < Size(); ++column)
     {
         auto coordinate = _inputCoordinates[column];
         auto& inputNode = graph.GetNode(coordinate);

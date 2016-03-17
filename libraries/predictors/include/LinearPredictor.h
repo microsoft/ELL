@@ -10,9 +10,6 @@
 
 #pragma once
 
-// types
-#include "types.h"
-
 // layers
 #include "Stack.h"
 #include "Coordinate.h"
@@ -24,6 +21,7 @@
 #include "IDataVector.h"
 
 // stl
+#include <cstdint>
 #include <memory>
 
 namespace predictors

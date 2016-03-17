@@ -20,7 +20,7 @@ std::string PrintableLayer::GetTypeName()
     return "PrintLayer";
 }
 
-LayerLayout PrintableLayer::Print(std::ostream& os, double left, double top, uint64 layerIndex, const std::string& typeName, uint64 size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle) const
+LayerLayout PrintableLayer::Print(std::ostream& os, double left, double top, uint64_t layerIndex, const std::string& typeName, uint64_t size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle) const
 {
     // calculate the layout
     LayerLayout layout(left, top, size, layerStyle.maxWidth, elementLayout);

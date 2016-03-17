@@ -10,7 +10,7 @@
 
 #include "CompilableSum.h"
 
-uint64 CompilableSum::Size() const
+uint64_t CompilableSum::Size() const
 {
     return Sum::Size();
 }
@@ -25,9 +25,9 @@ void CompilableSum::operator=(const layers::Layer& layer)
     operator=(dynamic_cast<const Sum&>(layer));
 }
 
-void CompilableSum::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const
+void CompilableSum::SetActions(uint64_t currentLayerIndex, DataFlowGraph& graph) const
 {
-    for(uint64 elementIndex = 0; elementIndex < Size(); ++elementIndex)
+    for(uint64_t elementIndex = 0; elementIndex < Size(); ++elementIndex)
     {
         layers::Coordinate thisCoordinate(currentLayerIndex, elementIndex);
 
@@ -39,7 +39,7 @@ void CompilableSum::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) c
             continue;
         }
 
-        for(uint64 i = 0; i < _inputCoordinates[elementIndex].size(); ++i)
+        for(uint64_t i = 0; i < _inputCoordinates[elementIndex].size(); ++i)
         {
             auto inputCoordinate = _inputCoordinates[elementIndex][i];
             auto& inputNode = graph.GetNode(inputCoordinate);

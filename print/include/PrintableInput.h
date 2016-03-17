@@ -17,6 +17,7 @@
 #include "Input.h"
 
 // stl
+#include <cstdint>
 #include <iostream>
 
 /// <summary> A printable input. </summary>
@@ -31,7 +32,7 @@ public:
     /// <summary> Returns the number of elements in the layer. </summary>
     ///
     /// <returns> The number of elements in the layer. </returns>
-    virtual uint64 Size() const override;
+    virtual uint64_t Size() const override;
 
     /// <summary> Assignment operator from layer::Input. </summary>
     ///
@@ -52,12 +53,12 @@ public:
     /// <param name="Arguments"> The arguments. </param>
     ///
     /// <returns> A LayerLayout. </returns>
-    virtual LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& arguments) const override;
+    virtual LayerLayout Print(std::ostream& os, double left, double top, uint64_t layerIndex, const PrintArguments& arguments) const override;
 
     /// <summary> Returns an iterator that enumerates the input coordinates for a specified element. </summary>
     ///
     /// <param name="index"> Zero-based element index. </param>
     ///
     /// <returns> The input coordinates. </returns>
-    virtual layers::Layer::InputCoordinateIterator GetInputCoordinates(uint64 index) const override;
+    virtual layers::Layer::InputCoordinateIterator GetInputCoordinates(uint64_t index) const override;
 };

@@ -13,10 +13,8 @@
 #include "Format.h"
 #include "TypeFactory.h"
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -33,7 +31,7 @@ namespace utilities
     /// string stream is as simple as
     /// 
     /// double x = 5.3;
-    /// uint64 y = 12;
+    /// uint64_t y = 12;
     /// std::stringstream stream;
     /// XMLSerializer serializer(stream);
     /// serializer.Serialize(x);
@@ -43,7 +41,7 @@ namespace utilities
     /// 
     /// XMLDeserializer deserializer(stream);
     /// double xx;
-    /// uint64 yy;
+    /// uint64_t yy;
     /// deserialize(xx);
     /// deserialize(yy);
     /// assert(x == xx &amp;&amp; y == yy);
@@ -202,7 +200,7 @@ namespace utilities
 
         void Indent();
 
-        uint64 _indentation = 0;
+        uint64_t _indentation = 0;
         std::ostream& _stream;
     };
 

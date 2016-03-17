@@ -10,13 +10,11 @@
 
 #pragma once
 
-// types
-#include "types.h"
-
 // utilities
 #include "XMLSerialization.h"
 
 // stl
+#include <cstdint>
 #include <vector>
 #include <iostream>
 
@@ -31,17 +29,17 @@ namespace layers
         ///
         /// <param name="layerIndex"> Zero-based index of the layer. </param>
         /// <param name="elementIndex"> Zero-based index of the element. </param>
-        Coordinate(uint64 layerIndex=0, uint64 elementIndex=0);
+        Coordinate(uint64_t layerIndex=0, uint64_t elementIndex=0);
 
         /// <summary> Gets the layer index. </summary>
         ///
         /// <returns> The layer index. </returns>
-        uint64 GetLayerIndex() const;
+        uint64_t GetLayerIndex() const;
 
         /// <summary> Gets the element index. </summary>
         ///
         /// <returns> The element index. </returns>
-        uint64 GetElementIndex() const; 
+        uint64_t GetElementIndex() const; 
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -59,8 +57,8 @@ namespace layers
         void Write(utilities::XMLSerializer& serializer) const;
 
     private:
-        uint64 _layerIndex = 0;
-        uint64 _elementIndex = 0;
+        uint64_t _layerIndex = 0;
+        uint64_t _elementIndex = 0;
     };
 
     /// <summary> Prints a Coordinate to a stream. </summary>

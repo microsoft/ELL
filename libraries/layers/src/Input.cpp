@@ -11,6 +11,7 @@
 #include "Input.h"
 
 // stl
+#include <cstdint>
 #include <string>
 #include <stdexcept>
 #include <algorithm>
@@ -22,12 +23,12 @@ namespace layers
     Input::Input() : _size(0)
     {}
 
-    uint64 Input::Size() const
+    uint64_t Input::Size() const
     {
         return _size;
     }
 
-    void Input::IncreaseSize(uint64 minimumSize)
+    void Input::IncreaseSize(uint64_t minimumSize)
     {
         _size = std::max(_size, minimumSize);
     }
@@ -37,7 +38,7 @@ namespace layers
         throw std::runtime_error("this code should never be reached");
     }
 
-    Layer::InputCoordinateIterator Input::GetInputCoordinates(uint64 index) const
+    Layer::InputCoordinateIterator Input::GetInputCoordinates(uint64_t index) const
     {
         throw std::runtime_error("this code should never be reached");
     }

@@ -25,7 +25,7 @@ namespace utilities
 
     void CompressedIntegerList::Iterator::Next()
     {
-        uint64 delta;
+        uint64_t delta;
         _iter += _iter_increment;
         uint8_t first_val = *_iter;
 
@@ -50,12 +50,12 @@ namespace utilities
         _value += delta;
     }
 
-    uint64 CompressedIntegerList::Iterator::Get() const
+    uint64_t CompressedIntegerList::Iterator::Get() const
     {
         return _value;
     }
 
-    CompressedIntegerList::Iterator::Iterator(const uint8 *iter, const uint8 *end) : _iter(iter), _end(end), _value(0), _iter_increment(0)
+    CompressedIntegerList::Iterator::Iterator(const uint8_t *iter, const uint8_t *end) : _iter(iter), _end(end), _value(0), _iter_increment(0)
     {
         Next();
     }
@@ -63,17 +63,17 @@ namespace utilities
     CompressedIntegerList::CompressedIntegerList() : _last(UINT64_MAX), _size(0)
     {}
 
-    uint64 CompressedIntegerList::Size() const
+    uint64_t CompressedIntegerList::Size() const
     {
         return _size;
     }
 
-    void CompressedIntegerList::Reserve(uint64 size)
+    void CompressedIntegerList::Reserve(uint64_t size)
     {
         _data.reserve(size*2); // guess that, on average, every entry will occupy 2 bytes
     }
 
-    uint64 CompressedIntegerList::Max() const
+    uint64_t CompressedIntegerList::Max() const
     {
         if(_size == 0)
         {
@@ -84,12 +84,12 @@ namespace utilities
     }
 
     /// adds an integer at the end of the list
-    void CompressedIntegerList::PushBack(uint64 value)
+    void CompressedIntegerList::PushBack(uint64_t value)
     {
         assert(value != UINT64_MAX);    // special value reserved for initialization
 
         // calculate the delta from the previous number pushed
-        uint64 delta = 0;
+        uint64_t delta = 0;
 
         // allow the first PushBack to have a value of zero, but subsequently require an increasing value
         if (_last < UINT64_MAX)
@@ -126,11 +126,11 @@ namespace utilities
 
         int total_bytes = 1 << log2bytes;
         _data.resize(_data.size() + total_bytes); // make room for new data
-        uint8 *buf = _data.data() + _data.size() - total_bytes; // get pointer to correct place in array
+        uint8_t *buf = _data.data() + _data.size() - total_bytes; // get pointer to correct place in array
         unsigned int mask = log2bytes << 6; // mask == log2(# bytes) shifted to be high-order 2 bits of a byte
         // splice the data length encoding in as the top 2 bits of the first byte
         // So, move all high-order bits of the delta over by 2 to make room, Add the mask, and Add the residual low-order bits of the delta
-        uint64 write_val = ((delta << 2) & 0xffffffffffffff00) | mask | (delta & 0x3f);
+        uint64_t write_val = ((delta << 2) & 0xffffffffffffff00) | mask | (delta & 0x3f);
         std::memcpy(buf, &write_val, total_bytes);
 
         ++_size;

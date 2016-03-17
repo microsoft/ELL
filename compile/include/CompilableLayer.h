@@ -12,10 +12,8 @@
 
 #include "DataFlowGraph.h"
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <vector>
 #include <string>
 
@@ -28,13 +26,13 @@ public:
     /// <summary> Returns the number of elements in the layer. </summary>
     ///
     /// <returns> The number of elements in the layer. </returns>
-    virtual uint64 Size() const = 0;
+    virtual uint64_t Size() const = 0;
 
     /// <summary> Pushes actions upward in the graph </summary>
     ///
     /// <param name="currentLayerIndex"> The index of the current layer. </param>
     /// <param name="graph"> [in,out] The data flow graph. </param>
-    virtual void SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const = 0;
+    virtual void SetActions(uint64_t currentLayerIndex, DataFlowGraph& graph) const = 0;
 
     /// <summary> Assignment operator from layer to CompilableLayer. </summary>
     ///

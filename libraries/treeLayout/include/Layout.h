@@ -10,10 +10,8 @@
 
 #pragma once
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <vector>
 
 namespace treeLayout
@@ -77,26 +75,26 @@ namespace treeLayout
         /// <param name="max_offset"> The maximum offset. </param>
         /// <param name="min_depth"> The minimum depth. </param>
         /// <param name="max_depth"> The maximum depth. </param>
-        Layout(uint64 size, double min_offset, double max_offset, double min_depth, double max_depth);
+        Layout(uint64_t size, double min_offset, double max_offset, double min_depth, double max_depth);
 
         /// <summary> Returns a reference to the position of a specified vertex. </summary>
         ///
         /// <param name="index"> Zero-based index of the vertex. </param>
         ///
         /// <returns> The vertex position. </returns>
-        VertexPosition& operator[](uint64 index);
+        VertexPosition& operator[](uint64_t index);
 
         /// <summary> Returns a reference to the position of a specified vertex. </summary>
         ///
         /// <param name="index"> Zero-based index of the vertex. </param>
         ///
         /// <returns> The vertex position. </returns>
-        const VertexPosition& operator[](uint64 index) const;
+        const VertexPosition& operator[](uint64_t index) const;
 
         /// <summary> Returns The number of vertices. </summary>
         ///
         /// <returns> The number of vertices. </returns>
-        uint64 Size() const;
+        uint64_t Size() const;
 
         /// <summary>
         /// Returns the min offset (if the tree is top down, this is the left of its bounding box)

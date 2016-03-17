@@ -12,10 +12,8 @@
 
 #include "AddToAction.h"
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <vector>
 #include <string>
 #include <stdexcept>
@@ -51,7 +49,7 @@ public:
     /// <summary> Gets the node's temporary variable index. </summary>
     ///
     /// <returns> The temporary variable index. </returns>
-    uint64 GetTempVariableIndex() const;
+    uint64_t GetTempVariableIndex() const;
 
     /// <summary> Query if this object has a temporary variable name. </summary>
     ///
@@ -61,7 +59,7 @@ public:
     /// <summary> Sets the node's temporary variable index. </summary>
     ///
     /// <param name="index"> The node's temporary variable index. </param>
-    void SetTempVariableIndex(uint64 index);
+    void SetTempVariableIndex(uint64_t index);
 
     /// <summary> Query if this node has actions. </summary>
     ///
@@ -105,5 +103,5 @@ private:
     std::string _fixedVariableName = "";
     bool _isInitialized = false;
     int _tempVariableIndex = -1;
-    uint64 _numUncomputedInputs = 0;
+    uint64_t _numUncomputedInputs = 0;
 };

@@ -18,7 +18,7 @@
 namespace layers
 {
     template <typename LayerType>
-    const LayerType& Stack::GetLayer(uint64 layerIndex) const
+    const LayerType& Stack::GetLayer(uint64_t layerIndex) const
     {
         return dynamic_cast<const LayerType&>(*_layers[layerIndex]);
     }

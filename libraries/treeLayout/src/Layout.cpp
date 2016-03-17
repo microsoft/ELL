@@ -42,23 +42,23 @@ namespace treeLayout
         _offset = value;
     }
 
-    Layout::Layout(uint64 size, double min_offset, double max_offset, double min_depth, double max_depth) :
+    Layout::Layout(uint64_t size, double min_offset, double max_offset, double min_depth, double max_depth) :
         _positions(size), _minOffset(min_offset), _maxOffset(max_offset), _minDepth(min_depth), _maxDepth(max_depth)
     {}
 
-    VertexPosition& Layout::operator[](uint64 index)
+    VertexPosition& Layout::operator[](uint64_t index)
     {
         return _positions[index];
     }
 
-    const VertexPosition& Layout::operator[](uint64 index) const
+    const VertexPosition& Layout::operator[](uint64_t index) const
     {
         return _positions[index];
     }
 
-    uint64 Layout::Size() const
+    uint64_t Layout::Size() const
     {
-        return (uint64)_positions.size();
+        return (uint64_t)_positions.size();
     }
 
     double Layout::GetMinOffset() const

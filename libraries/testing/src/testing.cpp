@@ -11,9 +11,6 @@
 // testing
 #include "testing.h"
 
-// types
-#include "types.h"
-
 // stl
 #include <iostream>
 
@@ -34,13 +31,13 @@ namespace testing
     bool IsEqual(const std::vector<double>& a, const std::vector<double>& b, double tolerance)
     {
         // allow vectors of different size, provided that they differ by a suffix of zeros
-        uint64 size = a.size();
+        uint64_t size = a.size();
         if (b.size() < size)
         {
             size = b.size();
         }
 
-        for (uint64 i = 0; i < size; ++i)
+        for (uint64_t i = 0; i < size; ++i)
         {
             if (IsEqual(a[i], b[i], tolerance) == false)
             {
@@ -49,7 +46,7 @@ namespace testing
         }
 
         // confirm suffix of zeros
-        for (uint64 i = size; i < a.size(); ++i)
+        for (uint64_t i = size; i < a.size(); ++i)
         {
             if (IsEqual(a[i], 0, tolerance) == false)
             {
@@ -57,7 +54,7 @@ namespace testing
             }
         }
 
-        for (uint64 i = size; i < b.size(); ++i)
+        for (uint64_t i = size; i < b.size(); ++i)
         {
             if (IsEqual(b[i], 0, tolerance) == false)
             {

@@ -81,7 +81,7 @@ namespace layers
         return _operationType;
     }
 
-    uint64 Coordinatewise::Size() const
+    uint64_t Coordinatewise::Size() const
     {
         return _inputCoordinates.size();
     }
@@ -90,7 +90,7 @@ namespace layers
     {
         auto operation = GetOperation(_operationType);
 
-        for (uint64 k = 0; k < _values.size(); ++k)
+        for (uint64_t k = 0; k < _values.size(); ++k)
         {
             Coordinate coordinate = _inputCoordinates[k];
             double input = inputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
@@ -98,7 +98,7 @@ namespace layers
         }
     }
 
-    Layer::InputCoordinateIterator Coordinatewise::GetInputCoordinates(uint64 index) const
+    Layer::InputCoordinateIterator Coordinatewise::GetInputCoordinates(uint64_t index) const
     {
         return Layer::InputCoordinateIterator(_inputCoordinates.cbegin() + index, _inputCoordinates.cbegin() + index + 1);
     }

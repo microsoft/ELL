@@ -11,7 +11,7 @@
 namespace linear
 {
     template<typename RowMatrixType>
-    const typename BiMatrix<RowMatrixType>::RowType& BiMatrix<RowMatrixType>::GetColumn(uint64 index) const
+    const typename BiMatrix<RowMatrixType>::RowType& BiMatrix<RowMatrixType>::GetColumn(uint64_t index) const
     {
         return _transp.GetRow(index);
     }

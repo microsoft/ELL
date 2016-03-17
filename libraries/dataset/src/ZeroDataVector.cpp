@@ -37,7 +37,7 @@ namespace dataset
         return type::zero;
     }
 
-    void ZeroDataVector::PushBack(uint64 index, double value)
+    void ZeroDataVector::PushBack(uint64_t index, double value)
     {
         if(value != 0)
         {
@@ -48,12 +48,12 @@ namespace dataset
     void ZeroDataVector::Reset()
     {}
 
-    uint64 ZeroDataVector::Size() const
+    uint64_t ZeroDataVector::Size() const
     {
         return 0;
     }
 
-    uint64 ZeroDataVector::NumNonzeros() const
+    uint64_t ZeroDataVector::NumNonzeros() const
     {
         return 0;
     }

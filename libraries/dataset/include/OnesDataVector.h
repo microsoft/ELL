@@ -13,10 +13,10 @@
 #include "IDataVector.h"
 
 // types
-#include "types.h"
 #include "IndexValue.h"
 
 // stl
+#include <cstdint>
 #include <iostream>
 
 namespace dataset
@@ -56,18 +56,18 @@ namespace dataset
 
         private:
             // private ctor, can only be called from SparseDataVector class
-            Iterator(uint64 size);
+            Iterator(uint64_t size);
             friend OnesDataVector;
 
             // members
-            uint64 _size = 0;
-            uint64 _index = 0;
+            uint64_t _size = 0;
+            uint64_t _index = 0;
         };
 
         /// <summary> Constructs an instance of OnesDataVector. </summary>
         ///
         /// <param name="dim"> The dimension of the DataVector. </param>
-        OnesDataVector(uint64 dim = 0);
+        OnesDataVector(uint64_t dim = 0);
 
         /// <summary> Converting constructor. </summary>
         ///
@@ -93,7 +93,7 @@ namespace dataset
         ///
         /// <param name="index"> Zero-based index of the. </param>
         /// <param name="value"> The value. </param>
-        virtual void PushBack(uint64 index, double value = 1.0) override;
+        virtual void PushBack(uint64_t index, double value = 1.0) override;
 
         /// <summary> Deletes all of the vector content and sets its Size to zero, but does not deallocate
         /// its memory. </summary>
@@ -102,12 +102,12 @@ namespace dataset
         /// <summary> Returns the size of the DataVector, which is the largest index of a non-zero entry plus one. </summary>
         ///
         /// <returns> The size of the DataVector. </returns>
-        virtual uint64 Size() const override;
+        virtual uint64_t Size() const override;
 
         /// <summary> \returns The number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
-        virtual uint64 NumNonzeros() const override;
+        virtual uint64_t NumNonzeros() const override;
 
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///
@@ -140,6 +140,6 @@ namespace dataset
         virtual void Print(std::ostream& os) const override;
 
     private:
-        uint64 _size = 0;
+        uint64_t _size = 0;
     };
 }

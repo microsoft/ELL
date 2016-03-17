@@ -13,10 +13,8 @@
 #include "Layer.h"
 #include "Coordinate.h"
 
-// types
-#include "types.h"
-
 // stl
+#include <cstdint>
 #include <vector>
 #include <functional>
 
@@ -46,7 +44,7 @@ namespace layers
         /// <summary> Returns the number of elements in the layer. </summary>
         ///
         /// <returns> The number of elements in the layer. </returns>
-        virtual uint64 Size() const override;
+        virtual uint64_t Size() const override;
 
         /// <summary> Computes the layer output. </summary>
         ///
@@ -59,7 +57,7 @@ namespace layers
         /// <param name="index"> Zero-based element index. </param>
         ///
         /// <returns> The input coordinates. </returns>
-        virtual Layer::InputCoordinateIterator GetInputCoordinates(uint64 index) const override;
+        virtual Layer::InputCoordinateIterator GetInputCoordinates(uint64_t index) const override;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -15,9 +15,9 @@
 
 namespace utilities
 {
-    uint64 IntegerStack::Pop()
+    uint64_t IntegerStack::Pop()
     {
-        uint64 top;
+        uint64_t top;
 
         if(_stack.empty())
         {
@@ -32,7 +32,7 @@ namespace utilities
 
         return top;
     }
-    uint64 IntegerStack::Top() const
+    uint64_t IntegerStack::Top() const
     {
         if(_stack.empty())
         {
@@ -43,7 +43,7 @@ namespace utilities
             return _stack.top();
         }
     }
-    void IntegerStack::Push(uint64 value)
+    void IntegerStack::Push(uint64_t value)
     {
         _stack.push(value);
 

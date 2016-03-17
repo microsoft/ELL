@@ -13,6 +13,7 @@
 #include "Layout.h"
 
 // stl
+#include <cstdint>
 #include <vector>
 
 namespace treeLayout
@@ -103,9 +104,9 @@ namespace treeLayout
 
         struct VertexInfo
         {
-            VertexInfo(uint64 i, double s);
+            VertexInfo(uint64_t i, double s);
 
-            uint64 index;
+            uint64_t index;
             double space_left;
         };
 
@@ -113,7 +114,7 @@ namespace treeLayout
         void BuildLayers(const ChildrenVectorType& Children);
 
         template<typename ChildrenVectorType>
-        void BuildLayers(const ChildrenVectorType& Children, uint64 index, std::vector<uint64>& ancestors, std::vector<std::vector<uint64>>& prev_layer_ancestors);
+        void BuildLayers(const ChildrenVectorType& Children, uint64_t index, std::vector<uint64_t>& ancestors, std::vector<std::vector<uint64_t>>& prev_layer_ancestors);
 
         template<typename ChildrenVectorType>
         void Optimize(const ChildrenVectorType& Children);
@@ -122,26 +123,26 @@ namespace treeLayout
         void GdStep(const ChildrenVectorType& Children, double step_size);
 
         template<typename ChildrenVectorType>
-        void ComputeGradient(const ChildrenVectorType& Children, const std::vector<double>& offsets, const std::vector<uint64>& depths, double step_size, std::vector<double>& grad);
+        void ComputeGradient(const ChildrenVectorType& Children, const std::vector<double>& offsets, const std::vector<uint64_t>& depths, double step_size, std::vector<double>& grad);
 
         template<typename ChildrenVectorType>
-        void MoveParents(const ChildrenVectorType& Children, uint64 node_index, double step_size);
+        void MoveParents(const ChildrenVectorType& Children, uint64_t node_index, double step_size);
 
         template<typename ChildrenVectorType>
-        std::vector<std::pair<double, double>> SimpleLayout(const ChildrenVectorType& Children, uint64 node_index, uint64 depth);
+        std::vector<std::pair<double, double>> SimpleLayout(const ChildrenVectorType& Children, uint64_t node_index, uint64_t depth);
 
         template<typename ChildrenVectorType>
-        void IncrementOffsets(const ChildrenVectorType& Children, uint64 node_index, double displacement);
+        void IncrementOffsets(const ChildrenVectorType& Children, uint64_t node_index, double displacement);
 
         void Project();
 
-        void Project(uint64 layer_index);
+        void Project(uint64_t layer_index);
 
         Layout GetLayout() const;
 
         std::vector<std::vector<VertexInfo>> _layers;
         std::vector<double> _offsets;
-        std::vector<uint64> _depth_index;
+        std::vector<uint64_t> _depth_index;
         std::vector<double> _gd_increment;
         Params _params;
     };

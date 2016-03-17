@@ -13,8 +13,6 @@
 #include "LayerLayout.h"
 #include "PrintArguments.h"
 
-#include "types.h"
-
 // layers
 #include "Layer.h"
 #include "Coordinate.h"
@@ -22,6 +20,8 @@
 // utilities
 #include "StlIterator.h"
 
+// stl
+#include <cstdint>
 #include <iostream>
 #include <memory>
 
@@ -40,7 +40,7 @@ public:
     /// <summary> Returns the number of elements in the layer. </summary>
     ///
     /// <returns> The number of elements in the layer. </returns>
-    virtual uint64 Size() const = 0;
+    virtual uint64_t Size() const = 0;
 
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///
@@ -51,14 +51,14 @@ public:
     /// <param name="Arguments"> The arguments. </param>
     ///
     /// <returns> A LayerLayout. </returns>
-    virtual LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& arguments) const = 0;
+    virtual LayerLayout Print(std::ostream& os, double left, double top, uint64_t layerIndex, const PrintArguments& arguments) const = 0;
 
     /// <summary> Returns an iterator that enumerates the input coordinates for a specified element. </summary>
     ///
     /// <param name="index"> Zero-based element index. </param>
     ///
     /// <returns> The input coordinates. </returns>
-    virtual layers::Layer::InputCoordinateIterator GetInputCoordinates(uint64 index) const = 0;
+    virtual layers::Layer::InputCoordinateIterator GetInputCoordinates(uint64_t index) const = 0;
 
     /// <summary> Assignment operator from layer to PrintableLayer. </summary>
     ///
@@ -71,7 +71,7 @@ public:
     static std::string GetTypeName(); 
 
 protected:
-    LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const std::string& typeName, uint64 size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle) const;
+    LayerLayout Print(std::ostream& os, double left, double top, uint64_t layerIndex, const std::string& typeName, uint64_t size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle) const;
 };
 
  

@@ -15,6 +15,9 @@
 // layers
 #include "Coordinatewise.h"
 
+// stl
+#include <cstdint>
+
 /// <summary> A struct that adds printing capabilities to a layer. </summary>
 class CompilableCoordinatewise : public layers::Coordinatewise, public CompilableLayer
 {
@@ -22,7 +25,7 @@ public:
     /// <summary> Returns the number of elements in the layer. </summary>
     ///
     /// <returns> The number of elements in the layer. </returns>
-    virtual uint64 Size() const override;
+    virtual uint64_t Size() const override;
 
     /// <summary> Assignment operator from Coordinatewise. </summary>
     ///
@@ -38,5 +41,5 @@ public:
     ///
     /// <param name="currentLayerIndex"> The index of the current layer. </param>
     /// <param name="graph"> [in,out] The data flow graph. </param>
-    virtual void SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const override;
+    virtual void SetActions(uint64_t currentLayerIndex, DataFlowGraph& graph) const override;
 };

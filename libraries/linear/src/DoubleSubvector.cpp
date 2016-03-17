@@ -12,7 +12,7 @@
 
 namespace linear
 {
-    DoubleSubvector::DoubleSubvector(const DoubleVector& vec, uint64 offset, uint64 size) : _ptr(vec.GetDataPointer() + offset), _size(size)
+    DoubleSubvector::DoubleSubvector(const DoubleVector& vec, uint64_t offset, uint64_t size) : _ptr(vec.GetDataPointer() + offset), _size(size)
     {
         if (_size > vec.Size())
         {
@@ -20,7 +20,7 @@ namespace linear
         }
     }
 
-    DoubleSubvector::DoubleSubvector(const double * ptr, uint64 size) : _ptr(ptr), _size(size)
+    DoubleSubvector::DoubleSubvector(const double * ptr, uint64_t size) : _ptr(ptr), _size(size)
     {}
 
     DoubleSubvector::Iterator DoubleSubvector::GetIterator() const
@@ -28,7 +28,7 @@ namespace linear
         return Iterator(_ptr, _ptr+_size);
     }
 
-    uint64 DoubleSubvector::Size() const
+    uint64_t DoubleSubvector::Size() const
     {
         return _size;
     }
@@ -36,7 +36,7 @@ namespace linear
     double DoubleSubvector::Norm2() const
     {
         double result = 0.0;
-        for (uint64 i = 0; i < _size; ++i)
+        for (uint64_t i = 0; i < _size; ++i)
         {
             double x = _ptr[i];
             result += x * x;
@@ -46,7 +46,7 @@ namespace linear
 
     void DoubleSubvector::AddTo(double* p_other, double scalar) const
     {
-        for (uint64 i = 0; i < _size; ++i)
+        for (uint64_t i = 0; i < _size; ++i)
         {
             p_other[i] += scalar * _ptr[i];
         }
@@ -56,7 +56,7 @@ namespace linear
     double DoubleSubvector::Dot(const double* p_other) const
     {
         double result = 0.0;
-        for (uint64 i = 0; i < _size; ++i)
+        for (uint64_t i = 0; i < _size; ++i)
         {
             result += _ptr[i] * p_other[i];
         }

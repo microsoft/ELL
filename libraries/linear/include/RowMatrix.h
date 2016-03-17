@@ -14,6 +14,7 @@
 #include "IMatrix.h"
 
 // stl
+#include <cstdint>
 #include <vector>
 #include <iostream>
 #include <random>
@@ -52,7 +53,7 @@ namespace linear
             /// </summary>
             ///
             /// <returns> The total number of iterates left. </returns>
-            uint64 NumIteratesLeft() const;
+            uint64_t NumIteratesLeft() const;
 
             /// <summary> Proceeds to the Next row. </summary>
             void Next();
@@ -65,13 +66,13 @@ namespace linear
         private:
 
             // private ctor, can only be called from RowMatrix class
-            Iterator(const RowMatrix& table, uint64 firstRow, uint64 maxRow);
+            Iterator(const RowMatrix& table, uint64_t firstRow, uint64_t maxRow);
             friend RowMatrix<DataVectorType>;
 
             // members
             const RowMatrix& _table;
-            uint64 _row;
-            uint64 _maxRow;
+            uint64_t _row;
+            uint64_t _maxRow;
         };
 
         /// <summary> The type of each row. </summary>
@@ -97,19 +98,19 @@ namespace linear
         /// <summary> Returns the number of rows in the matrix. </summary>
         ///
         /// <returns> The number of rows. </returns>
-        virtual uint64 NumRows() const override;
+        virtual uint64_t NumRows() const override;
 
         /// <summary> Returns the number of columns in the matrix. </summary>
         ///
         /// <returns> The number of columns. </returns>
-        virtual uint64 NumColumns() const override;
+        virtual uint64_t NumColumns() const override;
 
         /// <summary> Returns a reference to a row. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Refence to the specified row. </returns>
-        const RowType& GetRow(uint64 index) const;
+        const RowType& GetRow(uint64_t index) const;
 
         /// <summary> Returns an iterator that traverses the rows. </summary>
         ///
@@ -117,7 +118,7 @@ namespace linear
         /// <param name="size"> The number of rows to iterate over, a value of zero means all rows. </param>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator(uint64 firstRow = 0, uint64 numRows = 0) const;
+        Iterator GetIterator(uint64_t firstRow = 0, uint64_t numRows = 0) const;
 
         /// <summary> Pushes a row into the bottom of the matrix. </summary>
         ///
@@ -156,7 +157,7 @@ namespace linear
 
     private:
         std::vector<DataVectorType> _rows;
-        uint64 _num_columns = 0;
+        uint64_t _num_columns = 0;
     };
 }
 

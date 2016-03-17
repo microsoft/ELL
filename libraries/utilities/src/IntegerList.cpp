@@ -25,7 +25,7 @@ namespace utilities
         ++_begin;
     }
 
-    uint64 IntegerList::Iterator::Get() const
+    uint64_t IntegerList::Iterator::Get() const
     {
         return *_begin;
     }
@@ -36,17 +36,17 @@ namespace utilities
     IntegerList::IntegerList()
     {}
 
-    uint64 IntegerList::Size() const
+    uint64_t IntegerList::Size() const
     {
         return _list.size();
     }
 
-    void IntegerList::Reserve(uint64 size)
+    void IntegerList::Reserve(uint64_t size)
     {
         _list.reserve(size);
     }
 
-    uint64 IntegerList::Max() const
+    uint64_t IntegerList::Max() const
     {
         if(_list.size()==0)
         {
@@ -56,7 +56,7 @@ namespace utilities
         return _list[Size()-1];
     }
 
-    void IntegerList::PushBack(uint64 value)
+    void IntegerList::PushBack(uint64_t value)
     {
         _list.push_back(value);
     }

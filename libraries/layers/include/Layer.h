@@ -12,16 +12,13 @@
 
 #include "Coordinate.h"
 
-// types
-#include "types.h"
-#include "StlIndexValueIterator.h"
-
 // utilities
 #include "XMLSerialization.h"
 #include "StlIterator.h"
 #include "TypeFactory.h"
 
 // stl
+#include <cstdint>
 #include <vector>
 #include <memory>
 #include <string>
@@ -38,7 +35,7 @@ namespace layers
         /// <summary> Returns the number of elements in the layer. </summary>
         ///
         /// <returns> The number of elements in the layer. </returns>
-        virtual uint64 Size() const = 0;
+        virtual uint64_t Size() const = 0;
 
         /// <summary> Computes the layer output. </summary>
         ///
@@ -52,7 +49,7 @@ namespace layers
         ///
         /// <returns> An iterator over the input coordinates. </returns>
         using InputCoordinateIterator = utilities::StlIterator<std::vector<Coordinate>::const_iterator, Coordinate>;
-        virtual InputCoordinateIterator GetInputCoordinates(uint64 index) const = 0;
+        virtual InputCoordinateIterator GetInputCoordinates(uint64_t index) const = 0;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -16,7 +16,7 @@ std::string PrintableCoordinatewise::GetFriendlyLayerName() const
     return GetOperationName(GetOperationType());
 }
 
-uint64 PrintableCoordinatewise::Size() const
+uint64_t PrintableCoordinatewise::Size() const
 {
     return Coordinatewise::Size();
 }
@@ -31,12 +31,12 @@ void PrintableCoordinatewise::operator=(const layers::Coordinatewise& coordinate
     layers::Coordinatewise::operator=(coordinatewise);
 }
 
-LayerLayout PrintableCoordinatewise::Print(std::ostream & os, double left, double top, uint64 layerIndex, const PrintArguments & Arguments) const
+LayerLayout PrintableCoordinatewise::Print(std::ostream & os, double left, double top, uint64_t layerIndex, const PrintArguments & Arguments) const
 {
     auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetFriendlyLayerName(), Size(), Arguments.valueElementLayout, Arguments.layerStyle);
 
    //// print the visible elements, before the dots
-   for (uint64 k = 0; k < layout.NumVisibleElements()-1; ++k)
+   for (uint64_t k = 0; k < layout.NumVisibleElements()-1; ++k)
    {
         SvgValueElement(os, 2, layout.GetMidX(k), layout.GetMidY(), _values[k], Arguments.valueElementStyle.maxChars, k);
    }
@@ -53,7 +53,7 @@ LayerLayout PrintableCoordinatewise::Print(std::ostream & os, double left, doubl
    return layout;
 }
 
-layers::Layer::InputCoordinateIterator PrintableCoordinatewise::GetInputCoordinates(uint64 index) const
+layers::Layer::InputCoordinateIterator PrintableCoordinatewise::GetInputCoordinates(uint64_t index) const
 {
     return Coordinatewise::GetInputCoordinates(index);
 }
