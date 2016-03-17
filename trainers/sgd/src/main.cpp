@@ -12,7 +12,7 @@
 
 // utilities
 #include "Files.h"
-#include "OutputStream.h"
+#include "OutputStreamImpostor.h"
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
 #include "BinaryClassificationEvaluator.h"
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        auto outStream = utilities::GetOutputStream(mapSaveArguments.outputMapFile);
+        auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputMapFile);
 
         // read map from file
         std::shared_ptr<layers::Map> map = GetMap(mapLoadArguments);

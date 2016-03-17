@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     OutputStream.h (common)
+//  File:     OutputStreamImpostor.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "OutputStream.h"
+#include "OutputStreamImpostor.h"
 
 // utilities
 #include "Files.h"
@@ -52,7 +52,7 @@ namespace utilities
         return *_out;
     }
 
-    OutputStreamImpostor GetOutputStream(std::string filenameOrEmpty)
+    OutputStreamImpostor GetOutputStreamImpostor(std::string filenameOrEmpty)
     {
         return OutputStreamImpostor(filenameOrEmpty);
     }

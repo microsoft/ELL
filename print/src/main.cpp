@@ -14,7 +14,7 @@
 
 // utilities
 #include "Files.h"
-#include "OutputStream.h"
+#include "OutputStreamImpostor.h"
 #include "CommandLineParser.h"
 
 // layers
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, use it, otherwise use std::cout
-        auto outStream = utilities::GetOutputStream(printArguments.outputSvgFile);
+        auto outStream = utilities::GetOutputStreamImpostor(printArguments.outputSvgFile);
 
         // open map file
         auto map = layers::Map::Load<PrintableMap>(printArguments.inputMapFile);
