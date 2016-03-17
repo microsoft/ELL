@@ -131,7 +131,11 @@ namespace layers
         // members
         std::vector<std::unique_ptr<Layer>> _layers;
         mutable uint64 _maxInputSize;
+
         void UpdateInputLayer() const;
+
+        template <typename IndexValueIteratorType>
+        void LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const;
 
     private:
         std::vector<std::vector<double>> AllocateLayerOutputs() const;

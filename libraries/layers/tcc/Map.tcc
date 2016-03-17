@@ -8,6 +8,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "CoordinateListTools.h"
+
 // utilities
 #include "XMLSerialization.h"
 #include "Files.h"
@@ -21,8 +23,8 @@
 namespace layers
 {
     // specialization for IndexValueIterators
-    template<typename IteratorType>
-    void SetArray(std::vector<double>& array, IteratorType& indexValueIterator)
+    template<typename IndexValueIteratorType>
+    void SetArray(std::vector<double>& array, IndexValueIteratorType& indexValueIterator)
     {
         std::fill(array.begin(), array.end(), 0); // this isn't necessary because we always call this with a fresh array
         while (indexValueIterator.IsValid())
@@ -37,17 +39,23 @@ namespace layers
         }
     }
 
+    template<typename IndexValueIteratorType>
+    void Map::LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const
+    {
+        // set the input 
+        SetArray(layerOutputs, inputIterator);
+        
+        // increment the size of the input layer if this input vector is larger than something we've seen before
+        _maxInputSize = std::max(_maxInputSize, (uint64)layerOutputs.size());
+        UpdateInputLayer();
+    }
+
     template<typename IndexValueIteratorType, typename concept>
     Map::OutputIterator Map::Compute(IndexValueIteratorType inputIterator, const CoordinateList& outputCoordinatesIn) const
     {
         auto layerOutputs = AllocateLayerOutputs();
-        
-        // set the input 
-        SetArray(layerOutputs[0], inputIterator);
-        
-        // (yuck) increment the size of the input layer if this input vector is larger than something we've seen before
-        _maxInputSize = std::max(_maxInputSize, (uint64)layerOutputs[0].size());
-        UpdateInputLayer();
+
+        LoadInputLayer(inputIterator, layerOutputs[0]);
 
         // compute layers 1,2,... in order
         for (uint64 i = 1; i < _layers.size(); ++i)

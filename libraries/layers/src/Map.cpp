@@ -61,7 +61,7 @@ namespace layers
         auto numLayers = _layers.size();
 
         // Keep track of the maximum input dimension requested and make sure new layer's inputs 
-        // are to previous layers only
+        // are come from previous layers only
         auto layerSize = layer->Size();
         for (uint64 index = 0; index < layerSize; index++)
         {
@@ -75,7 +75,7 @@ namespace layers
                     throw std::runtime_error("Error: layer using inputs from non-previous layer");
                 }
                 auto inputElement = coord.GetElementIndex();
-                if (inputLayer == 0)
+                if (inputLayer == 0) // we're referring to an element of the first, Input, layer
                 {
                     _maxInputSize = std::max(inputElement+1, _maxInputSize);
                 }
@@ -142,6 +142,6 @@ namespace layers
 
     void Map::UpdateInputLayer() const
     {
-        dynamic_cast<Input*>(_layers[0].get())->SetSize(_maxInputSize);
+        dynamic_cast<Input &>(*_layers[0]).SetSize(_maxInputSize);
     }
 }
