@@ -38,7 +38,7 @@ namespace layers
     }
 
     template<typename IndexValueIteratorType, typename concept>
-    Map::OutputIterator Map::Compute(IndexValueIteratorType inputIterator, const CoordinateList& outputCoordinates) const
+    Map::OutputIterator Map::Compute(IndexValueIteratorType inputIterator, const CoordinateList& outputCoordinatesIn) const
     {
         auto layerOutputs = AllocateLayerOutputs();
         
@@ -55,6 +55,12 @@ namespace layers
             _layers[i]->Compute(layerOutputs, layerOutputs[i]);
         }
         
+        CoordinateList outputCoordinates = outputCoordinatesIn;
+        if (outputCoordinates.size() == 0)
+        {
+            outputCoordinates = GetCoordinateList(*this, NumLayers() - 1);
+        }
+
         // copy the outputs to a vector
         auto outputSize = outputCoordinates.size();
         std::vector<double> outputs(outputSize);

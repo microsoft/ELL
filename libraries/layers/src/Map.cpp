@@ -101,7 +101,7 @@ namespace layers
         for (uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
         {
             layerOutputs[layerIndex].resize(_layers[layerIndex]->Size());
-            layerOutputs[layerIndex].clear();
+            std::fill(layerOutputs[layerIndex].begin(), layerOutputs[layerIndex].end(), 0);
         }
         return layerOutputs;
     }
