@@ -13,6 +13,7 @@
 // stl
 #include <string>
 #include <stdexcept>
+#include <algorithm>
 
 namespace layers
 {
@@ -26,9 +27,9 @@ namespace layers
         return _size;
     }
 
-    void Input::SetSize(uint64 size)
+    void Input::IncreaseSize(uint64 minimumSize)
     {
-        _size = size;
+        _size = std::max(_size, minimumSize);
     }
 
     void Input::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const

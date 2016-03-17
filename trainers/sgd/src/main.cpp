@@ -73,18 +73,18 @@ int main(int argc, char* argv[])
         layers::CoordinateList inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
 
         // get the dataset
-        dataset::RowDataset dataset = common::GetDataset(dataLoadArguments, map, inputCoordinates);
+        auto dataset = common::GetDataset(dataLoadArguments, map, inputCoordinates);
 
         if (inputCoordinates.size() == 0)
         {
-            inputCoordinates = layers::GetCoordinateList(0, 0, dataset.NumColumns() - 1);
+            inputCoordinates = layers::GetCoordinateList(0, 0, dataset->NumColumns() - 1);
         }
 
         // create loss function
         lossFunctions::LogLoss loss;
 
         // create sgd trainer
-        optimization::AsgdOptimizer optimizer(dataset.NumColumns());
+        optimization::AsgdOptimizer optimizer(dataset->NumColumns());
 
         // create evaluator
         utilities::BinaryClassificationEvaluator evaluator;
@@ -96,14 +96,14 @@ int main(int argc, char* argv[])
         for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
         {
             // randomly permute the data
-            dataset.RandPerm(rng);
+            dataset->RandPerm(rng);
 
             // iterate over the entire permuted dataset
-            auto trainSetIterator = dataset.GetIterator();
+            auto trainSetIterator = dataset->GetIterator();
             optimizer.Update(trainSetIterator, loss, sgdArguments.l2Regularization);
 
             // Evaluate training error
-            auto evaluationIterator = dataset.GetIterator();
+            auto evaluationIterator = dataset->GetIterator();
             evaluator.Evaluate(evaluationIterator, optimizer.GetPredictor(), loss);
         }
 

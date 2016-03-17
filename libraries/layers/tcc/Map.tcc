@@ -45,9 +45,8 @@ namespace layers
         // set the input 
         SetArray(layerOutputs, inputIterator);
         
-        // increment the size of the input layer if this input vector is larger than something we've seen before
-        _maxInputSize = std::max(_maxInputSize, (uint64)layerOutputs.size());
-        UpdateInputLayer();
+        // update the input layer to handle vectors of this size
+        UpdateInputLayer((uint64)layerOutputs.size());
     }
 
     template<typename IndexValueIteratorType, typename concept>

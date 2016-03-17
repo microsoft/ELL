@@ -51,17 +51,18 @@ namespace layers
     //
     // Map class implementation
     //
-    Map::Map() : _maxInputSize(0)
+    Map::Map()
     {
         _layers.push_back(std::make_unique<Input>());
     }
 
     uint64 Map::AddLayer(std::unique_ptr<Layer>&& layer)
     {
+        uint64 maxInputSize = 0;
         auto numLayers = _layers.size();
 
         // Keep track of the maximum input dimension requested and make sure new layer's inputs 
-        // are come from previous layers only
+        // come from previous layers only
         auto layerSize = layer->Size();
         for (uint64 index = 0; index < layerSize; index++)
         {
@@ -77,14 +78,14 @@ namespace layers
                 auto inputElement = coord.GetElementIndex();
                 if (inputLayer == 0) // we're referring to an element of the first, Input, layer
                 {
-                    _maxInputSize = std::max(inputElement+1, _maxInputSize);
+                    maxInputSize = std::max(inputElement+1, maxInputSize);
                 }
                 inputCoords.Next();
             }
         }
 
         // Update input layer (layer 0)
-        UpdateInputLayer();
+        UpdateInputLayer(maxInputSize);
 
         uint64 layerIndex = _layers.size();
         _layers.push_back(std::move(layer));
@@ -140,8 +141,8 @@ namespace layers
         serializer.Serialize(*this);
     }
 
-    void Map::UpdateInputLayer() const
+    void Map::UpdateInputLayer(uint64 minSize) const
     {
-        dynamic_cast<Input &>(*_layers[0]).SetSize(_maxInputSize);
+        GetLayer<Input&>(0).IncreaseSize(minSize);
     }
 }

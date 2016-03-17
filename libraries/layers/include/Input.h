@@ -72,10 +72,10 @@ namespace layers
         /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Write(utilities::XMLSerializer& serializer) const override;
 
-        /// <summary> Sets the size of the layer </summary>
+        /// <summary> Increases the size of the layer if necessary </summary>
         ///
-        /// <param name="size"> The new size of the layer </param>
-        void SetSize(uint64 size);
+        /// <param name="minimumSize"> The new minimum size of the layer </param>
+        void IncreaseSize(uint64 minimumSize);
 
     private:
         uint64 _size;

@@ -94,7 +94,7 @@ namespace layers
         /// <typeparam name="LayerType"> Layer type to return. </typeparam>
         /// <param name="layerIndex"> Zero-based index of the layer. </param>
         ///
-        /// <returns> The requested layer, cast to the requested type. </returns>
+        /// <returns> The requested layer, cast to a const reference of the requested type. </returns>
         template <typename LayerType=Layer>
         const LayerType& GetLayer(uint64 layerIndex) const;
 
@@ -130,9 +130,8 @@ namespace layers
     protected:
         // members
         std::vector<std::unique_ptr<Layer>> _layers;
-        mutable uint64 _maxInputSize;
 
-        void UpdateInputLayer() const;
+        void UpdateInputLayer(uint64 minSize) const;
 
         template <typename IndexValueIteratorType>
         void LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const;
