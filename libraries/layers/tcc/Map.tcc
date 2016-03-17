@@ -61,18 +61,15 @@ namespace layers
         {
             _layers[i]->Compute(layerOutputs, layerOutputs[i]);
         }
-        
-        if (_outputCoordinates.size() == 0)
-        {
-            _outputCoordinates = GetCoordinateList(*this, NumLayers() - 1);
-        }
+
+        auto outputCoordinates = GetOutputCoordinates();
 
         // copy the outputs to a vector
-        auto outputSize = _outputCoordinates.size();
+        auto outputSize = outputCoordinates.size();
         std::vector<double> outputs(outputSize);
         for(uint64 index = 0; index < outputSize; ++index)
         {
-            auto coordinate = _outputCoordinates[index];
+            auto coordinate = outputCoordinates[index];
             auto layerIndex = coordinate.GetLayerIndex();
             auto elementIndex = coordinate.GetElementIndex();
             outputs[index] = layerOutputs[layerIndex][elementIndex];

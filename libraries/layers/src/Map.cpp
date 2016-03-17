@@ -99,7 +99,12 @@ namespace layers
 
     CoordinateList Map::GetOutputCoordinates() const
     {
-        return _outputCoordinates;
+        auto outputCoordinates = _outputCoordinates;
+        if (outputCoordinates.size() == 0)
+        {
+            outputCoordinates = GetCoordinateList(*this, NumLayers() - 1);
+        }
+        return outputCoordinates;
     }
 
     void Map::SetOutputCoordinates(const CoordinateList& coordinates)
