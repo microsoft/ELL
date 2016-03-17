@@ -51,11 +51,6 @@ namespace predictors
 
     void SharedLinearBinaryPredictor::AddToMap(layers::Map& map, layers::CoordinateList inputCoordinates) const
     {
-        if (inputCoordinates.size() == 0)
-        {
-            inputCoordinates = layers::GetCoordinateList(map, map.NumLayers() - 1);
-        }
-
         if (inputCoordinates.size() != _sp_predictor->w.Size())
         {
             throw std::runtime_error("Error in SharedLinearBinaryPredictor: input coordinates size doesn't match weight vector");
