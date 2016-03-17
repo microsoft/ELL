@@ -28,7 +28,6 @@ include_directories(../linear/include)
 include_directories(../dataset/include)
 include_directories(../layers/include)
 include_directories(../predictors/include)
-include_directories(../types/include)
 include_directories(../utilities/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})

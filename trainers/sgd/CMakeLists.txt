@@ -27,7 +27,6 @@ include_directories(../../libraries/linear/include)
 include_directories(../../libraries/lossFunctions/include)
 include_directories(../../libraries/predictors/include)
 include_directories(../../libraries/optimization/include)
-include_directories(../../libraries/types/include)
 include_directories(../../libraries/utilities/include)
 
 # create executable in build\bin

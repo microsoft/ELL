@@ -23,7 +23,6 @@ source_group("include" FILES ${INCLUDE})
 include_directories(include)
 #include_directories(tcc)
 include_directories(../linear/include)
-include_directories(../types/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 # target_link_libraries(${PROJ_NAME} linear)

@@ -25,6 +25,7 @@ set (INCLUDE include/Base.h
              include/DoubleSubvector.h
              include/DoubleVector.h
              include/IMatrix.h
+             include/IndexValue.h
              include/IVector.h
              include/RowMatrix.h)
 
@@ -38,7 +39,6 @@ source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(tcc)
-include_directories(../types/include)
 include_directories(../utilities/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})

@@ -13,9 +13,6 @@
 #include "Layer.h"
 #include "Coordinate.h"
 
-// types
-#include "types.h"
-
 // stl
 #include <string>
 #include <iostream>

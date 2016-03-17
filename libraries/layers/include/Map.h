@@ -13,7 +13,7 @@
 #include "Coordinate.h"
 #include "Stack.h"
 
-// types
+// linear
 #include "IndexValue.h"
 
 // stl

@@ -53,7 +53,6 @@ include_directories(include)
 include_directories(tcc)
 include_directories(../linear/include)
 include_directories(../layers/include)
-include_directories(../types/include)
 include_directories(../utilities/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})

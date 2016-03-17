@@ -46,7 +46,6 @@ include_directories(include)
 include_directories(../libraries/dataset/include)
 include_directories(../libraries/layers/include)
 include_directories(../libraries/linear/include)
-include_directories(../libraries/types/include)
 include_directories(../libraries/utilities/include)
 include_directories(../libraries/common/include)
 

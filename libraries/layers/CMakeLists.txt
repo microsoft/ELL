@@ -39,8 +39,7 @@ source_group("tcc" FILES ${TCC})
 include_directories(include)
 include_directories(tcc)
 include_directories(../layers/include)
-include_directories(../testing/include)
-include_directories(../types/include)
+include_directories(../linear/include)
 include_directories(../utilities/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
@@ -52,6 +51,8 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 #
 
 set (TEST_NAME ${PROJ_NAME}_test)
+
+include_directories(../testing/include)
 
 add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
 

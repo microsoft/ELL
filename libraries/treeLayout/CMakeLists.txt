@@ -26,7 +26,6 @@ source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(tcc)
-include_directories(../types/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 
