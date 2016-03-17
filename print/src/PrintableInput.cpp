@@ -11,6 +11,11 @@
 #include "PrintableInput.h"
 #include "SvgHelpers.h"
 
+std::string PrintableInput::GetFriendlyLayerName() const
+{
+    return "Input";
+}
+
 LayerLayout PrintableInput::Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const
 {
     // calculate the layout

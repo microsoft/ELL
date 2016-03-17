@@ -72,46 +72,50 @@ namespace layers
     layers::CoordinateList GetCoordinateList(const layers::Map& map, const std::string& coordinateListString)
     {
         layers::CoordinateList coordinateList;
-        const char* pStr = coordinateListString.c_str();
-        const char* pEnd = pStr + coordinateListString.size();
 
-        while (pStr < pEnd)
+        if(map.NumLayers() > 0)
         {
-            // read layer Index
-            uint64 layerIndex = ParseIndex(pStr, map.NumLayers() - 1);
+            const char* pStr = coordinateListString.c_str();
+            const char* pEnd = pStr + coordinateListString.size();
 
-            // read element index
-            uint64 fromElementIndex = 0;
-            uint64 maxElementIndex = map.GetLayer(layerIndex).Size() - 1;
-            uint64 toElementIndex = maxElementIndex;
-
-            // case: no elements specified - take entire layer
-            if (*pStr == ';')
+            while(pStr < pEnd)
             {
-                ++pStr;
-            }
+                // read layer Index
+                uint64 layerIndex = ParseIndex(pStr, map.NumLayers() - 1);
 
-            // case: elements specified
-            else if (*pStr == ',')
-            {
-                ++pStr;
-                fromElementIndex = toElementIndex = ParseIndex(pStr, maxElementIndex);
+                // read element index
+                uint64 fromElementIndex = 0;
+                uint64 maxElementIndex = map.GetLayer(layerIndex).Size() - 1;
+                uint64 toElementIndex = maxElementIndex;
 
-                // interval of elements
-                if (*pStr == ':')
+                // case: no elements specified - take entire layer
+                if(*pStr == ';')
                 {
                     ++pStr;
-                    toElementIndex = ParseIndex(pStr, maxElementIndex);
+                }
 
-                    if (toElementIndex < fromElementIndex)
+                // case: elements specified
+                else if(*pStr == ',')
+                {
+                    ++pStr;
+                    fromElementIndex = toElementIndex = ParseIndex(pStr, maxElementIndex);
+
+                    // interval of elements
+                    if(*pStr == ':')
                     {
-                        throw std::runtime_error("bad format in coordinate list definition string");
+                        ++pStr;
+                        toElementIndex = ParseIndex(pStr, maxElementIndex);
+
+                        if(toElementIndex < fromElementIndex)
+                        {
+                            throw std::runtime_error("bad format in coordinate list definition string");
+                        }
                     }
                 }
-            }
 
-            // add the coordinates to the list
-            AddCoordinates(coordinateList, layerIndex, fromElementIndex, toElementIndex);
+                // add the coordinates to the list
+                AddCoordinates(coordinateList, layerIndex, fromElementIndex, toElementIndex);
+            }
         }
 
         return coordinateList;

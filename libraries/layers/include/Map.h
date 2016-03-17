@@ -116,36 +116,25 @@ namespace layers
         template<typename MapType = Map>
         static MapType Load(const std::string& inputMapFile);
 
+        /// <summary> Saves a map to an output stream. </summary>
+        ///
+        /// <param name="os"> [in,out] Stream to write data to. </param>
+        void Save(std::ostream& os) const;
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
         static const char* GetTypeName();
 
+        /// <summary> Reads the map from an XMLDeserializer. </summary>
+        ///
+        /// <param name="deserializer"> [in,out] The deserializer. </param>
         void Read(utilities::XMLDeserializer& deserializer);
+
+        /// <summary> Writes the map to an XMLSerializer. </summary>
+        ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
         void Write(utilities::XMLSerializer& serializer) const;
-
-        // TODO: remove JSON serializaiton
-
-        /// <summary> Serializes the Map in json format. </summary>
-        ///
-        /// <param name="serializer"> [in,out] The serializer. </param>
-        void Serialize(utilities::JsonSerializer& serializer) const;
-
-        /// <summary> Serializes the Map in json format. </summary>
-        ///
-        /// <param name="os"> [in,out] Stream to write data to. </param>
-        void Serialize(std::ostream& os) const;
-
-        /// <summary> Deserializes the Map in json format. </summary>
-        ///
-        /// <param name="serializer"> [in,out] The serializer. </param>
-        virtual void Deserialize(utilities::JsonSerializer& serializer);
-
-        /// <summary> Static function for deserializing a std::unique_ptr that points to a Layer </summary>
-        ///
-        /// <param name="serializer"> [in,out] The serializer. </param>
-        /// <param name="up"> [in,out] The pointer to the layer. </param>
-        static void DeserializeLayers(utilities::JsonSerializer& serializer, std::unique_ptr<Layer>& spLayer);
 
     protected:
         // members

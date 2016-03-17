@@ -24,6 +24,11 @@ struct PrintableSum : public layers::Sum, public PrintableLayer
 {
 public:
 
+    /// <summary> Gets a friendly layer name. </summary>
+    ///
+    /// <returns> The friendly layer name. </returns>
+    virtual std::string GetFriendlyLayerName() const override;
+
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///
     /// <param name="os"> [in,out] Stream to write data to. </param>

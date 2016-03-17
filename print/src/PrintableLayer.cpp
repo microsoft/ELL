@@ -29,6 +29,10 @@ LayerLayout PrintableLayer::Print(std::ostream& os, double left, double top, uin
     // print the layer type
     std::string uppercaseTypeName = typeName;
     transform(typeName.cbegin(), typeName.cend(), uppercaseTypeName.begin(), ::toupper);
+    if (uppercaseTypeName.size() > 5)
+    {
+        uppercaseTypeName = uppercaseTypeName.substr(0, 5);
+    }
     SvgText(os, 2, "Layer", left + 40, layout.GetMidY(), uppercaseTypeName, -90);
 
     return layout;

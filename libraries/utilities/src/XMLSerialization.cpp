@@ -13,6 +13,29 @@
 
 namespace utilities
 {
+
+    XMLSerializer::XMLSerializer(std::ostream & stream) : _stream(stream)
+    {}
+
+
+    void utilities::XMLSerializer::Serialize(const char* name, const std::string& value)
+    {
+        WriteSingleLineTags("string", name, value);
+    }
+
+    void utilities::XMLSerializer::Serialize(const std::string& value)
+    {
+        WriteSingleLineTags("string", value);
+    }
+
+    void XMLSerializer::Indent()
+    {
+        for(uint64 i = 0; i < _indentation; ++i)
+        {
+            _stream << "    ";
+        }
+    }
+
     XMLDeserializer::XMLDeserializer(std::istream& stream)
     {
         std::stringstream stringStream;
@@ -21,14 +44,13 @@ namespace utilities
         _pStr = _string.c_str();
     }
 
-    XMLSerializer::XMLSerializer(std::ostream & stream) : _stream(stream)
-    {}
-
-    void XMLSerializer::Indent()
+    void XMLDeserializer::Deserialize(const char * name, std::string& value)
     {
-        for (uint64 i = 0; i < _indentation; ++i)
-        {
-            _stream << "    ";
-        }
+        ReadSingleLineTags(Match("string"), Match("name"), Match(name), value);
+    }
+    
+    void XMLDeserializer::Deserialize(std::string& value)
+    {
+        ReadSingleLineTags(Match("string"), value);
     }
 }

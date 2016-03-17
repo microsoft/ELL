@@ -13,7 +13,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/LayerLayout.cpp
+set (SRC src/ConstructLayer.cpp
+         src/LayerLayout.cpp
          src/PrintableInput.cpp
          src/PrintableLayer.cpp
          src/PrintableMap.cpp

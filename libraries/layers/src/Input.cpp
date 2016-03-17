@@ -16,8 +16,9 @@
 
 namespace layers
 {
+    const int Input::_currentVersion;
 
-    Input::Input(uint64 size) : Layer(Type::zero), _size(size)
+    Input::Input(uint64 size) : _size(size)
     {}
 
     uint64 Input::Size() const
@@ -47,41 +48,21 @@ namespace layers
 
     void Input::Read(utilities::XMLDeserializer& deserializer)
     {
-        //int version = 0;
-        //deserializer.Deserialize("version", version);
-        //if (version == 1)
-        //{
-        //    deserializer.Deserialize("size", _size);
-        //}
-        //else
-        //{
-        //    throw std::runtime_error("unsupported version: " + std::to_string(version));
-        //}
-    }
-
-    void Input::Write(utilities::XMLSerializer& serializer) const
-    {
-        //serializer.Serialize("version", _currentVersion);
-        //serializer.Serialize("size", _size);
-    }
-
-    void Input::Serialize(utilities::JsonSerializer & serializer) const
-    {
-        // version 1
-        Layer::SerializeHeader(serializer, 1);
-
-        serializer.Write("size", (Json::UInt64)_size);
-    }
-
-    void Input::Deserialize(utilities::JsonSerializer & serializer, int version)
-    {
+        int version = 0;
+        deserializer.Deserialize("version", version);
         if (version == 1)
         {
-            serializer.Read("size", _size);
+            deserializer.Deserialize("size", _size);
         }
         else
         {
             throw std::runtime_error("unsupported version: " + std::to_string(version));
         }
+    }
+
+    void Input::Write(utilities::XMLSerializer& serializer) const
+    {
+        serializer.Serialize("version", _currentVersion);
+        serializer.Serialize("size", _size);
     }
 }

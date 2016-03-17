@@ -17,7 +17,7 @@
 #include "StlIndexValueIterator.h"
 
 // utilities
-#include "JsonSerializer.h"
+#include "XMLSerialization.h"
 #include "StlIterator.h"
 
 // stl
@@ -31,23 +31,6 @@ namespace layers
     class Layer
     {
     public:
-        enum class Type { zero, scale, shift, sum, decisionTreePath };
-
-        /// <summary> Default ctor. </summary>
-        ///
-        /// <param name="type"> The type. </param>
-        Layer(Type type);
-
-        /// <summary> Default copy ctor. </summary>
-        ///
-        /// <param name="other"> The other. </param>
-        Layer(const Layer& other) = default;
-
-        /// <summary> Default move ctor. </summary>
-        ///
-        /// <param name="parameter1"> [in,out] The first parameter. </param>
-        Layer(Layer&&) = default;
-
         /// <summary> Default virtual destructor. </summary>
         virtual ~Layer() = default;
 
@@ -55,11 +38,6 @@ namespace layers
         ///
         /// <returns> The number of elements in the layer. </returns>
         virtual uint64 Size() const = 0;
-
-        /// <summary> Gets a human friendly name of the layer type. </summary>
-        ///
-        /// <returns> The type name. </returns>
-        std::string GetFriendlyLayerName() const;
 
         /// <summary> Computes the layer output. </summary>
         ///
@@ -85,27 +63,15 @@ namespace layers
         /// <returns> The name of this type. </returns>
         virtual const char* GetRuntimeTypeName() const = 0;
 
+        /// <summary> Reads the map from an XMLDeserializer. </summary>
+        ///
+        /// <param name="deserializer"> [in,out] The deserializer. </param>
         virtual void Read(utilities::XMLDeserializer& deserializer) = 0;
+
+        /// <summary> Writes the map to an XMLSerializer. </summary>
+        ///
+        /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Write(utilities::XMLSerializer& serializer) const = 0;
-        
-        // TODO: remove JSON serializaiton
-
-        /// <summary> Serializes the Layer in json format. </summary>
-        ///
-        /// <param name="serializer"> [in,out] The serializer. </param>
-        virtual void Serialize(utilities::JsonSerializer& serializer) const = 0;
-
-        /// <summary> Deserializes the Layer in json format. </summary>
-        ///
-        /// <param name="serializer"> [in,out] The serializer. </param>
-        /// <param name="version"> The version. </param>
-        virtual void Deserialize(utilities::JsonSerializer& serializer, int version) = 0;
-
-    protected:
-        void SerializeHeader(utilities::JsonSerializer& serializer, int version) const;
-
-        Type _type;
-        static const std::string typeName[];
     };
 }
 

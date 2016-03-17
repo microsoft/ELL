@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // utilities
-#include "JsonSerializer.h"
+#include "XMLSerialization.h"
 #include "Files.h"
 
 // stl
@@ -62,7 +62,11 @@ namespace layers
     MapType Map::Load(const std::string& inputMapFile)
     {
         auto inputMapFStream = utilities::OpenIfstream(inputMapFile);
-        return utilities::JsonSerializer::Load<MapType>(inputMapFStream, "Base");
+        utilities::XMLDeserializer deserializer(inputMapFStream);
+
+        MapType map;
+        deserializer.Deserialize(map);
+        return map;
     }
 
 }

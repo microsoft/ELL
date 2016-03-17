@@ -43,12 +43,14 @@ class Derived1 : public Base
     {
         deserializer.Deserialize("x", x);
         deserializer.Deserialize("y", y);
+        deserializer.Deserialize("s", s);
     }
 
     virtual void Write(utilities::XMLSerializer& serializer) const override
     {
         serializer.Serialize("x", x);
         serializer.Serialize("y", y);
+        serializer.Serialize("s", s);
     }
 
     // for the purpose of testing
@@ -56,17 +58,19 @@ class Derived1 : public Base
     {
         x = 5;
         y = -17.3;
+        s = "test";
     }
 
     virtual bool Check() override
     {
-        if (x == 5 && y == -17.3) return true;
+        if (x == 5 && y == -17.3 && s == "test") return true;
         return false;
     }
 
 private:
     int x = 0;
     double y = 0;
+    std::string s;
 };
 
 class Derived2 : public Base
@@ -103,7 +107,7 @@ private:
     std::vector<float> v;
 };
 
-void Read(std::string runtimeTypeName, std::unique_ptr<Base>& value)
+void Construct(std::string runtimeTypeName, std::unique_ptr<Base>& value)
 {
     if(runtimeTypeName == "Derived1")
     {

@@ -24,10 +24,10 @@ struct PrintableCoordinatewise : public layers::Coordinatewise, public Printable
 {
 public:
 
-    /// <summary> Constructs an instance of PrintableCoordinatewise. </summary>
+    /// <summary> Gets a friendly layer name. </summary>
     ///
-    /// <param name="type"> The type. </param>
-    PrintableCoordinatewise(layers::Layer::Type type);
+    /// <returns> The friendly layer name. </returns>
+    virtual std::string GetFriendlyLayerName() const override;
 
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///

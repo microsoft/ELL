@@ -17,10 +17,9 @@ set (SRC src/BinaryClassificationEvaluator.cpp
          src/Files.cpp
          src/Format.cpp
          src/IntegerStack.cpp
-         src/JsonSerializer.cpp
+         src/OutputStream.cpp
          src/RandomEngines.cpp
-         src/XMLSerialization.cpp
-         ../amalgamated_jsoncpp/jsoncpp.cpp)
+         src/XMLSerialization.cpp)
 
 set (INCLUDE include/BinaryClassificationEvaluator.h
              include/CommandLineParser.h
@@ -28,7 +27,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
              include/Format.h
              include/IIterator.h
              include/IntegerStack.h
-             include/JsonSerializer.h
+             include/OutputStream.h
              include/ParallelTransformIterator.h
              include/Parser.h
              include/RandomEngines.h
@@ -40,7 +39,6 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
 set (TCC tcc/BinaryClassificationEvaluator.tcc
          tcc/CommandLineParser.tcc
          tcc/Format.tcc
-         tcc/JsonSerializer.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
          tcc/StlIterator.tcc

@@ -11,6 +11,11 @@
 #include "PrintableSum.h"
 #include "SvgHelpers.h"
 
+std::string PrintableSum::GetFriendlyLayerName() const
+{
+    return "Sum";
+}
+
 LayerLayout PrintableSum::Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const
 {
     // calculate the layout
