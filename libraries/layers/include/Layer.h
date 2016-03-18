@@ -64,6 +64,11 @@ namespace layers
         /// <returns> The name of this type. </returns>
         virtual const char* GetRuntimeTypeName() const = 0;
 
+        /// <summary> Returns a TypeFactory that can construct subclasses of this type. </summary>
+        ///
+        /// <returns> a TypeFactory that can construct subclasses of this type. </returns> 
+        static const utilities::TypeFactory<Layer> GetTypeFactory();
+
         /// <summary> Reads the map from an XMLDeserializer. </summary>
         ///
         /// <param name="deserializer"> [in,out] The deserializer. </param>
@@ -73,11 +78,6 @@ namespace layers
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Write(utilities::XMLSerializer& serializer) const = 0;
-
-        /// <summary> Returns a TypeFactory that can construct subclasses of this type. </summary>
-        ///
-        /// <returns> a TypeFactory that can construct subclasses of this type. </returns> 
-        static const utilities::TypeFactory<Layer> GetTypeFactory();
     };
 }
 
