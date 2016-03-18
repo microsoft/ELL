@@ -182,9 +182,11 @@ namespace layers
         void LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const;
 
     private:
+        // #### TODO: yuck, try to get rid of these "mutable"s
         mutable uint64 _maxInputSize = 0; // keeps track of the largest input we've seen so far
         mutable CoordinateList _outputCoordinates; // zero-size means "use all of last layer"
-        std::vector<std::vector<double>> AllocateLayerOutputs() const;
+        mutable std::vector<std::vector<double>> _layerOutputs;
+        void AllocateLayerOutputs() const;
     };
 }
 

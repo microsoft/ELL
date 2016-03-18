@@ -52,17 +52,15 @@ namespace layers
     template<typename IndexValueIteratorType, typename concept>
     Map::OutputIterator Map::Compute(IndexValueIteratorType inputIterator) const
     {
-        auto layerOutputs = AllocateLayerOutputs();
-        
-        LoadInputLayer(inputIterator, layerOutputs[0]);
+        AllocateLayerOutputs();
+        LoadInputLayer(inputIterator, _layerOutputs[0]);
 
         // compute layers 1,2,... in order
         for (uint64 i = 1; i < _layerStack->NumLayers(); ++i)
         {
-            _layerStack->GetLayer(i).Compute(layerOutputs, layerOutputs[i]);
+            _layerStack->GetLayer(i).Compute(_layerOutputs, _layerOutputs[i]);
         }
 
-        // Problem: outputCoordinates can be large because
         auto outputCoordinates = GetOutputCoordinates();
 
         // copy the outputs to a vector
@@ -73,7 +71,7 @@ namespace layers
             auto coordinate = outputCoordinates[index];
             auto layerIndex = coordinate.GetLayerIndex();
             auto elementIndex = coordinate.GetElementIndex();
-            outputs[index] = layerOutputs[layerIndex][elementIndex];
+            outputs[index] = _layerOutputs[layerIndex][elementIndex];
         }        
 
         OutputIterator outputIterator(std::move(outputs));

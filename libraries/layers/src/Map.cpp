@@ -126,7 +126,7 @@ namespace layers
                 {
                     throw std::runtime_error("Error: unable to compute Map output coordinates");
                 }
-                outputCoordinates = GetCoordinateList(0, 0, maxOutputSize-1);
+                outputCoordinates = GetCoordinateList(0, 0, maxOutputSize - 1);
             }
             else
             {
@@ -141,11 +141,10 @@ namespace layers
         _outputCoordinates = coordinates;
     }
 
-    std::vector<std::vector<double>> Map::AllocateLayerOutputs() const
+    void Map::AllocateLayerOutputs() const
     {
         auto numLayers = _layerStack->NumLayers();
-        std::vector<std::vector<double>> layerOutputs;
-        layerOutputs.resize(numLayers);
+        _layerOutputs.resize(numLayers);
 
         // TODO: When we keep the outputs around instead of reallocating them for every call to compute, we'll need to ensure they're big enough
         for (uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
@@ -156,10 +155,8 @@ namespace layers
             {
                 layerSize = std::max(layerSize, _maxInputSize);
             }
-            layerOutputs[layerIndex].resize(layerSize);
-            std::fill(layerOutputs[layerIndex].begin(), layerOutputs[layerIndex].end(), 0);
+            _layerOutputs[layerIndex].resize(layerSize);
         }
-        return layerOutputs;
     }
 
     const char* Stack::GetTypeName()
