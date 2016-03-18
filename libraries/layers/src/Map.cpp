@@ -8,7 +8,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ConstructLayer.h"
 #include "Coordinatewise.h"
 #include "Input.h"
 #include "Sum.h"
@@ -89,6 +88,10 @@ namespace layers
 
     void Map::Read(utilities::XMLDeserializer& deserializer)
     {
+        deserializer.RegisterPolymorphicType<Input>();
+        deserializer.RegisterPolymorphicType<Coordinatewise>();
+        deserializer.RegisterPolymorphicType<Sum>();
+
         int version = 0;
         deserializer.Deserialize("version", version);
         if (version == 1)

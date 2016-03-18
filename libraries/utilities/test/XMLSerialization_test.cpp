@@ -110,22 +110,6 @@ private:
     std::vector<float> v;
 };
 
-void Construct(std::string runtimeTypeName, std::unique_ptr<Base>& value)
-{
-    if(runtimeTypeName == "Derived1")
-    {
-        value = std::make_unique<Derived1>();
-    }
-    else if(runtimeTypeName == "Derived2")
-    {
-        value = std::make_unique<Derived2>();
-    }
-    else
-    {
-        throw std::runtime_error("attempted to deserialize an unrecognized class type");
-    }
-}
-
 void TypeFactoryTest()
 {
     utilities::TypeFactory factory;
@@ -154,6 +138,10 @@ void XMLSerializationTest()
 
     utilities::XMLDeserializer deserializer(ss);
     std::vector<std::unique_ptr<Base>> vec2;
+
+    deserializer.RegisterPolymorphicType<Derived1>();
+    deserializer.RegisterPolymorphicType<Derived2>();
+
     deserializer.Deserialize("vec", vec2);
 
     testing::ProcessTest("utilities::XMLSerialization", vec2[0]->Check() && vec[1]->Check());

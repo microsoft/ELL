@@ -235,7 +235,7 @@ namespace utilities
 
         ReadOpenTag(Match(typeName), Match("name"), Match(name));
         ReadOpenTag(runtimeTypeName);
-        Construct(runtimeTypeName, value);
+        value = _polymorphicTypeFactory.Construct<ValueType>(runtimeTypeName);
         value->Read(*this);
 
         ReadCloseTag(Match(runtimeTypeName));
@@ -289,7 +289,7 @@ namespace utilities
 
         ReadOpenTag(Match(typeName));
         ReadOpenTag(runtimeTypeName);
-        Construct(runtimeTypeName, value);
+        value = _polymorphicTypeFactory.Construct<ValueType>(runtimeTypeName);
         value->Read(*this);
 
         ReadCloseTag(Match(runtimeTypeName));
