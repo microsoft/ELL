@@ -74,7 +74,7 @@ namespace layers
         /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Write(utilities::XMLSerializer& serializer) const = 0;
 
-        static utilities::TypeFactory<Layer> GetTypeFactory();
+        static const utilities::TypeFactory<Layer> GetTypeFactory();
     };
 }
 

@@ -20,8 +20,7 @@ namespace layers
         return "Layer";
     }
 
-
-    utilities::TypeFactory<Layer> Layer::GetTypeFactory()
+    const utilities::TypeFactory<Layer> Layer::GetTypeFactory()
     {
         utilities::TypeFactory<Layer> factory;
         factory.AddType<Input>();
