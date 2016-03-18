@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     OutputStreamImpostor.h (utilities)
+//  File:     OutputStreamImpostor.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
 //  [copyright]

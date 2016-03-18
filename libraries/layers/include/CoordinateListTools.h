@@ -18,6 +18,8 @@
 
 namespace layers
 {
+    class Map;
+
     /// <summary>
     /// Gets a coordinate list from a coordinate list definition string. The string has the following format
     /// [defString] .=. [def];[defString]
