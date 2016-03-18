@@ -42,7 +42,7 @@ namespace layers
     ///
     IndexValue Map::OutputIterator::Get() const
     {
-        return IndexValue{ _index, _outputs[_index]};
+        return IndexValue{ _index, _outputs[_index] };
     }
 
     Map::OutputIterator::OutputIterator(std::vector<double>&& outputs) : _outputs(std::move(outputs)), _index(0)
@@ -56,7 +56,7 @@ namespace layers
         _layers.push_back(std::make_unique<Input>());
     }
 
-   
+
     uint64 LayerStack::AddLayer(std::unique_ptr<Layer>&& layer)
     {
         uint64 maxInputSize = 0;
@@ -79,7 +79,7 @@ namespace layers
                 auto inputElement = coord.GetElementIndex();
                 if (inputLayer == 0) // we're referring to an element of the first, Input, layer
                 {
-                    maxInputSize = std::max(inputElement+1, maxInputSize);
+                    maxInputSize = std::max(inputElement + 1, maxInputSize);
                 }
                 inputCoords.Next();
             }
@@ -118,7 +118,20 @@ namespace layers
         auto outputCoordinates = _outputCoordinates;
         if (outputCoordinates.size() == 0)
         {
-            outputCoordinates = GetCoordinateList(*_layerStack, _layerStack->NumLayers() - 1);
+            if (_layerStack->NumLayers() == 1)
+            {
+                // size should be max of what we've seen and the input layer size
+                auto maxOutputSize = std::max(_maxInputSize, _layerStack->GetLayer(0).Size());
+                if (maxOutputSize == 0)
+                {
+                    throw std::runtime_error("Error: unable to compute Map output coordinates");
+                }
+                outputCoordinates = GetCoordinateList(0, 0, maxOutputSize-1);
+            }
+            else
+            {
+                outputCoordinates = GetCoordinateList(*_layerStack, _layerStack->NumLayers() - 1);
+            }
         }
         return outputCoordinates;
     }
@@ -136,6 +149,11 @@ namespace layers
         for (uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
         {
             auto layerSize = _layerStack->GetLayer(layerIndex).Size();
+            // #### Yuck:
+            if (layerIndex == 0) // input layer
+            {
+                layerSize = std::max(layerSize, _maxInputSize);
+            }
             layerOutputs[layerIndex].resize(layerSize);
             std::fill(layerOutputs[layerIndex].begin(), layerOutputs[layerIndex].end(), 0);
         }
@@ -181,8 +199,8 @@ namespace layers
 
     void Map::IncreaseInputLayerSize(uint64 minSize) const
     {
-        _inputSize = std::max(minSize, _inputSize);
-//        GetLayer<Input&>(0).IncreaseSize(minSize);
+        _maxInputSize = std::max(minSize, _maxInputSize);
+        //        GetLayer<Input&>(0).IncreaseSize(minSize);
     }
 
 

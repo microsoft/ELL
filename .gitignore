@@ -215,3 +215,4 @@ ModelManifest.xml
 # Emacs autosaves
 \#*\#
 .#*
+/*.map

@@ -62,6 +62,7 @@ namespace layers
             _layerStack->GetLayer(i).Compute(layerOutputs, layerOutputs[i]);
         }
 
+        // Problem: outputCoordinates can be large because
         auto outputCoordinates = GetOutputCoordinates();
 
         // copy the outputs to a vector
