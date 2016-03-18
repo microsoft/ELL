@@ -92,7 +92,7 @@ void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::Int
     }
 }
 
-void CompilableMap::ToCode(std::ostream& os, layers::CoordinateList coordinateList) const
+void CompilableStack::ToCode(std::ostream& os, layers::CoordinateList coordinateList) const
 {
     // create data flow graph datastructure
     DataFlowGraph graph;

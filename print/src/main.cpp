@@ -41,11 +41,11 @@ int main(int argc, char* argv[])
         // if output file specified, use it, otherwise use std::cout
         auto outStream = utilities::GetOutputStreamImpostor(printArguments.outputSvgFile);
 
-        // open map file
-        auto map = layers::Stack::Load<PrintableMap>(printArguments.inputMapFile);
+        // open stack file
+        auto stack = layers::Stack::Load<PrintableStack>(printArguments.inputMapFile);
         
         // print to svg file
-        map.Print(outStream, printArguments);
+        stack.Print(outStream, printArguments);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

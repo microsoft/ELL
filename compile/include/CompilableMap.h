@@ -20,8 +20,8 @@
 #include <memory>
 #include <iostream>
 
-/// <summary> A compilable map. </summary>
-class CompilableMap : public layers::Stack
+/// <summary> A compilable stack. </summary>
+class CompilableStack : public layers::Stack
 {
 public:
     /// <summary> Generates C code that encodes the map. </summary>

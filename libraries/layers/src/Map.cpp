@@ -56,7 +56,6 @@ namespace layers
         _layers.push_back(std::make_unique<Input>());
     }
 
-
     uint64 Stack::AddLayer(std::unique_ptr<Layer>&& layer)
     {
         uint64 maxInputSize = 0;
@@ -106,11 +105,10 @@ namespace layers
 
     Map::Map()
     {
-        // #### TODO: should the default constructor keep a null layer stack, create an empty one, or be inaccessible?
-        _layerStack = std::make_shared<Stack>();
+        _stack = std::make_shared<Stack>();
     }
 
-    Map::Map(const std::shared_ptr<Stack>& layers) : _layerStack(layers)
+    Map::Map(const std::shared_ptr<Stack>& layers) : _stack(layers)
     {}
 
     CoordinateList Map::GetOutputCoordinates() const
@@ -118,10 +116,10 @@ namespace layers
         auto outputCoordinates = _outputCoordinates;
         if (outputCoordinates.size() == 0)
         {
-            if (_layerStack->NumLayers() == 1)
+            if (_stack->NumLayers() == 1)
             {
                 // size should be max of what we've seen and the input layer size
-                auto maxOutputSize = std::max(_maxInputSize, _layerStack->GetLayer(0).Size());
+                auto maxOutputSize = std::max(_maxInputSize, _stack->GetLayer(0).Size());
                 if (maxOutputSize == 0)
                 {
                     throw std::runtime_error("Error: unable to compute Map output coordinates");
@@ -130,7 +128,7 @@ namespace layers
             }
             else
             {
-                outputCoordinates = GetCoordinateList(*_layerStack, _layerStack->NumLayers() - 1);
+                outputCoordinates = GetCoordinateList(*_stack, _stack->NumLayers() - 1);
             }
         }
         return outputCoordinates;
@@ -143,13 +141,13 @@ namespace layers
 
     void Map::AllocateLayerOutputs() const
     {
-        auto numLayers = _layerStack->NumLayers();
+        auto numLayers = _stack->NumLayers();
         _layerOutputs.resize(numLayers);
 
         // TODO: When we keep the outputs around instead of reallocating them for every call to compute, we'll need to ensure they're big enough
         for (uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
         {
-            auto layerSize = _layerStack->GetLayer(layerIndex).Size();
+            auto layerSize = _stack->GetLayer(layerIndex).Size();
             // #### TODO: This is gross. Can we make it simpler?
             if (layerIndex == 0) // input layer
             {

@@ -62,8 +62,8 @@ namespace layers
 
         /// <summary> Computes the layer output. </summary>
         ///
-        /// <param name="layerIndex"> The layer's own zero-based index in the map. </param>
-        /// <param name="outputs"> [in,out] The vector where the output values are written. </param>
+        /// <param name="inputs"> The set of vectors holding input values to use </param>
+        /// <param name="outputs"> [out] The vector where the output values are written. </param>
         virtual void Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const override;
 
         /// <summary> Returns an iterator that enumerates the input coordinates for a specified element. </summary>
@@ -83,12 +83,12 @@ namespace layers
         /// <returns> The name of this type. </returns>
         virtual const char* GetRuntimeTypeName() const override;
 
-        /// <summary> Reads the map from an XMLDeserializer. </summary>
+        /// <summary> Reads the layer from an XMLDeserializer. </summary>
         ///
         /// <param name="deserializer"> [in,out] The deserializer. </param>
         virtual void Read(utilities::XMLDeserializer& deserializer) override;
 
-        /// <summary> Writes the map to an XMLSerializer. </summary>
+        /// <summary> Writes the layer to an XMLSerializer. </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Write(utilities::XMLSerializer& serializer) const override;

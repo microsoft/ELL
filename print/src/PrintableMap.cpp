@@ -113,7 +113,7 @@ void PrintElementDefinition(std::ostream& os, const std::string& id, double widt
     os << "            </g>\n";
 }
 
-void PrintableMap::Print(std::ostream & os, const PrintArguments& Arguments)
+void PrintableStack::Print(std::ostream & os, const PrintArguments& Arguments)
 {
     os << "<html>\n<body>\n";
     utilities::PrintFormat(os, 

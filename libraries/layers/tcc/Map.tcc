@@ -56,9 +56,9 @@ namespace layers
         LoadInputLayer(inputIterator, _layerOutputs[0]);
 
         // compute layers 1,2,... in order
-        for (uint64 i = 1; i < _layerStack->NumLayers(); ++i)
+        for (uint64 i = 1; i < _stack->NumLayers(); ++i)
         {
-            _layerStack->GetLayer(i).Compute(_layerOutputs, _layerOutputs[i]);
+            _stack->GetLayer(i).Compute(_layerOutputs, _layerOutputs[i]);
         }
 
         auto outputCoordinates = GetOutputCoordinates();

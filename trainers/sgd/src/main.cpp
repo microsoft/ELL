@@ -67,10 +67,7 @@ int main(int argc, char* argv[])
         auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputMapFile);
 
         // read map from file
-        //        std::shared_ptr<layers::Map> map = GetMap(mapLoadArguments);
         std::shared_ptr<layers::Map> map = common::GetMap(mapLoadArguments);
-//        auto realMap = std::make_shared<layers::Map>(map);
-        //        std::shared_ptr<layers::Map> map = GetMap(mapLoadArguments);
 
         // get the dataset
         auto dataset = common::GetDataset(dataLoadArguments, map);
@@ -108,7 +105,7 @@ int main(int argc, char* argv[])
         // update the map with the newly learned layers
         auto predictor = optimizer.GetPredictor();
 
-        predictor.AddToMap(map->GetStack(), map->GetOutputCoordinates());
+        predictor.AddToStack(map->GetStack(), map->GetOutputCoordinates());
 
         // output map
         map->GetStack().Save(outStream);

@@ -28,7 +28,6 @@ namespace layers
     class Stack
     {
     public:
-
         /// <summary> Constructs an instance of Stack. </summary>
         Stack();
 
@@ -169,12 +168,12 @@ namespace layers
 
 
         // Accessor for stack
-        const Stack& GetStack() const { return *_layerStack; }
-        Stack& GetStack() { return *_layerStack; }
+        const Stack& GetStack() const { return *_stack; }
+        Stack& GetStack() { return *_stack; }
 
     protected:
         // members
-        std::shared_ptr<Stack> _layerStack;
+        std::shared_ptr<Stack> _stack;
 
         void IncreaseInputLayerSize(uint64 minSize) const;
 

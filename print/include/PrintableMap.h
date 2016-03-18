@@ -20,8 +20,8 @@
 #include <iostream>
 #include <memory>
 
-/// <summary> A printable map. </summary>
-class PrintableMap : public layers::Stack
+/// <summary> A printable stack. </summary>
+class PrintableStack : public layers::Stack
 {
 public:
 

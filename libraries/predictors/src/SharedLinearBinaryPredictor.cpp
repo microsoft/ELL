@@ -49,12 +49,12 @@ namespace predictors
         return _sp_predictor->b;
     }
 
-    void SharedLinearBinaryPredictor::AddToMap(layers::Stack& map, const layers::CoordinateList& inputCoordinates) const
+    void SharedLinearBinaryPredictor::AddToStack(layers::Stack& stack, const layers::CoordinateList& inputCoordinates) const
     {
-        uint64 layerIndex = map.AddLayer(std::make_unique<layers::Coordinatewise>(_sp_predictor->w, inputCoordinates, layers::Coordinatewise::OperationType::multiply));
-        auto coordinates = layers::GetCoordinateList(map, layerIndex);
-        layerIndex = map.AddLayer(std::make_unique<layers::Sum>(coordinates));
+        uint64 layerIndex = stack.AddLayer(std::make_unique<layers::Coordinatewise>(_sp_predictor->w, inputCoordinates, layers::Coordinatewise::OperationType::multiply));
+        auto coordinates = layers::GetCoordinateList(stack, layerIndex);
+        layerIndex = stack.AddLayer(std::make_unique<layers::Sum>(coordinates));
 
-        layerIndex = map.AddLayer(std::make_unique<layers::Coordinatewise>(_sp_predictor->b, layers::Coordinate{ layerIndex, 0 }, layers::Coordinatewise::OperationType::add));
+        layerIndex = stack.AddLayer(std::make_unique<layers::Coordinatewise>(_sp_predictor->b, layers::Coordinate{ layerIndex, 0 }, layers::Coordinatewise::OperationType::add));
     }
 }

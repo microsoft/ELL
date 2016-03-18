@@ -70,17 +70,17 @@ namespace
 
 namespace layers
 {
-    layers::CoordinateList GetCoordinateList(const layers::Stack& map, const std::string& coordinateListString)
+    layers::CoordinateList GetCoordinateList(const layers::Stack& stack, const std::string& coordinateListString)
     {
         layers::CoordinateList coordinateList;
 
         // special case for 'e' when map has just 1 layer (the input layer)
-        if (coordinateListString == "e" && map.NumLayers() == 1)
+        if (coordinateListString == "e" && stack.NumLayers() == 1)
         {
             return coordinateList;
         }
 
-        if(map.NumLayers() > 0)
+        if(stack.NumLayers() > 0)
         {
             const char* pStr = coordinateListString.c_str();
             const char* pEnd = pStr + coordinateListString.size();
@@ -89,11 +89,11 @@ namespace layers
             while(pStr < pEnd)
             {
                 // read layer Index
-                uint64 layerIndex = ParseIndex(pStr, map.NumLayers() - 1);
+                uint64 layerIndex = ParseIndex(pStr, stack.NumLayers() - 1);
                 
                 // read element index
                 uint64 fromElementIndex = 0;
-                uint64 maxElementIndex = map.GetLayer(layerIndex).Size() - 1; // Fails when layer has size 0
+                uint64 maxElementIndex = stack.GetLayer(layerIndex).Size() - 1; // Fails when layer has size 0
                 uint64 toElementIndex = maxElementIndex;
                 
                 // case: no elements specified - take entire layer
@@ -129,9 +129,9 @@ namespace layers
         return coordinateList;
     }
     
-    layers::CoordinateList GetCoordinateList(const layers::Stack& map, uint64 layerIndex)
+    layers::CoordinateList GetCoordinateList(const layers::Stack& stack, uint64 layerIndex)
     {
-        return GetCoordinateList(layerIndex, 0, map.GetLayer(layerIndex).Size()-1);
+        return GetCoordinateList(layerIndex, 0, stack.GetLayer(layerIndex).Size()-1);
     }
 
     layers::CoordinateList GetCoordinateList(uint64 layerIndex, uint64 fromElementIndex, uint64 toElementIndex)

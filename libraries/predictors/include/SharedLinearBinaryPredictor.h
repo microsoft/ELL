@@ -65,10 +65,10 @@ namespace predictors
         template<typename DataVectorType>
         double Predict(const DataVectorType& example) const;
 
-        /// <summary> Adds the predictor to a map. </summary>
+        /// <summary> Adds the predictor to a stack. </summary>
         ///
-        /// <param name="map"> [in,out] The map. </param>
-        void AddToMap(layers::Stack& map, const layers::CoordinateList& inputCoordinates) const;
+        /// <param name="map"> [in,out] The stack. </param>
+        void AddToStack(layers::Stack& stack, const layers::CoordinateList& inputCoordinates) const;
 
     private:
         struct BiasedVector

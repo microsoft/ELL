@@ -30,7 +30,7 @@ struct ElementLayoutArguments
     double dotsWidth;                   // width of the "dots" that represent the hidden elements
 };
 
-/// <summary> Arguments for map layout. </summary>
+/// <summary> Arguments for stack layout. </summary>
 struct MapLayoutArguments
 {
     double horizontalMargin;            // space to the left of the first layer

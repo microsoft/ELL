@@ -32,19 +32,19 @@ namespace layers
     /// [index] .=. (uint) || e || e-(uint)                         ("e" gets translated to the maximal index possible in the map) 
     /// </summary>
     ///
-    /// <param name="map"> The map which the coordinate list relates to. </param>
+    /// <param name="stack"> The stack which the coordinate list relates to. </param>
     /// <param name="coordinateListString"> The coordinate list definition string. </param>
     ///
     /// <returns> The coordinate list. </returns>
-    layers::CoordinateList GetCoordinateList(const layers::Stack& map, const std::string& coordinateListString);
+    layers::CoordinateList GetCoordinateList(const layers::Stack& stack, const std::string& coordinateListString);
 
-    /// <summary> Gets the list of coordinates in a given layer in a map. </summary>
+    /// <summary> Gets the list of coordinates in a given layer in a stack. </summary>
     ///
-    /// <param name="map"> The map. </param>
+    /// <param name="stack"> The stack. </param>
     /// <param name="layerIndex"> Zero-based index of the layer. </param>
     ///
     /// <returns> The coordinate list. </returns>
-    layers::CoordinateList GetCoordinateList(const layers::Stack& map, uint64 layerIndex);
+    layers::CoordinateList GetCoordinateList(const layers::Stack& stack, uint64 layerIndex);
 
     /// <summary> Constructs a coordinate list which is a sequence of consecutive elements on one layer. </summary>
     ///

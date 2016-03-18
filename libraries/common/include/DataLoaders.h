@@ -40,14 +40,18 @@ namespace common
     /// <returns> The data iterator. </returns>
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments);
 
+    /// <summary> Gets the stack specified by the command line parameters </summary>
+    ///
+    /// <param name="mapLoadArguments"> The map load arguments. </param>
+    ///
+    /// <returns> A shared pointer to the stack. </returns>
+    std::unique_ptr<layers::Stack> GetStack(const MapLoadArguments& mapLoadArguments);
+
     /// <summary> Gets the map specified by the command line parameters </summary>
     ///
     /// <param name="mapLoadArguments"> The map load arguments. </param>
     ///
     /// <returns> A shared pointer to the map. </returns>
-    std::unique_ptr<layers::Stack> GetStack(const MapLoadArguments& mapLoadArguments);
-
-    // #### Document
     std::unique_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments);
 
     /// <summary> Gets a dataset from a data file, based on command line parameters. </summary>
@@ -60,7 +64,7 @@ namespace common
     /// <summary> Gets a dataset by passing a dataset through a map, based on command line parameters. </summary>
     ///
     /// <param name="dataLoadArguments"> The data load arguments. </param>
-    /// <param name="mapLoadArguments"> The map load arguments. </param>
+    /// <param name="map"> The map. </param>
     ///
     /// <returns> The dataset produced by running the input dataset through the map. </returns>
     std::unique_ptr<dataset::RowDataset> GetDataset(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map);
