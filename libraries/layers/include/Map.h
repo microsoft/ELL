@@ -167,6 +167,11 @@ namespace layers
         /// <param name="coordinates"> The new output coordinates. </param>
         void SetOutputCoordinates(const CoordinateList& coordinates);
 
+
+        // Accessor for stack
+        const Stack& GetStack() const { return *_layerStack; }
+        Stack& GetStack() { return *_layerStack; }
+
     protected:
         // members
         std::shared_ptr<Stack> _layerStack;

@@ -68,12 +68,12 @@ int main(int argc, char* argv[])
 
         // read map from file
         //        std::shared_ptr<layers::Map> map = GetMap(mapLoadArguments);
-        std::shared_ptr<layers::Stack> map = common::GetLayerStack(mapLoadArguments);
-        auto realMap = std::make_shared<layers::Map>(map);
+        std::shared_ptr<layers::Map> map = common::GetMap(mapLoadArguments);
+//        auto realMap = std::make_shared<layers::Map>(map);
         //        std::shared_ptr<layers::Map> map = GetMap(mapLoadArguments);
 
         // get the dataset
-        auto dataset = common::GetDataset(dataLoadArguments, realMap);
+        auto dataset = common::GetDataset(dataLoadArguments, map);
 
         // create loss function
         lossFunctions::LogLoss loss;
@@ -108,10 +108,10 @@ int main(int argc, char* argv[])
         // update the map with the newly learned layers
         auto predictor = optimizer.GetPredictor();
 
-        predictor.AddToMap(*map, realMap->GetOutputCoordinates());
+        predictor.AddToMap(map->GetStack(), map->GetOutputCoordinates());
 
         // output map
-        map->Save(outStream);
+        map->GetStack().Save(outStream);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

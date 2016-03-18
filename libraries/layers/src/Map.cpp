@@ -107,6 +107,7 @@ namespace layers
     Map::Map()
     {
         // #### TODO: should the default constructor keep a null layer stack, create an empty one, or be inaccessible?
+        _layerStack = std::make_shared<Stack>();
     }
 
     Map::Map(const std::shared_ptr<Stack>& layers) : _layerStack(layers)

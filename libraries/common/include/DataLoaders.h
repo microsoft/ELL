@@ -45,7 +45,7 @@ namespace common
     /// <param name="mapLoadArguments"> The map load arguments. </param>
     ///
     /// <returns> A shared pointer to the map. </returns>
-    std::unique_ptr<layers::Stack> GetLayerStack(const MapLoadArguments& mapLoadArguments);
+    std::unique_ptr<layers::Stack> GetStack(const MapLoadArguments& mapLoadArguments);
 
     // #### Document
     std::unique_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments);
