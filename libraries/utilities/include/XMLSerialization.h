@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Format.h"
+#include "TypeFactory.h"
 
 // types
 #include "types.h"
@@ -136,6 +137,23 @@ namespace utilities
         /// <param name="iStream"> [in,out] The input stream. </param>
         XMLDeserializer(std::istream& stream);
 
+        /// <summary>
+        /// Registers a polymorphic runtime type for deserialization with its default name.
+        /// </summary>
+        ///
+        /// <typeparam name="T"> The type being registered. </typeparam>
+        template<typename T>
+        void RegisterPolymorphicType();
+
+        /// <summary>
+        /// Registers a polymorphic runtime type for deserialization with a given type name.
+        /// </summary>
+        ///
+        /// <typeparam name="T"> The type being registered. </typeparam>
+        /// <param name="typeName"> Name of the type. </param>
+        template<typename T>
+        void RegisterPolymorphicType(const std::string& typeName);
+
         /// <summary> Deserialize fundamental types. </summary>
         ///
         /// <typeparam name="ValueType"> The type being deserialized. </typeparam>
@@ -229,6 +247,7 @@ namespace utilities
 
         std::string _string;
         const char* _pStr;
+        TypeFactory _polymorphicTypeFactory;
     };
 }
 

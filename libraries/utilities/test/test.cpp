@@ -13,7 +13,6 @@
 #include "TransformIterator.h"
 #include "ParallelTransformIterator.h"
 #include "Format.h"
-#include "XMLSerialization.h"
 
 // testing
 #include "testing.h"

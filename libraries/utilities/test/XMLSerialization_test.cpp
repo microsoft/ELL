@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "XMLSerialization.h"
+#include "TypeFactory.h"
 
 // testing
 #include "testing.h"
@@ -35,6 +36,7 @@ public:
 
 class Derived1 : public Base
 {
+public:
     static const char* GetTypeName() { return "Derived1"; }
 
     virtual const char* GetRuntimeTypeName() const override { return GetTypeName(); };
@@ -75,6 +77,7 @@ private:
 
 class Derived2 : public Base
 {
+public:
     static const char* GetTypeName() { return "Derived2"; }
 
     virtual const char* GetRuntimeTypeName() const override { return GetTypeName(); };
@@ -123,6 +126,18 @@ void Construct(std::string runtimeTypeName, std::unique_ptr<Base>& value)
     }
 }
 
+void TypeFactoryTest()
+{
+    utilities::TypeFactory factory;
+    factory.Add<Derived1>();
+    factory.Add<Derived2>();
+
+    auto derived1 = factory.Construct<Base>(Derived1::GetTypeName());
+    auto derived2 = factory.Construct<Base>(Derived2::GetTypeName());
+
+    testing::ProcessTest("TypeFactory", std::strcmp(derived1->GetRuntimeTypeName(), Derived1::GetTypeName())==0 && std::strcmp(derived2->GetRuntimeTypeName(), Derived2::GetTypeName())==0);
+}
+
 void XMLSerializationTest()
 {
     std::vector<std::unique_ptr<Base>> vec;
@@ -147,6 +162,7 @@ void XMLSerializationTest()
 int main()
 {
     XMLSerializationTest();
+    TypeFactoryTest();
 
     if (testing::DidTestFail())
     {
