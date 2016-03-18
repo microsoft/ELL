@@ -11,14 +11,13 @@
 #pragma once
 
 #include "Coordinate.h"
-#include "Map.h"
 
 // stl
 #include <string>
 
 namespace layers
 {
-    class Map;
+    class Stack;
 
     /// <summary>
     /// Gets a coordinate list from a coordinate list definition string. The string has the following format

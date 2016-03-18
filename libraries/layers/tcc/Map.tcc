@@ -77,22 +77,4 @@ namespace layers
         OutputIterator outputIterator(std::move(outputs));
         return outputIterator;
     }
-
-    template <typename LayerType>
-    const LayerType& Stack::GetLayer(uint64 layerIndex) const
-    {
-        return dynamic_cast<const LayerType&>(*_layers[layerIndex]);
-    }
-
-    template<typename StackType>
-    StackType Stack::Load(const std::string& inputMapFile)
-    {
-        auto inputMapFStream = utilities::OpenIfstream(inputMapFile);
-        utilities::XMLDeserializer deserializer(inputMapFStream);
-
-        StackType map;
-        deserializer.Deserialize(map);
-        return map;
-    }
-
 }

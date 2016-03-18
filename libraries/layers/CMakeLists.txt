@@ -18,6 +18,7 @@ set (SRC src/Coordinate.cpp
          src/Layer.cpp
          src/Map.cpp
          src/ConstructLayer.cpp
+         src/Stack.cpp
          src/Sum.cpp)
 
 set (INCLUDE include/Coordinate.h
@@ -27,9 +28,11 @@ set (INCLUDE include/Coordinate.h
              include/Layer.h
              include/Map.h
              include/ConstructLayer.h
+             include/Stack.h
              include/Sum.h)
 
-set (TCC tcc/Map.tcc)
+set (TCC tcc/Map.tcc
+         tcc/Stack.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
