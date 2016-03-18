@@ -43,8 +43,6 @@ namespace layers
         }
     }
 
-    /// \returns The current index-value pair
-    ///
     IndexValue Map::OutputIterator::Get() const
     {
         auto coordinate = _outputCoordinates[_index];
@@ -59,7 +57,6 @@ namespace layers
     {
         AllocateLayerOutputs(layers);
     }
-
 
     //
     // Map class implementation
@@ -88,15 +85,16 @@ namespace layers
 
     void Map::Read(utilities::XMLDeserializer& deserializer)
     {
-        deserializer.RegisterPolymorphicType<Input>();
-        deserializer.RegisterPolymorphicType<Coordinatewise>();
-        deserializer.RegisterPolymorphicType<Sum>();
-
         int version = 0;
         deserializer.Deserialize("version", version);
         if (version == 1)
         {
-            deserializer.Deserialize("layers", _layers);
+            utilities::TypeFactory<Layer> factory;
+            factory.AddType<Input>();
+            factory.AddType<Coordinatewise>();
+            factory.AddType<Sum>();
+            
+            deserializer.Deserialize("layers", _layers, factory);
         }
         else
         {

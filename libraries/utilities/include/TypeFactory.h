@@ -18,22 +18,21 @@
 
 namespace utilities
 {
-
+    template<typename BaseType>
     class TypeFactory
     {
     public:
 
-        template<typename T>
-        std::unique_ptr<T> Construct(const std::string& typeName) const;
+        std::unique_ptr<BaseType> Construct(const std::string& typeName) const;
 
-        template<typename T>
-        void Add();
+        template<typename RuntimeType>
+        void AddType();
 
-        template<typename T>
-        void Add(const std::string& typeName);
+        template<typename RuntimeType>
+        void AddType(const std::string& typeName);
 
     private:
-        std::unordered_map<std::string, std::function<void*()>> _typeMap;
+        std::unordered_map<std::string, std::function<std::unique_ptr<BaseType>()>> _typeMap;
     };
 }
 

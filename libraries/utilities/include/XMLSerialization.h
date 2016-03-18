@@ -41,14 +41,6 @@ namespace utilities
         template<typename ValueType>
         void Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
 
-        /// <summary> Serialize a vector. </summary>
-        ///
-        /// <typeparam name="ElementType"> The type of vector elements being serialized. </typeparam>
-        /// <param name="name"> Name of the variable being serialized. </param>
-        /// <param name="value"> The vector being serialized. </param>
-        template<typename ElementType>
-        void Serialize(const char* name, const std::vector<ElementType>& value);
-
         /// <summary> Serialize a unique pointer to a polymorphic class. </summary>
         ///
         /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
@@ -56,6 +48,14 @@ namespace utilities
         /// <param name="value"> The variable being serialized. </param>
         template<typename ValueType>
         void Serialize(const char* name, const std::unique_ptr<ValueType>& value);
+
+        /// <summary> Serialize a vector. </summary>
+        ///
+        /// <typeparam name="ElementType"> The type of vector elements being serialized. </typeparam>
+        /// <param name="name"> Name of the variable being serialized. </param>
+        /// <param name="value"> The vector being serialized. </param>
+        template<typename ElementType>
+        void Serialize(const char* name, const std::vector<ElementType>& value);
 
         /// <summary> Serialize a std::string. </summary>
         ///
@@ -78,19 +78,19 @@ namespace utilities
         template<typename ValueType>
         void Serialize(const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
 
-        /// <summary> Serialize an unnamed vector. </summary>
-        ///
-        /// <typeparam name="ElementType"> The type of vector elements being serialized. </typeparam>
-        /// <param name="value"> The vector being serialized. </param>
-        template<typename ElementType>
-        void Serialize(const std::vector<ElementType>& value);
-
         /// <summary> Serialize an unnamed unique pointer to a polymorphic class. </summary>
         ///
         /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
         /// <param name="value"> The variable being serialized. </param>
         template<typename ValueType>
         void Serialize(const std::unique_ptr<ValueType>& value);
+
+        /// <summary> Serialize an unnamed vector. </summary>
+        ///
+        /// <typeparam name="ElementType"> The type of vector elements being serialized. </typeparam>
+        /// <param name="value"> The vector being serialized. </param>
+        template<typename ElementType>
+        void Serialize(const std::vector<ElementType>& value);
 
         /// <summary> Serialize an unnamed std::string. </summary>
         ///
@@ -137,23 +137,6 @@ namespace utilities
         /// <param name="iStream"> [in,out] The input stream. </param>
         XMLDeserializer(std::istream& stream);
 
-        /// <summary>
-        /// Registers a polymorphic runtime type for deserialization with its default name.
-        /// </summary>
-        ///
-        /// <typeparam name="T"> The type being registered. </typeparam>
-        template<typename T>
-        void RegisterPolymorphicType();
-
-        /// <summary>
-        /// Registers a polymorphic runtime type for deserialization with a given type name.
-        /// </summary>
-        ///
-        /// <typeparam name="T"> The type being registered. </typeparam>
-        /// <param name="typeName"> Name of the type. </param>
-        template<typename T>
-        void RegisterPolymorphicType(const std::string& typeName);
-
         /// <summary> Deserialize fundamental types. </summary>
         ///
         /// <typeparam name="ValueType"> The type being deserialized. </typeparam>
@@ -162,6 +145,17 @@ namespace utilities
         template<typename ValueType>
         void Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
 
+        /// <summary> Deserialize a unique pointer to a polymorphic class. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
+        /// <param name="name"> Name of the variable being deserialized, which is compared to the serialized version. </param>
+        /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
+        template<typename BaseType>
+        void Deserialize(const char* name, std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory); // TODO fix documentation
+
+        template<typename BaseType>
+        void Deserialize(const char* name, std::vector<std::unique_ptr<BaseType>>& value, const TypeFactory<BaseType>& factory);
+
         /// <summary> Deserialize vector types. </summary>
         ///
         /// <typeparam name="ElementType"> The type of vector elements being deserialized. </typeparam>
@@ -169,14 +163,6 @@ namespace utilities
         /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
         template<typename ElementType>
         void Deserialize(const char* name, std::vector<ElementType>& value);
-
-        /// <summary> Deserialize a unique pointer to a polymorphic class. </summary>
-        ///
-        /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
-        /// <param name="name"> Name of the variable being deserialized, which is compared to the serialized version. </param>
-        /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
-        template<typename ValueType>
-        void Deserialize(const char* name, std::unique_ptr<ValueType>& value);
 
         /// <summary> Deserialize a string. </summary>
         ///
@@ -199,19 +185,22 @@ namespace utilities
         template<typename ValueType>
         void Deserialize(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
 
+        /// <summary> Deserialize an unnamed unique pointer to a polymorphic class. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
+        /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
+        template<typename BaseType>
+        void Deserialize(std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory); // TODO fix documentation
+
+        template<typename BaseType>
+        void Deserialize(std::vector<std::unique_ptr<BaseType>>& value, const TypeFactory<BaseType>& factory);
+
         /// <summary> Deserialize unnamed vector types. </summary>
         ///
         /// <typeparam name="ElementType"> The type of vector elements being deserialized. </typeparam>
         /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
         template<typename ElementType>
         void Deserialize(std::vector<ElementType>& value);
-
-        /// <summary> Deserialize an unnamed unique pointer to a polymorphic class. </summary>
-        ///
-        /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
-        /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
-        template<typename ValueType>
-        void Deserialize(std::unique_ptr<ValueType>& value);
 
         /// <summary> Deserialize an unnamed string. </summary>
         ///
@@ -247,7 +236,6 @@ namespace utilities
 
         std::string _string;
         const char* _pStr;
-        TypeFactory _polymorphicTypeFactory;
     };
 }
 

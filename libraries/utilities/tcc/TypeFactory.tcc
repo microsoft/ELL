@@ -10,29 +10,32 @@
 
 namespace utilities
 {
-    template<typename T>
-    std::unique_ptr<T> TypeFactory::Construct(const std::string& typeName) const
+    template<typename BaseType>
+    std::unique_ptr<BaseType> TypeFactory<BaseType>::Construct(const std::string& typeName) const
     {
         auto entry = _typeMap.find(typeName);
         if (entry == _typeMap.end())
         {
-            throw std::runtime_error("type " + typeName + " not registered in TypeFactory");
+            throw std::runtime_error("type " + typeName + " not registered in TypeFactory<" + BaseType::GetTypeName() + ">");
         }
 
-        auto ptr = static_cast<T*>(entry->second());
-        return std::unique_ptr<T>(ptr);
+        return entry->second();
     }
 
-    template<typename T>
-    void TypeFactory::Add()
+    template<typename BaseType>
+    template<typename RuntimeType>
+    void TypeFactory<BaseType>::AddType()
     {
-        std::string typeName = T::GetTypeName();
-        Add<T>(typeName);
+        std::string typeName = RuntimeType::GetTypeName();
+        AddType<RuntimeType>(typeName);
     }
 
-    template<typename T>
-    void TypeFactory::Add(const std::string& typeName)
+    template<typename BaseType>
+    template<typename RuntimeType>
+    void TypeFactory<BaseType>::AddType(const std::string& typeName)
     {
-        _typeMap[typeName] = []() -> void* { return new T; };
+        static_assert(std::is_base_of<BaseType, RuntimeType>::value, "incompatible base and runtime types in TypeFactory::Add");
+
+        _typeMap[typeName] = []() -> std::unique_ptr<BaseType> { return std::make_unique<RuntimeType>(); };
     }
 }
