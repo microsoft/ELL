@@ -20,7 +20,7 @@
 
 namespace layers
 {
-    const int LayerStack::_currentVersion;
+    const int Stack::_currentVersion;
 
     //
     // Map::OutputIterator implementation
@@ -49,15 +49,15 @@ namespace layers
     {}
 
     //
-    // LayerStack class implementation
+    // Stack class implementation
     //
-    LayerStack::LayerStack()
+    Stack::Stack()
     {
         _layers.push_back(std::make_unique<Input>());
     }
 
 
-    uint64 LayerStack::AddLayer(std::unique_ptr<Layer>&& layer)
+    uint64 Stack::AddLayer(std::unique_ptr<Layer>&& layer)
     {
         uint64 maxInputSize = 0;
         auto numLayers = _layers.size();
@@ -94,7 +94,7 @@ namespace layers
         return layerIndex;
     }
 
-    uint64 LayerStack::NumLayers() const
+    uint64 Stack::NumLayers() const
     {
         return _layers.size();
     }
@@ -106,15 +106,14 @@ namespace layers
 
     Map::Map()
     {
-        // #### TODO: should the default constructor keep a null layer stack, create an empty one, or be inaccessible
+        // #### TODO: should the default constructor keep a null layer stack, create an empty one, or be inaccessible?
     }
 
-    Map::Map(const std::shared_ptr<LayerStack>& layers) : _layerStack(layers)
+    Map::Map(const std::shared_ptr<Stack>& layers) : _layerStack(layers)
     {}
 
     CoordinateList Map::GetOutputCoordinates() const
     {
-        // #### TODO: take into account _inputSize
         auto outputCoordinates = _outputCoordinates;
         if (outputCoordinates.size() == 0)
         {
@@ -146,10 +145,12 @@ namespace layers
         auto numLayers = _layerStack->NumLayers();
         std::vector<std::vector<double>> layerOutputs;
         layerOutputs.resize(numLayers);
+
+        // TODO: When we keep the outputs around instead of reallocating them for every call to compute, we'll need to ensure they're big enough
         for (uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
         {
             auto layerSize = _layerStack->GetLayer(layerIndex).Size();
-            // #### Yuck:
+            // #### TODO: This is gross. Can we make it simpler?
             if (layerIndex == 0) // input layer
             {
                 layerSize = std::max(layerSize, _maxInputSize);
@@ -160,12 +161,12 @@ namespace layers
         return layerOutputs;
     }
 
-    const char* LayerStack::GetTypeName()
+    const char* Stack::GetTypeName()
     {
         return "Map";
     }
 
-    void LayerStack::Read(utilities::XMLDeserializer& deserializer)
+    void Stack::Read(utilities::XMLDeserializer& deserializer)
     {
         int version = 0;
         deserializer.Deserialize("version", version);
@@ -179,19 +180,19 @@ namespace layers
         }
     }
 
-    void LayerStack::Write(utilities::XMLSerializer& serializer) const
+    void Stack::Write(utilities::XMLSerializer& serializer) const
     {
         serializer.Serialize("version", _currentVersion);
         serializer.Serialize("layers", _layers);
     }
 
-    void LayerStack::Save(std::ostream& os) const
+    void Stack::Save(std::ostream& os) const
     {
         utilities::XMLSerializer serializer(os);
         serializer.Serialize(*this);
     }
 
-    void LayerStack::IncreaseInputLayerSize(uint64 minSize) const
+    void Stack::IncreaseInputLayerSize(uint64 minSize) const
     {
         // #### ???
         GetLayer<Input&>(0).IncreaseSize(minSize);

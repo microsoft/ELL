@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 
         // open file
         // ####
-        auto layerStack = std::make_shared<CompilableMap>(layers::LayerStack::Load<CompilableMap>(mapLoadArguments.inputMapFile));
+        auto layerStack = std::make_shared<CompilableMap>(layers::Stack::Load<CompilableMap>(mapLoadArguments.inputMapFile));
         auto map = layers::Map(layerStack);
         //        auto map = layers::Map::Load<CompilableMap>(mapLoadArguments.inputMapFile);
 

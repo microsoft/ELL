@@ -81,18 +81,18 @@ namespace layers
     }
 
     template <typename LayerType>
-    const LayerType& LayerStack::GetLayer(uint64 layerIndex) const
+    const LayerType& Stack::GetLayer(uint64 layerIndex) const
     {
         return dynamic_cast<const LayerType&>(*_layers[layerIndex]);
     }
 
-    template<typename MapType>
-    MapType LayerStack::Load(const std::string& inputMapFile)
+    template<typename StackType>
+    StackType Stack::Load(const std::string& inputMapFile)
     {
         auto inputMapFStream = utilities::OpenIfstream(inputMapFile);
         utilities::XMLDeserializer deserializer(inputMapFStream);
 
-        MapType map;
+        StackType map;
         deserializer.Deserialize(map);
         return map;
     }

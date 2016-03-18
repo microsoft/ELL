@@ -36,7 +36,7 @@ namespace layers
     /// <param name="coordinateListString"> The coordinate list definition string. </param>
     ///
     /// <returns> The coordinate list. </returns>
-    layers::CoordinateList GetCoordinateList(const layers::LayerStack& map, const std::string& coordinateListString);
+    layers::CoordinateList GetCoordinateList(const layers::Stack& map, const std::string& coordinateListString);
 
     /// <summary> Gets the list of coordinates in a given layer in a map. </summary>
     ///
@@ -44,7 +44,7 @@ namespace layers
     /// <param name="layerIndex"> Zero-based index of the layer. </param>
     ///
     /// <returns> The coordinate list. </returns>
-    layers::CoordinateList GetCoordinateList(const layers::LayerStack& map, uint64 layerIndex);
+    layers::CoordinateList GetCoordinateList(const layers::Stack& map, uint64 layerIndex);
 
     /// <summary> Constructs a coordinate list which is a sequence of consecutive elements on one layer. </summary>
     ///

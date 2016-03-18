@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 
         // read map from file
         //        std::shared_ptr<layers::Map> map = GetMap(mapLoadArguments);
-        std::shared_ptr<layers::LayerStack> map = common::GetLayerStack(mapLoadArguments);
+        std::shared_ptr<layers::Stack> map = common::GetLayerStack(mapLoadArguments);
         auto realMap = std::make_shared<layers::Map>(map);
         //        std::shared_ptr<layers::Map> map = GetMap(mapLoadArguments);
 

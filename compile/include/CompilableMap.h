@@ -21,7 +21,7 @@
 #include <iostream>
 
 /// <summary> A compilable map. </summary>
-class CompilableMap : public layers::LayerStack
+class CompilableMap : public layers::Stack
 {
 public:
     /// <summary> Generates C code that encodes the map. </summary>

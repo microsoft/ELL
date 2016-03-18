@@ -49,7 +49,7 @@ namespace predictors
         return _sp_predictor->b;
     }
 
-    void SharedLinearBinaryPredictor::AddToMap(layers::LayerStack& map, const layers::CoordinateList& inputCoordinates) const
+    void SharedLinearBinaryPredictor::AddToMap(layers::Stack& map, const layers::CoordinateList& inputCoordinates) const
     {
         uint64 layerIndex = map.AddLayer(std::make_unique<layers::Coordinatewise>(_sp_predictor->w, inputCoordinates, layers::Coordinatewise::OperationType::multiply));
         auto coordinates = layers::GetCoordinateList(map, layerIndex);

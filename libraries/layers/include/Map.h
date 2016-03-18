@@ -2,7 +2,7 @@
 //
 //  Project:  [projectName]
 //  File:     Map.h (layers)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //
@@ -24,34 +24,34 @@
 
 namespace layers
 {
-    /// <summary> Implements a layer stack. </summary>
-    class LayerStack
+    /// <summary> Implements a stack of layers. </summary>
+    class Stack
     {
     public:
 
-        /// <summary> Constructs an instance of Map. </summary>
-        LayerStack();
+        /// <summary> Constructs an instance of Stack. </summary>
+        Stack();
 
         /// <summary> Deleted copy constructor </summary>
-        LayerStack(const LayerStack&) = delete;
+        Stack(const Stack&) = delete;
 
         /// <summary> Default move constructor </summary>
-        LayerStack(LayerStack&&) = default;
+        Stack(Stack&&) = default;
 
         /// <summary> Virtual destructor. </summary>
-        virtual ~LayerStack() = default;
+        virtual ~Stack() = default;
 
 
-        /// <summary> Adds a layer to the map. </summary>
+        /// <summary> Adds a layer to the stack. </summary>
         ///
-        /// <param name="layer"> The layer to add to the map. </param>
+        /// <param name="layer"> The layer to add to the stack. </param>
         ///
         /// <returns> The index of the added layer. </returns>
         uint64 AddLayer(std::unique_ptr<Layer>&& layer);
 
-        /// <summary> Returns the number of layers in the map. </summary>
+        /// <summary> Returns the number of layers in the stack. </summary>
         ///
-        /// <returns> The total number of layers in the map. </returns>
+        /// <returns> The total number of layers in the stack. </returns>
         uint64 NumLayers() const;
 
         /// <summary> Gets a Layer cast as a specified layer type, used when derived classes add functionality to layers </summary>
@@ -63,16 +63,16 @@ namespace layers
         template <typename LayerType = Layer>
         const LayerType& GetLayer(uint64 layerIndex) const;
 
-        /// <summary> Static function that loads a Map from file. </summary>
+        /// <summary> Static function that loads a Stack from file. </summary>
         ///
-        /// <typeparam name="MapType"> Map type to load. </typeparam>
-        /// <param name="inputMapFile"> Name of the map file to load. </param>
+        /// <typeparam name="StackType"> Stack type to load. </typeparam>
+        /// <param name="inputMapFile"> Name of the stack file to load. </param>
         ///
-        /// <returns> A MapType. </returns>
-        template<typename MapType = LayerStack>
-        static MapType Load(const std::string& inputMapFile);
+        /// <returns> A StackType. </returns>
+        template<typename StackType = Stack>
+        static StackType Load(const std::string& inputMapFile);
 
-        /// <summary> Saves a map to an output stream. </summary>
+        /// <summary> Saves a stack to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         void Save(std::ostream& os) const;
@@ -82,12 +82,12 @@ namespace layers
         /// <returns> The name of this type. </returns>
         static const char* GetTypeName();
 
-        /// <summary> Reads the map from an XMLDeserializer. </summary>
+        /// <summary> Reads the stack from an XMLDeserializer. </summary>
         ///
         /// <param name="deserializer"> [in,out] The deserializer. </param>
         void Read(utilities::XMLDeserializer& deserializer);
 
-        /// <summary> Writes the map to an XMLSerializer. </summary>
+        /// <summary> Writes the stack to an XMLSerializer. </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
         void Write(utilities::XMLSerializer& serializer) const;
@@ -101,7 +101,6 @@ namespace layers
     private:
         static const int _currentVersion = 1;
     };
-
 
     /// <summary> Implements a map. </summary>
     class Map
@@ -138,7 +137,7 @@ namespace layers
         Map();
 
         /// <summary> Constructs an instance of pointing to an existing stack of layers. </summary>
-        Map(const std::shared_ptr<LayerStack>& layers);
+        Map(const std::shared_ptr<Stack>& layers);
 
         /// <summary> Deleted copy constructor </summary>
         Map(const Map&) = delete;
@@ -160,17 +159,17 @@ namespace layers
 
         /// <summary> Returns the current output coordinates for the map. </summary>
         ///
-        /// <returns> The currently-set output coordinates. </returns>
+        /// <returns> The current output coordinates. </returns>
         CoordinateList GetOutputCoordinates() const;
 
         /// <summary> Sets the output coordinates for the map. </summary>
         ///
-        /// <param name="coordinates"> The currently-set output coordinates. </param>
+        /// <param name="coordinates"> The new output coordinates. </param>
         void SetOutputCoordinates(const CoordinateList& coordinates);
 
     protected:
         // members
-        std::shared_ptr<LayerStack> _layerStack;
+        std::shared_ptr<Stack> _layerStack;
 
         void IncreaseInputLayerSize(uint64 minSize) const;
 
@@ -178,7 +177,7 @@ namespace layers
         void LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const;
 
     private:
-        mutable uint64 _maxInputSize = 0;
+        mutable uint64 _maxInputSize = 0; // keeps track of the largest input we've seen so far
         mutable CoordinateList _outputCoordinates; // zero-size means "use all of last layer"
         std::vector<std::vector<double>> AllocateLayerOutputs() const;
     };
