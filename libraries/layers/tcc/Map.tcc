@@ -46,7 +46,7 @@ namespace layers
         SetArray(layerOutputs, inputIterator);
         
         // update the input layer to handle vectors of this size
-        UpdateInputLayer((uint64)layerOutputs.size());
+        IncreaseInputLayerSize((uint64)layerOutputs.size());
     }
 
     template<typename IndexValueIteratorType, typename concept>

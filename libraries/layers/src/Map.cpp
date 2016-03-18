@@ -87,7 +87,7 @@ namespace layers
 
         // Update input layer (layer 0)
         // #### 
-        UpdateInputLayer(maxInputSize);
+        IncreaseInputLayerSize(maxInputSize);
 
         uint64 layerIndex = _layers.size();
         _layers.push_back(std::move(layer));
@@ -114,6 +114,7 @@ namespace layers
 
     CoordinateList Map::GetOutputCoordinates() const
     {
+        // #### TODO: take into account _inputSize
         auto outputCoordinates = _outputCoordinates;
         if (outputCoordinates.size() == 0)
         {
@@ -172,10 +173,17 @@ namespace layers
         serializer.Serialize(*this);
     }
 
-    void Map::UpdateInputLayer(uint64 minSize) const
+    void LayerStack::IncreaseInputLayerSize(uint64 minSize) const
+    {
+        // #### ???
+        GetLayer<Input&>(0).IncreaseSize(minSize);
+    }
+
+    void Map::IncreaseInputLayerSize(uint64 minSize) const
     {
         _inputSize = std::max(minSize, _inputSize);
 //        GetLayer<Input&>(0).IncreaseSize(minSize);
     }
+
 
 }

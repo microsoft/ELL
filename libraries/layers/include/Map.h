@@ -95,7 +95,8 @@ namespace layers
     protected:
         // members
         std::vector<std::unique_ptr<Layer>> _layers;
-        void UpdateInputLayer(uint64 minSize) const;
+
+        void IncreaseInputLayerSize(uint64 minSize) const;
 
     private:
         static const int _currentVersion = 1;
@@ -171,7 +172,7 @@ namespace layers
         // members
         std::shared_ptr<LayerStack> _layerStack;
 
-        void UpdateInputLayer(uint64 minSize) const;
+        void IncreaseInputLayerSize(uint64 minSize) const;
 
         template <typename IndexValueIteratorType>
         void LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const;

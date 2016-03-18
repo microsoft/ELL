@@ -48,13 +48,17 @@ int main(int argc, char* argv[])
         auto outStream = utilities::GetOutputStreamImpostor(compileArguments.outputCodeFile);
 
         // open file
-        auto map = layers::Map::Load<CompilableMap>(mapLoadArguments.inputMapFile);
+        // ####
+        auto layerStack = std::make_shared<CompilableMap>(layers::LayerStack::Load<CompilableMap>(mapLoadArguments.inputMapFile));
+        auto map = layers::Map(layerStack);
+        //        auto map = layers::Map::Load<CompilableMap>(mapLoadArguments.inputMapFile);
 
         // construct coordinate list
-        auto coordinateList = layers::GetCoordinateList(map, mapLoadArguments.coordinateList);
+        auto coordinateList = layers::GetCoordinateList(*layerStack, mapLoadArguments.coordinateList);
 
         // output code
-        map.ToCode(outStream, coordinateList);
+        // #### TODO: map->ToCode(outStream) ??? --- but then we need a compilableMap to be a map, not a layerstack 
+        layerStack->ToCode(outStream, coordinateList);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
