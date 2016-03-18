@@ -145,17 +145,24 @@ namespace utilities
         template<typename ValueType>
         void Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
 
-        /// <summary> Deserialize a unique pointer to a polymorphic class. </summary>
+        /// <summary> Deserialize a unique pointer to a polymorphic class using the default type factory. </summary>
         ///
         /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
         /// <param name="name"> Name of the variable being deserialized, which is compared to the serialized version. </param>
         /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
         template<typename BaseType>
-        void Deserialize(const char* name, std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory); // TODO fix documentation
+        void Deserialize(const char* name, std::unique_ptr<BaseType>& value); 
 
+        /// <summary> Deserialize a unique pointer to a polymorphic class using the supplied type factory. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
+        /// <param name="name"> Name of the variable being deserialized, which is compared to the serialized version. </param>
+        /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
+        /// <param name="factory"> Const reference to the type factory to use to construct the object being deserialized. </param>
         template<typename BaseType>
-        void Deserialize(const char* name, std::unique_ptr<BaseType>& value); // TODO fix documentation
+        void Deserialize(const char* name, std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory);
 
+        // TODO: documentation for array-of-pointer
         template<typename BaseType>
         void Deserialize(const char* name, std::vector<std::unique_ptr<BaseType>>& value);
 
