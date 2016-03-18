@@ -19,6 +19,7 @@
 // utilities
 #include "XMLSerialization.h"
 #include "StlIterator.h"
+#include "TypeFactory.h"
 
 // stl
 #include <vector>
@@ -72,6 +73,8 @@ namespace layers
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Write(utilities::XMLSerializer& serializer) const = 0;
+
+        static utilities::TypeFactory<Layer> GetTypeFactory();
     };
 }
 

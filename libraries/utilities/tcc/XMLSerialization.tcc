@@ -209,6 +209,14 @@ namespace utilities
 
     // deserialize pointers to polymorphic classes
     template<typename BaseType>
+    void XMLDeserializer::Deserialize(const char* name, std::unique_ptr<BaseType>& value)
+    {
+        const auto& factory = BaseType::GetTypeFactory();
+        Deserialize(name, value, factory);
+    }
+
+    // deserialize pointers to polymorphic classes
+    template<typename BaseType>
     void XMLDeserializer::Deserialize(const char* name, std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory)
     {
         auto typeName = TypeName<std::unique_ptr<BaseType>>::GetName();
@@ -221,6 +229,14 @@ namespace utilities
 
         ReadCloseTag(Match(runtimeTypeName));
         ReadCloseTag(Match(typeName));
+    }
+
+    // deserialize vectors of pointers
+    template<typename BaseType>
+    void XMLDeserializer::Deserialize(const char * name, std::vector<std::unique_ptr<BaseType>>& value)
+    {
+        const auto& factory = BaseType::GetTypeFactory();
+        Deserialize(name, value, factory);
     }
 
     // deserialize vectors of pointers

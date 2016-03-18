@@ -154,6 +154,12 @@ namespace utilities
         void Deserialize(const char* name, std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory); // TODO fix documentation
 
         template<typename BaseType>
+        void Deserialize(const char* name, std::unique_ptr<BaseType>& value); // TODO fix documentation
+
+        template<typename BaseType>
+        void Deserialize(const char* name, std::vector<std::unique_ptr<BaseType>>& value);
+
+        template<typename BaseType>
         void Deserialize(const char* name, std::vector<std::unique_ptr<BaseType>>& value, const TypeFactory<BaseType>& factory);
 
         /// <summary> Deserialize vector types. </summary>

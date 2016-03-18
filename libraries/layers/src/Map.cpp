@@ -88,13 +88,8 @@ namespace layers
         int version = 0;
         deserializer.Deserialize("version", version);
         if (version == 1)
-        {
-            utilities::TypeFactory<Layer> factory;
-            factory.AddType<Input>();
-            factory.AddType<Coordinatewise>();
-            factory.AddType<Sum>();
-            
-            deserializer.Deserialize("layers", _layers, factory);
+        {            
+            deserializer.Deserialize("layers", _layers);
         }
         else
         {
