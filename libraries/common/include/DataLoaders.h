@@ -40,22 +40,6 @@ namespace common
     /// <returns> The data iterator. </returns>
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments);
 
-    /// <summary> Gets a mapped data iterator, based on command line parameters, a map, and a
-    /// coordinate list. </summary>
-    ///
-    /// <param name="dataLoadArguments"> The data load arguments. </param>
-    /// <param name="mapLoadArguments"> The map load arguments. </param>
-    /// <param name="rowDataset"> [in,out] The row dataset. </param>
-    /// <param name="map"> [in,out] The map. </param>
-    /// <param name="inputCoordinates"> [in,out] The input coordinates. </param>
-    void GetRowDatasetMapCoordinates(
-        const DataLoadArguments& dataLoadArguments,
-        const MapLoadArguments& mapLoadArguments,
-        dataset::RowDataset& rowDataset,
-        std::shared_ptr<layers::Map>& map, // going to have to be a shared_ptr<Map>&
-        layers::CoordinateList& inputCoordinates);
-
-
     /// <summary> Gets the map specified by the command line parameters </summary>
     ///
     /// <param name="mapLoadArguments"> The map load arguments. </param>
@@ -71,21 +55,19 @@ namespace common
     /// <returns> The input coordinates to use for the map. </returns>
     layers::CoordinateList GetInputCoordinates(const layers::Map& map, const MapLoadArguments& mapLoadArguments);
 
-    /// <summary> Loads a RowDataset from the data iterator returned by GetDataIterator </summary>
-    ///
-    /// <param name="dataIterator"> The data iterator to use to populate the dataset </param>
-    ///
-    /// <returns> The dataset. </returns>
-    dataset::RowDataset LoadDataset(dataset::IParsingIterator& dataIterator);
-
-    /// <summary> Gets a mapped data iterator, based on command line parameters, a map, and a
-    /// coordinate list. </summary>
+    /// <summary> Gets a dataset from a data file, based on command line parameters. </summary>
     ///
     /// <param name="dataLoadArguments"> The data load arguments. </param>
-    /// <param name="map"> The map. </param>
-    /// <param name="inputCoordinates"> The list of input coordinates. </param>
     ///
-    /// <returns> The data iterator. </returns>
-    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
+    /// <returns> The dataset read in from the file. </returns>
+    std::unique_ptr<dataset::RowDataset> GetDataset(const DataLoadArguments& dataLoadArguments);
+
+    /// <summary> Gets a dataset by passing a dataset through a map, based on command line parameters. </summary>
+    ///
+    /// <param name="dataLoadArguments"> The data load arguments. </param>
+    /// <param name="mapLoadArguments"> The map load arguments. </param>
+    ///
+    /// <returns> The dataset produced by running the input dataset through the map. </returns>
+    std::unique_ptr<dataset::RowDataset> GetDataset(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates);
 }
 

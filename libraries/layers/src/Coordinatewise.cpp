@@ -69,10 +69,12 @@ namespace layers
             return std::plus<double>();
         case OperationType::multiply:
             return std::multiplies<double>();
+
         }
 
         throw std::runtime_error("unrecognized operation type");
     }
+
 
     Coordinatewise::OperationType Coordinatewise::GetOperationType() const
     {
@@ -84,15 +86,15 @@ namespace layers
         return _inputCoordinates.size();
     }
 
-    void Coordinatewise::Compute(uint64 layerIndex, std::vector<std::vector<double>>& outputs) const 
+    void Coordinatewise::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
     {
         auto operation = GetOperation(_operationType);
 
         for(uint64 k=0; k<_values.size(); ++k)
         {
             Coordinate coordinate = _inputCoordinates[k];
-            double input = outputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
-            outputs[layerIndex][k] = operation(_values[k], input);
+            double input = inputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
+            outputs[k] = operation(_values[k], input);
         }
     }
 
@@ -128,7 +130,7 @@ namespace layers
             throw std::runtime_error("unsupported version: " + std::to_string(version));
         }
     }
-
+    
     void Coordinatewise::Write(utilities::XMLSerializer& serializer) const
     {
         serializer.Serialize("version", _currentVersion);

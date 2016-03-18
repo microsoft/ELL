@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     OutputStream.h (common)
+//  File:     OutputStreamImpostor.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 //  [copyright]
@@ -30,8 +30,12 @@ namespace utilities
         /// <param name="filenameOrEmpty">Either a filename or the empty string</param>
         OutputStreamImpostor(std::string filenamOrEmpty);
 
+        /// <summary> Casting operator that returns a reference to an ostream. This allows us to use an OutputStreamImpostor 
+        /// in most places where an ostream would be accepted. </summary>
         operator std::ostream&() &;
 
+        /// <summary> Casting operator that returns a const reference to an ostream. This allows us to use an OutputStreamImpostor 
+        /// in most places where a const ostream reference would be accepted. </summary>
         operator std::ostream const&() const &;
 
     private:
@@ -45,5 +49,5 @@ namespace utilities
     /// <param name="filenameOrEmpth"> The filename or an empty string. </param>
     ///
     /// <returns> The imposter for the stream. </returns>
-    OutputStreamImpostor GetOutputStream(std::string filenameOrEmpty);
+    OutputStreamImpostor GetOutputStreamImpostor(std::string filenameOrEmpty);
 }

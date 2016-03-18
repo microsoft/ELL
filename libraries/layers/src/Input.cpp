@@ -13,12 +13,13 @@
 // stl
 #include <string>
 #include <stdexcept>
+#include <algorithm>
 
 namespace layers
 {
     const int Input::_currentVersion;
 
-    Input::Input(uint64 size) : _size(size)
+    Input::Input() : _size(0)
     {}
 
     uint64 Input::Size() const
@@ -26,7 +27,12 @@ namespace layers
         return _size;
     }
 
-    void Input::Compute(uint64 layerIndex, std::vector<std::vector<double>>& outputs) const
+    void Input::IncreaseSize(uint64 minimumSize)
+    {
+        _size = std::max(_size, minimumSize);
+    }
+
+    void Input::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
     {
         throw std::runtime_error("this code should never be reached");
     }

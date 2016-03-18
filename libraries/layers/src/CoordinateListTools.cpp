@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CoordinateListTools.h"
+#include "Map.h"
 
 // utilities
 #include "Parser.h"
@@ -73,27 +74,35 @@ namespace layers
     {
         layers::CoordinateList coordinateList;
 
+        // special case for 'e' when map has just 1 layer (the input layer)
+        if (coordinateListString == "e" && map.NumLayers() == 1)
+        {
+            return coordinateList;
+        }
+
+
         if(map.NumLayers() > 0)
         {
             const char* pStr = coordinateListString.c_str();
             const char* pEnd = pStr + coordinateListString.size();
 
+
             while(pStr < pEnd)
             {
                 // read layer Index
                 uint64 layerIndex = ParseIndex(pStr, map.NumLayers() - 1);
-
+                
                 // read element index
                 uint64 fromElementIndex = 0;
-                uint64 maxElementIndex = map.GetLayer(layerIndex).Size() - 1;
+                uint64 maxElementIndex = map.GetLayer(layerIndex).Size() - 1; // Fails when layer has size 0
                 uint64 toElementIndex = maxElementIndex;
-
+                
                 // case: no elements specified - take entire layer
                 if(*pStr == ';')
                 {
                     ++pStr;
                 }
-
+                
                 // case: elements specified
                 else if(*pStr == ',')
                 {
@@ -117,10 +126,10 @@ namespace layers
                 AddCoordinates(coordinateList, layerIndex, fromElementIndex, toElementIndex);
             }
         }
-
+        
         return coordinateList;
     }
-
+    
     layers::CoordinateList GetCoordinateList(const layers::Map& map, uint64 layerIndex)
     {
         return GetCoordinateList(layerIndex, 0, map.GetLayer(layerIndex).Size()-1);

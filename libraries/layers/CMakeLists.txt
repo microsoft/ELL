@@ -5,7 +5,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 set (PROJ_NAME layers)
-
 PROJECT(${PROJ_NAME})
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
@@ -38,6 +37,8 @@ source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(tcc)
+include_directories(../layers/include)
+include_directories(../testing/include)
 include_directories(../types/include)
 include_directories(../utilities/include)
 
@@ -53,7 +54,7 @@ set (TEST_NAME ${PROJ_NAME}_test)
 
 add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} layers utilities)
+target_link_libraries(${TEST_NAME} layers testing utilities)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

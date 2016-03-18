@@ -18,7 +18,7 @@
 
 // utilities
 #include "Files.h"
-#include "OutputStream.h"
+#include "OutputStreamImpostor.h"
 
 // stl
 #include <iostream>
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        auto outStream = utilities::GetOutputStream(dataSaveArguments.outputDataFile);
+        auto outStream = utilities::GetOutputStreamImpostor(dataSaveArguments.outputDataFile);
 
         // create mapped data iterator based on the command line params
         auto dataIterator = GetDataIterator(dataLoadArguments, mapLoadArguments);
