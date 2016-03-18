@@ -85,7 +85,7 @@ namespace layers
         }
 
         // Update input layer (layer 0)
-        UpdateInputLayer(maxInputSize);
+        IncreaseInputLayerSize(maxInputSize);
 
         uint64 layerIndex = _layers.size();
         _layers.push_back(std::move(layer));
@@ -141,7 +141,7 @@ namespace layers
         serializer.Serialize(*this);
     }
 
-    void Map::UpdateInputLayer(uint64 minSize) const
+    void Map::IncreaseInputLayerSize(uint64 minSize) const
     {
         GetLayer<Input&>(0).IncreaseSize(minSize);
     }

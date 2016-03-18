@@ -131,7 +131,7 @@ namespace layers
         // members
         std::vector<std::unique_ptr<Layer>> _layers;
 
-        void UpdateInputLayer(uint64 minSize) const;
+        void IncreaseInputLayerSize(uint64 minSize) const;
 
         template <typename IndexValueIteratorType>
         void LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const;
