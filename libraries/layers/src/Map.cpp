@@ -94,8 +94,7 @@ namespace layers
         for (uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
         {
             auto layerSize = _stack->GetLayer(layerIndex).Size();
-            // #### TODO: This is gross. Can we make it simpler?
-            if (layerIndex == 0) // input layer
+            if (layerIndex == 0 && numLayers == 1) // input layer
             {
                 layerSize = std::max(layerSize, _maxInputSize);
             }
@@ -106,6 +105,5 @@ namespace layers
     void Map::IncreaseInputLayerSize(uint64 minSize) const
     {
         _maxInputSize = std::max(minSize, _maxInputSize);
-        //        GetLayer<Input&>(0).IncreaseSize(minSize);
     }
 }

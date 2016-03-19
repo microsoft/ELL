@@ -58,8 +58,7 @@ namespace layers
             }
         }
 
-        // Update input layer (layer 0)
-        // #### 
+        // Update input layer to be at least as big as the largest element this new layer accesses
         IncreaseInputLayerSize(maxInputSize);
 
         uint64 layerIndex = _layers.size();
@@ -105,7 +104,6 @@ namespace layers
 
     void Stack::IncreaseInputLayerSize(uint64 minSize) const
     {
-        // #### ???
         GetLayer<Input&>(0).IncreaseSize(minSize);
     }
 
