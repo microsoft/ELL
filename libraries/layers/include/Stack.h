@@ -65,11 +65,11 @@ namespace layers
         /// <summary> Static function that loads a Stack from file. </summary>
         ///
         /// <typeparam name="StackType"> Stack type to load. </typeparam>
-        /// <param name="inputMapFile"> Name of the stack file to load. </param>
+        /// <param name="inputStackFile"> Name of the stack file to load. </param>
         ///
         /// <returns> A StackType. </returns>
         template<typename StackType = Stack>
-        static StackType Load(const std::string& inputMapFile);
+        static StackType Load(const std::string& inputStackFile);
 
         /// <summary> Saves a stack to an output stream. </summary>
         ///

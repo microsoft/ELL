@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     Map.tcc (layers)
-//  Authors:  Ofer Dekel
+//  File:     Stack.tcc (layers)
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //

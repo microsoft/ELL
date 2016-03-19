@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     Map.cpp (layers)
-//  Authors:  Ofer Dekel
+//  File:     Stack.cpp (layers)
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //
@@ -73,7 +73,7 @@ namespace layers
 
     const char* Stack::GetTypeName()
     {
-        return "Map";
+        return "Stack";
     }
 
     void Stack::Read(utilities::XMLDeserializer& deserializer)
