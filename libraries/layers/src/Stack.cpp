@@ -102,7 +102,7 @@ namespace layers
         serializer.Serialize(*this);
     }
 
-    void Stack::IncreaseInputLayerSize(uint64 minSize) const
+    void Stack::IncreaseInputLayerSize(uint64 minSize) 
     {
         GetLayer<Input&>(0).IncreaseSize(minSize);
     }

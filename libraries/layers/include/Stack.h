@@ -95,7 +95,7 @@ namespace layers
         // members
         std::vector<std::unique_ptr<Layer>> _layers;
 
-        void IncreaseInputLayerSize(uint64 minSize) const;
+        void IncreaseInputLayerSize(uint64 minSize);
 
     private:
         static const int _currentVersion = 1;
