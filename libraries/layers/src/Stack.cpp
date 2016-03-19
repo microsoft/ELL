@@ -40,10 +40,10 @@ namespace layers
         auto layerSize = layer->Size();
         for (uint64 index = 0; index < layerSize; index++)
         {
-            auto inputCoords = layer->GetInputCoordinates(index);
-            while (inputCoords.IsValid())
+            auto inputCoordIterator = layer->GetInputCoordinates(index);
+            while (inputCoordIterator.IsValid())
             {
-                auto coord = inputCoords.Get();
+                auto coord = inputCoordIterator.Get();
                 auto inputLayer = coord.GetLayerIndex();
                 if (inputLayer >= numLayers)
                 {
@@ -54,7 +54,7 @@ namespace layers
                 {
                     maxInputSize = std::max(inputElement + 1, maxInputSize);
                 }
-                inputCoords.Next();
+                inputCoordIterator.Next();
             }
         }
 

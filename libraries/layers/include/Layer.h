@@ -49,7 +49,7 @@ namespace layers
         ///
         /// <param name="index"> Zero-based element index. </param>
         ///
-        /// <returns> The input coordinates. </returns>
+        /// <returns> An iterator over the input coordinates. </returns>
         using InputCoordinateIterator = utilities::StlIterator<std::vector<Coordinate>::const_iterator, Coordinate>;
         virtual InputCoordinateIterator GetInputCoordinates(uint64 index) const = 0;
 
