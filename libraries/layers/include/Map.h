@@ -77,6 +77,8 @@ namespace layers
         /// <param name="IndexValueIterator"> The input value iterator. </param>
         ///
         /// <returns> An Iterator over output values. </returns>
+        ///
+        /// <remarks> Note: this call is not thread-safe </remarks>
         template <typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         OutputIterator Compute(IndexValueIteratorType inputIterator) const;
 
@@ -90,9 +92,10 @@ namespace layers
         /// <param name="coordinates"> The new output coordinates. </param>
         void SetOutputCoordinates(const CoordinateList& coordinates);
 
-
-        // Accessor for stack
+        /// <summary> Gets a const reference to the layer stack this map refers to </summary>
         const Stack& GetStack() const { return *_stack; }
+
+        /// <summary> Gets a non-const reference to the layer stack this map refers to </summary>
         Stack& GetStack() { return *_stack; }
 
     protected:
@@ -105,9 +108,10 @@ namespace layers
         void LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const;
 
     private:
+        CoordinateList _outputCoordinates; // default empty coordinate list means "use all of last layer"
+
         // #### TODO: yuck, try to get rid of these "mutable"s
         mutable uint64 _maxInputSize = 0; // keeps track of the largest input we've seen so far
-        mutable CoordinateList _outputCoordinates; // zero-size means "use all of last layer"
         mutable std::vector<std::vector<double>> _layerOutputs;
         void AllocateLayerOutputs() const;
     };
