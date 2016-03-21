@@ -94,7 +94,6 @@ namespace layers
         auto numLayers = _stack->NumLayers();
         _layerOutputs.resize(numLayers);
 
-        // TODO: When we keep the outputs around instead of reallocating them for every call to compute, we'll need to ensure they're big enough
         for (uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
         {
             auto layerSize = _stack->GetLayer(layerIndex).Size();
