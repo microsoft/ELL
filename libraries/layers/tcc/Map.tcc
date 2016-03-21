@@ -19,7 +19,7 @@ namespace layers
     template<typename IndexValueIteratorType>
     void SetArray(std::vector<double>& array, IndexValueIteratorType& indexValueIterator)
     {
-        std::fill(array.begin(), array.end(), 0); // this isn't necessary because we always call this with a fresh array
+        std::fill(array.begin(), array.end(), 0);
         while (indexValueIterator.IsValid())
         {
             auto entry = indexValueIterator.Get();
