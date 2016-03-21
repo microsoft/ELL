@@ -18,7 +18,7 @@ set (SRC src/main.cpp
          src/CompilableCoordinatewise.cpp
          src/CompilableInput.cpp
          src/CompilableLayer.cpp
-         src/CompilableMap.cpp
+         src/CompilableStack.cpp
          src/CompilableSum.cpp
          src/ConstructLayer.cpp
          src/DataFlowGraph.cpp
@@ -30,7 +30,7 @@ set (INCLUDE include/AddToAction.h
              include/CompilableCoordinatewise.h
              include/CompilableInput.h
              include/CompilableLayer.h
-             include/CompilableMap.h
+             include/CompilableStack.h
              include/CompilableSum.h
              include/DataFlowGraph.h
              include/DataFlowNode.h

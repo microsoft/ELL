@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     CompilableMap.cpp (compile)
+//  File:     CompilableStack.cpp (compile)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "CompilableMap.h"
+#include "CompilableStack.h"
 #include "CompilableInput.h"
 #include "CompilableCoordinatewise.h"
 #include "CompilableSum.h"
