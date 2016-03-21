@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     PrintableMap.cpp (print)
+//  File:     PrintableStack.cpp (print)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "PrintableMap.h"
+#include "PrintableStack.h"
 #include "PrintableInput.h"
 #include "PrintableCoordinatewise.h"
 #include "PrintableSum.h"
