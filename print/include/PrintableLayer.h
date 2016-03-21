@@ -15,6 +15,13 @@
 
 #include "types.h"
 
+// layers
+#include "Layer.h"
+#include "Coordinate.h"
+
+// utilities
+#include "StlIterator.h"
+
 #include <iostream>
 #include <memory>
 
@@ -30,6 +37,11 @@ public:
     /// <returns> The friendly layer name. </returns>
     virtual std::string GetFriendlyLayerName() const = 0;
 
+    /// <summary> Returns the number of elements in the layer. </summary>
+    ///
+    /// <returns> The number of elements in the layer. </returns>
+    virtual uint64 Size() const = 0;
+
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///
     /// <param name="os"> [in,out] Stream to write data to. </param>
@@ -40,6 +52,13 @@ public:
     ///
     /// <returns> A LayerLayout. </returns>
     virtual LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& arguments) const = 0;
+
+    /// <summary> Returns an iterator that enumerates the input coordinates for a specified element. </summary>
+    ///
+    /// <param name="index"> Zero-based element index. </param>
+    ///
+    /// <returns> The input coordinates. </returns>
+    virtual layers::Layer::InputCoordinateIterator GetInputCoordinates(uint64 index) const = 0;
 
 protected:
     LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const std::string& typeName, uint64 size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle) const;

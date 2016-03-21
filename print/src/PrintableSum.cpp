@@ -16,6 +16,11 @@ std::string PrintableSum::GetFriendlyLayerName() const
     return "Sum";
 }
 
+uint64 PrintableSum::Size() const
+{
+    return Sum::Size();
+}
+
 LayerLayout PrintableSum::Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& arguments) const
 {
     // calculate the layout
@@ -38,3 +43,9 @@ LayerLayout PrintableSum::Print(std::ostream& os, double left, double top, uint6
 
     return layout;
 }
+
+layers::Layer::InputCoordinateIterator PrintableSum::GetInputCoordinates(uint64 index) const
+{
+    return Sum::GetInputCoordinates(index);
+}
+

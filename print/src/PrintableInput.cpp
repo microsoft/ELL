@@ -16,6 +16,11 @@ std::string PrintableInput::GetFriendlyLayerName() const
     return "Input";
 }
 
+uint64 PrintableInput::Size() const
+{
+    return Input::Size();
+}
+
 LayerLayout PrintableInput::Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& arguments) const
 {
     // calculate the layout
@@ -37,4 +42,9 @@ LayerLayout PrintableInput::Print(std::ostream& os, double left, double top, uin
     }
 
     return layout;
+}
+
+layers::Layer::InputCoordinateIterator PrintableInput::GetInputCoordinates(uint64 index) const
+{
+    return Input::GetInputCoordinates(index);
 }

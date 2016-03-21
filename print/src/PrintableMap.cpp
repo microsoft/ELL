@@ -161,12 +161,12 @@ void PrintableMap::Print(std::ostream & os, const PrintArguments& arguments)
         // print edges
         if (layerIndex > 0) // skip input layer
         {
-            uint64 layerSize = _layers[layerIndex]->Size();
+            uint64 layerSize = printableLayer.Size();
             for (uint64 elementIndex = 0; elementIndex<layerSize; ++elementIndex)
             {
                 if (!layout.IsHidden(elementIndex)) // if output is hidden, hide edge
                 {
-                    auto inputCoordinates = _layers[layerIndex]->GetInputCoordinates(elementIndex);
+                    auto inputCoordinates = printableLayer.GetInputCoordinates(elementIndex);
                     while (inputCoordinates.IsValid()) // foreach incoming edge
                     {
                         auto coordinate = inputCoordinates.Get();

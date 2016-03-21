@@ -16,6 +16,11 @@ std::string PrintableCoordinatewise::GetFriendlyLayerName() const
     return GetOperationName(GetOperationType());
 }
 
+uint64 PrintableCoordinatewise::Size() const
+{
+    return Coordinatewise::Size();
+}
+
 LayerLayout PrintableCoordinatewise::Print(std::ostream & os, double left, double top, uint64 layerIndex, const PrintArguments & Arguments) const
 {
     auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetFriendlyLayerName(), Size(), Arguments.valueElementLayout, Arguments.layerStyle);
@@ -36,4 +41,9 @@ LayerLayout PrintableCoordinatewise::Print(std::ostream & os, double left, doubl
    }
 
    return layout;
+}
+
+layers::Layer::InputCoordinateIterator PrintableCoordinatewise::GetInputCoordinates(uint64 index) const
+{
+    return Coordinatewise::GetInputCoordinates(index);
 }
