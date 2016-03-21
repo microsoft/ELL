@@ -38,5 +38,5 @@ public:
     /// <param name="Arguments"> The arguments. </param>
     ///
     /// <returns> A LayerLayout. </returns>
-    virtual LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const override;
+    virtual LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& arguments) const override;
 };

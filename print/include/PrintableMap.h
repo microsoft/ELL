@@ -29,5 +29,5 @@ public:
     ///
     /// <param name="os"> [in,out] Stream to write data to. </param>
     /// <param name="Arguments"> The arguments. </param>
-    void Print(std::ostream& os, const PrintArguments& Arguments);
+    void Print(std::ostream& os, const PrintArguments& arguments);
 };

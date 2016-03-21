@@ -39,7 +39,7 @@ public:
     /// <param name="Arguments"> The arguments. </param>
     ///
     /// <returns> A LayerLayout. </returns>
-    virtual LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const = 0;
+    virtual LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& arguments) const = 0;
 
 protected:
     LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const std::string& typeName, uint64 size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle) const;
