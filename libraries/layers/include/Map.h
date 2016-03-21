@@ -57,8 +57,11 @@ namespace layers
         /// <summary> Constructs an instance of Map. </summary>
         Map();
 
-        /// <summary> Constructs an instance of pointing to an existing stack of layers. </summary>
+        /// <summary> Constructs an instance of pointing to an existing stack of layers, and using the full last layer as output. </summary>
         Map(const std::shared_ptr<Stack>& layers);
+
+        /// <summary> Constructs an instance of pointing to an existing stack of layers, using the given output coordinates. </summary>
+        Map(const std::shared_ptr<Stack>& layers, const CoordinateList& outputCoordinates);
 
         /// <summary> Deleted copy constructor </summary>
         Map(const Map&) = delete;

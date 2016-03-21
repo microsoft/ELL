@@ -56,6 +56,9 @@ namespace layers
     Map::Map(const std::shared_ptr<Stack>& layers) : _stack(layers)
     {}
 
+    Map::Map(const std::shared_ptr<Stack>& layers, const CoordinateList& outputCoordinates) : _stack(layers), _outputCoordinates(outputCoordinates)
+    {}
+
     CoordinateList Map::GetOutputCoordinates() const
     {
         auto outputCoordinates = _outputCoordinates;

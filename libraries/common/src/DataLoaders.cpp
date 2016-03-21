@@ -95,9 +95,8 @@ namespace common
         if (mapLoadArguments.inputMapFile != "")
         {
             std::shared_ptr<layers::Stack> stack = GetStack(mapLoadArguments);
-            auto map = std::make_unique<layers::Map>(stack);
             layers::CoordinateList inputCoordinates = layers::GetCoordinateList(*stack, mapLoadArguments.coordinateList);
-            map->SetOutputCoordinates(inputCoordinates);
+            auto map = std::make_unique<layers::Map>(stack, inputCoordinates);
             return map;
         }
         else
