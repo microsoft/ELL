@@ -61,6 +61,13 @@ namespace layers
         template <typename LayerType = Layer>
         const LayerType& GetLayer(uint64 layerIndex) const;
 
+        /// <summary> Gets the list of coordinates in a given layer. </summary>
+        ///
+        /// <param name="layerIndex"> Zero-based index of the layer. </param>
+        ///
+        /// <returns> The coordinate list. </returns>
+        CoordinateList GetCoordinateList(uint64 layerIndex) const;
+
         /// <summary> Static function that loads a Stack from file. </summary>
         ///
         /// <typeparam name="StackType"> Stack type to load. </typeparam>

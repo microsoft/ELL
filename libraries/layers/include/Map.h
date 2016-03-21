@@ -108,8 +108,7 @@ namespace layers
     private:
         CoordinateList _outputCoordinates; // default empty coordinate list means "use all of last layer"
 
-        // #### TODO: yuck, try to get rid of these "mutable"s
-        mutable uint64 _maxInputSize = 0; // keeps track of the largest input we've seen so far
+        mutable uint64 _maxInputSizeSeen = 0; // keeps track of the largest input we've seen so far
         mutable std::vector<std::vector<double>> _layerOutputs;
         void AllocateLayerOutputs() const;
     };

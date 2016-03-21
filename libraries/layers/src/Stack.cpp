@@ -73,6 +73,17 @@ namespace layers
         return _layers.size();
     }
 
+    CoordinateList Stack::GetCoordinateList(uint64 layerIndex) const
+    {
+        auto layerSize = _layers[layerIndex]->Size();
+        CoordinateList coordinateList(layerSize);
+        for (uint64 elementIndex = 0; elementIndex < layerSize; ++elementIndex)
+        {
+            coordinateList[elementIndex] = { layerIndex, elementIndex };
+        }
+        return coordinateList;
+    }
+
     const char* Stack::GetTypeName()
     {
         return "Stack";

@@ -2,7 +2,7 @@
 //
 //  Project:  [projectName]
 //  File:     Map.cpp (layers)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //
@@ -10,7 +10,6 @@
 
 #include "Map.h"
 #include "Stack.h"
-#include "CoordinateListTools.h"
 
 // stl
 #include <stdexcept>
@@ -65,16 +64,21 @@ namespace layers
             if (_stack->NumLayers() == 1)
             {
                 // size should be max of what we've seen and the input layer size
-                auto maxOutputSize = std::max(_maxInputSize, _stack->GetLayer(0).Size());
+                auto maxOutputSize = std::max(_maxInputSizeSeen, _stack->GetLayer(0).Size());
                 if (maxOutputSize == 0)
                 {
                     throw std::runtime_error("Error: unable to compute Map output coordinates");
                 }
-                outputCoordinates = GetCoordinateList(0, 0, maxOutputSize - 1);
+
+                outputCoordinates = CoordinateList(maxOutputSize);
+                for (uint64 elementIndex = 0; elementIndex < maxOutputSize; ++elementIndex)
+                {
+                    outputCoordinates[elementIndex] = { 0, elementIndex };
+                }
             }
             else
             {
-                outputCoordinates = GetCoordinateList(*_stack, _stack->NumLayers() - 1);
+                outputCoordinates = _stack->GetCoordinateList(_stack->NumLayers() - 1);
             }
         }
         return outputCoordinates;
@@ -96,7 +100,7 @@ namespace layers
             auto layerSize = _stack->GetLayer(layerIndex).Size();
             if (layerIndex == 0 && numLayers == 1) // input layer
             {
-                layerSize = std::max(layerSize, _maxInputSize);
+                layerSize = std::max(layerSize, _maxInputSizeSeen);
             }
             _layerOutputs[layerIndex].resize(layerSize);
         }
@@ -104,6 +108,6 @@ namespace layers
 
     void Map::IncreaseInputLayerSize(uint64 minSize) const
     {
-        _maxInputSize = std::max(minSize, _maxInputSize);
+        _maxInputSizeSeen = std::max(minSize, _maxInputSizeSeen);
     }
 }

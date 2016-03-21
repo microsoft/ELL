@@ -80,41 +80,41 @@ namespace layers
             return coordinateList;
         }
 
-        if(stack.NumLayers() > 0)
+        if (stack.NumLayers() > 0)
         {
             const char* pStr = coordinateListString.c_str();
             const char* pEnd = pStr + coordinateListString.size();
 
 
-            while(pStr < pEnd)
+            while (pStr < pEnd)
             {
                 // read layer Index
                 uint64 layerIndex = ParseIndex(pStr, stack.NumLayers() - 1);
-                
+
                 // read element index
                 uint64 fromElementIndex = 0;
                 uint64 maxElementIndex = stack.GetLayer(layerIndex).Size() - 1; // Fails when layer has size 0
                 uint64 toElementIndex = maxElementIndex;
-                
+
                 // case: no elements specified - take entire layer
-                if(*pStr == ';')
+                if (*pStr == ';')
                 {
                     ++pStr;
                 }
-                
+
                 // case: elements specified
-                else if(*pStr == ',')
+                else if (*pStr == ',')
                 {
                     ++pStr;
                     fromElementIndex = toElementIndex = ParseIndex(pStr, maxElementIndex);
 
                     // interval of elements
-                    if(*pStr == ':')
+                    if (*pStr == ':')
                     {
                         ++pStr;
                         toElementIndex = ParseIndex(pStr, maxElementIndex);
 
-                        if(toElementIndex < fromElementIndex)
+                        if (toElementIndex < fromElementIndex)
                         {
                             throw std::runtime_error("bad format in coordinate list definition string");
                         }
@@ -125,19 +125,7 @@ namespace layers
                 AddCoordinates(coordinateList, layerIndex, fromElementIndex, toElementIndex);
             }
         }
-        
-        return coordinateList;
-    }
-    
-    layers::CoordinateList GetCoordinateList(const layers::Stack& stack, uint64 layerIndex)
-    {
-        return GetCoordinateList(layerIndex, 0, stack.GetLayer(layerIndex).Size()-1);
-    }
 
-    layers::CoordinateList GetCoordinateList(uint64 layerIndex, uint64 fromElementIndex, uint64 toElementIndex)
-    {
-        layers::CoordinateList coordinateList;
-        AddCoordinates(coordinateList, layerIndex, fromElementIndex, toElementIndex);
         return coordinateList;
     }
 }
