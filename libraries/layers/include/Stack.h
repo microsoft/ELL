@@ -17,10 +17,10 @@
 #include "types.h"
 
 // stl
+#include <string>
 #include <iostream>
 #include <vector>
 #include <memory>
-#include <type_traits>
 
 namespace layers
 {
@@ -28,7 +28,7 @@ namespace layers
     class Stack
     {
     public:
-        /// <summary> Constructs an instance of Stack. </summary>
+        /// <summary> Constructs an instance of Stack with a single input layer. </summary>
         Stack();
 
         /// <summary> Deleted copy constructor </summary>
@@ -39,7 +39,6 @@ namespace layers
 
         /// <summary> Virtual destructor. </summary>
         virtual ~Stack() = default;
-
 
         /// <summary> Adds a layer to the stack. </summary>
         ///

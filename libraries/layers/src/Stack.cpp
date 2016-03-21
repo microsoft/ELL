@@ -8,15 +8,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ConstructLayer.h"
-#include "Coordinatewise.h"
+#include "ConstructLayer.h" // Note: this is necessary for XMLDeserializer to work
 #include "Input.h"
-#include "Sum.h"
 #include "Stack.h"
 
 // stl
 #include <stdexcept>
 #include <string>
+#include <algorithm>
+#include <memory>
+#include <iostream>
+#include <utility> // for std::move
 
 namespace layers
 {

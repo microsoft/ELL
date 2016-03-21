@@ -8,17 +8,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "CoordinateListTools.h"
-
-// utilities
-#include "XMLSerialization.h"
-#include "Files.h"
-
 // stl
+#include <vector>
 #include <algorithm>
-#include <string>
-#include <memory>
-#include <algorithm>
+#include <utility>
 
 namespace layers
 {

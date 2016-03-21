@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include "Layer.h"
 #include "Coordinate.h"
 #include "Stack.h"
 
@@ -18,7 +17,6 @@
 #include "types.h"
 
 // stl
-#include <iostream>
 #include <vector>
 #include <memory>
 #include <type_traits>

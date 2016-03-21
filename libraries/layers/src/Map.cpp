@@ -8,16 +8,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ConstructLayer.h"
-#include "Coordinatewise.h"
-#include "Input.h"
-#include "Sum.h"
-#include "Stack.h"
 #include "Map.h"
+#include "Stack.h"
+#include "CoordinateListTools.h"
 
 // stl
 #include <stdexcept>
-#include <string>
+#include <vector>
+#include <memory>
+#include <algorithm>
+#include <utility>
 
 namespace layers
 {
