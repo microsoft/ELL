@@ -21,6 +21,16 @@ uint64 PrintableCoordinatewise::Size() const
     return Coordinatewise::Size();
 }
 
+void PrintableCoordinatewise::operator=(const layers::Layer& layer)
+{
+    operator=(dynamic_cast<const layers::Coordinatewise&>(layer));
+}
+
+void PrintableCoordinatewise::operator=(const layers::Coordinatewise& coordinatewise)
+{
+    layers::Coordinatewise::operator=(coordinatewise);
+}
+
 LayerLayout PrintableCoordinatewise::Print(std::ostream & os, double left, double top, uint64 layerIndex, const PrintArguments & Arguments) const
 {
     auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetFriendlyLayerName(), Size(), Arguments.valueElementLayout, Arguments.layerStyle);

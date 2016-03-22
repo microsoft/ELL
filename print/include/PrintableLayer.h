@@ -60,6 +60,16 @@ public:
     /// <returns> The input coordinates. </returns>
     virtual layers::Layer::InputCoordinateIterator GetInputCoordinates(uint64 index) const = 0;
 
+    /// <summary> Assignment operator from layer to PrintableLayer. </summary>
+    ///
+    /// <param name="layer"> The layer being copied. </param>
+    virtual void operator=(const layers::Layer& layer) = 0;
+
+    /// <summary> Gets the name of this type. </summary>
+    ///
+    /// <returns> The name of this type. </returns>
+    static std::string GetTypeName(); // TODO change all GetTypeName to string
+
 protected:
     LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const std::string& typeName, uint64 size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle) const;
 };

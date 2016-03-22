@@ -21,6 +21,16 @@ uint64 PrintableSum::Size() const
     return Sum::Size();
 }
 
+void PrintableSum::operator=(const layers::Sum& sum)
+{
+    Sum::operator=(sum);
+}
+
+void PrintableSum::operator=(const layers::Layer & layer)
+{
+    operator=(dynamic_cast<const layers::Sum&>(layer));
+}
+
 LayerLayout PrintableSum::Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& arguments) const
 {
     // calculate the layout

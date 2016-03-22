@@ -24,6 +24,13 @@ struct PrintableSum : public layers::Sum, public PrintableLayer
 {
 public:
 
+    PrintableSum() = default; // TODO - remove
+
+    using layers::Sum::Sum;
+    
+    //PrintableSum(layers::Sum&& other) : Sum(std::move(other))
+    //{}
+
     /// <summary> Gets a friendly layer name. </summary>
     ///
     /// <returns> The friendly layer name. </returns>
@@ -33,6 +40,13 @@ public:
     ///
     /// <returns> The number of elements in the layer. </returns>
     virtual uint64 Size() const override;
+
+    void operator=(const layers::Sum& sum);
+
+    /// <summary> Assignment operator from layer to PrintableLayer. </summary>
+    ///
+    /// <param name="layer"> The layer being copied. </param>
+    virtual void operator=(const layers::Layer& layer) override;
 
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///

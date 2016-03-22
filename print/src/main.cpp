@@ -42,10 +42,11 @@ int main(int argc, char* argv[])
         auto outStream = utilities::GetOutputStream(printArguments.outputSvgFile);
 
         // open map file
-        auto map = layers::Map::Load<PrintableMap>(printArguments.inputMapFile);
-        
+        auto map = layers::Map::Load<layers::Map>(printArguments.inputMapFile); // TODO - remove template
+        PrintableMap printableMap(std::move(map));
+
         // print to svg file
-        map.Print(outStream, printArguments);
+        printableMap.Print(outStream, printArguments);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

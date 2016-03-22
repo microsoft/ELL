@@ -78,6 +78,11 @@ namespace layers
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Write(utilities::XMLSerializer& serializer) const = 0;
+
+        /// <summary> Makes a deep copy of this Layer. </summary>
+        ///
+        /// <returns> A copy of this Layer. </returns>
+        virtual std::unique_ptr<Layer> Clone() const = 0;
     };
 }
 

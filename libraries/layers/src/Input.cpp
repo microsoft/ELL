@@ -65,4 +65,8 @@ namespace layers
         serializer.Serialize("version", _currentVersion);
         serializer.Serialize("size", _size);
     }
+    std::unique_ptr<Layer> Input::Clone() const
+    {
+        return std::make_unique<Input>(*this);
+    }
 }

@@ -24,6 +24,10 @@ struct PrintableCoordinatewise : public layers::Coordinatewise, public Printable
 {
 public:
 
+    PrintableCoordinatewise() = default; // TODO
+
+    using layers::Coordinatewise::Coordinatewise;
+
     /// <summary> Gets a friendly layer name. </summary>
     ///
     /// <returns> The friendly layer name. </returns>
@@ -33,6 +37,16 @@ public:
     ///
     /// <returns> The number of elements in the layer. </returns>
     virtual uint64 Size() const override;
+
+    /// <summary> Assignment operator from Coordinatewise. </summary>
+    ///
+    /// <param name="coordinatewise"> The coordinatewise layer to assign from.</param>
+    void operator=(const layers::Coordinatewise& coordinatewise);
+
+    /// <summary> Assignment operator from layer to PrintableLayer. </summary>
+    ///
+    /// <param name="layer"> The layer being copied. </param>
+    virtual void operator=(const layers::Layer& layer) override;
 
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///

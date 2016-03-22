@@ -21,6 +21,16 @@ uint64 PrintableInput::Size() const
     return Input::Size();
 }
 
+void PrintableInput::operator=(const layers::Input& input)
+{
+    Input::operator=(input);
+}
+
+void PrintableInput::operator=(const layers::Layer & layer)
+{
+    operator=(dynamic_cast<const layers::Input&>(layer));
+}
+
 LayerLayout PrintableInput::Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& arguments) const
 {
     // calculate the layout

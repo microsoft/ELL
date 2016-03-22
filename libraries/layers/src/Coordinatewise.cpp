@@ -136,6 +136,10 @@ namespace layers
         serializer.Serialize("values", _values);
         serializer.Serialize("coordinates", _inputCoordinates);
     }
+    std::unique_ptr<Layer> Coordinatewise::Clone() const
+    {
+        return std::make_unique<Coordinatewise>(*this);
+    }
 }
 
 
