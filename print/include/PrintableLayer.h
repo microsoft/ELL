@@ -68,7 +68,7 @@ public:
     /// <summary> Gets the name of this type. </summary>
     ///
     /// <returns> The name of this type. </returns>
-    static std::string GetTypeName(); // TODO change all GetTypeName to string
+    static std::string GetTypeName(); 
 
 protected:
     LayerLayout Print(std::ostream& os, double left, double top, uint64 layerIndex, const std::string& typeName, uint64 size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle) const;

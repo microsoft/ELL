@@ -15,7 +15,7 @@
 
 namespace layers
 {
-    const char* Layer::GetTypeName()
+    std::string Layer::GetTypeName()
     {
         return "Layer";
     }

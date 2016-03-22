@@ -25,7 +25,7 @@ namespace layers
         return _elementIndex;
     }
 
-    const char* Coordinate::GetTypeName()
+    std::string Coordinate::GetTypeName()
     {
         return "Coordinate";
     }

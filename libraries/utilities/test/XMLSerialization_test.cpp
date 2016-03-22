@@ -23,9 +23,9 @@ class Base
 public:
     virtual ~Base() = default;
 
-    static const char* GetTypeName() { return "Base"; }
+    static std::string GetTypeName() { return "Base"; }
     
-    virtual const char* GetRuntimeTypeName() const = 0;
+    virtual std::string GetRuntimeTypeName() const = 0;
     
     virtual void Read(utilities::XMLDeserializer& deserializer) = 0;
     
@@ -39,9 +39,9 @@ public:
 class Derived1 : public Base
 {
 public:
-    static const char* GetTypeName() { return "Derived1"; }
+    static std::string GetTypeName() { return "Derived1"; }
 
-    virtual const char* GetRuntimeTypeName() const override { return GetTypeName(); };
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); };
 
     virtual void Read(utilities::XMLDeserializer& deserializer) override
     {
@@ -80,9 +80,9 @@ private:
 class Derived2 : public Base
 {
 public:
-    static const char* GetTypeName() { return "Derived2"; }
+    static std::string GetTypeName() { return "Derived2"; }
 
-    virtual const char* GetRuntimeTypeName() const override { return GetTypeName(); };
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); };
 
     virtual void Read(utilities::XMLDeserializer& deserializer) override
     {
@@ -121,7 +121,7 @@ void TypeFactoryTest()
     auto derived1 = factory.Construct(Derived1::GetTypeName());
     auto derived2 = factory.Construct(Derived2::GetTypeName());
 
-    testing::ProcessTest("TypeFactory", std::strcmp(derived1->GetRuntimeTypeName(), Derived1::GetTypeName())==0 && std::strcmp(derived2->GetRuntimeTypeName(), Derived2::GetTypeName())==0);
+    testing::ProcessTest("TypeFactory", derived1->GetRuntimeTypeName() == Derived1::GetTypeName() && derived2->GetRuntimeTypeName() == Derived2::GetTypeName());
 }
 
 void XMLSerializationTest()

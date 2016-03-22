@@ -36,12 +36,12 @@ namespace layers
         throw std::runtime_error("this code should never be reached");
     }
 
-    const char* Input::GetTypeName()
+    std::string Input::GetTypeName()
     {
         return "Input";
     }
 
-    const char* Input::GetRuntimeTypeName() const
+    std::string Input::GetRuntimeTypeName() const
     {
         return GetTypeName();
     }

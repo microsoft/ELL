@@ -86,7 +86,7 @@ namespace layers
         return _layers.size();
     }
 
-    const char* Map::GetTypeName()
+    std::string Map::GetTypeName()
     {
         return "Map";
     }
