@@ -25,7 +25,59 @@
 
 namespace utilities
 {
-    /// <summary> An XML serializer. </summary>
+    /// <summary>
+    /// The XMLSerializer and XMLDeserializer classes facilitate serialization and deserialization of
+    /// some fundamental types, std::strings, std::vectors, std::unique_ptrs, and classes that
+    /// implement the required functions. Serializing a couple of variables to the string stream is
+    /// as simple as
+    /// 
+    /// double x = 5.3;
+    /// uint64 y = 12;
+    /// std::stringstream stream;
+    /// XMLSerializer serializer(stream);
+    /// serializer.Serialize(x);
+    /// serializer.Serialize(y);
+    /// 
+    /// Deserialization must occur in the same order.
+    /// 
+    /// XMLDeserializer deserializer(stream);
+    /// double xx;
+    /// uint64 yy;
+    /// deserialize(xx);
+    /// deserialize(yy);
+    /// assert(x == xx &amp;&amp; y == yy);
+    /// 
+    /// The XMLSerializer also supports serialization of named variables, in which case the
+    /// deserialization must specify the correct variable name.
+    /// 
+    /// x = 0.4;
+    /// serializer.Serialize("x", x);
+    /// deserialize("x", xx);
+    /// assert(x == xx);
+    /// 
+    /// Serialization of std::strings and std::vectors of fundamental types is similar.
+    /// 
+    /// To make a class serializable, the following public members are required:
+    /// 
+    /// class Foo
+    /// {
+    /// public:
+    ///     Foo();
+    ///     static std::string GetTypeName();
+    ///     void Read(utilities::XMLDeserializer&amp; deserializer);
+    ///     void Write(utilities::XMLSerializer&amp; serializer) const;
+    /// }
+    /// 
+    /// A typical implementation of Read() will include a sequence of calls to
+    /// deserializer.Deserialize(). A typical implementation of Write will include a sequence of
+    /// calls to serializer.Serialize(), in the same order. To serialize the class, call:
+    /// 
+    /// Foo z;
+    /// serializer.Serialize("z", z);
+    /// 
+    /// This class also supports serializing and deserialization of std::unique_pointers to a
+    /// polymorphic base class.  
+    /// </summary>
     class XMLSerializer
     {
     public:
