@@ -113,9 +113,8 @@ void PrintElementDefinition(std::ostream& os, const std::string& id, double widt
     os << "            </g>\n";
 }
 
-PrintableMap::PrintableMap(const layers::Map& other) : Map(other)
+PrintableMap::PrintableMap(layers::Map&& other) : Map(std::move(other))
 {
-
     utilities::TypeFactory<PrintableLayer> printableLayerFactory;
     printableLayerFactory.AddType<PrintableInput>(layers::Input::GetTypeName());
     printableLayerFactory.AddType<PrintableCoordinatewise>(layers::Coordinatewise::GetTypeName());
@@ -123,8 +122,8 @@ PrintableMap::PrintableMap(const layers::Map& other) : Map(other)
 
     for (const auto& layer : Map::_layers)
     {
-        _layers.push_back(printableLayerFactory.Construct(layer->GetRuntimeTypeName()));
-        (*_layers.back()) = (*layer);
+        _printableLayers.push_back(printableLayerFactory.Construct(layer->GetRuntimeTypeName()));
+        (*_printableLayers.back()) = (*layer);
     }
 }
 
@@ -166,9 +165,9 @@ void PrintableMap::Print(std::ostream & os, const PrintArguments& arguments)
     double layerTop = arguments.mapLayout.verticalMargin;
     std::vector<LayerLayout> layouts;
 
-    for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
+    for (uint64 layerIndex = 0; layerIndex < _printableLayers.size(); ++layerIndex)
     {
-        const auto& printableLayer = _layers[layerIndex];
+        const auto& printableLayer = _printableLayers[layerIndex];
         auto layout = printableLayer->Print(os, arguments.mapLayout.horizontalMargin, layerTop, layerIndex, arguments);
         layerTop += layout.GetHeight() + arguments.mapLayout.verticalSpacing;
         os << std::endl;

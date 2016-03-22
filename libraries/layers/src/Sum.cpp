@@ -80,9 +80,4 @@ namespace layers
         serializer.Serialize("version", _currentVersion);
         serializer.Serialize("coordinates", _inputCoordinates);
     }
-
-    std::unique_ptr<Layer> Sum::Clone() const
-    {
-        return std::make_unique<Sum>(*this);
-    }
 }

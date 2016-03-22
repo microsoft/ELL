@@ -63,9 +63,7 @@ namespace layers
         Map() = default;
 
         /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="other"> The map being copied. </param>
-        Map(const Map& other);
+        Map(const Map& other) = delete;
 
         /// <summary> Default move constructor </summary>
         Map(Map&&) = default;

@@ -93,11 +93,6 @@ namespace layers
         /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Write(utilities::XMLSerializer& serializer) const override;
 
-        /// <summary> Makes a deep copy of this Layer. </summary>
-        ///
-        /// <returns> A copy of this Layer. </returns>
-        virtual std::unique_ptr<Layer> Clone() const override;
-
     protected:
         std::vector<double> _values;
         CoordinateList _inputCoordinates;

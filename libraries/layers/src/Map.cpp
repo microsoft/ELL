@@ -61,13 +61,6 @@ namespace layers
     //
     // Map class implementation
     //
-    Map::Map(const Map& other)
-    {
-        for (const auto& layer : other._layers)
-        {
-            _layers.push_back(layer->Clone());
-        }
-    }
 
     Map::Map(uint64 inputLayerSize)
     {
