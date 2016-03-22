@@ -187,18 +187,6 @@ namespace utilities
     // XMLDeserializer class
     //
 
-    template<typename T>
-    void XMLDeserializer::RegisterPolymorphicType()
-    {
-        _polymorphicTypeFactory.AddType<T>();
-    }
-
-    template<typename T>
-    void XMLDeserializer::RegisterPolymorphicType(const std::string & typeName)
-    {
-        _polymorphicTypeFactory.AddType<T>(typeName);
-    }
-
     // deserialize fundamental types
     template<typename ValueType>
     void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
@@ -315,7 +303,7 @@ namespace utilities
 
         uint64 size = 0;
         auto typeName = TypeName<std::vector<std::unique_ptr<BaseType>>>::GetName();
-        ReadOpenTag(Match(typeName), Match("name"), Match(name), Match("size"), size);
+        ReadOpenTag(Match(typeName), Match("size"), size);
         value.resize(size);
         for(uint64 i = 0; i < size; ++i)
         {
