@@ -28,14 +28,14 @@
 #include <memory>
 
 /// <summary> A printable Map. </summary>
-class PrintableMap : public layers::Map
+class PrintableMap
 {
 public:
 
     /// <summary> Move constructor that constructs an instance of PrintableMap from a Map. </summary>
     ///
     /// <param name="other"> The Map being moved. </param>
-    PrintableMap(layers::Map&& other);
+    PrintableMap(const layers::Map& other);
 
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///
