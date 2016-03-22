@@ -153,20 +153,20 @@ void PrintableMap::Print(std::ostream & os, const PrintArguments& arguments)
 
     for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
     {
-        const auto& printableLayer = GetLayer<PrintableLayer>(layerIndex);
-        auto layout = printableLayer.Print(os, arguments.mapLayout.horizontalMargin, layerTop, layerIndex, arguments);
+        const auto& printableLayer = _layers[layerIndex];
+        auto layout = printableLayer->Print(os, arguments.mapLayout.horizontalMargin, layerTop, layerIndex, arguments);
         layerTop += layout.GetHeight() + arguments.mapLayout.verticalSpacing;
         os << std::endl;
 
         // print edges
         if (layerIndex > 0) // skip input layer
         {
-            uint64 layerSize = printableLayer.Size();
+            uint64 layerSize = printableLayer->Size();
             for (uint64 elementIndex = 0; elementIndex<layerSize; ++elementIndex)
             {
                 if (!layout.IsHidden(elementIndex)) // if output is hidden, hide edge
                 {
-                    auto inputCoordinates = printableLayer.GetInputCoordinates(elementIndex);
+                    auto inputCoordinates = printableLayer->GetInputCoordinates(elementIndex);
                     while (inputCoordinates.IsValid()) // foreach incoming edge
                     {
                         auto coordinate = inputCoordinates.Get();

@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 
         // open map file
         auto map = layers::Map::Load<layers::Map>(printArguments.inputMapFile); // TODO - remove template
-        PrintableMap printableMap(std::move(map));
+        PrintableMap printableMap(map);
 
         // print to svg file
         printableMap.Print(outStream, printArguments);
