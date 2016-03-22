@@ -40,12 +40,12 @@ R"aw(
             stroke-width:   2;
         }
     
-        rect.Scale
+        rect.%
         {
             fill:           #06aed5;
         }
 
-        rect.Shift
+        rect.%
         {
             fill:           #f15156;
         }
@@ -116,9 +116,13 @@ void PrintElementDefinition(std::ostream& os, const std::string& id, double widt
 void PrintableMap::Print(std::ostream & os, const PrintArguments& Arguments)
 {
     os << "<html>\n<body>\n";
-    utilities::PrintFormat(os, styleDefinitionFormat, Arguments.edgeStyle.dashStyle);
+    utilities::PrintFormat(os, 
+        styleDefinitionFormat, 
+        layers::Coordinatewise::GetOperationName(layers::Coordinatewise::OperationType::add),
+        layers::Coordinatewise::GetOperationName(layers::Coordinatewise::OperationType::multiply),
+        Arguments.edgeStyle.dashStyle);
 
-    os << "    <Svg>\n\n        <defs>\n";
+    os << "    <svg>\n\n        <defs>\n";
     PrintElementDefinition(os,
         "ValueElement",
         Arguments.valueElementLayout.width, 
@@ -185,46 +189,6 @@ void PrintableMap::Print(std::ostream & os, const PrintArguments& Arguments)
         os << std::endl;
     }
 
-    os << "\n    </Svg>\n\n<html>\n<body>\n";
-}
-
-void PrintableMap::Deserialize(utilities::JsonSerializer & serializer)
-{
-    serializer.Read("layers", _layers, PrintableMap::DeserializeLayers);
-}
-
-void PrintableMap::DeserializeLayers(utilities::JsonSerializer & serializer, std::unique_ptr<layers::Layer>& up)
-{
-    //auto type = serializer.Read<std::string>("_type");
-    //auto version = serializer.Read<int>("_version");
-
-    //if (type == "Input")
-    //{
-    //    auto upZero = std::make_shared<PrintableInput>();
-    //    upZero->Deserialize(serializer, version);
-    //    up = upZero;
-    //}
-    //else if (type == "Scale")
-    //{
-    //    auto upScale = std::make_shared<PrintableCoordinatewise>(layers::Layer::Type::scale);
-    //    upScale->Deserialize(serializer, version);
-    //    up = upScale;
-    //}
-    //else if (type == "Shift")
-    //{
-    //    auto upCoordinatewise = std::make_shared<PrintableCoordinatewise>(layers::Layer::Type::shift);
-    //    upCoordinatewise->Deserialize(serializer, version);
-    //    up = upCoordinatewise;
-    //}
-    //else if (type == "Sum")
-    //{
-    //    auto upSum = std::make_shared<PrintableSum>();
-    //    upSum->Deserialize(serializer, version);
-    //    up = upSum;
-    //}
-    //else
-    //{
-    //    throw std::runtime_error("unidentified type in map file: " + type);
-    //}
+    os << "\n    </svg>\n\n<html>\n<body>\n";
 }
 

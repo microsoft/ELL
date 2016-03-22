@@ -8,14 +8,23 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// testing
+#include "testing.h"
+
 // stl
 #include <iostream>
 #include <string>
+
 
 /// Runs all tests
 ///
 int main()
 {
+    if (testing::DidTestFail())
+    {
+        return 1;
+    }
+
     return 0;
 }
 

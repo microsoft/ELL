@@ -18,7 +18,7 @@
 namespace dataset
 {
     /// <summary> An iterator that reads a long text line by line. </summary>
-    class SequentialLineIterator 
+    class SequentialLineIterator
     {
     public:
 

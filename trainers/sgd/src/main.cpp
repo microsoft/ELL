@@ -12,6 +12,7 @@
 
 // utilities
 #include "Files.h"
+#include "OutputStreamImpostor.h"
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
 #include "BinaryClassificationEvaluator.h"
@@ -19,6 +20,7 @@
 // layers
 #include "Map.h"
 #include "Coordinate.h"
+#include "CoordinateListTools.h"
 
 // dataset
 #include "SupervisedExample.h"
@@ -62,24 +64,27 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        std::ofstream outputDataStream;
-        if (mapSaveArguments.outputMapFile != "")
-        {
-            outputDataStream = utilities::OpenOfstream(mapSaveArguments.outputMapFile);
-            std::cout.rdbuf(outputDataStream.rdbuf()); // replaces the streambuf in cout with the one in outputDataStream
-        }
+        auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputMapFile);
 
-        // create and load a dataset, a map, and a coordinate list
-        dataset::RowDataset dataset;
-        std::shared_ptr<layers::Map> map;
-        layers::CoordinateList inputCoordinates;
-        GetRowDatasetMapCoordinates(dataLoadArguments, mapLoadArguments, dataset, map, inputCoordinates);
+        // read map from file
+        std::shared_ptr<layers::Map> map = GetMap(mapLoadArguments);
+
+        // get the input coordinates
+        layers::CoordinateList inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
+
+        // get the dataset
+        auto dataset = common::GetDataset(dataLoadArguments, map, inputCoordinates);
+
+        if (inputCoordinates.size() == 0)
+        {
+            inputCoordinates = layers::GetCoordinateList(0, 0, dataset->NumColumns() - 1);
+        }
 
         // create loss function
         lossFunctions::LogLoss loss;
 
         // create sgd trainer
-        optimization::AsgdOptimizer optimizer(dataset.NumColumns());
+        optimization::AsgdOptimizer optimizer(dataset->NumColumns());
 
         // create evaluator
         utilities::BinaryClassificationEvaluator evaluator;
@@ -91,14 +96,14 @@ int main(int argc, char* argv[])
         for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
         {
             // randomly permute the data
-            dataset.RandPerm(rng);
+            dataset->RandPerm(rng);
 
             // iterate over the entire permuted dataset
-            auto trainSetIterator = dataset.GetIterator();
+            auto trainSetIterator = dataset->GetIterator();
             optimizer.Update(trainSetIterator, loss, sgdArguments.l2Regularization);
 
             // Evaluate training error
-            auto evaluationIterator = dataset.GetIterator();
+            auto evaluationIterator = dataset->GetIterator();
             evaluator.Evaluate(evaluationIterator, optimizer.GetPredictor(), loss);
         }
 
@@ -107,10 +112,10 @@ int main(int argc, char* argv[])
 
         // update the map with the newly learned layers
         auto predictor = optimizer.GetPredictor();
-        predictor.AddTo(*map, inputCoordinates);
+        predictor.AddToMap(*map, inputCoordinates);
 
         // output map
-        map->Serialize(std::cout);
+        map->Save(outStream);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

@@ -25,6 +25,11 @@ public:
     /// <summary> default virtual destructor. </summary>
     virtual ~PrintableLayer() = default;
 
+    /// <summary> Gets a friendly layer name. </summary>
+    ///
+    /// <returns> The friendly layer name. </returns>
+    virtual std::string GetFriendlyLayerName() const = 0;
+
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///
     /// <param name="os"> [in,out] Stream to write data to. </param>

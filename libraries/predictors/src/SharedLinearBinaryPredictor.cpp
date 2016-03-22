@@ -49,12 +49,16 @@ namespace predictors
         return _sp_predictor->b;
     }
 
-    void SharedLinearBinaryPredictor::AddTo(layers::Map& map, const layers::CoordinateList& inputCoordinates) const
+    void SharedLinearBinaryPredictor::AddToMap(layers::Map& map, layers::CoordinateList inputCoordinates) const
     {
-        uint64 layerIndex = map.AddLayer(std::make_unique<layers::Coordinatewise>(_sp_predictor->w, inputCoordinates, layers::Layer::Type::scale));
+        if (inputCoordinates.size() != _sp_predictor->w.Size())
+        {
+            throw std::runtime_error("Error in SharedLinearBinaryPredictor: input coordinates size doesn't match weight vector");
+        }
+
+        uint64 layerIndex = map.AddLayer(std::make_unique<layers::Coordinatewise>(_sp_predictor->w, inputCoordinates, layers::Coordinatewise::OperationType::multiply));
         auto coordinates = layers::GetCoordinateList(map, layerIndex);
         layerIndex = map.AddLayer(std::make_unique<layers::Sum>(coordinates));
-
-        map.AddLayer(std::make_unique<layers::Coordinatewise>(_sp_predictor->b, layers::Coordinate{layerIndex, 0}, layers::Layer::Type::shift));
+        map.AddLayer(std::make_unique<layers::Coordinatewise>(_sp_predictor->b, layers::Coordinate{layerIndex, 0}, layers::Coordinatewise::OperationType::add));
     }
 }

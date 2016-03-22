@@ -13,15 +13,15 @@
 #include "PrintArguments.h"
 
 // utilities
-#include "JsonSerializer.h"
 #include "Files.h"
+#include "OutputStreamImpostor.h"
 #include "CommandLineParser.h"
 
 // layers
 #include "Map.h"
 
 // stl
-#include<iostream>
+#include <iostream>
 #include <fstream>
 #include <stdexcept>
 #include <memory>
@@ -38,14 +38,14 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(printArguments);
         commandLineParser.Parse();
 
+        // if output file specified, use it, otherwise use std::cout
+        auto outStream = utilities::GetOutputStreamImpostor(printArguments.outputSvgFile);
+
         // open map file
         auto map = layers::Map::Load<PrintableMap>(printArguments.inputMapFile);
-
-        // open svg file
-        auto outputSvgFStream = utilities::OpenOfstream(printArguments.outputSvgFile);
         
         // print to svg file
-        map.Print(outputSvgFStream, printArguments);
+        map.Print(outStream, printArguments);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

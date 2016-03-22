@@ -5,7 +5,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 set (PROJ_NAME layers)
-
 PROJECT(${PROJ_NAME})
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
@@ -18,6 +17,7 @@ set (SRC src/Coordinate.cpp
          src/Input.cpp
          src/Layer.cpp
          src/Map.cpp
+         src/ConstructLayer.cpp
          src/Sum.cpp)
 
 set (INCLUDE include/Coordinate.h
@@ -26,6 +26,7 @@ set (INCLUDE include/Coordinate.h
              include/Input.h
              include/Layer.h
              include/Map.h
+             include/ConstructLayer.h
              include/Sum.h)
 
 set (TCC tcc/Map.tcc)
@@ -36,6 +37,8 @@ source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(tcc)
+include_directories(../layers/include)
+include_directories(../testing/include)
 include_directories(../types/include)
 include_directories(../utilities/include)
 
@@ -51,7 +54,7 @@ set (TEST_NAME ${PROJ_NAME}_test)
 
 add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} layers utilities)
+target_link_libraries(${TEST_NAME} layers testing utilities)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

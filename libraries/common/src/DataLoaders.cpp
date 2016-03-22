@@ -26,6 +26,39 @@
 
 namespace common
 {
+    //
+    // internal functions used below
+    //
+    namespace
+    {
+        void LoadDataset(dataset::IParsingIterator& dataIterator, dataset::RowDataset& dataset)
+        {
+            while (dataIterator.IsValid())
+            {
+                dataset.PushBackRow(dataIterator.Get());
+                dataIterator.Next();
+            }
+        }
+
+        std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates)
+        {
+            // create parser for sparse vectors (SVMLight format)
+            dataset::SparseEntryParser sparseEntryParser;
+
+            // create mapped parser --- Note: this keeps a shared_ptr to the map
+            dataset::MappedParser<dataset::SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
+
+            // create line iterator - read line by line sequentially
+            dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
+
+            // Create iterator
+            return dataset::GetParsingIterator(std::move(lineIterator), mappedParser);
+        }
+    }
+
+    //
+    // Public functions
+    //
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
     {
         // create line iterator - read line by line sequentially
@@ -40,60 +73,9 @@ namespace common
 
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments)
     {
-        if (mapLoadArguments.inputMapFile == "")
-        {
-            return GetDataIterator(dataLoadArguments);
-        }
-        else
-        {
-            auto map = std::shared_ptr<layers::Map>(GetMap(mapLoadArguments));
-            if(map == nullptr)
-            {
-                throw std::runtime_error("Error: couldn't load map");
-            }
-            auto inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
-            return GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
-        }
-    }
-
-
-    void GetRowDatasetMapCoordinates(
-        const DataLoadArguments& dataLoadArguments,
-        const MapLoadArguments& mapLoadArguments,
-        dataset::RowDataset& rowDataset,
-        std::shared_ptr<layers::Map>& map,
-        layers::CoordinateList& inputCoordinates)
-    {
-        // handle two cases - input map specified or unspecified
-        if (mapLoadArguments.inputMapFile == "")
-        {
-            // get data iterator 
-            auto upDataIterator = GetDataIterator(dataLoadArguments);
-
-            // load dataset
-            rowDataset = LoadDataset(*upDataIterator);
-
-            // number of columns
-            uint64 numColumns = rowDataset.NumColumns();
-
-            // create default map with single input layer
-            map = std::make_shared<layers::Map>(numColumns);
-
-            // create a coordinate list of this map
-            inputCoordinates = layers::GetCoordinateList(0, 0, numColumns - 1);
-        }
-        else
-        {
-            // read map from file
-            map = GetMap(mapLoadArguments);
-
-            // read input coordinates
-            inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
-
-            // fill in dataset
-            auto upDataIterator = GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
-            rowDataset = LoadDataset(*upDataIterator);
-        }
+        auto map = std::shared_ptr<layers::Map>(GetMap(mapLoadArguments));
+        auto inputCoordinates = GetInputCoordinates(*map, mapLoadArguments);
+        return GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
     }
 
     std::unique_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments)
@@ -104,7 +86,7 @@ namespace common
         }
         else
         {
-            return nullptr;
+            return std::make_unique<layers::Map>();
         }
     }
 
@@ -114,35 +96,20 @@ namespace common
         return inputCoordinates;
     }
 
-    dataset::RowDataset LoadDataset(dataset::IParsingIterator& dataIterator)
+    std::unique_ptr<dataset::RowDataset> GetDataset(const DataLoadArguments& dataLoadArguments)
     {
-        dataset::RowDataset dataset;
-        while (dataIterator.IsValid())
-        {
-            dataset.PushBackRow(dataIterator.Get());
-            dataIterator.Next();
-        }
+        auto dataIterator = GetDataIterator(dataLoadArguments);
+        auto dataset = std::make_unique<dataset::RowDataset>();
+        LoadDataset(*dataIterator, *dataset);
         return dataset;
     }
 
-    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates)
+    std::unique_ptr<dataset::RowDataset> GetDataset(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map, const layers::CoordinateList& inputCoordinates)
     {
-        if(map == nullptr)
-        {
-            return GetDataIterator(dataLoadArguments);
-        }
-
-        // create parser for sparse vectors (SVMLight format)
-        dataset::SparseEntryParser sparseEntryParser;
-
-        // create mapped parser
-        dataset::MappedParser<dataset::SparseEntryParser> mappedParser(sparseEntryParser, map, inputCoordinates);
-
-        // create line iterator - read line by line sequentially
-        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
-
-        // Create iterator
-        return dataset::GetParsingIterator(std::move(lineIterator), mappedParser);
+        // Note, here we don't really need a shared_ptr to the map, because we're not holding on to it after the lifetime of the function
+        auto dataIterator = GetMappedDataIterator(dataLoadArguments, map, inputCoordinates);
+        auto dataset = std::make_unique<dataset::RowDataset>();
+        LoadDataset(*dataIterator, *dataset);
+        return dataset;
     }
-
 }
