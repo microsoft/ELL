@@ -23,11 +23,6 @@
 struct PrintableInput : public layers::Input, public PrintableLayer
 {
 public:
-
-    PrintableInput() = default; // TODO - remove
-
-    using layers::Input::Input;
-
     /// <summary> Gets a friendly layer name. </summary>
     ///
     /// <returns> The friendly layer name. </returns>
@@ -38,9 +33,12 @@ public:
     /// <returns> The number of elements in the layer. </returns>
     virtual uint64 Size() const override;
 
+    /// <summary> Assignment operator from layer::Input. </summary>
+    ///
+    /// <param name="input"> The Input layer being copied. </param>
     void operator=(const layers::Input& input);
 
-    /// <summary> Assignment operator from layer to PrintableLayer. </summary>
+    /// <summary> Assignment operator from layer::Layer. </summary>
     ///
     /// <param name="layer"> The layer being copied. </param>
     virtual void operator=(const layers::Layer& layer) override;

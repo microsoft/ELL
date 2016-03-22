@@ -113,6 +113,21 @@ void PrintElementDefinition(std::ostream& os, const std::string& id, double widt
     os << "            </g>\n";
 }
 
+PrintableMap::PrintableMap(const layers::Map& other) : Map(other)
+{
+
+    utilities::TypeFactory<PrintableLayer> printableLayerFactory;
+    printableLayerFactory.AddType<PrintableInput>(layers::Input::GetTypeName());
+    printableLayerFactory.AddType<PrintableCoordinatewise>(layers::Coordinatewise::GetTypeName());
+    printableLayerFactory.AddType<PrintableSum>(layers::Sum::GetTypeName());
+
+    for (const auto& layer : Map::_layers)
+    {
+        _layers.push_back(printableLayerFactory.Construct(layer->GetRuntimeTypeName()));
+        (*_layers.back()) = (*layer);
+    }
+}
+
 void PrintableMap::Print(std::ostream & os, const PrintArguments& arguments)
 {
     os << "<html>\n<body>\n";

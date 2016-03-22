@@ -27,25 +27,15 @@
 #include <iostream>
 #include <memory>
 
-/// <summary> A printable map. </summary>
+/// <summary> A printable Map. </summary>
 class PrintableMap : public layers::Map
 {
 public:
 
-    PrintableMap(const layers::Map& other) : Map(other)
-    {
-
-        utilities::TypeFactory<PrintableLayer> printableLayerFactory;
-        printableLayerFactory.AddType<PrintableInput>(layers::Input::GetTypeName());
-        printableLayerFactory.AddType<PrintableCoordinatewise>(layers::Coordinatewise::GetTypeName());
-        printableLayerFactory.AddType<PrintableSum>(layers::Sum::GetTypeName());
-
-        for (const auto& layer : Map::_layers)
-        {
-            _layers.push_back(printableLayerFactory.Construct(layer->GetRuntimeTypeName()));
-            (*_layers.back()) = (*layer);
-        }
-    }
+    /// <summary> Copy constructor that constructs an instance of PrintableMap from a Map. </summary>
+    ///
+    /// <param name="other"> The Map being copied. </param>
+    PrintableMap(const layers::Map& other);
 
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///

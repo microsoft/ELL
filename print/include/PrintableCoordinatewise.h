@@ -23,11 +23,6 @@
 struct PrintableCoordinatewise : public layers::Coordinatewise, public PrintableLayer
 {
 public:
-
-    PrintableCoordinatewise() = default; // TODO
-
-    using layers::Coordinatewise::Coordinatewise;
-
     /// <summary> Gets a friendly layer name. </summary>
     ///
     /// <returns> The friendly layer name. </returns>
