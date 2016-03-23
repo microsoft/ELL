@@ -29,9 +29,9 @@ namespace layers
         auto inputMapFStream = utilities::OpenIfstream(inputStackFile);
         utilities::XMLDeserializer deserializer(inputMapFStream);
 
-        StackType map;
-        deserializer.Deserialize(map);
-        return map;
+        StackType stack;
+        deserializer.Deserialize(stack);
+        return stack;
     }
 
 }

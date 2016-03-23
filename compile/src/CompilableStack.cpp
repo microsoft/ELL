@@ -92,18 +92,36 @@ void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::Int
     }
 }
 
+CompilableStack::CompilableStack(const layers::Map & other)
+{
+    const auto& stack = other.GetStack();
+    utilities::TypeFactory<CompilableLayer> compilableLayerFactory;
+    compilableLayerFactory.AddType<CompilableInput>(layers::Input::GetTypeName());
+    compilableLayerFactory.AddType<CompilableCoordinatewise>(layers::Coordinatewise::GetTypeName());
+    compilableLayerFactory.AddType<CompilableSum>(layers::Sum::GetTypeName());
+
+    for (uint64 index = 0; index < stack.NumLayers(); ++index)
+    {
+        const auto& layer = stack.GetLayer(index);
+        _compilableLayers.push_back(compilableLayerFactory.Construct(layer.GetRuntimeTypeName()));
+        (*_compilableLayers.back()) = layer;
+    }
+}
+
 void CompilableStack::ToCode(std::ostream& os, layers::CoordinateList coordinateList) const
 {
+    uint64 numLayers = _compilableLayers.size();
+
     // create data flow graph datastructure
     DataFlowGraph graph;
-    for(uint64 layerIndex = 0; layerIndex < NumLayers(); ++layerIndex)
+    for(uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
     {
-        graph.AddLayer(_layers[layerIndex]->Size());
+        graph.AddLayer(_compilableLayers[layerIndex]->Size());
     }
 
     // add extra layer for outputs
     uint64 outputLayerSize = coordinateList.size();
-    uint64 outputLayerIndex = NumLayers();
+    uint64 outputLayerIndex = numLayers;
     graph.AddLayer(outputLayerSize);
 
     // set names on output layer and set the actions that generate the output coordinates
@@ -117,10 +135,9 @@ void CompilableStack::ToCode(std::ostream& os, layers::CoordinateList coordinate
     }
 
     // backwards pass to assign actions to nodes
-    for(uint64 layerIndex = NumLayers() - 1; layerIndex > 0; --layerIndex)
+    for(uint64 layerIndex = numLayers - 1; layerIndex > 0; --layerIndex)
     {
-        const auto& compilableLayer = GetLayer<CompilableLayer>(layerIndex);
-        compilableLayer.SetActions(layerIndex, graph);
+        _compilableLayers[layerIndex]->SetActions(layerIndex, graph);
     }
 
     // construct an integer stack, to manage temp variable names;
@@ -128,7 +145,7 @@ void CompilableStack::ToCode(std::ostream& os, layers::CoordinateList coordinate
 
     // print comment
     auto str = "// Predict function\n// Input dimension: %i\n// Output dimension: %i\n// Output coordinates:";
-    uint64 inputLayerSize = _layers[0]->Size();
+    uint64 inputLayerSize = _compilableLayers[0]->Size();
     utilities::PrintFormat(os, str, inputLayerSize, outputLayerSize);
     for (uint64 i = 0; i < coordinateList.size(); ++i)
     {

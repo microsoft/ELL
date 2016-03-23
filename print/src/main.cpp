@@ -42,10 +42,11 @@ int main(int argc, char* argv[])
         auto outStream = utilities::GetOutputStreamImpostor(printArguments.outputSvgFile);
 
         // open stack file
-        auto stack = layers::Stack::Load<PrintableStack>(printArguments.inputStackFile);
+        auto stack = layers::Stack::Load(printArguments.inputStackFile);
+        PrintableStack printableStack(stack);
         
         // print to svg file
-        stack.Print(outStream, printArguments);
+        printableStack.Print(outStream, printArguments);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

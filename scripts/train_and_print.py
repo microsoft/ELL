@@ -9,4 +9,4 @@ runBinary('sgd', ['-idf', dataFile, '-osf', stackFile1])
 runBinary('sgd', ['-idf', dataFile, '-isf', stackFile1, '-osf', stackFile2, '-cl', 'e-2'])
 
 if outFile:
-    runBinary('print', ['-isf', mapFile2, '-osvg', outFile])
+    runBinary('print', ['-isf', stackFile2, '-osvg', outFile])

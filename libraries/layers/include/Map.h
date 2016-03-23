@@ -22,7 +22,7 @@
 #include <type_traits>
 
 namespace layers
-{ 
+{
     /// <summary> Implements a map. </summary>
     class Map
     {

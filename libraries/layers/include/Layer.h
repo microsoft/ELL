@@ -19,6 +19,7 @@
 // utilities
 #include "XMLSerialization.h"
 #include "StlIterator.h"
+#include "TypeFactory.h"
 
 // stl
 #include <vector>
@@ -62,6 +63,11 @@ namespace layers
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const = 0;
+
+        /// <summary> Returns a TypeFactory that can construct subclasses of this type. </summary>
+        ///
+        /// <returns> a TypeFactory that can construct subclasses of this type. </returns> 
+        static const utilities::TypeFactory<Layer> GetTypeFactory();
 
         /// <summary> Reads the layer from an XMLDeserializer. </summary>
         ///

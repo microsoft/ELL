@@ -68,7 +68,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "char"; }
+        static std::string GetName() { return "char"; }
     };
 
     /// <summary> Class used to get information about the short type. </summary>
@@ -80,7 +80,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "short"; }
+        static std::string GetName() { return "short"; }
     };
 
     /// <summary> Class used to get information about the unsigned short type. </summary>
@@ -92,7 +92,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "ushort"; }
+        static std::string GetName() { return "ushort"; }
     };
 
     /// <summary> Class used to get information about the int type. </summary>
@@ -104,7 +104,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "int"; }
+        static std::string GetName() { return "int"; }
     };
 
     /// <summary> Class used to get information about the unsigned int type. </summary>
@@ -116,7 +116,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "uint"; }
+        static std::string GetName() { return "uint"; }
     };
 
     /// <summary> Class used to get information about the long type. </summary>
@@ -128,7 +128,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "long"; }
+        static std::string GetName() { return "long"; }
     };
 
     /// <summary> Class used to get information about the unsigned long type. </summary>
@@ -140,7 +140,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "ulong"; }
+        static std::string GetName() { return "ulong"; }
     };
 
     /// <summary> Class used to get information about the unit64 type. </summary>
@@ -152,7 +152,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "uint64"; }
+        static std::string GetName() { return "uint64"; }
     };
 
     /// <summary> Class used to get information about the float type. </summary>
@@ -164,7 +164,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "float"; }
+        static std::string GetName() { return "float"; }
     };
 
     /// <summary> Class used to get information about the double type. </summary>
@@ -176,7 +176,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "double"; }
+        static std::string GetName() { return "double"; }
     };
 }
 
