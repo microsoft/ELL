@@ -17,7 +17,7 @@ set (SRC src/BinaryClassificationEvaluator.cpp
          src/Files.cpp
          src/Format.cpp
          src/IntegerStack.cpp
-         src/OutputStream.cpp
+         src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
          src/XMLSerialization.cpp)
 
@@ -27,7 +27,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
              include/Format.h
              include/IIterator.h
              include/IntegerStack.h
-             include/OutputStream.h
+             include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
              include/Parser.h
              include/RandomEngines.h

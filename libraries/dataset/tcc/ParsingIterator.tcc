@@ -16,7 +16,8 @@ namespace dataset
     template<typename RowIteratorType, typename VectorEntryParserType>
     ParsingIterator<RowIteratorType, VectorEntryParserType>::ParsingIterator(RowIteratorType&& row_iter, const VectorEntryParserType& parser) :
         _rowIterator(std::move(row_iter)), _instanceParser(parser)
-    {}
+    {
+    }
 
     template<typename RowIteratorType, typename VectorEntryParserType>
     bool ParsingIterator<RowIteratorType, VectorEntryParserType>::IsValid() const

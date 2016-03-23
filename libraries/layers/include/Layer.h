@@ -44,7 +44,7 @@ namespace layers
         ///
         /// <param name="layerIndex"> The layer's own zero-based index in the map. </param>
         /// <param name="outputs"> [in,out] The vector where the output values are written. </param>
-        virtual void Compute(uint64 layerIndex, std::vector<std::vector<double>>& outputs) const = 0;
+        virtual void Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const = 0;
 
         /// <summary> Returns an iterator that enumerates the input coordinates for a specified element. </summary>
         ///

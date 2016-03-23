@@ -24,8 +24,6 @@
 
 namespace layers
 {
-    // TODO: Describe what a map is here
-
     /// <summary> Implements a map. </summary>
     class Map
     {
@@ -49,29 +47,22 @@ namespace layers
             IndexValue Get() const;
 
         protected:
-            std::vector<std::vector<double>> _layerOutputs;
-            const CoordinateList _outputCoordinates;
+            std::vector<double> _outputs;
             uint64 _index;
 
             // private ctor, can only be called from Map class
-            OutputIterator(const std::vector<std::unique_ptr<Layer>>& layers, const CoordinateList& outputCoordinates);
-            void AllocateLayerOutputs(const std::vector<std::unique_ptr<Layer>>& layers);
+            OutputIterator(std::vector<double>&& outputs);
             friend Map;
         };
 
-        /// <summary> Default constructor. </summary>
-        Map() = default;
+        /// <summary> Constructs an instance of Map. </summary>
+        Map();
 
         /// <summary> Deleted copy constructor. </summary>
         Map(const Map& other) = delete;
 
         /// <summary> Default move constructor </summary>
         Map(Map&&) = default;
-
-        /// <summary> Constructs an instance of Map. </summary>
-        ///
-        /// <param name="inputLayerSize"> Input dimension. </param>
-        Map(uint64 inputLayerSize);
 
         /// <summary> Virtual destructor. </summary>
         virtual ~Map() = default;
@@ -103,7 +94,7 @@ namespace layers
         /// <typeparam name="LayerType"> Layer type to return. </typeparam>
         /// <param name="layerIndex"> Zero-based index of the layer. </param>
         ///
-        /// <returns> The requested layer, cast to the requested type. </returns>
+        /// <returns> The requested layer, cast to a const reference of the requested type. </returns>
         template <typename LayerType=Layer>
         const LayerType& GetLayer(uint64 layerIndex) const;
 
@@ -124,7 +115,7 @@ namespace layers
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName();
+        static const char* GetTypeName();
 
         /// <summary> Reads the map from an XMLDeserializer. </summary>
         ///
@@ -140,7 +131,13 @@ namespace layers
         // members
         std::vector<std::unique_ptr<Layer>> _layers;
 
+        void IncreaseInputLayerSize(uint64 minSize) const;
+
+        template <typename IndexValueIteratorType>
+        void LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const;
+
     private:
+        std::vector<std::vector<double>> AllocateLayerOutputs() const;
         static const int _currentVersion = 1;
     };
 }

@@ -26,49 +26,64 @@ namespace layers
     //
     bool Map::OutputIterator::IsValid() const
     {
-        return _index < _outputCoordinates.size();
+        return _index < _outputs.size();
     }
 
     void Map::OutputIterator::Next()
     {
+        if (IsValid())
+        {
         ++_index;
     }
-
-    void Map::OutputIterator::AllocateLayerOutputs(const std::vector<std::unique_ptr<Layer>>& layers)
-    {
-        _layerOutputs.clear();
-        for (uint64 i = 0; i < layers.size(); ++i)
-        {
-            _layerOutputs.emplace_back(layers[i]->Size());
         }
-    }
 
     IndexValue Map::OutputIterator::Get() const
     {
-        auto coordinate = _outputCoordinates[_index];
-        uint64 layerIndex = coordinate.GetLayerIndex();
-        uint64 elementIndex = coordinate.GetElementIndex();
-        return IndexValue{ _index, _layerOutputs[layerIndex][elementIndex] };
+        return IndexValue{ _index, _outputs[_index]};
     }
 
-    Map::OutputIterator::OutputIterator(const std::vector<std::unique_ptr<Layer>>& layers, const CoordinateList& outputCoordinates) :
-        _outputCoordinates(outputCoordinates),
-        _index(0)
-    {
-        AllocateLayerOutputs(layers);
-    }
+    Map::OutputIterator::OutputIterator(std::vector<double>&& outputs) : _outputs(std::move(outputs)), _index(0)
+    {}
 
     //
     // Map class implementation
     //
-
-    Map::Map(uint64 inputLayerSize)
+    Map::Map()
     {
-        _layers.push_back(std::make_unique<Input>(inputLayerSize));
+        _layers.push_back(std::make_unique<Input>());
     }
 
     uint64 Map::AddLayer(std::unique_ptr<Layer>&& layer)
     {
+        uint64 maxInputSize = 0;
+        auto numLayers = _layers.size();
+
+        // Keep track of the maximum input dimension requested and make sure new layer's inputs 
+        // come from previous layers only
+        auto layerSize = layer->Size();
+        for (uint64 index = 0; index < layerSize; index++)
+        {
+            auto inputCoords = layer->GetInputCoordinates(index);
+            while (inputCoords.IsValid())
+            {
+                auto coord = inputCoords.Get();
+                auto inputLayer = coord.GetLayerIndex();
+                if (inputLayer >= numLayers)
+                {
+                    throw std::runtime_error("Error: layer using inputs from non-previous layer");
+                }
+                auto inputElement = coord.GetElementIndex();
+                if (inputLayer == 0) // we're referring to an element of the first, Input, layer
+                {
+                    maxInputSize = std::max(inputElement+1, maxInputSize);
+                }
+                inputCoords.Next();
+            }
+        }
+
+        // Update input layer (layer 0)
+        IncreaseInputLayerSize(maxInputSize);
+
         uint64 layerIndex = _layers.size();
         _layers.push_back(std::move(layer));
         return layerIndex;
@@ -79,7 +94,20 @@ namespace layers
         return _layers.size();
     }
 
-    std::string Map::GetTypeName()
+    std::vector<std::vector<double>> Map::AllocateLayerOutputs() const
+    {
+        auto numLayers = _layers.size();
+        std::vector<std::vector<double>> layerOutputs;
+        layerOutputs.resize(numLayers);
+        for (uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
+        {
+            layerOutputs[layerIndex].resize(_layers[layerIndex]->Size());
+            std::fill(layerOutputs[layerIndex].begin(), layerOutputs[layerIndex].end(), 0);
+        }
+        return layerOutputs;
+    }
+
+    const char* Map::GetTypeName()
     {
         return "Map";
     }
@@ -89,7 +117,7 @@ namespace layers
         int version = 0;
         deserializer.Deserialize("version", version);
         if (version == 1)
-        {            
+        {
             deserializer.Deserialize("layers", _layers);
         }
         else
@@ -108,5 +136,10 @@ namespace layers
     {
         utilities::XMLSerializer serializer(os);
         serializer.Serialize(*this);
+    }
+
+    void Map::IncreaseInputLayerSize(uint64 minSize) const
+    {
+        GetLayer<Input&>(0).IncreaseSize(minSize);
     }
 }

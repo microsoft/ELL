@@ -26,9 +26,7 @@ namespace layers
     public:
 
         /// <summary> Constructs an Input layer. </summary>
-        ///
-        /// <param name="size"> The dimension of the input. </param>
-        Input(uint64 size = 0);
+        Input();
 
         /// <summary> Copy constructor. </summary>
         Input(const Input&) = default;
@@ -45,7 +43,7 @@ namespace layers
         ///
         /// <param name="layerIndex"> The layer's own zero-based index in the map. </param>
         /// <param name="outputs"> [in,out] The vector where the output values are written. </param>
-        virtual void Compute(uint64 layerIndex, std::vector<std::vector<double>>& outputs) const override;
+        virtual void Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const override;
 
         /// <summary> Returns an iterator that enumerates the input coordinates for a specified element. </summary>
         ///
@@ -73,6 +71,11 @@ namespace layers
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
         virtual void Write(utilities::XMLSerializer& serializer) const override;
+
+        /// <summary> Increases the size of the layer if necessary </summary>
+        ///
+        /// <param name="minimumSize"> The new minimum size of the layer </param>
+        void IncreaseSize(uint64 minimumSize);
 
     private:
         uint64 _size;

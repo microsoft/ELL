@@ -13,7 +13,7 @@
 
 // utilities
 #include "CommandLineParser.h" 
-#include "OutputStream.h"
+#include "OutputStreamImpostor.h"
 
 // layers
 #include "Map.h"
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        auto outStream = utilities::GetOutputStream(compileArguments.outputCodeFile);
+        auto outStream = utilities::GetOutputStreamImpostor(compileArguments.outputCodeFile);
 
         // open file
         auto map = layers::Map::Load<layers::Map>(mapLoadArguments.inputMapFile);
