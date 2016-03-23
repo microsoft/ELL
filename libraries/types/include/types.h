@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <limits>
 using std::numeric_limits;
+#include <type_traits>
 
 // abbreviations for basic types
 typedef uint64_t uint64;
@@ -27,3 +28,5 @@ struct IndexValue
 // parent classes for iterators 
 struct IIndexValueIterator {};
 
+template <typename IteratorType>
+using IsIndexValueIterator = typename std::enable_if_t<std::is_base_of<IIndexValueIterator, IteratorType>::value, int>;
