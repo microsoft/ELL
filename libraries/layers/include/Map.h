@@ -58,8 +58,8 @@ namespace layers
         /// <summary> Constructs an instance of Map. </summary>
         Map();
 
-        /// <summary> Deleted copy constructor </summary>
-        Map(const Map&) = delete;
+        /// <summary> Deleted copy constructor. </summary>
+        Map(const Map& other) = delete;
 
         /// <summary> Default move constructor </summary>
         Map(Map&&) = default;

@@ -46,7 +46,7 @@ namespace layers
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static const char* GetTypeName();
+        static std::string GetTypeName();
 
         /// <summary> Reads the map from an XMLDeserializer. </summary>
         ///

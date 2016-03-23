@@ -113,67 +113,82 @@ void PrintElementDefinition(std::ostream& os, const std::string& id, double widt
     os << "            </g>\n";
 }
 
-void PrintableMap::Print(std::ostream & os, const PrintArguments& Arguments)
+PrintableMap::PrintableMap(const layers::Map& other)
+{
+    utilities::TypeFactory<PrintableLayer> printableLayerFactory;
+    printableLayerFactory.AddType<PrintableInput>(layers::Input::GetTypeName());
+    printableLayerFactory.AddType<PrintableCoordinatewise>(layers::Coordinatewise::GetTypeName());
+    printableLayerFactory.AddType<PrintableSum>(layers::Sum::GetTypeName());
+
+    for (uint64 index = 0; index < other.NumLayers(); ++index)
+    {
+        const auto& layer = other.GetLayer(index);
+        _printableLayers.push_back(printableLayerFactory.Construct(layer.GetRuntimeTypeName())); 
+        (*_printableLayers.back()) = layer;
+    }
+}
+
+void PrintableMap::Print(std::ostream & os, const PrintArguments& arguments)
 {
     os << "<html>\n<body>\n";
     utilities::PrintFormat(os, 
         styleDefinitionFormat, 
         layers::Coordinatewise::GetOperationName(layers::Coordinatewise::OperationType::add),
         layers::Coordinatewise::GetOperationName(layers::Coordinatewise::OperationType::multiply),
-        Arguments.edgeStyle.dashStyle);
+        arguments.edgeStyle.dashStyle);
 
     os << "    <svg>\n\n        <defs>\n";
     PrintElementDefinition(os,
         "ValueElement",
-        Arguments.valueElementLayout.width, 
-        Arguments.valueElementLayout.height, 
-        Arguments.valueElementStyle.connectorRadius, 
-        Arguments.valueElementStyle.cornerRadius);
+        arguments.valueElementLayout.width, 
+        arguments.valueElementLayout.height, 
+        arguments.valueElementStyle.connectorRadius, 
+        arguments.valueElementStyle.cornerRadius);
     
     PrintElementDefinition(os,
         "EmptyElement",
-        Arguments.emptyElementLayout.width,
-        Arguments.emptyElementLayout.height,
-        Arguments.emptyElementStyle.connectorRadius,
-        Arguments.emptyElementStyle.cornerRadius);
+        arguments.emptyElementLayout.width,
+        arguments.emptyElementLayout.height,
+        arguments.emptyElementStyle.connectorRadius,
+        arguments.emptyElementStyle.cornerRadius);
 
     PrintElementDefinition(os,
         "InputElement",
-        Arguments.emptyElementLayout.width,
-        Arguments.emptyElementLayout.height,
-        Arguments.emptyElementStyle.connectorRadius,
-        Arguments.emptyElementStyle.cornerRadius,
+        arguments.emptyElementLayout.width,
+        arguments.emptyElementLayout.height,
+        arguments.emptyElementStyle.connectorRadius,
+        arguments.emptyElementStyle.cornerRadius,
         false);
 
     os << "        </defs>\n\n";
 
     // print layer by layer
-    double layerTop = Arguments.mapLayout.verticalMargin;
+    double layerTop = arguments.mapLayout.verticalMargin;
     std::vector<LayerLayout> layouts;
 
-    for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
+    for (uint64 layerIndex = 0; layerIndex < _printableLayers.size(); ++layerIndex)
     {
-        const auto& printableLayer = GetLayer<PrintableLayer>(layerIndex);
-        auto layout = printableLayer.Print(os, Arguments.mapLayout.horizontalMargin, layerTop, layerIndex, Arguments);
-        layerTop += layout.GetHeight() + Arguments.mapLayout.verticalSpacing;
+        const auto& printableLayer = _printableLayers[layerIndex];
+        auto layout = printableLayer->Print(os, arguments.mapLayout.horizontalMargin, layerTop, layerIndex, arguments);
+        layerTop += layout.GetHeight() + arguments.mapLayout.verticalSpacing;
         os << std::endl;
 
         // print edges
         if (layerIndex > 0) // skip input layer
         {
-            uint64 layerSize = _layers[layerIndex]->Size();
-            for (uint64 column = 0; column<layerSize; ++column)
+            uint64 layerSize = printableLayer->Size();
+            for (uint64 elementIndex = 0; elementIndex<layerSize; ++elementIndex)
             {
-                if (!layout.IsHidden(column)) // if output is hidden, hide edge
+                if (!layout.IsHidden(elementIndex)) // if output is hidden, hide edge
                 {
-                    auto inputCoordinates = _layers[layerIndex]->GetInputCoordinates(column);
+                    auto inputCoordinates = printableLayer->GetInputCoordinates(elementIndex);
                     while (inputCoordinates.IsValid()) // foreach incoming edge
                     {
                         auto coordinate = inputCoordinates.Get();
                         const auto& inputLayout = layouts[coordinate.GetLayerIndex()];
                         if (!inputLayout.IsHidden(coordinate.GetElementIndex())) // if input is hidden, hide edge
                         {
-                            SvgEdge(os, 2, inputLayout.GetOutputPoint(coordinate.GetElementIndex()), layout.GetInputPoint(column), Arguments.edgeStyle.flattness);
+                            SvgEdge(os, 2, inputLayout.GetOutputPoint(coordinate.GetElementIndex()), layout.GetInputPoint(elementIndex), arguments.edgeStyle.flattness);
                         }
 
                         // on to the next input

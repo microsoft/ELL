@@ -19,6 +19,21 @@
 class CompilableInput : public layers::Input, public CompilableLayer
 {
 public:
+    /// <summary> Returns the number of elements in the layer. </summary>
+    ///
+    /// <returns> The number of elements in the layer. </returns>
+    virtual uint64 Size() const override;
+
+    /// <summary> Assignment operator from Input. </summary>
+    ///
+    /// <param name="input"> The input layer to assign from.</param>
+    void operator=(const layers::Input& input);
+
+    /// <summary> Assignment operator from Layer. </summary>
+    ///
+    /// <param name="layer"> The layer being copied. </param>
+    virtual void operator=(const layers::Layer& layer) override;
+
     /// <summary> Pushes actions upward in the graph </summary>
     ///
     /// <param name="currentLayerIndex"> The index of the current layer. </param>

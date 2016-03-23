@@ -8,7 +8,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ConstructLayer.h"
 #include "Coordinatewise.h"
 #include "Input.h"
 #include "Sum.h"
@@ -34,12 +33,10 @@ namespace layers
     {
         if (IsValid())
         {
-            ++_index;
-        }
+        ++_index;
     }
+        }
 
-    /// \returns The current index-value pair
-    ///
     IndexValue Map::OutputIterator::Get() const
     {
         return IndexValue{ _index, _outputs[_index]};
