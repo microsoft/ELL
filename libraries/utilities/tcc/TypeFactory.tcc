@@ -36,6 +36,6 @@ namespace utilities
     {
         static_assert(std::is_base_of<BaseType, RuntimeType>::value, "incompatible base and runtime types in TypeFactory::Add");
 
-        _typeMap[typeName] = []() -> std::unique_ptr<BaseType> { return std::make_unique<RuntimeType>(); };
+        _typeMap[typeName] = []() { return static_cast<BaseType>(std::make_unique<RuntimeType>()); };
     }
 }

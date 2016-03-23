@@ -165,10 +165,20 @@ namespace utilities
         template<typename BaseType>
         void Deserialize(const char* name, std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory);
 
-        // TODO: documentation for array-of-pointer
+        /// <summary> Deserialize vector of unique_ptr to polymorphic class. </summary>
+        ///
+        /// <typeparam name="BaseType"> Type of the polymorphic base class. </typeparam>
+        /// <param name="name"> The name of the vector. </param>
+        /// <param name="value"> [in,out] The vector to deserialize. </param>
         template<typename BaseType>
         void Deserialize(const char* name, std::vector<std::unique_ptr<BaseType>>& value);
 
+        /// <summary> Deserialize vector of unique_ptr to polymorphic class. </summary>
+        ///
+        /// <typeparam name="BaseType"> Type of the polymorphic base class. </typeparam>
+        /// <param name="name"> The name of the vector. </param>
+        /// <param name="value"> [in,out] The vector to deserialize. </param>
+        /// <param name="factory"> A type factory for the polymorphic base class. </param>
         template<typename BaseType>
         void Deserialize(const char* name, std::vector<std::unique_ptr<BaseType>>& value, const TypeFactory<BaseType>& factory);
 
