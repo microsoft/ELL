@@ -50,12 +50,12 @@ namespace layers
         return Layer::InputCoordinateIterator(_inputCoordinates[index].cbegin(), _inputCoordinates[index].cend());
     }
 
-    const char* Sum::GetTypeName()
+    std::string Sum::GetTypeName()
     {
         return "Sum";
     }
 
-    const char* Sum::GetRuntimeTypeName() const
+    std::string Sum::GetRuntimeTypeName() const
     {
         return GetTypeName();
     }

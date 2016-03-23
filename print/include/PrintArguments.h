@@ -31,7 +31,7 @@ struct ElementLayoutArguments
 };
 
 /// <summary> Arguments for stack layout. </summary>
-struct MapLayoutArguments
+struct StackLayoutArguments
 {
     double horizontalMargin;            // space to the left of the first layer
     double verticalMargin;              // space above the first layer
@@ -68,14 +68,14 @@ struct LayerStyleArguments
 /// <summary> Arguments for print. </summary>
 struct PrintArguments
 {
-    std::string inputMapFile;
+    std::string inputStackFile;
     std::string outputSvgFile;
 
     ElementLayoutArguments valueElementLayout;
     ElementLayoutArguments emptyElementLayout;
     ValueElementStyleArguments valueElementStyle;
     ElementStyleArguments emptyElementStyle;
-    MapLayoutArguments mapLayout;
+    StackLayoutArguments stackLayout;
     LayerStyleArguments layerStyle;
     EdgeStyleArguments edgeStyle;
 };

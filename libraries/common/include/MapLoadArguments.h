@@ -24,8 +24,8 @@ namespace common
     /// <summary> A struct that holds command line parameters for loading maps. </summary>
     struct MapLoadArguments
     {
-        std::string inputMapFile = "";
-        std::string coordinateList = "";
+        std::string inputStackFile = "";
+        std::string coordinateListString = "";
     };
 
     /// <summary> A version of MapLoadArguments that adds its members to the command line parser. </summary>

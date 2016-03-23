@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputMapFile);
+        auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputStackFile);
 
         // read map from file
         std::shared_ptr<layers::Map> map = common::GetMap(mapLoadArguments);

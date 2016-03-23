@@ -79,9 +79,9 @@ namespace common
 
     std::unique_ptr<layers::Stack> GetStack(const MapLoadArguments& mapLoadArguments)
     {
-        if (mapLoadArguments.inputMapFile != "")
+        if (mapLoadArguments.inputStackFile != "")
         {
-            auto map = std::make_unique<layers::Stack>(layers::Stack::Load(mapLoadArguments.inputMapFile));
+            auto map = std::make_unique<layers::Stack>(layers::Stack::Load(mapLoadArguments.inputStackFile));
             return map;
         }
         else
@@ -92,10 +92,10 @@ namespace common
 
     std::unique_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments)
     {
-        if (mapLoadArguments.inputMapFile != "")
+        if (mapLoadArguments.inputStackFile != "")
         {
             std::shared_ptr<layers::Stack> stack = GetStack(mapLoadArguments);
-            layers::CoordinateList inputCoordinates = layers::GetCoordinateList(*stack, mapLoadArguments.coordinateList);
+            layers::CoordinateList inputCoordinates = layers::GetCoordinateList(*stack, mapLoadArguments.coordinateListString);
             auto map = std::make_unique<layers::Map>(stack, inputCoordinates);
             return map;
         }

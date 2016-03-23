@@ -1,12 +1,12 @@
 ﻿from recipeUtil import *
 
 dataFile = args[0]
-mapFile1 = args[1]
-mapFile2 = args[2]
+stackFile1 = args[1]
+stackFile2 = args[2]
 outFile  = args[3]
 
-runBinary('sgd', ['-idf', dataFile, '-omf', mapFile1])
-runBinary('sgd', ['-idf', dataFile, '-imf', mapFile1, '-omf', mapFile2, '-cl', 'e-2'])
+runBinary('sgd', ['-idf', dataFile, '-osf', stackFile1])
+runBinary('sgd', ['-idf', dataFile, '-isf', stackFile1, '-osf', stackFile2, '-cl', 'e-2'])
 
 if outFile:
-    runBinary('print', ['-imf', mapFile2, '-osf', outFile])
+    runBinary('print', ['-isf', mapFile2, '-osvg', outFile])

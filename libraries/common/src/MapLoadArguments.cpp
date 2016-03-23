@@ -15,14 +15,14 @@ namespace common
     void ParsedMapLoadArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
-            inputMapFile,
-            "inputMapFile",
-            "imf",
-            "Path to the input map file",
+            inputStackFile,
+            "inputStackFile",
+            "isf",
+            "Path to the input stack file",
             "");
 
         parser.AddOption(
-            coordinateList,
+            coordinateListString,
             "coordinateList",
             "cl",
             "Coordinate list definition string (see README)",

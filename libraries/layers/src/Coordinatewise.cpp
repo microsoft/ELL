@@ -103,12 +103,12 @@ namespace layers
         return Layer::InputCoordinateIterator(_inputCoordinates.cbegin() + index, _inputCoordinates.cbegin() + index + 1);
     }
 
-    const char* Coordinatewise::GetTypeName()
+    std::string Coordinatewise::GetTypeName()
     {
         return "Coordinatewise";
     }
 
-    const char* Coordinatewise::GetRuntimeTypeName() const
+    std::string Coordinatewise::GetRuntimeTypeName() const
     {
         return GetTypeName();
     }

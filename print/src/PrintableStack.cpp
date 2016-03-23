@@ -148,14 +148,14 @@ void PrintableStack::Print(std::ostream & os, const PrintArguments& Arguments)
     os << "        </defs>\n\n";
 
     // print layer by layer
-    double layerTop = Arguments.mapLayout.verticalMargin;
+    double layerTop = Arguments.stackLayout.verticalMargin;
     std::vector<LayerLayout> layouts;
 
     for (uint64 layerIndex = 0; layerIndex < _layers.size(); ++layerIndex)
     {
         const auto& printableLayer = GetLayer<PrintableLayer>(layerIndex);
-        auto layout = printableLayer.Print(os, Arguments.mapLayout.horizontalMargin, layerTop, layerIndex, Arguments);
-        layerTop += layout.GetHeight() + Arguments.mapLayout.verticalSpacing;
+        auto layout = printableLayer.Print(os, Arguments.stackLayout.horizontalMargin, layerTop, layerIndex, Arguments);
+        layerTop += layout.GetHeight() + Arguments.stackLayout.verticalSpacing;
         os << std::endl;
 
         // print edges

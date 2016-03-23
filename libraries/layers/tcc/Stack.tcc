@@ -24,9 +24,9 @@ namespace layers
     }
 
     template<typename StackType>
-    StackType Stack::Load(const std::string& inputMapFile)
+    StackType Stack::Load(const std::string& inputStackFile)
     {
-        auto inputMapFStream = utilities::OpenIfstream(inputMapFile);
+        auto inputMapFStream = utilities::OpenIfstream(inputStackFile);
         utilities::XMLDeserializer deserializer(inputMapFStream);
 
         StackType map;

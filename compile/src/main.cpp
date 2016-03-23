@@ -48,10 +48,10 @@ int main(int argc, char* argv[])
         auto outStream = utilities::GetOutputStreamImpostor(compileArguments.outputCodeFile);
 
         // open file
-        auto stack = std::make_shared<CompilableStack>(layers::Stack::Load<CompilableStack>(mapLoadArguments.inputMapFile));
+        auto stack = std::make_shared<CompilableStack>(layers::Stack::Load<CompilableStack>(mapLoadArguments.inputStackFile));
 
         // construct coordinate list
-        auto coordinateList = layers::GetCoordinateList(*stack, mapLoadArguments.coordinateList);
+        auto coordinateList = layers::GetCoordinateList(*stack, mapLoadArguments.coordinateListString);
 
         // output code
         stack->ToCode(outStream, coordinateList);

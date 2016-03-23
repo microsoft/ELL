@@ -55,12 +55,12 @@ namespace layers
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static const char*  GetTypeName();
+        static std::string  GetTypeName();
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual const char* GetRuntimeTypeName() const override;
+        virtual std::string GetRuntimeTypeName() const override;
 
         /// <summary> Reads the layer from an XMLDeserializer. </summary>
         ///

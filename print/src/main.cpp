@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         auto outStream = utilities::GetOutputStreamImpostor(printArguments.outputSvgFile);
 
         // open stack file
-        auto stack = layers::Stack::Load<PrintableStack>(printArguments.inputMapFile);
+        auto stack = layers::Stack::Load<PrintableStack>(printArguments.inputStackFile);
         
         // print to svg file
         stack.Print(outStream, printArguments);
