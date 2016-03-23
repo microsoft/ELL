@@ -26,10 +26,10 @@
 namespace utilities
 {
     /// <summary>
-    /// The XMLSerializer and XMLDeserializer classes facilitate serialization and deserialization of
-    /// some fundamental types, std::strings, std::vectors, std::unique_ptrs, and classes that
-    /// implement the required functions. Serializing a couple of variables to the string stream is
-    /// as simple as
+    /// The XMLSerializer and XMLDeserializer classes facilitate serialization and
+    /// deserialization of some fundamental types, std::strings, std::vectors, std::unique_ptrs, and
+    /// classes that implement the required functions. Serializing a couple of variables to the
+    /// string stream is as simple as
     /// 
     /// double x = 5.3;
     /// uint64 y = 12;
@@ -61,9 +61,8 @@ namespace utilities
     /// 
     /// class Foo
     /// {
-    /// public:
+    /// public: 
     ///     Foo();
-    ///     static std::string GetTypeName();
     ///     void Read(utilities::XMLDeserializer&amp; deserializer);
     ///     void Write(utilities::XMLSerializer&amp; serializer) const;
     /// }
@@ -76,7 +75,25 @@ namespace utilities
     /// serializer.Serialize("z", z);
     /// 
     /// This class also supports serializing and deserialization of std::unique_pointers to a
-    /// polymorphic base class.  
+    /// polymorphic base class. For this, say that we have a base class named Base. The base class is
+    /// required to have the following two public static members, and there pure virtual functions:
+    /// 
+    /// class Base
+    /// {
+    /// public: 
+    ///     static std::string GetTypeName();
+    ///     static const utilities::TypeFactory&lt;Layer&gt; GetTypeFactory();
+    ///     virtual std::string GetRuntimeTypeName() const = 0;
+    ///     virtual void Read(utilities::XMLDeserializer&amp; deserializer) = 0;
+    ///     virtual void Write(utilities::XMLSerializer&amp; serializer) const = 0;
+    /// };
+    /// 
+    /// GetTypeFactory() constructs a factory that maps the names (strings) of classes that derive
+    /// from Base to their default constructors. The deserializer relies on this factory to construct
+    /// the correct derived type. Now, classes derived from Base must implement the pure virtual
+    /// functions defined in Base.
+    /// 
+    /// Finally, the XMLSerialization classes also support serialization and deserialization of vectors of unique_ptrs.
     /// </summary>
     class XMLSerializer
     {
