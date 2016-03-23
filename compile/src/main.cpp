@@ -8,7 +8,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "CompilableStack.h"
+#include "CompilableMap.h"
 #include "CompileArguments.h"
 
 // utilities
@@ -50,13 +50,10 @@ int main(int argc, char* argv[])
 
         // open file
         auto map = common::GetMap(mapLoadArguments);
-        CompilableStack compilableStack(*map);
-
-        // construct coordinate list
-        auto coordinateList = map->GetOutputCoordinates();
+        CompilableMap compilableMap(*map);
 
         // output code
-        compilableStack.ToCode(outStream, coordinateList);
+        compilableMap.ToCode(outStream);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

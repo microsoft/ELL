@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     CompilableStack.h (compile)
-//  Authors:  Ofer Dekel
+//  File:     CompilableMap.h (compile)
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //
@@ -20,21 +20,22 @@
 #include <memory>
 #include <iostream>
 
-/// <summary> A compilable stack. </summary>
-class CompilableStack
+/// <summary> A compilable map. </summary>
+class CompilableMap
 {
 public:
     /// <summary> Copy constructor that constructs an instance of CompilableMap from a Map. </summary>
     ///
     /// <param name="other"> The Map being copied. </param>
-    CompilableStack(const layers::Map& other);
+    CompilableMap(const layers::Map& other);
 
     /// <summary> Generates C code that encodes the map. </summary>
     ///
     /// <param name="os"> [in,out] Stream to write data to. </param>
     /// <param name="coordinateList"> List of output coordinates, whose values must be computed. </param>
-    void ToCode(std::ostream& os, layers::CoordinateList coordinateList) const;
+    void ToCode(std::ostream& os) const;
 
 private:
     std::vector<std::unique_ptr<CompilableLayer>> _compilableLayers;
+    layers::CoordinateList _outputCoordinates;
 };
