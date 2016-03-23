@@ -31,6 +31,9 @@ namespace utilities
     {
     public:
 
+        /// <summary> Constructs an instance of XMLSerializer. </summary>
+        ///
+        /// <param name="stream"> [in,out] An output stream. </param>
         XMLSerializer(std::ostream& stream);
 
         /// <summary> Serialize fundamental types. </summary>
