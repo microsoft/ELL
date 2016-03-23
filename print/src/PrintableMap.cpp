@@ -124,7 +124,7 @@ PrintableMap::PrintableMap(const layers::Map& other)
     {
         const auto& layer = other.GetLayer(index);
         _printableLayers.push_back(printableLayerFactory.Construct(layer.GetRuntimeTypeName())); 
-        (*_printableLayers.back()) = (layer);
+        (*_printableLayers.back()) = layer;
     }
 }
 
