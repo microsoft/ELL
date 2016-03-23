@@ -10,6 +10,21 @@
 
 #include "CompilableSum.h"
 
+uint64 CompilableSum::Size() const
+{
+    return Sum::Size();
+}
+
+void CompilableSum::operator=(const layers::Sum& sum)
+{
+    layers::Sum::operator=(sum);
+}
+
+void CompilableSum::operator=(const layers::Layer& layer)
+{
+    operator=(dynamic_cast<const Sum&>(layer));
+}
+
 void CompilableSum::SetActions(uint64 currentLayerIndex, DataFlowGraph& graph) const
 {
     for(uint64 elementIndex = 0; elementIndex < Size(); ++elementIndex)

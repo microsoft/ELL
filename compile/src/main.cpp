@@ -48,13 +48,14 @@ int main(int argc, char* argv[])
         auto outStream = utilities::GetOutputStream(compileArguments.outputCodeFile);
 
         // open file
-        auto map = layers::Map::Load<CompilableMap>(mapLoadArguments.inputMapFile);
+        auto map = layers::Map::Load<layers::Map>(mapLoadArguments.inputMapFile);
+        CompilableMap compilableMap(map);
 
         // construct coordinate list
         auto coordinateList = layers::GetCoordinateList(map, mapLoadArguments.coordinateList);
 
         // output code
-        map.ToCode(outStream, coordinateList);
+        compilableMap.ToCode(outStream, coordinateList);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
