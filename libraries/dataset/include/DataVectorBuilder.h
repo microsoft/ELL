@@ -31,7 +31,7 @@ namespace dataset
         /// <param name="IndexValueIterator"> The index value iterator. </param>
         ///
         /// <returns> A std::unique_ptr&lt;IDataVector&gt; </returns>
-        template<typename IndexValueIteratorType>
+        template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         static std::unique_ptr<IDataVector> Build(IndexValueIteratorType IndexValueIterator);
     };
 }

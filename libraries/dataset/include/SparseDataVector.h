@@ -83,7 +83,7 @@ namespace dataset
         /// <summary> Constructs an instance of SparseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        template<typename IndexValueIteratorType, typename concept = IsIndexValueIterator<IndexValueIteratorType>>
         SparseDataVector(IndexValueIteratorType IndexValueIterator);
 
         /// <summary> Move constructor. </summary>

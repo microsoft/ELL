@@ -74,7 +74,6 @@ namespace layers
         /// <param name="outputCoordinates"> The output coordinates. </param>
         ///
         /// <returns> An Iterator over output values. </returns>
-        //        template <typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
         template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         OutputIterator Compute(IndexValueIteratorType inputIterator, const CoordinateList& outputCoordinates) const;
 
