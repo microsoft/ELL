@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     PrintableMap.h (print)
+//  File:     PrintableStack.h (print)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
@@ -27,14 +27,14 @@
 #include <iostream>
 #include <memory>
 
-/// <summary> A printable Map. </summary>
-class PrintableMap
+/// <summary> A printable stack. </summary>
+class PrintableStack
 {
 public:
-    /// <summary> Copy constructor that constructs an instance of PrintableMap from a Map. </summary>
+    /// <summary> Copy constructor that constructs an instance of PrintableStack from a Stack. </summary>
     ///
     /// <param name="other"> The Map being copied. </param>
-    PrintableMap(const layers::Map& other);
+    PrintableStack(const layers::Stack& other);
 
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///

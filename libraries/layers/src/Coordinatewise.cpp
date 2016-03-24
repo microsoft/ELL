@@ -34,7 +34,7 @@ namespace layers
 
     const std::string Coordinatewise::GetOperationName(OperationType type)
     {
-        switch(type)
+        switch (type)
         {
         case OperationType::add:
             return addOperationName;
@@ -47,11 +47,11 @@ namespace layers
 
     Coordinatewise::OperationType Coordinatewise::GetOperationType(const std::string& name)
     {
-        if(name == addOperationName)
+        if (name == addOperationName)
         {
             return OperationType::add;
         }
-        else if(name == multiplyOperationName)
+        else if (name == multiplyOperationName)
         {
             return OperationType::multiply;
         }
@@ -63,7 +63,7 @@ namespace layers
 
     std::function<double(double, double)> Coordinatewise::GetOperation(OperationType type)
     {
-        switch(type)
+        switch (type)
         {
         case OperationType::add:
             return std::plus<double>();
@@ -90,7 +90,7 @@ namespace layers
     {
         auto operation = GetOperation(_operationType);
 
-        for(uint64 k=0; k<_values.size(); ++k)
+        for (uint64 k = 0; k < _values.size(); ++k)
         {
             Coordinate coordinate = _inputCoordinates[k];
             double input = inputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
@@ -100,7 +100,7 @@ namespace layers
 
     Layer::InputCoordinateIterator Coordinatewise::GetInputCoordinates(uint64 index) const
     {
-        return Layer::InputCoordinateIterator(_inputCoordinates.cbegin()+index, _inputCoordinates.cbegin()+index+1);
+        return Layer::InputCoordinateIterator(_inputCoordinates.cbegin() + index, _inputCoordinates.cbegin() + index + 1);
     }
 
     std::string Coordinatewise::GetTypeName()
@@ -130,7 +130,7 @@ namespace layers
             throw std::runtime_error("unsupported version: " + std::to_string(version));
         }
     }
-    
+
     void Coordinatewise::Write(utilities::XMLSerializer& serializer) const
     {
         serializer.Serialize("version", _currentVersion);

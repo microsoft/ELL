@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     PrintableMap.cpp (print)
+//  File:     PrintableStack.cpp (print)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "PrintableMap.h"
+#include "PrintableStack.h"
 #include "PrintableInput.h"
 #include "PrintableCoordinatewise.h"
 #include "PrintableSum.h"
@@ -113,7 +113,7 @@ void PrintElementDefinition(std::ostream& os, const std::string& id, double widt
     os << "            </g>\n";
 }
 
-PrintableMap::PrintableMap(const layers::Map& other)
+PrintableStack::PrintableStack(const layers::Stack& other)
 {
     utilities::TypeFactory<PrintableLayer> printableLayerFactory;
     printableLayerFactory.AddType<PrintableInput>(layers::Input::GetTypeName());
@@ -128,7 +128,7 @@ PrintableMap::PrintableMap(const layers::Map& other)
     }
 }
 
-void PrintableMap::Print(std::ostream & os, const PrintArguments& arguments)
+void PrintableStack::Print(std::ostream & os, const PrintArguments& arguments)
 {
     os << "<html>\n<body>\n";
     utilities::PrintFormat(os, 
@@ -163,14 +163,14 @@ void PrintableMap::Print(std::ostream & os, const PrintArguments& arguments)
     os << "        </defs>\n\n";
 
     // print layer by layer
-    double layerTop = arguments.mapLayout.verticalMargin;
+    double layerTop = arguments.stackLayout.verticalMargin;
     std::vector<LayerLayout> layouts;
 
     for (uint64 layerIndex = 0; layerIndex < _printableLayers.size(); ++layerIndex)
     {
         const auto& printableLayer = _printableLayers[layerIndex];
-        auto layout = printableLayer->Print(os, arguments.mapLayout.horizontalMargin, layerTop, layerIndex, arguments);
-        layerTop += layout.GetHeight() + arguments.mapLayout.verticalSpacing;
+        auto layout = printableLayer->Print(os, arguments.stackLayout.horizontalMargin, layerTop, layerIndex, arguments);
+        layerTop += layout.GetHeight() + arguments.stackLayout.verticalSpacing;
         os << std::endl;
 
         // print edges
