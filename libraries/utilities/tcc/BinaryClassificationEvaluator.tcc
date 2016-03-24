@@ -20,7 +20,7 @@ namespace utilities
         while(data_iter.IsValid())
         {
             const auto& example = data_iter.Get();
-            double prediction = predictor.Predict(example);
+            double prediction = predictor.Predict(example.GetDataVector());
             double loss = loss_function.Evaluate(prediction, example.GetLabel());
 
             total_weight += example.GetWeight();

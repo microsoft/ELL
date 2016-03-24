@@ -14,7 +14,7 @@
 #include "types.h"
 
 // predictors
-#include "SharedLinearBinaryPredictor.h"
+#include "LinearPredictor.h"
 
 // linear
 #include "DoubleVector.h"
@@ -22,7 +22,7 @@
 namespace optimization
 {
     /// <summary>
-    /// Implements the Averaged Stochstic Gradient Descent algorithm on an L2 regularized empirical
+    /// Implements the Averaged Stochastic Gradient Descent algorithm on an L2 regularized empirical
     /// loss.
     /// </summary>
     class AsgdOptimizer
@@ -48,13 +48,13 @@ namespace optimization
         /// <summary> Returns The averaged predictor. </summary>
         ///
         /// <returns> The averaged predictor. </returns>
-        const predictors::SharedLinearBinaryPredictor GetPredictor() const;
+        const predictors::LinearPredictor& GetPredictor() const;
             
     private:
         uint64 _total_iterations;
         linear::DoubleVector _w;
         double _b;
-        predictors::SharedLinearBinaryPredictor _predictor;
+        predictors::LinearPredictor _predictor;
     };
 }
 

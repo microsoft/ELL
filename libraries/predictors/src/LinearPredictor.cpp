@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     Linear.cpp (predictors)
+//  File:     LinearPredictor.cpp (predictors)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Linear.h"
+#include "LinearPredictor.h"
 
 // layers
 #include "Coordinate.h"
@@ -21,35 +21,35 @@
 
 namespace predictors
 {
-    Linear::Linear(uint64 dim) : _w(dim), _b(0)
+    LinearPredictor::LinearPredictor(uint64 dim) : _w(dim), _b(0)
     {}
 
-    linear::DoubleVector& Linear::GetVector()
+    linear::DoubleVector& LinearPredictor::GetVector()
     {
         return _w;
     }
 
-    const linear::DoubleVector& Linear::GetVector() const
+    const linear::DoubleVector& LinearPredictor::GetVector() const
     {
         return _w;
     }
 
-    double& Linear::GetBias()
+    double& LinearPredictor::GetBias()
     {
         return _b;
     }
 
-    double Linear::GetBias() const
+    double LinearPredictor::GetBias() const
     {
         return _b;
     }
 
-    double Linear::Predict(const dataset::IDataVector& dataVector) const
+    double LinearPredictor::Predict(const dataset::IDataVector& dataVector) const
     {
         return dataVector.Dot(_w) + _b;
     }
 
-    void Linear::AddToStack(layers::Stack& stack, const layers::CoordinateList& inputCoordinates) const
+    void LinearPredictor::AddToStack(layers::Stack& stack, const layers::CoordinateList& inputCoordinates) const
     {
         uint64 layerIndex = stack.AddLayer(std::make_unique<layers::Coordinatewise>(_w, inputCoordinates, layers::Coordinatewise::OperationType::multiply));
         auto coordinates = stack.GetCoordinateList(layerIndex);
