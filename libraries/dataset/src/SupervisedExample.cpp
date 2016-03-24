@@ -25,11 +25,6 @@ namespace dataset
         return _label;
     }
     
-    IDataVector::type SupervisedExample::GetType() const
-    {
-        return type();
-    }
-
     void SupervisedExample::Reset()
     {
         _upInstance->Reset();
@@ -60,6 +55,16 @@ namespace dataset
         _upInstance->AddTo(p_other, scalar);
     }
 
+    void SupervisedExample::AddTo(std::vector<double>& other, double scalar) const
+    {
+        AddTo(other.data(), scalar);
+    }
+
+    double SupervisedExample::Dot(const std::vector<double>& other) const
+    {
+        return _upInstance->Dot(other.data());
+    }
+
     double SupervisedExample::Dot(const double * p_other) const
     {
         return _upInstance->Dot(p_other);
@@ -69,5 +74,11 @@ namespace dataset
     {
         os << _label << '\t';
         _upInstance->Print(os);
+    }
+
+    std::ostream & operator<<(std::ostream & ostream, const SupervisedExample & example)
+    {
+        example.Print(ostream);
+        return ostream;
     }
 }
