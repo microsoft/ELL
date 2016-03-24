@@ -22,7 +22,7 @@ namespace layers
     void Map::LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const
     {
         // set the input 
-        types::SetArray(layerOutputs, inputIterator);
+        types::CopyToArray(inputIterator, layerOutputs);
         
         // update the input layer to handle vectors of this size
         IncreaseInputLayerSize((uint64)layerOutputs.size());

@@ -60,7 +60,7 @@ namespace types
 
     // specialization for IndexValueIterators
     template<typename ValueType, typename IndexValueIteratorType, typename std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value, int>>
-    void SetArray(std::vector<ValueType>& array, IndexValueIteratorType& indexValueIterator)
+    void CopyToArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array)
     {
         std::fill(array.begin(), array.end(), 0);
         while (indexValueIterator.IsValid())
