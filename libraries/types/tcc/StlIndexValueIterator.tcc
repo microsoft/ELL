@@ -57,4 +57,22 @@ namespace types
     {
         return VectorIndexValueIterator<ValueType>(arr.cbegin(), arr.cend());
     }
+
+    // specialization for IndexValueIterators
+    template<typename ValueType, typename IndexValueIteratorType, typename std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value, int>>
+    void SetArray(std::vector<ValueType>& array, IndexValueIteratorType& indexValueIterator)
+    {
+        std::fill(array.begin(), array.end(), 0);
+        while (indexValueIterator.IsValid())
+        {
+            auto entry = indexValueIterator.Get();
+            if (entry.index >= array.size())
+            {
+                array.resize(entry.index + 1);
+            }
+            array[entry.index] = entry.value;
+            indexValueIterator.Next();
+        }
+    }
+
 }

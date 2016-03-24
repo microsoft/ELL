@@ -8,6 +8,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// types
+#include "StlIndexValueIterator.h"
+
 // stl
 #include <vector>
 #include <algorithm>
@@ -15,28 +18,11 @@
 
 namespace layers
 {
-    // specialization for IndexValueIterators
-    template<typename IndexValueIteratorType>
-    void SetArray(std::vector<double>& array, IndexValueIteratorType& indexValueIterator)
-    {
-        std::fill(array.begin(), array.end(), 0);
-        while (indexValueIterator.IsValid())
-        {
-            auto entry = indexValueIterator.Get();
-            if (entry.index >= array.size())
-            {
-                array.resize(entry.index + 1);
-            }
-            array[entry.index] = entry.value;
-            indexValueIterator.Next();
-        }
-    }
-
     template<typename IndexValueIteratorType>
     void Map::LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const
     {
         // set the input 
-        SetArray(layerOutputs, inputIterator);
+        types::SetArray(layerOutputs, inputIterator);
         
         // update the input layer to handle vectors of this size
         IncreaseInputLayerSize((uint64)layerOutputs.size());

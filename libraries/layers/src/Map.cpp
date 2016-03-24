@@ -92,6 +92,16 @@ namespace layers
         _outputCoordinates = coordinates;
     }
 
+    const Stack& Map::GetStack() const 
+    { 
+        return *_stack; 
+    }
+
+    Stack& Map::GetStack() 
+    { 
+        return *_stack; 
+    }
+
     void Map::AllocateLayerOutputs() const
     {
         auto numLayers = _stack->NumLayers();

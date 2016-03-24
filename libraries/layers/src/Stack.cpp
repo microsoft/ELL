@@ -83,7 +83,7 @@ namespace layers
         return coordinateList;
     }
 
-    const char* Stack::GetTypeName()
+    std::string Stack::GetTypeName()
     {
         return "Stack";
     }

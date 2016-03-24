@@ -94,10 +94,10 @@ namespace layers
         void SetOutputCoordinates(const CoordinateList& coordinates);
 
         /// <summary> Gets a const reference to the layer stack this map refers to </summary>
-        const Stack& GetStack() const { return *_stack; }
+        const Stack& GetStack() const;
 
         /// <summary> Gets a non-const reference to the layer stack this map refers to </summary>
-        Stack& GetStack() { return *_stack; }
+        Stack& GetStack();
 
     protected:
         // members
