@@ -13,8 +13,6 @@
 #include "RowDataset.h"
 #include "SupervisedExample.h"
 
-#include "types.h"
-
 // utilities
 #include "StlIterator.h"
 
@@ -49,19 +47,19 @@ namespace dataset
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
         /// <returns> The number of examples. </returns>
-        uint64 NumExamples() const;
+        uint64_t NumExamples() const;
 
         /// <summary> Returns the maximal size of any example. </summary>
         ///
         /// <returns> The maximal size of any example. </returns>
-        uint64 GetMaxExampleSize() const;
+        uint64_t GetMaxExampleSize() const;
 
         /// <summary> Returns a reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        const SupervisedExample& GetExample(uint64 index) const;
+        const SupervisedExample& GetExample(uint64_t index) const;
 
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///
@@ -70,7 +68,7 @@ namespace dataset
         /// examples. </param>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator(uint64 firstExample = 0, uint64 numExamples = 0) const;
+        Iterator GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
@@ -88,10 +86,10 @@ namespace dataset
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
         /// <param name="count"> Number of examples to permute. </param>
-        void RandPerm(std::default_random_engine& rng, uint64 count);
+        void RandPerm(std::default_random_engine& rng, uint64_t count);
 
     private:
         std::vector<SupervisedExample> _examples;
-        uint64 _maxExampleSize = 0;
+        uint64_t _maxExampleSize = 0;
     };
 }

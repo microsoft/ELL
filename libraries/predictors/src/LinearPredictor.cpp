@@ -21,7 +21,7 @@
 
 namespace predictors
 {
-    LinearPredictor::LinearPredictor(uint64 dim) : _w(dim), _b(0)
+    LinearPredictor::LinearPredictor(uint64_t dim) : _w(dim), _b(0)
     {}
 
     linear::DoubleVector& LinearPredictor::GetVector()
@@ -57,7 +57,7 @@ namespace predictors
 
     void LinearPredictor::AddToStack(layers::Stack& stack, const layers::CoordinateList& inputCoordinates) const
     {
-        uint64 layerIndex = stack.AddLayer(std::make_unique<layers::Coordinatewise>(_w, inputCoordinates, layers::Coordinatewise::OperationType::multiply));
+        uint64_t layerIndex = stack.AddLayer(std::make_unique<layers::Coordinatewise>(_w, inputCoordinates, layers::Coordinatewise::OperationType::multiply));
         auto coordinates = stack.GetCoordinateList(layerIndex);
         layerIndex = stack.AddLayer(std::make_unique<layers::Sum>(coordinates));
         layerIndex = stack.AddLayer(std::make_unique<layers::Coordinatewise>(_b, layers::Coordinate{ layerIndex, 0 }, layers::Coordinatewise::OperationType::add));

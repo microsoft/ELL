@@ -34,7 +34,7 @@ namespace predictors
         /// <summary> Constructs an instance of Linear. </summary>
         ///
         /// <param name="dim"> The dimension. </param>
-        LinearPredictor(uint64 dim);
+        LinearPredictor(uint64_t dim);
 
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///

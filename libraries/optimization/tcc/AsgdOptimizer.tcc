@@ -15,7 +15,7 @@
 namespace optimization
 {
     template<typename ExampleIteratorType, typename LossFunctionType>
-    void AsgdOptimizer::Update(ExampleIteratorType& exampleIterator, uint64 numExamples, const LossFunctionType& lossFunction, double lambda)
+    void AsgdOptimizer::Update(ExampleIteratorType& exampleIterator, uint64_t numExamples, const LossFunctionType& lossFunction, double lambda)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetVector();

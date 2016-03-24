@@ -43,7 +43,7 @@ namespace optimization
         /// <param name="lossFunction"> The loss function. </param>
         /// <param name="l2Regularization"> The L2 regularization parameter. </param>
         template<typename ExampleIteratorType, typename LossFunctionType>
-        void Update(ExampleIteratorType& exampleIterator, uint64 numExamples, const LossFunctionType& lossFunction, double l2Regularization);
+        void Update(ExampleIteratorType& exampleIterator, uint64_t numExamples, const LossFunctionType& lossFunction, double l2Regularization);
 
         /// <summary> Returns The averaged predictor. </summary>
         ///
