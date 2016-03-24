@@ -130,8 +130,8 @@ void addToTest()
     b[12] = 1.0;
     b[13] = 1.0;
 
-    DataVectorType1 c1(types::MakeStlIndexValueIterator(b));
-    DataVectorType2 c2(types::MakeStlIndexValueIterator(b));
+    DataVectorType1 c1(utilities::MakeStlIndexValueIterator(b));
+    DataVectorType2 c2(utilities::MakeStlIndexValueIterator(b));
 
     c1.AddTo(a1);
     c2.AddTo(a2);

@@ -28,9 +28,9 @@ namespace dataset
     }
 
     template<typename IntegerListType>
-    types::IndexValue SparseBinaryDataVectorBase<IntegerListType>::Iterator::Get() const
+    linear::IndexValue SparseBinaryDataVectorBase<IntegerListType>::Iterator::Get() const
     {
-        return types::IndexValue { _list_iterator.Get(), 1.0 };
+        return linear::IndexValue { _list_iterator.Get(), 1.0 };
     }
 
     template<typename IntegerListType>

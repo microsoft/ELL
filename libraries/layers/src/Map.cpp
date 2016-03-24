@@ -36,7 +36,7 @@ namespace layers
         }
     }
 
-    types::IndexValue Map::OutputIterator::Get() const
+    linear::IndexValue Map::OutputIterator::Get() const
     {
         return{ _index, _outputs[_index] };
     }

@@ -22,13 +22,13 @@ namespace layers
     void Map::LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const
     {
         // set the input 
-        types::CopyToArray(inputIterator, layerOutputs);
+        utilities::CopyToArray(inputIterator, layerOutputs);
         
         // update the input layer to handle vectors of this size
         IncreaseInputLayerSize((uint64_t)layerOutputs.size());
     }
 
-    template <typename IndexValueIteratorType, types::IsIndexValueIterator<IndexValueIteratorType> concept>
+    template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept>
     Map::OutputIterator Map::Compute(IndexValueIteratorType inputIterator) const
     {
         AllocateLayerOutputs();

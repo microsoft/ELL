@@ -27,7 +27,7 @@ namespace linear
     class DoubleVector : public IVector
     {
     public:
-        using Iterator = types::VectorIndexValueIterator<double>;
+        using Iterator = utilities::VectorIndexValueIterator<double>;
 
         /// <summary> Constructs an instance of DoubleVector. </summary>
         ///
@@ -60,7 +60,7 @@ namespace linear
         /// <typeparam name="IIndexValueIterator"> Type of the index value iterator. </typeparam>
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
         /// <param name="indexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, types::IsIndexValueIterator<IndexValueIteratorType> concept = 0>
+        template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         DoubleVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Type-conversion operator into a std::vector<double>

@@ -29,7 +29,7 @@ namespace linear
     class DoubleSubvector: public IVector
     {
     public:
-        using Iterator = types::StlIndexValueIterator<const double*, double>;
+        using Iterator = utilities::StlIndexValueIterator<const double*, double>;
         /// <summary> Constructs a DoubleSubvector. </summary>
         ///
         /// <param name="vec"> The vector to reference. </param>

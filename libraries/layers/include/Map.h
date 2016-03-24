@@ -30,7 +30,7 @@ namespace layers
     public:
 
         /// <summary> An iterator over the output values of the map. </summary>
-        class OutputIterator : public types::IIndexValueIterator
+        class OutputIterator : public linear::IIndexValueIterator
         {
         public:
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
@@ -44,7 +44,7 @@ namespace layers
             /// <summary> Gets the current index-value pair. </summary>
             ///
             /// <returns> The current index-value pair. </returns>
-            types::IndexValue Get() const;
+            linear::IndexValue Get() const;
 
         protected:
             std::vector<double> _outputs;
@@ -79,7 +79,7 @@ namespace layers
         /// <param name="IndexValueIterator"> The input value iterator. </param>
         ///
         /// <returns> An Iterator over output values. </returns>
-        template <typename IndexValueIteratorType, types::IsIndexValueIterator<IndexValueIteratorType> concept = 0>
+        template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         OutputIterator Compute(IndexValueIteratorType inputIterator) const;
 
         /// <summary> Returns the current output coordinates for the map. </summary>

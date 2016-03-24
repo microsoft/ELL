@@ -32,7 +32,7 @@ namespace dataset
     class DenseDataVector : public IDataVector
     {
     public:
-        using Iterator = types::VectorIndexValueIterator<ValueType>;
+        using Iterator = utilities::VectorIndexValueIterator<ValueType>;
 
         /// <summary> Constructor. </summary>
         DenseDataVector();
@@ -40,7 +40,7 @@ namespace dataset
         /// <summary> Constructs an instance of DenseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, typename concept = types::IsIndexValueIterator<IndexValueIteratorType>>
+        template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         DenseDataVector(IndexValueIteratorType IndexValueIterator);
 
         /// <summary> Move constructor. </summary>

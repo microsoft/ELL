@@ -36,7 +36,7 @@ namespace dataset
     public:
 
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
-        class Iterator : public types::IIndexValueIterator
+        class Iterator : public linear::IIndexValueIterator
         {
         public:
 
@@ -61,7 +61,7 @@ namespace dataset
             /// <summary> \returns The current value. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            types::IndexValue Get() const;
+            linear::IndexValue Get() const;
 
         private:
 
@@ -87,7 +87,7 @@ namespace dataset
         /// <typeparam name="IIndexValueIterator">  Type of the index value iterator. </typeparam>
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, typename concept = types::IsIndexValueIterator<IndexValueIteratorType>>
+        template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         SparseBinaryDataVectorBase(IndexValueIteratorType IndexValueIterator);
 
         /// <summary> Move constructor. </summary>

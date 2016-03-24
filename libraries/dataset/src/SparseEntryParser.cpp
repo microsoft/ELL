@@ -86,10 +86,10 @@ namespace dataset
             }
         }
 
-        _currentIndexValue = types::IndexValue{index, value};
+        _currentIndexValue = linear::IndexValue{index, value};
     }
 
-    types::IndexValue SparseEntryParser::Iterator::Get() const
+    linear::IndexValue SparseEntryParser::Iterator::Get() const
     {
         return _currentIndexValue;
     }

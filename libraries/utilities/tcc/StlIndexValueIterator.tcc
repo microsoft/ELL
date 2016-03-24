@@ -8,7 +8,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace types
+namespace utilities
 {
     //
     // StlIndexValueIterator implementation
@@ -34,9 +34,9 @@ namespace types
     }
 
     template <typename IteratorType, typename ValueType>
-    IndexValue StlIndexValueIterator<IteratorType, ValueType>::Get() const
+    linear::IndexValue StlIndexValueIterator<IteratorType, ValueType>::Get() const
     {
-        return IndexValue{ _index, (double)*_begin };
+        return linear::IndexValue{ _index, (double)*_begin };
     }
 
     template <typename IteratorType, typename ValueType>
@@ -59,7 +59,7 @@ namespace types
     }
 
     // specialization for IndexValueIterators
-    template<typename ValueType, typename IndexValueIteratorType, typename std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value, int>>
+    template<typename ValueType, typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType>>
     void CopyToArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array)
     {
         std::fill(array.begin(), array.end(), 0);

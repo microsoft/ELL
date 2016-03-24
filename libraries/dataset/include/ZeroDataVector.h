@@ -26,7 +26,7 @@ namespace dataset
     public:
 
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
-        class Iterator : public types::IIndexValueIterator
+        class Iterator : public linear::IIndexValueIterator
         {
         public:
 
@@ -51,7 +51,7 @@ namespace dataset
             /// <summary> \returns The current index-value pair. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            types::IndexValue Get() const;
+            linear::IndexValue Get() const;
 
         private:
             // private ctor, can only be called from SparseDataVector class

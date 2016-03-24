@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace types
+namespace linear
 {
     // An entry in a vector
     struct IndexValue
@@ -19,5 +19,5 @@ namespace types
     struct IIndexValueIterator {};
 
     template <typename IteratorType>
-    using IsIndexValueIterator = typename std::enable_if_t<std::is_base_of<types::IIndexValueIterator, IteratorType>::value, int>;
+    using IsIndexValueIterator = typename std::enable_if_t<std::is_base_of<IIndexValueIterator, IteratorType>::value, int>;
 }

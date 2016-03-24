@@ -17,12 +17,12 @@
 #include <vector>
 #include <type_traits>
 
-namespace types
+namespace utilities
 {
     /// <summary> A read-only forward index-value iterator for an STL container </summary>
 
     template <typename IteratorType, typename ValueType = decltype(*std::declval<IteratorType>())>
-    class StlIndexValueIterator: public IIndexValueIterator
+    class StlIndexValueIterator: public linear::IIndexValueIterator
     {
     public:
         /// <summary> Constructs an instance of StlIndexValueIterator. </summary>
@@ -42,7 +42,7 @@ namespace types
         /// <summary> \returns The current index-value pair </summary>
         ///
         /// <returns> The current index-value pair </returns>
-        IndexValue Get() const;
+        linear::IndexValue Get() const;
 
     protected:
         IteratorType _begin;
@@ -67,7 +67,7 @@ namespace types
     ///
     /// <param name="array"> The std::vector to copy values into </param>
     /// <param name="indexValueIterator"> The IndexValueIterator to copy values from </param> 
-    template<typename ValueType, typename IndexValueIteratorType, types::IsIndexValueIterator<IndexValueIteratorType> = 0>
+    template<typename ValueType, typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> = 0>
     void CopyToArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array);
 }
 

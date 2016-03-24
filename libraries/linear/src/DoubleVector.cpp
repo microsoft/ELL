@@ -62,7 +62,7 @@ namespace linear
 
     DoubleVector::Iterator DoubleVector::GetIterator() const
     {
-        return types::MakeStlIndexValueIterator(_data);
+        return utilities::MakeStlIndexValueIterator(_data);
     }
     
     void DoubleVector::Print(std::ostream & os) const

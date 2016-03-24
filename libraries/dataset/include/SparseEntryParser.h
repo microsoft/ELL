@@ -25,7 +25,7 @@ namespace dataset
     {
     public:
 
-        class Iterator : public types::IIndexValueIterator
+        class Iterator : public linear::IIndexValueIterator
         {
         public:
 
@@ -50,12 +50,12 @@ namespace dataset
             /// <summary> \returns The current index-value pair. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            types::IndexValue Get() const;
+            linear::IndexValue Get() const;
 
         private:
             std::shared_ptr<const std::string> _spExampleString; // hold on to the shared ptr to make sure that std::string is not deleted
             const char* _currentPos = 0;
-            types::IndexValue _currentIndexValue;
+            linear::IndexValue _currentIndexValue;
             bool _isValid = true;
 
             // Private constructor that can only be called from SparseEntryParser
