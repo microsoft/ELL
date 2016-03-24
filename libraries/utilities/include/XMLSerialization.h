@@ -96,6 +96,13 @@ namespace utilities
     /// 
     /// Finally, the XMLSerialization classes also support serialization and deserialization of vectors of unique_ptrs.
     /// </summary>
+
+    template <typename ValueType>
+    using IsFundamental = typename std::enable_if_t<std::is_fundamental<ValueType>::value, int>;
+
+    template <typename ValueType>
+    using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, int>;
+
     class XMLSerializer
     {
     public:
@@ -110,8 +117,8 @@ namespace utilities
         /// <typeparam name="ValueType"> The type being serialized. </typeparam>
         /// <param name="name"> Name of the variable being serialized. </param>
         /// <param name="value"> The variable being serialized. </param>
-        template<typename ValueType>
-        void Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
+        template <typename ValueType, IsFundamental<ValueType> concept = 0>
+        void Serialize(const char* name, const ValueType& value);
 
         /// <summary> Serialize a unique pointer to a polymorphic class. </summary>
         ///
@@ -140,15 +147,15 @@ namespace utilities
         /// <typeparam name="ValueType"> Type being serialized. </typeparam>
         /// <param name="name"> Name of the variable being serialized. </param>
         /// <param name="value"> The variable being serialized. </param>
-        template<typename ValueType>
-        void Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
+        template <typename ValueType, IsClass<ValueType> concept = 0>
+        void Serialize(const char* name, const ValueType& value);
 
         /// <summary> Serialize unnamed fundamental types. </summary>
         ///
         /// <typeparam name="ValueType"> The type being serialized. </typeparam>
         /// <param name="value"> The variable being serialized. </param>
-        template<typename ValueType>
-        void Serialize(const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
+        template <typename ValueType, IsFundamental<ValueType> concept = 0>
+        void Serialize(const ValueType& value);
 
         /// <summary> Serialize an unnamed unique pointer to a polymorphic class. </summary>
         ///
@@ -173,8 +180,8 @@ namespace utilities
         ///
         /// <typeparam name="ValueType"> Type being serialized. </typeparam>
         /// <param name="value"> The variable being serialized. </param>
-        template<typename ValueType>
-        void Serialize(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
+        template <typename ValueType, IsClass<ValueType> concept = 0>
+        void Serialize(const ValueType& value);
 
     private:
         template<typename ValueType>
@@ -214,8 +221,8 @@ namespace utilities
         /// <typeparam name="ValueType"> The type being deserialized. </typeparam>
         /// <param name="name"> Name of the variable being deserialized, which is compared to the serialized version. </param>
         /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
-        template<typename ValueType>
-        void Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
+        template <typename ValueType, IsFundamental<ValueType> concept = 0>
+        void Deserialize(const char* name, ValueType& value);
 
         /// <summary> Deserialize a unique pointer to a polymorphic class using the default type factory. </summary>
         ///
@@ -270,15 +277,15 @@ namespace utilities
         /// <typeparam name="ValueType"> The type being deserialized. </typeparam>
         /// <param name="name"> Name of the variable being deserialized, which is compared to the serialized version. </param>
         /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
-        template<typename ValueType>
-        void Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
+        template <typename ValueType, IsClass<ValueType> concept = 0>
+        void Deserialize(const char* name, ValueType& value);
 
         /// <summary> Deserialize unnamed fundamental types. </summary>
         ///
         /// <typeparam name="ValueType"> The type being deserialized. </typeparam>
         /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
-        template<typename ValueType>
-        void Deserialize(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept = nullptr);
+        template <typename ValueType, IsFundamental<ValueType> concept = 0>
+        void Deserialize(ValueType& value);
 
         /// <summary> Deserialize an unnamed unique pointer to a polymorphic class. </summary>
         ///
@@ -306,8 +313,8 @@ namespace utilities
         ///
         /// <typeparam name="ValueType"> The type being deserialized. </typeparam>
         /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
-        template<typename ValueType>
-        void Deserialize(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept = nullptr);
+        template <typename ValueType, IsClass<ValueType> concept = 0>
+        void Deserialize(ValueType& value);
 
     private:
 

@@ -32,8 +32,8 @@ namespace utilities
     //
 
     // serialize fundamental types
-    template<typename ValueType>
-    void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
+    template<typename ValueType, IsFundamental<ValueType> concept>
+    void XMLSerializer::Serialize(const char* name, const ValueType& value)
     {
         auto typeName = TypeName<ValueType>::GetName();
         WriteSingleLineTags(typeName, name, value);
@@ -75,8 +75,8 @@ namespace utilities
     }
 
     // serialize classes
-    template<typename ValueType>
-    void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
+    template <typename ValueType, IsClass<ValueType> concept>
+    void XMLSerializer::Serialize(const char* name, const ValueType& value)
     {
         auto typeName = ValueType::GetTypeName();
 
@@ -86,8 +86,8 @@ namespace utilities
     }
 
     // serialize fundamental types
-    template<typename ValueType>
-    void XMLSerializer::Serialize(const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
+    template <typename ValueType, IsFundamental<ValueType> concept>
+    void XMLSerializer::Serialize(const ValueType& value)
     {
         auto typeName = TypeName<ValueType>::GetName();
         WriteSingleLineTags(typeName, value);
@@ -129,8 +129,8 @@ namespace utilities
     }
 
     // serialize classes
-    template<typename ValueType>
-    void XMLSerializer::Serialize(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
+    template <typename ValueType, IsClass<ValueType> concept>
+    void XMLSerializer::Serialize(const ValueType& value)
     {
         auto typeName = ValueType::GetTypeName();
 
@@ -188,8 +188,8 @@ namespace utilities
     //
 
     // deserialize fundamental types
-    template<typename ValueType>
-    void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
+    template <typename ValueType, IsFundamental<ValueType> concept>
+    void XMLDeserializer::Deserialize(const char* name, ValueType& value)
     {
         auto typeName = TypeName<ValueType>::GetName();
         ReadSingleLineTags(Match(typeName), Match("name"), Match(name), value);
@@ -262,8 +262,8 @@ namespace utilities
     }
 
     // deserialize classes
-    template<typename ValueType>
-    void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
+    template <typename ValueType, IsClass<ValueType> concept>
+    void XMLDeserializer::Deserialize(const char* name, ValueType& value)
     {
         auto typeName = ValueType::GetTypeName();
         ReadOpenTag(Match(typeName), Match("name"), Match(name));
@@ -272,8 +272,8 @@ namespace utilities
     }
 
     // deserialize fundamental types
-    template<typename ValueType>
-    void XMLDeserializer::Deserialize(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
+    template <typename ValueType, IsFundamental<ValueType> concept>
+    void XMLDeserializer::Deserialize(ValueType& value)
     {
         auto typeName = TypeName<ValueType>::GetName();
         ReadSingleLineTags(Match(typeName), value);
@@ -331,8 +331,8 @@ namespace utilities
     }
 
     // deserialize classes
-    template<typename ValueType>
-    void XMLDeserializer::Deserialize(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
+    template<typename ValueType, IsClass<ValueType> concept>
+    void XMLDeserializer::Deserialize(ValueType& value)
     {
         auto typeName = ValueType::GetTypeName();
         ReadOpenTag(Match(typeName));

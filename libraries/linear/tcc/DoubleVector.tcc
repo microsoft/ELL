@@ -34,7 +34,7 @@ namespace linear
         return std::move(_data);
     };
 
-    template<typename IndexValueIteratorType, typename concept>
+    template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> concept>
     inline DoubleVector::DoubleVector(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())

@@ -78,9 +78,7 @@ namespace layers
         /// <param name="IndexValueIterator"> The input value iterator. </param>
         ///
         /// <returns> An Iterator over output values. </returns>
-        ///
-        /// <remarks> Note: this call is not thread-safe </remarks>
-        template <typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         OutputIterator Compute(IndexValueIteratorType inputIterator) const;
 
         /// <summary> Returns the current output coordinates for the map. </summary>

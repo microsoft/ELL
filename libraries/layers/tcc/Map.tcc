@@ -28,7 +28,7 @@ namespace layers
         IncreaseInputLayerSize((uint64)layerOutputs.size());
     }
 
-    template<typename IndexValueIteratorType, typename concept>
+    template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> concept>
     Map::OutputIterator Map::Compute(IndexValueIteratorType inputIterator) const
     {
         AllocateLayerOutputs();
