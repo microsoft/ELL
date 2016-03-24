@@ -24,7 +24,7 @@ namespace common
     /// <summary> A struct that holds command line parameters for saving maps. </summary>
     struct MapSaveArguments
     {
-        std::string outputMapFile = "";
+        std::string outputStackFile = "";
     };
 
     /// <summary> A version of MapSaveArguments that adds its members to the command line parser. </summary>

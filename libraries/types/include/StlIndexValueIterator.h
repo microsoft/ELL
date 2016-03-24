@@ -14,6 +14,7 @@
 
 // stl
 #include <vector>
+#include <type_traits>
 
 namespace types
 {
@@ -59,6 +60,14 @@ namespace types
     /// <returns> An StlIndexValueIteratorAdapter that iterates over the given vector </returns>
     template <typename ValueType>
     VectorIndexValueIterator<ValueType> MakeStlIndexValueIterator(const std::vector<ValueType>& container);
+
+
+    /// <summary> Copies values from an IndexValueIterator into a std::vector, resizing the vector if necessary </summary>
+    ///
+    /// <param name="array"> The std::vector to copy values into </param>
+    /// <param name="indexValueIterator"> The IndexValueIterator to copy values from </param> 
+    template<typename ValueType, typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> = 0>
+    void CopyToArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array);
 }
 
 

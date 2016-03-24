@@ -48,12 +48,12 @@ namespace layers
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName();
 
-        /// <summary> Reads the map from an XMLDeserializer. </summary>
+        /// <summary> Reads the coordinate from an XMLDeserializer. </summary>
         ///
         /// <param name="deserializer"> [in,out] The deserializer. </param>
         void Read(utilities::XMLDeserializer& deserializer);
 
-        /// <summary> Writes the map to an XMLSerializer. </summary>
+        /// <summary> Writes the coordinate to an XMLSerializer. </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
         void Write(utilities::XMLSerializer& serializer) const;

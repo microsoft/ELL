@@ -15,8 +15,8 @@
 
 void ParsedPrintArguments::AddArgs(utilities::CommandLineParser & parser)
 {
-    parser.AddOption(inputMapFile, "inputMapFile", "imf", "Path to the input file that contains the map information", "");
-    parser.AddOption(outputSvgFile, "outputSvgFile", "osf", "Path to the output Svg file", "");
+    parser.AddOption(inputStackFile, "inputStackFile", "isf", "Path to the input file that contains the stack information", "");
+    parser.AddOption(outputSvgFile, "outputSvgFile", "osvg", "Path to the output Svg file", "");
 
     parser.AddOption(valueElementLayout.width, "valueElementWidth", "vew", "Width of each element in a layer that shows values", 55);
     parser.AddOption(valueElementLayout.height, "valueElementHeight", "veh", "Height of each element in a layer that shows values", 40);
@@ -41,9 +41,9 @@ void ParsedPrintArguments::AddArgs(utilities::CommandLineParser & parser)
     parser.AddOption(emptyElementStyle.cornerRadius, "emptyElementCornerRadius", "eecr", "Radius of rounded corners of elements in a layer that doesn't show values", 5);
     parser.AddOption(emptyElementStyle.connectorRadius, "emptyElementConnectorRadius", "eekr", "Radius of connectors on top and bottom of elements in a layer that doesn't show values", 5);
 
-    parser.AddOption(mapLayout.horizontalMargin, "layerHorizontalMargin", "lhm", "Horizontal distance to the left edge of each layer", 20);
-    parser.AddOption(mapLayout.verticalMargin, "layerVerticalMargin", "lvm", "Vertical distnace to the top edge of the first layer", 10);
-    parser.AddOption(mapLayout.verticalSpacing, "layerVerticalSpacing", "lvs", "The amount of vertical space between layers", 30);
+    parser.AddOption(stackLayout.horizontalMargin, "layerHorizontalMargin", "lhm", "Horizontal distance to the left edge of each layer", 20);
+    parser.AddOption(stackLayout.verticalMargin, "layerVerticalMargin", "lvm", "Vertical distnace to the top edge of the first layer", 10);
+    parser.AddOption(stackLayout.verticalSpacing, "layerVerticalSpacing", "lvs", "The amount of vertical space between layers", 30);
 
     parser.AddOption(layerStyle.maxWidth, "layerMaxWidth", "lmw", "The maximum width of any layer", 700);
     parser.AddOption(layerStyle.cornerRadius, "layerCornerRadius", "lcr", "Radius of layer rounded corners", 10);
@@ -56,15 +56,15 @@ utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilit
 {
     std::vector<std::string> parseErrorMessages;
 
-    if(inputMapFile == "")
+    if(inputStackFile == "")
     {
-        parseErrorMessages.push_back("-inputMapFile (or -imf) is required");
+        parseErrorMessages.push_back("-inputStackFile (or -isf) is required");
     }
     else
     {
-        if(!utilities::IsFileReadable(inputMapFile))
+        if(!utilities::IsFileReadable(inputStackFile))
         {
-            parseErrorMessages.push_back("cannot read from specified input map file: " + inputMapFile);
+            parseErrorMessages.push_back("cannot read from specified input stack file: " + inputStackFile);
         }
     }
 

@@ -68,6 +68,9 @@ namespace linear
         /// <summary> Type-conversion operator into a std::vector<double>, allowing non-const ref
         operator std::vector<double> & () &;
 
+        /// <summary> Type-conversion operator into a const std::vector<double> reference
+        operator std::vector<double> const & () const &;
+
         /// <summary> Type-conversion operator into a std::vector<double>, allowing move semantics
         operator std::vector<double> && () &&;
 

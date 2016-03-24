@@ -23,7 +23,12 @@ namespace linear
     {
         return std::ref(_data);
     };
-    
+
+    inline DoubleVector::operator std::vector<double> const & () const &
+    {
+        return std::cref(_data);
+    };
+
     inline DoubleVector::operator std::vector<double> && () &&
     {
         return std::move(_data);

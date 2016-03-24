@@ -2,7 +2,7 @@
 //
 //  Project:  [projectName]
 //  File:     CompilableMap.cpp (compile)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //
@@ -92,22 +92,25 @@ void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::Int
     }
 }
 
-CompilableMap::CompilableMap(const layers::Map & other)
+CompilableMap::CompilableMap(const layers::Map& other)
 {
+    _outputCoordinates = other.GetOutputCoordinates();
+
+    const auto& stack = other.GetStack();
     utilities::TypeFactory<CompilableLayer> compilableLayerFactory;
     compilableLayerFactory.AddType<CompilableInput>(layers::Input::GetTypeName());
     compilableLayerFactory.AddType<CompilableCoordinatewise>(layers::Coordinatewise::GetTypeName());
     compilableLayerFactory.AddType<CompilableSum>(layers::Sum::GetTypeName());
 
-    for (uint64 index = 0; index < other.NumLayers(); ++index)
+    for (uint64 index = 0; index < stack.NumLayers(); ++index)
     {
-        const auto& layer = other.GetLayer(index);
+        const auto& layer = stack.GetLayer(index);
         _compilableLayers.push_back(compilableLayerFactory.Construct(layer.GetRuntimeTypeName()));
         (*_compilableLayers.back()) = layer;
     }
 }
 
-void CompilableMap::ToCode(std::ostream& os, layers::CoordinateList coordinateList) const
+void CompilableMap::ToCode(std::ostream& os) const
 {
     uint64 numLayers = _compilableLayers.size();
 
@@ -119,7 +122,7 @@ void CompilableMap::ToCode(std::ostream& os, layers::CoordinateList coordinateLi
     }
 
     // add extra layer for outputs
-    uint64 outputLayerSize = coordinateList.size();
+    uint64 outputLayerSize = _outputCoordinates.size();
     uint64 outputLayerIndex = numLayers;
     graph.AddLayer(outputLayerSize);
 
@@ -127,7 +130,7 @@ void CompilableMap::ToCode(std::ostream& os, layers::CoordinateList coordinateLi
     const std::string outputFixedVariableName = "output";
     for (uint64 outputElementIndex = 0; outputElementIndex < outputLayerSize; ++outputElementIndex)
     {
-        auto inputCoordinate = coordinateList[outputElementIndex];
+        auto inputCoordinate = _outputCoordinates[outputElementIndex];
         layers::Coordinate outputCoordinate(outputLayerIndex, outputElementIndex);
         graph.GetNode(outputCoordinate).SetFixedVariableName(outputFixedVariableName + "[" + std::to_string(outputElementIndex) + "]");
         graph.GetNode(inputCoordinate).EmplaceAction(outputCoordinate);
@@ -146,9 +149,9 @@ void CompilableMap::ToCode(std::ostream& os, layers::CoordinateList coordinateLi
     auto str = "// Predict function\n// Input dimension: %i\n// Output dimension: %i\n// Output coordinates:";
     uint64 inputLayerSize = _compilableLayers[0]->Size();
     utilities::PrintFormat(os, str, inputLayerSize, outputLayerSize);
-    for (uint64 i = 0; i < coordinateList.size(); ++i)
+    for (uint64 i = 0; i < _outputCoordinates.size(); ++i)
     {
-        os << ' ' << coordinateList[i];
+        os << ' ' << _outputCoordinates[i];
     }
 
     // print function declaration
