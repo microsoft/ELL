@@ -133,20 +133,6 @@ namespace linear
         template<typename... Args >
         void EmplaceBackRow(Args&&... args);
 
-        /// <summary> Randomly permutes the rows of the matrix. </summary>
-        ///
-        /// <param name="rng"> [in,out] The random number generator. </param>
-        void RandPerm(std::default_random_engine& rng);
-
-        /// <summary>
-        /// Permutes the matrix so that the first numRows of the matrix are chosen uniformly, and the rest of the
-        /// rows are arbitrary.
-        /// </summary>
-        ///
-        /// <param name="rng"> [in,out] The random number generator. </param>
-        /// <param name="count"> Number of rows to permute. </param>
-        void RandPerm(std::default_random_engine& rng, uint64 count);
-
         /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>
         ///
         /// <param name="p_x"> The x vector. </param>
