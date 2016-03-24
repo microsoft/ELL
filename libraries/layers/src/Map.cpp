@@ -2,25 +2,24 @@
 //
 //  Project:  [projectName]
 //  File:     Map.cpp (layers)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Coordinatewise.h"
-#include "Input.h"
-#include "Sum.h"
 #include "Map.h"
+#include "Stack.h"
 
 // stl
 #include <stdexcept>
-#include <string>
+#include <vector>
+#include <memory>
+#include <algorithm>
+#include <utility>
 
 namespace layers
 {
-    const int Map::_currentVersion;
-
     //
     // Map::OutputIterator implementation
     //
@@ -33,113 +32,94 @@ namespace layers
     {
         if (IsValid())
         {
-        ++_index;
-    }
+            ++_index;
         }
+    }
 
     IndexValue Map::OutputIterator::Get() const
     {
-        return IndexValue{ _index, _outputs[_index]};
+        return IndexValue{ _index, _outputs[_index] };
     }
 
     Map::OutputIterator::OutputIterator(std::vector<double>&& outputs) : _outputs(std::move(outputs)), _index(0)
     {}
 
     //
-    // Map class implementation
+    // Map class implementataion
     //
+
     Map::Map()
     {
-        _layers.push_back(std::make_unique<Input>());
+        _stack = std::make_shared<Stack>();
     }
 
-    uint64 Map::AddLayer(std::unique_ptr<Layer>&& layer)
-    {
-        uint64 maxInputSize = 0;
-        auto numLayers = _layers.size();
+    Map::Map(const std::shared_ptr<Stack>& layers) : _stack(layers)
+    {}
 
-        // Keep track of the maximum input dimension requested and make sure new layer's inputs 
-        // come from previous layers only
-        auto layerSize = layer->Size();
-        for (uint64 index = 0; index < layerSize; index++)
+    Map::Map(const std::shared_ptr<Stack>& layers, const CoordinateList& outputCoordinates) : _stack(layers), _outputCoordinates(outputCoordinates)
+    {}
+
+    CoordinateList Map::GetOutputCoordinates() const
         {
-            auto inputCoords = layer->GetInputCoordinates(index);
-            while (inputCoords.IsValid())
+        auto outputCoordinates = _outputCoordinates;
+        if (outputCoordinates.size() == 0)
             {
-                auto coord = inputCoords.Get();
-                auto inputLayer = coord.GetLayerIndex();
-                if (inputLayer >= numLayers)
+            if (_stack->NumLayers() == 1)
                 {
-                    throw std::runtime_error("Error: layer using inputs from non-previous layer");
-                }
-                auto inputElement = coord.GetElementIndex();
-                if (inputLayer == 0) // we're referring to an element of the first, Input, layer
+                // size should be max of what we've seen and the input layer size
+                auto maxOutputSize = std::max(_maxInputSizeSeen, _stack->GetLayer(0).Size());
+                if (maxOutputSize == 0)
                 {
-                    maxInputSize = std::max(inputElement+1, maxInputSize);
+                    throw std::runtime_error("Error: unable to compute Map output coordinates");
                 }
-                inputCoords.Next();
+
+                outputCoordinates = CoordinateList(maxOutputSize);
+                for (uint64 elementIndex = 0; elementIndex < maxOutputSize; ++elementIndex)
+                {
+                    outputCoordinates[elementIndex] = { 0, elementIndex };
+                }
             }
+            else
+            {
+                outputCoordinates = _stack->GetCoordinateList(_stack->NumLayers() - 1);
         }
-
-        // Update input layer (layer 0)
-        IncreaseInputLayerSize(maxInputSize);
-
-        uint64 layerIndex = _layers.size();
-        _layers.push_back(std::move(layer));
-        return layerIndex;
+    }
+        return outputCoordinates;
     }
 
-    uint64 Map::NumLayers() const
-    {
-        return _layers.size();
+    void Map::SetOutputCoordinates(const CoordinateList& coordinates)
+        {
+        _outputCoordinates = coordinates;
     }
 
-    std::vector<std::vector<double>> Map::AllocateLayerOutputs() const
+    const Stack& Map::GetStack() const 
+    { 
+        return *_stack; 
+    }
+
+    Stack& Map::GetStack() 
+    { 
+        return *_stack; 
+    }
+
+    void Map::AllocateLayerOutputs() const
     {
-        auto numLayers = _layers.size();
-        std::vector<std::vector<double>> layerOutputs;
-        layerOutputs.resize(numLayers);
+        auto numLayers = _stack->NumLayers();
+        _layerOutputs.resize(numLayers);
+
         for (uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
         {
-            layerOutputs[layerIndex].resize(_layers[layerIndex]->Size());
-            std::fill(layerOutputs[layerIndex].begin(), layerOutputs[layerIndex].end(), 0);
-        }
-        return layerOutputs;
-    }
-
-    const char* Map::GetTypeName()
-    {
-        return "Map";
-    }
-
-    void Map::Read(utilities::XMLDeserializer& deserializer)
-    {
-        int version = 0;
-        deserializer.Deserialize("version", version);
-        if (version == 1)
+            auto layerSize = _stack->GetLayer(layerIndex).Size();
+            if (layerIndex == 0 && numLayers == 1) // input layer
         {
-            deserializer.Deserialize("layers", _layers);
-        }
-        else
-        {
-            throw std::runtime_error("unsupported version: " + std::to_string(version));
-        }
+                layerSize = std::max(layerSize, _maxInputSizeSeen);
     }
-
-    void Map::Write(utilities::XMLSerializer& serializer) const
-    {
-        serializer.Serialize("version", _currentVersion);
-        serializer.Serialize("layers", _layers);
+            _layerOutputs[layerIndex].resize(layerSize);
     }
-
-    void Map::Save(std::ostream& os) const
-    {
-        utilities::XMLSerializer serializer(os);
-        serializer.Serialize(*this);
     }
 
     void Map::IncreaseInputLayerSize(uint64 minSize) const
     {
-        GetLayer<Input&>(0).IncreaseSize(minSize);
+        _maxInputSizeSeen = std::max(minSize, _maxInputSizeSeen);
     }
 }

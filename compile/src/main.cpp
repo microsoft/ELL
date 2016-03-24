@@ -21,6 +21,7 @@
 // common
 #include "CoordinateListTools.h"
 #include "MapLoadArguments.h"
+#include "DataLoaders.h"
 
 // stl
 #include<iostream>
@@ -48,14 +49,11 @@ int main(int argc, char* argv[])
         auto outStream = utilities::GetOutputStreamImpostor(compileArguments.outputCodeFile);
 
         // open file
-        auto map = layers::Map::Load<layers::Map>(mapLoadArguments.inputMapFile);
-        CompilableMap compilableMap(map);
-
-        // construct coordinate list
-        auto coordinateList = layers::GetCoordinateList(map, mapLoadArguments.coordinateList);
+        auto map = common::GetMap(mapLoadArguments);
+        CompilableMap compilableMap(*map);
 
         // output code
-        compilableMap.ToCode(outStream, coordinateList);
+        compilableMap.ToCode(outStream);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

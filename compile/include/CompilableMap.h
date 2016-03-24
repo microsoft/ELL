@@ -2,7 +2,7 @@
 //
 //  Project:  [projectName]
 //  File:     CompilableMap.h (compile)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //
@@ -21,7 +21,7 @@
 #include <iostream>
 
 /// <summary> A compilable map. </summary>
-class CompilableMap 
+class CompilableMap
 {
 public:
     /// <summary> Copy constructor that constructs an instance of CompilableMap from a Map. </summary>
@@ -33,8 +33,9 @@ public:
     ///
     /// <param name="os"> [in,out] Stream to write data to. </param>
     /// <param name="coordinateList"> List of output coordinates, whose values must be computed. </param>
-    void ToCode(std::ostream& os, layers::CoordinateList coordinateList) const;
+    void ToCode(std::ostream& os) const;
 
 private:
     std::vector<std::unique_ptr<CompilableLayer>> _compilableLayers;
+    layers::CoordinateList _outputCoordinates;
 };
