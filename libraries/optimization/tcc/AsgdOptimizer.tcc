@@ -42,16 +42,17 @@ namespace optimization
             const auto& example = exampleIterator.Get();
             double label = example.GetLabel();
             double weight = example.GetWeight();
+            const auto& dataVector = example.GetDataVector();
 
             // calculate the prediction 
-            double alpha = T_prev / (t-1) * example.Dot(v);
+            double alpha = T_prev / (t-1) * dataVector.Dot(v);
 
             // calculate the loss derivative
             double beta = weight * lossFunction.GetDerivative(alpha, label);
 
             // Update v and v_avg
-            example.AddTo(v, -eta*beta);
-            example.AddTo(v_avg, -eta*beta*(sigma - log(t) - 0.5/t));
+            dataVector.AddTo(v, -eta*beta);
+            dataVector.AddTo(v_avg, -eta*beta*(sigma - log(t) - 0.5/t));
 
             // move on
             exampleIterator.Next();
