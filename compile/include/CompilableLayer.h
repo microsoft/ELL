@@ -23,6 +23,8 @@
 class CompilableLayer 
 {
 public:
+    virtual ~CompilableLayer() = default;
+
     /// <summary> Returns the number of elements in the layer. </summary>
     ///
     /// <returns> The number of elements in the layer. </returns>
