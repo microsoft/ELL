@@ -1,15 +1,16 @@
-﻿from recipeUtil import *
+﻿""" Example recipe showing how to invoke some of the binaries to create, print, and compile a classifier."""
+from recipeUtil import *
 
-dataFile = args[0]
-stackFile1 = args[1]
-htmlOutFile = args[2]
-codeOutFile = args[3]
+inputDatasetFile = args[0] # The file that contains the labeled dataset to use for training the classifier
+outputStackFile = args[1]  # The file to write the resulting model to
+outputHtmlFile = args[2]   # The file to write the model diagram to
+outputCodeFile = args[3]   # The file to write the C output code to
 
-# train using sgd
-runBinary('sgd', ['-idf', dataFile, '-osf', stackFile1])
+# Train a classifier using sgd
+runBinary('sgd', ['-idf', inputDatasetFile, '-osf', outputStackFile])
 
-# print to svg file
-runBinary('print', ['-isf', stackFile1, '-osvg', htmlOutFile])
+# Print the classifier to an html file
+runBinary('print', ['-isf', outputStackFile, '-osvg', outputHtmlFile])
 
 # compile to C code
-#runBinary('compile', ['-isf', stackFile1, '-ocf', codeOutFile])
+runBinary('compile', ['-isf', outputStackFile, '-ocf', outputCodeFile])
