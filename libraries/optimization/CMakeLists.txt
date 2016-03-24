@@ -48,3 +48,14 @@ set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
+#
+# documentation
+#
+set (DOC_NAME ${PROJ_NAME}_docs)
+set (DOC doc/tex/sgd_optimizer.tex)
+add_custom_target(${DOC_NAME} ALL DEPENDS ${DOC} SOURCES ${DOC})
+set_property(TARGET ${DOC_NAME} PROPERTY FOLDER "documentation")
+
+
+
+

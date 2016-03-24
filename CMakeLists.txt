@@ -3,7 +3,7 @@
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
-PROJECT(Layers)
+PROJECT(Rockmill)
 
 # Turn on ability to create folders to organize projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -30,4 +30,10 @@ add_subdirectory(compile)
 add_subdirectory(print)
 add_subdirectory(trainers/sgd)
 add_subdirectory(scripts)
+
+# Add documentation
+set (DOC INSTALL.md StyleGuide.md)
+add_custom_target(Rockmill ALL DEPENDS ${DOC} SOURCES ${DOC})
+set_property(TARGET Rockmill PROPERTY FOLDER "documentation")
+
 
