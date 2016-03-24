@@ -10,7 +10,7 @@
 
 #pragma once
 
-// types
+// linear
 #include "IndexValue.h"
 
 // stl

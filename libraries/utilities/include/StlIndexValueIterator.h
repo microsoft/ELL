@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     StlIndexValueIterator.h (types)
+//  File:     StlIndexValueIterator.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 //  [copyright]

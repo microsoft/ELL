@@ -11,9 +11,9 @@
 #pragma once
 
 #include "IVector.h"
-
-// types
 #include "IndexValue.h"
+
+// utilities
 #include "StlIndexValueIterator.h"
 
 // stl

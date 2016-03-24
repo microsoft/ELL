@@ -12,9 +12,9 @@
 
 #include "IVector.h"
 #include "DoubleVector.h"
-
-// types
 #include "IndexValue.h"
+
+// utilities
 #include "StlIndexValueIterator.h"
 
 // stl

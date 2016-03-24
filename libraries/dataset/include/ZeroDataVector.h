@@ -12,7 +12,7 @@
 
 #include "IDataVector.h"
 
-// types
+// linear
 #include "IndexValue.h"
 
 // stl

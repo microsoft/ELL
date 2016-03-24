@@ -20,7 +20,7 @@
 // linear
 #include "DoubleVector.h"
 
-// types
+// utilities
 #include "StlIndexValueIterator.h"
 
 // stl

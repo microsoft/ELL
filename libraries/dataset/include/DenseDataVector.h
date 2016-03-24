@@ -12,7 +12,7 @@
 
 #include "IDataVector.h"
 
-// types
+// utilities
 #include "StlIndexValueIterator.h"
 
 // stl

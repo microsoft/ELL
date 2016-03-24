@@ -16,7 +16,7 @@
 #include "CompressedIntegerList.h"
 #include "IntegerList.h"
 
-// types
+// linear
 #include "IndexValue.h"
 
 // stl
