@@ -12,10 +12,12 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/MutableDecisionTree.cpp
+set (SRC src/Linear.cpp
+         src/MutableDecisionTree.cpp
          src/SharedLinearBinaryPredictor.cpp)
 
-set (INCLUDE include/MutableDecisionTree.h
+set (INCLUDE include/Linear.h
+             include/MutableDecisionTree.h
              include/SharedLinearBinaryPredictor.h)
 
 set (TCC tcc/SharedLinearBinaryPredictor.tcc)
@@ -27,6 +29,7 @@ source_group("tcc" FILES ${TCC})
 include_directories(include)
 include_directories(tcc)
 include_directories(../layers/include)
+include_directories(../dataset/include)
 include_directories(../linear/include)
 include_directories(../types/include)
 include_directories(../utilities/include)
