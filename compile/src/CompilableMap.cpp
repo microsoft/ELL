@@ -113,6 +113,10 @@ CompilableMap::CompilableMap(const layers::Map& other)
 void CompilableMap::ToCode(std::ostream& os) const
 {
     uint64 numLayers = _compilableLayers.size();
+    if (numLayers == 0)
+    {
+        throw std::runtime_error("Error: calling ToCode on an empty CompilableMap");
+    }
 
     // create data flow graph datastructure
     DataFlowGraph graph;
