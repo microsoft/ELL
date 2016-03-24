@@ -50,7 +50,7 @@ namespace dataset
 
     void RowDataset::AddExample(SupervisedExample&& example)
     {
-        uint64 size = example.Size();
+        uint64 size = example.GetDataVector().Size();
         _examples.push_back(std::move(example));
 
         if(_maxExampleSize < size)
