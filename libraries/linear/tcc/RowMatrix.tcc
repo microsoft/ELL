@@ -101,25 +101,6 @@ namespace linear
     }
 
     template<typename DataVectorType>
-    void RowMatrix<DataVectorType>::RandPerm(std::default_random_engine& rng)
-    {
-        RandPerm(rng, NumRows());
-    }
-
-    template<typename DataVectorType>
-    void RowMatrix<DataVectorType>::RandPerm(std::default_random_engine& rng, uint64 count)
-    {
-        uint64 maxRow = NumRows()-1;
-
-        for(uint64 i = 0; i < count; ++i)
-        {
-            std::uniform_int_distribution<uint64> dist(i, maxRow);
-            uint64 j = dist(rng);
-            std::swap(_rows[i], _rows[j]);
-        }
-    }
-
-    template<typename DataVectorType>
     void RowMatrix<DataVectorType>::Gemv(const double* p_x, double* p_y, double alpha, double beta) const
     {
         int size = (int)NumRows(); // openmp doesn't like uint64

@@ -35,7 +35,7 @@ namespace common
         {
             while (dataIterator.IsValid())
             {
-                dataset.PushBackRow(dataIterator.Get());
+                dataset.AddExample(dataIterator.Get());
                 dataIterator.Next();
             }
         }

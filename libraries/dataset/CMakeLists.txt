@@ -16,6 +16,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/DenseDataVector.cpp
          src/IntegerList.cpp
          src/OnesDataVector.cpp
+         src/RowDataset.cpp
          src/SequentialLineIterator.cpp
          src/SparseBinaryDataVector.cpp
          src/SparseDataVector.cpp
@@ -31,6 +32,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/MappedParser.h
              include/OnesDataVector.h
              include/ParsingIterator.h
+             include/RowDataset.h
              include/SequentialLineIterator.h
              include/SparseBinaryDataVector.h
              include/SparseDataVector.h

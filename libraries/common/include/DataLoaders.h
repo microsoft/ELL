@@ -14,7 +14,7 @@
 #include "DataLoadArguments.h" 
 
 // dataset
-#include "SupervisedExample.h"
+#include "RowDataset.h"
 
 // layers
 #include "Map.h"
