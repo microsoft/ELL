@@ -18,12 +18,12 @@ namespace optimization
     template<typename ExampleIteratorType, typename LossFunctionType>
     void AsgdOptimizer::Update(ExampleIteratorType& exampleIterator, uint64 numExamples, const LossFunctionType& lossFunction, double lambda)
     {
-
         // get references to the vector and biases
-        auto& v = _w;
-        auto& v_avg = _predictor.GetVector();
-        //double& b = _b;   // TODO (ofer) add learning of bias term
-        //double& b_avg = _predictor.GetBias();
+        auto& vLast = _lastPredictor.GetVector();
+        auto& vAvg = _averagedPredictor.GetVector();
+
+        double& bLast = _lastPredictor.GetBias();
+        double& bAvg = _averagedPredictor.GetBias();
 
         // define some constants
         const double T_prev = double(_total_iterations);
@@ -31,7 +31,7 @@ namespace optimization
         const double eta = 1.0 / lambda / T_prev;
         const double sigma = std::log(T_next) + 0.5 / T_next;
 
-        v.AddTo(v_avg, sigma - std::log(T_prev) - 0.5 / T_prev);
+        vLast.AddTo(vAvg, sigma - std::log(T_prev) - 0.5 / T_prev);
 
         while(exampleIterator.IsValid())
         {
@@ -45,14 +45,14 @@ namespace optimization
             const auto& dataVector = example.GetDataVector();
 
             // calculate the prediction 
-            double alpha = T_prev / (t-1) * dataVector.Dot(v);
+            double alpha = T_prev / (t-1) * dataVector.Dot(vLast);
 
             // calculate the loss derivative
             double beta = weight * lossFunction.GetDerivative(alpha, label);
 
-            // Update v and v_avg
-            dataVector.AddTo(v, -eta*beta);
-            dataVector.AddTo(v_avg, -eta*beta*(sigma - log(t) - 0.5/t));
+            // Update vLast and vAvg
+            dataVector.AddTo(vLast, -eta*beta);
+            dataVector.AddTo(vAvg, -eta*beta*(sigma - log(t) - 0.5/t));
 
             // move on
             exampleIterator.Next();
@@ -61,7 +61,7 @@ namespace optimization
         assert((double)_total_iterations == T_next);
 
         // calculate w and w_avg
-        v.Scale(T_prev / T_next);
-        v_avg.Scale(T_prev / T_next);
+        vLast.Scale(T_prev / T_next);
+        vAvg.Scale(T_prev / T_next);
     }
 }

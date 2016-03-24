@@ -52,9 +52,8 @@ namespace optimization
             
     private:
         uint64 _total_iterations;
-        linear::DoubleVector _w;
-        double _b;
-        predictors::LinearPredictor _predictor;
+        predictors::LinearPredictor _lastPredictor;
+        predictors::LinearPredictor _averagedPredictor;
     };
 }
 
