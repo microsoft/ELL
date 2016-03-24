@@ -11,6 +11,8 @@
 #pragma once
 
 #include "IDataVector.h"
+
+// utilities
 #include "CompressedIntegerList.h"
 
 // types
@@ -153,10 +155,10 @@ namespace dataset
     };
 
     /// <summary> A sparse double data vector. </summary>
-    class SparseDoubleDataVector : public SparseDataVector<double, CompressedIntegerList>
+    class SparseDoubleDataVector : public SparseDataVector<double, utilities::CompressedIntegerList>
     {
     public:
-        using SparseDataVector<double, CompressedIntegerList>::SparseDataVector;
+        using SparseDataVector<double, utilities::CompressedIntegerList>::SparseDataVector;
 
         /// <summary> \returns The type of the vector. </summary>
         ///
@@ -165,10 +167,10 @@ namespace dataset
     };
 
     /// <summary> A sparse float data vector. </summary>
-    class SparseFloatDataVector : public SparseDataVector<float, CompressedIntegerList>
+    class SparseFloatDataVector : public SparseDataVector<float, utilities::CompressedIntegerList>
     {
     public:
-        using SparseDataVector<float, CompressedIntegerList>::SparseDataVector;
+        using SparseDataVector<float, utilities::CompressedIntegerList>::SparseDataVector;
 
         /// <summary> \returns The type of the vector. </summary>
         ///
@@ -177,10 +179,10 @@ namespace dataset
     };
 
     /// <summary> A sparse short data vector. </summary>
-    class SparseShortDataVector : public SparseDataVector<short, CompressedIntegerList>
+    class SparseShortDataVector : public SparseDataVector<short, utilities::CompressedIntegerList>
     {
     public:
-        using SparseDataVector<short, CompressedIntegerList>::SparseDataVector;
+        using SparseDataVector<short, utilities::CompressedIntegerList>::SparseDataVector;
 
         /// <summary> \returns The type of the vector. </summary>
         ///

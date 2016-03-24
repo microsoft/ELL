@@ -14,18 +14,22 @@ endif()
 
 set (SRC src/BinaryClassificationEvaluator.cpp
          src/CommandLineParser.cpp
+         src/CompressedIntegerList.cpp
          src/Files.cpp
          src/Format.cpp
+         src/IntegerList.cpp
          src/IntegerStack.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
          src/XMLSerialization.cpp)
 
 set (INCLUDE include/BinaryClassificationEvaluator.h
+             include/CompressedIntegerList.h
              include/CommandLineParser.h
              include/Files.h
              include/Format.h
              include/IIterator.h
+             include/IntegerList.h
              include/IntegerStack.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h

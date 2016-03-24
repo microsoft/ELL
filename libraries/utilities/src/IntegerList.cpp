@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     IntegerList.cpp (dataset)
+//  File:     IntegerList.cpp (utilities)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
@@ -13,7 +13,7 @@
 // stl
 #include <stdexcept>
 
-namespace dataset
+namespace utilities
 {
     bool IntegerList::Iterator::IsValid() const
     {

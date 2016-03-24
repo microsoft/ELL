@@ -12,9 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/CompressedIntegerList.cpp
-         src/DenseDataVector.cpp
-         src/IntegerList.cpp
+set (SRC src/DenseDataVector.cpp
          src/OnesDataVector.cpp
          src/RowDataset.cpp
          src/SequentialLineIterator.cpp
@@ -24,11 +22,9 @@ set (SRC src/CompressedIntegerList.cpp
          src/SupervisedExample.cpp
          src/ZeroDataVector.cpp)
 
-set (INCLUDE include/CompressedIntegerList.h
-             include/DataVectorBuilder.h
+set (INCLUDE include/DataVectorBuilder.h
              include/DenseDataVector.h
-             include/IDataVector.h
-             include/IntegerList.h
+             include/IDataVector.h             
              include/MappedParser.h
              include/OnesDataVector.h
              include/ParsingIterator.h
@@ -74,7 +70,7 @@ include_directories(../testing/include)
 
 add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} dataset linear testing)
+target_link_libraries(${TEST_NAME} dataset linear testing utilities)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

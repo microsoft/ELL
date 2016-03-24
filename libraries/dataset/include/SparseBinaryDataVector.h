@@ -11,8 +11,10 @@
 #pragma once
 
 #include "IDataVector.h"
-#include "IntegerList.h"
+
+// utilities
 #include "CompressedIntegerList.h"
+#include "IntegerList.h"
 
 // types
 #include "types.h"
@@ -153,10 +155,10 @@ namespace dataset
     };
 
     /// <summary> A sparse binary data vector. </summary>
-    class  SparseBinaryDataVector : public SparseBinaryDataVectorBase<CompressedIntegerList>
+    class  SparseBinaryDataVector : public SparseBinaryDataVectorBase<utilities::CompressedIntegerList>
     {
     public:
-        using SparseBinaryDataVectorBase<CompressedIntegerList>::SparseBinaryDataVectorBase;
+        using SparseBinaryDataVectorBase<utilities::CompressedIntegerList>::SparseBinaryDataVectorBase;
 
         /// <summary> \returns The type of the vector. </summary>
         ///
@@ -165,10 +167,10 @@ namespace dataset
     };
 
     /// <summary> An uncompressed sparse binary data vector. </summary>
-    class UncompressedSparseBinaryDataVector : public SparseBinaryDataVectorBase<IntegerList>
+    class UncompressedSparseBinaryDataVector : public SparseBinaryDataVectorBase<utilities::IntegerList>
     {
     public:
-        using SparseBinaryDataVectorBase<IntegerList>::SparseBinaryDataVectorBase;
+        using SparseBinaryDataVectorBase<utilities::IntegerList>::SparseBinaryDataVectorBase;
 
         /// <summary> \returns The type of the vector. </summary>
         ///

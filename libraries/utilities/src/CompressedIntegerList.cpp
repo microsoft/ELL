@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     CompressedIntegerList.cpp (dataset)
+//  File:     CompressedIntegerList.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
 //  [copyright]
@@ -15,7 +15,7 @@
 #include <stdexcept>
 #include <cstring>
 
-namespace dataset
+namespace utilities
 {
 
     bool CompressedIntegerList::Iterator::IsValid() const

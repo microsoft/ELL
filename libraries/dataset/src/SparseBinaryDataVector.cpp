@@ -141,6 +141,6 @@ namespace dataset
     }
 
     // Explicit instantiation
-    template class SparseBinaryDataVectorBase<CompressedIntegerList>;
-    template class SparseBinaryDataVectorBase<IntegerList>;
+    template class SparseBinaryDataVectorBase<utilities::CompressedIntegerList>;
+    template class SparseBinaryDataVectorBase<utilities::IntegerList>;
 }
