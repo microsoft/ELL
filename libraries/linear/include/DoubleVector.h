@@ -59,7 +59,7 @@ namespace linear
         /// <typeparam name="IIndexValueIterator"> Type of the index value iterator. </typeparam>
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
         /// <param name="indexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         DoubleVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Type-conversion operator into a std::vector<double>
@@ -67,6 +67,9 @@ namespace linear
 
         /// <summary> Type-conversion operator into a std::vector<double>, allowing non-const ref
         operator std::vector<double> & () &;
+
+        /// <summary> Type-conversion operator into a const std::vector<double> reference
+        operator std::vector<double> const & () const &;
 
         /// <summary> Type-conversion operator into a std::vector<double>, allowing move semantics
         operator std::vector<double> && () &&;

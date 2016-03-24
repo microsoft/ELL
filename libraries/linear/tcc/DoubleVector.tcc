@@ -8,6 +8,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <functional>
+
 namespace linear
 {
     inline DoubleVector::DoubleVector(const std::vector<double>& v) : _data(v) {};
@@ -23,13 +25,18 @@ namespace linear
     {
         return std::ref(_data);
     };
-    
+
+    inline DoubleVector::operator std::vector<double> const & () const &
+    {
+        return std::cref(_data);
+    };
+
     inline DoubleVector::operator std::vector<double> && () &&
     {
         return std::move(_data);
     };
 
-    template<typename IndexValueIteratorType, typename concept>
+    template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> concept>
     inline DoubleVector::DoubleVector(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())

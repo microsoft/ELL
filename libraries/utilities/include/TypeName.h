@@ -16,6 +16,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <cstdint>
 
 namespace utilities
 {
@@ -59,100 +60,101 @@ namespace utilities
         static std::string GetName();
     };
 
-    /// <summary> Class used to get information about the char type. </summary>
+    /// <summary> Class used to get information about the 8-bit integer type. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeName<char>
+    struct TypeName<int8_t>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "char"; }
+        static std::string GetName() { return "int8"; }
     };
 
-    /// <summary> Class used to get information about the short type. </summary>
+    /// <summary> Class used to get information about the unsigned 8-bit integer type. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeName<short>
+    struct TypeName<uint8_t>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "short"; }
+        static std::string GetName() { return "uint8"; }
     };
 
-    /// <summary> Class used to get information about the unsigned short type. </summary>
+    /// <summary> Class used to get information about the 16-bit integer type. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeName<unsigned short>
+    struct TypeName<int16_t>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "ushort"; }
+        static std::string GetName() { return "int16"; }
     };
 
-    /// <summary> Class used to get information about the int type. </summary>
+    /// <summary> Class used to get information about the unsigned 16-bit integer type. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeName<int>
+    struct TypeName<uint16_t>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "int"; }
+        static std::string GetName() { return "uint16"; }
     };
 
-    /// <summary> Class used to get information about the unsigned int type. </summary>
+
+    /// <summary> Class used to get information about the 32-bit integer type. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeName<unsigned int>
+    struct TypeName<int32_t>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "uint"; }
+        static std::string GetName() { return "int32"; }
     };
 
-    /// <summary> Class used to get information about the long type. </summary>
+    /// <summary> Class used to get information about the unsigned 32-bit integer type. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeName<long>
+    struct TypeName<uint32_t>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "long"; }
+        static std::string GetName() { return "uint32"; }
     };
 
-    /// <summary> Class used to get information about the unsigned long type. </summary>
+    /// <summary> Class used to get information about the 64-bit integer type. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeName<unsigned long>
+    struct TypeName<int64_t>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "ulong"; }
+        static std::string GetName() { return "int64"; }
     };
 
-    /// <summary> Class used to get information about the unit64 type. </summary>
+    /// <summary> Class used to get information about the unsigned 64-bit integer type. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template<>
-    struct TypeName<uint64>
+    struct TypeName<uint64_t>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "uint64"; }
+        static std::string GetName() { return "uint64"; }
     };
 
     /// <summary> Class used to get information about the float type. </summary>
@@ -164,7 +166,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "float"; }
+        static std::string GetName() { return "float"; }
     };
 
     /// <summary> Class used to get information about the double type. </summary>
@@ -176,7 +178,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static const char* GetName() { return "double"; }
+        static std::string GetName() { return "double"; }
     };
 }
 

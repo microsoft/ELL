@@ -33,6 +33,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
              include/RandomEngines.h
              include/StlIterator.h
              include/TransformIterator.h
+             include/TypeFactory.h
              include/TypeName.h
              include/XMLSerialization.h)
 
@@ -43,6 +44,7 @@ set (TCC tcc/BinaryClassificationEvaluator.tcc
          tcc/Parser.tcc
          tcc/StlIterator.tcc
          tcc/TransformIterator.tcc
+         tcc/TypeFactory.tcc
          tcc/TypeName.tcc
          tcc/XMLSerialization.tcc)
 

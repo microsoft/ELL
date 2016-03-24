@@ -17,7 +17,7 @@ set (SRC src/ConstructLayer.cpp
          src/LayerLayout.cpp
          src/PrintableInput.cpp
          src/PrintableLayer.cpp
-         src/PrintableMap.cpp
+         src/PrintableStack.cpp
          src/PrintableCoordinatewise.cpp
          src/PrintableSum.cpp
          src/PrintArguments.cpp
@@ -27,7 +27,7 @@ set (SRC src/ConstructLayer.cpp
 set (INCLUDE include/LayerLayout.h
              include/PrintableLayer.h
              include/PrintableInput.h
-             include/PrintableMap.h
+             include/PrintableStack.h
              include/PrintableCoordinatewise.h
              include/PrintableSum.h
              include/PrintArguments.h

@@ -63,10 +63,10 @@ namespace utilities
 
     MatchResult MatchFormat(const char*& content, const char* format)
     {
-        auto MatchResult = MatchToSubstitutionSymbol(content, format);
-        if(MatchResult != MatchResult::success)
+        auto matchResult = MatchToSubstitutionSymbol(content, format);
+        if(matchResult != MatchResult::success)
         {
-            return MatchResult;
+            return matchResult;
         }
 
         if(*format != '\0')

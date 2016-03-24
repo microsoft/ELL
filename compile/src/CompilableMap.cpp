@@ -2,7 +2,7 @@
 //
 //  Project:  [projectName]
 //  File:     CompilableMap.cpp (compile)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //
@@ -92,35 +92,58 @@ void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::Int
     }
 }
 
-void CompilableMap::ToCode(std::ostream& os, layers::CoordinateList coordinateList) const
+CompilableMap::CompilableMap(const layers::Map& other)
 {
+    _outputCoordinates = other.GetOutputCoordinates();
+
+    const auto& stack = other.GetStack();
+    utilities::TypeFactory<CompilableLayer> compilableLayerFactory;
+    compilableLayerFactory.AddType<CompilableInput>(layers::Input::GetTypeName());
+    compilableLayerFactory.AddType<CompilableCoordinatewise>(layers::Coordinatewise::GetTypeName());
+    compilableLayerFactory.AddType<CompilableSum>(layers::Sum::GetTypeName());
+
+    for (uint64 index = 0; index < stack.NumLayers(); ++index)
+    {
+        const auto& layer = stack.GetLayer(index);
+        _compilableLayers.push_back(compilableLayerFactory.Construct(layer.GetRuntimeTypeName()));
+        (*_compilableLayers.back()) = layer;
+    }
+}
+
+void CompilableMap::ToCode(std::ostream& os) const
+{
+    uint64 numLayers = _compilableLayers.size();
+    if (numLayers == 0)
+    {
+        throw std::runtime_error("Error: calling ToCode on an empty CompilableMap");
+    }
+
     // create data flow graph datastructure
     DataFlowGraph graph;
-    for(uint64 layerIndex = 0; layerIndex < NumLayers(); ++layerIndex)
+    for(uint64 layerIndex = 0; layerIndex < numLayers; ++layerIndex)
     {
-        graph.AddLayer(_layers[layerIndex]->Size());
+        graph.AddLayer(_compilableLayers[layerIndex]->Size());
     }
 
     // add extra layer for outputs
-    uint64 outputLayerSize = coordinateList.size();
-    uint64 outputLayerIndex = NumLayers();
+    uint64 outputLayerSize = _outputCoordinates.size();
+    uint64 outputLayerIndex = numLayers;
     graph.AddLayer(outputLayerSize);
 
     // set names on output layer and set the actions that generate the output coordinates
     const std::string outputFixedVariableName = "output";
     for (uint64 outputElementIndex = 0; outputElementIndex < outputLayerSize; ++outputElementIndex)
     {
-        auto inputCoordinate = coordinateList[outputElementIndex];
+        auto inputCoordinate = _outputCoordinates[outputElementIndex];
         layers::Coordinate outputCoordinate(outputLayerIndex, outputElementIndex);
         graph.GetNode(outputCoordinate).SetFixedVariableName(outputFixedVariableName + "[" + std::to_string(outputElementIndex) + "]");
         graph.GetNode(inputCoordinate).EmplaceAction(outputCoordinate);
     }
 
     // backwards pass to assign actions to nodes
-    for(uint64 layerIndex = NumLayers() - 1; layerIndex > 0; --layerIndex)
+    for(uint64 layerIndex = numLayers - 1; layerIndex > 0; --layerIndex)
     {
-        const auto& compilableLayer = GetLayer<CompilableLayer>(layerIndex);
-        compilableLayer.SetActions(layerIndex, graph);
+        _compilableLayers[layerIndex]->SetActions(layerIndex, graph);
     }
 
     // construct an integer stack, to manage temp variable names;
@@ -128,11 +151,11 @@ void CompilableMap::ToCode(std::ostream& os, layers::CoordinateList coordinateLi
 
     // print comment
     auto str = "// Predict function\n// Input dimension: %i\n// Output dimension: %i\n// Output coordinates:";
-    uint64 inputLayerSize = _layers[0]->Size();
+    uint64 inputLayerSize = _compilableLayers[0]->Size();
     utilities::PrintFormat(os, str, inputLayerSize, outputLayerSize);
-    for (uint64 i = 0; i < coordinateList.size(); ++i)
+    for (uint64 i = 0; i < _outputCoordinates.size(); ++i)
     {
-        os << ' ' << coordinateList[i];
+        os << ' ' << _outputCoordinates[i];
     }
 
     // print function declaration

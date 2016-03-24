@@ -16,10 +16,25 @@ std::string PrintableSum::GetFriendlyLayerName() const
     return "Sum";
 }
 
-LayerLayout PrintableSum::Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& Arguments) const
+uint64 PrintableSum::Size() const
+{
+    return Sum::Size();
+}
+
+void PrintableSum::operator=(const layers::Sum& sum)
+{
+    Sum::operator=(sum);
+}
+
+void PrintableSum::operator=(const layers::Layer & layer)
+{
+    operator=(dynamic_cast<const layers::Sum&>(layer));
+}
+
+LayerLayout PrintableSum::Print(std::ostream& os, double left, double top, uint64 layerIndex, const PrintArguments& arguments) const
 {
     // calculate the layout
-    auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetFriendlyLayerName(), Size(), Arguments.emptyElementLayout, Arguments.layerStyle);
+    auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetFriendlyLayerName(), Size(), arguments.emptyElementLayout, arguments.layerStyle);
 
     //// print the visible elements, before the dots
     for (uint64 k = 0; k < layout.NumVisibleElements() - 1; ++k)
@@ -38,3 +53,9 @@ LayerLayout PrintableSum::Print(std::ostream& os, double left, double top, uint6
 
     return layout;
 }
+
+layers::Layer::InputCoordinateIterator PrintableSum::GetInputCoordinates(uint64 index) const
+{
+    return Sum::GetInputCoordinates(index);
+}
+

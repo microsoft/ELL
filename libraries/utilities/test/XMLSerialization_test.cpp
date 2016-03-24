@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "XMLSerialization.h"
+#include "TypeFactory.h"
 
 // testing
 #include "testing.h"
@@ -20,9 +21,11 @@
 class Base
 {
 public:
-    static const char* GetTypeName() { return "Base"; }
+    virtual ~Base() = default;
+
+    static std::string GetTypeName() { return "Base"; }
     
-    virtual const char* GetRuntimeTypeName() const = 0;
+    virtual std::string GetRuntimeTypeName() const = 0;
     
     virtual void Read(utilities::XMLDeserializer& deserializer) = 0;
     
@@ -35,9 +38,10 @@ public:
 
 class Derived1 : public Base
 {
-    static const char* GetTypeName() { return "Derived1"; }
+public:
+    static std::string GetTypeName() { return "Derived1"; }
 
-    virtual const char* GetRuntimeTypeName() const override { return GetTypeName(); };
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); };
 
     virtual void Read(utilities::XMLDeserializer& deserializer) override
     {
@@ -75,9 +79,10 @@ private:
 
 class Derived2 : public Base
 {
-    static const char* GetTypeName() { return "Derived2"; }
+public:
+    static std::string GetTypeName() { return "Derived2"; }
 
-    virtual const char* GetRuntimeTypeName() const override { return GetTypeName(); };
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); };
 
     virtual void Read(utilities::XMLDeserializer& deserializer) override
     {
@@ -107,20 +112,16 @@ private:
     std::vector<float> v;
 };
 
-void Construct(std::string runtimeTypeName, std::unique_ptr<Base>& value)
+void TypeFactoryTest()
 {
-    if(runtimeTypeName == "Derived1")
-    {
-        value = std::make_unique<Derived1>();
-    }
-    else if(runtimeTypeName == "Derived2")
-    {
-        value = std::make_unique<Derived2>();
-    }
-    else
-    {
-        throw std::runtime_error("attempted to deserialize an unrecognized class type");
-    }
+    utilities::TypeFactory<Base> factory;
+    factory.AddType<Derived1>();
+    factory.AddType<Derived2>();
+
+    auto derived1 = factory.Construct(Derived1::GetTypeName());
+    auto derived2 = factory.Construct(Derived2::GetTypeName());
+
+    testing::ProcessTest("TypeFactory", derived1->GetRuntimeTypeName() == Derived1::GetTypeName() && derived2->GetRuntimeTypeName() == Derived2::GetTypeName());
 }
 
 void XMLSerializationTest()
@@ -139,7 +140,12 @@ void XMLSerializationTest()
 
     utilities::XMLDeserializer deserializer(ss);
     std::vector<std::unique_ptr<Base>> vec2;
-    deserializer.Deserialize("vec", vec2);
+
+    utilities::TypeFactory<Base> factory;
+    factory.AddType<Derived1>();
+    factory.AddType<Derived2>();
+
+    deserializer.Deserialize("vec", vec2, factory);
 
     testing::ProcessTest("utilities::XMLSerialization", vec2[0]->Check() && vec[1]->Check());
 }
@@ -147,6 +153,7 @@ void XMLSerializationTest()
 int main()
 {
     XMLSerializationTest();
+    TypeFactoryTest();
 
     if (testing::DidTestFail())
     {

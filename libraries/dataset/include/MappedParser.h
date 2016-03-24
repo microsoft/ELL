@@ -39,8 +39,7 @@ namespace dataset
         ///
         /// <param name="internalParser"> The internal parser. </param>
         /// <param name="map"> The map. </param>
-        /// <param name="outputCoordinates"> The output coordinates. </param>
-        MappedParser(const InternalParserType& internalParser, const std::shared_ptr<layers::Map>& map, layers::CoordinateList outputCoordinates);
+        MappedParser(const InternalParserType& internalParser, const std::shared_ptr<layers::Map>& map);
 
         /// <summary> Gets an iterator that parses the given std::string. </summary>
         ///

@@ -64,7 +64,7 @@ namespace utilities
     }
 
     // wrapper for strtoul
-    template <typename std::enable_if<!std::is_same<unsigned long, unsigned int>::value>::type* = nullptr>
+    template <typename std::enable_if_t<!std::is_same<unsigned long, unsigned int>::value, int> = 0>
     inline void cParse(const char* pStr, char*& pEnd, unsigned long& value)
     {
         value = strtoul(pStr, &pEnd, 0);

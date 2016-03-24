@@ -32,26 +32,11 @@ namespace utilities
     //
 
     // serialize fundamental types
-    template<typename ValueType>
-    void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
+    template<typename ValueType, IsFundamental<ValueType> concept>
+    void XMLSerializer::Serialize(const char* name, const ValueType& value)
     {
         auto typeName = TypeName<ValueType>::GetName();
         WriteSingleLineTags(typeName, name, value);
-    }
-
-    // serialize std::vector
-    template<typename ElementType>
-    void XMLSerializer::Serialize(const char* name, const std::vector<ElementType>& value)
-    {
-        auto size = value.size();
-        auto typeName = TypeName<std::vector<ElementType>>::GetName();
-
-        WriteOpenTag(typeName, "name", name, "size", size);
-        for (uint64 i = 0; i < size; ++i)
-        {
-            Serialize(value[i]);
-        }
-        WriteCloseTag(typeName);
     }
 
     // serialize pointers to polymorphic classes
@@ -74,9 +59,24 @@ namespace utilities
         WriteCloseTag(typeName);
     }
 
+    // serialize std::vector
+    template<typename ElementType>
+    void XMLSerializer::Serialize(const char* name, const std::vector<ElementType>& value)
+    {
+        auto size = value.size();
+        auto typeName = TypeName<std::vector<ElementType>>::GetName();
+
+        WriteOpenTag(typeName, "name", name, "size", size);
+        for(uint64 i = 0; i < size; ++i)
+        {
+            Serialize(value[i]);
+        }
+        WriteCloseTag(typeName);
+    }
+
     // serialize classes
-    template<typename ValueType>
-    void XMLSerializer::Serialize(const char* name, const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
+    template <typename ValueType, IsClass<ValueType> concept>
+    void XMLSerializer::Serialize(const char* name, const ValueType& value)
     {
         auto typeName = ValueType::GetTypeName();
 
@@ -86,11 +86,31 @@ namespace utilities
     }
 
     // serialize fundamental types
-    template<typename ValueType>
-    void XMLSerializer::Serialize(const ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
+    template <typename ValueType, IsFundamental<ValueType> concept>
+    void XMLSerializer::Serialize(const ValueType& value)
     {
         auto typeName = TypeName<ValueType>::GetName();
         WriteSingleLineTags(typeName, value);
+    }
+
+    // serialize pointers to polymorphic classes
+    template<typename ValueType>
+    void XMLSerializer::Serialize(const std::unique_ptr<ValueType>& value)
+    {
+        static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
+        if (value == nullptr)
+        {
+            throw std::runtime_error("cannot serialize a null pointer");
+        }
+
+        auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
+        auto runtimeTypeName = value->GetRuntimeTypeName();
+
+        WriteOpenTag(typeName);
+        WriteOpenTag(runtimeTypeName);
+        value->Write(*this);
+        WriteCloseTag(runtimeTypeName);
+        WriteCloseTag(typeName);
     }
 
     // serialize std::vector
@@ -101,10 +121,21 @@ namespace utilities
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
 
         WriteOpenTag(typeName, "size", size);
-        for (uint64 i = 0; i < size; ++i)
+        for(uint64 i = 0; i < size; ++i)
         {
             Serialize(value[i]);
         }
+        WriteCloseTag(typeName);
+    }
+
+    // serialize classes
+    template <typename ValueType, IsClass<ValueType> concept>
+    void XMLSerializer::Serialize(const ValueType& value)
+    {
+        auto typeName = ValueType::GetTypeName();
+
+        WriteOpenTag(typeName);
+        value.Write(*this);
         WriteCloseTag(typeName);
     }
 
@@ -152,47 +183,65 @@ namespace utilities
         PrintFormat(_stream, formatCloseTag, tagName);
     }
 
-    // serialize pointers to polymorphic classes
-    template<typename ValueType>
-    void XMLSerializer::Serialize(const std::unique_ptr<ValueType>& value)
-    {
-        static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
-        if (value == nullptr)
-        {
-            throw std::runtime_error("cannot serialize a null pointer");
-        }
-
-        auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
-        auto runtimeTypeName = value->GetRuntimeTypeName();
-
-        WriteOpenTag(typeName);
-        WriteOpenTag(runtimeTypeName);
-        value->Write(*this);
-        WriteCloseTag(runtimeTypeName);
-        WriteCloseTag(typeName);
-    }
-
-    // serialize classes
-    template<typename ValueType>
-    void XMLSerializer::Serialize(const ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
-    {
-        auto typeName = ValueType::GetTypeName();
-
-        WriteOpenTag(typeName);
-        value.Write(*this);
-        WriteCloseTag(typeName);
-    }
-
     //
     // XMLDeserializer class
     //
 
     // deserialize fundamental types
-    template<typename ValueType>
-    void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
+    template <typename ValueType, IsFundamental<ValueType> concept>
+    void XMLDeserializer::Deserialize(const char* name, ValueType& value)
     {
         auto typeName = TypeName<ValueType>::GetName();
         ReadSingleLineTags(Match(typeName), Match("name"), Match(name), value);
+    }
+
+    // deserialize pointers to polymorphic classes
+    template<typename BaseType>
+    void XMLDeserializer::Deserialize(const char* name, std::unique_ptr<BaseType>& value)
+    {
+        const auto& factory = BaseType::GetTypeFactory();
+        Deserialize(name, value, factory);
+    }
+
+    // deserialize pointers to polymorphic classes
+    template<typename BaseType>
+    void XMLDeserializer::Deserialize(const char* name, std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory)
+    {
+        auto typeName = TypeName<std::unique_ptr<BaseType>>::GetName();
+        std::string runtimeTypeName;
+
+        ReadOpenTag(Match(typeName), Match("name"), Match(name));
+        ReadOpenTag(runtimeTypeName);
+        value = factory.Construct(runtimeTypeName);
+        value->Read(*this);
+
+        ReadCloseTag(Match(runtimeTypeName));
+        ReadCloseTag(Match(typeName));
+    }
+
+    // deserialize vectors of pointers
+    template<typename BaseType>
+    void XMLDeserializer::Deserialize(const char * name, std::vector<std::unique_ptr<BaseType>>& value)
+    {
+        const auto& factory = BaseType::GetTypeFactory();
+        Deserialize(name, value, factory);
+    }
+
+    // deserialize vectors of pointers
+    template<typename BaseType>
+    void XMLDeserializer::Deserialize(const char * name, std::vector<std::unique_ptr<BaseType>>& value, const TypeFactory<BaseType>& factory)
+    { 
+        value.clear();
+
+        uint64 size = 0;
+        auto typeName = TypeName<std::vector<std::unique_ptr<BaseType>>>::GetName();
+        ReadOpenTag(Match(typeName), Match("name"), Match(name), Match("size"), size);
+        value.resize(size);
+        for(uint64 i = 0; i < size; ++i)
+        {
+            Deserialize(value[i], factory);
+        }
+        ReadCloseTag(Match(typeName));
     }
 
     // deserialize std::vectors
@@ -205,35 +254,16 @@ namespace utilities
         auto typeName = TypeName<std::vector<ElementType>>::GetName();
         ReadOpenTag(Match(typeName), Match("name"), Match(name), Match("size"), size);
         value.resize(size);
-        for (uint64 i = 0; i < size; ++i)
+        for(uint64 i = 0; i < size; ++i)
         {
             Deserialize(value[i]);
         }
         ReadCloseTag(Match(typeName));
     }
 
-    // deserialize pointers to polymorphic classes
-    template<typename ValueType>
-    void XMLDeserializer::Deserialize(const char* name, std::unique_ptr<ValueType>& value)
-    {
-        static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
-
-        auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
-        std::string runtimeTypeName;
-
-        ReadOpenTag(Match(typeName), Match("name"), Match(name));
-        ReadOpenTag(runtimeTypeName);
-
-        Read(runtimeTypeName, value);
-        value->Read(*this);
-
-        ReadCloseTag(Match(runtimeTypeName));
-        ReadCloseTag(Match(typeName));
-    }
-
     // deserialize classes
-    template<typename ValueType>
-    void XMLDeserializer::Deserialize(const char* name, ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
+    template <typename ValueType, IsClass<ValueType> concept>
+    void XMLDeserializer::Deserialize(const char* name, ValueType& value)
     {
         auto typeName = ValueType::GetTypeName();
         ReadOpenTag(Match(typeName), Match("name"), Match(name));
@@ -242,11 +272,44 @@ namespace utilities
     }
 
     // deserialize fundamental types
-    template<typename ValueType>
-    void XMLDeserializer::Deserialize(ValueType& value, typename std::enable_if_t<std::is_fundamental<ValueType>::value>* concept)
+    template <typename ValueType, IsFundamental<ValueType> concept>
+    void XMLDeserializer::Deserialize(ValueType& value)
     {
         auto typeName = TypeName<ValueType>::GetName();
         ReadSingleLineTags(Match(typeName), value);
+    }
+
+    // deserialize pointers to polymorphic classes
+    template<typename BaseType>
+    void XMLDeserializer::Deserialize(std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory)
+    {
+        auto typeName = TypeName<std::unique_ptr<BaseType>>::GetName();
+        std::string runtimeTypeName;
+
+        ReadOpenTag(Match(typeName));
+        ReadOpenTag(runtimeTypeName);
+        value = factory.Construct(runtimeTypeName);
+        value->Read(*this);
+
+        ReadCloseTag(Match(runtimeTypeName));
+        ReadCloseTag(Match(typeName));
+    }
+
+    // deserialize vectors of pointers
+    template<typename BaseType>
+    void XMLDeserializer::Deserialize(std::vector<std::unique_ptr<BaseType>>& value, const TypeFactory<BaseType>& factory)
+    {
+        value.clear();
+
+        uint64 size = 0;
+        auto typeName = TypeName<std::vector<std::unique_ptr<BaseType>>>::GetName();
+        ReadOpenTag(Match(typeName), Match("size"), size);
+        value.resize(size);
+        for(uint64 i = 0; i < size; ++i)
+        {
+            Deserialize(value[i], factory);
+        }
+        ReadCloseTag(Match(typeName));
     }
 
     // deserialize std::vectors
@@ -260,37 +323,18 @@ namespace utilities
 
         ReadOpenTag(Match(typeName), Match("size"), size);
         value.resize(size);
-        for (uint64 i = 0; i < size; ++i)
+        for(uint64 i = 0; i < size; ++i)
         {
             Deserialize(value[i]);
         }
         ReadCloseTag(Match(typeName));
     }
 
-    // deserialize pointers to polymorphic classes
-    template<typename ValueType>
-    void XMLDeserializer::Deserialize(std::unique_ptr<ValueType>& value)
-    {
-        static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
-
-        auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
-        std::string runtimeTypeName;
-
-        ReadOpenTag(Match(typeName));
-        ReadOpenTag(runtimeTypeName);
-        Construct(runtimeTypeName, value);
-        value->Read(*this);
-
-        ReadCloseTag(Match(runtimeTypeName));
-        ReadCloseTag(Match(typeName));
-    }
-
     // deserialize classes
-    template<typename ValueType>
-    void XMLDeserializer::Deserialize(ValueType& value, typename std::enable_if_t<std::is_class<ValueType>::value>* concept)
+    template<typename ValueType, IsClass<ValueType> concept>
+    void XMLDeserializer::Deserialize(ValueType& value)
     {
         auto typeName = ValueType::GetTypeName();
-
         ReadOpenTag(Match(typeName));
         value.Read(*this);
         ReadCloseTag(Match(typeName));

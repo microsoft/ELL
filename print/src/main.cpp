@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PrintableLayer.h"
-#include "PrintableMap.h"
+#include "PrintableStack.h"
 #include "PrintArguments.h"
 
 // utilities
@@ -41,11 +41,12 @@ int main(int argc, char* argv[])
         // if output file specified, use it, otherwise use std::cout
         auto outStream = utilities::GetOutputStreamImpostor(printArguments.outputSvgFile);
 
-        // open map file
-        auto map = layers::Map::Load<PrintableMap>(printArguments.inputMapFile);
+        // open stack file
+        auto stack = layers::Stack::Load(printArguments.inputStackFile);
+        PrintableStack printableStack(stack);
         
         // print to svg file
-        map.Print(outStream, printArguments);
+        printableStack.Print(outStream, printArguments);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
