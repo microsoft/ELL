@@ -16,7 +16,7 @@
 namespace optimization
 {
     template<typename ExampleIteratorType, typename LossFunctionType>
-    void AsgdOptimizer::Update(ExampleIteratorType& exampleIterator, const LossFunctionType& lossFunction, double lambda)
+    void AsgdOptimizer::Update(ExampleIteratorType& exampleIterator, uint64 numExamples, const LossFunctionType& lossFunction, double lambda)
     {
 
         // get references to the vector and biases
@@ -27,7 +27,7 @@ namespace optimization
 
         // define some constants
         const double T_prev = double(_total_iterations);
-        const double T_next = T_prev + exampleIterator.NumIteratesLeft();
+        const double T_next = T_prev + numExamples;
         const double eta = 1.0 / lambda / T_prev;
         const double sigma = std::log(T_next) + 0.5 / T_next;
 

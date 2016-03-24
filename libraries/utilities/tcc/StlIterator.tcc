@@ -1,3 +1,4 @@
+#include "..\include\StlIterator.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
@@ -34,7 +35,7 @@ namespace utilities
     {
         return *_current;
     }
-
+ 
     template <typename IteratorType>
     auto MakeStlIterator(IteratorType begin, IteratorType end) -> StlIterator<IteratorType, decltype(*begin)>
     {

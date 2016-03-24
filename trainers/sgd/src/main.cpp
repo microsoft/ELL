@@ -77,14 +77,14 @@ int main(int argc, char* argv[])
 
         if (inputCoordinates.size() == 0)
         {
-            inputCoordinates = layers::GetCoordinateList(0, 0, dataset->NumColumns() - 1);
+            inputCoordinates = layers::GetCoordinateList(0, 0, dataset->GetMaxExampleSize() - 1);
         }
 
         // create loss function
         lossFunctions::LogLoss loss;
 
         // create sgd trainer
-        optimization::AsgdOptimizer optimizer(dataset->NumColumns());
+        optimization::AsgdOptimizer optimizer(dataset->GetMaxExampleSize());
 
         // create evaluator
         utilities::BinaryClassificationEvaluator evaluator;
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 
             // iterate over the entire permuted dataset
             auto trainSetIterator = dataset->GetIterator();
-            optimizer.Update(trainSetIterator, loss, sgdArguments.l2Regularization);
+            optimizer.Update(trainSetIterator, dataset->NumExamples(), loss, sgdArguments.l2Regularization);
 
             // Evaluate training error
             auto evaluationIterator = dataset->GetIterator();

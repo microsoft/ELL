@@ -113,6 +113,4 @@ namespace dataset
     ///
     /// <returns> The shifted ostream. </returns>
     std::ostream& operator<<(std::ostream& ostream, const SupervisedExample& example);
-
-    using RowDataset = linear::RowMatrix<SupervisedExample>;
 }
