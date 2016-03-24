@@ -31,6 +31,7 @@
 #include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 
 
+
 // optimization
 #include "AsgdOptimizer.h"
 
@@ -76,7 +77,7 @@ int main(int argc, char* argv[])
         lossFunctions::LogLoss loss;
 
         // create sgd trainer
-        optimization::AsgdOptimizer optimizer(dataset->NumColumns());
+        optimization::AsgdOptimizer optimizer(dataset->GetMaxExampleSize());
 
         // create evaluator
         utilities::BinaryClassificationEvaluator evaluator;
@@ -92,7 +93,7 @@ int main(int argc, char* argv[])
 
             // iterate over the entire permuted dataset
             auto trainSetIterator = dataset->GetIterator();
-            optimizer.Update(trainSetIterator, loss, sgdArguments.l2Regularization);
+            optimizer.Update(trainSetIterator, dataset->NumExamples(), loss, sgdArguments.l2Regularization);
 
             // Evaluate training error
             auto evaluationIterator = dataset->GetIterator();

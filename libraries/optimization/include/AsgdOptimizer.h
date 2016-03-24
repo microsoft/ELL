@@ -14,7 +14,7 @@
 #include "types.h"
 
 // predictors
-#include "SharedLinearBinaryPredictor.h"
+#include "LinearPredictor.h"
 
 // linear
 #include "DoubleVector.h"
@@ -22,7 +22,7 @@
 namespace optimization
 {
     /// <summary>
-    /// Implements the Averaged Stochstic Gradient Descent algorithm on an L2 regularized empirical
+    /// Implements the Averaged Stochastic Gradient Descent algorithm on an L2 regularized empirical
     /// loss.
     /// </summary>
     class AsgdOptimizer
@@ -39,21 +39,21 @@ namespace optimization
         /// <typeparam name="ExampleIteratorType"> Type of example iterator to use. </typeparam>
         /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
         /// <param name="exampleIterator"> [in,out] The data iterator. </param>
+        /// <param name="numExamples"> The number of examples in the iterator. </param>
         /// <param name="lossFunction"> The loss function. </param>
         /// <param name="l2Regularization"> The L2 regularization parameter. </param>
         template<typename ExampleIteratorType, typename LossFunctionType>
-        void Update(ExampleIteratorType& exampleIterator, const LossFunctionType& lossFunction, double l2Regularization);
+        void Update(ExampleIteratorType& exampleIterator, uint64 numExamples, const LossFunctionType& lossFunction, double l2Regularization);
 
         /// <summary> Returns The averaged predictor. </summary>
         ///
         /// <returns> The averaged predictor. </returns>
-        const predictors::SharedLinearBinaryPredictor GetPredictor() const;
+        const predictors::LinearPredictor& GetPredictor() const;
             
     private:
         uint64 _total_iterations;
-        linear::DoubleVector _w;
-        double _b;
-        predictors::SharedLinearBinaryPredictor _predictor;
+        predictors::LinearPredictor _lastPredictor;
+        predictors::LinearPredictor _averagedPredictor;
     };
 }
 

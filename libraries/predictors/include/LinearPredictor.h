@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  [projectName]
-//  File:     SharedLinearBinaryPredictor.h (predictors)
+//  File:     LinearPredictor.h (predictors)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
@@ -14,27 +14,29 @@
 #include "types.h"
 
 // layers
-#include "Map.h"
+#include "Stack.h"
 #include "Coordinate.h"
 
 // linear
 #include "DoubleVector.h"
+
+// datasets
+#include "IDataVector.h"
 
 // stl
 #include <memory>
 
 namespace predictors
 {
-
-    /// <summary> A shared linear binary predictor. </summary>
-    class SharedLinearBinaryPredictor
+    /// <summary> A linear binary predictor. </summary>
+    class LinearPredictor
     {
     public:
 
-        /// <summary> Constructs an instance of SharedLinearBinaryPredictor. </summary>
+        /// <summary> Constructs an instance of Linear. </summary>
         ///
         /// <param name="dim"> The dimension. </param>
-        SharedLinearBinaryPredictor(uint64 dim);
+        LinearPredictor(uint64 dim);
 
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
@@ -58,28 +60,24 @@ namespace predictors
 
         /// <summary> Returns the output of the predictor for a given example. </summary>
         ///
-        /// <typeparam name="DataVectorType"> Type of the data vector type. </typeparam>
         /// <param name="example"> The data vector. </param>
         ///
         /// <returns> A double. </returns>
-        template<typename DataVectorType>
-        double Predict(const DataVectorType& example) const;
+        double Predict(const dataset::IDataVector& dataVector) const;
 
-        /// <summary> Adds the predictor to a stack. </summary>
+        /// <summary> Scales the linear predictor by a scalar </summary>
         ///
-        /// <param name="map"> [in,out] The stack. </param>
+        /// <param name="scalar"> The scalar. </param>
+        void Scale(double scalar);
+
+        /// <summary> Adds the predictor to a map. </summary>
+        ///
+        /// <param name="map"> [in,out] The map. </param>
+        /// <param name="inputCoordinates"> The input coordinates. </param>
         void AddToStack(layers::Stack& stack, const layers::CoordinateList& inputCoordinates) const;
 
     private:
-        struct BiasedVector
-        {
-            BiasedVector(uint64 dim);
-            linear::DoubleVector w;
-            double b;
-        };
-
-        std::shared_ptr<BiasedVector> _sp_predictor;
+        linear::DoubleVector _w;
+        double _b;
     };
 }
-
-#include "../tcc/SharedLinearBinaryPredictor.tcc"
