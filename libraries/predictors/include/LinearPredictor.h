@@ -65,6 +65,11 @@ namespace predictors
         /// <returns> A double. </returns>
         double Predict(const dataset::IDataVector& dataVector) const;
 
+        /// <summary> Scales the linear predictor by a scalar </summary>
+        ///
+        /// <param name="scalar"> The scalar. </param>
+        void Scale(double scalar);
+
         /// <summary> Adds the predictor to a map. </summary>
         ///
         /// <param name="map"> [in,out] The map. </param>

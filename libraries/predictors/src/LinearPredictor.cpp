@@ -49,6 +49,12 @@ namespace predictors
         return dataVector.Dot(_w) + _b;
     }
 
+    void LinearPredictor::Scale(double scalar)
+    {
+        _w.Scale(scalar);
+        _b *= scalar;
+    }
+
     void LinearPredictor::AddToStack(layers::Stack& stack, const layers::CoordinateList& inputCoordinates) const
     {
         uint64 layerIndex = stack.AddLayer(std::make_unique<layers::Coordinatewise>(_w, inputCoordinates, layers::Coordinatewise::OperationType::multiply));
