@@ -84,7 +84,7 @@ namespace dataset
         /// <typeparam name="IIndexValueIterator">  Type of the index value iterator. </typeparam>
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, typename concept = std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value>>
+        template<typename IndexValueIteratorType, typename concept = IsIndexValueIterator<IndexValueIteratorType>>
         SparseBinaryDataVectorBase(IndexValueIteratorType IndexValueIterator);
 
         /// <summary> Move constructor. </summary>

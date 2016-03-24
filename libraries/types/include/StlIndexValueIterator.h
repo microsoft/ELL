@@ -66,7 +66,7 @@ namespace types
     ///
     /// <param name="array"> The std::vector to copy values into </param>
     /// <param name="indexValueIterator"> The IndexValueIterator to copy values from </param> 
-    template<typename ValueType, typename IndexValueIteratorType, typename std::enable_if_t<std::is_base_of<IIndexValueIterator, IndexValueIteratorType>::value, int> = 0>
+    template<typename ValueType, typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> = 0>
     void CopyToArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array);
 }
 
