@@ -46,5 +46,7 @@ include_directories(../libraries/common/include)
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
+
 target_link_libraries(${PROJ_NAME} utilities layers common)
 
+set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools")

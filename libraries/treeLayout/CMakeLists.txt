@@ -37,8 +37,13 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 set (TEST_NAME ${PROJ_NAME}_test)
 
+PROJECT(${TEST_NAME})
+
 set (TEST_SRC test/src/main.cpp)
 set (TEST_INCLUDE )
+
+source_group("src" FILES ${TEST_SRC})
+source_group("include" FILES ${TEST_INCLUDE})
 
 include_directories(../testing/include)
 include_directories(test/include)

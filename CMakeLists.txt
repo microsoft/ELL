@@ -31,7 +31,7 @@ add_subdirectory(print)
 add_subdirectory(trainers/sgd)
 add_subdirectory(scripts)
 
-# Add documentation
+# Add solution-level documentation
 set (DOC INSTALL.md StyleGuide.md)
 add_custom_target(documentation ALL DEPENDS ${DOC} SOURCES ${DOC})
 

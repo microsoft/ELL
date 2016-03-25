@@ -21,9 +21,14 @@ include_directories(../libraries/dataset/include)
 include_directories(../libraries/common/include)
 include_directories(../libraries/utilities/include)
 
+source_group("src" FILES ${SRC})
+
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC})
 
 target_link_libraries(${PROJ_NAME} utilities layers linear dataset common)
+
+set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools")
+
