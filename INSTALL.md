@@ -19,6 +19,8 @@ Important: don't forget the two dots (..) at the end of the command! This comman
 
     > make
 
+A directory named "bin" should appear inside "build", with all of the executables in it.
+
 Building with Visual Studio 2015 on Windows
 -------------------------------------------
 Make sure you have Visual Studio installed. You can download the free "Visual Studio Express for Desktop" from:
@@ -42,8 +44,8 @@ The second option is to build directly in the command prompt using the visual st
 If you are able to run MSBuild, invoke the following command to build Rockmill
 
     > "\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" /m Rockmill.sln /p:Configuration=Release 
- 
-As an alternative to the above, you may want to create a 64-bit solution for Visual Studio 2015. To do this, invoke cmake as follows:
+
+Both build methods create a directory named "bin" inside "build", and put all of the executables in it. As an alternative to the above, you may want to create a 64-bit solution for Visual Studio 2015. To do this, invoke cmake as follows:
 
     > cmake -G "Visual Studio 14 2015 Win64" ..
 
