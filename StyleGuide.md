@@ -74,12 +74,12 @@ Next, indicate all `#include` statements. First, include files from the local pr
 
     #include "OtherClassFromThisProject.h"
 
-    // foo
-    #include "ClassFromProjectFoo.h"
-    #include "AnotherClassFromProjectFoo.h"
+    // proj1
+    #include "ClassFromProjectProj1.h"
+    #include "AnotherClassFromProj1.h"
 
-    // bar
-    #include "ClassFromProjectBar.h"
+    // proj2
+    #include "ClassFromProj2.h"
 
     // stl
     #include <vector>

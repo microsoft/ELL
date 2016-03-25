@@ -20,10 +20,10 @@ namespace utilities
     // options are queried by the long name
     // short name is optional
     // args are just strings at the end
-    // ex of valid commandlines:
-    // myexe.exe foo.tsv
-    // myexe.exe foo.tsv bar.tsv
-    // myexe.exe -t 8 -x blah foo.tsv bar.tsv
+    // example of valid commandlines:
+    // myexe.exe file1.tsv
+    // myexe.exe file1.tsv file2.tsv
+    // myexe.exe -t 8 -x someString file1.tsv file2.tsv
     template <typename T, typename U>
     void CommandLineParser::AddOption(T& option, std::string name, std::string shortName, std::string description, const U& defaultValue)
     {

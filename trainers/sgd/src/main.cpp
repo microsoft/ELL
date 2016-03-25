@@ -82,6 +82,13 @@ int main(int argc, char* argv[])
         // create evaluator
         utilities::BinaryClassificationEvaluator evaluator;
 
+        // calculate epoch size
+        uint64_t epochSize = sgdArguments.epochSize;
+        if(epochSize == 0 || epochSize >  dataset->NumExamples())
+        {
+            epochSize = dataset->NumExamples();
+        }
+
         // create random number generator
         auto rng = utilities::GetRandomEngine(sgdArguments.dataRandomPermutationSeedString);
 
@@ -89,11 +96,11 @@ int main(int argc, char* argv[])
         for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
         {
             // randomly permute the data
-            dataset->RandPerm(rng);
+            dataset->RandPerm(rng, epochSize);
 
             // iterate over the entire permuted dataset
-            auto trainSetIterator = dataset->GetIterator();
-            optimizer.Update(trainSetIterator, dataset->NumExamples(), loss, sgdArguments.l2Regularization);
+            auto trainSetIterator = dataset->GetIterator(0, epochSize);
+            optimizer.Update(trainSetIterator, epochSize, loss, sgdArguments.l2Regularization);
 
             // Evaluate training error
             auto evaluationIterator = dataset->GetIterator();

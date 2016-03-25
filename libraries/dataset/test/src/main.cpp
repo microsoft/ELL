@@ -310,16 +310,16 @@ void printTestOnesDataVector()
 
     dataset::OnesDataVector b(15);
 
-    std::stringstream ass;
-    std::stringstream bss;
+    std::stringstream aStream;
+    std::stringstream bStream;
 
-    a.Print(ass);
-    b.Print(bss);
+    a.Print(aStream);
+    b.Print(bStream);
 
-    std::string as = ass.str();
-    std::string bs = bss.str();
+    std::string aStr = aStream.str();
+    std::string bStr = bStream.str();
 
-    testing::ProcessTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::OnesDataVector::Print()", as == bs);
+    testing::ProcessTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::OnesDataVector::Print()", aStr == bStr);
 }
 
 void printTestZeroDataVector()
@@ -327,16 +327,16 @@ void printTestZeroDataVector()
     dataset::DoubleDataVector a;
     dataset::ZeroDataVector b;
 
-    std::stringstream ass;
-    std::stringstream bss;
+    std::stringstream aStream;
+    std::stringstream bStream;
 
-    a.Print(ass);
-    b.Print(bss);
+    a.Print(aStream);
+    b.Print(bStream);
 
-    std::string as = ass.str();
-    std::string bs = bss.str();
+    std::string aStr = aStream.str();
+    std::string bStr = bStream.str();
 
-    testing::ProcessTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::ZeroDataVector::Print()", as == bs);
+    testing::ProcessTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::ZeroDataVector::Print()", aStr == bStr);
 }
 
 void printTest()
