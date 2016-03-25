@@ -40,21 +40,19 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 set (TEST_NAME ${PROJ_NAME}_test)
 
-add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
+set (TEST_SRC test/src/main.cpp)
+set (TEST_INCLUDE )
+
+include_directories(../testing/include)
+include_directories(test/include)
+
+add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 
 target_link_libraries(${TEST_NAME} dataset linear)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
-
-#
-# documentation
-#
-set (DOC_NAME ${PROJ_NAME}_docs)
-set (DOC doc/tex/sgd_optimizer.tex)
-add_custom_target(${DOC_NAME} ALL DEPENDS ${DOC} SOURCES ${DOC})
-set_property(TARGET ${DOC_NAME} PROPERTY FOLDER "documentation")
 
 
 

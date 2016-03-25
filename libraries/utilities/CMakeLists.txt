@@ -77,18 +77,22 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 # test projects
 #
 
+set (TEST_NAME ${PROJ_NAME}_test)
+
+set (TEST_SRC test/src/main.cpp test/src/XMLSerialization_test.cpp)
+set (TEST_INCLUDE test/include/XMLSerialization_test.h)
+
+include_directories(../testing/include)
+include_directories(test/include)
+
+add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 include_directories(../testing/include)
 
-add_executable(utilities_test test/test.cpp ${INCLUDE})
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(utilities_test utilities dataset linear testing -pthread)
 else()
 target_link_libraries(utilities_test utilities dataset linear testing)
 endif()
 set_property(TARGET utilities_test PROPERTY FOLDER "tests")
-add_test(NAME utilities_test COMMAND utilities_test)
+add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
-add_executable(XMLSerialization_test test/XMLSerialization_test.cpp ${INCLUDE})
-target_link_libraries(XMLSerialization_test utilities testing)
-set_property(TARGET XMLSerialization_test PROPERTY FOLDER "tests")
-add_test(NAME XMLSerialization_test COMMAND XMLSerialization_test)

@@ -149,15 +149,3 @@ void XMLSerializationTest()
 
     testing::ProcessTest("utilities::XMLSerialization", vec2[0]->Check() && vec[1]->Check());
 }
-
-int main()
-{
-    XMLSerializationTest();
-    TypeFactoryTest();
-
-    if (testing::DidTestFail())
-    {
-        return 1;
-    }
-    return 0;
-}

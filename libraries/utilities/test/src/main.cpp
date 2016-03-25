@@ -8,6 +8,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "XMLSerialization_test.h"
+
 #include "IIterator.h"
 #include "StlIterator.h"
 #include "TransformIterator.h"
@@ -205,6 +207,11 @@ int main()
     testTransformIterator();
     testParallelTransformIterator();
     testMatchFormat();
+
+    // XMLSerialization tests
+    XMLSerializationTest();
+    TypeFactoryTest();
+
 
     if (testing::DidTestFail())
     {

@@ -37,3 +37,24 @@ add_library(${PROJ_NAME} ${SRC} ${INCLUDE})
 target_link_libraries(${PROJ_NAME} dataset layers linear utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+
+
+#
+# test project
+#
+
+set (TEST_NAME ${PROJ_NAME}_test)
+
+set (TEST_SRC test/src/main.cpp)
+set (TEST_INCLUDE )
+
+include_directories(../testing/include)
+include_directories(test/include)
+
+add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
+
+target_link_libraries(${TEST_NAME} dataset linear testing utilities)
+
+set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
+
+add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})

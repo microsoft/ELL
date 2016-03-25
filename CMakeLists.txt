@@ -33,7 +33,6 @@ add_subdirectory(scripts)
 
 # Add documentation
 set (DOC INSTALL.md StyleGuide.md)
-add_custom_target(Rockmill ALL DEPENDS ${DOC} SOURCES ${DOC})
-set_property(TARGET Rockmill PROPERTY FOLDER "documentation")
+add_custom_target(documentation ALL DEPENDS ${DOC} SOURCES ${DOC})
 
 

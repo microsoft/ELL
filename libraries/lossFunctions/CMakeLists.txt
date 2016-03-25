@@ -36,9 +36,13 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 set (TEST_NAME ${PROJ_NAME}_test)
 
-include_directories(../testing/include)
+set (TEST_SRC test/src/main.cpp)
+set (TEST_INCLUDE )
 
-add_executable(${TEST_NAME} test/test.cpp ${INCLUDE})
+include_directories(../testing/include)
+include_directories(test/include)
+
+add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 
 target_link_libraries(${TEST_NAME} lossFunctions testing)
 
