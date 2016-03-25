@@ -13,6 +13,7 @@
 // stl
 #include <stdexcept>
 #include <string>
+#include <cassert>
 
 namespace layers
 {
@@ -129,10 +130,16 @@ namespace layers
         {
             throw std::runtime_error("unsupported version: " + std::to_string(version));
         }
+
+        // check validity of deserialized vectors
+        assert(_values.size() == _inputCoordinates.size());
     }
 
     void Coordinatewise::Write(utilities::XMLSerializer& serializer) const
     {
+        // sanity check
+        assert(_values.size() == _inputCoordinates.size());
+
         serializer.Serialize("version", _currentVersion);
         serializer.Serialize("operationType", GetOperationName(_operationType));
         serializer.Serialize("values", _values);
