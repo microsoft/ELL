@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  [projectName]
-//  File:     test.cpp (layers_test)
+//  Project:  Rockmill
+//  File:     main.cpp (layers_test)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  [projectName]
-//  File:     test.cpp (predictors_test)
+//  Project:  Rockmill
+//  File:     main.cpp (predictors_test)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]

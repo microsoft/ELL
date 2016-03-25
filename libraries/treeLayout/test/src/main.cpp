@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  [projectName]
-//  File:     test.cpp (treeLayout_test)
+//  Project:  Rockmill
+//  File:     main.cpp (treeLayout_test)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]

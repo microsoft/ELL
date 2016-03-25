@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  [projectName]
-//  File:     test.cpp (dataset_test)
+//  Project:  Rockmill
+//  File:     main.cpp (dataset_test)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]

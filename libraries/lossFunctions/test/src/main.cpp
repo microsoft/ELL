@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  [projectName]
-//  File:     test.cpp (lossFunctions_test)
+//  Project:  Rockmill
+//  File:     main.cpp (lossFunctions_test)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]

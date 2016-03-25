@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  [projectName]
-//  File:     test.cpp (linear_test)
+//  Project:  Rockmill
+//  File:     main.cpp (linear_test)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
