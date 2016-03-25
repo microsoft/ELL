@@ -1,5 +1,5 @@
 #
-# cmake file for Bonsai projects
+# cmake file for Rockmill projects
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
