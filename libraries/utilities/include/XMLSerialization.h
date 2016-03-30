@@ -58,10 +58,10 @@ namespace utilities
     /// 
     /// To make a class serializable, the following public members are required:
     /// 
-    /// class Foo
+    /// class F
     /// {
     /// public: 
-    ///     Foo();
+    ///     F();
     ///     void Read(utilities::XMLDeserializer&amp; deserializer);
     ///     void Write(utilities::XMLSerializer&amp; serializer) const;
     /// }
@@ -70,7 +70,7 @@ namespace utilities
     /// deserializer.Deserialize(). A typical implementation of Write will include a sequence of
     /// calls to serializer.Serialize(), in the same order. To serialize the class, call:
     /// 
-    /// Foo z;
+    /// F z;
     /// serializer.Serialize("z", z);
     /// 
     /// This class also supports serializing and deserialization of std::unique_pointers to a
