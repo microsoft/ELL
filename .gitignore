@@ -215,3 +215,7 @@ ModelManifest.xml
 # Emacs autosaves
 \#*\#
 .#*
+
+# VS Code stuff
+browse.VC.db
+.vs/
