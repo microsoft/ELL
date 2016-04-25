@@ -39,7 +39,7 @@ void CompilableSum::SetActions(uint64_t currentLayerIndex, DataFlowGraph& graph)
             continue;
         }
 
-        for(uint64_t i = 0; i < _inputCoordinates[elementIndex].size(); ++i)
+        for(uint64_t i = 0; i < _inputCoordinates[elementIndex].Size(); ++i)
         {
             auto inputCoordinate = _inputCoordinates[elementIndex][i];
             auto& inputNode = graph.GetNode(inputCoordinate);

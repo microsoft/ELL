@@ -9,7 +9,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CompilableMap.h"
-#include "CompilableInput.h"
 #include "CompilableCoordinatewise.h"
 #include "CompilableSum.h"
 #include "DataFlowNode.h"
@@ -94,15 +93,17 @@ void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::Int
 
 CompilableMap::CompilableMap(const layers::Map& other)
 {
-    _outputCoordinates = other.GetOutputCoordinates();
+    _outputCoordinates = other.GetOutputCoordinateList();
 
-    const auto& stack = other.GetStack();
+    const auto& stack = other.LoadStack();
+    _requiredInputLayerSize = std::max(stack.GetRequiredLayerSize(0), _outputCoordinates.GetRequiredLayerSize(0));
+
     utilities::TypeFactory<CompilableLayer> compilableLayerFactory;
-    compilableLayerFactory.AddType<CompilableInput>(layers::Input::GetTypeName());
     compilableLayerFactory.AddType<CompilableCoordinatewise>(layers::Coordinatewise::GetTypeName());
     compilableLayerFactory.AddType<CompilableSum>(layers::Sum::GetTypeName());
 
-    for (uint64_t index = 0; index < stack.NumLayers(); ++index)
+    // input layer is stored implicitly, copy all other layers
+    for (uint64_t index = 1; index < stack.NumLayers(); ++index)
     {
         const auto& layer = stack.GetLayer(index);
         _compilableLayers.push_back(compilableLayerFactory.Construct(layer.GetRuntimeTypeName()));
@@ -112,22 +113,23 @@ CompilableMap::CompilableMap(const layers::Map& other)
 
 void CompilableMap::ToCode(std::ostream& os) const
 {
-    uint64_t numLayers = _compilableLayers.size();
-    if (numLayers == 0)
-    {
-        throw std::runtime_error("Error: calling ToCode on an empty CompilableMap");
-    }
+    uint64_t numLayersExcludingInput = _compilableLayers.size();
 
     // create data flow graph datastructure
     DataFlowGraph graph;
-    for(uint64_t layerIndex = 0; layerIndex < numLayers; ++layerIndex)
+
+    // add graph layer for input
+    graph.AddLayer(_requiredInputLayerSize);
+
+    // add graph later for other layers
+    for(uint64_t i = 0; i < numLayersExcludingInput; ++i)
     {
-        graph.AddLayer(_compilableLayers[layerIndex]->Size());
+        graph.AddLayer(_compilableLayers[i]->Size());
     }
 
-    // add extra layer for outputs
-    uint64_t outputLayerSize = _outputCoordinates.size();
-    uint64_t outputLayerIndex = numLayers;
+    // add an extra layer for outputs
+    uint64_t outputLayerSize = _outputCoordinates.Size();
+    uint64_t outputLayerIndex = numLayersExcludingInput+1;
     graph.AddLayer(outputLayerSize);
 
     // set names on output layer and set the actions that generate the output coordinates
@@ -141,19 +143,18 @@ void CompilableMap::ToCode(std::ostream& os) const
     }
 
     // backwards pass to assign actions to nodes
-    for(uint64_t layerIndex = numLayers - 1; layerIndex > 0; --layerIndex)
+    for(uint64_t layerIndex = outputLayerIndex-1; layerIndex > 0; --layerIndex)
     {
-        _compilableLayers[layerIndex]->SetActions(layerIndex, graph);
+        _compilableLayers[layerIndex-1]->SetActions(layerIndex, graph);
     }
 
     // construct an integer stack, to manage temp variable names;
     utilities::IntegerStack stack;
 
     // print comment
-    auto str = "// Predict function\n// Input dimension: %i\n// Output dimension: %i\n// Output coordinates:";
-    uint64_t inputLayerSize = _compilableLayers[0]->Size();
-    utilities::PrintFormat(os, str, inputLayerSize, outputLayerSize);
-    for (uint64_t i = 0; i < _outputCoordinates.size(); ++i)
+    auto str = "// Predict function\n// Input dimension: %\n// Output dimension: %\n// Output coordinates:";
+    utilities::PrintFormat(os, str, _requiredInputLayerSize, outputLayerSize);
+    for (uint64_t i = 0; i < _outputCoordinates.Size(); ++i)
     {
         os << ' ' << _outputCoordinates[i];
     }
@@ -161,9 +162,9 @@ void CompilableMap::ToCode(std::ostream& os) const
     // print function declaration
     os << "\nvoid Predict(const double* input, double* output)\n{\n";
 
-    // forwards pass to generate code
+    // forward pass to generate code
     const std::string inputNamePrefix = "input";
-    for (uint64_t inputElementIndex = 0; inputElementIndex < inputLayerSize; ++inputElementIndex)
+    for (uint64_t inputElementIndex = 0; inputElementIndex < _requiredInputLayerSize; ++inputElementIndex)
     {
         layers::Coordinate inputCoordinate(0, inputElementIndex);
         auto& inputNode = graph.GetNode(inputCoordinate);

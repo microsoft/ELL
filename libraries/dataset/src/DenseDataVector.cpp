@@ -22,7 +22,7 @@ namespace dataset
     }
 
     template<typename ValueType>
-    void DenseDataVector<ValueType>::PushBack(uint64_t index, double value)
+    void DenseDataVector<ValueType>::AppendEntry(uint64_t index, double value)
     {
         if(value == 0)
         {

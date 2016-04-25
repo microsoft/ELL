@@ -16,11 +16,9 @@ endif()
 set (SRC src/main.cpp
          src/AddToAction.cpp
          src/CompilableCoordinatewise.cpp
-         src/CompilableInput.cpp
          src/CompilableLayer.cpp
          src/CompilableMap.cpp
          src/CompilableSum.cpp
-         src/ConstructLayer.cpp
          src/DataFlowGraph.cpp
          src/DataFlowNode.cpp
          src/LinearOperation.cpp)
@@ -28,7 +26,6 @@ set (SRC src/main.cpp
 set (INCLUDE include/AddToAction.h
              include/CompileArguments.h
              include/CompilableCoordinatewise.h
-             include/CompilableInput.h
              include/CompilableLayer.h
              include/CompilableMap.h
              include/CompilableSum.h

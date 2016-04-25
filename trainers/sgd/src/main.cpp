@@ -26,11 +26,11 @@
 #include "SupervisedExample.h"
 
 // common
-#include "DataLoaders.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 
-
+#include "DataLoaders.h"
+#include "LoadStack.h"
 
 // optimization
 #include "AsgdOptimizer.h"
@@ -67,26 +67,30 @@ int main(int argc, char* argv[])
         // if output file specified, replace stdout with it 
         auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputStackFile);
 
-        // read map from file
-        std::shared_ptr<layers::Map> map = common::GetMap(mapLoadArguments);
+        // load a stack
+        auto stack = common::LoadStack(mapLoadArguments);
 
-        // get the dataset
-        auto dataset = common::GetDataset(dataLoadArguments, map);
+        // get output coordinate list and create the map
+        auto outputCoordinateList = layers::BuildCoordinateList(stack, dataLoadArguments.parsedDataDimension, mapLoadArguments.coordinateListString);
+        layers::Map map(stack, outputCoordinateList);
+
+        // load dataset
+        auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
         // create loss function
         lossFunctions::LogLoss loss;
 
         // create sgd trainer
-        optimization::AsgdOptimizer optimizer(dataset->GetMaxExampleSize());
+        optimization::AsgdOptimizer optimizer(outputCoordinateList.Size());
 
         // create evaluator
         utilities::BinaryClassificationEvaluator evaluator;
 
         // calculate epoch size
         uint64_t epochSize = sgdArguments.epochSize;
-        if(epochSize == 0 || epochSize >  dataset->NumExamples())
+        if(epochSize == 0 || epochSize >  rowDataset.NumExamples())
         {
-            epochSize = dataset->NumExamples();
+            epochSize = rowDataset.NumExamples();
         }
 
         // create random number generator
@@ -96,14 +100,14 @@ int main(int argc, char* argv[])
         for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
         {
             // randomly permute the data
-            dataset->RandPerm(rng, epochSize);
+            rowDataset.RandPerm(rng, epochSize);
 
             // iterate over the entire permuted dataset
-            auto trainSetIterator = dataset->GetIterator(0, epochSize);
-            optimizer.Update(trainSetIterator, epochSize, loss, sgdArguments.l2Regularization);
+            auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
+            optimizer.Update(trainSetIterator, loss, sgdArguments.l2Regularization);
 
             // Evaluate training error
-            auto evaluationIterator = dataset->GetIterator();
+            auto evaluationIterator = rowDataset.GetIterator();
             evaluator.Evaluate(evaluationIterator, optimizer.GetPredictor(), loss);
         }
 
@@ -113,10 +117,10 @@ int main(int argc, char* argv[])
         // update the map with the newly learned layers
         auto predictor = optimizer.GetPredictor();
 
-        predictor.AddToStack(map->GetStack(), map->GetOutputCoordinates());
+        predictor.AddToStack(stack, outputCoordinateList);
 
         // output map
-        map->GetStack().Save(outStream);
+        stack.Save(outStream);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

@@ -58,10 +58,10 @@ namespace utilities
     /// 
     /// To make a class serializable, the following public members are required:
     /// 
-    /// class F
+    /// class Bar
     /// {
     /// public: 
-    ///     F();
+    ///     Bar();
     ///     void Read(utilities::XMLDeserializer&amp; deserializer);
     ///     void Write(utilities::XMLSerializer&amp; serializer) const;
     /// }
@@ -70,7 +70,7 @@ namespace utilities
     /// deserializer.Deserialize(). A typical implementation of Write will include a sequence of
     /// calls to serializer.Serialize(), in the same order. To serialize the class, call:
     /// 
-    /// F z;
+    /// Bar z;
     /// serializer.Serialize("z", z);
     /// 
     /// This class also supports serializing and deserialization of std::unique_pointers to a
@@ -287,11 +287,17 @@ namespace utilities
 
         /// <summary> Deserialize an unnamed unique pointer to a polymorphic class. </summary>
         ///
-        /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
+        /// <typeparam name="BaseType"> The type pointed to, must be a polymorphic class. </typeparam>
         /// <param name="value"> [in,out] Reference to the variable being deserialized. </param>
+        /// <param name="factory"> A TypeFactory that constructs instances of this polymorphic class. </param>
         template<typename BaseType>
-        void Deserialize(std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory); // TODO fix documentation
+        void Deserialize(std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory); 
 
+        /// <summary> Deserialize an unnamed vector of unique pointers to a polymorphic class. </summary>
+        ///
+        /// <typeparam name="BaseType"> The type pointed to, must be a polymorphic class. </typeparam>
+        /// <param name="value"> [in,out] Reference to the vector being deserialized. </param>
+        /// <param name="factory"> A TypeFactory that constructs instances of this polymorphic class. </param>
         template<typename BaseType>
         void Deserialize(std::vector<std::unique_ptr<BaseType>>& value, const TypeFactory<BaseType>& factory);
 

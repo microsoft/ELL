@@ -58,7 +58,7 @@ public:
     /// <param name="index"> Zero-based element index. </param>
     ///
     /// <returns> The input coordinates. </returns>
-    virtual layers::Layer::InputCoordinateIterator GetInputCoordinates(uint64_t index) const = 0;
+    virtual layers::CoordinateIterator GetInputCoordinateIterator(uint64_t index) const = 0;
 
     /// <summary> Assignment operator from layer to PrintableLayer. </summary>
     ///
@@ -70,8 +70,33 @@ public:
     /// <returns> The name of this type. </returns>
     static std::string GetTypeName(); 
 
-protected:
-    LayerLayout Print(std::ostream& os, double left, double top, uint64_t layerIndex, const std::string& typeName, uint64_t size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle) const;
+    /// <summary> Prints generic layer of elements </summary>
+    ///
+    /// <param name="os"> [in,out] Stream to write data to. </param>
+    /// <param name="left"> The left position of the layer. </param>
+    /// <param name="top"> The top position of the layer. </param>
+    /// <param name="layerIndex"> Zero-based index of the layer. </param>
+    /// <param name="typeName"> Name of the layer type. </param>
+    /// <param name="size"> The number of elements in the layer. </param>
+    /// <param name="elementLayout"> The element layout arguments. </param>
+    /// <param name="layerStyle"> The layer style arguments. </param>
+    ///
+    /// <returns> A LayerLayout. </returns>
+    static LayerLayout PrintLayer(std::ostream& os, double left, double top, uint64_t layerIndex, const std::string& typeName, uint64_t size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle);
+
+    /// <summary> Prints empty elements according to a layout. </summary>
+    ///
+    /// <param name="os"> [in,out] Stream to write data to. </param>
+    /// <param name="layout"> The layout. </param>
+    static void PrintEmptyElements(std::ostream& os, const LayerLayout& layout);
+
+    /// <summary> Print value elements according to a layout and vector of values. </summary>
+    ///
+    /// <param name="os"> [in,out] Stream to write data to. </param>
+    /// <param name="layout"> The layout. </param>
+    /// <param name="values"> The values. </param>
+    /// <param name="maxChars"> The maximum number of character to use when printing values. </param>
+    static void PrintValueElements(std::ostream& os, const LayerLayout& layout, const std::vector<double>& values, uint64_t maxChars);
 };
 
  

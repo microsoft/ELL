@@ -76,7 +76,7 @@ namespace linear
     }
 
     template<typename DataVectorType>
-    void RowMatrix<DataVectorType>::PushBackRow(DataVectorType&& row)
+    void RowMatrix<DataVectorType>::AddRow(DataVectorType&& row)
     {
         uint64_t numColumns = row.Size();
         _rows.emplace_back(std::move(row));

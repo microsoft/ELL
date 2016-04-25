@@ -27,17 +27,11 @@ namespace dataset
     class MappedParser
     {
     public:
-        /// <summary> Copy constructor. </summary>
-        MappedParser(const MappedParser&) = default;
-
-        /// <summary> Move constructor. </summary>
-        MappedParser(MappedParser&&) = default;
-
         /// <summary> Constructs an instance of MappedParser. </summary>
         ///
         /// <param name="internalParser"> The internal parser. </param>
         /// <param name="map"> The map. </param>
-        MappedParser(const InternalParserType& internalParser, const std::shared_ptr<layers::Map>& map);
+        MappedParser(InternalParserType internalParser, layers::Map map);
 
         /// <summary> Gets an iterator that parses the given std::string. </summary>
         ///
@@ -48,9 +42,8 @@ namespace dataset
         layers::Map::OutputIterator GetIterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) const;
 
     private:
-        InternalParserType _internalParser;
-        std::shared_ptr<const layers::Map> _map; 
-        layers::CoordinateList _outputCoordinates;
+        const InternalParserType _internalParser;
+        const layers::Map _map;
     };
 }
 

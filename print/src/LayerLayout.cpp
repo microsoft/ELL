@@ -71,6 +71,11 @@ LayerLayout::LayerLayout(double left, double top, uint64_t size, double layerMax
     }
 }
 
+uint64_t LayerLayout::NumElements() const
+{
+    return _elementMidX.size();
+}
+
 double LayerLayout::GetWidth() const
 {
     return _layerWidth;
@@ -81,7 +86,7 @@ double LayerLayout::GetHeight() const
     return _layerHeight;
 }
 
-bool LayerLayout::HasHidden() const
+bool LayerLayout::HasHiddenElements() const
 {
     if (_numHiddenElements > 0)
     {

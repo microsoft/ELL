@@ -11,7 +11,7 @@
 #pragma once
 
 #include "Layer.h"
-#include "Coordinate.h"
+#include "CoordinateList.h"
 
 // stl
 #include <cstdint>
@@ -57,7 +57,14 @@ namespace layers
         /// <param name="index"> Zero-based element index. </param>
         ///
         /// <returns> The input coordinates. </returns>
-        virtual Layer::InputCoordinateIterator GetInputCoordinates(uint64_t index) const override;
+        virtual CoordinateIterator GetInputCoordinateIterator(uint64_t index) const override;
+
+        /// <summary> Returns the minimal required size of an input layer, which is the maximum input element from that layer plus 1. </summary>
+        ///
+        /// <param name="layerindex"> The layer index. </param>
+        ///
+        /// <returns> The required layer size. </returns>
+        virtual uint64_t GetRequiredLayerSize(uint64_t layerIndex) const override;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

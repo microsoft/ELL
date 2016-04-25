@@ -35,7 +35,7 @@ namespace dataset
         {
             // add entry to vector
             auto entry = IndexValueIterator.Get();
-            up_vec->PushBack(entry.index, entry.value);
+            up_vec->AppendEntry(entry.index, entry.value);
 
             // Update VectorStats
             if(entry.value != 1.0)

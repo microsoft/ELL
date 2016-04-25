@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "Coordinate.h"
+#include "CoordinateList.h"
 #include "Stack.h"
 
 // linear
@@ -51,27 +51,15 @@ namespace layers
             uint64_t _index;
 
             // private ctor, can only be called from Map class
-            OutputIterator(std::vector<double>&& outputs);
+            OutputIterator(std::vector<double> outputs);
             friend Map;
         };
 
-        /// <summary> Constructs an instance of Map. </summary>
-        Map();
-
-        /// <summary> Constructs an instance of pointing to an existing stack of layers, and using the full last layer as output. </summary>
-        Map(const std::shared_ptr<Stack>& layers);
-
-        /// <summary> Constructs an instance of pointing to an existing stack of layers, using the given output coordinates. </summary>
-        Map(const std::shared_ptr<Stack>& layers, const CoordinateList& outputCoordinates);
-
-        /// <summary> Deleted copy constructor </summary>
-        Map(const Map&) = delete;
-
-        /// <summary> Default move constructor </summary>
-        Map(Map&&) = default;
-
-        /// <summary> Virtual destructor. </summary>
-        virtual ~Map() = default;
+        /// <summary> Constructs a map</summary>
+        ///
+        /// <param name="stack"> A stack. </param>
+        /// <param name="outputCoordinates"> A list of output coordinates. </param>
+        Map(const Stack& stack, const CoordinateList& outputCoordinateList);
 
         /// <summary> Computes the Map. </summary>
         ///
@@ -82,37 +70,24 @@ namespace layers
         template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         OutputIterator Compute(IndexValueIteratorType inputIterator) const;
 
-        /// <summary> Returns the current output coordinates for the map. </summary>
+        /// <summary> Gets the output coordinate list. </summary>
         ///
-        /// <returns> The current output coordinates. </returns>
-        CoordinateList GetOutputCoordinates() const;
+        /// <returns> The coordinate list. </returns>
+        const CoordinateList& GetOutputCoordinateList() const;
 
-        /// <summary> Sets the output coordinates for the map. </summary>
+        /// <summary> Gets the underlying stack. </summary>
         ///
-        /// <param name="coordinates"> The new output coordinates. </param>
-        void SetOutputCoordinates(const CoordinateList& coordinates);
-
-        /// <summary> Gets a const reference to the layer stack this map refers to </summary>
-        const Stack& GetStack() const;
-
-        /// <summary> Gets a non-const reference to the layer stack this map refers to </summary>
-        Stack& GetStack();
-
-    protected:
-        // members
-        std::shared_ptr<Stack> _stack;
-
-        void IncreaseInputLayerSize(uint64_t minSize) const;
-
-        template <typename IndexValueIteratorType>
-        void LoadInputLayer(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const;
+        /// <returns> The stack. </returns>
+        const Stack& LoadStack() const;
 
     private:
-        CoordinateList _outputCoordinates; // default empty coordinate list means "use all of last layer"
-
-        mutable uint64_t _maxInputSizeSeen = 0; // keeps track of the largest input we've seen so far
+        // members
+        const Stack& _stack;
+        const CoordinateList& _outputCoordinateList;
         mutable std::vector<std::vector<double>> _layerOutputs;
-        void AllocateLayerOutputs() const;
+
+        template <typename IndexValueIteratorType>
+        void InitializeLayerOutputs(IndexValueIteratorType& inputIterator, std::vector<double>& layerOutputs) const;
     };
 }
 

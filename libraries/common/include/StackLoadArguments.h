@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
-//  File:     MapLoadArguments.h (common)
+//  File:     StackLoadArguments.h (common)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
@@ -9,8 +9,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
-#include "StackLoadArguments.h"
 
 // utilities
 #include "CommandLineParser.h"
@@ -21,17 +19,24 @@
 namespace common
 {
     /// <summary> A struct that holds command line parameters for loading maps. </summary>
-    struct MapLoadArguments : public StackLoadArguments
+    struct StackLoadArguments
     {
-        std::string coordinateListString = "";
+        std::string inputStackFile = "";
     };
 
     /// <summary> A version of MapLoadArguments that adds its members to the command line parser. </summary>
-    struct ParsedMapLoadArguments : public MapLoadArguments, public utilities::ParsedArgSet
+    struct ParsedStackLoadArguments : public StackLoadArguments, public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///
         /// <param name="parser"> [in,out] The parser. </param>
         virtual void AddArgs(utilities::CommandLineParser& parser);
+
+        /// <summary> Check arguments. </summary>
+        ///
+        /// <param name="parser"> The parser. </param>
+        ///
+        /// <returns> An utilities::CommandLineParseResult. </returns>
+        virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
     };
 }

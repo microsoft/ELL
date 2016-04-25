@@ -68,6 +68,4 @@ namespace layers
     ///
     /// <returns> The shifted ostream. </returns>
     std::ostream& operator<< (std::ostream& os, const Coordinate& coordinate);
-
-    typedef std::vector<Coordinate> CoordinateList;
 }

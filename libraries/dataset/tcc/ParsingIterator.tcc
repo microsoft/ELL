@@ -14,10 +14,9 @@
 namespace dataset
 {
     template<typename RowIteratorType, typename VectorEntryParserType>
-    ParsingIterator<RowIteratorType, VectorEntryParserType>::ParsingIterator(RowIteratorType&& row_iter, const VectorEntryParserType& parser) :
-        _rowIterator(std::move(row_iter)), _instanceParser(parser)
-    {
-    }
+    ParsingIterator<RowIteratorType, VectorEntryParserType>::ParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser) :
+        _rowIterator(std::move(row_iter)), _instanceParser(std::move(parser))
+    {}
 
     template<typename RowIteratorType, typename VectorEntryParserType>
     bool ParsingIterator<RowIteratorType, VectorEntryParserType>::IsValid() const
@@ -39,9 +38,9 @@ namespace dataset
     }
 
     template<typename RowIteratorType, typename VectorEntryParserType>
-    std::unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType&& row_iter, const VectorEntryParserType& parser)
+    std::unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser)
     {
-        return std::make_unique<ParsingIterator<RowIteratorType, VectorEntryParserType>>(std::move(row_iter), parser);
+        return std::make_unique<ParsingIterator<RowIteratorType, VectorEntryParserType>>(std::move(row_iter), std::move(parser));
     }
 
 }

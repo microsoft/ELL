@@ -7,7 +7,7 @@ outputHtmlFile = args[2]   # The file to write the model diagram to
 outputCodeFile = args[3]   # The file to write the C output code to
 
 # Train a classifier using sgd
-runBinary('sgd', ['-idf', inputDatasetFile, '-osf', outputStackFile])
+runBinary('sgd', ['-idf', inputDatasetFile, '-osf', outputStackFile, '-dd', 'auto'])
 
 # Print the classifier to an html file
 runBinary('print', ['-isf', outputStackFile, '-osvg', outputHtmlFile])

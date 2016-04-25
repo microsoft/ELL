@@ -30,6 +30,12 @@ namespace utilities
     }
 
     template <typename IteratorType, typename ValueType>
+    uint64_t StlIterator<IteratorType, ValueType>::NumIteratesLeft() const
+    {
+        return _end - _current;
+    }
+
+    template <typename IteratorType, typename ValueType>
     ValueType StlIterator<IteratorType, ValueType>::Get() const
     {
         return *_current;

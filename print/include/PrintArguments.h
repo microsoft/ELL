@@ -67,7 +67,6 @@ struct LayerStyleArguments
 /// <summary> Arguments for print. </summary>
 struct PrintArguments
 {
-    std::string inputStackFile;
     std::string outputSvgFile;
 
     ElementLayoutArguments valueElementLayout;
@@ -86,12 +85,4 @@ struct ParsedPrintArguments : public PrintArguments, public utilities::ParsedArg
     ///
     /// <param name="parser"> [in,out] The parser. </param>
     virtual void AddArgs(utilities::CommandLineParser& parser);
-
-    /// <summary> Check arguments. </summary>
-    ///
-    /// <param name="parser"> The parser. </param>
-    ///
-    /// <returns> An utilities::CommandLineParseResult. </returns>
-    virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
-
 };

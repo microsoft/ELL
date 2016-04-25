@@ -31,29 +31,14 @@ void PrintableCoordinatewise::operator=(const layers::Coordinatewise& coordinate
     layers::Coordinatewise::operator=(coordinatewise);
 }
 
-LayerLayout PrintableCoordinatewise::Print(std::ostream & os, double left, double top, uint64_t layerIndex, const PrintArguments & Arguments) const
+LayerLayout PrintableCoordinatewise::Print(std::ostream & os, double left, double top, uint64_t layerIndex, const PrintArguments & arguments) const
 {
-    auto layout = PrintableLayer::Print(os, left, top, layerIndex, GetFriendlyLayerName(), Size(), Arguments.valueElementLayout, Arguments.layerStyle);
-
-   //// print the visible elements, before the dots
-   for (uint64_t k = 0; k < layout.NumVisibleElements()-1; ++k)
-   {
-        SvgValueElement(os, 2, layout.GetMidX(k), layout.GetMidY(), _values[k], Arguments.valueElementStyle.maxChars, k);
-   }
-
-   // print last element
-   SvgValueElement(os, 2, layout.GetMidX(Size() - 1), layout.GetMidY(), _values[Size() - 1], Arguments.valueElementStyle.maxChars, Size() - 1);
-
-   // if has hidden elements, draw the dots
-   if(layout.HasHidden())
-   {
-       SvgDots(os, 2, layout.GetDotsMidX(), layout.GetMidY());
-   }
-
-   return layout;
+    auto layout = PrintableLayer::PrintLayer(os, left, top, layerIndex, GetFriendlyLayerName(), Size(), arguments.valueElementLayout, arguments.layerStyle);
+    PrintableLayer::PrintValueElements(os, layout, _values, arguments.valueElementStyle.maxChars);
+    return layout;
 }
 
-layers::Layer::InputCoordinateIterator PrintableCoordinatewise::GetInputCoordinates(uint64_t index) const
+layers::CoordinateIterator PrintableCoordinatewise::GetInputCoordinateIterator(uint64_t index) const
 {
-    return Coordinatewise::GetInputCoordinates(index);
+    return Coordinatewise::GetInputCoordinateIterator(index);
 }

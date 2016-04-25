@@ -36,6 +36,11 @@ public:
     /// <param name="Arguments"> The arguments. </param>
     LayerLayout(double left, double top, uint64_t size, double layerMaxWidth, ElementLayoutArguments Arguments);
 
+    /// <summary> Gets the number of elements </summary>
+    ///
+    /// <returns> The size. </returns>
+    uint64_t NumElements() const;
+
     /// <summary> Gets the width. </summary>
     ///
     /// <returns> The width. </returns>
@@ -46,10 +51,10 @@ public:
     /// <returns> The height. </returns>
     double GetHeight() const;
 
-    /// <summary> Query if this object has hidden. </summary>
+    /// <summary> Query if this object has hidden elements. </summary>
     ///
-    /// <returns> true if hidden, false if not. </returns>
-    bool HasHidden() const;
+    /// <returns> true if the object has hidden elements, false if not. </returns>
+    bool HasHiddenElements() const;
 
     /// <summary> Number visible elements. </summary>
     ///

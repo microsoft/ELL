@@ -37,5 +37,6 @@ public:
 
 private:
     std::vector<std::unique_ptr<CompilableLayer>> _compilableLayers;
+    uint64_t _requiredInputLayerSize = 0;
     layers::CoordinateList _outputCoordinates;
 };

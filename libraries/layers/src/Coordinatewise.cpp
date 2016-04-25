@@ -24,7 +24,7 @@ namespace layers
     Coordinatewise::Coordinatewise(double value, Coordinate coordinate, OperationType operationType) : _operationType(operationType)
     {
         _values.push_back(value);
-        _inputCoordinates.push_back(coordinate);
+        _inputCoordinates.AddCoordinate(coordinate);
     }
 
     Coordinatewise::Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, OperationType operationType) : _operationType(operationType)
@@ -84,7 +84,7 @@ namespace layers
 
     uint64_t Coordinatewise::Size() const
     {
-        return _inputCoordinates.size();
+        return _inputCoordinates.Size();
     }
 
     void Coordinatewise::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
@@ -99,9 +99,14 @@ namespace layers
         }
     }
 
-    Layer::InputCoordinateIterator Coordinatewise::GetInputCoordinates(uint64_t index) const
+    CoordinateIterator Coordinatewise::GetInputCoordinateIterator(uint64_t index) const
     {
-        return Layer::InputCoordinateIterator(_inputCoordinates.cbegin() + index, _inputCoordinates.cbegin() + index + 1);
+        return _inputCoordinates.GetIterator(index, 1);
+    }
+
+    uint64_t Coordinatewise::GetRequiredLayerSize(uint64_t layerIndex) const
+    {
+        return _inputCoordinates.GetRequiredLayerSize(layerIndex);
     }
 
     std::string Coordinatewise::GetTypeName()
@@ -132,13 +137,13 @@ namespace layers
         }
 
         // check validity of deserialized vectors
-        assert(_values.size() == _inputCoordinates.size());
+        assert(_values.size() == _inputCoordinates.Size());
     }
 
     void Coordinatewise::Write(utilities::XMLSerializer& serializer) const
     {
         // sanity check
-        assert(_values.size() == _inputCoordinates.size());
+        assert(_values.size() == _inputCoordinates.Size());
 
         serializer.Serialize("version", _currentVersion);
         serializer.Serialize("operationType", GetOperationName(_operationType));

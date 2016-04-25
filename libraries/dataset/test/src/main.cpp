@@ -305,7 +305,7 @@ void printTestOnesDataVector()
     dataset::DoubleDataVector a;
     for(int i = 0; i<15; ++i)
     {
-        a.PushBack(i, 1);
+        a.AppendEntry(i, 1);
     }
 
     dataset::OnesDataVector b(15);

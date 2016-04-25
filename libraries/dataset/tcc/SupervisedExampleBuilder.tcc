@@ -50,10 +50,10 @@ namespace dataset
         auto IndexValueIterator = _instanceParser.GetIterator(spExampleString, pStr);
 
         // create instance
-        auto upInstance = DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIterator);
+        auto instance = DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIterator);
 
         // return supervised example
-        return SupervisedExample(move(upInstance), label, weight);
+        return SupervisedExample(std::move(instance), label, weight);
     }
 
     template<typename VectorEntryParserType, typename DefaultDataVectorType>

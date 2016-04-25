@@ -45,7 +45,7 @@ namespace dataset
         return type::ones;
     }
 
-    void OnesDataVector::PushBack(uint64_t index, double value)
+    void OnesDataVector::AppendEntry(uint64_t index, double value)
     {
         if(value != 1 || index != _size)
         {

@@ -10,6 +10,7 @@
 
 #include "DataLoaders.h"
 #include "CoordinateListTools.h"
+#include "LoadStack.h"
 
 // utilities
 #include "Files.h"
@@ -25,101 +26,62 @@
 #include <memory>
 #include <stdexcept>
 
+namespace
+{
+    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const common::DataLoadArguments& dataLoadArguments, layers::Map map)
+    {
+        // create mapped parser for sparse vectors (SVMLight format)
+        dataset::MappedParser<dataset::SparseEntryParser> mappedParser(dataset::SparseEntryParser(), std::move(map));
+
+        // create line iterator - read line by line sequentially
+        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
+
+        // Create iterator
+        return dataset::GetParsingIterator(std::move(lineIterator), std::move(mappedParser));
+    }
+}
+
 namespace common
 {
-    //
-    // internal functions used below
-    //
-    namespace
-    {
-        void LoadDataset(dataset::IParsingIterator& dataIterator, dataset::RowDataset& dataset)
-        {
-            while (dataIterator.IsValid())
-            {
-                dataset.AddExample(dataIterator.Get());
-                dataIterator.Next();
-            }
-        }
-
-        std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map)
-        {
-            // create parser for sparse vectors (SVMLight format)
-            dataset::SparseEntryParser sparseEntryParser;
-
-            // create mapped parser --- Note: this keeps a shared_ptr to the map
-            dataset::MappedParser<dataset::SparseEntryParser> mappedParser(sparseEntryParser, map);
-
-            // create line iterator - read line by line sequentially
-            dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
-
-            // Create iterator
-            return dataset::GetParsingIterator(std::move(lineIterator), mappedParser);
-        }
-    }
-
     //
     // Public functions
     //
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
     {
-        // create line iterator - read line by line sequentially
-        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
-
         // create parser for sparse vectors (SVMLight format)
         dataset::SparseEntryParser sparseEntryParser;
 
+        // create line iterator - read line by line sequentially
+        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
+
         // Create iterator
-        return dataset::GetParsingIterator(std::move(lineIterator), sparseEntryParser);
+        return dataset::GetParsingIterator(std::move(lineIterator), std::move(sparseEntryParser));
     }
 
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments)
     {
-        auto map = std::shared_ptr<layers::Map>(GetMap(mapLoadArguments));
-        return GetMappedDataIterator(dataLoadArguments, map);
+        // read stack file
+        auto stack = common::LoadStack(mapLoadArguments);
+
+        // get map output coordinate list
+        auto mapOutputCoordinates = layers::BuildCoordinateList(stack, dataLoadArguments.parsedDataDimension, mapLoadArguments.coordinateListString);
+
+        // get a data iterator
+        return GetMappedDataIterator(dataLoadArguments, layers::Map(stack, mapOutputCoordinates));
     }
 
-    std::unique_ptr<layers::Stack> GetStack(const MapLoadArguments& mapLoadArguments)
+    dataset::RowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments, const layers::Map map)
     {
-        if (mapLoadArguments.inputStackFile != "")
-        {
-            auto map = std::make_unique<layers::Stack>(layers::Stack::Load(mapLoadArguments.inputStackFile));
-            return map;
-        }
-        else
-        {
-            return std::make_unique<layers::Stack>();
-        }
-    }
-
-    std::unique_ptr<layers::Map> GetMap(const MapLoadArguments& mapLoadArguments)
-    {
-        if (mapLoadArguments.inputStackFile != "")
-        {
-            std::shared_ptr<layers::Stack> stack = GetStack(mapLoadArguments);
-            layers::CoordinateList inputCoordinates = layers::GetCoordinateList(*stack, mapLoadArguments.coordinateListString);
-            auto map = std::make_unique<layers::Map>(stack, inputCoordinates);
-            return map;
-        }
-        else
-        {
-            return std::make_unique<layers::Map>();
-        }
-    }
-
-    std::unique_ptr<dataset::RowDataset> GetDataset(const DataLoadArguments& dataLoadArguments)
-    {
-        auto dataIterator = GetDataIterator(dataLoadArguments);
-        auto dataset = std::make_unique<dataset::RowDataset>();
-        LoadDataset(*dataIterator, *dataset);
-        return dataset;
-    }
-
-    std::unique_ptr<dataset::RowDataset> GetDataset(const DataLoadArguments& dataLoadArguments, const std::shared_ptr<layers::Map>& map)
-    {
-        // Note, here we don't really need a shared_ptr to the map, because we're not holding on to it after the lifetime of the function
         auto dataIterator = GetMappedDataIterator(dataLoadArguments, map);
-        auto dataset = std::make_unique<dataset::RowDataset>();
-        LoadDataset(*dataIterator, *dataset);
-        return dataset;
+
+        dataset::RowDataset rowDataset;
+
+        while (dataIterator->IsValid())
+        {
+            rowDataset.AddExample(dataIterator->Get());
+            dataIterator->Next();
+        }
+
+        return rowDataset;
     }
 }

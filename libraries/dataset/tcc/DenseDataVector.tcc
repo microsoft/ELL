@@ -17,7 +17,7 @@ namespace dataset
         while(IndexValueIterator.IsValid())
         {
             auto IndexValue = IndexValueIterator.Get();
-            DenseDataVector<ValueType>::PushBack(IndexValue.index, IndexValue.value); // explicit call to DenseDataVector<ValueType>::PushBack is given to avoid virtual function call in Ctor
+            DenseDataVector<ValueType>::AppendEntry(IndexValue.index, IndexValue.value); // explicit call to DenseDataVector<ValueType>::AppendEntry is given to avoid virtual function call in Ctor
             IndexValueIterator.Next();
         }
     }

@@ -56,7 +56,7 @@ namespace utilities
         return _list[Size()-1];
     }
 
-    void IntegerList::PushBack(uint64_t value)
+    void IntegerList::Append(uint64_t value)
     {
         _list.push_back(value);
     }

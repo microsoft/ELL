@@ -17,11 +17,11 @@
 
 // layers
 #include "Map.h"
+#include "CoordinateListTools.h"
 
 // common
-#include "CoordinateListTools.h"
 #include "MapLoadArguments.h"
-#include "DataLoaders.h"
+#include "LoadStack.h"
 
 // stl
 #include<iostream>
@@ -48,11 +48,17 @@ int main(int argc, char* argv[])
         // if output file specified, replace stdout with it 
         auto outStream = utilities::GetOutputStreamImpostor(compileArguments.outputCodeFile);
 
-        // open file
-        auto map = common::GetMap(mapLoadArguments);
-        CompilableMap compilableMap(*map);
+        // load the stack, coordinates, and map
+        auto stack = common::LoadStack(mapLoadArguments);
+        auto mapOutputCoordinates = layers::BuildCoordinateList(stack, 0, mapLoadArguments.coordinateListString);
 
-        // output code
+        // load the map
+        layers::Map map(stack, mapOutputCoordinates);
+
+        // convert map to compilable map
+        CompilableMap compilableMap(map);
+
+        // output the code
         compilableMap.ToCode(outStream);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

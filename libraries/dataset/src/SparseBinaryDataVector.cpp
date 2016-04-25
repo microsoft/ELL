@@ -43,7 +43,7 @@ namespace dataset
     {}
 
     template<typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::PushBack(uint64_t index, double value)
+    void SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(uint64_t index, double value)
     {
         if (value == 0)
         {
@@ -52,7 +52,7 @@ namespace dataset
 
         assert(value == 1);
 
-        _indices.PushBack(index);
+        _indices.Append(index);
     }
 
     template<typename IntegerListType>

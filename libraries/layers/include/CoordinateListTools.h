@@ -10,18 +10,19 @@
 
 #pragma once
 
-#include "Coordinate.h"
+#include "CoordinateList.h"
 
 // stl
 #include <cstdint>
 #include <string>
+#include <memory>
 
 namespace layers
 {
     class Stack;
 
     /// <summary>
-    /// Gets a coordinate list from a coordinate list definition string. The string has the following format
+    /// Builds a coordinate list from a coordinate list definition string. The string has the following format
     /// [defString] .=. [def];[defString]
     /// [def] .=. [layerIndex] || [layerIndex],[elementIndex] || [layerIndex],[elementInterval]
     /// [elementInterval] .=. [fromElementIndex]:[toElementIndex]   (used to define intervals of elements)
@@ -33,9 +34,10 @@ namespace layers
     /// </summary>
     ///
     /// <param name="stack"> The stack which the coordinate list relates to. </param>
+    /// <param name="inputLayerSize"> The dataset dimension </param>
     /// <param name="coordinateListString"> The coordinate list definition string. </param>
     ///
     /// <returns> The coordinate list. </returns>
-    layers::CoordinateList GetCoordinateList(const layers::Stack& stack, const std::string& coordinateListString);
+    layers::CoordinateList BuildCoordinateList(const layers::Stack& stack, uint64_t inputLayerSize, const std::string& coordinateListString);
 }
 

@@ -102,7 +102,7 @@ namespace utilities
         /// <summary> Appends an integer to the end of the list. </summary>
         ///
         /// <param name="value"> The value. </param>
-        void PushBack(uint64_t value);
+        void Append(uint64_t value);
 
         /// <summary> Deletes all of the vector content and sets its Size to zero. </summary>
         void Reset();

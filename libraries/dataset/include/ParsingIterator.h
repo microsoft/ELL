@@ -38,7 +38,7 @@ namespace dataset
         ///
         /// <param name="row_iter"> [in,out] The row iterator. </param>
         /// <param name="parser"> The parser. </param>
-        ParsingIterator(RowIteratorType&& row_iter, const VectorEntryParserType& parser);
+        ParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser);
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
@@ -67,7 +67,7 @@ namespace dataset
     ///
     /// <returns> The parsing iterator. </returns>
     template<typename RowIteratorType, typename VectorEntryParserType>
-    std::unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType&& row_iter, const VectorEntryParserType& parser);
+    std::unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser);
 }
 
 #include "../tcc/ParsingIterator.tcc"

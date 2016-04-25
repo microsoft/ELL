@@ -9,9 +9,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PrintableStack.h"
-#include "PrintableInput.h"
 #include "PrintableCoordinatewise.h"
 #include "PrintableSum.h"
+#include "PrintableLayer.h"
 #include "SvgHelpers.h"
 
 // utilities
@@ -113,14 +113,14 @@ void PrintElementDefinition(std::ostream& os, const std::string& id, double widt
     os << "            </g>\n";
 }
 
-PrintableStack::PrintableStack(const layers::Stack& other)
+PrintableStack::PrintableStack(const layers::Stack& other) : _inputLayerSize(other.GetRequiredLayerSize(0))
 {
     utilities::TypeFactory<PrintableLayer> printableLayerFactory;
-    printableLayerFactory.AddType<PrintableInput>(layers::Input::GetTypeName());
     printableLayerFactory.AddType<PrintableCoordinatewise>(layers::Coordinatewise::GetTypeName());
     printableLayerFactory.AddType<PrintableSum>(layers::Sum::GetTypeName());
 
-    for (uint64_t index = 0; index < other.NumLayers(); ++index)
+    // input layer is built-in, start from layer 1
+    for (uint64_t index = 1; index < other.NumLayers(); ++index)
     {
         const auto& layer = other.GetLayer(index);
         _printableLayers.push_back(printableLayerFactory.Construct(layer.GetRuntimeTypeName())); 
@@ -162,38 +162,46 @@ void PrintableStack::Print(std::ostream & os, const PrintArguments& arguments)
 
     os << "        </defs>\n\n";
 
-    // print layer by layer
+    // print
     double layerTop = arguments.stackLayout.verticalMargin;
     std::vector<LayerLayout> layouts;
 
-    for (uint64_t layerIndex = 0; layerIndex < _printableLayers.size(); ++layerIndex)
+    // print input layer
     {
-        const auto& printableLayer = _printableLayers[layerIndex];
+        auto inputLayout = PrintableLayer::PrintLayer(os, arguments.stackLayout.horizontalMargin, layerTop, 0, "Input", _inputLayerSize, arguments.emptyElementLayout, arguments.layerStyle);
+        PrintableLayer::PrintEmptyElements(os, inputLayout);
+        layerTop += inputLayout.GetHeight() + arguments.stackLayout.verticalSpacing;
+        layouts.push_back(std::move(inputLayout));
+        os << std::endl;
+    }
+
+    // print layer by layer
+    for (uint64_t i = 0; i < _printableLayers.size(); ++i)
+    {
+        uint64_t layerIndex = i + 1;
+        const auto& printableLayer = _printableLayers[i];
         auto layout = printableLayer->Print(os, arguments.stackLayout.horizontalMargin, layerTop, layerIndex, arguments);
         layerTop += layout.GetHeight() + arguments.stackLayout.verticalSpacing;
         os << std::endl;
 
         // print edges
-        if (layerIndex > 0) // skip input layer
+        uint64_t layerSize = printableLayer->Size();
+        for (uint64_t elementIndex = 0; elementIndex<layerSize; ++elementIndex)
         {
-            uint64_t layerSize = printableLayer->Size();
-            for (uint64_t elementIndex = 0; elementIndex<layerSize; ++elementIndex)
+            if (!layout.IsHidden(elementIndex)) // if output is hidden, hide edge
             {
-                if (!layout.IsHidden(elementIndex)) // if output is hidden, hide edge
+                auto inputCoordinates = printableLayer->GetInputCoordinateIterator(elementIndex);
+                while (inputCoordinates.IsValid()) // foreach incoming edge
                 {
-                    auto inputCoordinates = printableLayer->GetInputCoordinates(elementIndex);
-                    while (inputCoordinates.IsValid()) // foreach incoming edge
+                    auto coordinate = inputCoordinates.Get();
+                    const auto& inputLayout = layouts[coordinate.GetLayerIndex()];
+                    if (!inputLayout.IsHidden(coordinate.GetElementIndex())) // if input is hidden, hide edge
                     {
-                        auto coordinate = inputCoordinates.Get();
-                        const auto& inputLayout = layouts[coordinate.GetLayerIndex()];
-                        if (!inputLayout.IsHidden(coordinate.GetElementIndex())) // if input is hidden, hide edge
-                        {
-                            SvgEdge(os, 2, inputLayout.GetOutputPoint(coordinate.GetElementIndex()), layout.GetInputPoint(elementIndex), arguments.edgeStyle.flattness);
-                        }
-
-                        // on to the next input
-                        inputCoordinates.Next();
+                        SvgEdge(os, 2, inputLayout.GetOutputPoint(coordinate.GetElementIndex()), layout.GetInputPoint(elementIndex), arguments.edgeStyle.flattness);
                     }
+
+                    // on to the next input
+                    inputCoordinates.Next();
                 }
             }
         }

@@ -12,6 +12,10 @@
 #include "PrintableStack.h"
 #include "PrintArguments.h"
 
+// common
+#include "StackLoadArguments.h"
+#include "LoadStack.h"
+
 // utilities
 #include "Files.h"
 #include "OutputStreamImpostor.h"
@@ -19,6 +23,7 @@
 
 // layers
 #include "Map.h"
+#include "Stack.h"
 
 // stl
 #include <iostream>
@@ -34,7 +39,9 @@ int main(int argc, char* argv[])
         utilities::CommandLineParser commandLineParser(argc, argv);
 
         // add arguments to the command line parser
+        common::ParsedStackLoadArguments stackLoadArguments;
         ParsedPrintArguments printArguments;
+        commandLineParser.AddOptionSet(stackLoadArguments);
         commandLineParser.AddOptionSet(printArguments);
         commandLineParser.Parse();
 
@@ -42,7 +49,9 @@ int main(int argc, char* argv[])
         auto outStream = utilities::GetOutputStreamImpostor(printArguments.outputSvgFile);
 
         // open stack file
-        auto stack = layers::Stack::Load(printArguments.inputStackFile);
+        auto stack = common::LoadStack(stackLoadArguments);
+
+        // convert stack to printable stack
         PrintableStack printableStack(stack);
         
         // print to svg file

@@ -60,5 +60,5 @@ public:
     /// <param name="index"> Zero-based element index. </param>
     ///
     /// <returns> The input coordinates. </returns>
-    virtual layers::Layer::InputCoordinateIterator GetInputCoordinates(uint64_t index) const override;
+    virtual layers::CoordinateIterator GetInputCoordinateIterator(uint64_t index) const override;
 };

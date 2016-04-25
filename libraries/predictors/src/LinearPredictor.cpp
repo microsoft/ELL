@@ -58,7 +58,7 @@ namespace predictors
     void LinearPredictor::AddToStack(layers::Stack& stack, const layers::CoordinateList& inputCoordinates) const
     {
         uint64_t layerIndex = stack.AddLayer(std::make_unique<layers::Coordinatewise>(_w, inputCoordinates, layers::Coordinatewise::OperationType::multiply));
-        auto coordinates = stack.GetCoordinateList(layerIndex);
+        auto coordinates = stack.BuildCoordinateList(layerIndex);
         layerIndex = stack.AddLayer(std::make_unique<layers::Sum>(coordinates));
         layerIndex = stack.AddLayer(std::make_unique<layers::Coordinatewise>(_b, layers::Coordinate{ layerIndex, 0 }, layers::Coordinatewise::OperationType::add));
     }

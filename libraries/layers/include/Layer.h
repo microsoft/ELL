@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "Coordinate.h"
+#include "CoordinateList.h"
 
 // utilities
 #include "XMLSerialization.h"
@@ -48,8 +48,14 @@ namespace layers
         /// <param name="index"> Zero-based element index. </param>
         ///
         /// <returns> An iterator over the input coordinates. </returns>
-        using InputCoordinateIterator = utilities::StlIterator<std::vector<Coordinate>::const_iterator, Coordinate>;
-        virtual InputCoordinateIterator GetInputCoordinates(uint64_t index) const = 0;
+        virtual CoordinateIterator GetInputCoordinateIterator(uint64_t index) const = 0;
+
+        /// <summary> Returns the minimal required size of an input layer, which is the maximum input element from that layer plus 1. </summary>
+        ///
+        /// <param name="layerindex"> The layer index. </param>
+        ///
+        /// <returns> The required layer size. </returns>
+        virtual uint64_t GetRequiredLayerSize(uint64_t layerIndex) const = 0;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

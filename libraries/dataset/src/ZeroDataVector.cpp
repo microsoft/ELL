@@ -37,7 +37,7 @@ namespace dataset
         return type::zero;
     }
 
-    void ZeroDataVector::PushBack(uint64_t index, double value)
+    void ZeroDataVector::AppendEntry(uint64_t index, double value)
     {
         if(value != 0)
         {

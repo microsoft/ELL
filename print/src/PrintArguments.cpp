@@ -15,7 +15,6 @@
 
 void ParsedPrintArguments::AddArgs(utilities::CommandLineParser & parser)
 {
-    parser.AddOption(inputStackFile, "inputStackFile", "isf", "Path to the input file that contains the stack information", "");
     parser.AddOption(outputSvgFile, "outputSvgFile", "osvg", "Path to the output Svg file", "");
 
     parser.AddOption(valueElementLayout.width, "valueElementWidth", "vew", "Width of each element in a layer that shows values", 55);
@@ -52,21 +51,3 @@ void ParsedPrintArguments::AddArgs(utilities::CommandLineParser & parser)
     parser.AddOption(edgeStyle.dashStyle, "edgeDashStyle", "eds", "The dash style of the edges", "5,2");
 }
 
-utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilities::CommandLineParser & parser)
-{
-    std::vector<std::string> parseErrorMessages;
-
-    if(inputStackFile == "")
-    {
-        parseErrorMessages.push_back("-inputStackFile (or -isf) is required");
-    }
-    else
-    {
-        if(!utilities::IsFileReadable(inputStackFile))
-        {
-            parseErrorMessages.push_back("cannot read from specified input stack file: " + inputStackFile);
-        }
-    }
-
-    return parseErrorMessages;
-}

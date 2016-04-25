@@ -10,8 +10,6 @@
 
 #include "Coordinate.h"
 
-#include <cstdint>
-
 namespace layers
 {
     Coordinate::Coordinate(uint64_t layerIndex, uint64_t elementIndex) : _layerIndex(layerIndex), _elementIndex(elementIndex)

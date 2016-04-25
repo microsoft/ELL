@@ -13,7 +13,6 @@
 #include "PrintArguments.h" 
 #include "PrintableLayer.h"
 #include "PrintableSum.h"
-#include "PrintableInput.h"
 #include "PrintableCoordinatewise.h"
 
 // layers
@@ -43,5 +42,6 @@ public:
     void Print(std::ostream& os, const PrintArguments& arguments);
 
 private:
+    uint64_t _inputLayerSize = 0;
     std::vector<std::unique_ptr<PrintableLayer>> _printableLayers;
 };

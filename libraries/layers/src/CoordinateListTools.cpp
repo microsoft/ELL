@@ -29,12 +29,16 @@ namespace
     }
 
     // Parses the c-string pStr. Allowed values are (1) non-negative integers not greater than maxIndex, (2) "e", which translates to maxIndex, (3) "e-<uint>" which translates into maxIndex minus the integer value, as long as the outcome is in the range [0,maxValue]
-    uint64_t ParseIndex(const char*& pStr, uint64_t maxIndex)
+    uint64_t ParseIndex(const char*& pStr, uint64_t size)
     {
         uint64_t index;
         if (*pStr == 'e')
         {
-            index = maxIndex;
+            if (size == 0)
+            {
+                throw std::runtime_error("automatic index 'e' used, but layer size cannot be inferred (for input layer, use -dd <dimension> or -dd auto)");
+            }
+            index = size-1;
             ++pStr;
 
             if (*pStr == '-')
@@ -50,79 +54,90 @@ namespace
             HandleErrors(utilities::Parse<uint64_t>(pStr, index));
         }
 
-        if (index > maxIndex)
-        {
-            throw std::runtime_error("in coordinate list definition string, index " + std::to_string(index) + " exceeds maximal value " + std::to_string(maxIndex));
-        }
-
         return index;
     }
 
     // adds an sequence of entries to a coordinateList
-    void AddCoordinates(layers::CoordinateList& coordinateList, uint64_t layerIndex, uint64_t fromElementIndex, uint64_t toElementIndex)
+    void AddCoordinates(layers::CoordinateList& coordinateList, uint64_t layerIndex, uint64_t fromElementIndex, uint64_t endElementIndex)
     {
-        for (uint64_t elementIndex = fromElementIndex; elementIndex <= toElementIndex; ++elementIndex)
+        for (uint64_t elementIndex = fromElementIndex; elementIndex < endElementIndex; ++elementIndex)
         {
-            coordinateList.emplace_back(layerIndex, elementIndex);
+            coordinateList.AddCoordinate(layerIndex, elementIndex);
         }
     }
 }
 
 namespace layers
 {
-    layers::CoordinateList GetCoordinateList(const layers::Stack& stack, const std::string& coordinateListString)
+    layers::CoordinateList BuildCoordinateList(const layers::Stack& stack, uint64_t inputLayerSize, const std::string& coordinateListString)
     {
         layers::CoordinateList coordinateList;
 
-        // special case for 'e' when map has just 1 layer (the input layer)
-        if (coordinateListString == "e" && stack.NumLayers() == 1)
-        {
-            return coordinateList;
-        }
+        const char* pStr = coordinateListString.c_str();
+        const char* pEnd = pStr + coordinateListString.size();
 
-        if (stack.NumLayers() > 0)
+        while (pStr < pEnd)
         {
-            const char* pStr = coordinateListString.c_str();
-            const char* pEnd = pStr + coordinateListString.size();
+            // read layer Index
+            uint64_t layerIndex = ParseIndex(pStr, stack.NumLayers());
 
-            while (pStr < pEnd)
+            // read element index
+            uint64_t fromElementIndex = 0;
+            uint64_t layerSize;
+            if (layerIndex == 0)
             {
-                // read layer Index
-                uint64_t layerIndex = ParseIndex(pStr, stack.NumLayers() - 1);
+                layerSize = inputLayerSize;
+            }
+            else
+            {
+                layerSize = stack.GetLayer(layerIndex).Size();
+            }
+            uint64_t endElementIndex = layerSize;
 
-                // read element index
-                uint64_t fromElementIndex = 0;
-                uint64_t maxElementIndex = stack.GetLayer(layerIndex).Size() - 1; // Fails when layer has size 0
-                uint64_t toElementIndex = maxElementIndex;
+            // case: no elements specified - take entire layer
+            if (*pStr == ';')
+            {
+                ++pStr;
+            }
 
-                // case: no elements specified - take entire layer
-                if (*pStr == ';')
+            // case: elements specified
+            else if (*pStr == ',')
+            {
+                ++pStr;
+                fromElementIndex = ParseIndex(pStr, layerSize);
+                endElementIndex = fromElementIndex + 1;
+
+                // interval of elements
+                if (*pStr == ':')
                 {
                     ++pStr;
-                }
+                    endElementIndex = ParseIndex(pStr, layerSize)+1;
 
-                // case: elements specified
-                else if (*pStr == ',')
-                {
-                    ++pStr;
-                    fromElementIndex = toElementIndex = ParseIndex(pStr, maxElementIndex);
-
-                    // interval of elements
-                    if (*pStr == ':')
+                    if (endElementIndex <= fromElementIndex)
                     {
-                        ++pStr;
-                        toElementIndex = ParseIndex(pStr, maxElementIndex);
-
-                        if (toElementIndex < fromElementIndex)
-                        {
-                            throw std::runtime_error("bad format in coordinate list definition string");
-                        }
+                        throw std::runtime_error("bad format in coordinate list definition string");
                     }
                 }
-
-                // add the coordinates to the list
-                AddCoordinates(coordinateList, layerIndex, fromElementIndex, toElementIndex);
             }
+
+            // check that the coordiates are compatible with the stack
+            if (layerIndex == 0)
+            {
+                if (endElementIndex == 0)
+                {
+                    throw std::runtime_error("input layer size cannot be inferred (use - dd <dimension> or -dd auto)");
+                }
+            }
+            else
+            {
+                if (endElementIndex > layerSize)
+                {
+                    throw std::runtime_error("coordinate list index exceeds layer size");
+                }
+            }
+
+            // add the coordinates to the list
+            AddCoordinates(coordinateList, layerIndex, fromElementIndex, endElementIndex);
         }
 
         return coordinateList;

@@ -22,6 +22,10 @@ namespace common
     struct DataLoadArguments
     {
         std::string inputDataFile = "";
+        std::string dataDimension = "";
+
+        // not exposed on the command line
+        uint64_t parsedDataDimension = 0;
     };
 
     /// <summary> A version of DataLoadArguments that adds its members to the command line parser. </summary>

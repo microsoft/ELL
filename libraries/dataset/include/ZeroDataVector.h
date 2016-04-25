@@ -86,7 +86,7 @@ namespace dataset
         ///
         /// <param name="index"> Zero-based index of the. </param>
         /// <param name="value"> The value. </param>
-        virtual void PushBack(uint64_t index, double value = 1.0) override;
+        virtual void AppendEntry(uint64_t index, double value = 1.0) override;
 
         /// <summary> Deletes all of the vector content and sets its Size to zero, but does not deallocate
         /// its memory. </summary>

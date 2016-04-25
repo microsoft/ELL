@@ -37,17 +37,33 @@ namespace layers
         for (uint64_t k = 0; k < _inputCoordinates.size(); ++k)
         {
             double output = 0;
-            for (auto coordinate : _inputCoordinates[k])
+            auto iter = _inputCoordinates[k].GetIterator();
+            while(iter.IsValid())
             {
+                auto coordinate = iter.Get();
                 output += inputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
             }
             outputs[k] = output;
         }
     }
 
-    Layer::InputCoordinateIterator Sum::GetInputCoordinates(uint64_t index) const
+    CoordinateIterator Sum::GetInputCoordinateIterator(uint64_t index) const
     {
-        return Layer::InputCoordinateIterator(_inputCoordinates[index].cbegin(), _inputCoordinates[index].cend());
+        return _inputCoordinates[index].GetIterator();
+    }
+
+    uint64_t Sum::GetRequiredLayerSize(uint64_t layerIndex) const
+    {
+        uint64_t max = 0;
+        for(const auto& coordinateList : _inputCoordinates)
+        {
+            auto layerMax = coordinateList.GetRequiredLayerSize(layerIndex);
+            if(layerMax > max)
+            {
+                max = layerMax;
+            }
+        }
+        return max;
     }
 
     std::string Sum::GetTypeName()

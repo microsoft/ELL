@@ -123,7 +123,7 @@ namespace linear
         /// <summary> Pushes a row into the bottom of the matrix. </summary>
         ///
         /// <param name="row"> [in,out] The row. </param>
-        void PushBackRow(DataVectorType&& row);
+        void AddRow(DataVectorType&& row);
 
         /// <summary>
         /// Constructs a new row at the bottom of the matrix with given constructor arguments.

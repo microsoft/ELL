@@ -12,25 +12,24 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/Coordinate.cpp
+         src/CoordinateList.cpp
          src/CoordinateListTools.cpp
          src/Coordinatewise.cpp
-         src/Input.cpp
          src/Layer.cpp
          src/Map.cpp
          src/Stack.cpp
          src/Sum.cpp)
 
 set (INCLUDE include/Coordinate.h
+             include/CoordinateList.h
              include/CoordinateListTools.h
              include/Coordinatewise.h
-             include/Input.h
              include/Layer.h
              include/Map.h
              include/Stack.h
              include/Sum.h)
 
-set (TCC tcc/Map.tcc
-         tcc/Stack.tcc)
+set (TCC tcc/Map.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

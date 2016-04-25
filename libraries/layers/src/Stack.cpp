@@ -8,8 +8,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Input.h"
 #include "Stack.h"
+
+// utilities
+#include "Files.h"
 
 // stl
 #include <stdexcept>
@@ -17,7 +19,7 @@
 #include <algorithm>
 #include <memory>
 #include <iostream>
-#include <utility> // for std::move
+#include <cassert>
 
 namespace layers
 {
@@ -26,61 +28,85 @@ namespace layers
     //
     // Stack class implementation
     //
-    Stack::Stack()
+    uint64_t Stack::AddLayer(std::unique_ptr<Layer> layer)
     {
-        _layers.push_back(std::make_unique<Input>());
-    }
-
-    uint64_t Stack::AddLayer(std::unique_ptr<Layer>&& layer)
-    {
-        uint64_t maxInputSize = 0;
-        auto numLayers = _layers.size();
-
-        // Keep track of the maximum input dimension requested and make sure new layer's inputs 
-        // come from previous layers only
+        // check that the layer points to valid elements
+        auto numLayers = NumLayers();
         auto layerSize = layer->Size();
         for (uint64_t index = 0; index < layerSize; index++)
         {
-            auto inputCoordIterator = layer->GetInputCoordinates(index);
+            auto inputCoordIterator = layer->GetInputCoordinateIterator(index);
             while (inputCoordIterator.IsValid())
             {
                 auto coord = inputCoordIterator.Get();
-                auto inputLayer = coord.GetLayerIndex();
-                if (inputLayer >= numLayers)
+                if(coord.GetLayerIndex() >= numLayers)
                 {
-                    throw std::runtime_error("Error: layer using inputs from non-previous layer");
+                    throw std::runtime_error("new layer references nonexistent layers");
                 }
-                auto inputElement = coord.GetElementIndex();
-                if (inputLayer == 0) // we're referring to an element of the first, Input, layer
+                else if(coord.GetLayerIndex()>0 && coord.GetElementIndex() >= GetLayer(coord.GetLayerIndex()).Size())
                 {
-                    maxInputSize = std::max(inputElement + 1, maxInputSize);
+                    throw std::runtime_error("new layer references nonexistent elements");
                 }
                 inputCoordIterator.Next();
             }
         }
 
-        // Update input layer to be at least as big as the largest element this new layer accesses
-        IncreaseInputLayerSize(maxInputSize);
-
-        uint64_t layerIndex = _layers.size();
         _layers.push_back(std::move(layer));
-        return layerIndex;
+        return _layers.size();
     }
 
     uint64_t Stack::NumLayers() const
     {
-        return _layers.size();
+        // add one, to account for the input layer, which is not explicitly stores in _layers
+        return _layers.size()+1;
     }
 
-    CoordinateList Stack::GetCoordinateList(uint64_t layerIndex) const
+    uint64_t Stack::GetRequiredLayerSize(uint64_t layerIndex) const
     {
-        auto layerSize = _layers[layerIndex]->Size();
-        CoordinateList coordinateList(layerSize);
-        for (uint64_t elementIndex = 0; elementIndex < layerSize; ++elementIndex)
+        uint64_t max = 0;
+        for (const auto& layer : _layers)
         {
-            coordinateList[elementIndex] = { layerIndex, elementIndex };
+            auto requiredSize = layer->GetRequiredLayerSize(layerIndex);
+            if (requiredSize > max)
+            {
+                max = requiredSize;
+            }
         }
-        return coordinateList;
+        return max;
+    }
+
+    const Layer& Stack::GetLayer(uint64_t layerIndex) const
+    {
+        assert(layerIndex > 0);
+
+        // recall that _layers does not explicitly keep the input layer
+        return *_layers[layerIndex - 1];
+    }
+
+    CoordinateList Stack::BuildCoordinateList(uint64_t layerIndex) const
+    {
+        if (layerIndex == 0)
+        {
+            throw std::runtime_error("input layer does not have an input coordinate list");
+        }
+
+        return CoordinateList(layerIndex, GetLayer(layerIndex).Size());
+    }
+
+    //Stack Stack::Load(const std::string& inputStackFile)
+    //{
+    //    auto inputMapFStream = utilities::OpenIfstream(inputStackFile);
+    //    utilities::XMLDeserializer deserializer(inputMapFStream);
+
+    //    Stack stack;
+    //    deserializer.Deserialize(stack);
+    //    return stack;
+    //}
+
+    void Stack::Save(std::ostream& os) const
+    {
+        utilities::XMLSerializer serializer(os);
+        serializer.Serialize(*this);
     }
 
     std::string Stack::GetTypeName()
@@ -107,16 +133,4 @@ namespace layers
         serializer.Serialize("version", _currentVersion);
         serializer.Serialize("layers", _layers);
     }
-
-    void Stack::Save(std::ostream& os) const
-    {
-        utilities::XMLSerializer serializer(os);
-        serializer.Serialize(*this);
-    }
-
-    void Stack::IncreaseInputLayerSize(uint64_t minSize)
-    {
-        GetLayer<Input&>(0).IncreaseSize(minSize);
-    }
-
 }

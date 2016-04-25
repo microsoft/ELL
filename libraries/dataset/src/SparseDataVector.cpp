@@ -43,14 +43,14 @@ namespace dataset
     {}
 
     template<typename ValueType, typename IntegerListType>
-    void SparseDataVector<ValueType, IntegerListType>::PushBack(uint64_t index, double value)
+    void SparseDataVector<ValueType, IntegerListType>::AppendEntry(uint64_t index, double value)
     {
         if (value == 0)
         {
             return;
         }
 
-        _indices.PushBack(index);
+        _indices.Append(index);
         _values.push_back((ValueType)value);
     }
 

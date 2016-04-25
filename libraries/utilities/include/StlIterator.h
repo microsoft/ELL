@@ -34,6 +34,13 @@ namespace utilities
         /// <summary> Proceeds to the Next iterate. </summary>
         void Next();
 
+        /// <summary>
+        /// Returns the number of iterates left in this iterator, including the current one.
+        /// </summary>
+        ///
+        /// <returns> The total number of iterates left. </returns>
+        uint64_t NumIteratesLeft() const;
+
         /// <summary> Returns the value of the current iterate. </summary>
         ///
         /// <returns> The value of the current iterate. </returns>

@@ -84,14 +84,14 @@ namespace utilities
     }
 
     /// adds an integer at the end of the list
-    void CompressedIntegerList::PushBack(uint64_t value)
+    void CompressedIntegerList::Append(uint64_t value)
     {
         assert(value != UINT64_MAX);    // special value reserved for initialization
 
         // calculate the delta from the previous number pushed
         uint64_t delta = 0;
 
-        // allow the first PushBack to have a value of zero, but subsequently require an increasing value
+        // allow the first Append to have a value of zero, but subsequently require an increasing value
         if (_last < UINT64_MAX)
         {
             assert(value > _last);
