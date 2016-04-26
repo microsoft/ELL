@@ -8,6 +8,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "BinaryClassificationEvaluator.h"
+
 // stl
 #include <cmath>
 #include <cassert>
@@ -17,8 +19,13 @@
 
 namespace optimization
 {
-    template<typename ExampleIteratorType, typename LossFunctionType>
-    void AsgdOptimizer::Update(ExampleIteratorType& exampleIterator, const LossFunctionType& lossFunction, double lambda)
+    template<typename LossFunctionType>
+    AsgdOptimizer<LossFunctionType>::AsgdOptimizer(uint64_t dim, LossFunctionType lossFunction, double lambda) : _lossFunction(lossFunction), _lambda(lambda), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // start with 1 to prevent divide-by-zero
+    {}
+
+    template<typename LossFunctionType>
+    template<typename ExampleIteratorType>
+    void AsgdOptimizer<LossFunctionType>::Update(ExampleIteratorType& exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetVector();
@@ -30,7 +37,7 @@ namespace optimization
         // define some constants
         const double T_prev = double(_total_iterations);
         const double T_next = T_prev + exampleIterator.NumIteratesLeft();
-        const double eta = 1.0 / lambda / T_prev;
+        const double eta = 1.0 / _lambda / T_prev;
         const double sigma = std::log(T_next) + 0.5 / T_next;
 
         // calulate the contribution of the old lastPredictor to the new avergedPredictor
@@ -53,7 +60,7 @@ namespace optimization
             double alpha = T_prev / (t-1) * _lastPredictor.Predict(dataVector);
 
             // calculate the loss derivative
-            double beta = weight * lossFunction.GetDerivative(alpha, label);
+            double beta = weight * _lossFunction.GetDerivative(alpha, label);
 
             // Update vLast and vAvg
             double lastCoeff = -eta*beta;
@@ -74,5 +81,17 @@ namespace optimization
         double scale = T_prev / T_next;
         _lastPredictor.Scale(scale);
         _averagedPredictor.Scale(scale);
+    }
+
+    template<typename LossFunctionType>
+    void AsgdOptimizer<LossFunctionType>::Update(utilities::Iterator<dataset::SupervisedExample>& exampleIterator)
+    {
+        Update<decltype(exampleIterator)>(exampleIterator);
+    }
+
+    template<typename LossFunctionType>
+    const predictors::LinearPredictor& AsgdOptimizer<LossFunctionType>::GetPredictor() const
+    {
+        return _averagedPredictor;
     }
 }

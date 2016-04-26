@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
-//  File:     XMLSerialization_test.cpp (XMLSerialization_test)
+//  File:     XMLSerialization_test.cpp (utilities)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]

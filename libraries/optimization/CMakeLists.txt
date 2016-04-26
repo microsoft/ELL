@@ -27,6 +27,7 @@ include_directories(tcc)
 include_directories(../linear/include)
 include_directories(../dataset/include)
 include_directories(../layers/include)
+include_directories(../lossFunctions/include)
 include_directories(../predictors/include)
 include_directories(../utilities/include)
 
@@ -58,7 +59,3 @@ target_link_libraries(${TEST_NAME} dataset linear)
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
-
-
-
-

@@ -32,6 +32,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
              include/IIterator.h
              include/IntegerList.h
              include/IntegerStack.h
+             include/Iterator.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
              include/Parser.h
@@ -46,6 +47,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
 set (TCC tcc/BinaryClassificationEvaluator.tcc
          tcc/CommandLineParser.tcc
          tcc/Format.tcc
+         tcc/Iterator.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
          tcc/StlIndexValueIterator.tcc
@@ -81,8 +83,8 @@ set (TEST_NAME ${PROJ_NAME}_test)
 
 PROJECT(${TEST_NAME})
 
-set (TEST_SRC test/src/main.cpp test/src/XMLSerialization_test.cpp)
-set (TEST_INCLUDE test/include/XMLSerialization_test.h)
+set (TEST_SRC test/src/main.cpp test/src/XMLSerialization_test.cpp test/src/Iterator_test.cpp)
+set (TEST_INCLUDE test/include/XMLSerialization_test.h test/include/Iterator_test.h)
 
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})

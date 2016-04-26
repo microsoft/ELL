@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "XMLSerialization_test.h"
+#include "Iterator_test.h"
 
 #include "IIterator.h"
 #include "StlIterator.h"
@@ -51,7 +52,7 @@ float twoPointFiveTimes(int x)
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     return float(2.5*x);
 }
-
+ 
 template <typename FuncType>
 std::chrono::milliseconds::rep timeIt(FuncType fn)
 {
@@ -212,6 +213,8 @@ int main()
     XMLSerializationTest();
     TypeFactoryTest();
 
+    // Iterator test
+    TestIterator();
 
     if (testing::DidTestFail())
     {

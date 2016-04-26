@@ -1,16 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
-//  File:     AsgdOptimizer.cpp (optimization)
-//  Authors:  Ofer Dekel
+//  File:     Iterator_test.h (utilities)
+//  Authors:  Chuck Jacobs
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "AsgdOptimizer.h"
+#pragma once
 
-namespace optimization
-{    
-    // Nothing here --- This file is here only to get CMake to create a project for this library
-}
+void TestIterator();
+
+

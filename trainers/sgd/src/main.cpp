@@ -12,7 +12,7 @@
 
 // utilities
 #include "Files.h"
-#include "OutputStreamImpostor.h"
+#include "OutputStreamImpostor.h" 
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
 #include "BinaryClassificationEvaluator.h"
@@ -77,11 +77,9 @@ int main(int argc, char* argv[])
         // load dataset
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
-        // create loss function
-        lossFunctions::LogLoss loss;
-
         // create sgd trainer
-        optimization::AsgdOptimizer optimizer(outputCoordinateList.Size());
+        lossFunctions::LogLoss loss;
+        optimization::AsgdOptimizer<lossFunctions::LogLoss> optimizer(outputCoordinateList.Size(), loss, sgdArguments.l2Regularization);
 
         // create evaluator
         utilities::BinaryClassificationEvaluator evaluator;
@@ -104,7 +102,7 @@ int main(int argc, char* argv[])
 
             // iterate over the entire permuted dataset
             auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-            optimizer.Update(trainSetIterator, loss, sgdArguments.l2Regularization);
+            optimizer.Update(trainSetIterator);
 
             // Evaluate training error
             auto evaluationIterator = rowDataset.GetIterator();
