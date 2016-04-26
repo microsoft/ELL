@@ -11,7 +11,7 @@
 #pragma once
 
 #include "CoordinateList.h"
-#include "Stack.h"
+#include "Model.h"
 
 // linear
 #include "IndexValue.h"
@@ -57,9 +57,9 @@ namespace layers
 
         /// <summary> Constructs a map</summary>
         ///
-        /// <param name="stack"> A stack. </param>
+        /// <param name="model"> A model. </param>
         /// <param name="outputCoordinates"> A list of output coordinates. </param>
-        Map(const Stack& stack, const CoordinateList& outputCoordinateList);
+        Map(const Model& model, const CoordinateList& outputCoordinateList);
 
         /// <summary> Computes the Map. </summary>
         ///
@@ -75,14 +75,14 @@ namespace layers
         /// <returns> The coordinate list. </returns>
         const CoordinateList& GetOutputCoordinateList() const;
 
-        /// <summary> Gets the underlying stack. </summary>
+        /// <summary> Gets the underlying model. </summary>
         ///
-        /// <returns> The stack. </returns>
-        const Stack& LoadStack() const;
+        /// <returns> The model. </returns>
+        const Model& GetModel() const;
 
     private:
         // members
-        const Stack& _stack;
+        const Model& _model;
         const CoordinateList& _outputCoordinateList;
         mutable std::vector<std::vector<double>> _layerOutputs;
 

@@ -21,7 +21,7 @@
 
 // common
 #include "MapLoadArguments.h"
-#include "LoadStack.h"
+#include "LoadModel.h"
 
 // stl
 #include<iostream>
@@ -48,12 +48,12 @@ int main(int argc, char* argv[])
         // if output file specified, replace stdout with it 
         auto outStream = utilities::GetOutputStreamImpostor(compileArguments.outputCodeFile);
 
-        // load the stack, coordinates, and map
-        auto stack = common::LoadStack(mapLoadArguments);
-        auto mapOutputCoordinates = layers::BuildCoordinateList(stack, 0, mapLoadArguments.coordinateListString);
+        // load the model, coordinates, and map
+        auto model = common::LoadModel(mapLoadArguments);
+        auto mapOutputCoordinates = layers::BuildCoordinateList(model, 0, mapLoadArguments.coordinateListString);
 
         // load the map
-        layers::Map map(stack, mapOutputCoordinates);
+        layers::Map map(model, mapOutputCoordinates);
 
         // convert map to compilable map
         CompilableMap compilableMap(map);

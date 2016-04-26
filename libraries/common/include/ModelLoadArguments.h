@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
-//  File:     StackLoadArguments.h (common)
+//  File:     ModelLoadArguments.h (common)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
@@ -19,13 +19,13 @@
 namespace common
 {
     /// <summary> A struct that holds command line parameters for loading maps. </summary>
-    struct StackLoadArguments
+    struct ModelLoadArguments
     {
-        std::string inputStackFile = "";
+        std::string inputModelFile = "";
     };
 
     /// <summary> A version of MapLoadArguments that adds its members to the command line parser. </summary>
-    struct ParsedStackLoadArguments : public StackLoadArguments, public utilities::ParsedArgSet
+    struct ParsedModelLoadArguments : public ModelLoadArguments, public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///

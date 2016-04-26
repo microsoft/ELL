@@ -95,17 +95,17 @@ CompilableMap::CompilableMap(const layers::Map& other)
 {
     _outputCoordinates = other.GetOutputCoordinateList();
 
-    const auto& stack = other.LoadStack();
-    _requiredInputLayerSize = std::max(stack.GetRequiredLayerSize(0), _outputCoordinates.GetRequiredLayerSize(0));
+    const auto& model = other.GetModel();
+    _requiredInputLayerSize = std::max(model.GetRequiredLayerSize(0), _outputCoordinates.GetRequiredLayerSize(0));
 
     utilities::TypeFactory<CompilableLayer> compilableLayerFactory;
     compilableLayerFactory.AddType<CompilableCoordinatewise>(layers::Coordinatewise::GetTypeName());
     compilableLayerFactory.AddType<CompilableSum>(layers::Sum::GetTypeName());
 
     // input layer is stored implicitly, copy all other layers
-    for (uint64_t index = 1; index < stack.NumLayers(); ++index)
+    for (uint64_t index = 1; index < model.NumLayers(); ++index)
     {
-        const auto& layer = stack.GetLayer(index);
+        const auto& layer = model.GetLayer(index);
         _compilableLayers.push_back(compilableLayerFactory.Construct(layer.GetRuntimeTypeName()));
         (*_compilableLayers.back()) = layer;
     }

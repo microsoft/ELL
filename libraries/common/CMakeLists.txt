@@ -15,18 +15,18 @@ endif()
 set (SRC src/DataLoadArguments.cpp
          src/DataSaveArguments.cpp
          src/DataLoaders.cpp
-         src/LoadStack.cpp
+         src/LoadModel.cpp
          src/MapLoadArguments.cpp
          src/MapSaveArguments.cpp
-         src/StackLoadArguments.cpp)
+         src/ModelLoadArguments.cpp)
 
 set (INCLUDE include/DataLoadArguments.h
              include/DataSaveArguments.h
              include/DataLoaders.h
-             include/LoadStack.h
+             include/LoadModel.h
              include/MapLoadArguments.h
              include/MapSaveArguments.h
-             include/StackLoadArguments.h)
+             include/ModelLoadArguments.h)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

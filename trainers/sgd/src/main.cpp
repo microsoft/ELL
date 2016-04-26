@@ -30,7 +30,7 @@
 #include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 
 #include "DataLoaders.h"
-#include "LoadStack.h"
+#include "LoadModel.h"
 
 // optimization
 #include "AsgdOptimizer.h"
@@ -65,14 +65,14 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputStackFile);
+        auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputModelFile);
 
-        // load a stack
-        auto stack = common::LoadStack(mapLoadArguments);
+        // load a model
+        auto model = common::LoadModel(mapLoadArguments);
 
         // get output coordinate list and create the map
-        auto outputCoordinateList = layers::BuildCoordinateList(stack, dataLoadArguments.parsedDataDimension, mapLoadArguments.coordinateListString);
-        layers::Map map(stack, outputCoordinateList);
+        auto outputCoordinateList = layers::BuildCoordinateList(model, dataLoadArguments.parsedDataDimension, mapLoadArguments.coordinateListString);
+        layers::Map map(model, outputCoordinateList);
 
         // load dataset
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
@@ -117,10 +117,10 @@ int main(int argc, char* argv[])
         // update the map with the newly learned layers
         auto predictor = optimizer.GetPredictor();
 
-        predictor.AddToStack(stack, outputCoordinateList);
+        predictor.AddToModel(model, outputCoordinateList);
 
         // output map
-        stack.Save(outStream);
+        model.Save(outStream);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

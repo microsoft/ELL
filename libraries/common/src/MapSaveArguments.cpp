@@ -15,10 +15,10 @@ namespace common
     void ParsedMapSaveArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
-            outputStackFile,
-            "outputStackFile",
-            "osf",
-            "Path to the output stack file",
+            outputModelFile,
+            "outputModelFile",
+            "omf",
+            "Path to the output model file",
             "");
     }
 }

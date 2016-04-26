@@ -10,7 +10,7 @@
 
 #include "DataLoaders.h"
 #include "CoordinateListTools.h"
-#include "LoadStack.h"
+#include "LoadModel.h"
 
 // utilities
 #include "Files.h"
@@ -60,14 +60,14 @@ namespace common
 
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments)
     {
-        // read stack file
-        auto stack = common::LoadStack(mapLoadArguments);
+        // read model file
+        auto model = common::LoadModel(mapLoadArguments);
 
         // get map output coordinate list
-        auto mapOutputCoordinates = layers::BuildCoordinateList(stack, dataLoadArguments.parsedDataDimension, mapLoadArguments.coordinateListString);
+        auto mapOutputCoordinates = layers::BuildCoordinateList(model, dataLoadArguments.parsedDataDimension, mapLoadArguments.coordinateListString);
 
         // get a data iterator
-        return GetMappedDataIterator(dataLoadArguments, layers::Map(stack, mapOutputCoordinates));
+        return GetMappedDataIterator(dataLoadArguments, layers::Map(model, mapOutputCoordinates));
     }
 
     dataset::RowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments, const layers::Map map)

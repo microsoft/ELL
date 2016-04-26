@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "StackLoadArguments.h"
+#include "ModelLoadArguments.h"
 
 // utilities
 #include "CommandLineParser.h"
@@ -21,7 +21,7 @@
 namespace common
 {
     /// <summary> A struct that holds command line parameters for loading maps. </summary>
-    struct MapLoadArguments : public StackLoadArguments
+    struct MapLoadArguments : public ModelLoadArguments
     {
         std::string coordinateListString = "";
     };

@@ -40,9 +40,9 @@ void ParsedPrintArguments::AddArgs(utilities::CommandLineParser & parser)
     parser.AddOption(emptyElementStyle.cornerRadius, "emptyElementCornerRadius", "eecr", "Radius of rounded corners of elements in a layer that doesn't show values", 5);
     parser.AddOption(emptyElementStyle.connectorRadius, "emptyElementConnectorRadius", "eekr", "Radius of connectors on top and bottom of elements in a layer that doesn't show values", 5);
 
-    parser.AddOption(stackLayout.horizontalMargin, "layerHorizontalMargin", "lhm", "Horizontal distance to the left edge of each layer", 20);
-    parser.AddOption(stackLayout.verticalMargin, "layerVerticalMargin", "lvm", "Vertical distnace to the top edge of the first layer", 10);
-    parser.AddOption(stackLayout.verticalSpacing, "layerVerticalSpacing", "lvs", "The amount of vertical space between layers", 30);
+    parser.AddOption(modelLayout.horizontalMargin, "layerHorizontalMargin", "lhm", "Horizontal distance to the left edge of each layer", 20);
+    parser.AddOption(modelLayout.verticalMargin, "layerVerticalMargin", "lvm", "Vertical distnace to the top edge of the first layer", 10);
+    parser.AddOption(modelLayout.verticalSpacing, "layerVerticalSpacing", "lvs", "The amount of vertical space between layers", 30);
 
     parser.AddOption(layerStyle.maxWidth, "layerMaxWidth", "lmw", "The maximum width of any layer", 700);
     parser.AddOption(layerStyle.cornerRadius, "layerCornerRadius", "lcr", "Radius of layer rounded corners", 10);

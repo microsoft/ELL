@@ -14,18 +14,18 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/LayerLayout.cpp
-         src/PrintableLayer.cpp
-         src/PrintableStack.cpp
          src/PrintableCoordinatewise.cpp
+         src/PrintableLayer.cpp
+         src/PrintableModel.cpp
          src/PrintableSum.cpp
          src/PrintArguments.cpp
          src/main.cpp
          src/SvgHelpers.cpp)
 
 set (INCLUDE include/LayerLayout.h
-             include/PrintableLayer.h
-             include/PrintableStack.h
              include/PrintableCoordinatewise.h
+             include/PrintableLayer.h
+             include/PrintableModel.h
              include/PrintableSum.h
              include/PrintArguments.h
              include/SvgHelpers.h)

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
-//  File:     PrintableStack.h (print)
+//  File:     PrintableModel.h (print)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
@@ -26,14 +26,14 @@
 #include <iostream>
 #include <memory>
 
-/// <summary> A printable stack. </summary>
-class PrintableStack
+/// <summary> A printable model. </summary>
+class PrintableModel
 {
 public:
-    /// <summary> Copy constructor that constructs an instance of PrintableStack from a Stack. </summary>
+    /// <summary> Copy constructor that constructs an instance of PrintableModel from a Model. </summary>
     ///
     /// <param name="other"> The Map being copied. </param>
-    PrintableStack(const layers::Stack& other);
+    PrintableModel(const layers::Model& other);
 
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>
     ///

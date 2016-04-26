@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Map.h"
-#include "Stack.h"
+#include "Model.h"
 
 // stl
 #include <stdexcept>
@@ -47,17 +47,17 @@ namespace layers
     //
     // Map class implementataion
     //
-    Map::Map(const Stack& stack, const CoordinateList& outputCoordinateList) : _stack(stack), _outputCoordinateList(outputCoordinateList)
+    Map::Map(const Model& model, const CoordinateList& outputCoordinateList) : _model(model), _outputCoordinateList(outputCoordinateList)
     {
-        uint64_t inputLayerSize = std::max(stack.GetRequiredLayerSize(0), outputCoordinateList.GetRequiredLayerSize(0));
+        uint64_t inputLayerSize = std::max(model.GetRequiredLayerSize(0), outputCoordinateList.GetRequiredLayerSize(0));
 
         // allocate reusable memory needed to compute the map
-        _layerOutputs.resize(_stack.NumLayers());
+        _layerOutputs.resize(_model.NumLayers());
         _layerOutputs[0].resize(inputLayerSize);
 
-        for (uint64_t layerIndex = 1; layerIndex < _stack.NumLayers(); ++layerIndex)
+        for (uint64_t layerIndex = 1; layerIndex < _model.NumLayers(); ++layerIndex)
         {
-            auto layerSize = _stack.GetLayer(layerIndex).Size();
+            auto layerSize = _model.GetLayer(layerIndex).Size();
             _layerOutputs[layerIndex].resize(layerSize);
         }
     }
@@ -67,8 +67,8 @@ namespace layers
         return _outputCoordinateList;
     }
 
-    const Stack & Map::LoadStack() const
+    const Model& Map::GetModel() const 
     {
-        return _stack;
+        return _model;
     }
 }

@@ -29,8 +29,8 @@ struct ElementLayoutArguments
     double dotsWidth;                   // width of the "dots" that represent the hidden elements
 };
 
-/// <summary> Arguments for stack layout. </summary>
-struct StackLayoutArguments
+/// <summary> Arguments for model layout. </summary>
+struct ModelLayoutArguments
 {
     double horizontalMargin;            // space to the left of the first layer
     double verticalMargin;              // space above the first layer
@@ -73,7 +73,7 @@ struct PrintArguments
     ElementLayoutArguments emptyElementLayout;
     ValueElementStyleArguments valueElementStyle;
     ElementStyleArguments emptyElementStyle;
-    StackLayoutArguments stackLayout;
+    ModelLayoutArguments modelLayout;
     LayerStyleArguments layerStyle;
     EdgeStyleArguments edgeStyle;
 };

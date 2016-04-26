@@ -9,12 +9,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PrintableLayer.h"
-#include "PrintableStack.h"
+#include "PrintableModel.h"
 #include "PrintArguments.h"
 
 // common
-#include "StackLoadArguments.h"
-#include "LoadStack.h"
+#include "ModelLoadArguments.h"
+#include "LoadModel.h"
 
 // utilities
 #include "Files.h"
@@ -23,7 +23,7 @@
 
 // layers
 #include "Map.h"
-#include "Stack.h"
+#include "Model.h"
 
 // stl
 #include <iostream>
@@ -39,23 +39,23 @@ int main(int argc, char* argv[])
         utilities::CommandLineParser commandLineParser(argc, argv);
 
         // add arguments to the command line parser
-        common::ParsedStackLoadArguments stackLoadArguments;
+        common::ParsedModelLoadArguments modelLoadArguments;
         ParsedPrintArguments printArguments;
-        commandLineParser.AddOptionSet(stackLoadArguments);
+        commandLineParser.AddOptionSet(modelLoadArguments);
         commandLineParser.AddOptionSet(printArguments);
         commandLineParser.Parse();
 
         // if output file specified, use it, otherwise use std::cout
         auto outStream = utilities::GetOutputStreamImpostor(printArguments.outputSvgFile);
 
-        // open stack file
-        auto stack = common::LoadStack(stackLoadArguments);
+        // open model file
+        auto model = common::LoadModel(modelLoadArguments);
 
-        // convert stack to printable stack
-        PrintableStack printableStack(stack);
+        // convert model to printable model
+        PrintableModel printableModel(model);
         
         // print to svg file
-        printableStack.Print(outStream, printArguments);
+        printableModel.Print(outStream, printArguments);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

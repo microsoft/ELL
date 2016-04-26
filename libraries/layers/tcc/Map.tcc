@@ -46,9 +46,9 @@ namespace layers
         InitializeLayerOutputs(inputIterator, _layerOutputs[0]);
 
         // compute layers 1,2,... in order
-        for (uint64_t i = 1; i < _stack.NumLayers(); ++i)
+        for (uint64_t i = 1; i < _model.NumLayers(); ++i)
         {
-            _stack.GetLayer(i).Compute(_layerOutputs, _layerOutputs[i]);
+            _model.GetLayer(i).Compute(_layerOutputs, _layerOutputs[i]);
         }
 
         // copy the outputs to a vector

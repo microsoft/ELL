@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CoordinateListTools.h"
-#include "Stack.h"
+#include "Model.h"
 
 // utilities
 #include "Parser.h"
@@ -69,7 +69,7 @@ namespace
 
 namespace layers
 {
-    layers::CoordinateList BuildCoordinateList(const layers::Stack& stack, uint64_t inputLayerSize, const std::string& coordinateListString)
+    layers::CoordinateList BuildCoordinateList(const layers::Model& model, uint64_t inputLayerSize, const std::string& coordinateListString)
     {
         layers::CoordinateList coordinateList;
 
@@ -79,7 +79,7 @@ namespace layers
         while (pStr < pEnd)
         {
             // read layer Index
-            uint64_t layerIndex = ParseIndex(pStr, stack.NumLayers());
+            uint64_t layerIndex = ParseIndex(pStr, model.NumLayers());
 
             // read element index
             uint64_t fromElementIndex = 0;
@@ -90,7 +90,7 @@ namespace layers
             }
             else
             {
-                layerSize = stack.GetLayer(layerIndex).Size();
+                layerSize = model.GetLayer(layerIndex).Size();
             }
             uint64_t endElementIndex = layerSize;
 
@@ -120,7 +120,7 @@ namespace layers
                 }
             }
 
-            // check that the coordiates are compatible with the stack
+            // check that the coordiates are compatible with the model
             if (layerIndex == 0)
             {
                 if (endElementIndex == 0)

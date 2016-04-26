@@ -15,10 +15,10 @@ namespace common
     void ParsedMapLoadArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
-            inputStackFile,
-            "inputStackFile",
+            inputModelFile,
+            "inputModelFile",
             "isf",
-            "Path to the input stack file",
+            "Path to the input model file",
             "");
 
         parser.AddOption(

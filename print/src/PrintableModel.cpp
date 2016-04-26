@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
-//  File:     PrintableStack.cpp (print)
+//  File:     PrintableModel.cpp (print)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "PrintableStack.h"
+#include "PrintableModel.h"
 #include "PrintableCoordinatewise.h"
 #include "PrintableSum.h"
 #include "PrintableLayer.h"
@@ -113,7 +113,7 @@ void PrintElementDefinition(std::ostream& os, const std::string& id, double widt
     os << "            </g>\n";
 }
 
-PrintableStack::PrintableStack(const layers::Stack& other) : _inputLayerSize(other.GetRequiredLayerSize(0))
+PrintableModel::PrintableModel(const layers::Model& other) : _inputLayerSize(other.GetRequiredLayerSize(0))
 {
     utilities::TypeFactory<PrintableLayer> printableLayerFactory;
     printableLayerFactory.AddType<PrintableCoordinatewise>(layers::Coordinatewise::GetTypeName());
@@ -128,7 +128,7 @@ PrintableStack::PrintableStack(const layers::Stack& other) : _inputLayerSize(oth
     }
 }
 
-void PrintableStack::Print(std::ostream & os, const PrintArguments& arguments)
+void PrintableModel::Print(std::ostream & os, const PrintArguments& arguments)
 {
     os << "<html>\n<body>\n";
     utilities::PrintFormat(os, 
@@ -163,14 +163,14 @@ void PrintableStack::Print(std::ostream & os, const PrintArguments& arguments)
     os << "        </defs>\n\n";
 
     // print
-    double layerTop = arguments.stackLayout.verticalMargin;
+    double layerTop = arguments.modelLayout.verticalMargin;
     std::vector<LayerLayout> layouts;
 
     // print input layer
     {
-        auto inputLayout = PrintableLayer::PrintLayer(os, arguments.stackLayout.horizontalMargin, layerTop, 0, "Input", _inputLayerSize, arguments.emptyElementLayout, arguments.layerStyle);
+        auto inputLayout = PrintableLayer::PrintLayer(os, arguments.modelLayout.horizontalMargin, layerTop, 0, "Input", _inputLayerSize, arguments.emptyElementLayout, arguments.layerStyle);
         PrintableLayer::PrintEmptyElements(os, inputLayout);
-        layerTop += inputLayout.GetHeight() + arguments.stackLayout.verticalSpacing;
+        layerTop += inputLayout.GetHeight() + arguments.modelLayout.verticalSpacing;
         layouts.push_back(std::move(inputLayout));
         os << std::endl;
     }
@@ -180,8 +180,8 @@ void PrintableStack::Print(std::ostream & os, const PrintArguments& arguments)
     {
         uint64_t layerIndex = i + 1;
         const auto& printableLayer = _printableLayers[i];
-        auto layout = printableLayer->Print(os, arguments.stackLayout.horizontalMargin, layerTop, layerIndex, arguments);
-        layerTop += layout.GetHeight() + arguments.stackLayout.verticalSpacing;
+        auto layout = printableLayer->Print(os, arguments.modelLayout.horizontalMargin, layerTop, layerIndex, arguments);
+        layerTop += layout.GetHeight() + arguments.modelLayout.verticalSpacing;
         os << std::endl;
 
         // print edges

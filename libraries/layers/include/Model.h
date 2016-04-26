@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
-//  File:     Stack.h (layers)
+//  File:     Model.h (layers)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
@@ -21,20 +21,20 @@
 
 namespace layers
 {
-    /// <summary> Implements a stack of layers. </summary>
-    class Stack
+    /// <summary> Implements a model of layers. </summary>
+    class Model
     {
     public:
-        /// <summary> Adds a layer to the stack. </summary>
+        /// <summary> Adds a layer to the model. </summary>
         ///
-        /// <param name="layer"> The layer to add to the stack. </param>
+        /// <param name="layer"> The layer to add to the model. </param>
         ///
         /// <returns> The index of the added layer. </returns>
         uint64_t AddLayer(std::unique_ptr<Layer> layer);
 
-        /// <summary> Returns the number of layers in the stack. </summary>
+        /// <summary> Returns the number of layers in the model. </summary>
         ///
-        /// <returns> The total number of layers in the stack. </returns>
+        /// <returns> The total number of layers in the model. </returns>
         uint64_t NumLayers() const;
 
         /// <summary> Returns the minimal required size of a given layer, which is the maximum element associated with that layer plus 1. </summary>
@@ -58,7 +58,7 @@ namespace layers
         /// <returns> The coordinate list. </returns>
         CoordinateList BuildCoordinateList(uint64_t layerIndex) const;
 
-        /// <summary> Saves a stack to an output stream. </summary>
+        /// <summary> Saves a model to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         void Save(std::ostream& os) const; // TODO, move this to common
@@ -68,12 +68,12 @@ namespace layers
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName();
 
-        /// <summary> Reads the stack from an XMLDeserializer. </summary>
+        /// <summary> Reads the model from an XMLDeserializer. </summary>
         ///
         /// <param name="deserializer"> [in,out] The deserializer. </param>
         void Read(utilities::XMLDeserializer& deserializer);
 
-        /// <summary> Writes the stack to an XMLSerializer. </summary>
+        /// <summary> Writes the model to an XMLSerializer. </summary>
         ///
         /// <param name="serializer"> [in,out] The serializer. </param>
         void Write(utilities::XMLSerializer& serializer) const;

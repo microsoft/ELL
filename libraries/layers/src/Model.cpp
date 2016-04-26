@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
-//  File:     Stack.cpp (layers)
+//  File:     Model.cpp (layers)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Stack.h"
+#include "Model.h"
 
 // utilities
 #include "Files.h"
@@ -23,12 +23,12 @@
 
 namespace layers
 {
-    const int Stack::_currentVersion;
+    const int Model::_currentVersion;
 
     //
-    // Stack class implementation
+    // Model class implementation
     //
-    uint64_t Stack::AddLayer(std::unique_ptr<Layer> layer)
+    uint64_t Model::AddLayer(std::unique_ptr<Layer> layer)
     {
         // check that the layer points to valid elements
         auto numLayers = NumLayers();
@@ -55,13 +55,13 @@ namespace layers
         return _layers.size();
     }
 
-    uint64_t Stack::NumLayers() const
+    uint64_t Model::NumLayers() const
     {
         // add one, to account for the input layer, which is not explicitly stores in _layers
         return _layers.size()+1;
     }
 
-    uint64_t Stack::GetRequiredLayerSize(uint64_t layerIndex) const
+    uint64_t Model::GetRequiredLayerSize(uint64_t layerIndex) const
     {
         uint64_t max = 0;
         for (const auto& layer : _layers)
@@ -75,7 +75,7 @@ namespace layers
         return max;
     }
 
-    const Layer& Stack::GetLayer(uint64_t layerIndex) const
+    const Layer& Model::GetLayer(uint64_t layerIndex) const
     {
         assert(layerIndex > 0);
 
@@ -83,7 +83,7 @@ namespace layers
         return *_layers[layerIndex - 1];
     }
 
-    CoordinateList Stack::BuildCoordinateList(uint64_t layerIndex) const
+    CoordinateList Model::BuildCoordinateList(uint64_t layerIndex) const
     {
         if (layerIndex == 0)
         {
@@ -93,28 +93,18 @@ namespace layers
         return CoordinateList(layerIndex, GetLayer(layerIndex).Size());
     }
 
-    //Stack Stack::Load(const std::string& inputStackFile)
-    //{
-    //    auto inputMapFStream = utilities::OpenIfstream(inputStackFile);
-    //    utilities::XMLDeserializer deserializer(inputMapFStream);
-
-    //    Stack stack;
-    //    deserializer.Deserialize(stack);
-    //    return stack;
-    //}
-
-    void Stack::Save(std::ostream& os) const
+    void Model::Save(std::ostream& os) const
     {
         utilities::XMLSerializer serializer(os);
         serializer.Serialize(*this);
     }
 
-    std::string Stack::GetTypeName()
+    std::string Model::GetTypeName()
     {
-        return "Stack";
+        return "Model";
     }
 
-    void Stack::Read(utilities::XMLDeserializer& deserializer)
+    void Model::Read(utilities::XMLDeserializer& deserializer)
     {
         int version = 0;
         deserializer.Deserialize("version", version);
@@ -128,7 +118,7 @@ namespace layers
         }
     }
 
-    void Stack::Write(utilities::XMLSerializer& serializer) const
+    void Model::Write(utilities::XMLSerializer& serializer) const
     {
         serializer.Serialize("version", _currentVersion);
         serializer.Serialize("layers", _layers);

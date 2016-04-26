@@ -11,7 +11,7 @@
 #pragma once
 
 // layers
-#include "Stack.h"
+#include "Model.h"
 #include "Coordinate.h"
 
 // linear
@@ -72,7 +72,7 @@ namespace predictors
         ///
         /// <param name="map"> [in,out] The map. </param>
         /// <param name="inputCoordinates"> The input coordinates. </param>
-        void AddToStack(layers::Stack& stack, const layers::CoordinateList& inputCoordinates) const;
+        void AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
 
     private:
         linear::DoubleVector _w;
