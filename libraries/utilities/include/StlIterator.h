@@ -12,6 +12,7 @@
 
 // stl
 #include <vector>
+#include <cstdint>
 
 namespace utilities
 {

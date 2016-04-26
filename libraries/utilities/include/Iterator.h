@@ -50,8 +50,8 @@ namespace utilities
         ValueType Get();
 
         // friend declarations of the MakeIterator factory functions
-        template <typename IteratorType, typename ValueType>
-        friend auto MakeIterator(IteratorType iter) -> Iterator<ValueType>;
+        template <typename IteratorType, typename ValueType2>
+        friend auto MakeIterator(IteratorType iter) -> Iterator<ValueType2>;
     private:
 
         Iterator(std::shared_ptr<void> mem, std::function<bool()> isValid, std::function<void()> next, std::function<ValueType()> get);
