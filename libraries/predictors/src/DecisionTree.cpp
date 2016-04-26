@@ -1,116 +1,116 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
-//  File:     MutableDecisionTree.cpp (predictors)
+//  File:     DecisionTree.cpp (predictors)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "MutableDecisionTree.h"
+#include "DecisionTree.h"
 
 // stl
 #include <stdexcept>
 
 namespace decisionTree
 {
-    MutableDecisionTree::SplitRule::SplitRule(int index, double value) :
+    DecisionTree::SplitRule::SplitRule(int index, double value) :
         _index(index), _value(value)
     {}
 
-    int MutableDecisionTree::SplitRule::GetIndex() const
+    int DecisionTree::SplitRule::GetIndex() const
     {
         return _index;
     }
 
-    double MutableDecisionTree::SplitRule::Get() const
+    double DecisionTree::SplitRule::Get() const
     {
         return _value;
     }
 
-    MutableDecisionTree::ChildPair::ChildPair(int child0, int child1) :
+    DecisionTree::ChildPair::ChildPair(int child0, int child1) :
         _child0(child0), _child1(child1)
     {}
 
-    int MutableDecisionTree::ChildPair::GetChild0() const
+    int DecisionTree::ChildPair::GetChild0() const
     {
         return _child0;
     }
 
-    int MutableDecisionTree::ChildPair::GetChild1() const
+    int DecisionTree::ChildPair::GetChild1() const
     {
         return _child1;
     }
 
-    void MutableDecisionTree::ChildPair::SetChild0(int index)
+    void DecisionTree::ChildPair::SetChild0(int index)
     {
         _child0 = index;
     }
 
-    void MutableDecisionTree::ChildPair::SetChild1(int index)
+    void DecisionTree::ChildPair::SetChild1(int index)
     {
         _child1 = index;
     }
 
-    MutableDecisionTree::MutableDecisionTree(double root_output) :
+    DecisionTree::DecisionTree(double root_output) :
         _parents(1), _outputs(1)
     {
         _parents[0] = -1;
         _outputs[0] = root_output;
     }
 
-    MutableDecisionTree::SplitRuleIterator MutableDecisionTree::SplitRuleBegin() const
+    DecisionTree::SplitRuleIterator DecisionTree::SplitRuleBegin() const
     {
         return _splitRules.cbegin();
     }
 
-    MutableDecisionTree::SplitRuleIterator MutableDecisionTree::SplitRuleEnd() const
+    DecisionTree::SplitRuleIterator DecisionTree::SplitRuleEnd() const
     {
         return _splitRules.cend();
     }
 
-    MutableDecisionTree::ParentIterator MutableDecisionTree::ParentBegin() const
+    DecisionTree::ParentIterator DecisionTree::ParentBegin() const
     {
         return _parents.cbegin();
     }
 
-    MutableDecisionTree::ParentIterator MutableDecisionTree::ParentEnd() const
+    DecisionTree::ParentIterator DecisionTree::ParentEnd() const
     {
         return _parents.cend();
     }
 
-    MutableDecisionTree::ChildrenIterator MutableDecisionTree::ChildrenBegin() const
+    DecisionTree::ChildrenIterator DecisionTree::ChildrenBegin() const
     {
         return _children.cbegin();
     }
 
-    MutableDecisionTree::ChildrenIterator MutableDecisionTree::ChildrenEnd() const
+    DecisionTree::ChildrenIterator DecisionTree::ChildrenEnd() const
     {
         return _children.cend();
     }
 
-    MutableDecisionTree::OutputIterator MutableDecisionTree::OutputBegin() const
+    DecisionTree::OutputIterator DecisionTree::OutputBegin() const
     {
         return _outputs.cbegin();
     }
 
-    MutableDecisionTree::OutputIterator MutableDecisionTree::OutputEnd() const
+    DecisionTree::OutputIterator DecisionTree::OutputEnd() const
     {
         return _outputs.cend();
     }
 
-    int MutableDecisionTree::GetNumVertices() const
+    int DecisionTree::GetNumVertices() const
     {
         return (int)_parents.size();
     }
 
-    int MutableDecisionTree::GetNumInteriorVertices() const
+    int DecisionTree::GetNumInteriorVertices() const
     {
         return (int)_splitRules.size();
     }
 
-    void MutableDecisionTree::SplitLeaf(
+    void DecisionTree::SplitLeaf(
         int leaf_index,
         int input_index,
         double threshold,

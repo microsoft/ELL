@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
-//  File:     MutableDecisionTree.h (predictors)
+//  File:     DecisionTree.h (predictors)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
@@ -19,7 +19,7 @@ namespace decisionTree
     /// Represents a growable binary decision tree with interval splitting rules and outputs in all
     /// vertices.
     /// </summary>
-    class MutableDecisionTree
+    class DecisionTree
     {
 
     public:
@@ -89,7 +89,7 @@ namespace decisionTree
         /// <summary> Constructs an empty mutable decision tree with one leaf, the root. </summary>
         ///
         /// <param name="root_output"> The root output value. </param>
-        MutableDecisionTree(double root_output = 0.0);
+        DecisionTree(double root_output = 0.0);
 
         /// <summary> An iterator used to expose the tree split rules. </summary>
         using SplitRuleIterator = std::vector<SplitRule>::const_iterator;
@@ -179,7 +179,7 @@ namespace decisionTree
                       double child1_output);
 
         /// <summary> Deleted copy constructor. </summary>
-        MutableDecisionTree(const MutableDecisionTree&) = delete;
+        DecisionTree(const DecisionTree&) = delete;
 
     private:
         
