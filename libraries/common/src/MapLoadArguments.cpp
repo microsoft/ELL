@@ -17,7 +17,7 @@ namespace common
         parser.AddOption(
             inputModelFile,
             "inputModelFile",
-            "isf",
+            "imf",
             "Path to the input model file",
             "");
 
