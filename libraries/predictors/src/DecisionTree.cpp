@@ -12,44 +12,96 @@
 
 // stl
 #include <stdexcept>
+#include <cassert>
 
-namespace decisionTree
+namespace predictors
 {
     DecisionTree::SplitRule::SplitRule(int featureIndex, double threshold) :
         _featureIndex(featureIndex), _threshold(threshold)
     {}
 
-    int DecisionTree::SplitRule::GetFeatureIndex() const
+    DecisionTree::SplitRuleResult DecisionTree::SplitRule::Evaluate(const std::vector<double>& featureVector) const
     {
-        return _featureIndex;
+        if(featureVector[_featureIndex] > _threshold)
+        {
+            return SplitRuleResult::positive;
+        }
+        else
+        {
+            return SplitRuleResult::negative;
+        }
     }
 
-    double DecisionTree::SplitRule::GetThreshold() const
-    {
-        return _threshold;
-    }
-
-    DecisionTree::ChildPair::ChildPair(int negativeChildIndex, int positiveChildIndex) :
-        _negativeChildIndex(negativeChildIndex), _positiveChildIndex(positiveChildIndex)
+    DecisionTree::Child::Child(double weight, uint64_t index) : _weight(weight), _index()
     {}
 
-    int DecisionTree::ChildPair::GetNegativeChildIndex() const
+    double DecisionTree::Child::GetWeight() const
     {
-        return _negativeChildIndex;
+        return _weight;
     }
 
-    int DecisionTree::ChildPair::GetPositiveChildIndex() const
+    uint64_t DecisionTree::Child::GetIndex() const
     {
-        return _positiveChildIndex;
+        return _index;
     }
 
-    int DecisionTree::NumVertices() const
+    DecisionTree::InteriorNode::InteriorNode(SplitRule splitRule, Child negativeChild, Child positiveChild) : _splitRule(std::move(splitRule)), _negativeChild(std::move(negativeChild)), _positiveChild(std::move(positiveChild))
+    {}
+
+    const DecisionTree::SplitRule & DecisionTree::InteriorNode::GetSplitRule() const
     {
-        return (int)_parents.size();
+        return _splitRule;
     }
 
-    int DecisionTree::NumInteriorVertices() const
+    DecisionTree::Child & DecisionTree::InteriorNode::GetNegativeChild()
     {
-        return (int)_splitRules.size();
+        return _negativeChild;
+    }
+
+    const DecisionTree::Child & DecisionTree::InteriorNode::GetNegativeChild() const
+    {
+        return _negativeChild;
+    }
+
+    DecisionTree::Child & DecisionTree::InteriorNode::GetPositiveChild()
+    {
+        return _positiveChild;
+    }
+
+    const DecisionTree::Child & DecisionTree::InteriorNode::GetPositiveChild() const
+    {
+        return _positiveChild;
+    }
+
+    uint64_t DecisionTree::NumNodes() const
+    {
+        return _interiorNodes.size() * 2 + 1;
+    }
+
+    uint64_t DecisionTree::NumInteriorNodes() const
+    {
+        return _interiorNodes.size();
+    }
+
+    DecisionTree::InteriorNode& DecisionTree::SplitLeaf(Child& child, SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight)
+    {
+        // only split leaves
+        assert(child._index == 0);
+
+        child._index = _interiorNodes.size();
+        _interiorNodes.emplace_back(std::move(splitRule), Child(negativeLeafWeight), Child(positiveLeafWeight));
+        return _interiorNodes.back();
+    }
+
+    void DecisionTree::AddToModel(layers::Model & model, const layers::CoordinateList & inputCoordinates) const
+    {
+        // TODO
+        // add theshold layer
+
+        // add path layer
+
+        // add weight layer
+
+        // add sum layer
     }
 }

@@ -10,10 +10,13 @@
 
 #pragma once
 
+//layers
+#include "Model.h"
+
 // stl
 #include <vector>
 
-namespace decisionTree
+namespace predictors
 {
     /// <summary>
     /// Represents a binary decision tree with threshold split rules and output values in all
@@ -21,9 +24,10 @@ namespace decisionTree
     /// </summary>
     class DecisionTree
     {
-
     public:
         
+        enum class SplitRuleResult {negative, positive};
+
         /// <summary> Represents a split rule in a decision tree. </summary>
         class SplitRule
         {
@@ -35,61 +39,115 @@ namespace decisionTree
             /// <param name="threshold"> The threshold value. </param>
             SplitRule(int featureIndex, double threshold);
 
-            /// <summary> Returns the feature index. </summary>
+            /// <summary> Evaluates the split rule on a given feature vector. </summary>
             ///
-            /// <returns> The feature index. </returns>
-            int GetFeatureIndex() const;
-
-            /// <summary> Returns the threshold value. </summary>
+            /// <param name="featureVector"> The feature vector. </param>
             ///
-            /// <returns> A threshold. </returns>
-            double GetThreshold() const;
+            /// <returns> A SplitRuleResult. </returns>
+            SplitRuleResult Evaluate(const std::vector<double>& featureVector) const;
 
         private:
             int _featureIndex;
             double _threshold;
         };
 
-        /// <summary> Represents a pair of Children of a node in a binary tree. </summary>
-        class ChildPair 
+        class Child
         {
         public:
 
-            /// <summary> Constructs the pair of Children. </summary>
+            /// <summary> Constructs an instance of Child. </summary>
             ///
-            /// <param name="negativeChildIndex"> Index of the child that corresponds to instances where the split rule is negative. </param>
-            /// <param name="positiveChildIndex"> Index of the child that corresponds to instances where the split rule is positive. </param>
-            ChildPair(int negativeChildIndex, int positiveChildIndex);
+            /// <param name="weight"> The weight associated with the child. </param>
+            /// <param name="index"> The index of the child, if it is an interior node; zero otherwise. </param>
+            Child(double weight, uint64_t index=0);
 
-            /// <summary> Returns index of the negative child. </summary>
+            /// <summary> Gets the weight of the child. </summary>
             ///
-            /// <returns> Index of the negative child. </returns>
-            int GetNegativeChildIndex() const;
+            /// <returns> The weight associated with the child. </returns>
+            double GetWeight() const;
 
-            /// <summary> Returns index of the positive child. </summary>
+            /// <summary> Gets the index of the child, if it is an interior node; zero otherwise. </summary>
             ///
-            /// <returns> Index of the positive child. </returns>
-            int GetPositiveChildIndex() const;
+            /// <returns> The index, or zero for leaves
+            ///           . </returns>
+            uint64_t GetIndex() const;
 
         private:
-            int _negativeChildIndex;
-            int _positiveChildIndex;
+            double _weight;
+            uint64_t _index;
+            friend DecisionTree;
+        };
+
+        /// <summary> Represents a pair of Children of a node in a binary tree. </summary>
+        class InteriorNode
+        {
+        public:
+            
+            /// <summary> Constructs an instance of InteriorNode. </summary>
+            ///
+            /// <param name="splitRule"> The split rule. </param>
+            /// <param name="negativeChild"> The negative child. </param>
+            /// <param name="positiveChild"> The positive child. </param>
+            InteriorNode(SplitRule splitRule, Child negativeChild, Child positiveChild);
+
+            /// <summary> Gets the split rule. </summary>
+            ///
+            /// <returns> The split rule. </returns>
+            const SplitRule& GetSplitRule() const;
+
+            /// <summary> Gets the negative child of this interior node. </summary>
+            ///
+            /// <returns> The negative child. </returns>
+            Child& GetNegativeChild();
+
+            /// <summary> Gets the negative child of this interior node. </summary>
+            ///
+            /// <returns> The negative child. </returns>
+            const Child& GetNegativeChild() const;
+
+            /// <summary> Gets the positive child of this interior node. </summary>
+            ///
+            /// <returns> The positive child. </returns>
+            Child& GetPositiveChild();
+
+            /// <summary> Gets the positive child of this interior node. </summary>
+            ///
+            /// <returns> The positive child. </returns>
+            const Child& GetPositiveChild() const;
+
+        private:
+            SplitRule _splitRule;
+            Child _negativeChild;
+            Child _positiveChild;
         };
 
         /// <summary> Returns the number of vertices. </summary>
         ///
         /// <returns> The number vertices. </returns>
-        int NumVertices() const;
+        uint64_t NumNodes() const;
 
         /// <summary> Returns the number of interior vertices. </summary>
         ///
         /// <returns> The number interior vertices. </returns>
-        int NumInteriorVertices() const;
+        uint64_t NumInteriorNodes() const;
+
+        /// <summary> Splits a leaf, turning it into an interior node. </summary>
+        ///
+        /// <param name="child"> [in,out] The leaf being split. Must be a leaf in this tree. </param>
+        /// <param name="splitRule"> The split rule to use. </param>
+        /// <param name="negativeLeafWeight"> The negative leaf weight. </param>
+        /// <param name="positiveLeafWeight"> The positive leaf weight. </param>
+        ///
+        /// <returns> Reference to the interior node that is created. </returns>
+        InteriorNode& SplitLeaf(Child& child, SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight);
+
+        /// <summary> Adds the predictor to a model. </summary>
+        ///
+        /// <param name="model"> [in,out] The model. </param>
+        /// <param name="inputCoordinates"> The input coordinates. </param>
+        void AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
 
     private:
-        std::vector<SplitRule> _splitRules;
-        std::vector<ChildPair> _children;
-        std::vector<int> _parents;
-        std::vector<double> _outputs;
+        std::vector<InteriorNode> _interiorNodes;
     };
 }
