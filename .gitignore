@@ -219,3 +219,4 @@ ModelManifest.xml
 # VS Code stuff
 browse.VC.db
 .vs/
+.vscode/
