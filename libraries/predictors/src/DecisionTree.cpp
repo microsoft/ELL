@@ -83,6 +83,15 @@ namespace predictors
         return _interiorNodes.size();
     }
 
+    DecisionTree::InteriorNode & DecisionTree::SplitRoot(SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight)
+    {
+        // confirm that the root has never been split before
+        assert(_interiorNodes.size() == 0);
+
+        _interiorNodes.emplace_back(std::move(splitRule), Child(negativeLeafWeight), Child(positiveLeafWeight));
+        return _interiorNodes.back();
+    }
+
     DecisionTree::InteriorNode& DecisionTree::SplitLeaf(Child& child, SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight)
     {
         // only split leaves

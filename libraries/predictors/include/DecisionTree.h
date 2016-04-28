@@ -131,6 +131,15 @@ namespace predictors
         /// <returns> The number interior vertices. </returns>
         uint64_t NumInteriorNodes() const;
 
+        /// <summary> Splits the tree root. </summary>
+        ///
+        /// <param name="splitRule"> The split rule to use. </param>
+        /// <param name="negativeLeafWeight"> The negative leaf weight. </param>
+        /// <param name="positiveLeafWeight"> The positive leaf weight. </param>
+        ///
+        /// <returns> Reference to the interior node that is created. </returns>
+        InteriorNode& SplitRoot(SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight);
+
         /// <summary> Splits a leaf, turning it into an interior node. </summary>
         ///
         /// <param name="child"> [in,out] The leaf being split. Must be a leaf in this tree. </param>

@@ -11,24 +11,7 @@
 #pragma once
 
 // predictors
-#include "LinearPredictor.h"
-
-// loss functions
-#include "SquaredLoss.h"
-#include "LogLoss.h"
-
-// linear
-#include "DoubleVector.h"
-
-// dataset
-#include "RowDataset.h"
-#include "SupervisedExample.h"
-
-// utilities
-#include "Iterator.h"
-
-// stl
-#include <cstdint>
+#include "DecisionTree.h"
 
 namespace trainers
 {
@@ -37,15 +20,19 @@ namespace trainers
     {
     public:
 
+        /// <summary> Constructs an instance of SortingTreeLearner. </summary>
+        ///
+        /// <param name="lossFunction"> The loss function. </param>
         SortingTreeLearner(LossFunctionType lossFunction);
 
-        /// <summary> Performs a given number of learning iterations. </summary>
+        /// <summary> Trains a decision tree. </summary>
         ///
-        /// <typeparam name="ExampleIteratorType"> Type of example iterator to use. </typeparam>
-        /// <param name="exampleIterator"> [in,out] The data iterator. </param>
-        /// <param name="numExamples"> The number of examples in the iterator. </param>
-        template<typename ExampleIteratorType>
-        void Update(ExampleIteratorType& exampleIterator);
+        /// <typeparam name="ExampleIteratorType"> Type of the example iterator. </typeparam>
+        /// <param name="exampleIterator"> [in,out] The example iterator. </param>
+        ///
+        /// <returns> A decision tree. </returns>
+        template <typename ExampleIteratorType>
+        predictors::DecisionTree Train(ExampleIteratorType& exampleIterator);
 
     private:
         LossFunctionType _lossFunction;
