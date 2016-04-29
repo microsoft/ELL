@@ -15,6 +15,7 @@
 
 // stl
 #include <vector>
+#include <cstdint>
 
 namespace predictors
 {
@@ -51,6 +52,7 @@ namespace predictors
             double _threshold;
         };
 
+        // early declaration of InteriorNode allows Child to point to it.
         class InteriorNode;
 
         class Child
@@ -72,6 +74,7 @@ namespace predictors
             /// <returns> true if leaf, false if not. </returns>
             bool IsLeaf() const;
 
+            /// <summary> Splits a leaf node </summary>
             ///
             /// <param name="splitRule"> The split rule to use. </param>
             /// <param name="negativeLeafWeight"> The negative leaf weight. </param>
@@ -81,6 +84,8 @@ namespace predictors
             InteriorNode& Split(SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight);
 
         private:
+            friend InteriorNode;
+
             double _weight;
             std::unique_ptr<InteriorNode> _node;
         };
@@ -122,11 +127,21 @@ namespace predictors
             /// <returns> The positive child. </returns>
             const Child& GetPositiveChild() const;
 
+            /// <summary> Number of interior nodes in the subtree rooted at this node. </summary>
+            ///
+            /// <returns> The total number of interior nodes in the subtree. </returns>
+            uint64_t NumInteriorNodesInSubtree() const;
+
         private:
             SplitRule _splitRule;
             Child _negativeChild;
             Child _positiveChild;
         };
+
+        /// <summary> Number of interior nodes. </summary>
+        ///
+        /// <returns> The number of interior nodes. </returns>
+        uint64_t NumInteriorNodes() const;
 
         /// <summary> Splits the tree root. </summary>
         ///

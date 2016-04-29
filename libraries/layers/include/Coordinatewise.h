@@ -26,17 +26,12 @@ namespace layers
     {
     public:
 
-        enum class OperationType {add, multiply};
+        enum class OperationType {none, add, multiply};
 
         /// <summary> Constructs an instance of a Coordinatewise layer. </summary>
-        Coordinatewise() = default;
-
-        /// <summary> Constructs an single-element instance of a Coordinatewise layer. </summary>
         ///
-        /// <param name="value"> The element's value. </param>
-        /// <param name="coordinate"> The element's input coordinate. </param>
         /// <param name="operationType"> The type of Coordinatewise layer to construct. </param>
-        Coordinatewise(double value, Coordinate coordinate, OperationType operationType);
+        Coordinatewise(OperationType operationType = OperationType::none);
 
         /// <summary> Constructs an instance of a Coordinatewise layer. </summary>
         ///
@@ -45,13 +40,16 @@ namespace layers
         /// <param name="operationType"> The type of Coordinatewise layer to construct. </param>
         Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, OperationType operationType);
 
-        /// <summary> Default virtual destructor. </summary>
-        virtual ~Coordinatewise() = default;
-
         /// <summary> Returns the number of elements in the layer. </summary>
         ///
         /// <returns> The number of elements in the layer. </returns>
         virtual uint64_t Size() const override;
+
+        /// <summary> Appends a coordinate to the coordinatewise layer. </summary>
+        ///
+        /// <param name="value"> The value to append. </param>
+        /// <param name="coordinate"> The coordinate to append. </param>
+        void Append(double value, Coordinate coordinate);
 
         static const std::string GetOperationName(OperationType type);
         static OperationType GetOperationType(const std::string& name);

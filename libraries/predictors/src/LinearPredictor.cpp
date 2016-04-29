@@ -57,9 +57,15 @@ namespace predictors
 
     void LinearPredictor::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
     {
-        uint64_t layerIndex = model.AddLayer(std::make_unique<layers::Coordinatewise>(_w, inputCoordinates, layers::Coordinatewise::OperationType::multiply));
+        auto multiplyLayer = std::make_unique<layers::Coordinatewise>(_w, inputCoordinates, layers::Coordinatewise::OperationType::multiply);
+        uint64_t layerIndex = model.AddLayer(std::move(multiplyLayer));
+
         auto coordinates = model.BuildCoordinateList(layerIndex);
-        layerIndex = model.AddLayer(std::make_unique<layers::Sum>(coordinates));
-        layerIndex = model.AddLayer(std::make_unique<layers::Coordinatewise>(_b, layers::Coordinate{ layerIndex, 0 }, layers::Coordinatewise::OperationType::add));
+        auto sumLayer = std::make_unique<layers::Sum>(coordinates);
+        layerIndex = model.AddLayer(std::move(sumLayer));
+
+        auto biasLayer = std::make_unique<layers::Coordinatewise>(layers::Coordinatewise::OperationType::add);
+        biasLayer->Append(_b, layers::Coordinate{layerIndex, 0});
+        model.AddLayer(std::move(biasLayer));
     }
 }

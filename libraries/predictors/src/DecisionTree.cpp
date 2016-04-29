@@ -10,6 +10,11 @@
 
 #include "DecisionTree.h"
 
+// layers
+#include "Coordinatewise.h"
+#include "DecisionTreePath.h"
+#include "Sum.h"
+
 // stl
 #include <stdexcept>
 #include <cassert>
@@ -89,6 +94,32 @@ namespace predictors
         return _positiveChild;
     }
 
+    uint64_t DecisionTree::InteriorNode::NumInteriorNodesInSubtree() const
+    {
+        uint64_t num = 1;
+
+        if(_negativeChild._node != nullptr)
+        {
+            num += _negativeChild._node->NumInteriorNodesInSubtree();
+        }
+
+        if(_positiveChild._node != nullptr)
+        {
+            num += _positiveChild._node->NumInteriorNodesInSubtree();
+        }
+
+        return num;
+    }
+
+    uint64_t DecisionTree::NumInteriorNodes() const
+    {
+        if(_root == nullptr)
+        {
+            return 0;
+        }
+        return _root->NumInteriorNodesInSubtree();
+    }
+
     DecisionTree::InteriorNode & DecisionTree::SplitRoot(SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight)
     {
         // confirm that the root has never been split before
@@ -100,13 +131,20 @@ namespace predictors
 
     void DecisionTree::AddToModel(layers::Model & model, const layers::CoordinateList & inputCoordinates) const
     {
-        // TODO
-        // add theshold layer
+        auto numInteriorNodes = NumInteriorNodes();
 
-        // add path layer
+        auto thresholdsLayer = std::make_unique<layers::Coordinatewise>(layers::Coordinatewise::OperationType::add);
+        
+        auto decisionTreePathLayer = std::make_unique<layers::DecisionTreePath>();
 
-        // add weight layer
+        auto weightsLayer = std::make_unique<layers::Coordinatewise>(layers::Coordinatewise::OperationType::multiply);
 
-        // add sum layer
+        //auto coordinates = model.BuildCoordinateList(layerIndex);
+        //auto sumLayer = std::make_unique<layers::Sum>(coordinates);
+        //layerIndex = model.AddLayer(std::move(sumLayer));
+
+        // TODO finish this
+
+        model.AddLayer(std::move(thresholdsLayer));
     }
 }
