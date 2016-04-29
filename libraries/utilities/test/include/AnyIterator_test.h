@@ -10,6 +10,7 @@
 
 #pragma once
 
-void TestIterator();
-
+void TestAnyIterator1();
+void TestAnyIterator2();
+void TestAnyIterator3(bool runTest);
 

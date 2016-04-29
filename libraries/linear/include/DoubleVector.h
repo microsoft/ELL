@@ -63,6 +63,7 @@ namespace linear
         template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         DoubleVector(IndexValueIteratorType indexValueIterator);
 
+#ifndef SWIG
         /// <summary> Type-conversion operator into a std::vector<double>
         operator std::vector<double>() const &;
 
@@ -74,7 +75,7 @@ namespace linear
 
         /// <summary> Type-conversion operator into a std::vector<double>, allowing move semantics
         operator std::vector<double> && () &&;
-
+#endif
         /// <summary>
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its
         /// memory.

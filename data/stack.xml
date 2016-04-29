@@ -1,0 +1,1161 @@
+<Stack>
+    <int32 name="version">1</int32>
+    <vector(ptr(Layer)) name="layers" size="4">
+        <ptr(Layer)>
+            <Input>
+                <int32 name="version">1</int32>
+                <uint64 name="size">124</uint64>
+            </Input>
+        </ptr(Layer)>
+        <ptr(Layer)>
+            <Coordinatewise>
+                <int32 name="version">1</int32>
+                <string name="operationType">Multiply</string>
+                <vector(double) name="values" size="124">
+                    <double>0</double>
+                    <double>-0.12485</double>
+                    <double>-0.186484</double>
+                    <double>0.0323466</double>
+                    <double>0.0677667</double>
+                    <double>-0.0404971</double>
+                    <double>-0.509693</double>
+                    <double>0.261855</double>
+                    <double>-0.123226</double>
+                    <double>-0.0493673</double>
+                    <double>0.0401147</double>
+                    <double>0.128598</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0.123983</double>
+                    <double>-0.122749</double>
+                    <double>-0.214135</double>
+                    <double>-0.10556</double>
+                    <double>0.066743</double>
+                    <double>-0.0134493</double>
+                    <double>-0.0726995</double>
+                    <double>-0.0286164</double>
+                    <double>-0.109696</double>
+                    <double>0.00695667</double>
+                    <double>-0.0801843</double>
+                    <double>0.000775488</double>
+                    <double>0</double>
+                    <double>-0.0620831</double>
+                    <double>-0.00769608</double>
+                    <double>0.0833138</double>
+                    <double>0</double>
+                    <double>-0.014343</double>
+                    <double>0.0129806</double>
+                    <double>0.0330232</double>
+                    <double>0</double>
+                    <double>-0.0797154</double>
+                    <double>-0.109696</double>
+                    <double>-0.0726995</double>
+                    <double>-0.0794088</double>
+                    <double>0.0898018</double>
+                    <double>0.406453</double>
+                    <double>-0.254659</double>
+                    <double>-0.303275</double>
+                    <double>-0.0936427</double>
+                    <double>-0.00659484</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>-0.169388</double>
+                    <double>-0.162863</double>
+                    <double>-0.0712429</double>
+                    <double>0.197237</double>
+                    <double>-0.0934293</double>
+                    <double>0.174827</double>
+                    <double>-0.165987</double>
+                    <double>-0.0214813</double>
+                    <double>0.0532143</double>
+                    <double>-0.0678464</double>
+                    <double>0.0819568</double>
+                    <double>-8.75632e-05</double>
+                    <double>-0.00662903</double>
+                    <double>0</double>
+                    <double>0.129587</double>
+                    <double>-0.0770629</double>
+                    <double>0.284377</double>
+                    <double>-0.164931</double>
+                    <double>-0.0167333</double>
+                    <double>-0.406955</double>
+                    <double>-0.154885</double>
+                    <double>-0.156657</double>
+                    <double>0</double>
+                    <double>0.0343059</double>
+                    <double>0.0255181</double>
+                    <double>-0.381768</double>
+                    <double>0.13005</double>
+                    <double>-0.313197</double>
+                    <double>0.0614792</double>
+                    <double>-0.297576</double>
+                    <double>0.0458576</double>
+                    <double>-0.236579</double>
+                    <double>-0.0161191</double>
+                    <double>-0.274212</double>
+                    <double>0.161649</double>
+                    <double>0.113543</double>
+                    <double>-0.123183</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0.0418164</double>
+                    <double>0</double>
+                    <double>0.00253865</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>-0.000221819</double>
+                    <double>0</double>
+                    <double>-0.145621</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>-0.00879323</double>
+                    <double>0</double>
+                    <double>-0.00466068</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>-0.00751055</double>
+                    <double>0</double>
+                    <double>0</double>
+                    <double>-0.00608349</double>
+                    <double>0</double>
+                </vector(double)>
+                <vector(Coordinate) name="coordinates" size="124">
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">0</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">1</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">2</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">3</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">4</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">5</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">6</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">7</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">8</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">9</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">10</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">11</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">12</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">13</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">14</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">15</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">16</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">17</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">18</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">19</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">20</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">21</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">22</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">23</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">24</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">25</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">26</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">27</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">28</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">29</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">30</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">31</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">32</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">33</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">34</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">35</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">36</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">37</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">38</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">39</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">40</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">41</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">42</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">43</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">44</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">45</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">46</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">47</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">48</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">49</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">50</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">51</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">52</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">53</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">54</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">55</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">56</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">57</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">58</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">59</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">60</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">61</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">62</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">63</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">64</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">65</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">66</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">67</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">68</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">69</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">70</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">71</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">72</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">73</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">74</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">75</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">76</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">77</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">78</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">79</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">80</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">81</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">82</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">83</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">84</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">85</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">86</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">87</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">88</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">89</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">90</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">91</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">92</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">93</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">94</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">95</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">96</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">97</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">98</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">99</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">100</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">101</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">102</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">103</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">104</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">105</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">106</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">107</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">108</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">109</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">110</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">111</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">112</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">113</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">114</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">115</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">116</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">117</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">118</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">119</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">120</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">121</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">122</uint64>
+                    </Coordinate>
+                    <Coordinate>
+                        <uint64 name="l">0</uint64>
+                        <uint64 name="e">123</uint64>
+                    </Coordinate>
+                </vector(Coordinate)>
+            </Coordinatewise>
+        </ptr(Layer)>
+        <ptr(Layer)>
+            <Sum>
+                <int32 name="version">1</int32>
+                <vector(vector(Coordinate)) name="coordinates" size="1">
+                    <vector(Coordinate) size="124">
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">0</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">1</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">2</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">3</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">4</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">5</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">6</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">7</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">8</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">9</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">10</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">11</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">12</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">13</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">14</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">15</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">16</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">17</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">18</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">19</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">20</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">21</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">22</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">23</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">24</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">25</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">26</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">27</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">28</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">29</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">30</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">31</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">32</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">33</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">34</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">35</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">36</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">37</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">38</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">39</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">40</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">41</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">42</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">43</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">44</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">45</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">46</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">47</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">48</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">49</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">50</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">51</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">52</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">53</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">54</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">55</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">56</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">57</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">58</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">59</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">60</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">61</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">62</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">63</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">64</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">65</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">66</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">67</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">68</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">69</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">70</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">71</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">72</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">73</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">74</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">75</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">76</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">77</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">78</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">79</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">80</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">81</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">82</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">83</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">84</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">85</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">86</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">87</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">88</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">89</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">90</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">91</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">92</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">93</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">94</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">95</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">96</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">97</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">98</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">99</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">100</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">101</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">102</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">103</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">104</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">105</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">106</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">107</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">108</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">109</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">110</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">111</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">112</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">113</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">114</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">115</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">116</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">117</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">118</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">119</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">120</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">121</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">122</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">1</uint64>
+                            <uint64 name="e">123</uint64>
+                        </Coordinate>
+                    </vector(Coordinate)>
+                </vector(vector(Coordinate))>
+            </Sum>
+        </ptr(Layer)>
+        <ptr(Layer)>
+            <Coordinatewise>
+                <int32 name="version">1</int32>
+                <string name="operationType">Add</string>
+                <vector(double) name="values" size="1">
+                    <double>-0.251718</double>
+                </vector(double)>
+                <vector(Coordinate) name="coordinates" size="1">
+                    <Coordinate>
+                        <uint64 name="l">2</uint64>
+                        <uint64 name="e">0</uint64>
+                    </Coordinate>
+                </vector(Coordinate)>
+            </Coordinatewise>
+        </ptr(Layer)>
+    </vector(ptr(Layer))>
+</Stack>

@@ -12,8 +12,14 @@
 
 namespace dataset
 {
+    SupervisedExample::SupervisedExample(const SupervisedExample& other) : _dataVector(other._dataVector->Clone()), _label(other._label), _weight(other._weight) {}
     SupervisedExample::SupervisedExample(std::unique_ptr<IDataVector> instance, double label, double weight) : _dataVector(std::move(instance)), _label(label), _weight(weight)
     {}
+
+    const IDataVector& SupervisedExample::GetDataVector() const
+    {
+        return *_dataVector.get();
+    }
 
     double SupervisedExample::GetWeight() const
     {
@@ -25,15 +31,10 @@ namespace dataset
         return _label;
     }
 
-    const IDataVector & SupervisedExample::GetDataVector() const
-    {
-        return *_dataVector.get();
-    }
-
     void SupervisedExample::Print(std::ostream & os) const
     {
         os << _label << '\t';
-        _dataVector->Print(os);
+        GetDataVector().Print(os);
     }
 
     std::ostream & operator<<(std::ostream & ostream, const SupervisedExample & example)

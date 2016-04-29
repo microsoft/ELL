@@ -75,15 +75,14 @@ int main(int argc, char* argv[])
         layers::Map map(model, outputCoordinateList);
 
         // load dataset
-        auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
+        auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
         // create sgd trainer
         lossFunctions::LogLoss loss;
         optimization::AsgdOptimizer<lossFunctions::LogLoss> optimizer(outputCoordinateList.Size(), loss, sgdArguments.l2Regularization);
 
         // create evaluator
-        utilities::BinaryClassificationEvaluator evaluator;
-
+        utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss> evaluator;
         // calculate epoch size
         uint64_t epochSize = sgdArguments.epochSize;
         if(epochSize == 0 || epochSize >  rowDataset.NumExamples())

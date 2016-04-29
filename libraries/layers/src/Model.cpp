@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <memory>
 #include <iostream>
+#include <utility> // for std::move
+#include <ostream>
 #include <cassert>
 
 namespace layers
@@ -89,7 +91,10 @@ namespace layers
         {
             throw std::runtime_error("input layer does not have an input coordinate list");
         }
-
+        else if (layerIndex >= NumLayers())
+        {
+            throw std::out_of_range("Layer index out of range");
+        }
         return CoordinateList(layerIndex, GetLayer(layerIndex).Size());
     }
 

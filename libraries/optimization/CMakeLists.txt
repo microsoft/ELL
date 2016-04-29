@@ -30,6 +30,7 @@ include_directories(../layers/include)
 include_directories(../lossFunctions/include)
 include_directories(../predictors/include)
 include_directories(../utilities/include)
+include_directories(../lossFunctions/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 

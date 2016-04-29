@@ -9,6 +9,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SparseBinaryDataVector.h"
+#include "IntegerList.h"
+#include "CompressedIntegerList.h"
 
 // stl
 #include <cassert>
@@ -130,6 +132,9 @@ namespace dataset
         }
     }
 
+    //
+    // SparseBinaryDataVector
+    //
     IDataVector::type SparseBinaryDataVector::GetType() const
     {
         return type::sparse_binary;
