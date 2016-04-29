@@ -1,0 +1,69 @@
+#
+# cmake file
+#
+
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+
+set (PROJ_NAME featurization)
+
+PROJECT(${PROJ_NAME})
+
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
+  add_compile_options(-std=c++1y)
+endif()
+
+set (SRC src/DataLoadArguments.cpp
+         src/DataSaveArguments.cpp
+         src/DataLoaders.cpp
+         src/LoadModel.cpp
+         src/MapLoadArguments.cpp
+         src/MapSaveArguments.cpp
+         src/ModelLoadArguments.cpp)
+
+set (INCLUDE include/DataLoadArguments.h
+             include/DataSaveArguments.h
+             include/DataLoaders.h
+             include/LoadModel.h
+             include/MapLoadArguments.h
+             include/MapSaveArguments.h
+             include/ModelLoadArguments.h)
+
+source_group("src" FILES ${SRC})
+source_group("include" FILES ${INCLUDE})
+
+include_directories(include)
+include_directories(../dataset/include)
+include_directories(../layers/include)
+include_directories(../linear/include)
+include_directories(../utilities/include)
+
+add_library(${PROJ_NAME} ${SRC} ${INCLUDE})
+target_link_libraries(${PROJ_NAME} dataset layers linear utilities)
+
+set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+
+
+#
+# test project
+#
+
+set (TEST_NAME ${PROJ_NAME}_test)
+
+PROJECT(${TEST_NAME})
+
+set (TEST_SRC test/src/main.cpp)
+set (TEST_INCLUDE )
+
+source_group("src" FILES ${TEST_SRC})
+source_group("include" FILES ${TEST_INCLUDE})
+
+include_directories(../testing/include)
+include_directories(test/include)
+
+add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
+
+target_link_libraries(${TEST_NAME} dataset linear testing utilities)
+
+set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
+
+add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
