@@ -1,4 +1,4 @@
-Feature file used by microbit:
+Feature description used for microbit shake detector:
 
     # Note: For data sampled every 18ms
     f_in	Input
@@ -48,7 +48,7 @@ Features used:
 * IIR filter
 * Elementwise subtract
 * Delay
-* dot2
+* dot2(a,b,c) == dot(a,b)-dot(a,c) (?)
 * Mean over window
 * Variance over window
 
@@ -56,4 +56,7 @@ Non-feature concepts needed:
 * Delay line / history
 * Running total?
 * Elementwise x^2
+* Sum
+
+
 
