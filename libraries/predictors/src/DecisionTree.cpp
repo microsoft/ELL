@@ -32,7 +32,7 @@ namespace predictors
         }
     }
 
-    DecisionTree::Child::Child(double weight, uint64_t index) : _weight(weight), _index()
+    DecisionTree::Child::Child(double weight) : _weight(weight)
     {}
 
     double DecisionTree::Child::GetWeight() const
@@ -40,9 +40,25 @@ namespace predictors
         return _weight;
     }
 
-    uint64_t DecisionTree::Child::GetIndex() const
+    bool DecisionTree::Child::IsLeaf() const
     {
-        return _index;
+        if (_node == nullptr)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    DecisionTree::InteriorNode& DecisionTree::Child::Split(SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight)
+    {
+        // confirm that this is a leaf
+        assert(IsLeaf());
+
+        _node = std::make_unique<InteriorNode>(std::move(splitRule), Child(negativeLeafWeight), Child(positiveLeafWeight));
+        return *_node;
     }
 
     DecisionTree::InteriorNode::InteriorNode(SplitRule splitRule, Child negativeChild, Child positiveChild) : _splitRule(std::move(splitRule)), _negativeChild(std::move(negativeChild)), _positiveChild(std::move(positiveChild))
@@ -73,33 +89,13 @@ namespace predictors
         return _positiveChild;
     }
 
-    uint64_t DecisionTree::NumNodes() const
-    {
-        return _interiorNodes.size() * 2 + 1;
-    }
-
-    uint64_t DecisionTree::NumInteriorNodes() const
-    {
-        return _interiorNodes.size();
-    }
-
     DecisionTree::InteriorNode & DecisionTree::SplitRoot(SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight)
     {
         // confirm that the root has never been split before
-        assert(_interiorNodes.size() == 0);
+        assert(_root == nullptr);
 
-        _interiorNodes.emplace_back(std::move(splitRule), Child(negativeLeafWeight), Child(positiveLeafWeight));
-        return _interiorNodes.back();
-    }
-
-    DecisionTree::InteriorNode& DecisionTree::SplitLeaf(Child& child, SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight)
-    {
-        // only split leaves
-        assert(child._index == 0);
-
-        child._index = _interiorNodes.size();
-        _interiorNodes.emplace_back(std::move(splitRule), Child(negativeLeafWeight), Child(positiveLeafWeight));
-        return _interiorNodes.back();
+        _root = std::make_unique<InteriorNode>(std::move(splitRule), Child(negativeLeafWeight), Child(positiveLeafWeight));
+        return *_root;
     }
 
     void DecisionTree::AddToModel(layers::Model & model, const layers::CoordinateList & inputCoordinates) const

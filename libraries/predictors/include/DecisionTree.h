@@ -51,6 +51,8 @@ namespace predictors
             double _threshold;
         };
 
+        class InteriorNode;
+
         class Child
         {
         public:
@@ -58,24 +60,29 @@ namespace predictors
             /// <summary> Constructs an instance of Child. </summary>
             ///
             /// <param name="weight"> The weight associated with the child. </param>
-            /// <param name="index"> The index of the child, if it is an interior node; zero otherwise. </param>
-            Child(double weight, uint64_t index=0);
+            Child(double weight);
 
             /// <summary> Gets the weight of the child. </summary>
             ///
             /// <returns> The weight associated with the child. </returns>
             double GetWeight() const;
 
-            /// <summary> Gets the index of the child, if it is an interior node; zero otherwise. </summary>
+            /// <summary> Query if this Child is leaf. </summary>
             ///
-            /// <returns> The index, or zero for leaves
-            ///           . </returns>
-            uint64_t GetIndex() const;
+            /// <returns> true if leaf, false if not. </returns>
+            bool IsLeaf() const;
+
+            ///
+            /// <param name="splitRule"> The split rule to use. </param>
+            /// <param name="negativeLeafWeight"> The negative leaf weight. </param>
+            /// <param name="positiveLeafWeight"> The positive leaf weight. </param>
+            ///
+            /// <returns> Reference to the interior node that is created. </returns>
+            InteriorNode& Split(SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight);
 
         private:
             double _weight;
-            uint64_t _index;
-            friend DecisionTree;
+            std::unique_ptr<InteriorNode> _node;
         };
 
         /// <summary> Represents a pair of Children of a node in a binary tree. </summary>
@@ -121,16 +128,6 @@ namespace predictors
             Child _positiveChild;
         };
 
-        /// <summary> Returns the number of vertices. </summary>
-        ///
-        /// <returns> The number vertices. </returns>
-        uint64_t NumNodes() const;
-
-        /// <summary> Returns the number of interior vertices. </summary>
-        ///
-        /// <returns> The number interior vertices. </returns>
-        uint64_t NumInteriorNodes() const;
-
         /// <summary> Splits the tree root. </summary>
         ///
         /// <param name="splitRule"> The split rule to use. </param>
@@ -140,16 +137,6 @@ namespace predictors
         /// <returns> Reference to the interior node that is created. </returns>
         InteriorNode& SplitRoot(SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight);
 
-        /// <summary> Splits a leaf, turning it into an interior node. </summary>
-        ///
-        /// <param name="child"> [in,out] The leaf being split. Must be a leaf in this tree. </param>
-        /// <param name="splitRule"> The split rule to use. </param>
-        /// <param name="negativeLeafWeight"> The negative leaf weight. </param>
-        /// <param name="positiveLeafWeight"> The positive leaf weight. </param>
-        ///
-        /// <returns> Reference to the interior node that is created. </returns>
-        InteriorNode& SplitLeaf(Child& child, SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight);
-
         /// <summary> Adds the predictor to a model. </summary>
         ///
         /// <param name="model"> [in,out] The model. </param>
@@ -157,6 +144,6 @@ namespace predictors
         void AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
 
     private:
-        std::vector<InteriorNode> _interiorNodes;
+        std::unique_ptr<InteriorNode> _root;
     };
 }
