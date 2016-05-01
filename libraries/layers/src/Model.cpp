@@ -32,7 +32,10 @@ namespace layers
     {
         // check that the layer points to valid elements
         auto numLayers = NumLayers();
+        
         auto layerSize = layer->Size();
+
+        // check that layer is compatible with model
         for (uint64_t index = 0; index < layerSize; index++)
         {
             auto inputCoordIterator = layer->GetInputCoordinateIterator(index);

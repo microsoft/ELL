@@ -10,6 +10,9 @@
 
 #include "CoordinateList.h"
 
+// stl
+#include <cassert>
+
 namespace layers
 {
     CoordinateList::CoordinateList(uint64_t layerIndex, uint64_t size) : _list(size)
@@ -42,8 +45,10 @@ namespace layers
 
     CoordinateIterator CoordinateList::GetIterator(uint64_t fromIndex, uint64_t size) const
     {
+        assert(fromIndex + size <= _list.size());
+
         uint64_t end = fromIndex+size;
-        if(size == 0 || end > _list.size())
+        if(size == 0)
         {
             end = _list.size();
         }
