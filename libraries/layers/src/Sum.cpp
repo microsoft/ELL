@@ -21,10 +21,10 @@ namespace layers
     Sum::Sum() 
     {}
 
-    Sum::Sum(const CoordinateList & coordinates) : _inputCoordinates({ coordinates })
+    Sum::Sum(CoordinateList coordinates) : _inputCoordinates({ std::move(coordinates) })
     {}
 
-    Sum::Sum(const std::vector<CoordinateList>& coordinates) : _inputCoordinates(coordinates)
+    Sum::Sum(std::vector<CoordinateList> coordinates) : _inputCoordinates(std::move(coordinates))
     {}
 
     uint64_t Sum::Size() const

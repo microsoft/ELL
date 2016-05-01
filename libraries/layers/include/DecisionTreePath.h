@@ -25,10 +25,43 @@ namespace layers
     class DecisionTreePath : public Layer
     {
     public:
+
+        /// <summary> Constructs an instance of DecisionTreePath. </summary>
+        ///
+        /// <param name="edgeToInteriorNode"> A vector that maps incoming edge indices to interior node indices. </param>
+        /// <param name="splitRuleCoordinates"> The coordinates of the input split rules that correspond to interior nodes. </param>
+        DecisionTreePath(std::vector<uint64_t> edgeToInteriorNode, CoordinateList splitRuleCoordinates);
+        
         /// <summary> Returns the number of elements in the layer. </summary>
         ///
         /// <returns> The number of elements in the layer. </returns>
         virtual uint64_t Size() const override;
+
+        /// <summary> Number of interior nodes in the tree. </summary>
+        ///
+        /// <returns> The number of interior nodes. </returns>
+        uint64_t NumInteriorNodes() const;
+
+        /// <summary> Gets the index of the negative outgoing edge from a given node. </summary>
+        ///
+        /// <param name="nodeIndex"> Zero-based index of the interior node. </param>
+        ///
+        /// <returns> The negative outgoing edge index. </returns>
+        uint64_t GetNegativeOutgoingEdgeIndex(uint64_t interiorNodeIndex) const;
+
+        /// <summary> Gets the index of the positive outgoing edge from a given node. </summary>
+        ///
+        /// <param name="nodeIndex"> Zero-based index of the interior node. </param>
+        ///
+        /// <returns> The index of the positive outgoing edge. </returns>
+        uint64_t GetPositiveOutgoingEdgeIndex(uint64_t interiorNodeIndex) const;
+
+        /// <summary> Gets the index of the interiorNode from the index of its incoming edge. </summary>
+        ///
+        /// <param name="incomingEdgeIndex"> Zero-based index of the incoming edge. </param>
+        ///
+        /// <returns> The index of the interiorNode, or zero if the edge points to a leaf. </returns>
+        uint64_t GetInteriorNodeIndex(uint64_t incomingEdgeIndex) const;
 
         /// <summary> Computes the layer output. </summary>
         ///
@@ -71,9 +104,8 @@ namespace layers
         virtual void Write(utilities::XMLSerializer& serializer) const override;
 
     protected:
-        std::vector<uint64_t> _negativeChildIndex;
-        std::vector<uint64_t> _positiveChildIndex;
-        CoordinateList _inputSplitRulesCoordinates;
+        std::vector<uint64_t> _edgeToInteriorNode;
+        CoordinateList _splitRuleCoordinates;
         static const int _currentVersion = 1;
     };
 }

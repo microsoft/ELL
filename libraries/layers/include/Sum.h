@@ -31,12 +31,12 @@ namespace layers
         /// <summary> Constructs a single sum. </summary>
         ///
         /// <param name="coordinates"> The coordinates. </param>
-        Sum(const CoordinateList& coordinates);
+        Sum(CoordinateList coordinates);
 
         /// <summary> Constructs a multi-dimensional sum. </summary>
         ///
         /// <param name="coordinates"> The coordinates. </param>
-        Sum(const  std::vector<CoordinateList>& coordinates);
+        Sum(std::vector<CoordinateList> coordinates);
 
         /// <summary> Destructor. </summary>
         virtual ~Sum() = default;

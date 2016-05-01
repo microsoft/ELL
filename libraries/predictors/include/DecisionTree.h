@@ -27,8 +27,6 @@ namespace predictors
     {
     public:
         
-        enum class SplitRuleResult {negative, positive};
-
         /// <summary> Represents a split rule in a decision tree. </summary>
         class SplitRule
         {
@@ -40,15 +38,18 @@ namespace predictors
             /// <param name="threshold"> The threshold value. </param>
             SplitRule(int featureIndex, double threshold);
 
-            /// <summary> Evaluates the split rule on a given feature vector. </summary>
+            /// <summary> Gets the feature index. </summary>
             ///
-            /// <param name="featureVector"> The feature vector. </param>
+            /// <returns> The feature index. </returns>
+            uint64_t GetFeatureIndex() const;
+
+            /// <summary> Gets the split rule threshold. </summary>
             ///
-            /// <returns> A SplitRuleResult. </returns>
-            SplitRuleResult Evaluate(const std::vector<double>& featureVector) const;
+            /// <returns> The threshold. </returns>
+            double GetThreshold() const;
 
         private:
-            int _featureIndex;
+            uint64_t _featureIndex;
             double _threshold;
         };
 
@@ -84,7 +85,8 @@ namespace predictors
             InteriorNode& Split(SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight);
 
         private:
-            friend InteriorNode;
+            friend InteriorNode; // TODO ?
+            friend DecisionTree;
 
             double _weight;
             std::unique_ptr<InteriorNode> _node;
@@ -156,9 +158,20 @@ namespace predictors
         ///
         /// <param name="model"> [in,out] The model. </param>
         /// <param name="inputCoordinates"> The input coordinates. </param>
-        void AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
+        void AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
 
     private:
+
+        struct FlatTree
+        {
+            layers::CoordinateList splitRuleCoordinates;
+            std::vector<double> negativeThresholds;
+            std::vector<uint64_t> edgeToInteriorNode;
+            std::vector<double> edgeWeights;
+        };
+
+        void BuildFlatTree(FlatTree& flatTree, const layers::CoordinateList& inputCoordinates, InteriorNode* interiorNodePtr) const;
+
         std::unique_ptr<InteriorNode> _root;
     };
 }

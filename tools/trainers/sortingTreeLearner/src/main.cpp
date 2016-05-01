@@ -89,6 +89,8 @@ int main(int argc, char* argv[])
 
         auto dataIterator = rowDataset.GetIterator();
         auto tree = sortingTreeLearner.Train(dataIterator);
+
+        tree.AddToModel(model, outputCoordinateList);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

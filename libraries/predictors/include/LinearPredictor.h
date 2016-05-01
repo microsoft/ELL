@@ -72,7 +72,7 @@ namespace predictors
         ///
         /// <param name="model"> [in,out] The model. </param>
         /// <param name="inputCoordinates"> The input coordinates. </param>
-        void AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
+        void AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
 
     private:
         linear::DoubleVector _w;

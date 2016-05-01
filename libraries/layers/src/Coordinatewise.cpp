@@ -24,8 +24,8 @@ namespace layers
     Coordinatewise::Coordinatewise(OperationType operationType) : _operationType(operationType)
     {}
 
-    Coordinatewise::Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, OperationType operationType) :
-        _values(std::move(values)), _inputCoordinates(std::move(coordinates)), _operationType(operationType)
+    Coordinatewise::Coordinatewise(std::vector<double> values, CoordinateList coordinates, OperationType operationType) :
+        _values(std::move(std::move(values))), _inputCoordinates(std::move(coordinates)), _operationType(operationType)
     {}
 
     const std::string Coordinatewise::GetOperationName(OperationType type)

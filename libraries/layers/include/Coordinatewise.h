@@ -38,7 +38,7 @@ namespace layers
         /// <param name="values"> The value for each element. </param>
         /// <param name="coordinates"> The input coordinate for each element. </param>
         /// <param name="operationType"> The type of Coordinatewise layer to construct. </param>
-        Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, OperationType operationType);
+        Coordinatewise(std::vector<double> values, CoordinateList coordinates, OperationType operationType);
 
         /// <summary> Returns the number of elements in the layer. </summary>
         ///

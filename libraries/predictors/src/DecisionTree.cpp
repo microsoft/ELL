@@ -25,16 +25,14 @@ namespace predictors
         _featureIndex(featureIndex), _threshold(threshold)
     {}
 
-    DecisionTree::SplitRuleResult DecisionTree::SplitRule::Evaluate(const std::vector<double>& featureVector) const
+    uint64_t DecisionTree::SplitRule::GetFeatureIndex() const
     {
-        if(featureVector[_featureIndex] > _threshold)
-        {
-            return SplitRuleResult::positive;
-        }
-        else
-        {
-            return SplitRuleResult::negative;
-        }
+        return _featureIndex;
+    }
+
+    double DecisionTree::SplitRule::GetThreshold() const
+    {
+        return _threshold;
     }
 
     DecisionTree::Child::Child(double weight) : _weight(weight)
@@ -129,22 +127,65 @@ namespace predictors
         return *_root;
     }
 
-    void DecisionTree::AddToModel(layers::Model & model, const layers::CoordinateList & inputCoordinates) const
+    void DecisionTree::AddToModel(layers::Model & model, layers::CoordinateList inputCoordinates) const
     {
-        auto numInteriorNodes = NumInteriorNodes();
+        FlatTree flatTree;
+        BuildFlatTree(flatTree, inputCoordinates, _root.get());
 
-        auto thresholdsLayer = std::make_unique<layers::Coordinatewise>(layers::Coordinatewise::OperationType::add);
-        
-        auto decisionTreePathLayer = std::make_unique<layers::DecisionTreePath>();
+        auto thresholdsLayer = std::make_unique<layers::Coordinatewise>(std::move(flatTree.negativeThresholds), std::move(flatTree.splitRuleCoordinates), layers::Coordinatewise::OperationType::add);
+        auto thresholdsLayerCoordinates = model.AddLayer(std::move(thresholdsLayer));
 
-        auto weightsLayer = std::make_unique<layers::Coordinatewise>(layers::Coordinatewise::OperationType::multiply);
+        auto decisionTreePathLayer = std::make_unique<layers::DecisionTreePath>(std::move(flatTree.edgeToInteriorNode), std::move(thresholdsLayerCoordinates));
+        auto decisionTreePathLayerCoordinates = model.AddLayer(std::move(decisionTreePathLayer));
 
-        //auto coordinates = model.BuildCoordinateList(layerIndex);
-        //auto sumLayer = std::make_unique<layers::Sum>(coordinates);
-        //layerIndex = model.AddLayer(std::move(sumLayer));
+        auto weightsLayer = std::make_unique<layers::Coordinatewise>(std::move(flatTree.edgeWeights), std::move(decisionTreePathLayerCoordinates), layers::Coordinatewise::OperationType::multiply);
+        auto weightsLayerCoordinates = model.AddLayer(std::move(weightsLayer));
 
-        // TODO finish this
+        auto sumLayer = std::make_unique<layers::Sum>(std::move(weightsLayerCoordinates));
+        model.AddLayer(std::move(sumLayer));
+    }
 
-        model.AddLayer(std::move(thresholdsLayer));
+    void predictors::DecisionTree::BuildFlatTree(FlatTree& flatTree, const layers::CoordinateList& inputCoordinates, InteriorNode* interiorNodePtr) const
+    {
+        if (interiorNodePtr == nullptr)
+        {
+            return;
+        }
+
+        const auto& splitRule = interiorNodePtr->GetSplitRule();
+        auto splitRuleCoordinate = inputCoordinates[splitRule.GetFeatureIndex()];
+        auto negativeThreshold = -(splitRule.GetThreshold());
+
+
+        flatTree.splitRuleCoordinates.AddCoordinate(splitRuleCoordinate);
+        flatTree.negativeThresholds.push_back(negativeThreshold);
+
+        flatTree.edgeWeights.push_back(interiorNodePtr->GetNegativeChild()._weight);
+        flatTree.edgeWeights.push_back(interiorNodePtr->GetPositiveChild()._weight);
+
+        if (interiorNodePtr->GetNegativeChild().IsLeaf())
+        {
+            flatTree.edgeToInteriorNode.push_back(0);
+            flatTree.edgeToInteriorNode.push_back(0);
+        }
+        else
+        {
+            auto negativeChildIndex = flatTree.splitRuleCoordinates.Size();
+            flatTree.edgeToInteriorNode.push_back(negativeChildIndex);
+
+            // as a placeholder, set edgeToInteriorNode[positiveEdgeIndex] = 0
+            auto positiveEdgeIndex = flatTree.edgeToInteriorNode.size();
+            flatTree.edgeToInteriorNode.push_back(0);
+
+            // recurse (DFS) to the negative side
+            BuildFlatTree(flatTree, inputCoordinates, interiorNodePtr->GetNegativeChild()._node.get());
+            
+            // set edgeToInteriorNode[positiveEdgeIndex] to its correct value
+            auto positiveChildIndex = flatTree.splitRuleCoordinates.Size();
+            flatTree.edgeToInteriorNode[positiveEdgeIndex] = positiveChildIndex;
+            
+            // recurse (DFS) to the positive side
+            BuildFlatTree(flatTree, inputCoordinates, interiorNodePtr->GetPositiveChild()._node.get());
+        }
     }
 }

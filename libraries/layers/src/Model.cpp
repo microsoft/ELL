@@ -28,7 +28,7 @@ namespace layers
     //
     // Model class implementation
     //
-    uint64_t Model::AddLayer(std::unique_ptr<Layer> layer)
+    CoordinateList Model::AddLayer(std::unique_ptr<Layer> layer)
     {
         // check that the layer points to valid elements
         auto numLayers = NumLayers();
@@ -52,7 +52,7 @@ namespace layers
         }
 
         _layers.push_back(std::move(layer));
-        return _layers.size();
+        return CoordinateList(_layers.size(), layerSize);
     }
 
     uint64_t Model::NumLayers() const
@@ -81,16 +81,6 @@ namespace layers
 
         // recall that _layers does not explicitly keep the input layer
         return *_layers[layerIndex - 1];
-    }
-
-    CoordinateList Model::BuildCoordinateList(uint64_t layerIndex) const
-    {
-        if (layerIndex == 0)
-        {
-            throw std::runtime_error("input layer does not have an input coordinate list");
-        }
-
-        return CoordinateList(layerIndex, GetLayer(layerIndex).Size());
     }
 
     void Model::Save(std::ostream& os) const
