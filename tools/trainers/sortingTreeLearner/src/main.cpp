@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 
         // load dataset
         //auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
-        dataset::RowDataset<> rowDataset;
+        dataset::SupervisedExampleRowDataset rowDataset;
 
         // create sgd trainer
         lossFunctions::LogLoss loss;

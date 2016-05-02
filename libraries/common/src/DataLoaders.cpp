@@ -71,11 +71,11 @@ namespace common
         return GetMappedDataIterator(dataLoadArguments, layers::Map(model, mapOutputCoordinates));
     }
 
-    dataset::RowDataset<> GetRowDataset(const DataLoadArguments& dataLoadArguments, const layers::Map map)
+    dataset::SupervisedExampleRowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments, const layers::Map map)
     {
         auto dataIterator = GetMappedDataIterator(dataLoadArguments, map);
 
-        dataset::RowDataset<> rowDataset;
+        dataset::SupervisedExampleRowDataset rowDataset;
 
         while (dataIterator->IsValid())
         {
