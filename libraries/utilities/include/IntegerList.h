@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     IntegerList.h (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -74,7 +74,7 @@ namespace utilities
         /// <summary> Deleted copy constructor. </summary>
         ///
         /// <param name="parameter1"> The first parameter. </param>
-        IntegerList(const IntegerList&) = delete;
+        IntegerList(const IntegerList&) = default;
 
         /// <summary> Default Destructor. </summary>
         ~IntegerList() = default;

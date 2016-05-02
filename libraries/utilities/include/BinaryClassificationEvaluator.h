@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     BinaryClassificationEvaluator.h (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -10,12 +10,22 @@
 
 #pragma once
 
+#include "AnyIterator.h"
+
+#include "SupervisedExample.h"
+#include "LinearPredictor.h"
+
 // stl
 #include <vector>
-#include <iostream>
+#include <ostream>
 
 namespace utilities
 {
+    /// <summary> A binary classifier evaluator </summary>
+    ///
+    /// <typeparam name="PredictorType"> Type of the predictor type. </typeparam>
+    /// <typeparam name="LossFunctionType"> Type of the loss function type. </typeparam>
+    template<typename PredictorType, typename LossFunctionType>
     class BinaryClassificationEvaluator
     {
     public:
@@ -32,13 +42,19 @@ namespace utilities
         /// <summary> Evaluates a binary classifier </summary>
         ///
         /// <typeparam name="ExampleIteratorType"> Type of the example iterator type. </typeparam>
-        /// <typeparam name="PredictorType"> Type of the predictor type. </typeparam>
-        /// <typeparam name="LossFunctionType"> Type of the loss function type. </typeparam>
-        /// <param name="data_iter"> [in,out] The data iterator. </param>
+        /// <param name="dataIterator"> [in,out] The data iterator. </param>
         /// <param name="predictor"> The predictor. </param>
-        /// <param name="loss_function"> The loss function. </param>
-        template<typename ExampleIteratorType, typename PredictorType, typename LossFunctionType>
-        void Evaluate(ExampleIteratorType& data_iter, const PredictorType& predictor, const LossFunctionType& loss_function);
+        /// <param name="lossFunction"> The loss function. </param>
+        template<typename ExampleIteratorType>
+        void Evaluate(ExampleIteratorType& dataIterator, const PredictorType& predictor, const LossFunctionType& lossFunction);
+
+        /// <summary> Evaluates a binary classifier </summary>
+        ///
+        /// <typeparam name="ExampleIteratorType"> Type of the example iterator type. </typeparam>
+        /// <param name="dataIterator"> [in,out] The data iterator. </param>
+        /// <param name="predictor"> The predictor. </param>
+        /// <param name="lossFunction"> The loss function. </param>
+        void Evaluate(utilities::AnyIterator<dataset::SupervisedExample>& dataIterator, const PredictorType& predictor, const LossFunctionType& lossFunction);
 
         /// <summary> Returns the most recent average weighted loss. </summary>
         ///
@@ -59,7 +75,8 @@ namespace utilities
         std::vector<Result> _evals;
     };
 
-    std::ostream& operator<<(std::ostream& os, const BinaryClassificationEvaluator& evaluation);
+    template <typename PredictorType, typename LossFunctionType>
+    std::ostream& operator<<(std::ostream& os, const BinaryClassificationEvaluator<PredictorType, LossFunctionType>& evaluation);
 }
 
 #include "../tcc/BinaryClassificationEvaluator.tcc"

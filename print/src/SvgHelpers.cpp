@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     SvgHelpers.cpp (print)
 //  Authors:  Ofer Dekel
 //
@@ -17,6 +17,7 @@
 // stl
 #include <iomanip>
 #include <string>
+#include <sstream>
 #include <cmath>
 
 // unexposed utility functions

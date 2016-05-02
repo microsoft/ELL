@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     OnesDataVector.h (dataset)
 //  Authors:  Ofer Dekel
 //
@@ -69,11 +69,6 @@ namespace dataset
         /// <param name="dim"> The dimension of the DataVector. </param>
         OnesDataVector(uint64_t dim = 0);
 
-        /// <summary> Converting constructor. </summary>
-        ///
-        /// <param name="other"> The other DataVector. </param>
-        explicit OnesDataVector(const IDataVector& other);
-
         /// <summary> Move constructor. </summary>
         ///
         /// <param name="other"> [in,out] The other. </param>
@@ -82,7 +77,7 @@ namespace dataset
         /// <summary> Deleted copy constructor. </summary>
         ///
         /// <param name="parameter1"> The first parameter. </param>
-        OnesDataVector(const OnesDataVector&) = delete;
+        OnesDataVector(const OnesDataVector&) = default;
 
         /// <summary> Get the type of the vector. </summary>
         ///
@@ -138,6 +133,11 @@ namespace dataset
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
+
+        /// <summary> Makes a deep copy of the datavector </summary>
+        ///
+        /// <returns> A deep copy of the datavector </summary>
+        virtual std::unique_ptr<IDataVector> Clone() const override;
 
     private:
         uint64_t _size = 0;

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     DataLoaders.cpp (common)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //
@@ -70,7 +70,7 @@ namespace common
         return GetMappedDataIterator(dataLoadArguments, layers::Map(model, mapOutputCoordinates));
     }
 
-    dataset::RowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments, const layers::Map map)
+    dataset::RowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments, layers::Map map)
     {
         auto dataIterator = GetMappedDataIterator(dataLoadArguments, map);
 

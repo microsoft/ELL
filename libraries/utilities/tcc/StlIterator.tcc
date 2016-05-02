@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     StlIterator.tcc (utilities)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //
@@ -30,6 +30,12 @@ namespace utilities
     }
 
     template <typename IteratorType, typename ValueType>
+    bool StlIterator<IteratorType, ValueType>::HasSize() const
+    {
+        return true;
+    }
+
+    template <typename IteratorType, typename ValueType>
     uint64_t StlIterator<IteratorType, ValueType>::NumIteratesLeft() const
     {
         return _end - _current;
@@ -40,17 +46,17 @@ namespace utilities
     {
         return *_current;
     }
- 
+
     template <typename IteratorType>
-    auto MakeStlIterator(IteratorType begin, IteratorType end) -> StlIterator<IteratorType, decltype(*begin)>
+    StlIterator<IteratorType> MakeStlIterator(IteratorType begin, IteratorType end)
     {
         return StlIterator<IteratorType>(begin, end);
     }
 
     template <typename ContainerType>
-    auto MakeStlIterator(ContainerType& container) -> StlIterator<typename ContainerType::iterator, typename ContainerType::value_type>
+    StlIterator<typename ContainerType::iterator, typename ContainerType::value_type> MakeStlIterator(ContainerType& container)
     {
-        return StlIterator<typename ContainerType::iterator>(container.begin(), container.end());
+        return StlIterator<typename ContainerType::iterator, typename ContainerType::value_type>(container.begin(), container.end());
     }
 
 }

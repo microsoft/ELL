@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     OnesDataVector.cpp (dataset)
 //  Authors:  Ofer Dekel
 //
@@ -35,9 +35,6 @@ namespace dataset
     {}
 
     OnesDataVector::OnesDataVector(uint64_t dim) : _size(dim)
-    {}
-
-    OnesDataVector::OnesDataVector(const IDataVector& other) : _size(other.Size())
     {}
 
     IDataVector::type OnesDataVector::GetType() const
@@ -105,4 +102,11 @@ namespace dataset
             os << i << ":1\t";
         }
     }
+
+    std::unique_ptr<IDataVector> OnesDataVector::Clone() const
+    {
+        auto ptr = std::make_unique<OnesDataVector>(*this); 
+        return std::move(ptr);
+    }
+
 }

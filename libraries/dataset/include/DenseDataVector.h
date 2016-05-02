@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     DenseDataVector.h (dataset)
 //  Authors:  Ofer Dekel
 //
@@ -43,15 +43,15 @@ namespace dataset
         template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         DenseDataVector(IndexValueIteratorType IndexValueIterator);
 
+        /// <summary> Copy constructor. </summary>
+        ///
+        /// <param name="other"> [in,out] The other. </param>
+        DenseDataVector(const DenseDataVector&) = default; 
+
         /// <summary> Move constructor. </summary>
         ///
         /// <param name="other"> [in,out] The other. </param>
         DenseDataVector(DenseDataVector&& other) = default;
-
-        /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
-        DenseDataVector(const DenseDataVector&) = delete;
 
         /// <summary> Sets an entry in the std::vector. </summary>
         ///
@@ -102,6 +102,16 @@ namespace dataset
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
+        
+        /// <summary> Makes a deep copy of the datavector </summary>
+        ///
+        /// <returns> A deep copy of the datavector </summary>
+        virtual std::unique_ptr<IDataVector> Clone() const override;
+        
+        ///// <summary> \returns The type of the std::vector. </summary>
+        /////
+        ///// <returns> The type. </returns>
+        virtual type GetType() const override;
 
     private:
         uint64_t _num_nonzeros;

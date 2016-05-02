@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     AsgdOptimizer.tcc (optimization)
 //  Authors:  Ofer Dekel
 //
@@ -44,7 +44,6 @@ namespace optimization
         const double historyWeight = sigma - std::log(T_prev) - 0.5 / T_prev;
         vLast.AddTo(vAvg, historyWeight);
         bAvg += bLast * historyWeight;
-
         while(exampleIterator.IsValid())
         {
             ++_total_iterations;
@@ -74,7 +73,7 @@ namespace optimization
             // move on
             exampleIterator.Next();
         }
-
+        
         assert((double)_total_iterations == T_next);
 
         // calculate w and w_avg
@@ -84,7 +83,7 @@ namespace optimization
     }
 
     template<typename LossFunctionType>
-    void AsgdOptimizer<LossFunctionType>::Update(utilities::Iterator<dataset::SupervisedExample>& exampleIterator)
+    void AsgdOptimizer<LossFunctionType>::Update(utilities::AnyIterator<dataset::SupervisedExample>& exampleIterator)
     {
         Update<decltype(exampleIterator)>(exampleIterator);
     }

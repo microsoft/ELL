@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     ParsingIterator.h (dataset)
 //  Authors:  Ofer Dekel
 //
@@ -43,15 +43,15 @@ namespace dataset
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if it succeeds, false if it fails. </returns>
-        virtual bool IsValid() const;
+        virtual bool IsValid() const override;
 
         /// <summary> Proceeds to the Next row. </summary>
-        virtual void Next();
+        virtual void Next() override;
 
         /// <summary> \returns The weight of the current example. </summary>
         ///
         /// <returns> A SupervisedExample. </returns>
-        virtual SupervisedExample Get() const;
+        virtual SupervisedExample Get() const override;
 
     private:
         RowIteratorType _rowIterator;

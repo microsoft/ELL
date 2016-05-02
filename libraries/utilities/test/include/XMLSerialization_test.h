@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
-//  File:     XMLSerialization_test.h (XMLSerialization_test)
+//  Project:  EMLL
+//  File:     XMLSerialization_test.h (utilities)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]

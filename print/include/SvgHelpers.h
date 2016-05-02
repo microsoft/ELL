@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     SvgHelpers.h (print)
 //  Authors:  Ofer Dekel
 //
@@ -14,7 +14,7 @@
 
 // stl
 #include <cstdint>
-#include <iostream>
+#include <ostream>
 #include <string>
 
 /// <summary> Svg rectangle. </summary>

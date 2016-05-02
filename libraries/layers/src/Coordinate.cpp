@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     Coordinate.cpp (layers)
 //  Authors:  Ofer Dekel
 //
@@ -12,6 +12,9 @@
 
 namespace layers
 {
+    Coordinate::Coordinate() : _layerIndex(0), _elementIndex(0)
+    {}
+
     Coordinate::Coordinate(uint64_t layerIndex, uint64_t elementIndex) : _layerIndex(layerIndex), _elementIndex(elementIndex)
     {}
 

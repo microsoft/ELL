@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     ZeroDataVector.cpp (dataset)
 //  Authors:  Ofer Dekel
 //
@@ -28,9 +28,6 @@ namespace dataset
     {
         throw std::runtime_error("this code should bever be reached");
     }
-
-    ZeroDataVector::ZeroDataVector(const IDataVector& other) 
-    {}
 
     IDataVector::type ZeroDataVector::GetType() const
     {
@@ -78,4 +75,10 @@ namespace dataset
 
     void ZeroDataVector::Print(std::ostream & os) const
     {}
+
+    std::unique_ptr<IDataVector> ZeroDataVector::Clone() const
+    {
+        auto ptr = std::make_unique<ZeroDataVector>(*this); 
+        return std::move(ptr);
+    }
 }

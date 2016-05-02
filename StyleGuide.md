@@ -1,6 +1,7 @@
-Rockmill style guide
-====================
-This is the C++ coding style guide for the Rockmill project.
+Embedded Machine Learning Library (EMLL) style guide
+====================================================
+
+This is the C++ coding style guide for the EMLL project.
 
 File names and extensions
 -------------------------
@@ -62,7 +63,7 @@ Next, indicate all `#include` statements. First, include files from the local pr
     ******** begin example ********
     //////////////////////////////////////////////////////////////////////////////////////////////////// 
     // 
-    //  Project:  Rockmill (RCMLL - Resource Constrained Machine Learning Library)
+    //  Project:  EMLL (RCMLL - Resource Constrained Machine Learning Library)
     //  File:     FileName.h (libraryName)
     //  Authors:  Author1, Author2
     //

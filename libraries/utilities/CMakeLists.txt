@@ -12,8 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/BinaryClassificationEvaluator.cpp
-         src/CompressedIntegerList.cpp
+set (SRC src/CompressedIntegerList.cpp
          src/CommandLineParser.cpp
          src/CompressedIntegerList.cpp
          src/Files.cpp
@@ -24,7 +23,8 @@ set (SRC src/BinaryClassificationEvaluator.cpp
          src/RandomEngines.cpp
          src/XMLSerialization.cpp)
 
-set (INCLUDE include/BinaryClassificationEvaluator.h
+set (INCLUDE include/AnyIterator.h
+             include/BinaryClassificationEvaluator.h
              include/CompressedIntegerList.h
              include/CommandLineParser.h
              include/Files.h
@@ -32,7 +32,6 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
              include/IIterator.h
              include/IntegerList.h
              include/IntegerStack.h
-             include/Iterator.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
              include/Parser.h
@@ -44,10 +43,10 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
              include/TypeName.h
              include/XMLSerialization.h)
 
-set (TCC tcc/BinaryClassificationEvaluator.tcc
+set (TCC tcc/AnyIterator.tcc
+         tcc/BinaryClassificationEvaluator.tcc
          tcc/CommandLineParser.tcc
          tcc/Format.tcc
-         tcc/Iterator.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
          tcc/StlIndexValueIterator.tcc
@@ -63,7 +62,11 @@ source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(tcc)
+include_directories(../dataset/include)
+include_directories(../layers/include)
 include_directories(../linear/include)
+include_directories(../predictors/include)
+include_directories(../lossFunctions/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 
@@ -83,9 +86,13 @@ set (TEST_NAME ${PROJ_NAME}_test)
 
 PROJECT(${TEST_NAME})
 
-set (TEST_SRC test/src/main.cpp test/src/XMLSerialization_test.cpp test/src/Iterator_test.cpp)
-set (TEST_INCLUDE test/include/XMLSerialization_test.h test/include/Iterator_test.h)
+set (TEST_SRC test/src/main.cpp 
+              test/src/AnyIterator_test.cpp
+              test/src/XMLSerialization_test.cpp)
 
+set (TEST_INCLUDE test/include/AnyIterator_test.h
+                  test/include/XMLSerialization_test.h)
+                  
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})
 
@@ -96,9 +103,9 @@ add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 include_directories(../testing/include)
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-target_link_libraries(utilities_test utilities dataset linear testing -pthread)
+target_link_libraries(utilities_test utilities dataset linear layers testing -pthread)
 else()
-target_link_libraries(utilities_test utilities dataset linear testing)
+target_link_libraries(utilities_test utilities dataset linear layers testing)
 endif()
 set_property(TARGET utilities_test PROPERTY FOLDER "tests")
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})

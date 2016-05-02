@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     Model.h (layers)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //
@@ -25,6 +25,9 @@ namespace layers
     class Model
     {
     public:
+        Model() = default;
+        Model(const Model&) = delete;
+        Model(Model&&) = default;
         /// <summary> Adds a layer to the model. </summary>
         ///
         /// <param name="layer"> The layer to add to the model. </param>

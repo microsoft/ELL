@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     IIterator.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -10,33 +10,44 @@
 
 #pragma once
 
-/// stl
-#include <vector>
+#include <cstdint>
 
 namespace utilities
 {
     /// <summary> Abstract base class for an iterator over a collection of objects of type T. </summary>
     ///
-    /// <typeparam name="T"> Type of the elements being iterated over. </typeparam>
-    template <typename T>
+    /// <typeparam name="ValueType"> Type of the elements being iterated over. </typeparam>
+    template <typename ValueType>
     class IIterator
     {
     public:
 
-        /// default virtual destructor
-        ///
+        /// <summary> default virtual destructor </summary>
         virtual ~IIterator() = default;
 
-        /// Returns true if the iterator is currently pointing to a valid iterate
+        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
+        /// <returns> true if valid, false if not. </returns>
         virtual bool IsValid() const = 0;
 
-        /// Proceeds to the Next item
+        /// <summary> Returns true if the iterator knows its size. </summary>
         ///
+        /// <returns> true if NumIteratesLeft returns a valid number, false if not. </returns>
+        virtual bool HasSize() const { return false; }
+
+        /// <summary>
+        /// Returns the number of iterates left in this iterator, including the current one.
+        /// </summary>
+        ///
+        /// <returns> The total number of iterates left. </returns>
+        virtual uint64_t NumIteratesLeft() const { return 0; }
+
+        /// <summary> Proceeds to the Next item. </summary>
         virtual void Next() = 0;
 
-        /// Returns the current item
+        /// <summary> Returns a const reference to the current item`. </summary>
         ///
-        virtual T Get() const = 0;
+        /// <returns> A const reference to the current item; </returns>
+        virtual ValueType Get() const = 0;
     };
 }

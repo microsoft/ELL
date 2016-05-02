@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     SparseDataVector.h (dataset)
 //  Authors:  Ofer Dekel
 //
@@ -80,9 +80,6 @@ namespace dataset
         /// <summary> Constructs an empty sparse binary vector. </summary>
         SparseDataVector();
 
-        // Converting constructor
-        //
-
         /// <summary> Constructs an instance of SparseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
@@ -97,7 +94,7 @@ namespace dataset
         /// <summary> Deleted copy constructor. </summary>
         ///
         /// <param name="other"> The other. </param>
-        SparseDataVector(const SparseDataVector<ValueType, IntegerListType>& other) = delete;
+        SparseDataVector(const SparseDataVector<ValueType, IntegerListType>& other) = default;
 
         /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
         /// monotonically increasing argument. The value argument must equal 1.0. </summary>
@@ -150,8 +147,18 @@ namespace dataset
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
 
-    private:
-        IntegerListType _indices;
+        /// <summary> Makes a deep copy of the datavector </summary>
+        ///
+        /// <returns> A deep copy of the datavector </summary>
+        virtual std::unique_ptr<IDataVector> Clone() const override;
+
+        virtual type GetType() const override
+        {
+            return type::none; // TODO: fix this, maybe by removing it and moving clone to subclasses
+        }
+
+   private:
+        IntegerListType _indices; 
         std::vector<ValueType> _values;
     };
 

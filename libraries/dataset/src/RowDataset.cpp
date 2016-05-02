@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     RowDataset.cpp (dataset)
 //  Authors:  Ofer Dekel
 //
@@ -40,7 +40,7 @@ namespace dataset
         }
 
         uint64_t lastExample = firstExample + numExamples;
-        if(lastExample > NumExamples() || numExamples == 0)
+        if (lastExample > NumExamples() || numExamples == 0)
         {
             lastExample = NumExamples();
         }
@@ -53,7 +53,7 @@ namespace dataset
         uint64_t size = example.GetDataVector().Size();
         _examples.push_back(std::move(example));
 
-        if(_maxExampleSize < size)
+        if (_maxExampleSize < size)
         {
             _maxExampleSize = size;
         }
@@ -66,13 +66,14 @@ namespace dataset
 
     void RowDataset::RandPerm(std::default_random_engine& rng, uint64_t count)
     {
-        uint64_t lastIndex = NumExamples()-1;
+        using std::swap;
+        uint64_t lastIndex = NumExamples() - 1;
 
-        for(uint64_t i = 0; i < count; ++i)
+        for (uint64_t i = 0; i < count; ++i)
         {
             std::uniform_int_distribution<uint64_t> dist(i, lastIndex);
             uint64_t j = dist(rng);
-            std::swap(_examples[i], _examples[j]);
+            swap(_examples[i], _examples[j]);
         }
     }
 }

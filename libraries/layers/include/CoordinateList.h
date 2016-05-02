@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     CoordinateList.h (layers)
 //  Authors:  Ofer Dekel
 //
@@ -22,7 +22,7 @@
 
 namespace layers
 {
-    using CoordinateIterator = utilities::StlIterator<std::vector<Coordinate>::const_iterator, Coordinate>;
+    typedef utilities::StlIterator<std::vector<Coordinate>::const_iterator, Coordinate> CoordinateIterator;
 
     /// <summary> Represents an element in a layer. </summary>
     class CoordinateList

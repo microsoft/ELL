@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     Coordinate.h (layers)
 //  Authors:  Ofer Dekel
 //
@@ -16,20 +16,23 @@
 // stl
 #include <cstdint>
 #include <vector>
-#include <iostream>
+#include <iosfwd>
 
 namespace layers
 {
     /// <summary> Represents an element in a layer. </summary>
-    class Coordinate final
+    class Coordinate 
     {
     public:
+
+        /// <summary> Default constructor. Sets layer and element indices to 0. </summary>
+        Coordinate();
 
         /// <summary> Constructs a Coordinate object. </summary>
         ///
         /// <param name="layerIndex"> Zero-based index of the layer. </param>
         /// <param name="elementIndex"> Zero-based index of the element. </param>
-        Coordinate(uint64_t layerIndex=0, uint64_t elementIndex=0);
+        Coordinate(uint64_t layerIndex, uint64_t elementIndex);
 
         /// <summary> Gets the layer index. </summary>
         ///

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     ZeroDataVector.h (dataset)
 //  Authors:  Ofer Dekel
 //
@@ -62,11 +62,6 @@ namespace dataset
         /// <summary> Default constructor. </summary>
         ZeroDataVector() = default;
 
-        /// <summary> Converting constructor. </summary>
-        ///
-        /// <param name="other"> The other. </param>
-        explicit ZeroDataVector(const IDataVector& other);
-
         /// <summary> Move constructor. </summary>
         ///
         /// <param name="other"> [in,out] The other. </param>
@@ -75,7 +70,7 @@ namespace dataset
         /// <summary> Deleted copy constructor. </summary>
         ///
         /// <param name="parameter1"> The first parameter. </param>
-        ZeroDataVector(const ZeroDataVector&) = delete;
+        ZeroDataVector(const ZeroDataVector&) = default;
 
         /// <summary> \returns The type of the vector. </summary>
         ///
@@ -131,5 +126,10 @@ namespace dataset
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
+
+        /// <summary> Makes a deep copy of the datavector </summary>
+        ///
+        /// <returns> A deep copy of the datavector </summary>
+        virtual std::unique_ptr<IDataVector> Clone() const override;
     };
 }
