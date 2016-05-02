@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
-//  File:     RowDataset.tcc (dataset)
+//  Project:  EMLL
+//  File:     RowDataset.cpp (dataset)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]

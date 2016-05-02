@@ -1,7 +1,7 @@
 #include "..\include\SparseDataVector.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     SparseDataVector.tcc (dataset)
 //  Authors:  Ofer Dekel
 //

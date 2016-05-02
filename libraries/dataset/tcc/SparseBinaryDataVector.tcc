@@ -1,7 +1,7 @@
 #include "..\include\SparseBinaryDataVector.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     SparseBinaryDataVector.tcc (dataset)
 //  Authors:  Ofer Dekel
 //

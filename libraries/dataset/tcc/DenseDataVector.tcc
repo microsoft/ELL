@@ -1,7 +1,7 @@
 #include "..\include\DenseDataVector.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
+//  Project:  EMLL
 //  File:     DenseDataVector.tcc (dataset)
 //  Authors:  Ofer Dekel
 //

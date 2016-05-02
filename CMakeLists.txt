@@ -1,9 +1,9 @@
 #
-# cmake file for Rockmill projects
+# cmake file for EMLL sub projects
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
-PROJECT(Rockmill)
+PROJECT(EMLL)
 
 # Options
 option(SWIG_ENABLED "Enable swig interfaces" OFF)
@@ -61,3 +61,5 @@ endif()
 # Add solution-level documentation
 set (DOC INSTALL.md StyleGuide.md)
 add_custom_target(documentation ALL DEPENDS ${DOC} SOURCES ${DOC})
+
+add_dependencies(EMLL_common common dataset layers linear lossFunctions optimization predictors testing treeLayout utilities)

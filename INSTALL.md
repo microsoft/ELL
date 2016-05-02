@@ -1,5 +1,5 @@
-Building Rockmill using CMake
-=============================
+Building the Embedded Machine Learning Libraries (EMLL) using CMake
+===================================================================
 
 Prerequisites
 -------------
@@ -30,7 +30,7 @@ What to do next depends on which build system you would like to use to build the
 
 Building with makefiles on UNIX
 -------------------------------
-On unix systems, the easiest way to build Rockmill is to get cmake to create a makefile, and then run the makefile to build Rockmill. Invoke cmake as follows:
+On unix systems, the easiest way to build EMLL is to get cmake to create a makefile, and then run the makefile to build the libraries. Invoke cmake as follows:
 
     > cmake -G "Unix Makefiles" ..
 
@@ -50,9 +50,9 @@ To create a 32-bit solution for Visual Studio 2015, invoke cmake as follows:
 
     > cmake -G "Visual Studio 14 2015" ..
 
-Important: don't forget the two dots (..) at the end of the command! This command creates a solution file named "Rockmill.sln" and a bunch of other stuff. There are two ways to build the library. The first option is to open the solution file in Visual Studio and build it there. To do this, simply type:
+Important: don't forget the two dots (..) at the end of the command! This command creates a solution file named "EMLL.sln" and a bunch of other stuff. There are two ways to build the library. The first option is to open the solution file in Visual Studio and build it there. To do this, simply type:
 
-    > Rockmill.sln
+    > EMLL.sln
 
 Visual studio should open the solution. Chose either the "Debug" configuration or the "Release" configuration, and use the shortcut Ctrl+Shift+B to build the solution. 
 
@@ -60,9 +60,9 @@ The second option is to build directly in the command prompt using the visual st
 
     > "\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe"
 
-If you are able to run MSBuild, invoke the following command to build Rockmill
+If you are able to run MSBuild, invoke the following command to build EMLL
 
-    > "\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" /m Rockmill.sln /p:Configuration=Release 
+    > "\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" /m EMLL.sln /p:Configuration=Release 
 
 Both build methods create a directory named "bin" inside "build", and put all of the executables in it. As an alternative to the above, you may want to create a 64-bit solution for Visual Studio 2015. To do this, invoke cmake as follows:
 
