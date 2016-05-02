@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  EMLL
+//  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     CompilableMap.h (compile)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //

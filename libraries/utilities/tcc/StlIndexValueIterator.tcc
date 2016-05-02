@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  EMLL
+//  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     StlIndexValueIteratorAdapter.h (utilities)
 //  Authors:  Chuck Jacobs
 //
