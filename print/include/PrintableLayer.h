@@ -37,9 +37,9 @@ public:
     /// <returns> The friendly layer name. </returns>
     virtual std::string GetFriendlyLayerName() const = 0;
 
-    /// <summary> Returns the number of elements in the layer. </summary>
+    /// <summary> Returns the output dimension of the layer. </summary>
     ///
-    /// <returns> The number of elements in the layer. </returns>
+    /// <returns> The output dimension. </returns>
     virtual uint64_t GetOutputDimension() const = 0;
 
     /// <summary> Prints a SVG description of the underlying class to an output stream. </summary>

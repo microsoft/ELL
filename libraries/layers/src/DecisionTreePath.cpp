@@ -21,6 +21,11 @@ namespace layers
         _edgeToInteriorNode(std::move(edgeToInteriorNode)), _splitRuleCoordinates(std::move(splitRuleCoordinates))
     {}
 
+    uint64_t DecisionTreePath::GetInputDimension() const
+    {
+        return _splitRuleCoordinates.Size();
+    }
+
     uint64_t DecisionTreePath::GetOutputDimension() const
     {
         return _edgeToInteriorNode.size();

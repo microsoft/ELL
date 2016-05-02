@@ -41,9 +41,14 @@ namespace layers
         /// <summary> Destructor. </summary>
         virtual ~Sum() = default;
 
-        /// <summary> Returns the number of elements in the layer. </summary>
+        /// <summary> Returns the input dimension of the layer. </summary>
         ///
-        /// <returns> The number of elements in the layer. </returns>
+        /// <returns> The input dimension. </returns>
+        virtual uint64_t GetInputDimension() const override;
+
+        /// <summary> Returns the output dimension of the layer. </summary>
+        ///
+        /// <returns> The output dimension. </returns>
         virtual uint64_t GetOutputDimension() const override;
 
         /// <summary> Computes the layer output. </summary>

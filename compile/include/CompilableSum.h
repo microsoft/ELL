@@ -22,9 +22,9 @@
 class CompilableSum : public layers::Sum, public CompilableLayer
 {
 public:
-    /// <summary> Returns the number of elements in the layer. </summary>
+    /// <summary> Returns the output dimension of the layer. </summary>
     ///
-    /// <returns> The number of elements in the layer. </returns>
+    /// <returns> The output dimension. </returns>
     virtual uint64_t GetOutputDimension() const override;
 
     /// <summary> Assignment operator from Sum. </summary>

@@ -31,10 +31,15 @@ namespace layers
         /// <param name="edgeToInteriorNode"> A vector that maps incoming edge indices to interior node indices. </param>
         /// <param name="splitRuleCoordinates"> The coordinates of the input split rules that correspond to interior nodes. </param>
         DecisionTreePath(std::vector<uint64_t> edgeToInteriorNode, CoordinateList splitRuleCoordinates);
-        
-        /// <summary> Returns the number of elements in the layer. </summary>
+
+        /// <summary> Returns the input dimension of the layer. </summary>
         ///
-        /// <returns> The number of elements in the layer. </returns>
+        /// <returns> The input dimension. </returns>
+        virtual uint64_t GetInputDimension() const override;
+
+        /// <summary> Returns the output dimension of the layer. </summary>
+        ///
+        /// <returns> The output dimension. </returns>
         virtual uint64_t GetOutputDimension() const override;
 
         /// <summary> Number of interior nodes in the tree. </summary>

@@ -40,9 +40,14 @@ namespace layers
         /// <param name="operationType"> The type of Coordinatewise layer to construct. </param>
         Coordinatewise(std::vector<double> values, CoordinateList coordinates, OperationType operationType);
 
-        /// <summary> Returns the number of elements in the layer. </summary>
+        /// <summary> Returns the input dimension of the layer. </summary>
         ///
-        /// <returns> The number of elements in the layer. </returns>
+        /// <returns> The input dimension. </returns>
+        virtual uint64_t GetInputDimension() const override;
+
+        /// <summary> Returns the output dimension of the layer. </summary>
+        ///
+        /// <returns> The output dimension. </returns>
         virtual uint64_t GetOutputDimension() const override;
 
         /// <summary> Appends a coordinate to the coordinatewise layer. </summary>

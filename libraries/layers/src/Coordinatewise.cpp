@@ -28,6 +28,16 @@ namespace layers
         _values(std::move(std::move(values))), _inputCoordinates(std::move(coordinates)), _operationType(operationType)
     {}
 
+    uint64_t Coordinatewise::GetInputDimension() const
+    {
+        return _inputCoordinates.Size();
+    }
+
+    uint64_t Coordinatewise::GetOutputDimension() const
+    {
+        return _inputCoordinates.Size();
+    }
+
     const std::string Coordinatewise::GetOperationName(OperationType type)
     {
         switch (type)
@@ -75,11 +85,6 @@ namespace layers
     Coordinatewise::OperationType Coordinatewise::GetOperationType() const
     {
         return _operationType;
-    }
-
-    uint64_t Coordinatewise::GetOutputDimension() const
-    {
-        return _inputCoordinates.Size();
     }
 
     void Coordinatewise::Append(double value, Coordinate coordinate)
