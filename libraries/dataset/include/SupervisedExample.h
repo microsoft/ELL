@@ -12,9 +12,6 @@
 
 #include "IDataVector.h"
 
-// linear
-#include "RowMatrix.h"
-
 // stl
 #include <cstdint>
 #include <memory>
