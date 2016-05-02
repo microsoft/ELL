@@ -16,9 +16,21 @@
 namespace dataset
 {
     template<typename ValueType>
-    DenseDataVector<ValueType>::DenseDataVector() : _num_nonzeros(0)
+    DenseDataVector<ValueType>::DenseDataVector() : _numNonzeros(0)
     {
         _data.reserve(DEFAULT_DENSE_VECTOR_CAPACITY);
+    }
+
+    template<typename ValueType>
+    DenseDataVector<ValueType>::DenseDataVector(std::vector<ValueType> data) : _data(std::move(data)), _numNonzeros(0)
+    {
+        for (auto value : _data)
+        {
+            if (value != 0)
+            {
+                ++_numNonzeros;
+            }
+        }
     }
 
     template<typename ValueType>
@@ -39,14 +51,14 @@ namespace dataset
 
         _data.resize(index+1);
         _data[index] = (ValueType)value;
-        ++_num_nonzeros;
+        ++_numNonzeros;
     }
     
     template<typename ValueType>
     void DenseDataVector<ValueType>::Reset()
     {
         _data.resize(0);
-        _num_nonzeros = 0;
+        _numNonzeros = 0;
     }
 
     template<typename ValueType>
@@ -58,7 +70,7 @@ namespace dataset
     template<typename ValueType>
     uint64_t DenseDataVector<ValueType>::NumNonzeros() const
     {
-        return _num_nonzeros;
+        return _numNonzeros;
     }
 
     template<typename ValueType>

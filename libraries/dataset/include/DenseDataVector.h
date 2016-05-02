@@ -53,6 +53,11 @@ namespace dataset
         /// <param name="parameter1"> The first parameter. </param>
         DenseDataVector(const DenseDataVector&) = delete;
 
+        /// <summary> Constructs an instance of DenseDataVector from a std::vector. </summary>
+        ///
+        /// <param name="data"> The std::vector. </param>
+        DenseDataVector(std::vector<ValueType> data);
+        
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the desired element. </param>
@@ -111,7 +116,7 @@ namespace dataset
         virtual void Print(std::ostream& os) const override;
 
     private:
-        uint64_t _num_nonzeros;
+        uint64_t _numNonzeros;
         std::vector<ValueType> _data;
     };
 
