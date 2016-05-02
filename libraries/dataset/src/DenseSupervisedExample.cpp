@@ -15,6 +15,9 @@ namespace dataset
     DenseSupervisedExample::DenseSupervisedExample(DoubleDataVector instance, double label, double weight) : _dataVector(std::move(instance)), _label(label), _weight(weight)
     {}
 
+    DenseSupervisedExample::DenseSupervisedExample(const SupervisedExample& example) // TODO - fix construction 
+    {}
+
     double DenseSupervisedExample::GetWeight() const
     {
         return _weight;

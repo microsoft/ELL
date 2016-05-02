@@ -8,6 +8,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// dataset
+#include "DenseSupervisedExample.h"
+#include "RowDataset.h"
+
 namespace trainers
 {    
     template <typename LossFunctionType>
@@ -19,6 +23,15 @@ namespace trainers
     predictors::DecisionTree SortingTreeLearner<LossFunctionType>::Train(ExampleIteratorType& exampleIterator)
     {
         predictors::DecisionTree tree;
+
+        // create DenseRowDataset
+        dataset::RowDataset<dataset::DenseSupervisedExample> denseDataset;
+        while (exampleIterator.IsValid())
+        {
+            denseDataset.AddExample(exampleIterator.Get());
+            exampleIterator.Next();
+        }
+
 
         // TODO - replace the below with a real tree learning algo
         auto& root = tree.SplitRoot(predictors::DecisionTree::SplitRule(0, 0.0), -1.0, 1.0);

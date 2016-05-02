@@ -11,6 +11,7 @@
 #pragma once
 
 #include "DenseDataVector.h"
+#include "SupervisedExample.h"
 
 // stl
 #include <cstdint>
@@ -29,6 +30,11 @@ namespace dataset
         /// <param name="label"> The label. </param>
         /// <param name="weight"> The weight. </param>
         DenseSupervisedExample(DoubleDataVector instance, double label, double weight = 1.0);
+
+        /// <summary> Constructs an instance of DenseSupervisedExample from a SupervisedExample. </summary>
+        ///
+        /// <param name="example"> The SupervisedExample. </param>
+        DenseSupervisedExample(const SupervisedExample& example);
 
         /// <summary> Gets the weight. </summary>
         ///
