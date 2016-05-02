@@ -33,10 +33,11 @@ namespace layers
         // check that the layer points to valid elements
         auto numLayers = NumLayers();
         
-        auto layerSize = layer->GetOutputDimension();
+        auto layerInputDimension = layer->GetInputDimension();
+        auto layerOutputDimension = layer->GetOutputDimension();
 
         // check that layer is compatible with model
-        for (uint64_t index = 0; index < layerSize; index++)
+        for (uint64_t index = 0; index < layerInputDimension; index++)
         {
             auto inputCoordIterator = layer->GetInputCoordinateIterator(index);
             while (inputCoordIterator.IsValid())
@@ -55,7 +56,7 @@ namespace layers
         }
 
         _layers.push_back(std::move(layer));
-        return CoordinateList(_layers.size(), layerSize);
+        return CoordinateList(_layers.size(), layerOutputDimension);
     }
 
     uint64_t Model::NumLayers() const
