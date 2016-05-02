@@ -57,7 +57,7 @@ namespace layers
 
         for (uint64_t layerIndex = 1; layerIndex < _model.NumLayers(); ++layerIndex)
         {
-            auto layerSize = _model.GetLayer(layerIndex).Size();
+            auto layerSize = _model.GetLayer(layerIndex).GetOutputDimension();
             _layerOutputs[layerIndex].resize(layerSize);
         }
     }

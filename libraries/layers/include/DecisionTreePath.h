@@ -35,7 +35,7 @@ namespace layers
         /// <summary> Returns the number of elements in the layer. </summary>
         ///
         /// <returns> The number of elements in the layer. </returns>
-        virtual uint64_t Size() const override;
+        virtual uint64_t GetOutputDimension() const override;
 
         /// <summary> Number of interior nodes in the tree. </summary>
         ///

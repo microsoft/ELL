@@ -124,7 +124,7 @@ void CompilableMap::ToCode(std::ostream& os) const
     // add graph later for other layers
     for(uint64_t i = 0; i < numLayersExcludingInput; ++i)
     {
-        graph.AddLayer(_compilableLayers[i]->Size());
+        graph.AddLayer(_compilableLayers[i]->GetOutputDimension());
     }
 
     // add an extra layer for outputs

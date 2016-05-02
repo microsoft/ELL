@@ -33,7 +33,7 @@ namespace layers
         // check that the layer points to valid elements
         auto numLayers = NumLayers();
         
-        auto layerSize = layer->Size();
+        auto layerSize = layer->GetOutputDimension();
 
         // check that layer is compatible with model
         for (uint64_t index = 0; index < layerSize; index++)
@@ -46,7 +46,7 @@ namespace layers
                 {
                     throw std::runtime_error("new layer references nonexistent layers");
                 }
-                else if(coord.GetLayerIndex()>0 && coord.GetElementIndex() >= GetLayer(coord.GetLayerIndex()).Size())
+                else if(coord.GetLayerIndex()>0 && coord.GetElementIndex() >= GetLayer(coord.GetLayerIndex()).GetOutputDimension())
                 {
                     throw std::runtime_error("new layer references nonexistent elements");
                 }

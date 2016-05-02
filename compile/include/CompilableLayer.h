@@ -26,7 +26,7 @@ public:
     /// <summary> Returns the number of elements in the layer. </summary>
     ///
     /// <returns> The number of elements in the layer. </returns>
-    virtual uint64_t Size() const = 0;
+    virtual uint64_t GetOutputDimension() const = 0;
 
     /// <summary> Pushes actions upward in the graph </summary>
     ///

@@ -27,7 +27,7 @@ namespace layers
     Sum::Sum(std::vector<CoordinateList> coordinates) : _inputCoordinates(std::move(coordinates))
     {}
 
-    uint64_t Sum::Size() const
+    uint64_t Sum::GetOutputDimension() const
     {
         return _inputCoordinates.size();
     }

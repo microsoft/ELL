@@ -77,7 +77,7 @@ namespace layers
         return _operationType;
     }
 
-    uint64_t Coordinatewise::Size() const
+    uint64_t Coordinatewise::GetOutputDimension() const
     {
         return _inputCoordinates.Size();
     }
