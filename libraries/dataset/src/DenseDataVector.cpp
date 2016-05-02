@@ -22,6 +22,12 @@ namespace dataset
     }
 
     template<typename ValueType>
+    const ValueType & DenseDataVector<ValueType>::operator[](uint64_t index) const
+    {
+        return _data[index];
+    }
+
+    template<typename ValueType>
     void DenseDataVector<ValueType>::AppendEntry(uint64_t index, double value)
     {
         if(value == 0)
