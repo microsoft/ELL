@@ -22,10 +22,11 @@
 
 namespace dataset
 {
+    template<typename RowType = SupervisedExample>
     class RowDataset 
     {
     public:
-        using Iterator = utilities::StlIterator<std::vector<SupervisedExample>::const_iterator>;
+        using Iterator = utilities::StlIterator<typename std::vector<RowType>::const_iterator>;
 
         /// <summary> Default constructor. </summary>
         RowDataset() = default;
@@ -59,7 +60,7 @@ namespace dataset
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        const SupervisedExample& GetExample(uint64_t index) const;
+        const RowType& GetExample(uint64_t index) const;
 
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///
@@ -72,8 +73,8 @@ namespace dataset
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
-        /// <param name="example"> [in,out] The example. </param>
-        void AddExample(SupervisedExample&& example);
+        /// <param name="example"> The example. </param>
+        void AddExample(RowType example);
 
         /// <summary> Randomly permutes the rows of the dataset. </summary>
         ///
@@ -89,7 +90,9 @@ namespace dataset
         void RandPerm(std::default_random_engine& rng, uint64_t count);
 
     private:
-        std::vector<SupervisedExample> _examples;
+        std::vector<RowType> _examples;
         uint64_t _maxExampleSize = 0;
     };
 }
+
+#include "../tcc/RowDataset.tcc"

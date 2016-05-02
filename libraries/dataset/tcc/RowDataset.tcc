@@ -1,14 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
-//  File:     RowDataset.cpp (dataset)
+//  File:     RowDataset.tcc (dataset)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "RowDataset.h"
 
 // stl
 #include <stdexcept>
@@ -17,22 +15,26 @@
 
 namespace dataset
 {
-    uint64_t RowDataset::NumExamples() const
+    template<typename RowType>
+    uint64_t RowDataset<RowType>::NumExamples() const
     {
         return _examples.size();
     }
 
-    uint64_t RowDataset::GetMaxExampleSize() const
+    template<typename RowType>
+    uint64_t RowDataset<RowType>::GetMaxExampleSize() const
     {
         return _maxExampleSize;
     }
 
-    const SupervisedExample& RowDataset::GetExample(uint64_t index) const
+    template<typename RowType>
+    const RowType& RowDataset<RowType>::GetExample(uint64_t index) const
     {
         return _examples[index];
     }
 
-    RowDataset::Iterator RowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
+    template<typename RowType>
+    typename RowDataset<RowType>::Iterator RowDataset<RowType>::GetIterator(uint64_t firstExample, uint64_t numExamples) const
     {
         if (firstExample >= NumExamples())
         {
@@ -48,7 +50,8 @@ namespace dataset
         return utilities::MakeStlIterator(_examples.cbegin() + firstExample, _examples.cbegin() + lastExample);
     }
 
-    void RowDataset::AddExample(SupervisedExample&& example)
+    template<typename RowType>
+    void RowDataset<RowType>::AddExample(RowType example)
     {
         uint64_t size = example.GetDataVector().Size();
         _examples.push_back(std::move(example));
@@ -59,12 +62,14 @@ namespace dataset
         }
     }
 
-    void RowDataset::RandPerm(std::default_random_engine& rng)
+    template<typename RowType>
+    void RowDataset<RowType>::RandPerm(std::default_random_engine& rng)
     {
         RandPerm(rng, NumExamples());
     }
 
-    void RowDataset::RandPerm(std::default_random_engine& rng, uint64_t count)
+    template<typename RowType>
+    void RowDataset<RowType>::RandPerm(std::default_random_engine& rng, uint64_t count)
     {
         uint64_t lastIndex = NumExamples()-1;
 

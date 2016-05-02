@@ -20,6 +20,7 @@
 #include "SparseEntryParser.h"
 #include "MappedParser.h"
 #include "ParsingIterator.h"
+#include "SupervisedExample.h"
 
 // stl
 #include <cstdint>
@@ -70,11 +71,11 @@ namespace common
         return GetMappedDataIterator(dataLoadArguments, layers::Map(model, mapOutputCoordinates));
     }
 
-    dataset::RowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments, const layers::Map map)
+    dataset::RowDataset<> GetRowDataset(const DataLoadArguments& dataLoadArguments, const layers::Map map)
     {
         auto dataIterator = GetMappedDataIterator(dataLoadArguments, map);
 
-        dataset::RowDataset rowDataset;
+        dataset::RowDataset<> rowDataset;
 
         while (dataIterator->IsValid())
         {

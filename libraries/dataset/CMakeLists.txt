@@ -14,7 +14,6 @@ endif()
 
 set (SRC src/DenseDataVector.cpp
          src/OnesDataVector.cpp
-         src/RowDataset.cpp
          src/SequentialLineIterator.cpp
          src/SparseBinaryDataVector.cpp
          src/SparseDataVector.cpp
@@ -41,6 +40,7 @@ set (TCC tcc/DataVectorBuilder.tcc
          tcc/DenseDataVector.tcc
          tcc/MappedParser.tcc
          tcc/ParsingIterator.tcc
+         tcc/RowDataset.tcc
          tcc/SparseBinaryDataVector.tcc
          tcc/SparseDataVector.tcc
          tcc/SupervisedExampleBuilder.tcc)
