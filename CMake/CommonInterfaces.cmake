@@ -1,3 +1,7 @@
+#
+# CMake macro to create swig-generated language wrapper for Embedded Machine Learning Library
+#
+
 macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INTERFACE)
 
 cmake_minimum_required(VERSION 2.8.11)
@@ -55,7 +59,7 @@ if(${LANGUAGE_NAME} STREQUAL "common")
 
 else()
 
-# Add EMLL libraries include directories
+# Add EMLL library include directories
 include_directories(../../libraries/common/include)
 include_directories(../../libraries/dataset/include)
 include_directories(../../libraries/layers/include)
