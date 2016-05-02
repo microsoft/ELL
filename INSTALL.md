@@ -1,13 +1,32 @@
-Building Rockmill using cmake
------------------------------
+Building Rockmill using CMake
+=============================
+
+Prerequisites
+-------------
 If you don't have cmake installed, download and install it from:
 
-  <https://cmake.org/download/>
+   <https://cmake.org/download/>
 
-Open a console (a.k.a. command prompt) and navigate to the main solution directory (the directory that this file is in). Create a subdirectory named "build", and change to that directory:
+To build the python interfaces, you will also need to have Python 2.7 and SWIG installed. Download Python 2.7 from the [download directory](https://www.python.org/downloads/) of <https://www.python.org/>. 
+
+To install SWIG on Windows, download the swigwin zip file from <http://swig.org>'s [download section](http://www.swig.org/download.html). Unzip this directory
+and put it somewhere convenient (for example, C:\swigwin). Make sure you set your PATH environment
+variable to include the swigwin directory.
+
+On other operating systems, download the swig tarball, unpack it, and follow the instructions in the `INSTALL` file.
+
+Creating a build environment
+----------------------------
+CMake is a sort of meta-build system that takes a description of the files and other parameters needed to build a project and
+creates a build environment for it using the native compiler and build system on the target platform. 
+
+To create a build environment, first make a `build` directory that all of the generated files will live in.Open a console (a.k.a. command prompt) and navigate to 
+the main solution directory (the directory that this file is in). Create a subdirectory named "build", and change to that directory:
 
     > mkdir build
     > cd build
+
+What to do next depends on which build system you would like to use to build the library.
 
 Building with makefiles on UNIX
 -------------------------------

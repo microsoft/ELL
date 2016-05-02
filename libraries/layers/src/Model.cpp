@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <memory>
 #include <iostream>
+#include <utility> // for std::move
+#include <ostream>
 #include <cassert>
 
 namespace layers
@@ -85,6 +87,19 @@ namespace layers
 
         // recall that _layers does not explicitly keep the input layer
         return *_layers[layerIndex - 1];
+    }
+
+    CoordinateList Model::BuildCoordinateList(uint64_t layerIndex) const
+    {
+        if (layerIndex == 0)
+        {
+            throw std::runtime_error("input layer does not have an input coordinate list");
+        }
+        else if (layerIndex >= NumLayers())
+        {
+            throw std::out_of_range("Layer index out of range");
+        }
+        return CoordinateList(layerIndex, GetLayer(layerIndex).Size());
     }
 
     void Model::Save(std::ostream& os) const

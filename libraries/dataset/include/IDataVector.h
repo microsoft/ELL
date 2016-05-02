@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <vector>
 #include <functional>
+#include <memory>
 
 namespace dataset
 {
@@ -26,7 +27,7 @@ namespace dataset
     {
     public:
 
-        enum class type {dense_double, dense_float, sparse_double, sparse_float, sparse_short, sparse_binary, uncompressed_sparse_binary, zero, ones, segmented};
+        enum class type {none, dense_double, dense_float, sparse_double, sparse_float, sparse_short, sparse_binary, uncompressed_sparse_binary, zero, ones, segmented};
 
         /// <summary> \returns The type of the std::vector. </summary>
         ///
@@ -46,6 +47,11 @@ namespace dataset
         /// <summary> \returns The number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
-        virtual uint64_t NumNonzeros() const =0;
+        virtual uint64_t NumNonzeros() const = 0;
+        
+        /// <summary> Makes a deep copy of the datavector </summary>
+        ///
+        /// <returns> A deep copy of the datavector </summary>
+        virtual std::unique_ptr<IDataVector> Clone() const = 0;
     };
 }

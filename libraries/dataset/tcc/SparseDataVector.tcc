@@ -21,4 +21,10 @@ namespace dataset
             IndexValueIterator.Next();
         }
     }
+
+    template<typename ValueType, typename IntegerListType>
+    std::unique_ptr<IDataVector> SparseDataVector<ValueType, IntegerListType>::Clone() const
+    {
+        return std::make_unique<SparseDataVector<ValueType, IntegerListType>>(*this); 
+    }
 }

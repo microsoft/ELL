@@ -71,7 +71,7 @@ namespace common
         return GetMappedDataIterator(dataLoadArguments, layers::Map(model, mapOutputCoordinates));
     }
 
-    dataset::SupervisedExampleRowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments, const layers::Map map)
+    dataset::RowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments, layers::Map map)
     {
         auto dataIterator = GetMappedDataIterator(dataLoadArguments, map);
 

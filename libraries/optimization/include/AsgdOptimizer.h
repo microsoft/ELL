@@ -21,11 +21,10 @@
 #include "DoubleVector.h"
 
 // dataset
-#include "RowDataset.h"
 #include "SupervisedExample.h"
 
 // utilities
-#include "Iterator.h"
+#include "AnyIterator.h"
 
 // stl
 #include <cstdint>
@@ -41,7 +40,6 @@ namespace optimization
     class AsgdOptimizer
     {
     public:
-
         /// <summary> Constructs the optimizer. </summary>
         ///
         /// <param name="dim"> The dimension. </param>
@@ -61,7 +59,7 @@ namespace optimization
         ///
         /// <param name="exampleIterator"> [in,out] The data iterator. </param>
         /// <param name="numExamples"> The number of examples in the iterator. </param>
-        void Update(utilities::Iterator<dataset::SupervisedExample>& exampleIterator);
+        void Update(utilities::AnyIterator<dataset::SupervisedExample>& exampleIterator);
 
         /// <summary> Returns The averaged predictor. </summary>
         ///

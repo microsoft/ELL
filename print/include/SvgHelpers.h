@@ -14,7 +14,7 @@
 
 // stl
 #include <cstdint>
-#include <iostream>
+#include <ostream>
 #include <string>
 
 /// <summary> Svg rectangle. </summary>

@@ -26,7 +26,7 @@ namespace dataset
     class RowDataset 
     {
     public:
-        using Iterator = utilities::StlIterator<typename std::vector<RowType>::const_iterator>;
+        using Iterator = utilities::VectorIterator<SupervisedExample>;
 
         /// <summary> Default constructor. </summary>
         RowDataset() = default;
@@ -35,7 +35,7 @@ namespace dataset
         RowDataset(RowDataset&&) = default;
 
         /// <summary> Deleted copy constructor. </summary>
-        RowDataset(const RowDataset&) = delete;
+        RowDataset(const RowDataset&) = default;
 
         /// <summary> Default move assignment operator. </summary>
         ///
@@ -43,7 +43,7 @@ namespace dataset
         RowDataset& operator=(RowDataset&&) = default;
 
         /// <summary> Deleted asignment operator. </summary>
-        RowDataset& operator=(const RowDataset&) = delete;
+        RowDataset& operator=(const RowDataset&) = default;
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///

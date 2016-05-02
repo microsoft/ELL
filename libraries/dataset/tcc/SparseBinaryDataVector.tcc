@@ -21,4 +21,18 @@ namespace dataset
             IndexValueIterator.Next();
         }
     }
+
+    template <typename IntegerListType>
+    std::unique_ptr<IDataVector> SparseBinaryDataVectorBase<IntegerListType>::Clone() const
+    {
+        auto ptr = std::make_unique<SparseBinaryDataVectorBase<IntegerListType>>(*this); 
+        return std::move(ptr);
+    }
+
+
+    template <typename IntegerListType>
+    IDataVector::type SparseBinaryDataVectorBase<IntegerListType>::GetType() const
+    {
+        return type::none; // TODO: Find a way to avoid requiring GetType() to be defined in non-concrete classes. We could just move the Clone method to the concrete classes.
+    }
 }

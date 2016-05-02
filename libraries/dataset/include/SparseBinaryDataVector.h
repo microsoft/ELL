@@ -98,7 +98,7 @@ namespace dataset
         /// <summary> Deleted copy constructor. </summary>
         ///
         /// <param name="other"> The other. </param>
-        SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = delete;
+        SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = default;
 
         /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
         /// monotonically increasing argument. The value argument must equal 1.0. </summary>
@@ -150,6 +150,13 @@ namespace dataset
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
+
+        /// <summary> Makes a deep copy of the datavector </summary>
+        ///
+        /// <returns> A deep copy of the datavector </summary>
+        virtual std::unique_ptr<IDataVector> Clone() const override;
+        
+        virtual type GetType() const override;
 
     private:
         IntegerListType _indices;

@@ -16,13 +16,14 @@
 #include <cstdint>
 #include <vector>
 #include <type_traits>
+#include <utility>
 
 namespace utilities
 {
     /// <summary> A read-only forward index-value iterator for an STL container </summary>
 
     template <typename IteratorType, typename ValueType = decltype(*std::declval<IteratorType>())>
-    class StlIndexValueIterator: public linear::IIndexValueIterator
+    class StlIndexValueIterator : public linear::IIndexValueIterator
     {
     public:
         /// <summary> Constructs an instance of StlIndexValueIterator. </summary>
@@ -53,7 +54,7 @@ namespace utilities
 
     /// <summary> Handy type alias for a StlIndexValueIterator over a std::vector </summary>
     template <typename ValueType>
-    using VectorIndexValueIterator = StlIndexValueIterator<typename std::vector<ValueType>::const_iterator, ValueType>;
+    using VectorIndexValueIterator = StlIndexValueIterator<typename std::vector<ValueType>::const_iterator>;
 
     /// <summary> Creates an StlIndexValueIteratorAdapter for a std::vector </summary>
     ///

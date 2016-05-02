@@ -25,6 +25,8 @@
 
 namespace layers
 {
+    typedef utilities::StlIterator<std::vector<Coordinate>::const_iterator, Coordinate> InputCoordinateIterator;
+
     /// <summary> Implements a layer. </summary>
     class Layer
     {

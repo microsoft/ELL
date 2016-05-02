@@ -77,7 +77,7 @@ namespace utilities
         /// <summary> Deleted copy constructor. </summary>
         ///
         /// <param name="parameter1"> The first parameter. </param>
-        CompressedIntegerList(const CompressedIntegerList&) = delete;
+        CompressedIntegerList(const CompressedIntegerList&) = default;
 
         /// <summary> Default Destructor. </summary>
         ~CompressedIntegerList() = default;

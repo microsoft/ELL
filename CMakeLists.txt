@@ -5,6 +5,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 PROJECT(Rockmill)
 
+# Include modules in the CMake directory.
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
+
 # Turn on ability to create folders to organize projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -33,8 +36,20 @@ add_subdirectory(trainers/sgd)
 add_subdirectory(tools/trainers/sortingTreeLearner)
 add_subdirectory(scripts)
 
+# Add SWIG-generated interfaces
+find_package(SWIG)
+if(${SWIG_FOUND})
+  add_subdirectory(interfaces)
+else()
+  message(WARNING "Couldn't find SWIG, skipping interface generation.")
+endif()
+
+
+# Add examples
+add_subdirectory(examples)
+
 # Add solution-level documentation
 set (DOC INSTALL.md StyleGuide.md)
 add_custom_target(documentation ALL DEPENDS ${DOC} SOURCES ${DOC})
 
-
+add_dependencies(Rockmill_common common dataset layers linear lossFunctions optimization predictors testing treeLayout utilities)

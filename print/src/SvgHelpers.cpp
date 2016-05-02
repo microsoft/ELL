@@ -17,6 +17,7 @@
 // stl
 #include <iomanip>
 #include <string>
+#include <sstream>
 #include <cmath>
 
 // unexposed utility functions

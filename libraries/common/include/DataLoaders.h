@@ -52,6 +52,6 @@ namespace common
     /// <param name="map"> The map. </param>
     ///
     /// <returns> The row dataset. </returns>
-    dataset::SupervisedExampleRowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments, const layers::Map map);
+    dataset::RowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments, layers::Map map);
 }
 

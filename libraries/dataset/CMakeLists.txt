@@ -58,7 +58,7 @@ include_directories(../layers/include)
 include_directories(../utilities/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-
+target_link_libraries(${PROJ_NAME} utilities)
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 #

@@ -15,6 +15,7 @@
 
 namespace dataset
 {
+    
     template<typename ValueType>
     DenseDataVector<ValueType>::DenseDataVector() : _numNonzeros(0)
     {
