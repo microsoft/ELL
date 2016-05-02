@@ -67,8 +67,6 @@ Next, indicate all `#include` statements. First, include files from the local pr
     //  File:     FileName.h (libraryName)
     //  Authors:  Author1, Author2
     //
-    //  [copyright]
-    //
     //////////////////////////////////////////////////////////////////////////////////////////////////// 
 
     #pragma once
