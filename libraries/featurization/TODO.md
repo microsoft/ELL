@@ -52,11 +52,10 @@ Features used:
 * Mean over window
 * Variance over window
 
-Non-feature concepts needed:
+New layers needed:
 * Delay line / history
-* Running total?
-* Elementwise x^2
-* Sum
-
-
+* Running total (?) --- can use sum for this for now
+* Unary x^2 function (or binary mult)
+* Unary sqrt function
+* Accumulator, for filtering (can use this for running-total over window? add new item, subtract last item)
 
