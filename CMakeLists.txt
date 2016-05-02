@@ -50,7 +50,7 @@ if(${SWIG_ENABLED})
     add_subdirectory(examples)
   
     # Make interface code be dependent on all libraries
-    add_dependencies(Rockmill_common common dataset layers linear lossFunctions optimization predictors testing treeLayout utilities)
+    add_dependencies(EMLL_common common dataset layers linear lossFunctions optimization predictors testing treeLayout utilities)
   else()
     message(WARNING "Couldn't find SWIG, skipping interface generation.")
   endif()
@@ -62,4 +62,3 @@ endif()
 set (DOC INSTALL.md StyleGuide.md)
 add_custom_target(documentation ALL DEPENDS ${DOC} SOURCES ${DOC})
 
-add_dependencies(EMLL_common common dataset layers linear lossFunctions optimization predictors testing treeLayout utilities)
