@@ -22,7 +22,7 @@
 
 namespace dataset
 {
-    template<typename RowType>
+    template<typename RowType = SupervisedExample>
     class RowDataset 
     {
     public:
@@ -100,8 +100,6 @@ namespace dataset
         std::vector<RowType> _examples;
         uint64_t _maxExampleSize = 0;
     };
-
-    typedef RowDataset<SupervisedExample> SupervisedExampleRowDataset;
 }
 
 #include "../tcc/RowDataset.tcc"

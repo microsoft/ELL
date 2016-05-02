@@ -16,7 +16,7 @@ namespace interfaces
     //
     // RowDataset
     //
-    RowDataset::RowDataset(dataset::RowDataset dataset) : _dataset(std::move(dataset)) 
+    RowDataset::RowDataset(dataset::RowDataset<> dataset) : _dataset(std::move(dataset))
     {
     }
 

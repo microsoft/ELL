@@ -56,7 +56,7 @@ namespace interfaces
         /// <param name="layerIndex"> Zero-based index of the layer. </param>
         ///
         /// <returns> The coordinate list. </returns>
-        layers::CoordinateList BuildCoordinateList(uint64_t layerIndex) const {return _model->BuildCoordinateList(layerIndex);}
+//        layers::CoordinateList BuildCoordinateList(uint64_t layerIndex) const {return _model->BuildCoordinateList(layerIndex);}
 
         /// <summary> Saves a model to an output stream. </summary>
         ///

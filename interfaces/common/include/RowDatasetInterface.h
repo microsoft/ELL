@@ -28,7 +28,7 @@ namespace interfaces
         /// <summary> Constructor for RowDataset wrapper</summary>
         ///
         /// <param name="dataset"> The dataset::RowDataset to wrap </param>
-        RowDataset(dataset::RowDataset dataset);
+        RowDataset(dataset::RowDataset<> dataset);
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
@@ -75,7 +75,7 @@ namespace interfaces
         void RandPerm(std::default_random_engine& rng, uint64_t count);
 
     private:
-        dataset::RowDataset _dataset;
+        dataset::RowDataset<> _dataset;
     };
 }
 

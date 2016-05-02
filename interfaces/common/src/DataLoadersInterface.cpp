@@ -103,7 +103,7 @@ namespace interfaces
        dataLoadArguments.inputDataFile = dataFilename;
        auto dataIterator = common::GetDataIterator(dataLoadArguments);
 
-        dataset::RowDataset rowDataset;
+        dataset::RowDataset<> rowDataset;
 
         while (dataIterator->IsValid())
         {
@@ -116,7 +116,7 @@ namespace interfaces
 
     interfaces::RowDataset GetDataset(const common::DataLoadArguments& dataLoadArguments, const interfaces::Map& map)
     {
-        dataset::RowDataset rowDataset;
+        dataset::RowDataset<> rowDataset;
 
         auto dataIterator = GetMappedDataIterator(dataLoadArguments, map.GetMap());
         while (dataIterator->IsValid())
@@ -145,7 +145,7 @@ namespace interfaces
 
        auto dataIterator = common::GetDataIterator(dataLoadArguments, mapLoadArguments);
 
-        dataset::RowDataset rowDataset;
+        dataset::RowDataset<> rowDataset;
 
         while (dataIterator->IsValid())
         {

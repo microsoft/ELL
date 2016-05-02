@@ -11,7 +11,6 @@
 %module "layers"
 
 %ignore Model::GetTypeName;
-%ignore layers::BuildCoordinateList;
 
 %{
 #define SWIG_FILE_WITH_INIT
@@ -36,14 +35,6 @@
 // TODO: include the various layer types?
 %include "MapInterface.h"
 %include "ModelInterface.h"
-
-// Special version of BuildCoordinateList to work with our proxy Model object
-%inline %{
-layers::CoordinateList BuildCoordinateList(const interfaces::Model& model, uint64_t inputLayerSize, const std::string& coordinateListString)
-{
-    return layers::BuildCoordinateList(model.GetModel(), inputLayerSize, coordinateListString);
-}
-%}
 
 // Add operator[] to CoordinateList objects
 WRAP_OP_AT(layers::CoordinateList, layers::Coordinate);
