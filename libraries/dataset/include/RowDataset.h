@@ -62,6 +62,13 @@ namespace dataset
         /// <returns> Reference to the specified example. </returns>
         const RowType& GetExample(uint64_t index) const;
 
+        /// <summary> Returns a reference to an example. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the row. </param>
+        ///
+        /// <returns> Reference to the specified example. </returns>
+        const RowType& operator[](uint64_t index) const;
+
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///
         /// <param name="firstExample"> Zero-based index of the first example to iterate over. </param>

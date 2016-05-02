@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <random>
 #include <cassert>
+#include "..\include\RowDataset.h"
 
 namespace dataset
 {
@@ -29,6 +30,12 @@ namespace dataset
 
     template<typename RowType>
     const RowType& RowDataset<RowType>::GetExample(uint64_t index) const
+    {
+        return _examples[index];
+    }
+
+    template<typename RowType>
+    const RowType & RowDataset<RowType>::operator[](uint64_t index) const
     {
         return _examples[index];
     }
