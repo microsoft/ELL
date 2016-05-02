@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Rockmill
-//  File:     Rockmill.i (interfaces)
+//  Project:  EMLL
+//  File:     EMLL.i (interfaces)
 //  Authors:  Chuck Jacobs
 //
 //  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-%module "Rockmill"
+%module "EMLL"
 
 // Common stuff
 #ifdef SWIGPYTHON
@@ -87,7 +87,7 @@ namespace std
         SWIG_exception(SWIG_RuntimeError, err.what());        
     }    
     catch (...) {
-        SWIG_exception(SWIG_RuntimeError, "Exception in Rockmill library");
+        SWIG_exception(SWIG_RuntimeError, "Exception in EMLL library");
     }
 }
 

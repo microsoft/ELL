@@ -7,8 +7,8 @@ sys.path.append('../../interfaces/python')
 sys.path.append('../../interfaces/python/Release')
 sys.path.append('../../interfaces/python/Debug')
 
-import Rockmill
-from Rockmill import * # pull everything into main namespace
+import EMLL
+from EMLL import * # pull everything into main namespace
 
 def getArg(n, missingValue=''):
     if n < len(sys.argv):

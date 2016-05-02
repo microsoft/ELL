@@ -19,4 +19,4 @@ generate_interface(python ${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_LIBRARIES} "")
 #         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} 
 #         COMMAND python sgd.py ../../../data/a9a.txt)
 
-add_dependencies(_Rockmill_python Rockmill_common)
+add_dependencies(_EMLL_python EMLL_common)

@@ -13,7 +13,7 @@ set(CMAKE_CXX_FLAGS ${SWIG_CXX_COMPILER_FLAGS})
 #set(CMAKE_CXX_FLAGS_DISTRIBUTION "")
 #set(CMAKE_CXX_FLAGS_DEBUG "")
 
-set (module_name Rockmill_${LANGUAGE_NAME})
+set (module_name EMLL_${LANGUAGE_NAME})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
@@ -32,7 +32,7 @@ set (INTERFACE_INCLUDE ../common/include/DataLoadersInterface.h
                        ../common/include/ModelInterface.h
                        ../common/include/RowDatasetInterface.h)
 
-set (INTERFACE_MAIN ../common/Rockmill.i)
+set (INTERFACE_MAIN ../common/EMLL.i)
 
 set (INTERFACE_FILES ../common/common.i
                      ../common/dataset.i
@@ -55,7 +55,7 @@ if(${LANGUAGE_NAME} STREQUAL "common")
 
 else()
 
-# Add Rockmill libraries include directories
+# Add EMLL libraries include directories
 include_directories(../../libraries/common/include)
 include_directories(../../libraries/dataset/include)
 include_directories(../../libraries/layers/include)
@@ -95,7 +95,7 @@ endif()
 
 swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
 swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset layers lossFunctions optimization predictors utilities)
-set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}Rockmill)
+set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}EMLL)
 endif()
 
 set_property(TARGET ${PREPEND_TARGET}${module_name} PROPERTY FOLDER "interfaces") 
