@@ -88,7 +88,7 @@ namespace dataset
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
         template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
-        SparseBinaryDataVectorBase(IndexValueIteratorType IndexValueIterator);
+        SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Move constructor. </summary>
         ///
@@ -99,6 +99,11 @@ namespace dataset
         ///
         /// <param name="other"> The other. </param>
         SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = default;
+
+        /// <summary> Get the type of the vector. </summary>
+        ///
+        /// <returns> The type. </returns>
+        virtual type GetType() const override;
 
         /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
         /// monotonically increasing argument. The value argument must equal 1.0. </summary>
@@ -155,8 +160,13 @@ namespace dataset
         ///
         /// <returns> A deep copy of the datavector </summary>
         virtual std::unique_ptr<IDataVector> Clone() const override;
-        
-        virtual type GetType() const override;
+
+        /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
+        ///
+        /// <param name="size"> The array size. </param>
+        ///
+        /// <returns> The array. </returns>
+        virtual std::vector<double> ToArray(uint64_t size) const override;
 
     private:
         IntegerListType _indices;

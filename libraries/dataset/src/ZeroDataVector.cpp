@@ -81,4 +81,9 @@ namespace dataset
         auto ptr = std::make_unique<ZeroDataVector>(*this); 
         return std::move(ptr);
     }
+
+    std::vector<double> ZeroDataVector::ToArray(uint64_t size) const
+    {
+        return std::vector<double>(size);
+    }
 }

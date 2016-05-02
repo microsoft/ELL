@@ -20,7 +20,7 @@ namespace trainers
 
     template <typename LossFunctionType>
     template <typename ExampleIteratorType>
-    predictors::DecisionTree SortingTreeLearner<LossFunctionType>::Train(ExampleIteratorType& exampleIterator)
+    predictors::DecisionTree SortingTreeLearner<LossFunctionType>::Train(ExampleIteratorType& exampleIterator, uint64_t maxDataVectorSize)
     {
         predictors::DecisionTree tree;
 
@@ -28,7 +28,7 @@ namespace trainers
         dataset::RowDataset<dataset::DenseSupervisedExample> denseDataset;
         while (exampleIterator.IsValid())
         {
-            denseDataset.AddExample(exampleIterator.Get());
+            denseDataset.AddExample(dataset::DenseSupervisedExample(exampleIterator.Get(), maxDataVectorSize));
             exampleIterator.Next();
         }
 

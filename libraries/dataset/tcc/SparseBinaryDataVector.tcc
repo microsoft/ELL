@@ -1,3 +1,4 @@
+#include "..\include\SparseBinaryDataVector.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
@@ -12,13 +13,13 @@ namespace dataset
 {
     template<typename IntegerListType>
     template<typename IndexValueIteratorType, typename concept>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType IndexValueIterator)
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator)
     {
-        while(IndexValueIterator.IsValid())
+        while(indexValueIterator.IsValid())
         {
-            auto IndexValue = IndexValueIterator.Get();
-            SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(IndexValue.index, IndexValue.value); // explicit call to SparseBinaryDataVectorBase<ValueType>::AppendEntry is given to avoid virtual function call in Ctor
-            IndexValueIterator.Next();
+            auto indexValue = indexValueIterator.Get();
+            SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to SparseBinaryDataVectorBase<ValueType>::AppendEntry is given to avoid virtual function call in Ctor
+            indexValueIterator.Next();
         }
     }
 
@@ -29,6 +30,20 @@ namespace dataset
         return std::move(ptr);
     }
 
+    template<typename IntegerListType>
+    std::vector<double> SparseBinaryDataVectorBase<IntegerListType>::ToArray(uint64_t size) const
+    {
+        auto vector = std::vector<double>(size);
+        auto indexIterator = _indices.GetIterator();
+
+        while(indexIterator.IsValid())
+        {
+            vector[indexIterator.Get()] = 1.0;
+            indexIterator.Next();
+        }
+
+        return vector;
+    }
 
     template <typename IntegerListType>
     IDataVector::type SparseBinaryDataVectorBase<IntegerListType>::GetType() const

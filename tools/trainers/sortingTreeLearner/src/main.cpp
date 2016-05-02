@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
         //dataset->RandPerm(rng, epochSize);
 
         auto dataIterator = rowDataset.GetIterator();
-        auto tree = sortingTreeLearner.Train(dataIterator);
+        auto tree = sortingTreeLearner.Train(dataIterator, rowDataset.GetMaxDataVectorSize());
 
         tree.AddToModel(model, outputCoordinateList);
     }

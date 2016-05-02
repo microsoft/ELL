@@ -84,7 +84,7 @@ namespace dataset
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
         template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
-        SparseDataVector(IndexValueIteratorType IndexValueIterator);
+        SparseDataVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Move constructor. </summary>
         ///
@@ -151,6 +151,13 @@ namespace dataset
         ///
         /// <returns> A deep copy of the datavector </summary>
         virtual std::unique_ptr<IDataVector> Clone() const override;
+
+        /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
+        ///
+        /// <param name="size"> The array size. </param>
+        ///
+        /// <returns> The array. </returns>
+        virtual std::vector<double> ToArray(uint64_t size) const override;
 
         virtual type GetType() const override
         {

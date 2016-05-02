@@ -34,7 +34,8 @@ namespace dataset
         /// <summary> Constructs an instance of DenseSupervisedExample from a SupervisedExample. </summary>
         ///
         /// <param name="example"> The SupervisedExample. </param>
-        DenseSupervisedExample(const SupervisedExample& example);
+        /// <param name="size"> The size of the dense DataVector. </param>
+        DenseSupervisedExample(const SupervisedExample& example, uint64_t size);
 
         /// <summary> Gets the weight. </summary>
         ///

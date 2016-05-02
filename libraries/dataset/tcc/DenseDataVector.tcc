@@ -1,3 +1,4 @@
+#include "..\include\DenseDataVector.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Rockmill
@@ -12,13 +13,13 @@ namespace dataset
 {
     template<typename ValueType>
     template<typename IndexValueIteratorType, typename concept>
-    DenseDataVector<ValueType>::DenseDataVector(IndexValueIteratorType IndexValueIterator) 
+    DenseDataVector<ValueType>::DenseDataVector(IndexValueIteratorType indexValueIterator) 
     {
-        while(IndexValueIterator.IsValid())
+        while(indexValueIterator.IsValid())
         {
-            auto IndexValue = IndexValueIterator.Get();
-            DenseDataVector<ValueType>::AppendEntry(IndexValue.index, IndexValue.value); // explicit call to DenseDataVector<ValueType>::AppendEntry is given to avoid virtual function call in Ctor
-            IndexValueIterator.Next();
+            auto indexValue = indexValueIterator.Get();
+            DenseDataVector<ValueType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to DenseDataVector<ValueType>::AppendEntry is given to avoid virtual function call in Ctor
+            indexValueIterator.Next();
         }
     }
 
@@ -29,6 +30,18 @@ namespace dataset
         return std::make_unique<DenseDataVector<ValueType>>(std::move(result)); 
     }
     
+    template<typename ValueType>
+    std::vector<double> DenseDataVector<ValueType>::ToArray(uint64_t size) const
+    {
+        auto vector = std::vector<double>(size);
+        if(size > _data.size())
+        {
+            size = _data.size();
+        }
+        std::copy(_data.cbegin(), _data.cbegin()+size, vector.begin());
+        return vector;
+    }
+
     template <typename ValueType>
     IDataVector::type DenseDataVector<ValueType>::GetType() const
     {

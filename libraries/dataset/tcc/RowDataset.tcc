@@ -23,7 +23,7 @@ namespace dataset
     }
 
     template<typename RowType>
-    uint64_t RowDataset<RowType>::GetMaxExampleSize() const
+    uint64_t RowDataset<RowType>::GetMaxDataVectorSize() const
     {
         return _maxExampleSize;
     }
