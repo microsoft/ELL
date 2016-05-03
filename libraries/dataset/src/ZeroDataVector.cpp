@@ -82,8 +82,8 @@ namespace dataset
         return std::move(ptr);
     }
 
-    std::vector<double> ZeroDataVector::ToArray(uint64_t size) const
+    std::vector<double> ZeroDataVector::ToArray() const
     {
-        return std::vector<double>(size);
+        return std::vector<double>(Size());
     }
 }

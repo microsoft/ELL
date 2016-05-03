@@ -31,9 +31,9 @@ namespace dataset
     }
 
     template<typename IntegerListType>
-    std::vector<double> SparseBinaryDataVectorBase<IntegerListType>::ToArray(uint64_t size) const
+    std::vector<double> SparseBinaryDataVectorBase<IntegerListType>::ToArray() const
     {
-        auto vector = std::vector<double>(size);
+        auto vector = std::vector<double>(Size());
         auto indexIterator = _indices.GetIterator();
 
         while(indexIterator.IsValid())

@@ -30,9 +30,9 @@ namespace dataset
     }
 
     template<typename ValueType, typename IntegerListType>
-    std::vector<double> SparseDataVector<ValueType, IntegerListType>::ToArray(uint64_t size) const
+    std::vector<double> SparseDataVector<ValueType, IntegerListType>::ToArray() const
     {
-        auto vector = std::vector<double>(size);
+        auto vector = std::vector<double>(Size());
         auto indexValueIterator = GetIterator();
 
         while(indexValueIterator.IsValid())

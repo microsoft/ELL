@@ -56,9 +56,7 @@ namespace dataset
 
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///
-        /// <param name="size"> The array size. </param>
-        ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray(uint64_t size) const = 0;
+        virtual std::vector<double> ToArray() const = 0;
     };
 }

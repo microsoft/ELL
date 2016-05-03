@@ -31,14 +31,10 @@ namespace dataset
     }
     
     template<typename ValueType>
-    std::vector<double> DenseDataVector<ValueType>::ToArray(uint64_t size) const
+    std::vector<double> DenseDataVector<ValueType>::ToArray() const
     {
-        auto vector = std::vector<double>(size);
-        if(size > _data.size())
-        {
-            size = _data.size();
-        }
-        std::copy(_data.cbegin(), _data.cbegin()+size, vector.begin());
+        auto vector = std::vector<double>(Size());
+        std::copy(_data.cbegin(), _data.cend(), vector.begin());
         return vector;
     }
 

@@ -109,9 +109,9 @@ namespace dataset
         return std::move(ptr);
     }
 
-    std::vector<double> OnesDataVector::ToArray(uint64_t size) const
+    std::vector<double> OnesDataVector::ToArray() const
     {
-        auto vector = std::vector<double>(size);
+        auto vector = std::vector<double>(Size());
         std::fill(vector.begin(), vector.end(), 1.0);
         return vector;
     }

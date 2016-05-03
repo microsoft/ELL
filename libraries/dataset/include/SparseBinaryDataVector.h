@@ -163,10 +163,8 @@ namespace dataset
 
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///
-        /// <param name="size"> The array size. </param>
-        ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray(uint64_t size) const override;
+        virtual std::vector<double> ToArray() const override;
 
     private:
         IntegerListType _indices;

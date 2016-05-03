@@ -29,7 +29,7 @@ namespace trainers
         while (exampleIterator.IsValid())
         {
             const auto& example = exampleIterator.Get();
-            auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray(100));
+            auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
             auto denseSupervisedExample = dataset::SupervisedExample<dataset::DoubleDataVector>(std::move(denseDataVector), example.GetLabel(), example.GetWeight());
             denseDataset.AddExample(std::move(denseSupervisedExample));
             exampleIterator.Next();
