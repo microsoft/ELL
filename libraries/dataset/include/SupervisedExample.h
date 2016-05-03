@@ -53,19 +53,7 @@ namespace dataset
         /// <returns> The label. </returns>
         double GetLabel() const;
 
-        SupervisedExample& operator=(SupervisedExample other)
-        {
-            swap(*this, other);
-            return *this;
-        }
-
-        friend void swap(SupervisedExample& a, SupervisedExample &b)
-        {
-            using std::swap;
-            swap(a._dataVector, b._dataVector);
-            swap(a._label, b._label);
-            swap(a._weight, b._weight);
-        }
+        SupervisedExample<DataVectorType>& operator=(SupervisedExample<DataVectorType> other);
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///
@@ -73,6 +61,8 @@ namespace dataset
         void Print(std::ostream& os) const;
 
     private:
+        static void Swap(SupervisedExample<DataVectorType>& a, SupervisedExample<DataVectorType>& b);
+
         std::unique_ptr<DataVectorType> _dataVector;
         double _label;
         double _weight;

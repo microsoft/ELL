@@ -32,7 +32,7 @@ namespace trainers
         ///
         /// <returns> A decision tree. </returns>
         template <typename ExampleIteratorType>
-        predictors::DecisionTree Train(ExampleIteratorType& exampleIterator, uint64_t maxDataVectorSize);
+        predictors::DecisionTree Train(ExampleIteratorType& exampleIterator);
 
     private:
         LossFunctionType _lossFunction;

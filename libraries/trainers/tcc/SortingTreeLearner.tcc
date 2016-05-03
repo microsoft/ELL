@@ -20,7 +20,7 @@ namespace trainers
 
     template <typename LossFunctionType>
     template <typename ExampleIteratorType>
-    predictors::DecisionTree SortingTreeLearner<LossFunctionType>::Train(ExampleIteratorType& exampleIterator, uint64_t maxDataVectorSize)
+    predictors::DecisionTree SortingTreeLearner<LossFunctionType>::Train(ExampleIteratorType& exampleIterator)
     {
         predictors::DecisionTree tree;
 
@@ -28,10 +28,12 @@ namespace trainers
         dataset::RowDataset<dataset::DoubleDataVector> denseDataset;
         while (exampleIterator.IsValid())
         {
-//            denseDataset.AddExample(dataset::SupervisedExample<DoubleDataVector>(exampleIterator.Get(), maxDataVectorSize));
+            const auto& example = exampleIterator.Get();
+            auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray(100));
+            auto denseSupervisedExample = dataset::SupervisedExample<dataset::DoubleDataVector>(std::move(denseDataVector), example.GetLabel(), example.GetWeight());
+            denseDataset.AddExample(std::move(denseSupervisedExample));
             exampleIterator.Next();
         }
-
 
         // TODO - replace the below with a real tree learning algo
         auto& root = tree.SplitRoot(predictors::DecisionTree::SplitRule(0, 0.0), -1.0, 1.0);

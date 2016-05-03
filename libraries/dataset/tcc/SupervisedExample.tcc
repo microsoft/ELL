@@ -36,6 +36,23 @@ namespace dataset
     }
 
     template<typename DataVectorType>
+    SupervisedExample<DataVectorType>& SupervisedExample<DataVectorType>::operator=(SupervisedExample<DataVectorType> other)
+    {
+        Swap(*this, other);
+        return *this;
+    }
+
+    template<typename DataVectorType>
+    void SupervisedExample<DataVectorType>::Swap(SupervisedExample<DataVectorType>& a, SupervisedExample<DataVectorType> &b)
+    {
+        using std::swap;
+        swap(a._dataVector, b._dataVector);
+        swap(a._label, b._label);
+        swap(a._weight, b._weight);
+    }
+
+
+    template<typename DataVectorType>
     void SupervisedExample<DataVectorType>::Print(std::ostream & os) const
     {
         os << _label << '\t';
