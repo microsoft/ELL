@@ -45,7 +45,7 @@ public:
     /// <returns> An Iterator over output values. </returns>
     std::vector<double> Compute(const std::vector<double>& input) const;
 
-    uint64_t NumLayers() const;
+    //uint64_t NumLayers() const;
 
     /// <summary> Returns the current output coordinates for the map. </summary>
     ///
