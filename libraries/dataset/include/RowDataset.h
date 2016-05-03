@@ -22,11 +22,11 @@
 
 namespace dataset
 {
-    template<typename RowType = SupervisedExample>
+    template<typename RowType = SupervisedExample<>>
     class RowDataset 
     {
     public:
-        using Iterator = utilities::VectorIterator<SupervisedExample>;
+        using Iterator = utilities::VectorIterator<SupervisedExample<>>;
 
         /// <summary> Default constructor. </summary>
         RowDataset() = default;

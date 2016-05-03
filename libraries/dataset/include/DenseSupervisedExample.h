@@ -35,7 +35,7 @@ namespace dataset
         ///
         /// <param name="example"> The SupervisedExample. </param>
         /// <param name="size"> The size of the dense DataVector. </param>
-        DenseSupervisedExample(const SupervisedExample& example, uint64_t size);
+        DenseSupervisedExample(const SupervisedExample<>& example, uint64_t size);
 
         /// <summary> Gets the weight. </summary>
         ///

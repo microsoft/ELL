@@ -43,7 +43,7 @@ namespace dataset
         /// <param name="spExampleString"> The sp example string. </param>
         ///
         /// <returns> A SupervisedExample. </returns>
-        SupervisedExample Build(std::shared_ptr<const std::string> spExampleString);
+        SupervisedExample<> Build(std::shared_ptr<const std::string> spExampleString);
 
     private:
         void HandleErrors(utilities::ParseResult result, const std::string& str);

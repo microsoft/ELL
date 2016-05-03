@@ -31,7 +31,7 @@ namespace dataset
     }
 
     template<typename RowIteratorType, typename VectorEntryParserType>
-    SupervisedExample ParsingIterator<RowIteratorType, VectorEntryParserType>::Get() const
+    SupervisedExample<> ParsingIterator<RowIteratorType, VectorEntryParserType>::Get() const
     {
         SupervisedExampleBuilder<VectorEntryParserType, FloatDataVector> exampleBuilder(_instanceParser);
         return exampleBuilder.Build(_rowIterator.Get());

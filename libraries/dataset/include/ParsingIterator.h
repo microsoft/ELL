@@ -21,7 +21,7 @@
 
 namespace dataset
 {
-    using IParsingIterator = utilities::IIterator<SupervisedExample>;
+    using IParsingIterator = typename utilities::IIterator<SupervisedExample<>>;
 
     /// <summary> An input iterator that traverses a textual dataset row by row and applies a parser to
     /// each row into a dense feature std::vector of doubles, a double label, and a double weight. </summary>
@@ -51,7 +51,7 @@ namespace dataset
         /// <summary> \returns The weight of the current example. </summary>
         ///
         /// <returns> A SupervisedExample. </returns>
-        virtual SupervisedExample Get() const override;
+        virtual SupervisedExample<> Get() const override;
 
     private:
         RowIteratorType _rowIterator;

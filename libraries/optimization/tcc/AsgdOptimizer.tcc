@@ -83,7 +83,7 @@ namespace optimization
     }
 
     template<typename LossFunctionType>
-    void AsgdOptimizer<LossFunctionType>::Update(utilities::AnyIterator<dataset::SupervisedExample>& exampleIterator)
+    void AsgdOptimizer<LossFunctionType>::Update(utilities::AnyIterator<dataset::SupervisedExample<>>& exampleIterator)
     {
         Update<decltype(exampleIterator)>(exampleIterator);
     }

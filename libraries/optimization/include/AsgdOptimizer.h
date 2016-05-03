@@ -59,7 +59,7 @@ namespace optimization
         ///
         /// <param name="exampleIterator"> [in,out] The data iterator. </param>
         /// <param name="numExamples"> The number of examples in the iterator. </param>
-        void Update(utilities::AnyIterator<dataset::SupervisedExample>& exampleIterator);
+        void Update(utilities::AnyIterator<dataset::SupervisedExample<>>& exampleIterator);
 
         /// <summary> Returns The averaged predictor. </summary>
         ///

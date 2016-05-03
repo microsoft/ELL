@@ -20,7 +20,7 @@ namespace dataset
     {}
 
     template<typename VectorEntryParserType, typename DefaultDataVectorType>
-    SupervisedExample SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::Build(std::shared_ptr<const std::string> spExampleString)
+    SupervisedExample<> SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::Build(std::shared_ptr<const std::string> spExampleString)
     {
         const char* pStr = spExampleString->c_str(); 
 
@@ -53,7 +53,7 @@ namespace dataset
         auto instance = DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIterator);
 
         // return supervised example
-        return SupervisedExample(std::move(instance), label, weight);
+        return SupervisedExample<>(std::move(instance), label, weight);
     }
 
     template<typename VectorEntryParserType, typename DefaultDataVectorType>

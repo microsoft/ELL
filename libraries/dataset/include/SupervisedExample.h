@@ -20,31 +20,28 @@
 namespace dataset
 {
     /// <summary> A supervised example. </summary>
-    class SupervisedExample // : public DataRow<void>
+    template<typename DataVectorType = IDataVector>
+    class SupervisedExample 
     {
     public:
-        /// <summary> Default constructors and assignment operators </summary>
+
         SupervisedExample() = default;
-        SupervisedExample(const SupervisedExample& other); 
-        SupervisedExample(SupervisedExample&& other) = default;
-        
-        SupervisedExample& operator=(SupervisedExample other)
-        {
-            swap(*this, other);
-            return *this;
-        }
-        
+
+        SupervisedExample(const SupervisedExample<DataVectorType>& other);
+
+        SupervisedExample(SupervisedExample<DataVectorType>&&) = default;
+
         /// <summary> Constructs a supervised example. </summary>
         ///
         /// <param name="instance"> The instance. </param>
         /// <param name="label"> The label. </param>
         /// <param name="weight"> The weight. </param>
-        SupervisedExample(std::unique_ptr<IDataVector> instance, double label, double weight = 1.0);
+        SupervisedExample(std::unique_ptr<DataVectorType> instance, double label, double weight = 1.0);
 
         /// <summary> Gets the data vector. </summary>
         ///
         /// <returns> The data vector. </returns>
-        const IDataVector& GetDataVector() const;
+        const DataVectorType& GetDataVector() const;
 
         /// <summary> Gets the weight. </summary>
         ///
@@ -56,11 +53,12 @@ namespace dataset
         /// <returns> The label. </returns>
         double GetLabel() const;
 
-        /// <summary> Prints the datavector to an output stream. </summary>
-        ///
-        /// <param name="os"> [in,out] Stream to write data to. </param>
-        void Print(std::ostream& os) const;
-        
+        SupervisedExample& operator=(SupervisedExample other)
+        {
+            swap(*this, other);
+            return *this;
+        }
+
         friend void swap(SupervisedExample& a, SupervisedExample &b)
         {
             using std::swap;
@@ -68,9 +66,14 @@ namespace dataset
             swap(a._label, b._label);
             swap(a._weight, b._weight);
         }
-        
+
+        /// <summary> Prints the datavector to an output stream. </summary>
+        ///
+        /// <param name="os"> [in,out] Stream to write data to. </param>
+        void Print(std::ostream& os) const;
+
     private:
-        std::unique_ptr<IDataVector> _dataVector; 
+        std::unique_ptr<DataVectorType> _dataVector;
         double _label;
         double _weight;
     };
@@ -81,5 +84,8 @@ namespace dataset
     /// <param name="example"> The example. </param>
     ///
     /// <returns> The shifted ostream. </returns>
-    std::ostream& operator<<(std::ostream& ostream, const SupervisedExample& example);
+    template<typename DataVectorType>
+    std::ostream& operator<<(std::ostream& ostream, const SupervisedExample<DataVectorType>& example);
 }
+
+#include "../tcc/SupervisedExample.tcc"
