@@ -24,7 +24,7 @@ namespace trainers
     {
         predictors::DecisionTree tree;
 
-        // create DenseRowDataset
+        // create DenseRowDataset: TODO this code breaks isolation
         dataset::RowDataset<dataset::DoubleDataVector> denseDataset;
         while (exampleIterator.IsValid())
         {
