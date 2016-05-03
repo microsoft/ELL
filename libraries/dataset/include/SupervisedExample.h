@@ -24,9 +24,8 @@ namespace dataset
     public:
 
         SupervisedExample() = default;
-        SupervisedExample(const SupervisedExample& other); 
-        SupervisedExample(SupervisedExample&& other) = default;
-        SupervisedExample& operator=(SupervisedExample other);
+        SupervisedExample(const SupervisedExample<DataVectorType>& other);
+        SupervisedExample(SupervisedExample<DataVectorType>&& other) = default;
         
         /// <summary> Constructs a supervised example. </summary>
         ///
