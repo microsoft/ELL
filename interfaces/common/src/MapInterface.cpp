@@ -51,10 +51,10 @@ namespace interfaces
         return result;
     }
 
-    uint64_t Map::NumLayers() const
-    {
-        return _map.GetModel().NumLayers();
-    }
+    // uint64_t Map::NumLayers() const
+    // {
+    //     return _map.GetModel().NumLayers();
+    // }
 
     layers::CoordinateList Map::GetOutputCoordinateList() const
     {

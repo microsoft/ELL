@@ -19,5 +19,5 @@ namespace interfaces
     /// <param name="filename"> Model filename. </param>
     ///
     /// <returns> A unique pointer to the model. </returns>
-        interfaces::Model LoadModel(const std::string& filename);
+    interfaces::Model LoadModel(const std::string& filename);
 }

@@ -28,12 +28,7 @@ namespace dataset
         SupervisedExample() = default;
         SupervisedExample(const SupervisedExample& other); 
         SupervisedExample(SupervisedExample&& other) = default;
-        
-        SupervisedExample& operator=(SupervisedExample other)
-        {
-            swap(*this, other);
-            return *this;
-        }
+        SupervisedExample& operator=(SupervisedExample other);
         
         /// <summary> Constructs a supervised example. </summary>
         ///
@@ -62,13 +57,7 @@ namespace dataset
         /// <param name="os"> [in,out] Stream to write data to. </param>
         void Print(std::ostream& os) const;
         
-        friend void swap(SupervisedExample& a, SupervisedExample &b)
-        {
-            using std::swap;
-            swap(a._dataVector, b._dataVector);
-            swap(a._label, b._label);
-            swap(a._weight, b._weight);
-        }
+        friend void swap(SupervisedExample& a, SupervisedExample &b);
         
     private:
         std::unique_ptr<IDataVector> _dataVector; 
