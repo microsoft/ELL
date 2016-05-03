@@ -9,8 +9,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // dataset
-#include "DenseSupervisedExample.h"
 #include "RowDataset.h"
+#include "DenseDataVector.h"
 
 namespace trainers
 {    
@@ -25,10 +25,10 @@ namespace trainers
         predictors::DecisionTree tree;
 
         // create DenseRowDataset
-        dataset::RowDataset<dataset::DenseSupervisedExample> denseDataset;
+        dataset::RowDataset<dataset::DoubleDataVector> denseDataset;
         while (exampleIterator.IsValid())
         {
-//            denseDataset.AddExample(dataset::DenseSupervisedExample(exampleIterator.Get(), maxDataVectorSize));
+//            denseDataset.AddExample(dataset::SupervisedExample<DoubleDataVector>(exampleIterator.Get(), maxDataVectorSize));
             exampleIterator.Next();
         }
 

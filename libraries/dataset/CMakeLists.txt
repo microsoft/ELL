@@ -13,7 +13,6 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/DenseDataVector.cpp
-         src/DenseSupervisedExample.cpp
          src/OnesDataVector.cpp
          src/SequentialLineIterator.cpp
          src/SparseBinaryDataVector.cpp
@@ -23,7 +22,6 @@ set (SRC src/DenseDataVector.cpp
 
 set (INCLUDE include/DataVectorBuilder.h
              include/DenseDataVector.h
-             include/DenseSupervisedExample.h
              include/IDataVector.h
              include/MappedParser.h
              include/OnesDataVector.h
