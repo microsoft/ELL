@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include <random>
 #include <cassert>
-#include "..\include\RowDataset.h"
+#include <algorithm>
 
 namespace dataset
 {
@@ -88,5 +88,16 @@ namespace dataset
             swap(_examples[i], _examples[j]);
         }
     }
+
+    template<typename RowType>
+    template<typename SortKeyType>
+    void RowDataset<RowType>::Sort(SortKeyType sortKey)
+    {
+        std::sort(_examples.begin(), _examples.end(), [&](const RowType& a, const RowType& b) -> bool 
+        {
+            return sortKey(a) < sortKey(b);
+        });
+    }
+
 }
 

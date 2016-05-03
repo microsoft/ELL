@@ -96,6 +96,13 @@ namespace dataset
         /// <param name="count"> Number of examples to permute. </param>
         void RandPerm(std::default_random_engine& rng, uint64_t count);
 
+        /// <summary> Sorts the given row dataset by a certain key. </summary>
+        ///
+        /// <typeparam name="SortKeyType"> Type of the sort key. </typeparam>
+        /// <param name="sortKey"> A function that takes const reference to RowType and returns a sort key. </param>
+        template<typename SortKeyType>
+        void Sort(SortKeyType sortKey);
+
     private:
         std::vector<RowType> _examples;
         uint64_t _maxExampleSize = 0;
