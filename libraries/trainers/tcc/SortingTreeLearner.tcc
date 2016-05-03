@@ -35,6 +35,10 @@ namespace trainers
             exampleIterator.Next();
         }
 
+        denseDataset.Sort([](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[6];});
+
+        std::cout << denseDataset << std::endl;
+
         // TODO - replace the below with a real tree learning algo
         auto& root = tree.SplitRoot(predictors::DecisionTree::SplitRule(0, 0.0), -1.0, 1.0);
         root.GetNegativeChild().Split(predictors::DecisionTree::SplitRule(1, 1.0), -2.0, 2.0);

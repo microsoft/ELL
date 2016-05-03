@@ -18,6 +18,7 @@
 // stl
 #include <vector>
 #include <random>
+#include <ostream>
 
 namespace dataset
 {
@@ -103,10 +104,18 @@ namespace dataset
         template<typename SortKeyType>
         void Sort(SortKeyType sortKey);
 
+        /// <summary> Prints this object. </summary>
+        ///
+        /// <param name="os"> [in,out] Stream to write data to. </param>
+        void Print(std::ostream& os) const;
+
     private:
         std::vector<RowType> _examples;
         uint64_t _maxExampleSize = 0;
     };
+
+    template<typename DataVectorType>
+    std::ostream& operator<<(std::ostream& os, RowDataset<DataVectorType>& dataset);
 }
 
 #include "../tcc/RowDataset.tcc"

@@ -71,8 +71,7 @@ int main(int argc, char* argv[])
         layers::Map map(model, outputCoordinateList);
 
         // load dataset
-        //auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
-        dataset::RowDataset<> rowDataset;
+        auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
         // create sgd trainer
         lossFunctions::LogLoss loss;
@@ -87,7 +86,7 @@ int main(int argc, char* argv[])
         // randomly permute the data
         //dataset->RandPerm(rng, epochSize);
 
-        auto dataIterator = rowDataset.GetIterator();
+        auto dataIterator = rowDataset.GetIterator(0, 20);
         auto tree = sortingTreeLearner.Train(dataIterator);
 
         tree.AddToModel(model, outputCoordinateList);

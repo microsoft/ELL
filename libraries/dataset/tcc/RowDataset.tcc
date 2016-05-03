@@ -99,5 +99,20 @@ namespace dataset
         });
     }
 
+    template<typename DataVectorType>
+    void RowDataset<DataVectorType>::Print(std::ostream& os) const
+    {
+        for(const auto& example : _examples)
+        {
+            os << example << std::endl;
+        }
+    }
+
+    template<typename DataVectorType>
+    std::ostream& operator<<(std::ostream& os, RowDataset<DataVectorType>& dataset)
+    {
+        dataset.Print(os);
+        return os;
+    }
 }
 
