@@ -28,7 +28,7 @@ namespace trainers
         dataset::RowDataset<dataset::DenseSupervisedExample> denseDataset;
         while (exampleIterator.IsValid())
         {
-            denseDataset.AddExample(dataset::DenseSupervisedExample(exampleIterator.Get(), maxDataVectorSize));
+//            denseDataset.AddExample(dataset::DenseSupervisedExample(exampleIterator.Get(), maxDataVectorSize));
             exampleIterator.Next();
         }
 

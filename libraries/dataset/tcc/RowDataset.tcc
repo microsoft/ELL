@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  EMLL
-//  File:     RowDataset.cpp (dataset)
+//  File:     RowDataset.tcc (dataset)
 //  Authors:  Ofer Dekel
 //
 //  [copyright]
@@ -16,32 +16,32 @@
 
 namespace dataset
 {
-    template<typename RowType>
-    uint64_t RowDataset<RowType>::NumExamples() const
+    template<typename DataVectorType>
+    uint64_t RowDataset<DataVectorType>::NumExamples() const
     {
         return _examples.size();
     }
 
-    template<typename RowType>
-    uint64_t RowDataset<RowType>::GetMaxDataVectorSize() const
+    template<typename DataVectorType>
+    uint64_t RowDataset<DataVectorType>::GetMaxDataVectorSize() const
     {
         return _maxExampleSize;
     }
 
-    template<typename RowType>
-    const RowType& RowDataset<RowType>::GetExample(uint64_t index) const
+    template<typename DataVectorType>
+    const SupervisedExample<DataVectorType>& RowDataset<DataVectorType>::GetExample(uint64_t index) const
     {
         return _examples[index];
     }
 
-    template<typename RowType>
-    const RowType & RowDataset<RowType>::operator[](uint64_t index) const
+    template<typename DataVectorType>
+    const SupervisedExample<DataVectorType>& RowDataset<DataVectorType>::operator[](uint64_t index) const
     {
         return _examples[index];
     }
 
-    template<typename RowType>
-    typename RowDataset<RowType>::Iterator RowDataset<RowType>::GetIterator(uint64_t firstExample, uint64_t numExamples) const
+    template<typename DataVectorType>
+    typename RowDataset<DataVectorType>::Iterator RowDataset<DataVectorType>::GetIterator(uint64_t firstExample, uint64_t numExamples) const
     {
         if (firstExample >= NumExamples())
         {
@@ -57,8 +57,8 @@ namespace dataset
         return utilities::MakeStlIterator(_examples.cbegin() + firstExample, _examples.cbegin() + lastExample);
     }
 
-    template<typename RowType>
-    void RowDataset<RowType>::AddExample(RowType example)
+    template<typename DataVectorType>
+    void RowDataset<DataVectorType>::AddExample(RowType example)
     {
         uint64_t size = example.GetDataVector().Size();
         _examples.push_back(std::move(example));
@@ -69,14 +69,14 @@ namespace dataset
         }
     }
 
-    template<typename RowType>
-    void RowDataset<RowType>::RandPerm(std::default_random_engine& rng)
+    template<typename DataVectorType>
+    void RowDataset<DataVectorType>::RandPerm(std::default_random_engine& rng)
     {
         RandPerm(rng, NumExamples());
     }
 
-    template<typename RowType>
-    void RowDataset<RowType>::RandPerm(std::default_random_engine& rng, uint64_t count)
+    template<typename DataVectorType>
+    void RowDataset<DataVectorType>::RandPerm(std::default_random_engine& rng, uint64_t count)
     {
         using std::swap;
         uint64_t lastIndex = NumExamples() - 1;
@@ -89,9 +89,9 @@ namespace dataset
         }
     }
 
-    template<typename RowType>
+    template<typename DataVectorType>
     template<typename SortKeyType>
-    void RowDataset<RowType>::Sort(SortKeyType sortKey)
+    void RowDataset<DataVectorType>::Sort(SortKeyType sortKey)
     {
         std::sort(_examples.begin(), _examples.end(), [&](const RowType& a, const RowType& b) -> bool 
         {

@@ -12,6 +12,7 @@
 
 #include "RowDataset.h"
 #include "SupervisedExample.h"
+#include "IDataVector.h"
 
 // utilities
 #include "StlIterator.h"
@@ -22,11 +23,12 @@
 
 namespace dataset
 {
-    template<typename RowType = SupervisedExample<>>
+    template<typename DataVectorType = IDataVector>
     class RowDataset 
     {
     public:
-        using Iterator = utilities::VectorIterator<SupervisedExample<>>;
+        using RowType = SupervisedExample<DataVectorType>;
+        using Iterator = utilities::VectorIterator<RowType>;
 
         /// <summary> Default constructor. </summary>
         RowDataset() = default;
