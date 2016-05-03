@@ -1,10 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  EMLL
+//  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     unique_ptr.i (interfaces)
 //  Authors:  Chuck Jacobs
-//
-//  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -24,7 +22,7 @@ namespace std
         typedef T* pointer;
         
         unique_ptr();
-        unique_ptr( nullptr_t Nptr );
+        unique_ptr( std::nullptr_t Nptr );
         explicit unique_ptr( pointer Ptr );
         unique_ptr (unique_ptr&& Right);
         template<class T2, Class Del2> unique_ptr( unique_ptr<T2, Del2>&& Right );

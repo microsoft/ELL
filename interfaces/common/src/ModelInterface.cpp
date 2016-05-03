@@ -1,10 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  EMLL
+//  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     ModelInterface.cpp (interfaces)
 //  Authors:  Chuck Jacobs
-//
-//  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -25,9 +23,39 @@ namespace interfaces
     {
     }
 
+    uint64_t Model::NumLayers() const
+    {
+        return _model->NumLayers(); 
+    }
+    
+    uint64_t Model::GetRequiredLayerSize(uint64_t layerIndex) const 
+    {
+        return _model->GetRequiredLayerSize(layerIndex);
+    }
+    
+    const layers::Layer& Model::GetLayer(uint64_t layerIndex) const 
+    {
+        return _model->GetLayer(layerIndex); 
+    }
+    
+    layers::CoordinateList Model::BuildCoordinateList(uint64_t layerIndex) const 
+    {
+        return _model->BuildCoordinateList(layerIndex);
+    }
+
     void Model::Save(const std::string& filename) const
     {
         auto outputStream = utilities::OpenOfstream(filename);
         _model->Save(outputStream);
+    }
+    
+    const layers::Model& Model::GetModel() const 
+    { 
+        return *_model; 
+    }
+    
+    layers::Model& Model::GetModel() 
+    { 
+        return *_model; 
     }
 }

@@ -1,10 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  EMLL
+//  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     SupervisedExample.h (dataset)
 //  Authors:  Ofer Dekel
-//
-//  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -26,11 +24,10 @@ namespace dataset
     public:
 
         SupervisedExample() = default;
-
-        SupervisedExample(const SupervisedExample<DataVectorType>& other);
-
-        SupervisedExample(SupervisedExample<DataVectorType>&&) = default;
-
+        SupervisedExample(const SupervisedExample& other); 
+        SupervisedExample(SupervisedExample&& other) = default;
+        SupervisedExample& operator=(SupervisedExample other);
+        
         /// <summary> Constructs a supervised example. </summary>
         ///
         /// <param name="instance"> The instance. </param>

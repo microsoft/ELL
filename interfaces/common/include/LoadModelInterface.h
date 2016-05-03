@@ -1,10 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  EMLL
+//  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     LoadModelInterface.h (interfaces)
 //  Authors:  Chuck Jacobs
-//
-//  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
@@ -21,5 +19,5 @@ namespace interfaces
     /// <param name="filename"> Model filename. </param>
     ///
     /// <returns> A unique pointer to the model. </returns>
-        interfaces::Model LoadModel(const std::string& filename);
+    interfaces::Model LoadModel(const std::string& filename);
 }

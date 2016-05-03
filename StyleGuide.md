@@ -63,11 +63,9 @@ Next, indicate all `#include` statements. First, include files from the local pr
     ******** begin example ********
     //////////////////////////////////////////////////////////////////////////////////////////////////// 
     // 
-    //  Project:  EMLL (RCMLL - Resource Constrained Machine Learning Library)
+    //  Project:  Embedded Machine Learning Library (EMLL)
     //  File:     FileName.h (libraryName)
     //  Authors:  Author1, Author2
-    //
-    //  [copyright]
     //
     //////////////////////////////////////////////////////////////////////////////////////////////////// 
 

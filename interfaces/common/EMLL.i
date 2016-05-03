@@ -1,10 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  EMLL
+//  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     EMLL.i (interfaces)
 //  Authors:  Chuck Jacobs
-//
-//  [copyright]
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -123,4 +121,3 @@ wrap_unique_ptr(LayerPtr, layers::Layer)
 %shared_ptr(layers::Model)
 %shared_ptr(dataset::RowDataset)
 %shared_ptr(RowDataset)
-
