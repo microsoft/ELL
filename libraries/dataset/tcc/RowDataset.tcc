@@ -96,21 +96,23 @@ namespace dataset
 
     template<typename DataVectorType>
     template<typename SortKeyType>
-    void RowDataset<DataVectorType>::Sort(SortKeyType sortKey, uint64_t fromIndex, uint64_t size)
+    void RowDataset<DataVectorType>::Sort(SortKeyType sortKey, uint64_t fromRowIndex, uint64_t size)
     {
 
-        assert(fromIndex + size <= _examples.size());
+        assert(fromRowIndex + size <= _examples.size());
 
         if (size == 0)
         {
-            size = _examples.size() - fromIndex;
+            size = _examples.size() - fromRowIndex;
         }
         if(size <= 1)
         {
             return;
         }
 
-        std::sort(_examples.begin() + fromIndex, _examples.begin() + fromIndex + size, [&](const RowType& a, const RowType& b) -> bool 
+        std::sort(_examples.begin() + fromRowIndex, 
+        _examples.begin() + fromRowIndex + size, 
+        [&](const RowType& a, const RowType& b) -> bool 
         {
             return sortKey(a) < sortKey(b);
         });

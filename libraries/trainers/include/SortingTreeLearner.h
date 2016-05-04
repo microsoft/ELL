@@ -43,22 +43,27 @@ namespace trainers
 
         struct SplitCandidate
         {
+            predictors::DecisionTree::Child* child;
             predictors::DecisionTree::SplitRule splitRule;
-            predictors::DecisionTree::Child child;
+            double negativeChildWeight;
+            double positiveChildWeight;
             double gain;
-            uint64_t fromIndex;
+            uint64_t fromRowIndex;
             uint64_t size;
-        };
 
+            bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
+        };
 
         template <typename ExampleIteratorType>
         void LoadData(ExampleIteratorType exampleIterator);
+
+        SplitCandidate GetSplitCandidate(uint64_t fromRowIndex, uint64_t size) { return SplitCandidate{ nullptr, predictors::DecisionTree::SplitRule(0,0), 0,0,0,0,0 }; }
 
         void Cleanup();
 
         LossFunctionType _lossFunction;
         dataset::RowDataset<dataset::DoubleDataVector> _dataset;
-        std::priority_queue<double> _queue;
+        std::priority_queue<SplitCandidate> _queue;
     };
 }
 

@@ -1,3 +1,4 @@
+#include "..\include\SortingTreeLearner.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
@@ -20,6 +21,9 @@ namespace trainers
         LoadData(exampleIterator);
 
         predictors::DecisionTree tree;
+
+        _queue.push(GetSplitCandidate(0, _dataset.NumExamples()));
+
 
         _dataset.Sort([](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[6];});
 
