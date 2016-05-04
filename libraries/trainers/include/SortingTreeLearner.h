@@ -41,6 +41,16 @@ namespace trainers
 
     private:
 
+        struct SplitCandidate
+        {
+            predictors::DecisionTree::SplitRule splitRule;
+            predictors::DecisionTree::Child child;
+            double gain;
+            uint64_t fromIndex;
+            uint64_t size;
+        };
+
+
         template <typename ExampleIteratorType>
         void LoadData(ExampleIteratorType exampleIterator);
 
