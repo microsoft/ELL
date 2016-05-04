@@ -8,8 +8,15 @@
 
 #pragma once
 
+// dataset
+#include "RowDataset.h"
+#include "DenseDataVector.h"
+
 // predictors
 #include "DecisionTree.h"
+
+// stl
+#include <queue>
 
 namespace trainers
 {
@@ -30,10 +37,18 @@ namespace trainers
         ///
         /// <returns> A decision tree. </returns>
         template <typename ExampleIteratorType>
-        predictors::DecisionTree Train(ExampleIteratorType& exampleIterator);
+        predictors::DecisionTree Train(ExampleIteratorType exampleIterator);
 
     private:
+
+        template <typename ExampleIteratorType>
+        void LoadData(ExampleIteratorType exampleIterator);
+
+        void Cleanup();
+
         LossFunctionType _lossFunction;
+        dataset::RowDataset<dataset::DoubleDataVector> _dataset;
+        std::priority_queue<double> _queue;
     };
 }
 

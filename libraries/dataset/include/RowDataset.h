@@ -84,6 +84,9 @@ namespace dataset
         /// <param name="example"> The example. </param>
         void AddExample(RowType example);
 
+        /// <summary> Erases all of the examples in the RowDataset. </summary>
+        void Reset();
+
         /// <summary> Randomly permutes the rows of the dataset. </summary>
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
@@ -101,8 +104,10 @@ namespace dataset
         ///
         /// <typeparam name="SortKeyType"> Type of the sort key. </typeparam>
         /// <param name="sortKey"> A function that takes const reference to RowType and returns a sort key. </param>
+        /// <param name="fromIndex"> Zero-based index of the first row to sort. </param>
+        /// <param name="size"> The number of examples to sort. </param>
         template<typename SortKeyType>
-        void Sort(SortKeyType sortKey);
+        void Sort(SortKeyType sortKey, uint64_t fromIndex = 0, uint64_t size = 0);
 
         /// <summary> Prints this object. </summary>
         ///

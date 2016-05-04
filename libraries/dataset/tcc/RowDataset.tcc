@@ -68,6 +68,13 @@ namespace dataset
     }
 
     template<typename DataVectorType>
+    void RowDataset<DataVectorType>::Reset()
+    {
+        _examples.clear();
+        _maxExampleSize = 0;
+    }
+
+    template<typename DataVectorType>
     void RowDataset<DataVectorType>::RandPerm(std::default_random_engine& rng)
     {
         RandPerm(rng, NumExamples());
@@ -89,9 +96,21 @@ namespace dataset
 
     template<typename DataVectorType>
     template<typename SortKeyType>
-    void RowDataset<DataVectorType>::Sort(SortKeyType sortKey)
+    void RowDataset<DataVectorType>::Sort(SortKeyType sortKey, uint64_t fromIndex, uint64_t size)
     {
-        std::sort(_examples.begin(), _examples.end(), [&](const RowType& a, const RowType& b) -> bool 
+
+        assert(fromIndex + size <= _examples.size());
+
+        if (size == 0)
+        {
+            size = _examples.size() - fromIndex;
+        }
+        if(size <= 1)
+        {
+            return;
+        }
+
+        std::sort(_examples.begin() + fromIndex, _examples.begin() + fromIndex + size, [&](const RowType& a, const RowType& b) -> bool 
         {
             return sortKey(a) < sortKey(b);
         });
