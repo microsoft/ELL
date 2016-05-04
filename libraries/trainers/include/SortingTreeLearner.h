@@ -57,7 +57,7 @@ namespace trainers
         template <typename ExampleIteratorType>
         void LoadData(ExampleIteratorType exampleIterator);
 
-        SplitCandidate GetSplitCandidate(uint64_t fromRowIndex, uint64_t size) { return SplitCandidate{ nullptr, predictors::DecisionTree::SplitRule(0,0), 0,0,0,0,0 }; }
+        SplitCandidate GetSplitCandidate(uint64_t fromRowIndex, uint64_t size);
 
         void Cleanup();
 
