@@ -10,9 +10,19 @@
 
 namespace dataset
 {
-    SupervisedExample::SupervisedExample(const SupervisedExample& other) : _dataVector(other._dataVector->Clone()), _label(other._label), _weight(other._weight) {}
+    SupervisedExample::SupervisedExample(const SupervisedExample& other) : _dataVector(other._dataVector->Clone()), _label(other._label), _weight(other._weight) 
+    {
+    }
+
     SupervisedExample::SupervisedExample(std::unique_ptr<IDataVector> instance, double label, double weight) : _dataVector(std::move(instance)), _label(label), _weight(weight)
-    {}
+    {
+    }
+
+    SupervisedExample& SupervisedExample::operator=(SupervisedExample other)
+    {
+        swap(*this, other);
+        return *this;
+    }
 
     const IDataVector& SupervisedExample::GetDataVector() const
     {
@@ -40,4 +50,13 @@ namespace dataset
         example.Print(ostream);
         return ostream;
     }
+
+    void swap(SupervisedExample& a, SupervisedExample &b)
+    {
+        using std::swap;
+        swap(a._dataVector, b._dataVector);
+        swap(a._label, b._label);
+        swap(a._weight, b._weight);
+    }
+
 }
