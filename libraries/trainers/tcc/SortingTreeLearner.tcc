@@ -22,7 +22,7 @@ namespace trainers
 
         predictors::DecisionTree tree;
 
-        _queue.push(GetSplitCandidate(0, _dataset.NumExamples()));
+        AddSplitCandidateToQueue(&tree.GetRoot(), 0, _dataset.NumExamples());
 
         std::cout << _dataset << std::endl;
 
@@ -52,7 +52,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    typename SortingTreeLearner<LossFunctionType>::SplitCandidate SortingTreeLearner<LossFunctionType>::GetSplitCandidate(uint64_t fromRowIndex, uint64_t size)
+    void SortingTreeLearner<LossFunctionType>::AddSplitCandidateToQueue(predictors::DecisionTree::Child* leaf, uint64_t fromRowIndex, uint64_t size)
     {
         auto maxFeature = _dataset.GetMaxDataVectorSize();
 
@@ -62,7 +62,7 @@ namespace trainers
         double bestPositiveChildWeight=0.0;
 
         _dataset.Sort([](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[6]; });
-        return SplitCandidate{nullptr, bestSplitRule, bestGain, bestNegativeChildWeight, bestPositiveChildWeight, fromRowIndex, size};
+        _queue.push(SplitCandidate{leaf, bestSplitRule, bestGain, bestNegativeChildWeight, bestPositiveChildWeight, fromRowIndex, size});
     }
 
     template<typename LossFunctionType>
