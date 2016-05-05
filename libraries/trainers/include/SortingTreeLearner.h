@@ -52,23 +52,23 @@ namespace trainers
         // struct used to keep info about the gain maximizing split of each leaf in the tree
         struct SplitCandidate
         {
-            predictors::DecisionTree::Child* leaf;
+            predictors::DecisionTree::Node* leaf;
             predictors::DecisionTree::SplitRule splitRule;
             double gain = 0;
             uint64_t fromRowIndex;
+            uint64_t size;
             uint64_t negativeSize;
-            uint64_t positiveSize;
+            Sums sums;
             Sums negativeSums;
-            Sums positiveSums;
 
             bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
         };
 
         template <typename ExampleIteratorType>
         Sums LoadData(ExampleIteratorType exampleIterator);
-        void AddSplitCandidateToQueue(predictors::DecisionTree::Child* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums);
+        void AddSplitCandidateToQueue(predictors::DecisionTree::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums);
         void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size);
-        double CalculateGain(Sums sums, Sums negativeSums, Sums positiveSums) const;
+        double CalculateGain(Sums sums, Sums negativeSums) const;
         double GetOutputValue(Sums sums) const;
         void Cleanup();
 
