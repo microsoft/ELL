@@ -10,6 +10,7 @@
 
 // stl
 #include <cmath>
+#include "..\include\SquaredLoss.h"
 
 namespace lossFunctions
 {
@@ -23,5 +24,10 @@ namespace lossFunctions
     {
         double residual = prediction - label;
         return residual;
+    }
+
+    double SquaredLoss::BregmanGenerator(double value) const
+    {
+        return value*value;
     }
 }

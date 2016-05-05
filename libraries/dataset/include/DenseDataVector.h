@@ -61,7 +61,7 @@ namespace dataset
         /// <param name="index"> Zero-based index of the desired element. </param>
         ///
         /// <returns> Value of the desired element. </returns>
-        const ValueType& operator[](uint64_t index) const;
+        double operator[](uint64_t index) const;
 
         /// <summary> Sets an entry in the std::vector. </summary>
         ///

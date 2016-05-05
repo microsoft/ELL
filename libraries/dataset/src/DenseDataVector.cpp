@@ -33,13 +33,13 @@ namespace dataset
     }
 
     template<typename ValueType>
-    const ValueType & DenseDataVector<ValueType>::operator[](uint64_t index) const
+    double DenseDataVector<ValueType>::operator[](uint64_t index) const
     {
         if(index >= _data.size())
         {
             return 0.0;
         }
-        return _data[index];
+        return (double)_data[index];
     }
 
     template<typename ValueType>

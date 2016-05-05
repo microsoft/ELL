@@ -28,21 +28,23 @@ namespace trainers
         // as long as positive gains can be attained, keep growing the tree
         while(!_queue.empty())
         {
-            const auto& splitInfo = _queue.top();
+            auto splitInfo = _queue.top();
+            _queue.pop();
 
             // perform the split
-            auto& interiorNode = splitInfo.leaf->Split(splitInfo.splitRule, GetLeafOutputValue(splitInfo.negativeSums), GetLeafOutputValue(splitInfo.positiveSums)); 
+            auto& interiorNode = splitInfo.leaf->Split(splitInfo.splitRule, GetOutputValue(splitInfo.negativeSums), GetOutputValue(splitInfo.positiveSums)); 
 
             // sort the data according to the performed split
             SortDatasetByFeature(splitInfo.splitRule.featureIndex, splitInfo.fromRowIndex, splitInfo.negativeSize + splitInfo.positiveSize);
+
+            std::cout << _dataset << std::endl;
+
 
             // queue split candidate for negative child
             AddSplitCandidateToQueue(&interiorNode.GetNegativeChild(), splitInfo.fromRowIndex, splitInfo.negativeSize, splitInfo.negativeSums);
 
             // queue split candidate for positive child
             AddSplitCandidateToQueue(&interiorNode.GetPositiveChild(), splitInfo.fromRowIndex + splitInfo.negativeSize, splitInfo.positiveSize, splitInfo.positiveSums);
-
-            _queue.pop();
         }
 
 //        std::cout << _dataset << std::endl;
@@ -120,14 +122,14 @@ namespace trainers
                 Sums positiveSums = sums - negativeSums;
 
                 // find gain maximizer
-                double gain = CalculateGain(negativeSums, positiveSums);
+                double gain = CalculateGain(sums, negativeSums, positiveSums);
                 if (gain > splitCandidate.gain)
                 {
                     splitCandidate.gain = gain;
                     splitCandidate.splitRule.featureIndex = featureIndex;
                     splitCandidate.splitRule.threshold = 0.5 * (currentRow[featureIndex] + nextRow[featureIndex]);
-                    splitCandidate.negativeSize = rowIndex + 1;
-                    splitCandidate.positiveSize = size - rowIndex - 1;
+                    splitCandidate.negativeSize = rowIndex + 1 - fromRowIndex;
+                    splitCandidate.positiveSize = fromRowIndex + size - rowIndex - 1;
                     splitCandidate.negativeSums = negativeSums;
                     splitCandidate.positiveSums = positiveSums;
                 }
@@ -150,16 +152,21 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    double SortingTreeLearner<LossFunctionType>::CalculateGain(Sums negativeSums, Sums positiveSums) const
+    double SortingTreeLearner<LossFunctionType>::CalculateGain(Sums sums, Sums negativeSums, Sums positiveSums) const
     {
-        return 0.0;
+        if(negativeSums.sumWeights == 0 || positiveSums.sumWeights == 0)
+        {
+            return 0;
+        }
+        return negativeSums.sumWeights * _lossFunction.BregmanGenerator(negativeSums.sumWeightedLabels/negativeSums.sumWeights) +
+            positiveSums.sumWeights * _lossFunction.BregmanGenerator(positiveSums.sumWeightedLabels/positiveSums.sumWeights) -
+            sums.sumWeights * _lossFunction.BregmanGenerator(sums.sumWeightedLabels/sums.sumWeights);
     }
 
     template<typename LossFunctionType>
-    double SortingTreeLearner<LossFunctionType>::GetLeafOutputValue(Sums sums) const
+    double SortingTreeLearner<LossFunctionType>::GetOutputValue(Sums sums) const
     {
-        return 0.0;
-
+        return sums.sumWeightedLabels / sums.sumWeights;
     }
 
     template<typename LossFunctionType>

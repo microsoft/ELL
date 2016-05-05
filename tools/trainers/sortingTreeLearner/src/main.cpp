@@ -32,7 +32,7 @@
 #include "SortingTreeLearner.h"
 
 // lossFunctions
-#include "HingeLoss.h"
+#include "SquaredLoss.h"
 #include "LogLoss.h"
 
 // stl
@@ -72,11 +72,11 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
         // create sgd trainer
-        lossFunctions::LogLoss loss;
-        trainers::SortingTreeLearner<lossFunctions::LogLoss> sortingTreeLearner(loss);
+        lossFunctions::SquaredLoss loss;
+        trainers::SortingTreeLearner<lossFunctions::SquaredLoss> sortingTreeLearner(loss);
         
         // create evaluator
-        //utilities::BinaryClassificationEvaluator evaluator;
+        utilities::BinaryClassificationEvaluator<predictors::DecisionTree, lossFunctions::SquaredLoss> evaluator;
 
         // create random number generator
         //auto rng = utilities::GetRandomEngine(sgdArguments.dataRandomPermutationSeedString);
@@ -86,6 +86,13 @@ int main(int argc, char* argv[])
 
         auto dataIterator = rowDataset.GetIterator(0, 20);
         auto tree = sortingTreeLearner.Train(dataIterator);
+
+        // Evaluate training error
+        auto evaluationIterator = rowDataset.GetIterator(0,20);
+        evaluator.Evaluate(evaluationIterator, tree, loss);
+        
+        // print loss and errors
+        std::cerr << "training error\n" << evaluator << std::endl;
 
         tree.AddToModel(model, outputCoordinateList);
     }

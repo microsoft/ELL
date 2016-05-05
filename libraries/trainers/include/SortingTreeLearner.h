@@ -68,8 +68,8 @@ namespace trainers
         Sums LoadData(ExampleIteratorType exampleIterator);
         void AddSplitCandidateToQueue(predictors::DecisionTree::Child* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums);
         void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size);
-        double CalculateGain(Sums negativeSums, Sums positiveSums) const;
-        double GetLeafOutputValue(Sums sums) const;
+        double CalculateGain(Sums sums, Sums negativeSums, Sums positiveSums) const;
+        double GetOutputValue(Sums sums) const;
         void Cleanup();
 
         LossFunctionType _lossFunction;

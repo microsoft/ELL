@@ -121,6 +121,13 @@ namespace predictors
         /// <returns> The root. </returns>
         Child& GetRoot();
 
+        /// <summary> Returns the output of the predictor for a given example. </summary>
+        ///
+        /// <param name="example"> The data vector. </param>
+        ///
+        /// <returns> A double. </returns>
+        //double Predict(const dataset::IDataVector& dataVector) const;
+
         /// <summary> Adds the predictor to a model. </summary>
         ///
         /// <param name="model"> [in,out] The model. </param>
@@ -128,7 +135,7 @@ namespace predictors
         void AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
 
     private:
-
+        // represents a flattened version of the tree, where all parameters are in basic-type vectors
         struct FlatTree
         {
             layers::CoordinateList splitRuleCoordinates;
