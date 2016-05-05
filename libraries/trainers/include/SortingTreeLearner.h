@@ -41,23 +41,34 @@ namespace trainers
 
     private:
 
+        struct Sums
+        {
+            double sumWeights = 0;
+            double sumWeightedLabels = 0;
+
+            Sums operator-(const Sums& other) const; 
+        };
+
         struct SplitCandidate
         {
-            predictors::DecisionTree::Child* child;
+            predictors::DecisionTree::Child* leaf;
             predictors::DecisionTree::SplitRule splitRule;
-            double negativeChildWeight;
-            double positiveChildWeight;
-            double gain;
+            double gain = 0;
             uint64_t fromRowIndex;
-            uint64_t size;
+            uint64_t negativeSize;
+            uint64_t positiveSize;
+            Sums negativeSums;
+            Sums positiveSums;
 
             bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
         };
 
         template <typename ExampleIteratorType>
-        void LoadData(ExampleIteratorType exampleIterator);
+        Sums LoadData(ExampleIteratorType exampleIterator);
 
-        void AddSplitCandidateToQueue(predictors::DecisionTree::Child* leaf, uint64_t fromRowIndex, uint64_t size);
+        void AddSplitCandidateToQueue(predictors::DecisionTree::Child* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums);
+
+        double CalculateGain(Sums negativeSums, Sums positiveSums) const;
 
         void Cleanup();
 
