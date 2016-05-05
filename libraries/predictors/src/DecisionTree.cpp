@@ -19,28 +19,6 @@
 
 namespace predictors
 {
-    DecisionTree::SplitRule::SplitRule(int featureIndex, double threshold) :
-        _featureIndex(featureIndex), _threshold(threshold)
-    {}
-
-    uint64_t DecisionTree::SplitRule::GetFeatureIndex() const
-    {
-        return _featureIndex;
-    }
-
-    double DecisionTree::SplitRule::GetThreshold() const
-    {
-        return _threshold;
-    }
-
-    DecisionTree::Child::Child(double weight) : _weight(weight)
-    {}
-
-    double DecisionTree::Child::GetWeight() const
-    {
-        return _weight;
-    }
-
     bool DecisionTree::Child::IsLeaf() const
     {
         if (_node == nullptr)
@@ -53,16 +31,17 @@ namespace predictors
         }
     }
 
-    DecisionTree::InteriorNode& DecisionTree::Child::Split(SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight)
+    DecisionTree::InteriorNode& DecisionTree::Child::Split(SplitRule splitRule, double negativeEdgeOutputValue, double positiveEdgeOutputValue)
     {
         // confirm that this is a leaf
         assert(IsLeaf());
 
-        _node = std::make_unique<InteriorNode>(std::move(splitRule), Child(negativeLeafWeight), Child(positiveLeafWeight));
+        _node = std::make_unique<InteriorNode>(std::move(splitRule), negativeEdgeOutputValue, positiveEdgeOutputValue);
         return *_node;
     }
 
-    DecisionTree::InteriorNode::InteriorNode(SplitRule splitRule, Child negativeChild, Child positiveChild) : _splitRule(std::move(splitRule)), _negativeChild(std::move(negativeChild)), _positiveChild(std::move(positiveChild))
+    DecisionTree::InteriorNode::InteriorNode(SplitRule splitRule, double negativeEdgeOutputValue, double positiveEdgeOutputValue) : 
+        _splitRule(splitRule), _negativeEdgeOutputValue(negativeEdgeOutputValue), _positiveEdgeOutputValue(positiveEdgeOutputValue)
     {}
 
     const DecisionTree::SplitRule & DecisionTree::InteriorNode::GetSplitRule() const
@@ -109,26 +88,22 @@ namespace predictors
 
     uint64_t DecisionTree::NumInteriorNodes() const
     {
-        if(_root == nullptr)
+        if(_root._node == nullptr)
         {
             return 0;
         }
-        return _root->NumInteriorNodesInSubtree();
+        return _root._node->NumInteriorNodesInSubtree();
     }
 
-    DecisionTree::InteriorNode & DecisionTree::SplitRoot(SplitRule splitRule, double negativeLeafWeight, double positiveLeafWeight)
+    DecisionTree::Child& DecisionTree::GetRoot()
     {
-        // confirm that the root has never been split before
-        assert(_root == nullptr);
-
-        _root = std::make_unique<InteriorNode>(std::move(splitRule), Child(negativeLeafWeight), Child(positiveLeafWeight));
-        return *_root;
+        return _root;
     }
 
     void DecisionTree::AddToModel(layers::Model & model, layers::CoordinateList inputCoordinates) const
     {
         FlatTree flatTree;
-        BuildFlatTree(flatTree, inputCoordinates, _root.get());
+        BuildFlatTree(flatTree, inputCoordinates, _root._node.get());
 
         auto thresholdsLayer = std::make_unique<layers::Coordinatewise>(std::move(flatTree.negativeThresholds), std::move(flatTree.splitRuleCoordinates), layers::Coordinatewise::OperationType::add);
         auto thresholdsLayerCoordinates = model.AddLayer(std::move(thresholdsLayer));
@@ -136,10 +111,10 @@ namespace predictors
         auto decisionTreePathLayer = std::make_unique<layers::DecisionTreePath>(std::move(flatTree.edgeToInteriorNode), std::move(thresholdsLayerCoordinates));
         auto decisionTreePathLayerCoordinates = model.AddLayer(std::move(decisionTreePathLayer));
 
-        auto weightsLayer = std::make_unique<layers::Coordinatewise>(std::move(flatTree.edgeWeights), std::move(decisionTreePathLayerCoordinates), layers::Coordinatewise::OperationType::multiply);
-        auto weightsLayerCoordinates = model.AddLayer(std::move(weightsLayer));
+        auto outputValuesLayer = std::make_unique<layers::Coordinatewise>(std::move(flatTree.edgeOutputValues), std::move(decisionTreePathLayerCoordinates), layers::Coordinatewise::OperationType::multiply);
+        auto outputValuesLayerCoordinates = model.AddLayer(std::move(outputValuesLayer));
 
-        auto sumLayer = std::make_unique<layers::Sum>(std::move(weightsLayerCoordinates));
+        auto sumLayer = std::make_unique<layers::Sum>(std::move(outputValuesLayerCoordinates));
         model.AddLayer(std::move(sumLayer));
     }
 
@@ -151,15 +126,15 @@ namespace predictors
         }
 
         const auto& splitRule = interiorNodePtr->GetSplitRule();
-        auto splitRuleCoordinate = inputCoordinates[splitRule.GetFeatureIndex()];
-        auto negativeThreshold = -(splitRule.GetThreshold());
+        auto splitRuleCoordinate = inputCoordinates[splitRule.featureIndex];
+        auto negativeThreshold = -(splitRule.threshold);
 
 
         flatTree.splitRuleCoordinates.AddCoordinate(splitRuleCoordinate);
         flatTree.negativeThresholds.push_back(negativeThreshold);
 
-        flatTree.edgeWeights.push_back(interiorNodePtr->GetNegativeChild()._weight);
-        flatTree.edgeWeights.push_back(interiorNodePtr->GetPositiveChild()._weight);
+        flatTree.edgeOutputValues.push_back(interiorNodePtr->_negativeEdgeOutputValue);
+        flatTree.edgeOutputValues.push_back(interiorNodePtr->_positiveEdgeOutputValue);
 
         if (interiorNodePtr->GetNegativeChild().IsLeaf())
         {

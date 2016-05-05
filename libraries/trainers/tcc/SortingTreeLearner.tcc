@@ -24,15 +24,12 @@ namespace trainers
 
         _queue.push(GetSplitCandidate(0, _dataset.NumExamples()));
 
-
-        _dataset.Sort([](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[6];});
-
         std::cout << _dataset << std::endl;
 
         // TODO - replace the below with a real tree learning algo
-        auto& root = tree.SplitRoot(predictors::DecisionTree::SplitRule(0, 0.0), -1.0, 1.0);
-        root.GetNegativeChild().Split(predictors::DecisionTree::SplitRule(1, 1.0), -2.0, 2.0);
-        root.GetPositiveChild().Split(predictors::DecisionTree::SplitRule(2, 2.0), -4.0, 4.0);
+        auto& root = tree.GetRoot().Split(predictors::DecisionTree::SplitRule{0, 0.0 }, -1.0, 1.0);
+        root.GetNegativeChild().Split(predictors::DecisionTree::SplitRule{1, 1.0}, -2.0, 2.0);
+        root.GetPositiveChild().Split(predictors::DecisionTree::SplitRule{2, 2.0}, -4.0, 4.0);
 
         Cleanup();
 
@@ -57,7 +54,15 @@ namespace trainers
     template<typename LossFunctionType>
     typename SortingTreeLearner<LossFunctionType>::SplitCandidate SortingTreeLearner<LossFunctionType>::GetSplitCandidate(uint64_t fromRowIndex, uint64_t size)
     {
-        return SplitCandidate{ nullptr, predictors::DecisionTree::SplitRule(0,0), 0,0,0,0,0 }; 
+        auto maxFeature = _dataset.GetMaxDataVectorSize();
+
+        double bestGain = -1.0;
+        predictors::DecisionTree::SplitRule bestSplitRule{ 0,0 };
+        double bestNegativeChildWeight=0.0;
+        double bestPositiveChildWeight=0.0;
+
+        _dataset.Sort([](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[6]; });
+        return SplitCandidate{nullptr, bestSplitRule, bestGain, bestNegativeChildWeight, bestPositiveChildWeight, fromRowIndex, size};
     }
 
     template<typename LossFunctionType>
