@@ -40,7 +40,7 @@ namespace trainers
         predictors::DecisionTree Train(ExampleIteratorType exampleIterator);
 
     private:
-
+        // struct used to keep statistics about tree leaves
         struct Sums
         {
             double sumWeights = 0;
@@ -49,6 +49,7 @@ namespace trainers
             Sums operator-(const Sums& other) const; 
         };
 
+        // struct used to keep info about the gain maximizing split of each leaf in the tree
         struct SplitCandidate
         {
             predictors::DecisionTree::Child* leaf;
@@ -65,11 +66,10 @@ namespace trainers
 
         template <typename ExampleIteratorType>
         Sums LoadData(ExampleIteratorType exampleIterator);
-
         void AddSplitCandidateToQueue(predictors::DecisionTree::Child* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums);
-
+        void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size);
         double CalculateGain(Sums negativeSums, Sums positiveSums) const;
-
+        double GetLeafOutputValue(Sums sums) const;
         void Cleanup();
 
         LossFunctionType _lossFunction;

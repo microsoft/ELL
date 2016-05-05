@@ -17,12 +17,12 @@ namespace trainers
     template <typename ExampleIteratorType>
     predictors::DecisionTree SortingTreeLearner<LossFunctionType>::Train(ExampleIteratorType exampleIterator)
     {
-
-        auto sums = LoadData(exampleIterator);
-
         predictors::DecisionTree tree;
 
-        // find split candidate for root node
+        // convert data fron iterator to dense row dataset; compute sums statistics of the tree root
+        auto sums = LoadData(exampleIterator);
+
+        // find split candidate for root node and push it onto the priority queue
         AddSplitCandidateToQueue(&tree.GetRoot(), 0, _dataset.NumExamples(), sums);
 
         // as long as positive gains can be attained, keep growing the tree
@@ -31,25 +31,21 @@ namespace trainers
             const auto& splitInfo = _queue.top();
 
             // perform the split
-            auto& interiorNode = splitInfo.leaf->Split(splitInfo.splitRule, 0, 0); // TODO add function called get LeafOutputValues(Sums)
+            auto& interiorNode = splitInfo.leaf->Split(splitInfo.splitRule, GetLeafOutputValue(splitInfo.negativeSums), GetLeafOutputValue(splitInfo.positiveSums)); 
 
             // sort the data according to the performed split
+            SortDatasetByFeature(splitInfo.splitRule.featureIndex, splitInfo.fromRowIndex, splitInfo.negativeSize + splitInfo.positiveSize);
 
             // queue split candidate for negative child
+            AddSplitCandidateToQueue(&interiorNode.GetNegativeChild(), splitInfo.fromRowIndex, splitInfo.negativeSize, splitInfo.negativeSums);
 
             // queue split candidate for positive child
+            AddSplitCandidateToQueue(&interiorNode.GetPositiveChild(), splitInfo.fromRowIndex + splitInfo.negativeSize, splitInfo.positiveSize, splitInfo.positiveSums);
 
             _queue.pop();
         }
 
-
-
 //        std::cout << _dataset << std::endl;
-
-        // TODO - replace the below with a real tree learning algo
-        //auto& root = tree.GetRoot().Split(predictors::DecisionTree::SplitRule{0, 0.0 }, -1.0, 1.0);
-        //root.GetNegativeChild().Split(predictors::DecisionTree::SplitRule{1, 1.0}, -2.0, 2.0);
-        //root.GetPositiveChild().Split(predictors::DecisionTree::SplitRule{2, 2.0}, -4.0, 4.0);
 
         Cleanup();
 
@@ -98,10 +94,8 @@ namespace trainers
         for (uint64_t featureIndex = 0; featureIndex < numFeatures; ++featureIndex)
         {
             // sort the relevant rows of dataset in ascending order by featureIndex
-            _dataset.Sort([featureIndex](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[featureIndex];},
-                fromRowIndex,
-                size);
-            
+            SortDatasetByFeature(featureIndex, fromRowIndex, size);
+
             Sums negativeSums;
 
             for (uint64_t rowIndex = fromRowIndex; rowIndex < fromRowIndex + size-1; ++rowIndex)
@@ -148,9 +142,24 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
+    void SortingTreeLearner<LossFunctionType>::SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size)
+    {
+        _dataset.Sort([featureIndex](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[featureIndex]; },
+            fromRowIndex,
+            size);
+    }
+
+    template<typename LossFunctionType>
     double SortingTreeLearner<LossFunctionType>::CalculateGain(Sums negativeSums, Sums positiveSums) const
     {
         return 0.0;
+    }
+
+    template<typename LossFunctionType>
+    double SortingTreeLearner<LossFunctionType>::GetLeafOutputValue(Sums sums) const
+    {
+        return 0.0;
+
     }
 
     template<typename LossFunctionType>
