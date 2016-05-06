@@ -56,7 +56,7 @@ namespace dataset
     }
 
     template<typename DataVectorType>
-    void RowDataset<DataVectorType>::AddExample(RowType example)
+    void RowDataset<DataVectorType>::AddExample(ExampleType example)
     {
         uint64_t size = example.GetDataVector().Size();
         _examples.push_back(std::move(example));
@@ -112,7 +112,7 @@ namespace dataset
 
         std::sort(_examples.begin() + fromRowIndex, 
         _examples.begin() + fromRowIndex + size, 
-        [&](const RowType& a, const RowType& b) -> bool 
+        [&](const ExampleType& a, const ExampleType& b) -> bool 
         {
             return sortKey(a) < sortKey(b);
         });

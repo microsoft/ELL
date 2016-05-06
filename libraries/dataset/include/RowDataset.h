@@ -26,8 +26,8 @@ namespace dataset
     class RowDataset 
     {
     public:
-        using RowType = SupervisedExample<DataVectorType>;
-        using Iterator = utilities::VectorIterator<RowType>;
+        using ExampleType = SupervisedExample<DataVectorType>;
+        using Iterator = utilities::VectorIterator<ExampleType>;
 
         /// <summary> Default constructor. </summary>
         RowDataset() = default;
@@ -61,14 +61,14 @@ namespace dataset
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        const RowType& GetExample(uint64_t index) const;
+        const ExampleType& GetExample(uint64_t index) const;
 
         /// <summary> Returns a reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        const RowType& operator[](uint64_t index) const;
+        const ExampleType& operator[](uint64_t index) const;
 
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///
@@ -82,7 +82,7 @@ namespace dataset
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
         /// <param name="example"> The example. </param>
-        void AddExample(RowType example);
+        void AddExample(ExampleType example);
 
         /// <summary> Erases all of the examples in the RowDataset. </summary>
         void Reset();
@@ -103,7 +103,7 @@ namespace dataset
         /// <summary> Sorts the given row dataset by a certain key. </summary>
         ///
         /// <typeparam name="SortKeyType"> Type of the sort key. </typeparam>
-        /// <param name="sortKey"> A function that takes const reference to RowType and returns a sort key. </param>
+        /// <param name="sortKey"> A function that takes const reference to ExampleType and returns a sort key. </param>
         /// <param name="fromRowIndex"> Zero-based index of the first row to sort. </param>
         /// <param name="size"> The number of examples to sort. </param>
         template<typename SortKeyType>
@@ -115,7 +115,7 @@ namespace dataset
         void Print(std::ostream& os) const;
 
     private:
-        std::vector<RowType> _examples;
+        std::vector<ExampleType> _examples;
         uint64_t _maxExampleSize = 0;
     };
 
