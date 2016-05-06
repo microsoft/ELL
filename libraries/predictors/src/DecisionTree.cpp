@@ -119,6 +119,11 @@ namespace predictors
     DecisionTree::DecisionTree(double rootOutputValue) : _root(rootOutputValue)
     {}
 
+    uint64_t DecisionTree::NumNodes() const
+    {
+        return 2*NumInteriorNodes()+1;
+    }
+
     uint64_t DecisionTree::NumInteriorNodes() const
     {
         if(_root._interiorNode == nullptr)

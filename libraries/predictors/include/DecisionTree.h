@@ -143,7 +143,12 @@ namespace predictors
         /// <param name="rootOutputValue"> The root output value. </param>
         DecisionTree(double rootOutputValue);
 
-        /// <summary> Number of interior nodes. </summary>
+        /// <summary> Number of nodes in the tree. </summary>
+        ///
+        /// <returns> The number of nodes. </returns>
+        uint64_t NumNodes() const;
+
+        /// <summary> Number of interior nodes in the tree. </summary>
         ///
         /// <returns> The number of interior nodes. </returns>
         uint64_t NumInteriorNodes() const;

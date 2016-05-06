@@ -22,6 +22,7 @@
 #include "SupervisedExample.h"
 
 // common
+#include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 
@@ -47,10 +48,12 @@ int main(int argc, char* argv[])
         utilities::CommandLineParser commandLineParser(argc, argv);
 
         // add arguments to the command line parser
+        common::ParsedTrainerArguments trainerArguments;
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
 
+        commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
@@ -58,6 +61,8 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
 
+        if(trainerArguments.verbose) std::cout << "Sorting Tree Learner" << std::endl;
+        
         // if output file specified, replace stdout with it 
         auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputModelFile);
 
@@ -69,6 +74,7 @@ int main(int argc, char* argv[])
         layers::Map map(model, outputCoordinateList);
 
         // load dataset
+        if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
         // create sgd trainer
@@ -79,22 +85,32 @@ int main(int argc, char* argv[])
         utilities::BinaryClassificationEvaluator<predictors::DecisionTree, lossFunctions::SquaredLoss> evaluator;
 
         // create random number generator
-        //auto rng = utilities::GetRandomEngine(sgdArguments.dataRandomPermutationSeedString);
+        auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
 
         // randomly permute the data
-        //dataset->RandPerm(rng, epochSize);
+        rowDataset.RandPerm(rng);
 
-        auto dataIterator = rowDataset.GetIterator(0, 20);
+        // train
+        if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
+        auto dataIterator = rowDataset.GetIterator(0, 1000);
         auto tree = sortingTreeLearner.Train(dataIterator);
 
-        // Evaluate training error
-        auto evaluationIterator = rowDataset.GetIterator(0,20);
-        evaluator.Evaluate(evaluationIterator, tree, loss);
-        
         // print loss and errors
-        std::cerr << "training error\n" << evaluator << std::endl;
+        if(trainerArguments.verbose)
+        {
+            std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
 
+            auto evaluationIterator = rowDataset.GetIterator(0, 1000);
+            evaluator.Evaluate(evaluationIterator, tree, loss);
+            std::cout << "Training error\n" << evaluator << std::endl;
+        }
+
+        // add tree to model
         tree.AddToModel(model, outputCoordinateList);
+
+        // output map
+        model.Save(outStream);
+
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
