@@ -1,0 +1,39 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     InputFeature.h (features)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+#include "Feature.h"
+
+#include <string>
+#include <vector>
+#include <memory>
+
+namespace features
+{
+   //
+    // InputFeature
+    //
+    class InputFeature : public RegisteredFeature<InputFeature>
+    {
+    public:
+        static std::shared_ptr<InputFeature> Create(uint64_t size);
+        void SetValue(std::vector<double> val);
+
+        static constexpr const char* feature_name = "Input";
+
+        virtual std::vector<std::string> GetDescription() const;
+
+        static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, FeatureMap& prev_features);
+        explicit InputFeature(ctor_enable, uint64_t size);
+
+    protected:
+        virtual std::vector<double> ComputeValue() const;
+        std::vector<double> _currentValue;
+    };
+}

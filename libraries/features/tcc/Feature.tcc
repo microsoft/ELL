@@ -1,0 +1,45 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     Feature.tcc (features)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <iostream>
+#include <unordered_set>
+
+namespace features
+{
+    //
+    // CreateFeature convenience function
+    //
+//    template <typename FeatureType, typename ...Args>
+//    std::shared_ptr<FeatureType> CreateFeature(Args... args)
+//    {
+//        return FeatureType::Create(args...);
+//    }
+    
+    //
+    // RegisteredFeature implementation
+    //
+    template <typename FeatureT>
+    void RegisteredFeature<FeatureT>::RegisterFeature()
+    {
+        RegisterDeserializeFunction(FeatureT::feature_name, FeatureT::Deserialize);
+    }
+
+    template <typename FeatureT>
+    std::string RegisteredFeature<FeatureT>::FeatureType() const
+    { 
+        return FeatureT::feature_name;
+    }
+    
+    template <typename FeatureT>
+    template <typename... Args>
+    std::shared_ptr<FeatureT> RegisteredFeature<FeatureT>::Allocate(Args ...args)
+    {
+        return std::make_shared<FeatureT>(ctor_enable(), args...);
+    }
+    
+}

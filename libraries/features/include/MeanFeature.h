@@ -1,14 +1,22 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     InputFeature.cpp (featurization)
+//  File:     MeanFeature.h (features)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "InputFeature.h"
+#pragma once
 
-namespace featurization
+#include "Feature.h"
+
+namespace features
 {
-    
+    class MeanFeature : public Feature
+    {
+    public:
+        MeanFeature( /* coords */ );
+        
+    private:
+    };
 }

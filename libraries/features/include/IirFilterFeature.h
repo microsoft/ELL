@@ -1,14 +1,22 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MeanFeature.cpp (featurization)
+//  File:     IirFilterFeature.h (features)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "MeanFeature.h"
+#pragma once
 
-namespace featurization
+#include "Feature.h"
+
+namespace features
 {
-    
+    class IirFilterFeature : public Feature
+    {
+    public:
+        IirFilterFeature( /* coords */ );
+        
+    private:
+    };
 }
