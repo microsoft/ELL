@@ -75,13 +75,13 @@ namespace dataset
     }
 
     template<typename DataVectorType>
-    void RowDataset<DataVectorType>::RandPerm(std::default_random_engine& rng)
+    void RowDataset<DataVectorType>::RandomPermute(std::default_random_engine& rng)
     {
-        RandPerm(rng, NumExamples());
+        RandomPermute(rng, NumExamples());
     }
 
     template<typename DataVectorType>
-    void RowDataset<DataVectorType>::RandPerm(std::default_random_engine& rng, uint64_t count)
+    void RowDataset<DataVectorType>::RandomPermute(std::default_random_engine& rng, uint64_t count)
     {
         using std::swap;
         uint64_t lastIndex = NumExamples() - 1;

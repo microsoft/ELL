@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
 
         // randomly permute the data
-        rowDataset.RandPerm(rng);
+        rowDataset.RandomPermute(rng);
 
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;

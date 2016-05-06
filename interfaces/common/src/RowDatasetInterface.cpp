@@ -45,13 +45,13 @@ namespace interfaces
         _dataset.AddExample(std::move(example));
     }
 
-    void RowDataset::RandPerm(std::default_random_engine& rng)
+    void RowDataset::RandomPermute(std::default_random_engine& rng)
     {
-        _dataset.RandPerm(rng);
+        _dataset.RandomPermute(rng);
     }
 
-    void RowDataset::RandPerm(std::default_random_engine& rng, uint64_t count)
+    void RowDataset::RandomPermute(std::default_random_engine& rng, uint64_t count)
     {
-        _dataset.RandPerm(rng, count);
+        _dataset.RandomPermute(rng, count);
     }
 }

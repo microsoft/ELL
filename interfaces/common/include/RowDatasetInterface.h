@@ -62,7 +62,7 @@ namespace interfaces
         /// <summary> Randomly permutes the rows of the dataset. </summary>
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
-        void RandPerm(std::default_random_engine& rng);
+        void RandomPermute(std::default_random_engine& rng);
 
         /// <summary>
         /// Permutes the dataset so that the first count examples are chosen uniformly, and the rest are arbitrary.
@@ -70,7 +70,7 @@ namespace interfaces
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
         /// <param name="count"> Number of examples to permute. </param>
-        void RandPerm(std::default_random_engine& rng, uint64_t count);
+        void RandomPermute(std::default_random_engine& rng, uint64_t count);
 
     private:
         dataset::RowDataset<> _dataset;
