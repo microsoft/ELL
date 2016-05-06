@@ -20,6 +20,9 @@
 
 namespace trainers
 {
+    /// <summary> Implements a greedy decision tree growing algorithm that operates by repeatedly sorting the data by each feature. </summary>
+    ///
+    /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
     template <typename LossFunctionType>
     class SortingTreeLearner
     {
@@ -72,6 +75,7 @@ namespace trainers
         double GetOutputValue(Sums sums) const;
         void Cleanup();
 
+        // member variables
         LossFunctionType _lossFunction;
         dataset::RowDataset<dataset::DoubleDataVector> _dataset;
         std::priority_queue<SplitCandidate> _queue;

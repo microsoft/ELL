@@ -183,6 +183,7 @@ namespace predictors
 
         void BuildFlatTree(FlatTree& flatTree, const layers::CoordinateList& inputCoordinates, InteriorNode* interiorNodePtr) const;
 
+        // member variables
         Node _root;
     };
 }
