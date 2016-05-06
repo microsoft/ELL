@@ -9,14 +9,37 @@
 #pragma once
 
 #include "Feature.h"
+#include "UnaryFunctionFeature.h"
+
+#include <memory>
+#include <vector>
 
 namespace features
 {
-    class IirFilterFeature : public Feature
+    //
+    // IirFilterFeature
+    //
+    class IirFilterFeature : public UnaryFunctionFeature<IirFilterFeature>
     {
     public:
-        IirFilterFeature( /* coords */ );
-        
+        static std::shared_ptr<IirFilterFeature> Create(std::shared_ptr<Feature> inputFeature, std::vector<double> a, std::vector<double> b);
+        virtual size_t WarmupTime() const;
+        static constexpr const char* feature_name = "IirFilter";
+
+        virtual std::vector<std::string> GetDescription() const;
+
+        static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures);
+        explicit IirFilterFeature(ctor_enable, std::shared_ptr<Feature> inputFeature, std::vector<double> a, std::vector<double> b);
+
+        virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
+
+    protected:
+        virtual std::vector<double> ComputeValue() const;
+
     private:
+        // TODO: make IirFilter work on vectors, so we can keep one filter instead of one per channel
+        mutable std::vector<IirFilter> _filters;
+        std::vector<double> _a;
+        std::vector<double> _b;
     };
-}
+ }

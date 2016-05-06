@@ -58,7 +58,7 @@ namespace features
 
         /// <summary> Adds the feature set to a model. </summary>
         ///
-        /// <param name="map"> [in,out] The model. </param>
+        /// <param name="model"> [in,out] The model. </param>
         /// <param name="inputCoordinates"> The input coordinates. </param>
         /// <returns> The output coordinates </returns>
         layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;

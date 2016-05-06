@@ -7,6 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "CoordinateList.h"
+#include "Model.h"
 
 #include <string>
 #include <vector>
@@ -36,32 +38,32 @@ namespace features
         std::string Id() const;
         size_t NumColumns() const;
         virtual bool HasOutput() const;
-        std::vector<double> Eval() const;
+        std::vector<double> Eval() const; // TODO: call this Compute or something, maybe even GetOutput
 
         virtual void Reset();
         virtual size_t WarmupTime() const;
         virtual size_t ColumnDelay(int column) const;
 
-        virtual std::string FeatureType() const = 0;
         virtual std::vector<std::string> GetColumnDescriptions() const;
         virtual std::vector<std::string> GetDescription() const;
         const std::vector<std::shared_ptr<Feature>>& GetInputFeatures() const;
 
+        virtual std::string FeatureType() const = 0;
         static std::vector<std::string> GetRegisteredTypes();
 
+        virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
+
         void AddDependent(std::shared_ptr<Feature> f); // TODO: figure out how to make this protected
-
     protected:
-
         virtual std::vector<double> ComputeValue() const = 0;
 
         static void RegisterDeserializeFunction(std::string class_name, std::function<std::shared_ptr<Feature>(std::vector<std::string>, FeatureMap&)> create_fn);
         void SetDirty(bool dirty) const;
         bool IsDirty() const;
-        mutable size_t _numColumns = 0;
-        mutable std::vector<double> _cachedValue;
         void AddInputFeature(std::shared_ptr<Feature> inputFeature);
         std::vector<std::shared_ptr<Feature>> _inputFeatures; // parents
+        mutable size_t _numColumns = 0; // TODO: rename to _size (?)
+        mutable std::vector<double> _cachedValue;
 
     private:
         mutable bool _isDirty = true;

@@ -32,6 +32,8 @@ namespace features
         static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, FeatureMap& prev_features);
         explicit InputFeature(ctor_enable, uint64_t size);
 
+        virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
+
     protected:
         virtual std::vector<double> ComputeValue() const;
         std::vector<double> _currentValue;

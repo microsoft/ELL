@@ -16,6 +16,7 @@
 #include <string>
 #include <sstream>
 #include <cassert>
+#include <unordered_map>
 
 namespace features
 {
@@ -37,7 +38,7 @@ namespace features
     {
         if (_inputFeature && _outputFeature)
         {
-            _inputFeature->SetValue(static_cast<std::vector<double>>(inst)); // TODO: standardize on a vector type to use
+            _inputFeature->SetValue(inst); // TODO: standardize on a vector type to use
             auto newFeatures = _outputFeature->Eval();
             auto hasOutput = HasOutput();
             ++_numItemsProcessed;
@@ -192,13 +193,20 @@ namespace features
         return result;
     }
 
-
-
     std::shared_ptr<Feature> FeatureSet::CreateFeatureFromDescription(const std::vector<std::string>& description)
     {
         auto result = Feature::FromDescription(description, _featureMap);
         _featureMap[result->Id()] = result;
         return result;
+    }
+
+    layers::CoordinateList FeatureSet::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
+    {
+        // need to keep a map of output coordinate lists for the various features
+        std::unordered_map<std::shared_ptr<Feature>, layers::CoordinateList> featureOutputs;
+
+        // traverse graph, adding layers --- visit graph in same way we do during compute
+        return inputCoordinates;    
     }
 
 } // end namepsace

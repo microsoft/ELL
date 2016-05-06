@@ -69,6 +69,12 @@ namespace features
         _dependents.push_back(f);
     }
 
+    layers::CoordinateList Feature::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
+    {
+        throw std::runtime_error("Not implemented");
+        return inputCoordinates;
+    }
+
     size_t Feature::NumColumns() const
     {
         return _numColumns;

@@ -39,6 +39,11 @@ namespace features
         SetDirty(true); // propagates through graph
     }
 
+    layers::CoordinateList InputFeature::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
+    {
+        return inputCoordinates;    
+    }
+    
     std::vector<std::string> InputFeature::GetDescription() const
     {
         using std::to_string;
