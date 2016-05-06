@@ -153,8 +153,6 @@ namespace dataset
         ///
         /// <returns> A deep copy of the datavector </summary>
         virtual std::unique_ptr<IDataVector> Clone() const override;
-        
-        virtual type GetType() const override;
 
     private:
         IntegerListType _indices;
@@ -165,11 +163,6 @@ namespace dataset
     {
     public:
         using SparseBinaryDataVectorBase<utilities::CompressedIntegerList>::SparseBinaryDataVectorBase;
-
-        /// <summary> \returns The type of the vector. </summary>
-        ///
-        /// <returns> The type. </returns>
-        virtual type GetType() const override;
     };
 
     /// <summary> An uncompressed sparse binary data vector. </summary>
@@ -177,11 +170,6 @@ namespace dataset
     {
     public:
         using SparseBinaryDataVectorBase<utilities::IntegerList>::SparseBinaryDataVectorBase;
-
-        /// <summary> \returns The type of the vector. </summary>
-        ///
-        /// <returns> The type. </returns>
-        virtual type GetType() const override;
     };
 }
 

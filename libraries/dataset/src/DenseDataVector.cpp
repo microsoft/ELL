@@ -105,16 +105,5 @@ namespace dataset
     }
 
     template class DenseDataVector<float>;
-
-    IDataVector::type FloatDataVector::GetType() const
-    {
-        return type::dense_double;
-    }
-
     template class DenseDataVector<double>;
-
-    IDataVector::type DoubleDataVector::GetType() const
-    {
-        return type::dense_float;
-    }
 }

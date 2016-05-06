@@ -24,14 +24,6 @@ namespace dataset
     class IDataVector : public linear::IVector
     {
     public:
-
-        enum class type {none, dense_double, dense_float, sparse_double, sparse_float, sparse_short, sparse_binary, uncompressed_sparse_binary, zero, ones, segmented};
-
-        /// <summary> \returns The type of the std::vector. </summary>
-        ///
-        /// <returns> The type. </returns>
-        virtual type GetType() const = 0;
-
         /// <summary> Adds a value at the end of the std::vector. </summary>
         ///
         /// <param name="index"> Zero-based index of the. </param>

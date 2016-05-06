@@ -130,19 +130,6 @@ namespace dataset
         }
     }
 
-    //
-    // SparseBinaryDataVector
-    //
-    IDataVector::type SparseBinaryDataVector::GetType() const
-    {
-        return type::sparse_binary;
-    }
-
-    IDataVector::type UncompressedSparseBinaryDataVector::GetType() const
-    {
-        return type::uncompressed_sparse_binary;
-    }
-
     // Explicit instantiation
     template class SparseBinaryDataVectorBase<utilities::CompressedIntegerList>;
     template class SparseBinaryDataVectorBase<utilities::IntegerList>;
