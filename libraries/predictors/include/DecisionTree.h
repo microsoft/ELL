@@ -130,7 +130,6 @@ namespace predictors
             double Predict(const dataset::IDataVector& dataVector) const;
 
         private:
-
             friend DecisionTree;
 
             SplitRule _splitRule;
@@ -157,8 +156,7 @@ namespace predictors
         ///
         /// <param name="example"> The data vector. </param>
         ///
-        /// <returns> The prediction
-        ///           . </returns>
+        /// <returns> The prediction.</returns>
         double Predict(const dataset::IDataVector& dataVector) const;
 
         /// <summary> Adds the predictor to a model. </summary>
