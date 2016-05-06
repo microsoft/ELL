@@ -39,7 +39,7 @@ namespace predictors
         }
     }
 
-    double DecisionTree::Node::Predict(const dataset::IDataVector& dataVector) const
+    double DecisionTree::Node::Predict(const dataset::DoubleDataVector& dataVector) const
     {
         double output = _outputValue;
         if (_interiorNode != nullptr)
@@ -104,7 +104,7 @@ namespace predictors
         return num;
     }
 
-    double DecisionTree::InteriorNode::Predict(const dataset::IDataVector& dataVector) const
+    double DecisionTree::InteriorNode::Predict(const dataset::DoubleDataVector& dataVector) const
     {
         if (dataVector[_splitRule.featureIndex] <= _splitRule.threshold)
         {
@@ -133,9 +133,10 @@ namespace predictors
         return _root;
     }
 
-    double DecisionTree::Predict(const dataset::IDataVector & dataVector) const
+    double DecisionTree::Predict(const dataset::IDataVector& dataVector) const
     {
-        return 0.0; // TODO
+        dataset::DoubleDataVector denseDataVector(dataVector.ToArray());
+        return _root.Predict(denseDataVector);
     }
 
     void DecisionTree::AddToModel(layers::Model & model, layers::CoordinateList inputCoordinates) const

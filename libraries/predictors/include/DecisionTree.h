@@ -10,6 +10,7 @@
 
 // dataset
 #include "IDataVector.h"
+#include "DenseDataVector.h"
 
 //layers
 #include "Model.h"
@@ -62,7 +63,7 @@ namespace predictors
             /// <param name="example"> The data vector. </param>
             ///
             /// <returns> The prediction. </returns>
-            double Predict(const dataset::IDataVector& dataVector) const;
+            double Predict(const dataset::DoubleDataVector& dataVector) const;
 
             /// <summary> Splits a leaf node </summary>
             ///
@@ -127,7 +128,7 @@ namespace predictors
             /// <param name="example"> The data vector. </param>
             ///
             /// <returns> The prediction. </returns>
-            double Predict(const dataset::IDataVector& dataVector) const;
+            double Predict(const dataset::DoubleDataVector& dataVector) const;
 
         private:
             friend DecisionTree;

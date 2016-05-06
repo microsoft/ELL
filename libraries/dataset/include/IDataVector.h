@@ -32,13 +32,6 @@ namespace dataset
         /// <returns> The type. </returns>
         virtual type GetType() const = 0;
 
-        /// <summary> Array indexer operator. </summary>
-        ///
-        /// <param name="index"> Zero-based index of the desired element. </param>
-        ///
-        /// <returns> Value of the desired element. </returns>
-        virtual double operator[](uint64_t index) const = 0;
-
         /// <summary> Adds a value at the end of the std::vector. </summary>
         ///
         /// <param name="index"> Zero-based index of the. </param>

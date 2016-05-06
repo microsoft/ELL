@@ -40,15 +40,6 @@ namespace dataset
         return type::ones;
     }
 
-    double OnesDataVector::operator[](uint64_t index) const
-    {
-        if (index < _size)
-        {
-            return 1.0;
-        }
-        return 0.0;
-    }
-
     void OnesDataVector::AppendEntry(uint64_t index, double value)
     {
         if(value != 1 || index != _size)
