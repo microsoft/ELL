@@ -41,6 +41,27 @@ namespace dataset
     {}
 
     template<typename ValueType, typename IntegerListType>
+    double SparseDataVector<ValueType, IntegerListType>::operator[](uint64_t index) const
+    {
+        auto iter = _indices.GetIterator();
+        uint64_t count = 0;
+        while (iter.IsValid())
+        {
+            if (index < iter.Get())
+            {
+                break;
+            }
+            if (index == iter.Get())
+            {
+                return (double)_values[count];
+            }
+            iter.Next();
+            ++count;
+        }
+        return 0.0;
+    }
+
+    template<typename ValueType, typename IntegerListType>
     void SparseDataVector<ValueType, IntegerListType>::AppendEntry(uint64_t index, double value)
     {
         if (value == 0)

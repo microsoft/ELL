@@ -43,6 +43,25 @@ namespace dataset
     {}
 
     template<typename IntegerListType>
+    double SparseBinaryDataVectorBase<IntegerListType>::operator[](uint64_t index) const
+    {
+        auto iter = _indices.GetIterator();
+        while (iter.IsValid())
+        {
+            if (index < iter.Get())
+            {
+                break;
+            }
+            if (index == iter.Get())
+            {
+                return 1.0;
+            }
+            iter.Next();
+        }
+        return 0.0;
+    }
+
+    template<typename IntegerListType>
     void SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(uint64_t index, double value)
     {
         if (value == 0)

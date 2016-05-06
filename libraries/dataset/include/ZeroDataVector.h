@@ -75,6 +75,13 @@ namespace dataset
         /// <returns> The type. </returns>
         virtual type GetType() const override;
 
+        /// <summary> Array indexer operator. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the desired element. </param>
+        ///
+        /// <returns> Value of the desired element. </returns>
+        virtual double operator[](uint64_t index) const override;
+        
         /// <summary> Sets an entry in the vector. </summary>
         ///
         /// <param name="index"> Zero-based index of the. </param>

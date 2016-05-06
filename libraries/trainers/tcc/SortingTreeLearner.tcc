@@ -35,12 +35,14 @@ namespace trainers
 
             // perform the split
             double outputValueSoFar = GetOutputValue(splitInfo.sums);
-            auto& interiorNode = splitInfo.leaf->Split(splitInfo.splitRule, GetOutputValue(splitInfo.negativeSums)-outputValueSoFar, GetOutputValue(positiveSums)-outputValueSoFar);
+            double negativeOutputValue = GetOutputValue(splitInfo.negativeSums) - outputValueSoFar;
+            double positiveOutputValue = GetOutputValue(positiveSums) - outputValueSoFar;
+            auto& interiorNode = splitInfo.leaf->Split(splitInfo.splitRule, negativeOutputValue, positiveOutputValue);
 
             // sort the data according to the performed split
             SortDatasetByFeature(splitInfo.splitRule.featureIndex, splitInfo.fromRowIndex, splitInfo.size);
 
-            std::cout << _dataset << std::endl;
+//            std::cout << _dataset << std::endl;
 
             // queue split candidate for negative child
             AddSplitCandidateToQueue(&interiorNode.GetNegativeChild(), splitInfo.fromRowIndex, splitInfo.negativeSize, splitInfo.negativeSums);
@@ -48,8 +50,6 @@ namespace trainers
             // queue split candidate for positive child
             AddSplitCandidateToQueue(&interiorNode.GetPositiveChild(), splitInfo.fromRowIndex + splitInfo.negativeSize, splitInfo.size - splitInfo.negativeSize, positiveSums);
         }
-
-//        std::cout << _dataset << std::endl;
 
         Cleanup();
 

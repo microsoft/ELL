@@ -57,6 +57,9 @@ namespace predictors
             /// <returns> true if leaf, false if not. </returns>
             bool IsLeaf() const;
 
+            // TODO
+            double Predict(const dataset::IDataVector& dataVector) const;
+
             /// <summary> Splits a leaf node </summary>
             ///
             /// <param name="splitRule"> The split rule to use. </param>

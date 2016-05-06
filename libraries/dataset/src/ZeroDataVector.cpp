@@ -32,6 +32,11 @@ namespace dataset
         return type::zero;
     }
 
+    double ZeroDataVector::operator[](uint64_t index) const
+    {
+        return 0.0;
+    }
+
     void ZeroDataVector::AppendEntry(uint64_t index, double value)
     {
         if(value != 0)

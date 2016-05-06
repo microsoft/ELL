@@ -103,6 +103,13 @@ namespace dataset
         /// <returns> The type. </returns>
         virtual type GetType() const override;
 
+        /// <summary> Array indexer operator. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the desired element. </param>
+        ///
+        /// <returns> Value of the desired element. </returns>
+        virtual double operator[](uint64_t index) const override;
+
         /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
         /// monotonically increasing argument. The value argument must equal 1.0. </summary>
         ///
