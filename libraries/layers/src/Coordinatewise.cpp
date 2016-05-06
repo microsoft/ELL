@@ -22,6 +22,12 @@ namespace layers
     Coordinatewise::Coordinatewise(OperationType operationType) : _operationType(operationType)
     {}
 
+    Coordinatewise::Coordinatewise(double value, Coordinate coordinate, OperationType operationType) : _values(1), _operationType(operationType)
+    {
+        _values[0] = value;
+        _inputCoordinates.AddCoordinate(coordinate);
+    }
+
     Coordinatewise::Coordinatewise(std::vector<double> values, CoordinateList coordinates, OperationType operationType) :
         _values(std::move(std::move(values))), _inputCoordinates(std::move(coordinates)), _operationType(operationType)
     {}
@@ -83,12 +89,6 @@ namespace layers
     Coordinatewise::OperationType Coordinatewise::GetOperationType() const
     {
         return _operationType;
-    }
-
-    void Coordinatewise::Append(double value, Coordinate coordinate)
-    {
-        _values.push_back(value);
-        _inputCoordinates.AddCoordinate(coordinate);
     }
 
     void Coordinatewise::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const

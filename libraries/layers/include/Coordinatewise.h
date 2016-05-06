@@ -33,6 +33,13 @@ namespace layers
 
         /// <summary> Constructs an instance of a Coordinatewise layer. </summary>
         ///
+        /// <param name="value"> A value for element zero. </param>
+        /// <param name="coordinate"> The input coordinate for element zero. </param>
+        /// <param name="operationType"> The type of Coordinatewise layer to construct. </param>
+        Coordinatewise(double value, Coordinate coordinate, OperationType operationType);
+
+        /// <summary> Constructs an instance of a Coordinatewise layer. </summary>
+        ///
         /// <param name="values"> The value for each element. </param>
         /// <param name="coordinates"> The input coordinate for each element. </param>
         /// <param name="operationType"> The type of Coordinatewise layer to construct. </param>
@@ -47,12 +54,6 @@ namespace layers
         ///
         /// <returns> The output dimension. </returns>
         virtual uint64_t GetOutputDimension() const override;
-
-        /// <summary> Appends a coordinate to the coordinatewise layer. </summary>
-        ///
-        /// <param name="value"> The value to append. </param>
-        /// <param name="coordinate"> The coordinate to append. </param>
-        void Append(double value, Coordinate coordinate);
 
         static const std::string GetOperationName(OperationType type);
         static OperationType GetOperationType(const std::string& name);

@@ -61,8 +61,7 @@ namespace predictors
         auto sumLayer = std::make_unique<layers::Sum>(std::move(weightsLayerCoordinates));
         auto sumLayerCoordinates = model.AddLayer(std::move(sumLayer));
 
-        auto biasLayer = std::make_unique<layers::Coordinatewise>(layers::Coordinatewise::OperationType::add);
-        biasLayer->Append(_b, sumLayerCoordinates[0]);
+        auto biasLayer = std::make_unique<layers::Coordinatewise>(_b, sumLayerCoordinates[0], layers::Coordinatewise::OperationType::add);
         model.AddLayer(std::move(biasLayer));
     }
 }
