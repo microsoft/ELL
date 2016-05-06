@@ -98,11 +98,6 @@ namespace dataset
         /// <param name="other"> The other. </param>
         SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = default;
 
-        /// <summary> Get the type of the vector. </summary>
-        ///
-        /// <returns> The type. </returns>
-        virtual type GetType() const override;
-
         /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
         /// monotonically increasing argument. The value argument must equal 1.0. </summary>
         ///
