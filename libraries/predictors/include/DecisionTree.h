@@ -57,7 +57,11 @@ namespace predictors
             /// <returns> true if leaf, false if not. </returns>
             bool IsLeaf() const;
 
-            // TODO
+            /// <summary> Returns the output of the subtree rooted at this node for a given example. </summary>
+            ///
+            /// <param name="example"> The data vector. </param>
+            ///
+            /// <returns> The prediction. </returns>
             double Predict(const dataset::IDataVector& dataVector) const;
 
             /// <summary> Splits a leaf node </summary>
@@ -73,7 +77,7 @@ namespace predictors
             friend DecisionTree;
 
             double _outputValue;
-            std::unique_ptr<InteriorNode> _node;
+            std::unique_ptr<InteriorNode> _interiorNode;
         };
 
         /// <summary> Represents a pair of Children of a node in a binary tree. </summary>
@@ -118,6 +122,13 @@ namespace predictors
             /// <returns> The total number of interior nodes in the subtree. </returns>
             uint64_t NumInteriorNodesInSubtree() const;
 
+            /// <summary> Returns the output of the subtree rooted at this node for a given example. </summary>
+            ///
+            /// <param name="example"> The data vector. </param>
+            ///
+            /// <returns> The prediction. </returns>
+            double Predict(const dataset::IDataVector& dataVector) const;
+
         private:
 
             friend DecisionTree;
@@ -146,7 +157,8 @@ namespace predictors
         ///
         /// <param name="example"> The data vector. </param>
         ///
-        /// <returns> A double. </returns>
+        /// <returns> The prediction
+        ///           . </returns>
         double Predict(const dataset::IDataVector& dataVector) const;
 
         /// <summary> Adds the predictor to a model. </summary>

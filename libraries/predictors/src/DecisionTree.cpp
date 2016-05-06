@@ -29,7 +29,7 @@ namespace predictors
 
     bool DecisionTree::Node::IsLeaf() const
     {
-        if (_node == nullptr)
+        if (_interiorNode == nullptr)
         {
             return true;
         }
@@ -39,13 +39,23 @@ namespace predictors
         }
     }
 
+    double DecisionTree::Node::Predict(const dataset::IDataVector& dataVector) const
+    {
+        double output = _outputValue;
+        if (_interiorNode != nullptr)
+        {
+            output += _interiorNode->Predict(dataVector);
+        }
+        return output;
+    }
+
     DecisionTree::InteriorNode& DecisionTree::Node::Split(SplitRule splitRule, double negativeEdgeOutputValue, double positiveEdgeOutputValue)
     {
         // confirm that this is a leaf
         assert(IsLeaf());
 
-        _node = std::make_unique<InteriorNode>(std::move(splitRule), Node(negativeEdgeOutputValue), Node(positiveEdgeOutputValue));
-        return *_node;
+        _interiorNode = std::make_unique<InteriorNode>(std::move(splitRule), Node(negativeEdgeOutputValue), Node(positiveEdgeOutputValue));
+        return *_interiorNode;
     }
 
     DecisionTree::InteriorNode::InteriorNode(SplitRule splitRule, Node negativeChild, Node positiveChild) :
@@ -81,17 +91,29 @@ namespace predictors
     {
         uint64_t num = 1;
 
-        if(_negativeChild._node != nullptr)
+        if(_negativeChild._interiorNode != nullptr)
         {
-            num += _negativeChild._node->NumInteriorNodesInSubtree();
+            num += _negativeChild._interiorNode->NumInteriorNodesInSubtree();
         }
 
-        if(_positiveChild._node != nullptr)
+        if(_positiveChild._interiorNode != nullptr)
         {
-            num += _positiveChild._node->NumInteriorNodesInSubtree();
+            num += _positiveChild._interiorNode->NumInteriorNodesInSubtree();
         }
 
         return num;
+    }
+
+    double DecisionTree::InteriorNode::Predict(const dataset::IDataVector& dataVector) const
+    {
+        if (dataVector[_splitRule.featureIndex] <= _splitRule.threshold)
+        {
+            return _negativeChild.Predict(dataVector);
+        }
+        else
+        {
+            return _positiveChild.Predict(dataVector);
+        }
     }
 
     DecisionTree::DecisionTree(double rootOutputValue) : _root(rootOutputValue)
@@ -99,11 +121,11 @@ namespace predictors
 
     uint64_t DecisionTree::NumInteriorNodes() const
     {
-        if(_root._node == nullptr)
+        if(_root._interiorNode == nullptr)
         {
             return 0;
         }
-        return _root._node->NumInteriorNodesInSubtree();
+        return _root._interiorNode->NumInteriorNodesInSubtree();
     }
 
     DecisionTree::Node& DecisionTree::GetRoot()
@@ -119,7 +141,7 @@ namespace predictors
     void DecisionTree::AddToModel(layers::Model & model, layers::CoordinateList inputCoordinates) const
     {
         FlatTree flatTree;
-        BuildFlatTree(flatTree, inputCoordinates, _root._node.get());
+        BuildFlatTree(flatTree, inputCoordinates, _root._interiorNode.get());
 
         auto thresholdsLayer = std::make_unique<layers::Coordinatewise>(std::move(flatTree.negativeThresholds), std::move(flatTree.splitRuleCoordinates), layers::Coordinatewise::OperationType::add);
         auto thresholdsLayerCoordinates = model.AddLayer(std::move(thresholdsLayer));
@@ -170,14 +192,14 @@ namespace predictors
             flatTree.edgeToInteriorNode.push_back(0);
 
             // recurse (DFS) to the negative side
-            BuildFlatTree(flatTree, inputCoordinates, interiorNodePtr->GetNegativeChild()._node.get());
+            BuildFlatTree(flatTree, inputCoordinates, interiorNodePtr->GetNegativeChild()._interiorNode.get());
             
             // set edgeToInteriorNode[positiveEdgeIndex] to its correct value
             auto positiveChildIndex = flatTree.splitRuleCoordinates.Size();
             flatTree.edgeToInteriorNode[positiveEdgeIndex] = positiveChildIndex;
             
             // recurse (DFS) to the positive side
-            BuildFlatTree(flatTree, inputCoordinates, interiorNodePtr->GetPositiveChild()._node.get());
+            BuildFlatTree(flatTree, inputCoordinates, interiorNodePtr->GetPositiveChild()._interiorNode.get());
         }
     }
 }
