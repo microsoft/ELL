@@ -52,7 +52,7 @@ namespace utilities
         /// <param name="dataIterator"> [in,out] The data iterator. </param>
         /// <param name="predictor"> The predictor. </param>
         /// <param name="lossFunction"> The loss function. </param>
-        void Evaluate(utilities::AnyIterator<dataset::SupervisedExample<>>& dataIterator, const PredictorType& predictor, const LossFunctionType& lossFunction);
+        void Evaluate(utilities::AnyIterator<dataset::GenericSupervisedExample>& dataIterator, const PredictorType& predictor, const LossFunctionType& lossFunction);
 
         /// <summary> Returns the most recent average weighted loss. </summary>
         ///

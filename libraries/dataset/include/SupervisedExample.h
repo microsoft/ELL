@@ -18,13 +18,22 @@
 namespace dataset
 {
     /// <summary> A supervised example. </summary>
-    template<typename DataVectorType = IDataVector>
+    template<typename DataVectorType>
     class SupervisedExample 
     {
     public:
 
+        /// <summary> Default constructor. </summary>
         SupervisedExample() = default;
+
+        /// <summary> Copy constructor </summary>
+        ///
+        /// <param name="other"> The other. </param>
         SupervisedExample(const SupervisedExample<DataVectorType>& other);
+
+        /// <summary> Default move constructor. </summary>
+        ///
+        /// <param name="other"> [in,out] The other. </param>
         SupervisedExample(SupervisedExample<DataVectorType>&& other) = default;
         
         /// <summary> Constructs a supervised example. </summary>
@@ -72,6 +81,8 @@ namespace dataset
     /// <returns> The shifted ostream. </returns>
     template<typename DataVectorType>
     std::ostream& operator<<(std::ostream& ostream, const SupervisedExample<DataVectorType>& example);
+
+    typedef SupervisedExample<IDataVector> GenericSupervisedExample;
 }
 
 #include "../tcc/SupervisedExample.tcc"

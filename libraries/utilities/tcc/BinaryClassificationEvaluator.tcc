@@ -45,7 +45,7 @@ namespace utilities
     }
 
     template<typename PredictorType, typename LossFunctionType>
-    void BinaryClassificationEvaluator<PredictorType, LossFunctionType>::Evaluate(utilities::AnyIterator<dataset::SupervisedExample<>>& dataIterator, const PredictorType& predictor, const LossFunctionType& lossFunction)
+    void BinaryClassificationEvaluator<PredictorType, LossFunctionType>::Evaluate(utilities::AnyIterator<dataset::GenericSupervisedExample>& dataIterator, const PredictorType& predictor, const LossFunctionType& lossFunction)
     {
         Evaluate<decltype(dataIterator)>(dataIterator, predictor, lossFunction);
     }
