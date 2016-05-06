@@ -35,10 +35,4 @@ namespace dataset
         std::copy(_data.cbegin(), _data.cend(), vector.begin());
         return vector;
     }
-
-    template <typename ValueType>
-    IDataVector::type DenseDataVector<ValueType>::GetType() const
-    {
-        return type::none; // In order for Clone to work, we must implement GetType in the base class (or we could do it with a constexpr function)
-    }
 }

@@ -13,7 +13,6 @@
 
 namespace dataset
 {
-
     bool ZeroDataVector::Iterator::IsValid() const
     {
         return false;
@@ -25,11 +24,6 @@ namespace dataset
     linear::IndexValue ZeroDataVector::Iterator::Get() const
     {
         throw std::runtime_error("this code should bever be reached");
-    }
-
-    IDataVector::type ZeroDataVector::GetType() const
-    {
-        return type::zero;
     }
 
     void ZeroDataVector::AppendEntry(uint64_t index, double value)

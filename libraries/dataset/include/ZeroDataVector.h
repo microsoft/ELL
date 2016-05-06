@@ -70,11 +70,6 @@ namespace dataset
         /// <param name="parameter1"> The first parameter. </param>
         ZeroDataVector(const ZeroDataVector&) = default;
 
-        /// <summary> \returns The type of the vector. </summary>
-        ///
-        /// <returns> The type. </returns>
-        virtual type GetType() const override;
-
         /// <summary> Sets an entry in the vector. </summary>
         ///
         /// <param name="index"> Zero-based index of the. </param>

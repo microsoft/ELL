@@ -18,12 +18,6 @@
 %ignore dataset::SupervisedExample::GetDataVector;
 %ignore dataset::SupervisedExample::SupervisedExample;
 
-%ignore dataset::DoubleDataVector::GetType;
-%ignore dataset::FloatDataVector::GetType;
-%ignore dataset::SparseShortDataVector::GetType;
-%ignore dataset::SparseFloatDataVector::GetType;
-%ignore dataset::SparseDoubleDataVector::GetType;
-
 %{
 #define SWIG_FILE_WITH_INIT
 #include "DenseDataVector.h"

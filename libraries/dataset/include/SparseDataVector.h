@@ -155,11 +155,6 @@ namespace dataset
         /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const override;
 
-        virtual type GetType() const override
-        {
-            return type::none; // TODO: fix this, maybe by removing it and moving clone to subclasses
-        }
-
    private:
         IntegerListType _indices; 
         std::vector<ValueType> _values;
@@ -170,11 +165,6 @@ namespace dataset
     {
     public:
         using SparseDataVector<double, utilities::CompressedIntegerList>::SparseDataVector;
-
-        /// <summary> \returns The type of the vector. </summary>
-        ///
-        /// <returns> The type. </returns>
-        virtual type GetType() const override;
     };
 
     /// <summary> A sparse float data vector. </summary>
@@ -182,11 +172,6 @@ namespace dataset
     {
     public:
         using SparseDataVector<float, utilities::CompressedIntegerList>::SparseDataVector;
-
-        /// <summary> \returns The type of the vector. </summary>
-        ///
-        /// <returns> The type. </returns>
-        virtual type GetType() const override;
     };
 
     /// <summary> A sparse short data vector. </summary>
@@ -194,11 +179,6 @@ namespace dataset
     {
     public:
         using SparseDataVector<short, utilities::CompressedIntegerList>::SparseDataVector;
-
-        /// <summary> \returns The type of the vector. </summary>
-        ///
-        /// <returns> The type. </returns>
-        virtual type GetType() const override;
     };
 }
 

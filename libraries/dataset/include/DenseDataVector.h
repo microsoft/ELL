@@ -122,11 +122,6 @@ namespace dataset
         ///
         /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const override;
-        
-        ///// <summary> \returns The type of the std::vector. </summary>
-        /////
-        ///// <returns> The type. </returns>
-        virtual type GetType() const override;
 
     private:
         uint64_t _numNonzeros;
@@ -138,13 +133,6 @@ namespace dataset
     {
     public:
         using DenseDataVector<float>::DenseDataVector;
-
-        /// <summary> \returns The type of the std::vector. </summary>
-        ///
-        /// 
-        /// 
-        /// <returns> The type. </returns>
-        virtual type GetType() const override;
     };
 
     /// <summary> A double data vector. </summary>
@@ -152,11 +140,6 @@ namespace dataset
     {
     public:
         using DenseDataVector<double>::DenseDataVector;
-
-        /// <summary> \returns The type of the std::vector. </summary>
-        ///
-        /// <returns> The type. </returns>
-        virtual type GetType() const override;
     };
 }
 
