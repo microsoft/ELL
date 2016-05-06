@@ -35,11 +35,6 @@ namespace dataset
     OnesDataVector::OnesDataVector(uint64_t dim) : _size(dim)
     {}
 
-    IDataVector::type OnesDataVector::GetType() const
-    {
-        return type::ones;
-    }
-
     void OnesDataVector::AppendEntry(uint64_t index, double value)
     {
         if(value != 1 || index != _size)
