@@ -87,19 +87,6 @@ namespace layers
         return *_layers[layerIndex - 1];
     }
 
-    //CoordinateList Model::BuildCoordinateList(uint64_t layerIndex) const
-    //{
-    //    if (layerIndex == 0)
-    //    {
-    //        throw std::runtime_error("input layer does not have an input coordinate list");
-    //    }
-    //    else if (layerIndex >= NumLayers())
-    //    {
-    //        throw std::out_of_range("Layer index out of range");
-    //    }
-    //    return CoordinateList(layerIndex, GetLayer(layerIndex).Size());
-    //}
-
     void Model::Save(std::ostream& os) const
     {
         utilities::XMLSerializer serializer(os);
