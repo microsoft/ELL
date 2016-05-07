@@ -34,10 +34,10 @@ source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 
 include_directories(include)
-include_directories(../libraries/linear/include)
-include_directories(../libraries/layers/include)
-include_directories(../libraries/utilities/include)
-include_directories(../libraries/common/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/linear/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/layers/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/utilities/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/common/include)
 
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
