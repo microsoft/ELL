@@ -15,6 +15,8 @@
 
 namespace layers
 {
+    const int DecisionTreePath::_currentVersion;
+
     DecisionTreePath::DecisionTreePath(std::vector<uint64_t> edgeToInteriorNode, CoordinateList splitRuleCoordinates) :
         _edgeToInteriorNode(std::move(edgeToInteriorNode)), _splitRuleCoordinates(std::move(splitRuleCoordinates))
     {}
