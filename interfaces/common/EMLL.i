@@ -119,5 +119,6 @@ wrap_unique_ptr(LayerPtr, layers::Layer)
 %include "std_shared_ptr.i"
 %shared_ptr(layers::Map)
 %shared_ptr(layers::Model)
-%shared_ptr(dataset::RowDataset)
+//%template (GenericRowDataset) dataset::RowDataset<dataset::IDataVector>
+//%shared_ptr(GenericRowDataset)
 %shared_ptr(RowDataset)

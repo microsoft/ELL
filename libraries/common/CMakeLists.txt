@@ -18,7 +18,9 @@ set (SRC src/DataLoadArguments.cpp
          src/LoadModel.cpp
          src/MapLoadArguments.cpp
          src/MapSaveArguments.cpp
-         src/ModelLoadArguments.cpp)
+         src/ModelLoadArguments.cpp
+         src/TrainerArguments.cpp
+)
 
 set (INCLUDE include/DataLoadArguments.h
              include/DataSaveArguments.h
@@ -26,7 +28,9 @@ set (INCLUDE include/DataLoadArguments.h
              include/LoadModel.h
              include/MapLoadArguments.h
              include/MapSaveArguments.h
-             include/ModelLoadArguments.h)
+             include/ModelLoadArguments.h
+             include/TrainerArguments.h
+)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

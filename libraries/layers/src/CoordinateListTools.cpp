@@ -88,7 +88,7 @@ namespace layers
             }
             else
             {
-                layerSize = model.GetLayer(layerIndex).Size();
+                layerSize = model.GetLayer(layerIndex).GetOutputDimension();
             }
             uint64_t endElementIndex = layerSize;
 

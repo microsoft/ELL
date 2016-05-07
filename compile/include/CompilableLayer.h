@@ -21,10 +21,10 @@ class CompilableLayer
 public:
     virtual ~CompilableLayer() = default;
 
-    /// <summary> Returns the number of elements in the layer. </summary>
+    /// <summary> Returns the output dimension of the layer. </summary>
     ///
-    /// <returns> The number of elements in the layer. </returns>
-    virtual uint64_t Size() const = 0;
+    /// <returns> The output dimension. </returns>
+    virtual uint64_t GetOutputDimension() const = 0;
 
     /// <summary> Pushes actions upward in the graph </summary>
     ///

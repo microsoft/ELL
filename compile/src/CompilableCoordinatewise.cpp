@@ -8,9 +8,9 @@
 
 #include "CompilableCoordinatewise.h"
 
-uint64_t CompilableCoordinatewise::Size() const
+uint64_t CompilableCoordinatewise::GetOutputDimension() const
 {
-    return Coordinatewise::Size();
+    return Coordinatewise::GetOutputDimension();
 }
 
 void CompilableCoordinatewise::operator=(const layers::Coordinatewise& coordinatewise)
@@ -25,7 +25,7 @@ void CompilableCoordinatewise::operator=(const layers::Layer& layer)
 
 void CompilableCoordinatewise::SetActions(uint64_t currentLayerIndex, DataFlowGraph& graph) const 
 {
-    for (uint64_t column = 0; column < Size(); ++column)
+    for (uint64_t column = 0; column < GetOutputDimension(); ++column)
     {
         auto coordinate = _inputCoordinates[column];
         auto& inputNode = graph.GetNode(coordinate);

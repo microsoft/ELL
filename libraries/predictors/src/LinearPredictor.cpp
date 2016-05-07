@@ -53,11 +53,15 @@ namespace predictors
         _b *= scalar;
     }
 
-    void LinearPredictor::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
+    void LinearPredictor::AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const
     {
-        uint64_t layerIndex = model.AddLayer(std::make_unique<layers::Coordinatewise>(_w, inputCoordinates, layers::Coordinatewise::OperationType::multiply));
-        auto coordinates = model.BuildCoordinateList(layerIndex);
-        layerIndex = model.AddLayer(std::make_unique<layers::Sum>(coordinates));
-        layerIndex = model.AddLayer(std::make_unique<layers::Coordinatewise>(_b, layers::Coordinate{ layerIndex, 0 }, layers::Coordinatewise::OperationType::add));
+        auto weightsLayer = std::make_unique<layers::Coordinatewise>(std::vector<double>(_w), std::move(inputCoordinates), layers::Coordinatewise::OperationType::multiply);
+        auto weightsLayerCoordinates = model.AddLayer(std::move(weightsLayer));
+
+        auto sumLayer = std::make_unique<layers::Sum>(std::move(weightsLayerCoordinates));
+        auto sumLayerCoordinates = model.AddLayer(std::move(sumLayer));
+
+        auto biasLayer = std::make_unique<layers::Coordinatewise>(_b, sumLayerCoordinates[0], layers::Coordinatewise::OperationType::add);
+        model.AddLayer(std::move(biasLayer));
     }
 }

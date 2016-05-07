@@ -30,8 +30,8 @@ namespace layers
         ///
         /// <param name="layer"> The layer to add to the model. </param>
         ///
-        /// <returns> The index of the added layer. </returns>
-        uint64_t AddLayer(std::unique_ptr<Layer> layer);
+        /// <returns> The list of coordinates added. </returns>
+        CoordinateList AddLayer(std::unique_ptr<Layer> layer);
 
         /// <summary> Returns the number of layers in the model. </summary>
         ///
@@ -51,13 +51,6 @@ namespace layers
         ///
         /// <returns> The requested layer, cast to a const reference of the requested type. </returns>
         const Layer& GetLayer(uint64_t layerIndex) const;
-
-        /// <summary> Gets the list of coordinates in a given layer. </summary>
-        ///
-        /// <param name="layerIndex"> Zero-based index of the layer. </param>
-        ///
-        /// <returns> The coordinate list. </returns>
-        CoordinateList BuildCoordinateList(uint64_t layerIndex) const;
 
         /// <summary> Saves a model to an output stream. </summary>
         ///

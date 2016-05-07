@@ -5,6 +5,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 PROJECT(EMLL)
 
+# Options
+option(SWIG_ENABLED "Enable swig interfaces" OFF)
+
 # Include modules in the CMake directory.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
 
@@ -26,28 +29,36 @@ add_subdirectory(libraries/lossFunctions)
 add_subdirectory(libraries/optimization)
 add_subdirectory(libraries/predictors)
 add_subdirectory(libraries/testing)
+add_subdirectory(libraries/trainers)
 add_subdirectory(libraries/treeLayout)
 add_subdirectory(libraries/utilities)
 add_subdirectory(apply)
 add_subdirectory(compile)
 add_subdirectory(print)
 add_subdirectory(trainers/sgd)
+add_subdirectory(tools/trainers/sortingTreeLearner)
 add_subdirectory(scripts)
 
 # Add SWIG-generated interfaces
-find_package(SWIG)
-if(${SWIG_FOUND})
-  add_subdirectory(interfaces)
+
+if(${SWIG_ENABLED} STREQUAL "ON")
+  find_package(SWIG)
+  if(${SWIG_FOUND})
+    add_subdirectory(interfaces)
+
+    # Add examples
+    add_subdirectory(examples)
+  
+    # Make interface code be dependent on all libraries
+    add_dependencies(EMLL_common common dataset layers linear lossFunctions optimization predictors testing treeLayout utilities)
+  else()
+    message(WARNING "Couldn't find SWIG, skipping interface generation.")
+  endif()
 else()
-  message(WARNING "Couldn't find SWIG, skipping interface generation.")
+  message(WARNING "Note: swig interfaces disabled.")
 endif()
-
-
-# Add examples
-add_subdirectory(examples)
 
 # Add solution-level documentation
 set (DOC INSTALL.md StyleGuide.md)
 add_custom_target(documentation ALL DEPENDS ${DOC} SOURCES ${DOC})
 
-add_dependencies(EMLL_common common dataset layers linear lossFunctions optimization predictors testing treeLayout utilities)

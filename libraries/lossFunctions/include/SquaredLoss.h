@@ -30,5 +30,12 @@ namespace lossFunctions
         ///
         /// <returns> The loss derivative. </returns>
         double GetDerivative(double prediction, double label) const;
+
+        /// <summary> Evaluates the convex function that generates this Bregman loss. </summary>
+        ///
+        /// <param name="value"> The input to the convex function. </param>
+        ///
+        /// <returns> The output of the convex function. </returns>
+        double BregmanGenerator(double value) const;
     };
 }

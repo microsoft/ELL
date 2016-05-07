@@ -8,9 +8,9 @@
 
 #include "CompilableSum.h"
 
-uint64_t CompilableSum::Size() const
+uint64_t CompilableSum::GetOutputDimension() const
 {
-    return Sum::Size();
+    return Sum::GetOutputDimension();
 }
 
 void CompilableSum::operator=(const layers::Sum& sum)
@@ -25,7 +25,7 @@ void CompilableSum::operator=(const layers::Layer& layer)
 
 void CompilableSum::SetActions(uint64_t currentLayerIndex, DataFlowGraph& graph) const
 {
-    for(uint64_t elementIndex = 0; elementIndex < Size(); ++elementIndex)
+    for(uint64_t elementIndex = 0; elementIndex < GetOutputDimension(); ++elementIndex)
     {
         layers::Coordinate thisCoordinate(currentLayerIndex, elementIndex);
 
