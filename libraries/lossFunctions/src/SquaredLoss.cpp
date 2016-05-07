@@ -10,7 +10,6 @@
 
 // stl
 #include <cmath>
-#include "..\include\SquaredLoss.h"
 
 namespace lossFunctions
 {
