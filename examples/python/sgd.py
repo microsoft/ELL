@@ -36,30 +36,36 @@ def sgd():
 
     # Read model from file
     model = LoadModel(inMapFilename);
+    
+    # get output coordinate list and create the map
     outputCoordinates = BuildCoordinateList(model, dataDimension, coordinateString);
     map = Map(model, outputCoordinates);
 
     #  Get the dataset
     dataset = GetDataset(dataFilename, map);
-    
+
+    # create sgd trainer    
+    loss = LogLoss()
+    optimizer = LogLossOptimizer(outputCoordinates.Size(), loss, l2Regularization)
+
+    # create evaluator
+    evaluator = LinearLogLossClassificationEvaluator()
+
     numExamples = dataset.NumExamples()
     if not epochSize or epochSize >= numExamples:
         epochSize = numExamples
 
     print "Running SGD over dataset of size {0} x {1}".format(numExamples, outputCoordinates.Size())
     print "Output coordinates: {0}".format(outputCoordinates)
-    loss = LogLoss()
-    maxExampleSize = dataset.GetMaxExampleSize()
-    optimizer = LogLossOptimizer(maxExampleSize, loss, l2Regularization)
     rng = GetRandomEngine(randomSeed)
 
-    evaluator = LinearLogLossClassificationEvaluator()
-
     for epoch in xrange(numEpochs):
-        dataset.RandPerm(rng, epochSize)
+        # randomly permute the data
+        dataset.RandomPermute(rng, epochSize)
             
-        updateIterator = dataset.GetIterator(0, epochSize)
-        optimizer.Update(updateIterator)  
+        # iterate over the entire permuted dataset
+        trainSetIterator = dataset.GetIterator(0, epochSize)
+        optimizer.Update(trainSetIterator)  
 
         evalIterator = dataset.GetIterator()
         predictor = optimizer.GetPredictor()

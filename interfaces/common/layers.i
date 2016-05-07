@@ -43,6 +43,7 @@ layers::CoordinateList BuildCoordinateList(const interfaces::Model& model, uint6
 }
 %}
 
+
 // Add operator[] to CoordinateList objects
 WRAP_OP_AT(layers::CoordinateList, layers::Coordinate);
 

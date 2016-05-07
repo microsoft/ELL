@@ -19,16 +19,27 @@ namespace layers
     std::string addOperationName = "Add";
     std::string multiplyOperationName = "Multiply";
 
-    Coordinatewise::Coordinatewise(double value, Coordinate coordinate, OperationType operationType) : _operationType(operationType)
+    Coordinatewise::Coordinatewise(OperationType operationType) : _operationType(operationType)
+    {}
+
+    Coordinatewise::Coordinatewise(double value, Coordinate coordinate, OperationType operationType) : _values(1), _operationType(operationType)
     {
-        _values.push_back(value);
+        _values[0] = value;
         _inputCoordinates.AddCoordinate(coordinate);
     }
 
-    Coordinatewise::Coordinatewise(const std::vector<double>& values, const CoordinateList& coordinates, OperationType operationType) : _operationType(operationType)
+    Coordinatewise::Coordinatewise(std::vector<double> values, CoordinateList coordinates, OperationType operationType) :
+        _values(std::move(std::move(values))), _inputCoordinates(std::move(coordinates)), _operationType(operationType)
+    {}
+
+    uint64_t Coordinatewise::GetInputDimension() const
     {
-        _values = values;
-        _inputCoordinates = coordinates;
+        return _inputCoordinates.Size();
+    }
+
+    uint64_t Coordinatewise::GetOutputDimension() const
+    {
+        return _inputCoordinates.Size();
     }
 
     const std::string Coordinatewise::GetOperationName(OperationType type)
@@ -78,11 +89,6 @@ namespace layers
     Coordinatewise::OperationType Coordinatewise::GetOperationType() const
     {
         return _operationType;
-    }
-
-    uint64_t Coordinatewise::Size() const
-    {
-        return _inputCoordinates.Size();
     }
 
     void Coordinatewise::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const

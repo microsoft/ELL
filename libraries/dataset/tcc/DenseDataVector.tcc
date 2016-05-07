@@ -10,13 +10,13 @@ namespace dataset
 {
     template<typename ValueType>
     template<typename IndexValueIteratorType, typename concept>
-    DenseDataVector<ValueType>::DenseDataVector(IndexValueIteratorType IndexValueIterator) 
+    DenseDataVector<ValueType>::DenseDataVector(IndexValueIteratorType indexValueIterator) 
     {
-        while(IndexValueIterator.IsValid())
+        while(indexValueIterator.IsValid())
         {
-            auto IndexValue = IndexValueIterator.Get();
-            DenseDataVector<ValueType>::AppendEntry(IndexValue.index, IndexValue.value); // explicit call to DenseDataVector<ValueType>::AppendEntry is given to avoid virtual function call in Ctor
-            IndexValueIterator.Next();
+            auto indexValue = indexValueIterator.Get();
+            DenseDataVector<ValueType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to DenseDataVector<ValueType>::AppendEntry is given to avoid virtual function call in Ctor
+            indexValueIterator.Next();
         }
     }
 
@@ -25,5 +25,13 @@ namespace dataset
     {
         DenseDataVector<ValueType> result = *this;
         return std::make_unique<DenseDataVector<ValueType>>(std::move(result)); 
+    }
+    
+    template<typename ValueType>
+    std::vector<double> DenseDataVector<ValueType>::ToArray() const
+    {
+        auto vector = std::vector<double>(Size());
+        std::copy(_data.cbegin(), _data.cend(), vector.begin());
+        return vector;
     }
 }

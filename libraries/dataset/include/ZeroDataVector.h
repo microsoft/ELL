@@ -124,5 +124,10 @@ namespace dataset
         ///
         /// <returns> A deep copy of the datavector </summary>
         virtual std::unique_ptr<IDataVector> Clone() const override;
+
+        /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
+        ///
+        /// <returns> The array. </returns>
+        virtual std::vector<double> ToArray() const override;
     };
 }

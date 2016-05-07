@@ -38,11 +38,6 @@ namespace interfaces
         return _model->GetLayer(layerIndex); 
     }
     
-    layers::CoordinateList Model::BuildCoordinateList(uint64_t layerIndex) const 
-    {
-        return _model->BuildCoordinateList(layerIndex);
-    }
-
     void Model::Save(const std::string& filename) const
     {
         auto outputStream = utilities::OpenOfstream(filename);

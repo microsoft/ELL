@@ -33,7 +33,7 @@
 %include "RandomEngines.h"
 
 // This is necessary for us to avoid leaking memory:
-%template (SupervisedExampleIterator) utilities::AnyIterator<dataset::SupervisedExample>;
+%template (SupervisedExampleIterator) utilities::AnyIterator<dataset::SupervisedExample<dataset::IDataVector>>;
 
 template <typename IteratorType, typename ValueType>
 class StlIterator {};

@@ -15,6 +15,7 @@ set (SRC src/Coordinate.cpp
          src/CoordinateList.cpp
          src/CoordinateListTools.cpp
          src/Coordinatewise.cpp
+         src/DecisionTreePath.cpp
          src/Layer.cpp
          src/Map.cpp
          src/Model.cpp
@@ -24,6 +25,7 @@ set (INCLUDE include/Coordinate.h
              include/CoordinateList.h
              include/CoordinateListTools.h
              include/Coordinatewise.h
+             include/DecisionTreePath.h
              include/Layer.h
              include/Map.h
              include/Model.h

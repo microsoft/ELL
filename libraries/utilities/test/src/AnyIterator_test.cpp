@@ -43,7 +43,7 @@ void TestAnyIterator1()
 
 void TestAnyIterator2()
 {
-    std::vector<dataset::SupervisedExample> vec;
+    std::vector<dataset::GenericSupervisedExample> vec;
     auto it = utilities::MakeStlIterator(vec.cbegin(), vec.cend());
     auto it2 = utilities::MakeAnyIterator(it);
 

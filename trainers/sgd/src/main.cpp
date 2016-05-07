@@ -80,7 +80,8 @@ int main(int argc, char* argv[])
         optimization::AsgdOptimizer<lossFunctions::LogLoss> optimizer(outputCoordinateList.Size(), loss, sgdArguments.l2Regularization);
 
         // create evaluator
-        utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss> evaluator;
+        utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss> evaluator; // TODO give loss in ctor
+        
         // calculate epoch size
         uint64_t epochSize = sgdArguments.epochSize;
         if(epochSize == 0 || epochSize >  rowDataset.NumExamples())
@@ -95,7 +96,7 @@ int main(int argc, char* argv[])
         for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
         {
             // randomly permute the data
-            rowDataset.RandPerm(rng, epochSize);
+            rowDataset.RandomPermute(rng, epochSize);
 
             // iterate over the entire permuted dataset
             auto trainSetIterator = rowDataset.GetIterator(0, epochSize);

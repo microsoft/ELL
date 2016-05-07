@@ -62,9 +62,6 @@ namespace linear
         DoubleVector(IndexValueIteratorType indexValueIterator);
 
 #ifndef SWIG
-        /// <summary> Type-conversion operator into a std::vector<double>
-//        operator std::vector<double>() const;
-
         /// <summary> Type-conversion operator into a std::vector<double>, allowing non-const ref
         operator std::vector<double> & () &;
 

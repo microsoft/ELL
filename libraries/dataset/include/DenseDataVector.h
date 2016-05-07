@@ -39,7 +39,7 @@ namespace dataset
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
         template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
-        DenseDataVector(IndexValueIteratorType IndexValueIterator);
+        DenseDataVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Copy constructor. </summary>
         ///
@@ -50,6 +50,18 @@ namespace dataset
         ///
         /// <param name="other"> [in,out] The other. </param>
         DenseDataVector(DenseDataVector&& other) = default;
+
+        /// <summary> Constructs an instance of DenseDataVector from a std::vector. </summary>
+        ///
+        /// <param name="data"> The std::vector. </param>
+        DenseDataVector(std::vector<ValueType> data);
+        
+        /// <summary> Array indexer operator. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the desired element. </param>
+        ///
+        /// <returns> Value of the desired element. </returns>
+        double operator[](uint64_t index) const;
 
         /// <summary> Sets an entry in the std::vector. </summary>
         ///
@@ -106,8 +118,13 @@ namespace dataset
         /// <returns> A deep copy of the datavector </summary>
         virtual std::unique_ptr<IDataVector> Clone() const override;
 
+        /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
+        ///
+        /// <returns> The array. </returns>
+        virtual std::vector<double> ToArray() const override;
+
     private:
-        uint64_t _num_nonzeros;
+        uint64_t _numNonzeros;
         std::vector<ValueType> _data;
     };
 

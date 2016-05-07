@@ -183,7 +183,7 @@ void PrintableModel::Print(std::ostream & os, const PrintArguments& arguments)
         os << std::endl;
 
         // print edges
-        uint64_t layerSize = printableLayer->Size();
+        uint64_t layerSize = printableLayer->GetOutputDimension();
         for (uint64_t elementIndex = 0; elementIndex<layerSize; ++elementIndex)
         {
             if (!layout.IsHidden(elementIndex)) // if output is hidden, hide edge

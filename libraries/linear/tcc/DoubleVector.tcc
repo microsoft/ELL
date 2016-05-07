@@ -13,11 +13,6 @@ namespace linear
     inline DoubleVector::DoubleVector(const std::vector<double>& v) : _data(v) {};
 
     inline DoubleVector::DoubleVector(std::vector<double>&& v) : _data(std::forward<std::vector<double>>(v)) {};
-
-    // inline DoubleVector::operator std::vector<double>() const
-    // {
-    //     return _data;
-    // }
     
     inline DoubleVector::operator std::vector<double> & () &
     {

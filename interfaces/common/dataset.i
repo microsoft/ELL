@@ -12,11 +12,12 @@
     #include <stdexcept>
 %}
 
+%ignore dataset::RowDataset<>;
 %ignore dataset::RowDataset;
 %ignore dataset::IDataVector::Clone;
 
-%ignore dataset::SupervisedExample::GetDataVector;
-%ignore dataset::SupervisedExample::SupervisedExample;
+%ignore dataset::GenericSupervisedExample::GetDataVector;
+%ignore dataset::GenericSupervisedExample::GenericSupervisedExample;
 
 %{
 #define SWIG_FILE_WITH_INIT
@@ -47,7 +48,7 @@ wrap_unique_ptr(IDataVectorPtr, dataset::IDataVector)
 // %template (SparseFloatDataVectorBase) dataset::SparseDataVector<float, utilities::CompressedIntegerList>;
 // %template (SparseShortDataVectorBase) dataset::SparseDataVector<short, utilities::CompressedIntegerList>;
 
-WRAP_PRINT_TO_STR(dataset::SupervisedExample)
+WRAP_PRINT_TO_STR(dataset::GenericSupervisedExample)
 WRAP_PRINT_TO_STR(dataset::FloatDataVector)
 WRAP_PRINT_TO_STR(dataset::DoubleDataVector)
 

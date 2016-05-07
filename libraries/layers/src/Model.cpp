@@ -28,12 +28,16 @@ namespace layers
     //
     // Model class implementation
     //
-    uint64_t Model::AddLayer(std::unique_ptr<Layer> layer)
+    CoordinateList Model::AddLayer(std::unique_ptr<Layer> layer)
     {
         // check that the layer points to valid elements
         auto numLayers = NumLayers();
-        auto layerSize = layer->Size();
-        for (uint64_t index = 0; index < layerSize; index++)
+        
+        auto layerInputDimension = layer->GetInputDimension();
+        auto layerOutputDimension = layer->GetOutputDimension();
+
+        // check that layer is compatible with model
+        for (uint64_t index = 0; index < layerInputDimension; index++)
         {
             auto inputCoordIterator = layer->GetInputCoordinateIterator(index);
             while (inputCoordIterator.IsValid())
@@ -43,7 +47,7 @@ namespace layers
                 {
                     throw std::runtime_error("new layer references nonexistent layers");
                 }
-                else if(coord.GetLayerIndex()>0 && coord.GetElementIndex() >= GetLayer(coord.GetLayerIndex()).Size())
+                else if(coord.GetLayerIndex()>0 && coord.GetElementIndex() >= GetLayer(coord.GetLayerIndex()).GetOutputDimension())
                 {
                     throw std::runtime_error("new layer references nonexistent elements");
                 }
@@ -52,7 +56,7 @@ namespace layers
         }
 
         _layers.push_back(std::move(layer));
-        return _layers.size();
+        return CoordinateList(_layers.size(), layerOutputDimension);
     }
 
     uint64_t Model::NumLayers() const
@@ -81,19 +85,6 @@ namespace layers
 
         // recall that _layers does not explicitly keep the input layer
         return *_layers[layerIndex - 1];
-    }
-
-    CoordinateList Model::BuildCoordinateList(uint64_t layerIndex) const
-    {
-        if (layerIndex == 0)
-        {
-            throw std::runtime_error("input layer does not have an input coordinate list");
-        }
-        else if (layerIndex >= NumLayers())
-        {
-            throw std::out_of_range("Layer index out of range");
-        }
-        return CoordinateList(layerIndex, GetLayer(layerIndex).Size());
     }
 
     void Model::Save(std::ostream& os) const

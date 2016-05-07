@@ -32,10 +32,15 @@ namespace layers
         /// <summary> Default virtual destructor. </summary>
         virtual ~Layer() = default;
 
-        /// <summary> Returns the number of elements in the layer. </summary>
+        /// <summary> Returns the input dimension of the layer. </summary>
         ///
-        /// <returns> The number of elements in the layer. </returns>
-        virtual uint64_t Size() const = 0;
+        /// <returns> The input dimension. </returns>
+        virtual uint64_t GetInputDimension() const = 0;
+
+        /// <summary> Returns the output dimension of the layer. </summary>
+        ///
+        /// <returns> The output dimension. </returns>
+        virtual uint64_t GetOutputDimension() const = 0;
 
         /// <summary> Computes the layer output. </summary>
         ///

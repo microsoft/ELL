@@ -66,11 +66,11 @@ namespace predictors
         /// <param name="scalar"> The scalar. </param>
         void Scale(double scalar);
 
-        /// <summary> Adds the predictor to a map. </summary>
+        /// <summary> Adds the predictor to a model. </summary>
         ///
-        /// <param name="map"> [in,out] The map. </param>
+        /// <param name="model"> [in,out] The model. </param>
         /// <param name="inputCoordinates"> The input coordinates. </param>
-        void AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
+        void AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
 
     private:
         linear::DoubleVector _w;

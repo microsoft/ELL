@@ -14,9 +14,9 @@ std::string PrintableSum::GetFriendlyLayerName() const
     return "Sum";
 }
 
-uint64_t PrintableSum::Size() const
+uint64_t PrintableSum::GetOutputDimension() const
 {
-    return Sum::Size();
+    return Sum::GetOutputDimension();
 }
 
 void PrintableSum::operator=(const layers::Sum& sum)
@@ -32,7 +32,7 @@ void PrintableSum::operator=(const layers::Layer & layer)
 LayerLayout PrintableSum::Print(std::ostream& os, double left, double top, uint64_t layerIndex, const PrintArguments& arguments) const
 {
     // calculate the layout
-    auto layout = PrintableLayer::PrintLayer(os, left, top, layerIndex, GetFriendlyLayerName(), Size(), arguments.emptyElementLayout, arguments.layerStyle);
+    auto layout = PrintableLayer::PrintLayer(os, left, top, layerIndex, GetFriendlyLayerName(), GetOutputDimension(), arguments.emptyElementLayout, arguments.layerStyle);
 
     // print the elements
     PrintableLayer::PrintEmptyElements(os, layout);
