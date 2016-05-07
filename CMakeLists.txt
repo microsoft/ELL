@@ -6,7 +6,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 PROJECT(EMLL)
 
 # Options
-option(SWIG_ENABLED "Enable swig interfaces" OFF)
+option(SWIG_ENABLED "Enable swig interfaces" ON)
 
 # Include modules in the CMake directory.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")

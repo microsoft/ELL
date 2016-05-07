@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     BinaryOpLayer.h (layers)
+//  File:     UnaryOpLayer.h (layers)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,25 +20,22 @@
 namespace layers
 {
     /// <summary> A class that represents a layer that performs a coordinatewise binary operation. </summary>
-    class BinaryOpLayer : public Layer
+    class UnaryOpLayer : public Layer
     {
     public:
 
-        enum class OperationType {add, multiply};
+        enum class OperationType {sqrt};
 
-        /// <summary> Constructs an instance of a BinaryOpLayer layer. </summary>
-        BinaryOpLayer() = default;
+        /// <summary> Constructs an instance of a UnaryOpLayer layer. </summary>
+        UnaryOpLayer() = default;
 
-        /// <summary> Constructs an instance of a BinaryOpLayer layer. </summary>
+        /// <summary> Constructs an instance of a UnaryOpLayer layer. </summary>
         ///
         /// <param name="values"> The value for each element. </param>
         /// <param name="input1"> The input coordinate for the left side of the operation each element. </param>
         /// <param name="input2"> The input coordinate for the right side of the operation each element. </param>
-        /// <param name="operationType"> The type of BinaryOpLayer layer to construct. </param>
-        BinaryOpLayer(const CoordinateList& input1, const CoordinateList& input2, OperationType operationType);
-
-        /// <summary> Default virtual destructor. </summary>
-        virtual ~BinaryOpLayer() = default;
+        /// <param name="operationType"> The type of UnaryOpLayer layer to construct. </param>
+        UnaryOpLayer(const CoordinateList& inputCoordinates, OperationType operationType);
 
         /// <summary> Returns the input dimension of the layer. </summary>
         ///
@@ -52,7 +49,7 @@ namespace layers
 
         static const std::string GetOperationName(OperationType type);
         static OperationType GetOperationType(const std::string& name); 
-        static std::function<double(double, double)> GetOperation(OperationType type);
+        static std::function<double(double)> GetOperation(OperationType type);
         OperationType GetOperationType() const;
 
         /// <summary> Computes the layer output. </summary>
@@ -96,11 +93,7 @@ namespace layers
         virtual void Write(utilities::XMLSerializer& serializer) const override;
 
     protected:
-        // TODO: either find a way to make a "fake" iterator over [input1[k], input2[k]], or
-        //       store a vector of 2-element coord lists
-        std::vector<CoordinateList> _inputCoordinates;
-//        CoordinateList _input1Coordinates;
-//        CoordinateList _input2Coordinates;
+        CoordinateList _inputCoordinates;
         OperationType _operationType;
         static const int _currentVersion = 1;
     };

@@ -14,20 +14,36 @@
 #include <cassert>
 #include <algorithm>
 
+namespace
+{
+    std::string addOperationName = "Add";
+    std::string multiplyOperationName = "Multiply";
+}
+
 namespace layers
 {
     const int BinaryOpLayer::_currentVersion;
-    std::string addOperationName = "Add";
-    std::string multiplyOperationName = "Multiply";
 
     BinaryOpLayer::BinaryOpLayer(const CoordinateList& input1, const CoordinateList& input2, OperationType operationType) : _operationType(operationType)
     {
         assert(input1.Size() == input2.Size());
         for(uint64_t index = 0; index < input1.Size(); ++index)
         {
-            _inputCoordinates.AddCoordinate(input1[index]);
-            _inputCoordinates.AddCoordinate(input2[index]);            
+            CoordinateList entryCoordinates;
+            entryCoordinates.AddCoordinate(input1[index]);
+            entryCoordinates.AddCoordinate(input2[index]);            
+            _inputCoordinates.push_back(entryCoordinates);
         }
+    }
+
+    uint64_t BinaryOpLayer::GetInputDimension() const
+    {
+        return _inputCoordinates.size();
+    }
+
+    uint64_t BinaryOpLayer::GetOutputDimension() const
+    {
+        return _inputCoordinates.size();
     }
 
     const std::string BinaryOpLayer::GetOperationName(OperationType type)
@@ -79,22 +95,17 @@ namespace layers
         return _operationType;
     }
 
-    uint64_t BinaryOpLayer::Size() const
-    {
-        return _inputCoordinates.size();
-    }
-
     void BinaryOpLayer::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
     {
         auto operation = GetOperation(_operationType);
-
-        for (uint64_t k = 0; k < _values.size(); ++k)
+        auto numEntries = _inputCoordinates.size();
+        for (uint64_t index = 0; index < numEntries; ++index)
         {
-            Coordinate coordinate1 = _inputCoordinates[k][0];
-            Coordinate coordinate2 = _inputCoordinates[k][1];
+            Coordinate coordinate1 = _inputCoordinates[index][0];
+            Coordinate coordinate2 = _inputCoordinates[index][1];
             double input1 = inputs[coordinate1.GetLayerIndex()][coordinate1.GetElementIndex()];
             double input2 = inputs[coordinate2.GetLayerIndex()][coordinate2.GetElementIndex()];
-            outputs[k] = operation(input1, input2);
+            outputs[index] = operation(input1, input2);
         }
     }
 
@@ -106,7 +117,7 @@ namespace layers
     uint64_t BinaryOpLayer::GetRequiredLayerSize(uint64_t layerIndex) const
     {
         auto maxSize = _inputCoordinates[0].GetRequiredLayerSize(layerIndex);
-        auto size = _inputCoordinates.Size();
+        auto size = _inputCoordinates.size();
         for(uint64_t index = 1; index < size; ++index)
         {
             maxSize = std::max(maxSize, _inputCoordinates[index].GetRequiredLayerSize(layerIndex));

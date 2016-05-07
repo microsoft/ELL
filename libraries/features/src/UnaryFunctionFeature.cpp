@@ -10,6 +10,8 @@
 #include "Feature.h"
 #include "VectorMath.h"
 #include "StringUtil.h"
+#include "UnaryOpLayer.h"
+#include "BinaryOpLayer.h"
 
 #include <cassert>
 #include <cmath>
@@ -50,7 +52,11 @@ namespace features
 
     layers::CoordinateList MagnitudeFeature::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
     {
-        return inputCoordinates;
+        auto multLayer = std::make_unique<layers::BinaryOpLayer>(inputCoordinates, inputCoordinates, layers::BinaryOpLayer::OperationType::multiply);
+        auto squaredOutputCoordinates = model.AddLayer(std::move(multLayer));
+        auto sqrtLayer = std::make_unique<layers::UnaryOpLayer>(squaredOutputCoordinates, layers::UnaryOpLayer::OperationType::sqrt);
+        auto outputCoordinates = model.AddLayer(std::move(sqrtLayer)); 
+        return outputCoordinates;
     }
 
     std::shared_ptr<Feature> MagnitudeFeature::Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures)

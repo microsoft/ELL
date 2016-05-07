@@ -50,9 +50,10 @@ namespace features
         static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures);
         explicit MagnitudeFeature(ctor_enable, std::shared_ptr<Feature> inputFeature);
 
-        virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
+        virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const override;
+
     protected:
-        virtual std::vector<double> ComputeOutput() const;
+        virtual std::vector<double> ComputeOutput() const override;
     };
 }
 
