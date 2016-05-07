@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StochasticGradientDescent.tcc (optimization)
+//  File:     StochasticGradientDescent.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,7 +15,7 @@
 // dataset
 #include "RowDataset.h"
 
-namespace optimization
+namespace trainers
 {
     template<typename LossFunctionType>
     StochasticGradientDescent<LossFunctionType>::StochasticGradientDescent(uint64_t dim, LossFunctionType lossFunction, double lambda) : _lossFunction(lossFunction), _lambda(lambda), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // start with 1 to prevent divide-by-zero

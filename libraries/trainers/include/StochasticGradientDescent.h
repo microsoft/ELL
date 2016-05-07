@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StochasticGradientDescent.h (optimization)
+//  File:     StochasticGradientDescent.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,7 @@
 // stl
 #include <cstdint>
 
-namespace optimization
+namespace trainers
 {
     /// <summary>
     /// Implements the Averaged Stochastic Gradient Descent algorithm on an L2 regularized empirical

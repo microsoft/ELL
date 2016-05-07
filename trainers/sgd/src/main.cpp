@@ -30,7 +30,7 @@
 #include "DataLoaders.h"
 #include "LoadModel.h"
 
-// optimization
+// trainers
 #include "StochasticGradientDescent.h"
 
 // lossFunctions
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 
         // create sgd trainer
         lossFunctions::LogLoss loss;
-        optimization::StochasticGradientDescent<lossFunctions::LogLoss> optimizer(outputCoordinateList.Size(), loss, sgdArguments.l2Regularization);
+        trainers::StochasticGradientDescent<lossFunctions::LogLoss> trainer(outputCoordinateList.Size(), loss, sgdArguments.l2Regularization);
 
         // create evaluator
         utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss> evaluator; // TODO give loss in ctor
@@ -100,18 +100,18 @@ int main(int argc, char* argv[])
 
             // iterate over the entire permuted dataset
             auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-            optimizer.Update(trainSetIterator);
+            trainer.Update(trainSetIterator);
 
             // Evaluate training error
             auto evaluationIterator = rowDataset.GetIterator();
-            evaluator.Evaluate(evaluationIterator, optimizer.GetPredictor(), loss);
+            evaluator.Evaluate(evaluationIterator, trainer.GetPredictor(), loss);
         }
 
         // print loss and errors
         std::cerr << "training error\n" << evaluator << std::endl;
 
         // update the map with the newly learned layers
-        auto predictor = optimizer.GetPredictor();
+        auto predictor = trainer.GetPredictor();
 
         predictor.AddToModel(model, outputCoordinateList);
 
