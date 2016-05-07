@@ -34,10 +34,10 @@ namespace features
     MagnitudeFeature::MagnitudeFeature(ctor_enable, std::shared_ptr<Feature> inputFeature) : UnaryFunctionFeature<MagnitudeFeature>(inputFeature)
     {}
 
-    std::vector<double> MagnitudeFeature::ComputeValue() const
+    std::vector<double> MagnitudeFeature::ComputeOutput() const
     {
         assert(_inputFeatures.size() == 1);
-        const auto& in_vec = _inputFeatures[0]->Eval();
+        const auto& in_vec = _inputFeatures[0]->GetOutput();
         double m = 0;
         for (auto v : in_vec)
         {

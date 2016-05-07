@@ -52,7 +52,7 @@ namespace features
 
         virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
     protected:
-        virtual std::vector<double> ComputeValue() const;
+        virtual std::vector<double> ComputeOutput() const;
     };
 }
 

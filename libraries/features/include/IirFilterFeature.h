@@ -26,15 +26,14 @@ namespace features
         virtual size_t WarmupTime() const;
         static constexpr const char* feature_name = "IirFilter";
 
-        virtual std::vector<std::string> GetDescription() const;
-
         static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures);
         explicit IirFilterFeature(ctor_enable, std::shared_ptr<Feature> inputFeature, std::vector<double> a, std::vector<double> b);
 
         virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
 
     protected:
-        virtual std::vector<double> ComputeValue() const;
+        virtual std::vector<double> ComputeOutput() const;
+        virtual void AddDescription(std::vector<std::string>& description) const;
 
     private:
         // TODO: make IirFilter work on vectors, so we can keep one filter instead of one per channel

@@ -24,9 +24,9 @@ namespace features
         _filters.emplace_back(b, a);
     }
 
-    std::vector<double> IirFilterFeature::ComputeValue() const
+    std::vector<double> IirFilterFeature::ComputeOutput() const
     {
-        const auto& row = _inputFeatures[0]->Eval();
+        const auto& row = _inputFeatures[0]->GetOutput();
 
         // resize to accomodate row
         while (row.size() > _filters.size())
@@ -53,15 +53,13 @@ namespace features
         return inputCoordinates;
     }
 
-    std::vector<std::string> IirFilterFeature::GetDescription() const
+    void IirFilterFeature::AddDescription(std::vector<std::string>& description) const
     {
         using std::to_string;
         using features::to_string;
-        std::vector<std::string> result = Feature::GetDescription();
 
-        result.push_back(to_string(_b));
-        result.push_back(to_string(_a));
-        return result;
+        description.push_back(to_string(_b));
+        description.push_back(to_string(_a));
     }
 
     std::shared_ptr<Feature> IirFilterFeature::Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures)

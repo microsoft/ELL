@@ -27,15 +27,15 @@ namespace features
 
         static constexpr const char* feature_name = "Input";
 
-        virtual std::vector<std::string> GetDescription() const;
-
         static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, FeatureMap& prev_features);
         explicit InputFeature(ctor_enable, uint64_t size);
 
         virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
 
     protected:
-        virtual std::vector<double> ComputeValue() const;
+        virtual std::vector<double> ComputeOutput() const;
+        virtual void AddDescription(std::vector<std::string>& description) const;
+
         std::vector<double> _currentValue;
     };
 }

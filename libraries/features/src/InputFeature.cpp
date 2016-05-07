@@ -27,7 +27,7 @@ namespace features
         return Allocate(size);
     }
 
-    std::vector<double> InputFeature::ComputeValue() const
+    std::vector<double> InputFeature::ComputeOutput() const
     {
         return _currentValue;
     }
@@ -44,13 +44,10 @@ namespace features
         return inputCoordinates;    
     }
     
-    std::vector<std::string> InputFeature::GetDescription() const
+    void InputFeature::AddDescription(std::vector<std::string>& description) const
     {
         using std::to_string;
-        std::vector<std::string> result = Feature::GetDescription();
-
-        result.push_back(to_string(_numColumns));
-        return result;
+        description.push_back(to_string(_numColumns));
     }
 
     std::shared_ptr<Feature> InputFeature::Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures)

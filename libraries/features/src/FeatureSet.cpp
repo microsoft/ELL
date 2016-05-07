@@ -39,9 +39,12 @@ namespace features
         if (_inputFeature && _outputFeature)
         {
             _inputFeature->SetValue(inst); // TODO: standardize on a vector type to use
-            auto newFeatures = _outputFeature->Eval();
+            auto newFeatures = _outputFeature->GetOutput();
             auto hasOutput = HasOutput();
-            ++_numItemsProcessed;
+            if(_numItemsProcessed < _outputFeature->WarmupTime())
+            {
+                ++_numItemsProcessed;
+            }
             return hasOutput;
         }
 
@@ -55,7 +58,7 @@ namespace features
     
     DataVector FeatureSet::GetOutput() const
     {
-        return _outputFeature->Eval();    
+        return _outputFeature->GetOutput();    
     }
     
     void FeatureSet::Deserialize(std::istream& inStream)

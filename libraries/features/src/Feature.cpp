@@ -48,11 +48,11 @@ namespace features
     {
     }
 
-    std::vector<double> Feature::Eval() const
+    std::vector<double> Feature::GetOutput() const
     {
         if (IsDirty() || _cachedValue.size() == 0)
         {
-            _cachedValue = ComputeValue();
+            _cachedValue = ComputeOutput();
             _isDirty = false; // Note: don't call SetDirty(false) here, as that will start a cascade of SetDirty calls
         }
 
@@ -67,12 +67,6 @@ namespace features
     void Feature::AddDependent(std::shared_ptr<Feature> f)
     {
         _dependents.push_back(f);
-    }
-
-    layers::CoordinateList Feature::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
-    {
-        throw std::runtime_error("Not implemented");
-        return inputCoordinates;
     }
 
     size_t Feature::NumColumns() const
@@ -155,7 +149,14 @@ namespace features
         {
             result.push_back(inputFeature->Id());
         }
+        
+        // now get subclass-specific parts
+        AddDescription(result);
         return result;
+    }
+    
+    void Feature::AddDescription(std::vector<std::string>& description) const
+    {
     }
 
     const std::vector<std::shared_ptr<Feature>>& Feature::GetInputFeatures() const

@@ -38,11 +38,11 @@ namespace features
         std::string Id() const;
         size_t NumColumns() const;
         virtual bool HasOutput() const;
-        std::vector<double> Eval() const; // TODO: call this Compute or something, maybe even GetOutput
+        std::vector<double> GetOutput() const; // TODO: call this Compute or something, maybe even GetOutput
 
         virtual void Reset();
         virtual size_t WarmupTime() const;
-        virtual size_t ColumnDelay(int column) const;
+        virtual size_t ColumnDelay(int column) const;  // TODO: remove this?
 
         virtual std::vector<std::string> GetColumnDescriptions() const;
         virtual std::vector<std::string> GetDescription() const;
@@ -51,11 +51,14 @@ namespace features
         virtual std::string FeatureType() const = 0;
         static std::vector<std::string> GetRegisteredTypes();
 
-        virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
+        virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const = 0;
 
         void AddDependent(std::shared_ptr<Feature> f); // TODO: figure out how to make this protected
+
     protected:
-        virtual std::vector<double> ComputeValue() const = 0;
+        // virtual methods:
+        virtual std::vector<double> ComputeOutput() const = 0;
+        virtual void AddDescription(std::vector<std::string>& description) const;
 
         static void RegisterDeserializeFunction(std::string class_name, std::function<std::shared_ptr<Feature>(std::vector<std::string>, FeatureMap&)> create_fn);
         void SetDirty(bool dirty) const;
