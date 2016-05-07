@@ -26,10 +26,4 @@ namespace dataset
         DenseDataVector<ValueType> result = *this;
         return std::make_unique<DenseDataVector<ValueType>>(std::move(result)); 
     }
-    
-    template <typename ValueType>
-    IDataVector::type DenseDataVector<ValueType>::GetType() const
-    {
-        return type::none; // In order for Clone to work, we must implement GetType in the base class (or we could do it with a constexpr function)
-    }
 }

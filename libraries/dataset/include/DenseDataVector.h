@@ -105,11 +105,6 @@ namespace dataset
         ///
         /// <returns> A deep copy of the datavector </summary>
         virtual std::unique_ptr<IDataVector> Clone() const override;
-        
-        ///// <summary> \returns The type of the std::vector. </summary>
-        /////
-        ///// <returns> The type. </returns>
-        virtual type GetType() const override;
 
     private:
         uint64_t _num_nonzeros;
@@ -121,11 +116,6 @@ namespace dataset
     {
     public:
         using DenseDataVector<float>::DenseDataVector;
-
-        /// <summary> \returns The type of the std::vector. </summary>
-        ///
-        /// <returns> The type. </returns>
-        virtual type GetType() const override;
     };
 
     /// <summary> A double data vector. </summary>
@@ -133,11 +123,6 @@ namespace dataset
     {
     public:
         using DenseDataVector<double>::DenseDataVector;
-
-        /// <summary> \returns The type of the std::vector. </summary>
-        ///
-        /// <returns> The type. </returns>
-        virtual type GetType() const override;
     };
 }
 
