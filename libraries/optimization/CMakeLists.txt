@@ -12,11 +12,11 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/AsgdOptimizer.cpp)
+set (SRC src/StochasticGradientDescent.cpp)
 
-set (INCLUDE include/AsgdOptimizer.h)
+set (INCLUDE include/StochasticGradientDescent.h)
 
-set (TCC tcc/AsgdOptimizer.tcc)
+set (TCC tcc/StochasticGradientDescent.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

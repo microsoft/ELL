@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     AsgdOptimizer.cpp (optimization)
+//  File:     StochasticGradientDescent.cpp (optimization)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "AsgdOptimizer.h"
+#include "StochasticGradientDescent.h"
 #include "LogLoss.h"
 
 namespace optimization

@@ -31,7 +31,7 @@
 #include "LoadModel.h"
 
 // optimization
-#include "AsgdOptimizer.h"
+#include "StochasticGradientDescent.h"
 
 // lossFunctions
 #include "HingeLoss.h"
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 
         // create sgd trainer
         lossFunctions::LogLoss loss;
-        optimization::AsgdOptimizer<lossFunctions::LogLoss> optimizer(outputCoordinateList.Size(), loss, sgdArguments.l2Regularization);
+        optimization::StochasticGradientDescent<lossFunctions::LogLoss> optimizer(outputCoordinateList.Size(), loss, sgdArguments.l2Regularization);
 
         // create evaluator
         utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss> evaluator; // TODO give loss in ctor

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     AsgdOptimizer.h (optimization)
+//  File:     StochasticGradientDescent.h (optimization)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ namespace optimization
     /// </summary>    
     /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
     template <typename LossFunctionType>
-    class AsgdOptimizer
+    class StochasticGradientDescent
     {
     public:
         /// <summary> Constructs the optimizer. </summary>
@@ -43,7 +43,7 @@ namespace optimization
         /// <param name="dim"> The dimension. </param>
         /// <param name="lossFunction"> The loss function. </param>
         /// <param name="l2Regularization"> The L2 regularization parameter. </param>
-        AsgdOptimizer(uint64_t dim, LossFunctionType lossFunction, double l2Regularization);
+        StochasticGradientDescent(uint64_t dim, LossFunctionType lossFunction, double l2Regularization);
 
         /// <summary> Performs a given number of learning iterations. </summary>
         ///
@@ -74,4 +74,4 @@ namespace optimization
     };
 }
 
-#include "../tcc/AsgdOptimizer.tcc"
+#include "../tcc/StochasticGradientDescent.tcc"

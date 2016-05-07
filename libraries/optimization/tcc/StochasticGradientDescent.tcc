@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     AsgdOptimizer.tcc (optimization)
+//  File:     StochasticGradientDescent.tcc (optimization)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,12 +18,12 @@
 namespace optimization
 {
     template<typename LossFunctionType>
-    AsgdOptimizer<LossFunctionType>::AsgdOptimizer(uint64_t dim, LossFunctionType lossFunction, double lambda) : _lossFunction(lossFunction), _lambda(lambda), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // start with 1 to prevent divide-by-zero
+    StochasticGradientDescent<LossFunctionType>::StochasticGradientDescent(uint64_t dim, LossFunctionType lossFunction, double lambda) : _lossFunction(lossFunction), _lambda(lambda), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // start with 1 to prevent divide-by-zero
     {}
 
     template<typename LossFunctionType>
     template<typename ExampleIteratorType>
-    void AsgdOptimizer<LossFunctionType>::Update(ExampleIteratorType& exampleIterator)
+    void StochasticGradientDescent<LossFunctionType>::Update(ExampleIteratorType& exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetVector();
@@ -81,13 +81,13 @@ namespace optimization
     }
 
     template<typename LossFunctionType>
-    void AsgdOptimizer<LossFunctionType>::Update(utilities::AnyIterator<dataset::GenericSupervisedExample>& exampleIterator)
+    void StochasticGradientDescent<LossFunctionType>::Update(utilities::AnyIterator<dataset::GenericSupervisedExample>& exampleIterator)
     {
         Update<decltype(exampleIterator)>(exampleIterator);
     }
 
     template<typename LossFunctionType>
-    const predictors::LinearPredictor& AsgdOptimizer<LossFunctionType>::GetPredictor() const
+    const predictors::LinearPredictor& StochasticGradientDescent<LossFunctionType>::GetPredictor() const
     {
         return _averagedPredictor;
     }
