@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "RowDatasetInterface.h"
 
+#include "RowDataset.h"
 #include <string>
 
 namespace interfaces
@@ -14,7 +15,7 @@ namespace interfaces
     //
     // RowDataset
     //
-    RowDataset::RowDataset(dataset::RowDataset<> dataset) : _dataset(std::move(dataset))
+    RowDataset::RowDataset(dataset::RowDataset<dataset::IDataVector> dataset) : _dataset(std::move(dataset))
     {
     }
 
@@ -24,23 +25,23 @@ namespace interfaces
         return _dataset.NumExamples();
     }
 
-    uint64_t RowDataset::GetMaxExampleSize() const
+    uint64_t RowDataset::GetMaxDataVectorSize() const
     {
-        return _dataset.GetMaxExampleSize();
+        return _dataset.GetMaxDataVectorSize();
     }
 
-    dataset::SupervisedExample RowDataset::GetExample(uint64_t index) const
+    dataset::GenericSupervisedExample RowDataset::GetExample(uint64_t index) const
     {
-        return dataset::SupervisedExample(_dataset.GetExample(index));
+        return dataset::GenericSupervisedExample(_dataset.GetExample(index));
     }
 
-    utilities::AnyIterator<dataset::SupervisedExample> RowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
+    utilities::AnyIterator<dataset::GenericSupervisedExample> RowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
     {
         auto it = _dataset.GetIterator(firstExample, numExamples);
         return utilities::MakeAnyIterator(std::move(it));
     }
 
-    void RowDataset::AddExample(dataset::SupervisedExample&& example)
+    void RowDataset::AddExample(dataset::GenericSupervisedExample&& example)
     {
         _dataset.AddExample(std::move(example));
     }

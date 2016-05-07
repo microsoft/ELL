@@ -27,7 +27,7 @@ namespace interfaces
     /// <param name="dataLoadArguments"> The data load arguments. </param>
     ///
     /// <returns> The data iterator. </returns>
-    utilities::AnyIterator<dataset::SupervisedExample> GetDataIterator(const std::string& dataFilename);
+    utilities::AnyIterator<dataset::GenericSupervisedExample> GetDataIterator(const std::string& dataFilename);
 
     /// <summary>
     /// Gets a mapped data iterator from a data file, based on command line parameters.
@@ -39,7 +39,7 @@ namespace interfaces
     /// <param name="modelFilename"> The model filename. </param>
     ///
     /// <returns> The data iterator. </returns>
-    utilities::AnyIterator<dataset::SupervisedExample> GetDataIterator(const std::string& dataFilename, int dimension, const std::string coordinateListString, const std::string& modelFilename);
+    utilities::AnyIterator<dataset::GenericSupervisedExample> GetDataIterator(const std::string& dataFilename, int dimension, const std::string coordinateListString, const std::string& modelFilename);
 
     /// <summary> Gets a row dataset from data filename. </summary>
     ///

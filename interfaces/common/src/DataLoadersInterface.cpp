@@ -48,8 +48,7 @@ namespace
         return dataset::GetParsingIterator(std::move(lineIterator), std::move(mappedParser));
     }
 
-
-    utilities::AnyIterator<dataset::SupervisedExample> GetMappedDataIterator(const common::DataLoadArguments& dataLoadArguments, const interfaces::Map& map) 
+    utilities::AnyIterator<dataset::GenericSupervisedExample> GetMappedDataIterator(const common::DataLoadArguments& dataLoadArguments, const interfaces::Map& map)
     {
         // create mapped parser for sparse vectors (SVMLight format)
         dataset::MappedParser<dataset::SparseEntryParser> mappedParser(dataset::SparseEntryParser(), map.GetMap());
@@ -65,7 +64,7 @@ namespace
 
 namespace interfaces
 {
-    utilities::AnyIterator<dataset::SupervisedExample> GetDataIterator(const std::string& dataFilename)
+    utilities::AnyIterator<dataset::GenericSupervisedExample> GetDataIterator(const std::string& dataFilename)
     {
         // create parser for sparse vectors (SVMLight format)
         dataset::SparseEntryParser sparseEntryParser;
@@ -78,7 +77,7 @@ namespace interfaces
         return utilities::MakeAnyIterator(parsingIterator); // Why does this work?
     }
 
-    utilities::AnyIterator<dataset::SupervisedExample> GetDataIterator(const std::string& dataFilename, int dimension, const std::string coordinateListString, const std::string& modelFilename)
+    utilities::AnyIterator<dataset::GenericSupervisedExample> GetDataIterator(const std::string& dataFilename, int dimension, const std::string coordinateListString, const std::string& modelFilename)
     {
         common::DataLoadArguments dataLoadArguments;
         dataLoadArguments.inputDataFile = dataFilename;
@@ -101,7 +100,7 @@ namespace interfaces
        dataLoadArguments.inputDataFile = dataFilename;
        auto dataIterator = common::GetDataIterator(dataLoadArguments);
 
-        dataset::RowDataset<> rowDataset;
+        dataset::RowDataset<dataset::IDataVector> rowDataset;
 
         while (dataIterator->IsValid())
         {
@@ -114,7 +113,7 @@ namespace interfaces
 
     interfaces::RowDataset GetDataset(const common::DataLoadArguments& dataLoadArguments, const interfaces::Map& map)
     {
-        dataset::RowDataset<> rowDataset;
+        dataset::RowDataset<dataset::IDataVector> rowDataset;
 
         auto dataIterator = GetMappedDataIterator(dataLoadArguments, map.GetMap());
         while (dataIterator->IsValid())
@@ -143,7 +142,7 @@ namespace interfaces
 
        auto dataIterator = common::GetDataIterator(dataLoadArguments, mapLoadArguments);
 
-        dataset::RowDataset<> rowDataset;
+        dataset::RowDataset<dataset::IDataVector> rowDataset;
 
         while (dataIterator->IsValid())
         {

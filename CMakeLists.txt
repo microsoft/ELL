@@ -41,7 +41,7 @@ add_subdirectory(scripts)
 
 # Add SWIG-generated interfaces
 
-if(${SWIG_ENABLED})
+if(${SWIG_ENABLED} STREQUAL "ON")
   find_package(SWIG)
   if(${SWIG_FOUND})
     add_subdirectory(interfaces)
