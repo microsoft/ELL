@@ -34,7 +34,7 @@ add_subdirectory(libraries/utilities)
 add_subdirectory(apply)
 add_subdirectory(compile)
 add_subdirectory(print)
-add_subdirectory(trainers/sgd)
+add_subdirectory(tools/trainers/stochasticGradientDescent)
 add_subdirectory(tools/trainers/sortingTreeLearner)
 add_subdirectory(scripts)
 

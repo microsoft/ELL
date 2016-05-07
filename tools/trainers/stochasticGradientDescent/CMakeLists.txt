@@ -5,7 +5,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 # define project
-set (PROJ_NAME sgd)
+set (PROJ_NAME stochasticGradientDescent)
 PROJECT(${PROJ_NAME})
 
 #enable C++11 in GCC, etc
@@ -36,7 +36,7 @@ add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
 target_link_libraries(${PROJ_NAME} common dataset layers linear lossFunctions predictors trainers utilities)
 
 # put this project in the trainers folder in the IDE 
-set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "trainers")
+set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/trainers")
 
 # copy executable to build/bin directory
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
