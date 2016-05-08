@@ -101,8 +101,8 @@ namespace std
 // Interface for the predictors library
 %include predictors.i
 
-// Interface includes for optimizer library
-%include optimization.i
+// Interface includes for trainers library
+%include trainers.i
 
 // Interface includes for lossFunctions library
 %include lossFunctions.i

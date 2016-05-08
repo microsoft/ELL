@@ -38,7 +38,7 @@ namespace trainers
     class StochasticGradientDescent
     {
     public:
-        /// <summary> Constructs the optimizer. </summary>
+        /// <summary> Constructs the trainer. </summary>
         ///
         /// <param name="dim"> The dimension. </param>
         /// <param name="lossFunction"> The loss function. </param>
