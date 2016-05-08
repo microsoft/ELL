@@ -67,7 +67,7 @@ namespace features
         std::vector<std::shared_ptr<Feature>> stack;
 
         // start with output feature in stack
-        // TODO: when we have multiple output features, put them all in the stack (and put this code in FeatureSet)
+        // TODO: when we have multiple output features, put them all in the stack
         stack.push_back(_outputFeature);
         while (stack.size() > 0)
         {

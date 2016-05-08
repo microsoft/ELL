@@ -10,16 +10,7 @@
 #include <unordered_set>
 
 namespace features
-{
-    //
-    // CreateFeature convenience function
-    //
-//    template <typename FeatureType, typename ...Args>
-//    std::shared_ptr<FeatureType> CreateFeature(Args... args)
-//    {
-//        return FeatureType::Create(args...);
-//    }
-    
+{    
     //
     // RegisteredFeature implementation
     //
@@ -30,16 +21,28 @@ namespace features
     }
 
     template <typename FeatureT>
+    RegisteredFeature<FeatureT>::RegisteredFeature(const std::vector<std::shared_ptr<Feature>>& inputs) : Feature(inputs)
+    {        
+    }
+
+    template <typename FeatureT>
     std::string RegisteredFeature<FeatureT>::FeatureType() const
-    { 
+    {
         return FeatureT::feature_name;
     }
     
     template <typename FeatureT>
     template <typename... Args>
-    std::shared_ptr<FeatureT> RegisteredFeature<FeatureT>::Allocate(Args ...args)
+    std::shared_ptr<FeatureT> RegisteredFeature<FeatureT>::Allocate(const std::vector<std::shared_ptr<Feature>>& inputs, Args ...args)
     {
-        return std::make_shared<FeatureT>(ctor_enable(), args...);
+        return std::make_shared<FeatureT>(ctor_enable(), inputs, args...);
+    }    
+
+    //
+    // UnaryFunctionFeature
+    //
+    template <typename FeatureT>
+    UnaryFunctionFeature<FeatureT>::UnaryFunctionFeature(const std::vector<std::shared_ptr<Feature>>& inputs) : RegisteredFeature<FeatureT>(inputs)
+    {
     }
-    
 }

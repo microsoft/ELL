@@ -32,13 +32,15 @@ namespace features
     {
     public:
         Feature();
-        Feature(std::string Id);
+        Feature(std::string id);
+        Feature(const std::vector<std::shared_ptr<Feature>>& inputs);
+        Feature(std::string Id, const std::vector<std::shared_ptr<Feature>>& inputs);
         virtual ~Feature();
 
         std::string Id() const;
         size_t NumColumns() const;
         virtual bool HasOutput() const;
-        std::vector<double> GetOutput() const; // TODO: call this Compute or something, maybe even GetOutput
+        std::vector<double> GetOutput() const;
 
         virtual void Reset();
         virtual size_t WarmupTime() const;
@@ -48,18 +50,19 @@ namespace features
         virtual std::vector<std::string> GetDescription() const;
         const std::vector<std::shared_ptr<Feature>>& GetInputFeatures() const;
 
-        virtual std::string FeatureType() const = 0;
         static std::vector<std::string> GetRegisteredTypes();
 
-        virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const = 0;
-
+        // TODO: get rid of this by adding its functionality to Allocate
+        //       Allocate will have to take a vector of input features plus args...
         void AddDependent(std::shared_ptr<Feature> f); // TODO: figure out how to make this protected
-
+        
     protected:
         // virtual methods:
         virtual std::vector<double> ComputeOutput() const = 0;
         virtual void AddDescription(std::vector<std::string>& description) const;
+        virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const = 0;
 
+        virtual std::string FeatureType() const = 0;
         static void RegisterDeserializeFunction(std::string class_name, std::function<std::shared_ptr<Feature>(std::vector<std::string>, FeatureMap&)> create_fn);
         void SetDirty(bool dirty) const;
         bool IsDirty() const;
@@ -94,13 +97,35 @@ namespace features
     {
     public:
         static void RegisterFeature();
+        
+    protected:
         virtual std::string FeatureType() const final;
 
-    protected:
+        RegisteredFeature(const std::vector<std::shared_ptr<Feature>>& inputs);
+        
         // Allocates a new shared_ptr to a feature of type FeatureType
         template <typename ... Args>
-        static std::shared_ptr<FeatureT> Allocate(Args... args);
+        static std::shared_ptr<FeatureT> Allocate(const std::vector<std::shared_ptr<Feature>>& inputs, Args... args);
+
     };
+
+    //
+    // UnaryFunctionFeature
+    //
+    template <typename FeatureT>
+    class UnaryFunctionFeature : public RegisteredFeature<FeatureT>
+    {
+    protected:
+        UnaryFunctionFeature(const std::vector<std::shared_ptr<Feature>>& inputs);
+        using RegisteredFeature<FeatureT>::AddInputFeature;
+
+        // Allocates a new shared_ptr to a feature of type FeatureType
+        // template <typename ... Args>
+        // static std::shared_ptr<FeatureT> Allocate(std::shared_ptr<Feature>, Args... args);
+
+    private:
+    };
+
 }
 
 #include "../tcc/Feature.tcc"

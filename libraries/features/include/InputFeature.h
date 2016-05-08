@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 namespace features
 {
@@ -28,13 +29,12 @@ namespace features
         static constexpr const char* feature_name = "Input";
 
         static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, FeatureMap& prev_features);
-        explicit InputFeature(ctor_enable, uint64_t size);
-
-        virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
+        explicit InputFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>&, uint64_t size);
 
     protected:
         virtual std::vector<double> ComputeOutput() const;
         virtual void AddDescription(std::vector<std::string>& description) const;
+        virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const;
 
         std::vector<double> _currentValue;
     };

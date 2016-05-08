@@ -21,7 +21,7 @@ set (INCLUDE include/DelayBuffer.h
              include/MeanFeature.h 
              include/RingBuffer.h 
              include/StringUtil.h
-             include/UnaryFunctionFeature.h
+             include/MagnitudeFeature.h
              include/Vector.h
              include/VectorMath.h)
 
@@ -32,7 +32,7 @@ set (SRC src/Feature.cpp
          src/InputFeature.cpp
          src/MeanFeature.cpp
          src/StringUtil.cpp
-         src/UnaryFunctionFeature.cpp
+         src/MagnitudeFeature.cpp
          src/VectorMath.cpp)
 
 set (TCC tcc/DelayBuffer.tcc
@@ -40,7 +40,6 @@ set (TCC tcc/DelayBuffer.tcc
          tcc/FeatureSet.tcc
          tcc/RingBuffer.tcc
          tcc/StringUtil.tcc
-         tcc/UnaryFunctionFeature.tcc
          tcc/Vector.tcc
          tcc/VectorMath.tcc)
 
@@ -67,8 +66,8 @@ set (TEST_NAME ${PROJ_NAME}_test)
 
 PROJECT(${TEST_NAME})
 
-set (TEST_SRC test/src/main.cpp)
-set (TEST_INCLUDE )
+set (TEST_SRC test/src/main.cpp test/src/Features_test.cpp)
+set (TEST_INCLUDE test/include/Features_test.h)
 
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})

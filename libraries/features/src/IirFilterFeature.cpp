@@ -16,10 +16,10 @@ namespace features
     //
     std::shared_ptr<IirFilterFeature> IirFilterFeature::Create(std::shared_ptr<Feature> inputFeature, std::vector<double> b, std::vector<double> a)
     {
-        return Allocate(inputFeature, b, a);
+        return Allocate({inputFeature}, b, a);
     }
 
-    IirFilterFeature::IirFilterFeature(ctor_enable, std::shared_ptr<Feature> inputFeature, std::vector<double> b, std::vector<double> a) : UnaryFunctionFeature<IirFilterFeature>(inputFeature), _a(a), _b(b)
+    IirFilterFeature::IirFilterFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>& inputs, std::vector<double> b, std::vector<double> a) : UnaryFunctionFeature<IirFilterFeature>(inputs), _a(a), _b(b)
     {
         _filters.emplace_back(b, a);
     }
@@ -48,8 +48,10 @@ namespace features
         return Feature::WarmupTime() + std::max(_a.size(), _b.size());
     }
 
-    layers::CoordinateList IirFilterFeature::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
+    layers::CoordinateList IirFilterFeature::AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const
     {
+        layers::CoordinateList inputCoordinates;
+        throw std::runtime_error("Not implemented");
         return inputCoordinates;
     }
 

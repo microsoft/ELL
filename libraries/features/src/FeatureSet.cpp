@@ -205,11 +205,41 @@ namespace features
 
     layers::CoordinateList FeatureSet::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
     {
+        // TODO: document in Visit that we visit nodes in order --- a node is visited only after its inputs are
+        assert(_inputFeature != nullptr);
+        assert(_outputFeature != nullptr);
+        
         // need to keep a map of output coordinate lists for the various features
-        std::unordered_map<std::shared_ptr<Feature>, layers::CoordinateList> featureOutputs;
+        std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList> featureOutputs;
+        layers::CoordinateList outputCoordinates;
+        auto modelAdder = [this, &inputCoordinates, &featureOutputs, &outputCoordinates, &model](const Feature& f)
+        {
+            auto featurePtr = f.shared_from_this();
+            layers::CoordinateList coordinates;
+            if(featurePtr == _inputFeature)
+            {
+                coordinates = inputCoordinates;
+            }
+            else
+            {
+                coordinates = f.AddToModel(model, featureOutputs);
+            }
+
+            featureOutputs.emplace(featurePtr, coordinates);
+            if(featurePtr == _outputFeature)
+            {
+                outputCoordinates = coordinates;
+            }
+        };
 
         // traverse graph, adding layers --- visit graph in same way we do during compute
-        return inputCoordinates;    
+        Visit(modelAdder);
+        
+        return outputCoordinates;
     }
 
+
+// TODO: XML serialization
+// TODO: for variance feature, have 2 constructors, one which makes an anonymous mean feature
+// TODO: put Unary, Binary feature base classes in Feature.h
 } // end namepsace

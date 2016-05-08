@@ -6,7 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "UnaryFunctionFeature.h"
+#include "MagnitudeFeature.h"
 #include "Feature.h"
 #include "VectorMath.h"
 #include "StringUtil.h"
@@ -30,10 +30,10 @@ namespace features
     //
     std::shared_ptr<MagnitudeFeature> MagnitudeFeature::Create(std::shared_ptr<Feature> inputFeature)
     {
-        return Allocate(inputFeature);
+        return Allocate({inputFeature});
     }
 
-    MagnitudeFeature::MagnitudeFeature(ctor_enable, std::shared_ptr<Feature> inputFeature) : UnaryFunctionFeature<MagnitudeFeature>(inputFeature)
+    MagnitudeFeature::MagnitudeFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>& inputs) : UnaryFunctionFeature<MagnitudeFeature>(inputs)
     {}
 
     std::vector<double> MagnitudeFeature::ComputeOutput() const
@@ -50,8 +50,15 @@ namespace features
         return result;
     }
 
-    layers::CoordinateList MagnitudeFeature::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
+    layers::CoordinateList MagnitudeFeature::AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const
     {
+        auto it = featureOutputs.find(_inputFeatures[0]);
+        if (it == featureOutputs.end())
+        {
+            throw std::runtime_error("Couldn't find input feature");
+        }
+       
+        auto inputCoordinates = it->second;
         auto multLayer = std::make_unique<layers::BinaryOpLayer>(inputCoordinates, inputCoordinates, layers::BinaryOpLayer::OperationType::multiply);
         auto squaredOutputCoordinates = model.AddLayer(std::move(multLayer));
         auto sqrtLayer = std::make_unique<layers::UnaryOpLayer>(squaredOutputCoordinates, layers::UnaryOpLayer::OperationType::sqrt);

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     UnaryFunctionFeature.h (features)
+//  File:     MagnitudeFeature.h (features)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,25 +20,6 @@
 namespace features
 {
     //
-    // UnaryFunctionFeature
-    //
-    template <typename FeatureT>
-    class UnaryFunctionFeature : public RegisteredFeature<FeatureT>
-    {
-    public:
-        UnaryFunctionFeature(std::shared_ptr<Feature> inputFeature);
-
-    protected:
-        using RegisteredFeature<FeatureT>::AddInputFeature;
-
-        // Allocates a new shared_ptr to a feature of type FeatureType
-        template <typename ... Args>
-        static std::shared_ptr<FeatureT> Allocate(std::shared_ptr<Feature>, Args... args);
-
-    private:
-    };
-
-    //
     // MagnitudeFeature
     //
     class MagnitudeFeature : public UnaryFunctionFeature<MagnitudeFeature>
@@ -48,13 +29,10 @@ namespace features
         static constexpr const char* feature_name = "Magnitude";
 
         static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures);
-        explicit MagnitudeFeature(ctor_enable, std::shared_ptr<Feature> inputFeature);
-
-        virtual layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const override;
+        explicit MagnitudeFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>> &inputs);
 
     protected:
         virtual std::vector<double> ComputeOutput() const override;
+        virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const override;
     };
 }
-
-#include "../tcc/UnaryFunctionFeature.tcc"

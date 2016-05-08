@@ -30,7 +30,7 @@ namespace layers
         ///
         /// <param name="layer"> The layer to add to the model. </param>
         ///
-        /// <returns> The list of coordinates added. </returns>
+        /// <returns> The list of coordinates added. </returns>  // TODO: say "The output coordinates for the layer added" if that's correct
         CoordinateList AddLayer(std::unique_ptr<Layer> layer);
 
         /// <summary> Returns the number of layers in the model. </summary>

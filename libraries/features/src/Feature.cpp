@@ -34,14 +34,23 @@ namespace features
         using std::to_string;
         // create id
         _instanceId = _instanceCount;
-        _instanceCount++;
+        ++_instanceCount;
         _id = "f_" + to_string(_instanceId);
     }
-
+    
     Feature::Feature(std::string id) : _isDirty(true), _id(id)
     {
-        // Need to make sure name is unique. Punt for now --- it's an error if you don't ((de)serialization will fail)
-        Feature::_instanceCount++; // necessary?
+        ++_instanceCount;
+    }
+
+    Feature::Feature(const std::vector<std::shared_ptr<Feature>>& inputs) : Feature()
+    {
+        _inputFeatures = inputs;
+    }
+
+    Feature::Feature(std::string id, const std::vector<std::shared_ptr<Feature>>& inputs) : Feature(id)
+    {
+        _inputFeatures = inputs;
     }
 
     Feature::~Feature()
