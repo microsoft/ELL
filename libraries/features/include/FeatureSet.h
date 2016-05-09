@@ -29,15 +29,16 @@ namespace features
 
         void Reset();
         bool ProcessInputData(const DataVector& inData) const; // returns true if we generated output (in which case, call GetOutput())
-        // TODO: to deal with buffering nodes (e.g., FFT), need to split ProcessInputData into 2 or 3 phases:
+        // Note: to deal with buffering nodes (e.g., FFT), need to split ProcessInputData into 2 or 3 phases:
         // SetInput(...) // triggers dirty calc cascade
-        // GetValue() // sets dirty bit off
+        // GetOutput() // sets dirty bit off
         bool HasOutput() const; // Returns dirty bit value. If we have multiple output features, then this should just be a function on the feature
         DataVector GetOutput() const;
         
         std::shared_ptr<InputFeature> GetInputFeature() const;
         std::shared_ptr<Feature> GetOutputFeature() const;
         void SetOutputFeature(const std::shared_ptr<Feature>& output);
+
         std::shared_ptr<Feature> GetFeature(const std::string& featureId) const;
         std::vector<std::string> GetFeatureIds() const;
 
@@ -51,10 +52,15 @@ namespace features
         void Serialize(std::ostream& outStream) const; // Serializes all features in the graph
         void SerializeActiveGraph(std::ostream& outStream) const; // Serializes only the features needed to recreate output
 
+        // Visits all features in the graph in dependency order
+        // (that is, a feature is never visited unless its inputs have all been visted first)
         template <typename Visitor>
-        void Visit(Visitor& visitor) const; // Visits all features in the graph
+        void Visit(Visitor& visitor) const; 
+
+        // Visits active features in the graph in dependency order
+        // (that is, a feature is never visited unless its inputs have all been visted first)
         template <typename Visitor>
-        void VisitActiveGraph(Visitor& visitor) const; // Visits only the features needed to recreate output
+        void VisitActiveGraph(Visitor& visitor) const;
 
         /// <summary> Adds the feature set to a model. </summary>
         ///

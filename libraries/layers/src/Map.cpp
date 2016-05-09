@@ -71,11 +71,8 @@ namespace layers
         // compute layers 1,2,... in order
         for (uint64_t i = 1; i < _model.NumLayers(); ++i)
         {
-            std::cout << "About to init layer " << i << " of type " << _model.GetLayer(i).GetRuntimeTypeName() << std::endl;
             _model.GetLayer(i).Compute(_layerOutputs, _layerOutputs[i]);
-            std::cout << "...done" << std::endl;
         }
-        std::cout << "Done initializing inputs" << std::endl;
 
         // copy the outputs to a vector
         auto outputSize = _outputCoordinateList.Size();

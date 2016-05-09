@@ -61,7 +61,6 @@ void TestMagFeatureCompute()
     }
     else
     {
-        // TODO: maybe call ProcessTest Assert? Maybe even add testing::FailTest(msg) for situations like this?
         testing::ProcessTest("Error: no output from MagnitudeFeature", false); 
     }
 
@@ -92,23 +91,16 @@ void TestMagFeatureModel()
     std::vector<double> data = { 1,2,3 };
     dataset::DoubleDataVector dataVector(data);
     auto outputVec = map.Compute(data);
-    return;
     
-    // double output;
-    // if (outputVec.size() > 0)
-    // {
-    //     output = outputVec[0];
-    // }
-    // else
-    // {
-    //     // TODO: maybe rename ProcessTest to Assert? Maybe even add testing::FailTest(msg) for situations like this?
-    //     testing::ProcessTest("Error: no output from MagnitudeFeature", false); 
-    // }
-    // std::cout << "Output vec: ";
-    // for(const auto& x: outputVec) std::cout << x << "  ";
-    // std::cout << std::endl;
-    // std::cout << "Output: " << output << std::endl;
-    // double expectedOutput = VecMagnitude(data);
-    // testing::ProcessTest("Testing MagnitudeFeature", testing::IsEqual(output, expectedOutput));
-        
+    double output;
+    if (outputVec.size() > 0)
+    {
+        output = outputVec[0];
+    }
+    else
+    {
+        testing::ProcessTest("Error: no output from MagnitudeFeature", false); 
+    }
+    double expectedOutput = VecMagnitude(data);
+    testing::ProcessTest("Testing MagnitudeFeature", testing::IsEqual(output, expectedOutput));        
 }

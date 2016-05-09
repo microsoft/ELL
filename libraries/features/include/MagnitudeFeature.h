@@ -25,11 +25,12 @@ namespace features
     class MagnitudeFeature : public UnaryFunctionFeature<MagnitudeFeature>
     {
     public:
+        // Factory method
         static std::shared_ptr<MagnitudeFeature> Create(std::shared_ptr<Feature> inputFeature);
-        static constexpr const char* feature_name = "Magnitude";
-
         static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures);
+
         explicit MagnitudeFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>> &inputs);
+        static constexpr const char* feature_name = "Magnitude";
 
     protected:
         virtual std::vector<double> ComputeOutput() const override;

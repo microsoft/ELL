@@ -96,7 +96,6 @@ namespace layers
 
     void BinaryOpLayer::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
     {
-        std::cout << "BinaryOpLayer::Compute" << std::endl;
         auto operation = GetOperation(_operationType);
         auto numEntries = _inputCoordinates.size();
         for (uint64_t index = 0; index < numEntries; ++index)
