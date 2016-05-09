@@ -48,7 +48,7 @@ namespace features
         return inputCoordinates;    
     }
     
-    void InputFeature::AddDescription(std::vector<std::string>& description) const
+    void InputFeature::AddToDescription(std::vector<std::string>& description) const
     {
         using std::to_string;
         description.push_back(to_string(_numColumns));

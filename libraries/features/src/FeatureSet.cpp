@@ -136,12 +136,6 @@ namespace features
     {
         if(_outputFeature != nullptr)
         {
-            for (int columnIndex = 0; columnIndex < _outputFeature->NumColumns(); columnIndex++)
-            {
-                outStream << "\t" << _outputFeature->ColumnDelay(columnIndex);
-            }
-            outStream << std::endl;
-
             auto serializer = [&outStream](const Feature& f)
             {
                 f.Serialize(outStream);

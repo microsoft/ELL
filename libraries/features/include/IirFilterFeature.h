@@ -33,7 +33,7 @@ namespace features
 
     protected:
         virtual std::vector<double> ComputeOutput() const override;
-        virtual void AddDescription(std::vector<std::string>& description) const override;
+        virtual void AddToDescription(std::vector<std::string>& description) const override;
         virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const override;
 
     private:

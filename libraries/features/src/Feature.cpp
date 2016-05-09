@@ -125,11 +125,6 @@ namespace features
         return maxTime;
     }
 
-    size_t Feature::ColumnDelay(int column) const
-    {
-        return WarmupTime();
-    }
-
     void Feature::AddInputFeature(std::shared_ptr<Feature> inputFeature)
     {
         _inputFeatures.push_back(inputFeature);
@@ -160,14 +155,10 @@ namespace features
         }
         
         // now get subclass-specific parts
-        AddDescription(result);
+        AddToDescription(result);
         return result;
     }
     
-    void Feature::AddDescription(std::vector<std::string>& description) const
-    {
-    }
-
     const std::vector<std::shared_ptr<Feature>>& Feature::GetInputFeatures() const
     {
         return _inputFeatures;

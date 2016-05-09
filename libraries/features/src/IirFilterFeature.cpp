@@ -55,7 +55,7 @@ namespace features
         return inputCoordinates;
     }
 
-    void IirFilterFeature::AddDescription(std::vector<std::string>& description) const
+    void IirFilterFeature::AddToDescription(std::vector<std::string>& description) const
     {
         using std::to_string;
         using features::to_string;

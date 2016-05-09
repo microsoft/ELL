@@ -40,11 +40,13 @@ namespace features
         virtual bool HasOutput() const;
         std::vector<double> GetOutput() const;
 
+        // Resets any internal state
         virtual void Reset();
+        // Amount of time it takes for this feature to respond to input
         virtual size_t WarmupTime() const;
 
+        std::vector<std::string> GetDescription() const;
         virtual std::vector<std::string> GetColumnDescriptions() const;
-        virtual std::vector<std::string> GetDescription() const;
         const std::vector<std::shared_ptr<Feature>>& GetInputFeatures() const;
 
         static std::vector<std::string> GetRegisteredTypes();
@@ -52,10 +54,11 @@ namespace features
         void AddDependent(std::shared_ptr<Feature> f); // TODO: figure out how to make this protected
         
         using FeatureMap = std::unordered_map<std::string, std::shared_ptr<Feature>>;
-        using DeserializeFunction = std::function<std::shared_ptr<Feature>(std::vector<std::string>, FeatureMap&)>;
+        using DeserializeFunction = std::function<std::shared_ptr<Feature>(std::vector<std::string>, FeatureMap&)>; // TODO: have creation function take a const FeatureMap&
+
     protected:
         virtual std::vector<double> ComputeOutput() const = 0;
-        virtual void AddDescription(std::vector<std::string>& description) const;
+        virtual void AddToDescription(std::vector<std::string>& description) const = 0;
         virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const = 0;        
         virtual std::string FeatureType() const = 0;
         
@@ -71,14 +74,12 @@ namespace features
     private:
         mutable bool _isDirty = true;
         std::vector<std::shared_ptr<Feature>> _dependents; // children
-        mutable std::string _id;
+        std::string _id;
         int _instanceId = 0;
 
         static int _instanceCount;
-        // TODO: have creation function take a const FeatureMap&
         static std::unordered_map<std::string, DeserializeFunction> _createTypeMap;
 
-        virtual size_t ColumnDelay(int column) const;  // TODO: remove this?
         std::shared_ptr<InputFeature> FindInputFeature() const;
         void Serialize(std::ostream& outStream) const;
         static std::shared_ptr<Feature> FromDescription(const std::vector<std::string>& description, FeatureMap& deserializedFeatureMap);
