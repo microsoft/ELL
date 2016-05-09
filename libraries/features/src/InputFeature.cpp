@@ -56,8 +56,8 @@ namespace features
 
     std::shared_ptr<Feature> InputFeature::Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
-        assert(params.size() == 1);
-        uint64_t size = ParseInt(params[0]);
+        assert(params.size() == 3);
+        uint64_t size = ParseInt(params[2]);
         return Create(size);
     }    
 }

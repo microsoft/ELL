@@ -20,13 +20,15 @@
 
 namespace features
 {    
-    using DataVector = linear::DoubleVector; 
-
+//    using DataVector = linear::DoubleVector; 
+    typedef linear::DoubleVector DataVector;
+    
     class FeatureSet
     {
     public:
         FeatureSet();
-
+        ~FeatureSet() {};
+        
         void Reset();
         bool ProcessInputData(const DataVector& inData) const; // returns true if we generated output (in which case, call GetOutput())
         // Note: to deal with buffering nodes (e.g., FFT), need to split ProcessInputData into 2 or 3 phases:

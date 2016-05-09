@@ -136,8 +136,6 @@ namespace features
     {
         if(_outputFeature != nullptr)
         {
-            // Testing: write header with delay for each column
-            outStream << "#delay:";
             for (int columnIndex = 0; columnIndex < _outputFeature->NumColumns(); columnIndex++)
             {
                 outStream << "\t" << _outputFeature->ColumnDelay(columnIndex);

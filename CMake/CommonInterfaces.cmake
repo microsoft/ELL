@@ -40,6 +40,7 @@ set (INTERFACE_MAIN ../common/EMLL.i)
 
 set (INTERFACE_FILES ../common/common.i
                      ../common/dataset.i
+                     ../common/features.i
                      ../common/layers.i
                      ../common/linear.i
                      ../common/lossFunctions.i
@@ -62,6 +63,7 @@ else()
 # Add EMLL library include directories
 include_directories(../../libraries/common/include)
 include_directories(../../libraries/dataset/include)
+include_directories(../../libraries/features/include)
 include_directories(../../libraries/layers/include)
 include_directories(../../libraries/linear/include)
 include_directories(../../libraries/lossFunctions/include)
@@ -85,7 +87,7 @@ endforeach()
 set(CMAKE_SWIG_FLAGS "-c++")
 set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${EXTRA_INTERFACE})
 
-set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_FILES}) # Doesn't seem to work
+#set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_FILES}) # Doesn't seem to work
 # set_source_files_properties(${INTERFACE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties(${INTERFACE_MAIN} ${INTERFACE_FILES} PROPERTIES CPLUSPLUS ON)
 # set_source_files_properties(${INTERFACE_FILES} PROPERTIES SWIG_FLAGS "-includeall") # Don't want this, I think
@@ -98,7 +100,7 @@ if(${LANGUAGE_NAME} STREQUAL "python")
 endif()
 
 swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
-swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset layers lossFunctions optimization predictors utilities)
+swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset features layers lossFunctions optimization predictors utilities)
 set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}EMLL)
 endif()
 
