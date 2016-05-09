@@ -1,12 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SortingTreeLearner.cpp (trainers)
+//  File:     StochasticGradientDescentTrainer.cpp (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SortingTreeLearner.h"
+#include "StochasticGradientDescentTrainer.h"
+#include "LogLoss.h"
 
 namespace trainers
 {    

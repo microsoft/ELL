@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StochasticGradientDescent.h (trainers)
+//  File:     StochasticGradientDescentTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ namespace trainers
     /// </summary>    
     /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
     template <typename LossFunctionType>
-    class StochasticGradientDescent
+    class StochasticGradientDescentTrainer
     {
     public:
         /// <summary> Constructs the trainer. </summary>
@@ -43,7 +43,7 @@ namespace trainers
         /// <param name="dim"> The dimension. </param>
         /// <param name="lossFunction"> The loss function. </param>
         /// <param name="l2Regularization"> The L2 regularization parameter. </param>
-        StochasticGradientDescent(uint64_t dim, LossFunctionType lossFunction, double l2Regularization);
+        StochasticGradientDescentTrainer(uint64_t dim, LossFunctionType lossFunction, double l2Regularization);
 
         /// <summary> Performs a given number of learning iterations. </summary>
         ///
@@ -74,4 +74,4 @@ namespace trainers
     };
 }
 
-#include "../tcc/StochasticGradientDescent.tcc"
+#include "../tcc/StochasticGradientDescentTrainer.tcc"

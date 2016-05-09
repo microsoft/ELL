@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SortingTreeLearner.h (trainers)
+//  File:     SortingTreeTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,14 +24,14 @@ namespace trainers
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
     template <typename LossFunctionType>
-    class SortingTreeLearner
+    class SortingTreeTrainer
     {
     public:
 
-        /// <summary> Constructs an instance of SortingTreeLearner. </summary>
+        /// <summary> Constructs an instance of SortingTreeTrainer. </summary>
         ///
         /// <param name="lossFunction"> The loss function. </param>
-        SortingTreeLearner(LossFunctionType lossFunction);
+        SortingTreeTrainer(LossFunctionType lossFunction);
 
         /// <summary> Trains a decision tree. </summary>
         ///
@@ -82,4 +82,4 @@ namespace trainers
     };
 }
 
-#include "../tcc/SortingTreeLearner.tcc"
+#include "../tcc/SortingTreeTrainer.tcc"

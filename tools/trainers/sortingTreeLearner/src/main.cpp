@@ -30,7 +30,7 @@
 #include "LoadModel.h"
 
 // trainers
-#include "SortingTreeLearner.h"
+#include "SortingTreeTrainer.h"
 
 // lossFunctions
 #include "SquaredLoss.h"
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 
         // create sgd trainer
         lossFunctions::SquaredLoss loss;
-        trainers::SortingTreeLearner<lossFunctions::SquaredLoss> sortingTreeLearner(loss);
+        trainers::SortingTreeTrainer<lossFunctions::SquaredLoss> sortingTreeLearner(loss);
         
         // create evaluator
         utilities::BinaryClassificationEvaluator<predictors::DecisionTree, lossFunctions::SquaredLoss> evaluator;

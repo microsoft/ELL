@@ -32,7 +32,7 @@
 #include "LoadModel.h"
 
 // trainers
-#include "StochasticGradientDescent.h"
+#include "StochasticGradientDescentTrainer.h"
 
 // lossFunctions
 #include "HingeLoss.h"
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 
         // create sgd trainer
         lossFunctions::LogLoss loss;
-        trainers::StochasticGradientDescent<lossFunctions::LogLoss> trainer(outputCoordinateList.Size(), loss, sgdArguments.l2Regularization);
+        trainers::StochasticGradientDescentTrainer<lossFunctions::LogLoss> trainer(outputCoordinateList.Size(), loss, sgdArguments.l2Regularization);
 
         // create evaluator
         utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss> evaluator; // TODO give loss in ctor
