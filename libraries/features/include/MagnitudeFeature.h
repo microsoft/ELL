@@ -22,7 +22,7 @@ namespace features
     //
     // MagnitudeFeature
     //
-    class MagnitudeFeature : public UnaryFunctionFeature<MagnitudeFeature>
+    class MagnitudeFeature : public RegisteredFeature<MagnitudeFeature>
     {
     public:
         // Factory method

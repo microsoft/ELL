@@ -20,7 +20,7 @@ namespace features
     //
     // IirFilterFeature
     //
-    class IirFilterFeature : public UnaryFunctionFeature<IirFilterFeature>
+    class IirFilterFeature : public RegisteredFeature<IirFilterFeature>
     {
     public:
         static std::shared_ptr<IirFilterFeature> Create(std::shared_ptr<Feature> inputFeature, std::vector<double> a, std::vector<double> b);

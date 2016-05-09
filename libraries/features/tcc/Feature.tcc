@@ -37,12 +37,4 @@ namespace features
     {
         return std::make_shared<FeatureT>(ctor_enable(), inputs, args...);
     }    
-
-    //
-    // UnaryFunctionFeature
-    //
-    template <typename FeatureT>
-    UnaryFunctionFeature<FeatureT>::UnaryFunctionFeature(const std::vector<std::shared_ptr<Feature>>& inputs) : RegisteredFeature<FeatureT>(inputs)
-    {
-    }
 }

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     UnaryFunctionFeature.cpp (features)
+//  File:     MagnitudeFeature.cpp (features)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ namespace features
         return Allocate({inputFeature});
     }
 
-    MagnitudeFeature::MagnitudeFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>& inputs) : UnaryFunctionFeature<MagnitudeFeature>(inputs)
+    MagnitudeFeature::MagnitudeFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>& inputs) : RegisteredFeature<MagnitudeFeature>(inputs)
     {}
 
     std::vector<double> MagnitudeFeature::ComputeOutput() const

@@ -19,7 +19,7 @@ namespace features
         return Allocate({inputFeature}, b, a);
     }
 
-    IirFilterFeature::IirFilterFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>& inputs, std::vector<double> b, std::vector<double> a) : UnaryFunctionFeature<IirFilterFeature>(inputs), _a(a), _b(b)
+    IirFilterFeature::IirFilterFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>& inputs, std::vector<double> b, std::vector<double> a) : RegisteredFeature<IirFilterFeature>(inputs), _a(a), _b(b)
     {
         _filters.emplace_back(b, a);
     }

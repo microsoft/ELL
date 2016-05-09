@@ -108,24 +108,6 @@ namespace features
         static std::shared_ptr<FeatureT> Allocate(const std::vector<std::shared_ptr<Feature>>& inputs, Args... args);
 
     };
-
-    //
-    // UnaryFunctionFeature
-    //
-    template <typename FeatureT>
-    class UnaryFunctionFeature : public RegisteredFeature<FeatureT>
-    {
-    protected:
-        UnaryFunctionFeature(const std::vector<std::shared_ptr<Feature>>& inputs);
-        using RegisteredFeature<FeatureT>::AddInputFeature;
-
-        // Allocates a new shared_ptr to a feature of type FeatureType
-        // template <typename ... Args>
-        // static std::shared_ptr<FeatureT> Allocate(std::shared_ptr<Feature>, Args... args);
-
-    private:
-    };
-
 }
 
 #include "../tcc/Feature.tcc"
