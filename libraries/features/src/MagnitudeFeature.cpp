@@ -10,8 +10,11 @@
 #include "Feature.h"
 #include "VectorMath.h"
 #include "StringUtil.h"
+
+// layers
 #include "UnaryOpLayer.h"
 #include "BinaryOpLayer.h"
+#include "Sum.h"
 
 #include <cassert>
 #include <cmath>
@@ -61,7 +64,9 @@ namespace features
         auto inputCoordinates = it->second;
         auto multLayer = std::make_unique<layers::BinaryOpLayer>(inputCoordinates, inputCoordinates, layers::BinaryOpLayer::OperationType::multiply);
         auto squaredOutputCoordinates = model.AddLayer(std::move(multLayer));
-        auto sqrtLayer = std::make_unique<layers::UnaryOpLayer>(squaredOutputCoordinates, layers::UnaryOpLayer::OperationType::sqrt);
+        auto sumLayer = std::make_unique<layers::Sum>(squaredOutputCoordinates);
+        auto sumOutputCoordinates = model.AddLayer(std::move(sumLayer));
+        auto sqrtLayer = std::make_unique<layers::UnaryOpLayer>(sumOutputCoordinates, layers::UnaryOpLayer::OperationType::sqrt);
         auto outputCoordinates = model.AddLayer(std::move(sqrtLayer)); 
         return outputCoordinates;
     }

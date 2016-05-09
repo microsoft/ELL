@@ -55,7 +55,7 @@ namespace layers
         /// <summary> Saves a model to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
-        void Save(std::ostream& os) const; // TODO, move this to common
+        void Save(std::ostream& os) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

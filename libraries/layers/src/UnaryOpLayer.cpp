@@ -90,8 +90,10 @@ namespace layers
 
     void UnaryOpLayer::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
     {
+        std::cout << "Computing..." << std::endl;
         auto operation = GetOperation(_operationType);
         auto numEntries = _inputCoordinates.Size();
+        std::cout << numEntries << " entries..." << std::endl;
         for (uint64_t index = 0; index < numEntries; ++index)
         {
             Coordinate coordinate = _inputCoordinates[index];

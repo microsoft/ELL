@@ -9,6 +9,9 @@
 #include "Map.h"
 #include "Model.h"
 
+// utility
+#include "StlIndexValueIterator.h"
+
 // stl
 #include <stdexcept>
 #include <vector>
@@ -58,6 +61,34 @@ namespace layers
             auto layerSize = _model.GetLayer(layerIndex).GetOutputDimension();
             _layerOutputs[layerIndex].resize(layerSize);
         }
+    }
+    
+    std::vector<double> Map::Compute(const std::vector<double>& inputs) const
+    {
+        auto inputIterator = utilities::MakeStlIndexValueIterator(inputs);
+        InitializeLayerOutputs(inputIterator, _layerOutputs[0]);
+        
+        // compute layers 1,2,... in order
+        for (uint64_t i = 1; i < _model.NumLayers(); ++i)
+        {
+            std::cout << "About to init layer " << i << " of type " << _model.GetLayer(i).GetRuntimeTypeName() << std::endl;
+            _model.GetLayer(i).Compute(_layerOutputs, _layerOutputs[i]);
+            std::cout << "...done" << std::endl;
+        }
+        std::cout << "Done initializing inputs" << std::endl;
+
+        // copy the outputs to a vector
+        auto outputSize = _outputCoordinateList.Size();
+        std::vector<double> outputs(outputSize);
+        for(uint64_t index = 0; index < outputSize; ++index)
+        {
+            auto coordinate = _outputCoordinateList[index];
+            auto layerIndex = coordinate.GetLayerIndex();
+            auto elementIndex = coordinate.GetElementIndex();
+            outputs[index] = _layerOutputs[layerIndex][elementIndex];
+        }        
+
+        return outputs;
     }
 
     const CoordinateList& Map::GetOutputCoordinateList() const
