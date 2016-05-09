@@ -8,8 +8,6 @@
 
 #include "Feature.h"
 #include "InputFeature.h"
-//#include "Dataset.h"
-//#include "VectorMath.h"
 #include "StringUtil.h"
 
 #include <cassert>
@@ -62,7 +60,7 @@ namespace features
         if (IsDirty() || _cachedValue.size() == 0)
         {
             _cachedValue = ComputeOutput();
-            _isDirty = false; // Note: don't call SetDirtyFlag(false) here, as that will start a cascade of SetDirtyFlag calls
+            _isDirty = false; // Note: we don't call SetDirtyFlag(false) here, as that will start a cascade of SetDirtyFlag calls
         }
 
         return _cachedValue;

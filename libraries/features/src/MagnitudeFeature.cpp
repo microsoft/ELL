@@ -8,7 +8,7 @@
 
 #include "MagnitudeFeature.h"
 #include "Feature.h"
-#include "VectorMath.h"
+// #include "VectorMath.h"
 #include "StringUtil.h"
 
 // layers

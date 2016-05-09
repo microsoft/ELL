@@ -12,36 +12,27 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (INCLUDE include/DelayBuffer.h
-             include/Feature.h
+set (INCLUDE include/Feature.h
              include/FeatureSet.h
              include/IirFilter.h
              include/IirFilterFeature.h
              include/InputFeature.h
-             include/MeanFeature.h 
              include/RingBuffer.h 
              include/StringUtil.h
-             include/MagnitudeFeature.h
-             include/Vector.h
-             include/VectorMath.h)
+             include/MagnitudeFeature.h)
 
 set (SRC src/Feature.cpp
          src/FeatureSet.cpp
          src/IirFilter.cpp
          src/IirFilterFeature.cpp
          src/InputFeature.cpp
-         src/MeanFeature.cpp
          src/StringUtil.cpp
-         src/MagnitudeFeature.cpp
-         src/VectorMath.cpp)
+         src/MagnitudeFeature.cpp)
 
-set (TCC tcc/DelayBuffer.tcc
-         tcc/Feature.tcc
+set (TCC tcc/Feature.tcc
          tcc/FeatureSet.tcc
          tcc/RingBuffer.tcc
-         tcc/StringUtil.tcc
-         tcc/Vector.tcc
-         tcc/VectorMath.tcc)
+         tcc/StringUtil.tcc)
 
 source_group("include" FILES ${INCLUDE})
 source_group("src" FILES ${SRC})

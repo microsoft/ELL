@@ -32,9 +32,9 @@ namespace features
         explicit InputFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>&, uint64_t size);
 
     protected:
-        virtual std::vector<double> ComputeOutput() const;
-        virtual void AddToDescription(std::vector<std::string>& description) const;
-        virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const;
+        virtual std::vector<double> ComputeOutput() const override;
+        virtual void AddToDescription(std::vector<std::string>& description) const override;
+        virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const override;
 
         std::vector<double> _currentValue;
     };

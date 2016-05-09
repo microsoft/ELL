@@ -58,7 +58,7 @@ namespace features
 
     protected:
         virtual std::vector<double> ComputeOutput() const = 0;
-        virtual void AddToDescription(std::vector<std::string>& description) const = 0;
+        virtual void AddToDescription(std::vector<std::string>& description) const {};
         virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const = 0;        
         virtual std::string FeatureType() const = 0;
         
