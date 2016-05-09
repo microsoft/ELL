@@ -15,11 +15,11 @@ endif()
 
 set (SRC src/main.cpp)
 
-include_directories(../libraries/linear/include)
-include_directories(../libraries/layers/include)
-include_directories(../libraries/dataset/include)
-include_directories(../libraries/common/include)
-include_directories(../libraries/utilities/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/linear/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/layers/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/dataset/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/common/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/utilities/include)
 
 source_group("src" FILES ${SRC})
 
@@ -30,5 +30,5 @@ add_executable(${PROJ_NAME} ${SRC})
 
 target_link_libraries(${PROJ_NAME} utilities layers linear dataset common)
 
-set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools")
+set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")
 

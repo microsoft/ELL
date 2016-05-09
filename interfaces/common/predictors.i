@@ -13,7 +13,7 @@
 %{
 #define SWIG_FILE_WITH_INIT
 #include "LinearPredictor.h"
-#include "DecisionTree.h"
+#include "DecisionTreePredictor.h"
 #include "Coordinatewise.h"
 #include "Sum.h"
 #include "Model.h"

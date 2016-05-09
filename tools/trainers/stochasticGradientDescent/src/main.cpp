@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     main.cpp (sgd)
+//  File:     main.cpp (stochasticGradientDescent)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,14 +24,15 @@
 #include "SupervisedExample.h"
 
 // common
+#include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 
 #include "DataLoaders.h"
 #include "LoadModel.h"
 
-// optimization
-#include "AsgdOptimizer.h"
+// trainers
+#include "StochasticGradientDescentTrainer.h"
 
 // lossFunctions
 #include "HingeLoss.h"
@@ -49,11 +50,13 @@ int main(int argc, char* argv[])
         utilities::CommandLineParser commandLineParser(argc, argv);
 
         // add arguments to the command line parser
+        common::ParsedTrainerArguments trainerArguments;
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
         ParsedSgdArguments sgdArguments;
 
+        commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
@@ -77,7 +80,7 @@ int main(int argc, char* argv[])
 
         // create sgd trainer
         lossFunctions::LogLoss loss;
-        optimization::AsgdOptimizer<lossFunctions::LogLoss> optimizer(outputCoordinateList.Size(), loss, sgdArguments.l2Regularization);
+        trainers::StochasticGradientDescentTrainer<lossFunctions::LogLoss> trainer(outputCoordinateList.Size(), loss, sgdArguments.l2Regularization);
 
         // create evaluator
         utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss> evaluator; // TODO give loss in ctor
@@ -90,7 +93,7 @@ int main(int argc, char* argv[])
         }
 
         // create random number generator
-        auto rng = utilities::GetRandomEngine(sgdArguments.dataRandomPermutationSeedString);
+        auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
 
         // perform epochs
         for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
@@ -100,18 +103,18 @@ int main(int argc, char* argv[])
 
             // iterate over the entire permuted dataset
             auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-            optimizer.Update(trainSetIterator);
+            trainer.Update(trainSetIterator);
 
             // Evaluate training error
             auto evaluationIterator = rowDataset.GetIterator();
-            evaluator.Evaluate(evaluationIterator, optimizer.GetPredictor(), loss);
+            evaluator.Evaluate(evaluationIterator, trainer.GetPredictor(), loss);
         }
 
         // print loss and errors
         std::cerr << "training error\n" << evaluator << std::endl;
 
         // update the map with the newly learned layers
-        auto predictor = optimizer.GetPredictor();
+        auto predictor = trainer.GetPredictor();
 
         predictor.AddToModel(model, outputCoordinateList);
 

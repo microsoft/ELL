@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     DecisionTree.cpp (predictors)
+//  File:     DecisionTreePredictor.cpp (predictors)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "DecisionTree.h"
+#include "DecisionTreePredictor.h"
 
 // layers
 #include "Coordinatewise.h"
@@ -19,15 +19,15 @@
 
 namespace predictors
 {
-    DecisionTree::Node::Node(double outputValue) : _outputValue(outputValue)
+    DecisionTreePredictor::Node::Node(double outputValue) : _outputValue(outputValue)
     {}
 
-    double DecisionTree::Node::getOutputValue() const
+    double DecisionTreePredictor::Node::getOutputValue() const
     {
         return _outputValue;
     }
 
-    bool DecisionTree::Node::IsLeaf() const
+    bool DecisionTreePredictor::Node::IsLeaf() const
     {
         if (_interiorNode == nullptr)
         {
@@ -39,7 +39,7 @@ namespace predictors
         }
     }
 
-    double DecisionTree::Node::Predict(const dataset::DoubleDataVector& dataVector) const
+    double DecisionTreePredictor::Node::Predict(const dataset::DoubleDataVector& dataVector) const
     {
         double output = _outputValue;
         if (_interiorNode != nullptr)
@@ -49,7 +49,7 @@ namespace predictors
         return output;
     }
 
-    DecisionTree::InteriorNode& DecisionTree::Node::Split(SplitRule splitRule, double negativeEdgeOutputValue, double positiveEdgeOutputValue)
+    DecisionTreePredictor::InteriorNode& DecisionTreePredictor::Node::Split(SplitRule splitRule, double negativeEdgeOutputValue, double positiveEdgeOutputValue)
     {
         // confirm that this is a leaf
         assert(IsLeaf());
@@ -58,36 +58,36 @@ namespace predictors
         return *_interiorNode;
     }
 
-    DecisionTree::InteriorNode::InteriorNode(SplitRule splitRule, Node negativeChild, Node positiveChild) :
+    DecisionTreePredictor::InteriorNode::InteriorNode(SplitRule splitRule, Node negativeChild, Node positiveChild) :
         _splitRule(splitRule), _negativeChild(std::move(negativeChild)), _positiveChild(std::move(positiveChild))
     {}
 
-    const DecisionTree::SplitRule & DecisionTree::InteriorNode::GetSplitRule() const
+    const DecisionTreePredictor::SplitRule & DecisionTreePredictor::InteriorNode::GetSplitRule() const
     {
         return _splitRule;
     }
 
-    DecisionTree::Node & DecisionTree::InteriorNode::GetNegativeChild()
+    DecisionTreePredictor::Node & DecisionTreePredictor::InteriorNode::GetNegativeChild()
     {
         return _negativeChild;
     }
 
-    const DecisionTree::Node & DecisionTree::InteriorNode::GetNegativeChild() const
+    const DecisionTreePredictor::Node & DecisionTreePredictor::InteriorNode::GetNegativeChild() const
     {
         return _negativeChild;
     }
 
-    DecisionTree::Node & DecisionTree::InteriorNode::GetPositiveChild()
+    DecisionTreePredictor::Node & DecisionTreePredictor::InteriorNode::GetPositiveChild()
     {
         return _positiveChild;
     }
 
-    const DecisionTree::Node & DecisionTree::InteriorNode::GetPositiveChild() const
+    const DecisionTreePredictor::Node & DecisionTreePredictor::InteriorNode::GetPositiveChild() const
     {
         return _positiveChild;
     }
 
-    uint64_t DecisionTree::InteriorNode::NumInteriorNodesInSubtree() const
+    uint64_t DecisionTreePredictor::InteriorNode::NumInteriorNodesInSubtree() const
     {
         uint64_t num = 1;
 
@@ -104,7 +104,7 @@ namespace predictors
         return num;
     }
 
-    double DecisionTree::InteriorNode::Predict(const dataset::DoubleDataVector& dataVector) const
+    double DecisionTreePredictor::InteriorNode::Predict(const dataset::DoubleDataVector& dataVector) const
     {
         if (dataVector[_splitRule.featureIndex] <= _splitRule.threshold)
         {
@@ -116,15 +116,15 @@ namespace predictors
         }
     }
 
-    DecisionTree::DecisionTree(double rootOutputValue) : _root(rootOutputValue)
+    DecisionTreePredictor::DecisionTreePredictor(double rootOutputValue) : _root(rootOutputValue)
     {}
 
-    uint64_t DecisionTree::NumNodes() const
+    uint64_t DecisionTreePredictor::NumNodes() const
     {
         return 2*NumInteriorNodes()+1;
     }
 
-    uint64_t DecisionTree::NumInteriorNodes() const
+    uint64_t DecisionTreePredictor::NumInteriorNodes() const
     {
         if(_root._interiorNode == nullptr)
         {
@@ -133,18 +133,18 @@ namespace predictors
         return _root._interiorNode->NumInteriorNodesInSubtree();
     }
 
-    DecisionTree::Node& DecisionTree::GetRoot()
+    DecisionTreePredictor::Node& DecisionTreePredictor::GetRoot()
     {
         return _root;
     }
 
-    double DecisionTree::Predict(const dataset::IDataVector& dataVector) const
+    double DecisionTreePredictor::Predict(const dataset::IDataVector& dataVector) const
     {
         dataset::DoubleDataVector denseDataVector(dataVector.ToArray());
         return _root.Predict(denseDataVector);
     }
 
-    void DecisionTree::AddToModel(layers::Model & model, layers::CoordinateList inputCoordinates) const
+    void DecisionTreePredictor::AddToModel(layers::Model & model, layers::CoordinateList inputCoordinates) const
     {
         FlatTree flatTree;
         BuildFlatTree(flatTree, inputCoordinates, _root._interiorNode.get());
@@ -165,7 +165,7 @@ namespace predictors
         model.AddLayer(std::move(biasLayer));
     }
 
-    void predictors::DecisionTree::BuildFlatTree(FlatTree& flatTree, const layers::CoordinateList& inputCoordinates, InteriorNode* interiorNodePtr) const
+    void predictors::DecisionTreePredictor::BuildFlatTree(FlatTree& flatTree, const layers::CoordinateList& inputCoordinates, InteriorNode* interiorNodePtr) const
     {
         if (interiorNodePtr == nullptr)
         {
