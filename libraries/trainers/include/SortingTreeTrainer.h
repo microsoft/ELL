@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SortingTreeLearner.h (trainers)
+//  File:     SortingTreeTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13,7 +13,7 @@
 #include "DenseDataVector.h"
 
 // predictors
-#include "DecisionTree.h"
+#include "DecisionTreePredictor.h"
 
 // stl
 #include <queue>
@@ -24,14 +24,14 @@ namespace trainers
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
     template <typename LossFunctionType>
-    class SortingTreeLearner
+    class SortingTreeTrainer
     {
     public:
 
-        /// <summary> Constructs an instance of SortingTreeLearner. </summary>
+        /// <summary> Constructs an instance of SortingTreeTrainer. </summary>
         ///
         /// <param name="lossFunction"> The loss function. </param>
-        SortingTreeLearner(LossFunctionType lossFunction);
+        SortingTreeTrainer(LossFunctionType lossFunction);
 
         /// <summary> Trains a decision tree. </summary>
         ///
@@ -40,7 +40,7 @@ namespace trainers
         ///
         /// <returns> A decision tree. </returns>
         template <typename ExampleIteratorType>
-        predictors::DecisionTree Train(ExampleIteratorType exampleIterator);
+        predictors::DecisionTreePredictor Train(ExampleIteratorType exampleIterator);
 
     private:
         // struct used to keep statistics about tree leaves
@@ -55,8 +55,8 @@ namespace trainers
         // struct used to keep info about the gain maximizing split of each leaf in the tree
         struct SplitCandidate
         {
-            predictors::DecisionTree::Node* leaf;
-            predictors::DecisionTree::SplitRule splitRule;
+            predictors::DecisionTreePredictor::Node* leaf;
+            predictors::DecisionTreePredictor::SplitRule splitRule;
             double gain = 0;
             uint64_t fromRowIndex;
             uint64_t size;
@@ -69,7 +69,7 @@ namespace trainers
 
         template <typename ExampleIteratorType>
         Sums LoadData(ExampleIteratorType exampleIterator);
-        void AddSplitCandidateToQueue(predictors::DecisionTree::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums);
+        void AddSplitCandidateToQueue(predictors::DecisionTreePredictor::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums);
         void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size);
         double CalculateGain(Sums sums, Sums negativeSums) const;
         double GetOutputValue(Sums sums) const;
@@ -82,4 +82,4 @@ namespace trainers
     };
 }
 
-#include "../tcc/SortingTreeLearner.tcc"
+#include "../tcc/SortingTreeTrainer.tcc"

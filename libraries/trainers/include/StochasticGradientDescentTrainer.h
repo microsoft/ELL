@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     AsgdOptimizer.h (optimization)
+//  File:     StochasticGradientDescentTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,7 @@
 // stl
 #include <cstdint>
 
-namespace optimization
+namespace trainers
 {
     /// <summary>
     /// Implements the Averaged Stochastic Gradient Descent algorithm on an L2 regularized empirical
@@ -35,15 +35,15 @@ namespace optimization
     /// </summary>    
     /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
     template <typename LossFunctionType>
-    class AsgdOptimizer
+    class StochasticGradientDescentTrainer
     {
     public:
-        /// <summary> Constructs the optimizer. </summary>
+        /// <summary> Constructs the trainer. </summary>
         ///
         /// <param name="dim"> The dimension. </param>
         /// <param name="lossFunction"> The loss function. </param>
         /// <param name="l2Regularization"> The L2 regularization parameter. </param>
-        AsgdOptimizer(uint64_t dim, LossFunctionType lossFunction, double l2Regularization);
+        StochasticGradientDescentTrainer(uint64_t dim, LossFunctionType lossFunction, double l2Regularization);
 
         /// <summary> Performs a given number of learning iterations. </summary>
         ///
@@ -74,4 +74,4 @@ namespace optimization
     };
 }
 
-#include "../tcc/AsgdOptimizer.tcc"
+#include "../tcc/StochasticGradientDescentTrainer.tcc"

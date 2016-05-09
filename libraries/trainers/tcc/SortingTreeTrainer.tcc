@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SortingTreeLearner.tcc (trainers)
+//  File:     SortingTreeTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,17 +9,17 @@
 namespace trainers
 {    
     template <typename LossFunctionType>
-    SortingTreeLearner<LossFunctionType>::SortingTreeLearner(LossFunctionType lossFunction) : _lossFunction(lossFunction)
+    SortingTreeTrainer<LossFunctionType>::SortingTreeTrainer(LossFunctionType lossFunction) : _lossFunction(lossFunction)
     {}
 
     template <typename LossFunctionType>
     template <typename ExampleIteratorType>
-    predictors::DecisionTree SortingTreeLearner<LossFunctionType>::Train(ExampleIteratorType exampleIterator)
+    predictors::DecisionTreePredictor SortingTreeTrainer<LossFunctionType>::Train(ExampleIteratorType exampleIterator)
     {
         // convert data fron iterator to dense row dataset; compute sums statistics of the tree root
         auto sums = LoadData(exampleIterator);
 
-        predictors::DecisionTree tree(GetOutputValue(sums));
+        predictors::DecisionTreePredictor tree(GetOutputValue(sums));
 
         // find split candidate for root node and push it onto the priority queue
         AddSplitCandidateToQueue(&tree.GetRoot(), 0, _dataset.NumExamples(), sums);
@@ -56,7 +56,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    typename SortingTreeLearner<LossFunctionType>::Sums SortingTreeLearner<LossFunctionType>::Sums::operator-(const typename SortingTreeLearner<LossFunctionType>::Sums& other) const
+    typename SortingTreeTrainer<LossFunctionType>::Sums SortingTreeTrainer<LossFunctionType>::Sums::operator-(const typename SortingTreeTrainer<LossFunctionType>::Sums& other) const
     {
         Sums difference;
         difference.sumWeights = sumWeights - other.sumWeights;
@@ -66,7 +66,7 @@ namespace trainers
 
     template<typename LossFunctionType>
     template <typename ExampleIteratorType>
-    typename SortingTreeLearner<LossFunctionType>::Sums SortingTreeLearner<LossFunctionType>::LoadData(ExampleIteratorType exampleIterator)
+    typename SortingTreeTrainer<LossFunctionType>::Sums SortingTreeTrainer<LossFunctionType>::LoadData(ExampleIteratorType exampleIterator)
     {
         Sums sums;
 
@@ -86,7 +86,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void SortingTreeLearner<LossFunctionType>::AddSplitCandidateToQueue(predictors::DecisionTree::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums)
+    void SortingTreeTrainer<LossFunctionType>::AddSplitCandidateToQueue(predictors::DecisionTreePredictor::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums)
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 
@@ -142,7 +142,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void SortingTreeLearner<LossFunctionType>::SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size)
+    void SortingTreeTrainer<LossFunctionType>::SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size)
     {
         _dataset.Sort([featureIndex](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[featureIndex]; },
             fromRowIndex,
@@ -150,7 +150,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    double SortingTreeLearner<LossFunctionType>::CalculateGain(Sums sums, Sums negativeSums) const
+    double SortingTreeTrainer<LossFunctionType>::CalculateGain(Sums sums, Sums negativeSums) const
     {
         auto positiveSums = sums - negativeSums;
 
@@ -165,13 +165,13 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    double SortingTreeLearner<LossFunctionType>::GetOutputValue(Sums sums) const
+    double SortingTreeTrainer<LossFunctionType>::GetOutputValue(Sums sums) const
     {
         return sums.sumWeightedLabels / sums.sumWeights;
     }
 
     template<typename LossFunctionType>
-    void SortingTreeLearner<LossFunctionType>::Cleanup()
+    void SortingTreeTrainer<LossFunctionType>::Cleanup()
     {
         _dataset.Reset();
         while (!_queue.empty())

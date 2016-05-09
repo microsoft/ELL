@@ -44,7 +44,7 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/layers.i
                      ../common/linear.i
                      ../common/lossFunctions.i
-                     ../common/optimization.i
+                     ../common/trainers.i
                      ../common/predictors.i
                      ../common/unique_ptr.i
                      ../common/utilities.i)     
@@ -55,8 +55,8 @@ source_group("tcc" FILES ${INTERFACE_TCC})
 source_group("interface" FILES ${INTERFACE_MAIN} ${INTERFACE_FILES})
 
 if(${LANGUAGE_NAME} STREQUAL "common")
-
-    add_custom_target(${module_name} ALL DEPENDS ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} SOURCES ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES})
+    find_file(THIS_FILE_PATH CommonInterfaces.cmake PATHS ${CMAKE_MODULE_PATH})
+    add_custom_target(${module_name} ALL DEPENDS ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} SOURCES ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} ${THIS_FILE_PATH})
 
 else()
 
@@ -67,7 +67,7 @@ include_directories(../../libraries/features/include)
 include_directories(../../libraries/layers/include)
 include_directories(../../libraries/linear/include)
 include_directories(../../libraries/lossFunctions/include)
-include_directories(../../libraries/optimization/include)
+include_directories(../../libraries/trainers/include)
 include_directories(../../libraries/predictors/include)
 include_directories(../../libraries/utilities/include)
 
@@ -100,7 +100,7 @@ if(${LANGUAGE_NAME} STREQUAL "python")
 endif()
 
 swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
-swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset features layers lossFunctions optimization predictors utilities)
+swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset features layers lossFunctions trainers predictors utilities)
 set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}EMLL)
 endif()
 
