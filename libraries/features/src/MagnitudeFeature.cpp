@@ -71,7 +71,7 @@ namespace features
         return outputCoordinates;
     }
 
-    std::shared_ptr<Feature> MagnitudeFeature::Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures)
+    std::shared_ptr<Feature> MagnitudeFeature::Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
         std::shared_ptr<Feature> inputFeature = previousFeatures[params[2]];
         if (inputFeature == nullptr)

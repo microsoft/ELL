@@ -27,7 +27,7 @@ namespace features
     // feature base class
     //
     int Feature::_instanceCount = 0;
-    std::unordered_map<std::string, std::function<std::shared_ptr<Feature>(std::vector<std::string>, FeatureMap&)>> Feature::_createTypeMap;
+    std::unordered_map<std::string, Feature::DeserializeFunction> Feature::_createTypeMap;
 
     Feature::Feature() : _isDirty(true)
     {
@@ -62,7 +62,7 @@ namespace features
         if (IsDirty() || _cachedValue.size() == 0)
         {
             _cachedValue = ComputeOutput();
-            _isDirty = false; // Note: don't call SetDirty(false) here, as that will start a cascade of SetDirty calls
+            _isDirty = false; // Note: don't call SetDirtyFlag(false) here, as that will start a cascade of SetDirtyFlag calls
         }
 
         return _cachedValue;
@@ -88,7 +88,7 @@ namespace features
         return !IsDirty();
     }
 
-    void Feature::SetDirty(bool dirty) const
+    void Feature::SetDirtyFlag(bool dirty) const
     {
         _isDirty = dirty;
         if (dirty)
@@ -96,7 +96,7 @@ namespace features
             for (auto& f : _dependents)
             {
                 assert(f != nullptr);
-                f->SetDirty(true);
+                f->SetDirtyFlag(true);
             }
         }
     }
@@ -108,7 +108,7 @@ namespace features
 
     void Feature::Reset()
     {
-        SetDirty(true);
+        SetDirtyFlag(true);
         for (auto& f : _dependents)
         {
             f->Reset();
@@ -211,7 +211,7 @@ namespace features
         return nullptr;
     }
 
-    void Feature::RegisterDeserializeFunction(std::string class_name, std::function<std::shared_ptr<Feature>(std::vector<std::string>, FeatureMap&)> create_fn)
+    void Feature::RegisterDeserializeFunction(std::string class_name, DeserializeFunction create_fn)
     {
         _createTypeMap[class_name] = create_fn;
     }
@@ -226,7 +226,7 @@ namespace features
         return result;
     }
 
-    std::shared_ptr<Feature> Feature::FromDescription(const std::vector<std::string>& description, FeatureMap& deserializedFeatureMap)
+    std::shared_ptr<Feature> Feature::FromDescription(const std::vector<std::string>& description, Feature::FeatureMap& deserializedFeatureMap)
     {
         std::string featureId = TrimString(description[0]);
         std::string featureClass = TrimString(description[1]);

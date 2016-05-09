@@ -37,7 +37,7 @@ namespace features
     {
         _currentValue = val;
         assert(_numColumns == val.size());
-        SetDirty(true); // propagates through graph
+        SetDirtyFlag(true); // propagates through graph
     }
 
     layers::CoordinateList InputFeature::AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const
@@ -54,7 +54,7 @@ namespace features
         description.push_back(to_string(_numColumns));
     }
 
-    std::shared_ptr<Feature> InputFeature::Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures)
+    std::shared_ptr<Feature> InputFeature::Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
         assert(params.size() == 1);
         uint64_t size = ParseInt(params[0]);

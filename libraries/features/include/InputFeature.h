@@ -18,7 +18,7 @@
 namespace features
 {
    //
-    // InputFeature
+    // InputFeature -- Represents an input to the FeatureSet
     //
     class InputFeature : public RegisteredFeature<InputFeature>
     {
@@ -28,7 +28,7 @@ namespace features
 
         static constexpr const char* feature_name = "Input";
 
-        static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, FeatureMap& prev_features);
+        static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& prev_features);
         explicit InputFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>&, uint64_t size);
 
     protected:

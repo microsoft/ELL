@@ -42,6 +42,7 @@ namespace features
         std::shared_ptr<Feature> GetFeature(const std::string& featureId) const;
         std::vector<std::string> GetFeatureIds() const;
 
+        // Creates a new feature and adds it to the FeatureSet
         template <typename FeatureType, typename... Args>
         std::shared_ptr<FeatureType> CreateFeature(Args... args);
 
@@ -70,7 +71,7 @@ namespace features
         layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
 
     private:
-        FeatureMap _featureMap;
+        Feature::FeatureMap _featureMap;
         std::shared_ptr<InputFeature> _inputFeature;
         std::shared_ptr<Feature> _outputFeature;
         mutable size_t _numItemsProcessed = 0;

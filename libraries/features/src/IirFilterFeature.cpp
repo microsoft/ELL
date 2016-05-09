@@ -64,7 +64,7 @@ namespace features
         description.push_back(to_string(_a));
     }
 
-    std::shared_ptr<Feature> IirFilterFeature::Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures)
+    std::shared_ptr<Feature> IirFilterFeature::Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
         std::shared_ptr<Feature> inputFeature = previousFeatures[params[2]];
         if (inputFeature == nullptr)

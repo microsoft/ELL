@@ -35,6 +35,11 @@ namespace features
     template <typename... Args>
     std::shared_ptr<FeatureT> RegisteredFeature<FeatureT>::Allocate(const std::vector<std::shared_ptr<Feature>>& inputs, Args ...args)
     {
-        return std::make_shared<FeatureT>(ctor_enable(), inputs, args...);
+        auto feature = std::make_shared<FeatureT>(ctor_enable(), inputs, args...);
+        for(auto& input: inputs)
+        {        
+            input->AddDependent(feature);
+        }
+        return feature;
     }    
 }

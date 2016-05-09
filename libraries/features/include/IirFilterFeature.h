@@ -27,7 +27,7 @@ namespace features
         virtual size_t WarmupTime() const override;
         static constexpr const char* feature_name = "IirFilter";
 
-        static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures);
+        static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures);
 
         explicit IirFilterFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>& inputs, std::vector<double> a, std::vector<double> b);
 

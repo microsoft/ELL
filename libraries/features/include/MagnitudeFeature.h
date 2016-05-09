@@ -27,7 +27,7 @@ namespace features
     public:
         // Factory method
         static std::shared_ptr<MagnitudeFeature> Create(std::shared_ptr<Feature> inputFeature);
-        static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, FeatureMap& previousFeatures);
+        static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures);
 
         explicit MagnitudeFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>> &inputs);
         static constexpr const char* feature_name = "Magnitude";
