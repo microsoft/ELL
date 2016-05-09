@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     DecisionTree.h (predictors)
+//  File:     DecisionTreePredictor.h (predictors)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ namespace predictors
     /// Represents a binary decision tree with threshold split rules and output values in all
     /// vertices.
     /// </summary>
-    class DecisionTree
+    class DecisionTreePredictor
     {
     public:
         
@@ -75,7 +75,7 @@ namespace predictors
             InteriorNode& Split(SplitRule splitRule, double negativeEdgeOutputValue, double positiveEdgeOutputValue);
 
         private:
-            friend DecisionTree;
+            friend DecisionTreePredictor;
 
             double _outputValue;
             std::unique_ptr<InteriorNode> _interiorNode;
@@ -131,17 +131,17 @@ namespace predictors
             double Predict(const dataset::DoubleDataVector& dataVector) const;
 
         private:
-            friend DecisionTree;
+            friend DecisionTreePredictor;
 
             SplitRule _splitRule;
             Node _negativeChild;
             Node _positiveChild;
         };
 
-        /// <summary> Constructs an instance of DecisionTree. </summary>
+        /// <summary> Constructs an instance of DecisionTreePredictor. </summary>
         ///
         /// <param name="rootOutputValue"> The root output value. </param>
-        DecisionTree(double rootOutputValue);
+        DecisionTreePredictor(double rootOutputValue);
 
         /// <summary> Number of nodes in the tree. </summary>
         ///

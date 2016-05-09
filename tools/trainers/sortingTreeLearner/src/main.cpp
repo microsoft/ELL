@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
         trainers::SortingTreeTrainer<lossFunctions::SquaredLoss> sortingTreeLearner(loss);
         
         // create evaluator
-        utilities::BinaryClassificationEvaluator<predictors::DecisionTree, lossFunctions::SquaredLoss> evaluator;
+        utilities::BinaryClassificationEvaluator<predictors::DecisionTreePredictor, lossFunctions::SquaredLoss> evaluator;
 
         // create random number generator
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);

@@ -14,12 +14,12 @@ namespace trainers
 
     template <typename LossFunctionType>
     template <typename ExampleIteratorType>
-    predictors::DecisionTree SortingTreeTrainer<LossFunctionType>::Train(ExampleIteratorType exampleIterator)
+    predictors::DecisionTreePredictor SortingTreeTrainer<LossFunctionType>::Train(ExampleIteratorType exampleIterator)
     {
         // convert data fron iterator to dense row dataset; compute sums statistics of the tree root
         auto sums = LoadData(exampleIterator);
 
-        predictors::DecisionTree tree(GetOutputValue(sums));
+        predictors::DecisionTreePredictor tree(GetOutputValue(sums));
 
         // find split candidate for root node and push it onto the priority queue
         AddSplitCandidateToQueue(&tree.GetRoot(), 0, _dataset.NumExamples(), sums);
@@ -86,7 +86,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void SortingTreeTrainer<LossFunctionType>::AddSplitCandidateToQueue(predictors::DecisionTree::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums)
+    void SortingTreeTrainer<LossFunctionType>::AddSplitCandidateToQueue(predictors::DecisionTreePredictor::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums)
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 

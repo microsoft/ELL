@@ -13,10 +13,10 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/LinearPredictor.cpp
-         src/DecisionTree.cpp)
+         src/DecisionTreePredictor.cpp)
 
 set (INCLUDE include/LinearPredictor.h
-             include/DecisionTree.h)
+             include/DecisionTreePredictor.h)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
