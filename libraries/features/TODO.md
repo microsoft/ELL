@@ -1,6 +1,35 @@
-Feature description used for microbit shake detector:
 
+Features to add next
+--------------------
+
+Simple
+- Column subset
+- Concatenation
+- Dot product
+- FIR filter
+- IIR filter
+
+Buffered
+- Windowed mean
+- Windowed variance
+- FFT
+- Autocorrelation
+
+New layers needed to implement them
+-------------------------------
+
+- Shift register / ring buffer (FIR/IIR filter, windowed mean, windowed variance)
+- Accumulator (efficient mean / variance)
+- Function call (FFT, autocorrelation?)
+
+
+----
+
+  
+Reference: Feature description used for microbit shake detector
+---------------------------------------------------------------
     # Note: For data sampled every 18ms
+    # Columns are <ID> <FeatureType> <params ...>
     f_in	Input
     f_raw_accel	ColumnSubset	f_in	2	3	4
     f_lowpass	IirFilter	f_raw_accel	0.8	1,-0.2
@@ -45,17 +74,17 @@ Feature description used for microbit shake detector:
     f_out	Concat	f_dot2_10_mean_2
 
 Features used:
-* IIR filter
-* Elementwise subtract
-* Delay
-* dot2(a,b,c) == dot(a,b)-dot(a,c) (?)
-* Mean over window
-* Variance over window
+- IIR filter
+- Elementwise subtract
+- Delay
+- dot2(a,b,c) == dot(a,b)-dot(a,c) (?)
+- Mean over window
+- Variance over window
 
 New layers needed:
-* Delay line / history
-* Running total (?) --- can use sum for this for now
-* Unary x^2 function (or binary mult)
-* Unary sqrt function
-* Accumulator, for filtering (can use this for running-total over window? add new item, subtract last item)
+- Delay line / history
+- Running total (?) --- can use sum for this for now
+- Unary x^2 function (or binary mult)
+- Unary sqrt function
+- Accumulator, for filtering (can use this for running-total over window: add new item, subtract last item)
 

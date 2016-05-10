@@ -38,7 +38,7 @@ namespace features
     {
         if (_inputFeature && _outputFeature)
         {
-            _inputFeature->SetValue(inst); // TODO: standardize on a vector type to use
+            _inputFeature->SetValue(inst);
             auto newFeatures = _outputFeature->GetOutput();
             auto hasOutput = HasOutput();
             if(_numItemsProcessed < _outputFeature->WarmupTime())
@@ -175,17 +175,6 @@ namespace features
         {
             return nullptr;
         }
-    }
-
-    std::vector<std::string> FeatureSet::GetFeatureIds() const
-    {
-        std::vector<std::string> result;
-
-        for (const auto& f : _featureMap)
-        {
-            result.push_back(f.first);
-        }
-        return result;
     }
 
     std::shared_ptr<Feature> FeatureSet::CreateFeatureFromDescription(const std::vector<std::string>& description)

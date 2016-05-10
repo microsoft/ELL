@@ -11,13 +11,9 @@
 #include "StringUtil.h"
 
 #include <cassert>
-#include <cmath>
 #include <algorithm>
-#include <iostream>
-#include <sstream>
 #include <stdexcept>
 #include <unordered_map>
-#include <unordered_set>
 
 namespace features
 {
@@ -51,29 +47,9 @@ namespace features
         _inputFeatures = inputs;
     }
 
-    Feature::~Feature()
-    {
-    }
-
-    std::vector<double> Feature::GetOutput() const
-    {
-        if (IsDirty() || _cachedValue.size() == 0)
-        {
-            _cachedValue = ComputeOutput();
-            _isDirty = false; // Note: we don't call SetDirtyFlag(false) here, as that will start a cascade of SetDirtyFlag calls
-        }
-
-        return _cachedValue;
-    }
-
     std::string Feature::Id() const
     {
         return _id;
-    }
-
-    void Feature::AddDependent(std::shared_ptr<Feature> f)
-    {
-        _dependents.push_back(f);
     }
 
     size_t Feature::NumColumns() const
@@ -86,22 +62,15 @@ namespace features
         return !IsDirty();
     }
 
-    void Feature::SetDirtyFlag(bool dirty) const
+    std::vector<double> Feature::GetOutput() const
     {
-        _isDirty = dirty;
-        if (dirty)
+        if (IsDirty() || _cachedValue.size() == 0)
         {
-            for (auto& f : _dependents)
-            {
-                assert(f != nullptr);
-                f->SetDirtyFlag(true);
-            }
+            _cachedValue = ComputeOutput();
+            _isDirty = false; // Note: we don't call SetDirtyFlag(false) here, as that will start a cascade of SetDirtyFlag calls
         }
-    }
 
-    bool Feature::IsDirty() const
-    {
-        return _isDirty;
+        return _cachedValue;
     }
 
     void Feature::Reset()
@@ -123,9 +92,24 @@ namespace features
         return maxTime;
     }
 
-    void Feature::AddInputFeature(std::shared_ptr<Feature> inputFeature)
+    std::vector<std::string> Feature::GetDescription() const
     {
-        _inputFeatures.push_back(inputFeature);
+        std::vector<std::string> result;
+        result.reserve(_inputFeatures.size() + 2);
+
+        // Write out our id and type
+        result.push_back(Id());
+        result.push_back(FeatureType());
+
+        // Write out ids of everybody I depend on
+        for (const auto& inputFeature : _inputFeatures)
+        {
+            result.push_back(inputFeature->Id());
+        }
+        
+        // Now add subclass-specific parts
+        AddToDescription(result);
+        return result;
     }
 
     std::vector<std::string> Feature::GetColumnDescriptions() const
@@ -139,29 +123,54 @@ namespace features
         return result;
     }
 
-    std::vector<std::string> Feature::GetDescription() const
-    {
-        std::vector<std::string> result;
-        result.reserve(_inputFeatures.size() + 2);
-
-        // get everybody I depend on
-        result.push_back(Id());
-        result.push_back(FeatureType());
-        for (const auto& inputFeature : _inputFeatures)
-        {
-            result.push_back(inputFeature->Id());
-        }
-        
-        // now get subclass-specific parts
-        AddToDescription(result);
-        return result;
-    }
-    
     const std::vector<std::shared_ptr<Feature>>& Feature::GetInputFeatures() const
     {
         return _inputFeatures;
     }
 
+    std::vector<std::string> Feature::GetRegisteredTypes()
+    {
+        std::vector<std::string> result;
+        for (const auto& entry : _createTypeMap)
+        {
+            result.push_back(entry.first);
+        }
+        return result;
+    }
+
+    void Feature::RegisterDeserializeFunction(std::string class_name, DeserializeFunction create_fn)
+    {
+        _createTypeMap[class_name] = create_fn;
+    }
+
+    void Feature::AddDependent(std::shared_ptr<Feature> f)
+    {
+        _dependents.push_back(f);
+    }
+
+    bool Feature::IsDirty() const
+    {
+        return _isDirty;
+    }
+
+    void Feature::SetDirtyFlag(bool dirty) const
+    {
+        _isDirty = dirty;
+        if (dirty)
+        {
+            for (auto& f : _dependents)
+            {
+                assert(f != nullptr);
+                f->SetDirtyFlag(true);
+            }
+        }
+    }
+
+    void Feature::AddInputFeature(std::shared_ptr<Feature> inputFeature)
+    {
+        _inputFeatures.push_back(inputFeature);
+    }
+    
     void Feature::Serialize(std::ostream& outStream) const
     {
         bool first = true;
@@ -198,21 +207,6 @@ namespace features
         }
 
         return nullptr;
-    }
-
-    void Feature::RegisterDeserializeFunction(std::string class_name, DeserializeFunction create_fn)
-    {
-        _createTypeMap[class_name] = create_fn;
-    }
-
-    std::vector<std::string> Feature::GetRegisteredTypes()
-    {
-        std::vector<std::string> result;
-        for (const auto& entry : _createTypeMap)
-        {
-            result.push_back(entry.first);
-        }
-        return result;
     }
 
     std::shared_ptr<Feature> Feature::FromDescription(const std::vector<std::string>& description, Feature::FeatureMap& deserializedFeatureMap)

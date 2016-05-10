@@ -125,5 +125,3 @@ wrap_unique_ptr(LayerPtr, layers::Layer)
 //%template (GenericRowDataset) dataset::RowDataset<dataset::IDataVector>
 //%shared_ptr(GenericRowDataset)
 %shared_ptr(RowDataset)
-%shared_ptr(features::Feature)
-

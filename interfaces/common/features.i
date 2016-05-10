@@ -35,6 +35,20 @@
     }
 };
 
+%extend features::Feature
+{
+    std::string __str__() 
+    {        
+        std::ostringstream oss(std::ostringstream::out);
+        auto description = ($self)->GetDescription();
+        for(const auto& part: description)
+        {
+            oss << part << '\t';
+        }
+        return std::string(oss.str().begin(), oss.str().end()-1);
+    }
+};
+
 %inline
 %{
     void InitializeFeatures()
@@ -50,3 +64,7 @@
     InitializeFeatures();
 %}
 #endif
+
+%shared_ptr(features::Feature)
+%shared_ptr(features::RegisteredFeature)
+%shared_ptr(features::InputFeature)

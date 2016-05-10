@@ -33,7 +33,7 @@ namespace features
         Feature(std::string id);
         Feature(const std::vector<std::shared_ptr<Feature>>& inputs);
         Feature(std::string Id, const std::vector<std::shared_ptr<Feature>>& inputs);
-        virtual ~Feature();
+        virtual ~Feature() {};
 
         std::string Id() const;
         size_t NumColumns() const;
@@ -50,11 +50,11 @@ namespace features
         const std::vector<std::shared_ptr<Feature>>& GetInputFeatures() const;
 
         static std::vector<std::string> GetRegisteredTypes();
-
-        void AddDependent(std::shared_ptr<Feature> f); // TODO: figure out how to make this protected
         
         using FeatureMap = std::unordered_map<std::string, std::shared_ptr<Feature>>;
         using DeserializeFunction = std::function<std::shared_ptr<Feature>(std::vector<std::string>, FeatureMap&)>; // TODO: have creation function take a const FeatureMap&
+
+        void AddDependent(std::shared_ptr<Feature> f); // TODO: figure out how to make this protected
 
     protected:
         virtual std::vector<double> ComputeOutput() const = 0;
@@ -63,8 +63,8 @@ namespace features
         virtual std::string FeatureType() const = 0;
         
         static void RegisterDeserializeFunction(std::string class_name, DeserializeFunction create_fn);
-        void SetDirtyFlag(bool dirty) const;
         bool IsDirty() const;
+        void SetDirtyFlag(bool dirty) const;
         void AddInputFeature(std::shared_ptr<Feature> inputFeature);
 
         std::vector<std::shared_ptr<Feature>> _inputFeatures; // parents
@@ -72,6 +72,11 @@ namespace features
         mutable std::vector<double> _cachedValue;
 
     private:
+        friend class FeatureSet;
+        void Serialize(std::ostream& outStream) const;
+        static std::shared_ptr<Feature> FromDescription(const std::vector<std::string>& description, FeatureMap& deserializedFeatureMap);
+        std::shared_ptr<InputFeature> FindInputFeature() const; // TODO: Remove this, it's unnecessary now (?)
+
         mutable bool _isDirty = true;
         std::vector<std::shared_ptr<Feature>> _dependents; // children
         std::string _id;
@@ -79,11 +84,6 @@ namespace features
 
         static int _instanceCount;
         static std::unordered_map<std::string, DeserializeFunction> _createTypeMap;
-
-        std::shared_ptr<InputFeature> FindInputFeature() const;
-        void Serialize(std::ostream& outStream) const;
-        static std::shared_ptr<Feature> FromDescription(const std::vector<std::string>& description, FeatureMap& deserializedFeatureMap);
-        friend class FeatureSet;
     };
 
     //

@@ -32,7 +32,6 @@ void PrintableUnaryOpLayer::operator=(const layers::UnaryOpLayer& layer)
 LayerLayout PrintableUnaryOpLayer::Print(std::ostream & os, double left, double top, uint64_t layerIndex, const PrintArguments & arguments) const
 {
     auto layout = PrintableLayer::PrintLayer(os, left, top, layerIndex, GetFriendlyLayerName(), GetOutputDimension(), arguments.valueElementLayout, arguments.layerStyle);
-    // PrintableLayer::PrintValueElements(os, layout, _values, arguments.valueElementStyle.maxChars);
     return layout;
 }
 

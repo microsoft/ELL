@@ -15,7 +15,6 @@ endif()
 set (INCLUDE include/Feature.h
              include/FeatureSet.h
              include/InputFeature.h
-             include/RingBuffer.h 
              include/StringUtil.h
              include/MagnitudeFeature.h)
 
@@ -27,7 +26,6 @@ set (SRC src/Feature.cpp
 
 set (TCC tcc/Feature.tcc
          tcc/FeatureSet.tcc
-         tcc/RingBuffer.tcc
          tcc/StringUtil.tcc)
 
 source_group("include" FILES ${INCLUDE})

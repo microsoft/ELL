@@ -30,11 +30,11 @@ namespace features
         ~FeatureSet() {};
         
         void Reset();
-        bool ProcessInputData(const DataVector& inData) const; // returns true if we generated output (in which case, call GetOutput())
+        bool ProcessInputData(const DataVector& inData) const; // Returns true if we generated output (in which case, call GetOutput())
         // Note: to deal with buffering nodes (e.g., FFT), need to split ProcessInputData into 2 or 3 phases:
         // SetInput(...) // triggers dirty calc cascade
         // GetOutput() // sets dirty bit off
-        bool HasOutput() const; // Returns dirty bit value. If we have multiple output features, then this should just be a function on the feature
+        bool HasOutput() const; // Returns dirty bit value. If we have multiple output features, then this should be a function on the feature node
         DataVector GetOutput() const;
         
         std::shared_ptr<InputFeature> GetInputFeature() const;
@@ -42,7 +42,6 @@ namespace features
         void SetOutputFeature(const std::shared_ptr<Feature>& output);
 
         std::shared_ptr<Feature> GetFeature(const std::string& featureId) const;
-        std::vector<std::string> GetFeatureIds() const;
 
         // Creates a new feature and adds it to the FeatureSet
         template <typename FeatureType, typename... Args>

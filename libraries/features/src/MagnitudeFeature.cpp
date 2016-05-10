@@ -42,14 +42,14 @@ namespace features
     std::vector<double> MagnitudeFeature::ComputeOutput() const
     {
         assert(_inputFeatures.size() == 1);
-        const auto& in_vec = _inputFeatures[0]->GetOutput();
+        const auto& inputData = _inputFeatures[0]->GetOutput();
         double m = 0;
-        for (auto v : in_vec)
+        for (auto v : inputData)
         {
             m += v*v;
         }
         std::vector<double> result = { std::sqrt(m) };
-        _numColumns = result.size();
+        _numColumns = 1;
         return result;
     }
 

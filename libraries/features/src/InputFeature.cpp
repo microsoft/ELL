@@ -6,9 +6,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "Feature.h"
 #include "InputFeature.h"
 #include "StringUtil.h"
 
+#include <vector>
+#include <memory>
 #include <stdexcept>
 #include <cassert>
 
@@ -42,10 +45,7 @@ namespace features
 
     layers::CoordinateList InputFeature::AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const
     {
-        layers::CoordinateList inputCoordinates;
-        
         throw std::runtime_error("Not implemented");
-        return inputCoordinates;    
     }
     
     void InputFeature::AddToDescription(std::vector<std::string>& description) const
