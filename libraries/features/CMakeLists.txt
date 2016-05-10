@@ -14,8 +14,6 @@ endif()
 
 set (INCLUDE include/Feature.h
              include/FeatureSet.h
-             include/IirFilter.h
-             include/IirFilterFeature.h
              include/InputFeature.h
              include/RingBuffer.h 
              include/StringUtil.h
@@ -23,8 +21,6 @@ set (INCLUDE include/Feature.h
 
 set (SRC src/Feature.cpp
          src/FeatureSet.cpp
-         src/IirFilter.cpp
-         src/IirFilterFeature.cpp
          src/InputFeature.cpp
          src/StringUtil.cpp
          src/MagnitudeFeature.cpp)

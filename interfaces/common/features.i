@@ -15,7 +15,6 @@
 #include "DoubleVector.h"
 #include "InputFeature.h"
 #include "MagnitudeFeature.h"
-#include "IirFilterFeature.h"
 #include "FeatureSet.h"
 #include <sstream>
 %}
@@ -23,7 +22,6 @@
 %include "Feature.h"
 %include "InputFeature.h"
 %include "MagnitudeFeature.h"
-%include "IirFilterFeature.h"
 %include "FeatureSet.h"
 
 // add __str__ to Coordinate and CoordinateList

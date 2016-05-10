@@ -8,7 +8,6 @@
 
 #pragma once
 #include "Feature.h"
-#include "IirFilter.h"
 
 #include <string>
 #include <vector>
