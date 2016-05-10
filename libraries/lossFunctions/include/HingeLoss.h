@@ -8,7 +8,7 @@
 
 #pragma once
 
-/// <summary> `lossFunctions` namespace </summary>
+/// <summary> %lossFunctions namespace </summary>
 namespace lossFunctions
 {
     /// <summary> Implements the hinge loss function: loss(x) = max(1-x, 0) </summary>

@@ -14,7 +14,7 @@
 // stl
 #include <string>
 
-/// <summary> `common` namespace </summary>
+/// <summary> common namespace </summary>
 namespace common
 {
     /// <summary> A struct that holds command line parameters for loading maps. </summary>

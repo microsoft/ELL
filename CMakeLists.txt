@@ -5,6 +5,20 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 PROJECT(EMLL)
 
+# Define custom configuration types for VS
+if(CMAKE_CONFIGURATION_TYPES)
+  list(APPEND CMAKE_CONFIGURATION_TYPES Documentation)
+  list(REMOVE_DUPLICATES CMAKE_CONFIGURATION_TYPES)
+
+  # Copy important configuration info from Release config to new Documentation config  
+  set(CMAKE_CXX_FLAGS_DOCUMENTATION ${CMAKE_CXX_FLAGS_RELEASE})
+  set(CMAKE_C_FLAGS_DOCUMENTATION ${CMAKE_C_FLAGS_RELEASE})
+  set(CMAKE_EXE_LINKER_FLAGS_DOCUMENTATION ${CMAKE_EXE_LINKER_FLAGS_RELEASE})
+  set(CMAKE_EXE_LINKER_FLAGS_DOCUMENTATION ${CMAKE_EXE_LINKER_FLAGS_RELEASE})
+  set(CMAKE_SHARED_LINKER_FLAGS_DOCUMENTATION ${CMAKE_SHARED_LINKER_FLAGS_RELEASE})
+  set(CMAKE_MODULE_LINKER_FLAGS_DOCUMENTATION ${CMAKE_MODULE_LINKER_FLAGS_RELEASE})
+endif()
+
 # Options
 option(SWIG_ENABLED "Enable SWIG interfaces" OFF)
 option(DOXYGEN_ENABLED "Enable Doxygen interfaces" OFF)
@@ -58,7 +72,7 @@ else()
   message(WARNING "Note: swig interfaces disabled.")
 endif()
 
-# Add solution-level documentation
+# Add project for solution-level documentation
 set (DOC INSTALL.md StyleGuide.md)
 add_custom_target(documentation ALL DEPENDS ${DOC} SOURCES ${DOC})
 
@@ -69,12 +83,10 @@ if(DOXYGEN_ENABLED)
   if(DOXYGEN_FOUND)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 
-    add_custom_target(docs 
-      COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile"
-      OUTPUT "${CMAKE_CURRENT_BINARY_DIR/doc}"
-      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-      COMMENT "Building Doxygen documentation"
-      )
+    add_custom_target(doc ALL
+      COMMAND $<$<CONFIG:Documentation>: ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile" >
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+      COMMENT "Building Doxygen documentation" VERBATIM)
   
   endif()
 endif()
