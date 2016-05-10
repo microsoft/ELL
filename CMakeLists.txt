@@ -6,7 +6,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 PROJECT(EMLL)
 
 # Options
-option(SWIG_ENABLED "Enable swig interfaces" OFF)
+option(SWIG_ENABLED "Enable SWIG interfaces" OFF)
+option(DOXYGEN_ENABLED "Enable Doxygen interfaces" OFF)
 
 # Include modules in the CMake directory.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
@@ -40,9 +41,9 @@ add_subdirectory(scripts)
 
 # Add SWIG-generated interfaces
 
-if(${SWIG_ENABLED} STREQUAL "ON")
+if(SWIG_ENABLED)
   find_package(SWIG)
-  if(${SWIG_FOUND})
+  if(SWIG_FOUND)
     add_subdirectory(interfaces)
 
     # Add examples
@@ -61,3 +62,19 @@ endif()
 set (DOC INSTALL.md StyleGuide.md)
 add_custom_target(documentation ALL DEPENDS ${DOC} SOURCES ${DOC})
 
+# Generate doxygen documentation
+if(DOXYGEN_ENABLED)
+  message(STATUS "Doxygen documentation generation enabled")
+  find_package(Doxygen)
+  if(DOXYGEN_FOUND)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+
+    add_custom_target(docs 
+      COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile"
+      OUTPUT "${CMAKE_CURRENT_BINARY_DIR/doc}"
+      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+      COMMENT "Building Doxygen documentation"
+      )
+  
+  endif()
+endif()
