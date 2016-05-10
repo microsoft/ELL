@@ -92,7 +92,7 @@ namespace dataset
         /// <returns> The size of the DataVector. </returns>
         virtual uint64_t Size() const override;
 
-        /// <summary> \returns The number of non-zeros. </summary>
+        /// <summary> The number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
         virtual uint64_t NumNonzeros() const override;
@@ -117,7 +117,7 @@ namespace dataset
         virtual double Dot(const double* p_other) const override;
         using IVector::Dot;
 
-        /// <summary> \Returns a Iterator that points to the beginning of the datavector. </summary>
+        /// <summary> Returns an Iterator that points to the beginning of the datavector. </summary>
         ///
         /// <returns> The iterator. </returns>
         Iterator GetIterator() const;

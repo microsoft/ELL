@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+/// <summary> testing namespace </summary>
 namespace testing
 {
     /// <summary> Checks if two doubles are equal, up to a small numerical error. </summary>

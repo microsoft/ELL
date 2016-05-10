@@ -18,6 +18,7 @@
 // stl
 #include <queue>
 
+/// <summary> trainers namespace </summary>
 namespace trainers
 {
     /// <summary> Implements a greedy decision tree growing algorithm that operates by repeatedly sorting the data by each feature. </summary>
