@@ -22,13 +22,17 @@ namespace features
     class InputFeature;
 
     /// <summary>
+    /// This `ctor_enable` tag struct is required by a technique to create the equivalent of a protected constructor that can
+    /// be called by the base class. The idea is to have this `ctor_enable` type be a protected member of the base
+    /// class, so the only code that can create one would be something in the class hierarchy. Therefore, the only code
+    /// that can call a public function that contains a `ctor_enable` parameter would be some class in the hierarchy. 
+    struct ctor_enable {}; // TODO: figure out how to make this be a protected member of Feature without SWIG complaining
+
+    /// <summary>
     /// Base class for all features. 
     /// Users of the library will generally only interact with features via the featurizer (`FeatureSet`) object that
     /// owns the individual features.  
     /// </summary>
-    struct ctor_enable {}; // TODO: figure out how to make this be a protected member of Feature without SWIG complaining
-
-    /// <summary> Base class for features </summary>
     class Feature : public std::enable_shared_from_this<Feature>
     {
     public:
@@ -55,19 +59,37 @@ namespace features
         
         /// <summary> Amount of time it takes for this feature to respond to input. </summary>
         virtual size_t WarmupTime() const;
-
+        
+        /// <summary> 
+        /// Returns a list-of-strings representation of the feature. Used when deserializing a feature set from a file, and
+        /// for creating features from a GUI
+        /// </summary>
         std::vector<std::string> GetDescription() const;
+        
+        /// <summary>
+        /// Returns a list of strings giving semi-interpretable names for the columns (dimensions) of the output. Intended to
+        /// be suitable for use as the header line in an output dataset file. 
+        /// </summary>
         virtual std::vector<std::string> GetColumnDescriptions() const;
+        
         const std::vector<std::shared_ptr<Feature>>& GetInputFeatures() const;
 
+        /// <summary> Returns a list of the feature types known to the system. Useful for populating a GUI. </summary>
         static std::vector<std::string> GetRegisteredTypes();
         
         using FeatureMap = std::unordered_map<std::string, std::shared_ptr<Feature>>;
-        using DeserializeFunction = std::function<std::shared_ptr<Feature>(std::vector<std::string>, FeatureMap&)>; // TODO: have creation function take a const FeatureMap&
+        using DeserializeFunction = std::function<std::shared_ptr<Feature>(std::vector<std::string>, FeatureMap&)>; // TODO: have creation (deserialization) function take a const FeatureMap&
 
+        /// <summary> 
+        /// Adds a feature to our list of dependent features. Not meant to be called by client code.
+        /// We need to keep track of dependents for two reasons:
+        ///   1) traversing the whole graph (not just the active graph)
+        ///   2) propagating the 'dirty' flag when new input arrives  
+        /// </summary> 
         void AddDependent(std::shared_ptr<Feature> f); // TODO: figure out how to make this protected
 
     protected:
+        /// <summary> Virtual methods that implement feature-dependent things </summary>
         virtual std::vector<double> ComputeOutput() const = 0;
         virtual void AddToDescription(std::vector<std::string>& description) const {};
         virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const = 0;        

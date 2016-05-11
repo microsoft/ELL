@@ -157,7 +157,7 @@ namespace features
     void Feature::SetDirtyFlag(bool dirty) const
     {
         _isDirty = dirty;
-        if (dirty)
+        if (dirty) // Propagate dirtyness
         {
             for (auto& f : _dependents)
             {

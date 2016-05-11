@@ -24,10 +24,12 @@ namespace features
     typedef linear::DoubleVector DataVector; // TODO: This ought to really be an IDataVector or something more general
     
     /// <summary>
-    /// A `FeatureSet` (or _featurizer_) encodes a general transformation from an input time series (a series of vector-valued inputs)
-    /// to a set of output vectors. The primary use for the featurizer is to transform input data into feature vectors for a predictor or trainer. 
-    /// Its implementation is that of a dataflow graph with one designated input node (which is an instance of the `InputFeature` class), and one designated
-    /// output node. Each node produces takes input (typically from other `Feature` nodes) and produces its output.
+    /// A `FeatureSet` (or _featurizer_) encodes a transformation from an input time series (a series of vector-valued inputs)
+    /// to a set of output vectors. While the primary use for the featurizer is to transform input data into feature vectors
+    /// for a predictor or trainer, there isn't anything particularly "feature"-specific about it. The features could represent
+    /// denoising preprocessing filters, or post-prediction calibration as well. 
+    /// Its implementation is that of a dataflow graph with one designated input node (an instance of the `InputFeature` class),
+    /// and one designated output node. Each node produces takes input (typically from other `Feature` nodes) and produces its output.
     /// </summary>
     /// <remarks>
     /// Note: To deal with buffering nodes that don't always output a value when they get new input (e.g., FFT), we can't 
@@ -98,15 +100,19 @@ namespace features
         /// <summary> Saves the featurizer to a stream, but only including the parts required to compute the output. </summary>
         void SerializeActiveGraph(std::ostream& outStream) const;
 
-        /// <summary> Visits all features in the graph in dependency order
-        ///           (that is, a feature is never visited unless its inputs have all been visted first) </summary>
+        /// <summary> 
+        /// Visits all features in the graph in dependency order (that is, a feature is never visited unless
+        /// its inputs have all been visted first). </summary>
         /// <param name="visitor"> A visitor functor called for each `Feature` node in the graph. It should be compatible with the function:
         ///                        `void visitFunction(const Feature& feature)` </param>
         template <typename Visitor>
         void Visit(Visitor& visitor) const; 
 
-        /// <summary> Visits active features in the graph in dependency order
-        ///           (that is, a feature is never visited unless its inputs have all been visted first) </summary>
+        /// <summary> 
+        /// Visits the active features in the graph in dependency order (that is, a feature is never visited unless
+        /// its inputs have all been visted first). The "active graph" is the subset of features necessary to 
+        /// produce the output. 
+        /// </summary>
         template <typename Visitor>
         void VisitActiveGraph(Visitor& visitor) const;
 

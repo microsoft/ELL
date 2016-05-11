@@ -98,16 +98,17 @@ namespace features
                     visitor(*f);                    
                 }
                 
-                // now add children (Note: this partis the only difference between Visit and VisitActiveGraph)
-                for(const auto& child: Reverse(f->_dependents)) // TODO: really ought to push these in reverse order
+                // now add children (Note: this part is the only difference between Visit and VisitActiveGraph)
+                for(const auto& child: Reverse(f->_dependents)) // Visiting the children in reverse order more closely retains the order the features were originally created
                 {
                     // note: this is kind of inefficient --- we're going to push multiple copies of child on the stack. But we'll check if we've visited it already when we pop it off. 
+                    // TODO: optimize this if it's a problem
                     stack.push_back(child);
                 }
             }
             else // visit f's parents
             {
-                for (auto input : Reverse(f->_inputFeatures)) // TODO: really ought to push these in reverse order
+                for (auto input : Reverse(f->_inputFeatures))
                 {
                     stack.push_back(input);
                 }
