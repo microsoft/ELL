@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        auto dataIterator = rowDataset.GetIterator(0, 1000);
+        auto dataIterator = rowDataset.GetIterator(0, 30);
         auto tree = sortingTreeLearner.Train(dataIterator);
 
         // print loss and errors
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
         {
             std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
 
-            auto evaluationIterator = rowDataset.GetIterator(0, 1000);
+            auto evaluationIterator = rowDataset.GetIterator(0, 30);
             evaluator.Evaluate(evaluationIterator, tree, loss);
             std::cout << "Training error\n" << evaluator << std::endl;
         }

@@ -17,6 +17,7 @@
 
 // stl
 #include <queue>
+#include <iostream>
 
 namespace trainers
 {
@@ -65,6 +66,12 @@ namespace trainers
             Sums negativeSums;
 
             bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
+            void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
+        };
+
+        struct PriorityQueue : public std::priority_queue<SplitCandidate>
+        {
+            void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
         };
 
         template <typename ExampleIteratorType>
@@ -78,7 +85,7 @@ namespace trainers
         // member variables
         LossFunctionType _lossFunction;
         dataset::RowDataset<dataset::DoubleDataVector> _dataset;
-        std::priority_queue<SplitCandidate> _queue;
+        PriorityQueue _queue;
     };
 }
 
