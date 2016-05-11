@@ -18,34 +18,41 @@
 #include <vector>
 #include <memory>
 
-
-
-
 namespace features
 {    
 //    using DataVector = linear::DoubleVector; 
     typedef linear::DoubleVector DataVector; // TODO: This ought to really be an IDataVector or something more general
     
     /// <summary>
-    /// A `FeatureSet` (or _featurizer_) encodes transformations of data, and is used to transformation
-    /// an input time series into feature vectors for a predictor. 
-    /// Its implementation is that of a dataflow graph with one special `InputFeature` node, and one designated
+    /// A `FeatureSet` (or _featurizer_) encodes a general transformation from an input time series (a series of vector-valued inputs)
+    /// to a set of output vectors. The primary use for the featurizer is to transform input data into feature vectors for a predictor or trainer. 
+    /// Its implementation is that of a dataflow graph with one designated input node (which is an instance of the `InputFeature` class), and one designated
     /// output node. Each node produces takes input (typically from other `Feature` nodes) and produces its output.
     /// </summary>
+    /// <remarks>
+    /// Note: To deal with buffering nodes that don't always output a value when they get new input (e.g., FFT), we can't 
+    /// have  a single interface function for processing data (e.g., `double Compute(vec input)`), but instead we have to 
+    /// split it into 2 or 3 functions:
+    /// - void SetInput(vec input) -- returns true if we produced new data. 
+    /// - vec GetOutput() -- returns output and clears the 'has data' flag
+    ///
+    /// Note: The input data is typically assumed to be a continuous stream of data, and to deal with interruptions in the stream which
+    /// may invalidate the internal state of the features, there is a `Reset()` function which can be used to reinitialize the
+    /// featurizer in case of such an interruption. It would be necessary to call `Reset` when switching between datasets as well.
+    /// </remarks>
     class FeatureSet
     {
     public:
         FeatureSet();
-        ~FeatureSet() {};
-        
+        ~FeatureSet() {};        
+
         /// <summary> Supplies input data for the featurizer to process. </summary>
         /// <returns> true if the featurizer has new output as a result. </returns>
         bool ProcessInputData(const DataVector& inData) const; // Returns true if we generated output (in which case, call GetOutput())
-        // Note: to deal with buffering nodes (e.g., FFT), need to split ProcessInputData into 2 or 3 phases:
-        // SetInput(...) // triggers dirty calc cascade
-        // GetOutput() // sets dirty bit off
+
         /// <summary> Indicates whether there is new output data available. </summary>
         bool HasOutput() const; // Returns dirty bit value. If we have multiple output features, then this should be a function on the feature node
+
         /// <summary> Get the most recently-computed output feature vector </summary>
         DataVector GetOutput() const;
 

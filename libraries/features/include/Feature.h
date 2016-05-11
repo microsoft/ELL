@@ -21,9 +21,11 @@ namespace features
 {
     class InputFeature;
 
-    //
-    // Feature base class
-    //
+    /// <summary>
+    /// Base class for all features. 
+    /// Users of the library will generally only interact with features via the featurizer (`FeatureSet`) object that
+    /// owns the individual features.  
+    /// </summary>
     struct ctor_enable {}; // TODO: figure out how to make this be a protected member of Feature without SWIG complaining
 
     /// <summary> Base class for features </summary>
@@ -36,15 +38,22 @@ namespace features
         Feature(std::string Id, const std::vector<std::shared_ptr<Feature>>& inputs);
         virtual ~Feature() {};
 
-        /// <summary> </summary>
+        /// <summary> The unique ID of this feature. </summary>
         std::string Id() const;
+        
+        /// <summary> The dimensionality of this feature. </summary>
         size_t NumColumns() const;
+        
+        /// <summary> Indicates if this feature has new output to be read. </summary>
         virtual bool HasOutput() const;
+
+        /// <summary> The current output of this feature. </summary>
         std::vector<double> GetOutput() const;
 
-        // Resets any internal state
+        /// <summary> Resets any internal state </summary>
         virtual void Reset();
-        // Amount of time it takes for this feature to respond to input
+        
+        /// <summary> Amount of time it takes for this feature to respond to input. </summary>
         virtual size_t WarmupTime() const;
 
         std::vector<std::string> GetDescription() const;

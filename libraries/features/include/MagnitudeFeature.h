@@ -18,13 +18,10 @@
 
 namespace features
 {
-    //
-    // MagnitudeFeature
-    //
+    /// <summary> A feature that takes a vector input and returns its magnitude (L2 norm) </summary>
     class MagnitudeFeature : public RegisteredFeature<MagnitudeFeature>
     {
     public:
-        // Factory method
         static std::shared_ptr<MagnitudeFeature> Create(std::shared_ptr<Feature> inputFeature);
         static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures);
 

@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+/// TODO: The functionality in this file belongs in the utilities library somewhere
+
 namespace features
 {
     std::string TrimString(const std::string& str);
@@ -25,7 +27,7 @@ namespace features
     template <typename T>
     std::string to_string(const std::vector<T>& list);
 
-    // Fast routine for printing floats with a small (in magnitude) exponent:
+    /// <summary> Fast routine for printing floats with a small (in magnitude) exponent </summary>
     int sprint_float_fast(char* buf, int n, int p, double val);
 }
 

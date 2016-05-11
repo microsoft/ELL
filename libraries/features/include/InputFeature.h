@@ -17,13 +17,16 @@
 
 namespace features
 {
-   //
-    // InputFeature -- Represents an input to the FeatureSet
-    //
+    /// <summary> A feature that  represents an input to the featurizer. It's always the first feature to be added. </summary>
     class InputFeature : public RegisteredFeature<InputFeature>
     {
     public:
+        /// <summary> Factory function. </summary>
+        /// <param name="size"> The dimensionality of the input expected by the feature </param>
+        /// <returns> A `shared_ptr` to a newly-created input feature of the requested dimensionality. </returns>
         static std::shared_ptr<InputFeature> Create(uint64_t size);
+        
+        /// <summary> Sets the current value of the input </summary>
         void SetValue(std::vector<double> val);
 
         static constexpr const char* feature_name = "Input";
