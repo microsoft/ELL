@@ -27,7 +27,6 @@ namespace trainers
         // as long as positive gains can be attained, keep growing the tree
         while(!_queue.empty())
         {
-
             // useful debugging code - do not remove
             // std::cout << "Iteration\n";
             // _queue.Print(std::cout, _dataset);
