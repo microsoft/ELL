@@ -102,9 +102,12 @@ namespace features
 
         /// <summary> 
         /// Visits all features in the graph in dependency order (that is, a feature is never visited unless
-        /// its inputs have all been visted first). </summary>
-        /// <param name="visitor"> A visitor functor called for each `Feature` node in the graph. It should be compatible with the function:
-        ///                        `void visitFunction(const Feature& feature)` </param>
+        /// its inputs have all been visted first). 
+        /// </summary>
+        /// <param name="visitor">
+        /// A visitor functor called for each `Feature` node in the graph. It should be compatible with the function:
+        /// `void visitFunction(const Feature& feature)`
+        /// </param>
         template <typename Visitor>
         void Visit(Visitor& visitor) const; 
 
