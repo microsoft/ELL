@@ -41,8 +41,8 @@ namespace features
         /// <summary> The unique ID of this feature. </summary>
         std::string Id() const;
         
-        /// <summary> The dimensionality of this feature. </summary>
-        size_t NumColumns() const;
+        /// <summary> The output dimensionality of this feature. </summary>
+        size_t GetOutputDimension() const;
         
         /// <summary> Indicates if this feature has new output to be read. </summary>
         virtual bool HasOutput() const;
@@ -79,7 +79,7 @@ namespace features
         void AddInputFeature(std::shared_ptr<Feature> inputFeature);
 
         std::vector<std::shared_ptr<Feature>> _inputFeatures; // parents
-        mutable size_t _numColumns = 0; // TODO: rename to _size (?)
+        mutable size_t _outputDimension = 0;
         mutable std::vector<double> _cachedValue;
 
     private:

@@ -49,7 +49,7 @@ namespace features
             m += v*v;
         }
         std::vector<double> result = { std::sqrt(m) };
-        _numColumns = 1;
+        _outputDimension = 1;
         return result;
     }
 

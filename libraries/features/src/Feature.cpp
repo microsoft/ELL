@@ -52,9 +52,9 @@ namespace features
         return _id;
     }
 
-    size_t Feature::NumColumns() const
+    size_t Feature::GetOutputDimension() const
     {
-        return _numColumns;
+        return _outputDimension;
     }
 
     bool Feature::HasOutput() const
@@ -116,7 +116,8 @@ namespace features
     {
         using std::to_string;
         std::vector<std::string> result;
-        for (int index = 0; index < NumColumns(); index++)
+        auto size = GetOutputDimension();
+        for (int index = 0; index < size; index++)
         {
             result.push_back(FeatureType() + "_" + to_string(index));
         }

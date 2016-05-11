@@ -23,7 +23,7 @@ namespace features
     
     InputFeature::InputFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>& inputs, uint64_t size) : RegisteredFeature<InputFeature>(inputs)
     {
-        _numColumns = size;
+        _outputDimension = size;
     }
 
     std::shared_ptr<InputFeature> InputFeature::Create(uint64_t size)
@@ -39,7 +39,7 @@ namespace features
     void InputFeature::SetValue(std::vector<double> val)
     {
         _currentValue = val;
-        assert(_numColumns == val.size());
+        assert(_outputDimension == val.size());
         SetDirtyFlag(true); // propagates through graph
     }
 
@@ -51,7 +51,7 @@ namespace features
     void InputFeature::AddToDescription(std::vector<std::string>& description) const
     {
         using std::to_string;
-        description.push_back(to_string(_numColumns));
+        description.push_back(to_string(_outputDimension));
     }
 
     std::shared_ptr<Feature> InputFeature::Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
