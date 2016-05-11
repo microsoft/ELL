@@ -26,6 +26,7 @@ namespace features
     //
     struct ctor_enable {}; // TODO: figure out how to make this be a protected member of Feature without SWIG complaining
 
+    /// <summary> Base class for features </summary>
     class Feature : public std::enable_shared_from_this<Feature>
     {
     public:
@@ -35,6 +36,7 @@ namespace features
         Feature(std::string Id, const std::vector<std::shared_ptr<Feature>>& inputs);
         virtual ~Feature() {};
 
+        /// <summary> </summary>
         std::string Id() const;
         size_t NumColumns() const;
         virtual bool HasOutput() const;
