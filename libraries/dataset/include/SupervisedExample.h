@@ -43,6 +43,10 @@ namespace dataset
         /// <param name="weight"> The weight. </param>
         SupervisedExample(std::unique_ptr<DataVectorType> instance, double label, double weight = 1.0);
 
+        SupervisedExample<DataVectorType> ShallowCopy() const;
+
+        SupervisedExample<DataVectorType> DeepCopy() const;
+
         /// <summary> Gets the data vector. </summary>
         ///
         /// <returns> The data vector. </returns>
@@ -68,7 +72,7 @@ namespace dataset
     private:
         static void Swap(SupervisedExample<DataVectorType>& a, SupervisedExample<DataVectorType>& b);
 
-        std::unique_ptr<DataVectorType> _dataVector;
+        std::unique_ptr<const DataVectorType> _dataVector;
         double _label;
         double _weight;
     };
