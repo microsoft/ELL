@@ -49,12 +49,12 @@ namespace dataset
         /// <summary> Returns a shallow copy of the row dataset. A shallow copy has its own weights and labels, but shared data vectors. </summary>
         ///
         /// <returns> A RowDataset.</returns>
-        RowDataset<DataVectorType> ShallowCopy() const;
+        RowDataset<DataVectorType> ShallowCopy(uint64_t fromRowIndex = 0, uint64_t size = 0) const;
 
         /// <summary> Returns a deep copy of the row dataset. </summary>
         ///
         /// <returns> A RowDataset.</returns>
-        RowDataset<DataVectorType> DeepCopy() const;
+        RowDataset<DataVectorType> DeepCopy(uint64_t fromRowIndex = 0, uint64_t size = 0) const;
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
@@ -87,7 +87,7 @@ namespace dataset
         /// examples. </param>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
+        Iterator GetIterator(uint64_t fromRowIndex = 0, uint64_t size = 0) const;
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///

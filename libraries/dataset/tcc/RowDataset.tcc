@@ -15,23 +15,37 @@
 namespace dataset
 {
     template<typename DataVectorType>
-    RowDataset<DataVectorType> RowDataset<DataVectorType>::ShallowCopy() const
+    RowDataset<DataVectorType> RowDataset<DataVectorType>::ShallowCopy(uint64_t fromRowIndex, uint64_t size) const
     {
-        RowDataset<DataVectorType> other;
-        for (const auto& example : _examples)
+        assert(fromRowIndex + size <= _examples.size());
+
+        if (size == 0)
         {
-            other.AddExample(example.ShallowCopy());
+            size = _examples.size() - fromRowIndex;
+        }
+
+        RowDataset<DataVectorType> other;
+        for(uint64_t i = fromRowIndex; i < fromRowIndex+size; ++i)
+        {
+            other.AddExample(_examples[i].ShallowCopy());
         }
         return other;
     }
 
     template<typename DataVectorType>
-    RowDataset<DataVectorType> RowDataset<DataVectorType>::DeepCopy() const
+    RowDataset<DataVectorType> RowDataset<DataVectorType>::DeepCopy(uint64_t fromRowIndex, uint64_t size) const
     {
-        RowDataset<DataVectorType> other;
-        for (const auto& example : _examples)
+        assert(fromRowIndex + size <= _examples.size());
+
+        if (size == 0)
         {
-            other.AddExample(example.DeepCopy());
+            size = _examples.size() - fromRowIndex;
+        }
+
+        RowDataset<DataVectorType> other;
+        for (uint64_t i = fromRowIndex; i < fromRowIndex + size; ++i)
+        {
+            other.AddExample(_examples[i].DeepCopy());
         }
         return other;
     }
@@ -61,20 +75,16 @@ namespace dataset
     }
 
     template<typename DataVectorType>
-    typename RowDataset<DataVectorType>::Iterator RowDataset<DataVectorType>::GetIterator(uint64_t firstExample, uint64_t numExamples) const
+    typename RowDataset<DataVectorType>::Iterator RowDataset<DataVectorType>::GetIterator(uint64_t fromRowIndex, uint64_t size) const
     {
-        if (firstExample >= NumExamples())
+        assert(fromRowIndex + size <= _examples.size());
+
+        if (size == 0)
         {
-            return utilities::MakeStlIterator(_examples.cend(), _examples.cend());
+            size = _examples.size() - fromRowIndex;
         }
 
-        uint64_t lastExample = firstExample + numExamples;
-        if (lastExample > NumExamples() || numExamples == 0)
-        {
-            lastExample = NumExamples();
-        }
-
-        return utilities::MakeStlIterator(_examples.cbegin() + firstExample, _examples.cbegin() + lastExample);
+        return utilities::MakeStlIterator(_examples.cbegin() + fromRowIndex, _examples.cbegin() + fromRowIndex + size);
     }
 
     template<typename DataVectorType>
