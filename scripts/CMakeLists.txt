@@ -14,7 +14,7 @@ add_custom_target(${PROJ_NAME} ALL DEPENDS ${SRC} SOURCES ${SRC})
 # tests
 add_test(NAME sgd_train
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} 
-         COMMAND python train_sgd.py ../../data/a9a.txt a9a_sgd.model a9a_sgd.html a9a_sgd_code.txt)
+         COMMAND python train_sgd.py ../../examples/data/test_data.txt test_sgd.model test_sgd.html test_sgd_code.txt)
 
 # copy contents of scripts directory to build/scripts
 foreach(SCRIPT_FILE ${SRC})

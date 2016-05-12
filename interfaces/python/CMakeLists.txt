@@ -15,6 +15,6 @@ generate_interface(python ${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_LIBRARIES} "")
 # tests
 #add_test(NAME python_interface_test
 #         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} 
-#         COMMAND python sgd.py ../../../data/a9a.txt)
+#         COMMAND python sgd.py ../../../examples/data/test_data.txt)
 
 add_dependencies(_EMLL_python EMLL_common)
