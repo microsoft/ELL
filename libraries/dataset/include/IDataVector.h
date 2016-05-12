@@ -8,6 +8,7 @@
 
 #pragma once
 
+// linear
 #include "IVector.h"
 
 // stl

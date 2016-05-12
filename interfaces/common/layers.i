@@ -10,6 +10,11 @@
 
 %ignore Model::GetTypeName;
 %ignore layers::BuildCoordinateList;
+%ignore layers::Map::GetModel() const;
+%ignore layers::Map::GetModel();
+%ignore layers::Model::AddLayer;
+%ignore layers::CoordinateList::operator[];
+%ignore interfaces::Model::GetModel() const;
 
 %{
 #define SWIG_FILE_WITH_INIT
@@ -42,7 +47,6 @@ layers::CoordinateList BuildCoordinateList(const interfaces::Model& model, uint6
     return layers::BuildCoordinateList(model.GetModel(), inputLayerSize, coordinateListString);
 }
 %}
-
 
 // Add operator[] to CoordinateList objects
 WRAP_OP_AT(layers::CoordinateList, layers::Coordinate);
