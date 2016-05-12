@@ -81,12 +81,6 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void StochasticGradientDescentTrainer<LossFunctionType>::Update(utilities::AnyIterator<dataset::GenericSupervisedExample>& exampleIterator)
-    {
-        Update<decltype(exampleIterator)>(exampleIterator);
-    }
-
-    template<typename LossFunctionType>
     const predictors::LinearPredictor& StochasticGradientDescentTrainer<LossFunctionType>::GetPredictor() const
     {
         return _averagedPredictor;

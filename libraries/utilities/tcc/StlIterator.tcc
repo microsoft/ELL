@@ -40,7 +40,7 @@ namespace utilities
     }
 
     template <typename IteratorType, typename ValueType>
-    ValueType StlIterator<IteratorType, ValueType>::Get() const
+    const ValueType& StlIterator<IteratorType, ValueType>::Get() const
     {
         return *_current;
     }

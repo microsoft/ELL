@@ -48,7 +48,7 @@ namespace utilities
         /// <summary> Returns the value of the current iterate. </summary>
         ///
         /// <returns> The value of the current iterate. </returns>
-        ValueType Get() const;
+        const ValueType& Get() const;
 
     private:
         IteratorType _current;

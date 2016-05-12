@@ -21,9 +21,6 @@
 // dataset
 #include "SupervisedExample.h"
 
-// utilities
-#include "AnyIterator.h"
-
 // stl
 #include <cstdint>
 
@@ -52,12 +49,6 @@ namespace trainers
         /// <param name="numExamples"> The number of examples in the iterator. </param>
         template<typename ExampleIteratorType>
         void Update(ExampleIteratorType& exampleIterator);
-
-        /// <summary> Performs a given number of learning iterations. </summary>
-        ///
-        /// <param name="exampleIterator"> [in,out] The data iterator. </param>
-        /// <param name="numExamples"> The number of examples in the iterator. </param>
-        void Update(utilities::AnyIterator<dataset::GenericSupervisedExample>& exampleIterator);
 
         /// <summary> Returns The averaged predictor. </summary>
         ///

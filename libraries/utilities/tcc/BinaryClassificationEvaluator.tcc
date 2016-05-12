@@ -45,12 +45,6 @@ namespace utilities
     }
 
     template<typename PredictorType, typename LossFunctionType>
-    void BinaryClassificationEvaluator<PredictorType, LossFunctionType>::Evaluate(utilities::AnyIterator<dataset::GenericSupervisedExample>& dataIterator, const PredictorType& predictor, const LossFunctionType& lossFunction)
-    {
-        Evaluate<decltype(dataIterator)>(dataIterator, predictor, lossFunction);
-    }
-
-    template<typename PredictorType, typename LossFunctionType>
     double BinaryClassificationEvaluator<PredictorType, LossFunctionType>::GetLastLoss() const
     {
         if(_evals.size() == 0)

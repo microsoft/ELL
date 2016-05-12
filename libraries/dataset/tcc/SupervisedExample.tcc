@@ -8,9 +8,9 @@
 
 namespace dataset
 {
-    template<typename DataVectorType>
-    SupervisedExample<DataVectorType>::SupervisedExample(const SupervisedExample<DataVectorType>& other) : _dataVector(other._dataVector->Clone()), _label(other._label), _weight(other._weight) {}
-    
+    //template<typename DataVectorType>
+    //SupervisedExample<DataVectorType>::SupervisedExample(const SupervisedExample<DataVectorType>& other) : _dataVector(other._dataVector->Clone()), _label(other._label), _weight(other._weight) {}
+
     template<typename DataVectorType>
     SupervisedExample<DataVectorType>::SupervisedExample(std::unique_ptr<DataVectorType> instance, double label, double weight) : _dataVector(std::move(instance)), _label(label), _weight(weight)
     {}

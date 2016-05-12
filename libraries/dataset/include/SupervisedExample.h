@@ -29,7 +29,7 @@ namespace dataset
         /// <summary> Copy constructor </summary>
         ///
         /// <param name="other"> The other. </param>
-        SupervisedExample(const SupervisedExample<DataVectorType>& other);
+        SupervisedExample(const SupervisedExample<DataVectorType>& other) = delete;
 
         /// <summary> Default move constructor. </summary>
         ///

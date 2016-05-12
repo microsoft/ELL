@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "AnyIterator.h"
-
 #include "SupervisedExample.h"
 #include "LinearPredictor.h"
 
@@ -45,14 +43,6 @@ namespace utilities
         /// <param name="lossFunction"> The loss function. </param>
         template<typename ExampleIteratorType>
         void Evaluate(ExampleIteratorType& dataIterator, const PredictorType& predictor, const LossFunctionType& lossFunction);
-
-        /// <summary> Evaluates a binary classifier </summary>
-        ///
-        /// <typeparam name="ExampleIteratorType"> Type of the example iterator type. </typeparam>
-        /// <param name="dataIterator"> [in,out] The data iterator. </param>
-        /// <param name="predictor"> The predictor. </param>
-        /// <param name="lossFunction"> The loss function. </param>
-        void Evaluate(utilities::AnyIterator<dataset::GenericSupervisedExample>& dataIterator, const PredictorType& predictor, const LossFunctionType& lossFunction);
 
         /// <summary> Returns the most recent average weighted loss. </summary>
         ///
