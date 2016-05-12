@@ -14,7 +14,8 @@ endif()
 
 set (SRC src/StochasticGradientDescentTrainer.cpp)
 
-set (INCLUDE include/SortingTreeTrainer.h
+set (INCLUDE include/MultiEpochMetaTrainer.h
+             include/SortingTreeTrainer.h
              include/StochasticGradientDescentTrainer.h)
 
 set (TCC tcc/SortingTreeTrainer.tcc
