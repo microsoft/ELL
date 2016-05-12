@@ -15,6 +15,28 @@
 namespace dataset
 {
     template<typename DataVectorType>
+    RowDataset<DataVectorType> RowDataset<DataVectorType>::ShallowCopy() const
+    {
+        RowDataset<DataVectorType> other;
+        for (const auto& example : _examples)
+        {
+            other.AddExample(example.ShallowCopy());
+        }
+        return other;
+    }
+
+    template<typename DataVectorType>
+    RowDataset<DataVectorType> RowDataset<DataVectorType>::DeepCopy() const
+    {
+        RowDataset<DataVectorType> other;
+        for (const auto& example : _examples)
+        {
+            other.AddExample(example.DeepCopy());
+        }
+        return other;
+    }
+
+    template<typename DataVectorType>
     uint64_t RowDataset<DataVectorType>::NumExamples() const
     {
         return _examples.size();

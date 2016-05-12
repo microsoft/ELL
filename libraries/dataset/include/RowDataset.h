@@ -41,10 +41,20 @@ namespace dataset
         /// <summary> Default move assignment operator. </summary>
         ///
         /// <param name="other"> [in,out] The other vector. </param>
-        RowDataset& operator=(RowDataset&&) = default;
+        RowDataset<DataVectorType>& operator=(RowDataset&&) = default;
 
         /// <summary> Deleted asignment operator. </summary>
-        RowDataset& operator=(const RowDataset&) = delete;
+        RowDataset<DataVectorType>& operator=(const RowDataset&) = delete;
+
+        /// <summary> Returns a shallow copy of the row dataset. A shallow copy has its own weights and labels, but shared data vectors. </summary>
+        ///
+        /// <returns> A RowDataset.</returns>
+        RowDataset<DataVectorType> ShallowCopy() const;
+
+        /// <summary> Returns a deep copy of the row dataset. </summary>
+        ///
+        /// <returns> A RowDataset.</returns>
+        RowDataset<DataVectorType> DeepCopy() const;
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///

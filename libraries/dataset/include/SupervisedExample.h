@@ -57,7 +57,6 @@ namespace dataset
         /// <returns> A reference to this SupervisedExample. </returns>
         SupervisedExample& operator=(SupervisedExample<DataVectorType>&& other) = default;
 
-
         /// <summary> Returns a shallow copy of the supervised example. A shallow copy has its own weight and label, but shares the data vector. </summary>
         ///
         /// <returns> A SupervisedExample. </returns>
