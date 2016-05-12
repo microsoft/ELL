@@ -7,7 +7,6 @@ PROJECT(EMLL)
 
 # Define custom configuration types for VS
 if(CMAKE_CONFIGURATION_TYPES)
-## TODO: Get conditional generator expressions to work in Visual Studio. Then re-enable the "Documentation" target.
 #  list(APPEND CMAKE_CONFIGURATION_TYPES Documentation)
 #  list(REMOVE_DUPLICATES CMAKE_CONFIGURATION_TYPES)
 
@@ -86,10 +85,6 @@ if(DOXYGEN_ENABLED)
 
     set (DOXYFILE_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
     add_custom_target(doxygen ALL
-      COMMAND 
-# TODO: figure out why this conditional execution isn't working anymore --- it used to work in VS, but now it produces an error
-#      $<$<CONFIG:Documentation>:${DOXYGEN_EXECUTABLE} ${DOXYFILE_LOCATION}>
-#      $<$<NOT:$<CONFIG:Documentation>>:${CMAKE_COMMAND} -E echo "Only done in Documentation builds">
       COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_LOCATION}
       WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
       COMMENT "Building Doxygen documentation"
