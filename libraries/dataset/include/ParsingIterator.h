@@ -56,7 +56,7 @@ namespace dataset
         VectorEntryParserType _instanceParser;
     };
 
-    /// <summary> \returns A std::unique_ptr to a Parsing Iterator. </summary>
+    /// <summary> Gets a std::unique_ptr to a Parsing Iterator. </summary>
     ///
     /// <typeparam name="RowIteratorType"> Type of the row iterator type. </typeparam>
     /// <typeparam name="VectorEntryParserType"> Type of the vector entry parser type. </typeparam>

@@ -9,13 +9,13 @@
 namespace dataset
 {
     template<typename DataVectorType>
-    SupervisedExample<DataVectorType>::SupervisedExample(std::unique_ptr<DataVectorType> instance, double label, double weight) : _dataVector(std::move(instance)), _label(label), _weight(weight)
+    SupervisedExample<DataVectorType>::SupervisedExample(std::shared_ptr<DataVectorType> dataVector, double label, double weight) : _dataVector(std::move(dataVector)), _label(label), _weight(weight)
     {}
 
     template<typename DataVectorType>
     SupervisedExample<DataVectorType> SupervisedExample<DataVectorType>::ShallowCopy() const 
     {
-        return SupervisedExample<DataVectorType>(_dataVector->Clone(), _label, _weight); // TODO make this shallow
+        return SupervisedExample<DataVectorType>(_dataVector, _label, _weight);
     }
 
     template<typename DataVectorType>
