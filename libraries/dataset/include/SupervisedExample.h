@@ -43,6 +43,21 @@ namespace dataset
         /// <param name="weight"> The weight. </param>
         SupervisedExample(std::shared_ptr<DataVectorType> dataVector, double label, double weight = 1.0);
 
+        /// <summary> Assignment operator. </summary>
+        ///
+        /// <param name="other"> The other. </param>
+        ///
+        /// <returns> A reference to this SupervisedExample. </returns>
+        SupervisedExample& operator=(const SupervisedExample<DataVectorType>& other) = delete;
+
+        /// <summary> Move assignment operator. </summary>
+        ///
+        /// <param name="other"> [in,out] The other. </param>
+        ///
+        /// <returns> A reference to this SupervisedExample. </returns>
+        SupervisedExample& operator=(SupervisedExample<DataVectorType>&& other) = default;
+
+
         /// <summary> Returns a shallow copy of the supervised example. A shallow copy has its own weight and label, but shares the data vector. </summary>
         ///
         /// <returns> A SupervisedExample. </returns>
@@ -68,16 +83,12 @@ namespace dataset
         /// <returns> The label. </returns>
         double GetLabel() const;
 
-        SupervisedExample<DataVectorType>& operator=(SupervisedExample<DataVectorType> other);
-
         /// <summary> Prints the datavector to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         void Print(std::ostream& os) const;
 
     private:
-        static void Swap(SupervisedExample<DataVectorType>& a, SupervisedExample<DataVectorType>& b);
-
         std::shared_ptr<const DataVectorType> _dataVector;
         double _label;
         double _weight;

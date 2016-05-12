@@ -36,7 +36,7 @@ namespace dataset
         RowDataset(RowDataset&&) = default;
 
         /// <summary> Deleted copy constructor. </summary>
-        RowDataset(const RowDataset&) = default;
+        RowDataset(const RowDataset&) = delete;
 
         /// <summary> Default move assignment operator. </summary>
         ///
@@ -44,7 +44,7 @@ namespace dataset
         RowDataset& operator=(RowDataset&&) = default;
 
         /// <summary> Deleted asignment operator. </summary>
-        RowDataset& operator=(const RowDataset&) = default;
+        RowDataset& operator=(const RowDataset&) = delete;
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
