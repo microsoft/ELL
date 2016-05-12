@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <vector>
 
+/// <summary> %treeLayout namespace </summary>
 namespace treeLayout
 {
     /// <summary>

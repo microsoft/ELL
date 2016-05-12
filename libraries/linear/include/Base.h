@@ -11,6 +11,7 @@
 // stl
 #include <iostream>
 
+/// <summary> linear namespace </summary>
 namespace linear
 {
     /// <summary> Base class for all other classes in the linear library. </summary>

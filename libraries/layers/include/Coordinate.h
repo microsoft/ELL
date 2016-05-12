@@ -16,6 +16,7 @@
 #include <vector>
 #include <iosfwd>
 
+/// <summary> layers namespace </summary>
 namespace layers
 {
     /// <summary> Represents an element in a layer. </summary>

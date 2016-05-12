@@ -22,6 +22,7 @@
 
 namespace dataset
 {
+    /// <summary> A row-wise dataset of `SupervisedExample<DataVectorType>` items. </summary>
     template<typename DataVectorType = IDataVector>
     class RowDataset 
     {
