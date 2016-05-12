@@ -20,8 +20,8 @@ if(CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # Options
-option(SWIG_ENABLED "Enable SWIG interfaces" OFF)
-option(DOXYGEN_ENABLED "Enable Doxygen interfaces" OFF)
+option(SWIG_ENABLED "Enable SWIG interfaces" ON)
+option(DOXYGEN_ENABLED "Enable Doxygen interfaces" ON)
 
 # Include modules in the CMake directory.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
@@ -83,10 +83,19 @@ if(DOXYGEN_ENABLED)
   if(DOXYGEN_FOUND)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 
-    add_custom_target(doc ALL
-      COMMAND $<$<CONFIG:Documentation>: ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile" >
+    set (DOXYFILE_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
+    add_custom_target(doxygen ALL
+      COMMAND 
+# TODO: figure out why this conditional execution isn't working anymore --- it used to work in VS, but now I get an error
+#      $<$<CONFIG:Documentation>:${DOXYGEN_EXECUTABLE} ${DOXYFILE_LOCATION}>
+#      $<$<NOT:$<CONFIG:Documentation>>:${CMAKE_COMMAND} -E echo "Only done in Documentation builds">
+      COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_LOCATION}
       WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-      COMMENT "Building Doxygen documentation" VERBATIM)
-  
+      COMMENT "Building Doxygen documentation"
+      SOURCES Doxyfile)
+  else()
+    message(WARNING "Doxygen processor not found")
   endif()
+else()
+  message(STATUS "Doxygen documentation generation disabled")
 endif()
