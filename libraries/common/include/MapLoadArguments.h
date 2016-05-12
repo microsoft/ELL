@@ -21,6 +21,7 @@ namespace common
     /// <summary> A struct that holds command line parameters for loading maps. </summary>
     struct MapLoadArguments : public ModelLoadArguments
     {
+        /// <summary> The coordinates from the model to use as output. </summary>
         std::string coordinateListString = "";
     };
 

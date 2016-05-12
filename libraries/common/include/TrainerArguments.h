@@ -19,8 +19,11 @@ namespace common
     /// <summary> A struct that holds general command line parameters for training algorithms. </summary>
     struct TrainerArguments
     {
-        std::string randomSeedString = "";
-        bool verbose = false;
+        /// <summary> A random seed. </summary>
+        std::string randomSeedString = ""; 
+
+        /// <summary> If `true`, more output is generated. </summary>
+        bool verbose = false; 
     };
 
     /// <summary> A version of TrainerArguments that adds its members to the command line parser. </summary>

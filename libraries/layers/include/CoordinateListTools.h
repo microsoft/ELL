@@ -20,16 +20,21 @@ namespace layers
     class Model;
 
     /// <summary>
-    /// Builds a coordinate list from a coordinate list definition string. The string has the following format
-    /// [defString] .=. [def];[defString]
-    /// [def] .=. [layerIndex] || [layerIndex],[elementIndex] || [layerIndex],[elementInterval]
-    /// [elementInterval] .=. [fromElementIndex]:[toElementIndex]   (used to define intervals of elements)
-    /// [layerIndex] .=. [index]
-    /// [elementIndex] .=. [index]
-    /// [fromElementIndex] .=. [index]
-    /// [toElementIndex] .=. [index]
-    /// [index] .=. (uint) || e || e-(uint)                         ("e" gets translated to the maximal index possible in the map) 
+    /// Builds a coordinate list from a coordinate list definition string. 
     /// </summary>
+    /// <remarks>
+    /// The string has the following format:
+    /// <code>
+    ///   [defString] .=. [def]; [defString]
+    ///   [def] .=. [layerIndex] || [layerIndex],[elementIndex] || [layerIndex],[elementInterval]
+    ///   [elementInterval] .=. [fromElementIndex]:[toElementIndex]   (used to define intervals of elements)
+    ///   [layerIndex] .=. [index]
+    ///   [elementIndex] .=. [index]
+    ///   [fromElementIndex] .=. [index]
+    ///   [toElementIndex] .=. [index]
+    ///   [index] .=. (uint) || e || e-(uint)                         ("e" gets translated to the maximal index possible in the map)
+    /// </code> 
+    /// </remarks>
     ///
     /// <param name="model"> The model which the coordinate list relates to. </param>
     /// <param name="inputLayerSize"> The dataset dimension </param>
