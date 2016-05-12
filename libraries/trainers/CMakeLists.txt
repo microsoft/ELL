@@ -28,7 +28,6 @@ include_directories(include)
 include_directories(../linear/include)
 include_directories(../dataset/include)
 include_directories(../layers/include)
-include_directories(../lossFunctions/include)
 include_directories(../predictors/include)
 include_directories(../utilities/include)
 

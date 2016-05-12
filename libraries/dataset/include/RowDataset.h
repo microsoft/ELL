@@ -23,7 +23,7 @@
 namespace dataset
 {
     /// <summary> A row-wise dataset of `SupervisedExample<DataVectorType>` items. </summary>
-    template<typename DataVectorType = IDataVector>
+    template<typename DataVectorType>
     class RowDataset 
     {
     public:
@@ -119,6 +119,8 @@ namespace dataset
         std::vector<ExampleType> _examples;
         uint64_t _maxExampleSize = 0;
     };
+
+    typedef RowDataset<IDataVector> GenericRowDataset;
 
     template<typename DataVectorType>
     std::ostream& operator<<(std::ostream& os, RowDataset<DataVectorType>& dataset);

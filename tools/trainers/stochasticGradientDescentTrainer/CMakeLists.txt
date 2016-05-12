@@ -5,7 +5,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 # define project
-set (PROJ_NAME stochasticGradientDescent)
+set (PROJ_NAME stochasticGradientDescentTrainer)
 PROJECT(${PROJ_NAME})
 
 #enable C++11 in GCC, etc
@@ -13,8 +13,11 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/main.cpp)
-set (INCLUDE include/SGDArguments.h)
+set (SRC src/main.cpp
+         src/ParsedStochasticGradientDescentTrainerArguments.cpp)
+
+set (INCLUDE include/ParsedStochasticGradientDescentTrainerArguments.h
+             include/SGDArguments.h)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

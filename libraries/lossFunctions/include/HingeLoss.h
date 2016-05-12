@@ -16,7 +16,6 @@ namespace lossFunctions
     {
 
     public:
-
         /// <summary> Returns the value of the loss at a given point. </summary>
         ///
         /// <param name="prediction"> The prediction. </param>

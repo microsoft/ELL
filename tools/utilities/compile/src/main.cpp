@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
         auto outStream = utilities::GetOutputStreamImpostor(compileArguments.outputCodeFile);
 
         // load the model, coordinates, and map
-        auto model = common::LoadModel(mapLoadArguments);
+        auto model = common::LoadModel(mapLoadArguments.modelLoadArguments);
         auto mapOutputCoordinates = layers::BuildCoordinateList(model, 0, mapLoadArguments.coordinateListString);
 
         // load the map

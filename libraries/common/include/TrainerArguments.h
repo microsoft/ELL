@@ -16,14 +16,27 @@
 
 namespace common
 {
-    /// <summary> A struct that holds general command line parameters for training algorithms. </summary>
-    struct TrainerArguments
-    {
-        /// <summary> A random seed. </summary>
-        std::string randomSeedString = ""; 
 
-        /// <summary> If `true`, more output is generated. </summary>
-        bool verbose = false; 
+    /// <summary> A struct that holds command line arguments that specify the loss function. </summary>
+    struct LossArguments
+    {
+        enum class LossFunction { squared, log, hinge };
+
+        LossFunction lossFunction = LossFunction::squared;
+        double lossFunctionParameter = 0.0;
+    };
+
+    /// <summary> A struct that holds general command line parameters for training algorithms. </summary>
+    struct TrainerArguments 
+    {
+        /// <summary> The loss arguments. </summary>
+        LossArguments lossArguments;
+
+        /// <summary> A random seed. </summary>
+        std::string randomSeedString = "";
+
+        /// <summary> Generate verbose output. </summary>
+        bool verbose = false;
     };
 
     /// <summary> A version of TrainerArguments that adds its members to the command line parser. </summary>

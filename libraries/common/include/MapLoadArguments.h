@@ -19,8 +19,11 @@
 namespace common
 {
     /// <summary> A struct that holds command line parameters for loading maps. </summary>
-    struct MapLoadArguments : public ModelLoadArguments
+    struct MapLoadArguments
     {
+        /// <summary> The model load arguments. </summary>
+        ParsedModelLoadArguments modelLoadArguments;
+
         /// <summary> The coordinates from the model to use as output. </summary>
         std::string coordinateListString = "";
     };
@@ -32,5 +35,13 @@ namespace common
         ///
         /// <param name="parser"> [in,out] The parser. </param>
         virtual void AddArgs(utilities::CommandLineParser& parser);
+
+        /// <summary> Check arguments. </summary>
+        ///
+        /// <param name="parser"> The parser. </param>
+        ///
+        /// <returns> An utilities::CommandLineParseResult. </returns>
+        virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
+
     };
 }
