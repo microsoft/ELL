@@ -10,11 +10,6 @@
 
 %include "stl.i"
 
-%ignore utilities::operator<<;
-%ignore utilities::MakeAnyIterator;
-%ignore utilities::IteratorBase;
-%ignore utilities::IteratorWrapper;
-
 %{
 #define SWIG_FILE_WITH_INIT
 #include "BinaryClassificationEvaluator.h"
