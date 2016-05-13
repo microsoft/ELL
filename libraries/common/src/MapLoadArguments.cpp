@@ -12,12 +12,7 @@ namespace common
 {
     void ParsedMapLoadArguments::AddArgs(utilities::CommandLineParser& parser)
     {
-        parser.AddOption(
-            inputModelFile,
-            "inputModelFile",
-            "imf",
-            "Path to the input model file",
-            "");
+        modelLoadArguments.AddArgs(parser);
 
         parser.AddOption(
             coordinateListString,
@@ -25,5 +20,10 @@ namespace common
             "cl",
             "Coordinate list definition string (see README)",
             "e");
+    }
+
+    utilities::CommandLineParseResult ParsedMapLoadArguments::PostProcess(const utilities::CommandLineParser & parser)
+    {
+        return modelLoadArguments.PostProcess(parser);
     }
 }

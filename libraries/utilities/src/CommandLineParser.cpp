@@ -408,14 +408,14 @@ namespace utilities
                 uint64_t pad_len = 2 + (longest_name - thisOptionNameLen);
                 std::string padding(pad_len, ' ');
                 out << "\t--" << option_name << padding << info.description;
-                if (info.enum_values.size() > 0)
+                if (info.enumValues.size() > 0)
                 {
                     out << "  {";
                     std::string sep = "";
-                    out << info.enum_values[0];
-                    for (int index = 1; index < info.enum_values.size(); ++index)
+                    out << info.enumValues[0];
+                    for (int index = 1; index < info.enumValues.size(); ++index)
                     {
-                        out << " | " << info.enum_values[index];
+                        out << " | " << info.enumValues[index];
                     }
                     out << "}";
                 }

@@ -35,7 +35,7 @@ namespace dataset
         /// deallocate its memory. </summary>
         virtual void Reset() = 0;
 
-        /// <summary> \returns The number of non-zeros. </summary>
+        /// <summary> Returns the number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
         virtual uint64_t NumNonzeros() const = 0;

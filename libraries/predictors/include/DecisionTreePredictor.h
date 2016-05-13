@@ -19,6 +19,7 @@
 #include <vector>
 #include <cstdint>
 
+/// <summary> predictors namespace </summary>
 namespace predictors
 {
     /// <summary>

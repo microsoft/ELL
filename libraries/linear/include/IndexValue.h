@@ -8,7 +8,7 @@
 
 namespace linear
 {
-    // An entry in a vector
+    /// <summary> An entry in a vector </summary>
     struct IndexValue
     {
         uint64_t index;

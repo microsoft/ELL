@@ -11,6 +11,7 @@
 #include "AnyIterator.h"
 
 #include "SupervisedExample.h"
+#include "RowDataset.h"
 #include "LinearPredictor.h"
 
 // stl
@@ -19,12 +20,24 @@
 
 namespace utilities
 {
+    /// <summary> Interace for a binary classification evaluator. </summary>
+    template<typename PredictorType>
+    class IBinaryClassificationEvaluator
+    {
+    public:
+        typedef dataset::GenericRowDataset::Iterator ExampleIteratorType;
+
+        virtual void Evaluate(ExampleIteratorType& dataIterator, const PredictorType& predictor) = 0;
+
+        virtual void Print(std::ostream& os) const = 0;
+    };
+
     /// <summary> A binary classifier evaluator </summary>
     ///
     /// <typeparam name="PredictorType"> Type of the predictor type. </typeparam>
     /// <typeparam name="LossFunctionType"> Type of the loss function type. </typeparam>
     template<typename PredictorType, typename LossFunctionType>
-    class BinaryClassificationEvaluator
+    class BinaryClassificationEvaluator : public IBinaryClassificationEvaluator<PredictorType>
     {
     public:
 
@@ -35,24 +48,15 @@ namespace utilities
             double error = 0;
         };
         
-        BinaryClassificationEvaluator();
+        
+        BinaryClassificationEvaluator(const LossFunctionType& lossFunction);
 
         /// <summary> Evaluates a binary classifier </summary>
         ///
-        /// <typeparam name="ExampleIteratorType"> Type of the example iterator type. </typeparam>
         /// <param name="dataIterator"> [in,out] The data iterator. </param>
         /// <param name="predictor"> The predictor. </param>
         /// <param name="lossFunction"> The loss function. </param>
-        template<typename ExampleIteratorType>
-        void Evaluate(ExampleIteratorType& dataIterator, const PredictorType& predictor, const LossFunctionType& lossFunction);
-
-        /// <summary> Evaluates a binary classifier </summary>
-        ///
-        /// <typeparam name="ExampleIteratorType"> Type of the example iterator type. </typeparam>
-        /// <param name="dataIterator"> [in,out] The data iterator. </param>
-        /// <param name="predictor"> The predictor. </param>
-        /// <param name="lossFunction"> The loss function. </param>
-        void Evaluate(utilities::AnyIterator<dataset::GenericSupervisedExample>& dataIterator, const PredictorType& predictor, const LossFunctionType& lossFunction);
+        virtual void Evaluate(typename IBinaryClassificationEvaluator<PredictorType>::ExampleIteratorType& dataIterator, const PredictorType& predictor) override;
 
         /// <summary> Returns the most recent average weighted loss. </summary>
         ///
@@ -67,9 +71,10 @@ namespace utilities
         /// <summary> Prints losses and errors to an ostream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
-        void Print(std::ostream& os) const;
+        virtual void Print(std::ostream& os) const override;
 
     private:
+        LossFunctionType _lossFunction;
         std::vector<Result> _evals;
     };
 

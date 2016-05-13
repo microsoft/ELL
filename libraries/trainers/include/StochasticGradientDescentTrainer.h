@@ -11,67 +11,89 @@
 // predictors
 #include "LinearPredictor.h"
 
-// loss functions
-#include "SquaredLoss.h"
-#include "LogLoss.h"
-
 // linear
 #include "DoubleVector.h"
 
 // dataset
 #include "SupervisedExample.h"
-
-// utilities
-#include "AnyIterator.h"
+#include "RowDataset.h"
 
 // stl
 #include <cstdint>
 
 namespace trainers
 {
-    /// <summary>
-    /// Implements the Averaged Stochastic Gradient Descent algorithm on an L2 regularized empirical
-    /// loss.
-    /// </summary>    
-    /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
-    template <typename LossFunctionType>
-    class StochasticGradientDescentTrainer
+    /// <summary> Interface for the stochastic gradient descent trainer. </summary>
+    class IStochasticGradientDescentTrainer
     {
     public:
+        using ExampleIteratorType = dataset::GenericRowDataset::Iterator;
+
+        virtual ~IStochasticGradientDescentTrainer() = default;
+
+        /// <summary> Parameters for the stochastic gradient descent trainer. </summary>
+        struct Parameters
+        {
+            double regularization = 1.0;
+        };
+
+        /// <summary> Performs an epoch of stochastic gradient descent. </summary>
+        ///
+        /// <param name="exampleIterator"> [in,out] The data iterator. </param>
+        virtual void Update(IStochasticGradientDescentTrainer::ExampleIteratorType& exampleIterator) = 0;
+        
+        /// <summary> Returns The averaged predictor. </summary>
+        ///
+        /// <returns> The averaged predictor. </returns>
+        virtual const predictors::LinearPredictor& GetPredictor() const = 0;
+    };
+    
+    /// <summary>
+    /// Implements the averaged stochastic gradient descent algorithm on an L2 regularized empirical
+    /// loss.
+    /// </summary>
+    /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
+    template <typename LossFunctionType>
+    class StochasticGradientDescentTrainer : public IStochasticGradientDescentTrainer
+    {
+    public:
+
         /// <summary> Constructs the trainer. </summary>
         ///
         /// <param name="dim"> The dimension. </param>
+        /// <param name="parameters"> The training Parameters. </param>
         /// <param name="lossFunction"> The loss function. </param>
-        /// <param name="l2Regularization"> The L2 regularization parameter. </param>
-        StochasticGradientDescentTrainer(uint64_t dim, LossFunctionType lossFunction, double l2Regularization);
+        StochasticGradientDescentTrainer(uint64_t dim, const IStochasticGradientDescentTrainer::Parameters& parameters, const LossFunctionType& lossFunction);
 
-        /// <summary> Performs a given number of learning iterations. </summary>
-        ///
-        /// <typeparam name="ExampleIteratorType"> Type of example iterator to use. </typeparam>
-        /// <param name="exampleIterator"> [in,out] The data iterator. </param>
-        /// <param name="numExamples"> The number of examples in the iterator. </param>
-        template<typename ExampleIteratorType>
-        void Update(ExampleIteratorType& exampleIterator);
-
-        /// <summary> Performs a given number of learning iterations. </summary>
+        /// <summary> Performs an epoch of SGD iterations. </summary>
         ///
         /// <param name="exampleIterator"> [in,out] The data iterator. </param>
-        /// <param name="numExamples"> The number of examples in the iterator. </param>
-        void Update(utilities::AnyIterator<dataset::GenericSupervisedExample>& exampleIterator);
+        virtual void Update(IStochasticGradientDescentTrainer::ExampleIteratorType& exampleIterator) override;
 
         /// <summary> Returns The averaged predictor. </summary>
         ///
         /// <returns> The averaged predictor. </returns>
-        const predictors::LinearPredictor& GetPredictor() const;
+        virtual const predictors::LinearPredictor& GetPredictor() const override;
             
     private:
+        IStochasticGradientDescentTrainer::Parameters _parameters;
         LossFunctionType _lossFunction;
-        double _lambda = 0;
 
         uint64_t _total_iterations = 0;
         predictors::LinearPredictor _lastPredictor;
         predictors::LinearPredictor _averagedPredictor;
     };
+
+    /// <summary> Makes a sorting tree trainer. </summary>
+    ///
+    /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
+    /// <param name="dim"> The dimension. </param>
+    /// <param name="parameters"> The trainer parameters. </param>
+    /// <param name="lossFunction"> The loss function. </param>
+    ///
+    /// <returns> A sorting tree trainer </returns>
+    template <typename LossFunctionType>
+    StochasticGradientDescentTrainer<LossFunctionType> MakeStochasticGradientDescentTrainer(uint64_t dim, const IStochasticGradientDescentTrainer::Parameters& parameters, const LossFunctionType& lossFunction);
 }
 
 #include "../tcc/StochasticGradientDescentTrainer.tcc"

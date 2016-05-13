@@ -25,5 +25,20 @@ namespace common
             "v",
             "Verbose output",
             false);
+
+        parser.AddOption(
+            lossArguments.lossFunction,
+           "lossFunction",
+           "lf",
+           "Choice of loss function",
+           {{"squared", LossArguments::LossFunction::squared}, {"hinge", LossArguments::LossFunction::hinge}, {"log", LossArguments::LossFunction::log}},
+           "squared");
+
+        parser.AddOption(
+            lossArguments.lossFunctionParameter,
+            "lossFunctionParameter",
+            "lfp",
+            "Parameter of the loss function",
+            0.0);
     }
 }

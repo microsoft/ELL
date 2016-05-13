@@ -27,13 +27,9 @@ namespace utilities
         public:
 
             /// <summary> Default copy ctor. </summary>
-            ///
-            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
             /// <summary> Default move ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             // Returns true if the std::iterator is currently pointing to a valid iterate
@@ -72,20 +68,16 @@ namespace utilities
         /// <param name="other"> [in,out] The other. </param>
         CompressedIntegerList(CompressedIntegerList&& other) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
+        /// <summary> Default copy constructor. </summary>
         CompressedIntegerList(const CompressedIntegerList&) = default;
 
         /// <summary> Default Destructor. </summary>
         ~CompressedIntegerList() = default;
 
         /// <summary> Deleted assignment operator. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
         void operator= (const CompressedIntegerList&) = delete;
 
-        /// <summary> \returns The number of entries in the list. </summary>
+        /// <summary> Returns The number of entries in the list. </summary>
         ///
         /// <returns> An uint64_t. </returns>
         uint64_t Size() const;
@@ -95,7 +87,7 @@ namespace utilities
         /// <param name="size"> The size. </param>
         void Reserve(uint64_t size);
 
-        /// <summary> \returns The maximal integer in the list. </summary>
+        /// <summary> Returns The maximal integer in the list. </summary>
         ///
         /// <returns> The maximum value. </returns>
         uint64_t Max() const;
@@ -108,7 +100,7 @@ namespace utilities
         /// <summary> Deletes all of the std::vector content and sets its Size to zero. </summary>
         void Reset();
 
-        /// <summary> \Returns a Iterator that points to the beginning of the list. </summary>
+        /// <summary> Returns an `Iterator` that points to the beginning of the list. </summary>
         ///
         /// <returns> The iterator. </returns>
         Iterator GetIterator() const;

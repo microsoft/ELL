@@ -12,8 +12,7 @@
     #include <stdexcept>
 %}
 
-%ignore dataset::operator<<;
-%ignore dataset::RowDataset<>;
+%ignore dataset::GenericRowDataset;
 %ignore dataset::RowDataset;
 %ignore dataset::IDataVector::Clone;
 
@@ -71,4 +70,3 @@ WRAP_PRINT_TO_STR(dataset::DoubleDataVector)
 //WRAP_PRINT_TO_STR(dataset::SparseDoubleDataVector)
 //WRAP_PRINT_TO_STR(dataset::SparseFloatDataVector)
 //WRAP_PRINT_TO_STR(dataset::SparseShortDataVector)
-

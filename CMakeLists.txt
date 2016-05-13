@@ -5,8 +5,23 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 PROJECT(EMLL)
 
+# Define custom configuration types for VS
+if(CMAKE_CONFIGURATION_TYPES)
+#  list(APPEND CMAKE_CONFIGURATION_TYPES Documentation)
+#  list(REMOVE_DUPLICATES CMAKE_CONFIGURATION_TYPES)
+
+  # Copy important configuration info from Release config to new Documentation config  
+  set(CMAKE_CXX_FLAGS_DOCUMENTATION ${CMAKE_CXX_FLAGS_RELEASE})
+  set(CMAKE_C_FLAGS_DOCUMENTATION ${CMAKE_C_FLAGS_RELEASE})
+  set(CMAKE_EXE_LINKER_FLAGS_DOCUMENTATION ${CMAKE_EXE_LINKER_FLAGS_RELEASE})
+  set(CMAKE_EXE_LINKER_FLAGS_DOCUMENTATION ${CMAKE_EXE_LINKER_FLAGS_RELEASE})
+  set(CMAKE_SHARED_LINKER_FLAGS_DOCUMENTATION ${CMAKE_SHARED_LINKER_FLAGS_RELEASE})
+  set(CMAKE_MODULE_LINKER_FLAGS_DOCUMENTATION ${CMAKE_MODULE_LINKER_FLAGS_RELEASE})
+endif()
+
 # Options
-option(SWIG_ENABLED "Enable swig interfaces" OFF)
+option(SWIG_ENABLED "Enable SWIG interfaces" ON)
+option(DOXYGEN_ENABLED "Enable Doxygen interfaces" ON)
 
 # Include modules in the CMake directory.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
@@ -31,8 +46,8 @@ add_subdirectory(libraries/testing)
 add_subdirectory(libraries/trainers)
 add_subdirectory(libraries/treeLayout)
 add_subdirectory(libraries/utilities)
-add_subdirectory(tools/trainers/stochasticGradientDescent)
-add_subdirectory(tools/trainers/sortingTreeLearner)
+add_subdirectory(tools/trainers/stochasticGradientDescentTrainer)
+add_subdirectory(tools/trainers/sortingTreeTrainer)
 add_subdirectory(tools/utilities/apply)
 add_subdirectory(tools/utilities/compile)
 add_subdirectory(tools/utilities/print)
@@ -40,9 +55,9 @@ add_subdirectory(scripts)
 
 # Add SWIG-generated interfaces
 
-if(${SWIG_ENABLED} STREQUAL "ON")
+if(SWIG_ENABLED)
   find_package(SWIG)
-  if(${SWIG_FOUND})
+  if(SWIG_FOUND)
     add_subdirectory(interfaces)
 
     # Add examples
@@ -57,7 +72,26 @@ else()
   message(WARNING "Note: swig interfaces disabled.")
 endif()
 
-# Add solution-level documentation
+# Add project for solution-level documentation
 set (DOC INSTALL.md StyleGuide.md)
 add_custom_target(documentation ALL DEPENDS ${DOC} SOURCES ${DOC})
 
+# Generate doxygen documentation
+if(DOXYGEN_ENABLED)
+  message(STATUS "Doxygen documentation generation enabled")
+  find_package(Doxygen)
+  if(DOXYGEN_FOUND)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+
+    set (DOXYFILE_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
+    add_custom_target(doxygen ALL
+      COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_LOCATION}
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+      COMMENT "Building Doxygen documentation"
+      SOURCES Doxyfile)
+  else()
+    message(WARNING "Doxygen processor not found")
+  endif()
+else()
+  message(STATUS "Doxygen documentation generation disabled")
+endif()

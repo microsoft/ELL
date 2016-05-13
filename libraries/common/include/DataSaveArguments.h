@@ -19,6 +19,7 @@ namespace common
     /// <summary> A struct that holds command line parameters for saving data. </summary>
     struct DataSaveArguments
     {
+        /// <summary> The filename for the output data file. </summary>
         std::string outputDataFile = "";
     };
 

@@ -18,12 +18,11 @@
 namespace trainers
 {
     template<typename LossFunctionType>
-    StochasticGradientDescentTrainer<LossFunctionType>::StochasticGradientDescentTrainer(uint64_t dim, LossFunctionType lossFunction, double lambda) : _lossFunction(lossFunction), _lambda(lambda), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // start with 1 to prevent divide-by-zero
+    StochasticGradientDescentTrainer<LossFunctionType>::StochasticGradientDescentTrainer(uint64_t dim, const IStochasticGradientDescentTrainer::Parameters& parameters, const LossFunctionType& lossFunction) : _parameters(parameters), _lossFunction(lossFunction), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // iteations start from 1 to prevent divide-by-zero
     {}
 
     template<typename LossFunctionType>
-    template<typename ExampleIteratorType>
-    void StochasticGradientDescentTrainer<LossFunctionType>::Update(ExampleIteratorType& exampleIterator)
+    void StochasticGradientDescentTrainer<LossFunctionType>::Update(IStochasticGradientDescentTrainer::ExampleIteratorType& exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetVector();
@@ -35,7 +34,7 @@ namespace trainers
         // define some constants
         const double T_prev = double(_total_iterations);
         const double T_next = T_prev + exampleIterator.NumIteratesLeft();
-        const double eta = 1.0 / _lambda / T_prev;
+        const double eta = 1.0 / _parameters.regularization / T_prev;
         const double sigma = std::log(T_next) + 0.5 / T_next;
 
         // calulate the contribution of the old lastPredictor to the new avergedPredictor
@@ -81,14 +80,14 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void StochasticGradientDescentTrainer<LossFunctionType>::Update(utilities::AnyIterator<dataset::GenericSupervisedExample>& exampleIterator)
-    {
-        Update<decltype(exampleIterator)>(exampleIterator);
-    }
-
-    template<typename LossFunctionType>
     const predictors::LinearPredictor& StochasticGradientDescentTrainer<LossFunctionType>::GetPredictor() const
     {
         return _averagedPredictor;
+    }
+
+    template <typename LossFunctionType>
+    StochasticGradientDescentTrainer<LossFunctionType> MakeStochasticGradientDescentTrainer(uint64_t dim, const IStochasticGradientDescentTrainer::Parameters& parameters, const LossFunctionType& lossFunction)
+    {
+        return StochasticGradientDescentTrainer<LossFunctionType>(dim, parameters, lossFunction);
     }
 }

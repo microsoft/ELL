@@ -81,9 +81,20 @@ namespace utilities
         /// <param name="name"> The long name for the option. The option will be specified by '--' plus the long name (e.g., '--help') </param>
         /// <param name="shortName"> [optional] The short name for the option. The option will be secified by '-' plus the short name (e.g., '-h') </param>
         /// <param name="description"> The descriptive text that appears when help is requested </param>
-        /// <param name="defaultValue"> The default value for the option. The optionVal argument gets set to this if no value is specified on the command line </param>
+        /// <param name="defaultValue"> The default value for the option. The optionValue argument gets set to this if no value is specified on the command line </param>
         template <typename T, typename U>
         void AddOption(T& optionValue, std::string name, std::string shortName, std::string description, const U& defaultValue);
+
+        /// <summary> Adds a new enumerated-value option to the command-line parser </summary>
+        ///
+        /// <param name="optionValue"> [out] A reference to the variable to get filled in by the parser </param> 
+        /// <param name="name"> The long name for the option. The option will be specified by '--' plus the long name (e.g., '--help') </param>
+        /// <param name="shortName"> [optional] The short name for the option. The option will be secified by '-' plus the short name (e.g., '-h') </param>
+        /// <param name="description"> The descriptive text that appears when help is requested </param>
+        /// <param name="enumValues"> A list of allowed option strings and their values for this option.</param>
+        /// <param name="defaultValue"> The default value for this option. The optionValue argument gets set to this if no value is specified on the command line </param>
+		template <typename T>
+		void AddOption(T& optionValue, std::string name, std::string shortName, std::string description, std::initializer_list<std::pair<std::string, T>> enumValues, std::string defaultValue);
 
         /// <summary> Adds a ParsedArgSet representing a bundle of options to the commandline parser </summary>
         ///
@@ -164,7 +175,7 @@ namespace utilities
             std::string description;
             std::string defaultValueString;
             std::string currentValueString;
-            std::vector<std::string> enum_values;
+            std::vector<std::string> enumValues;
             
             std::vector<std::function<bool(std::string)>> set_value_callbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
             std::vector<std::function<bool(std::string)>> didSetValueCallbacks; // callback returns "true" if value was successfully std::set, otherwise "false"

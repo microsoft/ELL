@@ -1,16 +1,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     main.cpp (stochasticGradientDescent)
+//  File:     main.cpp (sortingTreeLearner)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SGDArguments.h"
+#include "ParsedSortingTreeTrainerArguments.h"
 
 // utilities
 #include "Files.h"
-#include "OutputStreamImpostor.h" 
+#include "OutputStreamImpostor.h"
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
 #include "BinaryClassificationEvaluator.h"
@@ -30,12 +30,14 @@
 #include "DataLoadArguments.h" 
 #include "DataLoaders.h"
 #include "LoadModel.h"
+#include "MakeTrainer.h"
+#include "MakeEvaluator.h"
 
 // trainers
-#include "StochasticGradientDescentTrainer.h"
+#include "SortingTreeTrainer.h"
 
 // lossFunctions
-#include "HingeLoss.h"
+#include "SquaredLoss.h"
 #include "LogLoss.h"
 
 // stl
@@ -54,72 +56,69 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
-        ParsedSgdArguments sgdArguments;
+        ParsedSortingTreeTrainerArguments sortingTreeTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
-        commandLineParser.AddOptionSet(sgdArguments);
+        commandLineParser.AddOptionSet(sortingTreeTrainerArguments);
         
         // parse command line
         commandLineParser.Parse();
-
+                
+        if(trainerArguments.verbose) std::cout << "Sorting Tree Trainer" << std::endl;
+        
         // if output file specified, replace stdout with it 
         auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputModelFile);
 
         // load a model
-        auto model = common::LoadModel(mapLoadArguments);
+        auto model = common::LoadModel(mapLoadArguments.modelLoadArguments);
 
         // get output coordinate list and create the map
         auto outputCoordinateList = layers::BuildCoordinateList(model, dataLoadArguments.parsedDataDimension, mapLoadArguments.coordinateListString);
         layers::Map map(model, outputCoordinateList);
 
         // load dataset
-        auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
+        if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
+        auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
         // create sgd trainer
-        lossFunctions::LogLoss loss;
-        trainers::StochasticGradientDescentTrainer<lossFunctions::LogLoss> trainer(outputCoordinateList.Size(), loss, sgdArguments.l2Regularization);
+        auto trainer = common::MakeSortingTreeTrainer(sortingTreeTrainerArguments, trainerArguments.lossArguments);
 
         // create evaluator
-        utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss> evaluator; // TODO give loss in ctor
-        
-        // calculate epoch size
-        uint64_t epochSize = sgdArguments.epochSize;
-        if(epochSize == 0 || epochSize >  rowDataset.NumExamples())
-        {
-            epochSize = rowDataset.NumExamples();
-        }
+        auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::DecisionTreePredictor>(trainerArguments.lossArguments);
 
         // create random number generator
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
 
-        // perform epochs
-        for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
-        {
-            // randomly permute the data
-            rowDataset.RandomPermute(rng, epochSize);
+        // randomly permute the data
+        rowDataset.RandomPermute(rng);
 
-            // iterate over the entire permuted dataset
-            auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-            trainer.Update(trainSetIterator);
-
-            // Evaluate training error
-            auto evaluationIterator = rowDataset.GetIterator();
-            evaluator.Evaluate(evaluationIterator, trainer.GetPredictor(), loss);
-        }
+        // train
+        if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
+        auto dataIterator = rowDataset.GetIterator(0, 1000);
+        auto tree = trainer->Train(dataIterator);
 
         // print loss and errors
-        std::cerr << "training error\n" << evaluator << std::endl;
+        if(trainerArguments.verbose)
+        {
+            std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
 
-        // update the map with the newly learned layers
-        auto predictor = trainer.GetPredictor();
+            auto evaluationIterator = rowDataset.GetIterator(0, 1000);
 
-        predictor.AddToModel(model, outputCoordinateList);
+            evaluator->Evaluate(evaluationIterator, tree);
+            std::cout << "Training error\n";
+            evaluator->Print(std::cout);
+            std::cout << std::endl;
+        }
+
+        // add tree to model
+        tree.AddToModel(model, outputCoordinateList);
 
         // output map
         model.Save(outStream);
+
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
