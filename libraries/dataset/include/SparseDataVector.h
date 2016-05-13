@@ -125,7 +125,7 @@ namespace dataset
         /// <param name="p_other"> [in,out] If non-null, the other. </param>
         /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(double* p_other, double scalar = 1.0) const override;
-        using IVector::AddTo;
+        using linear::IVector::AddTo;
 
         /// <summary> Computes the Dot product. </summary>
         ///
@@ -133,7 +133,7 @@ namespace dataset
         ///
         /// <returns> A double. </returns>
         virtual double Dot(const double* p_other) const override;
-        using IVector::Dot;
+        using linear::IVector::Dot;
 
         /// <summary> Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
         ///

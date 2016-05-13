@@ -15,41 +15,41 @@ namespace interfaces
     //
     // RowDataset
     //
-    RowDataset::RowDataset(dataset::RowDataset<dataset::IDataVector> dataset) : _dataset(std::move(dataset))
+    GenericRowDataset::GenericRowDataset(dataset::RowDataset<dataset::IDataVector> dataset) : _dataset(std::move(dataset))
     {
     }
 
-    uint64_t RowDataset::NumExamples() const
+    uint64_t GenericRowDataset::NumExamples() const
     {
         return _dataset.NumExamples();
     }
 
-    uint64_t RowDataset::GetMaxDataVectorSize() const
+    uint64_t GenericRowDataset::GetMaxDataVectorSize() const
     {
         return _dataset.GetMaxDataVectorSize();
     }
 
-    dataset::GenericSupervisedExample RowDataset::GetExample(uint64_t index) const
+    dataset::GenericSupervisedExample GenericRowDataset::GetExample(uint64_t index) const
     {
         return dataset::GenericSupervisedExample(_dataset.GetExample(index));
     }
 
-    RowDataset::Iterator RowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
+    GenericRowDataset::Iterator GenericRowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
     {
         return _dataset.GetIterator(firstExample, numExamples);
     }
 
-    void RowDataset::AddExample(dataset::GenericSupervisedExample&& example)
+    void GenericRowDataset::AddExample(dataset::GenericSupervisedExample&& example)
     {
         _dataset.AddExample(std::move(example));
     }
 
-    void RowDataset::RandomPermute(std::default_random_engine& rng)
+    void GenericRowDataset::RandomPermute(std::default_random_engine& rng)
     {
         _dataset.RandomPermute(rng);
     }
 
-    void RowDataset::RandomPermute(std::default_random_engine& rng, uint64_t count)
+    void GenericRowDataset::RandomPermute(std::default_random_engine& rng, uint64_t count)
     {
         _dataset.RandomPermute(rng, count);
     }

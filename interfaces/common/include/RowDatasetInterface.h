@@ -20,7 +20,7 @@
 
 namespace interfaces
 {
-    class RowDataset
+    class GenericRowDataset
     {
     public:
         typedef dataset::GenericRowDataset::Iterator Iterator;
@@ -28,7 +28,7 @@ namespace interfaces
         /// <summary> Constructor for RowDataset wrapper</summary>
         ///
         /// <param name="dataset"> The dataset::RowDataset to wrap </param>
-        RowDataset(dataset::RowDataset<dataset::IDataVector> dataset);
+        GenericRowDataset(dataset::RowDataset<dataset::IDataVector> dataset);
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
