@@ -19,6 +19,8 @@ namespace utilities
     class StlIterator
     {
     public:
+        StlIterator() = default;
+        
         /// <summary> Constructor </summary>
         ///
         /// <param name="begin"> The STL iterator pointing to the beginning of the range to iterate over. </param>

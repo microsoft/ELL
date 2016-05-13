@@ -16,6 +16,7 @@ set (SRC src/DataLoadArguments.cpp
          src/DataSaveArguments.cpp
          src/DataLoaders.cpp
          src/LoadModel.cpp
+         src/MakeTrainer.cpp
          src/MapLoadArguments.cpp
          src/MapSaveArguments.cpp
          src/ModelLoadArguments.cpp
@@ -26,23 +27,32 @@ set (INCLUDE include/DataLoadArguments.h
              include/DataSaveArguments.h
              include/DataLoaders.h
              include/LoadModel.h
+             include/MakeEvaluator.h
+             include/MakeTrainer.h
              include/MapLoadArguments.h
              include/MapSaveArguments.h
              include/ModelLoadArguments.h
              include/TrainerArguments.h
 )
 
+set (TCC tcc/MakeEvaluator.tcc)
+
+
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
+source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(../dataset/include)
 include_directories(../layers/include)
 include_directories(../linear/include)
 include_directories(../utilities/include)
+include_directories(../lossFunctions/include)
+include_directories(../predictors/include)
+include_directories(../trainers/include)
 
-add_library(${PROJ_NAME} ${SRC} ${INCLUDE})
-target_link_libraries(${PROJ_NAME} dataset layers linear utilities)
+add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
+target_link_libraries(${PROJ_NAME} dataset layers linear utilities lossFunctions predictors trainers)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
@@ -66,7 +76,7 @@ include_directories(test/include)
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} dataset linear testing utilities)
+target_link_libraries(${TEST_NAME} dataset linear testing utilities lossFunctions predictors trainers)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

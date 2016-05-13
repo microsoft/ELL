@@ -19,7 +19,6 @@ namespace interfaces
     {
     }
 
-
     uint64_t RowDataset::NumExamples() const
     {
         return _dataset.NumExamples();
@@ -35,10 +34,9 @@ namespace interfaces
         return dataset::GenericSupervisedExample(_dataset.GetExample(index));
     }
 
-    utilities::AnyIterator<dataset::GenericSupervisedExample> RowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
+    RowDataset::Iterator RowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
     {
-        auto it = _dataset.GetIterator(firstExample, numExamples);
-        return utilities::MakeAnyIterator(std::move(it));
+        return _dataset.GetIterator(firstExample, numExamples);
     }
 
     void RowDataset::AddExample(dataset::GenericSupervisedExample&& example)

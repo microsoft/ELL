@@ -13,6 +13,7 @@
 // stl
 #include <memory>
 
+/// <summary> dataset namespace </summary>
 namespace dataset
 {
     /// <summary> DataVectorBuilder Base class. </summary>

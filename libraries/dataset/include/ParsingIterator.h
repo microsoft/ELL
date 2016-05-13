@@ -46,7 +46,7 @@ namespace dataset
         /// <summary> Proceeds to the Next row. </summary>
         virtual void Next() override;
 
-        /// <summary> \returns The weight of the current example. </summary>
+        /// <summary> Get the current example. </summary>
         ///
         /// <returns> A SupervisedExample. </returns>
         virtual GenericSupervisedExample Get() const override;
@@ -56,7 +56,7 @@ namespace dataset
         VectorEntryParserType _instanceParser;
     };
 
-    /// <summary> Gets a std::unique_ptr to a Parsing Iterator. </summary>
+    /// <summary> Returns a std::unique_ptr to a Parsing Iterator. </summary>
     ///
     /// <typeparam name="RowIteratorType"> Type of the row iterator type. </typeparam>
     /// <typeparam name="VectorEntryParserType"> Type of the vector entry parser type. </typeparam>

@@ -44,7 +44,7 @@ namespace dataset
         /// <summary> Proceeds to the Next row. </summary>
         void Next();
 
-        /// <summary> \returns A const reference to the row. </summary>
+        /// <summary> Returns a const reference to the row. </summary>
         ///
         /// <returns> A std::shared_ptr&lt;const std::string&gt; </returns>
         std::shared_ptr<const std::string> Get() const;

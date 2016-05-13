@@ -73,12 +73,12 @@ namespace dataset
         /// deallocate its memory. </summary>
         virtual void Reset() override;
 
-        /// <summary> \returns The largest index of a non-zero entry plus one. </summary>
+        /// <summary> The largest index of a non-zero entry plus one. </summary>
         ///
         /// <returns> An uint64_t. </returns>
         virtual uint64_t Size() const override;
 
-        /// <summary> \returns The number of non-zeros. </summary>
+        /// <summary> The number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
         virtual uint64_t NumNonzeros() const override;
@@ -103,7 +103,7 @@ namespace dataset
         virtual double Dot(const double* p_other) const override;
         using IVector::Dot;
 
-        /// <summary> \Returns An Iterator that points to the beginning of the std::vector. </summary>
+        /// <summary> Returns an Iterator that points to the beginning of the std::vector. </summary>
         ///
         /// <returns> The iterator. </returns>
         Iterator GetIterator() const;

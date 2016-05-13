@@ -30,7 +30,7 @@ namespace utilities
         /// <param name="end"> STL iterator pointing at end of range to iterate over </param>
         StlIndexValueIterator(const IteratorType& begin, const IteratorType& end);
 
-        /// <summary> \returns True if the iterator is currently pointing to a valid iterate. </summary>
+        /// <summary> Returns True if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> True if the iterator is currently pointing to a valid iterate. </returns>
         bool IsValid() const;
@@ -38,7 +38,7 @@ namespace utilities
         /// <summary> Proceeds to the Next iterate </summary>
         void Next();
 
-        /// <summary> \returns The current index-value pair </summary>
+        /// <summary> Returns The current index-value pair </summary>
         ///
         /// <returns> The current index-value pair </returns>
         linear::IndexValue Get() const;
