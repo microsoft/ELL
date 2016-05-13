@@ -94,13 +94,13 @@ namespace interfaces
         return GetMappedDataIterator(dataLoadArguments, interfaces::Map(layers::Map(model, mapOutputCoordinates)));
     }
 
-    interfaces::RowDataset GetDataset(const std::string& dataFilename)
+    interfaces::GenericRowDataset GetDataset(const std::string& dataFilename)
     {
        common::DataLoadArguments dataLoadArguments;    
        dataLoadArguments.inputDataFile = dataFilename;
        auto dataIterator = common::GetDataIterator(dataLoadArguments);
 
-        dataset::RowDataset<dataset::IDataVector> rowDataset;
+        dataset::GenericRowDataset rowDataset;
 
         while (dataIterator->IsValid())
         {
@@ -108,12 +108,12 @@ namespace interfaces
             dataIterator->Next();
         }
 
-        return interfaces::RowDataset(std::move(rowDataset));
+        return interfaces::GenericRowDataset(std::move(rowDataset));
     }
 
-    interfaces::RowDataset GetDataset(const common::DataLoadArguments& dataLoadArguments, const interfaces::Map& map)
+    interfaces::GenericRowDataset GetDataset(const common::DataLoadArguments& dataLoadArguments, const interfaces::Map& map)
     {
-        dataset::RowDataset<dataset::IDataVector> rowDataset;
+        dataset::GenericRowDataset rowDataset;
 
         auto dataIterator = GetMappedDataIterator(dataLoadArguments, map.GetMap());
         while (dataIterator->IsValid())
@@ -122,17 +122,17 @@ namespace interfaces
             dataIterator->Next();
         }
 
-        return interfaces::RowDataset(std::move(rowDataset));
+        return interfaces::GenericRowDataset(std::move(rowDataset));
     }
 
-    interfaces::RowDataset GetDataset(const std::string& dataFilename, const interfaces::Map& map)
+    interfaces::GenericRowDataset GetDataset(const std::string& dataFilename, const interfaces::Map& map)
     {
        common::DataLoadArguments dataLoadArguments;
        dataLoadArguments.inputDataFile = dataFilename;
        return interfaces::GetDataset(dataLoadArguments, map);
     }
     
-    interfaces::RowDataset GetDataset(const std::string& dataFilename, const std::string& mapFilename)
+    interfaces::GenericRowDataset GetDataset(const std::string& dataFilename, const std::string& mapFilename)
     {
        common::DataLoadArguments dataLoadArguments;
        common::MapLoadArguments mapLoadArguments;
@@ -142,7 +142,7 @@ namespace interfaces
 
        auto dataIterator = common::GetDataIterator(dataLoadArguments, mapLoadArguments);
 
-        dataset::RowDataset<dataset::IDataVector> rowDataset;
+        dataset::GenericRowDataset rowDataset;
 
         while (dataIterator->IsValid())
         {
@@ -150,6 +150,6 @@ namespace interfaces
             dataIterator->Next();
         }
 
-        return interfaces::RowDataset(std::move(rowDataset));
+        return interfaces::GenericRowDataset(std::move(rowDataset));
     }
 }

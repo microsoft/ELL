@@ -27,7 +27,7 @@ namespace trainers
     class IStochasticGradientDescentTrainer
     {
     public:
-        using ExampleIteratorType = dataset::GenericRowDataset::Iterator;
+        typedef dataset::GenericRowDataset::Iterator ExampleIteratorType;
 
         virtual ~IStochasticGradientDescentTrainer() = default;
 
