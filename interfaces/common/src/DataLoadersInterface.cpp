@@ -138,7 +138,7 @@ namespace interfaces
        common::MapLoadArguments mapLoadArguments;
     
        dataLoadArguments.inputDataFile = dataFilename;
-       mapLoadArguments.inputModelFile = mapFilename;
+       mapLoadArguments.modelLoadArguments.inputModelFile = mapFilename;
 
        auto dataIterator = common::GetDataIterator(dataLoadArguments, mapLoadArguments);
 
