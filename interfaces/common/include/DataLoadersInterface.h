@@ -46,7 +46,7 @@ namespace interfaces
     /// <param name="dataFilename"> The data filename. </param>
     ///
     /// <returns> The row dataset. </returns>
-    interfaces::RowDataset GetDataset(const std::string& dataFilename);
+    interfaces::GenericRowDataset GetDataset(const std::string& dataFilename);
 
     /// <summary> Gets a row dataset from data filename and a map. </summary>
     ///
@@ -54,7 +54,7 @@ namespace interfaces
     /// <param name="map"> The map. </param>
     ///
     /// <returns> The row dataset. </returns>
-    interfaces::RowDataset GetDataset(const std::string& dataFilename, const interfaces::Map& map);
+    interfaces::GenericRowDataset GetDataset(const std::string& dataFilename, const interfaces::Map& map);
 
     /// <summary> Gets a row dataset from data filename and a map filename. </summary>
     ///
@@ -62,5 +62,5 @@ namespace interfaces
     /// <param name="mapFilename"> The map filename. </param>
     ///
     /// <returns> The row dataset. </returns>
-    interfaces::RowDataset GetDataset(const std::string& dataFilename, const std::string& mapFilename);
+    interfaces::GenericRowDataset GetDataset(const std::string& dataFilename, const std::string& mapFilename);
 }

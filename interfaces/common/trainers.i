@@ -17,7 +17,6 @@
 %}
 
 %include "StochasticGradientDescentTrainer.h"
-%ignore IStochasticGradientDescentTrainer;
 
 %template (LogLossOptimizer) trainers::StochasticGradientDescentTrainer<lossFunctions::LogLoss>;
 %template (HingeLossOptimizer) trainers::StochasticGradientDescentTrainer<lossFunctions::HingeLoss>;

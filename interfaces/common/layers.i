@@ -8,11 +8,7 @@
 
 %module "layers"
 
-%ignore Model::GetTypeName;
 %ignore layers::BuildCoordinateList;
-%ignore layers::Map::GetModel() const;
-%ignore layers::Map::GetModel();
-%ignore layers::Model::AddLayer;
 %ignore layers::CoordinateList::operator[];
 %ignore interfaces::Model::GetModel() const;
 
@@ -24,13 +20,9 @@
 #include "CoordinateList.h"
 #include "CoordinateListTools.h"
 #include "Layer.h"
-#include "Model.h"
-#include "Map.h"
 #include "MapInterface.h"
 #include "ModelInterface.h"
-#include "LoadModel.h"
 %}
-
 
 %include "Coordinate.h"
 %include "CoordinateList.h"

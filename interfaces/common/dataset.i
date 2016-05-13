@@ -12,7 +12,7 @@
     #include <stdexcept>
 %}
 
-%ignore dataset::GenericRowDataset;
+%ignore dataset::operator<<;
 %ignore dataset::RowDataset;
 %ignore dataset::IDataVector::Clone;
 
@@ -32,7 +32,6 @@
 #include "IVector.h"
 #include "DenseDataVector.h"
 #include "IDataVector.h"
-#include "RowDataset.h"
 #include "SparseDataVector.h"
 #include "SupervisedExample.h"
 #include "RowDatasetInterface.h"
@@ -43,7 +42,6 @@
 %include "IDataVector.h"
 %include "SparseDataVector.h"
 %include "SupervisedExample.h"
-
 %include "RowDatasetInterface.h"
 
 %include "unique_ptr.i"
