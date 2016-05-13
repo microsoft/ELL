@@ -2,7 +2,7 @@
 # SWIG example projects
 #
 
-set (DATA_FILES test_data.txt)
+set (DATA_FILES testData.txt)
 add_custom_target(datafiles ALL DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
 
 
