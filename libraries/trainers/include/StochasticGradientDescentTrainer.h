@@ -46,6 +46,11 @@ namespace trainers
         ///
         /// <returns> The averaged predictor. </returns>
         virtual const predictors::LinearPredictor& GetPredictor() const = 0;
+
+        /// <summary> Resets the trainer and returns its current predictor. </summary>
+        ///
+        /// <returns> The current predictor. </returns>
+        virtual predictors::LinearPredictor Reset() = 0;
     };
     
     /// <summary>
@@ -74,7 +79,12 @@ namespace trainers
         ///
         /// <returns> The averaged predictor. </returns>
         virtual const predictors::LinearPredictor& GetPredictor() const override;
-            
+
+        /// <summary> Resets the trainer and returns its current predictor. </summary>
+        ///
+        /// <returns> The current predictor. </returns>
+        virtual predictors::LinearPredictor Reset() override;
+
     private:
         IStochasticGradientDescentTrainer::Parameters _parameters;
         LossFunctionType _lossFunction;

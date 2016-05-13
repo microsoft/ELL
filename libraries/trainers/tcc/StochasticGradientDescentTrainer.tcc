@@ -18,7 +18,7 @@
 namespace trainers
 {
     template<typename LossFunctionType>
-    StochasticGradientDescentTrainer<LossFunctionType>::StochasticGradientDescentTrainer(uint64_t dim, const IStochasticGradientDescentTrainer::Parameters& parameters, const LossFunctionType& lossFunction) : _parameters(parameters), _lossFunction(lossFunction), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // iteations start from 1 to prevent divide-by-zero
+    StochasticGradientDescentTrainer<LossFunctionType>::StochasticGradientDescentTrainer(uint64_t dim, const IStochasticGradientDescentTrainer::Parameters& parameters, const LossFunctionType& lossFunction) : _parameters(parameters), _lossFunction(lossFunction), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // iterations start from 1 to prevent divide-by-zero
     {}
 
     template<typename LossFunctionType>
@@ -83,6 +83,16 @@ namespace trainers
     const predictors::LinearPredictor& StochasticGradientDescentTrainer<LossFunctionType>::GetPredictor() const
     {
         return _averagedPredictor;
+    }
+
+    template<typename LossFunctionType>
+    predictors::LinearPredictor StochasticGradientDescentTrainer<LossFunctionType>::Reset()
+    {
+        _total_iterations = 1;
+        _lastPredictor.Reset();
+        predictors::LinearPredictor averagedPredictor(_averagedPredictor.GetDimension());
+        predictors::LinearPredictor::Swap(_averagedPredictor, averagedPredictor);
+        return averagedPredictor;
     }
 
     template <typename LossFunctionType>

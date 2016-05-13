@@ -10,8 +10,9 @@
 
 namespace trainers
 {
+    template <typename TrainerType>
     class MultiEpochMetaTrainer
     {
-    
+        auto Train(ISortingTreeTrainer::ExampleIteratorType exampleIterator) const -> decltype(TrainerType::Reset());
     };
 }

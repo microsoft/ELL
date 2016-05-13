@@ -42,6 +42,17 @@ namespace predictors
         return _b;
     }
 
+    uint64_t LinearPredictor::GetDimension() const
+    {
+        return _w.Size();
+    }
+
+    void LinearPredictor::Reset()
+    {
+        _w.Reset();
+        _b = 0;
+    }
+
     double LinearPredictor::Predict(const dataset::IDataVector& dataVector) const
     {
         return dataVector.Dot(_w) + _b;
@@ -63,5 +74,11 @@ namespace predictors
 
         auto biasLayer = std::make_unique<layers::Coordinatewise>(_b, sumLayerCoordinates[0], layers::Coordinatewise::OperationType::add);
         model.AddLayer(std::move(biasLayer));
+    }
+
+    void LinearPredictor::Swap(LinearPredictor& u, LinearPredictor& v)
+    {
+        linear::DoubleVector::Swap(u._w, v._w);
+        std::swap(u._b, v._b);
     }
 }

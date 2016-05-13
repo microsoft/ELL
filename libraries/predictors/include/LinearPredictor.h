@@ -54,6 +54,11 @@ namespace predictors
         /// <returns> The bias. </returns>
         double GetBias() const;
 
+        /// <summary> Gets the dimension of the linear predictor. </summary>
+        ///
+        /// <returns> The dimension. </returns>
+        uint64_t GetDimension() const;
+
         /// <summary> Returns the output of the predictor for a given example. </summary>
         ///
         /// <param name="example"> The data vector. </param>
@@ -66,11 +71,20 @@ namespace predictors
         /// <param name="scalar"> The scalar. </param>
         void Scale(double scalar);
 
+        /// <summary> Resets the linear predictor to the zero vector with zero bias. </summary>
+        void Reset();
+
         /// <summary> Adds the predictor to a model. </summary>
         ///
         /// <param name="model"> [in,out] The model. </param>
         /// <param name="inputCoordinates"> The input coordinates. </param>
         void AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
+
+        /// <summary> Swaps two linear predictors </summary>
+        ///
+        /// <param name="u"> [in,out] A LinearPredictor. </param>
+        /// <param name="v"> [in,out] A LinearPredictor. </param>
+        static void Swap(LinearPredictor& u, LinearPredictor& v);
 
     private:
         linear::DoubleVector _w;
