@@ -21,12 +21,12 @@ namespace features
     // InputFeature
     //
     
-    InputFeature::InputFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>& inputs, uint64_t size) : RegisteredFeature<InputFeature>(inputs)
+    InputFeature::InputFeature(ctor_enable, const std::vector<Feature*>& inputs, uint64_t size) : RegisteredFeature<InputFeature>(inputs)
     {
         _outputDimension = size;
     }
 
-    std::shared_ptr<InputFeature> InputFeature::Create(uint64_t size)
+    std::unique_ptr<InputFeature> InputFeature::Create(uint64_t size)
     {
         return Allocate({}, size);
     }
@@ -43,7 +43,7 @@ namespace features
         SetDirtyFlag(true); // propagates through graph
     }
 
-    layers::CoordinateList InputFeature::AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const
+    layers::CoordinateList InputFeature::AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const
     {
         throw std::runtime_error("Not implemented");
     }
@@ -54,7 +54,7 @@ namespace features
         description.push_back(to_string(_outputDimension));
     }
 
-    std::shared_ptr<Feature> InputFeature::Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
+    std::unique_ptr<Feature> InputFeature::Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
         assert(params.size() == 3);
         uint64_t size = ParseInt(params[2]);

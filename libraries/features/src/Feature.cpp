@@ -37,12 +37,12 @@ namespace features
         ++_instanceCount;
     }
 
-    Feature::Feature(const std::vector<std::shared_ptr<Feature>>& inputs) : Feature()
+    Feature::Feature(const std::vector<Feature*>& inputs) : Feature()
     {
         _inputFeatures = inputs;
     }
 
-    Feature::Feature(std::string id, const std::vector<std::shared_ptr<Feature>>& inputs) : Feature(id)
+    Feature::Feature(std::string id, const std::vector<Feature*>& inputs) : Feature(id)
     {
         _inputFeatures = inputs;
     }
@@ -124,7 +124,7 @@ namespace features
         return result;
     }
 
-    const std::vector<std::shared_ptr<Feature>>& Feature::GetInputFeatures() const
+    const std::vector<Feature*>& Feature::GetInputFeatures() const
     {
         return _inputFeatures;
     }
@@ -144,7 +144,7 @@ namespace features
         _createTypeMap[class_name] = create_fn;
     }
 
-    void Feature::AddDependent(std::shared_ptr<Feature> f)
+    void Feature::AddDependent(Feature* f)
     {
         _dependents.push_back(f);
     }
@@ -167,7 +167,7 @@ namespace features
         }
     }
 
-    void Feature::AddInputFeature(std::shared_ptr<Feature> inputFeature)
+    void Feature::AddInputFeature(Feature* inputFeature)
     {
         _inputFeatures.push_back(inputFeature);
     }
@@ -192,11 +192,11 @@ namespace features
 
     // searches recursively through input features and returns first InputFeature it finds
     // returns nullptr if it can't find one
-    std::shared_ptr<InputFeature> Feature::FindInputFeature() const
+    InputFeature* Feature::FindInputFeature() const
     {
         for (const auto& inputFeature : _inputFeatures)
         {
-            auto m = std::dynamic_pointer_cast<InputFeature>(inputFeature);
+            auto m = dynamic_cast<InputFeature*>(inputFeature);
             if (m != nullptr)
             {
                 return m;
@@ -210,7 +210,7 @@ namespace features
         return nullptr;
     }
 
-    std::shared_ptr<Feature> Feature::FromDescription(const std::vector<std::string>& description, Feature::FeatureMap& deserializedFeatureMap)
+    std::unique_ptr<Feature> Feature::FromDescription(const std::vector<std::string>& description, Feature::FeatureMap& deserializedFeatureMap)
     {
         std::string featureId = TrimString(description[0]);
         std::string featureClass = TrimString(description[1]);

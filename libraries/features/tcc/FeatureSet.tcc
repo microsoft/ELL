@@ -34,15 +34,16 @@ namespace
 namespace features
 {   
     template <typename FeatureType, typename... Args>
-    std::shared_ptr<FeatureType> FeatureSet::CreateFeature(Args... args)
+    FeatureType* FeatureSet::CreateFeature(Args... args)
     {
-        auto feature = FeatureType::Create(args...);
-
+        _features.emplace_back(FeatureType::Create(args...));
+        auto feature = _features.back().get();
+        
         if(_featureMap.size() == 0)
         {
             if(std::is_same<FeatureType, InputFeature>::value)
             {
-                _inputFeature = std::dynamic_pointer_cast<InputFeature>(feature);
+                _inputFeature = dynamic_cast<InputFeature*>(feature);
             }
             else
             {
@@ -51,8 +52,8 @@ namespace features
         }
                 
         // add to map
-        _featureMap[feature->Id()] = std::shared_ptr<Feature>(feature);
-        return feature;
+        _featureMap[feature->Id()] = feature;
+        return static_cast<FeatureType*>(feature);
     }
     
     template <typename Visitor>
@@ -63,15 +64,15 @@ namespace features
             return;
         }
         
-        std::unordered_set<std::shared_ptr<Feature>> visitedFeatures;
-        std::vector<std::shared_ptr<Feature>> stack;
+        std::unordered_set<Feature*> visitedFeatures;
+        std::vector<Feature*> stack;
 
         // start with output feature in stack
         // TODO: when we have multiple output features, put them all in the stack
         stack.push_back(_outputFeature);
         while (stack.size() > 0)
         {
-            std::shared_ptr<Feature> f = stack.back();
+            Feature* f = stack.back();
 
             // check if we've already visited this node
             if (visitedFeatures.find(f) != visitedFeatures.end()) 
@@ -125,15 +126,15 @@ namespace features
             return;
         }
         
-        std::unordered_set<std::shared_ptr<Feature>> visitedFeatures;
-        std::vector<std::shared_ptr<Feature>> stack;
+        std::unordered_set<Feature*> visitedFeatures;
+        std::vector<Feature*> stack;
 
         // start with output feature in stack
         // TODO: when we have multiple output features, put them all in the stack (and put this code in FeatureSet)
         stack.push_back(_outputFeature);
         while (stack.size() > 0)
         {
-            std::shared_ptr<Feature> f = stack.back();
+            Feature* f = stack.back();
 
             // check if we've already visited this node
             if (visitedFeatures.find(f) != visitedFeatures.end())

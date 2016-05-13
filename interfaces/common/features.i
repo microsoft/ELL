@@ -19,6 +19,10 @@
 #include <sstream>
 %}
 
+%ignore Create;
+%ignore Allocate;
+%ignore Deserialize;
+
 %include "Feature.h"
 %include "InputFeature.h"
 %include "MagnitudeFeature.h"
@@ -65,6 +69,11 @@
 %}
 #endif
 
-%shared_ptr(features::Feature)
-%shared_ptr(features::RegisteredFeature)
-%shared_ptr(features::InputFeature)
+%include "unique_ptr.i"
+wrap_unique_ptr(FeaturePtr, features::Feature)
+wrap_unique_ptr(InputFeaturePtr, features::InputFeature)
+wrap_unique_ptr(MagnitudeFeaturePtr, features::MagnitudeFeature)
+
+//%shared_ptr(features::Feature)
+//%shared_ptr(features::RegisteredFeature)
+//%shared_ptr(features::InputFeature)

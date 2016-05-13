@@ -65,7 +65,7 @@ namespace features
     {
         // read in lines 1 at a time
         std::string lineBuffer;
-        std::shared_ptr<Feature> lastFeature = nullptr;
+        Feature* lastFeature = nullptr;
         while (std::getline(inStream, lineBuffer))
         {
             lineBuffer = TrimString(lineBuffer);
@@ -102,8 +102,9 @@ namespace features
                 std::string error_msg = std::string("Error deserializing feature description: unknown feature type '") + featureClass + "'";
                 throw std::runtime_error(error_msg);
             }
-
-            lastFeature = createFunction(description, _featureMap);
+            
+            _features.emplace_back(createFunction(description, _featureMap));
+            lastFeature = _features.back().get();
             // TODO: throw an exception if new feature's ID isn't unique
             _featureMap[featureId] = lastFeature;
         }
@@ -149,22 +150,22 @@ namespace features
         }
     }
 
-    std::shared_ptr<InputFeature> FeatureSet::GetInputFeature() const
+    InputFeature* FeatureSet::GetInputFeature() const
     {
         return _inputFeature;
     }
 
-    std::shared_ptr<Feature> FeatureSet::GetOutputFeature() const
+    Feature* FeatureSet::GetOutputFeature() const
     {
         return _outputFeature;
     }
     
-    void FeatureSet::SetOutputFeature(const std::shared_ptr<Feature>& output)
+    void FeatureSet::SetOutputFeature(Feature* output)
     {
         _outputFeature = output;
     }
 
-    std::shared_ptr<Feature> FeatureSet::GetFeature(const std::string& featureId) const
+    Feature* FeatureSet::GetFeature(const std::string& featureId) const
     {
         auto it = _featureMap.find(featureId);
         if (it != _featureMap.end())
@@ -177,11 +178,12 @@ namespace features
         }
     }
 
-    std::shared_ptr<Feature> FeatureSet::CreateFeatureFromDescription(const std::vector<std::string>& description)
+    Feature* FeatureSet::CreateFeatureFromDescription(const std::vector<std::string>& description)
     {
-        auto result = Feature::FromDescription(description, _featureMap);
-        _featureMap[result->Id()] = result;
-        return result;
+        _features.emplace_back(Feature::FromDescription(description, _featureMap));
+        auto ptr = _features.back().get();
+        _featureMap[ptr->Id()] = ptr;
+        return ptr;
     }
 
     layers::CoordinateList FeatureSet::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
@@ -191,11 +193,11 @@ namespace features
         assert(_outputFeature != nullptr);
         
         // need to keep a map of output coordinate lists for the various features
-        std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList> featureOutputs;
+        std::unordered_map<const Feature*, layers::CoordinateList> featureOutputs;
         layers::CoordinateList outputCoordinates;
         auto modelAdder = [this, &inputCoordinates, &featureOutputs, &outputCoordinates, &model](const Feature& f)
         {
-            auto featurePtr = f.shared_from_this();
+            auto featurePtr = &f; // bleh
             layers::CoordinateList coordinates;
             if(featurePtr == _inputFeature)
             {

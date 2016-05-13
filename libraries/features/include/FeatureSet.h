@@ -73,23 +73,23 @@ namespace features
         void Reset();
 
         /// <summary> Returns the input for the featurizer. </summary>
-        std::shared_ptr<InputFeature> GetInputFeature() const;
+        InputFeature* GetInputFeature() const;
         
         /// <summary> Gets the output feature for the featurizer. </summary>
-        std::shared_ptr<Feature> GetOutputFeature() const;
+        Feature* GetOutputFeature() const;
         
         /// <summary> Sets the output feature for the featurizer. </summary>
-        void SetOutputFeature(const std::shared_ptr<Feature>& output);
+        void SetOutputFeature(Feature* output);
 
         /// <summary> Retrieves a feature by its ID </summary>
-        std::shared_ptr<Feature> GetFeature(const std::string& featureId) const;
+        Feature* GetFeature(const std::string& featureId) const;
 
         /// <summary> Creates a new feature and adds it to the featurizer </summary>
         template <typename FeatureType, typename... Args>
-        std::shared_ptr<FeatureType> CreateFeature(Args... args);
+        FeatureType* CreateFeature(Args... args);
 
         /// <summary> Creates feature from a string description. Used by serialization and UI code. </summary>
-        std::shared_ptr<Feature> CreateFeatureFromDescription(const std::vector<std::string>& description);
+        Feature* CreateFeatureFromDescription(const std::vector<std::string>& description);
 
         /// <summary> Loads the featurizer from a stream. </summary>
         void Deserialize(std::istream& inStream);
@@ -127,9 +127,10 @@ namespace features
         layers::CoordinateList AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const;
 
     private:
+        std::vector<std::unique_ptr<Feature>> _features;
         Feature::FeatureMap _featureMap;
-        std::shared_ptr<InputFeature> _inputFeature;
-        std::shared_ptr<Feature> _outputFeature;
+        InputFeature* _inputFeature;
+        Feature* _outputFeature;
         mutable size_t _numItemsProcessed = 0;
     };
 }

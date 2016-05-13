@@ -22,14 +22,14 @@ namespace features
     class MagnitudeFeature : public RegisteredFeature<MagnitudeFeature>
     {
     public:
-        static std::shared_ptr<MagnitudeFeature> Create(std::shared_ptr<Feature> inputFeature);
-        static std::shared_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures);
+        static std::unique_ptr<MagnitudeFeature> Create(Feature* inputFeature);
+        static std::unique_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures);
 
-        explicit MagnitudeFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>> &inputs);
+        explicit MagnitudeFeature(ctor_enable, const std::vector<Feature*> &inputs);
         static constexpr const char* feature_name = "Magnitude";
 
     protected:
         virtual std::vector<double> ComputeOutput() const override;
-        virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const override;
+        virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const override;
     };
 }

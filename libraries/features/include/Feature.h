@@ -33,13 +33,13 @@ namespace features
     /// Users of the library will generally only interact with features via the featurizer (`FeatureSet`) object that
     /// owns the individual features.  
     /// </summary>
-    class Feature : public std::enable_shared_from_this<Feature>
+    class Feature
     {
     public:
         Feature();
         Feature(std::string id);
-        Feature(const std::vector<std::shared_ptr<Feature>>& inputs);
-        Feature(std::string Id, const std::vector<std::shared_ptr<Feature>>& inputs);
+        Feature(const std::vector<Feature*>& inputs);
+        Feature(std::string Id, const std::vector<Feature*>& inputs);
         virtual ~Feature() {};
 
         /// <summary> The unique ID of this feature. </summary>
@@ -72,13 +72,13 @@ namespace features
         /// </summary>
         virtual std::vector<std::string> GetColumnDescriptions() const;
         
-        const std::vector<std::shared_ptr<Feature>>& GetInputFeatures() const;
+        const std::vector<Feature*>& GetInputFeatures() const;
 
         /// <summary> Returns a list of the feature types known to the system. Useful for populating a GUI. </summary>
         static std::vector<std::string> GetRegisteredTypes();
         
-        using FeatureMap = std::unordered_map<std::string, std::shared_ptr<Feature>>;
-        using DeserializeFunction = std::function<std::shared_ptr<Feature>(std::vector<std::string>, FeatureMap&)>; // TODO: have creation (deserialization) function take a const FeatureMap&
+        using FeatureMap = std::unordered_map<std::string, Feature*>;
+        using DeserializeFunction = std::function<std::unique_ptr<Feature>(std::vector<std::string>, FeatureMap&)>; // TODO: have creation (deserialization) function take a const FeatureMap&
 
         /// <summary> 
         /// Adds a feature to our list of dependent features. Not meant to be called by client code.
@@ -86,32 +86,32 @@ namespace features
         ///   1) traversing the whole graph (not just the active graph)
         ///   2) propagating the 'dirty' flag when new input arrives  
         /// </summary> 
-        void AddDependent(std::shared_ptr<Feature> f); // TODO: figure out how to make this protected
+        void AddDependent(Feature* f); // TODO: figure out how to make this protected
 
     protected:
         /// <summary> Virtual methods that implement feature-dependent things </summary>
         virtual std::vector<double> ComputeOutput() const = 0;
         virtual void AddToDescription(std::vector<std::string>& description) const {};
-        virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const = 0;        
+        virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const = 0;        
         virtual std::string FeatureType() const = 0;
         
         static void RegisterDeserializeFunction(std::string class_name, DeserializeFunction create_fn);
         bool IsDirty() const;
         void SetDirtyFlag(bool dirty) const;
-        void AddInputFeature(std::shared_ptr<Feature> inputFeature);
+        void AddInputFeature(Feature* inputFeature);
 
-        std::vector<std::shared_ptr<Feature>> _inputFeatures; // parents
+        std::vector<Feature*> _inputFeatures; // parents
         mutable size_t _outputDimension = 0;
         mutable std::vector<double> _cachedValue;
 
     private:
         friend class FeatureSet;
         void Serialize(std::ostream& outStream) const;
-        static std::shared_ptr<Feature> FromDescription(const std::vector<std::string>& description, FeatureMap& deserializedFeatureMap);
-        std::shared_ptr<InputFeature> FindInputFeature() const; // TODO: Remove this, it's unnecessary now (?)
+        static std::unique_ptr<Feature> FromDescription(const std::vector<std::string>& description, FeatureMap& deserializedFeatureMap);
+        InputFeature* FindInputFeature() const; // TODO: Remove this, it's unnecessary now (?)
 
         mutable bool _isDirty = true;
-        std::vector<std::shared_ptr<Feature>> _dependents; // children
+        std::vector<Feature*> _dependents; // children
         std::string _id;
         int _instanceId = 0;
 
@@ -133,11 +133,11 @@ namespace features
     protected:
         virtual std::string FeatureType() const final;
 
-        RegisteredFeature(const std::vector<std::shared_ptr<Feature>>& inputs);
+        RegisteredFeature(const std::vector<Feature*>& inputs);
         
-        // Allocates a new shared_ptr to a feature of type FeatureType
+        // Allocates a new unique_ptr to a feature of type FeatureType
         template <typename ... Args>
-        static std::shared_ptr<FeatureT> Allocate(const std::vector<std::shared_ptr<Feature>>& inputs, Args... args);
+        static std::unique_ptr<FeatureT> Allocate(const std::vector<Feature*>& inputs, Args... args);
 
     };
 }

@@ -31,12 +31,12 @@ namespace features
     //
     // MagnitudeFeature
     //
-    std::shared_ptr<MagnitudeFeature> MagnitudeFeature::Create(std::shared_ptr<Feature> inputFeature)
+    std::unique_ptr<MagnitudeFeature> MagnitudeFeature::Create(Feature* inputFeature)
     {
         return Allocate({inputFeature});
     }
 
-    MagnitudeFeature::MagnitudeFeature(ctor_enable, const std::vector<std::shared_ptr<Feature>>& inputs) : RegisteredFeature<MagnitudeFeature>(inputs)
+    MagnitudeFeature::MagnitudeFeature(ctor_enable, const std::vector<Feature*>& inputs) : RegisteredFeature<MagnitudeFeature>(inputs)
     {}
 
     std::vector<double> MagnitudeFeature::ComputeOutput() const
@@ -53,7 +53,7 @@ namespace features
         return result;
     }
 
-    layers::CoordinateList MagnitudeFeature::AddToModel(layers::Model& model, const std::unordered_map<std::shared_ptr<const Feature>, layers::CoordinateList>& featureOutputs) const
+    layers::CoordinateList MagnitudeFeature::AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const
     {
         auto it = featureOutputs.find(_inputFeatures[0]);
         if (it == featureOutputs.end())
@@ -71,9 +71,9 @@ namespace features
         return outputCoordinates;
     }
 
-    std::shared_ptr<Feature> MagnitudeFeature::Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
+    std::unique_ptr<Feature> MagnitudeFeature::Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
-        std::shared_ptr<Feature> inputFeature = previousFeatures[params[2]];
+        Feature* inputFeature = previousFeatures[params[2]];
         if (inputFeature == nullptr)
         {
             std::string error_msg = std::string("Error deserializing feature description: unknown input feature ") + params[2];

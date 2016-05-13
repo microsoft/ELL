@@ -21,7 +21,7 @@ namespace features
     }
 
     template <typename FeatureT>
-    RegisteredFeature<FeatureT>::RegisteredFeature(const std::vector<std::shared_ptr<Feature>>& inputs) : Feature(inputs)
+    RegisteredFeature<FeatureT>::RegisteredFeature(const std::vector<Feature*>& inputs) : Feature(inputs)
     {        
     }
 
@@ -33,12 +33,12 @@ namespace features
     
     template <typename FeatureT>
     template <typename... Args>
-    std::shared_ptr<FeatureT> RegisteredFeature<FeatureT>::Allocate(const std::vector<std::shared_ptr<Feature>>& inputs, Args ...args)
+    std::unique_ptr<FeatureT> RegisteredFeature<FeatureT>::Allocate(const std::vector<Feature*>& inputs, Args ...args)
     {
-        auto feature = std::make_shared<FeatureT>(ctor_enable(), inputs, args...);
+        auto feature = std::make_unique<FeatureT>(ctor_enable(), inputs, args...);
         for(auto& input: inputs)
         {        
-            input->AddDependent(feature);
+            input->AddDependent(feature.get());
         }
         return feature;
     }    
