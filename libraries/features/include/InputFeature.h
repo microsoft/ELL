@@ -18,15 +18,17 @@
 namespace features
 {
     /// <summary> A feature that  represents an input to the featurizer. It's always the first feature to be added. </summary>
-    class InputFeature : public RegisteredFeature<InputFeature>
+    class InputFeature : public Feature
     {
     public:
         /// <summary> Constructor </summary>
         /// <param name="size"> The dimensionality of the input </param>
-        InputFeature(uint64_t size) : RegisteredFeature<InputFeature>({}) { _outputDimension = size; }
+        InputFeature(uint64_t size) : Feature({}) { _outputDimension = size; }
                 
         /// <summary> Sets the current value of the input </summary>
         void SetValue(std::vector<double> val);
+
+        virtual std::string FeatureType() const override { return feature_name; }
 
         static constexpr const char* feature_name = "Input";
         static std::unique_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& prev_features);

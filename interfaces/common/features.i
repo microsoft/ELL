@@ -57,8 +57,8 @@
 %{
     void InitializeFeatures()
     {
-        features::InputFeature::RegisterFeature();
-        features::MagnitudeFeature::RegisterFeature();
+        features::Feature::RegisterFeatureType<features::InputFeature>();
+        features::Feature::RegisterFeatureType<features::MagnitudeFeature>();
     }
 %}
 

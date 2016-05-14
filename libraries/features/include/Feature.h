@@ -61,6 +61,7 @@ namespace features
         /// </summary>
         virtual std::vector<std::string> GetColumnDescriptions() const;
         
+        /// <summary> Returns the set of inputs to this feature </summary>        
         const std::vector<Feature*>& GetInputFeatures() const;
 
         /// <summary> Returns a list of the feature types known to the system. Useful for populating a GUI. </summary>
@@ -112,23 +113,6 @@ namespace features
 
         static int _instanceCount;
         static std::unordered_map<std::string, DeserializeFunction> _createTypeMap;
-    };
-
-    //
-    // RegisteredFeature
-    //
-    // Superclass for any serializable feature. This class uses the CRTP, so for any subclass, the template parameter is the subclass itself.
-    // e.g., if MyFeature is a subclass of RegisteredFeature<>, it needs to be declared as: class MyFeature : public RegisteredFeature<MyFeature>
-    template <typename FeatureT>
-    class RegisteredFeature : public Feature
-    {
-    public:
-        static void RegisterFeature();
-        
-    protected:
-        virtual std::string FeatureType() const final;
-
-        RegisteredFeature(const std::vector<Feature*>& inputs);
     };
 }
 

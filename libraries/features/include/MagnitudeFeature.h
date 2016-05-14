@@ -19,12 +19,13 @@
 namespace features
 {
     /// <summary> A feature that takes a vector input and returns its magnitude (L2 norm) </summary>
-    class MagnitudeFeature : public RegisteredFeature<MagnitudeFeature>
+    class MagnitudeFeature : public Feature
     {
     public:
-        MagnitudeFeature(Feature* inputFeature) : RegisteredFeature<MagnitudeFeature>({inputFeature}) {}
+        MagnitudeFeature(Feature* inputFeature) : Feature({inputFeature}) {}
         static std::unique_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures);
 
+        virtual std::string FeatureType() const override{ return feature_name; }
         static constexpr const char* feature_name = "Magnitude";
 
     protected:
