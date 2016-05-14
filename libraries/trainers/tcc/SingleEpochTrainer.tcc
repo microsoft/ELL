@@ -9,20 +9,20 @@
 namespace trainers
 {
     template <typename PredictorType>
-    SingleEpochTrainer<PredictorType>::SingleEpochTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer) : 
-        _statefulTrainer(std::move(statefulTrainer)) 
+    SingleEpochTrainer<PredictorType>::SingleEpochTrainer(std::unique_ptr<ILearner<PredictorType>>&& learner) : 
+        _learner(std::move(learner)) 
     {}
     
     template <typename PredictorType>
     PredictorType SingleEpochTrainer<PredictorType>::Train(dataset::GenericRowDataset::Iterator exampleIterator) const
     {
-        _statefulTrainer->Update(exampleIterator);
-        return _statefulTrainer->Reset();
+        _learner->Update(exampleIterator);
+        return _learner->Reset();
     }
 
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeSingleEpochTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer)
+    std::unique_ptr<ITrainer<PredictorType>> MakeSingleEpochTrainer(std::unique_ptr<ILearner<PredictorType>>&& learner)
     {
-        return std::make_unique<SingleEpochTrainer<PredictorType>>(std::move(statefulTrainer));
+        return std::make_unique<SingleEpochTrainer<PredictorType>>(std::move(learner));
     }
 }

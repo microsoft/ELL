@@ -18,7 +18,7 @@
 
 namespace common
 {
-    std::unique_ptr<trainers::IStatefulTrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentLearner(uint64_t dim, const trainers::StochasticGradientDescentLearnerParameters& parameters, const LossArguments& lossArguments)
+    std::unique_ptr<trainers::ILearner<predictors::LinearPredictor>> MakeStochasticGradientDescentLearner(uint64_t dim, const trainers::StochasticGradientDescentLearnerParameters& parameters, const LossArguments& lossArguments)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 

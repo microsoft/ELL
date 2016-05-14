@@ -15,7 +15,7 @@ endif()
 set (SRC src/Nothing.cpp)
 
 set (INCLUDE include/BaggingLearner.h
-             include/IStatefulTrainer.h
+             include/ILearner.h
              include/ITrainer.h
              include/MultiEpochTrainer.h
              include/SingleEpochTrainer.h

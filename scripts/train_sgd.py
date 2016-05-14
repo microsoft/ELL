@@ -7,7 +7,7 @@ outputHtmlFile = args[2]   # The file to write the model diagram to
 outputCodeFile = args[3]   # The file to write the C output code to
 
 # Train a classifier using sgd
-runBinary('stochasticGradientDescentTrainer', ['-idf', inputDatasetFile, '-omf', outputModelFile, '-dd', 'auto'])
+runBinary('StochasticGradientDescentLearner', ['-idf', inputDatasetFile, '-omf', outputModelFile, '-dd', 'auto'])
 
 # Print the classifier to an html file
 runBinary('print', ['-imf', outputModelFile, '-osvg', outputHtmlFile])

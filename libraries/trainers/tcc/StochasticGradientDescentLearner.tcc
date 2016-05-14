@@ -97,7 +97,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<IStatefulTrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentLearner(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType& lossFunction)
+    std::unique_ptr<ILearner<predictors::LinearPredictor>> MakeStochasticGradientDescentLearner(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType& lossFunction)
     {
         return std::make_unique<StochasticGradientDescentLearner<LossFunctionType>>(dim, parameters, lossFunction);
     }

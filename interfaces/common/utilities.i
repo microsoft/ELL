@@ -30,7 +30,6 @@
 
 %include "BinaryClassificationEvaluator.h"
 %include "IIterator.h"
-%include "AnyIterator.h"
 %include "RandomEngines.h"
 
 // This is necessary for us to avoid leaking memory:

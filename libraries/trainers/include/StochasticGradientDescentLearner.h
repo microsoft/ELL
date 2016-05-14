@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include "IStatefulTrainer.h"
+#include "ILearner.h"
+#include "ITrainer.h"
 
 // predictors
 #include "LinearPredictor.h"
@@ -38,7 +39,7 @@ namespace trainers
     /// </summary>
     /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
     template <typename LossFunctionType>
-    class StochasticGradientDescentLearner : public IStatefulTrainer<predictors::LinearPredictor>
+    class StochasticGradientDescentLearner : public ILearner<predictors::LinearPredictor>
     {
     public:
 
@@ -82,7 +83,10 @@ namespace trainers
     ///
     /// <returns> A sorting tree trainer </returns>
     template <typename LossFunctionType>
-    std::unique_ptr<IStatefulTrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentLearner(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType& lossFunction);
+    std::unique_ptr<ILearner<predictors::LinearPredictor>> MakeStochasticGradientDescentLearner(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType& lossFunction);
+
+    template <typename LossFunctionType>
+    std::unique_ptr<ITrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType& lossFunction);
 }
 
 #include "../tcc/StochasticGradientDescentLearner.tcc"

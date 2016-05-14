@@ -9,8 +9,8 @@
 namespace trainers
 {
     template <typename PredictorType>
-    MultiEpochTrainer<PredictorType>::MultiEpochTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer, const MultiEpochTrainerParameters& parameters) :
-        _statefulTrainer(std::move(statefulTrainer)), _parameters(parameters)
+    MultiEpochTrainer<PredictorType>::MultiEpochTrainer(std::unique_ptr<ILearner<PredictorType>>&& learner, const MultiEpochTrainerParameters& parameters) :
+        _learner(std::move(learner)), _parameters(parameters)
     {}
     
     template <typename PredictorType>
@@ -19,14 +19,14 @@ namespace trainers
         // TODO: constuct shallow copy of dataset
         
         // TODO: call the following function _parameters.numEpochs times
-        _statefulTrainer->Update(exampleIterator);
+        _learner->Update(exampleIterator);
 
-        return _statefulTrainer->Reset();
+        return _learner->Reset();
     }
 
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer, const MultiEpochTrainerParameters& parameters)
+    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<ILearner<PredictorType>>&& learner, const MultiEpochTrainerParameters& parameters)
     {
-        return std::make_unique<MultiEpochTrainer<PredictorType>>(std::move(statefulTrainer), parameters);
+        return std::make_unique<MultiEpochTrainer<PredictorType>>(std::move(learner), parameters);
     }
 }

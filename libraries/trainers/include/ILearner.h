@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     IStatefulTrainer.h (trainers)
+//  File:     ILearner.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,11 +17,11 @@ namespace trainers
     ///
     /// <typeparam name="PredictorType"> Type of the predictor created by the trainer. </typeparam>
     template <typename PredictorType>
-    class IStatefulTrainer
+    class ILearner
     {
     public:
 
-        virtual ~IStatefulTrainer() = default;
+        virtual ~ILearner() = default;
 
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
         ///

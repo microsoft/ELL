@@ -10,14 +10,14 @@
 
 %{
 #define SWIG_FILE_WITH_INIT
-#include "StochasticGradientDescentTrainer.h"
+#include "StochasticGradientDescentLearner.h"
 #include "LogLoss.h"
 #include "HingeLoss.h"
 #include "SquaredLoss.h"
 %}
 
-%include "StochasticGradientDescentTrainer.h"
+%include "StochasticGradientDescentLearner.h"
 
-%template (LogLossOptimizer) trainers::StochasticGradientDescentTrainer<lossFunctions::LogLoss>;
-%template (HingeLossOptimizer) trainers::StochasticGradientDescentTrainer<lossFunctions::HingeLoss>;
-%template (SquaredLossOptimizer) trainers::StochasticGradientDescentTrainer<lossFunctions::SquaredLoss>;
+%template (LogLossOptimizer) trainers::StochasticGradientDescentLearner<lossFunctions::LogLoss>;
+%template (HingeLossOptimizer) trainers::StochasticGradientDescentLearner<lossFunctions::HingeLoss>;
+%template (SquaredLossOptimizer) trainers::StochasticGradientDescentLearner<lossFunctions::SquaredLoss>;
