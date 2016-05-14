@@ -13,8 +13,8 @@ To install SWIG on Windows, download the swigwin zip file from <http://swig.org>
 and put it somewhere convenient (for example, C:\swigwin). Make sure you set your PATH environment
 variable to include the swigwin directory.
 
-On other operating systems, download the swig tarball, unpack it, and follow the instructions in the `INSTALL` file.
-
+On other operating systems, download the swig tarball, unpack it, and follow the instructions in the `INSTALL` file.  
+  
 Creating a build environment
 ----------------------------
 CMake is a sort of meta-build system that takes a description of the files and other parameters needed to build a project and
@@ -46,9 +46,9 @@ Make sure you have Visual Studio installed. You can download the free "Visual St
 
    http://www.microsoft.com/express/ 
 
-To create a 32-bit solution for Visual Studio 2015, invoke cmake as follows:
+The library currently can only be built in 64-bit mode on Windows. To create a 64-bit solution for Visual Studio 2015, invoke cmake as follows:
 
-    > cmake -G "Visual Studio 14 2015" ..
+    > cmake -G "Visual Studio 14 2015 Win64" ..
 
 Important: don't forget the two dots (..) at the end of the command! This command creates a solution file named "EMLL.sln" and a bunch of other stuff. There are two ways to build the library. The first option is to open the solution file in Visual Studio and build it there. To do this, simply type:
 
@@ -64,8 +64,4 @@ If you are able to run MSBuild, invoke the following command to build EMLL
 
     > "\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" /m EMLL.sln /p:Configuration=Release 
 
-Both build methods create a directory named "bin" inside "build", and put all of the executables in it. As an alternative to the above, you may want to create a 64-bit solution for Visual Studio 2015. To do this, invoke cmake as follows:
-
-    > cmake -G "Visual Studio 14 2015 Win64" ..
-
-Repeat the build process described above.
+Both build methods create a directory named "bin" inside "build", and put all of the executables in it.
