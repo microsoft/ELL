@@ -12,7 +12,7 @@
 %{
 #define SWIG_FILE_WITH_INIT
 #define SWIG_PYTHON_EXTRA_NATIVE_CONTAINERS 
-#include "DoubleVector.h"
+#include "Feature.h"
 #include "InputFeature.h"
 #include "MagnitudeFeature.h"
 #include "FeatureSet.h"

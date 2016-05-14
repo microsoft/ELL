@@ -31,13 +31,6 @@ namespace features
     //
     // MagnitudeFeature
     //
-    std::unique_ptr<MagnitudeFeature> MagnitudeFeature::Create(Feature* inputFeature)
-    {
-        return Allocate({inputFeature});
-    }
-
-    MagnitudeFeature::MagnitudeFeature(ctor_enable, const std::vector<Feature*>& inputs) : RegisteredFeature<MagnitudeFeature>(inputs)
-    {}
 
     std::vector<double> MagnitudeFeature::ComputeOutput() const
     {
@@ -79,6 +72,6 @@ namespace features
             std::string error_msg = std::string("Error deserializing feature description: unknown input feature ") + params[2];
             throw std::runtime_error(error_msg);
         }
-        return Create(inputFeature);
+        return std::make_unique<MagnitudeFeature>(ctor_enable(), inputFeature);
     }
 }

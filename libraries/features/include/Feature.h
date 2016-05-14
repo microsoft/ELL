@@ -36,10 +36,6 @@ namespace features
     class Feature
     {
     public:
-        Feature();
-        Feature(std::string id);
-        Feature(const std::vector<Feature*>& inputs);
-        Feature(std::string Id, const std::vector<Feature*>& inputs);
         virtual ~Feature() {};
 
         /// <summary> The unique ID of this feature. </summary>
@@ -87,8 +83,14 @@ namespace features
         ///   2) propagating the 'dirty' flag when new input arrives  
         /// </summary> 
         void AddDependent(Feature* f); // TODO: figure out how to make this protected
+        
+        template <typename FeatureType>
+        static void RegisterFeatureType();
 
     protected:
+        Feature(const std::vector<Feature*>& inputs);
+        Feature(std::string Id, const std::vector<Feature*>& inputs);
+
         /// <summary> Virtual methods that implement feature-dependent things </summary>
         virtual std::vector<double> ComputeOutput() const = 0;
         virtual void AddToDescription(std::vector<std::string>& description) const {};
@@ -134,11 +136,6 @@ namespace features
         virtual std::string FeatureType() const final;
 
         RegisteredFeature(const std::vector<Feature*>& inputs);
-        
-        // Allocates a new unique_ptr to a feature of type FeatureType
-        template <typename ... Args>
-        static std::unique_ptr<FeatureT> Allocate(const std::vector<Feature*>& inputs, Args... args);
-
     };
 }
 

@@ -23,28 +23,24 @@ namespace features
     int Feature::_instanceCount = 0;
     std::unordered_map<std::string, Feature::DeserializeFunction> Feature::_createTypeMap;
 
-    Feature::Feature() : _isDirty(true)
+    Feature::Feature(const std::vector<Feature*>& inputs) : _isDirty(true), _inputFeatures(inputs)
     {
         using std::to_string;
         // create id
         _instanceId = _instanceCount;
         ++_instanceCount;
         _id = "f_" + to_string(_instanceId);
+        
+        for(auto input: inputs)
+        {
+            input->AddDependent(this);
+        }
     }
-    
-    Feature::Feature(std::string id) : _isDirty(true), _id(id)
+
+    Feature::Feature(std::string id, const std::vector<Feature*>& inputs) : _id(id), _isDirty(true), _inputFeatures(inputs) 
     {
+        // TODO: ensure id is unique?
         ++_instanceCount;
-    }
-
-    Feature::Feature(const std::vector<Feature*>& inputs) : Feature()
-    {
-        _inputFeatures = inputs;
-    }
-
-    Feature::Feature(std::string id, const std::vector<Feature*>& inputs) : Feature(id)
-    {
-        _inputFeatures = inputs;
     }
 
     std::string Feature::Id() const

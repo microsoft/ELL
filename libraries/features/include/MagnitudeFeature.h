@@ -22,10 +22,9 @@ namespace features
     class MagnitudeFeature : public RegisteredFeature<MagnitudeFeature>
     {
     public:
-        static std::unique_ptr<MagnitudeFeature> Create(Feature* inputFeature);
+        MagnitudeFeature(ctor_enable, Feature* inputFeature) : RegisteredFeature<MagnitudeFeature>({inputFeature}) {}
         static std::unique_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures);
 
-        explicit MagnitudeFeature(ctor_enable, const std::vector<Feature*> &inputs);
         static constexpr const char* feature_name = "Magnitude";
 
     protected:

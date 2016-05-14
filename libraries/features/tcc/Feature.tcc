@@ -20,6 +20,12 @@ namespace features
         RegisterDeserializeFunction(FeatureT::feature_name, FeatureT::Deserialize);
     }
 
+    template <typename FeatureType>
+    void Feature<FeatureType>::RegisterFeatureType()
+    {        
+        RegisterDeserializeFunction(FeatureT::feature_name, FeatureT::Deserialize);
+    }
+
     template <typename FeatureT>
     RegisteredFeature<FeatureT>::RegisteredFeature(const std::vector<Feature*>& inputs) : Feature(inputs)
     {        
@@ -30,16 +36,4 @@ namespace features
     {
         return FeatureT::feature_name;
     }
-    
-    template <typename FeatureT>
-    template <typename... Args>
-    std::unique_ptr<FeatureT> RegisteredFeature<FeatureT>::Allocate(const std::vector<Feature*>& inputs, Args ...args)
-    {
-        auto feature = std::make_unique<FeatureT>(ctor_enable(), inputs, args...);
-        for(auto& input: inputs)
-        {        
-            input->AddDependent(feature.get());
-        }
-        return feature;
-    }    
 }

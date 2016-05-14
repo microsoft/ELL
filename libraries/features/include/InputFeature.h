@@ -21,18 +21,17 @@ namespace features
     class InputFeature : public RegisteredFeature<InputFeature>
     {
     public:
-        /// <summary> Factory function. </summary>
-        /// <param name="size"> The dimensionality of the input expected by the feature </param>
-        /// <returns> A `unique_ptr` to a newly-created input feature of the requested dimensionality. </returns>
-        static std::unique_ptr<InputFeature> Create(uint64_t size);
-        
+        InputFeature(ctor_enable, uint64_t size) : RegisteredFeature<InputFeature>({})
+        {
+            _outputDimension = size;
+        };
+                
         /// <summary> Sets the current value of the input </summary>
         void SetValue(std::vector<double> val);
 
         static constexpr const char* feature_name = "Input";
 
         static std::unique_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& prev_features);
-        explicit InputFeature(ctor_enable, const std::vector<Feature*>&, uint64_t size);
 
     protected:
         virtual std::vector<double> ComputeOutput() const override;

@@ -20,16 +20,6 @@ namespace features
     //
     // InputFeature
     //
-    
-    InputFeature::InputFeature(ctor_enable, const std::vector<Feature*>& inputs, uint64_t size) : RegisteredFeature<InputFeature>(inputs)
-    {
-        _outputDimension = size;
-    }
-
-    std::unique_ptr<InputFeature> InputFeature::Create(uint64_t size)
-    {
-        return Allocate({}, size);
-    }
 
     std::vector<double> InputFeature::ComputeOutput() const
     {
@@ -58,6 +48,6 @@ namespace features
     {
         assert(params.size() == 3);
         uint64_t size = ParseInt(params[2]);
-        return Create(size);
+        return std::make_unique<InputFeature>(ctor_enable(), size);
     }    
 }
