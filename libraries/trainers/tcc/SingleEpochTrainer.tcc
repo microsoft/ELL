@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MetaTrainer.tcc (trainers)
+//  File:     SingleEpochTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,20 +9,20 @@
 namespace trainers
 {
     template <typename PredictorType>
-    MetaTrainer<PredictorType>::MetaTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer) : 
+    SingleEpochTrainer<PredictorType>::SingleEpochTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer) : 
         _statefulTrainer(std::move(statefulTrainer)) 
     {}
     
     template <typename PredictorType>
-    PredictorType MetaTrainer<PredictorType>::Train(dataset::GenericRowDataset::Iterator exampleIterator) const
+    PredictorType SingleEpochTrainer<PredictorType>::Train(dataset::GenericRowDataset::Iterator exampleIterator) const
     {
         _statefulTrainer->Update(exampleIterator);
         return _statefulTrainer->Reset();
     }
 
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeMetaTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer)
+    std::unique_ptr<ITrainer<PredictorType>> MakeSingleEpochTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer)
     {
-        return std::make_unique<MetaTrainer<PredictorType>>(std::move(statefulTrainer));
+        return std::make_unique<SingleEpochTrainer<PredictorType>>(std::move(statefulTrainer));
     }
 }

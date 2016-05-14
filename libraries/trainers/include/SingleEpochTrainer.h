@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MetaTrainer.h (trainers)
+//  File:     SingleEpochTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,15 +24,15 @@ namespace trainers
     ///
     /// <typeparam name="PredictorType"> The type of predictor returned by this trainer. </typeparam>
     template <typename PredictorType>
-    class MetaTrainer : public ITrainer<PredictorType>
+    class SingleEpochTrainer : public ITrainer<PredictorType>
     {
     public:
-        MetaTrainer() = delete;
+        SingleEpochTrainer() = delete;
 
-        /// <summary> Constructs an instance of MetaTrainer. </summary>
+        /// <summary> Constructs an instance of SingleEpochTrainer. </summary>
         ///
         /// <param name="statefulTrainer"> [in,out] The stateful trainer. </param>
-        MetaTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer);
+        SingleEpochTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer);
         
         /// <summary> Trains and returns a predictor. </summary>
         ///
@@ -46,7 +46,7 @@ namespace trainers
     };
 
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeMetaTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer);
+    std::unique_ptr<ITrainer<PredictorType>> MakeSingleEpochTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer);
 }
 
-#include "../tcc/MetaTrainer.tcc"
+#include "../tcc/SingleEpochTrainer.tcc"

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MultiEpochMetaTrainer.h (trainers)
+//  File:     MultiEpochTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@
 namespace trainers
 {
     /// <summary> Parameters for the multi-epoch meta-trainer. </summary>
-    struct MultiEpochMetaTrainerParameters
+    struct MultiEpochTrainerParameters
     {
         uint64_t numEpochs = 1;
     };
@@ -30,15 +30,15 @@ namespace trainers
     ///
     /// <typeparam name="PredictorType"> The type of predictor returned by this trainer. </typeparam>
     template <typename PredictorType>
-    class MultiEpochMetaTrainer : public ITrainer<PredictorType>
+    class MultiEpochTrainer : public ITrainer<PredictorType>
     {
     public:
-        MultiEpochMetaTrainer() = delete;
+        MultiEpochTrainer() = delete;
 
-        /// <summary> Constructs an instance of MultiEpochMetaTrainer. </summary>
+        /// <summary> Constructs an instance of MultiEpochTrainer. </summary>
         ///
         /// <param name="statefulTrainer"> [in,out] The stateful trainer. </param>
-        MultiEpochMetaTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer, const MultiEpochMetaTrainerParameters& parameters);
+        MultiEpochTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer, const MultiEpochTrainerParameters& parameters);
 
         /// <summary> Trains and returns a predictor. </summary>
         ///
@@ -49,11 +49,11 @@ namespace trainers
 
     private:
         std::unique_ptr<IStatefulTrainer<PredictorType>> _statefulTrainer;
-        MultiEpochMetaTrainerParameters _parameters;
+        MultiEpochTrainerParameters _parameters;
     };
 
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochMetaTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer);
+    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer);
 }
 
-#include "../tcc/MultiEpochMetaTrainer.tcc"
+#include "../tcc/MultiEpochTrainer.tcc"

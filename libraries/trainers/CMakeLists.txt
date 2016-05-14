@@ -14,15 +14,16 @@ endif()
 
 set (SRC src/StochasticGradientDescentTrainer.cpp)
 
-set (INCLUDE include/IStatefulTrainer.h
+set (INCLUDE include/BaggingLearner.h
+             include/IStatefulTrainer.h
              include/ITrainer.h
-             include/MultiEpochMetaTrainer.h
-             include/MetaTrainer.h
+             include/MultiEpochTrainer.h
+             include/SingleEpochTrainer.h
              include/SortingTreeTrainer.h
              include/StochasticGradientDescentTrainer.h)
 
-set (TCC tcc/MetaTrainer.tcc
-         tcc/MultiEpochMetaTrainer.tcc
+set (TCC tcc/SingleEpochTrainer.tcc
+         tcc/MultiEpochTrainer.tcc
          tcc/SortingTreeTrainer.tcc
          tcc/StochasticGradientDescentTrainer.tcc)
 

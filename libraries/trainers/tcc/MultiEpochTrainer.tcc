@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MultiEpochMetaTrainer.tcc (trainers)
+//  File:     MultiEpochTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,12 +9,12 @@
 namespace trainers
 {
     template <typename PredictorType>
-    MultiEpochMetaTrainer<PredictorType>::MultiEpochMetaTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer, const MultiEpochMetaTrainerParameters& parameters) :
+    MultiEpochTrainer<PredictorType>::MultiEpochTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer, const MultiEpochTrainerParameters& parameters) :
         _statefulTrainer(std::move(statefulTrainer)), _parameters(parameters)
     {}
     
     template <typename PredictorType>
-    PredictorType MultiEpochMetaTrainer<PredictorType>::Train(dataset::GenericRowDataset::Iterator exampleIterator) const
+    PredictorType MultiEpochTrainer<PredictorType>::Train(dataset::GenericRowDataset::Iterator exampleIterator) const
     {
         // TODO: constuct shallow copy of dataset
         
@@ -25,8 +25,8 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochMetaTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer, const MultiEpochMetaTrainerParameters& parameters)
+    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer, const MultiEpochTrainerParameters& parameters)
     {
-        return std::make_unique<MultiEpochMetaTrainer<PredictorType>>(std::move(statefulTrainer), parameters);
+        return std::make_unique<MultiEpochTrainer<PredictorType>>(std::move(statefulTrainer), parameters);
     }
 }

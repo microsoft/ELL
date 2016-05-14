@@ -36,8 +36,8 @@
 
 // trainers
 #include "StochasticGradientDescentTrainer.h"
-#include "MultiEpochMetaTrainer.h"
-#include "MetaTrainer.h"
+#include "MultiEpochTrainer.h"
+#include "SingleEpochTrainer.h"
 
 // lossFunctions
 #include "HingeLoss.h"
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
 
         // create sgd trainer
         auto trainer = common::MakeStochasticGradientDescentTrainer(outputCoordinateList.Size(), stochasticGradientDescentTrainerArguments, trainerArguments.lossArguments);
-        auto trainer2 = trainers::MakeMetaTrainer(std::move(trainer));
+        auto trainer2 = trainers::MakeSingleEpochTrainer(std::move(trainer));
 
         // create evaluator
         auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::LinearPredictor>(trainerArguments.lossArguments);
