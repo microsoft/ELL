@@ -37,6 +37,7 @@
 // trainers
 #include "StochasticGradientDescentTrainer.h"
 #include "MultiEpochMetaTrainer.h"
+#include "MetaTrainer.h"
 
 // lossFunctions
 #include "HingeLoss.h"
@@ -90,8 +91,7 @@ int main(int argc, char* argv[])
 
         // create sgd trainer
         auto trainer = common::MakeStochasticGradientDescentTrainer(outputCoordinateList.Size(), stochasticGradientDescentTrainerArguments, trainerArguments.lossArguments);
-
-        //auto trainer2 = trainers::MakeMultiEpochMetaTrainer(std::move(trainer));
+        auto trainer2 = trainers::MakeMetaTrainer(std::move(trainer));
 
         // create evaluator
         auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::LinearPredictor>(trainerArguments.lossArguments);
@@ -116,6 +116,8 @@ int main(int argc, char* argv[])
             // iterate over the entire permuted dataset
             auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
             trainer->Update(trainSetIterator);
+
+            trainer2->Train(trainSetIterator); // XXX
 
             // Evaluate training error
             auto evaluationIterator = rowDataset.GetIterator();

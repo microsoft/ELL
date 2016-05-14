@@ -17,10 +17,13 @@ set (SRC src/StochasticGradientDescentTrainer.cpp)
 set (INCLUDE include/IStatefulTrainer.h
              include/ITrainer.h
              include/MultiEpochMetaTrainer.h
+             include/MetaTrainer.h
              include/SortingTreeTrainer.h
              include/StochasticGradientDescentTrainer.h)
 
-set (TCC tcc/SortingTreeTrainer.tcc
+set (TCC tcc/MetaTrainer.tcc
+         tcc/MultiEpochMetaTrainer.tcc
+         tcc/SortingTreeTrainer.tcc
          tcc/StochasticGradientDescentTrainer.tcc)
 
 source_group("src" FILES ${SRC})
