@@ -45,9 +45,9 @@ namespace trainers
 
         /// <summary> Trains a decision tree. </summary>
         ///
-        /// <param name="exampleIterator"> [in,out] The example iterator. </param>
+        /// <param name="exampleIterator"> An example iterator that represents the training set.  </param>
         ///
-        /// <returns> A decision tree. </returns>
+        /// <returns> The trained decision tree. </returns>
         virtual predictors::DecisionTreePredictor Train(dataset::GenericRowDataset::Iterator exampleIterator) const override;
 
     private:
