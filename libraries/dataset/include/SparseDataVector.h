@@ -55,7 +55,7 @@ namespace dataset
             /// <summary> Proceeds to the Next iterate. </summary>
             void Next();
 
-            /// <summary> \returns The current index-value pair. </summary>
+            /// <summary> Returns The current index-value pair. </summary>
             ///
             /// <returns> An IndexValue. </returns>
             linear::IndexValue Get() const;
@@ -105,12 +105,12 @@ namespace dataset
         /// its memory. </summary>
         virtual void Reset() override;
 
-        /// <summary> \returns The largest index of a non-zero entry plus one. </summary>
+        /// <summary> Returns The largest index of a non-zero entry plus one. </summary>
         ///
         /// <returns> An uint64_t. </returns>
         virtual uint64_t Size() const override;
 
-        /// <summary> \returns The number of non-zeros. </summary>
+        /// <summary> Returns The number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
         virtual uint64_t NumNonzeros() const override;
@@ -125,7 +125,7 @@ namespace dataset
         /// <param name="p_other"> [in,out] If non-null, the other. </param>
         /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(double* p_other, double scalar = 1.0) const override;
-        using IVector::AddTo;
+        using linear::IVector::AddTo;
 
         /// <summary> Computes the Dot product. </summary>
         ///
@@ -133,9 +133,9 @@ namespace dataset
         ///
         /// <returns> A double. </returns>
         virtual double Dot(const double* p_other) const override;
-        using IVector::Dot;
+        using linear::IVector::Dot;
 
-        /// <summary> \Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
+        /// <summary> Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
         ///
         /// <returns> The iterator. </returns>
         Iterator GetIterator() const;

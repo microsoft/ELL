@@ -54,9 +54,9 @@ namespace layers
             return addOperationName;
         case OperationType::multiply:
             return multiplyOperationName;
+        default:
+            throw std::runtime_error("unrecognized operation type");
         }
-
-        throw std::runtime_error("unrecognized operation type");
     }
 
     Coordinatewise::OperationType Coordinatewise::GetOperationType(const std::string& name)
@@ -83,12 +83,10 @@ namespace layers
             return std::plus<double>();
         case OperationType::multiply:
             return std::multiplies<double>();
-
+        default:
+            throw std::runtime_error("unrecognized operation type");
         }
-
-        throw std::runtime_error("unrecognized operation type");
     }
-
 
     Coordinatewise::OperationType Coordinatewise::GetOperationType() const
     {
@@ -159,5 +157,3 @@ namespace layers
         serializer.Serialize("coordinates", _inputCoordinates);
     }
 }
-
-

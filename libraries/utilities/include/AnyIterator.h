@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-//4
+//
 //  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     AnyIterator.h (utilities)
 //  Authors:  Chuck Jacobs
@@ -10,11 +10,12 @@
 
 #include "IIterator.h"
 
-/// stl
+// stl
 #include <functional>
 #include <memory>
 #include <utility>
 
+/// <summary> utilities namespace </summary>
 namespace utilities
 {
     // Forward declaration necessary so we can declare the MakeAnyIterator functions, so we can then declare them as friends.

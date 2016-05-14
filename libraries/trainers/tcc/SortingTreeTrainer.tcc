@@ -9,12 +9,11 @@
 namespace trainers
 {    
     template <typename LossFunctionType>
-    SortingTreeTrainer<LossFunctionType>::SortingTreeTrainer(LossFunctionType lossFunction) : _lossFunction(lossFunction)
+    SortingTreeTrainer<LossFunctionType>::SortingTreeTrainer(const ISortingTreeTrainer::Parameters& parameters, const LossFunctionType& lossFunction) : _parameters(parameters), _lossFunction(lossFunction)
     {}
 
     template <typename LossFunctionType>
-    template <typename ExampleIteratorType>
-    predictors::DecisionTreePredictor SortingTreeTrainer<LossFunctionType>::Train(ExampleIteratorType exampleIterator)
+    predictors::DecisionTreePredictor SortingTreeTrainer<LossFunctionType>::Train(ISortingTreeTrainer::ExampleIteratorType exampleIterator) const
     {
         // convert data fron iterator to dense row dataset; compute sums statistics of the tree root
         auto sums = LoadData(exampleIterator);
@@ -65,8 +64,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    template <typename ExampleIteratorType>
-    typename SortingTreeTrainer<LossFunctionType>::Sums SortingTreeTrainer<LossFunctionType>::LoadData(ExampleIteratorType exampleIterator)
+    typename SortingTreeTrainer<LossFunctionType>::Sums SortingTreeTrainer<LossFunctionType>::LoadData(ISortingTreeTrainer::ExampleIteratorType exampleIterator) const
     {
         Sums sums;
 
@@ -86,7 +84,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void SortingTreeTrainer<LossFunctionType>::AddSplitCandidateToQueue(predictors::DecisionTreePredictor::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums)
+    void SortingTreeTrainer<LossFunctionType>::AddSplitCandidateToQueue(predictors::DecisionTreePredictor::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums) const
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 
@@ -142,7 +140,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void SortingTreeTrainer<LossFunctionType>::SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size)
+    void SortingTreeTrainer<LossFunctionType>::SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size) const
     {
         _dataset.Sort([featureIndex](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[featureIndex]; },
             fromRowIndex,
@@ -171,12 +169,18 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void SortingTreeTrainer<LossFunctionType>::Cleanup()
+    void SortingTreeTrainer<LossFunctionType>::Cleanup() const
     {
         _dataset.Reset();
         while (!_queue.empty())
         {
             _queue.pop();
         }
+    }
+
+    template<typename LossFunctionType>
+    SortingTreeTrainer<LossFunctionType> MakeSortingTreeTrainer(const ISortingTreeTrainer::Parameters& parameters, const LossFunctionType& lossFunction)
+    {
+        return SortingTreeTrainer<LossFunctionType>(parameters, lossFunction);
     }
 }

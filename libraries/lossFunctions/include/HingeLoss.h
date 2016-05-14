@@ -8,6 +8,7 @@
 
 #pragma once
 
+/// <summary> %lossFunctions namespace </summary>
 namespace lossFunctions
 {
     /// <summary> Implements the hinge loss function: loss(x) = max(1-x, 0) </summary>
@@ -15,7 +16,6 @@ namespace lossFunctions
     {
 
     public:
-
         /// <summary> Returns the value of the loss at a given point. </summary>
         ///
         /// <param name="prediction"> The prediction. </param>

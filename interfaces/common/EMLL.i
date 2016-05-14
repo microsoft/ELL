@@ -60,16 +60,6 @@ namespace std
     class default_random_engine {};
 }
 
-%ignore utilities::operator<<;
-%ignore dataset::operator<<;
-
-%ignore dataset::DataRow<void>;
-%ignore layers::Map::GetModel() const;
-%ignore layers::Map::GetModel();
-%ignore predictors::LinearPredictor::AddToModel(layers::Model&, const layers::CoordinateList& ) const;
-%ignore layers::Model::AddLayer;
-%ignore utilities::IteratorBase;
-
 // Redefine uint64_t to long so we can use them in python
 %typemap(in) uint64_t = unsigned long;
 %apply unsigned long {uint64_t}

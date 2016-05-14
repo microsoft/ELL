@@ -19,6 +19,7 @@ namespace common
     /// <summary> A struct that holds command line parameters for loading maps. </summary>
     struct ModelLoadArguments
     {
+        /// <summary> The file to read a model from. </summary>
         std::string inputModelFile = "";
     };
 

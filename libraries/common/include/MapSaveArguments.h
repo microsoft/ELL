@@ -19,6 +19,7 @@ namespace common
     /// <summary> A struct that holds command line parameters for saving maps. </summary>
     struct MapSaveArguments
     {
+        /// <summary> The filename to store the output model in. </summary>
         std::string outputModelFile = "";
     };
 

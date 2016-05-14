@@ -20,13 +20,15 @@
 
 namespace interfaces
 {
-    class RowDataset
+    class GenericRowDataset
     {
     public:
+        typedef dataset::GenericRowDataset::Iterator Iterator;
+
         /// <summary> Constructor for RowDataset wrapper</summary>
         ///
         /// <param name="dataset"> The dataset::RowDataset to wrap </param>
-        RowDataset(dataset::RowDataset<dataset::IDataVector> dataset);
+        GenericRowDataset(dataset::RowDataset<dataset::IDataVector> dataset);
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
@@ -52,7 +54,7 @@ namespace interfaces
         /// examples. </param>
         ///
         /// <returns> The iterator. </returns>
-        utilities::AnyIterator<dataset::GenericSupervisedExample> GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
+        Iterator GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///

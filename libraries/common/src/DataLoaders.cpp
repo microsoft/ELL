@@ -60,7 +60,7 @@ namespace common
     std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments, const MapLoadArguments& mapLoadArguments)
     {
         // read model file
-        auto model = common::LoadModel(mapLoadArguments);
+        auto model = common::LoadModel(mapLoadArguments.modelLoadArguments);
 
         // get map output coordinate list
         auto mapOutputCoordinates = layers::BuildCoordinateList(model, dataLoadArguments.parsedDataDimension, mapLoadArguments.coordinateListString);
@@ -69,11 +69,11 @@ namespace common
         return GetMappedDataIterator(dataLoadArguments, layers::Map(model, mapOutputCoordinates));
     }
 
-    dataset::RowDataset<> GetRowDataset(const DataLoadArguments& dataLoadArguments, layers::Map map)
+    dataset::GenericRowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments, layers::Map map)
     {
         auto dataIterator = GetMappedDataIterator(dataLoadArguments, map);
 
-        dataset::RowDataset<> rowDataset;
+        dataset::GenericRowDataset rowDataset;
 
         while (dataIterator->IsValid())
         {

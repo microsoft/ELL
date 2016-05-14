@@ -10,22 +10,23 @@
 
 %include "stl.i"
 
+%ignore utilities::operator<<;
+%ignore utilities::MakeAnyIterator;
+%ignore utilities::IteratorBase;
+%ignore utilities::IteratorWrapper;
+
 %{
 #define SWIG_FILE_WITH_INIT
 #include "BinaryClassificationEvaluator.h"
-#include "LogLoss.h"
-#include "HingeLoss.h"
-#include "SquaredLoss.h"
 #include "IIterator.h"
 #include "AnyIterator.h"
 #include "RandomEngines.h"
 #include "StlIterator.h"
 #include "StlIndexValueIterator.h"
+#include "LogLoss.h"
+#include "HingeLoss.h"
+#include "SquaredLoss.h"
 %}
-
-%ignore utilities::MakeAnyIterator;
-%ignore utilities::IteratorBase;
-%ignore utilities::IteratorWrapper;
 
 %include "BinaryClassificationEvaluator.h"
 %include "IIterator.h"

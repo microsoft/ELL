@@ -45,7 +45,7 @@ namespace dataset
             /// <summary> Proceeds to the Next iterate. </summary>
             void Next();
 
-            /// <summary> \returns The current index-value pair. </summary>
+            /// <summary> Returns The current index-value pair. </summary>
             ///
             /// <returns> An IndexValue. </returns>
             linear::IndexValue Get() const;

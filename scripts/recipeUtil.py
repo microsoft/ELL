@@ -29,7 +29,10 @@ def findDirWithFile(dirs, filenames):
 
 def runBinary(binaryFilename, args=None):
     binDir = findDirWithFile(['../bin/Debug', '../bin/Release', '../bin'], [binaryFilename, binaryFilename+'.exe'])
+    if not binDir:
+        return
     binPath = os.path.join(binDir, binaryFilename)
+
     if args:
         subprocess.check_call([binPath]+args)
     else:
