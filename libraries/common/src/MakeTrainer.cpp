@@ -18,20 +18,20 @@
 
 namespace common
 {
-    std::unique_ptr<trainers::IStatefulTrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(uint64_t dim, const trainers::StochasticGradientDescentTrainerParameters& parameters, const LossArguments& lossArguments)
+    std::unique_ptr<trainers::IStatefulTrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentLearner(uint64_t dim, const trainers::StochasticGradientDescentLearnerParameters& parameters, const LossArguments& lossArguments)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
         switch(lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return MakeStochasticGradientDescentTrainer(dim, parameters, lossFunctions::SquaredLoss());
+            return MakeStochasticGradientDescentLearner(dim, parameters, lossFunctions::SquaredLoss());
 
         case LossFunctionEnum::log:
-            return MakeStochasticGradientDescentTrainer(dim, parameters, lossFunctions::LogLoss(lossArguments.lossFunctionParameter));
+            return MakeStochasticGradientDescentLearner(dim, parameters, lossFunctions::LogLoss(lossArguments.lossFunctionParameter));
 
         case LossFunctionEnum::hinge:
-            return MakeStochasticGradientDescentTrainer(dim, parameters, lossFunctions::HingeLoss());
+            return MakeStochasticGradientDescentLearner(dim, parameters, lossFunctions::HingeLoss());
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");

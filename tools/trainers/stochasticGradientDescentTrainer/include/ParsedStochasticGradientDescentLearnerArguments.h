@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ParsedStochasticGradientDescentTrainerArguments.h (stochasticGradientDescent)
+//  File:     ParsedStochasticGradientDescentLearnerArguments.h (stochasticGradientDescentTrainer)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,10 +10,10 @@
 #include "CommandLineParser.h"
 
 // trainers
-#include "StochasticGradientDescentTrainer.h"
+#include "StochasticGradientDescentLearner.h"
 
 /// <summary> Parsed version of stochastic gradient descent parameters. </summary>
-struct ParsedStochasticGradientDescentTrainerArguments : public trainers::StochasticGradientDescentTrainerParameters, public utilities::ParsedArgSet
+struct ParsedStochasticGradientDescentLearnerArguments : public trainers::StochasticGradientDescentLearnerParameters, public utilities::ParsedArgSet
 {
     /// <summary> Adds the arguments to the command line parser. </summary>
     ///

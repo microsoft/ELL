@@ -12,7 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/StochasticGradientDescentTrainer.cpp)
+set (SRC src/Nothing.cpp)
 
 set (INCLUDE include/BaggingLearner.h
              include/IStatefulTrainer.h
@@ -20,12 +20,12 @@ set (INCLUDE include/BaggingLearner.h
              include/MultiEpochTrainer.h
              include/SingleEpochTrainer.h
              include/SortingTreeTrainer.h
-             include/StochasticGradientDescentTrainer.h)
+             include/StochasticGradientDescentLearner.h)
 
 set (TCC tcc/SingleEpochTrainer.tcc
          tcc/MultiEpochTrainer.tcc
          tcc/SortingTreeTrainer.tcc
-         tcc/StochasticGradientDescentTrainer.tcc)
+         tcc/StochasticGradientDescentLearner.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

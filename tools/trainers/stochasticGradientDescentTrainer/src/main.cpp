@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     main.cpp (stochasticGradientDescent)
+//  File:     main.cpp (stochasticGradientDescentTrainer)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SGDArguments.h"
-#include "ParsedStochasticGradientDescentTrainerArguments.h"
+#include "ParsedStochasticGradientDescentLearnerArguments.h"
 
 // utilities
 #include "Files.h"
@@ -35,7 +35,7 @@
 #include "MakeEvaluator.h"
 
 // trainers
-#include "StochasticGradientDescentTrainer.h"
+#include "StochasticGradientDescentLearner.h"
 #include "MultiEpochTrainer.h"
 #include "SingleEpochTrainer.h"
 
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
         ParsedSgdArguments sgdArguments; // TODO - figure out what to do with these arguments
-        ParsedStochasticGradientDescentTrainerArguments stochasticGradientDescentTrainerArguments;
+        ParsedStochasticGradientDescentLearnerArguments StochasticGradientDescentLearnerArguments;
 
 
         commandLineParser.AddOptionSet(trainerArguments);
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(sgdArguments);
-        commandLineParser.AddOptionSet(stochasticGradientDescentTrainerArguments);
+        commandLineParser.AddOptionSet(StochasticGradientDescentLearnerArguments);
         
         // parse command line
         commandLineParser.Parse();
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
         // create sgd trainer
-        auto trainer = common::MakeStochasticGradientDescentTrainer(outputCoordinateList.Size(), stochasticGradientDescentTrainerArguments, trainerArguments.lossArguments);
+        auto trainer = common::MakeStochasticGradientDescentLearner(outputCoordinateList.Size(), StochasticGradientDescentLearnerArguments, trainerArguments.lossArguments);
         auto trainer2 = trainers::MakeSingleEpochTrainer(std::move(trainer));
 
         // create evaluator
