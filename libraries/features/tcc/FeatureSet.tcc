@@ -37,7 +37,7 @@ namespace features
     template <typename FeatureType, typename... Args>
     FeatureType* FeatureSet::CreateFeature(Args... args)
     {
-        _features.emplace_back(std::make_unique<FeatureType>(ctor_enable(), args...));
+        _features.emplace_back(std::make_unique<FeatureType>(args...));
         auto feature = _features.back().get();
         
         if(_featureMap.size() == 0)

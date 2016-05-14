@@ -22,13 +22,6 @@ namespace features
     class InputFeature;
 
     /// <summary>
-    /// This `ctor_enable` tag struct is required by a technique to create the equivalent of a protected constructor that can
-    /// be called by the base class. The idea is to have this `ctor_enable` type be a protected member of the base
-    /// class, so the only code that can create one would be something in the class hierarchy. Therefore, the only code
-    /// that can call a public function that contains a `ctor_enable` parameter would be some class in the hierarchy. 
-    struct ctor_enable {}; // TODO: figure out how to make this be a protected member of Feature without SWIG complaining
-
-    /// <summary>
     /// Base class for all features. 
     /// Users of the library will generally only interact with features via the featurizer (`FeatureSet`) object that
     /// owns the individual features.  

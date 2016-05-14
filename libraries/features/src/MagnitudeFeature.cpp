@@ -72,6 +72,6 @@ namespace features
             std::string error_msg = std::string("Error deserializing feature description: unknown input feature ") + params[2];
             throw std::runtime_error(error_msg);
         }
-        return std::make_unique<MagnitudeFeature>(ctor_enable(), inputFeature);
+        return std::make_unique<MagnitudeFeature>(inputFeature);
     }
 }

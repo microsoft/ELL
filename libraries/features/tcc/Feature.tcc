@@ -20,12 +20,6 @@ namespace features
         RegisterDeserializeFunction(FeatureT::feature_name, FeatureT::Deserialize);
     }
 
-    template <typename FeatureType>
-    void Feature<FeatureType>::RegisterFeatureType()
-    {        
-        RegisterDeserializeFunction(FeatureT::feature_name, FeatureT::Deserialize);
-    }
-
     template <typename FeatureT>
     RegisteredFeature<FeatureT>::RegisteredFeature(const std::vector<Feature*>& inputs) : Feature(inputs)
     {        

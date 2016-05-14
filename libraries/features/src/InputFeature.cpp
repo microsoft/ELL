@@ -48,6 +48,6 @@ namespace features
     {
         assert(params.size() == 3);
         uint64_t size = ParseInt(params[2]);
-        return std::make_unique<InputFeature>(ctor_enable(), size);
+        return std::make_unique<InputFeature>(size);
     }    
 }
