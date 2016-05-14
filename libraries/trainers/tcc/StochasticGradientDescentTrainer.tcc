@@ -18,11 +18,12 @@
 namespace trainers
 {
     template<typename LossFunctionType>
-    StochasticGradientDescentTrainer<LossFunctionType>::StochasticGradientDescentTrainer(uint64_t dim, const IStochasticGradientDescentTrainer::Parameters& parameters, const LossFunctionType& lossFunction) : _parameters(parameters), _lossFunction(lossFunction), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // iterations start from 1 to prevent divide-by-zero
+    StochasticGradientDescentTrainer<LossFunctionType>::StochasticGradientDescentTrainer(uint64_t dim, const StochasticGradientDescentTrainerParameters& parameters, const LossFunctionType& lossFunction) :
+        _parameters(parameters), _lossFunction(lossFunction), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // iterations start from 1 to prevent divide-by-zero
     {}
 
     template<typename LossFunctionType>
-    void StochasticGradientDescentTrainer<LossFunctionType>::Update(IStochasticGradientDescentTrainer::ExampleIteratorType& exampleIterator)
+    void StochasticGradientDescentTrainer<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetVector();
@@ -96,8 +97,8 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    StochasticGradientDescentTrainer<LossFunctionType> MakeStochasticGradientDescentTrainer(uint64_t dim, const IStochasticGradientDescentTrainer::Parameters& parameters, const LossFunctionType& lossFunction)
+    std::unique_ptr<IStatefulTrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(uint64_t dim, const StochasticGradientDescentTrainerParameters& parameters, const LossFunctionType& lossFunction)
     {
-        return StochasticGradientDescentTrainer<LossFunctionType>(dim, parameters, lossFunction);
+        return std::make_unique<StochasticGradientDescentTrainer<LossFunctionType>>(dim, parameters, lossFunction);
     }
 }

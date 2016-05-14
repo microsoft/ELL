@@ -1,12 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MultiEpochMetaTrainer.h (updaters)
+//  File:     MultiEpochMetaTrainer.h (statefulTrainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
+#include "ITrainer.h"
+#include "IStatefulTrainer.h"
 
 // dataset
 #include "RowDataset.h"
@@ -17,45 +20,21 @@
 
 namespace trainers
 {
-    using ExampleIteratorType = dataset::GenericRowDataset::Iterator;
-
-    template <typename PredictorType>
-    class ITrainer
-    {
-    public:
-
-        virtual ~ITrainer() = default;
-
-        virtual PredictorType Train(ExampleIteratorType exampleIterator) const = 0;
-    };
-
-    template <typename PredictorType>
-    class IUpdater
-    {
-    public:
-
-        virtual ~IUpdater() = default;
-
-        virtual void Update(ExampleIteratorType exampleIterator) = 0;
-        virtual const PredictorType& GetPredictor() const = 0;
-        virtual PredictorType Reset() = 0;
-    };
-
     template <typename PredictorType>
     class MultiEpochMetaTrainer : public ITrainer<PredictorType>
     {
     public:
         MultiEpochMetaTrainer() = delete;
-        MultiEpochMetaTrainer(std::unique_ptr<IUpdater<PredictorType>>&& updater) : _updater(std::move(updater)) {}
-        virtual PredictorType Train(ExampleIteratorType exampleIterator) const {/*TODO: first do iterations of Update*/ return _updater->Reset();}
+        MultiEpochMetaTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer) : _statefulTrainer(std::move(statefulTrainer)) {}
+        virtual PredictorType Train(dataset::GenericRowDataset::Iterator exampleIterator) const {/*TODO: first do iterations of Update*/ return _statefulTrainer->Reset();}
 
     private: 
-        std::unique_ptr<IUpdater<PredictorType>> _updater;
+        std::unique_ptr<IStatefulTrainer<PredictorType>> _statefulTrainer;
     };
 
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochMetaTrainer(std::unique_ptr<IUpdater<PredictorType>>&& updater)
+    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochMetaTrainer(std::unique_ptr<IStatefulTrainer<PredictorType>>&& statefulTrainer)
     {
-        return MultiEpochMetaTrainer<PredictorType>(std::move(updater));
+        return MultiEpochMetaTrainer<PredictorType>(std::move(statefulTrainer));
     }
 }

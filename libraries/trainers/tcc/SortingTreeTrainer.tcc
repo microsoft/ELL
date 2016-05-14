@@ -9,11 +9,12 @@
 namespace trainers
 {    
     template <typename LossFunctionType>
-    SortingTreeTrainer<LossFunctionType>::SortingTreeTrainer(const ISortingTreeTrainer::Parameters& parameters, const LossFunctionType& lossFunction) : _parameters(parameters), _lossFunction(lossFunction)
+    SortingTreeTrainer<LossFunctionType>::SortingTreeTrainer(const SortingTreeTrainerParameters& parameters, const LossFunctionType& lossFunction) :
+        _parameters(parameters), _lossFunction(lossFunction)
     {}
 
     template <typename LossFunctionType>
-    predictors::DecisionTreePredictor SortingTreeTrainer<LossFunctionType>::Train(ISortingTreeTrainer::ExampleIteratorType exampleIterator) const
+    predictors::DecisionTreePredictor SortingTreeTrainer<LossFunctionType>::Train(dataset::GenericRowDataset::Iterator exampleIterator) const
     {
         // convert data fron iterator to dense row dataset; compute sums statistics of the tree root
         auto sums = LoadData(exampleIterator);
@@ -64,7 +65,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    typename SortingTreeTrainer<LossFunctionType>::Sums SortingTreeTrainer<LossFunctionType>::LoadData(ISortingTreeTrainer::ExampleIteratorType exampleIterator) const
+    typename SortingTreeTrainer<LossFunctionType>::Sums SortingTreeTrainer<LossFunctionType>::LoadData(dataset::GenericRowDataset::Iterator exampleIterator) const
     {
         Sums sums;
 
@@ -179,8 +180,8 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    SortingTreeTrainer<LossFunctionType> MakeSortingTreeTrainer(const ISortingTreeTrainer::Parameters& parameters, const LossFunctionType& lossFunction)
+    std::unique_ptr<ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const SortingTreeTrainerParameters& parameters, const LossFunctionType& lossFunction)
     {
-        return SortingTreeTrainer<LossFunctionType>(parameters, lossFunction);
+        return std::make_unique<SortingTreeTrainer<LossFunctionType>>(parameters, lossFunction);
     }
 }

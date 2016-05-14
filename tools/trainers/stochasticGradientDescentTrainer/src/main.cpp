@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
         // create sgd trainer
         auto trainer = common::MakeStochasticGradientDescentTrainer(outputCoordinateList.Size(), stochasticGradientDescentTrainerArguments, trainerArguments.lossArguments);
 
-        auto trainer2 = trainers::MakeMultiEpochMetaTrainer(std::move(trainer));
+        //auto trainer2 = trainers::MakeMultiEpochMetaTrainer(std::move(trainer));
 
         // create evaluator
         auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::LinearPredictor>(trainerArguments.lossArguments);

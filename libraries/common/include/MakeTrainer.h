@@ -10,7 +10,12 @@
 
 #include "TrainerArguments.h"
 
+// predictors
+#include "LinearPredictor.h"
+
 // trainers
+#include "ITrainer.h"
+#include "IStatefulTrainer.h"
 #include "SortingTreeTrainer.h"
 #include "StochasticGradientDescentTrainer.h"
 
@@ -25,7 +30,7 @@ namespace common
     /// <param name="trainerArguments"> Trainer command line arguments. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::IStochasticGradientDescentTrainer> MakeStochasticGradientDescentTrainer(uint64_t dim, const trainers::IStochasticGradientDescentTrainer::Parameters& parameters, const LossArguments& lossArguments);
+    std::unique_ptr<trainers::IStatefulTrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(uint64_t dim, const trainers::StochasticGradientDescentTrainerParameters& parameters, const LossArguments& lossArguments);
 
     /// <summary> Makes a sorting tree trainer. </summary>
     ///
@@ -33,5 +38,5 @@ namespace common
     /// <param name="trainerArguments"> Trainer command line arguments. </param>
     ///
     /// <returns> A unique_ptr to a sorting tree trainer. </returns>
-    std::unique_ptr<trainers::ISortingTreeTrainer> MakeSortingTreeTrainer(const trainers::ISortingTreeTrainer::Parameters& parameters, const LossArguments& lossArguments);
+    std::unique_ptr<trainers::ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const trainers::SortingTreeTrainerParameters& parameters, const LossArguments& lossArguments);
 }

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "ITrainer.h"
+
 // dataset
 #include "RowDataset.h"
 #include "DenseDataVector.h"
@@ -21,33 +23,17 @@
 /// <summary> trainers namespace </summary>
 namespace trainers
 {
-    /// <summary> Interface to sorting tree trainer. </summary>
-    class ISortingTreeTrainer
+    /// <summary> Parameters for the sorting tree trainer. </summary>
+    struct SortingTreeTrainerParameters
     {
-    public:
-        using ExampleIteratorType = dataset::GenericRowDataset::Iterator;
-
-        virtual ~ISortingTreeTrainer() = default;
-
-        /// <summary> Parameters for the sorting tree trainer. </summary>
-        struct Parameters
-        {
-            double minSplitGain = 0.0;
-        };
-
-        /// <summary> Trains a decision tree. </summary>
-        ///
-        /// <param name="exampleIterator"> [in,out] The example iterator. </param>
-        ///
-        /// <returns> A decision tree. </returns>
-        virtual predictors::DecisionTreePredictor Train(ExampleIteratorType exampleIterator) const = 0;
+        double minSplitGain = 0.0;
     };
 
     /// <summary> Implements a greedy decision tree growing algorithm that operates by repeatedly sorting the data by each feature. </summary>
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
     template <typename LossFunctionType> 
-    class SortingTreeTrainer : public ISortingTreeTrainer
+    class SortingTreeTrainer : public ITrainer<predictors::DecisionTreePredictor>
     {
     public:
 
@@ -55,14 +41,14 @@ namespace trainers
         ///
         /// <param name="parameters"> Training Parameters. </param>
         /// <param name="lossFunction"> The loss function. </param>
-        SortingTreeTrainer(const ISortingTreeTrainer::Parameters& parameters, const LossFunctionType& lossFunction);
+        SortingTreeTrainer(const SortingTreeTrainerParameters& parameters, const LossFunctionType& lossFunction);
 
         /// <summary> Trains a decision tree. </summary>
         ///
         /// <param name="exampleIterator"> [in,out] The example iterator. </param>
         ///
         /// <returns> A decision tree. </returns>
-        virtual predictors::DecisionTreePredictor Train(ISortingTreeTrainer::ExampleIteratorType exampleIterator) const override;
+        virtual predictors::DecisionTreePredictor Train(dataset::GenericRowDataset::Iterator exampleIterator) const override;
 
     private:
         // struct used to keep statistics about tree leaves
@@ -89,7 +75,7 @@ namespace trainers
             bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
         };
 
-        Sums LoadData(ExampleIteratorType exampleIterator) const;
+        Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator) const;
         void AddSplitCandidateToQueue(predictors::DecisionTreePredictor::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums) const;
         void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size) const;
         double CalculateGain(Sums sums, Sums negativeSums) const;
@@ -97,7 +83,7 @@ namespace trainers
         void Cleanup() const;
 
         // member variables
-        ISortingTreeTrainer::Parameters _parameters;
+        SortingTreeTrainerParameters _parameters;
         LossFunctionType _lossFunction;
         mutable dataset::RowDataset<dataset::DoubleDataVector> _dataset;
         mutable std::priority_queue<SplitCandidate> _queue;
@@ -111,7 +97,7 @@ namespace trainers
     ///
     /// <returns> A sorting tree trainer. </returns>
     template<typename LossFunctionType>
-    SortingTreeTrainer<LossFunctionType> MakeSortingTreeTrainer(const ISortingTreeTrainer::Parameters& parameters, const LossFunctionType& lossFunction);
+    std::unique_ptr<ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const SortingTreeTrainerParameters& parameters, const LossFunctionType& lossFunction);
 }
 
 #include "../tcc/SortingTreeTrainer.tcc"

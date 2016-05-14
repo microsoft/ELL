@@ -13,7 +13,7 @@
 #include "StochasticGradientDescentTrainer.h"
 
 /// <summary> Parsed version of stochastic gradient descent parameters. </summary>
-struct ParsedStochasticGradientDescentTrainerArguments : public trainers::IStochasticGradientDescentTrainer::Parameters, public utilities::ParsedArgSet
+struct ParsedStochasticGradientDescentTrainerArguments : public trainers::StochasticGradientDescentTrainerParameters, public utilities::ParsedArgSet
 {
     /// <summary> Adds the arguments to the command line parser. </summary>
     ///

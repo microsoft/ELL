@@ -13,7 +13,7 @@
 #include "SortingTreeTrainer.h"
 
 /// <summary> Parsed version of sorting tree trainer parameters. </summary>
-struct ParsedSortingTreeTrainerArguments : public trainers::ISortingTreeTrainer::Parameters, public utilities::ParsedArgSet
+struct ParsedSortingTreeTrainerArguments : public trainers::SortingTreeTrainerParameters, public utilities::ParsedArgSet
 {
     /// <summary> Adds the arguments to the command line parser. </summary>
     ///
