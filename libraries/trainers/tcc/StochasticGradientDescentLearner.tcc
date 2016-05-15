@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BinaryClassificationEvaluator.h"
+#include "SingleEpochTrainer.h"
 
 // stl
 #include <cmath>
@@ -100,5 +101,11 @@ namespace trainers
     std::unique_ptr<ILearner<predictors::LinearPredictor>> MakeStochasticGradientDescentLearner(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType& lossFunction)
     {
         return std::make_unique<StochasticGradientDescentLearner<LossFunctionType>>(dim, parameters, lossFunction);
+    }
+
+    template<typename LossFunctionType>
+    std::unique_ptr<ITrainer<predictors::LinearPredictor>> trainers::MakeStochasticGradientDescentTrainer(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType & lossFunction)
+    {
+        return std::unique_ptr<SingleEpochTrainer<predictors::LinearPredictor>>(MakeStochasticGradientDescentLearner(dim, parameters, lossfunction));
     }
 }

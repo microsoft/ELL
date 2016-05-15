@@ -22,7 +22,8 @@ set (INCLUDE include/BaggingLearner.h
              include/SortingTreeTrainer.h
              include/StochasticGradientDescentLearner.h)
 
-set (TCC tcc/SingleEpochTrainer.tcc
+set (TCC tcc/BaggingLearner.tcc
+         tcc/SingleEpochTrainer.tcc
          tcc/MultiEpochTrainer.tcc
          tcc/SortingTreeTrainer.tcc
          tcc/StochasticGradientDescentLearner.tcc)
