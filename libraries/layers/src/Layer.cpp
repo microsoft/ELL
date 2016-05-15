@@ -12,11 +12,6 @@
 
 namespace layers
 {
-    std::string Layer::GetTypeName()
-    {
-        return "Layer";
-    }
-
     const utilities::TypeFactory<Layer> Layer::GetTypeFactory()
     {
         utilities::TypeFactory<Layer> factory;

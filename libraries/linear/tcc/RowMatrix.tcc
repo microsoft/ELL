@@ -52,7 +52,7 @@ namespace linear
     template<typename DataVectorType>
     uint64_t RowMatrix<DataVectorType>::NumColumns() const
     {
-        return _num_columns;
+        return _numColumns;
     }
 
     template<typename DataVectorType>
@@ -79,9 +79,9 @@ namespace linear
         uint64_t numColumns = row.Size();
         _rows.emplace_back(std::move(row));
 
-        if(_num_columns < numColumns)
+        if(_numColumns < numColumns)
         {
-            _num_columns = numColumns;
+            _numColumns = numColumns;
         }
     }
 
@@ -92,9 +92,9 @@ namespace linear
         _rows.emplace_back(args...);
 
         uint64_t numColumns = _rows[_rows.size()-1].size();
-        if(_num_columns < numColumns)
+        if(_numColumns < numColumns)
         {
-            _num_columns = numColumns;
+            _numColumns = numColumns;
         }
     }
 

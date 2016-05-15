@@ -65,7 +65,7 @@ namespace layers
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName();
+        static std::string GetTypeName() { return "Layer"; }
 
         /// <summary> Gets the name of the derived type (for serialization). </summary>
         ///

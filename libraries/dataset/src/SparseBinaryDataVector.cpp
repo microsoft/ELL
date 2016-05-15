@@ -16,30 +16,8 @@
 namespace dataset
 {
     template<typename IntegerListType>
-    bool SparseBinaryDataVectorBase<IntegerListType>::Iterator::IsValid() const
-    {
-        return _list_iterator.IsValid();
-    }
-
-    template<typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::Iterator::Next()
-    {
-        _list_iterator.Next();
-    }
-
-    template<typename IntegerListType>
-    linear::IndexValue SparseBinaryDataVectorBase<IntegerListType>::Iterator::Get() const
-    {
-        return linear::IndexValue { _list_iterator.Get(), 1.0 };
-    }
-
-    template<typename IntegerListType>
     SparseBinaryDataVectorBase<IntegerListType>::Iterator::Iterator(const IndexIteratorType& list_iterator)
         : _list_iterator(list_iterator)
-    {}
-
-    template<typename IntegerListType>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase() 
     {}
 
     template<typename IntegerListType>
@@ -56,12 +34,6 @@ namespace dataset
     }
 
     template<typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::Reset()
-    {
-        _indices.Reset();
-    }
-
-    template<typename IntegerListType>
     uint64_t SparseBinaryDataVectorBase<IntegerListType>::Size() const
     {
         if(_indices.Size() == 0)
@@ -72,18 +44,6 @@ namespace dataset
         {
             return _indices.Max() + 1;
         }
-    }
-
-    template<typename IntegerListType>
-    uint64_t SparseBinaryDataVectorBase<IntegerListType>::NumNonzeros() const
-    {
-        return _indices.Size();
-    }
-
-    template<typename IntegerListType>
-    double SparseBinaryDataVectorBase<IntegerListType>::Norm2() const
-    {
-        return (double)_indices.Size();
     }
     
     template<typename IntegerListType>
@@ -110,12 +70,6 @@ namespace dataset
         }
         
         return value;
-    }
-
-    template<typename IntegerListType>
-    typename SparseBinaryDataVectorBase<IntegerListType>::Iterator SparseBinaryDataVectorBase<IntegerListType>::GetIterator() const
-    {
-        return Iterator(_indices.GetIterator());
     }
 
     template<typename IntegerListType>

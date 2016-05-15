@@ -42,17 +42,17 @@ namespace dataset
         /// <summary> Gets the data vector. </summary>
         ///
         /// <returns> The data vector. </returns>
-        const DataVectorType& GetDataVector() const;
+        const DataVectorType& GetDataVector() const { return *_dataVector.get(); }
 
         /// <summary> Gets the weight. </summary>
         ///
         /// <returns> The weight. </returns>
-        double GetWeight() const;
+        double GetWeight() const { return _weight; }
 
         /// <summary> Gets the label. </summary>
         ///
         /// <returns> The label. </returns>
-        double GetLabel() const;
+        double GetLabel() const { return _label; }
 
         SupervisedExample<DataVectorType>& operator=(SupervisedExample<DataVectorType> other);
 

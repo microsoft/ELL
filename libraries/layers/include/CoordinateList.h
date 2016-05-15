@@ -43,7 +43,7 @@ namespace layers
         /// <summary> Gets the size. </summary>
         ///
         /// <returns> The number of coordinates in the list. </returns>
-        uint64_t Size() const;
+        uint64_t Size() const { return _list.size(); }
 
         /// <summary> Individual coordinate access operator. </summary>
         ///
@@ -76,7 +76,7 @@ namespace layers
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName();
+        static std::string GetTypeName() { return "CoordinateList"; }
 
         /// <summary> Reads the coordinate from an XMLDeserializer. </summary>
         ///

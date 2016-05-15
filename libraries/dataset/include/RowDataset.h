@@ -43,26 +43,26 @@ namespace dataset
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
         /// <returns> The number of examples. </returns>
-        uint64_t NumExamples() const;
+        uint64_t NumExamples() const { return _examples.size(); }
 
         /// <summary> Returns the maximal size of any example. </summary>
         ///
         /// <returns> The maximal size of any example. </returns>
-        uint64_t GetMaxDataVectorSize() const;
+        uint64_t GetMaxDataVectorSize() const { return _maxExampleSize; }
 
         /// <summary> Returns a reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        const ExampleType& GetExample(uint64_t index) const;
+        const ExampleType& GetExample(uint64_t index) const { return _examples[index]; }
 
         /// <summary> Returns a reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        const ExampleType& operator[](uint64_t index) const;
+        const ExampleType& operator[](uint64_t index) const { return _examples[index]; }
 
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///

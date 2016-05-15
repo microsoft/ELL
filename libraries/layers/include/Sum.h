@@ -23,8 +23,7 @@ namespace layers
     {
     public:
 
-        /// <summary> Default constructor, creates an empty sum </summary>
-        Sum();
+        Sum() = default;
 
         /// <summary> Constructs a single sum. </summary>
         ///
@@ -41,12 +40,12 @@ namespace layers
         /// <summary> Returns the input dimension of the layer. </summary>
         ///
         /// <returns> The input dimension. </returns>
-        virtual uint64_t GetInputDimension() const override;
+        virtual uint64_t GetInputDimension() const override { return _inputCoordinates.size(); }
 
         /// <summary> Returns the output dimension of the layer. </summary>
         ///
         /// <returns> The output dimension. </returns>
-        virtual uint64_t GetOutputDimension() const override;
+        virtual uint64_t GetOutputDimension() const override { return _inputCoordinates.size(); }
 
         /// <summary> Computes the layer output. </summary>
         ///
@@ -71,12 +70,12 @@ namespace layers
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName();
+        static std::string GetTypeName() { return "Sum"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override;
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Reads the map from an XMLDeserializer. </summary>
         ///

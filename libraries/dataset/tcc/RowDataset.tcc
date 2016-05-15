@@ -15,30 +15,6 @@
 namespace dataset
 {
     template<typename DataVectorType>
-    uint64_t RowDataset<DataVectorType>::NumExamples() const
-    {
-        return _examples.size();
-    }
-
-    template<typename DataVectorType>
-    uint64_t RowDataset<DataVectorType>::GetMaxDataVectorSize() const
-    {
-        return _maxExampleSize;
-    }
-
-    template<typename DataVectorType>
-    const SupervisedExample<DataVectorType>& RowDataset<DataVectorType>::GetExample(uint64_t index) const
-    {
-        return _examples[index];
-    }
-
-    template<typename DataVectorType>
-    const SupervisedExample<DataVectorType>& RowDataset<DataVectorType>::operator[](uint64_t index) const
-    {
-        return _examples[index];
-    }
-
-    template<typename DataVectorType>
     typename RowDataset<DataVectorType>::Iterator RowDataset<DataVectorType>::GetIterator(uint64_t firstExample, uint64_t numExamples) const
     {
         if (firstExample >= NumExamples())

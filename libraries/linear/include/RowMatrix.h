@@ -146,7 +146,7 @@ namespace linear
 
     private:
         std::vector<DataVectorType> _rows;
-        uint64_t _num_columns = 0;
+        uint64_t _numColumns = 0;
     };
 }
 

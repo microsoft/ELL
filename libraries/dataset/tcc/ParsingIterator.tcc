@@ -17,18 +17,6 @@ namespace dataset
     {}
 
     template<typename RowIteratorType, typename VectorEntryParserType>
-    bool ParsingIterator<RowIteratorType, VectorEntryParserType>::IsValid() const
-    {
-        return _rowIterator.IsValid();
-    }
-
-    template<typename RowIteratorType, typename VectorEntryParserType>
-    void ParsingIterator<RowIteratorType, VectorEntryParserType>::Next()
-    {
-        _rowIterator.Next();
-    }
-
-    template<typename RowIteratorType, typename VectorEntryParserType>
     GenericSupervisedExample ParsingIterator<RowIteratorType, VectorEntryParserType>::Get() const
     {
         SupervisedExampleBuilder<VectorEntryParserType, FloatDataVector> exampleBuilder(_instanceParser);
