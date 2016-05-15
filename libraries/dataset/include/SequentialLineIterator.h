@@ -26,14 +26,8 @@ namespace dataset
         /// <param name="delim"> The delimiter. </param>
         SequentialLineIterator(const std::string& filepath, char delim = '\n');
 
-        /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
         SequentialLineIterator(const SequentialLineIterator&) = delete; // this ctor is deleted because a provate member of this class cannot be copied
 
-        /// <summary> default move Ctor. </summary>
-        ///
-        /// <param name="parameter1"> [in,out] The first parameter. </param>
         SequentialLineIterator(SequentialLineIterator&&) = default;
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>

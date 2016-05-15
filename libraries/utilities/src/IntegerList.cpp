@@ -31,9 +31,6 @@ namespace utilities
     IntegerList::Iterator::Iterator(const vector_iterator& begin, const vector_iterator& end) : _begin(begin), _end(end)
     {}
 
-    IntegerList::IntegerList()
-    {}
-
     uint64_t IntegerList::Size() const
     {
         return _list.size();

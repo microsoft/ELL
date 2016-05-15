@@ -28,14 +28,8 @@ namespace dataset
         {
         public:
 
-            /// <summary> Default copy ctor. </summary>
-            ///
-            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
-            /// <summary> Default move ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
@@ -57,17 +51,10 @@ namespace dataset
             friend ZeroDataVector;
         };
 
-        /// <summary> Default constructor. </summary>
         ZeroDataVector() = default;
 
-        /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
         ZeroDataVector(ZeroDataVector&& other) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
         ZeroDataVector(const ZeroDataVector&) = default;
 
         /// <summary> Sets an entry in the vector. </summary>

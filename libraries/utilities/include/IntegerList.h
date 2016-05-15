@@ -27,14 +27,8 @@ namespace utilities
         {
         public:
 
-            /// <summary> Default copy ctor. </summary>
-            ///
-            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
-            /// <summary> Default move ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
@@ -61,25 +55,14 @@ namespace utilities
             vector_iterator _end;
         };
 
-        /// <summary> Default Constructor. Constructs an empty list. </summary>
-        IntegerList();
+        IntegerList() = default;
 
-        /// <summary> Move Constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
         IntegerList(IntegerList&& other) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
         IntegerList(const IntegerList&) = default;
 
-        /// <summary> Default Destructor. </summary>
         ~IntegerList() = default;
 
-        /// <summary> Deleted assignment operator. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
         void operator= (const IntegerList&) = delete;
 
         /// <summary> Gets the number of entries in the list. </summary>

@@ -29,14 +29,8 @@ namespace dataset
         {
         public:
 
-            /// <summary> Default copy ctor. </summary>
-            ///
-            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
-            /// <summary> Default move ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns True if the iterator is currently pointing to a valid iterate. </summary>
@@ -67,14 +61,8 @@ namespace dataset
         /// <param name="dim"> The dimension of the DataVector. </param>
         OnesDataVector(uint64_t dim = 0);
 
-        /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
         OnesDataVector(OnesDataVector&& other) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
         OnesDataVector(const OnesDataVector&) = default;
 
         /// <summary> Sets an entry in the vector. </summary>

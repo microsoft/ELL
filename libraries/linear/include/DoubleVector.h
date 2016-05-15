@@ -32,14 +32,8 @@ namespace linear
         /// <param name="size"> The size. </param>
         DoubleVector(uint64_t size = 0);
 
-        /// <summary> Copy constructor. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
         DoubleVector(const DoubleVector&) = default;
 
-        /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="parameter1"> [in,out] The first parameter. </param>
         DoubleVector(DoubleVector&&) = default;
 
         /// <summary> Constructor to copy from a std::vector<double>

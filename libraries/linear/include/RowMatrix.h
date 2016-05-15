@@ -35,10 +35,8 @@ namespace linear
         {
         public:
 
-            /// <summary> Copy constructor. </summary>
             Iterator(const Iterator&) = default;
 
-            /// <summary> Move constructor. </summary>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
@@ -76,21 +74,14 @@ namespace linear
         /// <summary> The type of each row. </summary>
         using RowType = DataVectorType;
 
-        /// <summary> Default constructor. </summary>
         RowMatrix() = default;
 
-        /// <summary> Move constructor </summary>
         RowMatrix(RowMatrix<DataVectorType>&&) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
         RowMatrix(const RowMatrix<DataVectorType>&) = delete;
 
-        /// <summary> Default move assignment operator. </summary>
-        ///
-        /// <param name="other"> [in,out] The other vector. </param>
         RowMatrix<DataVectorType>& operator=(RowMatrix<DataVectorType>&&) = default;
 
-        /// <summary> Deleted asignment operator. </summary>
         RowMatrix<DataVectorType>& operator=(const RowMatrix<DataVectorType>&) = delete;
 
         /// <summary> Returns the number of rows in the matrix. </summary>

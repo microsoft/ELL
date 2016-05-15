@@ -23,7 +23,6 @@ namespace dataset
     {
     public:
 
-        /// <summary> Default constructor. </summary>
         SupervisedExample() = default;
 
         /// <summary> Copy constructor </summary>
@@ -31,9 +30,6 @@ namespace dataset
         /// <param name="other"> The other. </param>
         SupervisedExample(const SupervisedExample<DataVectorType>& other);
 
-        /// <summary> Default move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
         SupervisedExample(SupervisedExample<DataVectorType>&& other) = default;
         
         /// <summary> Constructs a supervised example. </summary>

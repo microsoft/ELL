@@ -27,14 +27,8 @@ namespace dataset
         {
         public:
 
-            /// <summary> default copy ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&) = default;
 
-            /// <summary> Default move ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>

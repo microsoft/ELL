@@ -26,10 +26,8 @@ namespace utilities
         {
         public:
 
-            /// <summary> Default copy ctor. </summary>
             Iterator(const Iterator&) = default;
 
-            /// <summary> Default move ctor. </summary>
             Iterator(Iterator&&) = default;
 
             // Returns true if the std::iterator is currently pointing to a valid iterate
@@ -63,18 +61,12 @@ namespace utilities
         /// <summary> Default Constructor. Constructs an empty list. </summary>
         CompressedIntegerList();
 
-        /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
         CompressedIntegerList(CompressedIntegerList&& other) = default;
 
-        /// <summary> Default copy constructor. </summary>
         CompressedIntegerList(const CompressedIntegerList&) = default;
 
-        /// <summary> Default Destructor. </summary>
         ~CompressedIntegerList() = default;
 
-        /// <summary> Deleted assignment operator. </summary>
         void operator= (const CompressedIntegerList&) = delete;
 
         /// <summary> Returns The number of entries in the list. </summary>

@@ -38,21 +38,15 @@ namespace dataset
         /// <summary> Constructor. </summary>
         DenseDataVector();
 
+        DenseDataVector(const DenseDataVector&) = default;
+
+        DenseDataVector(DenseDataVector&& other) = default;
+
         /// <summary> Constructs an instance of DenseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
         template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         DenseDataVector(IndexValueIteratorType indexValueIterator);
-
-        /// <summary> Copy constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
-        DenseDataVector(const DenseDataVector&) = default; 
-
-        /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
-        DenseDataVector(DenseDataVector&& other) = default;
 
         /// <summary> Constructs an instance of DenseDataVector from a std::vector. </summary>
         ///

@@ -29,7 +29,7 @@ namespace layers
     class Layer
     {
     public:
-        /// <summary> Default virtual destructor. </summary>
+
         virtual ~Layer() = default;
 
         /// <summary> Returns the input dimension of the layer. </summary>

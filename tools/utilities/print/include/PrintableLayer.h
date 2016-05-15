@@ -27,7 +27,7 @@
 class PrintableLayer 
 {
 public:
-    /// <summary> default virtual destructor. </summary>
+
     virtual ~PrintableLayer() = default;
 
     /// <summary> Gets a friendly layer name. </summary>

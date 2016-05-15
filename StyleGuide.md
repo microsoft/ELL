@@ -85,3 +85,25 @@ Next, indicate all `#include` statements. First, include files from the local pr
     #include <string>
     ******** end example ********
 
+Documentation
+-------------
+All public classes, functions, and variables that are declared in .h files should be preceded by an XML documentation block. The only exception is functions that are defined with =default or =delete, which should not be documented. Each documentation row should begin with three slashes (///) and the first line in a documentation block should contain a summary tag. Follow this example:
+
+    /// <summary> Mathematical power operation. </summary>
+    ///
+    /// <param name="base"> The base number. </param>
+    /// <param name="exponent"> The exponent number. </param>
+    ///
+    /// <returns> Base number to the power of the exponent number. </returns>
+    double Power(double base, double exponent);
+
+    /// <summary> Performs an in-place sort. </summary>
+    ///
+    /// <typeparam name="RandomAccessContainerType"> The container type, which must implement a square bracket operator. </typeparam>
+    /// <param name="container"> [in,out] The container being sorted. </param>
+    template<typename RandomAccessContainerType>
+    void InplaceSort(RandomAccessContainerType& container);
+
+
+
+

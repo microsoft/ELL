@@ -36,7 +36,6 @@ namespace layers
         /// <param name="coordinates"> The coordinates. </param>
         Sum(std::vector<CoordinateList> coordinates);
 
-        /// <summary> Destructor. </summary>
         virtual ~Sum() = default;
 
         /// <summary> Returns the input dimension of the layer. </summary>

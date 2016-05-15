@@ -37,14 +37,8 @@ namespace dataset
         {
         public:
 
-            /// <summary> Default copy ctor. </summary>
-            ///
-            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
-            /// <summary> Default move ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
@@ -84,14 +78,8 @@ namespace dataset
         template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         SparseDataVector(IndexValueIteratorType indexValueIterator);
 
-        /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
         SparseDataVector(SparseDataVector<ValueType, IntegerListType>&& other) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="other"> The other. </param>
         SparseDataVector(const SparseDataVector<ValueType, IntegerListType>& other) = default;
 
         /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a

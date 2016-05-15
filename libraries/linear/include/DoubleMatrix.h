@@ -34,10 +34,8 @@ namespace linear
     {
     public:
 
-        /// <summary> Move constructor. </summary>
         DoubleMatrixBase(DoubleMatrixBase&&) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
         DoubleMatrixBase(const DoubleMatrixBase&) = delete;
 
         /// <summary> Returns the number of rows in the matrix. </summary>

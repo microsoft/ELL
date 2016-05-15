@@ -30,21 +30,14 @@ namespace dataset
         using ExampleType = SupervisedExample<DataVectorType>;
         using Iterator = utilities::VectorIterator<ExampleType>;
 
-        /// <summary> Default constructor. </summary>
         RowDataset() = default;
 
-        /// <summary> Move constructor </summary>
         RowDataset(RowDataset&&) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
         RowDataset(const RowDataset&) = default;
 
-        /// <summary> Default move assignment operator. </summary>
-        ///
-        /// <param name="other"> [in,out] The other vector. </param>
         RowDataset& operator=(RowDataset&&) = default;
 
-        /// <summary> Deleted asignment operator. </summary>
         RowDataset& operator=(const RowDataset&) = default;
 
         /// <summary> Returns the number of examples in the dataset. </summary>

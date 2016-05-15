@@ -19,6 +19,7 @@ namespace utilities
     class StlIterator
     {
     public:
+
         StlIterator() = default;
         
         /// <summary> Constructor </summary>

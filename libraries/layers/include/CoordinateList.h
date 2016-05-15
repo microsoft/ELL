@@ -27,7 +27,6 @@ namespace layers
     {
     public:
 
-        /// <summary> Default constructor. </summary>
         CoordinateList() = default;
 
         /// <summary> Constructs a coordinateList for a specified number of elements in a given layer. </summary>
