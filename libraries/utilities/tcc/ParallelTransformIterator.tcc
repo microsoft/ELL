@@ -39,12 +39,6 @@ namespace utilities
             _inIter.Next();
         }
     }
-    
-    template <typename InputIteratorType, typename OutType, typename FuncType, int MaxTasks>
-    bool ParallelTransformIterator<InputIteratorType, OutType, FuncType, MaxTasks>::IsValid() const
-    {
-        return _currentIndex != _endIndex;
-    }
 
     template <typename InputIteratorType, typename OutType, typename FuncType, int MaxTasks>
     void ParallelTransformIterator<InputIteratorType, OutType, FuncType, MaxTasks>::Next()

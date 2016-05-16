@@ -73,7 +73,7 @@ namespace trainers
         /// <summary> Returns The averaged predictor. </summary>
         ///
         /// <returns> The averaged predictor. </returns>
-        virtual const predictors::LinearPredictor& GetPredictor() const override;
+        virtual const predictors::LinearPredictor& GetPredictor() const override { return _averagedPredictor; }
             
     private:
         IStochasticGradientDescentTrainer::Parameters _parameters;

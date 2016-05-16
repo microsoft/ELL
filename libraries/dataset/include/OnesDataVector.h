@@ -29,28 +29,22 @@ namespace dataset
         {
         public:
 
-            /// <summary> Default copy ctor. </summary>
-            ///
-            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
-            /// <summary> Default move ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns True if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if it succeeds, false if it fails. </returns>
-            bool IsValid() const;
+            bool IsValid() const { return _index < _size; }
 
             /// <summary> Proceeds to the Next iterate. </summary>
-            void Next();
+            void Next() { ++_index; }
 
             /// <summary> Gets the current index-value pair. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            linear::IndexValue Get() const;
+            linear::IndexValue Get() const { return linear::IndexValue{ _index, 1 }; }
 
         private:
             // private ctor, can only be called from SparseDataVector class
@@ -67,14 +61,8 @@ namespace dataset
         /// <param name="dim"> The dimension of the DataVector. </param>
         OnesDataVector(uint64_t dim = 0);
 
-        /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
         OnesDataVector(OnesDataVector&& other) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
         OnesDataVector(const OnesDataVector&) = default;
 
         /// <summary> Sets an entry in the vector. </summary>
@@ -85,22 +73,22 @@ namespace dataset
 
         /// <summary> Deletes all of the vector content and sets its Size to zero, but does not deallocate
         /// its memory. </summary>
-        virtual void Reset() override;
+        virtual void Reset() override { _size = 0; }
 
         /// <summary> Returns the size of the DataVector, which is the largest index of a non-zero entry plus one. </summary>
         ///
         /// <returns> The size of the DataVector. </returns>
-        virtual uint64_t Size() const override;
+        virtual uint64_t Size() const override { return _size; }
 
         /// <summary> The number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
-        virtual uint64_t NumNonzeros() const override;
+        virtual uint64_t NumNonzeros() const override { return _size; }
 
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///
         /// <returns> A double. </returns>
-        virtual double Norm2() const override;
+        virtual double Norm2() const override { return (double)_size; }
 
         /// <summary> Performs (*p_other) += scalar * (*this), where other is a dense vector. </summary>
         ///
@@ -120,7 +108,7 @@ namespace dataset
         /// <summary> Returns an Iterator that points to the beginning of the datavector. </summary>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator() const;
+        Iterator GetIterator() const { return Iterator(_size); }
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///
@@ -130,7 +118,7 @@ namespace dataset
         /// <summary> Makes a deep copy of the datavector </summary>
         ///
         /// <returns> A deep copy of the datavector </summary>
-        virtual std::unique_ptr<IDataVector> Clone() const override;
+        virtual std::unique_ptr<IDataVector> Clone() const override {return std::make_unique<OnesDataVector>(*this); }
 
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///

@@ -34,21 +34,19 @@ namespace linear
     {
     public:
 
-        /// <summary> Move constructor. </summary>
         DoubleMatrixBase(DoubleMatrixBase&&) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
         DoubleMatrixBase(const DoubleMatrixBase&) = delete;
 
         /// <summary> Returns the number of rows in the matrix. </summary>
         ///
         /// <returns> The number of rows. </returns>
-        virtual uint64_t NumRows() const override;
+        virtual uint64_t NumRows() const override { return _numRows; }
 
         /// <summary> Returns the number of columns in the matrix. </summary>
         ///
         /// <returns> The number of columns. </returns>
-        virtual uint64_t NumColumns() const override;
+        virtual uint64_t NumColumns() const override { return _numColumns; }
 
         /// <summary> Sets an entry in the matrix. </summary>
         ///
@@ -58,7 +56,7 @@ namespace linear
         virtual void Set(uint64_t i, uint64_t j, double value = 1.0);
 
         /// <summary> Sets all of the matrix elements to zero. </summary>
-        void Reset();
+        void Reset() { std::fill(begin(), end(), 0); }
 
         /// <summary> Returns a reference to a matrix element </summary>
         ///
@@ -102,8 +100,8 @@ namespace linear
     protected:
         DoubleMatrixBase(uint64_t size, uint64_t numRows, uint64_t numColumns);
 
-        uint64_t _num_rows;
-        uint64_t _num_columns;
+        uint64_t _numRows;
+        uint64_t _numColumns;
 
     private:
         double RowDot(uint64_t i, const double* p_x) const;

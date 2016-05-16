@@ -37,22 +37,22 @@ namespace predictors
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        linear::DoubleVector& GetVector();
+        linear::DoubleVector& GetVector() { return _w; }
 
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        const linear::DoubleVector& GetVector() const;
+        const linear::DoubleVector& GetVector() const { return _w; }
 
         /// <summary> Returns the underlying bias. </summary>
         ///
         /// <returns> The bias. </returns>
-        double& GetBias();
+        double& GetBias() { return _b; }
 
         /// <summary> Returns the underlying bias. </summary>
         ///
         /// <returns> The bias. </returns>
-        double GetBias() const;
+        double GetBias() const { return _b; }
 
         /// <summary> Returns the output of the predictor for a given example. </summary>
         ///

@@ -27,20 +27,14 @@ namespace dataset
         {
         public:
 
-            /// <summary> default copy ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&) = default;
 
-            /// <summary> Default move ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if it succeeds, false if it fails. </returns>
-            bool IsValid() const;
+            bool IsValid() const { return _isValid; }
 
             /// <summary> Proceeds to the Next iterate. </summary>
             void Next();
@@ -48,7 +42,7 @@ namespace dataset
             /// <summary> Returns The current index-value pair. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            linear::IndexValue Get() const;
+            linear::IndexValue Get() const { return _currentIndexValue; }
 
         private:
             std::shared_ptr<const std::string> _spExampleString; // hold on to the shared ptr to make sure that std::string is not deleted

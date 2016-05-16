@@ -8,11 +8,6 @@
 
 #include "CompilableCoordinatewise.h"
 
-uint64_t CompilableCoordinatewise::GetOutputDimension() const
-{
-    return Coordinatewise::GetOutputDimension();
-}
-
 void CompilableCoordinatewise::operator=(const layers::Coordinatewise& coordinatewise)
 {
     Coordinatewise::operator=(coordinatewise);

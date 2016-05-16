@@ -29,15 +29,15 @@ public:
     /// <summary> Query if this node is initialized, namely, if one of its input actions has been performed. </summary>
     ///
     /// <returns> true if the node has been initialized. </returns>
-    bool IsInitialized() const;
+    bool IsInitialized() const { return _isInitialized; }
 
     /// <summary> Sets the node's state to initalized. </summary>
-    void SetInitialized();
+    void SetInitialized() { _isInitialized = true; }
 
     /// <summary> Query if this object has a variable name. </summary>
     ///
     /// <returns> true if the node has a fixed variable name. </returns>
-    bool HasFixedVariableName() const;
+    bool HasFixedVariableName() const { return _fixedVariableName != ""; }
 
     /// <summary> Gets the node's variable name. </summary>
     ///
@@ -52,7 +52,7 @@ public:
     /// <summary> Query if this object has a temporary variable name. </summary>
     ///
     /// <returns> true if the node has a temporary variable name. </returns>
-    bool HasTempVariableName() const;
+    bool HasTempVariableName() const { return _tempVariableIndex >= 0; }
 
     /// <summary> Sets the node's temporary variable index. </summary>
     ///
@@ -62,7 +62,7 @@ public:
     /// <summary> Query if this node has actions. </summary>
     ///
     /// <returns> true if the node actions. </returns>
-    bool HasActions() const;
+    bool HasActions() const { return !_actions.empty(); }
 
     /// <summary> Pops an action of the node's action stack. </summary>
     ///
@@ -83,15 +83,15 @@ public:
     /// <summary> Gets the vector of actions associated with this node. </summary>
     ///
     /// <returns> The vector of actions associated with this node. </returns>
-    const std::vector<AddToAction>& GetActions() const;
+    const std::vector<AddToAction>& GetActions() const { return _actions; }
 
     /// <summary> Query if this node is still waiting for inputs. </summary>
     ///
     /// <returns> true if the node is still waiting for more inputs. </returns>
-    bool IsWaitingForInputs() const;
+    bool IsWaitingForInputs() const { return _numUncomputedInputs > 0; }
 
     /// <summary> Increment the number of inputs tha the node is still waiting for. </summary>
-    void IncrementUncomputedInputs();
+    void IncrementUncomputedInputs() { ++_numUncomputedInputs; }
 
     /// <summary> Decrement the number of inputs tha the node is still waiting for. </summary>
     void DecrementUncomputedInputs();

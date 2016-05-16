@@ -21,16 +21,6 @@ namespace linear
     DoubleSubvector::DoubleSubvector(const double * ptr, uint64_t size) : _ptr(ptr), _size(size)
     {}
 
-    DoubleSubvector::Iterator DoubleSubvector::GetIterator() const
-    {
-        return Iterator(_ptr, _ptr+_size);
-    }
-
-    uint64_t DoubleSubvector::Size() const
-    {
-        return _size;
-    }
-
     double DoubleSubvector::Norm2() const
     {
         double result = 0.0;

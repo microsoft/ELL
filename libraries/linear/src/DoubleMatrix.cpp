@@ -13,24 +13,10 @@
 
 namespace linear
 {
-    uint64_t DoubleMatrixBase::NumRows() const
-    {
-        return _num_rows;
-    }
-
-    uint64_t DoubleMatrixBase::NumColumns() const
-    {
-        return _num_columns;
-    }
 
     void DoubleMatrixBase::Set(uint64_t i, uint64_t j, double value)
     {
         operator()(i,j) = value;
-    }
-
-    void DoubleMatrixBase::Reset()
-    {
-        std::fill(begin(), end(), 0);
     }
 
     void DoubleMatrixBase::Gemv(const double* p_x, double* p_y, double alpha, double beta) const
@@ -155,9 +141,9 @@ namespace linear
 
     void DoubleMatrixBase::Print(std::ostream& os) const
     {
-        for(uint64_t i = 0; i < _num_rows; ++i)
+        for(uint64_t i = 0; i < _numRows; ++i)
         {
-            for(uint64_t j = 0; j < _num_columns; ++j)
+            for(uint64_t j = 0; j < _numColumns; ++j)
             {
                 os << this->operator()(i, j) << "\t";
             }
@@ -166,7 +152,7 @@ namespace linear
     }
 
     DoubleMatrixBase::DoubleMatrixBase(uint64_t size, uint64_t numRows, uint64_t numColumns)
-        : std::vector<double>(size), _num_rows(numRows), _num_columns(numColumns)
+        : std::vector<double>(size), _numRows(numRows), _numColumns(numColumns)
     {}
 
     double DoubleMatrixBase::RowDot(uint64_t i, const double* p_x) const
@@ -197,14 +183,14 @@ namespace linear
 
     double& DoubleMatrix<MatrixStructure::column>::operator()(uint64_t i, uint64_t j)
     {
-        assert(i < this->_num_rows && j < this->_num_columns);
-        return this->operator[](j * this->_num_rows + i);
+        assert(i < this->_numRows && j < this->_numColumns);
+        return this->operator[](j * this->_numRows + i);
     }
 
     double DoubleMatrix<MatrixStructure::column>::operator()(uint64_t i, uint64_t j) const
     {
-        assert(i < this->_num_rows && j < this->_num_columns);
-        return this->operator[](j * this->_num_rows + i);
+        assert(i < this->_numRows && j < this->_numColumns);
+        return this->operator[](j * this->_numRows + i);
     }
 
     // MatrixStructure::row
@@ -215,14 +201,14 @@ namespace linear
 
     double& DoubleMatrix<MatrixStructure::row>::operator()(uint64_t i, uint64_t j)
     {
-        assert(i < this->_num_rows && j < this->_num_columns);
-        return this->operator[](i * this->_num_columns + j);
+        assert(i < this->_numRows && j < this->_numColumns);
+        return this->operator[](i * this->_numColumns + j);
     }
 
     double DoubleMatrix<MatrixStructure::row>::operator()(uint64_t i, uint64_t j) const
     {
-        assert(i < this->_num_rows && j < this->_num_columns);
-        return this->operator[](i * this->_num_columns + j);
+        assert(i < this->_numRows && j < this->_numColumns);
+        return this->operator[](i * this->_numColumns + j);
     }
 
     // MatrixStructure::columnSquare
@@ -255,17 +241,17 @@ namespace linear
 
     double& DoubleMatrix<MatrixStructure::rowSquareUptriangular>::operator()(uint64_t i, uint64_t j)
     {
-        assert(i < this->_num_rows && j < this->_num_columns);
+        assert(i < this->_numRows && j < this->_numColumns);
         _dummy = 0;
         if(i > j) return _dummy;
-        return this->operator[](i * this->_num_columns - (i + 1) * i / 2 + j);
+        return this->operator[](i * this->_numColumns - (i + 1) * i / 2 + j);
     }
 
     double DoubleMatrix<MatrixStructure::rowSquareUptriangular>::operator()(uint64_t i, uint64_t j) const
     {
-        assert(i < this->_num_rows && j < this->_num_columns);
+        assert(i < this->_numRows && j < this->_numColumns);
         if(i > j) return 0;
-        return this->operator[](i * this->_num_columns - (i + 1) * i / 2 + j);
+        return this->operator[](i * this->_numColumns - (i + 1) * i / 2 + j);
     }
 
     void DoubleMatrix<MatrixStructure::rowSquareUptriangular>::Gemv(const double* p_x, double* p_y, double alpha, double beta) const
@@ -298,7 +284,7 @@ namespace linear
 
     double& DoubleMatrix<MatrixStructure::diagonal>::operator()(uint64_t i, uint64_t j)
     {
-        assert(i < this->_num_rows && j < this->_num_columns);
+        assert(i < this->_numRows && j < this->_numColumns);
         _dummy = 0;
         if(i != j) return _dummy;
         return this->operator[](i);
@@ -306,7 +292,7 @@ namespace linear
 
     double DoubleMatrix<MatrixStructure::diagonal>::operator()(uint64_t i, uint64_t j) const
     {
-        assert(i < this->_num_rows && j < this->_num_columns);
+        assert(i < this->_numRows && j < this->_numColumns);
         if(i != j) return 0;
         return this->operator[](i);
     }

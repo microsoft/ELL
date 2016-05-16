@@ -19,11 +19,6 @@ namespace dataset
         Next();
     }
 
-    bool SequentialLineIterator::IsValid() const
-    {
-        return (_spCurrentLine != nullptr);
-    }
-
     void SequentialLineIterator::Next()
     {
         auto spNextLine = std::make_shared<std::string>();
@@ -36,10 +31,5 @@ namespace dataset
         {
             _spCurrentLine = spNextLine;
         }
-    }
-
-    std::shared_ptr<const std::string> SequentialLineIterator::Get() const
-    {
-        return _spCurrentLine;
     }
 }

@@ -10,14 +10,7 @@
 
 namespace treeLayout
 {
-
-    QpLayoutGenerator::Params::Params()
-    {}
-
-    QpLayoutGenerator::QpLayoutGenerator() : _params()
-    {}
-
-    QpLayoutGenerator::QpLayoutGenerator(Params p) : _params(p)
+    QpLayoutGenerator::QpLayoutGenerator(const Parameters& parameters) : _parameters(parameters)
     {}
 
     QpLayoutGenerator::VertexInfo::VertexInfo(uint64_t i, double s) :
@@ -71,7 +64,7 @@ namespace treeLayout
         uint64_t numLayers = (uint64_t)_layers.size();
         std::vector<double> depths(numLayers);
         depths[0] = 0.0;
-        double depthSpace = _params.depthSpace * pow(_params.depthSpaceGrowthFactor, numLayers - 1.0);
+        double depthSpace = _parameters.depthSpace * pow(_parameters.depthSpaceGrowthFactor, numLayers - 1.0);
 
         // find min max offsets
         double min_offset = _offsets[0];
@@ -80,7 +73,7 @@ namespace treeLayout
         {
             depths[i] = depths[i - 1] + depthSpace;
 
-            depthSpace /= _params.depthSpaceGrowthFactor;
+            depthSpace /= _parameters.depthSpaceGrowthFactor;
             uint64_t first_in_layer = _layers[i][0].index;
             uint64_t last_in_layer = _layers[i][_layers[i].size() - 1].index;
 

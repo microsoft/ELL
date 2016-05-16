@@ -28,7 +28,7 @@ namespace utilities
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if it succeeds, false if it fails. </returns>
-        bool IsValid() const;
+        bool IsValid() const { return _currentIndex != _endIndex; }
 
         /// <summary> Proceeds to the Next iterate. </summary>
         void Next();

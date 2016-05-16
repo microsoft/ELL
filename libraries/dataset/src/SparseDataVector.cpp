@@ -11,12 +11,6 @@
 namespace dataset
 {
     template<typename ValueType, typename IntegerListType>
-    bool SparseDataVector<ValueType, IntegerListType>::Iterator::IsValid() const
-    {
-        return _index_iterator.IsValid();
-    }
-
-    template<typename ValueType, typename IntegerListType>
     void SparseDataVector<ValueType, IntegerListType>::Iterator::Next()
     {
         _index_iterator.Next();
@@ -24,20 +18,10 @@ namespace dataset
     }
 
     template<typename ValueType, typename IntegerListType>
-    linear::IndexValue SparseDataVector<ValueType, IntegerListType>::Iterator::Get() const
-    {
-        return linear::IndexValue{_index_iterator.Get(), (double)*_value_iterator};
-    }
-
-    template<typename ValueType, typename IntegerListType>
     SparseDataVector<ValueType, IntegerListType>::Iterator::Iterator(
         const IndexIteratorType& index_iterator,
         const ValueIteratorType& value_iterator)
         : _index_iterator(index_iterator), _value_iterator(value_iterator)
-    {}
-
-    template<typename ValueType, typename IntegerListType>
-    SparseDataVector<ValueType, IntegerListType>::SparseDataVector() 
     {}
 
     template<typename ValueType, typename IntegerListType>
@@ -71,17 +55,16 @@ namespace dataset
             return _indices.Max() + 1;
         }
     }
-
-    template<typename ValueType, typename IntegerListType>
-    uint64_t SparseDataVector<ValueType, IntegerListType>::NumNonzeros() const
-    {
-        return _indices.Size();
-    }
     
     template<typename ValueType, typename IntegerListType>
     double SparseDataVector<ValueType, IntegerListType>::Norm2() const
     {
-        return (double)_indices.Size();
+        double result = 0.0;
+        for (auto value : _values)
+        {
+            result += value*value;
+        }
+        return result;
     }
     
     template<typename ValueType, typename IntegerListType>

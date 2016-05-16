@@ -41,10 +41,10 @@ namespace dataset
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if it succeeds, false if it fails. </returns>
-        virtual bool IsValid() const override;
+        virtual bool IsValid() const override { return _rowIterator.IsValid(); }
 
         /// <summary> Proceeds to the Next row. </summary>
-        virtual void Next() override;
+        virtual void Next() override { _rowIterator.Next(); }
 
         /// <summary> The weight of the current example. </summary>
         ///

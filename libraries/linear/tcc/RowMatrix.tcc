@@ -16,43 +16,12 @@ namespace linear
     template<typename DataVectorType>
     RowMatrix<DataVectorType>::Iterator::Iterator(const RowMatrix& table, uint64_t firstRow, uint64_t maxRow) : _table(table), _row(firstRow), _maxRow(maxRow)
     {}
-
-    template<typename DataVectorType>
-    bool RowMatrix<DataVectorType>::Iterator::IsValid() const
-    {
-        return _row < _maxRow;
-    }
-
-    template<typename DataVectorType>
-    uint64_t RowMatrix<DataVectorType>::Iterator::NumIteratesLeft() const
-    {
-        return _maxRow - _row;
-    }
-    
-    template<typename DataVectorType>
-    void RowMatrix<DataVectorType>::Iterator::Next() 
-    {
-        ++_row;
-    }
     
     template<typename DataVectorType>
     const DataVectorType& RowMatrix<DataVectorType>::Iterator::Get() const
     {
         assert(_row < _table.NumRows() && _row < _maxRow);
-    
         return _table.GetRow(_row);
-    }
-    
-    template<typename DataVectorType>
-    uint64_t RowMatrix<DataVectorType>::NumRows() const
-    {
-        return _rows.size();
-    }
-
-    template<typename DataVectorType>
-    uint64_t RowMatrix<DataVectorType>::NumColumns() const
-    {
-        return _num_columns;
     }
 
     template<typename DataVectorType>
@@ -79,9 +48,9 @@ namespace linear
         uint64_t numColumns = row.Size();
         _rows.emplace_back(std::move(row));
 
-        if(_num_columns < numColumns)
+        if(_numColumns < numColumns)
         {
-            _num_columns = numColumns;
+            _numColumns = numColumns;
         }
     }
 
@@ -92,9 +61,9 @@ namespace linear
         _rows.emplace_back(args...);
 
         uint64_t numColumns = _rows[_rows.size()-1].size();
-        if(_num_columns < numColumns)
+        if(_numColumns < numColumns)
         {
-            _num_columns = numColumns;
+            _numColumns = numColumns;
         }
     }
 

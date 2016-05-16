@@ -14,21 +14,6 @@
 
 namespace dataset
 {
-    bool OnesDataVector::Iterator::IsValid() const
-    {
-        return (_index < _size);
-    }
-
-    void OnesDataVector::Iterator::Next()
-    {
-        ++_index;
-    }
-
-    linear::IndexValue OnesDataVector::Iterator::Get() const
-    {
-        return linear::IndexValue{_index, 1};
-    }
-
     OnesDataVector::Iterator::Iterator(uint64_t size) : _size(size)
     {}
 
@@ -42,26 +27,6 @@ namespace dataset
             throw std::runtime_error("Cannot set elements of a ones vector to non-one values");
         }
         ++_size;
-    }
-
-    void OnesDataVector::Reset()
-    {
-        _size = 0;
-    }
-
-    uint64_t OnesDataVector::Size() const
-    {
-        return _size;
-    }
-
-    uint64_t OnesDataVector::NumNonzeros() const
-    {
-        return _size;
-    }
-
-    double OnesDataVector::Norm2() const
-    {
-        return (double)_size;
     }
 
     void OnesDataVector::AddTo(double* p_other, double scalar) const
@@ -83,23 +48,12 @@ namespace dataset
         return result;
     }
 
-    OnesDataVector::Iterator OnesDataVector::GetIterator() const
-    {
-        return Iterator(_size);
-    }
-
     void OnesDataVector::Print(std::ostream & os) const
     {
         for(int i=0; i<_size; ++i)
         {
             os << i << ":1\t";
         }
-    }
-
-    std::unique_ptr<IDataVector> OnesDataVector::Clone() const
-    {
-        auto ptr = std::make_unique<OnesDataVector>(*this); 
-        return std::move(ptr);
     }
 
     std::vector<double> OnesDataVector::ToArray() const
