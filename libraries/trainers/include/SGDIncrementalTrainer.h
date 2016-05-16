@@ -10,6 +10,8 @@
 
 #include "IIncrementalTrainer.h"
 #include "ITrainer.h"
+#include "SingleEpochTrainer.h"
+#include "MultiEpochTrainer.h"
 
 // predictors
 #include "LinearPredictor.h"
@@ -83,10 +85,10 @@ namespace trainers
     ///
     /// <returns> A sorting tree trainer </returns>
     template <typename LossFunctionType>
-    std::unique_ptr<IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction);
+    std::unique_ptr<SGDIncrementalTrainer<LossFunctionType>> MakeSGDIncrementalTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction);
 
     template <typename LossFunctionType>
-    std::unique_ptr<ITrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction);
+    std::unique_ptr<SingleEpochTrainer<SGDIncrementalTrainer<LossFunctionType>>> MakeSGDTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction);
 }
 
 #include "../tcc/SGDIncrementalTrainer.tcc"

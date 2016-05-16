@@ -36,16 +36,16 @@ namespace trainers
     }
 
     template<typename BasePredictorType>
-    std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer)
+    std::unique_ptr<BaggingIncrementalTrainer<BasePredictorType>> MakeBaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer)
     {
         // TODO
-        return std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>>();
+        return std::unique_ptr<BaggingIncrementalTrainer<BasePredictorType>>();
     }
 
     template<typename BasePredictorType>
-    std::unique_ptr<ITrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer)
+    std::unique_ptr<BaggingIncrementalTrainer<BasePredictorType>> MakeBaggingTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer)
     {
         // TODO
-        return std::unique_ptr<ITrainer<predictors::EnsemblePredictor<BasePredictorType>>>();
+        return std::unique_ptr<BaggingIncrementalTrainer<BasePredictorType>>();
     }
 }

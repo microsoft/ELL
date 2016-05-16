@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BinaryClassificationEvaluator.h"
-#include "SingleEpochTrainer.h"
 
 // stl
 #include <cmath>
@@ -98,13 +97,13 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction)
+    std::unique_ptr<SGDIncrementalTrainer<LossFunctionType>> MakeSGDIncrementalTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction)
     {
         return std::make_unique<SGDIncrementalTrainer<LossFunctionType>>(dim, parameters, lossFunction);
     }
 
     template<typename LossFunctionType>
-    std::unique_ptr<ITrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType & lossFunction)
+    std::unique_ptr<SingleEpochTrainer<SGDIncrementalTrainer<LossFunctionType>>> MakeSGDTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType & lossFunction)
     {
         return std::unique_ptr<SingleEpochTrainer<predictors::LinearPredictor>>(MakeSGDIncrementalTrainer(dim, parameters, lossFunction));
     }

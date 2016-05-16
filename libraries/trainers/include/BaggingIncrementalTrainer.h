@@ -9,6 +9,7 @@
 #pragma once
 
 #include "IIncrementalTrainer.h"
+#include "ITrainer.h"
 
 // predictors
 #include "EnsemblePredictor.h"
@@ -47,10 +48,10 @@ namespace trainers
     };
 
     template <typename BasePredictorType>
-    std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer);
+    std::unique_ptr<BaggingIncrementalTrainer<BasePredictorType>> MakeBaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer);
 
     template <typename BasePredictorType>
-    std::unique_ptr<ITrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer);
+    std::unique_ptr<BaggingIncrementalTrainer<BasePredictorType>> MakeBaggingTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer);
 }
 
 #include "../tcc/BaggingIncrementalTrainer.tcc"

@@ -21,7 +21,7 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeSingleEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner)
+    std::unique_ptr<SingleEpochTrainer<PredictorType>> MakeSingleEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner)
     {
         return std::make_unique<SingleEpochTrainer<PredictorType>>(std::move(learner));
     }

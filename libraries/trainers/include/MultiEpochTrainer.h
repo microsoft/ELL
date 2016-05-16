@@ -53,7 +53,7 @@ namespace trainers
     };
 
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner);
+    std::unique_ptr<MultiEpochTrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner);
 }
 
 #include "../tcc/MultiEpochTrainer.tcc"
