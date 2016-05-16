@@ -93,11 +93,6 @@ namespace layers
         serializer.Serialize(*this);
     }
 
-    std::string Model::GetTypeName()
-    {
-        return "Model";
-    }
-
     void Model::Read(utilities::XMLDeserializer& deserializer)
     {
         int version = 0;

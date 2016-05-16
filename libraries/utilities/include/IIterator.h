@@ -21,7 +21,6 @@ namespace utilities
     {
     public:
 
-        /// <summary> default virtual destructor </summary>
         virtual ~IIterator() = default;
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>

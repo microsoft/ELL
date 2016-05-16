@@ -18,10 +18,6 @@ namespace utilities
     //
     // ParsedArgSet class
     //
-    ParsedArgSet::ParsedArgSet()
-    {
-    }
-
     void ParsedArgSet::AddArgs(CommandLineParser& parser)
     {
     }
@@ -34,10 +30,6 @@ namespace utilities
     //
     // CommandLineParseResult class
     //
-    CommandLineParseResult::CommandLineParseResult() : _isOK(true)
-    {
-    }
-
     CommandLineParseResult::CommandLineParseResult(bool ok) : _isOK(ok)
     {
     }
@@ -57,22 +49,11 @@ namespace utilities
         _isOK = _messages.size() == 0;
     }
 
-    CommandLineParseResult::operator bool()
-    {
-        return _isOK;
-    }
-
-
     //
     // ParseError class
     //
     ParseError::ParseError(const std::string& message) : _message(message)
     {
-    }
-
-    std::string ParseError::GetMessage() const
-    {
-        return _message;
     }
 
     //

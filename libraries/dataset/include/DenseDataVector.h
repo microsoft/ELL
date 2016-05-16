@@ -38,21 +38,15 @@ namespace dataset
         /// <summary> Constructor. </summary>
         DenseDataVector();
 
+        DenseDataVector(const DenseDataVector&) = default;
+
+        DenseDataVector(DenseDataVector&& other) = default;
+
         /// <summary> Constructs an instance of DenseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
         template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         DenseDataVector(IndexValueIteratorType indexValueIterator);
-
-        /// <summary> Copy constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
-        DenseDataVector(const DenseDataVector&) = default; 
-
-        /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
-        DenseDataVector(DenseDataVector&& other) = default;
 
         /// <summary> Constructs an instance of DenseDataVector from a std::vector. </summary>
         ///
@@ -79,12 +73,12 @@ namespace dataset
         /// <summary> The largest index of a non-zero entry plus one. </summary>
         ///
         /// <returns> An uint64_t. </returns>
-        virtual uint64_t Size() const override;
+        virtual uint64_t Size() const override { return _data.size(); }
 
         /// <summary> The number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
-        virtual uint64_t NumNonzeros() const override;
+        virtual uint64_t NumNonzeros() const override { return _numNonzeros; }
 
         /// <summary> Computes the std::vector squared 2-norm. </summary>
         ///
@@ -109,7 +103,7 @@ namespace dataset
         /// <summary> Returns an Iterator that points to the beginning of the std::vector. </summary>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator() const;
+        Iterator GetIterator() const { return utilities::MakeStlIndexValueIterator(_data); }
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///

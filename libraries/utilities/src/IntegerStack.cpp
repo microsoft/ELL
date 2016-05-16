@@ -47,9 +47,4 @@ namespace utilities
 
         assert(value < _smallestUnpopped);
     }
-
-    bool IntegerStack::IsTopNovel() const
-    {
-        return _stack.empty();
-    }
 }

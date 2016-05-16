@@ -27,7 +27,7 @@
 class PrintableLayer 
 {
 public:
-    /// <summary> default virtual destructor. </summary>
+
     virtual ~PrintableLayer() = default;
 
     /// <summary> Gets a friendly layer name. </summary>
@@ -66,7 +66,7 @@ public:
     /// <summary> Gets the name of this type. </summary>
     ///
     /// <returns> The name of this type. </returns>
-    static std::string GetTypeName(); 
+    static std::string GetTypeName() { return "PrintLayer"; }
 
     /// <summary> Prints generic layer of elements </summary>
     ///

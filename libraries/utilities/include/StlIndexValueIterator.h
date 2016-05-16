@@ -33,7 +33,7 @@ namespace utilities
         /// <summary> Returns True if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> True if the iterator is currently pointing to a valid iterate. </returns>
-        bool IsValid() const;
+        bool IsValid() const { return _begin != _end; }
 
         /// <summary> Proceeds to the Next iterate </summary>
         void Next();
@@ -41,7 +41,7 @@ namespace utilities
         /// <summary> Returns The current index-value pair </summary>
         ///
         /// <returns> The current index-value pair </returns>
-        linear::IndexValue Get() const;
+        linear::IndexValue Get() const { return linear::IndexValue{ _index, (double)*_begin }; }
 
     protected:
         IteratorType _begin;

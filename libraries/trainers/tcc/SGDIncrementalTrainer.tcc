@@ -80,11 +80,6 @@ namespace trainers
         _averagedPredictor.Scale(scale);
     }
 
-    template<typename LossFunctionType>
-    const predictors::LinearPredictor& SGDIncrementalTrainer<LossFunctionType>::GetPredictor() const
-    {
-        return _averagedPredictor;
-    }
 
     template<typename LossFunctionType>
     predictors::LinearPredictor SGDIncrementalTrainer<LossFunctionType>::Reset()

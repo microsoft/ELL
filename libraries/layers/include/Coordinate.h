@@ -25,7 +25,7 @@ namespace layers
     public:
 
         /// <summary> Default constructor. Sets layer and element indices to 0. </summary>
-        Coordinate();
+        Coordinate() : _layerIndex(0), _elementIndex(0) {}
 
         /// <summary> Constructs a Coordinate object. </summary>
         ///
@@ -36,17 +36,17 @@ namespace layers
         /// <summary> Gets the layer index. </summary>
         ///
         /// <returns> The layer index. </returns>
-        uint64_t GetLayerIndex() const;
+        uint64_t GetLayerIndex() const { return _layerIndex; }
 
         /// <summary> Gets the element index. </summary>
         ///
         /// <returns> The element index. </returns>
-        uint64_t GetElementIndex() const; 
+        uint64_t GetElementIndex() const { return _elementIndex; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName();
+        static std::string GetTypeName() { return "Coordinate"; }
 
         /// <summary> Reads the coordinate from an XMLDeserializer. </summary>
         ///

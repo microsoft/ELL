@@ -37,20 +37,14 @@ namespace dataset
         {
         public:
 
-            /// <summary> Default copy ctor. </summary>
-            ///
-            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
-            /// <summary> Default move ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if it succeeds, false if it fails. </returns>
-            bool IsValid() const;
+            bool IsValid() const { return _index_iterator.IsValid(); }
 
             /// <summary> Proceeds to the Next iterate. </summary>
             void Next();
@@ -58,7 +52,7 @@ namespace dataset
             /// <summary> Returns The current index-value pair. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            linear::IndexValue Get() const;
+            linear::IndexValue Get() const { return linear::IndexValue{ _index_iterator.Get(), (double)*_value_iterator }; }
 
         private:
             
@@ -75,8 +69,7 @@ namespace dataset
             ValueIteratorType _value_iterator;
         };
 
-        /// <summary> Constructs an empty sparse binary vector. </summary>
-        SparseDataVector();
+        SparseDataVector() = default;
 
         /// <summary> Constructs an instance of SparseDataVector. </summary>
         ///
@@ -84,14 +77,8 @@ namespace dataset
         template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         SparseDataVector(IndexValueIteratorType indexValueIterator);
 
-        /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
         SparseDataVector(SparseDataVector<ValueType, IntegerListType>&& other) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="other"> The other. </param>
         SparseDataVector(const SparseDataVector<ValueType, IntegerListType>& other) = default;
 
         /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
@@ -113,7 +100,7 @@ namespace dataset
         /// <summary> Returns The number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
-        virtual uint64_t NumNonzeros() const override;
+        virtual uint64_t NumNonzeros() const override { return _indices.Size(); }
 
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///

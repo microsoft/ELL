@@ -28,8 +28,8 @@ namespace utilities
     class CommandLineParseResult
     {
     public:
-        /// <summary> Result indicating no error </summary>
-        CommandLineParseResult();
+
+        CommandLineParseResult() = default;
 
         /// <summary> Result indicating result with no message </summary>
         ///
@@ -52,13 +52,13 @@ namespace utilities
         CommandLineParseResult(const std::vector<std::string>& messages);
 
         /// <summary> Returns true if result is OK (there were no errors) </summary>
-        operator bool();
+        operator bool() { return _isOK; }
 
         friend class CommandLineParser;
 
     private:
         std::vector<std::string> _messages;
-        bool _isOK;
+        bool _isOK = true;
     };
 
     class ParsedArgSet;
@@ -206,7 +206,8 @@ namespace utilities
     class ParsedArgSet
     {
     public:
-        ParsedArgSet();
+
+        ParsedArgSet() = default;
 
         /// <summary> 
         /// Adds the arguments stored in this arg set to the command-line parser.
@@ -238,7 +239,7 @@ namespace utilities
         /// <summary> Gets the error message for this error </summary>
         ///
         /// <returns> The error message for this error </returns>
-        std::string GetMessage() const;
+        std::string GetMessage() const { return _message; }
 
         /// <summary> Constructor for ParseError class. Used by CommandLineParserErrorException. </summary>
         ParseError(const std::string& message);

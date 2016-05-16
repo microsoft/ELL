@@ -28,13 +28,10 @@ namespace linear
         /// <summary> The type of each row. </summary>
         using RowType = typename RowMatrixType::RowType;
 
-        /// <summary> Constructs a bioriented matrix. </summary>
         BiMatrix() = default;
 
-        /// <summary> Move constructor. </summary>
         BiMatrix(BiMatrix<RowMatrixType>&&) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
         BiMatrix(const BiMatrix<RowMatrixType>&) = delete;
 
         /// <summary> Gets a reference to a column. </summary>

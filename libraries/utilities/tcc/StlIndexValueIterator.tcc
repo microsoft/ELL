@@ -18,23 +18,11 @@ namespace utilities
     }
 
     template <typename IteratorType, typename ValueType>
-    bool StlIndexValueIterator<IteratorType, ValueType>::IsValid() const
-    {
-        return (_begin != _end);
-    }
-
-    template <typename IteratorType, typename ValueType>
     void StlIndexValueIterator<IteratorType, ValueType>::Next()
     {
         ++_begin;
         ++_index;
         SkipZeros();
-    }
-
-    template <typename IteratorType, typename ValueType>
-    linear::IndexValue StlIndexValueIterator<IteratorType, ValueType>::Get() const
-    {
-        return linear::IndexValue{ _index, (double)*_begin };
     }
 
     template <typename IteratorType, typename ValueType>

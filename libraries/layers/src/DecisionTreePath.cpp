@@ -21,21 +21,6 @@ namespace layers
         _edgeToInteriorNode(std::move(edgeToInteriorNode)), _splitRuleCoordinates(std::move(splitRuleCoordinates))
     {}
 
-    uint64_t DecisionTreePath::GetInputDimension() const
-    {
-        return _splitRuleCoordinates.Size();
-    }
-
-    uint64_t DecisionTreePath::GetOutputDimension() const
-    {
-        return _edgeToInteriorNode.size();
-    }
-
-    uint64_t DecisionTreePath::NumInteriorNodes() const
-    {
-        return _splitRuleCoordinates.Size();
-    }
-
     uint64_t DecisionTreePath::GetNegativeOutgoingEdgeIndex(uint64_t interiorNodeIndex) const
     {
         return interiorNodeIndex * 2;
@@ -92,16 +77,6 @@ namespace layers
     uint64_t DecisionTreePath::GetRequiredLayerSize(uint64_t layerIndex) const
     {
         return _splitRuleCoordinates.GetRequiredLayerSize(layerIndex);
-    }
-
-    std::string DecisionTreePath::GetTypeName()
-    {
-        return "DecisionTreePath";
-    }
-
-    std::string DecisionTreePath::GetRuntimeTypeName() const
-    {
-        return GetTypeName();
     }
 
     void DecisionTreePath::Read(utilities::XMLDeserializer& deserializer)
