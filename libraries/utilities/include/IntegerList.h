@@ -34,15 +34,15 @@ namespace utilities
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if it succeeds, false if it fails. </returns>
-            bool IsValid() const;
+            bool IsValid() const { return _begin < _end; }
 
             /// <summary> Proceeds to the Next iterate. </summary>
-            void Next();
+            void Next() { ++_begin; }
 
             /// <summary> Returns the value of the current iterate. </summary>
             ///
             /// <returns> An uint64_t. </returns>
-            uint64_t Get() const;
+            uint64_t Get() const { return *_begin; }
 
         private:
 
@@ -68,7 +68,7 @@ namespace utilities
         /// <summary> Gets the number of entries in the list. </summary>
         ///
         /// <returns> An uint64_t. </returns>
-        uint64_t Size() const;
+        uint64_t Size() const { return (uint64_t)_list.size(); }
 
         /// <summary> Allocates a specified number of entires to the list. </summary>
         ///
@@ -86,7 +86,7 @@ namespace utilities
         void Append(uint64_t value);
 
         /// <summary> Deletes all of the vector content and sets its Size to zero. </summary>
-        void Reset();
+        void Reset() { _list.resize(0); }
 
         /// <summary> Gets Iterator that points to the beginning of the list. </summary>
         ///

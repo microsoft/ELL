@@ -42,17 +42,17 @@ namespace linear
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if valid, false if not. </returns>
-            bool IsValid() const;
+            bool IsValid() const { return _row < _maxRow; }
 
             /// <summary>
             /// Returns the number of iterates left in this iterator, including the current one.
             /// </summary>
             ///
             /// <returns> The total number of iterates left. </returns>
-            uint64_t NumIteratesLeft() const;
+            uint64_t NumIteratesLeft() const { return _maxRow - _row; }
 
             /// <summary> Proceeds to the Next row. </summary>
-            void Next();
+            void Next() { ++_row; }
 
             /// <summary> Returns a const reference to the current row. </summary>
             ///
@@ -87,12 +87,12 @@ namespace linear
         /// <summary> Returns the number of rows in the matrix. </summary>
         ///
         /// <returns> The number of rows. </returns>
-        virtual uint64_t NumRows() const override;
+        virtual uint64_t NumRows() const override { return _rows.size(); }
 
         /// <summary> Returns the number of columns in the matrix. </summary>
         ///
         /// <returns> The number of columns. </returns>
-        virtual uint64_t NumColumns() const override;
+        virtual uint64_t NumColumns() const override { return _numColumns; }
 
         /// <summary> Returns a reference to a row. </summary>
         ///

@@ -23,8 +23,7 @@ namespace treeLayout
     {
     public:
         
-        /// <summary> Constructs a default vertex position. </summary>
-        VertexPosition();
+        VertexPosition() = default;
 
         /// <summary> Constructs a vertex position with specific depth and offset. </summary>
         ///
@@ -35,12 +34,12 @@ namespace treeLayout
         /// <summary> Returns the depth of the vertex. </summary>
         ///
         /// <returns> The depth. </returns>
-        double GetDepth() const;
+        double GetDepth() const { return _depth; }
 
         /// <summary> Returns the offset of the vertex. </summary>
         ///
         /// <returns> The offset. </returns>
-        double GetOffset() const;
+        double GetOffset() const { return _offset; }
 
         /// <summary> Sets the depth. </summary>
         ///
@@ -93,39 +92,39 @@ namespace treeLayout
         /// <summary> Returns The number of vertices. </summary>
         ///
         /// <returns> The number of vertices. </returns>
-        uint64_t Size() const;
+        uint64_t Size() const { return (uint64_t)_positions.size(); }
 
         /// <summary>
         /// Returns the min offset (if the tree is top down, this is the left of its bounding box)
         /// </summary>
         ///
         /// <returns> The minimum offset. </returns>
-        double GetMinOffset() const;
+        double GetMinOffset() const { return _minOffset; }
 
         /// <summary>
         /// Returns the max offset (if the tree is top down, this is the right of its bounding box)
         /// </summary>
         ///
         /// <returns> The maximum offset. </returns>
-        double GetMaxOffset() const;
+        double GetMaxOffset() const { return _maxOffset; }
 
         /// <summary>
         /// Returns the min depth (if the tree is top down, this is the top of its bounding box)
         /// </summary>
         ///
         /// <returns> The minimum depth. </returns>
-        double GetMinDepth() const;
+        double GetMinDepth() const { return _minDepth; }
 
         /// <summary> Returns the max depth (if the tree is top down, this is the bottom of its bounding
         /// box) </summary>
         ///
         /// <returns> The maximum depth. </returns>
-        double GetMaxDepth() const;
+        double GetMaxDepth() const { return _maxDepth; }
 
         /// <summary> Gets the vector of vertex positions. </summary>
         ///
         /// <returns> The vertices. </returns>
-        const std::vector<VertexPosition>& GetVertices() const;
+        const std::vector<VertexPosition>& GetVertices() const { return _positions; }
 
     private:
         std::vector<VertexPosition> _positions;

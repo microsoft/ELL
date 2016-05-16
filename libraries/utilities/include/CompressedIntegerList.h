@@ -35,7 +35,7 @@ namespace utilities
             /// <summary> Query if this object input stream valid. </summary>
             ///
             /// <returns> true if it succeeds, false if it fails. </returns>
-            bool IsValid() const;
+            bool IsValid() const { return _iter < _end; }
 
             /// <summary> Proceeds to the Next iterate. </summary>
             void Next();
@@ -43,7 +43,7 @@ namespace utilities
             /// <summary> Returns the value of the current iterate. </summary>
             ///
             /// <returns> An uint64_t. </returns>
-            uint64_t Get() const;
+            uint64_t Get() const { return _value; }
 
         private:
 
@@ -95,7 +95,7 @@ namespace utilities
         /// <summary> Returns an `Iterator` that points to the beginning of the list. </summary>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator() const;
+        Iterator GetIterator() const { return Iterator(_data.data(), _data.data() + _data.size()); }
 
     private:
         std::vector<uint8_t> _data;

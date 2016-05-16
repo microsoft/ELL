@@ -25,10 +25,9 @@ namespace treeLayout
     public:
 
         /// <summary> User configurable parameters of the Layout algorithm. </summary>
-        struct Params
+        struct Parameters
         {
-            /// <summary> Default constructor. </summary>
-            Params();
+            Parameters() = default;
 
             /// <summary>
             /// The maximum number of gradient descent steps to take. The more steps, the longer the running
@@ -81,13 +80,12 @@ namespace treeLayout
             bool SimpleLayout = false;
         };
 
-        /// <summary> Constructs a generator with default parameters. </summary>
-        QpLayoutGenerator();
+        QpLayoutGenerator() = default;
 
-        /// <summary> Constructs a generator with user defined parameters. </summary>
+        /// <summary> Constructs a layout generator with user defined parameters. </summary>
         ///
-        /// <param name="p"> Variable arguments providing additional information. </param>
-        QpLayoutGenerator(Params p);
+        /// <param name="parameters"> Layout generator parameters. </param>
+        QpLayoutGenerator(const Parameters& parameters);
 
         /// <summary> Calculates the tree Layout. </summary>
         ///
@@ -142,7 +140,7 @@ namespace treeLayout
         std::vector<double> _offsets;
         std::vector<uint64_t> _depth_index;
         std::vector<double> _gd_increment;
-        Params _params;
+        Parameters _parameters;
     };
 }
 

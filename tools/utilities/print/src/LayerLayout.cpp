@@ -69,35 +69,6 @@ LayerLayout::LayerLayout(double left, double top, uint64_t size, double layerMax
     }
 }
 
-uint64_t LayerLayout::NumElements() const
-{
-    return _elementMidX.size();
-}
-
-double LayerLayout::GetWidth() const
-{
-    return _layerWidth;
-}
-
-double LayerLayout::GetHeight() const
-{
-    return _layerHeight;
-}
-
-bool LayerLayout::HasHiddenElements() const
-{
-    if (_numHiddenElements > 0)
-    {
-        return true;
-    }
-    return false;
-}
-
-uint64_t LayerLayout::NumVisibleElements() const
-{
-    return _elementMidX.size() - _numHiddenElements;
-}
-
 bool LayerLayout::IsHidden(uint64_t index) const
 {
     uint64_t size = _elementMidX.size();
@@ -108,19 +79,9 @@ bool LayerLayout::IsHidden(uint64_t index) const
     return true;
 }
 
-double LayerLayout::GetMidY() const
-{
-    return _midY;
-}
-
 double LayerLayout::GetMidX(uint64_t index) const
 {
     return _elementMidX[index];
-}
-
-double LayerLayout::GetDotsMidX() const
-{
-    return _dotsMidX;
 }
 
 Point LayerLayout::GetOutputPoint(uint64_t index) const

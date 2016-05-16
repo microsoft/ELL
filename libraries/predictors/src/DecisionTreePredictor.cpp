@@ -22,23 +22,6 @@ namespace predictors
     DecisionTreePredictor::Node::Node(double outputValue) : _outputValue(outputValue)
     {}
 
-    double DecisionTreePredictor::Node::getOutputValue() const
-    {
-        return _outputValue;
-    }
-
-    bool DecisionTreePredictor::Node::IsLeaf() const
-    {
-        if (_interiorNode == nullptr)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
     double DecisionTreePredictor::Node::Predict(const dataset::DoubleDataVector& dataVector) const
     {
         double output = _outputValue;
@@ -61,31 +44,6 @@ namespace predictors
     DecisionTreePredictor::InteriorNode::InteriorNode(SplitRule splitRule, Node negativeChild, Node positiveChild) :
         _splitRule(splitRule), _negativeChild(std::move(negativeChild)), _positiveChild(std::move(positiveChild))
     {}
-
-    const DecisionTreePredictor::SplitRule & DecisionTreePredictor::InteriorNode::GetSplitRule() const
-    {
-        return _splitRule;
-    }
-
-    DecisionTreePredictor::Node & DecisionTreePredictor::InteriorNode::GetNegativeChild()
-    {
-        return _negativeChild;
-    }
-
-    const DecisionTreePredictor::Node & DecisionTreePredictor::InteriorNode::GetNegativeChild() const
-    {
-        return _negativeChild;
-    }
-
-    DecisionTreePredictor::Node & DecisionTreePredictor::InteriorNode::GetPositiveChild()
-    {
-        return _positiveChild;
-    }
-
-    const DecisionTreePredictor::Node & DecisionTreePredictor::InteriorNode::GetPositiveChild() const
-    {
-        return _positiveChild;
-    }
 
     uint64_t DecisionTreePredictor::InteriorNode::NumInteriorNodesInSubtree() const
     {
@@ -131,11 +89,6 @@ namespace predictors
             return 0;
         }
         return _root._interiorNode->NumInteriorNodesInSubtree();
-    }
-
-    DecisionTreePredictor::Node& DecisionTreePredictor::GetRoot()
-    {
-        return _root;
     }
 
     double DecisionTreePredictor::Predict(const dataset::IDataVector& dataVector) const

@@ -30,7 +30,7 @@ namespace utilities
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static std::string GetName();
+        static std::string GetName() { return std::string(T::GetTypeName()); }
     };
 
     /// <summary> Class used to get information about unique_ptr types. </summary>

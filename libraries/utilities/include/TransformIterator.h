@@ -27,15 +27,15 @@ namespace utilities
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if it succeeds, false if it fails. </returns>
-        bool IsValid() const;
+        bool IsValid() const { return _inIter.IsValid(); }
 
         /// <summary> Proceeds to the Next iterate. </summary>
-        void Next();
+        void Next() { _inIter.Next(); }
 
         /// <summary> Returns the value of the current iterate. </summary>
         ///
         /// <returns> The result of applying the transformFunction on the current item in the input iterator. </returns>
-        OutType Get() const;
+        OutType Get() const { return _transformFunction(_inIter.Get()); }
 
     private:
         InputIteratorType& _inIter;
