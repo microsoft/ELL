@@ -29,7 +29,7 @@ namespace dataset
         /// <summary> Copy constructor </summary>
         ///
         /// <param name="other"> The other. </param>
-        SupervisedExample(const SupervisedExample<DataVectorType>& other) = delete;
+        SupervisedExample(const SupervisedExample<DataVectorType>& other) = delete; // { throw std::exception(); }//= delete;
 
         /// <summary> Default move constructor. </summary>
         ///
@@ -41,7 +41,7 @@ namespace dataset
         /// <param name="dataVector"> The data vector. </param>
         /// <param name="label"> The label. </param>
         /// <param name="weight"> The weight. </param>
-        SupervisedExample(std::shared_ptr<DataVectorType> dataVector, double label, double weight = 1.0);
+        SupervisedExample(std::shared_ptr<const DataVectorType> dataVector, double label, double weight = 1.0);
 
         /// <summary> Assignment operator. </summary>
         ///

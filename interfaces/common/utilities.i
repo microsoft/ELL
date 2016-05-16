@@ -18,7 +18,7 @@
 %{
 #define SWIG_FILE_WITH_INIT
 #include "BinaryClassificationEvaluator.h"
-#include "IIterator.h"
+//#include "IIterator.h"
 #include "AnyIterator.h"
 #include "RandomEngines.h"
 #include "StlIterator.h"
@@ -29,7 +29,8 @@
 %}
 
 %include "BinaryClassificationEvaluator.h"
-%include "IIterator.h"
+//%include "IIterator.h"
+%include "AnyIterator.h"
 %include "RandomEngines.h"
 
 // This is necessary for us to avoid leaking memory:

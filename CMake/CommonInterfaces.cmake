@@ -43,6 +43,7 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/layers.i
                      ../common/linear.i
                      ../common/lossFunctions.i
+                     ../common/noncopyable.i
                      ../common/trainers.i
                      ../common/predictors.i
                      ../common/unique_ptr.i
@@ -85,7 +86,7 @@ endforeach()
 set(CMAKE_SWIG_FLAGS "-c++")
 set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${EXTRA_INTERFACE})
 
-set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_FILES}) # Doesn't seem to work
+# set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_FILES}) # Doesn't seem to work
 # set_source_files_properties(${INTERFACE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties(${INTERFACE_MAIN} ${INTERFACE_FILES} PROPERTIES CPLUSPLUS ON)
 # set_source_files_properties(${INTERFACE_FILES} PROPERTIES SWIG_FLAGS "-includeall") # Don't want this, I think

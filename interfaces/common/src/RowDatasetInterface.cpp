@@ -15,26 +15,32 @@ namespace interfaces
     //
     // RowDataset
     //
-    GenericRowDataset::GenericRowDataset(dataset::RowDataset<dataset::IDataVector> dataset) : _dataset(std::move(dataset))
+    GenericRowDataset::GenericRowDataset(const GenericRowDataset& other) : _dataset(other._dataset.DeepCopy())
     {
     }
 
+#ifndef SWIG
+    GenericRowDataset::GenericRowDataset(dataset::GenericRowDataset&& dataset) : _dataset(std::move(dataset))
+    {
+    }
+#endif
     uint64_t GenericRowDataset::NumExamples() const
     {
         return _dataset.NumExamples();
     }
 
-    uint64_t GenericRowDataset::GetMaxDataVectorSize() const
+    uint64_t GenericRowDataset::GetMaxDataVectorSizeee() const
     {
         return _dataset.GetMaxDataVectorSize();
     }
 
     dataset::GenericSupervisedExample GenericRowDataset::GetExample(uint64_t index) const
     {
-        return dataset::GenericSupervisedExample(_dataset.GetExample(index));
+        return _dataset.GetExample(index).ShallowCopy();
+//        return dataset::GenericSupervisedExample(_dataset.GetExample(index));
     }
 
-    GenericRowDataset::Iterator GenericRowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
+    dataset::GenericRowDataset::Iterator GenericRowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
     {
         return _dataset.GetIterator(firstExample, numExamples);
     }

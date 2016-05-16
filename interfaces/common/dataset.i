@@ -37,12 +37,28 @@
 #include "RowDatasetInterface.h"
 %}
 
+namespace utilities
+{
+class IIterator;
+}
+
+%include "noncopyable.i"
+
 %include "IVector.h"
 %include "DenseDataVector.h"
 %include "IDataVector.h"
 %include "SparseDataVector.h"
 %include "SupervisedExample.h"
+
+namespace dataset
+{
+//    %feature("novaluewrapper") SupervisedExample<IDataVector>;
+    wrap_noncopyable(SupervisedExample<IDataVector>);
+    %template() SupervisedExample<IDataVector>;
+}
+
 %include "RowDatasetInterface.h"
+
 
 %include "unique_ptr.i"
 wrap_unique_ptr(IDataVectorPtr, dataset::IDataVector)

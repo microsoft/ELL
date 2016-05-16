@@ -9,7 +9,7 @@
 namespace dataset
 {
     template<typename DataVectorType>
-    SupervisedExample<DataVectorType>::SupervisedExample(std::shared_ptr<DataVectorType> dataVector, double label, double weight) : _dataVector(std::move(dataVector)), _label(label), _weight(weight)
+    SupervisedExample<DataVectorType>::SupervisedExample(std::shared_ptr<const DataVectorType> dataVector, double label, double weight) : _dataVector(std::move(dataVector)), _label(label), _weight(weight)
     {}
 
     template<typename DataVectorType>
