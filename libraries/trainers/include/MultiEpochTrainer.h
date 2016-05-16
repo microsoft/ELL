@@ -23,6 +23,7 @@ namespace trainers
     /// <summary> Parameters for the multi-epoch meta-trainer. </summary>
     struct MultiEpochTrainerParameters
     {
+        uint64_t epochSize = 0;
         uint64_t numEpochs = 1;
     };
 
