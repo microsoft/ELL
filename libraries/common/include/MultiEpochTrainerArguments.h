@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SortingTreeTrainerArguments.h (common)
+//  File:     MultiEpochTrainerArguments.h (common)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,18 +12,19 @@
 #include "CommandLineParser.h"
 
 // trainers
-#include "SortingTreeTrainer.h"
+#include "MultiEpochTrainer.h"
 
 namespace common
 {
-    using SortingTreeTrainerArguments = trainers::SortingTreeTrainerParameters;
+    using MultiEpochTrainerArguments = trainers::MultiEpochTrainerParameters;
 
-    /// <summary> Parsed version of sorting tree trainer parameters. </summary>
-    struct ParsedSortingTreeTrainerArguments : public SortingTreeTrainerArguments, public utilities::ParsedArgSet
+    /// <summary> Parsed version of multi-epoch trainer parameters. </summary>
+    struct ParsedMultiEpochTrainerArguments : public MultiEpochTrainerArguments, public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///
         /// <param name="parser"> [in,out] The command line parser. </param>
         virtual void AddArgs(utilities::CommandLineParser& parser);
     };
+
 }

@@ -20,6 +20,7 @@ set (SRC src/DataLoadArguments.cpp
          src/MapLoadArguments.cpp
          src/MapSaveArguments.cpp
          src/ModelLoadArguments.cpp
+         src/MultiEpochTrainerArguments.cpp
          src/SGDIncrementalTrainerArguments.cpp
          src/SortingTreeTrainerArguments.cpp
          src/TrainerArguments.cpp
@@ -34,6 +35,7 @@ set (INCLUDE include/DataLoadArguments.h
              include/MapLoadArguments.h
              include/MapSaveArguments.h
              include/ModelLoadArguments.h
+             include/MultiEpochTrainerArguments.h
              include/SGDIncrementalTrainerArguments.h
              include/SortingTreeTrainerArguments.h
              include/TrainerArguments.h
