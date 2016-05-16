@@ -97,14 +97,8 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<SGDIncrementalTrainer<LossFunctionType>> MakeSGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
     {
         return std::make_unique<SGDIncrementalTrainer<LossFunctionType>>(dim, lossFunction, parameters);
-    }
-
-    template<typename LossFunctionType>
-    std::unique_ptr<SingleEpochTrainer<SGDIncrementalTrainer<LossFunctionType>>> MakeSGDTrainer(uint64_t dim, const LossFunctionType & lossFunction, const SGDIncrementalTrainerParameters& parameters)
-    {
-        return std::unique_ptr<SingleEpochTrainer<predictors::LinearPredictor>>(MakeSGDIncrementalTrainer(dim, lossFunction, parameters));
     }
 }

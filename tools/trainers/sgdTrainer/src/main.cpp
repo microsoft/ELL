@@ -24,7 +24,8 @@
 #include "SupervisedExample.h"
 
 // common
-#include "SGDIncrementalTrainerArguments.h"
+#include "sgdIncrementalTrainerArguments.h"
+#include "MultiEpochTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
@@ -59,16 +60,15 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
-        ParsedSgdArguments sgdArguments; // TODO - figure out what to do with these arguments
-        common::ParsedSGDIncrementalTrainerArguments SGDIncrementalTrainerArguments;
-
+        common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
+        common::ParsedMultiEpochTrainerArguments multiEpochTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
-        commandLineParser.AddOptionSet(sgdArguments);
-        commandLineParser.AddOptionSet(SGDIncrementalTrainerArguments);
+        commandLineParser.AddOptionSet(multiEpochTrainerArguments);
+        commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
         
         // parse command line
         commandLineParser.Parse();
@@ -90,39 +90,41 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
         // create sgd trainer
-        auto trainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, SGDIncrementalTrainerArguments);
-        auto trainer2 = trainers::MakeSingleEpochTrainer(std::move(trainer));
+        auto trainer = common::MakeSGDTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments, multiEpochTrainerArguments);
 
         // create evaluator
         auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::LinearPredictor>(trainerArguments.lossArguments);
         
-        // calculate epoch size
-        uint64_t epochSize = sgdArguments.epochSize;
-        if(epochSize == 0 || epochSize >  rowDataset.NumExamples())
-        {
-            epochSize = rowDataset.NumExamples();
-        }
+        //// calculate epoch size
+        //uint64_t epochSize = sgdArguments.epochSize;
+        //if(epochSize == 0 || epochSize >  rowDataset.NumExamples())
+        //{
+        //    epochSize = rowDataset.NumExamples();
+        //}
 
         // create random number generator
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
 
-        // perform epochs
-        if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
-        {
-            // randomly permute the data
-            rowDataset.RandomPermute(rng, epochSize);
 
-            // iterate over the entire permuted dataset
-            auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-            trainer->Update(trainSetIterator);
+        auto trainSetIterator = rowDataset.GetIterator();
+        auto predictor = trainer->Train(trainSetIterator); // XXX
 
-            trainer2->Train(trainSetIterator); // XXX
+        //// perform epochs
+        //if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
+        //for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
+        //{
+        //    // randomly permute the data
+        //    rowDataset.RandomPermute(rng, epochSize);
 
-            // Evaluate training error
-            auto evaluationIterator = rowDataset.GetIterator();
-            evaluator->Evaluate(evaluationIterator, trainer->GetPredictor());
-        }
+        //    // iterate over the entire permuted dataset
+        //    auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
+        //    trainer->Update(trainSetIterator);
+
+
+        //    // Evaluate training error
+        //    auto evaluationIterator = rowDataset.GetIterator();
+        //    evaluator->Evaluate(evaluationIterator, trainer->GetPredictor());
+        //}
 
         // print loss and errors
         if(trainerArguments.verbose)
@@ -134,7 +136,7 @@ int main(int argc, char* argv[])
         }
 
         // update the map with the newly learned layers
-        auto predictor = trainer->GetPredictor();
+       // auto predictor = trainer->GetPredictor();
 
         predictor.AddToModel(model, outputCoordinateList);
 

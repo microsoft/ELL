@@ -9,6 +9,8 @@
 #pragma once
 
 #include "TrainerArguments.h"
+#include "SGDIncrementalTrainerArguments.h"
+#include "MultiEpochTrainerArguments.h"
 
 // predictors
 #include "LinearPredictor.h"
@@ -18,6 +20,7 @@
 #include "IIncrementalTrainer.h"
 #include "SortingTreeTrainer.h"
 #include "SGDIncrementalTrainer.h"
+#include "MultiEpochTrainer.h"
 
 // stl
 #include <memory>
@@ -38,5 +41,9 @@ namespace common
     /// <param name="trainerArguments"> Trainer command line arguments. </param>
     ///
     /// <returns> A unique_ptr to a sorting tree trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossArguments& lossArguments, const trainers::SortingTreeTrainerParameters& parameters);
+    std::unique_ptr<trainers::ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossArguments& lossArguments, const trainers::SortingTreeTrainerParameters& parameters); // TODO change params -> arguments
+
+
+
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDTrainer(uint64_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& sgdArguments, const MultiEpochTrainerArguments& multiEpochArguments);
 }

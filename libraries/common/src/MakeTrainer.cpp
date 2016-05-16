@@ -25,13 +25,13 @@ namespace common
         switch(lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return MakeSGDIncrementalTrainer(dim, lossFunctions::SquaredLoss(), parameters);
+            return trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::SquaredLoss(), parameters);
 
         case LossFunctionEnum::log:
-            return MakeSGDIncrementalTrainer(dim, lossFunctions::LogLoss(lossArguments.lossFunctionParameter), parameters);
+            return trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::LogLoss(lossArguments.lossFunctionParameter), parameters);
 
         case LossFunctionEnum::hinge:
-            return MakeSGDIncrementalTrainer(dim, lossFunctions::HingeLoss(), parameters);
+            return trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::HingeLoss(), parameters);
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
@@ -45,10 +45,36 @@ namespace common
         switch(lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return MakeSortingTreeTrainer(lossFunctions::SquaredLoss(), parameters);
+            return trainers::MakeSortingTreeTrainer(lossFunctions::SquaredLoss(), parameters);
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+        }
+    }
+
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDTrainer(uint64_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& sgdArguments, const MultiEpochTrainerArguments& multiEpochArguments)
+    {
+        using LossFunctionEnum = common::LossArguments::LossFunction;
+
+        switch(lossArguments.lossFunction)
+        {
+            case LossFunctionEnum::squared:
+            {
+                auto sgdIncrementalTrainer = trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::SquaredLoss(), sgdArguments);
+                return trainers::MakeMultiEpochTrainer(std::move(sgdIncrementalTrainer), multiEpochArguments);
+            }
+            case LossFunctionEnum::log:
+            {
+               // auto sgdIncrementalTrainer = ;
+                return trainers::MakeMultiEpochTrainer(trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::LogLoss(lossArguments.lossFunctionParameter), sgdArguments), multiEpochArguments);
+            }
+            case LossFunctionEnum::hinge:
+            {
+                auto sgdIncrementalTrainer = trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::HingeLoss(), sgdArguments);
+                return trainers::MakeMultiEpochTrainer(std::move(sgdIncrementalTrainer), multiEpochArguments);
+            }
+            default:
+                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 }
