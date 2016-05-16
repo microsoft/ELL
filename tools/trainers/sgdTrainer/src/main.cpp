@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SGDArguments.h"
-#include "ParsedSGDIncrementalTrainerArguments.h"
 
 // utilities
 #include "Files.h"
@@ -25,6 +24,7 @@
 #include "SupervisedExample.h"
 
 // common
+#include "SGDIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
         ParsedSgdArguments sgdArguments; // TODO - figure out what to do with these arguments
-        ParsedSGDIncrementalTrainerArguments SGDIncrementalTrainerArguments;
+        common::ParsedSGDIncrementalTrainerArguments SGDIncrementalTrainerArguments;
 
 
         commandLineParser.AddOptionSet(trainerArguments);

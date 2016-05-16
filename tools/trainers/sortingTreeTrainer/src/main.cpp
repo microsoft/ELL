@@ -6,7 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ParsedSortingTreeTrainerArguments.h"
 
 // utilities
 #include "Files.h"
@@ -24,6 +23,7 @@
 #include "SupervisedExample.h"
 
 // common
+#include "SortingTreeTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
-        ParsedSortingTreeTrainerArguments sortingTreeTrainerArguments;
+        common::ParsedSortingTreeTrainerArguments sortingTreeTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
