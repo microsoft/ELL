@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
         // create sgd trainer
-        auto trainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), SGDIncrementalTrainerArguments, trainerArguments.lossArguments);
+        auto trainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, SGDIncrementalTrainerArguments);
         auto trainer2 = trainers::MakeSingleEpochTrainer(std::move(trainer));
 
         // create evaluator

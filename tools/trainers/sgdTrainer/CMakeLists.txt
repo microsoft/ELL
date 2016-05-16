@@ -5,7 +5,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 # define project
-set (PROJ_NAME StochasticGradientDescentTrainer)
+set (PROJ_NAME sgdTrainer)
 PROJECT(${PROJ_NAME})
 
 #enable C++11 in GCC, etc

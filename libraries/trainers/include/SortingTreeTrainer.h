@@ -39,9 +39,9 @@ namespace trainers
 
         /// <summary> Constructs an instance of SortingTreeTrainer. </summary>
         ///
-        /// <param name="parameters"> Training Parameters. </param>
         /// <param name="lossFunction"> The loss function. </param>
-        SortingTreeTrainer(const SortingTreeTrainerParameters& parameters, const LossFunctionType& lossFunction);
+        /// <param name="parameters"> Training Parameters. </param>
+        SortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters);
 
         /// <summary> Trains a decision tree. </summary>
         ///
@@ -83,8 +83,8 @@ namespace trainers
         void Cleanup() const;
 
         // member variables
-        SortingTreeTrainerParameters _parameters;
         LossFunctionType _lossFunction;
+        SortingTreeTrainerParameters _parameters;
         mutable dataset::RowDataset<dataset::DoubleDataVector> _dataset;
         mutable std::priority_queue<SplitCandidate> _queue;
     };
@@ -97,7 +97,7 @@ namespace trainers
     ///
     /// <returns> A sorting tree trainer. </returns>
     template<typename LossFunctionType>
-    std::unique_ptr<SortingTreeTrainer<LossFunctionType>> MakeSortingTreeTrainer(const SortingTreeTrainerParameters& parameters, const LossFunctionType& lossFunction);
+    std::unique_ptr<SortingTreeTrainer<LossFunctionType>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters);
 }
 
 #include "../tcc/SortingTreeTrainer.tcc"

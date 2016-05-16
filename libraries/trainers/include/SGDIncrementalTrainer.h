@@ -48,9 +48,9 @@ namespace trainers
         /// <summary> Constructs the trainer. </summary>
         ///
         /// <param name="dim"> The dimension. </param>
-        /// <param name="parameters"> The training Parameters. </param>
         /// <param name="lossFunction"> The loss function. </param>
-        SGDIncrementalTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction);
+        /// <param name="parameters"> The training parameters. </param>
+        SGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
 
         /// <summary> Performs an epoch of SGD iterations. </summary>
         ///
@@ -68,8 +68,8 @@ namespace trainers
         virtual predictors::LinearPredictor Reset() override;
 
     private:
-        SGDIncrementalTrainerParameters _parameters;
         LossFunctionType _lossFunction;
+        SGDIncrementalTrainerParameters _parameters;
 
         uint64_t _total_iterations = 0;
         predictors::LinearPredictor _lastPredictor;
@@ -85,10 +85,10 @@ namespace trainers
     ///
     /// <returns> A sorting tree trainer </returns>
     template <typename LossFunctionType>
-    std::unique_ptr<SGDIncrementalTrainer<LossFunctionType>> MakeSGDIncrementalTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction);
+    std::unique_ptr<SGDIncrementalTrainer<LossFunctionType>> MakeSGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
 
     template <typename LossFunctionType>
-    std::unique_ptr<SingleEpochTrainer<SGDIncrementalTrainer<LossFunctionType>>> MakeSGDTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction);
+    std::unique_ptr<SingleEpochTrainer<SGDIncrementalTrainer<LossFunctionType>>> MakeSGDTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
 }
 
 #include "../tcc/SGDIncrementalTrainer.tcc"

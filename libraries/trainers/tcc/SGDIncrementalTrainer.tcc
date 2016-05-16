@@ -18,8 +18,8 @@
 namespace trainers
 {
     template<typename LossFunctionType>
-    SGDIncrementalTrainer<LossFunctionType>::SGDIncrementalTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction) :
-        _parameters(parameters), _lossFunction(lossFunction), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // iterations start from 1 to prevent divide-by-zero
+    SGDIncrementalTrainer<LossFunctionType>::SGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters) :
+        _lossFunction(lossFunction), _parameters(parameters), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // iterations start from 1 to prevent divide-by-zero
     {}
 
     template<typename LossFunctionType>
@@ -97,14 +97,14 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<SGDIncrementalTrainer<LossFunctionType>> MakeSGDIncrementalTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction)
+    std::unique_ptr<SGDIncrementalTrainer<LossFunctionType>> MakeSGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
     {
-        return std::make_unique<SGDIncrementalTrainer<LossFunctionType>>(dim, parameters, lossFunction);
+        return std::make_unique<SGDIncrementalTrainer<LossFunctionType>>(dim, lossFunction, parameters);
     }
 
     template<typename LossFunctionType>
-    std::unique_ptr<SingleEpochTrainer<SGDIncrementalTrainer<LossFunctionType>>> MakeSGDTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType & lossFunction)
+    std::unique_ptr<SingleEpochTrainer<SGDIncrementalTrainer<LossFunctionType>>> MakeSGDTrainer(uint64_t dim, const LossFunctionType & lossFunction, const SGDIncrementalTrainerParameters& parameters)
     {
-        return std::unique_ptr<SingleEpochTrainer<predictors::LinearPredictor>>(MakeSGDIncrementalTrainer(dim, parameters, lossFunction));
+        return std::unique_ptr<SingleEpochTrainer<predictors::LinearPredictor>>(MakeSGDIncrementalTrainer(dim, lossFunction, parameters));
     }
 }

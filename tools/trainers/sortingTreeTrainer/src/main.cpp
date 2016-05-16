@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
         // create sgd trainer
-        auto trainer = common::MakeSortingTreeTrainer(sortingTreeTrainerArguments, trainerArguments.lossArguments);
+        auto trainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
 
         // create evaluator
         auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::DecisionTreePredictor>(trainerArguments.lossArguments);

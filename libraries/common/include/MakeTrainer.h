@@ -30,7 +30,7 @@ namespace common
     /// <param name="trainerArguments"> Trainer command line arguments. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const trainers::SGDIncrementalTrainerParameters& parameters, const LossArguments& lossArguments);
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossArguments& lossArguments, const trainers::SGDIncrementalTrainerParameters& parameters);
 
     /// <summary> Makes a sorting tree trainer. </summary>
     ///
@@ -38,5 +38,5 @@ namespace common
     /// <param name="trainerArguments"> Trainer command line arguments. </param>
     ///
     /// <returns> A unique_ptr to a sorting tree trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const trainers::SortingTreeTrainerParameters& parameters, const LossArguments& lossArguments);
+    std::unique_ptr<trainers::ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossArguments& lossArguments, const trainers::SortingTreeTrainerParameters& parameters);
 }

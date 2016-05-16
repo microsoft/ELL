@@ -9,8 +9,8 @@
 namespace trainers
 {    
     template <typename LossFunctionType>
-    SortingTreeTrainer<LossFunctionType>::SortingTreeTrainer(const SortingTreeTrainerParameters& parameters, const LossFunctionType& lossFunction) :
-        _parameters(parameters), _lossFunction(lossFunction)
+    SortingTreeTrainer<LossFunctionType>::SortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters) :
+        _lossFunction(lossFunction), _parameters(parameters)
     {}
 
     template <typename LossFunctionType>
@@ -180,8 +180,8 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    std::unique_ptr<SortingTreeTrainer<LossFunctionType>> MakeSortingTreeTrainer(const SortingTreeTrainerParameters& parameters, const LossFunctionType& lossFunction)
+    std::unique_ptr<SortingTreeTrainer<LossFunctionType>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters)
     {
-        return std::make_unique<SortingTreeTrainer<LossFunctionType>>(parameters, lossFunction);
+        return std::make_unique<SortingTreeTrainer<LossFunctionType>>(lossFunction, parameters);
     }
 }
