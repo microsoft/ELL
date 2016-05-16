@@ -104,8 +104,8 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    std::unique_ptr<ITrainer<predictors::LinearPredictor>> trainers::MakeStochasticGradientDescentTrainer(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType & lossFunction)
+    std::unique_ptr<ITrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType & lossFunction)
     {
-        return std::unique_ptr<SingleEpochTrainer<predictors::LinearPredictor>>(MakeStochasticGradientDescentLearner(dim, parameters, lossfunction));
+        return std::unique_ptr<SingleEpochTrainer<predictors::LinearPredictor>>(MakeStochasticGradientDescentLearner(dim, parameters, lossFunction));
     }
 }
