@@ -23,5 +23,11 @@ namespace common
                          "ne",
                          "The number of epochs.",
                          1);
+
+        parser.AddOption(dataPermutationRandomSeed,
+                         "dataPermutationRandomSeed",
+                         "dprs",
+                         "Seed for the random generator that controls data permutation between epochs.",
+                         "123456");
     }
 }

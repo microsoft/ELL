@@ -34,21 +34,16 @@ namespace dataset
 
         RowDataset(RowDataset&&) = default;
 
-        RowDataset(const RowDataset&) = delete;
+        explicit RowDataset(const RowDataset&) = default;
+
+        /// <summary> Constructs an instance of RowDataset by making shallow copies of supervised examples. </summary>
+        ///
+        /// <param name="exampleIterator"> The example iterator. </param>
+        RowDataset(Iterator exampleIterator);
 
         RowDataset<DataVectorType>& operator=(RowDataset&&) = default;
 
         RowDataset<DataVectorType>& operator=(const RowDataset&) = delete;
-
-        /// <summary> Returns a shallow copy of the row dataset. A shallow copy has its own weights and labels, but shared data vectors. </summary>
-        ///
-        /// <returns> A RowDataset.</returns>
-        RowDataset<DataVectorType> ShallowCopy(uint64_t fromRowIndex = 0, uint64_t size = 0) const;
-
-        /// <summary> Returns a deep copy of the row dataset. </summary>
-        ///
-        /// <returns> A RowDataset.</returns>
-        RowDataset<DataVectorType> DeepCopy(uint64_t fromRowIndex = 0, uint64_t size = 0) const;
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
@@ -86,7 +81,7 @@ namespace dataset
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
         /// <param name="example"> The example. </param>
-        void AddExample(ExampleType example);
+        void AddExample(ExampleType&& example);
 
         /// <summary> Erases all of the examples in the RowDataset. </summary>
         void Reset();

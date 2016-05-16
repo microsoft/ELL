@@ -10,14 +10,14 @@ namespace trainers
 {
     template <typename PredictorType>
     SingleEpochTrainer<PredictorType>::SingleEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner) : 
-        _learner(std::move(learner)) 
+        _incrementalTrainer(std::move(learner)) 
     {}
     
     template <typename PredictorType>
     PredictorType SingleEpochTrainer<PredictorType>::Train(dataset::GenericRowDataset::Iterator exampleIterator) const
     {
-        _learner->Update(exampleIterator);
-        return _learner->Reset();
+        _incrementalTrainer->Update(exampleIterator);
+        return _incrementalTrainer->Reset();
     }
 
     template <typename PredictorType>

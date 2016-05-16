@@ -15,39 +15,13 @@
 namespace dataset
 {
     template<typename DataVectorType>
-    RowDataset<DataVectorType> RowDataset<DataVectorType>::ShallowCopy(uint64_t fromRowIndex, uint64_t size) const
+    RowDataset<DataVectorType>::RowDataset(Iterator exampleIterator)
     {
-        assert(fromRowIndex + size <= _examples.size());
-
-        if (size == 0)
+        while(exampleIterator.IsValid())
         {
-            size = _examples.size() - fromRowIndex;
+            AddExample(SupervisedExample<DataVectorType>(exampleIterator.Get()));
+            exampleIterator.Next();
         }
-
-        RowDataset<DataVectorType> other;
-        for(uint64_t i = fromRowIndex; i < fromRowIndex+size; ++i)
-        {
-            other.AddExample(_examples[i].ShallowCopy());
-        }
-        return other;
-    }
-
-    template<typename DataVectorType>
-    RowDataset<DataVectorType> RowDataset<DataVectorType>::DeepCopy(uint64_t fromRowIndex, uint64_t size) const
-    {
-        assert(fromRowIndex + size <= _examples.size());
-
-        if (size == 0)
-        {
-            size = _examples.size() - fromRowIndex;
-        }
-
-        RowDataset<DataVectorType> other;
-        for (uint64_t i = fromRowIndex; i < fromRowIndex + size; ++i)
-        {
-            other.AddExample(_examples[i].DeepCopy());
-        }
-        return other;
     }
 
     template<typename DataVectorType>
@@ -76,7 +50,7 @@ namespace dataset
     }
 
     template<typename DataVectorType>
-    void RowDataset<DataVectorType>::AddExample(ExampleType example)
+    void RowDataset<DataVectorType>::AddExample(ExampleType&& example)
     {
         uint64_t size = example.GetDataVector().Size();
         _examples.push_back(std::move(example));

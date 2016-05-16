@@ -9,20 +9,8 @@
 namespace dataset
 {
     template<typename DataVectorType>
-    SupervisedExample<DataVectorType>::SupervisedExample(std::shared_ptr<DataVectorType> dataVector, double label, double weight) : _dataVector(std::move(dataVector)), _label(label), _weight(weight)
+    SupervisedExample<DataVectorType>::SupervisedExample(const std::shared_ptr<DataVectorType>& dataVector, double label, double weight) : _dataVector(dataVector), _label(label), _weight(weight)
     {}
-
-    template<typename DataVectorType>
-    SupervisedExample<DataVectorType> SupervisedExample<DataVectorType>::ShallowCopy() const 
-    {
-        return SupervisedExample<DataVectorType>(_dataVector, _label, _weight);
-    }
-
-    template<typename DataVectorType>
-    SupervisedExample<DataVectorType> SupervisedExample<DataVectorType>::DeepCopy() const 
-    {
-        return SupervisedExample<DataVectorType>(_dataVector->Clone(), _label, _weight);
-    }
 
     template<typename DataVectorType>
     void SupervisedExample<DataVectorType>::Print(std::ostream & os) const

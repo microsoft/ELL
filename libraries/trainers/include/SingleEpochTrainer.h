@@ -42,7 +42,7 @@ namespace trainers
         virtual PredictorType Train(dataset::GenericRowDataset::Iterator exampleIterator) const;
 
     private: 
-        std::unique_ptr<IIncrementalTrainer<PredictorType>> _learner;
+        std::unique_ptr<IIncrementalTrainer<PredictorType>> _incrementalTrainer;
     };
 
     template <typename PredictorType>

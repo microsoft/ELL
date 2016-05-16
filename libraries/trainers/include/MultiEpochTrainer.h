@@ -17,6 +17,8 @@
 //stl
 #include <utility>
 #include <memory>
+#include <random>
+#include <string>
 
 namespace trainers
 {
@@ -25,6 +27,7 @@ namespace trainers
     {
         uint64_t epochSize = 0;
         uint64_t numEpochs = 1;
+        std::string dataPermutationRandomSeed = 0;
     };
 
     /// <summary> A class that performs multiple epochs of a learner and exposes a trainer. </summary>
@@ -49,8 +52,9 @@ namespace trainers
         virtual PredictorType Train(dataset::GenericRowDataset::Iterator exampleIterator) const;
 
     private:
-        std::unique_ptr<IIncrementalTrainer<PredictorType>> _learner;
+        std::unique_ptr<IIncrementalTrainer<PredictorType>> _incrementalTrainer;
         MultiEpochTrainerParameters _parameters;
+        mutable std::default_random_engine _random;
     };
 
     template <typename PredictorType>

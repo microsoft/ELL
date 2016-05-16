@@ -92,46 +92,20 @@ int main(int argc, char* argv[])
         // create sgd trainer
         auto trainer = common::MakeSGDTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments, multiEpochTrainerArguments);
 
-        // create evaluator
+        // create evaluator - TODO
         auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::LinearPredictor>(trainerArguments.lossArguments);
-        
-        //// calculate epoch size
-        //uint64_t epochSize = sgdArguments.epochSize;
-        //if(epochSize == 0 || epochSize >  rowDataset.NumExamples())
-        //{
-        //    epochSize = rowDataset.NumExamples();
-        //}
 
-        // create random number generator
-        auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
-
-
+        // train
+        if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto trainSetIterator = rowDataset.GetIterator();
         auto predictor = trainer->Train(trainSetIterator); // XXX
-
-        //// perform epochs
-        //if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        //for(int epoch = 0; epoch < sgdArguments.numEpochs; ++epoch)
-        //{
-        //    // randomly permute the data
-        //    rowDataset.RandomPermute(rng, epochSize);
-
-        //    // iterate over the entire permuted dataset
-        //    auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-        //    trainer->Update(trainSetIterator);
-
-
-        //    // Evaluate training error
-        //    auto evaluationIterator = rowDataset.GetIterator();
-        //    evaluator->Evaluate(evaluationIterator, trainer->GetPredictor());
-        //}
 
         // print loss and errors
         if(trainerArguments.verbose)
         {
             std::cout << "Finished training.\n";
             std::cout << "Training error\n";
-            evaluator->Print(std::cout);
+            evaluator->Print(std::cout); // TODO
             std::cout << std::endl;
         }
 
