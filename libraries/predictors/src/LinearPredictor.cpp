@@ -22,31 +22,6 @@ namespace predictors
     LinearPredictor::LinearPredictor(uint64_t dim) : _w(dim), _b(0)
     {}
 
-    linear::DoubleVector& LinearPredictor::GetVector()
-    {
-        return _w;
-    }
-
-    const linear::DoubleVector& LinearPredictor::GetVector() const
-    {
-        return _w;
-    }
-
-    double& LinearPredictor::GetBias()
-    {
-        return _b;
-    }
-
-    double LinearPredictor::GetBias() const
-    {
-        return _b;
-    }
-
-    uint64_t LinearPredictor::GetDimension() const
-    {
-        return _w.Size();
-    }
-
     void LinearPredictor::Reset()
     {
         _w.Reset();

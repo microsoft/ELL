@@ -25,24 +25,6 @@ namespace dataset
     }
 
     template<typename DataVectorType>
-    const DataVectorType& SupervisedExample<DataVectorType>::GetDataVector() const
-    {
-        return *_dataVector.get();
-    }
-
-    template<typename DataVectorType>
-    double SupervisedExample<DataVectorType>::GetWeight() const
-    {
-        return _weight;
-    }
-
-    template<typename DataVectorType>
-    double SupervisedExample<DataVectorType>::GetLabel() const
-    {
-        return _label;
-    }
-
-    template<typename DataVectorType>
     void SupervisedExample<DataVectorType>::Print(std::ostream & os) const
     {
         os << _label << '\t';
