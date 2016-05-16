@@ -46,10 +46,12 @@ def sgd():
 
     # create sgd trainer    
     loss = LogLoss()
-    optimizer = LogLossOptimizer(outputCoordinates.Size(), loss, l2Regularization)
+    params = SGDIncrementalTrainerParameters()
+    params.regularization = l2Regularization
+    optimizer = LogLossOptimizer(outputCoordinates.Size(), loss, params)
 
     # create evaluator
-    evaluator = LinearLogLossClassificationEvaluator()
+    evaluator = LinearLogLossClassificationEvaluator(loss)
 
     numExamples = dataset.NumExamples()
     if not epochSize or epochSize >= numExamples:
@@ -62,14 +64,18 @@ def sgd():
     for epoch in xrange(numEpochs):
         # randomly permute the data
         dataset.RandomPermute(rng, epochSize)
-            
+
         # iterate over the entire permuted dataset
         trainSetIterator = dataset.GetIterator(0, epochSize)
         optimizer.Update(trainSetIterator)  
 
         evalIterator = dataset.GetIterator()
         predictor = optimizer.GetPredictor()
-        evaluator.Evaluate(evalIterator, predictor, loss) 
+        
+        print evalIterator
+        print type(evalIterator)
+        
+        evaluator.Evaluate(evalIterator, predictor) 
 
     print "Training Error:"
     print "binary classification evaluation"

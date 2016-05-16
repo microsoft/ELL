@@ -33,12 +33,12 @@ namespace interfaces
             _dataset = std::move(other._dataset);
             return *this;
         }
-#ifndef SWIG
+
         /// <summary> Constructor for RowDataset wrapper</summary>
         ///
         /// <param name="dataset"> The dataset::RowDataset to wrap </param>
         GenericRowDataset(dataset::GenericRowDataset&& dataset);
-#endif
+
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
         /// <returns> The number of examples. </returns>

@@ -19,11 +19,10 @@ namespace interfaces
     {
     }
 
-#ifndef SWIG
     GenericRowDataset::GenericRowDataset(dataset::GenericRowDataset&& dataset) : _dataset(std::move(dataset))
     {
     }
-#endif
+
     uint64_t GenericRowDataset::NumExamples() const
     {
         return _dataset.NumExamples();

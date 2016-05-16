@@ -12,20 +12,28 @@
     #include <stdexcept>
 %}
 
-%ignore dataset::operator<<;
-%ignore dataset::RowDataset;
-%ignore dataset::IDataVector::Clone;
 
-%ignore dataset::GenericSupervisedExample::GetDataVector;
-%ignore dataset::GenericSupervisedExample::GenericSupervisedExample;
+namespace dataset
+{
+    %ignore RowDataset;
+    %ignore IDataVector::Clone;
 
-%ignore dataset::DataRow<void>;
-%ignore dataset::DenseDataVector::operator[];
-%ignore dataset::DenseDataVector<double>;
-%ignore dataset::DenseDataVector<float>;
-%ignore dataset::SparseDataVector<double, utilities::CompressedIntegerList>;
-%ignore dataset::SparseDataVector<float, utilities::CompressedIntegerList>;
-%ignore dataset::SparseDataVector<short, utilities::CompressedIntegerList>;
+    %ignore GenericSupervisedExample::GetDataVector;
+    %ignore GenericSupervisedExample::GenericSupervisedExample;
+
+    %ignore DataRow<void>;
+    %ignore DenseDataVector::operator[];
+    %ignore DenseDataVector<double>;
+    %ignore DenseDataVector<float>;
+    %ignore SparseDataVector<double, utilities::CompressedIntegerList>;
+    %ignore SparseDataVector<float, utilities::CompressedIntegerList>;
+    %ignore SparseDataVector<short, utilities::CompressedIntegerList>;
+}
+
+namespace interfaces
+{
+    %ignore GenericRowDataset::GenericRowDataset(GenericRowDataset &&);
+}
 
 %{
 #define SWIG_FILE_WITH_INIT
@@ -39,7 +47,7 @@
 
 namespace utilities
 {
-class IIterator;
+    class IIterator;
 }
 
 %include "noncopyable.i"
@@ -52,7 +60,6 @@ class IIterator;
 
 namespace dataset
 {
-//    %feature("novaluewrapper") SupervisedExample<IDataVector>;
     wrap_noncopyable(SupervisedExample<IDataVector>);
     %template() SupervisedExample<IDataVector>;
 }
@@ -63,24 +70,30 @@ namespace dataset
 %include "unique_ptr.i"
 wrap_unique_ptr(IDataVectorPtr, dataset::IDataVector)
 
-%template (DoubleDataVector2) dataset::DenseDataVector<double>;
-%template (FloatDataVector2) dataset::DenseDataVector<float>;
-%template (SparseDoubleDataVector2) dataset::SparseDataVector<double, utilities::CompressedIntegerList>;
-%template (SparseFloatDataVector2) dataset::SparseDataVector<float, utilities::CompressedIntegerList>;
-%template (SparseShortDataVector2) dataset::SparseDataVector<short, utilities::CompressedIntegerList>;
+namespace dataset
+{
+    // The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
+    %template () DenseDataVector<double>;
+    %template () DenseDataVector<float>;
+    %template () SparseDataVector<double, utilities::CompressedIntegerList>;
+    %template () SparseDataVector<float, utilities::CompressedIntegerList>;
+    %template () SparseDataVector<short, utilities::CompressedIntegerList>;
 
-// Bafflingly, the below causes SWIG to give an error about no default constructor for SparseDataVector<>
-// %template (SparseDoubleDataVectorBase) dataset::SparseDataVector<double, utilities::CompressedIntegerList>;
-// %template (SparseFloatDataVectorBase) dataset::SparseDataVector<float, utilities::CompressedIntegerList>;
-// %template (SparseShortDataVectorBase) dataset::SparseDataVector<short, utilities::CompressedIntegerList>;
+    // Bafflingly, the below causes SWIG to give an error about no default constructor for SparseDataVector<>
+    // %template (SparseDoubleDataVectorBase) SparseDataVector<double, utilities::CompressedIntegerList>;
+    // %template (SparseFloatDataVectorBase) SparseDataVector<float, utilities::CompressedIntegerList>;
+    // %template (SparseShortDataVectorBase) SparseDataVector<short, utilities::CompressedIntegerList>;
 
-WRAP_OP_AT(dataset::DenseDataVector, double)
+    // wrap operator[] for python
+    WRAP_OP_AT(DenseDataVector, double)
 
-//WRAP_PRINT_TO_STR(dataset::GenericSupervisedExample)
-WRAP_PRINT_TO_STR(dataset::SupervisedExample<dataset::IDataVector>)
-WRAP_PRINT_TO_STR(dataset::FloatDataVector)
-WRAP_PRINT_TO_STR(dataset::DoubleDataVector)
+    // wrap "Print" method for python
+    //WRAP_PRINT_TO_STR(GenericSupervisedExample)
+    WRAP_PRINT_TO_STR(SupervisedExample<dataset::IDataVector>)
+    WRAP_PRINT_TO_STR(FloatDataVector)
+    WRAP_PRINT_TO_STR(DoubleDataVector)
 
-//WRAP_PRINT_TO_STR(dataset::SparseDoubleDataVector)
-//WRAP_PRINT_TO_STR(dataset::SparseFloatDataVector)
-//WRAP_PRINT_TO_STR(dataset::SparseShortDataVector)
+    //WRAP_PRINT_TO_STR(SparseDoubleDataVector)
+    //WRAP_PRINT_TO_STR(SparseFloatDataVector)
+    //WRAP_PRINT_TO_STR(SparseShortDataVector)
+}
