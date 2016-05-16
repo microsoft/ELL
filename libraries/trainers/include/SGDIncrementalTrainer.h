@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StochasticGradientDescentLearner.h (trainers)
+//  File:     SGDIncrementalTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include "ILearner.h"
+#include "IIncrementalTrainer.h"
 #include "ITrainer.h"
 
 // predictors
@@ -28,7 +28,7 @@
 namespace trainers
 {
     /// <summary> Parameters for the stochastic gradient descent trainer. </summary>
-    struct StochasticGradientDescentLearnerParameters
+    struct SGDIncrementalTrainerParameters
     {
         double regularization = 1.0;
     };
@@ -39,7 +39,7 @@ namespace trainers
     /// </summary>
     /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
     template <typename LossFunctionType>
-    class StochasticGradientDescentLearner : public ILearner<predictors::LinearPredictor>
+    class SGDIncrementalTrainer : public IIncrementalTrainer<predictors::LinearPredictor>
     {
     public:
 
@@ -48,7 +48,7 @@ namespace trainers
         /// <param name="dim"> The dimension. </param>
         /// <param name="parameters"> The training Parameters. </param>
         /// <param name="lossFunction"> The loss function. </param>
-        StochasticGradientDescentLearner(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType& lossFunction);
+        SGDIncrementalTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction);
 
         /// <summary> Performs an epoch of SGD iterations. </summary>
         ///
@@ -66,7 +66,7 @@ namespace trainers
         virtual predictors::LinearPredictor Reset() override;
 
     private:
-        StochasticGradientDescentLearnerParameters _parameters;
+        SGDIncrementalTrainerParameters _parameters;
         LossFunctionType _lossFunction;
 
         uint64_t _total_iterations = 0;
@@ -83,10 +83,10 @@ namespace trainers
     ///
     /// <returns> A sorting tree trainer </returns>
     template <typename LossFunctionType>
-    std::unique_ptr<ILearner<predictors::LinearPredictor>> MakeStochasticGradientDescentLearner(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType& lossFunction);
+    std::unique_ptr<IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction);
 
     template <typename LossFunctionType>
-    std::unique_ptr<ITrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType& lossFunction);
+    std::unique_ptr<ITrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction);
 }
 
-#include "../tcc/StochasticGradientDescentLearner.tcc"
+#include "../tcc/SGDIncrementalTrainer.tcc"

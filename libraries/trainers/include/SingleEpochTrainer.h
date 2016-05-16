@@ -9,7 +9,7 @@
 #pragma once
 
 #include "ITrainer.h"
-#include "ILearner.h"
+#include "IIncrementalTrainer.h"
 
 // dataset
 #include "RowDataset.h"
@@ -32,7 +32,7 @@ namespace trainers
         /// <summary> Constructs an instance of SingleEpochTrainer. </summary>
         ///
         /// <param name="learner"> [in,out] The stateful trainer. </param>
-        SingleEpochTrainer(std::unique_ptr<ILearner<PredictorType>>&& learner);
+        SingleEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner);
         
         /// <summary> Trains and returns a predictor. </summary>
         ///
@@ -42,11 +42,11 @@ namespace trainers
         virtual PredictorType Train(dataset::GenericRowDataset::Iterator exampleIterator) const;
 
     private: 
-        std::unique_ptr<ILearner<PredictorType>> _learner;
+        std::unique_ptr<IIncrementalTrainer<PredictorType>> _learner;
     };
 
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeSingleEpochTrainer(std::unique_ptr<ILearner<PredictorType>>&& learner);
+    std::unique_ptr<ITrainer<PredictorType>> MakeSingleEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner);
 }
 
 #include "../tcc/SingleEpochTrainer.tcc"

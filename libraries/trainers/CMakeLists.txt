@@ -14,19 +14,19 @@ endif()
 
 set (SRC src/Nothing.cpp)
 
-set (INCLUDE include/BaggingLearner.h
-             include/ILearner.h
+set (INCLUDE include/BaggingIncrementalTrainer.h
+             include/IIncrementalTrainer.h
              include/ITrainer.h
              include/MultiEpochTrainer.h
              include/SingleEpochTrainer.h
              include/SortingTreeTrainer.h
-             include/StochasticGradientDescentLearner.h)
+             include/SGDIncrementalTrainer.h)
 
-set (TCC tcc/BaggingLearner.tcc
+set (TCC tcc/BaggingIncrementalTrainer.tcc
          tcc/SingleEpochTrainer.tcc
          tcc/MultiEpochTrainer.tcc
          tcc/SortingTreeTrainer.tcc
-         tcc/StochasticGradientDescentLearner.tcc)
+         tcc/SGDIncrementalTrainer.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

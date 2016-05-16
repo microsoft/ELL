@@ -14,9 +14,9 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/main.cpp
-         src/ParsedStochasticGradientDescentLearnerArguments.cpp)
+         src/ParsedSGDIncrementalTrainerArguments.cpp)
 
-set (INCLUDE include/ParsedStochasticGradientDescentLearnerArguments.h
+set (INCLUDE include/ParsedSGDIncrementalTrainerArguments.h
              include/SGDArguments.h)
 
 source_group("src" FILES ${SRC})

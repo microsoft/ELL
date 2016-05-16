@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StochasticGradientDescentLearner.tcc (trainers)
+//  File:     SGDIncrementalTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,12 +19,12 @@
 namespace trainers
 {
     template<typename LossFunctionType>
-    StochasticGradientDescentLearner<LossFunctionType>::StochasticGradientDescentLearner(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType& lossFunction) :
+    SGDIncrementalTrainer<LossFunctionType>::SGDIncrementalTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction) :
         _parameters(parameters), _lossFunction(lossFunction), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // iterations start from 1 to prevent divide-by-zero
     {}
 
     template<typename LossFunctionType>
-    void StochasticGradientDescentLearner<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetVector();
@@ -82,13 +82,13 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    const predictors::LinearPredictor& StochasticGradientDescentLearner<LossFunctionType>::GetPredictor() const
+    const predictors::LinearPredictor& SGDIncrementalTrainer<LossFunctionType>::GetPredictor() const
     {
         return _averagedPredictor;
     }
 
     template<typename LossFunctionType>
-    predictors::LinearPredictor StochasticGradientDescentLearner<LossFunctionType>::Reset()
+    predictors::LinearPredictor SGDIncrementalTrainer<LossFunctionType>::Reset()
     {
         _total_iterations = 1;
         _lastPredictor.Reset();
@@ -98,14 +98,14 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<ILearner<predictors::LinearPredictor>> MakeStochasticGradientDescentLearner(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType& lossFunction)
+    std::unique_ptr<IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType& lossFunction)
     {
-        return std::make_unique<StochasticGradientDescentLearner<LossFunctionType>>(dim, parameters, lossFunction);
+        return std::make_unique<SGDIncrementalTrainer<LossFunctionType>>(dim, parameters, lossFunction);
     }
 
     template<typename LossFunctionType>
-    std::unique_ptr<ITrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(uint64_t dim, const StochasticGradientDescentLearnerParameters& parameters, const LossFunctionType & lossFunction)
+    std::unique_ptr<ITrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(uint64_t dim, const SGDIncrementalTrainerParameters& parameters, const LossFunctionType & lossFunction)
     {
-        return std::unique_ptr<SingleEpochTrainer<predictors::LinearPredictor>>(MakeStochasticGradientDescentLearner(dim, parameters, lossFunction));
+        return std::unique_ptr<SingleEpochTrainer<predictors::LinearPredictor>>(MakeSGDIncrementalTrainer(dim, parameters, lossFunction));
     }
 }

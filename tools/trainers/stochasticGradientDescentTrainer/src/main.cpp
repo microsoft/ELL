@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SGDArguments.h"
-#include "ParsedStochasticGradientDescentLearnerArguments.h"
+#include "ParsedSGDIncrementalTrainerArguments.h"
 
 // utilities
 #include "Files.h"
@@ -35,7 +35,7 @@
 #include "MakeEvaluator.h"
 
 // trainers
-#include "StochasticGradientDescentLearner.h"
+#include "SGDIncrementalTrainer.h"
 #include "MultiEpochTrainer.h"
 #include "SingleEpochTrainer.h"
 
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
         ParsedSgdArguments sgdArguments; // TODO - figure out what to do with these arguments
-        ParsedStochasticGradientDescentLearnerArguments StochasticGradientDescentLearnerArguments;
+        ParsedSGDIncrementalTrainerArguments SGDIncrementalTrainerArguments;
 
 
         commandLineParser.AddOptionSet(trainerArguments);
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(sgdArguments);
-        commandLineParser.AddOptionSet(StochasticGradientDescentLearnerArguments);
+        commandLineParser.AddOptionSet(SGDIncrementalTrainerArguments);
         
         // parse command line
         commandLineParser.Parse();
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
         // create sgd trainer
-        auto trainer = common::MakeStochasticGradientDescentLearner(outputCoordinateList.Size(), StochasticGradientDescentLearnerArguments, trainerArguments.lossArguments);
+        auto trainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), SGDIncrementalTrainerArguments, trainerArguments.lossArguments);
         auto trainer2 = trainers::MakeSingleEpochTrainer(std::move(trainer));
 
         // create evaluator

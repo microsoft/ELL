@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ParsedStochasticGradientDescentLearnerArguments.cpp (stochasticGradientDescentTrainer)
+//  File:     ParsedSGDIncrementalTrainerArguments.cpp (stochasticGradientDescentTrainer)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ParsedStochasticGradientDescentLearnerArguments.h"
+#include "ParsedSGDIncrementalTrainerArguments.h"
 
-void ParsedStochasticGradientDescentLearnerArguments::AddArgs(utilities::CommandLineParser& parser)
+void ParsedSGDIncrementalTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
 {
     parser.AddOption(regularization, 
                      "regularization", 

@@ -9,7 +9,7 @@
 namespace trainers
 {
     template <typename PredictorType>
-    MultiEpochTrainer<PredictorType>::MultiEpochTrainer(std::unique_ptr<ILearner<PredictorType>>&& learner, const MultiEpochTrainerParameters& parameters) :
+    MultiEpochTrainer<PredictorType>::MultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner, const MultiEpochTrainerParameters& parameters) :
         _learner(std::move(learner)), _parameters(parameters)
     {}
     
@@ -25,7 +25,7 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<ILearner<PredictorType>>&& learner, const MultiEpochTrainerParameters& parameters)
+    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner, const MultiEpochTrainerParameters& parameters)
     {
         return std::make_unique<MultiEpochTrainer<PredictorType>>(std::move(learner), parameters);
     }
