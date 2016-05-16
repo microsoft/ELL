@@ -78,12 +78,12 @@ namespace features
         }
     }
 
-    size_t Feature::WarmupTime() const
+    size_t Feature::GetWarmupTime() const
     {
         size_t maxTime = 0;
         for (const auto& inputFeature : _inputFeatures)
         {
-            maxTime = std::max(maxTime, inputFeature->WarmupTime());
+            maxTime = std::max(maxTime, inputFeature->GetWarmupTime());
         }
         return maxTime;
     }
@@ -140,6 +140,10 @@ namespace features
         _createTypeMap[class_name] = create_fn;
     }
 
+    // Adds a feature to our list of dependent features.
+    // We need to keep track of dependents for two reasons:
+    //   1) traversing the whole graph (not just the active graph)
+    //   2) propagating the 'dirty' flag when new input arrives  
     void Feature::AddDependent(Feature* f)
     {
         _dependents.push_back(f);
@@ -184,26 +188,6 @@ namespace features
             outStream << s;
         }
         outStream << '\n';
-    }
-
-    // searches recursively through input features and returns first InputFeature it finds
-    // returns nullptr if it can't find one
-    InputFeature* Feature::FindInputFeature() const
-    {
-        for (const auto& inputFeature : _inputFeatures)
-        {
-            auto m = dynamic_cast<InputFeature*>(inputFeature);
-            if (m != nullptr)
-            {
-                return m;
-            }
-            else
-            {
-                return inputFeature->FindInputFeature();
-            }
-        }
-
-        return nullptr;
     }
 
     std::unique_ptr<Feature> Feature::FromDescription(const std::vector<std::string>& description, Feature::FeatureMap& deserializedFeatureMap)

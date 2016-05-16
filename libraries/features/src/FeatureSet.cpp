@@ -41,7 +41,7 @@ namespace features
             _inputFeature->SetValue(inst);
             auto newFeatures = _outputFeature->GetOutput();
             auto hasOutput = HasOutput();
-            if(_numItemsProcessed < _outputFeature->WarmupTime())
+            if(_numItemsProcessed < _outputFeature->GetWarmupTime())
             {
                 ++_numItemsProcessed;
             }
@@ -53,7 +53,7 @@ namespace features
     
     bool FeatureSet::HasOutput() const
     {
-        return _numItemsProcessed >= _outputFeature->WarmupTime() && _outputFeature->HasOutput();    
+        return _numItemsProcessed >= _outputFeature->GetWarmupTime() && _outputFeature->HasOutput();    
     }
     
     DataVector FeatureSet::GetOutput() const
@@ -110,14 +110,7 @@ namespace features
         }
 
         _outputFeature = lastFeature;
-        if (_outputFeature != nullptr)
-        {
-            _inputFeature = _outputFeature->FindInputFeature();
-        }
-        else
-        {
-            _inputFeature = nullptr;
-        }        
+        assert(_inputFeature != nullptr);
     }
     
     void FeatureSet::Serialize(std::ostream& outStream) const

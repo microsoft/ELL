@@ -19,12 +19,9 @@
 #include <cassert>
 #include <cmath>
 #include <algorithm>
-#include <iostream>
 #include <memory>
-#include <sstream>
 #include <stdexcept>
 #include <unordered_map>
-#include <unordered_set>
 
 namespace features
 {

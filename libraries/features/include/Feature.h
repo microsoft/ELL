@@ -47,7 +47,7 @@ namespace features
         virtual void Reset();
         
         /// <summary> Amount of time it takes for this feature to respond to input. </summary>
-        virtual size_t WarmupTime() const;
+        virtual size_t GetWarmupTime() const;
         
         /// <summary> 
         /// Returns a list-of-strings representation of the feature. Used when deserializing a feature set from a file, and
@@ -61,23 +61,16 @@ namespace features
         /// </summary>
         virtual std::vector<std::string> GetColumnDescriptions() const;
         
-        /// <summary> Returns the set of inputs to this feature </summary>        
+        /// <summary> Returns the set of inputs to this feature </summary>
         const std::vector<Feature*>& GetInputFeatures() const;
 
-        /// <summary> Returns a list of the feature types known to the system. Useful for populating a GUI. </summary>
+        /// <summary> Returns a list of the feature types registered in the global feature registry. </summary>
         static std::vector<std::string> GetRegisteredTypes();
         
         using FeatureMap = std::unordered_map<std::string, Feature*>;
         using DeserializeFunction = std::function<std::unique_ptr<Feature>(std::vector<std::string>, FeatureMap&)>; // TODO: have creation (deserialization) function take a const FeatureMap&
-
-        /// <summary> 
-        /// Adds a feature to our list of dependent features. Not meant to be called by client code.
-        /// We need to keep track of dependents for two reasons:
-        ///   1) traversing the whole graph (not just the active graph)
-        ///   2) propagating the 'dirty' flag when new input arrives  
-        /// </summary> 
-        void AddDependent(Feature* f); // TODO: figure out how to make this protected
         
+        /// <summary> Adds a feature to the global registry of features. Allows deserialization and creation from vector of strings. </summary>
         template <typename FeatureType>
         static void RegisterFeatureType();
 
@@ -85,12 +78,13 @@ namespace features
         Feature(const std::vector<Feature*>& inputs);
         Feature(std::string Id, const std::vector<Feature*>& inputs);
 
-        /// <summary> Virtual methods that implement feature-dependent things </summary>
+        //Virtual methods that implement feature-dependent things
         virtual std::vector<double> ComputeOutput() const = 0;
         virtual void AddToDescription(std::vector<std::string>& description) const {};
         virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const = 0;        
         virtual std::string FeatureType() const = 0;
-        
+        void AddDependent(Feature* f);
+
         static void RegisterDeserializeFunction(std::string class_name, DeserializeFunction create_fn);
         bool IsDirty() const;
         void SetDirtyFlag(bool dirty) const;
@@ -104,7 +98,6 @@ namespace features
         friend class FeatureSet;
         void Serialize(std::ostream& outStream) const;
         static std::unique_ptr<Feature> FromDescription(const std::vector<std::string>& description, FeatureMap& deserializedFeatureMap);
-        InputFeature* FindInputFeature() const; // TODO: Remove this, it's unnecessary now (?)
 
         mutable bool _isDirty = true;
         std::vector<Feature*> _dependents; // children
