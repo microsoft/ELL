@@ -48,6 +48,8 @@ namespace trainers
         /// <returns> A constant reference to the current predictor. </returns>
         virtual const predictors::EnsemblePredictor<BasePredictorType>& GetPredictor() const override;
 
+        virtual const utilities::IBinaryClassificationEvaluator<predictors::EnsemblePredictor<BasePredictorType>>* GetEvaluator() const override { return nullptr; }
+
     private:
         std::unique_ptr<ITrainer<BasePredictorType>> _trainer;
         BaggingIncrementalTrainerParameters _parameters;

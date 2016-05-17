@@ -67,7 +67,7 @@ namespace trainers
         /// <returns> The current predictor. </returns>
         virtual predictors::LinearPredictor Reset() override;
 
-        
+        virtual const utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>* GetEvaluator() const override { return nullptr; }
             
     private:
         LossFunctionType _lossFunction;

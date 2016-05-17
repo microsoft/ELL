@@ -11,6 +11,9 @@
 // dataset
 #include "RowDataset.h"
 
+// utilities
+#include "BinaryClassificationEvaluator.h"
+
 namespace trainers
 {
     /// <summary> Interface to a stateful training algorithm which keeps a predictor as part of its state. </summary>
@@ -37,5 +40,7 @@ namespace trainers
         ///
         /// <returns> A constant reference to the current predictor. </returns>
         virtual const PredictorType& GetPredictor() const = 0;
+
+        virtual const utilities::IBinaryClassificationEvaluator<PredictorType>* GetEvaluator() const = 0;
     };
 }

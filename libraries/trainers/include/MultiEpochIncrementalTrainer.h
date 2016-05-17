@@ -58,8 +58,11 @@ namespace trainers
         /// <returns> A constant reference to the current predictor. </returns>
         virtual const PredictorType& GetPredictor() const override { return _incrementalTrainer->GetPredictor(); }
 
+        virtual const utilities::IBinaryClassificationEvaluator<PredictorType>* GetEvaluator() const override { return nullptr; }
+
     private:
         std::unique_ptr<IIncrementalTrainer<PredictorType>> _incrementalTrainer;
+        std::unique_ptr<utilities::IBinaryClassificationEvaluator<PredictorType>> _evaluator;
         MultiEpochIncrementalTrainerParameters _parameters;
         mutable std::default_random_engine _random;
     };
