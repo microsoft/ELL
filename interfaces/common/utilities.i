@@ -34,10 +34,14 @@
 %include "RandomEngines.h"
 
 // This is necessary for us to avoid leaking memory:
-//%template (SupervisedExampleIterator) utilities::AnyIterator<dataset::SupervisedExample<dataset::IDataVector>>;
+// %template (SupervisedExampleIterator) utilities::AnyIterator<dataset::SupervisedExample<dataset::IDataVector>>;
 
 template <typename IteratorType, typename ValueType>
 class StlIterator {};
+
+// TODO: need to make SWIG aware of utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>::ExampleIteratorType
+// and that it's the same as dataset::GenericRowDataset::Iterator
+// ... which is the same as utilities::VectorIterator<ExampleType>;
 
 %template (LinearLogLossClassificationEvaluator) utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss>;
 %template (LinearHingeLossClassificationEvaluator) utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::HingeLoss>;

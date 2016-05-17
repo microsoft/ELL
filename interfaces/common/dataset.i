@@ -79,6 +79,8 @@ namespace dataset
     %template () SparseDataVector<float, utilities::CompressedIntegerList>;
     %template () SparseDataVector<short, utilities::CompressedIntegerList>;
 
+    %template () RowDataset<IDataVector>::Iterator;
+
     // Bafflingly, the below causes SWIG to give an error about no default constructor for SparseDataVector<>
     // %template (SparseDoubleDataVectorBase) SparseDataVector<double, utilities::CompressedIntegerList>;
     // %template (SparseFloatDataVectorBase) SparseDataVector<float, utilities::CompressedIntegerList>;

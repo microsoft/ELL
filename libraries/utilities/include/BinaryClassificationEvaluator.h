@@ -45,8 +45,7 @@ namespace utilities
             double loss = 0;
             double error = 0;
         };
-        
-        
+                
         BinaryClassificationEvaluator(const LossFunctionType& lossFunction);
 
         /// <summary> Evaluates a binary classifier </summary>
