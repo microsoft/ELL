@@ -15,10 +15,7 @@ endif()
 
 set (SRC src/main.cpp)
 
-set (INCLUDE include/SGDArguments.h)
-
 source_group("src" FILES ${SRC})
-source_group("include" FILES ${INCLUDE})
 
 include_directories(include)
 include_directories(${CMAKE_SOURCE_DIR}/libraries/common/include)
@@ -33,7 +30,7 @@ include_directories(${CMAKE_SOURCE_DIR}/libraries/utilities/include)
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
-add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
+add_executable(${PROJ_NAME} ${SRC})
 target_link_libraries(${PROJ_NAME} common dataset layers linear lossFunctions predictors trainers utilities)
 
 # put this project in the trainers folder in the IDE 

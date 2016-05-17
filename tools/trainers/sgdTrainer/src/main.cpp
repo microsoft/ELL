@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SGDArguments.h"
-
 // utilities
 #include "Files.h"
 #include "OutputStreamImpostor.h" 
@@ -25,7 +23,7 @@
 
 // common
 #include "sgdIncrementalTrainerArguments.h"
-#include "MultiEpochTrainerArguments.h"
+#include "MultiEpochIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
@@ -37,7 +35,7 @@
 
 // trainers
 #include "SGDIncrementalTrainer.h"
-#include "MultiEpochTrainer.h"
+#include "MultiEpochIncrementalTrainer.h"
 #include "SingleEpochTrainer.h"
 
 // lossFunctions
@@ -61,7 +59,7 @@ int main(int argc, char* argv[])
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
         common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
-        common::ParsedMultiEpochTrainerArguments multiEpochTrainerArguments;
+        common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
@@ -90,7 +88,7 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
         // create sgd trainer
-        auto trainer = common::MakeSGDTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments, multiEpochTrainerArguments);
+        auto trainer = common::MakeMultiEpochSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments, multiEpochTrainerArguments);
 
         // create evaluator - TODO
         auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::LinearPredictor>(trainerArguments.lossArguments);
@@ -98,7 +96,8 @@ int main(int argc, char* argv[])
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto trainSetIterator = rowDataset.GetIterator();
-        auto predictor = trainer->Train(trainSetIterator); // XXX
+        trainer->Update(trainSetIterator);
+        const auto& predictor = trainer->GetPredictor();
 
         // print loss and errors
         if(trainerArguments.verbose)

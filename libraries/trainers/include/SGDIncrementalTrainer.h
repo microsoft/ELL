@@ -11,7 +11,7 @@
 #include "IIncrementalTrainer.h"
 #include "ITrainer.h"
 #include "SingleEpochTrainer.h"
-#include "MultiEpochTrainer.h"
+#include "MultiEpochIncrementalTrainer.h"
 
 // predictors
 #include "LinearPredictor.h"

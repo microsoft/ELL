@@ -1,16 +1,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MultiEpochTrainerArguments.cpp (common)
+//  File:     MultiEpochIncrementalTrainerArguments.cpp (common)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "MultiEpochTrainerArguments.h"
+#include "MultiEpochIncrementalTrainerArguments.h"
 
 namespace common
 {
-    void ParsedMultiEpochTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
+    void ParsedMultiEpochIncrementalTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(epochSize,
                          "epochSize",

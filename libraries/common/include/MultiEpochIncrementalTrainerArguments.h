@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MultiEpochTrainerArguments.h (common)
+//  File:     MultiEpochIncrementalTrainerArguments.h (common)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,14 +12,14 @@
 #include "CommandLineParser.h"
 
 // trainers
-#include "MultiEpochTrainer.h"
+#include "MultiEpochIncrementalTrainer.h"
 
 namespace common
 {
-    using MultiEpochTrainerArguments = trainers::MultiEpochTrainerParameters;
+    using MultiEpochIncrementalTrainerArguments = trainers::MultiEpochIncrementalTrainerParameters;
 
     /// <summary> Parsed version of multi-epoch trainer parameters. </summary>
-    struct ParsedMultiEpochTrainerArguments : public MultiEpochTrainerArguments, public utilities::ParsedArgSet
+    struct ParsedMultiEpochIncrementalTrainerArguments : public MultiEpochIncrementalTrainerArguments, public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///

@@ -1,14 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MultiEpochTrainer.h (trainers)
+//  File:     MultiEpochIncrementalTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include "ITrainer.h"
 #include "IIncrementalTrainer.h"
 
 // dataset
@@ -23,7 +22,7 @@
 namespace trainers
 {
     /// <summary> Parameters for the multi-epoch meta-trainer. </summary>
-    struct MultiEpochTrainerParameters
+    struct MultiEpochIncrementalTrainerParameters
     {
         uint64_t epochSize = 0;
         uint64_t numEpochs = 1;
@@ -34,26 +33,34 @@ namespace trainers
     ///
     /// <typeparam name="PredictorType"> The type of predictor returned by this trainer. </typeparam>
     template <typename PredictorType>
-    class MultiEpochTrainer : public ITrainer<PredictorType>
+    class MultiEpochIncrementalTrainer : public IIncrementalTrainer<PredictorType>
     {
     public:
-        MultiEpochTrainer() = delete;
+        MultiEpochIncrementalTrainer() = delete;
 
-        /// <summary> Constructs an instance of MultiEpochTrainer. </summary>
+        /// <summary> Constructs an instance of MultiEpochIncrementalTrainer. </summary>
         ///
         /// <param name="incrementalTrainer"> [in,out] The stateful trainer. </param>
-        MultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochTrainerParameters& parameters);
+        MultiEpochIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochIncrementalTrainerParameters& parameters);
 
-        /// <summary> Trains and returns a predictor. </summary>
+        /// <summary> Perform a set of training epochs. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
+        virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
+
+        /// <summary> Returns the trained predictor and resets the trainer to its initial state. </summary>
         ///
-        /// <returns> The trained predictor. </returns>
-        virtual PredictorType Train(dataset::GenericRowDataset::Iterator exampleIterator) const;
+        /// <returns> The current trained predictor. </returns>
+        virtual PredictorType Reset() override { return _incrementalTrainer->Reset(); }
+
+        /// <summary> Gets a const reference to the current predictor. </summary>
+        ///
+        /// <returns> A constant reference to the current predictor. </returns>
+        virtual const PredictorType& GetPredictor() const override { return _incrementalTrainer->GetPredictor(); }
 
     private:
         std::unique_ptr<IIncrementalTrainer<PredictorType>> _incrementalTrainer;
-        MultiEpochTrainerParameters _parameters;
+        MultiEpochIncrementalTrainerParameters _parameters;
         mutable std::default_random_engine _random;
     };
 
@@ -65,7 +72,7 @@ namespace trainers
     ///
     /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochTrainerParameters& parameters);
+    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochIncrementalTrainerParameters& parameters);
 }
 
-#include "../tcc/MultiEpochTrainer.tcc"
+#include "../tcc/MultiEpochIncrementalTrainer.tcc"

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MultiEpochTrainer.tcc (trainers)
+//  File:     MultiEpochIncrementalTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,12 +12,12 @@
 namespace trainers
 {
     template <typename PredictorType>
-    MultiEpochTrainer<PredictorType>::MultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochTrainerParameters& parameters) :
+    MultiEpochIncrementalTrainer<PredictorType>::MultiEpochIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochIncrementalTrainerParameters& parameters) :
         _incrementalTrainer(std::move(incrementalTrainer)), _parameters(parameters), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
     {}
     
     template <typename PredictorType>
-    PredictorType MultiEpochTrainer<PredictorType>::Train(dataset::GenericRowDataset::Iterator exampleIterator) const
+    void MultiEpochIncrementalTrainer<PredictorType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         dataset::GenericRowDataset rowDataset(exampleIterator);
 
@@ -42,13 +42,11 @@ namespace trainers
         //    auto evaluationIterator = rowDataset.GetIterator();
         //    evaluator->Evaluate(evaluationIterator, trainer->GetPredictor());
         }
-
-        return _incrementalTrainer->Reset();
     }
 
     template <typename PredictorType>
-    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochTrainerParameters& parameters)
+    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochIncrementalTrainerParameters& parameters)
     {
-        return std::make_unique<MultiEpochTrainer<PredictorType>>(std::move(incrementalTrainer), parameters);
+        return std::make_unique<MultiEpochIncrementalTrainer<PredictorType>>(std::move(incrementalTrainer), parameters);
     }
 }
