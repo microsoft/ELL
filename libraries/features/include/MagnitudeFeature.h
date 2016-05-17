@@ -22,7 +22,14 @@ namespace features
     class MagnitudeFeature : public Feature
     {
     public:
+        /// <summary> Constructor from magnitude feature </summary>
+        /// <param name="inputFeature"> The feature to take the magnitude of </param>
         MagnitudeFeature(Feature* inputFeature) : Feature({inputFeature}) {}
+
+        /// <summary> Creates a MagnitudeFeature from a vector of strings </summary>
+        ///
+        /// <param name="params"> The strings describing the parameters </params> 
+        /// <param name="previousFeatures"> The map of existing features available as inputs. </params> 
         static std::unique_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures);
 
         virtual std::string FeatureType() const override{ return feature_name; }

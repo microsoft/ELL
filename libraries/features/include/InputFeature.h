@@ -28,13 +28,14 @@ namespace features
         /// <summary> Sets the current value of the input </summary>
         void SetValue(std::vector<double> val);
 
+        /// <summary> Returns the name of this feature type </summary>
         virtual std::string FeatureType() const override { return feature_name; }
 
         static constexpr const char* feature_name = "Input";
         static std::unique_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& prev_features);
 
     protected:
-        virtual std::vector<double> ComputeOutput() const override;
+        virtual std::vector<double> ComputeOutput() const override { return _currentValue; }
         virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const override;
         virtual void AddToDescription(std::vector<std::string>& description) const override;
 

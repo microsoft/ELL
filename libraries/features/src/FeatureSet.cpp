@@ -23,7 +23,6 @@ namespace features
     //
     // FeatureSet class
     //
-    FeatureSet::FeatureSet() : _numItemsProcessed(0) {}
 
     void FeatureSet::Reset()
     {
@@ -51,31 +50,6 @@ namespace features
         return false;
     }
     
-    bool FeatureSet::HasOutput() const
-    {
-        return _numItemsProcessed >= _outputFeature->GetWarmupTime() && _outputFeature->HasOutput();    
-    }
-    
-    DataVector FeatureSet::GetOutput() const
-    {
-        return _outputFeature->GetOutput();    
-    }
-    
-    InputFeature* FeatureSet::GetInputFeature() const
-    {
-        return _inputFeature;
-    }
-
-    Feature* FeatureSet::GetOutputFeature() const
-    {
-        return _outputFeature;
-    }
-    
-    void FeatureSet::SetOutputFeature(Feature* output)
-    {
-        _outputFeature = output;
-    }
-
     Feature* FeatureSet::GetFeature(const std::string& featureId) const
     {
         auto it = _featureMap.find(featureId);

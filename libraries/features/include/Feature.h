@@ -32,13 +32,13 @@ namespace features
         virtual ~Feature() {};
 
         /// <summary> The unique ID of this feature. </summary>
-        std::string Id() const;
+        std::string Id() const { return _id; }
         
         /// <summary> The output dimensionality of this feature. </summary>
-        size_t GetOutputDimension() const;
+        size_t GetOutputDimension() const { return _outputDimension; }
         
         /// <summary> Indicates if this feature has new output to be read. </summary>
-        virtual bool HasOutput() const;
+        virtual bool HasOutput() const { return !IsDirty(); }
 
         /// <summary> The current output of this feature. </summary>
         std::vector<double> GetOutput() const;
@@ -78,7 +78,7 @@ namespace features
         Feature(const std::vector<Feature*>& inputs);
         Feature(std::string Id, const std::vector<Feature*>& inputs);
 
-        //Virtual methods that implement feature-dependent things
+        // Virtual methods that implement feature-dependent things
         virtual std::vector<double> ComputeOutput() const = 0;
         virtual void AddToDescription(std::vector<std::string>& description) const {};
         virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const = 0;        
@@ -86,9 +86,9 @@ namespace features
         void AddDependent(Feature* f);
 
         static void RegisterDeserializeFunction(std::string class_name, DeserializeFunction create_fn);
-        bool IsDirty() const;
+        bool IsDirty() const { return _isDirty; }
         void SetDirtyFlag(bool dirty) const;
-        void AddInputFeature(Feature* inputFeature);
+        void AddInputFeature(Feature* inputFeature) { _inputFeatures.push_back(inputFeature); }
 
         std::vector<Feature*> _inputFeatures; // parents
         mutable size_t _outputDimension = 0;

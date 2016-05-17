@@ -21,11 +21,6 @@ namespace features
     // InputFeature
     //
 
-    std::vector<double> InputFeature::ComputeOutput() const
-    {
-        return _currentValue;
-    }
-
     void InputFeature::SetValue(std::vector<double> val)
     {
         _currentValue = val;

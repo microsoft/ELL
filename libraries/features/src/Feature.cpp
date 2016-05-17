@@ -43,21 +43,6 @@ namespace features
         ++_instanceCount;
     }
 
-    std::string Feature::Id() const
-    {
-        return _id;
-    }
-
-    size_t Feature::GetOutputDimension() const
-    {
-        return _outputDimension;
-    }
-
-    bool Feature::HasOutput() const
-    {
-        return !IsDirty();
-    }
-
     std::vector<double> Feature::GetOutput() const
     {
         if (IsDirty() || _cachedValue.size() == 0)
@@ -149,11 +134,6 @@ namespace features
         _dependents.push_back(f);
     }
 
-    bool Feature::IsDirty() const
-    {
-        return _isDirty;
-    }
-
     void Feature::SetDirtyFlag(bool dirty) const
     {
         _isDirty = dirty;
@@ -165,11 +145,6 @@ namespace features
                 f->SetDirtyFlag(true);
             }
         }
-    }
-
-    void Feature::AddInputFeature(Feature* inputFeature)
-    {
-        _inputFeatures.push_back(inputFeature);
     }
     
     std::unique_ptr<Feature> Feature::FromDescription(const std::vector<std::string>& description, Feature::FeatureMap& deserializedFeatureMap)

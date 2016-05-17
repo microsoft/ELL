@@ -56,30 +56,31 @@ namespace features
     class FeatureSet
     {
     public:
-        FeatureSet();
-        ~FeatureSet() {};        
+        /// <summary> Default constructor </summary>
+        FeatureSet() : _numItemsProcessed(0) {}        
+        ~FeatureSet() = default;
 
         /// <summary> Supplies input data for the featurizer to process. </summary>
         /// <returns> true if the featurizer has new output as a result. </returns>
         bool ProcessInputData(const DataVector& inData) const; // Returns true if we generated output (in which case, call GetOutput())
 
         /// <summary> Indicates whether there is new output data available. </summary>
-        bool HasOutput() const; // Returns dirty bit value. If we have multiple output features, then this should be a function on the feature node
-
+        bool HasOutput() const { return _numItemsProcessed >= _outputFeature->GetWarmupTime() && _outputFeature->HasOutput(); }    
+    
         /// <summary> Get the most recently-computed output feature vector </summary>
-        DataVector GetOutput() const;
-
+        DataVector GetOutput() const { return _outputFeature->GetOutput(); }
+    
         /// <summary> Resets the internal state of the featurizer. Typically called after an interruption in input signal data. </summary>          
         void Reset();
 
         /// <summary> Returns the input for the featurizer. </summary>
-        InputFeature* GetInputFeature() const;
-        
+        InputFeature* GetInputFeature() const { return _inputFeature; }
+
         /// <summary> Gets the output feature for the featurizer. </summary>
-        Feature* GetOutputFeature() const;
-        
+        Feature* GetOutputFeature() const { return _outputFeature; }
+
         /// <summary> Sets the output feature for the featurizer. </summary>
-        void SetOutputFeature(Feature* output);
+        void SetOutputFeature(Feature* output) { _outputFeature = output; }
 
         /// <summary> Retrieves a feature by its ID </summary>
         Feature* GetFeature(const std::string& featureId) const;
