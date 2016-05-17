@@ -78,7 +78,9 @@ namespace predictors
         ///
         /// <param name="model"> [in,out] The model. </param>
         /// <param name="inputCoordinates"> The input coordinates. </param>
-        void AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
+        ///
+        /// <returns> The predictor's output coordinates in the model. </returns>
+        layers::CoordinateList AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
 
         /// <summary> Swaps two linear predictors </summary>
         ///

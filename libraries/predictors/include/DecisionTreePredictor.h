@@ -170,7 +170,9 @@ namespace predictors
         ///
         /// <param name="model"> [in,out] The model. </param>
         /// <param name="inputCoordinates"> The input coordinates. </param>
-        void AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
+        /// 
+        /// <returns> The predictor's output coordinates in the model. </returns>
+        layers::CoordinateList AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
 
     private:
         // represents a flattened version of the tree, where all parameters are in basic-type vectors
