@@ -38,28 +38,22 @@ namespace dataset
         {
         public:
 
-            /// <summary> Default copy ctor. </summary>
-            ///
-            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
-            /// <summary> Default move ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if it succeeds, false if it fails. </returns>
-            bool IsValid() const;
+            bool IsValid() const { return _list_iterator.IsValid(); }
 
             /// <summary> Proceeds to the Next iterate. </summary>
-            void Next();
+            void Next() { _list_iterator.Next(); }
 
             /// <summary> Returns The current value. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            linear::IndexValue Get() const;
+            linear::IndexValue Get() const { return linear::IndexValue{ _list_iterator.Get(), 1.0 }; }
 
         private:
 
@@ -76,8 +70,7 @@ namespace dataset
             IndexIteratorType _list_iterator;
         };
 
-        /// <summary> Constructs an empty sparse binary vector. </summary>
-        SparseBinaryDataVectorBase();
+        SparseBinaryDataVectorBase() = default;
 
         /// <summary> Converting constructor. </summary>
         ///
@@ -88,14 +81,8 @@ namespace dataset
         template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator);
 
-        /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
         SparseBinaryDataVectorBase(SparseBinaryDataVectorBase<IntegerListType>&& other) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="other"> The other. </param>
         SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = default;
 
         /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
@@ -107,7 +94,7 @@ namespace dataset
 
         /// <summary> Deletes all of the vector content and sets its Size to zero, but does not deallocate
         /// its memory. </summary>
-        virtual void Reset() override;
+        virtual void Reset() override { _indices.Reset(); }
 
         /// <summary> Returns The largest index of a non-zero entry plus one. </summary>
         ///
@@ -117,12 +104,12 @@ namespace dataset
         /// <summary> Returns The number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
-        virtual uint64_t NumNonzeros() const override;
+        virtual uint64_t NumNonzeros() const override { return _indices.Size(); }
 
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///
         /// <returns> A double. </returns>
-        virtual double Norm2() const override;
+        virtual double Norm2() const override { return (double)_indices.Size(); }
 
         /// <summary> Performs (*p_other) += scalar * (*this), where other a dense vector. </summary>
         ///
@@ -142,7 +129,7 @@ namespace dataset
         /// <summary> Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator() const;
+        Iterator GetIterator() const { return Iterator(_indices.GetIterator()); }
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///
@@ -152,7 +139,7 @@ namespace dataset
         /// <summary> Makes a deep copy of the datavector </summary>
         ///
         /// <returns> A deep copy of the datavector </summary>
-        virtual std::unique_ptr<IDataVector> Clone() const override;
+        virtual std::unique_ptr<IDataVector> Clone() const override { return std::make_unique<SparseBinaryDataVectorBase<IntegerListType>>(*this); }
 
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///

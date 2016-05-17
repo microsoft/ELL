@@ -36,16 +36,6 @@ namespace layers
         _values(std::move(std::move(values))), _inputCoordinates(std::move(coordinates)), _operationType(operationType)
     {}
 
-    uint64_t Coordinatewise::GetInputDimension() const
-    {
-        return _inputCoordinates.Size();
-    }
-
-    uint64_t Coordinatewise::GetOutputDimension() const
-    {
-        return _inputCoordinates.Size();
-    }
-
     const std::string Coordinatewise::GetOperationName(OperationType type)
     {
         switch (type)
@@ -88,11 +78,6 @@ namespace layers
         }
     }
 
-    Coordinatewise::OperationType Coordinatewise::GetOperationType() const
-    {
-        return _operationType;
-    }
-
     void Coordinatewise::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
     {
         auto operation = GetOperation(_operationType);
@@ -113,16 +98,6 @@ namespace layers
     uint64_t Coordinatewise::GetRequiredLayerSize(uint64_t layerIndex) const
     {
         return _inputCoordinates.GetRequiredLayerSize(layerIndex);
-    }
-
-    std::string Coordinatewise::GetTypeName()
-    {
-        return "Coordinatewise";
-    }
-
-    std::string Coordinatewise::GetRuntimeTypeName() const
-    {
-        return GetTypeName();
     }
 
     void Coordinatewise::Read(utilities::XMLDeserializer& deserializer)

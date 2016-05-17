@@ -37,27 +37,27 @@ public:
     /// <summary> Gets the number of elements </summary>
     ///
     /// <returns> The size. </returns>
-    uint64_t NumElements() const;
+    uint64_t NumElements() const { return _elementMidX.size(); }
 
     /// <summary> Gets the width. </summary>
     ///
     /// <returns> The width. </returns>
-    double GetWidth() const;
+    double GetWidth() const { return _layerWidth; }
 
     /// <summary> Gets the height. </summary>
     ///
     /// <returns> The height. </returns>
-    double GetHeight() const;
+    double GetHeight() const { return _layerHeight; }
 
     /// <summary> Query if this object has hidden elements. </summary>
     ///
     /// <returns> true if the object has hidden elements, false if not. </returns>
-    bool HasHiddenElements() const;
+    bool HasHiddenElements() const { return _numHiddenElements > 0; }
 
     /// <summary> Number visible elements. </summary>
     ///
     /// <returns> The total number of visible elements. </returns>
-    uint64_t NumVisibleElements() const;
+    uint64_t NumVisibleElements() const { return _elementMidX.size() - _numHiddenElements; }
 
     /// <summary> Query if 'index' input stream hidden. </summary>
     ///
@@ -69,7 +69,7 @@ public:
     /// <summary> Gets middle y coordinate. </summary>
     ///
     /// <returns> The middle y coordinate. </returns>
-    double GetMidY() const;
+    double GetMidY() const { return _midY; }
 
     /// <summary> Gets middle x coordinate. </summary>
     ///
@@ -81,7 +81,7 @@ public:
     /// <summary> Gets dots middle x coordinate. </summary>
     ///
     /// <returns> The dots middle x coordinate. </returns>
-    double GetDotsMidX() const;
+    double GetDotsMidX() const { return _dotsMidX; }
 
     /// <summary> Gets output point. </summary>
     ///

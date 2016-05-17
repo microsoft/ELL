@@ -16,18 +16,3 @@ AddToAction::AddToAction(layers::Coordinate targetCoordinate) : _targetCoordinat
 
 AddToAction::AddToAction(const LinearOperation & operation, layers::Coordinate targetCoordinate) : _operation(operation), _targetCoordinate(targetCoordinate)
 {}
-
-const LinearOperation& AddToAction::GetOperation() const
-{
-    return _operation;
-}
-
-const layers::Coordinate& AddToAction::GetTarget() const
-{
-    return _targetCoordinate;
-}
-
-bool AddToAction::IsNull() const
-{
-    return _operation.IsNull();
-}

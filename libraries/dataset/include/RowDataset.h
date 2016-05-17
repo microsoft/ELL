@@ -30,46 +30,39 @@ namespace dataset
         using ExampleType = SupervisedExample<DataVectorType>;
         using Iterator = utilities::VectorIterator<ExampleType>;
 
-        /// <summary> Default constructor. </summary>
         RowDataset() = default;
 
-        /// <summary> Move constructor </summary>
         RowDataset(RowDataset&&) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
         RowDataset(const RowDataset&) = default;
 
-        /// <summary> Default move assignment operator. </summary>
-        ///
-        /// <param name="other"> [in,out] The other vector. </param>
         RowDataset& operator=(RowDataset&&) = default;
 
-        /// <summary> Deleted asignment operator. </summary>
         RowDataset& operator=(const RowDataset&) = default;
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
         /// <returns> The number of examples. </returns>
-        uint64_t NumExamples() const;
+        uint64_t NumExamples() const { return _examples.size(); }
 
         /// <summary> Returns the maximal size of any example. </summary>
         ///
         /// <returns> The maximal size of any example. </returns>
-        uint64_t GetMaxDataVectorSize() const;
+        uint64_t GetMaxDataVectorSize() const { return _maxExampleSize; }
 
         /// <summary> Returns a reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        const ExampleType& GetExample(uint64_t index) const;
+        const ExampleType& GetExample(uint64_t index) const { return _examples[index]; }
 
         /// <summary> Returns a reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        const ExampleType& operator[](uint64_t index) const;
+        const ExampleType& operator[](uint64_t index) const { return _examples[index]; }
 
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///

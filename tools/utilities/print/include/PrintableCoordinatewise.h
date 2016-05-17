@@ -25,12 +25,12 @@ public:
     /// <summary> Gets a friendly layer name. </summary>
     ///
     /// <returns> The friendly layer name. </returns>
-    virtual std::string GetFriendlyLayerName() const override;
+    virtual std::string GetFriendlyLayerName() const override { return GetOperationName(GetOperationType()); }
 
     /// <summary> Returns the output dimension of the layer. </summary>
     ///
     /// <returns> The output dimension. </returns>
-    virtual uint64_t GetOutputDimension() const override;
+    virtual uint64_t GetOutputDimension() const override { return Coordinatewise::GetOutputDimension(); }
 
     /// <summary> Assignment operator from Coordinatewise. </summary>
     ///

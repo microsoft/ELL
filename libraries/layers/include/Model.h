@@ -23,9 +23,13 @@ namespace layers
     class Model
     {
     public:
+
         Model() = default;
+        
         Model(const Model&) = delete;
+        
         Model(Model&&) = default;
+        
         /// <summary> Adds a layer to the model. </summary>
         ///
         /// <param name="layer"> The layer to add to the model. </param>
@@ -60,7 +64,7 @@ namespace layers
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName();
+        static std::string GetTypeName() { return "Model"; }
 
         /// <summary> Reads the model from an XMLDeserializer. </summary>
         ///

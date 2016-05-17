@@ -24,22 +24,12 @@ namespace layers
     //
     // Map::OutputIterator implementation
     //
-    bool Map::OutputIterator::IsValid() const
-    {
-        return _index < _outputs.size();
-    }
-
     void Map::OutputIterator::Next()
     {
         if (IsValid())
         {
             ++_index;
         }
-    }
-
-    linear::IndexValue Map::OutputIterator::Get() const
-    {
-        return{ _index, _outputs[_index] };
     }
 
     Map::OutputIterator::OutputIterator(std::vector<double> outputs) : _outputs(std::move(outputs)), _index(0)
@@ -86,15 +76,5 @@ namespace layers
         }        
 
         return outputs;
-    }
-
-    const CoordinateList& Map::GetOutputCoordinateList() const
-    {
-        return _outputCoordinateList;
-    }
-
-    const Model& Map::GetModel() const 
-    {
-        return _model;
     }
 }

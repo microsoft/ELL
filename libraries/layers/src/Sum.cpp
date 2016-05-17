@@ -16,24 +16,11 @@ namespace layers
 {
     const int Sum::_currentVersion;
 
-    Sum::Sum() 
-    {}
-
     Sum::Sum(CoordinateList coordinates) : _inputCoordinates({ std::move(coordinates) })
     {}
 
     Sum::Sum(std::vector<CoordinateList> coordinates) : _inputCoordinates(std::move(coordinates))
     {}
-
-    uint64_t Sum::GetInputDimension() const
-    {
-        return _inputCoordinates.size();
-    }
-
-    uint64_t Sum::GetOutputDimension() const
-    {
-        return _inputCoordinates.size();
-    }
 
     void Sum::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
     {
@@ -68,16 +55,6 @@ namespace layers
             }
         }
         return max;
-    }
-
-    std::string Sum::GetTypeName()
-    {
-        return "Sum";
-    }
-
-    std::string Sum::GetRuntimeTypeName() const
-    {
-        return GetTypeName();
     }
 
     void Sum::Read(utilities::XMLDeserializer& deserializer)

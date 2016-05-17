@@ -8,11 +8,6 @@
 
 #include "CompilableSum.h"
 
-uint64_t CompilableSum::GetOutputDimension() const
-{
-    return Sum::GetOutputDimension();
-}
-
 void CompilableSum::operator=(const layers::Sum& sum)
 {
     layers::Sum::operator=(sum);

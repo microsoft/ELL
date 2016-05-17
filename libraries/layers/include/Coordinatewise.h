@@ -48,17 +48,38 @@ namespace layers
         /// <summary> Returns the input dimension of the layer. </summary>
         ///
         /// <returns> The input dimension. </returns>
-        virtual uint64_t GetInputDimension() const override;
+        virtual uint64_t GetInputDimension() const override { return _inputCoordinates.Size(); }
 
         /// <summary> Returns the output dimension of the layer. </summary>
         ///
         /// <returns> The output dimension. </returns>
-        virtual uint64_t GetOutputDimension() const override;
+        virtual uint64_t GetOutputDimension() const override { return _inputCoordinates.Size(); }
 
+        /// <summary> Gets the operation name from the operation type. </summary>
+        ///
+        /// <param name="type"> The operation type. </param>
+        ///
+        /// <returns> The operation name. </returns>
         static const std::string GetOperationName(OperationType type);
+
+        /// <summary> Gets the operation type from its name. </summary>
+        ///
+        /// <param name="name"> The operation name. </param>
+        ///
+        /// <returns> The operation type. </returns>
         static OperationType GetOperationType(const std::string& name);
+
+        /// <summary> Gets the operation from its type. </summary>
+        ///
+        /// <param name="type"> The operation type. </param>
+        ///
+        /// <returns> The operation. </returns>
         static std::function<double(double, double)> GetOperation(OperationType type);
-        OperationType GetOperationType() const;
+
+        /// <summary> Gets the operation type of this coordinatewise layer. </summary>
+        ///
+        /// <returns> The operation type. </returns>
+        OperationType GetOperationType() const { return _operationType; }
 
         /// <summary> Computes the layer output. </summary>
         ///
@@ -83,12 +104,12 @@ namespace layers
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName();
+        static std::string GetTypeName() { return "Coordinatewise"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override;
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Reads the layer from an XMLDeserializer. </summary>
         ///

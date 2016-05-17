@@ -65,18 +65,6 @@ namespace dataset
     }
 
     template<typename ValueType>
-    uint64_t DenseDataVector<ValueType>::Size() const
-    {
-        return _data.size();
-    }
-
-    template<typename ValueType>
-    uint64_t DenseDataVector<ValueType>::NumNonzeros() const
-    {
-        return _numNonzeros;
-    }
-
-    template<typename ValueType>
     double DenseDataVector<ValueType>::Norm2() const
     {
         double result = 0.0;
@@ -106,12 +94,6 @@ namespace dataset
         }
         
         return result;
-    }
-
-    template<typename ValueType>
-    typename DenseDataVector<ValueType>::Iterator DenseDataVector<ValueType>::GetIterator() const
-    {
-        return utilities::MakeStlIndexValueIterator(_data);
     }
 
     template<typename ValueType>

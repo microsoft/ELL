@@ -36,17 +36,17 @@ public:
     /// <summary> Gets the action's operation. </summary>
     ///
     /// <returns> The operation. </returns>
-    const LinearOperation& GetOperation() const;
+    const LinearOperation& GetOperation() const { return _operation; }
 
     /// <summary> Gets the action's target coordinate. </summary>
     ///
     /// <returns> The target coordinate. </returns>
-    const layers::Coordinate& GetTarget() const;
+    const layers::Coordinate& GetTarget() const { return _targetCoordinate; }
 
     /// <summary> Query if this action is a null action (a null action does not change its target). </summary>
     ///
     /// <returns> true if the action is a null action. </returns>
-    bool IsNull() const;
+    bool IsNull() const { return _operation.IsNull(); }
 
 private:
     LinearOperation _operation;

@@ -26,11 +26,6 @@ namespace layers
         _list.push_back(coordinate);
     }
 
-    uint64_t CoordinateList::Size() const
-    {
-        return _list.size();
-    }
-
     const Coordinate & CoordinateList::operator[](uint64_t index) const
     {
         return _list[index];
@@ -64,11 +59,6 @@ namespace layers
             }
         }
         return max;
-    }
-
-    std::string CoordinateList::GetTypeName()
-    {
-        return "CoordinateList";
     }
 
     void CoordinateList::Read(utilities::XMLDeserializer& deserializer)

@@ -79,12 +79,6 @@ namespace trainers
         _averagedPredictor.Scale(scale);
     }
 
-    template<typename LossFunctionType>
-    const predictors::LinearPredictor& StochasticGradientDescentTrainer<LossFunctionType>::GetPredictor() const
-    {
-        return _averagedPredictor;
-    }
-
     template <typename LossFunctionType>
     StochasticGradientDescentTrainer<LossFunctionType> MakeStochasticGradientDescentTrainer(uint64_t dim, const IStochasticGradientDescentTrainer::Parameters& parameters, const LossFunctionType& lossFunction)
     {
