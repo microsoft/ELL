@@ -15,11 +15,11 @@
 
 namespace dataset
 {
-    %ignore RowDataset;
     %ignore IDataVector::Clone;
 
     %ignore GenericSupervisedExample::GetDataVector;
     %ignore GenericSupervisedExample::GenericSupervisedExample;
+    %ignore RowDataset::operator[];
 
     %ignore DataRow<void>;
     %ignore DenseDataVector::operator[];
@@ -47,7 +47,9 @@ namespace interfaces
 
 namespace utilities
 {
-    class IIterator;
+    class IIterator {};
+//    template <typename IteratorType> class StlIterator {};
+//    %template () StlIterator<typename std::vector<dataset::IDataVector>::const_iterator>;
 }
 
 %include "noncopyable.i"
@@ -57,21 +59,25 @@ namespace utilities
 %include "IDataVector.h"
 %include "SparseDataVector.h"
 %include "SupervisedExample.h"
+%include "RowDataset.h"
 
 namespace dataset
 {
     wrap_noncopyable(SupervisedExample<IDataVector>);
     %template() SupervisedExample<IDataVector>;
+    %template() RowDataset<IDataVector>;
+    typedef foobar RowDataset<IDataVector>::Iterator;
 }
 
 %include "RowDatasetInterface.h"
-
 
 %include "unique_ptr.i"
 wrap_unique_ptr(IDataVectorPtr, dataset::IDataVector)
 
 namespace dataset
 {
+    %template (GenericSupervisedExample) SupervisedExample<IDataVector>;
+
     // The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
     %template () DenseDataVector<double>;
     %template () DenseDataVector<float>;
@@ -79,7 +85,8 @@ namespace dataset
     %template () SparseDataVector<float, utilities::CompressedIntegerList>;
     %template () SparseDataVector<short, utilities::CompressedIntegerList>;
 
-    %template () RowDataset<IDataVector>::Iterator;
+    %template () RowDataset<IDataVector>;
+    
 
     // Bafflingly, the below causes SWIG to give an error about no default constructor for SparseDataVector<>
     // %template (SparseDoubleDataVectorBase) SparseDataVector<double, utilities::CompressedIntegerList>;
@@ -87,15 +94,17 @@ namespace dataset
     // %template (SparseShortDataVectorBase) SparseDataVector<short, utilities::CompressedIntegerList>;
 
     // wrap operator[] for python
-    WRAP_OP_AT(DenseDataVector, double)
+    WRAP_OP_AT(DoubleDataVector, double)
 
     // wrap "Print" method for python
-    //WRAP_PRINT_TO_STR(GenericSupervisedExample)
-    WRAP_PRINT_TO_STR(SupervisedExample<dataset::IDataVector>)
+    WRAP_PRINT_TO_STR(SupervisedExample<IDataVector>)
     WRAP_PRINT_TO_STR(FloatDataVector)
     WRAP_PRINT_TO_STR(DoubleDataVector)
 
-    //WRAP_PRINT_TO_STR(SparseDoubleDataVector)
-    //WRAP_PRINT_TO_STR(SparseFloatDataVector)
-    //WRAP_PRINT_TO_STR(SparseShortDataVector)
+    WRAP_PRINT_TO_STR(SparseDoubleDataVector)
+    WRAP_PRINT_TO_STR(SparseFloatDataVector) 
+    WRAP_PRINT_TO_STR(SparseShortDataVector)
 }
+
+// This is necessary for us to avoid leaking memory:
+// %template () interfaces::GenericRowDataset::Iterator;

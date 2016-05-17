@@ -66,15 +66,12 @@ def sgd():
         dataset.RandomPermute(rng, epochSize)
 
         # iterate over the entire permuted dataset
-        trainSetIterator = dataset.GetIterator(0, epochSize)
+        trainSetIterator = dataset.GetIterator(0, epochSize) # mem leak comes from here
         optimizer.Update(trainSetIterator)  
 
         evalIterator = dataset.GetIterator()
         predictor = optimizer.GetPredictor()
-        
-        print evalIterator
-        print type(evalIterator)
-        
+                
         evaluator.Evaluate(evalIterator, predictor) 
 
     print "Training Error:"
@@ -83,10 +80,11 @@ def sgd():
     print "{0}\t{1}".format(evaluator.GetLastLoss(), evaluator.GetLastError())
     
     # update the map with the newly learned layers
-    predictor = optimizer.GetPredictor()
-    predictor.AddToModel(model, map.GetOutputCoordinateList())
+#    predictor = optimizer.GetPredictor()
+#    predictor.AddToModel(model, map.GetOutputCoordinateList())
     
     # output the map
-    model.Save(outMapFilename)
+#    model.Save(outMapFilename)
     
-    
+sgd()
+

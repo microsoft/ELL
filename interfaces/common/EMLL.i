@@ -27,13 +27,28 @@
 %include "std_vector.i"
 %include "std_shared_ptr.i"
 
-%template (DoubleVec) std::vector<double>;
+%template () std::vector<double>;
+%template () std::vector<floast>;
+
+%{
+#include "StlIterator.h"
+%}
+
+namespace utilities
+{
+    template <typename ValueType>
+    class IIterator {};
+
+    template <typename IteratorType, typename ValueType> class StlIterator {};
+    %template () StlIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
+}
+//typedef utilities::StlIterator<typename std::vector<dataset::IDataVector>::const_iterator>;
 
 // Macro for exposing operator[] to python
 %define WRAP_OP_AT(Class, ValueType)
   %extend Class 
   {
-    const ValueType& __getitem__(size_t index)
+    ValueType __getitem__(size_t index)
     {
       return (*$self)[index];
     }
@@ -109,6 +124,6 @@ wrap_unique_ptr(LayerPtr, layers::Layer)
 %include "std_shared_ptr.i"
 %shared_ptr(layers::Map)
 %shared_ptr(layers::Model)
-//%template (GenericRowDataset) dataset::RowDataset<dataset::IDataVector>
+//%template (GenericRowDataset) dataset::RowDataset<dataset::IDataVector>;
 //%shared_ptr(GenericRowDataset)
 %shared_ptr(RowDataset)
