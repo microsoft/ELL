@@ -16,8 +16,24 @@ namespace predictors
     }
 
     template<typename BasePredictorType>
+    double predictors::EnsemblePredictor<BasePredictorType>::Predict(const dataset::IDataVector& dataVector) const 
+    {
+        double output = 0.0;
+        for(uint64_t i=0; i<_basePredictors.size(); ++i)
+        {
+            output += _weights[i] * _basePredictors[i].Predict(dataVector);
+        }
+        return output;
+    }
+
+    template<typename BasePredictorType>
     void predictors::EnsemblePredictor<BasePredictorType>::AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const 
     {
-        // TODO
+        for(uint64_t i = 0; i<_basePredictors.size(); ++i)
+        {
+            _basePredictors[i].AddToModel(model, inputCoordinates);
+        }
+
+        // TODO - get the weighted sum of all of the base learner outputs and add that to the model
     }
 }
