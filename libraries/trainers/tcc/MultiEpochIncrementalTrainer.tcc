@@ -33,14 +33,9 @@ namespace trainers
             // randomly permute the data
             rowDataset.RandomPermute(_random, epochSize);
 
-            // iterate over the entire permuted dataset
+            // update the incremental trainer
             auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
             _incrementalTrainer->Update(trainSetIterator);
-
-
-        //    // Evaluate training error
-        //    auto evaluationIterator = rowDataset.GetIterator();
-        //    evaluator->Evaluate(evaluationIterator, trainer->GetPredictor());
         }
     }
 

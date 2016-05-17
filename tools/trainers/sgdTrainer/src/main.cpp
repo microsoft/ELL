@@ -90,9 +90,6 @@ int main(int argc, char* argv[])
         // create sgd trainer
         auto trainer = common::MakeMultiEpochSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments, multiEpochTrainerArguments);
 
-        // create evaluator - TODO
-        auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::LinearPredictor>(trainerArguments.lossArguments);
-
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto trainSetIterator = rowDataset.GetIterator();
@@ -103,17 +100,20 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose)
         {
             std::cout << "Finished training.\n";
+
+            auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::LinearPredictor>(trainerArguments.lossArguments);           
+            auto evaluationIterator = rowDataset.GetIterator();
+            evaluator->Evaluate(evaluationIterator, *predictor);
+
             std::cout << "Training error\n";
-            evaluator->Print(std::cout); // TODO
+            evaluator->Print(std::cout); 
             std::cout << std::endl;
         }
 
-        // update the map with the newly learned layers
-       // auto predictor = trainer->GetPredictor();
-
+        // add predictor to the model
         predictor->AddToModel(model, outputCoordinateList);
 
-        // output map
+        // save the model
         model.Save(outStream);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

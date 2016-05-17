@@ -86,9 +86,6 @@ int main(int argc, char* argv[])
         // create sgd trainer
         auto trainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
 
-        // create evaluator
-        auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::DecisionTreePredictor>(trainerArguments.lossArguments);
-
         // create random number generator
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
 
@@ -105,9 +102,10 @@ int main(int argc, char* argv[])
         {
             std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
 
+            auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::DecisionTreePredictor>(trainerArguments.lossArguments);
             auto evaluationIterator = rowDataset.GetIterator(0, 1000);
-
             evaluator->Evaluate(evaluationIterator, tree);
+
             std::cout << "Training error\n";
             evaluator->Print(std::cout);
             std::cout << std::endl;
