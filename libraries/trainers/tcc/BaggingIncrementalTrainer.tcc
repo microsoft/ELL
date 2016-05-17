@@ -7,37 +7,42 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "RandomEngines.h"
+
 namespace trainers
 {
-
     template<typename BasePredictorType>
-    BaggingIncrementalTrainer<BasePredictorType>::BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& parameters) : _parameters(parameters)
-    {
-        // TODO
-    }
+    BaggingIncrementalTrainer<BasePredictorType>::BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters) :
+        _trainer(std::move(trainer)), _baggingParameters(baggingParameters), _ensemble(std::make_shared<PredictorType>()), _random(utilities::GetRandomEngine(baggingParameters.dataPermutationRandomSeed))
+    {}
 
     template<typename BasePredictorType>
     void BaggingIncrementalTrainer<BasePredictorType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
     {
-        // TODO
+        dataset::GenericRowDataset rowDataset(exampleIterator);
+
+        // calculate epoch size
+        uint64_t bagSize = _baggingParameters.bagSize;
+        if(bagSize == 0 || bagSize >  rowDataset.NumExamples())
+        {
+            bagSize = rowDataset.NumExamples();
+        }
+
+        for(int i = 0; i < _baggingParameters.numIterations; ++i)
+        {
+            // get random bag of data
+            rowDataset.RandomPermute(_random, bagSize);
+            auto trainSetIterator = rowDataset.GetIterator(0, bagSize);
+
+            // append weak predictor to the ensemble
+            _ensemble->AppendPredictor(_trainer->Train(trainSetIterator));
+        }
     }
 
     template<typename BasePredictorType>
-    predictors::EnsemblePredictor<BasePredictorType> BaggingIncrementalTrainer<BasePredictorType>::Reset()
+    std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters)
     {
-        // TODO
-        return predictors::EnsemblePredictor<BasePredictorType>();
-    }
-
-    template<typename BasePredictorType>
-    const predictors::EnsemblePredictor<BasePredictorType>& BaggingIncrementalTrainer<BasePredictorType>::GetPredictor() const
-    {
-        return _ensemble;
-    }
-
-    template<typename BasePredictorType>
-    std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, , const BaggingIncrementalTrainerParameters& parameters)
-    {
-        return std::make_unique<BaggingIncrementalTrainer<BasePredictorType>>(std::move(trainer), parameters);
+        return std::make_unique<BaggingIncrementalTrainer<BasePredictorType>>(std::move(trainer), baggingParameters);
     }
 }

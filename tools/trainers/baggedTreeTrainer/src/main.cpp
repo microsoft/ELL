@@ -1,14 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     main.cpp (stochasticGradientDescentTrainer)
+//  File:     main.cpp (baggedTreeLearner)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 // utilities
 #include "Files.h"
-#include "OutputStreamImpostor.h" 
+#include "OutputStreamImpostor.h"
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
 #include "BinaryClassificationEvaluator.h"
@@ -22,8 +23,8 @@
 #include "SupervisedExample.h"
 
 // common
-#include "sgdIncrementalTrainerArguments.h"
-#include "MultiEpochIncrementalTrainerArguments.h"
+#include "SortingTreeTrainerArguments.h"
+#include "BaggingIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
@@ -34,12 +35,10 @@
 #include "MakeEvaluator.h"
 
 // trainers
-#include "SGDIncrementalTrainer.h"
-#include "MultiEpochIncrementalTrainer.h"
-#include "SingleEpochTrainer.h"
+#include "SortingTreeTrainer.h"
 
 // lossFunctions
-#include "HingeLoss.h"
+#include "SquaredLoss.h"
 #include "LogLoss.h"
 
 // stl
@@ -58,21 +57,21 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
-        common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
-        common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
+        common::ParsedSortingTreeTrainerArguments sortingTreeTrainerArguments;
+        common::ParsedBaggingIncrementalTrainerArguments baggingIncrementalTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
-        commandLineParser.AddOptionSet(multiEpochTrainerArguments);
-        commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
+        commandLineParser.AddOptionSet(sortingTreeTrainerArguments);
+        commandLineParser.AddOptionSet(baggingIncrementalTrainerArguments);
         
         // parse command line
         commandLineParser.Parse();
 
-        if(trainerArguments.verbose) std::cout << "Stochastic Gradient Descent Trainer" << std::endl;
-
+        if(trainerArguments.verbose) std::cout << "Bagging Tree Trainer" << std::endl;
+        
         // if output file specified, replace stdout with it 
         auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputModelFile);
 
@@ -85,12 +84,12 @@ int main(int argc, char* argv[])
 
         // load dataset
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
+        auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
-        // create sgd trainer
-        auto sgdIncrementalTrainer = MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
-        auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments);
-
+        // create trainer
+        auto baseTrainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
+        auto trainer = trainers::MakeBaggingIncrementalTrainer(std::move(baseTrainer), baggingIncrementalTrainerArguments);
+        
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto trainSetIterator = rowDataset.GetIterator();
@@ -102,12 +101,12 @@ int main(int argc, char* argv[])
         {
             std::cout << "Finished training.\n";
 
-            auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::LinearPredictor>(trainerArguments.lossArguments);           
+            auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::EnsemblePredictor<predictors::DecisionTreePredictor>>(trainerArguments.lossArguments);
             auto evaluationIterator = rowDataset.GetIterator();
             evaluator->Evaluate(evaluationIterator, *predictor);
 
             std::cout << "Training error\n";
-            evaluator->Print(std::cout); 
+            evaluator->Print(std::cout);
             std::cout << std::endl;
         }
 
@@ -116,6 +115,7 @@ int main(int argc, char* argv[])
 
         // save the model
         model.Save(outStream);
+
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

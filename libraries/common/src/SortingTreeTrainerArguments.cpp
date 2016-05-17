@@ -10,7 +10,8 @@
 
 namespace common
 {
-    void ParsedSortingTreeTrainerArguments::AddArgs(utilities::CommandLineParser & parser) {
+    void ParsedSortingTreeTrainerArguments::AddArgs(utilities::CommandLineParser & parser) 
+    {
         parser.AddOption(minSplitGain,
                          "minSplitGain",
                          "msg",

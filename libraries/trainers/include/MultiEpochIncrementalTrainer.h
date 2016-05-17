@@ -59,7 +59,7 @@ namespace trainers
         mutable std::default_random_engine _random;
     };
 
-    /// <summary> Makes a trainer that runs an incremental trainer for multiple epochs. </summary>
+    /// <summary> Makes an incremental trainer that runs another incremental trainer for multiple epochs. </summary>
     ///
     /// <typeparam name="PredictorType"> Type of the predictor returned by this trainer. </typeparam>
     /// <param name="incrementalTrainer"> [in,out] The incremental trainer. </param>
