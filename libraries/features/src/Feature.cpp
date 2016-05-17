@@ -172,24 +172,6 @@ namespace features
         _inputFeatures.push_back(inputFeature);
     }
     
-    void Feature::Serialize(std::ostream& outStream) const
-    {
-        bool first = true;
-        for (auto s : GetDescription())
-        {
-            if (!first)
-            {
-                outStream << '\t';
-            }
-            else
-            {
-                first = false;
-            }
-            outStream << s;
-        }
-        outStream << '\n';
-    }
-
     std::unique_ptr<Feature> Feature::FromDescription(const std::vector<std::string>& description, Feature::FeatureMap& deserializedFeatureMap)
     {
         std::string featureId = TrimString(description[0]);

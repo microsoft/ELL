@@ -31,12 +31,15 @@
 // add __str__ to Coordinate and CoordinateList
 %extend features::FeatureSet
 {
+    // TODO: reimplement this using Visit
+    /*
     std::string __str__() 
     {        
         std::ostringstream oss(std::ostringstream::out);
         ($self)->Serialize(oss);
         return oss.str();
     }
+    */
 };
 
 %extend features::Feature

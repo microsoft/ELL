@@ -96,7 +96,6 @@ namespace features
 
     private:
         friend class FeatureSet;
-        void Serialize(std::ostream& outStream) const;
         static std::unique_ptr<Feature> FromDescription(const std::vector<std::string>& description, FeatureMap& deserializedFeatureMap);
 
         mutable bool _isDirty = true;

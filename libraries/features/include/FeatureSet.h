@@ -90,16 +90,7 @@ namespace features
 
         /// <summary> Creates feature from a string description. Used by serialization and UI code. </summary>
         Feature* CreateFeatureFromDescription(const std::vector<std::string>& description);
-
-        /// <summary> Loads the featurizer from a stream. </summary>
-        void Deserialize(std::istream& inStream);
         
-        /// <summary> Saves the featurizer to a stream. </summary>
-        void Serialize(std::ostream& outStream) const;
-        
-        /// <summary> Saves the featurizer to a stream, but only including the parts required to compute the output. </summary>
-        void SerializeActiveGraph(std::ostream& outStream) const;
-
         /// <summary> 
         /// Visits all features in the graph in dependency order (that is, a feature is never visited unless
         /// its inputs have all been visted first). 
