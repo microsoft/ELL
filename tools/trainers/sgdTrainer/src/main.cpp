@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto trainSetIterator = rowDataset.GetIterator();
         trainer->Update(trainSetIterator);
-        const auto& predictor = trainer->GetPredictor();
+        auto predictor = trainer->GetPredictor();
 
         // print loss and errors
         if(trainerArguments.verbose)
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
         // update the map with the newly learned layers
        // auto predictor = trainer->GetPredictor();
 
-        predictor.AddToModel(model, outputCoordinateList);
+        predictor->AddToModel(model, outputCoordinateList);
 
         // output map
         model.Save(outStream);

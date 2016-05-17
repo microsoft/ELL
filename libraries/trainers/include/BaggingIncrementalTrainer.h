@@ -26,6 +26,8 @@ namespace trainers
     class BaggingIncrementalTrainer : public IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>
     {
     public:
+        using PredictorType = predictors::EnsemblePredictor<BasePredictorType>;
+
         BaggingIncrementalTrainer() = delete;
 
         /// <summary> Constructs an instance of SingleEpochTrainer. </summary>
@@ -38,22 +40,15 @@ namespace trainers
         /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
         virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
 
-        /// <summary> Returns the trained predictor and resets the trainer to its initial state. </summary>
-        ///
-        /// <returns> The current trained predictor. </returns>
-        virtual predictors::EnsemblePredictor<BasePredictorType> Reset() override;
-
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
-        /// <returns> A constant reference to the current predictor. </returns>
-        virtual const predictors::EnsemblePredictor<BasePredictorType>& GetPredictor() const override;
-
-        virtual const utilities::IBinaryClassificationEvaluator<predictors::EnsemblePredictor<BasePredictorType>>* GetEvaluator() const override { return nullptr; }
+        /// <returns> A shared pointer to the current predictor. </returns>
+        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override;
 
     private:
         std::unique_ptr<ITrainer<BasePredictorType>> _trainer;
         BaggingIncrementalTrainerParameters _parameters;
-        predictors::EnsemblePredictor _ensemble;
+        PredictorType _ensemble;
     };
 
     template <typename BasePredictorType>

@@ -44,6 +44,7 @@ namespace trainers
     class SGDIncrementalTrainer : public IIncrementalTrainer<predictors::LinearPredictor>
     {
     public:
+        using PredictorType = predictors::LinearPredictor;
 
         /// <summary> Constructs the trainer. </summary>
         ///
@@ -59,23 +60,16 @@ namespace trainers
 
         /// <summary> Returns The averaged predictor. </summary>
         ///
-        /// <returns> The averaged predictor. </returns>
-        virtual const predictors::LinearPredictor& GetPredictor() const override { return _averagedPredictor; }
+        /// <returns> A shared pointer to the current predictor. </returns>
+        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _averagedPredictor; }
 
-        /// <summary> Resets the trainer and returns its current predictor. </summary>
-        ///
-        /// <returns> The current predictor. </returns>
-        virtual predictors::LinearPredictor Reset() override;
-
-        virtual const utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>* GetEvaluator() const override { return nullptr; }
-            
     private:
         LossFunctionType _lossFunction;
         SGDIncrementalTrainerParameters _parameters;
 
         uint64_t _total_iterations = 0;
-        predictors::LinearPredictor _lastPredictor;
-        predictors::LinearPredictor _averagedPredictor;
+        PredictorType _lastPredictor;
+        std::shared_ptr<PredictorType> _averagedPredictor;
     };
 
     /// <summary> Makes a sorting tree trainer. </summary>

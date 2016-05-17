@@ -48,21 +48,13 @@ namespace trainers
         /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
         virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
 
-        /// <summary> Returns the trained predictor and resets the trainer to its initial state. </summary>
-        ///
-        /// <returns> The current trained predictor. </returns>
-        virtual PredictorType Reset() override { return _incrementalTrainer->Reset(); }
-
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
-        /// <returns> A constant reference to the current predictor. </returns>
-        virtual const PredictorType& GetPredictor() const override { return _incrementalTrainer->GetPredictor(); }
-
-        virtual const utilities::IBinaryClassificationEvaluator<PredictorType>* GetEvaluator() const override { return nullptr; }
+        /// <returns> A shared pointer to the current predictor. </returns>
+        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _incrementalTrainer->GetPredictor(); }
 
     private:
         std::unique_ptr<IIncrementalTrainer<PredictorType>> _incrementalTrainer;
-        std::unique_ptr<utilities::IBinaryClassificationEvaluator<PredictorType>> _evaluator;
         MultiEpochIncrementalTrainerParameters _parameters;
         mutable std::default_random_engine _random;
     };

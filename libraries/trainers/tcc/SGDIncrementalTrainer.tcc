@@ -19,7 +19,7 @@ namespace trainers
 {
     template<typename LossFunctionType>
     SGDIncrementalTrainer<LossFunctionType>::SGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters) :
-        _lossFunction(lossFunction), _parameters(parameters), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // iterations start from 1 to prevent divide-by-zero
+        _lossFunction(lossFunction), _parameters(parameters), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(std::make_shared<PredictorType>(dim)) // iterations start from 1 to prevent divide-by-zero
     {}
 
     template<typename LossFunctionType>
@@ -27,10 +27,10 @@ namespace trainers
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetVector();
-        auto& vAvg = _averagedPredictor.GetVector();
+        auto& vAvg = _averagedPredictor->GetVector();
 
         double& bLast = _lastPredictor.GetBias();
-        double& bAvg = _averagedPredictor.GetBias();
+        double& bAvg = _averagedPredictor->GetBias();
 
         // define some constants
         const double T_prev = double(_total_iterations);
@@ -77,18 +77,7 @@ namespace trainers
         // calculate w and w_avg
         double scale = T_prev / T_next;
         _lastPredictor.Scale(scale);
-        _averagedPredictor.Scale(scale);
-    }
-
-
-    template<typename LossFunctionType>
-    predictors::LinearPredictor SGDIncrementalTrainer<LossFunctionType>::Reset()
-    {
-        _total_iterations = 1;
-        _lastPredictor.Reset();
-        predictors::LinearPredictor averagedPredictor(_averagedPredictor.GetDimension());
-        predictors::LinearPredictor::Swap(_averagedPredictor, averagedPredictor);
-        return averagedPredictor;
+        _averagedPredictor->Scale(scale);
     }
 
     template <typename LossFunctionType>

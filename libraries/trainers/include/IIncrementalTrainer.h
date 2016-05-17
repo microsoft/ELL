@@ -11,8 +11,8 @@
 // dataset
 #include "RowDataset.h"
 
-// utilities
-#include "BinaryClassificationEvaluator.h"
+// stl
+#include <memory>
 
 namespace trainers
 {
@@ -31,16 +31,9 @@ namespace trainers
         /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
         virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) = 0;
 
-        /// <summary> Returns the trained predictor and resets the trainer to its initial state. </summary>
-        ///
-        /// <returns> The current trained predictor. </returns>
-        virtual PredictorType Reset() = 0;
-
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
-        /// <returns> A constant reference to the current predictor. </returns>
-        virtual const PredictorType& GetPredictor() const = 0;
-
-        virtual const utilities::IBinaryClassificationEvaluator<PredictorType>* GetEvaluator() const = 0;
+        /// <returns> A shared pointer to the current predictor. </returns>
+        virtual const std::shared_ptr<const PredictorType> GetPredictor() const = 0;
     };
 }
