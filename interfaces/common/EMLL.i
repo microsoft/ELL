@@ -15,7 +15,7 @@
 
 %{
 #define SWIG_FILE_WITH_INIT
-#define SWIG_PYTHON_EXTRA_NATIVE_CONTAINERS
+#define SWIG_PYTHON_EXTRA_NATIVE_CONTAINERS 
 #include <cstdint>
 %}
 
@@ -28,7 +28,7 @@
 %include "std_shared_ptr.i"
 
 %template () std::vector<double>;
-%template () std::vector<floast>;
+%template () std::vector<float>;
 
 %{
 #include "StlIterator.h"
@@ -37,12 +37,11 @@
 namespace utilities
 {
     template <typename ValueType>
-    class IIterator {};
+    class IIterator {}; 
 
     template <typename IteratorType, typename ValueType> class StlIterator {};
     %template () StlIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
 }
-//typedef utilities::StlIterator<typename std::vector<dataset::IDataVector>::const_iterator>;
 
 // Macro for exposing operator[] to python
 %define WRAP_OP_AT(Class, ValueType)
@@ -103,6 +102,9 @@ namespace std
 // Interface for common library
 %include common.i
 
+// Interface includes for utilities library
+%include utilities.i
+
 // Interface for the predictors library
 %include predictors.i
 
@@ -111,9 +113,6 @@ namespace std
 
 // Interface includes for lossFunctions library
 %include lossFunctions.i
-
-// Interface includes for utilities library
-%include utilities.i
 
 // Interface includes for linear library
 %include linear.i

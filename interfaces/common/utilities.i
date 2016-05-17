@@ -17,7 +17,6 @@
 %{
 #define SWIG_FILE_WITH_INIT
 #include "BinaryClassificationEvaluator.h"
-//#include "IIterator.h"
 #include "AnyIterator.h"
 #include "RandomEngines.h"
 #include "StlIterator.h"
@@ -27,19 +26,22 @@
 #include "SquaredLoss.h"
 %}
 
+template <typename IteratorType, typename ValueType> class StlIterator {};
+
 %include "BinaryClassificationEvaluator.h"
-//%include "IIterator.h"
 %include "AnyIterator.h"
 %include "RandomEngines.h"
+%include "RowDataset.h"
 
 // This is necessary for us to avoid leaking memory:
 // %template (SupervisedExampleIterator) utilities::AnyIterator<dataset::SupervisedExample<dataset::IDataVector>>;
 
-template <typename IteratorType, typename ValueType> class StlIterator {};
+%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 
 // TODO: need to make SWIG aware of utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>::ExampleIteratorType
 // and that it's the same as dataset::GenericRowDataset::Iterator
 // ... which is the same as utilities::VectorIterator<ExampleType>;
+// ... which is the same as utilities::StlIterator<typename std::vector<ExampleType>::const_iterator>;
 
 %template () utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>;
 %template (LinearLogLossClassificationEvaluator) utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss>;

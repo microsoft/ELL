@@ -48,8 +48,6 @@ namespace interfaces
 namespace utilities
 {
     class IIterator {};
-//    template <typename IteratorType> class StlIterator {};
-//    %template () StlIterator<typename std::vector<dataset::IDataVector>::const_iterator>;
 }
 
 %include "noncopyable.i"
@@ -66,7 +64,6 @@ namespace dataset
     wrap_noncopyable(SupervisedExample<IDataVector>);
     %template() SupervisedExample<IDataVector>;
     %template() RowDataset<IDataVector>;
-    typedef foobar RowDataset<IDataVector>::Iterator;
 }
 
 %include "RowDatasetInterface.h"
@@ -87,7 +84,6 @@ namespace dataset
 
     %template () RowDataset<IDataVector>;
     
-
     // Bafflingly, the below causes SWIG to give an error about no default constructor for SparseDataVector<>
     // %template (SparseDoubleDataVectorBase) SparseDataVector<double, utilities::CompressedIntegerList>;
     // %template (SparseFloatDataVectorBase) SparseDataVector<float, utilities::CompressedIntegerList>;

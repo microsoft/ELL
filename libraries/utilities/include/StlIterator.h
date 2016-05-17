@@ -60,8 +60,8 @@ namespace utilities
     };
 
     /// <summary> Handy type alias for a StlIterator over a std::vector </summary>
-    template <typename ValueType>
-    using VectorIterator = StlIterator<typename std::vector<ValueType>::const_iterator>;
+//    template <typename ValueType>
+//    using VectorIterator = StlIterator<typename std::vector<ValueType>::const_iterator>;
 
     /// <summary> Convenience function for creating StlIterators </summary>
     ///

@@ -20,9 +20,9 @@
 
 namespace interfaces
 {
-    typedef dataset::RowDataset<dataset::IDataVector>::Iterator RowDatasetIterator;
-    
-    
+    // typedef dataset::RowDataset<dataset::IDataVector>::Iterator RowDatasetIterator;
+    typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> RowDatasetIterator;
+       
     class GenericRowDataset
     {
     public:

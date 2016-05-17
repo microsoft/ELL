@@ -23,7 +23,7 @@ namespace trainers
     {}
 
     template<typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::Update(dataset::GenericRowIterator exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetVector();
