@@ -95,9 +95,9 @@ namespace trainers
     /// <param name="parameters"> The trainer parameters. </param>
     /// <param name="lossFunction"> The loss function. </param>
     ///
-    /// <returns> A sorting tree trainer. </returns>
+    /// <returns> A nique_ptr to a sorting tree trainer. </returns>
     template<typename LossFunctionType>
-    std::unique_ptr<SortingTreeTrainer<LossFunctionType>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters);
+    std::unique_ptr<ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters);
 }
 
 #include "../tcc/SortingTreeTrainer.tcc"

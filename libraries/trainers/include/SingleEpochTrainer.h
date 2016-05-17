@@ -20,7 +20,7 @@
 
 namespace trainers
 {
-    /// <summary> A class that wraps a learner and exposes a trainer. </summary>
+    /// <summary> A class that wraps an IncrementalTrainer and exposes a trainer. </summary>
     ///
     /// <typeparam name="PredictorType"> The type of predictor returned by this trainer. </typeparam>
     template <typename PredictorType>
@@ -31,8 +31,8 @@ namespace trainers
 
         /// <summary> Constructs an instance of SingleEpochTrainer. </summary>
         ///
-        /// <param name="learner"> [in,out] The stateful trainer. </param>
-        SingleEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner);
+        /// <param name="incrementalTrainer"> [in,out] The stateful trainer. </param>
+        SingleEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer);
         
         /// <summary> Trains and returns a predictor. </summary>
         ///
@@ -45,8 +45,14 @@ namespace trainers
         std::unique_ptr<IIncrementalTrainer<PredictorType>> _incrementalTrainer;
     };
 
+    /// <summary> Makes a trainer that runs an incremental trainer for a single epoch. </summary>
+    ///
+    /// <typeparam name="PredictorType"> Type of the predictor returned by this trainer. </typeparam>
+    /// <param name="incrementalTrainer"> [in,out] The incremental trainer. </param>
+    ///
+    /// <returns> A unique_ptr to a single epoch trainer. </returns>
     template <typename PredictorType>
-    std::unique_ptr<SingleEpochTrainer<PredictorType>> MakeSingleEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner);
+    std::unique_ptr<ITrainer<PredictorType>> MakeSingleEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer);
 }
 
 #include "../tcc/SingleEpochTrainer.tcc"

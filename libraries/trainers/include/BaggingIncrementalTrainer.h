@@ -16,6 +16,12 @@
 
 namespace trainers
 {
+    /// <summary> Parameters for the bagging incremental trainer. </summary>
+    struct BaggingIncrementalTrainerParameters
+    {
+        uint64_t numIterations = 1;
+    };
+
     template <typename BasePredictorType>
     class BaggingIncrementalTrainer : public IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>
     {
@@ -24,8 +30,8 @@ namespace trainers
 
         /// <summary> Constructs an instance of SingleEpochTrainer. </summary>
         ///
-        /// <param name="learner"> [in,out] The stateful trainer. </param>
-        BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer);
+        /// <param name="incrementalTrainer"> [in,out] The stateful trainer. </param>
+        BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& parameters);
 
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
         ///
@@ -44,14 +50,12 @@ namespace trainers
 
     private:
         std::unique_ptr<ITrainer<BasePredictorType>> _trainer;
+        BaggingIncrementalTrainerParameters _parameters;
         predictors::EnsemblePredictor _ensemble;
     };
 
     template <typename BasePredictorType>
-    std::unique_ptr<BaggingIncrementalTrainer<BasePredictorType>> MakeBaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer);
-
-    template <typename BasePredictorType>
-    std::unique_ptr<BaggingIncrementalTrainer<BasePredictorType>> MakeBaggingTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer);
+    std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer);
 }
 
 #include "../tcc/BaggingIncrementalTrainer.tcc"

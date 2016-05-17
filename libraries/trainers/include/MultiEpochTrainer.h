@@ -30,7 +30,7 @@ namespace trainers
         std::string dataPermutationRandomSeed = 0;
     };
 
-    /// <summary> A class that performs multiple epochs of a learner and exposes a trainer. </summary>
+    /// <summary> A class that performs multiple epochs of an IncrementalTrainer and exposes a trainer. </summary>
     ///
     /// <typeparam name="PredictorType"> The type of predictor returned by this trainer. </typeparam>
     template <typename PredictorType>
@@ -41,8 +41,8 @@ namespace trainers
 
         /// <summary> Constructs an instance of MultiEpochTrainer. </summary>
         ///
-        /// <param name="learner"> [in,out] The stateful trainer. </param>
-        MultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner, const MultiEpochTrainerParameters& parameters);
+        /// <param name="incrementalTrainer"> [in,out] The stateful trainer. </param>
+        MultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochTrainerParameters& parameters);
 
         /// <summary> Trains and returns a predictor. </summary>
         ///
@@ -57,8 +57,15 @@ namespace trainers
         mutable std::default_random_engine _random;
     };
 
+    /// <summary> Makes a trainer that runs an incremental trainer for multiple epochs. </summary>
+    ///
+    /// <typeparam name="PredictorType"> Type of the predictor returned by this trainer. </typeparam>
+    /// <param name="incrementalTrainer"> [in,out] The incremental trainer. </param>
+    /// <param name="parameters"> Parameters for the multi-epoch trainer. </param>
+    ///
+    /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
     template <typename PredictorType>
-    std::unique_ptr<MultiEpochTrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner);
+    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochTrainerParameters& parameters);
 }
 
 #include "../tcc/MultiEpochTrainer.tcc"

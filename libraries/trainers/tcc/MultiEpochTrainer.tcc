@@ -12,8 +12,8 @@
 namespace trainers
 {
     template <typename PredictorType>
-    MultiEpochTrainer<PredictorType>::MultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner, const MultiEpochTrainerParameters& parameters) :
-        _incrementalTrainer(std::move(learner)), _parameters(parameters), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
+    MultiEpochTrainer<PredictorType>::MultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochTrainerParameters& parameters) :
+        _incrementalTrainer(std::move(incrementalTrainer)), _parameters(parameters), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
     {}
     
     template <typename PredictorType>
@@ -47,8 +47,8 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    std::unique_ptr<MultiEpochTrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& learner, const MultiEpochTrainerParameters& parameters)
+    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochTrainerParameters& parameters)
     {
-        return std::make_unique<MultiEpochTrainer<PredictorType>>(std::move(learner), parameters);
+        return std::make_unique<MultiEpochTrainer<PredictorType>>(std::move(incrementalTrainer), parameters);
     }
 }
