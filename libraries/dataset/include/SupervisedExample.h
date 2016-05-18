@@ -23,17 +23,10 @@ namespace dataset
     {
     public:
 
-        /// <summary> Default constructor. </summary>
         SupervisedExample() = default;
 
-        /// <summary> Copy constructor </summary>
-        ///
-        /// <param name="other"> The other. </param>
-        SupervisedExample(const SupervisedExample<DataVectorType>& other) = delete; // { throw std::exception(); }//= delete;
+        explicit SupervisedExample(const SupervisedExample<DataVectorType>& other) = default;
 
-        /// <summary> Default move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
         SupervisedExample(SupervisedExample<DataVectorType>&& other) = default;
         
         /// <summary> Constructs a supervised example. </summary>
@@ -41,7 +34,7 @@ namespace dataset
         /// <param name="dataVector"> The data vector. </param>
         /// <param name="label"> The label. </param>
         /// <param name="weight"> The weight. </param>
-        SupervisedExample(std::shared_ptr<const DataVectorType> dataVector, double label, double weight = 1.0);
+        SupervisedExample(const std::shared_ptr<DataVectorType>& dataVector, double label, double weight = 1.0);
 
         /// <summary> Assignment operator. </summary>
         ///
@@ -57,30 +50,20 @@ namespace dataset
         /// <returns> A reference to this SupervisedExample. </returns>
         SupervisedExample& operator=(SupervisedExample<DataVectorType>&& other) = default;
 
-        /// <summary> Returns a shallow copy of the supervised example. A shallow copy has its own weight and label, but shares the data vector. </summary>
-        ///
-        /// <returns> A SupervisedExample. </returns>
-        SupervisedExample<DataVectorType> ShallowCopy() const;
-
-        /// <summary> Returns a deep copy of the supervised example. </summary>
-        ///
-        /// <returns> A SupervisedExample. </returns>
-        SupervisedExample<DataVectorType> DeepCopy() const;
-
         /// <summary> Gets the data vector. </summary>
         ///
         /// <returns> The data vector. </returns>
-        const DataVectorType& GetDataVector() const;
+        const DataVectorType& GetDataVector() const { return *_dataVector.get(); }
 
         /// <summary> Gets the weight. </summary>
         ///
         /// <returns> The weight. </returns>
-        double GetWeight() const;
+        double GetWeight() const { return _weight; }
 
         /// <summary> Gets the label. </summary>
         ///
         /// <returns> The label. </returns>
-        double GetLabel() const;
+        double GetLabel() const { return _label; }
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///

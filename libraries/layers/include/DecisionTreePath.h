@@ -33,17 +33,17 @@ namespace layers
         /// <summary> Returns the input dimension of the layer. </summary>
         ///
         /// <returns> The input dimension. </returns>
-        virtual uint64_t GetInputDimension() const override;
+        virtual uint64_t GetInputDimension() const override { return _splitRuleCoordinates.Size(); }
 
         /// <summary> Returns the output dimension of the layer. </summary>
         ///
         /// <returns> The output dimension. </returns>
-        virtual uint64_t GetOutputDimension() const override;
+        virtual uint64_t GetOutputDimension() const override { return _edgeToInteriorNode.size(); }
 
         /// <summary> Number of interior nodes in the tree. </summary>
         ///
         /// <returns> The number of interior nodes. </returns>
-        uint64_t NumInteriorNodes() const;
+        uint64_t NumInteriorNodes() const { return _splitRuleCoordinates.Size(); }
 
         /// <summary> Gets the index of the negative outgoing edge from a given node. </summary>
         ///
@@ -89,12 +89,12 @@ namespace layers
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName();
+        static std::string GetTypeName() { return "DecisionTreePath"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override;
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Reads the layer from an XMLDeserializer. </summary>
         ///

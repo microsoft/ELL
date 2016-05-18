@@ -13,22 +13,9 @@
 
 namespace treeLayout
 {
-    VertexPosition::VertexPosition()
-    {}
-
     VertexPosition::VertexPosition(double depth, double offset) :
         _depth(depth), _offset(offset)
     {}
-
-    double VertexPosition::GetDepth() const
-    {
-        return _depth;
-    }
-
-    double VertexPosition::GetOffset() const
-    {
-        return _offset;
-    }
 
     void VertexPosition::SetDepth(double value)
     {
@@ -52,35 +39,5 @@ namespace treeLayout
     const VertexPosition& Layout::operator[](uint64_t index) const
     {
         return _positions[index];
-    }
-
-    uint64_t Layout::Size() const
-    {
-        return (uint64_t)_positions.size();
-    }
-
-    double Layout::GetMinOffset() const
-    {
-        return _minOffset;
-    }
-
-    double Layout::GetMaxOffset() const
-    {
-        return _maxOffset;
-    }
-
-    double Layout::GetMinDepth() const
-    {
-        return _minDepth;
-    }
-
-    double Layout::GetMaxDepth() const
-    {
-        return _maxDepth;
-    }
-
-    const std::vector<VertexPosition>& Layout::GetVertices() const
-    {
-        return _positions;
     }
 }

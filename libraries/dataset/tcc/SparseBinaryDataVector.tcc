@@ -20,13 +20,6 @@ namespace dataset
         }
     }
 
-    template <typename IntegerListType>
-    std::unique_ptr<IDataVector> SparseBinaryDataVectorBase<IntegerListType>::Clone() const
-    {
-        auto ptr = std::make_unique<SparseBinaryDataVectorBase<IntegerListType>>(*this); 
-        return std::move(ptr);
-    }
-
     template<typename IntegerListType>
     std::vector<double> SparseBinaryDataVectorBase<IntegerListType>::ToArray() const
     {

@@ -19,7 +19,6 @@ namespace linear
     {
     public:
 
-        /// <summary> Virtual destructor. </summary>
         virtual ~Base() = default;
 
         /// <summary> Human readable printout to an output stream. </summary>

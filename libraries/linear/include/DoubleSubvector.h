@@ -44,12 +44,12 @@ namespace linear
         /// <summary> Returns an IndexValueIterator for the vector. </summary>
         ///
         /// <returns> An IndexValueIterator. </returns>
-        Iterator GetIterator() const;
+        Iterator GetIterator() const { return Iterator(_ptr, _ptr + _size); }
 
         /// <summary> Returns the Size of the vector. </summary>
         ///
         /// <returns> An uint64_t. </returns>
-        virtual uint64_t Size() const override;
+        virtual uint64_t Size() const override { return _size; }
 
         /// <summary> Computes the squared 2-norm. </summary>
         ///

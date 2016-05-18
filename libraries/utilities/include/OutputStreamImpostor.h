@@ -30,11 +30,11 @@ namespace utilities
 
         /// <summary> Casting operator that returns a reference to an ostream. This allows us to use an OutputStreamImpostor 
         /// in most places where an ostream would be accepted. </summary>
-        operator std::ostream&() &;
+        operator std::ostream&() & { return *_out; }
 
         /// <summary> Casting operator that returns a const reference to an ostream. This allows us to use an OutputStreamImpostor 
         /// in most places where a const ostream reference would be accepted. </summary>
-        operator std::ostream const&() const &;
+        operator std::ostream const&() const & { return *_out; }
 
     private:
         std::ofstream _outputFileStream;

@@ -16,11 +16,6 @@ namespace linear
     DoubleVector::DoubleVector(uint64_t size) : _data(size)
     {}
 
-    void DoubleVector::Reset()
-    {
-        std::fill(_data.begin(), _data.end(), 0);
-    }
-
     double DoubleVector::Norm2() const
     {
         double result = 0.0;
@@ -58,11 +53,6 @@ namespace linear
         return result;
     }
 
-    DoubleVector::Iterator DoubleVector::GetIterator() const
-    {
-        return utilities::MakeStlIndexValueIterator(_data);
-    }
-    
     void DoubleVector::Print(std::ostream & os) const
     {
         auto iterator = GetIterator();
@@ -73,10 +63,4 @@ namespace linear
             iterator.Next();
         }
     }
-
-    void DoubleVector::Swap(DoubleVector& u, DoubleVector& v)
-    {
-        std::swap(u._data, v._data);
-    }
-
 }

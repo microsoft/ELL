@@ -33,42 +33,30 @@ namespace dataset
         //        typedef utilities::VectorIterator<ExampleType> Iterator;
         typedef utilities::StlIterator<typename std::vector<ExampleType>::const_iterator> Iterator;
 
-        /// <summary> Default constructor. </summary>
         RowDataset() = default;
 
-        /// <summary> Move constructor </summary>
         RowDataset(RowDataset&&) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
-        RowDataset(const RowDataset&) = delete;
+        explicit RowDataset(const RowDataset&) = default;
 
-        /// <summary> Default move assignment operator. </summary>
+        /// <summary> Constructs an instance of RowDataset by making shallow copies of supervised examples. </summary>
         ///
-        /// <param name="other"> [in,out] The other vector. </param>
+        /// <param name="exampleIterator"> The example iterator. </param>
+        RowDataset(Iterator exampleIterator);
+
         RowDataset<DataVectorType>& operator=(RowDataset&&) = default;
 
-        /// <summary> Deleted asignment operator. </summary>
         RowDataset<DataVectorType>& operator=(const RowDataset&) = delete;
-
-        /// <summary> Returns a shallow copy of the row dataset. A shallow copy has its own weights and labels, but shared data vectors. </summary>
-        ///
-        /// <returns> A RowDataset.</returns>
-        RowDataset<DataVectorType> ShallowCopy(uint64_t fromRowIndex = 0, uint64_t size = 0) const;
-
-        /// <summary> Returns a deep copy of the row dataset. </summary>
-        ///
-        /// <returns> A RowDataset.</returns>
-        RowDataset<DataVectorType> DeepCopy(uint64_t fromRowIndex = 0, uint64_t size = 0) const;
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
         /// <returns> The number of examples. </returns>
-        uint64_t NumExamples() const;
+        uint64_t NumExamples() const { return _examples.size(); }
 
         /// <summary> Returns the maximal size of any example. </summary>
         ///
         /// <returns> The maximal size of any example. </returns>
-        uint64_t GetMaxDataVectorSize() const;
+        uint64_t GetMaxDataVectorSize() const { return _maxExampleSize; }
 
         /// <summary> Returns a reference to an example. </summary>
         ///
@@ -96,7 +84,7 @@ namespace dataset
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
         /// <param name="example"> The example. </param>
-        void AddExample(ExampleType example);
+        void AddExample(ExampleType&& example);
 
         /// <summary> Erases all of the examples in the RowDataset. </summary>
         void Reset();
@@ -126,9 +114,13 @@ namespace dataset
         /// <summary> Prints this object. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
-        void Print(std::ostream& os) const;
+        /// <param name="fromRowIndex"> Zero-based index of the first row to print. </param>
+        /// <param name="size"> The number of rows to print, or 0 to print until the end. </param>
+        void Print(std::ostream& os, uint64_t fromRowIndex = 0, uint64_t size = 0) const;
 
     private:
+        uint64_t CorrectRangeSize(uint64_t fromRowIndex, uint64_t size) const;
+
         std::vector<ExampleType> _examples;
         uint64_t _maxExampleSize = 0;
     };

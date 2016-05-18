@@ -37,27 +37,27 @@ namespace predictors
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        linear::DoubleVector& GetVector();
+        linear::DoubleVector& GetVector() { return _w; }
 
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        const linear::DoubleVector& GetVector() const;
+        const linear::DoubleVector& GetVector() const { return _w; }
 
         /// <summary> Returns the underlying bias. </summary>
         ///
         /// <returns> The bias. </returns>
-        double& GetBias();
+        double& GetBias() { return _b; }
 
         /// <summary> Returns the underlying bias. </summary>
         ///
         /// <returns> The bias. </returns>
-        double GetBias() const;
+        double GetBias() const { return _b; }
 
         /// <summary> Gets the dimension of the linear predictor. </summary>
         ///
         /// <returns> The dimension. </returns>
-        uint64_t GetDimension() const;
+        uint64_t GetDimension() const { return _w.Size(); }
 
         /// <summary> Returns the output of the predictor for a given example. </summary>
         ///
@@ -78,13 +78,9 @@ namespace predictors
         ///
         /// <param name="model"> [in,out] The model. </param>
         /// <param name="inputCoordinates"> The input coordinates. </param>
-        void AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
-
-        /// <summary> Swaps two linear predictors </summary>
         ///
-        /// <param name="u"> [in,out] A LinearPredictor. </param>
-        /// <param name="v"> [in,out] A LinearPredictor. </param>
-        static void Swap(LinearPredictor& u, LinearPredictor& v);
+        /// <returns> The predictor's output coordinates in the model. </returns>
+        layers::CoordinateList AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
 
     private:
         linear::DoubleVector _w;

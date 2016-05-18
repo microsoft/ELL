@@ -35,26 +35,24 @@ namespace linear
         {
         public:
 
-            /// <summary> Copy constructor. </summary>
             Iterator(const Iterator&) = default;
 
-            /// <summary> Move constructor. </summary>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if valid, false if not. </returns>
-            bool IsValid() const;
+            bool IsValid() const { return _row < _maxRow; }
 
             /// <summary>
             /// Returns the number of iterates left in this iterator, including the current one.
             /// </summary>
             ///
             /// <returns> The total number of iterates left. </returns>
-            uint64_t NumIteratesLeft() const;
+            uint64_t NumIteratesLeft() const { return _maxRow - _row; }
 
             /// <summary> Proceeds to the Next row. </summary>
-            void Next();
+            void Next() { ++_row; }
 
             /// <summary> Returns a const reference to the current row. </summary>
             ///
@@ -76,32 +74,25 @@ namespace linear
         /// <summary> The type of each row. </summary>
         using RowType = DataVectorType;
 
-        /// <summary> Default constructor. </summary>
         RowMatrix() = default;
 
-        /// <summary> Move constructor </summary>
         RowMatrix(RowMatrix<DataVectorType>&&) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
         RowMatrix(const RowMatrix<DataVectorType>&) = delete;
 
-        /// <summary> Default move assignment operator. </summary>
-        ///
-        /// <param name="other"> [in,out] The other vector. </param>
         RowMatrix<DataVectorType>& operator=(RowMatrix<DataVectorType>&&) = default;
 
-        /// <summary> Deleted asignment operator. </summary>
         RowMatrix<DataVectorType>& operator=(const RowMatrix<DataVectorType>&) = delete;
 
         /// <summary> Returns the number of rows in the matrix. </summary>
         ///
         /// <returns> The number of rows. </returns>
-        virtual uint64_t NumRows() const override;
+        virtual uint64_t NumRows() const override { return _rows.size(); }
 
         /// <summary> Returns the number of columns in the matrix. </summary>
         ///
         /// <returns> The number of columns. </returns>
-        virtual uint64_t NumColumns() const override;
+        virtual uint64_t NumColumns() const override { return _numColumns; }
 
         /// <summary> Returns a reference to a row. </summary>
         ///
@@ -155,7 +146,7 @@ namespace linear
 
     private:
         std::vector<DataVectorType> _rows;
-        uint64_t _num_columns = 0;
+        uint64_t _numColumns = 0;
     };
 }
 

@@ -19,6 +19,7 @@ namespace utilities
     class StlIterator
     {
     public:
+
         StlIterator() = default;
         
         /// <summary> Constructor </summary>
@@ -32,19 +33,19 @@ namespace utilities
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if it succeeds, false if it fails. </returns>
-        bool IsValid() const;
+        bool IsValid() const { return _current != _end; }
 
         /// <summary> Returns true if the iterator knows its size. </summary>
         ///
         /// <returns> true if NumIteratesLeft returns a valid number, false if not. </returns>
-        bool HasSize() const;
+        bool HasSize() const { return true; }
 
         /// <summary>
         /// Returns the number of iterates left in this iterator, including the current one.
         /// </summary>
         ///
         /// <returns> The total number of iterates left. </returns>
-        uint64_t NumIteratesLeft() const;
+        uint64_t NumIteratesLeft() const { return _end - _current; }
 
         /// <summary> Proceeds to the Next iterate. </summary>
         void Next();
@@ -52,7 +53,7 @@ namespace utilities
         /// <summary> Returns the value of the current iterate. </summary>
         ///
         /// <returns> The value of the current iterate. </returns>
-        const ValueType& Get() const;
+        const ValueType& Get() const { return *_current; }
 
     private:
         IteratorType _current;

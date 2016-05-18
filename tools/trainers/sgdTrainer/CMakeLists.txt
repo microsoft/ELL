@@ -13,14 +13,9 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/main.cpp
-         src/ParsedSGDIncrementalTrainerArguments.cpp)
-
-set (INCLUDE include/ParsedSGDIncrementalTrainerArguments.h
-             include/SGDArguments.h)
+set (SRC src/main.cpp)
 
 source_group("src" FILES ${SRC})
-source_group("include" FILES ${INCLUDE})
 
 include_directories(include)
 include_directories(${CMAKE_SOURCE_DIR}/libraries/common/include)
@@ -35,7 +30,7 @@ include_directories(${CMAKE_SOURCE_DIR}/libraries/utilities/include)
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
-add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
+add_executable(${PROJ_NAME} ${SRC})
 target_link_libraries(${PROJ_NAME} common dataset layers linear lossFunctions predictors trainers utilities)
 
 # put this project in the trainers folder in the IDE 
@@ -43,3 +38,8 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/trainers")
 
 # copy executable to build/bin directory
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
+
+# tests
+add_test(NAME sgdTrainerTest
+         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
+         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto -omf null -v)

@@ -34,7 +34,7 @@ namespace layers
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if valid, false if not. </returns>
-            bool IsValid() const;
+            bool IsValid() const { return _index < _outputs.size(); }
 
             /// <summary> Proceeds to the Next iterate. </summary>
             void Next();
@@ -42,7 +42,7 @@ namespace layers
             /// <summary> Gets the current index-value pair. </summary>
             ///
             /// <returns> The current index-value pair. </returns>
-            linear::IndexValue Get() const;
+            linear::IndexValue Get() const { return{ _index, _outputs[_index] }; }
 
         protected:
             std::vector<double> _outputs;
@@ -71,12 +71,12 @@ namespace layers
         /// <summary> Gets the output coordinate list. </summary>
         ///
         /// <returns> The coordinate list. </returns>
-        const CoordinateList& GetOutputCoordinateList() const;
+        const CoordinateList& GetOutputCoordinateList() const { return _outputCoordinateList; }
 
         /// <summary> Gets the underlying model. </summary>
         ///
         /// <returns> The model. </returns>
-        const Model& GetModel() const;
+        const Model& GetModel() const { return _model; }
 
     private:
         // members

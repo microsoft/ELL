@@ -32,14 +32,8 @@ namespace linear
         /// <param name="size"> The size. </param>
         DoubleVector(uint64_t size = 0);
 
-        /// <summary> Copy constructor. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
         DoubleVector(const DoubleVector&) = default;
 
-        /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="parameter1"> [in,out] The first parameter. </param>
         DoubleVector(DoubleVector&&) = default;
 
         /// <summary> Constructor to copy from a std::vector<double>
@@ -62,23 +56,20 @@ namespace linear
         DoubleVector(IndexValueIteratorType indexValueIterator);
 
 #ifndef SWIG
-        /// <summary> Type-conversion operator into a std::vector<double>
-//        operator std::vector<double>() const &;
-
         /// <summary> Type-conversion operator into a std::vector<double>, allowing non-const ref
-        operator std::vector<double> & () &;
+        operator std::vector<double> & () & { return std::ref(_data); }
 
         /// <summary> Type-conversion operator into a const std::vector<double> reference
-        operator std::vector<double> const & () const &;
+        operator std::vector<double> const & () const & { return std::cref(_data); }
 
         /// <summary> Type-conversion operator into a std::vector<double>, allowing move semantics
-        operator std::vector<double> && () &&;
+        operator std::vector<double> && () && { return std::move(_data); }
 #endif
         /// <summary>
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its
         /// memory.
         /// </summary>
-        void Reset();
+        void Reset() { std::fill(_data.begin(), _data.end(), 0); }
 
         /// <summary> Returns a reference to an element in the vector. </summary>
         ///
@@ -95,22 +86,22 @@ namespace linear
         /// <summary> Returns a pointer to the beginning of the vector</summary>
         ///
         /// <returns> A pointer to the first element in the vector. </returns>
-        double* GetDataPointer();
+        double* GetDataPointer() { return _data.data(); }
 
         /// <summary> Returns a const pointer to the beginning of the vector</summary>
         ///
         /// <returns> A pointer to the first element in the vector. </returns>
-        const double* GetDataPointer() const;
+        const double* GetDataPointer() const { return _data.data(); }
 
         /// <summary> Returns an IndexValueIterator for the vector. </summary>
         ///
         /// <returns> An IndexValueIterator. </returns>
-        Iterator GetIterator() const;
+        Iterator GetIterator() const { return utilities::MakeStlIndexValueIterator(_data); }
 
         /// <summary> Returns the Size of the vector. </summary>
         ///
         /// <returns> The size of the vector. </returns>
-        virtual uint64_t Size() const override;
+        virtual uint64_t Size() const override { return _data.size(); }
 
         /// <summary> Computes the squared 2-norm. </summary>
         ///
@@ -140,12 +131,6 @@ namespace linear
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
-
-        /// <summary> Swaps two double vectors </summary>
-        ///
-        /// <param name="u"> [in,out] A DoubleVector. </param>
-        /// <param name="v"> [in,out] A DoubleVector. </param>
-        static void Swap(DoubleVector& u, DoubleVector& v);
 
     private:
         std::vector<double> _data;

@@ -17,14 +17,12 @@ set (SRC src/Nothing.cpp)
 set (INCLUDE include/BaggingIncrementalTrainer.h
              include/IIncrementalTrainer.h
              include/ITrainer.h
-             include/MultiEpochTrainer.h
-             include/SingleEpochTrainer.h
+             include/MultiEpochIncrementalTrainer.h
              include/SortingTreeTrainer.h
              include/SGDIncrementalTrainer.h)
 
 set (TCC tcc/BaggingIncrementalTrainer.tcc
-         tcc/SingleEpochTrainer.tcc
-         tcc/MultiEpochTrainer.tcc
+         tcc/MultiEpochIncrementalTrainer.tcc
          tcc/SortingTreeTrainer.tcc
          tcc/SGDIncrementalTrainer.tcc)
 

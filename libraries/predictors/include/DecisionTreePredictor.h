@@ -52,12 +52,12 @@ namespace predictors
             /// <summary> Gets the node's output value. </summary>
             ///
             /// <returns> The output value. </returns>
-            double getOutputValue() const;
+            double getOutputValue() const { return _outputValue; }
             
             /// <summary> Query if this Node is leaf. </summary>
             ///
             /// <returns> true if leaf, false if not. </returns>
-            bool IsLeaf() const;
+            bool IsLeaf() const { return _interiorNode == nullptr; }
 
             /// <summary> Returns the output of the subtree rooted at this node for a given example. </summary>
             ///
@@ -97,27 +97,27 @@ namespace predictors
             /// <summary> Gets the split rule. </summary>
             ///
             /// <returns> The split rule. </returns>
-            const SplitRule& GetSplitRule() const;
+            const SplitRule& GetSplitRule() const { return _splitRule; }
 
             /// <summary> Gets the negative child of this interior node. </summary>
             ///
             /// <returns> The negative child. </returns>
-            Node& GetNegativeChild();
+            Node& GetNegativeChild() { return _negativeChild; }
 
             /// <summary> Gets the negative child of this interior node. </summary>
             ///
             /// <returns> The negative child. </returns>
-            const Node& GetNegativeChild() const;
+            const Node& GetNegativeChild() const { return _negativeChild; }
 
             /// <summary> Gets the positive child of this interior node. </summary>
             ///
             /// <returns> The positive child. </returns>
-            Node& GetPositiveChild();
+            Node& GetPositiveChild() { return _positiveChild; }
 
             /// <summary> Gets the positive child of this interior node. </summary>
             ///
             /// <returns> The positive child. </returns>
-            const Node& GetPositiveChild() const;
+            const Node& GetPositiveChild() const { return _positiveChild; }
 
             /// <summary> Number of interior nodes in the subtree rooted at this node. </summary>
             ///
@@ -157,7 +157,7 @@ namespace predictors
         /// <summary> Returns a Node object that represents the tree root. </summary>
         ///
         /// <returns> The root. </returns>
-        Node& GetRoot();
+        Node& GetRoot() { return _root; }
 
         /// <summary> Returns the output of the predictor for a given example. </summary>
         ///
@@ -170,7 +170,9 @@ namespace predictors
         ///
         /// <param name="model"> [in,out] The model. </param>
         /// <param name="inputCoordinates"> The input coordinates. </param>
-        void AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
+        /// 
+        /// <returns> The predictor's output coordinates in the model. </returns>
+        layers::CoordinateList AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
 
     private:
         // represents a flattened version of the tree, where all parameters are in basic-type vectors

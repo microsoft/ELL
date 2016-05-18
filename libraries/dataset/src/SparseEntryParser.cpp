@@ -17,11 +17,6 @@
 
 namespace dataset
 {
-    bool SparseEntryParser::Iterator::IsValid() const
-    {
-        return _isValid;
-    }
-
     std::string getSnippet(const char* pos)
     {
         std::string str;
@@ -85,11 +80,6 @@ namespace dataset
         }
 
         _currentIndexValue = linear::IndexValue{index, value};
-    }
-
-    linear::IndexValue SparseEntryParser::Iterator::Get() const
-    {
-        return _currentIndexValue;
     }
 
     SparseEntryParser::Iterator::Iterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) : _spExampleString(spExampleString), _currentPos(pStr)

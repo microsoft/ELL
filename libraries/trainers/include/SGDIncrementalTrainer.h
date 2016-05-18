@@ -10,8 +10,7 @@
 
 #include "IIncrementalTrainer.h"
 #include "ITrainer.h"
-#include "SingleEpochTrainer.h"
-#include "MultiEpochTrainer.h"
+#include "MultiEpochIncrementalTrainer.h"
 
 // predictors
 #include "LinearPredictor.h"
@@ -44,6 +43,7 @@ namespace trainers
     class SGDIncrementalTrainer : public IIncrementalTrainer<predictors::LinearPredictor>
     {
     public:
+        using PredictorType = predictors::LinearPredictor;
 
         /// <summary> Constructs the trainer. </summary>
         ///
@@ -59,21 +59,16 @@ namespace trainers
 
         /// <summary> Returns The averaged predictor. </summary>
         ///
-        /// <returns> The averaged predictor. </returns>
-        virtual const predictors::LinearPredictor& GetPredictor() const override;
-
-        /// <summary> Resets the trainer and returns its current predictor. </summary>
-        ///
-        /// <returns> The current predictor. </returns>
-        virtual predictors::LinearPredictor Reset() override;
+        /// <returns> A shared pointer to the current predictor. </returns>
+        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _averagedPredictor; }
 
     private:
         LossFunctionType _lossFunction;
         SGDIncrementalTrainerParameters _parameters;
 
         uint64_t _total_iterations = 0;
-        predictors::LinearPredictor _lastPredictor;
-        predictors::LinearPredictor _averagedPredictor;
+        PredictorType _lastPredictor;
+        std::shared_ptr<PredictorType> _averagedPredictor;
     };
 
     /// <summary> Makes a sorting tree trainer. </summary>
@@ -85,10 +80,7 @@ namespace trainers
     ///
     /// <returns> A sorting tree trainer </returns>
     template <typename LossFunctionType>
-    std::unique_ptr<SGDIncrementalTrainer<LossFunctionType>> MakeSGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
-
-    template <typename LossFunctionType>
-    std::unique_ptr<SingleEpochTrainer<SGDIncrementalTrainer<LossFunctionType>>> MakeSGDTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
 }
 
 #include "../tcc/SGDIncrementalTrainer.tcc"

@@ -24,7 +24,7 @@ namespace treeLayout
         _gd_increment.resize(num_nodes);
         BuildLayers(Children);
 
-        if (_params.SimpleLayout)
+        if (_parameters.SimpleLayout)
         {
             SimpleLayout(Children, 0, 0);
         }
@@ -35,7 +35,7 @@ namespace treeLayout
 
             // run the optimization
             Optimize(Children);
-            if (_params.postprocess)
+            if (_parameters.postprocess)
             {
                 for (uint64_t i = 0; i < 10; i++)
                 {
@@ -99,7 +99,7 @@ namespace treeLayout
         double space_left = 1.0 + closest_common_ancestor;
 
         // get the cumulative space_left in the layer
-        double cum_space_left = _params.offsetSpace + _params.offsetSpaceGrowthFactor * log2(space_left);
+        double cum_space_left = _parameters.offsetSpace + _parameters.offsetSpaceGrowthFactor * log2(space_left);
         if (size > 0)
         {
             cum_space_left += layer[layer.size() - 1].space_left;
@@ -147,10 +147,10 @@ namespace treeLayout
         uint64_t min_depth = std::min(x0.size(), x1.size());
         uint64_t max_depth = std::max(x0.size(), x1.size());
 
-        double max_dist = _params.offsetSpace;
+        double max_dist = _parameters.offsetSpace;
         for (uint64_t d = 0; d < min_depth; d++)
         {
-            double gap = _params.offsetSpace +_params.offsetSpaceGrowthFactor * log2(2.0+d);
+            double gap = _parameters.offsetSpace +_parameters.offsetSpaceGrowthFactor * log2(2.0+d);
             double dist = gap + x0[d].second - x1[d].first;
             max_dist = std::max(dist, max_dist);
         }
@@ -195,10 +195,10 @@ namespace treeLayout
     template<typename ChildrenVectorType>
     void QpLayoutGenerator::Optimize(const ChildrenVectorType& Children)
     {
-        for (uint64_t t = 1; t <= _params.gdNumSteps; ++t)
+        for (uint64_t t = 1; t <= _parameters.gdNumSteps; ++t)
         {
             std::vector<double> old_offsets = _offsets;
-            GdStep(Children, _params.gd_learning_rate);
+            GdStep(Children, _parameters.gd_learning_rate);
             Project();
 
             double total_disp = 0;
@@ -238,12 +238,12 @@ namespace treeLayout
             double child1_offset = offsets[child1];
 
             double max_depth = (double)_layers.size();
-            double spring_coeff = (1.0 + pow(depths[i], _params.spring_coeff_growth));
+            double spring_coeff = (1.0 + pow(depths[i], _parameters.spring_coeff_growth));
 
             double spring0_len = (parent_offset - child0_offset);
             double spring1_len = (parent_offset - child1_offset);
-            double spring0_f = spring_coeff * (spring0_len - _params.springRestLength / 2.0);
-            double spring1_f = spring_coeff * (spring1_len + _params.springRestLength / 2.0);
+            double spring0_f = spring_coeff * (spring0_len - _parameters.springRestLength / 2.0);
+            double spring1_f = spring_coeff * (spring1_len + _parameters.springRestLength / 2.0);
 
             // gradient step of parent towards Children
             grad[i] -= step_size * (spring0_f + spring1_f);

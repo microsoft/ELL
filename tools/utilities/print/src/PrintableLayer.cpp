@@ -13,11 +13,6 @@
 #include <string>
 #include <algorithm>
 
-std::string PrintableLayer::GetTypeName()
-{
-    return "PrintLayer";
-}
-
 LayerLayout PrintableLayer::PrintLayer(std::ostream& os, double left, double top, uint64_t layerIndex, const std::string& typeName, uint64_t size, const ElementLayoutArguments& elementLayout, const LayerStyleArguments& layerStyle)
 {
     // calculate the layout

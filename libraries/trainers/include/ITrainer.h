@@ -13,7 +13,7 @@
 
 namespace trainers
 {
-    /// <summary> Interface to a stateless training algorithm that takes a data iterator and returns a predictor. </summary>
+    /// <summary> Interface to a black box (stateless) training algorithm that takes a data iterator and returns a predictor. </summary>
     ///
     /// <typeparam name="PredictorType"> Type of the predictor created by the trainer. </typeparam>
     template <typename PredictorType>

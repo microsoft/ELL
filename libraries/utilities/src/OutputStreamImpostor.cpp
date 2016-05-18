@@ -20,6 +20,16 @@
 
 namespace utilities
 {
+    class NullStreamBuf : public std::streambuf
+    {
+        virtual int overflow(int c)
+        {
+            return std::char_traits<char>::not_eof(c) ? c : EOF; 
+        }
+    };
+
+    NullStreamBuf nullStreamBuf;
+
     OutputStreamImpostor::OutputStreamImpostor()
     {
         _outBuf = std::cout.rdbuf();
@@ -32,22 +42,16 @@ namespace utilities
         {
             _outBuf = std::cout.rdbuf();
         }
+        else if(filenameOrEmpty == "null")
+        {
+            _outBuf = &nullStreamBuf;
+        }
         else
         {
             _outputFileStream = OpenOfstream(filenameOrEmpty);
             _outBuf = _outputFileStream.rdbuf();
         }
         _out = std::make_unique<std::ostream>(_outBuf);
-    }
-
-    OutputStreamImpostor::operator std::ostream&() &
-    {
-        return *_out;
-    }
-
-    OutputStreamImpostor::operator std::ostream const&() const &
-    {
-        return *_out;
     }
 
     OutputStreamImpostor GetOutputStreamImpostor(std::string filenameOrEmpty)

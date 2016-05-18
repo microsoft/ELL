@@ -19,6 +19,7 @@
 
 // stl
 #include <queue>
+#include <iostream>
 
 /// <summary> trainers namespace </summary>
 namespace trainers
@@ -73,6 +74,12 @@ namespace trainers
             Sums negativeSums;
 
             bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
+            void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
+        };
+
+        struct PriorityQueue : public std::priority_queue<SplitCandidate>
+        {
+            void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
         };
 
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator) const;
@@ -86,7 +93,7 @@ namespace trainers
         LossFunctionType _lossFunction;
         SortingTreeTrainerParameters _parameters;
         mutable dataset::RowDataset<dataset::DoubleDataVector> _dataset;
-        mutable std::priority_queue<SplitCandidate> _queue;
+        mutable PriorityQueue _queue;
     };
 
     /// <summary> Makes a sorting tree trainer. </summary>
@@ -95,9 +102,9 @@ namespace trainers
     /// <param name="parameters"> The trainer parameters. </param>
     /// <param name="lossFunction"> The loss function. </param>
     ///
-    /// <returns> A sorting tree trainer. </returns>
+    /// <returns> A nique_ptr to a sorting tree trainer. </returns>
     template<typename LossFunctionType>
-    std::unique_ptr<SortingTreeTrainer<LossFunctionType>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters);
+    std::unique_ptr<ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters);
 }
 
 #include "../tcc/SortingTreeTrainer.tcc"

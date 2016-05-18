@@ -9,16 +9,6 @@
 #include "PrintableCoordinatewise.h"
 #include "SvgHelpers.h"
 
-std::string PrintableCoordinatewise::GetFriendlyLayerName() const
-{
-    return GetOperationName(GetOperationType());
-}
-
-uint64_t PrintableCoordinatewise::GetOutputDimension() const
-{
-    return Coordinatewise::GetOutputDimension();
-}
-
 void PrintableCoordinatewise::operator=(const layers::Layer& layer)
 {
     operator=(dynamic_cast<const layers::Coordinatewise&>(layer));

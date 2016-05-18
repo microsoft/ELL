@@ -9,16 +9,6 @@
 #include "PrintableSum.h"
 #include "SvgHelpers.h"
 
-std::string PrintableSum::GetFriendlyLayerName() const
-{
-    return "Sum";
-}
-
-uint64_t PrintableSum::GetOutputDimension() const
-{
-    return Sum::GetOutputDimension();
-}
-
 void PrintableSum::operator=(const layers::Sum& sum)
 {
     Sum::operator=(sum);

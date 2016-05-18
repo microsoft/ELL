@@ -28,23 +28,17 @@ namespace dataset
         {
         public:
 
-            /// <summary> Default copy ctor. </summary>
-            ///
-            /// <param name="parameter1"> The first parameter. </param>
             Iterator(const Iterator&) = default;
 
-            /// <summary> Default move ctor. </summary>
-            ///
-            /// <param name="parameter1"> [in,out] The first parameter. </param>
             Iterator(Iterator&&) = default;
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if it succeeds, false if it fails. </returns>
-            bool IsValid() const;
+            bool IsValid() const { return false; }
 
             /// <summary> Proceeds to the Next iterate. </summary>
-            void Next();
+            void Next() {}
 
             /// <summary> Returns The current index-value pair. </summary>
             ///
@@ -57,17 +51,10 @@ namespace dataset
             friend ZeroDataVector;
         };
 
-        /// <summary> Default constructor. </summary>
         ZeroDataVector() = default;
 
-        /// <summary> Move constructor. </summary>
-        ///
-        /// <param name="other"> [in,out] The other. </param>
         ZeroDataVector(ZeroDataVector&& other) = default;
 
-        /// <summary> Deleted copy constructor. </summary>
-        ///
-        /// <param name="parameter1"> The first parameter. </param>
         ZeroDataVector(const ZeroDataVector&) = default;
 
         /// <summary> Sets an entry in the vector. </summary>
@@ -78,22 +65,22 @@ namespace dataset
 
         /// <summary> Deletes all of the vector content and sets its Size to zero, but does not deallocate
         /// its memory. </summary>
-        virtual void Reset() override;
+        virtual void Reset() override {}
 
         /// <summary> Returns The largest index of a non-zero entry plus one. </summary>
         ///
         /// <returns> An uint64_t. </returns>
-        virtual uint64_t Size() const override;
+        virtual uint64_t Size() const override { return 0; }
 
         /// <summary> Returns The number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
-        virtual uint64_t NumNonzeros() const override;
+        virtual uint64_t NumNonzeros() const override { return 0; }
 
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///
         /// <returns> A double. </returns>
-        virtual double Norm2() const override;
+        virtual double Norm2() const override { return 0.0; }
 
         /// <summary> Performs (*p_other) += scalar * (*this), where other is a dense vector. </summary>
         ///
@@ -113,7 +100,7 @@ namespace dataset
         /// <summary> Returns a Iterator that points to the beginning of the datavector. </summary>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator() const;
+        Iterator GetIterator() const { return Iterator(); }
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///
@@ -123,11 +110,11 @@ namespace dataset
         /// <summary> Makes a deep copy of the datavector </summary>
         ///
         /// <returns> A deep copy of the datavector </summary>
-        virtual std::unique_ptr<IDataVector> Clone() const override;
+        virtual std::unique_ptr<IDataVector> Clone() const override { return std::make_unique<ZeroDataVector>(*this); }
 
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const override;
+        virtual std::vector<double> ToArray() const override { return std::vector<double>(0); }
     };
 }

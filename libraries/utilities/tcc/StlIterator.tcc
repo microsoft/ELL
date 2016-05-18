@@ -13,36 +13,12 @@ namespace utilities
     {}
 
     template <typename IteratorType, typename ValueType>
-    bool StlIterator<IteratorType, ValueType>::IsValid() const
-    {
-        return (_current != _end);
-    }
-
-    template <typename IteratorType, typename ValueType>
     void StlIterator<IteratorType, ValueType>::Next()
     {
         if (IsValid())
         {
             ++_current;
         }
-    }
-
-    template <typename IteratorType, typename ValueType>
-    bool StlIterator<IteratorType, ValueType>::HasSize() const
-    {
-        return true;
-    }
-
-    template <typename IteratorType, typename ValueType>
-    uint64_t StlIterator<IteratorType, ValueType>::NumIteratesLeft() const
-    {
-        return _end - _current;
-    }
-
-    template <typename IteratorType, typename ValueType>
-    const ValueType& StlIterator<IteratorType, ValueType>::Get() const
-    {
-        return *_current;
     }
 
     template <typename IteratorType>

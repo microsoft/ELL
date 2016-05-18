@@ -16,11 +16,6 @@
 namespace utilities
 {
 
-    bool CompressedIntegerList::Iterator::IsValid() const
-    {
-        return _iter < _end;
-    }
-
     void CompressedIntegerList::Iterator::Next()
     {
         uint64_t delta;
@@ -46,11 +41,6 @@ namespace utilities
 
         _iter_increment = total_bytes;
         _value += delta;
-    }
-
-    uint64_t CompressedIntegerList::Iterator::Get() const
-    {
-        return _value;
     }
 
     CompressedIntegerList::Iterator::Iterator(const uint8_t *iter, const uint8_t *end) : _iter(iter), _end(end), _value(0), _iter_increment(0)
@@ -139,10 +129,5 @@ namespace utilities
         _data.resize(0);
         _last = UINT64_MAX;
         _size = 0;
-    }
-
-    CompressedIntegerList::Iterator CompressedIntegerList::GetIterator() const
-    {
-        return Iterator(_data.data(), _data.data() + _data.size());
     }
 }

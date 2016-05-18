@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//#define VERY_VERBOSE
+
 namespace trainers
 {    
     template <typename LossFunctionType>
@@ -27,6 +29,12 @@ namespace trainers
         // as long as positive gains can be attained, keep growing the tree
         while(!_queue.empty())
         {
+
+#ifdef VERY_VERBOSE
+             std::cout << "Iteration\n";
+             _queue.Print(std::cout, _dataset);
+#endif
+
             auto splitInfo = _queue.top();
             _queue.pop();
 
@@ -40,8 +48,6 @@ namespace trainers
 
             // sort the data according to the performed split
             SortDatasetByFeature(splitInfo.splitRule.featureIndex, splitInfo.fromRowIndex, splitInfo.size);
-
-//            std::cout << _dataset << std::endl;
 
             // queue split candidate for negative child
             AddSplitCandidateToQueue(&interiorNode.GetNegativeChild(), splitInfo.fromRowIndex, splitInfo.negativeSize, splitInfo.negativeSums);
@@ -138,6 +144,14 @@ namespace trainers
         {
             _queue.push(std::move(splitCandidate));
         }
+
+#ifdef VERY_VERBOSE
+        else
+        {
+            std::cout << "No positive-gain split candidate found - queue unmodified\n";
+            splitCandidate.Print(std::cout, _dataset);
+        }
+#endif
     }
 
     template<typename LossFunctionType>
@@ -180,8 +194,34 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    std::unique_ptr<SortingTreeTrainer<LossFunctionType>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters)
+    std::unique_ptr<ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters)
     {
         return std::make_unique<SortingTreeTrainer<LossFunctionType>>(lossFunction, parameters);
+    }
+
+    template<typename LossFunctionType>
+    void SortingTreeTrainer<LossFunctionType>::SplitCandidate::Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const
+    {
+        os << "Leaf: " << leaf <<
+            "\tSplitRule: (" << splitRule.featureIndex << "," << splitRule.threshold << ")" <<
+            "\tGain: " << gain <<
+            "\tSize: " << size <<
+            "\tNegativeSize: " << negativeSize <<
+            "\tSums: (" << sums.sumWeights << "," << sums.sumWeightedLabels << ")" <<
+            "\tNegativeSums: (" << negativeSums.sumWeights << "," << negativeSums.sumWeightedLabels << ")\n";
+
+        dataset.Print(os, fromRowIndex, size);
+        os << std::endl;
+    }
+
+    template<typename LossFunctionType>
+    void SortingTreeTrainer<LossFunctionType>::PriorityQueue::Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const
+    {
+        os << "Priority Queue Size: " << size() << "\n";
+
+        for(const auto& candidate : c) // c is a protected member of std::priority_queue
+        {
+            candidate.Print(os, dataset);
+        }
     }
 }
