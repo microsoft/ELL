@@ -16,10 +16,10 @@ def getArg(n, missingValue=''):
     return missingValue
 
 dataset = None
-optimizer = None
+trainer = None
 evaluator = None
 def sgd():
-    global optimizer
+    global trainer
     global dataset
     global evaluator
 
@@ -48,7 +48,7 @@ def sgd():
     loss = LogLoss()
     params = SGDIncrementalTrainerParameters()
     params.regularization = l2Regularization
-    optimizer = LogLossOptimizer(outputCoordinates.Size(), loss, params)
+    trainer = LogLossSGDTrainer(outputCoordinates.Size(), loss, params)
 
     # create evaluator
     evaluator = LinearLogLossClassificationEvaluator(loss)
@@ -67,20 +67,19 @@ def sgd():
 
         # iterate over the entire permuted dataset
         trainSetIterator = dataset.GetIterator(0, epochSize) # mem leak comes from here
-        optimizer.Update(trainSetIterator)  
+        trainer.Update(trainSetIterator)  
 
         evalIterator = dataset.GetIterator()
-        predictor = optimizer.GetPredictor()
-                
-        evaluator.Evaluate(evalIterator, predictor) 
-
+        predictor = trainer.GetPredictor() 
+        evaluator.Eval(evalIterator, predictor) 
+        
     print "Training Error:"
     print "binary classification evaluation"
     print "loss\terror"
     print "{0}\t{1}".format(evaluator.GetLastLoss(), evaluator.GetLastError())
     
     # update the map with the newly learned layers
-#    predictor = optimizer.GetPredictor()
+#    predictor = trainer.GetPredictor()
 #    predictor.AddToModel(model, map.GetOutputCoordinateList())
     
     # output the map

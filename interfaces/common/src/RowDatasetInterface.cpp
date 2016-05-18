@@ -15,7 +15,7 @@ namespace interfaces
     //
     // RowDataset
     //
-    GenericRowDataset::GenericRowDataset(const GenericRowDataset& other) : _dataset(other._dataset.DeepCopy())
+    GenericRowDataset::GenericRowDataset(const GenericRowDataset& other) : _dataset(other._dataset)
     {
     }
 
@@ -35,8 +35,7 @@ namespace interfaces
 
     dataset::GenericSupervisedExample GenericRowDataset::GetExample(uint64_t index) const
     {
-        return _dataset.GetExample(index).ShallowCopy();
-//        return dataset::GenericSupervisedExample(_dataset.GetExample(index));
+        return static_cast<dataset::GenericSupervisedExample>(_dataset.GetExample(index));
     }
 
     dataset::GenericRowIterator GenericRowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const

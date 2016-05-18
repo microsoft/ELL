@@ -122,13 +122,43 @@ namespace std
 %include "unique_ptr.i"
 wrap_unique_ptr(LayerPtr, layers::Layer)
 
-%include "std_shared_ptr.i"
-%shared_ptr(layers::Map)
-%shared_ptr(layers::Model)
-%template () dataset::RowDataset<dataset::IDataVector>;
-//%shared_ptr(GenericRowDataset)
-%shared_ptr(RowDataset)
-
 %template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>, std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
+
+%inline %{
+typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> GenericRowIterator;
+%}
+
+%template () dataset::RowDataset<dataset::IDataVector>;
+
+class GenericRowIterator {};
+namespace predictors
+{
+    class LinearPredictor {};
+}
+namespace trainers
+{
+    template <typename LossFunction>
+    class SGDIncrementalTrainer
+    {
+    public:
+    typename predictors::LinearPredictor PredictorType;
+    };
+}
+%template () trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
+
+typedef trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType predictors::LinearPredictor;
+
+
+%shared_ptr(layers::Map)
+%shared_ptr(layers::Model)
+//%shared_ptr(GenericRowDataset)
+%shared_ptr(RowDataset)
+%shared_ptr(predictors::LinearPredictor)
+%shared_ptr(predictors::LinearPredictor const)
+%shared_ptr(trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType);
+%shared_ptr(trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType const);
+%shared_ptr(predictors::LinearPredictor);
+%shared_ptr(predictors::LinearPredictor const);
+%shared_ptr(LinearPredictor);

@@ -6,7 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-%module dataset
+//%module dataset
 
 %{
     #include <stdexcept>
@@ -17,6 +17,7 @@ namespace dataset
 {
     %ignore IDataVector::Clone;
 
+    %ignore GenericSupervisedExample::GenericSupervisedExample(GenericSupervisedExample&& other);
     %ignore GenericSupervisedExample::GetDataVector;
     %ignore GenericSupervisedExample::GenericSupervisedExample;
     %ignore RowDataset::operator[];
@@ -44,11 +45,6 @@ namespace interfaces
 #include "SupervisedExample.h"
 #include "RowDatasetInterface.h"
 %}
-
-namespace utilities
-{
-//    class IIterator {};
-}
 
 %include "noncopyable.i"
 
