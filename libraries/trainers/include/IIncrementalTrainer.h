@@ -16,7 +16,7 @@
 
 namespace trainers
 {
-    /// <summary> Interface to a stateful training algorithm which keeps a predictor as part of its state. </summary>
+    /// <summary> Interface to a stateful training algorithm that keeps a predictor as part of its state. </summary>
     ///
     /// <typeparam name="PredictorType"> Type of the predictor created by the trainer. </typeparam>
     template <typename PredictorType>

@@ -24,6 +24,9 @@ namespace trainers
         std::string dataPermutationRandomSeed = "123456";
     };
 
+    /// <summary> Implements a bagging incremental trainer. </summary>
+    ///
+    /// <typeparam name="BasePredictorType"> Type of the base predictor type. </typeparam>
     template <typename BasePredictorType>
     class BaggingIncrementalTrainer : public IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>
     {

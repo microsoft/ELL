@@ -10,7 +10,6 @@
 
 #include "IIncrementalTrainer.h"
 #include "ITrainer.h"
-#include "SingleEpochTrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
 
 // predictors

@@ -36,7 +36,6 @@
 // trainers
 #include "SGDIncrementalTrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
-#include "SingleEpochTrainer.h"
 
 // lossFunctions
 #include "HingeLoss.h"

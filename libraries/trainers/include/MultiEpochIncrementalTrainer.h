@@ -29,7 +29,7 @@ namespace trainers
         std::string dataPermutationRandomSeed = "";
     };
 
-    /// <summary> A class that performs multiple epochs of an IncrementalTrainer and exposes a trainer. </summary>
+    /// <summary> A class that performs multiple epochs of an IncrementalTrainer. </summary>
     ///
     /// <typeparam name="PredictorType"> The type of predictor returned by this trainer. </typeparam>
     template <typename PredictorType>

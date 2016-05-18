@@ -18,12 +18,10 @@ set (INCLUDE include/BaggingIncrementalTrainer.h
              include/IIncrementalTrainer.h
              include/ITrainer.h
              include/MultiEpochIncrementalTrainer.h
-             include/SingleEpochTrainer.h
              include/SortingTreeTrainer.h
              include/SGDIncrementalTrainer.h)
 
 set (TCC tcc/BaggingIncrementalTrainer.tcc
-         tcc/SingleEpochTrainer.tcc
          tcc/MultiEpochIncrementalTrainer.tcc
          tcc/SortingTreeTrainer.tcc
          tcc/SGDIncrementalTrainer.tcc)
