@@ -27,6 +27,10 @@ namespace trainers
         // as long as positive gains can be attained, keep growing the tree
         while(!_queue.empty())
         {
+            // useful debugging code - do not remove
+            // std::cout << "Iteration\n";
+            // _queue.Print(std::cout, _dataset);
+
             auto splitInfo = _queue.top();
             _queue.pop();
 
@@ -138,6 +142,13 @@ namespace trainers
         {
             _queue.push(std::move(splitCandidate));
         }
+
+        // useful debugging code- do not remove
+        //else
+        //{
+        //    std::cout << "No positive-gain split candidate found - queue unmodified\n";
+        //    splitCandidate.Print(std::cout, _dataset);
+        //}
     }
 
     template<typename LossFunctionType>
@@ -183,5 +194,31 @@ namespace trainers
     std::unique_ptr<ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters)
     {
         return std::make_unique<SortingTreeTrainer<LossFunctionType>>(lossFunction, parameters);
+    }
+
+    template<typename LossFunctionType>
+    void SortingTreeTrainer<LossFunctionType>::SplitCandidate::Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const
+    {
+        os << "Leaf: " << leaf <<
+            "\tSplitRule: (" << splitRule.featureIndex << "," << splitRule.threshold << ")" <<
+            "\tGain: " << gain <<
+            "\tSize: " << size <<
+            "\tNegativeSize: " << negativeSize <<
+            "\tSums: (" << sums.sumWeights << "," << sums.sumWeightedLabels << ")" <<
+            "\tNegativeSums: (" << negativeSums.sumWeights << "," << negativeSums.sumWeightedLabels << ")\n";
+
+        dataset.Print(os, fromRowIndex, size);
+        os << std::endl;
+    }
+
+    template<typename LossFunctionType>
+    void SortingTreeTrainer<LossFunctionType>::PriorityQueue::Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const
+    {
+        os << "Priority Queue Size: " << size() << "\n";
+
+        for(const auto& candidate : c) // c is a protected member of std::priority_queue
+        {
+            candidate.Print(os, dataset);
+        }
     }
 }

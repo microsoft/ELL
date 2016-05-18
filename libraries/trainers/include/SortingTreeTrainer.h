@@ -19,6 +19,7 @@
 
 // stl
 #include <queue>
+#include <iostream>
 
 /// <summary> trainers namespace </summary>
 namespace trainers
@@ -73,9 +74,16 @@ namespace trainers
             Sums negativeSums;
 
             bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
+            void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
         };
 
-        Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator) const;
+        struct PriorityQueue : public std::priority_queue<SplitCandidate>
+        {
+            void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
+        };
+
+        template <typename ExampleIteratorType>
+        Sums LoadData(ExampleIteratorType exampleIterator);
         void AddSplitCandidateToQueue(predictors::DecisionTreePredictor::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums) const;
         void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size) const;
         double CalculateGain(Sums sums, Sums negativeSums) const;
@@ -86,7 +94,7 @@ namespace trainers
         LossFunctionType _lossFunction;
         SortingTreeTrainerParameters _parameters;
         mutable dataset::RowDataset<dataset::DoubleDataVector> _dataset;
-        mutable std::priority_queue<SplitCandidate> _queue;
+        mutable PriorityQueue _queue;
     };
 
     /// <summary> Makes a sorting tree trainer. </summary>

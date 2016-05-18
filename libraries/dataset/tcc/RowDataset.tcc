@@ -113,11 +113,18 @@ namespace dataset
     }
 
     template<typename DataVectorType>
-    void RowDataset<DataVectorType>::Print(std::ostream& os) const
+    void RowDataset<DataVectorType>::Print(std::ostream& os, uint64_t fromRowIndex, uint64_t size) const
     {
-        for(const auto& example : _examples)
+        assert(fromRowIndex + size <= _examples.size());
+
+        if(size == 0)
         {
-            os << example << std::endl;
+            size = _examples.size() - fromRowIndex;
+        }
+
+        for(uint64_t index = fromRowIndex; index < fromRowIndex + size; ++index)
+        {
+            os << _examples[index] << std::endl;
         }
     }
 

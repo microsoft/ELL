@@ -111,7 +111,9 @@ namespace dataset
         /// <summary> Prints this object. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
-        void Print(std::ostream& os) const;
+        /// <param name="fromIndex"> Zero-based index of the first row to print. </param>
+        /// <param name="size"> The number of rows to print, or 0 to print until the end. </param>
+        void Print(std::ostream& os, uint64_t fromIndex = 0, uint64_t size = 0) const;
 
     private:
         std::vector<ExampleType> _examples;
