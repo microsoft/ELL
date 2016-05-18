@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//#define VERY_VERBOSE
+
 namespace trainers
 {    
     template <typename LossFunctionType>
@@ -27,9 +29,11 @@ namespace trainers
         // as long as positive gains can be attained, keep growing the tree
         while(!_queue.empty())
         {
-            // useful debugging code - do not remove
-            // std::cout << "Iteration\n";
-            // _queue.Print(std::cout, _dataset);
+
+#ifdef VERY_VERBOSE
+             std::cout << "Iteration\n";
+             _queue.Print(std::cout, _dataset);
+#endif
 
             auto splitInfo = _queue.top();
             _queue.pop();
@@ -141,12 +145,13 @@ namespace trainers
             _queue.push(std::move(splitCandidate));
         }
 
-        // useful debugging code- do not remove
-        //else
-        //{
-        //    std::cout << "No positive-gain split candidate found - queue unmodified\n";
-        //    splitCandidate.Print(std::cout, _dataset);
-        //}
+#ifdef VERY_VERBOSE
+        else
+        {
+            std::cout << "No positive-gain split candidate found - queue unmodified\n";
+            splitCandidate.Print(std::cout, _dataset);
+        }
+#endif
     }
 
     template<typename LossFunctionType>
