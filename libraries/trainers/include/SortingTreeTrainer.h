@@ -82,8 +82,7 @@ namespace trainers
             void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
         };
 
-        template <typename ExampleIteratorType>
-        Sums LoadData(ExampleIteratorType exampleIterator);
+        Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator) const;
         void AddSplitCandidateToQueue(predictors::DecisionTreePredictor::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums) const;
         void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size) const;
         double CalculateGain(Sums sums, Sums negativeSums) const;

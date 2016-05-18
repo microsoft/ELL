@@ -45,8 +45,6 @@ namespace trainers
             // sort the data according to the performed split
             SortDatasetByFeature(splitInfo.splitRule.featureIndex, splitInfo.fromRowIndex, splitInfo.size);
 
-//            std::cout << _dataset << std::endl;
-
             // queue split candidate for negative child
             AddSplitCandidateToQueue(&interiorNode.GetNegativeChild(), splitInfo.fromRowIndex, splitInfo.negativeSize, splitInfo.negativeSums);
 
