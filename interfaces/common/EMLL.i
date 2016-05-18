@@ -105,6 +105,8 @@ namespace std
 // Interface includes for utilities library
 %include utilities.i
 
+%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>, std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
+
 // Interface for the predictors library
 %include predictors.i
 
@@ -123,6 +125,10 @@ wrap_unique_ptr(LayerPtr, layers::Layer)
 %include "std_shared_ptr.i"
 %shared_ptr(layers::Map)
 %shared_ptr(layers::Model)
-//%template (GenericRowDataset) dataset::RowDataset<dataset::IDataVector>;
+%template () dataset::RowDataset<dataset::IDataVector>;
 //%shared_ptr(GenericRowDataset)
 %shared_ptr(RowDataset)
+
+%template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
+%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
+%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>, std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;

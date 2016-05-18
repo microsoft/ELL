@@ -39,7 +39,7 @@ namespace interfaces
 //        return dataset::GenericSupervisedExample(_dataset.GetExample(index));
     }
 
-    RowDatasetIterator GenericRowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
+    dataset::GenericRowIterator GenericRowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
     {
         return _dataset.GetIterator(firstExample, numExamples);
     }

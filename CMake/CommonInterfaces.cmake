@@ -83,7 +83,8 @@ foreach(file ${INTERFACE_FILES})
     configure_file(${file} ${file} COPYONLY)
 endforeach()
 
-set(CMAKE_SWIG_FLAGS -c++ -debug-classes -debug-typedef)
+# -debug-classes -debug-typedef 
+set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft -debug-template)
 set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${EXTRA_INTERFACE})
 
 # set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_FILES}) # Doesn't seem to work

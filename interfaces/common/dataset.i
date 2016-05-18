@@ -47,7 +47,7 @@ namespace interfaces
 
 namespace utilities
 {
-    class IIterator {};
+//    class IIterator {};
 }
 
 %include "noncopyable.i"
@@ -63,7 +63,7 @@ namespace dataset
 {
     wrap_noncopyable(SupervisedExample<IDataVector>);
     %template() SupervisedExample<IDataVector>;
-    %template() RowDataset<IDataVector>;
+//    %template() RowDataset<IDataVector>;
 }
 
 %include "RowDatasetInterface.h"

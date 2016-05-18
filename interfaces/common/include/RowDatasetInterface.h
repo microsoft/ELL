@@ -20,9 +20,6 @@
 
 namespace interfaces
 {
-    // typedef dataset::RowDataset<dataset::IDataVector>::Iterator RowDatasetIterator;
-    typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> RowDatasetIterator;
-       
     class GenericRowDataset
     {
     public:
@@ -64,7 +61,7 @@ namespace interfaces
         /// examples. </param>
         ///
         /// <returns> The iterator. </returns>
-        RowDatasetIterator GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
+        dataset::GenericRowIterator GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
