@@ -63,10 +63,4 @@ namespace linear
             iterator.Next();
         }
     }
-
-    void DoubleVector::Swap(DoubleVector& u, DoubleVector& v)
-    {
-        std::swap(u._data, v._data);
-    }
-
 }

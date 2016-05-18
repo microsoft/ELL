@@ -82,12 +82,6 @@ namespace predictors
         /// <returns> The predictor's output coordinates in the model. </returns>
         layers::CoordinateList AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
 
-        /// <summary> Swaps two linear predictors </summary>
-        ///
-        /// <param name="u"> [in,out] A LinearPredictor. </param>
-        /// <param name="v"> [in,out] A LinearPredictor. </param>
-        static void Swap(LinearPredictor& u, LinearPredictor& v);
-
     private:
         linear::DoubleVector _w;
         double _b;

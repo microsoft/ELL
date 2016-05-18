@@ -18,7 +18,7 @@ namespace common
 {
     using BaggingIncrementalTrainerArguments = trainers::BaggingIncrementalTrainerParameters;
 
-    /// <summary> Parsed version of sorting tree trainer parameters. </summary>
+    /// <summary> Parsed version of bagging parameters. </summary>
     struct ParsedBaggingIncrementalTrainerArguments : public BaggingIncrementalTrainerArguments, public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>

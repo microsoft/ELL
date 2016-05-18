@@ -24,7 +24,7 @@ namespace utilities
     {
         virtual int overflow(int c)
         {
-            return std::char_traits<char>::not_eof(c);
+            return std::char_traits<char>::not_eof(c) ? c : EOF; 
         }
     };
 

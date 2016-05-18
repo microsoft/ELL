@@ -52,10 +52,4 @@ namespace predictors
 
         return biasLayerCoordinates;
     }
-
-    void LinearPredictor::Swap(LinearPredictor& u, LinearPredictor& v)
-    {
-        linear::DoubleVector::Swap(u._w, v._w);
-        std::swap(u._b, v._b);
-    }
 }

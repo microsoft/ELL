@@ -132,12 +132,6 @@ namespace linear
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
 
-        /// <summary> Swaps two double vectors </summary>
-        ///
-        /// <param name="u"> [in,out] A DoubleVector. </param>
-        /// <param name="v"> [in,out] A DoubleVector. </param>
-        static void Swap(DoubleVector& u, DoubleVector& v);
-
     private:
         std::vector<double> _data;
     };
