@@ -32,7 +32,7 @@ namespace features
         virtual std::string FeatureType() const override { return feature_name; }
 
         static constexpr const char* feature_name = "Input";
-        static std::unique_ptr<Feature> Deserialize(std::vector<std::string> params, Feature::FeatureMap& prev_features);
+        static std::unique_ptr<Feature> Create(std::vector<std::string> params, Feature::FeatureMap& prev_features);
 
     protected:
         virtual std::vector<double> ComputeOutput() const override { return _currentValue; }

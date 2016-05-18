@@ -14,6 +14,6 @@ namespace features
     template <typename FeatureT>
     void Feature::RegisterFeatureType()
     {
-        RegisterDeserializeFunction(FeatureT::feature_name, FeatureT::Deserialize);
+        RegisterCreateFunction(FeatureT::feature_name, FeatureT::Create);
     }
 }

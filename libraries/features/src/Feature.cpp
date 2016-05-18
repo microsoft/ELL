@@ -21,7 +21,7 @@ namespace features
     // feature base class
     //
     int Feature::_instanceCount = 0;
-    std::unordered_map<std::string, Feature::DeserializeFunction> Feature::_createTypeMap;
+    std::unordered_map<std::string, Feature::CreateFunction> Feature::_createTypeMap;
 
     Feature::Feature(const std::vector<Feature*>& inputs) : _isDirty(true), _inputFeatures(inputs)
     {
@@ -120,7 +120,7 @@ namespace features
         return result;
     }
 
-    void Feature::RegisterDeserializeFunction(std::string class_name, DeserializeFunction create_fn)
+    void Feature::RegisterCreateFunction(std::string class_name, CreateFunction create_fn)
     {
         _createTypeMap[class_name] = create_fn;
     }
@@ -147,7 +147,7 @@ namespace features
         }
     }
     
-    std::unique_ptr<Feature> Feature::FromDescription(const std::vector<std::string>& description, Feature::FeatureMap& deserializedFeatureMap)
+    std::unique_ptr<Feature> Feature::FromDescription(const std::vector<std::string>& description, Feature::FeatureMap& existingFeatureMap)
     {
         std::string featureId = TrimString(description[0]);
         std::string featureClass = TrimString(description[1]);
@@ -158,6 +158,6 @@ namespace features
             std::string error = std::string("Error deserializing feature description: unknown feature type '") + featureClass + "'";
             throw std::runtime_error(error);
         }
-        return createFunction(description, deserializedFeatureMap);
+        return createFunction(description, existingFeatureMap);
     }
 }

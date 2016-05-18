@@ -68,7 +68,7 @@ namespace features
         static std::vector<std::string> GetRegisteredTypes();
         
         using FeatureMap = std::unordered_map<std::string, Feature*>;
-        using DeserializeFunction = std::function<std::unique_ptr<Feature>(std::vector<std::string>, FeatureMap&)>; // TODO: have creation (deserialization) function take a const FeatureMap&
+        using CreateFunction = std::function<std::unique_ptr<Feature>(std::vector<std::string>, FeatureMap&)>; // TODO: have creation (deserialization) function take a const FeatureMap&
         
         /// <summary> Adds a feature to the global registry of features. Allows deserialization and creation from vector of strings. </summary>
         template <typename FeatureType>
@@ -85,7 +85,7 @@ namespace features
         virtual std::string FeatureType() const = 0;
         void AddDependent(Feature* f);
 
-        static void RegisterDeserializeFunction(std::string class_name, DeserializeFunction create_fn);
+        static void RegisterCreateFunction(std::string class_name, CreateFunction create_fn);
         bool IsDirty() const { return _isDirty; }
         void SetDirtyFlag(bool dirty) const;
         void AddInputFeature(Feature* inputFeature) { _inputFeatures.push_back(inputFeature); }
@@ -96,7 +96,7 @@ namespace features
 
     private:
         friend class FeatureSet;
-        static std::unique_ptr<Feature> FromDescription(const std::vector<std::string>& description, FeatureMap& deserializedFeatureMap);
+        static std::unique_ptr<Feature> FromDescription(const std::vector<std::string>& description, FeatureMap& existingFeatureMap);
 
         mutable bool _isDirty = true;
         std::vector<Feature*> _dependents; // children
@@ -104,7 +104,7 @@ namespace features
         int _instanceId = 0;
 
         static int _instanceCount;
-        static std::unordered_map<std::string, DeserializeFunction> _createTypeMap;
+        static std::unordered_map<std::string, CreateFunction> _createTypeMap;
     };
 }
 

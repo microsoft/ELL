@@ -20,7 +20,6 @@
 %}
 
 %ignore Create;
-%ignore Allocate;
 %ignore Deserialize;
 
 %include "Feature.h"
