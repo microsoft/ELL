@@ -11,7 +11,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/Coordinate.cpp
+set (SRC src/BinaryOpLayer.cpp
+         src/Coordinate.cpp
          src/CoordinateList.cpp
          src/CoordinateListTools.cpp
          src/Coordinatewise.cpp
@@ -19,9 +20,11 @@ set (SRC src/Coordinate.cpp
          src/Layer.cpp
          src/Map.cpp
          src/Model.cpp
-         src/Sum.cpp)
+         src/Sum.cpp
+         src/UnaryOpLayer.cpp)
 
-set (INCLUDE include/Coordinate.h
+set (INCLUDE include/BinaryOpLayer.h
+             include/Coordinate.h
              include/CoordinateList.h
              include/CoordinateListTools.h
              include/Coordinatewise.h
@@ -29,7 +32,8 @@ set (INCLUDE include/Coordinate.h
              include/Layer.h
              include/Map.h
              include/Model.h
-             include/Sum.h)
+             include/Sum.h
+             include/UnaryOpLayer.h)
 
 set (TCC tcc/Map.tcc)
 
