@@ -61,7 +61,7 @@ namespace features
         return outputCoordinates;
     }
 
-    std::unique_ptr<Feature> MagnitudeFeature::Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
+    std::unique_ptr<Feature> MagnitudeFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
         Feature* inputFeature = previousFeatures[params[2]];
         if (inputFeature == nullptr)

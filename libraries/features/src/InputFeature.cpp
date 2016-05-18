@@ -39,7 +39,7 @@ namespace features
         description.push_back(to_string(_outputDimension));
     }
 
-    std::unique_ptr<Feature> InputFeature::Deserialize(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
+    std::unique_ptr<Feature> InputFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
         assert(params.size() == 3);
         uint64_t size = ParseInt(params[2]);
