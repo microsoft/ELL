@@ -20,6 +20,16 @@
 
 namespace utilities
 {
+    class NullStreamBuf : public std::streambuf
+    {
+        virtual int overflow(int c)
+        {
+            return std::char_traits<char>::not_eof(c);
+        }
+    };
+
+    NullStreamBuf nullStreamBuf;
+
     OutputStreamImpostor::OutputStreamImpostor()
     {
         _outBuf = std::cout.rdbuf();
@@ -31,6 +41,10 @@ namespace utilities
         if (filenameOrEmpty == "")
         {
             _outBuf = std::cout.rdbuf();
+        }
+        else if(filenameOrEmpty == "null")
+        {
+            _outBuf = &nullStreamBuf;
         }
         else
         {

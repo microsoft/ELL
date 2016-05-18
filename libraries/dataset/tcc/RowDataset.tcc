@@ -39,13 +39,7 @@ namespace dataset
     template<typename DataVectorType>
     typename RowDataset<DataVectorType>::Iterator RowDataset<DataVectorType>::GetIterator(uint64_t fromRowIndex, uint64_t size) const
     {
-        assert(fromRowIndex + size <= _examples.size());
-
-        if (size == 0)
-        {
-            size = _examples.size() - fromRowIndex;
-        }
-
+        size = CorrectRangeSize(fromRowIndex, size);
         return utilities::MakeStlIterator(_examples.cbegin() + fromRowIndex, _examples.cbegin() + fromRowIndex + size);
     }
 
@@ -92,13 +86,8 @@ namespace dataset
     template<typename SortKeyType>
     void RowDataset<DataVectorType>::Sort(SortKeyType sortKey, uint64_t fromRowIndex, uint64_t size)
     {
+        size = CorrectRangeSize(fromRowIndex, size);
 
-        assert(fromRowIndex + size <= _examples.size());
-
-        if (size == 0)
-        {
-            size = _examples.size() - fromRowIndex;
-        }
         if(size <= 1)
         {
             return;
@@ -115,12 +104,7 @@ namespace dataset
     template<typename DataVectorType>
     void RowDataset<DataVectorType>::Print(std::ostream& os, uint64_t fromRowIndex, uint64_t size) const
     {
-        assert(fromRowIndex + size <= _examples.size());
-
-        if(size == 0)
-        {
-            size = _examples.size() - fromRowIndex;
-        }
+        size = CorrectRangeSize(fromRowIndex, size);
 
         for(uint64_t index = fromRowIndex; index < fromRowIndex + size; ++index)
         {
@@ -133,6 +117,15 @@ namespace dataset
     {
         dataset.Print(os);
         return os;
+    }
+
+    template<typename DataVectorType>
+    uint64_t RowDataset<DataVectorType>::CorrectRangeSize(uint64_t fromRowIndex, uint64_t size) const {
+        if(size == 0 || fromRowIndex + size > _examples.size())
+        {
+            return _examples.size() - fromRowIndex;
+        }
+        return size;
     }
 }
 

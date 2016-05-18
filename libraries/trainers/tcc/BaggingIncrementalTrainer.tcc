@@ -29,6 +29,10 @@ namespace trainers
             bagSize = rowDataset.NumExamples();
         }
 
+        // calculate base predictor weight
+        double weight = 1.0 / _baggingParameters.numIterations;
+
+        // iterate
         for(int i = 0; i < _baggingParameters.numIterations; ++i)
         {
             // get random bag of data
@@ -36,7 +40,7 @@ namespace trainers
             auto trainSetIterator = rowDataset.GetIterator(0, bagSize);
 
             // append weak predictor to the ensemble
-            _ensemble->AppendPredictor(_trainer->Train(trainSetIterator));
+            _ensemble->AppendPredictor(_trainer->Train(trainSetIterator), weight);
         }
     }
 

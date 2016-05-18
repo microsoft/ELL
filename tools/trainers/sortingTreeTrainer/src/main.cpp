@@ -66,8 +66,12 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
                 
-        if(trainerArguments.verbose) std::cout << "Sorting Tree Trainer" << std::endl;
-        
+        if(trainerArguments.verbose)
+        {
+            std::cout << "Sorting Tree Trainer" << std::endl;
+            std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
+        }
+
         // if output file specified, replace stdout with it 
         auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputModelFile);
 

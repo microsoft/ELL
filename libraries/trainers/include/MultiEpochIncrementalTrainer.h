@@ -26,7 +26,7 @@ namespace trainers
     {
         uint64_t epochSize = 0;
         uint64_t numEpochs = 1;
-        std::string dataPermutationRandomSeed = 0;
+        std::string dataPermutationRandomSeed = "";
     };
 
     /// <summary> A class that performs multiple epochs of an IncrementalTrainer and exposes a trainer. </summary>

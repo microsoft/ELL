@@ -21,8 +21,8 @@ namespace common
         parser.AddOption(bagSize,
                          "bagSize",
                          "bs",
-                         "The number of training examples to randomly place in each bag",
-                         1);
+                         "The number of training examples to randomly place in each bag, zero to use all available examples",
+                         0);
 
         parser.AddOption(dataPermutationRandomSeed,
                          "dataPermutationRandomSeed",
