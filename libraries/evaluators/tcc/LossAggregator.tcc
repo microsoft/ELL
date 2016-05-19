@@ -17,7 +17,12 @@ namespace evaluators
     {
         double loss = _lossFunction.Evaluate(prediction, label);
         _sumWeights += weight;
-        _sumWeightedLoss += weight * loss;
+        _sumWeightedLosses += weight * loss;
     }
 
+    template<typename LossFunctionType>
+    void evaluators::LossAggregator<LossFunctionType>::Print(std::ostream & os) const
+    {
+        os << _sumWeightedLosses / _sumWeights << "\t";
+    }
 }

@@ -100,16 +100,6 @@ int main(int argc, char* argv[])
         auto sgdIncrementalTrainer = MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
         auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments);
 
-        // XXXX
-        auto validationSetIterator = rowDataset.GetIterator();
-        lossFunctions::LogLoss logLoss;
-        auto tuple = std::make_tuple(evaluators::BinaryErrorAggregator());
-        auto evaluator = evaluators::MakeEvaluator<predictors::LinearPredictor>(validationSetIterator, std::move(tuple));
-        evaluator.Evaluate(*trainer->GetPredictor());
-
-
-        /// XXXX
-
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto trainSetIterator = rowDataset.GetIterator();
@@ -121,9 +111,10 @@ int main(int argc, char* argv[])
         {
             std::cout << "Finished training.\n";
 
-            auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::LinearPredictor>(trainerArguments.lossArguments);           
             auto evaluationIterator = rowDataset.GetIterator();
-            evaluator->Evaluate(evaluationIterator, *predictor);
+            lossFunctions::LogLoss logLoss;
+            auto evaluator = evaluators::MakeEvaluator<predictors::LinearPredictor>(evaluationIterator, evaluators::BinaryErrorAggregator(), evaluators::LossAggregator<lossFunctions::LogLoss>(logLoss));
+            evaluator->Evaluate(*trainer->GetPredictor());
 
             std::cout << "Training error\n";
             evaluator->Print(std::cout); 

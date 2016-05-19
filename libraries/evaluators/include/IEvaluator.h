@@ -11,6 +11,9 @@
 // dataset
 #include "RowDataset.h"
 
+// stl
+#include <iostream>
+
 namespace evaluators
 {
     template <typename PredictorType>
@@ -22,5 +25,6 @@ namespace evaluators
 
         virtual void Evaluate(const PredictorType& predictor) = 0;
 
+        virtual void Print(std::ostream& os) const = 0;
     };
 }

@@ -10,18 +10,16 @@
 
 // stl
 #include <cstdint>
+#include <iostream>
 
 namespace evaluators
 {
     class BinaryErrorAggregator
     {
     public:
-
-        BinaryErrorAggregator() = default;
-        BinaryErrorAggregator(const BinaryErrorAggregator&) = delete;
-        BinaryErrorAggregator(BinaryErrorAggregator&&) = default;
-
         void Update(double prediction, double label, double weight);
+
+        void Print(std::ostream& os) const;
 
     private:
         double _sumWeightedTruePositives = 0.0;

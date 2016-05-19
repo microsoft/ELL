@@ -35,4 +35,12 @@ namespace evaluators
             }
         }
     }
+
+    void BinaryErrorAggregator::Print(std::ostream & os) const
+    {
+        double sumWeightFalse = _sumWeightedFalsePositives + _sumWeightedFalseNegatives;
+        double sumWeightTrue = _sumWeightedTruePositives + _sumWeightedTrueNegatives;
+        double errorRate = sumWeightFalse / (sumWeightTrue + sumWeightFalse);
+        os << errorRate << "\t";
+    }
 }

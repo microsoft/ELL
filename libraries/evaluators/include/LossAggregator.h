@@ -22,10 +22,12 @@ namespace evaluators
 
         void Update(double prediction, double label, double weight);
 
+        void Print(std::ostream& os) const;
+
     private:
         LossFunctionType _lossFunction;
         double _sumWeights = 0.0;
-        double _sumWeightedLoss = 0.0;
+        double _sumWeightedLosses = 0.0;
     };
 }
 
