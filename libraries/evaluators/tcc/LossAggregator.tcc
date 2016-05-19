@@ -21,8 +21,8 @@ namespace evaluators
     }
 
     template<typename LossFunctionType>
-    void evaluators::LossAggregator<LossFunctionType>::Print(std::ostream & os) const
+    std::string evaluators::LossAggregator<LossFunctionType>::ToString() const 
     {
-        os << _sumWeightedLosses / _sumWeights << "\t";
+        return std::to_string(_sumWeightedLosses / _sumWeights);
     }
 }

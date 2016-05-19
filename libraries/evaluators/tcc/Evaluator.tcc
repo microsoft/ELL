@@ -12,7 +12,10 @@ namespace evaluators
 {
     template<typename PredictorType, typename EvaluationAggregatorTupleType>
     Evaluator<PredictorType, EvaluationAggregatorTupleType>::Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, EvaluationAggregatorTupleType evaluationAggregatorTuple)
-        : _rowDataset(exampleIterator), _evaluationAggregatorTuple(std::move(evaluationAggregatorTuple)) {}
+        : _rowDataset(exampleIterator), _evaluationAggregatorTuple(std::move(evaluationAggregatorTuple)) 
+    {
+        static_assert(std::tuple_size<EvaluationAggregatorTupleType>::value > 0, "Evaluator must contains at least one aggregator");
+    }
 
     template<typename PredictorType, typename EvaluationAggregatorTupleType>
     void Evaluator<PredictorType, EvaluationAggregatorTupleType>::Evaluate(const PredictorType& predictor)
@@ -22,11 +25,15 @@ namespace evaluators
         while (iterator.IsValid())
         {
             const auto& example = iterator.Get();
-            DispatchUpdate(predictor, example, std::make_index_sequence<std::tuple_size<decltype(_evaluationAggregatorTuple)>::value>());
+
+            double weight = example.GetWeight();
+            double label = example.GetLabel();
+            double prediction = predictor.Predict(example.GetDataVector());
+
+            DispatchUpdate(prediction, label, weight, std::make_index_sequence<std::tuple_size<EvaluationAggregatorTupleType>::value>());
             iterator.Next();
         }
     }
-
 
     template<typename PredictorType, typename EvaluationAggregatorTupleType>
     void Evaluator<PredictorType, EvaluationAggregatorTupleType>::Print(std::ostream& os) const
@@ -36,11 +43,8 @@ namespace evaluators
 
     template<typename PredictorType, typename EvaluationAggregatorTupleType>
     template<std::size_t ...Is>
-    void Evaluator<PredictorType, EvaluationAggregatorTupleType>::DispatchUpdate(const PredictorType& predictor, const dataset::GenericSupervisedExample& example, std::index_sequence<Is...>) {
-        double weight = example.GetWeight();
-        double label = example.GetLabel();
-        double prediction = predictor.Predict(example.GetDataVector());
-
+    void Evaluator<PredictorType, EvaluationAggregatorTupleType>::DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Is...>)
+    {
         // Call X.Update() for each X in _evaluationAggregatorTuple
         auto dummy = {(std::get<Is>(_evaluationAggregatorTuple).Update(prediction, label, weight), 0)...}; // OMG!
     }
@@ -49,8 +53,15 @@ namespace evaluators
     template<std::size_t ...Is>
     void Evaluator<PredictorType, EvaluationAggregatorTupleType>::DispatchPrint(std::ostream& os, std::index_sequence<Is...>) const
     {
-        // Call X.Print() for each X in _evaluationAggregatorTuple
-        auto dummy = {(std::get<Is>(_evaluationAggregatorTuple).Print(os), 0)...}; // OMG!
+        // Call X.ToString() for each X in _evaluationAggregatorTuple
+        std::vector<std::string> strings {std::get<Is>(_evaluationAggregatorTuple).ToString()...};
+
+        os << strings[0];
+        for(uint64_t i=1; i<strings.size(); ++i)
+        {
+            os << "\t" << strings[i];
+        }
+        os << std::endl;
     }
 
     template<typename PredictorType, typename... EvaluationAggregatorTupleType>

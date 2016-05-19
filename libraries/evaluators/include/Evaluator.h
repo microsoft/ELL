@@ -32,7 +32,7 @@ namespace evaluators
     private:
 
         template<std::size_t ...Is>
-        void DispatchUpdate(const PredictorType& predictor, const dataset::GenericSupervisedExample& example, std::index_sequence<Is...>);
+        void DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Is...>);
 
         template<std::size_t ...Is>
         void DispatchPrint(std::ostream& os, std::index_sequence<Is...>) const;

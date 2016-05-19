@@ -10,8 +10,7 @@
 
 // stl
 #include <cstdint>
-#include <iostream>
-
+#include <string>
 namespace evaluators
 {
     class BinaryErrorAggregator
@@ -19,7 +18,7 @@ namespace evaluators
     public:
         void Update(double prediction, double label, double weight);
 
-        void Print(std::ostream& os) const;
+        std::string ToString() const;
 
     private:
         double _sumWeightedTruePositives = 0.0;
