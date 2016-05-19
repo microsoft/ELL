@@ -6,11 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "BinaryErrorAggregator.h"
+
 namespace evaluators
 {
     template<typename PredictorType, typename EvaluationAggregatorTupleType>
-    Evaluator<PredictorType, EvaluationAggregatorTupleType>::Evaluator(EvaluationAggregatorTupleType&& evaluationAggregatorTuple, dataset::GenericRowDataset::Iterator exampleIterator) 
-        : _evaluationAggregatorTuple(std::move(evaluationAggregatorTuple)), _rowDataset(exampleIterator) {}
+    Evaluator<PredictorType, EvaluationAggregatorTupleType>::Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, EvaluationAggregatorTupleType&& evaluationAggregatorTuple)
+        : _rowDataset(exampleIterator), _evaluationAggregatorTuple(std::move(evaluationAggregatorTuple)) {}
 
     template<typename PredictorType, typename EvaluationAggregatorTupleType>
     void Evaluator<PredictorType, EvaluationAggregatorTupleType>::Evaluate(const PredictorType& predictor)
@@ -36,4 +38,19 @@ namespace evaluators
         // Call X.Update() for each X in _evaluationAggregatorTuple
         auto dummy = { (std::get<Is>(_evaluationAggregatorTuple).Update(prediction, label, weight), 0)... }; // OMG!
     }
+
+    template<typename PredictorType, typename EvaluationAggregatorTupleType>
+    Evaluator<PredictorType, EvaluationAggregatorTupleType> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, EvaluationAggregatorTupleType&& evaluationAggregatorTuple) 
+    {
+        return Evaluator<PredictorType, EvaluationAggregatorTupleType>(exampleIterator, std::move(evaluationAggregatorTuple));
+    }
+
+    //template<typename PredictorType, typename... AggregatorTypes>
+    //Evaluator<PredictorType, std::tuple<AggregatorTypes...>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... evaluationAggregatorTuple)
+    //{
+    //    using EvaluationAggregatorTupleType = decltype(std::make_tuple(evaluationAggregatorTuple...));
+    //    EvaluationAggregatorTupleType tuple = std::make_tuple(evaluationAggregatorTuple...);
+    //    return Evaluator<PredictorType, EvaluationAggregatorTupleType>(exampleIterator, std::move(tuple));
+    //}
+
 }

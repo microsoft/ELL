@@ -103,8 +103,8 @@ int main(int argc, char* argv[])
         // XXXX
         auto validationSetIterator = rowDataset.GetIterator();
         lossFunctions::LogLoss logLoss;
-        auto tuple = std::make_tuple(evaluators::BinaryErrorAggregator(), evaluators::LossAggregator<lossFunctions::LogLoss>(logLoss));
-        auto evaluator = evaluators::MakeEvaluator<predictors::LinearPredictor>(std::move(tuple), validationSetIterator);
+        auto tuple = std::make_tuple(evaluators::BinaryErrorAggregator());
+        auto evaluator = evaluators::MakeEvaluator<predictors::LinearPredictor>(validationSetIterator, std::move(tuple));
         evaluator.Evaluate(*trainer->GetPredictor());
 
 
