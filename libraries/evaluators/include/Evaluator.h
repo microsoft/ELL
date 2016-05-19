@@ -19,18 +19,17 @@
 
 namespace evaluators
 {
-    template<typename PredictorType, typename EvaluationAggregatorTupleType>
+    template<typename PredictorType, typename AggregatorTupleType>
     class Evaluator : public IEvaluator<PredictorType>
     {
     public:
-        Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, EvaluationAggregatorTupleType evaluationAggregatorTuple);
+        Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTupleType aggregatorTuple);
 
         virtual void Evaluate(const PredictorType& predictor) override;
 
         virtual void Print(std::ostream& os) const override;
 
     private:
-
         template<std::size_t ...Is>
         void DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Is...>);
 
@@ -38,14 +37,11 @@ namespace evaluators
         void DispatchPrint(std::ostream& os, std::index_sequence<Is...>) const;
 
         dataset::GenericRowDataset _rowDataset;
-        EvaluationAggregatorTupleType _evaluationAggregatorTuple;
+        AggregatorTupleType _aggregatorTuple;
     };
 
-    template<typename PredictorType, typename... EvaluationAggregatorTupleType>
-    std::unique_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, EvaluationAggregatorTupleType... evaluationAggregatorTuple);
-
-    //template<typename PredictorType, typename... AggregatorTypes>
-    //Evaluator<PredictorType, std::tuple<AggregatorTypes...>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... evaluationAggregatorTuple);
+    template<typename PredictorType, typename... AggregatorTupleType>
+    std::unique_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTupleType... aggregatorTuple);
 }
 
 #include "../tcc/Evaluator.tcc"
