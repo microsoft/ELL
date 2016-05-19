@@ -8,8 +8,11 @@
 
 #pragma once
 
+#include "IEvaluator.h"
+
 // dataset
 #include "RowDataset.h"
+#include "SupervisedExample.h"
 
 // stl
 #include <memory>
@@ -17,21 +20,18 @@
 namespace evaluators
 {
     template<typename PredictorType, typename EvaluationAggregatorTupleType>
-    class Evaluator
+    class Evaluator : public IEvaluator<PredictorType>
     {
     public:
-        Evaluator(EvaluationAggregatorTupleType&& evaluationAggregatorTuple, dataset::GenericRowDataset::Iterator exampleIterator) : _evaluationAggregatorTuple(std::move(evaluationAggregatorTuple)), _rowDataset(exampleIterator) {}
+        Evaluator(EvaluationAggregatorTupleType&& evaluationAggregatorTuple, dataset::GenericRowDataset::Iterator exampleIterator);
 
-        void Evaluate();
+        virtual void Evaluate(const PredictorType& predictor) override;
 
 
     private:
 
         template<std::size_t ...Is>
-        void Update(std::index_sequence<Is...>);
-
-
-
+        void DispatchUpdate(const PredictorType& predictor, const dataset::GenericSupervisedExample& example, std::index_sequence<Is...>);
 
         EvaluationAggregatorTupleType _evaluationAggregatorTuple;
         dataset::GenericRowDataset _rowDataset;

@@ -40,6 +40,7 @@
 // evaluators
 #include "Evaluator.h"
 #include "BinaryErrorAggregator.h"
+#include "LossAggregator.h"
 
 // lossFunctions
 #include "HingeLoss.h"
@@ -101,9 +102,10 @@ int main(int argc, char* argv[])
 
         // XXXX
         auto validationSetIterator = rowDataset.GetIterator();
-        auto tuple = std::make_tuple(evaluators::BinaryErrorAggregator(), evaluators::BinaryErrorAggregator(), evaluators::BinaryErrorAggregator());
+        lossFunctions::LogLoss logLoss;
+        auto tuple = std::make_tuple(evaluators::BinaryErrorAggregator(), evaluators::LossAggregator<lossFunctions::LogLoss>(logLoss));
         auto evaluator = evaluators::MakeEvaluator<predictors::LinearPredictor>(std::move(tuple), validationSetIterator);
-        evaluator.Evaluate();
+        evaluator.Evaluate(*trainer->GetPredictor());
 
 
         /// XXXX

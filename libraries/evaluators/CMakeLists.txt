@@ -16,9 +16,11 @@ set (SRC src/BinaryErrorAggregator.cpp)
 
 set (INCLUDE include/BinaryErrorAggregator.h
              include/Evaluator.h
-             include/IEvaluator.h)
+             include/IEvaluator.h
+             include/LossAggregator.h)
 
-set (TCC tcc/Evaluator.tcc)
+set (TCC tcc/Evaluator.tcc
+         tcc/LossAggregator.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

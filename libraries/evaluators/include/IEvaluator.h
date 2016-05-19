@@ -20,5 +20,7 @@ namespace evaluators
 
         virtual ~IEvaluator() = default;
 
+        virtual void Evaluate(const PredictorType& predictor) = 0;
+
     };
 }

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     BinaryErrorAggregator.h (evaluators)
+//  File:     LossAggregator.h (evaluators)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13,20 +13,20 @@
 
 namespace evaluators
 {
-    class BinaryErrorAggregator
+    template <typename LossFunctionType>
+    class LossAggregator
     {
     public:
 
-        BinaryErrorAggregator() = default;
-        BinaryErrorAggregator(const BinaryErrorAggregator&) = delete;
-        BinaryErrorAggregator(BinaryErrorAggregator&&) = default;
+        LossAggregator(const LossFunctionType& lossFunction);
 
         void Update(double prediction, double label, double weight);
 
     private:
-        double _sumWeightedTruePositives = 0.0;
-        double _sumWeightedTrueNegatives = 0.0;
-        double _sumWeightedFalsePositives = 0.0;
-        double _sumWeightedFalseNegatives = 0.0;
+        LossFunctionType _lossFunction;
+        double _sumWeights = 0.0;
+        double _sumWeightedLoss = 0.0;
     };
 }
+
+#include "../tcc/LossAggregator.tcc"
