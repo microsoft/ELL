@@ -1,12 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Nothing.cpp (evaluators)
+//  File:     BinaryErrorAggregator.cpp (evaluators)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace trainers
-{    
-    // Nothing here --- This file is here only to get CMake to create a project for this library
+#include "BinaryErrorAggregator.h"
+
+namespace evaluators
+{
+
 }

@@ -25,13 +25,14 @@ include_directories(${CMAKE_SOURCE_DIR}/libraries/linear/include)
 include_directories(${CMAKE_SOURCE_DIR}/libraries/lossFunctions/include)
 include_directories(${CMAKE_SOURCE_DIR}/libraries/predictors/include)
 include_directories(${CMAKE_SOURCE_DIR}/libraries/trainers/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/evaluators/include)
 include_directories(${CMAKE_SOURCE_DIR}/libraries/utilities/include)
 
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC})
-target_link_libraries(${PROJ_NAME} common dataset layers linear lossFunctions predictors trainers utilities)
+target_link_libraries(${PROJ_NAME} common dataset layers linear lossFunctions predictors trainers evaluators utilities)
 
 # put this project in the trainers folder in the IDE 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/trainers")

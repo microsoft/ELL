@@ -37,6 +37,10 @@
 #include "SGDIncrementalTrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
 
+// evaluators
+#include "Evaluator.h"
+#include "BinaryErrorAggregator.h"
+
 // lossFunctions
 #include "HingeLoss.h"
 #include "LogLoss.h"
@@ -44,6 +48,7 @@
 // stl
 #include <iostream>
 #include <stdexcept>
+#include <tuple>
 
 int main(int argc, char* argv[])
 {
@@ -93,6 +98,15 @@ int main(int argc, char* argv[])
         // create sgd trainer
         auto sgdIncrementalTrainer = MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
         auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments);
+
+        // XXXX
+        auto validationSetIterator = rowDataset.GetIterator();
+        auto tuple = std::make_tuple(evaluators::BinaryErrorAggregator(), evaluators::BinaryErrorAggregator(), evaluators::BinaryErrorAggregator());
+        auto evaluator = evaluators::MakeEvaluator<predictors::LinearPredictor>(std::move(tuple), validationSetIterator);
+        evaluator.Evaluate();
+
+
+        /// XXXX
 
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
