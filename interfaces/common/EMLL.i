@@ -91,7 +91,7 @@ namespace std
     };
 %enddef
 
-// Things that get used a lot
+// Define some namespaces so we can refer to them later
 namespace lossFunctions {};
 namespace predictors {};
 

@@ -27,11 +27,10 @@ namespace dataset
     class RowDataset 
     {
     public:
-//        using ExampleType = SupervisedExample<DataVectorType>;
-//        using Iterator = utilities::VectorIterator<ExampleType>;
-        typedef SupervisedExample<DataVectorType> ExampleType;
-        //        typedef utilities::VectorIterator<ExampleType> Iterator;
-        typedef utilities::StlIterator<typename std::vector<ExampleType>::const_iterator> Iterator;
+        using ExampleType = SupervisedExample<DataVectorType>;
+        using Iterator = utilities::VectorIterator<ExampleType>;
+//        typedef SupervisedExample<DataVectorType> ExampleType;
+//        typedef utilities::VectorIterator<ExampleType> Iterator;
 
         RowDataset() = default;
 
