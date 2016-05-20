@@ -71,7 +71,7 @@ def sgd():
 
         evalIterator = dataset.GetIterator()
         predictor = trainer.GetPredictor()
-        evaluator.Eval(evalIterator, predictor) 
+        evaluator.Evaluate(evalIterator, predictor) 
         
     print "Training Error:"
     print "binary classification evaluation"

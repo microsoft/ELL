@@ -23,12 +23,12 @@ namespace utilities
     class IBinaryClassificationEvaluator
     {
     public:
-//        typedef dataset::GenericRowDataset::Iterator ExampleIteratorType;
+        typedef dataset::GenericRowDataset::Iterator ExampleIteratorType;
 //        typedef dataset::SupervisedExample<dataset::IDataVector> ExampleType;
 //        typedef utilities::StlIterator<typename std::vector<ExampleType>::const_iterator> ExampleIteratorType;
 //        typedef dataset::GenericRowIterator ExampleIteratorType;
 
-        virtual void Evaluate(dataset::GenericRowIterator& dataIterator, const PredictorType& predictor) = 0;
+        virtual void Evaluate(ExampleIteratorType& dataIterator, const PredictorType& predictor) = 0;
 
         virtual void Print(std::ostream& os) const = 0;
     };

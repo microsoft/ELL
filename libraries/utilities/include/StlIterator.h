@@ -28,8 +28,6 @@ namespace utilities
         /// <param name="end"> The STL iterator pointing just past the end of the range to iterate over. </param>
         StlIterator(IteratorType begin, IteratorType end);
 
-        ~StlIterator() {};
-
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if it succeeds, false if it fails. </returns>

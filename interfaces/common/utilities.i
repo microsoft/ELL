@@ -66,12 +66,3 @@ namespace dataset
 
 typedef predictors::LinearPredictor trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::Predictor;
 
-%ignore utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss>::Evaluate;
-%extend utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss>
-{
-    void Eval(dataset::GenericRowIterator& dataIterator, std::shared_ptr<const predictors::LinearPredictor> predictor)
-    {
-        ($self)->Evaluate(dataIterator, *predictor);
-    }
-}
-
