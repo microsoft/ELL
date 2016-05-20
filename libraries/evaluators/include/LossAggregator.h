@@ -46,6 +46,11 @@ namespace evaluators
         /// <returns> The current value. </returns>
         Value GetAndReset();
 
+        /// <summary> Gets a header that describes Value::ToString(). </summary>
+        ///
+        /// <returns> The header string. </returns>
+        std::string GetHeader() const { return "MeanLoss"; }
+
     private:
         LossFunctionType _lossFunction;
         Value _value;

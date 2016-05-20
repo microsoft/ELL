@@ -20,10 +20,10 @@ namespace evaluators
 
         struct Value
         {
-            double sumWeightedTruePositives = 0.0;
-            double sumWeightedTrueNegatives = 0.0;
-            double sumWeightedFalsePositives = 0.0;
-            double sumWeightedFalseNegatives = 0.0;
+            double truePositives = 0.0;
+            double trueNegatives = 0.0;
+            double falsePositives = 0.0;
+            double falseNegatives = 0.0;
 
             /// <summary> Convert this object into a string. </summary>
             ///
@@ -42,6 +42,11 @@ namespace evaluators
         ///
         /// <returns> The current value. </returns>
         Value GetAndReset();
+
+        /// <summary> Gets a header that describes Value::ToString(). </summary>
+        ///
+        /// <returns> The header string. </returns>
+        std::string GetHeader() const { return "ErrorRate\tPrecision\tRecall"; }
 
     private:
         Value _value;

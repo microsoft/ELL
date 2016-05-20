@@ -63,6 +63,16 @@ namespace evaluators
     template<std::size_t ...Is>
     void Evaluator<PredictorType, AggregatorTypes...>::DispatchPrint(std::ostream& os, std::index_sequence<Is...>) const
     {
+
+        // print header
+        std::vector<std::string> header {std::get<Is>(_aggregatorTuple).GetHeader()...};
+        os << header[0];
+        for(uint64_t i = 1; i<header.size(); ++i)
+        {
+            os << "\t" << header[i];
+        }
+        os << std::endl;
+
         for(const auto& valueTuple : _valueTuples)
         {
             // Call X.ToString() for each X in valueTuple
