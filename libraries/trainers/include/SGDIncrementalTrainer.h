@@ -63,6 +63,10 @@ namespace trainers
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _averagedPredictor; }
 
     private:
+
+        void UpdateSparse(dataset::GenericRowDataset::Iterator exampleIterator);
+        void UpdateDense(dataset::GenericRowDataset::Iterator exampleIterator);
+
         LossFunctionType _lossFunction;
         SGDIncrementalTrainerParameters _parameters;
 

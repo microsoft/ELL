@@ -23,6 +23,18 @@ namespace trainers
     template<typename LossFunctionType>
     void SGDIncrementalTrainer<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
     {
+        UpdateSparse(std::move(exampleIterator));
+    }
+
+    template <typename LossFunctionType>
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
+    {
+        return std::make_unique<SGDIncrementalTrainer<LossFunctionType>>(dim, lossFunction, parameters);
+    }
+
+    template<typename LossFunctionType>
+    void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(dataset::GenericRowDataset::Iterator exampleIterator)
+    {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetVector();
         auto& vAvg = _averagedPredictor->GetVector();
@@ -66,21 +78,63 @@ namespace trainers
             dataVector.AddTo(vAvg, avgCoeff);
             bAvg += avgCoeff;
 
-            // move on
             exampleIterator.Next();
         }
-        
+
         assert((double)_total_iterations == T_next);
 
         // calculate w and w_avg
         double scale = T_prev / T_next;
-        _lastPredictor.Scale(scale);
-        _averagedPredictor->Scale(scale);
+        vLast.Scale(scale);
+        bLast *= scale;
+        vAvg.Scale(scale);
+        bAvg *= scale;
     }
 
-    template <typename LossFunctionType>
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
+    template<typename LossFunctionType>
+    void SGDIncrementalTrainer<LossFunctionType>::UpdateDense(dataset::GenericRowDataset::Iterator exampleIterator)
     {
-        return std::make_unique<SGDIncrementalTrainer<LossFunctionType>>(dim, lossFunction, parameters);
+        // get references to the vector and biases
+        auto& vLast = _lastPredictor.GetVector();
+        auto& vAvg = _averagedPredictor->GetVector();
+
+        double& bLast = _lastPredictor.GetBias();
+        double& bAvg = _averagedPredictor->GetBias();
+
+        while(exampleIterator.IsValid())
+        {
+            ++_total_iterations;
+            double t = (double)_total_iterations;
+
+            // get the Next example
+            const auto& example = exampleIterator.Get();
+            double label = example.GetLabel();
+            double weight = example.GetWeight();
+            const auto& dataVector = example.GetDataVector();
+
+            // predict
+            double alpha = _lastPredictor.Predict(dataVector);
+
+            // calculate the loss derivative
+            double beta = weight * _lossFunction.GetDerivative(alpha, label);
+
+            // update last
+            double scaleCoefficient = 1.0 - 1.0 / t;
+            vLast.Scale(scaleCoefficient); // dense operation
+            bLast *= scaleCoefficient;
+
+            double updateCoefficient = -beta / t / _parameters.regularization;
+            dataVector.AddTo(vLast, updateCoefficient);
+            bLast += updateCoefficient;
+
+            // update average
+            double averageingCoefficient = (t-1) / t;
+            vAvg.Scale(averageingCoefficient); // dense operation
+            bAvg *= averageingCoefficient;
+            vLast.AddTo(vAvg, 1/t); // dense operation
+            bAvg += bLast / t;
+
+            exampleIterator.Next();
+        }
     }
 }
