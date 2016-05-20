@@ -28,6 +28,7 @@
 
 template <typename IteratorType, typename ValueType> class StlIterator {};
 
+
 %include "BinaryClassificationEvaluator.h"
 %include "AnyIterator.h"
 %include "RandomEngines.h"
@@ -42,7 +43,7 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 %template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
 namespace dataset
 {
-    typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> GenericRowIterator;
+//    typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> GenericRowIterator;
 }
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 
@@ -50,6 +51,7 @@ namespace dataset
 // and that it's the same as dataset::GenericRowDataset::Iterator
 // ... which is the same as utilities::VectorIterator<ExampleType>;
 // ... which is the same as utilities::StlIterator<typename std::vector<ExampleType>::const_iterator>;
+
 
 %include "LogLoss.h"
 %include "HingeLoss.h"
@@ -66,3 +68,5 @@ namespace dataset
 
 typedef predictors::LinearPredictor trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::Predictor;
 
+typedef dataset::GenericRowDataset::Iterator utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>::ExampleIteratorType;
+typedef dataset::RowDataset<dataset::IDataVector>::Iterator utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>::ExampleIteratorType;

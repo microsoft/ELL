@@ -45,11 +45,13 @@ namespace dataset
 %include "SupervisedExample.h"
 %include "RowDataset.h"
 
+%template() dataset::RowDataset<dataset::IDataVector>;
+
 namespace dataset
 {
     wrap_noncopyable(SupervisedExample<IDataVector>);
     %template() SupervisedExample<IDataVector>;
-//    %template() RowDataset<IDataVector>;
+    %template() RowDataset<IDataVector>;
 }
 
 %include "RowDatasetInterface.h"

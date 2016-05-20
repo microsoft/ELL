@@ -23,10 +23,9 @@ namespace utilities
     class IBinaryClassificationEvaluator
     {
     public:
-        typedef dataset::GenericRowDataset::Iterator ExampleIteratorType;
-//        typedef dataset::SupervisedExample<dataset::IDataVector> ExampleType;
+        typedef dataset::SupervisedExample<dataset::IDataVector> ExampleType;
 //        typedef utilities::StlIterator<typename std::vector<ExampleType>::const_iterator> ExampleIteratorType;
-//        typedef dataset::GenericRowIterator ExampleIteratorType;
+        typedef dataset::GenericRowDataset::Iterator ExampleIteratorType;
 
         virtual void Evaluate(ExampleIteratorType& dataIterator, const PredictorType& predictor) = 0;
 
@@ -56,7 +55,9 @@ namespace utilities
         /// <param name="dataIterator"> [in,out] The data iterator. </param>
         /// <param name="predictor"> The predictor. </param>
         /// <param name="lossFunction"> The loss function. </param>
-        virtual void Evaluate(dataset::GenericRowIterator& dataIterator, const PredictorType& predictor) override;
+// ####
+        virtual void Evaluate(typename IBinaryClassificationEvaluator<PredictorType>::ExampleIteratorType& dataIterator, const PredictorType& predictor) override;
+//        virtual void Evaluate(dataset::GenericRowIterator& dataIterator, const PredictorType& predictor) override;
 
         /// <summary> Returns the most recent average weighted loss. </summary>
         ///

@@ -13,7 +13,8 @@ namespace utilities
     {}
 
     template<typename PredictorType, typename LossFunctionType>
-    void BinaryClassificationEvaluator<PredictorType, LossFunctionType>::Evaluate(dataset::GenericRowIterator& dataIterator, const PredictorType& predictor)
+    //void BinaryClassificationEvaluator<PredictorType, LossFunctionType>::Evaluate(dataset::GenericRowIterator& dataIterator, const PredictorType& predictor)
+    void BinaryClassificationEvaluator<PredictorType, LossFunctionType>::Evaluate(typename IBinaryClassificationEvaluator<PredictorType>::ExampleIteratorType& dataIterator, const PredictorType& predictor)
     {
         Result currentEval; 
         double totalWeight = 0;

@@ -98,13 +98,12 @@ namespace predictors {};
 %import "IDataVector.h"
 
 %template () std::vector<dataset::IDataVector>;
-
 namespace dataset
 {
     class GenericRowIterator {}; // This is necessary to prevent memory leak of datasets::GenericRowIterator
 }
 
-typedef RowDataset<IDataVector> GenericRowDataset;
+typedef dataset::RowDataset<IDataVector> dataset::GenericRowDataset;
 
 namespace utilities
 {
@@ -150,6 +149,20 @@ typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<d
 %include common.i
 
 wrap_unique_ptr(LayerPtr, layers::Layer)
+
+/*
+    /// <summary> Interace for a binary classification evaluator. </summary>
+    template<typename PredictorType>
+    class IBinaryClassificationEvaluator
+    {
+    public:
+//        typedef dataset::GenericRowDataset::Iterator ExampleIteratorType;
+        typedef dataset::SupervisedExample<dataset::IDataVector> ExampleType;
+        typedef utilities::StlIterator<typename std::vector<ExampleType>::const_iterator> ExampleIteratorType;
+}
+*/
+
+// %template () utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>::ExampleIteratorType;
 
 %template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;

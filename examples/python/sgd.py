@@ -66,12 +66,11 @@ def sgd():
         dataset.RandomPermute(rng, epochSize)
 
         # iterate over the entire permuted dataset
-        trainSetIterator = dataset.GetIterator(0, epochSize) # mem leak comes from here
+        trainSetIterator = dataset.GetIterator(0, epochSize)
         trainer.Update(trainSetIterator)  
 
         evalIterator = dataset.GetIterator()
         predictor = trainer.GetPredictor()
-        evaluator.Evaluate(evalIterator, predictor) 
         
     print "Training Error:"
     print "binary classification evaluation"
@@ -79,11 +78,11 @@ def sgd():
     print "{0}\t{1}".format(evaluator.GetLastLoss(), evaluator.GetLastError())
     
     # update the map with the newly learned layers
-#    predictor = trainer.GetPredictor()
-#    predictor.AddToModel(model, map.GetOutputCoordinateList())
+    predictor = trainer.GetPredictor()
+    predictor.AddToModel(model, map.GetOutputCoordinateList())
     
     # output the map
-#    model.Save(outMapFilename)
+    model.Save(outMapFilename)
     
 sgd()
 
