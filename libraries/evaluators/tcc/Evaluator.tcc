@@ -14,9 +14,9 @@ namespace evaluators
     Evaluator<PredictorType, AggregatorTypes...>::Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... aggregators)
         : _rowDataset(exampleIterator), _aggregatorTuple(std::make_tuple(aggregators...))
     {
-        //static_assert(std::tuple_size<AggregatorTupleType>::value > 0, "Evaluator must contains at least one aggregator");
+        static_assert(sizeof...(AggregatorTypes) > 0, "Evaluator must contains at least one aggregator");
     }
-//
+
     template<typename PredictorType, typename... AggregatorTypes>
     void Evaluator<PredictorType, AggregatorTypes...>::Evaluate(const PredictorType& predictor)
     {
