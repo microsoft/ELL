@@ -16,9 +16,12 @@
 ///
 int main()
 {
-    TestMagFeatureCompute();
-    TestMagFeatureModel();
+    TestMagnitudeFeatureCompute();
+    TestMagnitudeFeatureModel();
     
+    TestMeanFeatureCompute();
+    TestMeanFeatureModel();
+
     if(testing::DidTestFail())
     {
         return 1;

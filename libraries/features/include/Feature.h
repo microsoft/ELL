@@ -17,6 +17,9 @@
 #include <unordered_map>
 #include <functional>
 
+#include "CoordinateList.h"
+#include "Model.h"
+
 namespace features
 {
     class InputFeature;

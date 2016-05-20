@@ -43,7 +43,7 @@ double VecMagnitude(const std::vector<double>& vec)
     return std::sqrt(sumSq);
 }
 
-void TestMagFeatureCompute()
+void TestMagnitudeFeatureCompute()
 {
     FeatureSet features;
     auto inputFeature = features.CreateFeature<InputFeature>(3);
@@ -68,7 +68,7 @@ void TestMagFeatureCompute()
     testing::ProcessTest("Testing MagnitudeFeature", testing::IsEqual(output, expectedOutput));
 }
 
-void TestMagFeatureModel()
+void TestMagnitudeFeatureModel()
 {
     // Set up feature set
     FeatureSet features;
@@ -103,4 +103,14 @@ void TestMagFeatureModel()
     }
     double expectedOutput = VecMagnitude(data);
     testing::ProcessTest("Testing MagnitudeFeature", testing::IsEqual(output, expectedOutput));        
+}
+
+void TestMeanFeatureCompute()
+{
+    testing::ProcessTest("Testing MeanFeature::Compute", false);
+}
+
+void TestMeanFeatureModel()
+{
+    testing::ProcessTest("Testing MeanFeature::AddToModel", false);
 }

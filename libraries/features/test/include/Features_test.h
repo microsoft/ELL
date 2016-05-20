@@ -8,6 +8,8 @@
 
 #pragma once
 
-void TestMagFeatureCompute();
-void TestMagFeatureModel();
+void TestMagnitudeFeatureCompute();
+void TestMagnitudeFeatureModel();
 
+void TestMeanFeatureCompute();
+void TestMeanFeatureModel();
