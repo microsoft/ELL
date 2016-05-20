@@ -9,20 +9,28 @@
 namespace evaluators
 {
     template<typename LossFunctionType>
-    evaluators::LossAggregator<LossFunctionType>::LossAggregator(const LossFunctionType & lossFunction) : _lossFunction(lossFunction)
-    {}
-
-    template<typename LossFunctionType>
-    void evaluators::LossAggregator<LossFunctionType>::Update(double prediction, double label, double weight)
+    std::string evaluators::LossAggregator<LossFunctionType>::Value::ToString() const 
     {
-        double loss = _lossFunction.Evaluate(prediction, label);
-        _sumWeights += weight;
-        _sumWeightedLosses += weight * loss;
+        return std::to_string(sumWeightedLosses / sumWeights);
     }
 
     template<typename LossFunctionType>
-    std::string evaluators::LossAggregator<LossFunctionType>::ToString() const 
+    LossAggregator<LossFunctionType>::LossAggregator(const LossFunctionType& lossFunction) : _lossFunction(lossFunction)
+    {}
+
+    template<typename LossFunctionType>
+    void LossAggregator<LossFunctionType>::Update(double prediction, double label, double weight)
     {
-        return std::to_string(_sumWeightedLosses / _sumWeights);
+        double loss = _lossFunction.Evaluate(prediction, label);
+        _value.sumWeights += weight;
+        _value.sumWeightedLosses += weight * loss;
+    }
+
+    template<typename LossFunctionType>
+    typename LossAggregator<LossFunctionType>::Value LossAggregator<LossFunctionType>::GetAndReset()
+    {
+        Value newValue;
+        std::swap(_value, newValue);
+        return newValue;
     }
 }

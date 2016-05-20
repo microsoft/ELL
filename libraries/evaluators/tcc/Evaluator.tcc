@@ -10,15 +10,15 @@
 
 namespace evaluators
 {
-    template<typename PredictorType, typename AggregatorTupleType>
-    Evaluator<PredictorType, AggregatorTupleType>::Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTupleType aggregatorTuple)
-        : _rowDataset(exampleIterator), _aggregatorTuple(std::move(aggregatorTuple)) 
+    template<typename PredictorType, typename... AggregatorTypes>
+    Evaluator<PredictorType, AggregatorTypes...>::Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... aggregators)
+        : _rowDataset(exampleIterator), _aggregatorTuple(std::make_tuple(aggregators...))
     {
-        static_assert(std::tuple_size<AggregatorTupleType>::value > 0, "Evaluator must contains at least one aggregator");
+        //static_assert(std::tuple_size<AggregatorTupleType>::value > 0, "Evaluator must contains at least one aggregator");
     }
-
-    template<typename PredictorType, typename AggregatorTupleType>
-    void Evaluator<PredictorType, AggregatorTupleType>::Evaluate(const PredictorType& predictor)
+//
+    template<typename PredictorType, typename... AggregatorTypes>
+    void Evaluator<PredictorType, AggregatorTypes...>::Evaluate(const PredictorType& predictor)
     {
         auto iterator = _rowDataset.GetIterator();
 
@@ -30,43 +30,56 @@ namespace evaluators
             double label = example.GetLabel();
             double prediction = predictor.Predict(example.GetDataVector());
 
-            DispatchUpdate(prediction, label, weight, std::make_index_sequence<std::tuple_size<AggregatorTupleType>::value>());
+            DispatchUpdate(prediction, label, weight, std::make_index_sequence<sizeof...(AggregatorTypes)>());
             iterator.Next();
         }
+        Aggregate(std::make_index_sequence<sizeof...(AggregatorTypes)>());
     }
 
-    template<typename PredictorType, typename AggregatorTupleType>
-    void Evaluator<PredictorType, AggregatorTupleType>::Print(std::ostream& os) const
+    template<typename PredictorType, typename... AggregatorTypes>
+    void Evaluator<PredictorType, AggregatorTypes...>::Print(std::ostream& os) const
     {
-        DispatchPrint(os, std::make_index_sequence<std::tuple_size<decltype(_aggregatorTuple)>::value>());
+        DispatchPrint(os, std::make_index_sequence<sizeof...(AggregatorTypes)>());
     }
 
-    template<typename PredictorType, typename AggregatorTupleType>
+    template<typename PredictorType, typename... AggregatorTypes>
     template<std::size_t ...Is>
-    void Evaluator<PredictorType, AggregatorTupleType>::DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Is...>)
+    void Evaluator<PredictorType, AggregatorTypes...>::DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Is...>)
     {
         // Call X.Update() for each X in _aggregatorTuple
-        auto dummy = {(std::get<Is>(_aggregatorTuple).Update(prediction, label, weight), 0)...}; // OMG!
+        auto dummy = {(std::get<Is>(_aggregatorTuple).Update(prediction, label, weight), 0)...}; 
     }
 
-    template<typename PredictorType, typename AggregatorTupleType>
+    template<typename PredictorType, typename... AggregatorTypes>
     template<std::size_t ...Is>
-    void Evaluator<PredictorType, AggregatorTupleType>::DispatchPrint(std::ostream& os, std::index_sequence<Is...>) const
+    void Evaluator<PredictorType, AggregatorTypes...>::Aggregate(std::index_sequence<Is...>)
     {
-        // Call X.ToString() for each X in _aggregatorTuple
-        std::vector<std::string> strings {std::get<Is>(_aggregatorTuple).ToString()...};
-
-        os << strings[0];
-        for(uint64_t i=1; i<strings.size(); ++i)
-        {
-            os << "\t" << strings[i];
-        }
-        os << std::endl;
+        // Call X.GetAndReset() for each X in _aggregatorTuple
+        auto valueTuple = std::make_tuple(std::get<Is>(_aggregatorTuple).GetAndReset()...);
+        _valueTuples.push_back(std::move(valueTuple));
     }
 
-    template<typename PredictorType, typename... AggregatorTupleType>
-    std::unique_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTupleType... aggregatorTuple)
+    template<typename PredictorType, typename... AggregatorTypes>
+    template<std::size_t ...Is>
+    void Evaluator<PredictorType, AggregatorTypes...>::DispatchPrint(std::ostream& os, std::index_sequence<Is...>) const
     {
-        return std::make_unique<Evaluator<PredictorType, std::tuple<AggregatorTupleType...>>>(exampleIterator, std::make_tuple(aggregatorTuple...));
+        for(const auto& valueTuple : _valueTuples)
+        {
+            // Call X.ToString() for each X in valueTuple
+            std::vector<std::string> strings {std::get<Is>(valueTuple).ToString()...};
+
+            os << strings[0];
+            for(uint64_t i = 1; i<strings.size(); ++i)
+            {
+                os << "\t" << strings[i];
+            }
+            os << std::endl;
+        }
+    }
+
+    template<typename PredictorType, typename... AggregatorTypes>
+    std::unique_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... aggregators)
+    {
+        return std::make_unique<Evaluator<PredictorType, AggregatorTypes...>>(exampleIterator, aggregators...);
     }
 }

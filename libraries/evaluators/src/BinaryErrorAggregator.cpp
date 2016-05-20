@@ -10,37 +10,44 @@
 
 namespace evaluators
 {
+    std::string BinaryErrorAggregator::Value::ToString() const 
+    {
+        double sumWeightFalse = sumWeightedFalsePositives + sumWeightedFalseNegatives;
+        double sumWeightTrue = sumWeightedTruePositives + sumWeightedTrueNegatives;
+        double errorRate = sumWeightFalse / (sumWeightTrue + sumWeightFalse);
+        return std::to_string(errorRate);
+    }
+
     void BinaryErrorAggregator::Update(double prediction, double label, double weight)
     {
         if (label > 0)
         {
             if (prediction > 0)
             {
-                _sumWeightedTruePositives += weight;
+                _value.sumWeightedTruePositives += weight;
             }
             else
             {
-                _sumWeightedFalseNegatives += weight;
+                _value.sumWeightedFalseNegatives += weight;
             }
         }
         else
         {
             if (prediction > 0)
             {
-                _sumWeightedFalsePositives += weight;
+                _value.sumWeightedFalsePositives += weight;
             }
             else
             {
-                _sumWeightedTrueNegatives += weight;
+                _value.sumWeightedTrueNegatives += weight;
             }
         }
     }
 
-    std::string BinaryErrorAggregator::ToString() const 
+    BinaryErrorAggregator::Value BinaryErrorAggregator::GetAndReset()
     {
-        double sumWeightFalse = _sumWeightedFalsePositives + _sumWeightedFalseNegatives;
-        double sumWeightTrue = _sumWeightedTruePositives + _sumWeightedTrueNegatives;
-        double errorRate = sumWeightFalse / (sumWeightTrue + sumWeightFalse);
-        return std::to_string(errorRate);
+        Value newValue;
+        std::swap(_value, newValue);
+        return newValue;
     }
 }
