@@ -6,24 +6,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//%module trainers
-
 %{
 #define SWIG_FILE_WITH_INIT
-#include "SGDIncrementalTrainer.h"
 #include "LogLoss.h"
 #include "HingeLoss.h"
 #include "SquaredLoss.h"
+#include "SGDIncrementalTrainer_wrap.h"
 %}
 
-%include "SGDIncrementalTrainer.h"
 
-// %template () trainers::IIncrementalTrainer<predictors::LinearPredictor>;
-
-class lossFunctions::LogLoss {};
-class lossFunctions::HingeLoss {};
-class lossFunctions::SquaredLoss {};
-class predictors::LinearPredictor {};
+%include "SGDIncrementalTrainer_wrap.h"
 
 %inline 
 %{
@@ -37,12 +29,9 @@ class predictors::LinearPredictor {};
     };
 %}
 
-
 %template (LogLossSGDTrainer) trainers::SGDIncrementalTrainer<lossFunctions::LogLoss>;
 %template (HingeLossSGDTrainer) trainers::SGDIncrementalTrainer<lossFunctions::HingeLoss>;
 %template (SquaredLossSGDTrainer) trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
-
-
 
 %extend trainers::SGDIncrementalTrainer<lossFunctions::LogLoss>
 {

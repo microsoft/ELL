@@ -45,7 +45,7 @@ namespace interfaces
         /// <summary> Returns the maximal size of any example. </summary>
         ///
         /// <returns> The maximal size of any example. </returns>
-        uint64_t GetMaxDataVectorSizeee() const;
+        uint64_t GetMaxDataVectorSize() const;
 
         /// <summary> Returns a reference to an example. </summary>
         ///

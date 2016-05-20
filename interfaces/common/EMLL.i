@@ -13,34 +13,58 @@
 #pragma SWIG nowarn=325,341,362,401,503
 #endif
 
+// Useful defines
 %{
-#define SWIG_FILE_WITH_INIT
-#define SWIG_PYTHON_EXTRA_NATIVE_CONTAINERS 
-#include <cstdint>
+#ifdef SWIGPYTHON
+  #define SWIG_FILE_WITH_INIT
+  #define SWIG_PYTHON_EXTRA_NATIVE_CONTAINERS 
+#endif
 %}
 
+// Include common STL libraries
+%{
+#include <cstdint>
+#include <sstream>
+#include <stdexcept>
+%}
+
+%include typemaps.i
 %include "exception.i" 
 %include "std_string.i"
+%include "std_vector.i"
+%include "std_shared_ptr.i"
+%include "unique_ptr.i"
 #ifdef SWIGPYTHON
 %include "std_iostream.i"  // Sadly, there is no std_iostream.i for C#
 #endif
-%include "std_vector.i"
-%include "std_shared_ptr.i"
+
+// Make trivial definitions for some things in std:: that SWIG chokes on, so we remember to call their constructors
+namespace std 
+{
+    class default_random_engine {};
+}
+
+// Redefine uint64_t to long so we can use it in python
+%typemap(in) uint64_t = unsigned long;
+%apply unsigned long {uint64_t}
+
+%typemap(in) int64_t = long;
+%apply long {int64_t}
 
 %template () std::vector<double>;
 %template () std::vector<float>;
 
-%{
-#include "StlIterator.h"
-%}
-
-namespace utilities
-{
-    template <typename ValueType>
-    class IIterator {}; 
-
-    template <typename IteratorType, typename ValueType> class StlIterator {};
-    %template () StlIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
+// Add some primitive exception handling
+%exception {
+    try { 
+        $action 
+    }
+    catch(std::runtime_error err) {
+        SWIG_exception(SWIG_RuntimeError, const_cast<char*>(err.what()));        
+    }    
+    catch (...) {
+        SWIG_exception(SWIG_RuntimeError, "Exception in EMLL library");
+    }
 }
 
 // Macro for exposing operator[] to python
@@ -67,51 +91,21 @@ namespace utilities
     };
 %enddef
 
-// Make trivial definitions for some things in std:: that SWIG chokes on, so we remember to call their constructors
-namespace std 
+// Things that get used a lot
+namespace lossFunctions {};
+namespace predictors {};
+
+namespace utilities
 {
-    class default_random_engine {};
+    template <typename ValueType>
+    class IIterator {}; 
+
+    template <typename IteratorType, typename ValueType> class StlIterator {};
+    %template () StlIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
+
+    template <typename IteratorType, typename ValueType> class StlIndexValueIterator {};
+    %template () StlIndexValueIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
 }
-
-// Redefine uint64_t to long so we can use them in python
-%typemap(in) uint64_t = unsigned long;
-%apply unsigned long {uint64_t}
-
-%typemap(in) int64_t = long;
-%apply long {int64_t}
-
-// Add some primitive exception handling
-%exception {
-    try { 
-        $action 
-    }
-    catch(std::runtime_error err) {
-        SWIG_exception(SWIG_RuntimeError, err.what());        
-    }    
-    catch (...) {
-        SWIG_exception(SWIG_RuntimeError, "Exception in EMLL library");
-    }
-}
-
-// Interface includes for layers library
-%include layers.i
-
-// Interface includes for dataset library
-%include dataset.i
-
-// Interface for common library
-%include common.i
-
-// Interface includes for utilities library
-%include utilities.i
-
-%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>, std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
-
-// Interface for the predictors library
-%include predictors.i
-
-// Interface includes for trainers library
-%include trainers.i
 
 // Interface includes for lossFunctions library
 %include lossFunctions.i
@@ -119,46 +113,34 @@ namespace std
 // Interface includes for linear library
 %include linear.i
 
-%include "unique_ptr.i"
+// Interface includes for layers library
+%include layers.i
+
+// Interface includes for dataset library
+%include dataset.i
+
+// Interface includes for utilities library
+%include utilities.i
+
+// Interface for the predictors library
+%include predictors.i
+
+// Interface includes for trainers library
+%include trainers.i
+
+// Interface for common library
+%include common.i
+
 wrap_unique_ptr(LayerPtr, layers::Layer)
 
 %template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>, std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 
-%inline %{
-typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> GenericRowIterator;
-%}
-
 %template () dataset::RowDataset<dataset::IDataVector>;
-
-class GenericRowIterator {};
-namespace predictors
-{
-    class LinearPredictor {};
-}
-namespace trainers
-{
-    template <typename LossFunction>
-    class SGDIncrementalTrainer
-    {
-    public:
-    typename predictors::LinearPredictor PredictorType;
-    };
-}
 %template () trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
 
+%inline %{
+%}
 typedef trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType predictors::LinearPredictor;
-
-
-%shared_ptr(layers::Map)
-%shared_ptr(layers::Model)
-//%shared_ptr(GenericRowDataset)
-%shared_ptr(RowDataset)
-%shared_ptr(predictors::LinearPredictor)
-%shared_ptr(predictors::LinearPredictor const)
-%shared_ptr(trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType);
-%shared_ptr(trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType const);
-%shared_ptr(predictors::LinearPredictor);
-%shared_ptr(predictors::LinearPredictor const);
-%shared_ptr(LinearPredictor);
+class trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType {};

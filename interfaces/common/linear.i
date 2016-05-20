@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//%module linear
-
 %{
 #define SWIG_FILE_WITH_INIT
 #include "DoubleVector.h"
@@ -24,6 +22,7 @@
 %ignore linear::DoubleVector::DoubleVector(std::vector<double> &&);
 
 %ignore linear::DoubleVector::operator[];
+%ignore linear::DoubleSubvector::operator[];
 %rename (GetValue) linear::DoubleVector::operator[](uint64_t) const;
 %rename (GetValue) linear::DoubleSubvector::operator[](uint64_t) const;
 %ignore linear::DoubleMatrixBase::operator()const;
@@ -32,7 +31,8 @@
 %include "DoubleVector.h"
 %include "DoubleSubvector.h"
 %include "DoubleMatrix.h"
-%include "IVector.h"
+
+//%include "IVector.h"
 %include "IMatrix.h"
 
 WRAP_OP_AT(linear::DoubleVector, double)

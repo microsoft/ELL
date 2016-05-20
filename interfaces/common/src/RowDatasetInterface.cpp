@@ -28,7 +28,7 @@ namespace interfaces
         return _dataset.NumExamples();
     }
 
-    uint64_t GenericRowDataset::GetMaxDataVectorSizeee() const
+    uint64_t GenericRowDataset::GetMaxDataVectorSize() const
     {
         return _dataset.GetMaxDataVectorSize();
     }

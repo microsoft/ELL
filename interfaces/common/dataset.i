@@ -6,38 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//%module dataset
-
 %{
-    #include <stdexcept>
-%}
-
-
-namespace dataset
-{
-    %ignore IDataVector::Clone;
-
-    %ignore GenericSupervisedExample::GenericSupervisedExample(GenericSupervisedExample&& other);
-    %ignore GenericSupervisedExample::GetDataVector;
-    %ignore GenericSupervisedExample::GenericSupervisedExample;
-    %ignore RowDataset::operator[];
-
-    %ignore DataRow<void>;
-    %ignore DenseDataVector::operator[];
-    %ignore DenseDataVector<double>;
-    %ignore DenseDataVector<float>;
-    %ignore SparseDataVector<double, utilities::CompressedIntegerList>;
-    %ignore SparseDataVector<float, utilities::CompressedIntegerList>;
-    %ignore SparseDataVector<short, utilities::CompressedIntegerList>;
-}
-
-namespace interfaces
-{
-    %ignore GenericRowDataset::GenericRowDataset(GenericRowDataset &&);
-}
-
-%{
-#define SWIG_FILE_WITH_INIT
+//#define SWIG_FILE_WITH_INIT
 #include "IVector.h"
 #include "DenseDataVector.h"
 #include "IDataVector.h"
@@ -46,6 +16,26 @@ namespace interfaces
 #include "RowDatasetInterface.h"
 %}
 
+namespace dataset
+{
+    %ignore IDataVector::Clone;
+    %ignore SupervisedExample(SupervisedExample<IDataVector>&& other);
+    %ignore GenericSupervisedExample::GenericSupervisedExample(GenericSupervisedExample&& other);
+    %ignore GenericSupervisedExample::GetDataVector;
+    %ignore GenericSupervisedExample::GenericSupervisedExample;
+    %ignore RowDataset::operator[];
+
+    %ignore DenseDataVector::operator[];
+    %ignore DenseDataVector<double>;
+    %ignore DenseDataVector<float>;
+    %ignore SparseDataVector<double, utilities::CompressedIntegerList>;
+    %ignore SparseDataVector<float, utilities::CompressedIntegerList>;
+    %ignore SparseDataVector<short, utilities::CompressedIntegerList>;
+}
+
+%ignore dataset::SupervisedExample<dataset::IDataVector>::SupervisedExample(SupervisedExample&&);
+%ignore interfaces::GenericRowDataset::GenericRowDataset(GenericRowDataset &&);
+
 %include "noncopyable.i"
 
 %include "IVector.h"
@@ -53,7 +43,7 @@ namespace interfaces
 %include "IDataVector.h"
 %include "SparseDataVector.h"
 %include "SupervisedExample.h"
-%include "RowDataset.h"
+// %include "RowDataset.h"
 
 namespace dataset
 {
@@ -78,7 +68,7 @@ namespace dataset
     %template () SparseDataVector<float, utilities::CompressedIntegerList>;
     %template () SparseDataVector<short, utilities::CompressedIntegerList>;
 
-    %template () RowDataset<IDataVector>;
+//    %template () RowDataset<IDataVector>;
     
     // Bafflingly, the below causes SWIG to give an error about no default constructor for SparseDataVector<>
     // %template (SparseDoubleDataVectorBase) SparseDataVector<double, utilities::CompressedIntegerList>;
@@ -97,6 +87,3 @@ namespace dataset
     WRAP_PRINT_TO_STR(SparseFloatDataVector) 
     WRAP_PRINT_TO_STR(SparseShortDataVector)
 }
-
-// This is necessary for us to avoid leaking memory:
-// %template () interfaces::GenericRowDataset::Iterator;

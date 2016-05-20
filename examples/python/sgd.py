@@ -70,8 +70,8 @@ def sgd():
         trainer.Update(trainSetIterator)  
 
         evalIterator = dataset.GetIterator()
-        predictor = trainer.GetPredictor() 
-        evaluator.Eval(evalIterator, predictor) 
+        predictor = trainer.GetPredictor()
+        evaluator.Evaluate(evalIterator, predictor) 
         
     print "Training Error:"
     print "binary classification evaluation"

@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//%module utilities
-
 %include "stl.i"
 
 %ignore utilities::operator<<;
@@ -33,9 +31,9 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 %include "BinaryClassificationEvaluator.h"
 %include "AnyIterator.h"
 %include "RandomEngines.h"
-%include "RowDataset.h"
+%import "RowDataset.h"
 
-%include "SGDIncrementalTrainer.h"
+%import "SGDIncrementalTrainer_wrap.h"
 
 // This is necessary for us to avoid leaking memory:
 // %template (SupervisedExampleIterator) utilities::AnyIterator<dataset::SupervisedExample<dataset::IDataVector>>;
@@ -56,14 +54,16 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 %template (LinearHingeLossClassificationEvaluator) utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::HingeLoss>;
 %template (LinearSquaredLossClassificationEvaluator) utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::SquaredLoss>;
 
+%template () trainers::SGDIncrementalTrainer<lossFunctions::LogLoss>;
+%template () trainers::SGDIncrementalTrainer<lossFunctions::HingeLoss>;
 %template () trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
+
 typedef predictors::LinearPredictor trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::Predictor;
 
 %ignore utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss>::Evaluate;
-
 %extend utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss>
 {
-    void Eval(dataset::GenericRowIterator& dataIterator, std::shared_ptr<const predictors::LinearPredictor> predictor)
+    void Evaluate(dataset::GenericRowIterator& dataIterator, std::shared_ptr<const predictors::LinearPredictor> predictor)
     {
         ($self)->Evaluate(dataIterator, *predictor);
     }
