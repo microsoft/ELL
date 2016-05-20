@@ -11,8 +11,8 @@
 namespace evaluators
 {
     template<typename PredictorType, typename... AggregatorTypes>
-    Evaluator<PredictorType, AggregatorTypes...>::Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... aggregators)
-        : _rowDataset(exampleIterator), _aggregatorTuple(std::make_tuple(aggregators...))
+    Evaluator<PredictorType, AggregatorTypes...>::Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
+        : _rowDataset(exampleIterator), _evaluatorParameters(evaluatorParameters), _aggregatorTuple(std::make_tuple(aggregators...))
     {
         static_assert(sizeof...(AggregatorTypes) > 0, "Evaluator must contains at least one aggregator");
     }
@@ -88,8 +88,8 @@ namespace evaluators
     }
 
     template<typename PredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... aggregators)
+    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
     {
-        return std::make_unique<Evaluator<PredictorType, AggregatorTypes...>>(exampleIterator, aggregators...);
+        return std::make_unique<Evaluator<PredictorType, AggregatorTypes...>>(exampleIterator, evaluatorParameters, aggregators...);
     }
 }

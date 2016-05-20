@@ -21,6 +21,12 @@
 
 namespace evaluators
 {
+    struct EvaluatorParameters
+    {
+        uint64_t evaluationFrequency = 1;
+        bool addZeroEvaluation = true;
+    };
+
     /// <summary> Implements an evaluator that holds a dataset and a set of evaluation aggregators. </summary>
     ///
     /// <typeparam name="PredictorType"> The predictor type. </typeparam>
@@ -30,11 +36,12 @@ namespace evaluators
     {
     public:
 
-        /// <summary> Constructs an instance of Evaluator with a given dataset and given aggregators </summary>
+        /// <summary> Constructs an instance of Evaluator with a given dataset and given aggregators. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the evaluation set. </param>
+        /// <param name="evaluatorParameters"> The evaluation parameters. </param>
         /// <param name="aggregators"> The aggregators. </param>
-        Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... aggregators);
+        Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 
         /// <summary> Runs the given predictor on the evaluation set, invokes each of the aggregators on the output, and logs the result. </summary>
         ///
@@ -58,6 +65,7 @@ namespace evaluators
 
         // member variables
         dataset::GenericRowDataset _rowDataset;
+        EvaluatorParameters _evaluatorParameters;
         typename std::tuple<AggregatorTypes...> _aggregatorTuple;
         std::vector<std::tuple<typename AggregatorTypes::Value...>> _valueTuples;
     };
@@ -71,7 +79,7 @@ namespace evaluators
     ///
     /// <returns> A unique_ptr to an IEvaluator. </returns>
     template<typename PredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... aggregators);
+    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 }
 
 #include "../tcc/Evaluator.tcc"

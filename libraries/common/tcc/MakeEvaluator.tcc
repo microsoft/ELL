@@ -20,20 +20,20 @@
 namespace common
 {
     template<typename PredictorType>
-    std::shared_ptr<evaluators::IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const LossArguments& lossArguments)
+    std::shared_ptr<evaluators::IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const evaluators::EvaluatorParameters& evaluatorParameters, const LossArguments& lossArguments)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
         switch(lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluators::BinaryErrorAggregator(), evaluators::MakeLossAggregator(lossFunctions::SquaredLoss()));
+            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::MakeLossAggregator(lossFunctions::SquaredLoss()));
 
         case LossFunctionEnum::log:
-            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluators::BinaryErrorAggregator(), evaluators::MakeLossAggregator(lossFunctions::LogLoss(lossArguments.lossFunctionParameter)));
+            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::MakeLossAggregator(lossFunctions::LogLoss(lossArguments.lossFunctionParameter)));
 
         case LossFunctionEnum::hinge:
-            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluators::BinaryErrorAggregator(), evaluators::MakeLossAggregator(lossFunctions::HingeLoss()));
+            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::MakeLossAggregator(lossFunctions::HingeLoss()));
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this evaluator");

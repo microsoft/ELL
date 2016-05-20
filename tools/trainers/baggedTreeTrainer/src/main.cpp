@@ -28,6 +28,7 @@
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 
+#include "EvaluatorArguments.h"
 #include "DataLoaders.h"
 #include "LoadModel.h"
 #include "MakeTrainer.h"
@@ -61,6 +62,7 @@ int main(int argc, char* argv[])
         common::ParsedMapSaveArguments mapSaveArguments;
         common::ParsedSortingTreeTrainerArguments sortingTreeTrainerArguments;
         common::ParsedBaggingIncrementalTrainerArguments baggingIncrementalTrainerArguments;
+        common::ParsedEvaluatorArguments evaluatorArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
@@ -68,7 +70,8 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(sortingTreeTrainerArguments);
         commandLineParser.AddOptionSet(baggingIncrementalTrainerArguments);
-        
+        commandLineParser.AddOptionSet(evaluatorArguments);
+
         // parse command line
         commandLineParser.Parse();
 
@@ -96,7 +99,7 @@ int main(int argc, char* argv[])
         std::shared_ptr<evaluators::IEvaluator<predictors::EnsemblePredictor<predictors::DecisionTreePredictor>>> evaluator = nullptr;
         if(trainerArguments.verbose)
         {
-            evaluator = common::MakeEvaluator<predictors::EnsemblePredictor<predictors::DecisionTreePredictor>>(rowDataset.GetIterator(), trainerArguments.lossArguments);
+            evaluator = common::MakeEvaluator<predictors::EnsemblePredictor<predictors::DecisionTreePredictor>>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
         }
 
         // create trainer

@@ -27,6 +27,7 @@
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 
+#include "EvaluatorArguments.h"
 #include "DataLoaders.h"
 #include "LoadModel.h"
 #include "MakeTrainer.h"
@@ -65,6 +66,7 @@ int main(int argc, char* argv[])
         common::ParsedMapSaveArguments mapSaveArguments;
         common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
+        common::ParsedEvaluatorArguments evaluatorArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
@@ -72,7 +74,8 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
         commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
-        
+        commandLineParser.AddOptionSet(evaluatorArguments);
+
         // parse command line
         commandLineParser.Parse();
 
@@ -100,7 +103,7 @@ int main(int argc, char* argv[])
         std::shared_ptr<evaluators::IEvaluator<predictors::LinearPredictor>> evaluator = nullptr;
         if(trainerArguments.verbose)
         {
-            evaluator = common::MakeEvaluator<predictors::LinearPredictor>(rowDataset.GetIterator(), trainerArguments.lossArguments);
+            evaluator = common::MakeEvaluator<predictors::LinearPredictor>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
         }
 
         // create sgd trainer

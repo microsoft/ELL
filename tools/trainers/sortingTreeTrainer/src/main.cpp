@@ -25,7 +25,7 @@
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
-#include "DataLoadArguments.h" 
+#include "DataLoadArguments.h"
 #include "DataLoaders.h"
 #include "LoadModel.h"
 #include "MakeTrainer.h"
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
             std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
 
             // evaluate
-            auto evaluator = common::MakeEvaluator<predictors::DecisionTreePredictor>(rowDataset.GetIterator(), trainerArguments.lossArguments);
+            auto evaluator = common::MakeEvaluator<predictors::DecisionTreePredictor>(rowDataset.GetIterator(), evaluators::EvaluatorParameters(), trainerArguments.lossArguments);
             evaluator->Evaluate(tree);
             std::cout << "Training error\n";
             evaluator->Print(std::cout);
