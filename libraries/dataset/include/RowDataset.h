@@ -29,8 +29,6 @@ namespace dataset
     public:
         using ExampleType = SupervisedExample<DataVectorType>;
         using Iterator = utilities::VectorIterator<ExampleType>;
-//        typedef SupervisedExample<DataVectorType> ExampleType;
-//        typedef utilities::VectorIterator<ExampleType> Iterator;
 
         RowDataset() = default;
 
@@ -125,8 +123,8 @@ namespace dataset
     };
 
     typedef RowDataset<IDataVector> GenericRowDataset;
-    typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> GenericRowIterator;
-
+    typedef GenericRowDataset::Iterator GenericRowIterator;
+    
     template<typename DataVectorType>
     std::ostream& operator<<(std::ostream& os, RowDataset<DataVectorType>& dataset);
 }

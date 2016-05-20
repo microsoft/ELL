@@ -55,7 +55,7 @@ namespace trainers
         /// <summary> Performs an epoch of SGD iterations. </summary>
         ///
         /// <param name="exampleIterator"> [in,out] The data iterator. </param>
-        virtual void Update(dataset::GenericRowIterator exampleIterator) override;
+        virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
 
         /// <summary> Returns The averaged predictor. </summary>
         ///
