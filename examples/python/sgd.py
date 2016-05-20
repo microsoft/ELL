@@ -67,15 +67,15 @@ def sgd():
 
         # iterate over the entire permuted dataset
         trainSetIterator = dataset.GetIterator(0, epochSize)
-        trainer.Update(trainSetIterator)  
+        trainer.Update(trainSetIterator)
 
         evalIterator = dataset.GetIterator()
         predictor = trainer.GetPredictor()
+        evaluator.Evaluate(evalIterator, predictor)
+        print "{}".format(evaluator.GetLastLoss())
         
-    print "Training Error:"
     print "binary classification evaluation"
-    print "loss\terror"
-    print "{0}\t{1}".format(evaluator.GetLastLoss(), evaluator.GetLastError())
+    print "Loss: {0}\tError: {1}".format(evaluator.GetLastLoss(), evaluator.GetLastError())
     
     # update the map with the newly learned layers
     predictor = trainer.GetPredictor()

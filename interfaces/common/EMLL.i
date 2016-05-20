@@ -95,6 +95,7 @@ namespace std
 namespace lossFunctions {};
 namespace predictors {};
 
+%import "RowDataset.h"
 %import "IDataVector.h"
 
 %template () std::vector<dataset::IDataVector>;
@@ -104,6 +105,7 @@ namespace dataset
 }
 
 typedef dataset::RowDataset<IDataVector> dataset::GenericRowDataset;
+typedef dataset::GenericRowDataset::Iterator dataset::GenericRowIterator;
 
 namespace utilities
 {
@@ -149,20 +151,6 @@ typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<d
 %include common.i
 
 wrap_unique_ptr(LayerPtr, layers::Layer)
-
-/*
-    /// <summary> Interace for a binary classification evaluator. </summary>
-    template<typename PredictorType>
-    class IBinaryClassificationEvaluator
-    {
-    public:
-//        typedef dataset::GenericRowDataset::Iterator ExampleIteratorType;
-        typedef dataset::SupervisedExample<dataset::IDataVector> ExampleType;
-        typedef utilities::StlIterator<typename std::vector<ExampleType>::const_iterator> ExampleIteratorType;
-}
-*/
-
-// %template () utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>::ExampleIteratorType;
 
 %template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;

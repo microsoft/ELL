@@ -85,7 +85,7 @@ foreach(file ${INTERFACE_FILES})
 endforeach()
 
 # -debug-classes -debug-typedef 
-set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft) # -debug-template)
+set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft) # for debugging type-related problems, try adding these flags: -debug-typedef  -debug-template)
 set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${EXTRA_INTERFACE})
 
 foreach(file ${INTERFACE_INCLUDE})

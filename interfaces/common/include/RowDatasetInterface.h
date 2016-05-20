@@ -18,8 +18,15 @@
 #include <vector>
 #include <random>
 
+namespace dataset
+{
+    typedef GenericRowDataset::Iterator GenericRowIterator;
+}
+
+
 namespace interfaces
 {
+
     class GenericRowDataset
     {
     public:

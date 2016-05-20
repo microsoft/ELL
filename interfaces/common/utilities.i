@@ -29,7 +29,7 @@
 template <typename IteratorType, typename ValueType> class StlIterator {};
 
 
-%include "BinaryClassificationEvaluator.h"
+%include "BinaryClassificationEvaluator_wrap.h"
 %include "AnyIterator.h"
 %include "RandomEngines.h"
 %include "RowDataset.h"
@@ -41,10 +41,6 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 
 %template () dataset::SupervisedExample<dataset::IDataVector>;
 %template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
-namespace dataset
-{
-//    typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> GenericRowIterator;
-}
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 
 // TODO: need to make SWIG aware of utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>::ExampleIteratorType
@@ -57,7 +53,7 @@ namespace dataset
 %include "HingeLoss.h"
 %include "SquaredLoss.h"
 
-%template () utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>;
+//%template () utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>;
 %template (LinearLogLossClassificationEvaluator) utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss>;
 %template (LinearHingeLossClassificationEvaluator) utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::HingeLoss>;
 %template (LinearSquaredLossClassificationEvaluator) utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::SquaredLoss>;
@@ -70,3 +66,7 @@ typedef predictors::LinearPredictor trainers::SGDIncrementalTrainer<lossFunction
 
 typedef dataset::GenericRowDataset::Iterator utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>::ExampleIteratorType;
 typedef dataset::RowDataset<dataset::IDataVector>::Iterator utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>::ExampleIteratorType;
+
+%ignore utilities::BinaryClassificationEvaluator::Evaluate;
+
+// TODO: wrap print
