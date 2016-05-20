@@ -219,7 +219,8 @@ namespace trainers
     {
         os << "Priority Queue Size: " << size() << "\n";
 
-        for(const auto& candidate : c) // c is a protected member of std::priority_queue
+        // TODO: use the heapify routines on a normal vector if we want to iterate over the items
+        for(const auto& candidate : std::priority_queue<SplitCandidate>::c) // c is a protected member of std::priority_queue
         {
             candidate.Print(os, dataset);
         }
