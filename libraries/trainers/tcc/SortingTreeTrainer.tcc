@@ -219,7 +219,7 @@ namespace trainers
     {
         os << "Priority Queue Size: " << size() << "\n";
 
-        for(const auto& candidate : c) // c is a protected member of std::priority_queue
+        for(const auto& candidate : std::priority_queue<SplitCandidate>::c) // c is a protected member of std::priority_queue
         {
             candidate.Print(os, dataset);
         }

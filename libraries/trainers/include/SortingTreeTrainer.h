@@ -80,6 +80,7 @@ namespace trainers
         struct PriorityQueue : public std::priority_queue<SplitCandidate>
         {
             void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
+            using std::priority_queue<SplitCandidate>::size;
         };
 
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator) const;
