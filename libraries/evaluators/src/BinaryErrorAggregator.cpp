@@ -14,9 +14,10 @@ namespace evaluators
     {
         double allFalse = falsePositives + falseNegatives;
         double allTrue = truePositives + trueNegatives;
+
         double errorRate = allFalse / (allTrue + allFalse);
-        double precision = truePositives / (truePositives + falsePositives);
-        double recall = truePositives / (truePositives + falseNegatives);
+        double precision = truePositives == 0.0 ? 0.0 : truePositives / (truePositives + falsePositives);
+        double recall = truePositives == 0.0 ? 0.0 : truePositives / (truePositives + falseNegatives);
         return std::to_string(errorRate) + '\t' + std::to_string(precision) + '\t' + std::to_string(recall);
     }
 
@@ -35,7 +36,7 @@ namespace evaluators
         }
         else
         {
-            if (prediction > 0)
+            if (prediction >= 0)
             {
                 _value.falsePositives += weight;
             }

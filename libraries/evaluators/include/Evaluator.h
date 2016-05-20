@@ -54,6 +54,8 @@ namespace evaluators
         virtual void Print(std::ostream& os) const override;
 
     private:
+        void EvaluateZero();
+
         template<std::size_t ...Is>
         void DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Is...>);
 
@@ -66,6 +68,7 @@ namespace evaluators
         // member variables
         dataset::GenericRowDataset _rowDataset;
         EvaluatorParameters _evaluatorParameters;
+        uint64_t _evaluateCounter = 0;
         typename std::tuple<AggregatorTypes...> _aggregatorTuple;
         std::vector<std::tuple<typename AggregatorTypes::Value...>> _valueTuples;
     };

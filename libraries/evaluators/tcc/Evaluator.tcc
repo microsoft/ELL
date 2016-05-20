@@ -15,11 +15,22 @@ namespace evaluators
         : _rowDataset(exampleIterator), _evaluatorParameters(evaluatorParameters), _aggregatorTuple(std::make_tuple(aggregators...))
     {
         static_assert(sizeof...(AggregatorTypes) > 0, "Evaluator must contains at least one aggregator");
+
+        if(_evaluatorParameters.addZeroEvaluation)
+        {
+            EvaluateZero();
+        }
     }
 
     template<typename PredictorType, typename... AggregatorTypes>
     void Evaluator<PredictorType, AggregatorTypes...>::Evaluate(const PredictorType& predictor)
     {
+        ++_evaluateCounter;
+        if(_evaluateCounter % _evaluatorParameters.evaluationFrequency != 0)
+        {
+            return;
+        }
+
         auto iterator = _rowDataset.GetIterator();
 
         while (iterator.IsValid())
@@ -40,6 +51,24 @@ namespace evaluators
     void Evaluator<PredictorType, AggregatorTypes...>::Print(std::ostream& os) const
     {
         DispatchPrint(os, std::make_index_sequence<sizeof...(AggregatorTypes)>());
+    }
+
+    template<typename PredictorType, typename... AggregatorTypes>
+    void Evaluator<PredictorType, AggregatorTypes...>::EvaluateZero()
+    {
+        auto iterator = _rowDataset.GetIterator();
+
+        while (iterator.IsValid())
+        {
+            const auto& example = iterator.Get();
+
+            double weight = example.GetWeight();
+            double label = example.GetLabel();
+
+            DispatchUpdate(0.0, label, weight, std::make_index_sequence<sizeof...(AggregatorTypes)>());
+            iterator.Next();
+        }
+        Aggregate(std::make_index_sequence<sizeof...(AggregatorTypes)>());
     }
 
     template<typename PredictorType, typename... AggregatorTypes>
