@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 
         if(trainerArguments.verbose)
         {
-            std::cout << "Bagging Tree Trainer" << std::endl;
+            std::cout << "Bagged Tree Trainer" << std::endl;
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 

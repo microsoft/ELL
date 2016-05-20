@@ -46,7 +46,7 @@ namespace evaluators
         /// <summary> Gets a header that describes Value::ToString(). </summary>
         ///
         /// <returns> The header string. </returns>
-        std::string GetHeader() const { return "ErrorRate\tPrecision\tRecall"; }
+        std::string GetHeader() const { return "ErrorRate\tPrecision\tRecall\tTP\tFP\tTN\tFN"; }
 
     private:
         Value _value;
