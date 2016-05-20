@@ -15,7 +15,7 @@ namespace evaluators
     }
 
     template<typename LossFunctionType>
-    LossAggregator<LossFunctionType>::LossAggregator(const LossFunctionType& lossFunction) : _lossFunction(lossFunction)
+    LossAggregator<LossFunctionType>::LossAggregator(LossFunctionType lossFunction) : _lossFunction(std::move(lossFunction))
     {}
 
     template<typename LossFunctionType>
@@ -33,4 +33,11 @@ namespace evaluators
         std::swap(_value, newValue);
         return newValue;
     }
+
+    template <typename LossFunctionType>
+    LossAggregator<LossFunctionType> MakeLossAggregator(LossFunctionType lossFunction)
+    {
+        return LossAggregator<LossFunctionType>(std::move(lossFunction));
+    }
+
 }

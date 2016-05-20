@@ -11,7 +11,6 @@
 #include "OutputStreamImpostor.h"
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
-#include "BinaryClassificationEvaluator.h"
 
 // layers
 #include "Map.h"
@@ -105,10 +104,9 @@ int main(int argc, char* argv[])
         {
             std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
 
-            auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::DecisionTreePredictor>(trainerArguments.lossArguments);
-            auto evaluationIterator = rowDataset.GetIterator(0, 1000);
-            evaluator->Evaluate(evaluationIterator, tree);
-
+            // evaluate
+            auto evaluator = common::MakeEvaluator<predictors::DecisionTreePredictor>(rowDataset.GetIterator(), trainerArguments.lossArguments);
+            evaluator->Evaluate(tree);
             std::cout << "Training error\n";
             evaluator->Print(std::cout);
             std::cout << std::endl;

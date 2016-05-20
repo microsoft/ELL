@@ -11,7 +11,6 @@
 #include "OutputStreamImpostor.h" 
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
-#include "BinaryClassificationEvaluator.h"
 
 // layers
 #include "Map.h"
@@ -98,11 +97,14 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
         // create evaluator
-        auto evaluationIterator = rowDataset.GetIterator();
-        auto evaluator = evaluators::MakeEvaluator<predictors::LinearPredictor>(evaluationIterator, evaluators::BinaryErrorAggregator());
+        std::shared_ptr<evaluators::IEvaluator<predictors::LinearPredictor>> evaluator = nullptr;
+        if(trainerArguments.verbose)
+        {
+            evaluator = common::MakeEvaluator<predictors::LinearPredictor>(rowDataset.GetIterator(), trainerArguments.lossArguments);
+        }
 
         // create sgd trainer
-        auto sgdIncrementalTrainer = MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
+        auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
         auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments, evaluator);
 
         // train
@@ -115,12 +117,12 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose)
         {
             std::cout << "Finished training.\n";
-        }
 
-        // print evaluation
-        std::cout << "Training error\n";
-        evaluator->Print(std::cout);
-        std::cout << std::endl;
+            // print evaluation
+            std::cout << "Training error\n";
+            evaluator->Print(std::cout);
+            std::cout << std::endl;
+        }
 
         // add predictor to the model
         predictor->AddToModel(model, outputCoordinateList);

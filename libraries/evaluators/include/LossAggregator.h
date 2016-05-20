@@ -32,7 +32,7 @@ namespace evaluators
         /// <summary> Constructs an instance of LossAggregator with a given loss. </summary>
         ///
         /// <param name="lossFunction"> The loss function. </param>
-        LossAggregator(const LossFunctionType& lossFunction);
+        LossAggregator(LossFunctionType lossFunction);
 
         /// <summary> Updates this aggregator. </summary>
         ///
@@ -55,6 +55,9 @@ namespace evaluators
         LossFunctionType _lossFunction;
         Value _value;
     };
+
+    template <typename LossFunctionType>
+    LossAggregator<LossFunctionType> MakeLossAggregator(LossFunctionType lossFunction);
 }
 
 #include "../tcc/LossAggregator.tcc"

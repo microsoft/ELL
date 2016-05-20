@@ -12,7 +12,6 @@
 #include "OutputStreamImpostor.h"
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
-#include "BinaryClassificationEvaluator.h"
 
 // layers
 #include "Map.h"
@@ -36,6 +35,9 @@
 
 // trainers
 #include "SortingTreeTrainer.h"
+
+// evaluators
+#include "IEvaluator.h"
 
 // lossFunctions
 #include "SquaredLoss.h"
@@ -90,9 +92,16 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
+        // create evaluator
+        std::shared_ptr<evaluators::IEvaluator<predictors::EnsemblePredictor<predictors::DecisionTreePredictor>>> evaluator = nullptr;
+        if(trainerArguments.verbose)
+        {
+            evaluator = common::MakeEvaluator<predictors::EnsemblePredictor<predictors::DecisionTreePredictor>>(rowDataset.GetIterator(), trainerArguments.lossArguments);
+        }
+
         // create trainer
         auto baseTrainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
-        auto trainer = trainers::MakeBaggingIncrementalTrainer(std::move(baseTrainer), baggingIncrementalTrainerArguments);
+        auto trainer = trainers::MakeBaggingIncrementalTrainer(std::move(baseTrainer), baggingIncrementalTrainerArguments, evaluator);
         
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
@@ -105,10 +114,7 @@ int main(int argc, char* argv[])
         {
             std::cout << "Finished training.\n";
 
-            auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::EnsemblePredictor<predictors::DecisionTreePredictor>>(trainerArguments.lossArguments);
-            auto evaluationIterator = rowDataset.GetIterator();
-            evaluator->Evaluate(evaluationIterator, *predictor);
-
+            // print evaluation
             std::cout << "Training error\n";
             evaluator->Print(std::cout);
             std::cout << std::endl;
