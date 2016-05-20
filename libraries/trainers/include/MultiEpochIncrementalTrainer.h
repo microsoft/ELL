@@ -13,6 +13,9 @@
 // dataset
 #include "RowDataset.h"
 
+// evaluators
+#include "IEvaluator.h"
+
 //stl
 #include <utility>
 #include <memory>
@@ -41,7 +44,10 @@ namespace trainers
         /// <summary> Constructs an instance of MultiEpochIncrementalTrainer. </summary>
         ///
         /// <param name="incrementalTrainer"> [in,out] The stateful trainer. </param>
-        MultiEpochIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochIncrementalTrainerParameters& parameters);
+        MultiEpochIncrementalTrainer(
+            std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, 
+            const MultiEpochIncrementalTrainerParameters& parameters, 
+            std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator);
 
         /// <summary> Perform a set of training epochs. </summary>
         ///
@@ -56,6 +62,7 @@ namespace trainers
     private:
         std::unique_ptr<IIncrementalTrainer<PredictorType>> _incrementalTrainer;
         MultiEpochIncrementalTrainerParameters _parameters;
+        std::shared_ptr<evaluators::IEvaluator<PredictorType>> _evaluator;
         mutable std::default_random_engine _random;
     };
 
@@ -67,7 +74,10 @@ namespace trainers
     ///
     /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
     template <typename PredictorType>
-    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochIncrementalTrainerParameters& parameters);
+    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(
+        std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, 
+        const MultiEpochIncrementalTrainerParameters& parameters, 
+        std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr);
 }
 
 #include "../tcc/MultiEpochIncrementalTrainer.tcc"

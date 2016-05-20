@@ -57,10 +57,11 @@ include_directories(../linear/include)
 include_directories(../utilities/include)
 include_directories(../lossFunctions/include)
 include_directories(../predictors/include)
+include_directories(../evaluators/include)
 include_directories(../trainers/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_link_libraries(${PROJ_NAME} dataset layers linear utilities lossFunctions predictors trainers)
+target_link_libraries(${PROJ_NAME} dataset layers linear utilities lossFunctions predictors evaluators trainers)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 

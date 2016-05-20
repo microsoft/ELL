@@ -12,8 +12,8 @@
 namespace trainers
 {
     template<typename BasePredictorType>
-    BaggingIncrementalTrainer<BasePredictorType>::BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters) :
-        _trainer(std::move(trainer)), _baggingParameters(baggingParameters), _ensemble(std::make_shared<PredictorType>()), _random(utilities::GetRandomEngine(baggingParameters.dataPermutationRandomSeed))
+    BaggingIncrementalTrainer<BasePredictorType>::BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters, std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator) :
+        _trainer(std::move(trainer)), _baggingParameters(baggingParameters), _ensemble(std::make_shared<PredictorType>()), _evaluator(std::move(evaluator)), _random(utilities::GetRandomEngine(baggingParameters.dataPermutationRandomSeed))
     {}
 
     template<typename BasePredictorType>
@@ -40,12 +40,21 @@ namespace trainers
 
             // append weak predictor to the ensemble
             _ensemble->AppendPredictor(_trainer->Train(trainSetIterator), weight);
+
+            // evaluate
+            if (_evaluator != nullptr)
+            {
+                _evaluator->Evaluate(*_ensemble);
+            }
         }
     }
 
     template<typename BasePredictorType>
-    std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters)
+    std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(
+        std::unique_ptr<ITrainer<BasePredictorType>>&& trainer,
+        const BaggingIncrementalTrainerParameters& baggingParameters, 
+        std::shared_ptr<evaluators::IEvaluator<predictors::EnsemblePredictor<BasePredictorType>>> evaluator)
     {
-        return std::make_unique<BaggingIncrementalTrainer<BasePredictorType>>(std::move(trainer), baggingParameters);
+        return std::make_unique<BaggingIncrementalTrainer<BasePredictorType>>(std::move(trainer), baggingParameters, std::move(evaluator));
     }
 }

@@ -88,7 +88,7 @@ namespace evaluators
     }
 
     template<typename PredictorType, typename... AggregatorTypes>
-    std::unique_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... aggregators)
+    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... aggregators)
     {
         return std::make_unique<Evaluator<PredictorType, AggregatorTypes...>>(exampleIterator, aggregators...);
     }

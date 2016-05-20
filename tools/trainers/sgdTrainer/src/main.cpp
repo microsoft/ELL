@@ -50,6 +50,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <tuple>
+#include <memory>
 
 int main(int argc, char* argv[])
 {
@@ -96,9 +97,13 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
+        // create evaluator
+        auto evaluationIterator = rowDataset.GetIterator();
+        auto evaluator = evaluators::MakeEvaluator<predictors::LinearPredictor>(evaluationIterator, evaluators::BinaryErrorAggregator());
+
         // create sgd trainer
         auto sgdIncrementalTrainer = MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
-        auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments);
+        auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments, evaluator);
 
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
@@ -110,16 +115,12 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose)
         {
             std::cout << "Finished training.\n";
-
-            auto evaluationIterator = rowDataset.GetIterator();
-            lossFunctions::LogLoss logLoss;
-            auto evaluator = evaluators::MakeEvaluator<predictors::LinearPredictor>(evaluationIterator, evaluators::BinaryErrorAggregator(), evaluators::LossAggregator<lossFunctions::LogLoss>(logLoss));
-            evaluator->Evaluate(*trainer->GetPredictor());
-
-            std::cout << "Training error\n";
-            evaluator->Print(std::cout); 
-            std::cout << std::endl;
         }
+
+        // print evaluation
+        std::cout << "Training error\n";
+        evaluator->Print(std::cout);
+        std::cout << std::endl;
 
         // add predictor to the model
         predictor->AddToModel(model, outputCoordinateList);

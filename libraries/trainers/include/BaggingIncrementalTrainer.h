@@ -14,6 +14,9 @@
 // predictors
 #include "EnsemblePredictor.h"
 
+// evaluators
+#include "IEvaluator.h"
+
 namespace trainers
 {
     /// <summary> Parameters for the bagging incremental trainer. </summary>
@@ -38,7 +41,7 @@ namespace trainers
         /// <summary> Constructs an instance of SingleEpochTrainer. </summary>
         ///
         /// <param name="incrementalTrainer"> [in,out] The stateful trainer. </param>
-        BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters);
+        BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters, std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator);
 
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
         ///
@@ -53,6 +56,7 @@ namespace trainers
     private:
         std::unique_ptr<ITrainer<BasePredictorType>> _trainer;
         BaggingIncrementalTrainerParameters _baggingParameters;
+        std::shared_ptr<evaluators::IEvaluator<PredictorType>> _evaluator;
         std::shared_ptr<PredictorType> _ensemble;
         std::default_random_engine _random;
     };
@@ -65,7 +69,10 @@ namespace trainers
     ///
     /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
     template <typename BasePredictorType>
-    std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters);
+    std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(
+        std::unique_ptr<ITrainer<BasePredictorType>>&& trainer,
+        const BaggingIncrementalTrainerParameters& baggingParameters,
+        std::shared_ptr<evaluators::IEvaluator<predictors::EnsemblePredictor<BasePredictorType>>> evaluator = nullptr);
 }
 
 #include "../tcc/BaggingIncrementalTrainer.tcc"

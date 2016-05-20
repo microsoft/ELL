@@ -71,7 +71,7 @@ namespace evaluators
     ///
     /// <returns> A unique_ptr to an IEvaluator. </returns>
     template<typename PredictorType, typename... AggregatorTypes>
-    std::unique_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... aggregators);
+    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, AggregatorTypes... aggregators);
 }
 
 #include "../tcc/Evaluator.tcc"
