@@ -21,6 +21,9 @@
 #include "Model.h"
 %}
 
+//%import "Model.h"
+//%import "ModelInterface.h"
+
 %shared_ptr(predictors::LinearPredictor) 
 %include "LinearPredictor.h"
 %include "DecisionTreePredictor.h"

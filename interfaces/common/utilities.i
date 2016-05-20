@@ -31,14 +31,20 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 %include "BinaryClassificationEvaluator.h"
 %include "AnyIterator.h"
 %include "RandomEngines.h"
-%import "RowDataset.h"
+%include "RowDataset.h"
 
-%import "SGDIncrementalTrainer_wrap.h"
+%include "SGDIncrementalTrainer_wrap.h"
 
 // This is necessary for us to avoid leaking memory:
 // %template (SupervisedExampleIterator) utilities::AnyIterator<dataset::SupervisedExample<dataset::IDataVector>>;
 
-//%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
+%template () dataset::SupervisedExample<dataset::IDataVector>;
+%template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
+namespace dataset
+{
+    typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> GenericRowIterator;
+}
+%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 
 // TODO: need to make SWIG aware of utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>::ExampleIteratorType
 // and that it's the same as dataset::GenericRowDataset::Iterator
@@ -63,7 +69,7 @@ typedef predictors::LinearPredictor trainers::SGDIncrementalTrainer<lossFunction
 %ignore utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss>::Evaluate;
 %extend utilities::BinaryClassificationEvaluator<predictors::LinearPredictor, lossFunctions::LogLoss>
 {
-    void Evaluate(dataset::GenericRowIterator& dataIterator, std::shared_ptr<const predictors::LinearPredictor> predictor)
+    void Eval(dataset::GenericRowIterator& dataIterator, std::shared_ptr<const predictors::LinearPredictor> predictor)
     {
         ($self)->Evaluate(dataIterator, *predictor);
     }

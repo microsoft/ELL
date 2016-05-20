@@ -43,7 +43,7 @@ namespace dataset
 %include "IDataVector.h"
 %include "SparseDataVector.h"
 %include "SupervisedExample.h"
-// %include "RowDataset.h"
+%include "RowDataset.h"
 
 namespace dataset
 {
@@ -53,6 +53,8 @@ namespace dataset
 }
 
 %include "RowDatasetInterface.h"
+%import "RowDataset.h"
+%include "IDataVector.h"
 
 %include "unique_ptr.i"
 wrap_unique_ptr(IDataVectorPtr, dataset::IDataVector)
@@ -67,8 +69,7 @@ namespace dataset
     %template () SparseDataVector<double, utilities::CompressedIntegerList>;
     %template () SparseDataVector<float, utilities::CompressedIntegerList>;
     %template () SparseDataVector<short, utilities::CompressedIntegerList>;
-
-//    %template () RowDataset<IDataVector>;
+    %template () RowDataset<IDataVector>;
     
     // Bafflingly, the below causes SWIG to give an error about no default constructor for SparseDataVector<>
     // %template (SparseDoubleDataVectorBase) SparseDataVector<double, utilities::CompressedIntegerList>;

@@ -95,17 +95,33 @@ namespace std
 namespace lossFunctions {};
 namespace predictors {};
 
+%import "IDataVector.h"
+
+%template () std::vector<dataset::IDataVector>;
+
+namespace dataset
+{
+    class GenericRowIterator {}; // This is necessary to prevent memory leak of datasets::GenericRowIterator
+}
+
+typedef RowDataset<IDataVector> GenericRowDataset;
+
 namespace utilities
 {
     template <typename ValueType>
     class IIterator {}; 
-
+    
     template <typename IteratorType, typename ValueType> class StlIterator {};
     %template () StlIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
 
     template <typename IteratorType, typename ValueType> class StlIndexValueIterator {};
     %template () StlIndexValueIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
 }
+
+%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>,std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
+typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> dataset::GenericRowIterator;
+
+//%import predictors.i
 
 // Interface includes for lossFunctions library
 %include lossFunctions.i
@@ -119,11 +135,13 @@ namespace utilities
 // Interface includes for dataset library
 %include dataset.i
 
-// Interface includes for utilities library
-%include utilities.i
+%include "SGDIncrementalTrainer_wrap.h"
 
 // Interface for the predictors library
 %include predictors.i
+
+// Interface includes for utilities library
+%include utilities.i
 
 // Interface includes for trainers library
 %include trainers.i
@@ -140,7 +158,5 @@ wrap_unique_ptr(LayerPtr, layers::Layer)
 %template () dataset::RowDataset<dataset::IDataVector>;
 %template () trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
 
-%inline %{
-%}
 typedef trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType predictors::LinearPredictor;
 class trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType {};
