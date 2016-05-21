@@ -92,7 +92,6 @@ namespace evaluators
     template<std::size_t ...Is>
     void Evaluator<PredictorType, AggregatorTypes...>::DispatchPrint(std::ostream& os, std::index_sequence<Is...>) const
     {
-
         // print header
         std::vector<std::string> header {std::get<Is>(_aggregatorTuple).GetHeader()...};
         os << header[0];

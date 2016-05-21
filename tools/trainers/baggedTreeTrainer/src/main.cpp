@@ -38,7 +38,7 @@
 #include "SortingTreeTrainer.h"
 
 // evaluators
-#include "IEvaluator.h"
+#include "Evaluator.h"
 
 // lossFunctions
 #include "SquaredLoss.h"

@@ -14,7 +14,7 @@
 #include "RowDataset.h"
 
 // evaluators
-#include "IEvaluator.h"
+#include "Evaluator.h"
 
 //stl
 #include <utility>

@@ -18,10 +18,11 @@ set (SRC src/AUCAggregator.cpp
 set (INCLUDE include/AUCAggregator.h
              include/BinaryErrorAggregator.h
              include/Evaluator.h
-             include/IEvaluator.h
+             include/IncrementalEvaluator.h
              include/LossAggregator.h)
 
 set (TCC tcc/Evaluator.tcc
+         tcc/IncrementalEvaluator.tcc
          tcc/LossAggregator.tcc)
 
 source_group("src" FILES ${SRC})

@@ -15,7 +15,7 @@
 #include "EnsemblePredictor.h"
 
 // evaluators
-#include "IEvaluator.h"
+#include "Evaluator.h"
 
 namespace trainers
 {
