@@ -31,7 +31,7 @@ namespace evaluators
         // collect statistics
         double sumPositiveWeights = 0.0;
         double sumNegativeWeights = 0.0;
-        double sumUnorderedWeights = 0.0;
+        double sumOrderedWeights = 0.0;
 
         for (uint64_t i = 0; i < _aggregates.size(); ++i)
         {
@@ -40,11 +40,11 @@ namespace evaluators
             if (_aggregates[i].label <= 0)
             {
                 sumNegativeWeights += weight;
-                sumUnorderedWeights += sumPositiveWeights * weight;
             }
             else
             {
                 sumPositiveWeights += weight;
+                sumOrderedWeights += sumNegativeWeights * weight;
             }
         }
 
@@ -52,7 +52,7 @@ namespace evaluators
         Value value;
         if (sumPositiveWeights > 0 && sumNegativeWeights > 0)
         {
-            value.auc = sumUnorderedWeights / sumPositiveWeights / sumNegativeWeights;
+            value.auc = sumOrderedWeights / sumPositiveWeights / sumNegativeWeights;
         }
         
         // reset the vector of aggregates
