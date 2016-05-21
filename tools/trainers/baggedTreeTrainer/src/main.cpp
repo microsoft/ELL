@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto trainSetIterator = rowDataset.GetIterator();
         trainer->Update(trainSetIterator);
-        auto predictor = trainer->GetPredictor();
+        auto ensemble = trainer->GetPredictor();
 
         // print loss and errors
         if(trainerArguments.verbose)
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
         }
 
         // add predictor to the model
-        predictor->AddToModel(model, outputCoordinateList);
+        ensemble->AddToModel(model, outputCoordinateList);
 
         // save the model
         model.Save(outStream);

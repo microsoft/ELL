@@ -44,7 +44,7 @@ namespace trainers
             // evaluate
             if (_evaluator != nullptr)
             {
-                _evaluator->IncrementalEvaluate(baseLearner);
+                _evaluator->IncrementalEvaluate(baseLearner, weight);
             }
 
             // append weak predictor to the ensemble

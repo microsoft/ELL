@@ -16,7 +16,7 @@ namespace evaluators
     }
 
     template<typename BasePredictorType, typename... AggregatorTypes>
-    void IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluate(const BasePredictorType& weakPredictor)
+    void IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluate(const BasePredictorType& weakPredictor, double predictorWeight)
     {
         ++_evaluateCounter;
         bool evaluate = _evaluateCounter % _evaluatorParameters.evaluationFrequency == 0 ? true : false;
@@ -28,14 +28,13 @@ namespace evaluators
         {
             const auto& example = iterator.Get();
 
-            double weight = example.GetWeight();
+            double exampleWeight = example.GetWeight();
             double label = example.GetLabel();
-            double weakPrediction = weakPredictor.Predict(example.GetDataVector());
-            _predictions[index] += weakPrediction;
+            _predictions[index] += predictorWeight * weakPredictor.Predict(example.GetDataVector());
 
             if (evaluate)
             {
-                DispatchUpdate(_predictions[index], label, weight, std::make_index_sequence<sizeof...(AggregatorTypes)>());
+                DispatchUpdate(_predictions[index], label, exampleWeight, std::make_index_sequence<sizeof...(AggregatorTypes)>());
             }
 
             iterator.Next();

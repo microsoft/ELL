@@ -29,7 +29,8 @@ namespace evaluators
         /// <summary> Runs the given predictor on the evaluation set, invokes each of the aggregators on the output, and logs the result. </summary>
         ///
         /// <param name="predictor"> The predictor. </param>
-        virtual void IncrementalEvaluate(const BasePredictorType& predictor) = 0;
+        /// <param name="predictorWeight"> The weight of the predictor. </param>
+        virtual void IncrementalEvaluate(const BasePredictorType& predictor, double predictorWeight = 1.0) = 0;
 
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
@@ -48,10 +49,14 @@ namespace evaluators
         /// <param name="aggregators"> The aggregators. </param>
         IncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 
-        /// <summary> Runs the given predictor on the evaluation set, increments cached outputs, invokes each of the aggregators, and logs the result. </summary>
+        /// <summary>
+        /// Runs the given predictor on the evaluation set, increments cached outputs, invokes each of
+        /// the aggregators, and logs the result.
+        /// </summary>
         ///
         /// <param name="weakPredictor"> The predictor. </param>
-        virtual void IncrementalEvaluate(const BasePredictorType& weakPredictor) override;
+        /// <param name="predictorWeight"> The weight of the predictor. </param>
+        virtual void IncrementalEvaluate(const BasePredictorType& weakPredictor, double predictorWeight = 1.0) override;
 
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
