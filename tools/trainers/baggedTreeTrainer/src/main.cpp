@@ -38,7 +38,7 @@
 #include "SortingTreeTrainer.h"
 
 // evaluators
-#include "Evaluator.h"
+#include "IncrementalEvaluator.h"
 
 // lossFunctions
 #include "SquaredLoss.h"
@@ -96,10 +96,10 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
         // create evaluator
-        std::shared_ptr<evaluators::IEvaluator<predictors::EnsemblePredictor<predictors::DecisionTreePredictor>>> evaluator = nullptr;
+        std::shared_ptr<evaluators::IIncrementalEvaluator<predictors::DecisionTreePredictor>> evaluator = nullptr;
         if(trainerArguments.verbose)
         {
-            evaluator = common::MakeEvaluator<predictors::EnsemblePredictor<predictors::DecisionTreePredictor>>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
+            evaluator = common::MakeIncrementalEvaluator<predictors::DecisionTreePredictor>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
         }
 
         // create trainer

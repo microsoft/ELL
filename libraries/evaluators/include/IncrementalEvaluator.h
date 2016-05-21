@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "IEvaluator.h"
 #include "Evaluator.h"
 
 // stl
@@ -19,8 +18,8 @@ namespace evaluators
 {
     /// <summary> Interface to an incremental evaluator (used to evaluate ensembles). </summary>
     ///
-    /// <typeparam name="PredictorType"> The predictor type. </typeparam>
-    template <typename PredictorType>
+    /// <typeparam name="BasePredictorType"> The predictor type. </typeparam>
+    template <typename BasePredictorType>
     class IIncrementalEvaluator
     {
     public:
@@ -30,7 +29,7 @@ namespace evaluators
         /// <summary> Runs the given predictor on the evaluation set, invokes each of the aggregators on the output, and logs the result. </summary>
         ///
         /// <param name="predictor"> The predictor. </param>
-        virtual void IncrementalEvaluate(const PredictorType& predictor) = 0;
+        virtual void IncrementalEvaluate(const BasePredictorType& predictor) = 0;
 
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
@@ -38,9 +37,10 @@ namespace evaluators
         virtual void Print(std::ostream& os) const = 0;
     };
 
-    template<typename PredictorType, typename... AggregatorTypes>
-    class IncrementalEvaluator : public Evaluator<PredictiorType, AggregatorTypes...>, public IIncrementalEvaluator<PredictorType>
+    template<typename BasePredictorType, typename... AggregatorTypes>
+    class IncrementalEvaluator : public Evaluator<BasePredictorType, AggregatorTypes...>, public IIncrementalEvaluator<BasePredictorType>
     {
+    public:
         /// <summary> Constructs an instance of IncrementalEvaluator with a given dataset and given aggregators. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the evaluation set. </param>
@@ -51,7 +51,7 @@ namespace evaluators
         /// <summary> Runs the given predictor on the evaluation set, increments cached outputs, invokes each of the aggregators, and logs the result. </summary>
         ///
         /// <param name="weakPredictor"> The predictor. </param>
-        virtual void IncrementalEvaluate(const PredictorType& weakPredictor) override;
+        virtual void IncrementalEvaluate(const BasePredictorType& weakPredictor) override;
 
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
@@ -64,14 +64,14 @@ namespace evaluators
 
     /// <summary> Makes an incremental evaluator (used to evaluate ensembles). </summary>
     ///
-    /// <typeparam name="PredictorType"> The predictor type. </typeparam>
+    /// <typeparam name="BasePredictorType"> The predictor type. </typeparam>
     /// <typeparam name="AggregatorTypes"> The Aggregator types. </typeparam>
     /// <param name="exampleIterator"> An example iterator that represents the evaluation data. </param>
     /// <param name="aggregators"> The aggregators. </param>
     ///
     /// <returns> A unique_ptr to an IEvaluator. </returns>
-    template<typename PredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IIncrementalEvaluator<PredictorType>> MakeIncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+    template<typename BasePredictorType, typename... AggregatorTypes>
+    std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 }
 
 #include "../tcc/IncrementalEvaluator.tcc"

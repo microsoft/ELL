@@ -8,15 +8,15 @@
 
 namespace evaluators
 {
-    template<typename PredictorType, typename... AggregatorTypes>
-    IncrementalEvaluator<PredictorType, AggregatorTypes...>::IncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators) :
-        Evaluator<PredictorType, AggregatorTypes...>(exampleIterator, evaluatorParameters, aggregators...)
+    template<typename BasePredictorType, typename... AggregatorTypes>
+    IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators) :
+        Evaluator<BasePredictorType, AggregatorTypes...>(exampleIterator, evaluatorParameters, aggregators...)
     {
         _predictions.resize(_rowDataset.NumExamples());
     }
 
-    template<typename PredictorType, typename... AggregatorTypes>
-    void IncrementalEvaluator<PredictorType, AggregatorTypes...>::IncrementalEvaluate(const PredictorType& weakPredictor)
+    template<typename BasePredictorType, typename... AggregatorTypes>
+    void IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluate(const BasePredictorType& weakPredictor)
     {
         ++_evaluateCounter;
         bool evaluate = _evaluateCounter % _evaluatorParameters.evaluationFrequency == 0 ? true : false;
@@ -47,15 +47,15 @@ namespace evaluators
         }
     }
 
-    template<typename PredictorType, typename... AggregatorTypes>
-    void IncrementalEvaluator<PredictorType, AggregatorTypes...>::Print(std::ostream& os) const
+    template<typename BasePredictorType, typename... AggregatorTypes>
+    void IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::Print(std::ostream& os) const
     {
-        Evaluator<PredictorType, AggregatorTypes...>::Print(os);
+        Evaluator<BasePredictorType, AggregatorTypes...>::Print(os);
     }
 
-    template<typename PredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IIncrementalEvaluator<PredictorType>> MakeIncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
+    template<typename BasePredictorType, typename... AggregatorTypes>
+    std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
     {
-        return std::make_unique<IncrementalEvaluator<PredictorType, AggregatorTypes...>>(exampleIterator, evaluatorParameters, aggregators...);
+        return std::make_unique<IncrementalEvaluator<BasePredictorType, AggregatorTypes...>>(exampleIterator, evaluatorParameters, aggregators...);
     }
 }

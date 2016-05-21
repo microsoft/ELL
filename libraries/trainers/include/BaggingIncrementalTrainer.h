@@ -15,7 +15,7 @@
 #include "EnsemblePredictor.h"
 
 // evaluators
-#include "Evaluator.h"
+#include "IncrementalEvaluator.h"
 
 namespace trainers
 {
@@ -34,14 +34,14 @@ namespace trainers
     class BaggingIncrementalTrainer : public IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>
     {
     public:
-        using PredictorType = predictors::EnsemblePredictor<BasePredictorType>;
+        using EnsembleType = predictors::EnsemblePredictor<BasePredictorType>;
 
         BaggingIncrementalTrainer() = delete;
 
         /// <summary> Constructs an instance of SingleEpochTrainer. </summary>
         ///
         /// <param name="incrementalTrainer"> [in,out] The stateful trainer. </param>
-        BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters, std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator);
+        BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters, std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> evaluator);
 
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
         ///
@@ -51,13 +51,13 @@ namespace trainers
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
         /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _ensemble; }
+        virtual const std::shared_ptr<const EnsembleType> GetPredictor() const override { return _ensemble; }
 
     private:
         std::unique_ptr<ITrainer<BasePredictorType>> _trainer;
         BaggingIncrementalTrainerParameters _baggingParameters;
-        std::shared_ptr<evaluators::IEvaluator<PredictorType>> _evaluator;
-        std::shared_ptr<PredictorType> _ensemble;
+        std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> _evaluator;
+        std::shared_ptr<EnsembleType> _ensemble;
         std::default_random_engine _random;
     };
 
@@ -72,7 +72,7 @@ namespace trainers
     std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(
         std::unique_ptr<ITrainer<BasePredictorType>>&& trainer,
         const BaggingIncrementalTrainerParameters& baggingParameters,
-        std::shared_ptr<evaluators::IEvaluator<predictors::EnsemblePredictor<BasePredictorType>>> evaluator = nullptr);
+        std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> evaluator = nullptr);
 }
 
 #include "../tcc/BaggingIncrementalTrainer.tcc"
