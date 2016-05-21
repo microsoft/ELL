@@ -50,8 +50,8 @@ namespace evaluators
 
         /// <summary> Runs the given predictor on the evaluation set, increments cached outputs, invokes each of the aggregators, and logs the result. </summary>
         ///
-        /// <param name="predictor"> The predictor. </param>
-        virtual void IncrementalEvaluate(const PredictorType& predictor) override;
+        /// <param name="weakPredictor"> The predictor. </param>
+        virtual void IncrementalEvaluate(const PredictorType& weakPredictor) override;
 
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
