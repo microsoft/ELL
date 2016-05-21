@@ -12,9 +12,11 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/BinaryErrorAggregator.cpp)
+set (SRC src/AUCAggregator.cpp
+         src/BinaryErrorAggregator.cpp)
 
-set (INCLUDE include/BinaryErrorAggregator.h
+set (INCLUDE include/AUCAggregator.h
+             include/BinaryErrorAggregator.h
              include/Evaluator.h
              include/IEvaluator.h
              include/LossAggregator.h)

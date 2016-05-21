@@ -16,6 +16,7 @@
 #include "Evaluator.h"
 #include "BinaryErrorAggregator.h"
 #include "LossAggregator.h"
+#include "AUCAggregator.h"
 
 namespace common
 {
@@ -27,13 +28,13 @@ namespace common
         switch(lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::MakeLossAggregator(lossFunctions::SquaredLoss()));
+            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(lossFunctions::SquaredLoss()));
 
         case LossFunctionEnum::log:
-            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::MakeLossAggregator(lossFunctions::LogLoss(lossArguments.lossFunctionParameter)));
+            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(lossFunctions::LogLoss(lossArguments.lossFunctionParameter)));
 
         case LossFunctionEnum::hinge:
-            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::MakeLossAggregator(lossFunctions::HingeLoss()));
+            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(lossFunctions::HingeLoss()));
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this evaluator");

@@ -18,7 +18,7 @@ namespace evaluators
         double errorRate = allFalse / (allTrue + allFalse);
         double precision = truePositives == 0.0 ? 0.0 : truePositives / (truePositives + falsePositives);
         double recall = truePositives == 0.0 ? 0.0 : truePositives / (truePositives + falseNegatives);
-        return std::to_string(errorRate) + '\t' + std::to_string(precision) + '\t' + std::to_string(recall) + '\t' + std::to_string(truePositives) + '\t' + std::to_string(falsePositives) + '\t' + std::to_string(trueNegatives) + '\t' + std::to_string(falseNegatives);
+        return std::to_string(errorRate) + '\t' + std::to_string(precision) + '\t' + std::to_string(recall);
     }
 
     void BinaryErrorAggregator::Update(double prediction, double label, double weight)

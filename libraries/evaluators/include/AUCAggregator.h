@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     BinaryErrorAggregator.h (evaluators)
+//  File:     AUCAggregator.h (evaluators)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,19 +11,18 @@
 // stl
 #include <cstdint>
 #include <string>
+#include <vector>
+
 namespace evaluators
 {
-    /// <summary> An evaluation aggregator that computes a binary confusion matrix. </summary>
-    class BinaryErrorAggregator
+    /// <summary> An evaluation aggregator that computes AUC. </summary>
+    class AUCAggregator
     {
     public:
 
         struct Value
         {
-            double truePositives = 0.0;
-            double trueNegatives = 0.0;
-            double falsePositives = 0.0;
-            double falseNegatives = 0.0;
+            double auc = 0.0;
 
             /// <summary> Convert this object into a string. </summary>
             ///
@@ -46,9 +45,20 @@ namespace evaluators
         /// <summary> Gets a header that describes Value::ToString(). </summary>
         ///
         /// <returns> The header string. </returns>
-        std::string GetHeader() const { return "ErrorRate\tPrecision\tRecall"; }
+        std::string GetHeader() const { return "AUC"; }
 
     private:
+
+        struct Aggregate
+        {
+            double prediction;
+            double label;
+            double weight;
+
+            bool operator<(const Aggregate& other) const;
+        };
+
         Value _value;
+        std::vector<Aggregate> _aggregates;
     };
 }
