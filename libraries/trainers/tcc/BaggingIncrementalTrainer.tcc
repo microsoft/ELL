@@ -42,9 +42,10 @@ namespace trainers
             auto baseLearner = _trainer->Train(trainSetIterator);
 
             // evaluate
+            double evaluationRescale = _baggingParameters.numIterations / (i + 1.0);
             if (_evaluator != nullptr)
             {
-                _evaluator->IncrementalEvaluate(baseLearner, weight);
+                _evaluator->IncrementalEvaluate(baseLearner, weight, evaluationRescale);
             }
 
             // append weak predictor to the ensemble

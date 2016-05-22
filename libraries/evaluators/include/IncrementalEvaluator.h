@@ -26,11 +26,15 @@ namespace evaluators
 
         virtual ~IIncrementalEvaluator() = default;
 
-        /// <summary> Runs the given predictor on the evaluation set, invokes each of the aggregators on the output, and logs the result. </summary>
+        /// <summary>
+        /// Runs the given predictor on the evaluation set, invokes each of the aggregators on the output,
+        /// and logs the result.
+        /// </summary>
         ///
-        /// <param name="predictor"> The predictor. </param>
-        /// <param name="predictorWeight"> The weight of the predictor. </param>
-        virtual void IncrementalEvaluate(const BasePredictorType& predictor, double predictorWeight = 1.0) = 0;
+        /// <param name="basePredictor"> The base predictor. </param>
+        /// <param name="basePredictorWeight"> The weight of the base predictor in the ensemble. </param>
+        /// <param name="evaluationRescale"> A rescaling coefficient applied to the current predictions of the entire ensemble, but not recorded in the evaluator. </param>
+        virtual void IncrementalEvaluate(const BasePredictorType& basePredictor, double basePredictorWeight = 1.0, double evaluationRescale = 1.0) = 0;
 
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
@@ -54,9 +58,10 @@ namespace evaluators
         /// the aggregators, and logs the result.
         /// </summary>
         ///
-        /// <param name="weakPredictor"> The predictor. </param>
-        /// <param name="predictorWeight"> The weight of the predictor. </param>
-        virtual void IncrementalEvaluate(const BasePredictorType& weakPredictor, double predictorWeight = 1.0) override;
+        /// <param name="basePredictor"> The base predictor. </param>
+        /// <param name="basePredictorWeight"> The weight of the base predictor in the ensemble. </param>
+        /// <param name="evaluationRescale"> A rescaling coefficient applied to the current predictions of the entire ensemble, but not recorded in the evaluator. </param>
+        virtual void IncrementalEvaluate(const BasePredictorType& weakPredictor, double basePredictorWeight = 1.0, double evaluationRescale = 1.0) override;
 
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
