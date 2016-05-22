@@ -61,7 +61,7 @@ namespace evaluators
         /// <param name="basePredictor"> The base predictor. </param>
         /// <param name="basePredictorWeight"> The weight of the base predictor in the ensemble. </param>
         /// <param name="evaluationRescale"> A rescaling coefficient applied to the current predictions of the entire ensemble, but not recorded in the evaluator. </param>
-        virtual void IncrementalEvaluate(const BasePredictorType& weakPredictor, double basePredictorWeight = 1.0, double evaluationRescale = 1.0) override;
+        virtual void IncrementalEvaluate(const BasePredictorType& basePredictor, double basePredictorWeight = 1.0, double evaluationRescale = 1.0) override;
 
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///

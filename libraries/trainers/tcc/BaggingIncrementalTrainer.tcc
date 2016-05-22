@@ -38,18 +38,18 @@ namespace trainers
             rowDataset.RandomPermute(_random, bagSize);
             auto trainSetIterator = rowDataset.GetIterator(0, bagSize);
 
-            // get base learner
-            auto baseLearner = _trainer->Train(trainSetIterator);
+            // get base predictor
+            auto basePredictor = _trainer->Train(trainSetIterator);
 
             // evaluate
             double evaluationRescale = _baggingParameters.numIterations / (i + 1.0);
             if (_evaluator != nullptr)
             {
-                _evaluator->IncrementalEvaluate(baseLearner, weight, evaluationRescale);
+                _evaluator->IncrementalEvaluate(basePredictor, weight, evaluationRescale);
             }
 
-            // append weak predictor to the ensemble
-            _ensemble->AppendPredictor(std::move(baseLearner), weight);
+            // append base predictor to the ensemble
+            _ensemble->AppendPredictor(std::move(basePredictor), weight);
         }
     }
 
