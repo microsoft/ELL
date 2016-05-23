@@ -50,7 +50,11 @@ namespace evaluators
     template<typename PredictorType, typename... AggregatorTypes>
     void Evaluator<PredictorType, AggregatorTypes...>::Print(std::ostream& os) const
     {
+        auto originalPrecision = os.precision(6);
+        auto originalFlags = os.setf(std::ios::fixed);
         PrintDispatch(os, std::make_index_sequence<sizeof...(AggregatorTypes)>());
+        os.setf(originalFlags);
+        os.precision(originalPrecision);
     }
 
     template<typename PredictorType, typename... AggregatorTypes>
