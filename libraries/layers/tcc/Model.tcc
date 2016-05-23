@@ -1,0 +1,16 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     Layer.tcc (layers)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace layers
+{
+    template <typename LayerType, typename ...Args>
+    CoordinateList Model::EmplaceLayer(Args... args)
+    {
+        return AddLayer(std::make_unique<LayerType>(args...));
+    }
+}

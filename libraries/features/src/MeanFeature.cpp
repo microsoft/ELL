@@ -8,11 +8,11 @@
 
 #include "MeanFeature.h"
 #include "Feature.h"
-// #include "VectorMath.h"
 #include "StringUtil.h"
 
 // layers
-#include "UnaryOpLayer.h"
+#include "ShiftRegisterLayer.h"
+#include "ConstantLayer.h"
 #include "BinaryOpLayer.h"
 #include "Sum.h"
 
@@ -23,10 +23,9 @@
 #include <stdexcept>
 #include <unordered_map>
 
-
 namespace
 {
-    double VecMean(const std::vector<double>& vec)
+    double VectorMean(const std::vector<double>& vec)
     {
         if(vec.size() == 0) return 0.0;
         double sum = 0.0;
@@ -55,13 +54,14 @@ namespace features
         
         UpdateRowSamples(inputData);
         
-        auto rowSize = inputData.size();        
+        auto rowSize = inputData.size();    
         // average windows and put in result
         std::vector<double> result(rowSize);
         for (size_t columnIndex = 0; columnIndex < rowSize; columnIndex++)
         {
             // compute mean (TODO: incrementally)
-            double mean = VecMean(GetAllSamples(columnIndex));
+            auto samples = GetAllSamples(columnIndex);
+            double mean = VectorMean(samples);
             result[columnIndex] = mean;
         }
 
@@ -71,15 +71,32 @@ namespace features
 
     layers::CoordinateList MeanFeature::AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const
     {
+        // TODO: reimplement this using incremental computation (with an accumulator layer)
         auto it = featureOutputs.find(_inputFeatures[0]);
         if (it == featureOutputs.end())
         {
             throw std::runtime_error("Couldn't find input feature");
         }
        
-        throw std::runtime_error("MeanFeature unimplemented");
         auto inputCoordinates = it->second;
-        return inputCoordinates;
+        auto windowSize = GetWindowSize();
+
+        // Compute mean
+        auto bufferOutputCoordinates = model.EmplaceLayer<layers::ShiftRegisterLayer>(inputCoordinates, windowSize);        
+        // TODO: find a better way to extract the per-channel coordinates
+        std::vector<layers::CoordinateList> perChannelBufferOutputCoordinates;
+        auto dimension = inputCoordinates.Size();
+        auto shiftRegisterLayer = dynamic_cast<const layers::ShiftRegisterLayer&>(model.GetLastLayer());
+        for(size_t channel = 0; channel < dimension; channel++)
+        {
+            perChannelBufferOutputCoordinates.push_back(shiftRegisterLayer.GetChannelOutputCoordinates(bufferOutputCoordinates, channel));
+        }
+
+        auto sumCoordinates = model.EmplaceLayer<layers::Sum>(perChannelBufferOutputCoordinates);
+        auto divisorCoordinates = model.EmplaceLayer<layers::ConstantLayer>(std::vector<double>(dimension, windowSize));
+        
+        auto meanCoordinates = model.EmplaceLayer<layers::BinaryOpLayer>(sumCoordinates, divisorCoordinates, layers::BinaryOpLayer::OperationType::divide);
+        return meanCoordinates;
     }
 
     std::unique_ptr<Feature> MeanFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)

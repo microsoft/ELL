@@ -96,7 +96,8 @@ namespace features
 
     double BufferedFeature::GetSample(int column, size_t offset) const
     {
-        assert(offset <= WindowSize());
+        // implements a simple ring buffer
+        assert(offset <= GetWindowSize());
         auto computedSamples = NumSamples();
         if (computedSamples < _windowSize)
         {
@@ -128,6 +129,6 @@ namespace features
     
     size_t BufferedFeature::GetWarmupTime() const
     {
-        return Feature::GetWarmupTime() + WindowSize();
+        return Feature::GetWarmupTime() + GetWindowSize();
     }
 }

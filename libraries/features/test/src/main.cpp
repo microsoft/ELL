@@ -22,6 +22,9 @@ int main()
     TestMeanFeatureCompute();
     TestMeanFeatureModel();
 
+    TestVarianceFeatureCompute();
+    TestVarianceFeatureModel();
+
     if(testing::DidTestFail())
     {
         return 1;

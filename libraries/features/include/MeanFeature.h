@@ -24,8 +24,9 @@ namespace features
     class MeanFeature : public BufferedFeature
     {
     public:
-        /// <summary> Constructor from magnitude feature </summary>
-        /// <param name="inputFeature"> The feature to take the magnitude of </param>
+        /// <summary> Constructor </summary>
+        /// <param name="inputFeature"> The feature to take the mean of </param>
+        /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
         MeanFeature(Feature* inputFeature, size_t windowSize) : BufferedFeature({inputFeature}, windowSize) {}
 
         /// <summary> Creates a `MeanFeature` from a vector of strings </summary>

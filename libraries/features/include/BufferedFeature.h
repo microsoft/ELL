@@ -23,12 +23,14 @@ namespace features
     class BufferedFeature : public Feature
     {
     public:
-        size_t WindowSize() const { return _windowSize; }
+        size_t GetWindowSize() const { return _windowSize; }
         virtual void Reset() override;
+        virtual size_t GetWarmupTime() const override;
 
     protected:
         BufferedFeature(const std::vector<Feature*>& inputs, size_t windowSize);
         
+        // BufferedFeature-specific routines
         size_t NumSamples() const;
         double GetSample(int column, size_t offset) const;
         std::vector<std::vector<double>>& GetAllSamples();
@@ -38,7 +40,7 @@ namespace features
         void UpdateRowSamples(const std::vector<double>& row) const;
 
         virtual void AddToDescription(std::vector<std::string>& description) const override;
-        virtual size_t GetWarmupTime() const override;
+
         size_t _windowSize = 0;
 
     private:

@@ -12,6 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/BinaryOpLayer.cpp
+         src/ConstantLayer.cpp
          src/Coordinate.cpp
          src/CoordinateList.cpp
          src/CoordinateListTools.cpp
@@ -20,10 +21,12 @@ set (SRC src/BinaryOpLayer.cpp
          src/Layer.cpp
          src/Map.cpp
          src/Model.cpp
+         src/ShiftRegisterLayer.cpp
          src/Sum.cpp
          src/UnaryOpLayer.cpp)
 
 set (INCLUDE include/BinaryOpLayer.h
+             include/ConstantLayer.h
              include/Coordinate.h
              include/CoordinateList.h
              include/CoordinateListTools.h
@@ -32,10 +35,12 @@ set (INCLUDE include/BinaryOpLayer.h
              include/Layer.h
              include/Map.h
              include/Model.h
+             include/ShiftRegisterLayer.h
              include/Sum.h
              include/UnaryOpLayer.h)
 
-set (TCC tcc/Map.tcc)
+set (TCC tcc/Map.tcc
+         tcc/Model.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

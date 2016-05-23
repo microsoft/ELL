@@ -16,17 +16,19 @@ set (INCLUDE include/BufferedFeature.h
              include/Feature.h
              include/FeatureSet.h
              include/InputFeature.h
+             include/MagnitudeFeature.h
              include/MeanFeature.h
              include/StringUtil.h
-             include/MagnitudeFeature.h)
+             include/VarianceFeature.h)
 
 set (SRC src/BufferedFeature.cpp
          src/Feature.cpp
          src/FeatureSet.cpp
          src/InputFeature.cpp
+         src/MagnitudeFeature.cpp
          src/MeanFeature.cpp
          src/StringUtil.cpp
-         src/MagnitudeFeature.cpp)
+         src/VarianceFeature.cpp)
 
 set (TCC tcc/Feature.tcc
          tcc/FeatureSet.tcc

@@ -86,6 +86,11 @@ namespace layers
         // recall that _layers does not explicitly keep the input layer
         return *_layers[layerIndex - 1];
     }
+    
+    const Layer& Model::GetLastLayer() const
+    {
+        return GetLayer(NumLayers()-1);
+    }
 
     void Model::Save(std::ostream& os) const
     {

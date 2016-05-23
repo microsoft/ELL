@@ -13,3 +13,6 @@ void TestMagnitudeFeatureModel();
 
 void TestMeanFeatureCompute();
 void TestMeanFeatureModel();
+
+void TestVarianceFeatureCompute();
+void TestVarianceFeatureModel();

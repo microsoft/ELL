@@ -17,7 +17,9 @@
 namespace
 {
     std::string addOperationName = "Add";
+    std::string subtractOperationName = "Subtract";
     std::string multiplyOperationName = "Multiply";
+    std::string divideOperationName = "Divide";
 }
 
 namespace layers
@@ -52,8 +54,12 @@ namespace layers
         {
         case OperationType::add:
             return addOperationName;
+        case OperationType::subtract:
+            return subtractOperationName;
         case OperationType::multiply:
             return multiplyOperationName;
+        case OperationType::divide:
+            return divideOperationName;
         }
 
         throw std::runtime_error("unrecognized operation type");
@@ -65,9 +71,17 @@ namespace layers
         {
             return OperationType::add;
         }
+        else if (name == subtractOperationName)
+        {
+            return OperationType::subtract;
+        }
         else if (name == multiplyOperationName)
         {
             return OperationType::multiply;
+        }
+        else if (name == divideOperationName)
+        {
+            return OperationType::divide;
         }
         else
         {
@@ -81,9 +95,12 @@ namespace layers
         {
         case OperationType::add:
             return std::plus<double>();
+        case OperationType::subtract:
+            return std::minus<double>();
         case OperationType::multiply:
             return std::multiplies<double>();
-
+        case OperationType::divide:
+            return std::divides<double>();
         }
 
         throw std::runtime_error("unrecognized operation type");
@@ -122,16 +139,6 @@ namespace layers
             maxSize = std::max(maxSize, _inputCoordinates[index].GetRequiredLayerSize(layerIndex));
         }
         return maxSize;
-    }
-
-    std::string BinaryOpLayer::GetTypeName()
-    {
-        return "BinaryOpLayer";
-    }
-
-    std::string BinaryOpLayer::GetRuntimeTypeName() const
-    {
-        return GetTypeName();
     }
 
     void BinaryOpLayer::Read(utilities::XMLDeserializer& deserializer)
