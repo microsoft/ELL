@@ -27,11 +27,7 @@ namespace common
     {
         std::vector<std::string> parseErrorMessages;
 
-        if (inputModelFile == "")
-        {
-            parseErrorMessages.push_back("-inputModelFile (or -imf) is required");
-        }
-        else
+        if (inputModelFile != "")
         {
             if (!utilities::IsFileReadable(inputModelFile))
             {
@@ -41,5 +37,4 @@ namespace common
 
         return parseErrorMessages;
     }
-
 }

@@ -21,6 +21,8 @@
 
 %ignore Create;
 %ignore Deserialize;
+%ignore features::Feature::CreateFunction;
+%ignore std::function<std::unique_ptr<features::Feature>>;
 
 %include "Feature.h"
 %include "InputFeature.h"

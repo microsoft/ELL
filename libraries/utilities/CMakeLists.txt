@@ -23,8 +23,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/RandomEngines.cpp
          src/XMLSerialization.cpp)
 
-set (INCLUDE include/AnyIterator.h
-             include/BinaryClassificationEvaluator.h
+set (INCLUDE include/BinaryClassificationEvaluator.h
              include/CompressedIntegerList.h
              include/CommandLineParser.h
              include/Files.h
@@ -43,8 +42,7 @@ set (INCLUDE include/AnyIterator.h
              include/TypeName.h
              include/XMLSerialization.h)
 
-set (TCC tcc/AnyIterator.tcc
-         tcc/BinaryClassificationEvaluator.tcc
+set (TCC tcc/BinaryClassificationEvaluator.tcc
          tcc/CommandLineParser.tcc
          tcc/Format.tcc
          tcc/ParallelTransformIterator.tcc
@@ -87,11 +85,9 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp 
-              test/src/AnyIterator_test.cpp
               test/src/XMLSerialization_test.cpp)
 
-set (TEST_INCLUDE test/include/AnyIterator_test.h
-                  test/include/XMLSerialization_test.h)
+set (TEST_INCLUDE test/include/XMLSerialization_test.h)
                   
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})

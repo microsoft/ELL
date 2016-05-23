@@ -34,7 +34,8 @@ set (INTERFACE_INCLUDE ../common/include/DataLoadersInterface.h
                        ../common/include/LoadModelInterface.h
                        ../common/include/MapInterface.h
                        ../common/include/ModelInterface.h
-                       ../common/include/RowDatasetInterface.h)
+                       ../common/include/RowDatasetInterface.h
+                       ../common/include/SGDIncrementalTrainer_wrap.h)
 
 set (INTERFACE_MAIN ../common/EMLL.i)
 
@@ -44,6 +45,7 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/layers.i
                      ../common/linear.i
                      ../common/lossFunctions.i
+                     ../common/noncopyable.i
                      ../common/trainers.i
                      ../common/predictors.i
                      ../common/unique_ptr.i
@@ -86,10 +88,16 @@ foreach(file ${INTERFACE_FILES})
     configure_file(${file} ${file} COPYONLY)
 endforeach()
 
-set(CMAKE_SWIG_FLAGS "-c++")
+# -debug-classes -debug-typedef 
+set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft) # for debugging type-related problems, try adding these flags: -debug-typedef  -debug-template)
 set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${EXTRA_INTERFACE})
 
-#set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_FILES}) # Doesn't seem to work
+foreach(file ${INTERFACE_INCLUDE})
+    set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${file})
+endforeach()
+# set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_INCLUDE}) # Doesn't seem to work
+# set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_FILES}) # Doesn't seem to work
+
 # set_source_files_properties(${INTERFACE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties(${INTERFACE_MAIN} ${INTERFACE_FILES} PROPERTIES CPLUSPLUS ON)
 # set_source_files_properties(${INTERFACE_FILES} PROPERTIES SWIG_FLAGS "-includeall") # Don't want this, I think
@@ -101,10 +109,10 @@ if(${LANGUAGE_NAME} STREQUAL "python")
     SET(PREPEND_TARGET "_")
 endif()
 
-swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
-swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset features layers lossFunctions trainers predictors utilities)
+swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC}) # ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
+swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset features layers linear lossFunctions trainers predictors utilities)
 set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}EMLL)
-add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} common dataset features layers linear lossFunctions trainers predictors testing treeLayout utilities)
+add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} EMLL_common)
 
 endif()
 

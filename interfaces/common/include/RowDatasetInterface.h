@@ -18,17 +18,31 @@
 #include <vector>
 #include <random>
 
+namespace dataset
+{
+    typedef GenericRowDataset::Iterator GenericRowIterator;
+}
+
+
 namespace interfaces
 {
+
     class GenericRowDataset
     {
     public:
-        typedef dataset::GenericRowDataset::Iterator Iterator;
+        GenericRowDataset() {};
+        GenericRowDataset(const GenericRowDataset& other);
+        GenericRowDataset(GenericRowDataset&& other) = default;
+        const GenericRowDataset& operator=(GenericRowDataset&& other)
+        {
+            _dataset = std::move(other._dataset);
+            return *this;
+        }
 
         /// <summary> Constructor for RowDataset wrapper</summary>
         ///
         /// <param name="dataset"> The dataset::RowDataset to wrap </param>
-        GenericRowDataset(dataset::RowDataset<dataset::IDataVector> dataset);
+        GenericRowDataset(dataset::GenericRowDataset&& dataset);
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
@@ -54,7 +68,7 @@ namespace interfaces
         /// examples. </param>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
+        dataset::GenericRowIterator GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
@@ -67,7 +81,7 @@ namespace interfaces
         void RandomPermute(std::default_random_engine& rng);
 
         /// <summary>
-        /// Permutes the dataset so that the first count examples are chosen uniformly, and the rest are arbitrary.
+        /// Permutes the dataset so that the first `count` examples are chosen uniformly, and the rest are arbitrary.
         /// </summary>
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
@@ -75,7 +89,7 @@ namespace interfaces
         void RandomPermute(std::default_random_engine& rng, uint64_t count);
 
     private:
-        dataset::RowDataset<dataset::IDataVector> _dataset;
+        dataset::GenericRowDataset _dataset;
     };
 }
 

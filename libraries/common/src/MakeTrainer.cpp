@@ -18,35 +18,34 @@
 
 namespace common
 {
-    std::unique_ptr<trainers::IStochasticGradientDescentTrainer> MakeStochasticGradientDescentTrainer(uint64_t dim, const trainers::IStochasticGradientDescentTrainer::Parameters& parameters, const LossArguments& lossArguments)
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& sgdArguments)
     {
-
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
         switch(lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return std::make_unique<trainers::StochasticGradientDescentTrainer<lossFunctions::SquaredLoss>>(dim, parameters, lossFunctions::SquaredLoss());
+            return trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::SquaredLoss(), sgdArguments);
 
         case LossFunctionEnum::log:
-            return std::make_unique<trainers::StochasticGradientDescentTrainer<lossFunctions::LogLoss>>(dim, parameters, lossFunctions::LogLoss(lossArguments.lossFunctionParameter));
+            return trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::LogLoss(lossArguments.lossFunctionParameter), sgdArguments);
 
         case LossFunctionEnum::hinge:
-            return std::make_unique<trainers::StochasticGradientDescentTrainer<lossFunctions::HingeLoss>>(dim, parameters, lossFunctions::HingeLoss());
+            return trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::HingeLoss(), sgdArguments);
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 
-    std::unique_ptr<trainers::ISortingTreeTrainer> MakeSortingTreeTrainer(const trainers::ISortingTreeTrainer::Parameters & parameters, const LossArguments& lossArguments)
+    std::unique_ptr<trainers::ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossArguments& lossArguments, const SortingTreeTrainerArguments& sortingTreeArguments)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
         switch(lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return std::make_unique<trainers::SortingTreeTrainer<lossFunctions::SquaredLoss>>(parameters, lossFunctions::SquaredLoss());
+            return trainers::MakeSortingTreeTrainer(lossFunctions::SquaredLoss(), sortingTreeArguments);
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
