@@ -30,6 +30,9 @@ namespace features
     // IncrementalMeanFeature
     //
 
+    IncrementalMeanFeature::IncrementalMeanFeature(Feature* inputFeature, size_t windowSize) : BufferedFeature({inputFeature}, windowSize) 
+    {}
+
     std::vector<double> IncrementalMeanFeature::ComputeOutput() const
     {
         assert(_inputFeatures.size() == 1);
@@ -44,7 +47,6 @@ namespace features
         // get the oldest sample
         auto windowSize = GetWindowSize();
         auto oldData = GetDelayedSamples(windowSize-1);
-//        assert(oldData.size() == rowSize);
         oldData.resize(rowSize);
         _runningSum.resize(rowSize);
          
@@ -63,7 +65,6 @@ namespace features
 
     layers::CoordinateList IncrementalMeanFeature::AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const
     {
-        // TODO: reimplement this using incremental computation (with an accumulator layer)
         auto it = featureOutputs.find(_inputFeatures[0]);
         if (it == featureOutputs.end())
         {
@@ -74,17 +75,15 @@ namespace features
         auto dimension = inputCoordinates.Size();
         auto windowSize = GetWindowSize();
 
-        // Compute mean
+        // TODO: document
         auto bufferOutputCoordinates = model.EmplaceLayer<layers::ShiftRegisterLayer>(inputCoordinates, windowSize+1);
-
-        // TODO: find a better way to extract the per-channel coordinates
         auto shiftRegisterLayer = dynamic_cast<const layers::ShiftRegisterLayer&>(model.GetLastLayer());
-        auto oldestSampleCoordinates = shiftRegisterLayer.GetDelayedOutputCoordinates(bufferOutputCoordinates, windowSize);
-        auto diffCoordinates = model.EmplaceLayer<layers::BinaryOpLayer>(inputCoordinates, oldestSampleCoordinates, layers::BinaryOpLayer::OperationType::subtract);
-        auto accumulatorCoordinates = model.EmplaceLayer<layers::AccumulatorLayer>(diffCoordinates);
-        auto divisorCoordinates = model.EmplaceLayer<layers::ConstantLayer>(std::vector<double>(dimension, windowSize));        
-        auto meanCoordinates = model.EmplaceLayer<layers::BinaryOpLayer>(accumulatorCoordinates, divisorCoordinates, layers::BinaryOpLayer::OperationType::divide);
-        return meanCoordinates;
+        auto oldestSample = shiftRegisterLayer.GetDelayedOutputCoordinates(bufferOutputCoordinates, windowSize);
+        auto diff = model.EmplaceLayer<layers::BinaryOpLayer>(inputCoordinates, oldestSample, layers::BinaryOpLayer::OperationType::subtract);
+        auto accumulator = model.EmplaceLayer<layers::AccumulatorLayer>(diff);
+        auto divisor = model.EmplaceLayer<layers::ConstantLayer>(std::vector<double>(dimension, windowSize));        
+        auto mean = model.EmplaceLayer<layers::BinaryOpLayer>(accumulator, divisor, layers::BinaryOpLayer::OperationType::divide);
+        return mean;
     }
 
     std::unique_ptr<Feature> IncrementalMeanFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)

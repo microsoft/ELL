@@ -26,7 +26,7 @@ namespace features
         /// <summary> Constructor </summary>
         /// <param name="inputFeature"> The feature to take the mean of </param>
         /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
-        IncrementalMeanFeature(Feature* inputFeature, size_t windowSize) : BufferedFeature({inputFeature}, windowSize) {}
+        IncrementalMeanFeature(Feature* inputFeature, size_t windowSize);
 
         /// <summary> Creates an `IncrementalMeanFeature` from a vector of strings </summary>
         ///

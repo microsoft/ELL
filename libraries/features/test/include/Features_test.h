@@ -15,3 +15,5 @@ void TestMeanFeature();
 void TestIncrementalMeanFeature();
 
 void TestVarianceFeature();
+
+void TestIncrementalVarianceFeature();

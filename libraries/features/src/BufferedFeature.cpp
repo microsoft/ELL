@@ -22,7 +22,7 @@ namespace features
 
     BufferedFeature::BufferedFeature(const std::vector<Feature*>& inputs, size_t windowSize) : Feature({inputs}), _windowSize(windowSize), _currentIndex(0)
     {
-        // TODO: resize _samples buffer to be windowSize
+        // TODO: resize _samples buffer to be windowSize here?
     }
 
     void BufferedFeature::Reset()

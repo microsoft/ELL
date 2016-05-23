@@ -13,6 +13,7 @@
 #include "MeanFeature.h"
 #include "IncrementalMeanFeature.h"
 #include "VarianceFeature.h"
+#include "IncrementalVarianceFeature.h"
 
 // datset
 #include "DenseDataVector.h"
@@ -301,6 +302,62 @@ void TestVarianceFeature()
     }
     
     double output;
+    if (outputVec.size() == 0)
+    {
+        testing::ProcessTest("Error: no output from VarianceFeature's Map", false); 
+    }
+    testing::ProcessTest("Testing VarianceFeature", testing::IsEqual(outputVec[0], expectedOutput));
+}
+
+void TestIncrementalVarianceFeature()
+{
+    FeatureSet features;
+    auto inputFeature = features.CreateFeature<InputFeature>(1);
+    const int windowSize = 4;
+    auto varianceFeature = features.CreateFeature<IncrementalVarianceFeature>(inputFeature, windowSize);
+    features.SetOutputFeature(varianceFeature);
+
+    std::vector<std::vector<double>> data = { {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} };
+    double mean = VectorMean({7.0, 8.0, 9.0, 10.0});
+    double expectedOutput = VectorVariance({7.0, 8.0, 9.0, 10.0}, mean);
+
+    // 1) Test Compute()
+    std::vector<double> outputVec;
+    bool hasOutput = false;
+    for(const auto& x: data)
+    {
+        hasOutput = features.ProcessInputData(x);
+    }
+
+    if (hasOutput)
+    {
+        outputVec = features.GetOutput();
+    }
+    else
+    {
+        testing::ProcessTest("Error: no output from MagnitudeFeature", false); 
+    }
+
+    testing::ProcessTest("Testing Variance Feature", testing::IsEqual(outputVec[0], expectedOutput));
+
+    // 2) Create Model / Map and test it
+    layers::Model model;
+    layers::CoordinateList inputCoordinates(0, 1); // What should the input coordinates be???
+    auto outputCoordinates = features.AddToModel(model, inputCoordinates);
+    
+    std::cout << "Variance feature model" << std::endl;
+    model.Save(std::cout);
+    std::cout << std::endl;
+    
+    // create a map
+    layers::Map map(model, outputCoordinates);
+
+    // now run a test vector through it    
+    for(const auto& x: data)
+    {
+        outputVec = map.Compute(x);
+    }
+    
     if (outputVec.size() == 0)
     {
         testing::ProcessTest("Error: no output from VarianceFeature's Map", false); 

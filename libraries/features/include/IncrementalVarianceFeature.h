@@ -28,7 +28,7 @@ namespace features
         /// <param name="windowSize"> The number of samples of history to use in computing the variance </param>
         IncrementalVarianceFeature(Feature* inputFeature, size_t windowSize);
 
-        /// <summary> Constructor from magnitude feature </summary>
+        /// <summary> Constructor from mean feature </summary>
         /// <param name="inputFeature"> The feature to take the variance of </param>
         /// <param name="meanFeature"> A feature that returns the mean of the input window </param>
         /// <param name="windowSize"> The number of samples of history to use in computing the variance </param>
@@ -46,5 +46,9 @@ namespace features
     protected:
         virtual std::vector<double> ComputeOutput() const override;
         virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const override;
+
+    private:
+        mutable std::vector<double> _runningSum;
+        mutable std::vector<double> _runningSumSq;
     };
 }
