@@ -14,6 +14,7 @@ namespace features
     template <typename FeatureT>
     void Feature::RegisterFeatureType()
     {
+        // TODO: change feature_name to static GetTypeName() and call that there
         RegisterCreateFunction(FeatureT::feature_name, FeatureT::Create);
     }
 }

@@ -16,13 +16,13 @@
 ///
 int main()
 {
-//    TestMagnitudeFeature();
+     TestMagnitudeFeature();
     
-//     TestMeanFeature();
+     TestMeanFeature();
 
-//     TestIncrementalMeanFeature();
+     TestIncrementalMeanFeature();
 
-//     TestVarianceFeature();
+     TestVarianceFeature();
 
     TestIncrementalVarianceFeature();
 

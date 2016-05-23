@@ -42,5 +42,9 @@ namespace layers
     ///
     /// <returns> The coordinate list. </returns>
     layers::CoordinateList BuildCoordinateList(const layers::Model& model, uint64_t inputLayerSize, const std::string& coordinateListString);
+    
+    layers::CoordinateList RepeatCoordinates(const Coordinate& coordinate, uint64_t numRepeats);
+    layers::CoordinateList RepeatCoordinates(const CoordinateList& coordinateList, uint64_t numRepeats);
+    
 }
 

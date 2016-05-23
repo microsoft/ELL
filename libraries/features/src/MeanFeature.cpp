@@ -59,7 +59,6 @@ namespace features
         std::vector<double> result(rowSize);
         for (size_t columnIndex = 0; columnIndex < rowSize; columnIndex++)
         {
-            // compute mean (TODO: incrementally)
             auto samples = GetAllSamples(columnIndex);
             double mean = VectorMean(samples);
             result[columnIndex] = mean;

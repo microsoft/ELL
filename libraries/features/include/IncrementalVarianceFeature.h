@@ -20,6 +20,7 @@
 namespace features
 {
     /// <summary> A feature that takes a vector input and returns its variance over some window of time </summary>
+    /// <remarks> Computes variance by keeping a running sum of x and x^2, and computes var = (sum(x^2) - (sum(x)^2 / N)) / N</remarks>
     class IncrementalVarianceFeature : public BufferedFeature
     {
     public:
@@ -28,13 +29,7 @@ namespace features
         /// <param name="windowSize"> The number of samples of history to use in computing the variance </param>
         IncrementalVarianceFeature(Feature* inputFeature, size_t windowSize);
 
-        /// <summary> Constructor from mean feature </summary>
-        /// <param name="inputFeature"> The feature to take the variance of </param>
-        /// <param name="meanFeature"> A feature that returns the mean of the input window </param>
-        /// <param name="windowSize"> The number of samples of history to use in computing the variance </param>
-//        IncrementalVarianceFeature(Feature* inputFeature, Feature* meanFeature, size_t windowSize) : BufferedFeature({inputFeature}, windowSize) {}
-
-        /// <summary> Creates a `IncrementalVarianceFeature` from a vector of strings </summary>
+        /// <summary> Creates an `IncrementalVarianceFeature` from a vector of strings </summary>
         ///
         /// <param name="params"> The strings describing the parameters </params> 
         /// <param name="previousFeatures"> The map of existing features available as inputs. </params> 
