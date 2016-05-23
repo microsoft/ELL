@@ -13,11 +13,15 @@
 #include <string>
 #include <cassert>
 
+namespace
+{
+    std::string addOperationName = "Add";
+    std::string multiplyOperationName = "Multiply";
+}
+
 namespace layers
 {
     const int Coordinatewise::_currentVersion;
-    std::string addOperationName = "Add";
-    std::string multiplyOperationName = "Multiply";
 
     Coordinatewise::Coordinatewise(OperationType operationType) : _operationType(operationType)
     {}

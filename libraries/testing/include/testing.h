@@ -40,7 +40,7 @@ namespace testing
     /// <param name="testDescription"> Information describing the test. </param>
     /// <param name="success"> true if the test was a success, false if it failed. </param>
     void ProcessTest(const std::string& testDescription, bool success);
-
+    
     /// <summary> Checks if one of the tests failed. </summary>
     ///
     /// <returns> true if one of the tests failed. </returns>

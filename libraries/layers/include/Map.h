@@ -61,8 +61,15 @@ namespace layers
 
         /// <summary> Computes the Map. </summary>
         ///
+        /// <param name="input"> The input values. </param>
+        ///
+        /// <returns> An vector of output values. </returns>
+        std::vector<double> Compute(const std::vector<double>& input) const; // TODO: instead of std::vector<double>, this should probably take a DenseDataVector<double> or a DenseVector<double> (but which?)
+
+        /// <summary> Computes the Map. </summary>
+        ///
         /// <typeparam name="IndexValueIteratorType"> Input iterator type. </typeparam>
-        /// <param name="IndexValueIterator"> The input value iterator. </param>
+        /// <param name="inputIterator"> The input value iterator. </param>
         ///
         /// <returns> An Iterator over output values. </returns>
         template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 0>

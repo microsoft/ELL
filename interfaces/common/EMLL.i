@@ -94,7 +94,9 @@ namespace std
 // Define some namespaces so we can refer to them later
 namespace lossFunctions {};
 namespace predictors {};
+namespace dataset {};
 
+%ignore dataset::RowDataset::operator[];
 %import "RowDataset.h"
 %import "IDataVector.h"
 
@@ -161,3 +163,12 @@ wrap_unique_ptr(LayerPtr, layers::Layer)
 
 typedef trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType predictors::LinearPredictor;
 class trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType {};
+
+// Interface for features library
+%include features.i
+
+%shared_ptr(layers::Map)
+%shared_ptr(layers::Model)
+//%template (GenericRowDataset) dataset::RowDataset<dataset::IDataVector>
+//%shared_ptr(GenericRowDataset)
+%shared_ptr(RowDataset)

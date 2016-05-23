@@ -16,6 +16,7 @@
 #include "RowDatasetInterface.h"
 %}
 
+%ignore dataset::RowDataset::operator[];
 namespace dataset
 {
     %ignore IDataVector::Clone;
@@ -23,7 +24,6 @@ namespace dataset
     %ignore GenericSupervisedExample::GenericSupervisedExample(GenericSupervisedExample&& other);
     %ignore GenericSupervisedExample::GetDataVector;
     %ignore GenericSupervisedExample::GenericSupervisedExample;
-    %ignore RowDataset::operator[];
 
     %ignore DenseDataVector::operator[];
     %ignore DenseDataVector<double>;
