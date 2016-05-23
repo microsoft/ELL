@@ -10,6 +10,8 @@
 
 // stl
 #include <cstdint>
+#include <string>
+#include <vector>
 
 namespace evaluators
 {
@@ -26,7 +28,10 @@ namespace evaluators
             double sumWeights = 0.0;
             double sumWeightedLosses = 0.0;
 
-            std::string ToString() const;
+            /// <summary> Gets the vector of evaluation values that match the descriptions in GetHeader(). </summary>
+            ///
+            /// <returns> A vector of evaluation values. </returns>
+            std::vector<double> GetValues() const;
         };
 
         /// <summary> Constructs an instance of LossAggregator with a given loss. </summary>
@@ -46,10 +51,10 @@ namespace evaluators
         /// <returns> The current value. </returns>
         Value GetAndReset();
 
-        /// <summary> Gets a header that describes Value::ToString(). </summary>
+        /// <summary> Gets a header that describes the values of this aggregator. </summary>
         ///
-        /// <returns> The header string. </returns>
-        std::string GetHeader() const { return "MeanLoss"; }
+        /// <returns> The header string vector. </returns>
+        std::vector<std::string> GetHeader() const;
 
     private:
         LossFunctionType _lossFunction;

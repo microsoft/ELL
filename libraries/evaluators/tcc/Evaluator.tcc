@@ -50,7 +50,7 @@ namespace evaluators
     template<typename PredictorType, typename... AggregatorTypes>
     void Evaluator<PredictorType, AggregatorTypes...>::Print(std::ostream& os) const
     {
-        DispatchPrint(os, std::make_index_sequence<sizeof...(AggregatorTypes)>());
+        PrintDispatch(os, std::make_index_sequence<sizeof...(AggregatorTypes)>());
     }
 
     template<typename PredictorType, typename... AggregatorTypes>
@@ -88,28 +88,44 @@ namespace evaluators
         _valueTuples.push_back(std::move(valueTuple));
     }
 
+    template<typename T>
+    void printVector(std::ostream& os, const std::vector<T>& v)
+    {
+        if(v.size() == 0) return;
+
+        os << v[0];
+        for(uint64_t j = 1; j<v.size(); ++j)
+        {
+            os << '\t' << v[j];
+        }
+    }
+
+
     template<typename PredictorType, typename... AggregatorTypes>
     template<std::size_t ...Is>
-    void Evaluator<PredictorType, AggregatorTypes...>::DispatchPrint(std::ostream& os, std::index_sequence<Is...>) const
+    void Evaluator<PredictorType, AggregatorTypes...>::PrintDispatch(std::ostream& os, std::index_sequence<Is...>) const
     {
         // print header
-        std::vector<std::string> header {std::get<Is>(_aggregatorTuple).GetHeader()...};
-        os << header[0];
+        std::vector<std::vector<std::string>> header {std::get<Is>(_aggregatorTuple).GetHeader()...};
+
+        printVector(os, header[0]);
         for(uint64_t i = 1; i<header.size(); ++i)
         {
-            os << "\t" << header[i];
+            os << '\t';
+            printVector(os, header[i]);
         }
         os << std::endl;
 
         for(const auto& valueTuple : _valueTuples)
         {
             // Call X.ToString() for each X in valueTuple
-            std::vector<std::string> strings {std::get<Is>(valueTuple).ToString()...};
+            std::vector<std::vector<double>> values {std::get<Is>(valueTuple).GetValues()...};
 
-            os << strings[0];
-            for(uint64_t i = 1; i<strings.size(); ++i)
+            printVector(os, values[0]);
+            for(uint64_t i = 1; i<values.size(); ++i)
             {
-                os << "\t" << strings[i];
+                os << '\t';
+                printVector(os, values[i]);
             }
             os << std::endl;
         }

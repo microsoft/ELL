@@ -13,9 +13,9 @@
 
 namespace evaluators
 {
-    std::string AUCAggregator::Value::ToString() const
+    std::vector<double> AUCAggregator::Value::GetValues() const
     {
-        return std::to_string(auc);
+        return {auc};
     }
 
     void AUCAggregator::Update(double prediction, double label, double weight)
@@ -66,5 +66,10 @@ namespace evaluators
         if (prediction < other.prediction) return true;
         if (prediction > other.prediction) return false;
         return label > other.label;
+    }
+
+    std::vector<std::string> AUCAggregator::GetHeader() const 
+    { 
+        return {"AUC"}; 
     }
 }

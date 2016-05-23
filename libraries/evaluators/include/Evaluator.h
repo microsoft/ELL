@@ -83,7 +83,7 @@ namespace evaluators
         void Aggregate(std::index_sequence<Is...>);
 
         template<std::size_t ...Is>
-        void DispatchPrint(std::ostream& os, std::index_sequence<Is...>) const;
+        void PrintDispatch(std::ostream& os, std::index_sequence<Is...>) const;
 
         // member variables
         dataset::GenericRowDataset _rowDataset;

@@ -10,7 +10,7 @@
 
 namespace evaluators
 {
-    std::string BinaryErrorAggregator::Value::ToString() const 
+    std::vector<double> BinaryErrorAggregator::Value::GetValues() const
     {
         double allFalse = falsePositives + falseNegatives;
         double allTrue = truePositives + trueNegatives;
@@ -18,7 +18,9 @@ namespace evaluators
         double errorRate = allFalse / (allTrue + allFalse);
         double precision = truePositives == 0.0 ? 0.0 : truePositives / (truePositives + falsePositives);
         double recall = truePositives == 0.0 ? 0.0 : truePositives / (truePositives + falseNegatives);
-        return std::to_string(errorRate) + '\t' + std::to_string(precision) + '\t' + std::to_string(recall);
+        double f1 = (precision + recall) == 0.0 ? 0.0 : 2 * (precision * recall) / (precision + recall);
+
+        return {errorRate, precision, recall, f1};
     }
 
     void BinaryErrorAggregator::Update(double prediction, double label, double weight)
@@ -52,5 +54,10 @@ namespace evaluators
         Value newValue;
         std::swap(_value, newValue);
         return newValue;
+    }
+
+    std::vector<std::string> BinaryErrorAggregator::GetHeader() const 
+    { 
+        return {"ErrorRate", "Precision", "Recall", "F1-Score"}; 
     }
 }
