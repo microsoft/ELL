@@ -12,14 +12,18 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/LinearPredictor.cpp
-         src/DecisionTreePredictor.cpp)
+set (SRC src/DecisionTreePredictor.cpp
+         src/LinearPredictor.cpp)
 
-set (INCLUDE include/LinearPredictor.h
-             include/DecisionTreePredictor.h)
+set (INCLUDE include/DecisionTreePredictor.h
+             include/EnsemblePredictor.h
+             include/LinearPredictor.h)
+
+set (TCC tcc/EnsemblePredictor.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
+source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(../layers/include)
@@ -48,7 +52,7 @@ source_group("include" FILES ${TEST_INCLUDE})
 include_directories(../testing/include)
 include_directories(test/include)
 
-add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
+add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE} ${TCC})
 
 target_link_libraries(${TEST_NAME} dataset linear)
 

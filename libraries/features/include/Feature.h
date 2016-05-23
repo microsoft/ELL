@@ -68,7 +68,7 @@ namespace features
         static std::vector<std::string> GetRegisteredTypes();
         
         using FeatureMap = std::unordered_map<std::string, Feature*>;
-        using CreateFunction = std::function<std::unique_ptr<Feature>(std::vector<std::string>, FeatureMap&)>; // TODO: have creation (deserialization) function take a const FeatureMap&
+        typedef std::function<std::unique_ptr<Feature>(std::vector<std::string>, FeatureMap&)> CreateFunction; // TODO: have creation (deserialization) function take a const FeatureMap&
         
         /// <summary> Adds a feature to the global registry of features. Allows deserialization and creation from vector of strings. </summary>
         template <typename FeatureType>

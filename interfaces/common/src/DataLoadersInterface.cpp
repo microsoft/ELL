@@ -108,7 +108,7 @@ namespace interfaces
             dataIterator->Next();
         }
 
-        return interfaces::GenericRowDataset(std::move(rowDataset));
+        return std::move(interfaces::GenericRowDataset(std::move(rowDataset)));
     }
 
     interfaces::GenericRowDataset GetDataset(const common::DataLoadArguments& dataLoadArguments, const interfaces::Map& map)
@@ -122,7 +122,7 @@ namespace interfaces
             dataIterator->Next();
         }
 
-        return interfaces::GenericRowDataset(std::move(rowDataset));
+        return std::move(interfaces::GenericRowDataset(std::move(rowDataset)));
     }
 
     interfaces::GenericRowDataset GetDataset(const std::string& dataFilename, const interfaces::Map& map)

@@ -29,7 +29,7 @@ namespace dataset
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
         ///
-        /// <returns> A std::unique_ptr&lt;IDataVector&gt; </returns>
+        /// <returns> A unique_ptr to an IDataVector</returns>
         template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         static std::unique_ptr<IDataVector> Build(IndexValueIteratorType IndexValueIterator);
     };

@@ -6,10 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-%module predictors
-
-%include typemaps.i
-
 %ignore predictors::LinearPredictor::AddToModel(layers::Model&, const layers::CoordinateList& ) const;
 %ignore predictors::LinearPredictor::GetVector() const;
 %ignore predictors::LinearPredictor::GetBias() const;
@@ -25,6 +21,10 @@
 #include "Model.h"
 %}
 
+//%import "Model.h"
+//%import "ModelInterface.h"
+
+%shared_ptr(predictors::LinearPredictor) 
 %include "LinearPredictor.h"
 %include "DecisionTreePredictor.h"
 
