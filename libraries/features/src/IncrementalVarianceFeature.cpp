@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     VarianceFeature.cpp (features)
+//  File:     IncrementalVarianceFeature.cpp (features)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "VarianceFeature.h"
+#include "IncrementalVarianceFeature.h"
 #include "MeanFeature.h"
 #include "Feature.h"
 #include "StringUtil.h"
@@ -53,17 +53,17 @@ namespace
 namespace features
 {
     //
-    // VarianceFeature
+    // IncrementalVarianceFeature
     //
 
-    VarianceFeature::VarianceFeature(Feature* inputFeature, size_t windowSize)  : BufferedFeature({inputFeature}, windowSize) 
+    IncrementalVarianceFeature::IncrementalVarianceFeature(Feature* inputFeature, size_t windowSize)  : BufferedFeature({inputFeature}, windowSize) 
     {
     }
     
-    //VarianceFeature::VarianceFeature(Feature* inputFeature, Feature* meanFeature, size_t windowSize)  : BufferedFeature({inputFeature}, windowSize), _meanFeature(meanFeature)
+    //IncrementalVarianceFeature::IncrementalVarianceFeature(Feature* inputFeature, Feature* meanFeature, size_t windowSize)  : BufferedFeature({inputFeature}, windowSize), _meanFeature(meanFeature)
     //{}
 
-    std::vector<double> VarianceFeature::ComputeOutput() const
+    std::vector<double> IncrementalVarianceFeature::ComputeOutput() const
     {
         assert(_inputFeatures.size() == 1);
         const auto& inputData = _inputFeatures[0]->GetOutput();
@@ -90,7 +90,7 @@ namespace features
         return result;
     }
 
-    layers::CoordinateList VarianceFeature::AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const
+    layers::CoordinateList IncrementalVarianceFeature::AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const
     {
         // TODO: reimplement this using incremental computation (with an accumulator layer)
         auto it = featureOutputs.find(_inputFeatures[0]);
@@ -156,7 +156,7 @@ namespace features
         return varianceCoordinates;
     }
 
-    std::unique_ptr<Feature> VarianceFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
+    std::unique_ptr<Feature> IncrementalVarianceFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
         assert(params.size() == 4);
         Feature* inputFeature = previousFeatures[params[2]];
@@ -167,6 +167,6 @@ namespace features
             std::string error_msg = std::string("Error deserializing feature description: unknown input feature ") + params[2];
             throw std::runtime_error(error_msg);
         }
-        return std::make_unique<VarianceFeature>(inputFeature, windowSize);
+        return std::make_unique<IncrementalVarianceFeature>(inputFeature, windowSize);
     }
 }

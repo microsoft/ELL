@@ -18,8 +18,10 @@ set (INCLUDE include/BufferedFeature.h
              include/InputFeature.h
              include/MagnitudeFeature.h
              include/MeanFeature.h
+             include/IncrementalMeanFeature.h
              include/StringUtil.h
-             include/VarianceFeature.h)
+             include/VarianceFeature.h
+             include/IncrementalVarianceFeature.h)
 
 set (SRC src/BufferedFeature.cpp
          src/Feature.cpp
@@ -27,8 +29,10 @@ set (SRC src/BufferedFeature.cpp
          src/InputFeature.cpp
          src/MagnitudeFeature.cpp
          src/MeanFeature.cpp
+         src/IncrementalMeanFeature.cpp
          src/StringUtil.cpp
-         src/VarianceFeature.cpp)
+         src/VarianceFeature.cpp
+         src/IncrementalVarianceFeature.cpp)
 
 set (TCC tcc/Feature.tcc
          tcc/FeatureSet.tcc

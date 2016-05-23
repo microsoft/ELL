@@ -11,6 +11,7 @@
 #include "InputFeature.h"
 #include "MagnitudeFeature.h"
 #include "MeanFeature.h"
+#include "IncrementalMeanFeature.h"
 #include "VarianceFeature.h"
 
 // datset
@@ -82,7 +83,7 @@ namespace
 //
 // Test functions
 //
-void TestMagnitudeFeatureCompute()
+void TestMagnitudeFeature()
 {
     FeatureSet features;
     auto inputFeature = features.CreateFeature<InputFeature>(3);
@@ -90,105 +91,87 @@ void TestMagnitudeFeatureCompute()
     features.SetOutputFeature(magnitudeFeature);
     features.Reset();
 
-    std::vector<double> data = { 1,2,3 };
-    double output = 0;
-    bool hasOutput = features.ProcessInputData(data);
-    if (hasOutput)
-    {
-        auto out = features.GetOutput();
-        output = out[0];
-    }
-    else
-    {
-        testing::ProcessTest("Error: no output from MagnitudeFeature", false); 
-    }
+    std::vector<std::vector<double>> data = {{ 1,2,3 }};
+    double expectedOutput = VectorMagnitude(data.back());
 
-    double expectedOutput = VectorMagnitude(data);
-    testing::ProcessTest("Testing MagnitudeFeature", testing::IsEqual(output, expectedOutput));
-}
-
-void TestMagnitudeFeatureModel()
-{
-    // Set up feature set
-    FeatureSet features;
-    auto inputFeature = features.CreateFeature<InputFeature>(3);
-    auto magnitudeFeature = features.CreateFeature<MagnitudeFeature>(inputFeature);
-    features.SetOutputFeature(magnitudeFeature);
-
-    // create model
-    layers::Model model;
-    layers::CoordinateList inputCoordinates(0, 3); // What should the input coordinates be???
-    auto outputCoordinates = features.AddToModel(model, inputCoordinates);
-    std::cout << "Magnitude feature output coordinates: " << outputCoordinates << std::endl;
-
-    std::cout << "Magnitude feature model" << std::endl;
-    model.Save(std::cout);
-    std::cout << std::endl;
-    // create a map
-    layers::Map map(model, outputCoordinates);
-
-    // now run a test vector through it
-    std::vector<double> data = { 1,2,3 };
-    dataset::DoubleDataVector dataVector(data);
-    auto outputVec = map.Compute(data);
-    
-    double output;
-    if (outputVec.size() > 0)
-    {
-        output = outputVec[0];
-    }
-    else
-    {
-        testing::ProcessTest("Error: no output from MagnitudeFeature", false); 
-    }
-    double expectedOutput = VectorMagnitude(data);
-    testing::ProcessTest("Testing MagnitudeFeature", testing::IsEqual(output, expectedOutput));        
-}
-
-void TestMeanFeatureCompute()
-{
-   FeatureSet features;
-    auto inputFeature = features.CreateFeature<InputFeature>(1);
-    const int windowSize = 4;
-    auto meanFeature = features.CreateFeature<MeanFeature>(inputFeature, windowSize);
-    features.SetOutputFeature(meanFeature);
-    features.Reset();
-
-    std::vector<std::vector<double>> data = { {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} };
-    double output = 0;
+    // 1) Test Compute()
+    std::vector<double> outputVec;
     bool hasOutput = false;
     for(const auto& x: data)
     {
         hasOutput = features.ProcessInputData(x);
     }
+
     if (hasOutput)
     {
-        auto out = features.GetOutput();
-        output = out[0];
+        outputVec = static_cast<std::vector<double>>(features.GetOutput());
     }
     else
     {
         testing::ProcessTest("Error: no output from MagnitudeFeature", false); 
     }
 
-    double expectedOutput = VectorMean({7.0, 8.0, 9.0, 10.0}); 
-    testing::ProcessTest("Testing MeanFeature", testing::IsEqual(output, expectedOutput));
+    testing::ProcessTest("Testing MagnitudeFeature", testing::IsEqual(outputVec[0], expectedOutput));
+
+    // 2) Create Model / Map and test it
+    layers::Model model;
+    layers::CoordinateList inputCoordinates(0, 3); // What should the input coordinates be???
+    auto outputCoordinates = features.AddToModel(model, inputCoordinates);
+
+    std::cout << "Magnitude feature model" << std::endl;
+    model.Save(std::cout);
+    std::cout << std::endl;
+
+    // create a map
+    layers::Map map(model, outputCoordinates);
+
+    // now run a test vector through it
+    for(const auto& x: data)
+    {
+        outputVec = map.Compute(x);
+    }
+    
+    if (outputVec.size() == 0)
+    {
+        testing::ProcessTest("Error: no output from MagnitudeFeature", false); 
+    }
+    testing::ProcessTest("Testing MagnitudeFeature", testing::IsEqual(outputVec[0], expectedOutput));
 }
 
-void TestMeanFeatureModel()
+void TestMeanFeature()
 {
-    // Set up feature set
     FeatureSet features;
-    auto inputFeature = features.CreateFeature<InputFeature>(1);
     const int windowSize = 4;
+    auto inputFeature = features.CreateFeature<InputFeature>(1);
     auto meanFeature = features.CreateFeature<MeanFeature>(inputFeature, windowSize);
     features.SetOutputFeature(meanFeature);
 
-    // create model
+    std::vector<std::vector<double>> data = { {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} };
+    double expectedOutput = VectorMean({7.0, 8.0, 9.0, 10.0}); 
+
+    // 1) Test Compute()
+    std::vector<double> outputVec;
+    bool hasOutput = false;
+    for(const auto& x: data)
+    {
+        hasOutput = features.ProcessInputData(x);
+    }
+    
+    if (hasOutput)
+    {
+        outputVec = features.GetOutput();
+    }
+    else
+    {
+        testing::ProcessTest("Error: no output from MeanFeature", false); 
+    }
+
+    testing::ProcessTest("Testing MeanFeature::Compute", testing::IsEqual(outputVec[0], expectedOutput));
+    
+    // 2) Create Model / Map and test it
     layers::Model model;
     layers::CoordinateList inputCoordinates(0, 1); // What should the input coordinates be???
     auto outputCoordinates = features.AddToModel(model, inputCoordinates);
-    std::cout << "Mean feature output coordinates: " << outputCoordinates << std::endl;
 
     std::cout << "Mean feature model" << std::endl;
     model.Save(std::cout);
@@ -198,38 +181,90 @@ void TestMeanFeatureModel()
     layers::Map map(model, outputCoordinates);
 
     // now run a test vector through it
-    std::vector<std::vector<double>> data = { {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} };
-
-    std::vector<double> outputVec;
     for(const auto& x: data)
     {
         outputVec = map.Compute(x);
     }
     
-    double output;
-    if (outputVec.size() > 0)
+    if (outputVec.size() == 0)
     {
-        output = outputVec[0];
+        testing::ProcessTest("Error: no output from MeanFeature's Map", false); 
+    }
+    testing::ProcessTest("Testing MeanFeature::AddToModel", testing::IsEqual(outputVec[0], expectedOutput));
+}
+
+void TestIncrementalMeanFeature()
+{
+    FeatureSet features;
+    const int windowSize = 4;
+    auto inputFeature = features.CreateFeature<InputFeature>(1);
+    auto meanFeature = features.CreateFeature<IncrementalMeanFeature>(inputFeature, windowSize);
+    features.SetOutputFeature(meanFeature);
+
+    std::vector<std::vector<double>> data = { {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} };
+    double expectedOutput = VectorMean({7.0, 8.0, 9.0, 10.0}); 
+
+    // 1) Test Compute()
+    std::vector<double> outputVec;
+    bool hasOutput = false;
+    for(const auto& x: data)
+    {
+        hasOutput = features.ProcessInputData(x);
+    }
+    
+    if (hasOutput)
+    {
+        outputVec = features.GetOutput();
     }
     else
     {
-        testing::ProcessTest("Error: no output from MeanFeature", false); 
+        testing::ProcessTest("Error: no output from IncrementalMeanFeature", false); 
     }
-    double expectedOutput = VectorMean({7.0, 8.0, 9.0, 10.0}); 
-    testing::ProcessTest("Testing MeanFeature", testing::IsEqual(output, expectedOutput));
+
+    testing::ProcessTest("Testing IncrementalMeanFeature::Compute", testing::IsEqual(outputVec[0], expectedOutput));
+        
+    // 2) Create Model / Map and test it
+    layers::Model model;
+    layers::CoordinateList inputCoordinates(0, 1); // What should the input coordinates be???
+    auto outputCoordinates = features.AddToModel(model, inputCoordinates);
+
+    std::cout << "Incremental mean feature model" << std::endl;
+    model.Save(std::cout);
+    std::cout << std::endl;
+        
+    // create a map
+    layers::Map map(model, outputCoordinates);
+
+    // now run a test vector through it
+    for(const auto& x: data)
+    {
+        outputVec = map.Compute(x);
+    }
+    
+    if (outputVec.size() == 0)
+    {
+        testing::ProcessTest("Error: no output from IncrementalMeanFeature's Map", false); 
+    }
+    
+    std::cout << "output: " << outputVec[0] << ", expected: " << expectedOutput << std::endl;
+    
+    testing::ProcessTest("Testing IncrementalMeanFeature::AddToModel", testing::IsEqual(outputVec[0], expectedOutput));
 }
 
-void TestVarianceFeatureCompute()
+void TestVarianceFeature()
 {
-   FeatureSet features;
+    FeatureSet features;
     auto inputFeature = features.CreateFeature<InputFeature>(1);
     const int windowSize = 4;
     auto varianceFeature = features.CreateFeature<VarianceFeature>(inputFeature, windowSize);
     features.SetOutputFeature(varianceFeature);
-    features.Reset();
 
     std::vector<std::vector<double>> data = { {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} };
-    double output = 0;
+    double mean = VectorMean({7.0, 8.0, 9.0, 10.0});
+    double expectedOutput = VectorVariance({7.0, 8.0, 9.0, 10.0}, mean);
+
+    // 1) Test Compute()
+    std::vector<double> outputVec;
     bool hasOutput = false;
     for(const auto& x: data)
     {
@@ -237,30 +272,17 @@ void TestVarianceFeatureCompute()
     }
     if (hasOutput)
     {
-        auto out = features.GetOutput();
-        output = out[0];
+        outputVec = features.GetOutput();
     }
     else
     {
         testing::ProcessTest("Error: no output from MagnitudeFeature", false); 
     }
 
-    double mean = VectorMean({7.0, 8.0, 9.0, 10.0});
-    double expectedOutput = VectorVariance({7.0, 8.0, 9.0, 10.0}, mean);
-    std::cout << "variance: " << output << ", expected " << expectedOutput << std::endl;
-    testing::ProcessTest("Testing Variance Feature", testing::IsEqual(output, expectedOutput));
-}
+    std::cout << "variance: " << outputVec[0] << ", expected " << expectedOutput << std::endl;
+    testing::ProcessTest("Testing Variance Feature", testing::IsEqual(outputVec[0], expectedOutput));
 
-void TestVarianceFeatureModel()
-{
-    // Set up feature set
-    FeatureSet features;
-    auto inputFeature = features.CreateFeature<InputFeature>(1);
-    const int windowSize = 4;
-    auto varianceFeature = features.CreateFeature<VarianceFeature>(inputFeature, windowSize);
-    features.SetOutputFeature(varianceFeature);
-
-    // create model
+    // 2) Create Model / Map and test it
     layers::Model model;
     layers::CoordinateList inputCoordinates(0, 1); // What should the input coordinates be???
     auto outputCoordinates = features.AddToModel(model, inputCoordinates);
@@ -272,26 +294,16 @@ void TestVarianceFeatureModel()
     // create a map
     layers::Map map(model, outputCoordinates);
 
-    // now run a test vector through it
-    std::vector<std::vector<double>> data = { {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} };
-
-    std::vector<double> outputVec;
+    // now run a test vector through it    
     for(const auto& x: data)
     {
         outputVec = map.Compute(x);
     }
     
     double output;
-    if (outputVec.size() > 0)
+    if (outputVec.size() == 0)
     {
-        output = outputVec[0];
+        testing::ProcessTest("Error: no output from VarianceFeature's Map", false); 
     }
-    else
-    {
-        testing::ProcessTest("Error: no output from VarianceFeature", false); 
-    }
-    double mean = VectorMean({7.0, 8.0, 9.0, 10.0}); 
-    double expectedOutput = VectorVariance({7.0, 8.0, 9.0, 10.0}, mean);
-    std::cout << "Output: " << output << ", expected: " << expectedOutput << std::endl;
-    testing::ProcessTest("Testing VarianceFeature", testing::IsEqual(output, expectedOutput));
+    testing::ProcessTest("Testing VarianceFeature", testing::IsEqual(outputVec[0], expectedOutput));
 }

@@ -28,13 +28,20 @@ namespace layers
     void ShiftRegister::AddSample(std::vector<double> value)
     {
         assert(value.size() == _inputDimension);
-        // TODO: use a ring buffer instead of this simple but slower version
-        if(_data.size() >= _inputDimension*_size)
-        {
-            _data.erase(_data.begin(), _data.begin() + _inputDimension);
-        }
+        assert(_data.size() == _inputDimension * _size);
+        if(_size == 0) return;
 
-        for(auto x: value) _data.push_back(x);
+        // erase _inputDimension things from the back
+        _data.resize(_inputDimension*(_size-1));
+        _data.insert(_data.begin(), value.begin(), value.end());
+                
+        // // TODO: use a ring buffer instead of this simple but slower version
+        // if(_data.size() >= _inputDimension*_size)
+        // {
+        //     _data.erase(_data.begin(), _data.begin() + _inputDimension);
+        // }
+
+        // for(auto x: value) _data.push_back(x);
     }
     
     //

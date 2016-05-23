@@ -16,14 +16,13 @@
 ///
 int main()
 {
-    TestMagnitudeFeatureCompute();
-    TestMagnitudeFeatureModel();
+   TestMagnitudeFeature();
     
-    TestMeanFeatureCompute();
-    TestMeanFeatureModel();
+    TestMeanFeature();
 
-    TestVarianceFeatureCompute();
-    TestVarianceFeatureModel();
+    TestIncrementalMeanFeature();
+
+    TestVarianceFeature();
 
     if(testing::DidTestFail())
     {

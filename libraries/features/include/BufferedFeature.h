@@ -33,10 +33,15 @@ namespace features
         // BufferedFeature-specific routines
         size_t NumSamples() const;
         double GetSample(int column, size_t offset) const;
+
+        std::vector<double> GetDelayedSamples(size_t offset) const;
+
         std::vector<std::vector<double>>& GetAllSamples();
         const std::vector<std::vector<double>>& GetAllSamples() const;
+
         std::vector<double>& GetAllSamples(int column) { return _samples[column]; }
         const std::vector<double>& GetAllSamples(int column) const { return _samples[column]; }
+
         void UpdateRowSamples(const std::vector<double>& row) const;
 
         virtual void AddToDescription(std::vector<std::string>& description) const override;

@@ -11,7 +11,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/BinaryOpLayer.cpp
+set (SRC src/AccumulatorLayer.cpp
+         src/BinaryOpLayer.cpp
          src/ConstantLayer.cpp
          src/Coordinate.cpp
          src/CoordinateList.cpp
@@ -25,7 +26,8 @@ set (SRC src/BinaryOpLayer.cpp
          src/Sum.cpp
          src/UnaryOpLayer.cpp)
 
-set (INCLUDE include/BinaryOpLayer.h
+set (INCLUDE include/AccumulatorLayer.h
+             include/BinaryOpLayer.h
              include/ConstantLayer.h
              include/Coordinate.h
              include/CoordinateList.h

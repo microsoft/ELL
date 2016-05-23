@@ -8,11 +8,10 @@
 
 #pragma once
 
-void TestMagnitudeFeatureCompute();
-void TestMagnitudeFeatureModel();
+void TestMagnitudeFeature();
 
-void TestMeanFeatureCompute();
-void TestMeanFeatureModel();
+void TestMeanFeature();
 
-void TestVarianceFeatureCompute();
-void TestVarianceFeatureModel();
+void TestIncrementalMeanFeature();
+
+void TestVarianceFeature();

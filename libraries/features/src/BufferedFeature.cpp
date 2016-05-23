@@ -64,23 +64,11 @@ namespace features
             AllocateSampleBuffer(numColumns);
         }
 
-        if (NumSamples() < _windowSize) // never happens now
+        assert(NumSamples() == _windowSize);
+        _currentIndex = (_currentIndex + 1) % _windowSize;
+        for (unsigned int col_index = 0; col_index < numColumns; col_index++)
         {
-            assert(false);
-            for (unsigned int col_index = 0; col_index < numColumns; col_index++)
-            {
-                // haven't filled the buffer yet
-                _samples[col_index].push_back(row[col_index]);
-                _currentIndex = (int)_samples[col_index].size() - 1;
-            }
-        }
-        else
-        {
-            _currentIndex = (_currentIndex + 1) % _windowSize;
-            for (unsigned int col_index = 0; col_index < numColumns; col_index++)
-            {
-                _samples[col_index][_currentIndex] = row[col_index];
-            }
+            _samples[col_index][_currentIndex] = row[col_index];
         }
     }
 
@@ -97,24 +85,20 @@ namespace features
     double BufferedFeature::GetSample(int column, size_t offset) const
     {
         // implements a simple ring buffer
-        assert(offset <= GetWindowSize());
-        auto computedSamples = NumSamples();
-        if (computedSamples < _windowSize)
+        assert(NumSamples() == _windowSize);
+        assert(offset <= _windowSize);
+        return _samples[column][(_currentIndex - offset + _windowSize) % _windowSize];
+    }
+
+    std::vector<double> BufferedFeature::GetDelayedSamples(size_t offset) const
+    {
+        auto numChannels = _samples.size();
+        std::vector<double> result;
+        for(size_t channelIndex = 0; channelIndex < numChannels; ++channelIndex)
         {
-            // haven't filled the buffer yet
-            if (offset < computedSamples)
-            {
-                return _samples[column][_samples[column].size() - 1 - offset];
-            }
-            else
-            {
-                return _samples[column][0];
-            }
-        }
-        else
-        {
-            return _samples[column][(_currentIndex - offset + _windowSize) % _windowSize];
-        }
+            result.push_back(GetSample(channelIndex, offset));
+        }        
+        return result;
     }
 
     std::vector<std::vector<double>>& BufferedFeature::GetAllSamples()
