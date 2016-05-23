@@ -34,7 +34,7 @@ namespace layers
         ///
         /// <param name="layer"> The layer to add to the model. </param>
         ///
-        /// <returns> The list of coordinates added. </returns>
+        /// <returns> The list of coordinates added. </returns>  // TODO: say "The output coordinates for the layer added" if that's correct
         CoordinateList AddLayer(std::unique_ptr<Layer> layer);
 
         /// <summary> Returns the number of layers in the model. </summary>
@@ -59,7 +59,7 @@ namespace layers
         /// <summary> Saves a model to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
-        void Save(std::ostream& os) const; // TODO, move this to common
+        void Save(std::ostream& os) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

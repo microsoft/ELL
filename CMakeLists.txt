@@ -26,7 +26,7 @@ if(CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # Options
-option(SWIG_ENABLED "Enable SWIG interfaces" ON)
+option(SWIG_ENABLED "Enable swig interfaces" ON)
 option(DOXYGEN_ENABLED "Enable Doxygen interfaces" ON)
 
 # Include modules in the CMake directory.
@@ -45,6 +45,7 @@ enable_testing()
 add_subdirectory(libraries/common)
 add_subdirectory(libraries/dataset)
 add_subdirectory(libraries/evaluators)
+add_subdirectory(libraries/features)
 add_subdirectory(libraries/layers)
 add_subdirectory(libraries/linear)
 add_subdirectory(libraries/lossFunctions)
@@ -71,8 +72,6 @@ if(SWIG_ENABLED)
     # Add examples
     add_subdirectory(examples)
   
-    # Make interface code be dependent on all libraries
-    add_dependencies(EMLL_common common dataset layers linear lossFunctions trainers predictors testing treeLayout utilities)
   else()
     message(WARNING "Couldn't find SWIG, skipping interface generation.")
   endif()

@@ -32,6 +32,7 @@ namespace layers
             {
                 auto coordinate = iter.Get();
                 output += inputs[coordinate.GetLayerIndex()][coordinate.GetElementIndex()];
+                iter.Next();
             }
             outputs[k] = output;
         }

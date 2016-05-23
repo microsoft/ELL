@@ -46,6 +46,9 @@ namespace linear
         /// <param name="v"> The vector to move from </param>
         DoubleVector(std::vector<double>&& v);
 
+        DoubleVector& operator=(const DoubleVector& other) = default;
+        DoubleVector& operator=(DoubleVector&& other) = default;
+
         /// <summary> Converting constructor. </summary>
         ///
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>

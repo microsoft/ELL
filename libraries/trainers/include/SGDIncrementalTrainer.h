@@ -43,7 +43,7 @@ namespace trainers
     class SGDIncrementalTrainer : public IIncrementalTrainer<predictors::LinearPredictor>
     {
     public:
-        using PredictorType = predictors::LinearPredictor;
+        typedef predictors::LinearPredictor PredictorType;
 
         /// <summary> Constructs the trainer. </summary>
         ///

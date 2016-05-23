@@ -6,18 +6,35 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-%module trainers
-
 %{
 #define SWIG_FILE_WITH_INIT
-#include "StochasticGradientDescentLearner.h"
 #include "LogLoss.h"
 #include "HingeLoss.h"
 #include "SquaredLoss.h"
+#include "SGDIncrementalTrainer_wrap.h"
 %}
 
-%include "StochasticGradientDescentLearner.h"
 
-%template (LogLossOptimizer) trainers::StochasticGradientDescentLearner<lossFunctions::LogLoss>;
-%template (HingeLossOptimizer) trainers::StochasticGradientDescentLearner<lossFunctions::HingeLoss>;
-%template (SquaredLossOptimizer) trainers::StochasticGradientDescentLearner<lossFunctions::SquaredLoss>;
+%include "SGDIncrementalTrainer_wrap.h"
+
+%inline 
+%{
+    class LinearPredictorProxy
+    {
+    public:
+        LinearPredictorProxy(const std::shared_ptr<const predictors::LinearPredictor>& pred) : _pred(*pred) {}
+        const predictors::LinearPredictor& GetPred() { return _pred; }
+    private:
+        predictors::LinearPredictor _pred;
+    };
+%}
+
+%template (LogLossSGDTrainer) trainers::SGDIncrementalTrainer<lossFunctions::LogLoss>;
+%template (HingeLossSGDTrainer) trainers::SGDIncrementalTrainer<lossFunctions::HingeLoss>;
+%template (SquaredLossSGDTrainer) trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
+
+%extend trainers::SGDIncrementalTrainer<lossFunctions::LogLoss>
+{
+    // TODO: return some other type of thing
+    LinearPredictorProxy GetPred() const { return LinearPredictorProxy(($self)->GetPredictor()); }
+}

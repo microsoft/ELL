@@ -16,10 +16,10 @@ def getArg(n, missingValue=''):
     return missingValue
 
 dataset = None
-optimizer = None
+trainer = None
 evaluator = None
 def sgd():
-    global optimizer
+    global trainer
     global dataset
     global evaluator
 
@@ -46,10 +46,12 @@ def sgd():
 
     # create sgd trainer    
     loss = LogLoss()
-    optimizer = LogLossOptimizer(outputCoordinates.Size(), loss, l2Regularization)
+    params = SGDIncrementalTrainerParameters()
+    params.regularization = l2Regularization
+    trainer = LogLossSGDTrainer(outputCoordinates.Size(), loss, params)
 
     # create evaluator
-    evaluator = LinearLogLossClassificationEvaluator()
+    evaluator = LinearLogLossClassificationEvaluator(loss)
 
     numExamples = dataset.NumExamples()
     if not epochSize or epochSize >= numExamples:
@@ -62,25 +64,25 @@ def sgd():
     for epoch in xrange(numEpochs):
         # randomly permute the data
         dataset.RandomPermute(rng, epochSize)
-            
+
         # iterate over the entire permuted dataset
         trainSetIterator = dataset.GetIterator(0, epochSize)
-        optimizer.Update(trainSetIterator)  
+        trainer.Update(trainSetIterator)
 
         evalIterator = dataset.GetIterator()
-        predictor = optimizer.GetPredictor()
-        evaluator.Evaluate(evalIterator, predictor, loss) 
-
-    print "Training Error:"
+        predictor = trainer.GetPredictor()
+        evaluator.Evaluate(evalIterator, predictor)
+        print "{}".format(evaluator.GetLastLoss())
+        
     print "binary classification evaluation"
-    print "loss\terror"
-    print "{0}\t{1}".format(evaluator.GetLastLoss(), evaluator.GetLastError())
+    print "Loss: {0}\tError: {1}".format(evaluator.GetLastLoss(), evaluator.GetLastError())
     
     # update the map with the newly learned layers
-    predictor = optimizer.GetPredictor()
+    predictor = trainer.GetPredictor()
     predictor.AddToModel(model, map.GetOutputCoordinateList())
     
     # output the map
     model.Save(outMapFilename)
     
-    
+sgd()
+
