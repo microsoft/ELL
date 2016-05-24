@@ -38,15 +38,15 @@ namespace layers
     {
     public:
 
-        /// <summary> Constructs an instance of a BinaryOpLayer layer. </summary>
+        /// <summary> Constructs an instance of a BinaryOperationLayer layer. </summary>
         ShiftRegisterLayer() = default;
 
-        /// <summary> Constructs an instance of a BinaryOpLayer layer. </summary>
+        /// <summary> Constructs an instance of a BinaryOperationLayer layer. </summary>
         ///
         /// <param name="values"> The value for each element. </param>
         /// <param name="input1"> The input coordinate for the left side of the operation each element. </param>
         /// <param name="input2"> The input coordinate for the right side of the operation each element. </param>
-        /// <param name="operationType"> The type of BinaryOpLayer layer to construct. </param>
+        /// <param name="operationType"> The type of BinaryOperationLayer layer to construct. </param>
         ShiftRegisterLayer(const CoordinateList& input, uint64_t windowSize);
 
         /// <summary> Default virtual destructor. </summary>

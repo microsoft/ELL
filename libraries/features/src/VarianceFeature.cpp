@@ -14,7 +14,7 @@
 // layers
 #include "ShiftRegisterLayer.h"
 #include "ConstantLayer.h"
-#include "BinaryOpLayer.h"
+#include "BinaryOperationLayer.h"
 #include "Sum.h"
 
 #include <cassert>
@@ -117,7 +117,7 @@ namespace features
         auto sumCoordinates = model.EmplaceLayer<layers::Sum>(perChannelBufferOutputCoordinates);
         auto divisorCoordinates = model.EmplaceLayer<layers::ConstantLayer>(std::vector<double>(dimension, windowSize));
         
-        auto meanCoordinates = model.EmplaceLayer<layers::BinaryOpLayer>(sumCoordinates, divisorCoordinates, layers::BinaryOpLayer::OperationType::divide);
+        auto meanCoordinates = model.EmplaceLayer<layers::BinaryOperationLayer>(sumCoordinates, divisorCoordinates, layers::BinaryOperationLayer::OperationType::divide);
 
         // -- Now compute variance
 
@@ -132,10 +132,10 @@ namespace features
         }
         
         // Subtract mean from windowed input
-        auto subtractMeanCoordinates = model.EmplaceLayer<layers::BinaryOpLayer>(expandedMeanCoordinates, bufferOutputCoordinates, layers::BinaryOpLayer::OperationType::subtract);
+        auto subtractMeanCoordinates = model.EmplaceLayer<layers::BinaryOperationLayer>(expandedMeanCoordinates, bufferOutputCoordinates, layers::BinaryOperationLayer::OperationType::subtract);
 
         // Square the difference
-        auto squaredDiffCoordinates = model.EmplaceLayer<layers::BinaryOpLayer>(subtractMeanCoordinates, subtractMeanCoordinates, layers::BinaryOpLayer::OperationType::multiply);
+        auto squaredDiffCoordinates = model.EmplaceLayer<layers::BinaryOperationLayer>(subtractMeanCoordinates, subtractMeanCoordinates, layers::BinaryOperationLayer::OperationType::multiply);
 
         std::vector<layers::CoordinateList> perChannelSquaredDiffCoordinates;
         for(size_t channel = 0; channel < dimension; ++channel)
@@ -152,7 +152,7 @@ namespace features
         auto sumDifferenceCoordinates = model.EmplaceLayer<layers::Sum>(perChannelSquaredDiffCoordinates);
         
         // Divide by N, and we're done
-        auto varianceCoordinates = model.EmplaceLayer<layers::BinaryOpLayer>(sumDifferenceCoordinates, divisorCoordinates, layers::BinaryOpLayer::OperationType::divide);
+        auto varianceCoordinates = model.EmplaceLayer<layers::BinaryOperationLayer>(sumDifferenceCoordinates, divisorCoordinates, layers::BinaryOperationLayer::OperationType::divide);
         return varianceCoordinates;
     }
 

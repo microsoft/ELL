@@ -13,7 +13,7 @@
 // layers
 #include "AccumulatorLayer.h"
 #include "ConstantLayer.h"
-#include "BinaryOpLayer.h"
+#include "BinaryOperationLayer.h"
 #include "ShiftRegisterLayer.h"
 #include "Sum.h"
 #include "CoordinateListTools.h"
@@ -86,13 +86,13 @@ namespace features
 
         // Compute running sum by subtracting oldest value and adding newest
         auto oldestSample = shiftRegisterLayer.GetDelayedOutputCoordinates(bufferOutput, windowSize);
-        auto diff = model.EmplaceLayer<layers::BinaryOpLayer>(inputData, oldestSample, layers::BinaryOpLayer::OperationType::subtract);
+        auto diff = model.EmplaceLayer<layers::BinaryOperationLayer>(inputData, oldestSample, layers::BinaryOperationLayer::OperationType::subtract);
         auto runningSum = model.EmplaceLayer<layers::AccumulatorLayer>(diff);
 
         // Make a layer holding the constant `windowSize`, broadcast to be wide enough to apply to all input dimensions, and divide running sum by it
         auto divisor = model.EmplaceLayer<layers::ConstantLayer>(std::vector<double>{(double)windowSize});
         auto divisorVector = layers::RepeatCoordinates(divisor, inputDimension);
-        auto mean = model.EmplaceLayer<layers::BinaryOpLayer>(runningSum, divisorVector, layers::BinaryOpLayer::OperationType::divide);
+        auto mean = model.EmplaceLayer<layers::BinaryOperationLayer>(runningSum, divisorVector, layers::BinaryOperationLayer::OperationType::divide);
         return mean;
     }
 

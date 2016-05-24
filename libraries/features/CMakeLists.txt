@@ -72,7 +72,7 @@ include_directories(test/include)
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} testing features utilities)
+target_link_libraries(${TEST_NAME} testing layers features utilities)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

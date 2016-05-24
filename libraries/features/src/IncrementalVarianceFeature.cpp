@@ -15,7 +15,7 @@
 #include "ShiftRegisterLayer.h"
 #include "ConstantLayer.h"
 #include "AccumulatorLayer.h"
-#include "BinaryOpLayer.h"
+#include "BinaryOperationLayer.h"
 #include "Sum.h"
 #include "CoordinateListTools.h"
 
@@ -95,22 +95,22 @@ namespace features
 
         // Compute running sum by subtracting oldest value and adding newest
         auto oldestSample = shiftRegisterLayer.GetDelayedOutputCoordinates(bufferOutput, windowSize);
-        auto diff = model.EmplaceLayer<layers::BinaryOpLayer>(inputCoordinates, oldestSample, layers::BinaryOpLayer::OperationType::subtract);
+        auto diff = model.EmplaceLayer<layers::BinaryOperationLayer>(inputCoordinates, oldestSample, layers::BinaryOperationLayer::OperationType::subtract);
         auto runningSum = model.EmplaceLayer<layers::AccumulatorLayer>(diff);
 
         // Square the sum of inputs and divide by window size
-        auto squaredSum = model.EmplaceLayer<layers::BinaryOpLayer>(runningSum, runningSum, layers::BinaryOpLayer::OperationType::multiply);
-        auto normSquaredSum = model.EmplaceLayer<layers::BinaryOpLayer>(squaredSum, divisorVector, layers::BinaryOpLayer::OperationType::divide);
+        auto squaredSum = model.EmplaceLayer<layers::BinaryOperationLayer>(runningSum, runningSum, layers::BinaryOperationLayer::OperationType::multiply);
+        auto normSquaredSum = model.EmplaceLayer<layers::BinaryOperationLayer>(squaredSum, divisorVector, layers::BinaryOperationLayer::OperationType::divide);
         
         // Accumulate running sum of squared samples 
-        auto newValueSquared = model.EmplaceLayer<layers::BinaryOpLayer>(inputCoordinates, inputCoordinates, layers::BinaryOpLayer::OperationType::multiply);
-        auto oldValueSquared = model.EmplaceLayer<layers::BinaryOpLayer>(oldestSample, oldestSample, layers::BinaryOpLayer::OperationType::multiply);
-        auto diffSquared = model.EmplaceLayer<layers::BinaryOpLayer>(newValueSquared, oldValueSquared, layers::BinaryOpLayer::OperationType::subtract);
+        auto newValueSquared = model.EmplaceLayer<layers::BinaryOperationLayer>(inputCoordinates, inputCoordinates, layers::BinaryOperationLayer::OperationType::multiply);
+        auto oldValueSquared = model.EmplaceLayer<layers::BinaryOperationLayer>(oldestSample, oldestSample, layers::BinaryOperationLayer::OperationType::multiply);
+        auto diffSquared = model.EmplaceLayer<layers::BinaryOperationLayer>(newValueSquared, oldValueSquared, layers::BinaryOperationLayer::OperationType::subtract);
         auto runningSquaredSum = model.EmplaceLayer<layers::AccumulatorLayer>(diffSquared);
 
         // Compute variance from above values (var = (sum(x^2) - (sum(x)^2 / N)) / N )
-        auto varianceTimesN = model.EmplaceLayer<layers::BinaryOpLayer>(runningSquaredSum, normSquaredSum, layers::BinaryOpLayer::OperationType::subtract);
-        auto variance = model.EmplaceLayer<layers::BinaryOpLayer>(varianceTimesN, divisorVector, layers::BinaryOpLayer::OperationType::divide);
+        auto varianceTimesN = model.EmplaceLayer<layers::BinaryOperationLayer>(runningSquaredSum, normSquaredSum, layers::BinaryOperationLayer::OperationType::subtract);
+        auto variance = model.EmplaceLayer<layers::BinaryOperationLayer>(varianceTimesN, divisorVector, layers::BinaryOperationLayer::OperationType::divide);
         return variance;
     }
 

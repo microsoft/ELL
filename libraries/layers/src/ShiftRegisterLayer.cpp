@@ -34,14 +34,6 @@ namespace layers
         // erase _inputDimension things from the back
         _data.resize(_inputDimension*(_size-1));
         _data.insert(_data.begin(), value.begin(), value.end());
-                
-        // // TODO: use a ring buffer instead of this simple but slower version
-        // if(_data.size() >= _inputDimension*_size)
-        // {
-        //     _data.erase(_data.begin(), _data.begin() + _inputDimension);
-        // }
-
-        // for(auto x: value) _data.push_back(x);
     }
     
     //

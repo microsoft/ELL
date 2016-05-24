@@ -12,7 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/AccumulatorLayer.cpp
-         src/BinaryOpLayer.cpp
+         src/BinaryOperationLayer.cpp
          src/ConstantLayer.cpp
          src/Coordinate.cpp
          src/CoordinateList.cpp
@@ -24,10 +24,10 @@ set (SRC src/AccumulatorLayer.cpp
          src/Model.cpp
          src/ShiftRegisterLayer.cpp
          src/Sum.cpp
-         src/UnaryOpLayer.cpp)
+         src/UnaryOperationLayer.cpp)
 
 set (INCLUDE include/AccumulatorLayer.h
-             include/BinaryOpLayer.h
+             include/BinaryOperationLayer.h
              include/ConstantLayer.h
              include/Coordinate.h
              include/CoordinateList.h
@@ -39,7 +39,7 @@ set (INCLUDE include/AccumulatorLayer.h
              include/Model.h
              include/ShiftRegisterLayer.h
              include/Sum.h
-             include/UnaryOpLayer.h)
+             include/UnaryOperationLayer.h)
 
 set (TCC tcc/Map.tcc
          tcc/Model.tcc)
