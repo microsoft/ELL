@@ -140,4 +140,28 @@ namespace layers
 
         return coordinateList;
     }
-}
+    
+    layers::CoordinateList RepeatCoordinates(const Coordinate& coordinate, uint64_t numRepeats)
+    {
+        CoordinateList result;
+        for(uint64_t index = 0; index < numRepeats; ++index)
+        {
+            result.AddCoordinate(coordinate);
+        }
+        return result;
+    }
+    
+    layers::CoordinateList RepeatCoordinates(const CoordinateList& coordinateList, uint64_t numRepeats)
+    {
+        CoordinateList result;
+        for(uint64_t index = 0; index < numRepeats; ++index)
+        {
+            for(const auto& coordinate: coordinateList)
+            {
+                result.AddCoordinate(coordinate);
+            }
+        }
+        return result;        
+    }
+
+} 

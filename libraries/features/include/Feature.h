@@ -17,6 +17,9 @@
 #include <unordered_map>
 #include <functional>
 
+#include "CoordinateList.h"
+#include "Model.h"
+
 namespace features
 {
     class InputFeature;
@@ -83,8 +86,8 @@ namespace features
         virtual void AddToDescription(std::vector<std::string>& description) const {};
         virtual layers::CoordinateList AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const = 0;        
         virtual std::string FeatureType() const = 0;
-        void AddDependent(Feature* f);
 
+        void AddDependent(Feature* f);
         static void RegisterCreateFunction(std::string class_name, CreateFunction create_fn);
         bool IsDirty() const { return _isDirty; }
         void SetDirtyFlag(bool dirty) const;

@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     UnaryOpLayer.cpp (layers)
+//  File:     UnaryOperationLayer.cpp (layers)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "UnaryOpLayer.h"
+#include "UnaryOperationLayer.h"
 
 // stl
 #include <stdexcept>
@@ -30,25 +30,25 @@ namespace
 
 namespace layers
 {
-    const int UnaryOpLayer::_currentVersion;
+    const int UnaryOperationLayer::_currentVersion;
     std::string sqrtOperationName = "Sqrt";
     
-    UnaryOpLayer::UnaryOpLayer(const CoordinateList& inputCoordinates, OperationType operationType) : _operationType(operationType)
+    UnaryOperationLayer::UnaryOperationLayer(const CoordinateList& inputCoordinates, OperationType operationType) : _operationType(operationType)
     {
         _inputCoordinates = inputCoordinates;
     }
 
-    uint64_t UnaryOpLayer::GetInputDimension() const
+    uint64_t UnaryOperationLayer::GetInputDimension() const
     {
         return _inputCoordinates.Size();
     }
 
-    uint64_t UnaryOpLayer::GetOutputDimension() const
+    uint64_t UnaryOperationLayer::GetOutputDimension() const
     {
         return _inputCoordinates.Size();
     }
 
-    const std::string UnaryOpLayer::GetOperationName(OperationType type)
+    const std::string UnaryOperationLayer::GetOperationName(OperationType type)
     {
         switch (type)
         {
@@ -59,7 +59,7 @@ namespace layers
         throw std::runtime_error("unrecognized operation type");
     }
 
-    UnaryOpLayer::OperationType UnaryOpLayer::GetOperationType(const std::string& name)
+    UnaryOperationLayer::OperationType UnaryOperationLayer::GetOperationType(const std::string& name)
     {
         if (name == sqrtOperationName)
         {
@@ -71,7 +71,7 @@ namespace layers
         }
     }
 
-    std::function<double(double)> UnaryOpLayer::GetOperation(OperationType type)
+    std::function<double(double)> UnaryOperationLayer::GetOperation(OperationType type)
     {
         switch (type)
         {
@@ -83,12 +83,12 @@ namespace layers
     }
 
 
-    UnaryOpLayer::OperationType UnaryOpLayer::GetOperationType() const
+    UnaryOperationLayer::OperationType UnaryOperationLayer::GetOperationType() const
     {
         return _operationType;
     }
 
-    void UnaryOpLayer::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
+    void UnaryOperationLayer::Compute(const std::vector<std::vector<double>>& inputs, std::vector<double>& outputs) const
     {
         auto operation = GetOperation(_operationType);
         auto numEntries = _inputCoordinates.Size();
@@ -100,27 +100,27 @@ namespace layers
         }
     }
 
-    CoordinateIterator UnaryOpLayer::GetInputCoordinateIterator(uint64_t index) const
+    CoordinateIterator UnaryOperationLayer::GetInputCoordinateIterator(uint64_t index) const
     {
         return _inputCoordinates.GetIterator(index, 1);
     }
 
-    uint64_t UnaryOpLayer::GetRequiredLayerSize(uint64_t layerIndex) const
+    uint64_t UnaryOperationLayer::GetRequiredLayerSize(uint64_t layerIndex) const
     {
         return _inputCoordinates.GetRequiredLayerSize(layerIndex);
     }
 
-    std::string UnaryOpLayer::GetTypeName()
+    std::string UnaryOperationLayer::GetTypeName()
     {
-        return "UnaryOpLayer";
+        return "UnaryOperationLayer";
     }
 
-    std::string UnaryOpLayer::GetRuntimeTypeName() const
+    std::string UnaryOperationLayer::GetRuntimeTypeName() const
     {
         return GetTypeName();
     }
 
-    void UnaryOpLayer::Read(utilities::XMLDeserializer& deserializer)
+    void UnaryOperationLayer::Read(utilities::XMLDeserializer& deserializer)
     {
         int version = 0;
         std::string operationName;
@@ -137,7 +137,7 @@ namespace layers
         }
     }
 
-    void UnaryOpLayer::Write(utilities::XMLSerializer& serializer) const
+    void UnaryOperationLayer::Write(utilities::XMLSerializer& serializer) const
     {
         serializer.Serialize("version", _currentVersion);
         serializer.Serialize("operationType", GetOperationName(_operationType));

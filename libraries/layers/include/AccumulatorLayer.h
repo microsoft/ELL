@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     UnaryOpLayer.h (layers)
+//  File:     AccumulatorLayer.h (layers)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,38 +19,66 @@
 
 namespace layers
 {
-    /// <summary> A class that represents a layer that performs a coordinatewise binary operation. </summary>
-    class UnaryOpLayer : public Layer
+    /// <summary> A layer that computes the running sum or product of its input. </summary>
+    class AccumulatorLayer : public Layer
     {
     public:
 
-        enum class OperationType {sqrt};
+        enum class OperationType {add, multiply};
 
-        /// <summary> Constructs an instance of a UnaryOpLayer layer. </summary>
-        UnaryOpLayer() = default;
-
-        /// <summary> Constructs an instance of a UnaryOpLayer layer. </summary>
+        /// <summary> Constructs an instance of a AccumulatorLayer layer. </summary>
         ///
-        /// <param name="values"> The value for each element. </param>
-        /// <param name="input1"> The input coordinate for the left side of the operation each element. </param>
-        /// <param name="input2"> The input coordinate for the right side of the operation each element. </param>
-        /// <param name="operationType"> The type of UnaryOpLayer layer to construct. </param>
-        UnaryOpLayer(const CoordinateList& inputCoordinates, OperationType operationType);
+        /// <param name="operationType"> The type of AccumulatorLayer layer to construct. </param>
+        AccumulatorLayer(OperationType operationType = OperationType::add);
+
+        /// <summary> Constructs an instance of a AccumulatorLayer layer. </summary>
+        ///
+        /// <param name="coordinates"> The input coordinate for each element. </param>
+        /// <param name="operationType"> The type of AccumulatorLayer layer to construct. </param>
+        AccumulatorLayer(CoordinateList coordinates, OperationType operationType = OperationType::add);
+
+        /// <summary> Constructs an instance of a AccumulatorLayer layer. </summary>
+        ///
+        /// <param name="initialValue"> The initial value for each element. </param>
+        /// <param name="coordinates"> The input coordinate for each element. </param>
+        /// <param name="operationType"> The type of AccumulatorLayer layer to construct. </param>
+        AccumulatorLayer(std::vector<double> initialValues, CoordinateList coordinates, OperationType operationType = OperationType::add);
 
         /// <summary> Returns the input dimension of the layer. </summary>
         ///
         /// <returns> The input dimension. </returns>
-        virtual uint64_t GetInputDimension() const override;
+        virtual uint64_t GetInputDimension() const override { return _inputCoordinates.Size(); }
 
         /// <summary> Returns the output dimension of the layer. </summary>
         ///
         /// <returns> The output dimension. </returns>
-        virtual uint64_t GetOutputDimension() const override;
+        virtual uint64_t GetOutputDimension() const override { return _inputCoordinates.Size(); }
 
+        /// <summary> Gets the operation name from the operation type. </summary>
+        ///
+        /// <param name="type"> The operation type. </param>
+        ///
+        /// <returns> The operation name. </returns>
         static const std::string GetOperationName(OperationType type);
-        static OperationType GetOperationType(const std::string& name); 
-        static std::function<double(double)> GetOperation(OperationType type);
-        OperationType GetOperationType() const;
+
+        /// <summary> Gets the operation type from its name. </summary>
+        ///
+        /// <param name="name"> The operation name. </param>
+        ///
+        /// <returns> The operation type. </returns>
+        static OperationType GetOperationType(const std::string& name);
+
+        /// <summary> Gets the operation from its type. </summary>
+        ///
+        /// <param name="type"> The operation type. </param>
+        ///
+        /// <returns> The operation. </returns>
+        static std::function<double(double, double)> GetOperation(OperationType type);
+
+        /// <summary> Gets the operation type of this AccumulatorLayer layer. </summary>
+        ///
+        /// <returns> The operation type. </returns>
+        OperationType GetOperationType() const { return _operationType; }
 
         /// <summary> Computes the layer output. </summary>
         ///
@@ -75,12 +103,12 @@ namespace layers
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName();
+        static std::string GetTypeName() { return "AccumulatorLayer"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override;
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Reads the layer from an XMLDeserializer. </summary>
         ///
@@ -93,6 +121,8 @@ namespace layers
         virtual void Write(utilities::XMLSerializer& serializer) const override;
 
     protected:
+        std::vector<double> _initialValues;
+        mutable std::vector<double> _currentValues;
         CoordinateList _inputCoordinates;
         OperationType _operationType;
         static const int _currentVersion = 1;

@@ -12,8 +12,8 @@
 #include "StringUtil.h"
 
 // layers
-#include "UnaryOpLayer.h"
-#include "BinaryOpLayer.h"
+#include "UnaryOperationLayer.h"
+#include "BinaryOperationLayer.h"
 #include "Sum.h"
 
 #include <cassert>
@@ -52,12 +52,11 @@ namespace features
         }
        
         auto inputCoordinates = it->second;
-        auto multLayer = std::make_unique<layers::BinaryOpLayer>(inputCoordinates, inputCoordinates, layers::BinaryOpLayer::OperationType::multiply);
-        auto squaredOutputCoordinates = model.AddLayer(std::move(multLayer));
-        auto sumLayer = std::make_unique<layers::Sum>(squaredOutputCoordinates);
-        auto sumOutputCoordinates = model.AddLayer(std::move(sumLayer));
-        auto sqrtLayer = std::make_unique<layers::UnaryOpLayer>(sumOutputCoordinates, layers::UnaryOpLayer::OperationType::sqrt);
-        auto outputCoordinates = model.AddLayer(std::move(sqrtLayer)); 
+        auto squaredOutputCoordinates = model.EmplaceLayer<layers::BinaryOperationLayer>(inputCoordinates, inputCoordinates, layers::BinaryOperationLayer::OperationType::multiply); 
+
+        auto sumOutputCoordinates = model.EmplaceLayer<layers::Sum>(squaredOutputCoordinates);
+
+        auto outputCoordinates = model.EmplaceLayer<layers::UnaryOperationLayer>(sumOutputCoordinates, layers::UnaryOperationLayer::OperationType::sqrt); 
         return outputCoordinates;
     }
 
