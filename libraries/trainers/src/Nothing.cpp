@@ -1,14 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Iterator_test.h (utilities)
-//  Authors:  Chuck Jacobs
+//  File:     Nothing.cpp (trainers)
+//  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
-
-void TestAnyIterator1();
-void TestAnyIterator2();
-void TestAnyIterator3(bool runTest);
-
+namespace trainers
+{    
+    // Nothing here --- This file is here only to get CMake to create a project for this library
+}

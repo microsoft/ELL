@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StochasticGradientDescentTrainer.tcc (trainers)
+//  File:     SGDIncrementalTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,18 +18,19 @@
 namespace trainers
 {
     template<typename LossFunctionType>
-    StochasticGradientDescentTrainer<LossFunctionType>::StochasticGradientDescentTrainer(uint64_t dim, const IStochasticGradientDescentTrainer::Parameters& parameters, const LossFunctionType& lossFunction) : _parameters(parameters), _lossFunction(lossFunction), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(dim) // iteations start from 1 to prevent divide-by-zero
+    SGDIncrementalTrainer<LossFunctionType>::SGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters) :
+        _lossFunction(lossFunction), _parameters(parameters), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(std::make_shared<PredictorType>(dim)) // iterations start from 1 to prevent divide-by-zero
     {}
 
     template<typename LossFunctionType>
-    void StochasticGradientDescentTrainer<LossFunctionType>::Update(IStochasticGradientDescentTrainer::ExampleIteratorType& exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetVector();
-        auto& vAvg = _averagedPredictor.GetVector();
+        auto& vAvg = _averagedPredictor->GetVector();
 
         double& bLast = _lastPredictor.GetBias();
-        double& bAvg = _averagedPredictor.GetBias();
+        double& bAvg = _averagedPredictor->GetBias();
 
         // define some constants
         const double T_prev = double(_total_iterations);
@@ -76,12 +77,12 @@ namespace trainers
         // calculate w and w_avg
         double scale = T_prev / T_next;
         _lastPredictor.Scale(scale);
-        _averagedPredictor.Scale(scale);
+        _averagedPredictor->Scale(scale);
     }
 
     template <typename LossFunctionType>
-    StochasticGradientDescentTrainer<LossFunctionType> MakeStochasticGradientDescentTrainer(uint64_t dim, const IStochasticGradientDescentTrainer::Parameters& parameters, const LossFunctionType& lossFunction)
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
     {
-        return StochasticGradientDescentTrainer<LossFunctionType>(dim, parameters, lossFunction);
+        return std::make_unique<SGDIncrementalTrainer<LossFunctionType>>(dim, lossFunction, parameters);
     }
 }

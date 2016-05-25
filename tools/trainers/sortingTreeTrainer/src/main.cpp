@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ParsedSortingTreeTrainerArguments.h"
-
 // utilities
 #include "Files.h"
 #include "OutputStreamImpostor.h"
@@ -24,6 +22,7 @@
 #include "SupervisedExample.h"
 
 // common
+#include "SortingTreeTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
@@ -56,7 +55,7 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
-        ParsedSortingTreeTrainerArguments sortingTreeTrainerArguments;
+        common::ParsedSortingTreeTrainerArguments sortingTreeTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
@@ -67,8 +66,12 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
                 
-        if(trainerArguments.verbose) std::cout << "Sorting Tree Trainer" << std::endl;
-        
+        if(trainerArguments.verbose)
+        {
+            std::cout << "Sorting Tree Trainer" << std::endl;
+            std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
+        }
+
         // if output file specified, replace stdout with it 
         auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputModelFile);
 
@@ -84,10 +87,7 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
         // create sgd trainer
-        auto trainer = common::MakeSortingTreeTrainer(sortingTreeTrainerArguments, trainerArguments.lossArguments);
-
-        // create evaluator
-        auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::DecisionTreePredictor>(trainerArguments.lossArguments);
+        auto trainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
 
         // create random number generator
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
@@ -105,9 +105,10 @@ int main(int argc, char* argv[])
         {
             std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
 
+            auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::DecisionTreePredictor>(trainerArguments.lossArguments);
             auto evaluationIterator = rowDataset.GetIterator(0, 1000);
-
             evaluator->Evaluate(evaluationIterator, tree);
+
             std::cout << "Training error\n";
             evaluator->Print(std::cout);
             std::cout << std::endl;

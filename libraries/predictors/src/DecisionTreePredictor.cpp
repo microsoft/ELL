@@ -97,7 +97,7 @@ namespace predictors
         return _root.Predict(denseDataVector);
     }
 
-    void DecisionTreePredictor::AddToModel(layers::Model & model, layers::CoordinateList inputCoordinates) const
+    layers::CoordinateList DecisionTreePredictor::AddToModel(layers::Model & model, layers::CoordinateList inputCoordinates) const
     {
         FlatTree flatTree;
         BuildFlatTree(flatTree, inputCoordinates, _root._interiorNode.get());
@@ -115,7 +115,9 @@ namespace predictors
         auto sumLayerCoordinates = model.AddLayer(std::move(sumLayer));
 
         auto biasLayer = std::make_unique<layers::Coordinatewise>(_root._outputValue, sumLayerCoordinates[0], layers::Coordinatewise::OperationType::add);
-        model.AddLayer(std::move(biasLayer));
+        auto biasLayerCoordinates = model.AddLayer(std::move(biasLayer));
+
+        return biasLayerCoordinates;
     }
 
     void predictors::DecisionTreePredictor::BuildFlatTree(FlatTree& flatTree, const layers::CoordinateList& inputCoordinates, InteriorNode* interiorNodePtr) const

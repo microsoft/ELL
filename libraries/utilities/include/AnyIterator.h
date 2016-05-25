@@ -39,6 +39,7 @@ namespace utilities
         /// <summary> Constructor that takes a shared pointer to an IIterator (used by MakeAnyIterator helper function) </summary>
         AnyIterator(std::shared_ptr<IIterator<ValueType>> iterator); 
 
+        /// <summary> Default destructor </summary>
         ~AnyIterator() = default;
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>

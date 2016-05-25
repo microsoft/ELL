@@ -13,7 +13,7 @@
 // layers
 #include "ShiftRegisterLayer.h"
 #include "ConstantLayer.h"
-#include "BinaryOpLayer.h"
+#include "BinaryOperationLayer.h"
 #include "Sum.h"
 
 #include <cassert>
@@ -59,7 +59,6 @@ namespace features
         std::vector<double> result(rowSize);
         for (size_t columnIndex = 0; columnIndex < rowSize; columnIndex++)
         {
-            // compute mean (TODO: incrementally)
             auto samples = GetAllSamples(columnIndex);
             double mean = VectorMean(samples);
             result[columnIndex] = mean;
@@ -95,7 +94,7 @@ namespace features
         auto sumCoordinates = model.EmplaceLayer<layers::Sum>(perChannelBufferOutputCoordinates);
         auto divisorCoordinates = model.EmplaceLayer<layers::ConstantLayer>(std::vector<double>(dimension, windowSize));
         
-        auto meanCoordinates = model.EmplaceLayer<layers::BinaryOpLayer>(sumCoordinates, divisorCoordinates, layers::BinaryOpLayer::OperationType::divide);
+        auto meanCoordinates = model.EmplaceLayer<layers::BinaryOperationLayer>(sumCoordinates, divisorCoordinates, layers::BinaryOperationLayer::OperationType::divide);
         return meanCoordinates;
     }
 

@@ -12,7 +12,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/DataLoadArguments.cpp
+set (SRC src/BaggingIncrementalTrainerArguments.cpp
+         src/DataLoadArguments.cpp
          src/DataSaveArguments.cpp
          src/DataLoaders.cpp
          src/LoadModel.cpp
@@ -20,10 +21,14 @@ set (SRC src/DataLoadArguments.cpp
          src/MapLoadArguments.cpp
          src/MapSaveArguments.cpp
          src/ModelLoadArguments.cpp
+         src/MultiEpochIncrementalTrainerArguments.cpp
+         src/SGDIncrementalTrainerArguments.cpp
+         src/SortingTreeTrainerArguments.cpp
          src/TrainerArguments.cpp
 )
 
-set (INCLUDE include/DataLoadArguments.h
+set (INCLUDE include/BaggingIncrementalTrainerArguments.h
+             include/DataLoadArguments.h
              include/DataSaveArguments.h
              include/DataLoaders.h
              include/LoadModel.h
@@ -32,6 +37,9 @@ set (INCLUDE include/DataLoadArguments.h
              include/MapLoadArguments.h
              include/MapSaveArguments.h
              include/ModelLoadArguments.h
+             include/MultiEpochIncrementalTrainerArguments.h
+             include/SGDIncrementalTrainerArguments.h
+             include/SortingTreeTrainerArguments.h
              include/TrainerArguments.h
 )
 

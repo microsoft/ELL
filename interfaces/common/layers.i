@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-%module "layers"
-
 %ignore layers::BuildCoordinateList;
 %ignore layers::CoordinateList::operator[];
 %ignore interfaces::Model::GetModel() const;
@@ -32,7 +30,7 @@
 %include "MapInterface.h"
 %include "ModelInterface.h"
 
-// Special version of BuildCoordinateList to work with our proxy Model object
+// Special version of BuildCoordinateList function to work with our proxy Model object
 %inline %{
 layers::CoordinateList BuildCoordinateList(const interfaces::Model& model, uint64_t inputLayerSize, const std::string& coordinateListString)
 {
@@ -55,3 +53,4 @@ WRAP_OP_AT(layers::CoordinateList, layers::Coordinate);
 };
 
 WRAP_PRINT_TO_STR(layers::CoordinateList)
+

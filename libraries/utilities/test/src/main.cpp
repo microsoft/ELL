@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "XMLSerialization_test.h"
-#include "AnyIterator_test.h"
 
 #include "IIterator.h"
 #include "StlIterator.h"
@@ -210,11 +209,6 @@ int main()
     // XMLSerialization tests
     XMLSerializationTest();
     TypeFactoryTest();
-
-    // Iterator tests
-    TestAnyIterator1();
-    TestAnyIterator2();
-    TestAnyIterator3(false); // this is just a compilation test
 
     if (testing::DidTestFail())
     {

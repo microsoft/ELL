@@ -15,9 +15,11 @@
 #include "ShiftRegisterLayer.h"
 #include "ConstantLayer.h"
 #include "AccumulatorLayer.h"
-#include "BinaryOpLayer.h"
+#include "BinaryOperationLayer.h"
 #include "Sum.h"
+#include "CoordinateListTools.h"
 
+// stl
 #include <cassert>
 #include <cmath>
 #include <algorithm>
@@ -39,33 +41,33 @@ namespace features
     {
         assert(_inputFeatures.size() == 1);
         const auto& inputData = _inputFeatures[0]->GetOutput();
-        auto rowSize = inputData.size();    
-        if(rowSize == 0) // error, should we throw?
+        auto inputDimension = inputData.size();    
+        if(inputDimension == 0) // error, should we throw?
         {
+            throw std::runtime_error("Invalid input of size zero");
             return inputData;
         }
-        _outputDimension = rowSize;
+        _outputDimension = inputDimension;
         auto windowSize = GetWindowSize();
         
         // get the oldest sample
         auto oldData = GetDelayedSamples(windowSize-1);
-        oldData.resize(rowSize);
-        _runningSum.resize(rowSize);
-        _runningSumSq.resize(rowSize);
+        oldData.resize(inputDimension);
+        _runningSum.resize(inputDimension);
+        _runningSumSq.resize(inputDimension);
          
         UpdateRowSamples(inputData);
 
         // update the running sum and output
-        std::vector<double> result(rowSize);
-        for(size_t index = 0; index < rowSize; ++index)
+        std::vector<double> result(inputDimension);
+        for(size_t index = 0; index < inputDimension; ++index)
         {
             auto newVal = inputData[index];
             auto oldVal = oldData[index];
             _runningSum[index] += (newVal - oldVal);
             _runningSumSq[index] += (newVal*newVal - oldVal*oldVal);
 
-            auto variance = (_runningSumSq[index] - (_runningSum[index]*_runningSum[index] / windowSize)) / windowSize;
-            result[index] = variance;
+            result[index] = (_runningSumSq[index] - (_runningSum[index]*_runningSum[index] / windowSize)) / windowSize;
         }
 
         return result;
@@ -73,36 +75,42 @@ namespace features
 
     layers::CoordinateList IncrementalVarianceFeature::AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const
     {
-        auto it = featureOutputs.find(_inputFeatures[0]);
-        if (it == featureOutputs.end())
+        auto inputIterator = featureOutputs.find(_inputFeatures[0]);
+        if (inputIterator == featureOutputs.end())
         {
             throw std::runtime_error("Couldn't find input feature");
         }
        
-        auto inputCoordinates = it->second;
-        auto dimension = inputCoordinates.Size();
+        auto inputCoordinates = inputIterator->second;
+        auto inputDimension = inputCoordinates.Size();
         auto windowSize = GetWindowSize();
 
-        // TODO: document!
-        auto divisor = model.EmplaceLayer<layers::ConstantLayer>(std::vector<double>(dimension, windowSize)); // for dividing by window size
+        // Make a layer holding the constant `windowSize`, broadcast to be wide enough to apply to all input dimensions
+        auto divisor = model.EmplaceLayer<layers::ConstantLayer>(std::vector<double>{(double)windowSize});        
+        auto divisorVector = layers::RepeatCoordinates(divisor, inputDimension);
 
+        // Make a buffer that will hold `windowSize` samples
         auto bufferOutput = model.EmplaceLayer<layers::ShiftRegisterLayer>(inputCoordinates, windowSize+1);
         auto shiftRegisterLayer = dynamic_cast<const layers::ShiftRegisterLayer&>(model.GetLastLayer());
-        auto oldestSample = shiftRegisterLayer.GetDelayedOutputCoordinates(bufferOutput, windowSize);
-        auto diff = model.EmplaceLayer<layers::BinaryOpLayer>(inputCoordinates, oldestSample, layers::BinaryOpLayer::OperationType::subtract);
-        auto accumValue = model.EmplaceLayer<layers::AccumulatorLayer>(diff);
-        auto squaredSum = model.EmplaceLayer<layers::BinaryOpLayer>(accumValue, accumValue, layers::BinaryOpLayer::OperationType::multiply);
-        auto normsquaredSum = model.EmplaceLayer<layers::BinaryOpLayer>(squaredSum, divisor, layers::BinaryOpLayer::OperationType::divide);
-        
-        // accumulate squared samples
-        auto newValueSquared = model.EmplaceLayer<layers::BinaryOpLayer>(inputCoordinates, inputCoordinates, layers::BinaryOpLayer::OperationType::multiply);
-        auto oldValueSquared = model.EmplaceLayer<layers::BinaryOpLayer>(oldestSample, oldestSample, layers::BinaryOpLayer::OperationType::multiply);
-        auto diffSquared = model.EmplaceLayer<layers::BinaryOpLayer>(newValueSquared, oldValueSquared, layers::BinaryOpLayer::OperationType::subtract);
-        auto accumSquared = model.EmplaceLayer<layers::AccumulatorLayer>(diffSquared);
 
-        // compute variance from above
-        auto varianceTimesN = model.EmplaceLayer<layers::BinaryOpLayer>(accumSquared, normsquaredSum, layers::BinaryOpLayer::OperationType::subtract);
-        auto variance = model.EmplaceLayer<layers::BinaryOpLayer>(varianceTimesN, divisor, layers::BinaryOpLayer::OperationType::divide);
+        // Compute running sum by subtracting oldest value and adding newest
+        auto oldestSample = shiftRegisterLayer.GetDelayedOutputCoordinates(bufferOutput, windowSize);
+        auto diff = model.EmplaceLayer<layers::BinaryOperationLayer>(inputCoordinates, oldestSample, layers::BinaryOperationLayer::OperationType::subtract);
+        auto runningSum = model.EmplaceLayer<layers::AccumulatorLayer>(diff);
+
+        // Square the sum of inputs and divide by window size
+        auto squaredSum = model.EmplaceLayer<layers::BinaryOperationLayer>(runningSum, runningSum, layers::BinaryOperationLayer::OperationType::multiply);
+        auto normSquaredSum = model.EmplaceLayer<layers::BinaryOperationLayer>(squaredSum, divisorVector, layers::BinaryOperationLayer::OperationType::divide);
+        
+        // Accumulate running sum of squared samples 
+        auto newValueSquared = model.EmplaceLayer<layers::BinaryOperationLayer>(inputCoordinates, inputCoordinates, layers::BinaryOperationLayer::OperationType::multiply);
+        auto oldValueSquared = model.EmplaceLayer<layers::BinaryOperationLayer>(oldestSample, oldestSample, layers::BinaryOperationLayer::OperationType::multiply);
+        auto diffSquared = model.EmplaceLayer<layers::BinaryOperationLayer>(newValueSquared, oldValueSquared, layers::BinaryOperationLayer::OperationType::subtract);
+        auto runningSquaredSum = model.EmplaceLayer<layers::AccumulatorLayer>(diffSquared);
+
+        // Compute variance from above values (var = (sum(x^2) - (sum(x)^2 / N)) / N )
+        auto varianceTimesN = model.EmplaceLayer<layers::BinaryOperationLayer>(runningSquaredSum, normSquaredSum, layers::BinaryOperationLayer::OperationType::subtract);
+        auto variance = model.EmplaceLayer<layers::BinaryOperationLayer>(varianceTimesN, divisorVector, layers::BinaryOperationLayer::OperationType::divide);
         return variance;
     }
 

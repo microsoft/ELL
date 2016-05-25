@@ -23,7 +23,8 @@ namespace features
     /// A feature that takes a vector input and returns its variance over some window of time. 
     /// This feature is computed incrementally, so it takes \f$O(1)\f$ time instead of \f$O(n)\f$ time.
     /// </summary>
-    class IncrementalVarianceFeature : public BufferedFeature
+    /// <remarks> Computes variance by keeping a running sum of x and x^2, and computes var = (sum(x^2) - (sum(x)^2 / N)) / N</remarks>
+   class IncrementalVarianceFeature : public BufferedFeature
     {
     public:
         /// <summary> Constructor </summary>
@@ -31,7 +32,7 @@ namespace features
         /// <param name="windowSize"> The number of samples of history to use in computing the variance </param>
         IncrementalVarianceFeature(Feature* inputFeature, size_t windowSize);
 
-        /// <summary> Creates a `IncrementalVarianceFeature` from a vector of strings </summary>
+        /// <summary> Creates an `IncrementalVarianceFeature` from a vector of strings </summary>
         ///
         /// <param name="params"> The strings describing the parameters </params> 
         /// <param name="previousFeatures"> The map of existing features available as inputs. </params> 

@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "AnyIterator.h"
-
 #include "SupervisedExample.h"
 #include "RowDataset.h"
 #include "LinearPredictor.h"
@@ -25,7 +23,8 @@ namespace utilities
     class IBinaryClassificationEvaluator
     {
     public:
-        typedef dataset::GenericRowDataset::Iterator ExampleIteratorType;
+        typedef dataset::SupervisedExample<dataset::IDataVector> ExampleType;
+        typedef utilities::StlIterator<typename std::vector<ExampleType>::const_iterator> ExampleIteratorType;
 
         virtual void Evaluate(ExampleIteratorType& dataIterator, const PredictorType& predictor) = 0;
 
@@ -47,8 +46,7 @@ namespace utilities
             double loss = 0;
             double error = 0;
         };
-        
-        
+                
         BinaryClassificationEvaluator(const LossFunctionType& lossFunction);
 
         /// <summary> Evaluates a binary classifier </summary>

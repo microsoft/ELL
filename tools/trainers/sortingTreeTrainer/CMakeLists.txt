@@ -13,13 +13,10 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/main.cpp
-         src/ParsedSortingTreeTrainerArguments.cpp)
+set (SRC src/main.cpp)
 
-set (INCLUDE include/ParsedSortingTreeTrainerArguments.h)
 
 source_group("src" FILES ${SRC})
-source_group("include" FILES ${INCLUDE})
 
 include_directories(include)
 include_directories(../../../libraries/common/include)
@@ -42,3 +39,8 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/trainers")
 
 # copy executable to build/bin directory
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
+
+# tests
+add_test(NAME sgdTrainerTest
+         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
+         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto -omf null -v)

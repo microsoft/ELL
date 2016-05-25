@@ -138,6 +138,7 @@ void CompilableMap::ToCode(std::ostream& os) const
         layers::Coordinate outputCoordinate(outputLayerIndex, outputElementIndex);
         graph.GetNode(outputCoordinate).SetFixedVariableName(outputFixedVariableName + "[" + std::to_string(outputElementIndex) + "]");
         graph.GetNode(inputCoordinate).EmplaceAction(outputCoordinate);
+        graph.GetNode(outputCoordinate).IncrementUncomputedInputs();
     }
 
     // backwards pass to assign actions to nodes

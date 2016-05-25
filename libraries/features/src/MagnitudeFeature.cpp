@@ -12,8 +12,8 @@
 #include "StringUtil.h"
 
 // layers
-#include "UnaryOpLayer.h"
-#include "BinaryOpLayer.h"
+#include "UnaryOperationLayer.h"
+#include "BinaryOperationLayer.h"
 #include "Sum.h"
 
 #include <cassert>
@@ -52,11 +52,11 @@ namespace features
         }
        
         auto inputCoordinates = it->second;
-        auto squaredOutputCoordinates = model.EmplaceLayer<layers::BinaryOpLayer>(inputCoordinates, inputCoordinates, layers::BinaryOpLayer::OperationType::multiply); 
+        auto squaredOutputCoordinates = model.EmplaceLayer<layers::BinaryOperationLayer>(inputCoordinates, inputCoordinates, layers::BinaryOperationLayer::OperationType::multiply); 
 
         auto sumOutputCoordinates = model.EmplaceLayer<layers::Sum>(squaredOutputCoordinates);
 
-        auto outputCoordinates = model.EmplaceLayer<layers::UnaryOpLayer>(sumOutputCoordinates, layers::UnaryOpLayer::OperationType::sqrt); 
+        auto outputCoordinates = model.EmplaceLayer<layers::UnaryOperationLayer>(sumOutputCoordinates, layers::UnaryOperationLayer::OperationType::sqrt); 
         return outputCoordinates;
     }
 

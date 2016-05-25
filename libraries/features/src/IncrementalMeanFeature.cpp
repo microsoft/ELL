@@ -13,9 +13,10 @@
 // layers
 #include "AccumulatorLayer.h"
 #include "ConstantLayer.h"
-#include "BinaryOpLayer.h"
+#include "BinaryOperationLayer.h"
 #include "ShiftRegisterLayer.h"
 #include "Sum.h"
+#include "CoordinateListTools.h"
 
 #include <cassert>
 #include <cmath>
@@ -37,24 +38,25 @@ namespace features
     {
         assert(_inputFeatures.size() == 1);
         const auto& inputData = _inputFeatures[0]->GetOutput();
-        auto rowSize = inputData.size();    
-        if(rowSize == 0) // error, should we throw?
+        auto inputDimension = inputData.size();    
+        if(inputDimension == 0) 
         {
+            throw std::runtime_error("Invalid input of size zero");
             return inputData;
         }
-        _outputDimension = rowSize;
+        _outputDimension = inputDimension;
+        auto windowSize = GetWindowSize();
         
         // get the oldest sample
-        auto windowSize = GetWindowSize();
         auto oldData = GetDelayedSamples(windowSize-1);
-        oldData.resize(rowSize);
-        _runningSum.resize(rowSize);
+        oldData.resize(inputDimension);
+        _runningSum.resize(inputDimension);
          
         UpdateRowSamples(inputData);
 
         // update the running sum and output
-        std::vector<double> result(rowSize);
-        for(size_t index = 0; index < rowSize; ++index)
+        std::vector<double> result(inputDimension);
+        for(size_t index = 0; index < inputDimension; ++index)
         {
             _runningSum[index] += (inputData[index] - oldData[index]);
             result[index] = _runningSum[index] / windowSize;
@@ -65,24 +67,32 @@ namespace features
 
     layers::CoordinateList IncrementalMeanFeature::AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const
     {
-        auto it = featureOutputs.find(_inputFeatures[0]);
-        if (it == featureOutputs.end())
+        auto inputIterator = featureOutputs.find(_inputFeatures[0]);
+        if (inputIterator == featureOutputs.end())
         {
             throw std::runtime_error("Couldn't find input feature");
         }
-       
-        auto inputCoordinates = it->second;
-        auto dimension = inputCoordinates.Size();
+
+        auto inputData = inputIterator->second;
+        auto inputDimension = inputData.Size();
         auto windowSize = GetWindowSize();
 
-        // TODO: document
-        auto bufferOutputCoordinates = model.EmplaceLayer<layers::ShiftRegisterLayer>(inputCoordinates, windowSize+1);
+        // We implement mean by keeping a running sum over `windowSize` samples, and then divide 
+        // the result by the number of samples
+        
+        // Make a buffer that will hold `windowSize` samples
+        auto bufferOutput = model.EmplaceLayer<layers::ShiftRegisterLayer>(inputData, windowSize+1);
         auto shiftRegisterLayer = dynamic_cast<const layers::ShiftRegisterLayer&>(model.GetLastLayer());
-        auto oldestSample = shiftRegisterLayer.GetDelayedOutputCoordinates(bufferOutputCoordinates, windowSize);
-        auto diff = model.EmplaceLayer<layers::BinaryOpLayer>(inputCoordinates, oldestSample, layers::BinaryOpLayer::OperationType::subtract);
-        auto accumulator = model.EmplaceLayer<layers::AccumulatorLayer>(diff);
-        auto divisor = model.EmplaceLayer<layers::ConstantLayer>(std::vector<double>(dimension, windowSize));        
-        auto mean = model.EmplaceLayer<layers::BinaryOpLayer>(accumulator, divisor, layers::BinaryOpLayer::OperationType::divide);
+
+        // Compute running sum by subtracting oldest value and adding newest
+        auto oldestSample = shiftRegisterLayer.GetDelayedOutputCoordinates(bufferOutput, windowSize);
+        auto diff = model.EmplaceLayer<layers::BinaryOperationLayer>(inputData, oldestSample, layers::BinaryOperationLayer::OperationType::subtract);
+        auto runningSum = model.EmplaceLayer<layers::AccumulatorLayer>(diff);
+
+        // Make a layer holding the constant `windowSize`, broadcast to be wide enough to apply to all input dimensions, and divide running sum by it
+        auto divisor = model.EmplaceLayer<layers::ConstantLayer>(std::vector<double>{(double)windowSize});
+        auto divisorVector = layers::RepeatCoordinates(divisor, inputDimension);
+        auto mean = model.EmplaceLayer<layers::BinaryOperationLayer>(runningSum, divisorVector, layers::BinaryOperationLayer::OperationType::divide);
         return mean;
     }
 

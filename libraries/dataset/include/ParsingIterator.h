@@ -46,7 +46,7 @@ namespace dataset
         /// <summary> Proceeds to the Next row. </summary>
         virtual void Next() override { _rowIterator.Next(); }
 
-        /// <summary> The weight of the current example. </summary>
+        /// <summary> Get the current example. </summary>
         ///
         /// <returns> A SupervisedExample. </returns>
         virtual GenericSupervisedExample Get() const override;

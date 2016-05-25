@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     UnaryOpLayer.h (layers)
+//  File:     UnaryOperationLayer.h (layers)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,22 +20,22 @@
 namespace layers
 {
     /// <summary> A class that represents a layer that performs a coordinatewise binary operation. </summary>
-    class UnaryOpLayer : public Layer
+    class UnaryOperationLayer : public Layer
     {
     public:
 
         enum class OperationType {sqrt};
 
-        /// <summary> Constructs an instance of a UnaryOpLayer layer. </summary>
-        UnaryOpLayer() = default;
+        /// <summary> Constructs an instance of a UnaryOperationLayer layer. </summary>
+        UnaryOperationLayer() = default;
 
-        /// <summary> Constructs an instance of a UnaryOpLayer layer. </summary>
+        /// <summary> Constructs an instance of a UnaryOperationLayer layer. </summary>
         ///
         /// <param name="values"> The value for each element. </param>
         /// <param name="input1"> The input coordinate for the left side of the operation each element. </param>
         /// <param name="input2"> The input coordinate for the right side of the operation each element. </param>
-        /// <param name="operationType"> The type of UnaryOpLayer layer to construct. </param>
-        UnaryOpLayer(const CoordinateList& inputCoordinates, OperationType operationType);
+        /// <param name="operationType"> The type of UnaryOperationLayer layer to construct. </param>
+        UnaryOperationLayer(const CoordinateList& inputCoordinates, OperationType operationType);
 
         /// <summary> Returns the input dimension of the layer. </summary>
         ///

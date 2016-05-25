@@ -40,5 +40,4 @@ namespace std
   %{
       $result = std::move($1);
   %};
-
 %enddef
