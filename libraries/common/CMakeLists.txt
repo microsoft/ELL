@@ -40,12 +40,15 @@ set (INCLUDE include/BaggingIncrementalTrainerArguments.h
              include/MapSaveArguments.h
              include/ModelLoadArguments.h
              include/MultiEpochIncrementalTrainerArguments.h
+             include/ParametersGenerator.h
              include/SGDIncrementalTrainerArguments.h
              include/SortingTreeTrainerArguments.h
              include/TrainerArguments.h
 )
 
-set (TCC tcc/MakeEvaluator.tcc)
+set (TCC tcc/MakeEvaluator.tcc
+         tcc/ParametersGenerator.tcc
+)
 
 
 source_group("src" FILES ${SRC})

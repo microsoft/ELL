@@ -86,19 +86,19 @@ namespace evaluators
     }
 
     template<typename PredictorType, typename... AggregatorTypes>
-    template<std::size_t ...Is>
-    void Evaluator<PredictorType, AggregatorTypes...>::DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Is...>)
+    template<std::size_t... Sequence>
+    void Evaluator<PredictorType, AggregatorTypes...>::DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Sequence...>)
     {
         // Call X.Update() for each X in _aggregatorTuple
-        auto dummy = {(std::get<Is>(_aggregatorTuple).Update(prediction, label, weight), 0)...}; 
+        auto dummy = {(std::get<Sequence>(_aggregatorTuple).Update(prediction, label, weight), 0)...}; 
     }
 
     template<typename PredictorType, typename... AggregatorTypes>
-    template<std::size_t ...Is>
-    void Evaluator<PredictorType, AggregatorTypes...>::Aggregate(std::index_sequence<Is...>)
+    template<std::size_t ...Sequence>
+    void Evaluator<PredictorType, AggregatorTypes...>::Aggregate(std::index_sequence<Sequence...>)
     {
         // Call X.GetAndReset() for each X in _aggregatorTuple
-        auto valueTuple = std::make_tuple(std::get<Is>(_aggregatorTuple).GetAndReset()...);
+        auto valueTuple = std::make_tuple(std::get<Sequence>(_aggregatorTuple).GetAndReset()...);
         _valueTuples.push_back(std::move(valueTuple));
     }
 
@@ -116,11 +116,11 @@ namespace evaluators
 
 
     template<typename PredictorType, typename... AggregatorTypes>
-    template<std::size_t ...Is>
-    void Evaluator<PredictorType, AggregatorTypes...>::PrintDispatch(std::ostream& os, std::index_sequence<Is...>) const
+    template<std::size_t ...Sequence>
+    void Evaluator<PredictorType, AggregatorTypes...>::PrintDispatch(std::ostream& os, std::index_sequence<Sequence...>) const
     {
         // print header
-        std::vector<std::vector<std::string>> header {std::get<Is>(_aggregatorTuple).GetHeader()...};
+        std::vector<std::vector<std::string>> header {std::get<Sequence>(_aggregatorTuple).GetHeader()...};
 
         printVector(os, header[0]);
         for(uint64_t i = 1; i<header.size(); ++i)
@@ -133,7 +133,7 @@ namespace evaluators
         for(const auto& valueTuple : _valueTuples)
         {
             // Call X.ToString() for each X in valueTuple
-            std::vector<std::vector<double>> values {std::get<Is>(valueTuple).GetValues()...};
+            std::vector<std::vector<double>> values {std::get<Sequence>(valueTuple).GetValues()...};
 
             printVector(os, values[0]);
             for(uint64_t i = 1; i<values.size(); ++i)
