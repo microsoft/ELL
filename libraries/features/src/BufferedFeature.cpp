@@ -111,6 +111,16 @@ namespace features
         return _samples;
     }
     
+    std::vector<double>& BufferedFeature::GetAllSamples(int column) 
+    { 
+        return _samples[column]; 
+    }
+    
+    const std::vector<double>& BufferedFeature::GetAllSamples(int column) const
+    { 
+        return _samples[column]; 
+    }
+
     size_t BufferedFeature::GetWarmupTime() const
     {
         return Feature::GetWarmupTime() + GetWindowSize();

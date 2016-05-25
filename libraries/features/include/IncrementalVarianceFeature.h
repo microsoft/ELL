@@ -28,12 +28,6 @@ namespace features
         /// <param name="windowSize"> The number of samples of history to use in computing the variance </param>
         IncrementalVarianceFeature(Feature* inputFeature, size_t windowSize);
 
-        /// <summary> Constructor from mean feature </summary>
-        /// <param name="inputFeature"> The feature to take the variance of </param>
-        /// <param name="meanFeature"> A feature that returns the mean of the input window </param>
-        /// <param name="windowSize"> The number of samples of history to use in computing the variance </param>
-//        IncrementalVarianceFeature(Feature* inputFeature, Feature* meanFeature, size_t windowSize) : BufferedFeature({inputFeature}, windowSize) {}
-
         /// <summary> Creates a `IncrementalVarianceFeature` from a vector of strings </summary>
         ///
         /// <param name="params"> The strings describing the parameters </params> 

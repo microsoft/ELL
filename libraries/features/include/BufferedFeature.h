@@ -23,11 +23,14 @@ namespace features
     class BufferedFeature : public Feature
     {
     public:
+        /// <summary> Returns the number of samples used to compute the feature </summary> 
+        ///
+        /// <returns> The number of samples used to compute the feature </returns>
         size_t GetWindowSize() const { return _windowSize; }
         virtual void Reset() override;
         virtual size_t GetWarmupTime() const override;
 
-    protected:
+    protected:        
         BufferedFeature(const std::vector<Feature*>& inputs, size_t windowSize);
         
         // BufferedFeature-specific routines
@@ -39,8 +42,8 @@ namespace features
         std::vector<std::vector<double>>& GetAllSamples();
         const std::vector<std::vector<double>>& GetAllSamples() const;
 
-        std::vector<double>& GetAllSamples(int column) { return _samples[column]; }
-        const std::vector<double>& GetAllSamples(int column) const { return _samples[column]; }
+        std::vector<double>& GetAllSamples(int column);
+        const std::vector<double>& GetAllSamples(int column) const;
 
         void UpdateRowSamples(const std::vector<double>& row) const;
 
