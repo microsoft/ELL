@@ -9,10 +9,15 @@
 namespace evaluators
 {
     template<typename LossFunctionType>
-    std::vector<double> evaluators::LossAggregator<LossFunctionType>::Value::GetValues() const 
+    std::vector<double> evaluators::LossAggregator<LossFunctionType>::Value::GetValues() const
     {
-        double meanLoss = sumWeightedLosses / sumWeights;
-        return {meanLoss};
+        return{ GetMeanLoss() };
+    }
+
+    template<typename LossFunctionType>
+    double evaluators::LossAggregator<LossFunctionType>::Value::GetMeanLoss() const
+    {
+        return sumWeightedLosses / sumWeights;
     }
 
     template<typename LossFunctionType>

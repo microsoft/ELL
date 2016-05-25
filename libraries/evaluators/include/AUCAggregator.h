@@ -24,6 +24,11 @@ namespace evaluators
         {
             double auc = 0.0;
 
+            /// <summary> Returns a number between 0 and 1 that represents the goodness of this value. </summary>
+            ///
+            /// <returns> The goodness of this value. </returns>
+            double GetGoodness() const { return auc; }
+
             /// <summary> Gets the vector of evaluation values that match the descriptions in GetHeader(). </summary>
             ///
             /// <returns> A vector of evaluation values. </returns>

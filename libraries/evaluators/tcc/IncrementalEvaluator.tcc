@@ -46,6 +46,16 @@ namespace evaluators
         }
     }
 
+    template<typename BasePredictorType, typename ...AggregatorTypes>
+    double IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::GetGoodness() const
+    {
+        if (_valueTuples.size() == 0)
+        {
+            return 0;
+        }
+        return std::get<0>(_valueTuples.back()).GetGoodness();
+    }
+
     template<typename BasePredictorType, typename... AggregatorTypes>
     void IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::Print(std::ostream& os) const
     {

@@ -47,6 +47,16 @@ namespace evaluators
         Aggregate(std::make_index_sequence<sizeof...(AggregatorTypes)>());
     }
 
+    template<typename PredictorType, typename ...AggregatorTypes>
+    double Evaluator<PredictorType, AggregatorTypes...>::GetGoodness() const
+    {
+        if (_valueTuples.size() == 0)
+        {
+            return 0;
+        }
+        return std::get<0>(_valueTuples.back()).GetGoodness();
+    }
+
     template<typename PredictorType, typename... AggregatorTypes>
     void Evaluator<PredictorType, AggregatorTypes...>::Print(std::ostream& os) const
     {

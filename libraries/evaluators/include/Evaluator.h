@@ -34,6 +34,11 @@ namespace evaluators
         /// <param name="predictor"> The predictor. </param>
         virtual void Evaluate(const PredictorType& predictor) = 0;
 
+        /// <summary> Gets the goodness of the most recent evaluation, according to the first aggregator. </summary>
+        ///
+        /// <returns> The goodness of the most recent evaluation. </returns>
+        virtual double GetGoodness() const = 0;
+
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] The output stream. </param>
@@ -67,6 +72,11 @@ namespace evaluators
         ///
         /// <param name="predictor"> The predictor. </param>
         virtual void Evaluate(const PredictorType& predictor) override;
+
+        /// <summary> Gets the goodness of the most recent evaluation, according to the first aggregator. </summary>
+        ///
+        /// <returns> The goodness of the most recent evaluation. </returns>
+        virtual double GetGoodness() const override;
 
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
