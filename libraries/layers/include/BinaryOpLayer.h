@@ -96,8 +96,6 @@ namespace layers
         virtual void Write(utilities::XMLSerializer& serializer) const override;
 
     protected:
-        // TODO: either find a way to make a "fake" iterator over [input1[k], input2[k]], or
-        //       store a vector of 2-element coord lists
         std::vector<CoordinateList> _inputCoordinates;
         OperationType _operationType;
         static const int _currentVersion = 1;

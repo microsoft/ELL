@@ -19,7 +19,10 @@
 
 namespace features
 {
-    /// <summary> A feature that takes a vector input and returns its variance over some window of time </summary>
+    /// <summary> 
+    /// A feature that takes a vector input and returns its variance over some window of time. 
+    /// This feature is computed incrementally, so it takes \f$O(1)\f$ time instead of \f$O(n)\f$ time.
+    /// </summary>
     class IncrementalVarianceFeature : public BufferedFeature
     {
     public:

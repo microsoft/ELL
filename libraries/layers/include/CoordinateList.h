@@ -93,10 +93,25 @@ namespace layers
         /// <param name="os"> [in,out] Stream to write data to. </param>
         void Print(std::ostream& os) const;
         
+        /// <summary> Returns an STL-style iterator to the the beginning </summary>
+        ///
+        /// <returns> An iterator </returns>
         std::vector<Coordinate>::iterator begin() { return _list.begin(); }
+        
+        /// <summary> Returns an STL-style iterator to the end </summary>
+        ///
+        /// <returns> An iterator </returns>
         std::vector<Coordinate>::iterator end() { return _list.end(); }
-        std::vector<Coordinate>::const_iterator begin() const { return _list.begin(); }
-        std::vector<Coordinate>::const_iterator end() const { return _list.end(); }
+        
+        /// <summary> Returns an STL-style iterator to the beginning </summary>
+        ///
+        /// <returns> An iterator </returns>
+        std::vector<Coordinate>::const_iterator cbegin() const { return _list.cbegin(); }
+        
+        /// <summary> Returns an STL-style iterator to the end </summary>
+        ///
+        /// <returns> An iterator </returns>
+        std::vector<Coordinate>::const_iterator cend() const { return _list.cend(); }
         
     private:
         std::vector<Coordinate> _list;

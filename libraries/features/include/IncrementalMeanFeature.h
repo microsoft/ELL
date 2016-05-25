@@ -19,7 +19,10 @@
 
 namespace features
 {
-    /// <summary> A feature that takes a vector input and returns its mean over some window of time, computed incrementally. </summary>
+    /// <summary>
+    /// A feature that takes a vector input and returns its mean over some window of time.
+    /// This feature is computed incrementally, so it takes \f$O(1)\f$ time instead of \f$O(n)\f$ time.
+    /// </summary>
     class IncrementalMeanFeature : public BufferedFeature
     {
     public:
@@ -34,7 +37,7 @@ namespace features
         /// <param name="previousFeatures"> The map of existing features available as inputs. </params> 
         static std::unique_ptr<Feature> Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures);
 
-        virtual std::string FeatureType() const override{ return feature_name; }
+        virtual std::string FeatureType() const override { return feature_name; }
         static constexpr const char* feature_name = "IncrementalMean";
 
     protected:

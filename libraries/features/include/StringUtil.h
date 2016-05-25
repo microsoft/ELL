@@ -11,8 +11,6 @@
 #include <string>
 #include <vector>
 
-/// TODO: The functionality in this file belongs in the utilities library somewhere
-
 namespace features
 {
     std::string TrimString(const std::string& str);
