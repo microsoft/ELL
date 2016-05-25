@@ -23,7 +23,7 @@ namespace features
     /// A feature that takes a vector input and returns its variance over some window of time. 
     /// This feature is computed incrementally, so it takes \f$O(1)\f$ time instead of \f$O(n)\f$ time.
     /// </summary>
-    /// <remarks> Computes variance by keeping a running sum of x and x^2, and computes var = (sum(x^2) - (sum(x)^2 / N)) / N</remarks>
+    /// <remarks> Computes variance by keeping a running sum of \f$x\f$ and \f$x^2\f$, and computes \f$var = \frac{(\sum{x^2} - \frac{\sum{x}^2}{N})}{N}\f$ </remarks>
    class IncrementalVarianceFeature : public BufferedFeature
     {
     public:
@@ -34,8 +34,8 @@ namespace features
 
         /// <summary> Creates an `IncrementalVarianceFeature` from a vector of strings </summary>
         ///
-        /// <param name="params"> The strings describing the parameters </params> 
-        /// <param name="previousFeatures"> The map of existing features available as inputs. </params> 
+        /// <param name="params"> The strings describing the parameters </paras> 
+        /// <param name="previousFeatures"> The map of existing features available as inputs. </param> 
         static std::unique_ptr<Feature> Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures);
 
         virtual std::string FeatureType() const override { return feature_name; }

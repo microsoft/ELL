@@ -106,12 +106,12 @@ namespace layers
         /// <summary> Returns an STL-style iterator to the beginning </summary>
         ///
         /// <returns> An iterator </returns>
-        std::vector<Coordinate>::const_iterator cbegin() const { return _list.cbegin(); }
+        std::vector<Coordinate>::const_iterator begin() const { return _list.cbegin(); }
         
         /// <summary> Returns an STL-style iterator to the end </summary>
         ///
         /// <returns> An iterator </returns>
-        std::vector<Coordinate>::const_iterator cend() const { return _list.cend(); }
+        std::vector<Coordinate>::const_iterator end() const { return _list.cend(); }
         
     private:
         std::vector<Coordinate> _list;
