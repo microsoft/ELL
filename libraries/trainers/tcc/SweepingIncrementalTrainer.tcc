@@ -12,8 +12,8 @@
 namespace trainers
 {
     template <typename PredictorType>
-    SweepingIncrementalTrainer<PredictorType>::SweepingIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const SweepingIncrementalTrainerParameters& parameters, std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator) :
-        _incrementalTrainer(std::move(incrementalTrainer)), _parameters(parameters), _evaluator(std::move(evaluator)), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
+    SweepingIncrementalTrainer<PredictorType>::SweepingIncrementalTrainer(std::vector<std::unique_ptr<IIncrementalTrainer<PredictorType>>>&& incrementalTrainers, const MultiEpochIncrementalTrainerParameters& parameters, std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators) :
+        _incrementalTrainers(std::move(incrementalTrainers)), _parameters(parameters), _evaluators(std::move(evaluators)), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
     {}
     
     template <typename PredictorType>
@@ -34,20 +34,16 @@ namespace trainers
             rowDataset.RandomPermute(_random, epochSize);
 
             // update the incremental trainer
-            auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-            _incrementalTrainer->Update(trainSetIterator);
+            //auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
+            //_incrementalTrainer->Update(trainSetIterator);
 
-            // evaluate
-            if (_evaluator != nullptr)
-            {
-                _evaluator->Evaluate(*_incrementalTrainer->GetPredictor());
-            }
+            //    _evaluator->Evaluate(*_incrementalTrainer->GetPredictor());
         }
     }
 
     template <typename PredictorType>
-    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeSweepingIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const SweepingIncrementalTrainerParameters& parameters, std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator)
+    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeSweepingIncrementalTrainer(std::vector<std::unique_ptr<IIncrementalTrainer<PredictorType>>>&& incrementalTrainers, const MultiEpochIncrementalTrainerParameters& parameters, std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators)
     {
-        return std::make_unique<SweepingIncrementalTrainer<PredictorType>>(std::move(incrementalTrainer), parameters, std::move(evaluator));
+        return std::make_unique<SweepingIncrementalTrainer<PredictorType>>(std::move(incrementalTrainers), parameters, std::move(evaluators));
     }
 }

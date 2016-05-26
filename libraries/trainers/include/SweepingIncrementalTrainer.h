@@ -9,6 +9,7 @@
 #pragma once
 
 #include "IIncrementalTrainer.h"
+#include "MultiEpochIncrementalTrainer.h"
 
 // dataset
 #include "RowDataset.h"
@@ -21,17 +22,10 @@
 #include <memory>
 #include <random>
 #include <string>
+#include <vector>
 
 namespace trainers
 {
-    /// <summary> Parameters for the multi-epoch meta-trainer. </summary>
-    struct SweepingIncrementalTrainerParameters
-    {
-        uint64_t epochSize = 0;
-        uint64_t numEpochs = 1;
-        std::string dataPermutationRandomSeed = "";
-    };
-
     /// <summary> A class that performs multiple epochs of an IncrementalTrainer. </summary>
     ///
     /// <typeparam name="PredictorType"> The type of predictor returned by this trainer. </typeparam>
@@ -43,11 +37,13 @@ namespace trainers
 
         /// <summary> Constructs an instance of SweepingIncrementalTrainer. </summary>
         ///
-        /// <param name="incrementalTrainer"> [in,out] The stateful trainer. </param>
+        /// <param name="incrementalTrainers"> A vector of incremental trainers. </param>
+        /// <param name="parameters"> Multi-epoch training parameters. </param>
+        /// <param name="evaluator"> A vector of evaluators. </param>
         SweepingIncrementalTrainer(
-            std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, 
-            const SweepingIncrementalTrainerParameters& parameters, 
-            std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator);
+            std::vector<std::unique_ptr<IIncrementalTrainer<PredictorType>>>&& incrementalTrainers, 
+            const MultiEpochIncrementalTrainerParameters& parameters, 
+            std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators);
 
         /// <summary> Perform a set of training epochs. </summary>
         ///
@@ -57,27 +53,28 @@ namespace trainers
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
         /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _incrementalTrainer->GetPredictor(); }
+        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override;
 
     private:
-        std::unique_ptr<IIncrementalTrainer<PredictorType>> _incrementalTrainer;
-        SweepingIncrementalTrainerParameters _parameters;
-        std::shared_ptr<evaluators::IEvaluator<PredictorType>> _evaluator;
+        std::vector<std::unique_ptr<IIncrementalTrainer<PredictorType>>> _incrementalTrainers;
+        MultiEpochIncrementalTrainerParameters _parameters;
+        std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> _evaluators;
         mutable std::default_random_engine _random;
     };
 
-    /// <summary> Makes an incremental trainer that runs another incremental trainer for multiple epochs. </summary>
+    /// <summary> Makes an incremental trainer that runs multiple internal incremental trainers in parallel and uses an evaluator to choose the best one. </summary>
     ///
     /// <typeparam name="PredictorType"> Type of the predictor returned by this trainer. </typeparam>
-    /// <param name="incrementalTrainer"> [in,out] The incremental trainer. </param>
-    /// <param name="parameters"> Parameters for the multi-epoch trainer. </param>
+    /// <param name="incrementalTrainers"> A vector of incremental trainers. </param>
+    /// <param name="parameters"> Multi-epoch training parameters. </param>
+    /// <param name="evaluator"> A vector of evaluators. </param>
     ///
-    /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
+    /// <returns> A unique_ptr to a sweeping trainer. </returns>
     template <typename PredictorType>
     std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeSweepingIncrementalTrainer(
-        std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, 
-        const SweepingIncrementalTrainerParameters& parameters, 
-        std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr);
+        std::vector<std::unique_ptr<IIncrementalTrainer<PredictorType>>>&& incrementalTrainers,
+        const MultiEpochIncrementalTrainerParameters& parameters,
+        std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluator);
 }
 
 #include "../tcc/SweepingIncrementalTrainer.tcc"
