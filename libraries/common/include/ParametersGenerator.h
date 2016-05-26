@@ -13,6 +13,10 @@
 
 namespace common
 {
+    /// <summary> Implements a factory class that enumerates all possible combinations of parameter values. </summary>
+    ///
+    /// <typeparam name="ParametersType"> The parameters struct type. </typeparam>
+    /// <typeparam name="ValueTypes"> Types of the individual variables in the parameters struct. </typeparam>
     template <typename ParametersType, typename ...ValueTypes>
     class ParametersGenerator
     {
@@ -21,12 +25,26 @@ namespace common
         using ValueVectorTupleType = std::tuple<std::vector<ValueTypes>...>; // holds the vectors of parameter values to sweep over
         using ValueTupleType = std::tuple<ValueTypes...>; // holds a concrete assignment of parameter values
 
+        /// <summary> Constructs an instance of ParametersGenerator. </summary>
+        ///
+        /// <param name="parameterValues"> Variable number of parameter value vectors. The number and order of these types should match the constructor of ParametersType. </param>
         ParametersGenerator(std::vector<ValueTypes>... parameterValues);
 
+        /// <summary> Gets the number of different parameter configurations. </summary>
+        ///
+        /// <returns> The size. </returns>
         size_t Size() const;
 
+        /// <summary> Generates the desired a parameters struct.</summary>
+        ///
+        /// <param name="index"> Zero-based index of the desired set of parameters. This parameter is interpreted modulo Size(), so all inputs produce valid output.</param>
+        ///
+        /// <returns> The desired parameters struct. </returns>
         ParametersType GenerateParameters(size_t index) const; 
 
+        /// <summary> Generates all possible parameters structs. </summary>
+        ///
+        /// <returns> A vector of all possible parameters. </returns>
         std::vector<ParametersType> GenerateParametersVector() const;
 
     private:
@@ -47,9 +65,14 @@ namespace common
         ValueVectorTupleType _valueVectorTuple;
     };
 
+    /// <summary> Makes a parameters generator. </summary>
+    ///
+    /// <typeparam name="ParametersType"> The parameters struct type. </typeparam>
+    /// <typeparam name="ValueTypes"> Types of the individual variables in the parameters struct. </typeparam>
+    /// <param name="parameterValues"> Variable number of parameter value vectors. The number and order of these types should match the constructor of ParametersType. </param>
+    /// <returns> A parameters generator. </returns>
     template <typename ParametersType, typename... ValueTypes>
     ParametersGenerator<ParametersType, ValueTypes...> MakeParametersGenerator(std::vector<ValueTypes>... parameterValues);
 }
-
 
 #include "../tcc/ParametersGenerator.tcc"
