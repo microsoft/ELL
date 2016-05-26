@@ -32,6 +32,7 @@
 #include "LoadModel.h"
 #include "MakeTrainer.h"
 #include "MakeEvaluator.h"
+#include "ParametersGenerator.h"
 
 // trainers
 #include "SGDIncrementalTrainer.h"
@@ -78,6 +79,11 @@ int main(int argc, char* argv[])
 
         // parse command line
         commandLineParser.Parse();
+
+        std::vector<double> yVals{1,2,3,4};
+        auto generator = common::MakeParametersGenerator<trainers::SGDIncrementalTrainerParameters>(yVals);
+        auto parameters = generator.GenerateParametersVector();
+
 
         if(trainerArguments.verbose)
         {

@@ -9,6 +9,7 @@
 #pragma once
 
 #include <vector>
+#include <tuple>
 
 namespace common
 {
@@ -17,18 +18,38 @@ namespace common
     {
     public:
 
-        using ValueVectorTupleType = std::tuple<std::vector<ParameterValueType>...>; // holds the vectors of parameter values to sweep over
-        using ValueTupleType = std::tuple<ParameterValueType...>; // holds a concrete assignment of parameter values
+        using ValueVectorTupleType = std::tuple<std::vector<ValueTypes>...>; // holds the vectors of parameter values to sweep over
+        using ValueTupleType = std::tuple<ValueTypes...>; // holds a concrete assignment of parameter values
 
-        ParametersGenerator(ParametersType parametersPrototype, std::vector<ParameterValueType>... parameterValues);
+        ParametersGenerator(std::vector<ValueTypes>... parameterValues);
 
-        ParametersType GetParameters(size_t index) const; 
+        size_t Size() const;
+
+        ParametersType GenerateParameters(size_t index) const; 
+
+        std::vector<ParametersType> GenerateParametersVector() const;
 
     private:
-        ParametersType _parametersPrototype;
+        template <size_t Index = 0>
+        void SetValueTuple(ValueTupleType& valueTuple, size_t index) const;
+
+        // termination of template recursion
+        template <>
+        void SetValueTuple<std::tuple_size<ValueTupleType>::value>(ValueTupleType& valueTuple, size_t index) const {}
+
+        template <size_t... Sequence>
+        ParametersType GenerateParameters(const ValueTupleType& valueTuple, std::index_sequence<Sequence...>) const;
+
+        template <size_t... Sequence>
+        size_t Size(std::index_sequence<Sequence...>) const;
+
+        // members
         ValueVectorTupleType _valueVectorTuple;
     };
 
+    template <typename ParametersType, typename... ValueTypes>
+    ParametersGenerator<ParametersType, ValueTypes...> MakeParametersGenerator(std::vector<ValueTypes>... parameterValues);
 }
 
-#include "../tcc/ParameterGenerator.tcc"
+
+#include "../tcc/ParametersGenerator.tcc"
