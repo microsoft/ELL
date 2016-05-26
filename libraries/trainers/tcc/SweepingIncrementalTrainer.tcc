@@ -33,12 +33,34 @@ namespace trainers
             // randomly permute the data
             rowDataset.RandomPermute(_random, epochSize);
 
-            // update the incremental trainer
-            //auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-            //_incrementalTrainer->Update(trainSetIterator);
+            for(int i = 0; i<_incrementalTrainers.size(); ++i)
+            {
 
-            //    _evaluator->Evaluate(*_incrementalTrainer->GetPredictor());
+                // update the incremental trainer
+                auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
+                _incrementalTrainers[i]->Update(trainSetIterator);
+
+                _evaluators[i]->Evaluate(*_incrementalTrainers[i]->GetPredictor());
+            }
         }
+    }
+
+    template <typename PredictorType>
+    const std::shared_ptr<const PredictorType> SweepingIncrementalTrainer<PredictorType>::GetPredictor() const
+    {
+        double bestGoodness = _evaluators[0]->GetGoodness();
+        double best = 0;
+        for(int i = 1; i<_incrementalTrainers.size(); ++i)
+        {
+            double goodness =  _evaluators[i]->GetGoodness();
+            if(goodness > bestGoodness)
+            {
+                bestGoodness = goodness;
+                best = i;
+            }
+        }
+
+        return _incrementalTrainers[best]->GetPredictor();
     }
 
     template <typename PredictorType>

@@ -36,7 +36,7 @@
 
 // trainers
 #include "SGDIncrementalTrainer.h"
-#include "MultiEpochIncrementalTrainer.h"
+#include "SweepingIncrementalTrainer.h"
 
 // evaluators
 #include "Evaluator.h"
@@ -80,14 +80,12 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
 
-        std::vector<double> yVals{1,2,3,4};
-        auto generator = common::MakeParametersGenerator<trainers::SGDIncrementalTrainerParameters>(yVals);
-        auto parameters = generator.GenerateParametersVector();
-
+        // manually define regularization parameters to sweep over
+        std::vector<double> regularization{1.0e-0, 1.0e-1, 1.0e-2, 1.0e-3, 1.0e-4, 1.0e-5, 1.0e-6};
 
         if(trainerArguments.verbose)
         {
-            std::cout << "Stochastic Gradient Descent Trainer" << std::endl;
+            std::cout << "Sweeping Stochastic Gradient Descent Trainer" << std::endl;
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
@@ -105,16 +103,18 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
-        // create evaluator
-        std::shared_ptr<evaluators::IEvaluator<predictors::LinearPredictor>> evaluator = nullptr;
-        if(trainerArguments.verbose)
+        // create trainers
+        auto generator = common::MakeParametersGenerator<trainers::SGDIncrementalTrainerParameters>(regularization);
+        std::vector<std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>>> sgdIncrementalTrainers;
+        std::vector<std::shared_ptr<evaluators::IEvaluator<predictors::LinearPredictor>>> evaluators;
+        for(uint64_t i = 0; i<regularization.size(); ++i)
         {
-            evaluator = common::MakeEvaluator<predictors::LinearPredictor>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
+            sgdIncrementalTrainers.push_back(common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, generator.GenerateParameters(i)));
+            evaluators.push_back(common::MakeEvaluator<predictors::LinearPredictor>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments));
         }
 
-        // create sgd trainer
-        auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
-        auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments, evaluator);
+        // create meta trainer
+        auto trainer = trainers::MakeSweepingIncrementalTrainer(std::move(sgdIncrementalTrainers), multiEpochTrainerArguments, evaluators);
 
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
@@ -128,9 +128,12 @@ int main(int argc, char* argv[])
             std::cout << "Finished training.\n";
 
             // print evaluation
-            std::cout << "Training error\n";
-            evaluator->Print(std::cout);
-            std::cout << std::endl;
+            for(uint64_t i = 0; i<regularization.size(); ++i)
+            {
+                std::cout << "Trainer " << i << ":\n";
+                evaluators[i]->Print(std::cout);
+                std::cout << std::endl;
+            }
         }
 
         // add predictor to the model
