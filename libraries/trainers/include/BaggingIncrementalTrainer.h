@@ -40,7 +40,9 @@ namespace trainers
 
         /// <summary> Constructs an instance of SingleEpochTrainer. </summary>
         ///
-        /// <param name="incrementalTrainer"> [in,out] The stateful trainer. </param>
+        /// <param name="trainer"> A trainer. </param>
+        /// <param name="baggingParameters"> Bagging paramters. </param>
+        /// <param name="evaluator"> An optional evaluator, or nullptr. </param>
         BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters, std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> evaluator);
 
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
@@ -64,8 +66,9 @@ namespace trainers
     /// <summary> Makes a bagging incremental trainer. </summary>
     ///
     /// <typeparam name="BasePredictorType"> Type of base predictor used to build the ensemble. </typeparam>
-    /// <param name="trainer"> [in,out] The incremental trainer. </param>
-    /// <param name="baggingParameters"> Bagging parameters. </param>
+    /// <param name="trainer"> A trainer. </param>
+    /// <param name="baggingParameters"> Bagging paramters. </param>
+    /// <param name="evaluator"> An optional evaluator. </param>
     ///
     /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
     template <typename BasePredictorType>

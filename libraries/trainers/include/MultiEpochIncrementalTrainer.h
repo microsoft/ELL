@@ -43,7 +43,9 @@ namespace trainers
 
         /// <summary> Constructs an instance of MultiEpochIncrementalTrainer. </summary>
         ///
-        /// <param name="incrementalTrainer"> [in,out] The stateful trainer. </param>
+        /// <param name="incrementalTrainer"> An incremental trainer. </param>
+        /// <param name="parameters"> Multi-epoch training parameters. </param>
+        /// <param name="evaluator"> An optional evaluator, or nullptr. </param>
         MultiEpochIncrementalTrainer(
             std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, 
             const MultiEpochIncrementalTrainerParameters& parameters, 
@@ -69,8 +71,9 @@ namespace trainers
     /// <summary> Makes an incremental trainer that runs another incremental trainer for multiple epochs. </summary>
     ///
     /// <typeparam name="PredictorType"> Type of the predictor returned by this trainer. </typeparam>
-    /// <param name="incrementalTrainer"> [in,out] The incremental trainer. </param>
-    /// <param name="parameters"> Parameters for the multi-epoch trainer. </param>
+    /// <param name="incrementalTrainer"> An incremental trainer. </param>
+    /// <param name="parameters"> Multi-epoch training parameters. </param>
+    /// <param name="evaluator"> An optional evaluator. </param>
     ///
     /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
     template <typename PredictorType>
