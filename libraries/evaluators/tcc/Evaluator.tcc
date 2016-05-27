@@ -79,7 +79,8 @@ namespace evaluators
     template<std::size_t ...Is>
     void Evaluator<PredictorType, AggregatorTypes...>::DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Is...>)
     {
-        // Call X.Update() for each X in _aggregatorTuple
+        // Call (X.Update(), 0) for each X in _aggregatorTuple
+        // The ',0' above is due to the fact that Update returns void
         auto dummy = {(std::get<Is>(_aggregatorTuple).Update(prediction, label, weight), 0)...}; 
     }
 
@@ -110,7 +111,7 @@ namespace evaluators
     void Evaluator<PredictorType, AggregatorTypes...>::PrintDispatch(std::ostream& os, std::index_sequence<Is...>) const
     {
         // print header
-        std::vector<std::vector<std::string>> header {std::get<Is>(_aggregatorTuple).GetHeader()...};
+        std::vector<std::vector<std::string>> header {std::get<Is>(_aggregatorTuple).GetValueNames()...};
 
         printVector(os, header[0]);
         for(uint64_t i = 1; i<header.size(); ++i)

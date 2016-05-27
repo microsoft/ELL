@@ -12,12 +12,12 @@ namespace evaluators
 {
     std::vector<double> BinaryErrorAggregator::Value::GetValues() const
     {
-        double allFalse = falsePositives + falseNegatives;
-        double allTrue = truePositives + trueNegatives;
+        double sumFalse = sumFalsePositives + sumFalseNegatives;
+        double sumTrue = sumTruePositives + sumTrueNegatives;
 
-        double errorRate = allFalse / (allTrue + allFalse);
-        double precision = truePositives == 0.0 ? 0.0 : truePositives / (truePositives + falsePositives);
-        double recall = truePositives == 0.0 ? 0.0 : truePositives / (truePositives + falseNegatives);
+        double errorRate = sumFalse == 0.0 ? 0.0 : sumFalse / (sumTrue + sumFalse);
+        double precision = sumTruePositives == 0.0 ? 0.0 : sumTruePositives / (sumTruePositives + sumFalsePositives);
+        double recall = sumTruePositives == 0.0 ? 0.0 : sumTruePositives / (sumTruePositives + sumFalseNegatives);
         double f1 = (precision + recall) == 0.0 ? 0.0 : 2 * (precision * recall) / (precision + recall);
 
         return {errorRate, precision, recall, f1};
@@ -29,22 +29,22 @@ namespace evaluators
         {
             if (prediction > 0)
             {
-                _value.truePositives += weight;
+                _value.sumTruePositives += weight;
             }
             else
             {
-                _value.falseNegatives += weight;
+                _value.sumFalseNegatives += weight;
             }
         }
         else
         {
             if (prediction >= 0)
             {
-                _value.falsePositives += weight;
+                _value.sumFalsePositives += weight;
             }
             else
             {
-                _value.trueNegatives += weight;
+                _value.sumTrueNegatives += weight;
             }
         }
     }
@@ -56,7 +56,7 @@ namespace evaluators
         return newValue;
     }
 
-    std::vector<std::string> BinaryErrorAggregator::GetHeader() const 
+    std::vector<std::string> BinaryErrorAggregator::GetValueNames() const 
     { 
         return {"ErrorRate", "Precision", "Recall", "F1-Score"}; 
     }

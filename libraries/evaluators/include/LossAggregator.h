@@ -28,7 +28,7 @@ namespace evaluators
             double sumWeights = 0.0;
             double sumWeightedLosses = 0.0;
 
-            /// <summary> Gets the vector of evaluation values that match the descriptions in GetHeader(). </summary>
+            /// <summary> Gets the vector of evaluation values that match the descriptions in GetValueNames(). </summary>
             ///
             /// <returns> A vector of evaluation values. </returns>
             std::vector<double> GetValues() const;
@@ -54,7 +54,7 @@ namespace evaluators
         /// <summary> Gets a header that describes the values of this aggregator. </summary>
         ///
         /// <returns> The header string vector. </returns>
-        std::vector<std::string> GetHeader() const;
+        std::vector<std::string> GetValueNames() const;
 
     private:
         LossFunctionType _lossFunction;

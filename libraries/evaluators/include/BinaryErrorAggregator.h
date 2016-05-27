@@ -22,12 +22,12 @@ namespace evaluators
 
         struct Value
         {
-            double truePositives = 0.0;
-            double trueNegatives = 0.0;
-            double falsePositives = 0.0;
-            double falseNegatives = 0.0;
+            double sumTruePositives = 0.0;
+            double sumTrueNegatives = 0.0;
+            double sumFalsePositives = 0.0;
+            double sumFalseNegatives = 0.0;
 
-            /// <summary> Gets the vector of evaluation values that match the descriptions in GetHeader(). </summary>
+            /// <summary> Gets the vector of evaluation values that match the descriptions in GetValueNames(). </summary>
             ///
             /// <returns> A vector of evaluation values. </returns>
             std::vector<double> GetValues() const;
@@ -48,7 +48,7 @@ namespace evaluators
         /// <summary> Gets a header that describes the values of this aggregator. </summary>
         ///
         /// <returns> The header string vector. </returns>
-        std::vector<std::string> GetHeader() const;
+        std::vector<std::string> GetValueNames() const;
 
     private:
         Value _value;

@@ -63,12 +63,13 @@ namespace evaluators
 
     bool AUCAggregator::Aggregate::operator<(const Aggregate& other) const
     {
+        // order by prediction (ascending) and then by label (descending) - this will produce the most pessimistic AUC 
         if (prediction < other.prediction) return true;
         if (prediction > other.prediction) return false;
         return label > other.label;
     }
 
-    std::vector<std::string> AUCAggregator::GetHeader() const 
+    std::vector<std::string> AUCAggregator::GetValueNames() const 
     { 
         return {"AUC"}; 
     }
