@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
-        // create sgd trainer
+        // create trainer
         auto trainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
 
         // create random number generator

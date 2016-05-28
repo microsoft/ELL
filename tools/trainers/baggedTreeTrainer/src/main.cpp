@@ -95,11 +95,14 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
+        // predictor type
+        using PredictorType = predictors::DecisionTreePredictor;
+
         // create evaluator
-        std::shared_ptr<evaluators::IIncrementalEvaluator<predictors::DecisionTreePredictor>> evaluator = nullptr;
+        std::shared_ptr<evaluators::IIncrementalEvaluator<PredictorType>> evaluator = nullptr;
         if(trainerArguments.verbose)
         {
-            evaluator = common::MakeIncrementalEvaluator<predictors::DecisionTreePredictor>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
+            evaluator = common::MakeIncrementalEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
         }
 
         // create trainer

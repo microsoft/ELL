@@ -34,16 +34,20 @@ namespace trainers
     class BaggingIncrementalTrainer : public IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>
     {
     public:
-        using EnsembleType = predictors::EnsemblePredictor<BasePredictorType>;
+        typedef predictors::EnsemblePredictor<BasePredictorType> EnsembleType;
+        typedef ITrainer<BasePredictorType> BaseTrainerType;
+        typedef evaluators::IIncrementalEvaluator<BasePredictorType> EvaluatorType;
 
         BaggingIncrementalTrainer() = delete;
 
         /// <summary> Constructs an instance of SingleEpochTrainer. </summary>
         ///
-        /// <param name="trainer"> A trainer. </param>
+        /// <param name="trainer"> A base trainer. </param>
         /// <param name="baggingParameters"> Bagging paramters. </param>
         /// <param name="evaluator"> An optional evaluator, or nullptr. </param>
-        BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters, std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> evaluator);
+        BaggingIncrementalTrainer(std::unique_ptr<BaseTrainerType>&& trainer, 
+            const BaggingIncrementalTrainerParameters& baggingParameters, 
+            std::shared_ptr<EvaluatorType> evaluator);
 
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
         ///
@@ -56,9 +60,9 @@ namespace trainers
         virtual const std::shared_ptr<const EnsembleType> GetPredictor() const override { return _ensemble; }
 
     private:
-        std::unique_ptr<ITrainer<BasePredictorType>> _trainer;
+        std::unique_ptr<BaseTrainerType> _trainer;
         BaggingIncrementalTrainerParameters _baggingParameters;
-        std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> _evaluator;
+        std::shared_ptr<EvaluatorType> _evaluator;
         std::shared_ptr<EnsembleType> _ensemble;
         std::default_random_engine _random;
     };

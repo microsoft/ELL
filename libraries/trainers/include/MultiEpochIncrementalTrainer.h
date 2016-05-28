@@ -39,14 +39,14 @@ namespace trainers
     class MultiEpochIncrementalTrainer : public IIncrementalTrainer<PredictorType>
     {
     public:
-        MultiEpochIncrementalTrainer() = delete;
+        typedef IIncrementalTrainer<PredictorType> InternalTrainerType;
 
         /// <summary> Constructs an instance of MultiEpochIncrementalTrainer. </summary>
         ///
         /// <param name="internalTrainer"> An incremental trainer. </param>
         /// <param name="parameters"> Multi-epoch training parameters. </param>
         MultiEpochIncrementalTrainer(
-            std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer, 
+            std::unique_ptr<InternalTrainerType>&& internalTrainer, 
             const MultiEpochIncrementalTrainerParameters& parameters);
 
         /// <summary> Perform a set of training epochs. </summary>
@@ -60,7 +60,7 @@ namespace trainers
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _internalTrainer->GetPredictor(); }
 
     private:
-        std::unique_ptr<IIncrementalTrainer<PredictorType>> _internalTrainer;
+        std::unique_ptr<InternalTrainerType> _internalTrainer;
         MultiEpochIncrementalTrainerParameters _parameters;
         mutable std::default_random_engine _random;
     };

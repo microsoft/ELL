@@ -35,11 +35,13 @@ namespace trainers
     {
     public:
 
+        typedef EvaluatingIncrementalTrainer<PredictorType> EvaluatingTrainerType;
+
         /// <summary> Constructs an instance of SweepingIncrementalTrainer. </summary>
         ///
         /// <param name="evaluatingTrainers"> A vector of evaluating trainers. </param>
         /// <param name="parameters"> Multi-epoch training parameter. </param>
-        SweepingIncrementalTrainer(std::vector<EvaluatingIncrementalTrainer<PredictorType>>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters);
+        SweepingIncrementalTrainer(std::vector<EvaluatingTrainerType>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters);
 
         /// <summary> Perform a set of training epochs. </summary>
         ///
@@ -52,7 +54,7 @@ namespace trainers
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const override;
 
     private:
-        std::vector<EvaluatingIncrementalTrainer<PredictorType>> _evaluatingTrainers;
+        std::vector<EvaluatingTrainerType> _evaluatingTrainers;
         MultiEpochIncrementalTrainerParameters _parameters;
         mutable std::default_random_engine _random;
     };

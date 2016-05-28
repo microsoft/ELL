@@ -24,13 +24,16 @@ namespace trainers
     {
     public:
 
+        typedef IIncrementalTrainer<PredictorType> InternalTrainerType;
+        typedef evaluators::IEvaluator<PredictorType> EvaluatorType;
+
         /// <summary> Constructs an instance of EvaluatingIncrementalTrainer. </summary>
         ///
         /// <param name="internalTrainer"> An incremental trainer. </param>
         /// <param name="evaluator"> An evaluator. </param>
         EvaluatingIncrementalTrainer(
-            std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer, 
-            std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator);
+            std::unique_ptr<InternalTrainerType>&& internalTrainer,
+            std::shared_ptr<EvaluatorType> evaluator);
 
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
         ///
@@ -45,11 +48,11 @@ namespace trainers
         /// <summary> Gets a const reference to the evaluator. </summary>
         ///
         /// <returns> A shared pointer to the evaluator. </returns>
-        virtual const std::shared_ptr<const evaluators::IEvaluator<PredictorType>> GetEvaluator() const { return _evaluator; }
+        virtual const std::shared_ptr<const EvaluatorType> GetEvaluator() const { return _evaluator; }
 
     private:
-        std::unique_ptr<IIncrementalTrainer<PredictorType>> _internalTrainer;
-        std::shared_ptr<evaluators::IEvaluator<PredictorType>> _evaluator;
+        std::unique_ptr<InternalTrainerType> _internalTrainer;
+        std::shared_ptr<EvaluatorType> _evaluator;
     };
 
     /// <summary> Makes an evaluating trainer. </summary>

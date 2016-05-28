@@ -100,15 +100,18 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
+        // predictor type
+        using PredictorType = predictors::LinearPredictor;
+
         // create sgd trainer
         auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
 
-        // create evaluator
-        std::shared_ptr<evaluators::IEvaluator<predictors::LinearPredictor>> evaluator = nullptr;
+        // in verbose mode, create evaluator
+        std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
         if(trainerArguments.verbose)
         {
-            evaluator = common::MakeEvaluator<predictors::LinearPredictor>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
-            sgdIncrementalTrainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<predictors::LinearPredictor>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluator));
+            evaluator = common::MakeEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
+            sgdIncrementalTrainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<PredictorType>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluator));
         }
 
         auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments);

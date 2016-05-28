@@ -12,7 +12,7 @@
 namespace trainers
 {
     template <typename PredictorType>
-    SweepingIncrementalTrainer<PredictorType>::SweepingIncrementalTrainer(std::vector<EvaluatingIncrementalTrainer<PredictorType>>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters) :
+    SweepingIncrementalTrainer<PredictorType>::SweepingIncrementalTrainer(std::vector<EvaluatingTrainerType>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters) :
         _evaluatingTrainers(std::move(evaluatingTrainers)), _parameters(parameters), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
     {}
     
@@ -46,7 +46,7 @@ namespace trainers
     const std::shared_ptr<const PredictorType> SweepingIncrementalTrainer<PredictorType>::GetPredictor() const
     {
         double bestGoodness = _evaluatingTrainers[0].GetEvaluator()->GetGoodness(); // TODO make nicer
-        double best = 0;
+        int best = 0;
         for(int i = 1; i<_evaluatingTrainers.size(); ++i)
         {
             double goodness = _evaluatingTrainers[i].GetEvaluator()->GetGoodness();

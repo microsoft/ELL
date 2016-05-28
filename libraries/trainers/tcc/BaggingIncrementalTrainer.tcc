@@ -12,7 +12,7 @@
 namespace trainers
 {
     template<typename BasePredictorType>
-    BaggingIncrementalTrainer<BasePredictorType>::BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters, std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> evaluator) :
+    BaggingIncrementalTrainer<BasePredictorType>::BaggingIncrementalTrainer(std::unique_ptr<BaseTrainerType>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters, std::shared_ptr<EvaluatorType> evaluator) :
         _trainer(std::move(trainer)), _baggingParameters(baggingParameters), _ensemble(std::make_shared<EnsembleType>()), _evaluator(std::move(evaluator)), _random(utilities::GetRandomEngine(baggingParameters.dataPermutationRandomSeed))
     {}
 

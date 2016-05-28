@@ -104,14 +104,17 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
+        // get predictor type
+        using PredictorType = predictors::LinearPredictor;
+
         // create trainers
         auto generator = common::MakeParametersGenerator<trainers::SGDIncrementalTrainerParameters>(regularization);
-        std::vector<trainers::EvaluatingIncrementalTrainer<predictors::LinearPredictor>> evaluatingTrainers;
-        std::vector<std::shared_ptr<evaluators::IEvaluator<predictors::LinearPredictor>>> evaluators;
+        std::vector<trainers::EvaluatingIncrementalTrainer<PredictorType>> evaluatingTrainers;
+        std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators;
         for(uint64_t i = 0; i<regularization.size(); ++i)
         {
             auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, generator.GenerateParameters(i));
-            evaluators.push_back(common::MakeEvaluator<predictors::LinearPredictor>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments));
+            evaluators.push_back(common::MakeEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments));
             evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluators.back()));
         }
 
