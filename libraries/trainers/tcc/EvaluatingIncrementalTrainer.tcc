@@ -26,8 +26,10 @@ namespace trainers
     }
 
     template<typename PredictorType>
-    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeEvaluatingIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer, std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator)
+    EvaluatingIncrementalTrainer<PredictorType> MakeEvaluatingIncrementalTrainer(
+        std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer, 
+        std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator)
     {
-        return std::make_unique<EvaluatingIncrementalTrainer<PredictorType>>(std::move(internalTrainer), evaluator);
+        return EvaluatingIncrementalTrainer<PredictorType>(std::move(internalTrainer), evaluator);
     }
 }

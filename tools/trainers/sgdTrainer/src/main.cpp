@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose)
         {
             evaluator = common::MakeEvaluator<predictors::LinearPredictor>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
-            sgdIncrementalTrainer = trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluator);
+            sgdIncrementalTrainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<predictors::LinearPredictor>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluator));
         }
 
         auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments);

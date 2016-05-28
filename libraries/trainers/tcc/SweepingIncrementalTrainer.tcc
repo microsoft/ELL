@@ -12,8 +12,8 @@
 namespace trainers
 {
     template <typename PredictorType>
-    SweepingIncrementalTrainer<PredictorType>::SweepingIncrementalTrainer(std::vector<std::unique_ptr<IIncrementalTrainer<PredictorType>>>&& incrementalTrainers, const MultiEpochIncrementalTrainerParameters& parameters, std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators) :
-        _incrementalTrainers(std::move(incrementalTrainers)), _parameters(parameters), _evaluators(std::move(evaluators)), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
+    SweepingIncrementalTrainer<PredictorType>::SweepingIncrementalTrainer(std::vector<EvaluatingIncrementalTrainer<PredictorType>>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters) :
+        _evaluatingTrainers(std::move(evaluatingTrainers)), _parameters(parameters), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
     {}
     
     template <typename PredictorType>
@@ -33,14 +33,11 @@ namespace trainers
             // randomly permute the data
             rowDataset.RandomPermute(_random, epochSize);
 
-            for(int i = 0; i<_incrementalTrainers.size(); ++i)
+            for(int i = 0; i<_evaluatingTrainers.size(); ++i)
             {
-
                 // update the incremental trainer
                 auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-                _incrementalTrainers[i]->Update(trainSetIterator);
-
-                _evaluators[i]->Evaluate(*_incrementalTrainers[i]->GetPredictor());
+                _evaluatingTrainers[i].Update(trainSetIterator);
             }
         }
     }
@@ -48,11 +45,11 @@ namespace trainers
     template <typename PredictorType>
     const std::shared_ptr<const PredictorType> SweepingIncrementalTrainer<PredictorType>::GetPredictor() const
     {
-        double bestGoodness = _evaluators[0]->GetGoodness();
+        double bestGoodness = _evaluatingTrainers[0].GetEvaluator()->GetGoodness(); // TODO make nicer
         double best = 0;
-        for(int i = 1; i<_incrementalTrainers.size(); ++i)
+        for(int i = 1; i<_evaluatingTrainers.size(); ++i)
         {
-            double goodness =  _evaluators[i]->GetGoodness();
+            double goodness = _evaluatingTrainers[i].GetEvaluator()->GetGoodness();
             if(goodness > bestGoodness)
             {
                 bestGoodness = goodness;
@@ -60,12 +57,12 @@ namespace trainers
             }
         }
 
-        return _incrementalTrainers[best]->GetPredictor();
+        return _evaluatingTrainers[best].GetPredictor();
     }
 
     template <typename PredictorType>
-    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeSweepingIncrementalTrainer(std::vector<std::unique_ptr<IIncrementalTrainer<PredictorType>>>&& incrementalTrainers, const MultiEpochIncrementalTrainerParameters& parameters, std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators)
+    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeSweepingIncrementalTrainer(std::vector<EvaluatingIncrementalTrainer<PredictorType>>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters)
     {
-        return std::make_unique<SweepingIncrementalTrainer<PredictorType>>(std::move(incrementalTrainers), parameters, std::move(evaluators));
+        return std::make_unique<SweepingIncrementalTrainer<PredictorType>>(std::move(evaluatingTrainers), parameters);
     }
 }
