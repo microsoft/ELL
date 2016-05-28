@@ -27,7 +27,10 @@ namespace trainers
         std::string dataPermutationRandomSeed = "123456";
     };
 
-    /// <summary> Implements a bagging incremental trainer. </summary>
+    /// <summary>
+    /// Implements a bagging incremental trainer. A bagging trainer runs a base trainer on random
+    /// subsets of the training data and averages the resulting predictors to create an ensemble.
+    /// </summary>
     ///
     /// <typeparam name="BasePredictorType"> Type of the base predictor type. </typeparam>
     template <typename BasePredictorType>
@@ -45,7 +48,7 @@ namespace trainers
         /// <param name="trainer"> A base trainer. </param>
         /// <param name="baggingParameters"> Bagging paramters. </param>
         /// <param name="evaluator"> An optional evaluator, or nullptr. </param>
-        BaggingIncrementalTrainer(std::unique_ptr<BaseTrainerType>&& trainer, 
+        BaggingIncrementalTrainer(std::unique_ptr<BaseTrainerType>&& baseTrainer, 
             const BaggingIncrementalTrainerParameters& baggingParameters, 
             std::shared_ptr<EvaluatorType> evaluator);
 
@@ -60,7 +63,7 @@ namespace trainers
         virtual const std::shared_ptr<const EnsembleType> GetPredictor() const override { return _ensemble; }
 
     private:
-        std::unique_ptr<BaseTrainerType> _trainer;
+        std::unique_ptr<BaseTrainerType> _baseTrainer;
         BaggingIncrementalTrainerParameters _baggingParameters;
         std::shared_ptr<EvaluatorType> _evaluator;
         std::shared_ptr<EnsembleType> _ensemble;

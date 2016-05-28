@@ -12,8 +12,8 @@
 namespace trainers
 {
     template<typename BasePredictorType>
-    BaggingIncrementalTrainer<BasePredictorType>::BaggingIncrementalTrainer(std::unique_ptr<BaseTrainerType>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters, std::shared_ptr<EvaluatorType> evaluator) :
-        _trainer(std::move(trainer)), _baggingParameters(baggingParameters), _ensemble(std::make_shared<EnsembleType>()), _evaluator(std::move(evaluator)), _random(utilities::GetRandomEngine(baggingParameters.dataPermutationRandomSeed))
+    BaggingIncrementalTrainer<BasePredictorType>::BaggingIncrementalTrainer(std::unique_ptr<BaseTrainerType>&& baseTrainer, const BaggingIncrementalTrainerParameters& baggingParameters, std::shared_ptr<EvaluatorType> evaluator) :
+        _baseTrainer(std::move(baseTrainer)), _baggingParameters(baggingParameters), _ensemble(std::make_shared<EnsembleType>()), _evaluator(std::move(evaluator)), _random(utilities::GetRandomEngine(baggingParameters.dataPermutationRandomSeed))
     {}
 
     template<typename BasePredictorType>
@@ -39,7 +39,7 @@ namespace trainers
             auto trainSetIterator = rowDataset.GetIterator(0, bagSize);
 
             // get base predictor
-            auto basePredictor = _trainer->Train(trainSetIterator);
+            auto basePredictor = _baseTrainer->Train(trainSetIterator);
 
             // evaluate
             double evaluationRescale = _baggingParameters.numIterations / (i + 1.0);

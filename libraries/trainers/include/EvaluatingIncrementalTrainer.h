@@ -16,7 +16,10 @@
 
 namespace trainers
 {
-    /// <summary> An evaluating incremental trainer, which wraps another incremental trainer and performs an evaluation after each update. </summary>
+    /// <summary>
+    /// Implements an evaluating incremental trainer. This trainer contains another incremental
+    /// trainer and an evaluator, and performs an evaluation after each update.
+    /// </summary>
     ///
     /// <typeparam name="PredictorType"> The predictor type. </typeparam>
     template <typename PredictorType>
