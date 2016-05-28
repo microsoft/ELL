@@ -32,7 +32,11 @@
 %include "exception.i" 
 %include "std_string.i"
 %include "std_vector.i"
+
+#ifndef SWIGJAVASCRIPT
 %include "std_shared_ptr.i"
+#endif
+
 %include "unique_ptr.i"
 #ifdef SWIGPYTHON
 %include "std_iostream.i"  // Sadly, there is no std_iostream.i for C#
@@ -167,8 +171,12 @@ class trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType
 // Interface for features library
 %include features.i
 
+
+#ifndef SWIGJAVASCRIPT
+// TODO: Review rules on when to apply the %shared_ptr() directive and get rid of these altogether if they're not in the right place 
 %shared_ptr(layers::Map)
 %shared_ptr(layers::Model)
 //%template (GenericRowDataset) dataset::RowDataset<dataset::IDataVector>
 //%shared_ptr(GenericRowDataset)
 %shared_ptr(RowDataset)
+#endif
