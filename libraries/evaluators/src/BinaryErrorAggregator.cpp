@@ -12,8 +12,8 @@ namespace evaluators
 {
     std::vector<double> BinaryErrorAggregator::Value::GetValues() const
     {
-        double precision = truePositives == 0.0 ? 0.0 : truePositives / (truePositives + falsePositives);
-        double recall = truePositives == 0.0 ? 0.0 : truePositives / (truePositives + falseNegatives);
+        double precision = sumTruePositives == 0.0 ? 0.0 : sumTruePositives / (sumTruePositives + sumFalsePositives);
+        double recall = sumTruePositives == 0.0 ? 0.0 : sumTruePositives / (sumTruePositives + sumFalseNegatives);
         double f1 = (precision + recall) == 0.0 ? 0.0 : 2 * (precision * recall) / (precision + recall);
 
         return {GetErrorRate(), precision, recall, f1};
@@ -21,8 +21,8 @@ namespace evaluators
 
     double BinaryErrorAggregator::Value::GetErrorRate() const
     {
-        double allFalse = falsePositives + falseNegatives;
-        double allTrue = truePositives + trueNegatives;
+        double allFalse = sumFalsePositives + sumFalseNegatives;
+        double allTrue = sumTruePositives + sumTrueNegatives;
         return allFalse == 0.0 ? 0.0 : allFalse / (allTrue + allFalse);
     }
 
