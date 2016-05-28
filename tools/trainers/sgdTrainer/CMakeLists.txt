@@ -43,4 +43,4 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 # tests
 add_test(NAME sgdTrainerTest
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto -omf null -v)
+         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto -omf null -v -ne 20)

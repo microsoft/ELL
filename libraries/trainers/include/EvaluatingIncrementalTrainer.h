@@ -11,6 +11,9 @@
 #include "IIncrementalTrainer.h"
 #include "Evaluator.h"
 
+// stl
+#include <memory>
+
 namespace trainers
 {
     /// <summary> An evaluating incremental trainer, which wraps another incremental trainer and performs an evaluation after each update. </summary>
@@ -58,8 +61,8 @@ namespace trainers
     /// <returns> A unique_ptr to an evaluating trainer. </returns>
     template <typename PredictorType>
     std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeEvaluatingIncrementalTrainer(
-        std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer, 
-        std::shared_ptr<evaluators::IEvaluator<PredictorType>>&& evaluator);
+        std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer,
+        std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator);
 }
 
 #include "../tcc/EvaluatingIncrementalTrainer.tcc"
