@@ -52,7 +52,7 @@ namespace common
     template <size_t... Sequence>
     ParametersType ParametersGenerator<ParametersType, ValueTypes...>::GenerateParameters(const ValueTupleType& valueTuple, std::index_sequence<Sequence...>) const
     {
-        return ParametersType(std::get<Sequence>(valueTuple)...);
+        return ParametersType{ std::get<Sequence>(valueTuple)... };
     }
 
     template<typename ParametersType, typename ...ValueTypes>

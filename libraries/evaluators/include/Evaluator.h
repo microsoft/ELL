@@ -48,8 +48,8 @@ namespace evaluators
     /// <summary> Evaluator parameters. </summary>
     struct EvaluatorParameters
     {
-        uint64_t evaluationFrequency = 1;
-        bool addZeroEvaluation = true;
+        uint64_t evaluationFrequency;
+        bool addZeroEvaluation;
     };
 
     /// <summary> Implements an evaluator that holds a dataset and a set of evaluation aggregators. </summary>

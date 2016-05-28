@@ -1,15 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SGDIncrementalTrainer.cpp (trainers)
+//  File:     Nothing.cpp (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SGDIncrementalTrainer.h"
-
-namespace trainers
-{    
-    trainers::SGDIncrementalTrainerParameters::SGDIncrementalTrainerParameters(double regularization) : regularization(regularization)
-    {}
-}
+// Empty file, to ensure that CMake creates a project for this library

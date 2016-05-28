@@ -68,7 +68,6 @@ int main(int argc, char* argv[])
         common::ParsedMapSaveArguments mapSaveArguments;
         common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
-        common::ParsedEvaluatorArguments evaluatorArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
@@ -76,7 +75,6 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
         commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
-        commandLineParser.AddOptionSet(evaluatorArguments);
 
         // parse command line
         commandLineParser.Parse();
@@ -107,6 +105,9 @@ int main(int argc, char* argv[])
         // get predictor type
         using PredictorType = predictors::LinearPredictor;
 
+        // set up evaluators to only evaluate on the last update of the multi-epoch trainer
+        evaluators::EvaluatorParameters evaluatorParameters{ multiEpochTrainerArguments.numEpochs, false };
+
         // create trainers
         auto generator = common::MakeParametersGenerator<trainers::SGDIncrementalTrainerParameters>(regularization);
         std::vector<trainers::EvaluatingIncrementalTrainer<PredictorType>> evaluatingTrainers;
@@ -114,7 +115,7 @@ int main(int argc, char* argv[])
         for(uint64_t i = 0; i<regularization.size(); ++i)
         {
             auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, generator.GenerateParameters(i));
-            evaluators.push_back(common::MakeEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments));
+            evaluators.push_back(common::MakeEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorParameters, trainerArguments.lossArguments));
             evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluators.back()));
         }
 

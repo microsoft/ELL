@@ -31,10 +31,7 @@ namespace trainers
     /// <summary> Parameters for the stochastic gradient descent trainer. </summary>
     struct SGDIncrementalTrainerParameters
     {
-        SGDIncrementalTrainerParameters() = default;
-        SGDIncrementalTrainerParameters(double regularization);
-
-        double regularization = 1.0;
+        double regularization;
     };
     
     /// <summary>
