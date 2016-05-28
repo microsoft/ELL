@@ -43,7 +43,7 @@ namespace trainers
         /// <param name="parameters"> Multi-epoch training parameter. </param>
         SweepingIncrementalTrainer(std::vector<EvaluatingTrainerType>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters);
 
-        /// <summary> Perform a set of training epochs. </summary>
+        /// <summary> Perform a sequence of training epochs. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
         virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
