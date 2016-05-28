@@ -36,6 +36,7 @@
 // trainers
 #include "SGDIncrementalTrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
+#include "EvaluatingIncrementalTrainer.h"
 
 // evaluators
 #include "Evaluator.h"
@@ -99,16 +100,18 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
+        // create sgd trainer
+        auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
+
         // create evaluator
         std::shared_ptr<evaluators::IEvaluator<predictors::LinearPredictor>> evaluator = nullptr;
         if(trainerArguments.verbose)
         {
             evaluator = common::MakeEvaluator<predictors::LinearPredictor>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
+            sgdIncrementalTrainer = trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluator);
         }
 
-        // create sgd trainer
-        auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
-        auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments, evaluator);
+        auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments);
 
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;

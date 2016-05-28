@@ -43,13 +43,11 @@ namespace trainers
 
         /// <summary> Constructs an instance of MultiEpochIncrementalTrainer. </summary>
         ///
-        /// <param name="incrementalTrainer"> An incremental trainer. </param>
+        /// <param name="internalTrainer"> An incremental trainer. </param>
         /// <param name="parameters"> Multi-epoch training parameters. </param>
-        /// <param name="evaluator"> An optional evaluator, or nullptr. </param>
         MultiEpochIncrementalTrainer(
-            std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, 
-            const MultiEpochIncrementalTrainerParameters& parameters, 
-            std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator);
+            std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer, 
+            const MultiEpochIncrementalTrainerParameters& parameters);
 
         /// <summary> Perform a set of training epochs. </summary>
         ///
@@ -59,12 +57,11 @@ namespace trainers
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
         /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _incrementalTrainer->GetPredictor(); }
+        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _internalTrainer->GetPredictor(); }
 
     private:
-        std::unique_ptr<IIncrementalTrainer<PredictorType>> _incrementalTrainer;
+        std::unique_ptr<IIncrementalTrainer<PredictorType>> _internalTrainer;
         MultiEpochIncrementalTrainerParameters _parameters;
-        std::shared_ptr<evaluators::IEvaluator<PredictorType>> _evaluator;
         mutable std::default_random_engine _random;
     };
 
@@ -73,14 +70,12 @@ namespace trainers
     /// <typeparam name="PredictorType"> Type of the predictor returned by this trainer. </typeparam>
     /// <param name="incrementalTrainer"> An incremental trainer. </param>
     /// <param name="parameters"> Multi-epoch training parameters. </param>
-    /// <param name="evaluator"> An optional evaluator. </param>
     ///
     /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
     template <typename PredictorType>
     std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(
         std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, 
-        const MultiEpochIncrementalTrainerParameters& parameters, 
-        std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr);
+        const MultiEpochIncrementalTrainerParameters& parameters);
 }
 
 #include "../tcc/MultiEpochIncrementalTrainer.tcc"

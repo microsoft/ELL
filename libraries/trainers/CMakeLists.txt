@@ -15,6 +15,7 @@ endif()
 set (SRC src/SGDIncrementalTrainer.cpp)
 
 set (INCLUDE include/BaggingIncrementalTrainer.h
+             include/EvaluatingIncrementalTrainer.h
              include/IIncrementalTrainer.h
              include/ITrainer.h
              include/MultiEpochIncrementalTrainer.h
@@ -23,6 +24,7 @@ set (INCLUDE include/BaggingIncrementalTrainer.h
              include/SGDIncrementalTrainer.h)
 
 set (TCC tcc/BaggingIncrementalTrainer.tcc
+         tcc/EvaluatingIncrementalTrainer.tcc         
          tcc/MultiEpochIncrementalTrainer.tcc
          tcc/SortingTreeTrainer.tcc
          tcc/SweepingIncrementalTrainer.tcc

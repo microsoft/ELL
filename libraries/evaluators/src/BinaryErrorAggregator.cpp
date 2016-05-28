@@ -23,7 +23,7 @@ namespace evaluators
     {
         double allFalse = falsePositives + falseNegatives;
         double allTrue = truePositives + trueNegatives;
-        return allFalse / (allTrue + allFalse);
+        return allFalse == 0.0 ? 0.0 : allFalse / (allTrue + allFalse);
     }
 
     void BinaryErrorAggregator::Update(double prediction, double label, double weight)
@@ -32,22 +32,22 @@ namespace evaluators
         {
             if (prediction > 0)
             {
-                _value.truePositives += weight;
+                _value.sumTruePositives += weight;
             }
             else
             {
-                _value.falseNegatives += weight;
+                _value.sumFalseNegatives += weight;
             }
         }
         else
         {
             if (prediction >= 0)
             {
-                _value.falsePositives += weight;
+                _value.sumFalsePositives += weight;
             }
             else
             {
-                _value.trueNegatives += weight;
+                _value.sumTrueNegatives += weight;
             }
         }
     }
@@ -59,7 +59,7 @@ namespace evaluators
         return newValue;
     }
 
-    std::vector<std::string> BinaryErrorAggregator::GetHeader() const 
+    std::vector<std::string> BinaryErrorAggregator::GetValueNames() const 
     { 
         return {"ErrorRate", "Precision", "Recall", "F1-Score"}; 
     }
