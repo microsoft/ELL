@@ -68,13 +68,13 @@ namespace trainers
     /// <summary> Makes an incremental trainer that runs another incremental trainer for multiple epochs. </summary>
     ///
     /// <typeparam name="PredictorType"> Type of the predictor returned by this trainer. </typeparam>
-    /// <param name="incrementalTrainer"> An incremental trainer. </param>
+    /// <param name="internalTrainer"> The internal trainer. </param>
     /// <param name="parameters"> Multi-epoch training parameters. </param>
     ///
     /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
     template <typename PredictorType>
     std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(
-        std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, 
+        std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer,
         const MultiEpochIncrementalTrainerParameters& parameters);
 }
 

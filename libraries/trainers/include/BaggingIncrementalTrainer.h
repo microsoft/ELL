@@ -80,7 +80,7 @@ namespace trainers
     /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
     template <typename BasePredictorType>
     std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(
-        std::unique_ptr<ITrainer<BasePredictorType>>&& trainer,
+        std::unique_ptr<ITrainer<BasePredictorType>>&& baseTrainer,
         const BaggingIncrementalTrainerParameters& baggingParameters,
         std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> evaluator = nullptr);
 }

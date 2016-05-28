@@ -14,7 +14,9 @@ namespace trainers
     template<typename BasePredictorType>
     BaggingIncrementalTrainer<BasePredictorType>::BaggingIncrementalTrainer(std::unique_ptr<BaseTrainerType>&& baseTrainer, const BaggingIncrementalTrainerParameters& baggingParameters, std::shared_ptr<EvaluatorType> evaluator) :
         _baseTrainer(std::move(baseTrainer)), _baggingParameters(baggingParameters), _ensemble(std::make_shared<EnsembleType>()), _evaluator(std::move(evaluator)), _random(utilities::GetRandomEngine(baggingParameters.dataPermutationRandomSeed))
-    {}
+    {
+        assert(_baseTrainer != nullptr);
+    }
 
     template<typename BasePredictorType>
     void BaggingIncrementalTrainer<BasePredictorType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
@@ -55,10 +57,10 @@ namespace trainers
 
     template<typename BasePredictorType>
     std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(
-        std::unique_ptr<ITrainer<BasePredictorType>>&& trainer,
+        std::unique_ptr<ITrainer<BasePredictorType>>&& baseTrainer,
         const BaggingIncrementalTrainerParameters& baggingParameters, 
         std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> evaluator)
     {
-        return std::make_unique<BaggingIncrementalTrainer<BasePredictorType>>(std::move(trainer), baggingParameters, std::move(evaluator));
+        return std::make_unique<BaggingIncrementalTrainer<BasePredictorType>>(std::move(baseTrainer), baggingParameters, std::move(evaluator));
     }
 }

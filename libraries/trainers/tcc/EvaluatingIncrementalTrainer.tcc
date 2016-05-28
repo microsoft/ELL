@@ -16,7 +16,10 @@ namespace trainers
         std::unique_ptr<InternalTrainerType>&& internalTrainer, 
         std::shared_ptr<EvaluatorType> evaluator) :
         _internalTrainer(std::move(internalTrainer)), _evaluator(evaluator)
-    {}
+    {
+        assert(_internalTrainer != nullptr);
+        assert(_evaluator != nullptr);
+    }
 
     template<typename PredictorType>
     void EvaluatingIncrementalTrainer<PredictorType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)

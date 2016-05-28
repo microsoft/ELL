@@ -14,7 +14,9 @@ namespace trainers
     template <typename PredictorType>
     SweepingIncrementalTrainer<PredictorType>::SweepingIncrementalTrainer(std::vector<EvaluatingTrainerType>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters) :
         _evaluatingTrainers(std::move(evaluatingTrainers)), _parameters(parameters), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
-    {}
+    {
+        assert(_evaluatingTrainers.size() > 0);
+    }
     
     template <typename PredictorType>
     void SweepingIncrementalTrainer<PredictorType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
