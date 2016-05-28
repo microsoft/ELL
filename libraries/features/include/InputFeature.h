@@ -15,6 +15,9 @@
 #include <memory>
 #include <unordered_map>
 
+#include "CoordinateList.h"
+#include "Model.h"
+
 namespace features
 {
     /// <summary> A feature that  represents an input to the featurizer. It's always the first feature to be added. </summary>

@@ -35,11 +35,6 @@ namespace layers
         /// <param name="size"> The number of elements. </param>
         CoordinateList(uint64_t layerIndex, uint64_t size);
 
-        /// <summary> Adds a coordinate to the list. </summary>
-        ///
-        /// <param name="coordinate"> The coordinate to add. </param>
-        void AddCoordinate(const Coordinate& coordinate);
-
         /// <summary> Gets the size. </summary>
         ///
         /// <returns> The number of coordinates in the list. </returns>
@@ -51,6 +46,11 @@ namespace layers
         ///
         /// <returns> The indexed value. </returns>
         const Coordinate& operator[](uint64_t index) const;
+
+        /// <summary> Adds a coordinate to the list. </summary>
+        ///
+        /// <param name="coordinate"> The coordinate to add. </param>
+        void AddCoordinate(const Coordinate& coordinate);
 
         /// <summary> Adds a coordinate to the list. </summary>
         ///
@@ -92,7 +92,27 @@ namespace layers
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         void Print(std::ostream& os) const;
-
+        
+        /// <summary> Returns an STL-style iterator to the the beginning </summary>
+        ///
+        /// <returns> An iterator </returns>
+        std::vector<Coordinate>::iterator begin() { return _list.begin(); }
+        
+        /// <summary> Returns an STL-style iterator to the end </summary>
+        ///
+        /// <returns> An iterator </returns>
+        std::vector<Coordinate>::iterator end() { return _list.end(); }
+        
+        /// <summary> Returns an STL-style iterator to the beginning </summary>
+        ///
+        /// <returns> An iterator </returns>
+        std::vector<Coordinate>::const_iterator begin() const { return _list.cbegin(); }
+        
+        /// <summary> Returns an STL-style iterator to the end </summary>
+        ///
+        /// <returns> An iterator </returns>
+        std::vector<Coordinate>::const_iterator end() const { return _list.cend(); }
+        
     private:
         std::vector<Coordinate> _list;
     };

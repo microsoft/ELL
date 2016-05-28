@@ -37,6 +37,14 @@ namespace layers
         /// <returns> The list of coordinates added. </returns>  // TODO: say "The output coordinates for the layer added" if that's correct
         CoordinateList AddLayer(std::unique_ptr<Layer> layer);
 
+        /// <summary> Constructs a layer and adds it to the model. </summary>
+        ///
+        /// <typeparam name="LayerType"> The type of layer to add to the model. </param>
+        /// <param name="args"> The arguments for the specified layer type's contructor. </param>
+        /// <returns> The list of coordinates added. </returns>  // TODO: say "The output coordinates for the layer added" if that's correct
+        template <typename LayerType, typename ...Args>
+        CoordinateList EmplaceLayer(Args... args);
+
         /// <summary> Returns the number of layers in the model. </summary>
         ///
         /// <returns> The total number of layers in the model. </returns>
@@ -49,12 +57,17 @@ namespace layers
         /// <returns> The required layer size. </returns>
         uint64_t GetRequiredLayerSize(uint64_t layerIndex) const;
 
-        /// <summary> Gets a Layer cast as a specified layer type, used when derived classes add functionality to layers </summary>
+        /// <summary> Gets a const reference to a Layer, used when derived classes add functionality to layers </summary>
         ///
         /// <param name="layerIndex"> Zero-based index of the layer. </param>
         ///
-        /// <returns> The requested layer, cast to a const reference of the requested type. </returns>
+        /// <returns> The requested layer. </returns>
         const Layer& GetLayer(uint64_t layerIndex) const;
+
+        /// <summary> Gets a const reference to the most recently added Layer </summary>
+        ///
+        /// <returns> The most recently added layer. </returns>
+        const Layer& GetLastLayer() const;
 
         /// <summary> Saves a model to an output stream. </summary>
         ///
@@ -84,3 +97,5 @@ namespace layers
         static const int _currentVersion = 1;
     };
 }
+
+#include "../tcc/Model.tcc"

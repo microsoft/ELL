@@ -18,10 +18,10 @@
 #include <vector>
 #include <memory>
 
+/// <summary> features namespace </summary>
 namespace features
 {    
-//    using DataVector = linear::DoubleVector; 
-    typedef linear::DoubleVector DataVector; // TODO: This ought to really be an IDataVector or something more general
+    typedef linear::DoubleVector DataVector;
     
     /// <summary>
     /// A `FeatureSet` (or _featurizer_) encodes a transformation from an input time series (a series of vector-valued inputs)
@@ -31,27 +31,28 @@ namespace features
     /// Its implementation is that of a dataflow graph with one designated input node (an instance of the `InputFeature` class),
     /// and one designated output node. Each node produces takes input (typically from other `Feature` nodes) and produces its output.
     /// </summary>
+    ///
     /// <remarks>
     /// Note: To deal with buffering nodes that don't always output a value when they get new input (e.g., FFT), we can't 
     /// have  a single interface function for processing data (e.g., `double Compute(vec input)`), but instead we have to 
     /// split it into 2 or 3 functions:
-    /// - void SetInput(vec input) -- returns true if we produced new data. 
-    /// - vec GetOutput() -- returns output and clears the 'has data' flag
-    ///
+    /// - `bool SetInput(vec input)` -- returns true if we produced new data. 
+    /// - `DataVector %GetOutput()` -- returns output and clears the 'has data' flag
+    /// - `bool %HasOutput()`
     /// Note: The input data is typically assumed to be a continuous stream of data, and to deal with interruptions in the stream which
     /// may invalidate the internal state of the features, there is a `Reset()` function which can be used to reinitialize the
     /// featurizer in case of such an interruption. It would be necessary to call `Reset` when switching between datasets as well.
     ///
     /// Here's an example of how one would produce a simple (7-dimensional) feature vector from some input accelerometer data:
     /// 
-    /// > auto featurizer = FeatureSet();
-    /// > auto input = featurizer.CreateFeature<InputFeature>(3); // input dataset dimension expected to be 3
-    /// > auto gravity = featurizer.CreateFeature<IirFilterFeature>(input, {0.1}, {0.9}); // a simple lowpass filter
-    /// > auto signal = featurizer.CreateFeature<SubtractFeature(input, gravity); // remove gravity from the raw input, call this the 'signal'
-    /// > auto channelVariance = featurizer.CreateFeature<VarianceFeature>(signal, 16); // variance over a 16-sample window (computed separately for each dimension)
-    /// > auto energy = featurizer.CreateFeature<Magnitude>(signal);
-    /// > auto energyVariance = featurizer.CreateFeature<VarianceFeature>(energy, 16); // variance of the signal magnitude over a 16-sample window
-    /// > auto outputFeature = featurizer.CreateFeature<ConcatFeature>(gravity, channelVariance, energyVariance);
+    ///     auto featurizer = FeatureSet();
+    ///     auto input = featurizer.CreateFeature<InputFeature>(3); // input dataset dimension expected to be 3
+    ///     auto gravity = featurizer.CreateFeature<IirFilterFeature>(input, {0.1}, {0.9}); // a simple lowpass filter
+    ///     auto signal = featurizer.CreateFeature<SubtractFeature(input, gravity); // remove gravity from the raw input, call this the 'signal'
+    ///     auto channelVariance = featurizer.CreateFeature<VarianceFeature>(signal, 16); // variance over a 16-sample window (computed separately for each dimension)
+    ///     auto energy = featurizer.CreateFeature<Magnitude>(signal);
+    ///     auto energyVariance = featurizer.CreateFeature<VarianceFeature>(energy, 16); // variance of the signal magnitude over a 16-sample window
+    ///     auto outputFeature = featurizer.CreateFeature<ConcatFeature>(gravity, channelVariance, energyVariance);
     /// </remarks>
     class FeatureSet
     {

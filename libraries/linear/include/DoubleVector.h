@@ -66,7 +66,7 @@ namespace linear
         operator std::vector<double> const & () const & { return std::cref(_data); }
 
         /// <summary> Type-conversion operator into a std::vector<double>, allowing move semantics
-        operator std::vector<double> && () && { return std::move(_data); }
+//        operator std::vector<double> && () && { return std::move(_data); }
 #endif
         /// <summary>
         /// Deletes all of the vector content and sets its Size to zero, but does not deallocate its

@@ -12,17 +12,27 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (INCLUDE include/Feature.h
+set (INCLUDE include/BufferedFeature.h
+             include/Feature.h
              include/FeatureSet.h
              include/InputFeature.h
+             include/MagnitudeFeature.h
+             include/MeanFeature.h
+             include/IncrementalMeanFeature.h
              include/StringUtil.h
-             include/MagnitudeFeature.h)
+             include/VarianceFeature.h
+             include/IncrementalVarianceFeature.h)
 
-set (SRC src/Feature.cpp
+set (SRC src/BufferedFeature.cpp
+         src/Feature.cpp
          src/FeatureSet.cpp
          src/InputFeature.cpp
+         src/MagnitudeFeature.cpp
+         src/MeanFeature.cpp
+         src/IncrementalMeanFeature.cpp
          src/StringUtil.cpp
-         src/MagnitudeFeature.cpp)
+         src/VarianceFeature.cpp
+         src/IncrementalVarianceFeature.cpp)
 
 set (TCC tcc/Feature.tcc
          tcc/FeatureSet.tcc
@@ -62,7 +72,7 @@ include_directories(test/include)
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} testing features utilities)
+target_link_libraries(${TEST_NAME} testing layers features utilities)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

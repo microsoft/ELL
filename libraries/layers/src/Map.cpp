@@ -62,6 +62,12 @@ namespace layers
         for (uint64_t i = 1; i < _model.NumLayers(); ++i)
         {
             _model.GetLayer(i).Compute(_layerOutputs, _layerOutputs[i]);
+
+#ifdef VERBOSE
+            std::cout << "Layer " << i << ":" << std::endl;
+            for(auto x: _layerOutputs[i]) std::cout << x << "  ";
+            std::cout << std::endl;
+#endif
         }
 
         // copy the outputs to a vector

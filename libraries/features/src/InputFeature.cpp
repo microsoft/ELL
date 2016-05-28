@@ -24,6 +24,10 @@ namespace features
     void InputFeature::SetValue(std::vector<double> val)
     {
         _currentValue = val;
+        if(_outputDimension != val.size())
+        {
+            throw std::runtime_error("Input feature dimension doesn't match data size");
+        }
         assert(_outputDimension == val.size());
         SetDirtyFlag(true); // propagates through graph
     }
