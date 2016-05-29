@@ -48,6 +48,7 @@ namespace utilities
         };
                 
         BinaryClassificationEvaluator(const LossFunctionType& lossFunction);
+        virtual ~BinaryClassificationEvaluator() = default;
 
         /// <summary> Evaluates a binary classifier </summary>
         ///

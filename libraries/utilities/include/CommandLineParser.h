@@ -208,6 +208,7 @@ namespace utilities
     public:
 
         ParsedArgSet() = default;
+        virtual ~ParsedArgSet() = default;
 
         /// <summary> 
         /// Adds the arguments stored in this arg set to the command-line parser.
