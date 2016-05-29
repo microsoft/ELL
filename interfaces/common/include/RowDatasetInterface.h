@@ -60,7 +60,7 @@ namespace interfaces
         ///
         /// <returns> Reference to the specified example. </returns>
         dataset::GenericSupervisedExample GetExample(uint64_t index) const;
-
+        
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///
         /// <param name="firstExample"> Zero-based index of the first example to iterate over. </param>
