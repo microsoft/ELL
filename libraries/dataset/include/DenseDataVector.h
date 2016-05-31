@@ -136,7 +136,14 @@ namespace dataset
     class DoubleDataVector : public DenseDataVector<double>
     {
     public:
-        using DenseDataVector<double>::DenseDataVector;
+//        using DenseDataVector<double>::DenseDataVector;
+        DoubleDataVector() : DenseDataVector<double>() {};
+        DoubleDataVector(const DoubleDataVector& other) = default;
+        DoubleDataVector(DoubleDataVector&& other) = default;
+        template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
+        DoubleDataVector(IndexValueIteratorType indexValueIterator) : DenseDataVector<double>(indexValueIterator) {};
+        DoubleDataVector(std::vector<double> data) : DenseDataVector<double>(data) {};
+
     };
 }
 

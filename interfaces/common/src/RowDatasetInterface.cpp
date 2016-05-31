@@ -35,7 +35,32 @@ namespace interfaces
 
     dataset::GenericSupervisedExample GenericRowDataset::GetExample(uint64_t index) const
     {
+        if(index >= NumExamples())
+        {
+            throw std::runtime_error("Out of bounds");
+        }
+        
+        std::cout << "Dataset size: " << NumExamples() << std::endl;
+        std::cout << "Dataset[" << index << "]: ";
+        auto result = static_cast<dataset::GenericSupervisedExample>(_dataset.GetExample(index));
+        result.Print(std::cout);
+        std::cout << std::endl;
         return static_cast<dataset::GenericSupervisedExample>(_dataset.GetExample(index));
+    }
+
+    dataset::SupervisedExample<dataset::DoubleDataVector> GenericRowDataset::GetDenseExample(uint64_t index) const
+    {
+        if(index >= NumExamples())
+        {
+            throw std::runtime_error("Out of bounds");
+        }
+
+        const auto& example = _dataset.GetExample(index); // GenericSupervisedExample
+        const auto& exampleData = example.GetDataVector();
+        auto exampleDataArray = exampleData.ToArray();        
+        auto resultData = std::make_shared<dataset::DoubleDataVector>(exampleDataArray);
+        dataset::SupervisedExample<dataset::DoubleDataVector> result(resultData, example.GetLabel(), example.GetWeight());
+        return result;
     }
 
     dataset::GenericRowIterator GenericRowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const

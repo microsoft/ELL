@@ -174,7 +174,5 @@ class trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType
 // TODO: Review rules on when to apply the %shared_ptr() directive and get rid of these altogether if they're not in the right place 
 %shared_ptr(layers::Map)
 %shared_ptr(layers::Model)
-//%template (GenericRowDataset) dataset::RowDataset<dataset::IDataVector>
-//%shared_ptr(GenericRowDataset)
 %shared_ptr(RowDataset)
 #endif

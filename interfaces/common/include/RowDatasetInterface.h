@@ -7,7 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+// dataset
 #include "RowDataset.h"
+#include "DenseDataVector.h"
 #include "SupervisedExample.h"
 
 // utilities
@@ -61,6 +63,9 @@ namespace interfaces
         /// <returns> Reference to the specified example. </returns>
         dataset::GenericSupervisedExample GetExample(uint64_t index) const;
         
+        
+        dataset::SupervisedExample<dataset::DoubleDataVector> GetDenseExample(uint64_t index) const;
+                
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///
         /// <param name="firstExample"> Zero-based index of the first example to iterate over. </param>
