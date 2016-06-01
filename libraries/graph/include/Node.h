@@ -11,10 +11,10 @@ public:
     class Port
     {        
     public:
+        typedef int Id;
         enum class Type { Real, Boolean, Categorical };
         size_t GetSize();
         Type GetType();
-        typedef int Id;
         
     private:
         int _size;
