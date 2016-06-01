@@ -62,6 +62,8 @@ namespace features
 
     std::unique_ptr<Feature> MagnitudeFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
+        // TODO: keep ID
+        
         Feature* inputFeature = previousFeatures[params[2]];
         if (inputFeature == nullptr)
         {
