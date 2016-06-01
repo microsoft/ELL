@@ -25,6 +25,9 @@
 #include "Coordinate.h"
 #include "CoordinateListTools.h"
 
+// utilties
+#include "Files.h"
+
 // interface
 #include "MapInterface.h"
 
@@ -59,6 +62,63 @@ namespace
         // Create iterator
         auto parsingIterator = MakeParsingIterator(std::move(lineIterator), std::move(mappedParser));
         return utilities::MakeAnyIterator(parsingIterator); // TODO: investigate why this works, but using std::move(parsingIterator) doesn't (shouldn't a ParsingIterator with a SequentialLineIterator uncopyable?)
+    }
+    
+    // (Temporary) dense file I/O
+    void ReadTsvStream(std::istream& stream, dataset::GenericRowDataset& dataset)
+    {
+        std::string current_label = "";
+        std::string line_buf;
+        while (std::getline(stream, line_buf))
+        {
+            // read instance
+            std::stringstream line_stream(line_buf);
+
+            // for each field
+            std::string field;
+            int field_index = 0;
+            std::string label;
+            int timestamp = 0;
+            std::vector<double> features;
+
+            while (std::getline(line_stream, field, '\t'))
+            {
+                // 0: label
+                // 1: timestamp
+                // 2-end: feature data (unless comment)
+
+                if (field_index == 0) // label / comment type
+                {
+                    label = field == "" ? "Other" : field;
+                }
+                else if (field_index == 1) // timestamp
+                {
+                    timestamp = std::stoi(field, nullptr);
+                }
+                else // feature data
+                {
+                    double val = std::stod(field, nullptr);
+                    features.push_back(val);
+                }
+                field_index++;
+            }
+
+            // done reading line, add row to database
+            unsigned int min_num_features = 5;
+            if (features.size() >= min_num_features)
+            {
+                auto labelValue = label == "Other" ? 0.0 : 1.0;
+                auto dataVector = std::static_pointer_cast<dataset::IDataVector>(std::make_shared<dataset::DoubleDataVector>(features));
+                dataset::GenericSupervisedExample example(dataVector, labelValue);
+                dataset.AddExample(std::move(example));
+//                _rows.emplace_back(label, timestamp, features);
+            }
+        }
+    }
+    
+    bool EndsWith(const std::string& str, const std::string& suffix)
+    {
+        return(str.rfind(suffix) == str.length() - suffix.length());
     }
 }
 
@@ -96,17 +156,25 @@ namespace interfaces
 
     interfaces::GenericRowDataset GetDataset(const std::string& dataFilename)
     {
-       common::DataLoadArguments dataLoadArguments;    
-       dataLoadArguments.inputDataFile = dataFilename;
-       auto dataIterator = common::GetDataIterator(dataLoadArguments);
-
         dataset::GenericRowDataset rowDataset;
-
-        while (dataIterator->IsValid())
+        // load dense TSV file if filename ends in .tsv
+        if(EndsWith(dataFilename, ".tsv"))
         {
-            rowDataset.AddExample(dataIterator->Get());
-            dataIterator->Next();
+            auto inputStream = utilities::OpenIfstream(dataFilename);
+            ReadTsvStream(inputStream, rowDataset);
         }
+        else
+        {
+            common::DataLoadArguments dataLoadArguments;
+            dataLoadArguments.inputDataFile = dataFilename;
+            auto dataIterator = common::GetDataIterator(dataLoadArguments);
+            while (dataIterator->IsValid())
+            {
+                rowDataset.AddExample(dataIterator->Get());
+                dataIterator->Next();
+            }
+        }
+        
 
         return interfaces::GenericRowDataset(std::move(rowDataset));
     }

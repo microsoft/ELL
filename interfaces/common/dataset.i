@@ -39,13 +39,15 @@ namespace dataset
 %include "noncopyable.i"
 
 %include "IVector.h"
-%include "DenseDataVector.h"
 %include "IDataVector.h"
+%include "DenseDataVector.h"
 %include "SparseDataVector.h"
 %include "SupervisedExample.h"
 %include "RowDataset.h"
 
 %template() dataset::RowDataset<dataset::IDataVector>;
+%template(xx) dataset::DenseDataVector<double>;
+%template(DenseSupervisedExample) dataset::SupervisedExample<dataset::DoubleDataVector>;
 
 namespace dataset
 {
@@ -56,14 +58,14 @@ namespace dataset
 
 %include "RowDatasetInterface.h"
 %import "RowDataset.h"
-%include "IDataVector.h"
 
 %include "unique_ptr.i"
 wrap_unique_ptr(IDataVectorPtr, dataset::IDataVector)
 
+
 namespace dataset
 {
-    %template (GenericSupervisedExample) SupervisedExample<IDataVector>;
+//    %template (GenericSupervisedExample) SupervisedExample<IDataVector>;
 
     // The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
     %template () DenseDataVector<double>;

@@ -1,0 +1,135 @@
+<Model>
+    <int32 name="version">1</int32>
+    <vector(ptr(Layer)) name="layers" size="3">
+        <ptr(Layer)>
+            <Coordinatewise>
+                <int32 name="version">1</int32>
+                <string name="operationType">Multiply</string>
+                <vector(double) name="values" size="10">
+                    <double>0</double>
+                    <double>0.00518223</double>
+                    <double>0.147404</double>
+                    <double>0.0851748</double>
+                    <double>0.174354</double>
+                    <double>0.160728</double>
+                    <double>-0.158697</double>
+                    <double>0.00017644</double>
+                    <double>0.0896827</double>
+                    <double>0.194372</double>
+                </vector(double)>
+                <CoordinateList name="coordinates">
+                    <vector(Coordinate) name="list" size="10">
+                        <Coordinate>
+                            <uint64 name="l">0</uint64>
+                            <uint64 name="e">0</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">0</uint64>
+                            <uint64 name="e">1</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">0</uint64>
+                            <uint64 name="e">2</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">0</uint64>
+                            <uint64 name="e">3</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">0</uint64>
+                            <uint64 name="e">4</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">0</uint64>
+                            <uint64 name="e">5</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">0</uint64>
+                            <uint64 name="e">6</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">0</uint64>
+                            <uint64 name="e">7</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">0</uint64>
+                            <uint64 name="e">8</uint64>
+                        </Coordinate>
+                        <Coordinate>
+                            <uint64 name="l">0</uint64>
+                            <uint64 name="e">9</uint64>
+                        </Coordinate>
+                    </vector(Coordinate)>
+                </CoordinateList>
+            </Coordinatewise>
+        </ptr(Layer)>
+        <ptr(Layer)>
+            <Sum>
+                <int32 name="version">1</int32>
+                <vector(CoordinateList) name="coordinates" size="1">
+                    <CoordinateList>
+                        <vector(Coordinate) name="list" size="10">
+                            <Coordinate>
+                                <uint64 name="l">1</uint64>
+                                <uint64 name="e">0</uint64>
+                            </Coordinate>
+                            <Coordinate>
+                                <uint64 name="l">1</uint64>
+                                <uint64 name="e">1</uint64>
+                            </Coordinate>
+                            <Coordinate>
+                                <uint64 name="l">1</uint64>
+                                <uint64 name="e">2</uint64>
+                            </Coordinate>
+                            <Coordinate>
+                                <uint64 name="l">1</uint64>
+                                <uint64 name="e">3</uint64>
+                            </Coordinate>
+                            <Coordinate>
+                                <uint64 name="l">1</uint64>
+                                <uint64 name="e">4</uint64>
+                            </Coordinate>
+                            <Coordinate>
+                                <uint64 name="l">1</uint64>
+                                <uint64 name="e">5</uint64>
+                            </Coordinate>
+                            <Coordinate>
+                                <uint64 name="l">1</uint64>
+                                <uint64 name="e">6</uint64>
+                            </Coordinate>
+                            <Coordinate>
+                                <uint64 name="l">1</uint64>
+                                <uint64 name="e">7</uint64>
+                            </Coordinate>
+                            <Coordinate>
+                                <uint64 name="l">1</uint64>
+                                <uint64 name="e">8</uint64>
+                            </Coordinate>
+                            <Coordinate>
+                                <uint64 name="l">1</uint64>
+                                <uint64 name="e">9</uint64>
+                            </Coordinate>
+                        </vector(Coordinate)>
+                    </CoordinateList>
+                </vector(CoordinateList)>
+            </Sum>
+        </ptr(Layer)>
+        <ptr(Layer)>
+            <Coordinatewise>
+                <int32 name="version">1</int32>
+                <string name="operationType">Add</string>
+                <vector(double) name="values" size="1">
+                    <double>0.00907956</double>
+                </vector(double)>
+                <CoordinateList name="coordinates">
+                    <vector(Coordinate) name="list" size="1">
+                        <Coordinate>
+                            <uint64 name="l">2</uint64>
+                            <uint64 name="e">0</uint64>
+                        </Coordinate>
+                    </vector(Coordinate)>
+                </CoordinateList>
+            </Coordinatewise>
+        </ptr(Layer)>
+    </vector(ptr(Layer))>
+</Model>
