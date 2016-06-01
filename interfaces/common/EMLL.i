@@ -57,6 +57,7 @@ namespace std
 
 %template () std::vector<double>;
 %template () std::vector<float>;
+%template (StringVector) std::vector<std::string>;
 
 // Add some primitive exception handling
 %exception {

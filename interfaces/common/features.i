@@ -12,10 +12,12 @@
 %{
 #define SWIG_FILE_WITH_INIT
 #define SWIG_PYTHON_EXTRA_NATIVE_CONTAINERS 
+#include "FeatureSet.h"
 #include "Feature.h"
 #include "InputFeature.h"
 #include "MagnitudeFeature.h"
-#include "FeatureSet.h"
+#include "IncrementalMeanFeature.h"
+#include "IncrementalVarianceFeature.h"
 #include <sstream>
 %}
 
@@ -63,6 +65,8 @@
     {
         features::Feature::RegisterFeatureType<features::InputFeature>();
         features::Feature::RegisterFeatureType<features::MagnitudeFeature>();
+        features::Feature::RegisterFeatureType<features::IncrementalMeanFeature>();
+        features::Feature::RegisterFeatureType<features::IncrementalVarianceFeature>();
     }
 %}
 
