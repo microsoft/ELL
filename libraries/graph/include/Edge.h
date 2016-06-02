@@ -3,6 +3,7 @@
 #include "Node.h"
 
 #include <cstddef>
+#include <memory>
 
 // We could have 2 types of ports and 2 types of edges: input and output
 // I suggest we don't, because we can enforce that edges point the right way by construction (?)

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <ostream>
+#include <memory>
 
 // Graph.h
 class Node;
@@ -12,8 +13,8 @@ typedef Node& NodeRef;
 class DirectedGraph
 {
 public:
-    
-    // CreateNode
+    template <typename NodeType, typename... Args>
+    std::shared_ptr<NodeType> AddNode(Args... args);
     
     template <typename Visitor>
     void Visit(Visitor& visitor) const; // Visits all nodes in the graph
@@ -27,3 +28,10 @@ public:
 private:
     // the nodes (?)
 };
+
+template <typename NodeType, typename... Args>
+std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
+{
+    // TODO: Store node somewhere
+    return std::make_shared<NodeType>(args...);
+}

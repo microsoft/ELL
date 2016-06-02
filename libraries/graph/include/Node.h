@@ -1,50 +1,26 @@
 #pragma once
+//
+// Node
+// 
 
-#include <vector>
-#include <memory>
+#include <string>
 
-class Edge;
 class Node
 {
 public:
-    // Q: Do we want to have 2 kinds of ports: input and output (or a flag saying what direction a port points?)
-    class Port
-    {        
-    public:
-        typedef int Id;
-        enum class Type { Real, Boolean, Categorical };
-        size_t GetSize();
-        Type GetType();
-        
-    private:
-        int _size;
-        Type _type;
-    };
     
     Node();
-    Node(const std::vector<Edge>& inputs);
+//    Node(const std::vector<Edge>& inputs);
 
-    template <typename OutputType>
-    OutputType ComputeOutput(Port::Id portId) const;
-        
-    const std::vector<Edge>& GetInputEdges() const { return _inputs; }
-    void AddDependent(const std::shared_ptr<Node>& dependent);
+//    const std::vector<Edge>& GetInputEdges() const { return _inputs; }
+//    void AddDependent(const std::shared_ptr<Node>& dependent);
 
+    void GetOutputHandle(size_t index); // ???
+    void GetOutputHandle(std::string name);  // ???
+
+protected:
+    void RegisterOutputs(); // ???
 private:
-    // vector of inputs
-    std::vector<Edge> _inputs;
-    std::vector<Port> _outputs;
-        
-    // vector of outputs  
-    std::vector<std::shared_ptr<Node>> _dependents;
-
-    // Other attributes (perhaps a template parameter)
-    // string ID
-    // string[] metadata
-    // ???
 };
-
-
-
 
 #include "../tcc/Node.tcc"

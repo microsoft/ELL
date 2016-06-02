@@ -13,13 +13,21 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/DirectedGraph.cpp
-         src/Edge.cpp
          src/Node.cpp
+         src/ConstantNode.cpp
+         src/InputNode.cpp
+         src/ArgMaxNode.cpp
+         src/ValueSelectorNode.cpp
 )
 
 set (INCLUDE include/DirectedGraph.h
-             include/Edge.h
              include/Node.h
+             include/NodeInput.h
+             include/NodeOutput.h
+             include/ConstantNode.h
+             include/InputNode.h
+             include/ArgMaxNode.h
+             include/ValueSelectorNode.h
 )
 
 set (TCC tcc/Node.tcc)
