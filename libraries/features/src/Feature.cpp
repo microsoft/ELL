@@ -39,7 +39,7 @@ namespace features
 
     Feature::Feature(std::string id, const std::vector<Feature*>& inputs) : _id(id), _isDirty(true), _inputFeatures(inputs) 
     {
-        // TODO: ensure id is unique?
+        // TODO: ensure id is unique --- how?
         ++_instanceCount;
     }
 
@@ -147,17 +147,23 @@ namespace features
         }
     }
     
-    std::unique_ptr<Feature> Feature::FromDescription(const std::vector<std::string>& description, Feature::FeatureMap& existingFeatureMap)
+    std::unique_ptr<Feature> Feature::FromDescription(const std::vector<std::string>& description, Feature::FeatureMap& previousFeatures)
     {
         std::string featureId = TrimString(description[0]);
         std::string featureClass = TrimString(description[1]);
 
+        if(previousFeatures.find(featureId) != previousFeatures.end())
+        {
+            std::string error_msg = std::string("Error deserializing feature description: non-unique ID ") + featureId;
+            throw std::runtime_error(error_msg);
+        }
+        
         auto createFunction = _createTypeMap[featureClass];
         if (createFunction == nullptr)
         {
             std::string error = std::string("Error deserializing feature description: unknown feature type '") + featureClass + "'";
             throw std::runtime_error(error);
         }
-        return createFunction(description, existingFeatureMap);
+        return createFunction(description, previousFeatures);
     }
 }

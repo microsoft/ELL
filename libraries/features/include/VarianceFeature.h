@@ -28,6 +28,12 @@ namespace features
         /// <param name="windowSize"> The number of samples of history to use in computing the variance </param>
         VarianceFeature(Feature* inputFeature, size_t windowSize);
 
+        /// <summary> Constructor </summary>
+        /// <param name="id"> The id to use for this feature </param>
+        /// <param name="inputFeature"> The feature to take the variance of </param>
+        /// <param name="windowSize"> The number of samples of history to use in computing the variance </param>
+        VarianceFeature(const std::string& id, Feature* inputFeature, size_t windowSize);
+
         /// <summary> Creates a `VarianceFeature` from a vector of strings </summary>
         ///
         /// <param name="params"> The strings describing the parameters </params> 
