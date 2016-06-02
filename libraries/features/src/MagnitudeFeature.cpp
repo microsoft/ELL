@@ -69,13 +69,16 @@ namespace features
         assert(params.size() == 3);        
         auto featureId = params[0];        
         
-        Feature* inputFeature = previousFeatures[params[2]];
-        if (inputFeature == nullptr)
+        auto it = previousFeatures.find(params[2]);
+        if(it != previousFeatures.end())
         {
-            std::string error_msg = std::string("Error deserializing feature description: unknown input feature ") + params[2];
-            throw std::runtime_error(error_msg);
+            auto inputFeature = it->second;
+            return std::make_unique<MagnitudeFeature>(featureId, inputFeature);            
         }
-        
-        return std::make_unique<MagnitudeFeature>(featureId, inputFeature);
+        else
+        {
+            std::string error_msg = std::string("Error deserializing feature description: unknown input feature '") + params[2] + "'";
+            throw std::runtime_error(error_msg);            
+        }
     }
 }

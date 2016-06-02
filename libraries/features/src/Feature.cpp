@@ -40,7 +40,12 @@ namespace features
     Feature::Feature(std::string id, const std::vector<Feature*>& inputs) : _id(id), _isDirty(true), _inputFeatures(inputs) 
     {
         // TODO: ensure id is unique --- how?
+        _instanceId = _instanceCount;
         ++_instanceCount;
+        for(auto input: inputs)
+        {
+            input->AddDependent(this);
+        }
     }
 
     std::vector<double> Feature::GetOutput() const

@@ -33,7 +33,7 @@
 %include "std_string.i"
 %include "std_vector.i"
 
-#ifndef SWIGJAVASCRIPT
+#if !defined(SWIGJAVASCRIPT)
 %include "std_shared_ptr.i"
 #endif
 
@@ -72,7 +72,8 @@ namespace std
     }
 }
 
-// Macro for exposing operator[] to python
+// Macros for exposing operator[] to python / javascript
+#if defined(SWIGPYTHON)
 %define WRAP_OP_AT(Class, ValueType)
   %extend Class 
   {
@@ -83,7 +84,27 @@ namespace std
   };
 %enddef
 
-// Macro for turning Print(ostream) into __str__ 
+#elif defined(SWIGJAVASCRIPT)
+
+%define WRAP_OP_AT(Class, ValueType)
+  %extend Class 
+  {
+    ValueType get(size_t index)
+    {
+      return (*$self)[index];
+    }
+  };
+%enddef
+
+#else
+
+%define WRAP_OP_AT(Class, ValueType)
+%enddef
+
+#endif
+
+// Macro for exposing Print(ostream) into __str__ / toString in python / javascript
+#if defined(SWIGPYTHON      )
 %define WRAP_PRINT_TO_STR(Class)
     %extend Class
     {
@@ -95,6 +116,27 @@ namespace std
         }
     };
 %enddef
+
+#elif defined(SWIGJAVASCRIPT)
+
+%define WRAP_PRINT_TO_STR(Class)
+    %extend Class
+    {
+        std::string toString() 
+        {        
+            std::ostringstream oss(std::ostringstream::out);
+            ($self)->Print(oss);
+            return oss.str();
+        }
+    };
+%enddef
+
+#else
+
+%define WRAP_PRINT_TO_STR(Class)
+%enddef
+
+#endif
 
 // Define some namespaces so we can refer to them later
 namespace lossFunctions {};
