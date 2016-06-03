@@ -13,7 +13,7 @@ template <typename ValueType>
 class InputNode: public Node
 {
 public:
-    InputNode(size_t dimension);
+    InputNode(size_t dimension) : Node({}, {&output}), output(this, dimension) {};
 
     NodeOutput<ValueType> output;
 };

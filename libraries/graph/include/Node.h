@@ -3,24 +3,29 @@
 // Node
 // 
 
+#include "NodeOutput.h"
+
 #include <string>
+#include <memory>
+#include <vector>
 
 class Node
 {
 public:
-    
-    Node();
-//    Node(const std::vector<Edge>& inputs);
+    void AddDependent(const Node* dependent);
 
-//    const std::vector<Edge>& GetInputEdges() const { return _inputs; }
-//    void AddDependent(const std::shared_ptr<Node>& dependent);
-
-    void GetOutputHandle(size_t index); // ???
-    void GetOutputHandle(std::string name);  // ???
+    const NodeOutputBase& GetOutputHandle(size_t index) const;
+//    void GetOutputHandle(std::string name);  // ???
 
 protected:
+    Node(const std::vector<NodeOutputBase*> inputs, const std::vector<NodeOutputBase*>& outputs);
     void RegisterOutputs(); // ???
+
 private:
+    friend class DirectedGraph;
+    std::vector<NodeOutputBase*> _inputs;
+    std::vector<NodeOutputBase*> _outputs;
+    std::vector<std::shared_ptr<Node>> _dependents;
 };
 
 #include "../tcc/Node.tcc"

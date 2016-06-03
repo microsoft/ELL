@@ -4,22 +4,23 @@
 
 #include "DirectedGraph.h"
 #include "ValueSelectorNode.h"
-#include "ArgMaxNode.h"
+#include "ExtremalValNode.h"
 #include "ConstantNode.h"
 #include "InputNode.h"
 #include "NodeInput.h"
 #include "NodeOutput.h"
 
+#include <iostream>
 
-template <typename... Args>
-auto concat(Args... args)
-{
-    return { args... };
-}
+// template <typename... Args>
+// auto concat(Args... args)
+// {
+//     return { args... };
+// }
 
 int main(int argc, char** argv)
 {
-    // Create a grpah
+    // Create a graph
 
     DirectedGraph g;
     auto in = g.AddNode<InputNode<double>>(3);
@@ -27,7 +28,15 @@ int main(int argc, char** argv)
     auto minAndArgMin = g.AddNode<ArgMinNode<double>>(in->output);
     auto condition = g.AddNode<ConstantNode<bool>>(true);
 
-    auto selector = g.AddNode<ValueSelectorNode<double>>(condition->output, concat(maxAndArgMax->extremalVal, minAndArgMin->extremalVal));
+    std::cout << "Visiting graph" << std::endl;
+    auto visitor = [](const Node& node)
+    {
+        std::cout << "x" << std::endl;        
+    };
+    
+    g.Visit(visitor, condition);
+
+//    auto selector = g.AddNode<ValueSelectorNode<double>>(condition->output, concat(maxAndArgMax->val, minAndArgMin->val));
 
     //g.Compute({ 1,2,3 });
     //auto output = selector.output.GetValue();

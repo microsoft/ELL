@@ -15,8 +15,8 @@ endif()
 set (SRC src/DirectedGraph.cpp
          src/Node.cpp
          src/ConstantNode.cpp
+         src/ExtremalValNode.cpp
          src/InputNode.cpp
-         src/ArgMaxNode.cpp
          src/ValueSelectorNode.cpp
 )
 
@@ -26,11 +26,12 @@ set (INCLUDE include/DirectedGraph.h
              include/NodeOutput.h
              include/ConstantNode.h
              include/InputNode.h
-             include/ArgMaxNode.h
+             include/ExtremalValNode.h
              include/ValueSelectorNode.h
 )
 
-set (TCC tcc/Node.tcc)
+set (TCC tcc/Node.tcc
+         tcc/DirectedGraph.tcc)
 
 
 source_group("src" FILES ${SRC})

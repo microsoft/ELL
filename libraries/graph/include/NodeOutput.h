@@ -7,22 +7,53 @@
 #include <vector>
 #include <memory>
 
-template <typename ValueType>
-class NodeOutput
+class Node;
+
+class NodeOutputBase
 {
 public:
-    NodeOutput(size_t size);
+    enum class OutputType { Real, Integer, Categorical, Boolean };    
 
-    NodeOutput<ValueType> operator[](size_t index);
+    virtual ~NodeOutputBase() = default;
+    OutputType GetType() { return _type; }
+    const Node* GetNode() { return _node; }    
 
+protected:
+    NodeOutputBase(const Node* node, size_t size, OutputType type) : _node(node), _size(size), _type(type) {};
 
-private:
-    // Note: this is not a real thing. It's a debugging tool only available in debug mode.
+    template <typename ValueType>
+    static OutputType GetTypeCode(); 
     
+private:
+    size_t _size;
+    OutputType _type;
+    const Node* _node;
 };
 
 template <typename ValueType>
-NodeOutput<ValueType> NodeOutput<ValueType>::operator[](size_t index)
+class NodeOutput : public NodeOutputBase
 {
-    return NodeOutput<ValueType>(1, index);
-}
+public:
+    NodeOutput(const Node* node, size_t size) : NodeOutputBase(node, size, NodeOutputBase::GetTypeCode<ValueType>()) {}
+
+//    NodeOutput<ValueType> operator[](size_t index);
+
+private:
+    std::vector<ValueType> _cachedOutput;
+};
+
+template<>
+NodeOutputBase::OutputType NodeOutputBase::GetTypeCode<double>() { return NodeOutputBase::OutputType::Real; }
+
+template<>
+NodeOutputBase::OutputType NodeOutputBase::GetTypeCode<int>() { return NodeOutputBase::OutputType::Integer; }
+
+template<>
+NodeOutputBase::OutputType NodeOutputBase::GetTypeCode<bool>() { return NodeOutputBase::OutputType::Boolean; }
+
+
+// template <typename ValueType>
+// NodeOutput<ValueType> NodeOutput<ValueType>::operator[](size_t index)
+// {
+//     return NodeOutput<ValueType>(1, index);
+// }

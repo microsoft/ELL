@@ -1,6 +1,6 @@
 #pragma once
 //
-// ArgMaxNode
+// ExtremalValNode
 // 
 
 #include "Node.h"
@@ -14,10 +14,11 @@ template <typename ValueType, bool max>
 class ExtremalValNode: public Node
 {
 public:
-    ExtremalValNode(NodeInput<ValueType> values);
+    ExtremalValNode(NodeOutput<ValueType> input) : Node({input}, {&val, &argVal}), val(this, 1), argVal(this, 1) {};
 
-    NodeOutput<ValueType> extremalVal;
-    NodeOutput<int> argExtremalVal;
+    // My outputs
+    NodeOutput<ValueType> val;
+    NodeOutput<int> argVal;
 };
 
 template <typename ValueType>

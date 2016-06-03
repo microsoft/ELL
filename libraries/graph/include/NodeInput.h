@@ -15,7 +15,6 @@ public:
     NodeInput(const NodeOutput<ValueType>& output);
 
     NodeInput(const std::vector<NodeOutput<ValueType>>& outputs);
-private:
-    
+private:  
 };
 
