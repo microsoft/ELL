@@ -4,21 +4,25 @@
 // 
 
 #include "NodeOutput.h"
+#include "NodeInput.h"
 
 #include <string>
 #include <memory>
 #include <vector>
+#include <set>
 
 class Node
 {
 public:
     void AddDependent(const Node* dependent);
 
-    const NodeOutputBase& GetOutputHandle(size_t index) const;
+    const NodeOutputBase& GetOutput(size_t index) const;
+    const NodeOutputBase& GetOutput(std::string name) const;
+
 
 protected:
     Node(const std::vector<NodeOutputBase*> inputs, const std::vector<NodeOutputBase*>& outputs);
-    void RegisterOutputs(); // ???
+    void RegisterOutputs(); 
 
 private:
     friend class DirectedGraph;
@@ -26,7 +30,7 @@ private:
     std::vector<NodeInput> _inputs;
     std::vector<NodeOutputBase*> _outputs;
     
-    std::vector<std::shared_ptr<Node>> _dependentNodes; // perhaps this is a std::set
+    std::set<std::shared_ptr<Node>> _dependentNodes;
 };
 
 #include "../tcc/Node.tcc"

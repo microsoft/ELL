@@ -16,6 +16,11 @@ class ExtremalValNode: public Node
 public:
     ExtremalValNode(NodeOutput<ValueType> input) : Node({input}, {&val, &argVal}), val(this, 1), argVal(this, 1) {};
 
+
+
+    // My inputs
+    NodeInput input;
+    
     // My outputs
     NodeOutput<ValueType> val;
     NodeOutput<int> argVal;
