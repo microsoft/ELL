@@ -193,7 +193,7 @@ namespace interfaces
         return interfaces::GenericRowDataset(std::move(rowDataset));
     }
 
-    interfaces::GenericRowDataset GetDataset(const std::string& dataFilename, const interfaces::Map& map)
+    interfaces::GenericRowDataset GetMappedDataset(const std::string& dataFilename, const interfaces::Map& map)
     {
        common::DataLoadArguments dataLoadArguments;
        dataLoadArguments.inputDataFile = dataFilename;

@@ -24,6 +24,7 @@
 %ignore Create;
 %ignore Deserialize;
 %ignore features::Feature::CreateFunction;
+%ignore features::FeatureSet::AddToModel(layers::Model&, const layers::CoordinateList&) const;
 %ignore std::function<std::unique_ptr<features::Feature>>;
 
 %include "Feature.h"
@@ -70,12 +71,20 @@
     }
 %}
 
-#ifdef SWIGPYTHON
+#if defined(SWIGPYTHON)
 %init
 %{
     InitializeFeatures();
 %}
 #endif
+
+%extend features::FeatureSet
+{
+    layers::CoordinateList AddToModel(interfaces::Model& model, const layers::CoordinateList& inputCoordinates) const
+    {
+        return ($self)->AddToModel(model.GetModel(), inputCoordinates);
+    }    
+}
 
 %include "unique_ptr.i"
 wrap_unique_ptr(FeaturePtr, features::Feature)

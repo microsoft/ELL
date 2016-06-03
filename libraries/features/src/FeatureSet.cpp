@@ -86,9 +86,14 @@ namespace features
 
     layers::CoordinateList FeatureSet::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
     {
-        // TODO: document in Visit that we visit nodes in order --- a node is visited only after its inputs are
-        assert(_inputFeature != nullptr);
-        assert(_outputFeature != nullptr);
+        if(_inputFeature == nullptr) 
+        {
+            throw std::runtime_error("Input feature not assigned");
+        }
+        if(_outputFeature == nullptr)
+        {
+            throw std::runtime_error("Output feature not assigned");
+        }
         
         // need to keep a map of output coordinate lists for the various features
         std::unordered_map<const Feature*, layers::CoordinateList> featureOutputs;

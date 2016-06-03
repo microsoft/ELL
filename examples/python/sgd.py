@@ -42,7 +42,7 @@ def sgd():
     map = Map(model, outputCoordinates);
 
     #  Get the dataset
-    dataset = GetDataset(dataFilename, map);
+    dataset = GetMappedDataset(dataFilename, map);
 
     # create sgd trainer    
     loss = LogLoss()
