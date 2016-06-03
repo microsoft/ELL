@@ -11,7 +11,7 @@ namespace evaluators
     template<typename LossFunctionType>
     std::vector<double> evaluators::LossAggregator<LossFunctionType>::Value::GetValues() const
     {
-        return{ GetMeanLoss() };
+        return { GetMeanLoss() };
     }
 
     template<typename LossFunctionType>

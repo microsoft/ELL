@@ -25,7 +25,7 @@ namespace trainers
 
         // calculate epoch size
         uint64_t epochSize = _parameters.epochSize;
-        if(epochSize == 0 || epochSize >  rowDataset.NumExamples())
+        if(epochSize == 0 || epochSize > rowDataset.NumExamples())
         {
             epochSize = rowDataset.NumExamples();
         }
@@ -35,7 +35,7 @@ namespace trainers
             // randomly permute the data
             rowDataset.RandomPermute(_random, epochSize);
 
-            for(int i = 0; i<_evaluatingTrainers.size(); ++i)
+            for(int i = 0; i < _evaluatingTrainers.size(); ++i)
             {
                 // update the incremental trainer
                 auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
@@ -49,7 +49,7 @@ namespace trainers
     {
         double bestGoodness = _evaluatingTrainers[0].GetEvaluator()->GetGoodness(); // TODO make nicer
         int best = 0;
-        for(int i = 1; i<_evaluatingTrainers.size(); ++i)
+        for(int i = 1; i < _evaluatingTrainers.size(); ++i)
         {
             double goodness = _evaluatingTrainers[i].GetEvaluator()->GetGoodness();
             if(goodness > bestGoodness)

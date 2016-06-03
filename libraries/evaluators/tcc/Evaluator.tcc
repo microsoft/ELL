@@ -52,7 +52,7 @@ namespace evaluators
     {
         if (_valueTuples.size() == 0)
         {
-            return 0;
+            return 0.0;
         }
         return std::get<0>(_valueTuples.back()).GetGoodness();
     }

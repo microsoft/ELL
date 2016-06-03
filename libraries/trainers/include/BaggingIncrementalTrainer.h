@@ -43,7 +43,7 @@ namespace trainers
 
         BaggingIncrementalTrainer() = delete;
 
-        /// <summary> Constructs an instance of SingleEpochTrainer. </summary>
+        /// <summary> Constructs an instance of BaggingIncrementalTrainer. </summary>
         ///
         /// <param name="trainer"> A base trainer. </param>
         /// <param name="baggingParameters"> Bagging paramters. </param>
