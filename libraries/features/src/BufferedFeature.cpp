@@ -64,7 +64,7 @@ namespace features
 
         // allocate samples if necessary
         auto numColumns = row.size();
-        if (_samples.size() < numColumns)
+        if (_samples.size() < numColumns || (_samples.size() >0 && _samples[0].size() < _windowSize))
         {
             AllocateSampleBuffer(numColumns);
         }

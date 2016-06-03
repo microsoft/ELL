@@ -16,6 +16,8 @@
 #include "Feature.h"
 #include "InputFeature.h"
 #include "MagnitudeFeature.h"
+#include "MeanFeature.h"
+#include "VarianceFeature.h"
 #include "IncrementalMeanFeature.h"
 #include "IncrementalVarianceFeature.h"
 #include <sstream>
@@ -66,6 +68,8 @@
     {
         features::Feature::RegisterFeatureType<features::InputFeature>();
         features::Feature::RegisterFeatureType<features::MagnitudeFeature>();
+        features::Feature::RegisterFeatureType<features::MeanFeature>();
+        features::Feature::RegisterFeatureType<features::VarianceFeature>();
         features::Feature::RegisterFeatureType<features::IncrementalMeanFeature>();
         features::Feature::RegisterFeatureType<features::IncrementalVarianceFeature>();
     }
