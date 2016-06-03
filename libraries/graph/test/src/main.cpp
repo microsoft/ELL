@@ -27,6 +27,7 @@ int main(int argc, char** argv)
     auto maxAndArgMax = g.AddNode<ArgMaxNode<double>>(in->output);
     auto minAndArgMin = g.AddNode<ArgMinNode<double>>(in->output);
     auto condition = g.AddNode<ConstantNode<bool>>(true);
+    auto selector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
 
     std::cout << "Visiting graph" << std::endl;
     auto visitor = [](const Node& node)
@@ -36,7 +37,6 @@ int main(int argc, char** argv)
     
     g.Visit(visitor, condition);
 
-//    auto selector = g.AddNode<ValueSelectorNode<double>>(condition->output, concat(maxAndArgMax->val, minAndArgMin->val));
 
     //g.Compute({ 1,2,3 });
     //auto output = selector.output.GetValue();

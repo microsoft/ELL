@@ -14,7 +14,7 @@ template <typename ValueType>
 class ValueSelectorNode : public Node
 {
 public:
-    ValueSelectorNode(NodeOutput<bool> condition, NodeOutput<ValueType> values): Node({condition, values}, {&output}), output(this, 1) {};
+    ValueSelectorNode(NodeOutput<bool> condition, NodeOutput<ValueType> value1, NodeOutput<ValueType> value2): Node({condition, value1, value2}, {&output}), output(this, 1) {};
 
     NodeOutput<ValueType> output;
 };

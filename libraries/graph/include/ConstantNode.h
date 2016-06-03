@@ -5,6 +5,7 @@
 
 #include "Node.h"
 #include "NodeOutput.h"
+#include "NodeInput.h"
 
 #include <vector>
 #include <memory>
