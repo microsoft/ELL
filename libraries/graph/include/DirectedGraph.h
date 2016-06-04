@@ -38,6 +38,8 @@ public:
     template <typename Visitor>
     void Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNode) const;
     
+    // TODO: iterators
+    
 private:
     // The node map acts both as the main container that holds the shared pointers to nodes, and as the index
     // to look nodes up by id.

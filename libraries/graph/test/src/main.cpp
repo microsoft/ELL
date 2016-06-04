@@ -77,6 +77,10 @@ int main(int argc, char** argv)
     auto valSelector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
     auto indexSelector = g.AddNode<ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
+
+    // 
+
+
     std::cout << "\nSelected value:" << std::endl;
     PrintGraph(g, valSelector);
     
@@ -85,11 +89,13 @@ int main(int argc, char** argv)
 
     std::cout << "\nfullGraph:" << std::endl;
     PrintGraph(g);
+
     // Now copy graph
 
-    //g.Compute({ 1,2,3 });
-    //auto output = selector.output.GetValue();
-
+    // g.Compute({ 1,2,3 });
+    // auto output = valSelector.output.GetValue();
+    // std::cout << "val: " << output << std::endl;
+    
     //auto map = g.GetMap({ selector.output });
     //auto output2 = map.Compute({ 1,2,3 });
 }

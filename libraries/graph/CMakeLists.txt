@@ -14,7 +14,6 @@ endif()
 
 set (SRC src/DirectedGraph.cpp
          src/Node.cpp
-         src/NodeInput.cpp
          src/NodeEdge.cpp
 )
 
@@ -30,6 +29,7 @@ set (INCLUDE include/DirectedGraph.h
 )
 
 set (TCC tcc/Node.tcc
+         tcc/NodeInput.tcc
          tcc/DirectedGraph.tcc
          tcc/ConstantNode.tcc
          tcc/InputNode.tcc
