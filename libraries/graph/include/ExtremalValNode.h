@@ -16,7 +16,7 @@ class ExtremalValNode: public Node
 public:
     ExtremalValNode(NodeOutput<ValueType> input) : Node({&_input}, {&_val, &_argVal}), _input(input), _val(this, 0, 1), _argVal(this, 1, 1) {};
 
-    virtual std::string Type() const override { return max ? "ArgMax" : "ArgMin"; }
+    virtual std::string NodeType() const override { return max ? "ArgMax" : "ArgMin"; }
 
     // read-only properties
     const NodeOutput<ValueType>& val = _val;

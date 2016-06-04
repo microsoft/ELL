@@ -15,7 +15,6 @@ class NodeOutputBase
 public:
     enum class OutputType { None, Real, Integer, Categorical, Boolean };    
 
-    virtual ~NodeOutputBase() = default;
     const Node* GetNode() const { return _node; }
     size_t GetOutputIndex() const { return _outputIndex; }
     size_t GetSize() const { return _size; } // dimension
@@ -32,6 +31,7 @@ protected:
 private:
     const Node* _node = nullptr;
     size_t _outputIndex = 0;
+
     size_t _size = 0;
     OutputType _type = OutputType::None;
 };

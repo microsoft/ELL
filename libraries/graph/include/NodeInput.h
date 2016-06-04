@@ -13,7 +13,8 @@ class Node;
 class NodeInput
 {
 public:
-    NodeInput(const NodeOutputBase& output): _node(output.GetNode()), _outputIndex(output.GetOutputIndex()) {}
+
+//    NodeInput(const NodeOutputBase& output): _node(output.GetNode()), _outputIndex(output.GetOutputIndex()) {}
 
     template <typename ValueType>
     NodeInput(const NodeOutput<ValueType>& output): _node(output.GetNode()), _outputIndex(output.GetOutputIndex()) {}
@@ -29,9 +30,9 @@ protected:
     
 private:
     // keeps info on where the input is coming from (which "port")
-
     const Node* _node = nullptr;
     size_t _outputIndex = 0;
+    
     // optional offset, size
     // maybe a union?
     // Later, maybe keep a list of (node*, outputIndex, start, len) tuples    

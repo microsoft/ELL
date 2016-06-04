@@ -16,7 +16,7 @@ class InputNode: public Node
 public:
     InputNode(size_t dimension) : Node({}, {&_output}), _output(this, 0, dimension) {};
 
-    virtual std::string Type() const override { return "Input"; }
+    virtual std::string NodeType() const override { return "Input"; }
 
     const NodeOutput<ValueType>& output = _output; // This is a (perhaps too-)clever way to make a read-only property. I don't know if I like it.
 

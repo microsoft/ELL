@@ -21,7 +21,16 @@
 
 void PrintVisitor(const Node& node)
 {
-    std::cout << node.Id() << ": " << node.Type() << std::endl;        
+    bool first = true;
+    std::cout << "node_" << node.Id() << " = " << node.NodeType() << "(";
+    for(const auto& input: node.GetInputs())
+    {
+        std::cout << (first ? "" : ", ");
+        first = false;
+        std::cout << "node_" << input->GetNode()->Id() << "[" << input->GetOutputIndex() << "]";
+        
+    }
+    std::cout << ")" << std::endl;        
 };
 
 
