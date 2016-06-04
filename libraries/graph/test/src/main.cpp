@@ -19,14 +19,20 @@
 //     return { args... };
 // }
 
-void PrintGraph(const DirectedGraph& graph, const std::shared_ptr<Node>& output)
+void PrintVisitor(const Node& node)
 {
-    auto visitor = [](const Node& node)
-    {
-        std::cout << node.Type() << std::endl;        
-    };
-    
-    graph.Visit(visitor, output);    
+    std::cout << node.Id() << ": " << node.Type() << std::endl;        
+};
+
+
+void PrintGraph(const DirectedGraph& graph)
+{
+    graph.Visit(PrintVisitor);    
+}
+
+void PrintGraph(const DirectedGraph& graph, const std::shared_ptr<Node>& output)
+{    
+    graph.Visit(PrintVisitor, output);    
 }
 
 void CopyGraph(const DirectedGraph& graph1, const std::shared_ptr<Node>& output,  DirectedGraph& graph2)
@@ -59,10 +65,17 @@ int main(int argc, char** argv)
     auto maxAndArgMax = g.AddNode<ArgMaxNode<double>>(in->output);
     auto minAndArgMin = g.AddNode<ArgMinNode<double>>(in->output);
     auto condition = g.AddNode<ConstantNode<bool>>(true);
-    auto selector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
+    auto valSelector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
+    auto indexSelector = g.AddNode<ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
-    PrintGraph(g, selector);
+    std::cout << "\nSelected value:" << std::endl;
+    PrintGraph(g, valSelector);
     
+    std::cout << "\nSelected index:" << std::endl;
+    PrintGraph(g, indexSelector);
+
+    std::cout << "\nfullGraph:" << std::endl;
+    PrintGraph(g);
     // Now copy graph
 
     //g.Compute({ 1,2,3 });

@@ -12,17 +12,17 @@ namespace
     class ReverseRange
     {
     public:
-        ReverseRange(ContainerType& container) : _begin(container.rbegin()), _end(container.rend()) {}
-        typename ContainerType::reverse_iterator begin() const { return _begin; }
-        typename ContainerType::reverse_iterator end() const { return _end; }
+        ReverseRange(const ContainerType& container) : _begin(container.crbegin()), _end(container.crend()) {}
+        typename ContainerType::const_reverse_iterator begin() const { return _begin; }
+        typename ContainerType::const_reverse_iterator end() const { return _end; }
     
     private:
-        typename ContainerType::reverse_iterator _begin;
-        typename ContainerType::reverse_iterator _end;    
+        typename ContainerType::const_reverse_iterator _begin;
+        typename ContainerType::const_reverse_iterator _end;    
     };
     
     template <typename ContainerType>
-    ReverseRange<ContainerType> Reverse(ContainerType& container)
+    ReverseRange<ContainerType> Reverse(const ContainerType& container)
     {
         return ReverseRange<ContainerType>(container);
     }
@@ -36,9 +36,8 @@ std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
 {
     // TODO: Store node somewhere
     auto result = std::make_shared<NodeType>(args...);
+    _nodeMap[result->Id()] = result;
     result->AddDependents();
-    
-    // _nodeMap[result->Id()] = result;    
     return result;
 }
 
@@ -47,16 +46,30 @@ std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
 //
 
 // Visits the entire graph
+// TODO: merge code for this and active-graph visitor
 template <typename Visitor>
 void DirectedGraph::Visit(Visitor& visitor) const
 {
+    if(_nodeMap.size() == 0)
+    {
+        return;
+    }
+
+    // helper function to find a terminal node
+    auto IsLeaf = [](const Node* node) { return node->GetDependents().size() == 0; };
+    
     std::unordered_set<const Node*> visitedNodes;
     std::vector<const Node*> stack;
 
-    // TODO: get some arbitrary node
-    std::shared_ptr<Node> someArbitraryNode;
-    std::shared_ptr<Node> anOutputNode; // TODO: follow dependency chain until we get an output node
-    stack.push_back(anOutputNode.get());
+    // start with some arbitrary node
+    const Node* anOutputNode = _nodeMap.begin()->second.get();
+    // follow dependency chain until we get an output node
+    while(!IsLeaf(anOutputNode))
+    {
+        anOutputNode = anOutputNode->GetDependents()[0];
+    } 
+    
+    stack.push_back(anOutputNode);
     while (stack.size() > 0)
     {
         const Node* node = stack.back();
@@ -83,23 +96,22 @@ void DirectedGraph::Visit(Visitor& visitor) const
             visitedNodes.insert(node);
             
             // explicitly skip output feature (until we visit it manually at the end)
-            if(node != anOutputNode.get())
+            if(node != anOutputNode)
             {
                 visitor(*node);               
             }
             
-            // now add children (Note: this part is the only difference between Visit and VisitActiveGraph)
-            for(const auto& child: Reverse(node->_inputs)) // Visiting the children in reverse order more closely retains the order the features were originally created
+            // now add all our children (Note: this part is the only difference between visit-all and visit-active-graph
+            for(const auto& child: Reverse(node->_dependentNodes)) // Visiting the children in reverse order more closely retains the order the features were originally created
             {
                 // note: this is kind of inefficient --- we're going to push multiple copies of child on the stack. But we'll check if we've visited it already when we pop it off. 
                 // TODO: optimize this if it's a problem
-                auto childNode = child->GetNode();
-                stack.push_back(childNode);
+                stack.push_back(child);
             }
         }
         else // visit node's inputs
         {
-            for (auto input : node->_inputs) // TODO: should be for input: Reversed(node->_inputs)
+            for (auto input : Reverse(node->_inputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
             {
                 stack.push_back(input->GetNode()); // Again, if `NodeInput`s point to multiple nodes, need to iterate here
             }
@@ -143,7 +155,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<std::shared_ptr<No
 
         // we can visit this node only if all its inputs have been visited already
         bool canVisit = true;
-        for (auto input : node->_inputs)
+        for (auto input: node->_inputs)
         {
             // Note: If NodeInputs can point to multiple nodes, we'll have to iterate over them here
             auto inputNode = input->GetNode(); 
@@ -159,7 +171,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<std::shared_ptr<No
         }
         else // visit node's inputs
         {
-            for (auto input : node->_inputs)
+            for (auto input: Reverse(node->_inputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
             {
                 stack.push_back(input->GetNode()); // Again, if `NodeInput`s point to multiple nodes, need to iterate here
             }

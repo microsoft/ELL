@@ -3,8 +3,8 @@
 #include "Node.h"
 
 #include <vector>
-#include <ostream>
 #include <memory>
+#include <unordered_map>
 
 // Graph.h
 
@@ -24,7 +24,7 @@ public:
     void Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNode) const; // Visits all nodes in the graph necssary to compute all outputNodes
     
 private:
-    // std::unordered_map<NodeId, std::shared_ptr<Node>> _nodeMap;
+    std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _nodeMap;
 };
 
 #include "../tcc/DirectedGraph.tcc"
