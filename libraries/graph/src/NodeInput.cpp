@@ -7,7 +7,7 @@
 
 #include <cassert>
 
-NodeOutputBase::OutputType NodeInput::GetType() const
+NodeEdge::OutputType NodeInput::GetType() const
 { 
     assert(_type == _node->GetOutput(_outputIndex).GetType());
     return _type;

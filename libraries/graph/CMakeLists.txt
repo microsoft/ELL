@@ -15,11 +15,12 @@ endif()
 set (SRC src/DirectedGraph.cpp
          src/Node.cpp
          src/NodeInput.cpp
-         src/NodeOutput.cpp
+         src/NodeEdge.cpp
 )
 
 set (INCLUDE include/DirectedGraph.h
              include/Node.h
+             include/NodeEdge.h
              include/NodeInput.h
              include/NodeOutput.h
              include/ConstantNode.h

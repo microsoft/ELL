@@ -3,6 +3,7 @@
 //
 // NodeInput
 // 
+#include "NodeEdge.h"
 #include "NodeOutput.h"
 
 #include <vector>
@@ -10,21 +11,18 @@
 
 class Node;
 
-class NodeInput
+class NodeInput : public NodeEdge
 {
 public:
-
-//    NodeInput(const NodeOutputBase& output): _node(output.GetNode()), _outputIndex(output.GetOutputIndex()) {}
+//    NodeInput(const NodeEdge& output): _node(output.GetNode()), _outputIndex(output.GetOutputIndex()) {}
 
     template <typename ValueType>
-    NodeInput(const NodeOutput<ValueType>& output): _node(output.GetNode()), _outputIndex(output.GetOutputIndex()), _type(NodeOutputBase::GetTypeCode<ValueType>()) {}
+    NodeInput(const NodeOutput<ValueType>& output): NodeEdge(output.GetNode(), output.GetOutputIndex()), _type(NodeEdge::GetTypeCode<ValueType>()) {}
 
     // "concat" version
     // NodeInput(const std::vector<NodeOutput<ValueType>>& outputs);
 
-    const Node* GetNode() const { return _node; }
-    size_t GetOutputIndex() const { return _outputIndex; }
-    NodeOutputBase::OutputType GetType() const;
+    NodeEdge::OutputType GetType() const;
     
 protected:
     
@@ -33,7 +31,7 @@ private:
     const Node* _node = nullptr;
     size_t _outputIndex = 0;
 
-    NodeOutputBase::OutputType _type;
+    NodeEdge::OutputType _type;
     
     // optional offset, size
     // maybe a union?
