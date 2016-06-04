@@ -19,8 +19,10 @@ public:
 
     virtual std::string Type() const override { return "Constant"; }
 
-    NodeOutput<ValueType> _output;
+    const NodeOutput<ValueType>& output = _output;
 
 private:
     std::vector<ValueType> _values;
+    
+    NodeOutput<ValueType> _output;
 };

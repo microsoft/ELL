@@ -8,13 +8,23 @@
 #include <vector>
 #include <memory>
 
-class NodeInputBase
+class Node;
+
+class NodeInput
 {
 public:
-    NodeInputBase(const NodeOutputBase& output): _node(output.GetNode()), _outputIndex(output.GetOutputIndex()) {}
+    NodeInput(const NodeOutputBase& output): _node(output.GetNode()), _outputIndex(output.GetOutputIndex()) {}
+
+    template <typename ValueType>
+    NodeInput(const NodeOutput<ValueType>& output): _node(output.GetNode()), _outputIndex(output.GetOutputIndex()) {}
+
+    // "concat" version
+    // NodeInput(const std::vector<NodeOutput<ValueType>>& outputs);
+
     const Node* GetNode() const { return _node; }
     size_t GetOutputIndex() const { return _outputIndex; }
-
+    NodeOutputBase::OutputType GetType() const;
+    
 protected:
     
 private:
@@ -27,14 +37,6 @@ private:
     // Later, maybe keep a list of (node*, outputIndex, start, len) tuples    
 };
 
-class NodeInput : public NodeInputBase
-{
-public:
-    template <typename ValueType>
-    NodeInput(const NodeOutput<ValueType>& output): NodeInputBase(output) {};
-
-    // "concat" version
-    // NodeInput(const std::vector<NodeOutput<ValueType>>& outputs);
-};
-
-// If we insist on a complicated interface for crazy swizzled edges, NodeInput should be the class that has that interface 
+// If we have a class for crazy swizzled edges, NodeInput should be the class that has that interface 
+// Idea: have NodeInput be base class for NodeOutput (rename appropriately). Then the NodeInput(vector<...>) constructor can be a vector of NodeInputs.
+//       ...then concat and subset operators can return NodeInputs, which is what we'd want them to return 

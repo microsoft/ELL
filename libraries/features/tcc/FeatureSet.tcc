@@ -160,7 +160,7 @@ namespace features
             }
             else // visit f's input features
             {
-                for (auto input : f->_inputFeatures)
+                for (auto input : f->_inputFeatures) // TODO: visit these in reverse order?
                 {
                     stack.push_back(input);
                 }

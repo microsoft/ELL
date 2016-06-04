@@ -14,6 +14,7 @@ endif()
 
 set (SRC src/DirectedGraph.cpp
          src/Node.cpp
+         src/NodeInput.cpp
          src/NodeOutput.cpp
          src/ConstantNode.cpp
          src/ExtremalValNode.cpp

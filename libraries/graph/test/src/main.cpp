@@ -11,6 +11,7 @@
 #include "NodeOutput.h"
 
 #include <iostream>
+#include <unordered_map>
 
 // template <typename... Args>
 // auto concat(Args... args)
@@ -30,9 +31,20 @@ void PrintGraph(const DirectedGraph& graph, const std::shared_ptr<Node>& output)
 
 void CopyGraph(const DirectedGraph& graph1, const std::shared_ptr<Node>& output,  DirectedGraph& graph2)
 {
-    auto visitor = [](const Node& node)
+    std::unordered_map<Node*, Node*> oldToNewMap;
+    auto visitor = [&graph1, &graph2, &oldToNewMap](const Node& node)
     {
-        std::cout << node.Type() << std::endl;        
+        auto inputs = node.GetInputs();
+        std::vector<NodeInput> newInputs;
+        for(const auto& oldInput: inputs) 
+        {
+            auto newInput = oldInput; // copy c'tor 
+            // auto newInput = oldInput.CloneButNullifyNodePointers();
+            // TODO: replace the _node field in the copy with oldToNewMap[oldInput.GetNode()]
+            // nowInputs.push_back(newInput);
+        }
+        // auto newNode = graph2.MakeNodeByCloningNodeAndReplacingInputs(node, newInputs)
+        // oldToNewMap[&node] = newNode;
     };
     
     graph1.Visit(visitor, output);
@@ -44,10 +56,10 @@ int main(int argc, char** argv)
 
     DirectedGraph g;
     auto in = g.AddNode<InputNode<double>>(3);
-    auto maxAndArgMax = g.AddNode<ArgMaxNode<double>>(in->_output); // segfault
-    auto minAndArgMin = g.AddNode<ArgMinNode<double>>(in->_output);
+    auto maxAndArgMax = g.AddNode<ArgMaxNode<double>>(in->output);
+    auto minAndArgMin = g.AddNode<ArgMinNode<double>>(in->output);
     auto condition = g.AddNode<ConstantNode<bool>>(true);
-    auto selector = g.AddNode<ValueSelectorNode<double>>(condition->_output, maxAndArgMax->_val, minAndArgMin->_val);
+    auto selector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
 
     PrintGraph(g, selector);
     

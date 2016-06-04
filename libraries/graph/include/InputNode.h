@@ -18,7 +18,8 @@ public:
 
     virtual std::string Type() const override { return "Input"; }
 
-    NodeOutput<ValueType> _output;
+    const NodeOutput<ValueType>& output = _output; // This is a (perhaps too-)clever way to make a read-only property. I don't know if I like it.
 
 private:
+    NodeOutput<ValueType> _output;
 };

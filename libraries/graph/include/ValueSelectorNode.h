@@ -18,8 +18,8 @@ public:
 
     virtual std::string Type() const override { return "ValueSelector"; }
 
-    // Outputs
-    NodeOutput<ValueType> _output;
+    // Output
+    const NodeOutput<ValueType>& output = _output;
 
 private:
     // Inputs
@@ -27,4 +27,6 @@ private:
     NodeInput _value1;
     NodeInput _value2;
     
+    // Output
+    NodeOutput<ValueType> _output;
 };

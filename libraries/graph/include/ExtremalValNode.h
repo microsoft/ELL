@@ -14,18 +14,21 @@ template <typename ValueType, bool max>
 class ExtremalValNode: public Node
 {
 public:
-    ExtremalValNode(NodeOutput<ValueType> input) : Node({&_input}, {&_val, &_argVal}), _val(this, 0, 1), _argVal(this, 1, 1), _input(input) {};
+    ExtremalValNode(NodeOutput<ValueType> input) : Node({&_input}, {&_val, &_argVal}), _input(input), _val(this, 0, 1), _argVal(this, 1, 1) {};
 
     virtual std::string Type() const override { return max ? "ArgMax" : "ArgMin"; }
 
-    // My outputs
-    NodeOutput<ValueType> _val;
-    NodeOutput<int> _argVal;
+    // read-only properties
+    const NodeOutput<ValueType>& val = _val;
+    const NodeOutput<int>& argVal = _argVal;
 
 private:
     // My inputs
     NodeInput _input;
     
+    // My outputs
+    NodeOutput<ValueType> _val;
+    NodeOutput<int> _argVal;
 };
 
 template <typename ValueType>

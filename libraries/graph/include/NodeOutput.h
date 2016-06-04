@@ -10,7 +10,6 @@
 
 class Node;
 
-// TODO: get rid of size somehow?
 class NodeOutputBase
 {
 public:
