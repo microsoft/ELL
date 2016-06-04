@@ -14,10 +14,10 @@ template <typename ValueType>
 class ConstantNode : public Node
 {
 public:
-    ConstantNode(ValueType value) : Node({}, {&output}), output(this, 1), _values({value}) {};
-    ConstantNode(std::vector<ValueType> values) : Node({&output}), output(this, values.size()), _values(values) {};
+    ConstantNode(ValueType value) : Node({}, {&_output}), _output(this, 0, 1), _values({value}) {};
+    ConstantNode(std::vector<ValueType> values) : Node({&_output}), _output(this, values.size()), _values(values) {};
 
-    NodeOutput<ValueType> output;
+    NodeOutput<ValueType> _output;
 
 private:
     std::vector<ValueType> _values;

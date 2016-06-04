@@ -24,8 +24,7 @@ public:
     void Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNode) const; // Visits all nodes in the graph necssary to compute all outputNodes
     
 private:
-    
-    // the nodes (?)
+    // std::unordered_map<NodeId, std::shared_ptr<Node>> _nodeMap;
 };
 
 #include "../tcc/DirectedGraph.tcc"

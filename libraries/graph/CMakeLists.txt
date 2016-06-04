@@ -14,6 +14,7 @@ endif()
 
 set (SRC src/DirectedGraph.cpp
          src/Node.cpp
+         src/NodeOutput.cpp
          src/ConstantNode.cpp
          src/ExtremalValNode.cpp
          src/InputNode.cpp
@@ -62,6 +63,7 @@ include_directories(../testing/include)
 include_directories(test/include)
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
+target_link_libraries(${TEST_NAME} graph)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

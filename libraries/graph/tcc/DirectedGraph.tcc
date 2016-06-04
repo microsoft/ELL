@@ -5,13 +5,21 @@
 #include <unordered_set>
 #include <iostream>
 
+//
+// Factory method
+//
 template <typename NodeType, typename... Args>
 std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
 {
     // TODO: Store node somewhere
-    return std::make_shared<NodeType>(args...);
+    auto result = std::make_shared<NodeType>(args...);
+    // _nodeMap[result->Id()] = result;    
+    return result;
 }
 
+//
+// Visitors
+//
 template <typename Visitor>
 void DirectedGraph::Visit(Visitor& visitor) const
 {

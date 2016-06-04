@@ -24,10 +24,10 @@ int main(int argc, char** argv)
 
     DirectedGraph g;
     auto in = g.AddNode<InputNode<double>>(3);
-    auto maxAndArgMax = g.AddNode<ArgMaxNode<double>>(in->output);
-    auto minAndArgMin = g.AddNode<ArgMinNode<double>>(in->output);
+    auto maxAndArgMax = g.AddNode<ArgMaxNode<double>>(in->_output);
+    auto minAndArgMin = g.AddNode<ArgMinNode<double>>(in->_output);
     auto condition = g.AddNode<ConstantNode<bool>>(true);
-    auto selector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
+    auto selector = g.AddNode<ValueSelectorNode<double>>(condition->_output, maxAndArgMax->_val, minAndArgMin->_val);
 
     std::cout << "Visiting graph" << std::endl;
     auto visitor = [](const Node& node)
@@ -36,7 +36,6 @@ int main(int argc, char** argv)
     };
     
     g.Visit(visitor, condition);
-
 
     //g.Compute({ 1,2,3 });
     //auto output = selector.output.GetValue();

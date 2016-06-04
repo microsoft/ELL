@@ -14,23 +14,23 @@
 class Node
 {
 public:
-    void AddDependent(const Node* dependent);
+    void AddDependent(const Node* dependent) const;
 
-    const NodeOutputBase& GetOutput(size_t index) const;
-    const NodeOutputBase& GetOutput(std::string name) const;
-
+    const NodeOutputBase& GetOutputRef(size_t index) const { return *_outputs[index]; }
+    // const NodeOutputBase& GetOutputRef(std::string name) const; // ...
 
 protected:
-    Node(const std::vector<NodeOutputBase*> inputs, const std::vector<NodeOutputBase*>& outputs);
+    Node(const std::vector<NodeInputBase*>& inputs, const std::vector<NodeOutputBase*>& outputs);
     void RegisterOutputs(); 
+    virtual void ComputeOutput() {};
 
 private:
     friend class DirectedGraph;
 
-    std::vector<NodeInput> _inputs;
+    std::vector<NodeInputBase*> _inputs; //?
     std::vector<NodeOutputBase*> _outputs;
     
-    std::set<std::shared_ptr<Node>> _dependentNodes;
+    mutable std::set<const Node*> _dependentNodes;
 };
 
 #include "../tcc/Node.tcc"

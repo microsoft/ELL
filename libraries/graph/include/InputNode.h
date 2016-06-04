@@ -13,7 +13,9 @@ template <typename ValueType>
 class InputNode: public Node
 {
 public:
-    InputNode(size_t dimension) : Node({}, {&output}), output(this, dimension) {};
+    InputNode(size_t dimension) : Node({}, {&_output}), _output(this, 0, dimension) {};
 
-    NodeOutput<ValueType> output;
+    NodeOutput<ValueType> _output;
+
+private:
 };
