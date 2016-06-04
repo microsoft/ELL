@@ -17,7 +17,7 @@ public:
 //    NodeInput(const NodeOutputBase& output): _node(output.GetNode()), _outputIndex(output.GetOutputIndex()) {}
 
     template <typename ValueType>
-    NodeInput(const NodeOutput<ValueType>& output): _node(output.GetNode()), _outputIndex(output.GetOutputIndex()) {}
+    NodeInput(const NodeOutput<ValueType>& output): _node(output.GetNode()), _outputIndex(output.GetOutputIndex()), _type(NodeOutputBase::GetTypeCode<ValueType>()) {}
 
     // "concat" version
     // NodeInput(const std::vector<NodeOutput<ValueType>>& outputs);
@@ -32,6 +32,8 @@ private:
     // keeps info on where the input is coming from (which "port")
     const Node* _node = nullptr;
     size_t _outputIndex = 0;
+
+    NodeOutputBase::OutputType _type;
     
     // optional offset, size
     // maybe a union?
