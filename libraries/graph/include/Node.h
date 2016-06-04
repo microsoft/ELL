@@ -11,6 +11,9 @@
 #include <vector>
 #include <set>
 
+//
+// Node: superclass for all node types. 
+//
 class Node
 {
 public:
@@ -25,7 +28,8 @@ public:
     const NodeOutputBase& GetOutput(size_t index) const { return *_outputs[index]; }    
     
 protected:
-    Node(const std::vector<NodeInput*>& inputs, const std::vector<NodeOutputBase*>& outputs);
+    // The constructor for Node is kind of 
+    Node(const std::vector<NodeInput *>& inputs, const std::vector<NodeOutputBase *>& outputs);
 
     virtual void ComputeOutput() const {}; // TODO
     void RegisterOutputs() const; // TODO

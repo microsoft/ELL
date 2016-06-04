@@ -16,10 +16,6 @@ set (SRC src/DirectedGraph.cpp
          src/Node.cpp
          src/NodeInput.cpp
          src/NodeOutput.cpp
-         src/ConstantNode.cpp
-         src/ExtremalValNode.cpp
-         src/InputNode.cpp
-         src/ValueSelectorNode.cpp
 )
 
 set (INCLUDE include/DirectedGraph.h
@@ -28,12 +24,17 @@ set (INCLUDE include/DirectedGraph.h
              include/NodeOutput.h
              include/ConstantNode.h
              include/InputNode.h
-             include/ExtremalValNode.h
+             include/ExtremalValueNode.h
              include/ValueSelectorNode.h
 )
 
 set (TCC tcc/Node.tcc
-         tcc/DirectedGraph.tcc)
+         tcc/DirectedGraph.tcc
+         tcc/ConstantNode.tcc
+         tcc/InputNode.tcc
+         tcc/ExtremalValueNode.tcc
+         tcc/ValueSelectorNode.tcc
+)
 
 
 source_group("src" FILES ${SRC})

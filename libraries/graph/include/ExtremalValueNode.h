@@ -11,10 +11,10 @@
 #include <memory>
 
 template <typename ValueType, bool max>
-class ExtremalValNode: public Node
+class ExtremalValueNode: public Node
 {
 public:
-    ExtremalValNode(NodeOutput<ValueType> input) : Node({&_input}, {&_val, &_argVal}), _input(input), _val(this, 0, 1), _argVal(this, 1, 1) {};
+    ExtremalValueNode(NodeOutput<ValueType> input);
 
     virtual std::string NodeType() const override { return max ? "ArgMax" : "ArgMin"; }
 
@@ -32,7 +32,9 @@ private:
 };
 
 template <typename ValueType>
-using ArgMinNode = ExtremalValNode<ValueType, false>;
+using ArgMinNode = ExtremalValueNode<ValueType, false>;
 
 template <typename ValueType>
-using ArgMaxNode = ExtremalValNode<ValueType, true>;
+using ArgMaxNode = ExtremalValueNode<ValueType, true>;
+
+#include "../tcc/ExtremalValueNode.tcc"

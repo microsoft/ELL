@@ -17,11 +17,16 @@ template <typename ValueType>
 class ConstantNode : public Node
 {
 public:
-    ConstantNode(ValueType value) : Node({}, {&_output}), _output(this, 0, 1), _values({value}) {};
-    ConstantNode(std::vector<ValueType> values) : Node({&_output}), _output(this, values.size()), _values(values) {};
+    // Constructor for a scalar constant
+    ConstantNode(ValueType value);
 
+    // Constructor for a vector constant
+    ConstantNode(std::vector<ValueType> values);
+
+    // Returns the name for this node class
     virtual std::string NodeType() const override { return "Constant"; }
 
+    // This is a somewhat cringe-inducing way to make the equivalent of a read-only property in C++
     const NodeOutput<ValueType>& output = _output;
 
 private:
@@ -29,3 +34,5 @@ private:
     
     NodeOutput<ValueType> _output;
 };
+
+#include "../tcc/ConstantNode.tcc"

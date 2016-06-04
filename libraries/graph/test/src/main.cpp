@@ -4,7 +4,7 @@
 
 #include "DirectedGraph.h"
 #include "ValueSelectorNode.h"
-#include "ExtremalValNode.h"
+#include "ExtremalValueNode.h"
 #include "ConstantNode.h"
 #include "InputNode.h"
 #include "NodeInput.h"

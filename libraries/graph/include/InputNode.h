@@ -14,7 +14,7 @@ template <typename ValueType>
 class InputNode: public Node
 {
 public:
-    InputNode(size_t dimension) : Node({}, {&_output}), _output(this, 0, dimension) {};
+    InputNode(size_t dimension);
 
     virtual std::string NodeType() const override { return "Input"; }
 
@@ -23,3 +23,5 @@ public:
 private:
     NodeOutput<ValueType> _output;
 };
+
+#include "../tcc/InputNode.tcc"
