@@ -3,7 +3,6 @@
 //
 
 #include <unordered_set>
-#include <iostream>
 
 //
 // Factory method
@@ -13,6 +12,8 @@ std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
 {
     // TODO: Store node somewhere
     auto result = std::make_shared<NodeType>(args...);
+    result->AddDependents();
+    
     // _nodeMap[result->Id()] = result;    
     return result;
 }

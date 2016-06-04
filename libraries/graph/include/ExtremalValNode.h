@@ -16,6 +16,8 @@ class ExtremalValNode: public Node
 public:
     ExtremalValNode(NodeOutput<ValueType> input) : Node({&_input}, {&_val, &_argVal}), _val(this, 0, 1), _argVal(this, 1, 1), _input(input) {};
 
+    virtual std::string Type() const override { return max ? "ArgMax" : "ArgMin"; }
+
     // My outputs
     NodeOutput<ValueType> _val;
     NodeOutput<int> _argVal;

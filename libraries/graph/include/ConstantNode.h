@@ -17,6 +17,8 @@ public:
     ConstantNode(ValueType value) : Node({}, {&_output}), _output(this, 0, 1), _values({value}) {};
     ConstantNode(std::vector<ValueType> values) : Node({&_output}), _output(this, values.size()), _values(values) {};
 
+    virtual std::string Type() const override { return "Constant"; }
+
     NodeOutput<ValueType> _output;
 
 private:

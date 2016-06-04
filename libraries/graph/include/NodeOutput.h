@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <memory>
+#include <iostream>
 
 class Node;
 
@@ -22,7 +23,9 @@ public:
     OutputType GetType() const { return _type; }
 
 protected:
-    NodeOutputBase(const Node* node, size_t outputIndex, size_t size, OutputType type) : _node(node), _outputIndex(outputIndex), _size(size), _type(type) {};
+    NodeOutputBase(const Node* node, size_t outputIndex, size_t size, OutputType type) : _node(node), _outputIndex(outputIndex), _size(size), _type(type) 
+    {
+    };
 
     template <typename ValueType>
     static OutputType GetTypeCode(); 
