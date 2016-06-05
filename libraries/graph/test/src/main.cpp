@@ -75,22 +75,26 @@ int main(int argc, char** argv)
     auto maxAndArgMax = g.AddNode<ArgMaxNode<double>>(in->output);
     auto minAndArgMin = g.AddNode<ArgMinNode<double>>(in->output);
     auto condition = g.AddNode<ConstantNode<bool>>(true);
-    auto valSelector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, maxAndArgMax->val);
+    auto valSelector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
     auto indexSelector = g.AddNode<ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
 
     // 
-
-
-    std::cout << "\nSelected value:" << std::endl;
-    PrintGraph(g, valSelector);
-    
-    std::cout << "\nSelected index:" << std::endl;
-    PrintGraph(g, indexSelector);
-
-    std::cout << "\nfullGraph:" << std::endl;
+    // Print various subgraphs
+    // 
+    std::cout << "\nFullGraph:" << std::endl;
     PrintGraph(g);
 
+    std::cout << "\nGraph necessary for selected value:" << std::endl;
+    PrintGraph(g, valSelector);
+    
+    std::cout << "\nGraph necessary for selected index:" << std::endl;
+    PrintGraph(g, indexSelector);
+
+    
+    //
+    // Compute outputs of various nodes
+    //
     // Set the input node's current values
     in->SetInput({0.25, 0.5, 0.75});
 

@@ -23,6 +23,7 @@ public:
     // shared_ptr<Node> --- pro: easier to use than weak_ptr, con: wrong
     std::weak_ptr<Node> GetNode(Node::NodeId id);
 
+    // GetNodeOutput -- Computes and returns the computed output value for a node
     template <typename ValueType>
     std::vector<ValueType> GetNodeOutput(const std::shared_ptr<Node>& node, size_t outputIndex) const;
     
@@ -42,7 +43,7 @@ public:
     void Visit(Visitor& visitor, const std::shared_ptr<Node>& outputNode) const;
 
     template <typename Visitor>
-    void Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNode) const;
+    void Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNodes) const;
     
     // TODO: iterators
     
@@ -50,6 +51,9 @@ private:
     // The node map acts both as the main container that holds the shared pointers to nodes, and as the index
     // to look nodes up by id.
     std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _nodeMap;
+
+    template <typename Visitor>
+    void Visit(Visitor& visitor, const std::vector<const Node*>& outputNodePtrs) const;
 };
 
 #include "../tcc/DirectedGraph.tcc"
