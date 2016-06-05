@@ -27,7 +27,7 @@ namespace DirectedGraphImpl
 }
 
 //
-// Factory method
+// Factory method for creating nodes
 //
 template <typename NodeType, typename... Args>
 std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
@@ -40,10 +40,7 @@ std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
 
 //
 // Compute output value
-// There are 2 overloads for `GetNodeOutput`. One takes a typed NodeOutput<T>, and its output type is compile-time enforced. The other
-// takes a node and index into its outputs, and requires the user to specify the output type as a template parameter. We must check
-// that the types are compatible at runtime.
-
+//
 template <typename ValueType>
 std::vector<ValueType> DirectedGraph::GetNodeOutput(const NodeOutput<ValueType>& nodeOutput) const
 {
@@ -108,7 +105,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<std::shared_ptr<No
     Visit(visitor, outputNodePtrs);
 }
 
-// TODO: merge implementations into this function --- use "visit full graph" semantics with outputNodePtrs is empty
+// Real implementation function for `Visit()`
 template <typename Visitor>
 void DirectedGraph::Visit(Visitor& visitor, const std::vector<const Node*>& outputNodePtrs) const
 {
@@ -193,4 +190,3 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<const Node*>& outp
         visitor(*sentinelNode);
     }
 }
-

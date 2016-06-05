@@ -9,7 +9,6 @@
 template <typename ValueType>
 ConstantNode<ValueType>::ConstantNode(ValueType value) : Node({}, {&_output}), _output(this, 0, 1), _values({value})
 {
-    _output.SetOutput(_values);
 };
 
 // Constructor for a vector constant

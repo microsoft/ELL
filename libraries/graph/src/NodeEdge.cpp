@@ -3,7 +3,9 @@
 // 
 
 #include "NodeEdge.h"
-
+//
+// Specializations of GetTypeCode
+//
 template<>
 NodeEdge::OutputType NodeEdge::GetTypeCode<double>() 
 { 

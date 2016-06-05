@@ -7,6 +7,11 @@
 template <typename ValueType>
 std::vector<ValueType> Node::GetOutputValue(size_t outputIndex) const
 {
+    // runtime enforcement of type-matching
+    if(GetOutputType(outputIndex) != NodeEdge::GetTypeCode<ValueType>())
+    {
+        throw std::runtime_error("Incompatible types for GetOutputValue");
+    }
     // Ensure inputs are computed
     for(const auto& input: _inputs)
     {

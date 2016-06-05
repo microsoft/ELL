@@ -18,4 +18,3 @@ void InputNode<ValueType>::ComputeOutput() const
 {
     _output.SetOutput(_inputValues);
 }
-
