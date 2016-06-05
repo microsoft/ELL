@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <memory>
+#include <exception>
 
 template <typename ValueType>
 class ValueSelectorNode : public Node

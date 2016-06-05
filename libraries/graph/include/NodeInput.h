@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <memory>
+#include <cassert>
 
 class Node;
 

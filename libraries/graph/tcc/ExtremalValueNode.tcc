@@ -2,9 +2,6 @@
 // ExtremalValueNode.tcc
 //
 
-#include <iostream>
-#include <algorithm>
-
 template <typename ValueType, bool max>
 ExtremalValueNode<ValueType, max>::ExtremalValueNode(NodeOutput<ValueType> input) : Node({&_input}, {&_val, &_argVal}), _input(input), _val(this, 0, 1), _argVal(this, 1, 1) 
 {

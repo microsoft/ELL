@@ -2,12 +2,7 @@
 // DirectedGraph.tcc
 //
 
-#include "NodeInput.h"
-#include "NodeOutput.h"
-
-#include <unordered_set>
-
-namespace
+namespace DirectedGraphImpl
 {
     // TODO: put this in some utility place
     template <typename ContainerType>
@@ -172,7 +167,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<const Node*>& outp
             if(sentinelNode != nullptr) // sentinelNode is non-null only if we're in visit-whole-graph mode
             {
                 // now add all our children (Note: this part is the only difference between visit-all and visit-active-graph
-                for(const auto& child: Reverse(node->_dependentNodes)) // Visiting the children in reverse order more closely retains the order the features were originally created
+                for(const auto& child: DirectedGraphImpl::Reverse(node->_dependentNodes)) // Visiting the children in reverse order more closely retains the order the features were originally created
                 {
                     // note: this is kind of inefficient --- we're going to push multiple copies of child on the stack. But we'll check if we've visited it already when we pop it off. 
                     // TODO: optimize this if it's a problem
@@ -182,7 +177,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<const Node*>& outp
         }
         else // visit node's inputs
         {
-            for (auto input: Reverse(node->_inputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
+            for (auto input: DirectedGraphImpl::Reverse(node->_inputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
             {
                 stack.push_back(input->GetNode()); // Again, if `NodeInput`s point to multiple nodes, need to iterate here
             }

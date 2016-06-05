@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <memory>
+#include <algorithm>
 
 template <typename ValueType, bool max>
 class ExtremalValueNode: public Node

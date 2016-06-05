@@ -1,13 +1,17 @@
 #pragma once
 
 #include "Node.h"
+#include "NodeInput.h"
+#include "NodeOutput.h"
 
+#include <unordered_set>
 #include <vector>
 #include <memory>
 #include <unordered_map>
 
-// Graph.h
-
+//
+// DirectedGraph
+//
 class DirectedGraph
 {
 public:

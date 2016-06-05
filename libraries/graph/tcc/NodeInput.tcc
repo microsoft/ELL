@@ -4,8 +4,6 @@
 
 #include "Node.h"
 
-#include <cassert>
-
 template <typename ValueType>
 NodeInput::NodeInput(const NodeOutput<ValueType>& output): NodeEdge(output.GetNode(), output.GetOutputIndex(), NodeEdge::GetTypeCode<ValueType>(), output.GetSize()) 
 {
@@ -19,6 +17,6 @@ std::vector<ValueType> NodeInput::GetValue() const
 
     // retrieve cached value from our connected output
     auto result = GetNode()->GetOutputValue<ValueType>(GetOutputIndex());
-//    assert(result.size() == GetSize());
+    assert(result.size() == GetSize());
     return result;
 }

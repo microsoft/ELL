@@ -2,8 +2,6 @@
 // ConstantNode.tcc
 //
 
-#include <iostream>
-
 // Constructor for a scalar constant
 
 // superclass (Node) constructor takes two array arguments: inputs and outputs. These are pointers to our local NodeInput and NodeOutput storage.
