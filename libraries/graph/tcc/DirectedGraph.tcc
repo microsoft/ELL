@@ -52,7 +52,7 @@ std::vector<ValueType> DirectedGraph::GetNodeOutput(const NodeOutput<ValueType>&
         node.ComputeOutput();
     };
 
-    Visit(compute, {nodeOutput.GetNode()});
+    Visit(compute, {nodeOutput.Node()});
 
     return nodeOutput.GetOutput();
 }
@@ -125,13 +125,13 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<const Node*>& outp
     if(stack.size() == 0) // Visit full graph
     {
         // helper function to find a terminal node
-        auto IsLeaf = [](const Node* node) { return node->GetDependents().size() == 0; };
+        auto IsLeaf = [](const Node* node) { return node->GetDependentNodes().size() == 0; };
         // start with some arbitrary node
         const Node* anOutputNode = _nodeMap.begin()->second.get();
         // follow dependency chain until we get an output node
         while(!IsLeaf(anOutputNode))
         {
-            anOutputNode = anOutputNode->GetDependents()[0];
+            anOutputNode = anOutputNode->GetDependentNodes()[0];
         } 
         stack.push_back(anOutputNode);
         sentinelNode = anOutputNode;
@@ -153,7 +153,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<const Node*>& outp
         for (auto input: node->_inputs)
         {
             // Note: If NodeInputs can point to multiple nodes, we'll have to iterate over them here
-            auto inputNode = input->GetNode(); 
+            auto inputNode = input->Node(); 
             canVisit = canVisit && visitedNodes.find(inputNode) != visitedNodes.end();
         }
 
@@ -184,7 +184,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<const Node*>& outp
         {
             for (auto input: DirectedGraphImpl::Reverse(node->_inputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
             {
-                stack.push_back(input->GetNode()); // Again, if `NodeInput`s point to multiple nodes, need to iterate here
+                stack.push_back(input->Node()); // Again, if `NodeInput`s point to multiple nodes, need to iterate here
             }
         }
     }    

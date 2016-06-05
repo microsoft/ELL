@@ -15,7 +15,12 @@ Node::Node(const std::vector<NodeInput*>& inputs, const std::vector<NodeOutputBa
 
 NodeEdge::OutputType Node::GetOutputType(size_t outputIndex) const
 {
-    return _outputs[outputIndex]->GetType();    
+    return _outputs[outputIndex]->Type();    
+}
+
+size_t Node::GetOutputSize(size_t outputIndex) const
+{
+    return _outputs[outputIndex]->Size();
 }
 
 void Node::AddDependent(const Node* dependent) const
@@ -27,6 +32,6 @@ void Node::AddDependencies() const
 {
     for(const auto& input: _inputs)
     {
-        input->GetNode()->AddDependent(this);
+        input->Node()->AddDependent(this);
     }
 }

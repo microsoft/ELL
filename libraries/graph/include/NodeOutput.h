@@ -19,7 +19,7 @@ public:
 
 
 protected:
-    NodeOutputBase(const Node* node, size_t outputIndex, OutputType type, size_t size) : NodeEdge(node, outputIndex, type, size) 
+    NodeOutputBase(const class Node* node, size_t outputIndex, OutputType type, size_t size) : NodeEdge(node, outputIndex, type, size) 
     {
     };
 };
@@ -28,7 +28,7 @@ template <typename ValueType>
 class NodeOutput : public NodeOutputBase
 {
 public:
-    NodeOutput(const Node* node, size_t outputIndex, size_t size) : NodeOutputBase(node, outputIndex, NodeOutputBase::GetTypeCode<ValueType>(), size) {}
+    NodeOutput(const class Node* node, size_t outputIndex, size_t size) : NodeOutputBase(node, outputIndex, NodeOutputBase::GetTypeCode<ValueType>(), size) {}
 
     void SetOutput(std::vector<ValueType> values) const { _cachedOutput = values; }
     std::vector<ValueType> GetOutput() const { return _cachedOutput; }

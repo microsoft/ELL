@@ -27,7 +27,7 @@ void NodePrinter(const Node& node)
     {
         std::cout << (first ? "" : ", ");
         first = false;
-        std::cout << "node_" << input->GetNode()->Id() << "[" << input->GetOutputIndex() << "]";
+        std::cout << "node_" << input->Node()->Id() << "[" << input->OutputIndex() << "]";
         
     }
     std::cout << ")" << std::endl;        
