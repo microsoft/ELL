@@ -3,6 +3,7 @@
 //
 
 #include "Node.h"
+#include "NodeInput.h"
 
 size_t Node::_nextNodeId = 0;
 

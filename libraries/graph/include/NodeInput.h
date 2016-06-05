@@ -24,6 +24,9 @@ public:
 
     NodeEdge::OutputType GetType() const;
     
+    template <typename ValueType>
+    std::vector<ValueType> GetValue() const;
+    
 protected:
     
 private:

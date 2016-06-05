@@ -4,12 +4,13 @@
 // 
 
 #include "NodeOutput.h"
-#include "NodeInput.h"
 
 #include <string>
 #include <memory>
 #include <vector>
 #include <set>
+
+class NodeInput;
 
 //
 // Node: superclass for all node types. 
@@ -25,7 +26,10 @@ public:
     const std::vector<NodeInput*>& GetInputs() const { return _inputs; }
     const std::vector<const Node*>& GetDependents() const { return _dependentNodes; }
 
-    const NodeOutputBase& GetOutput(size_t index) const { return *_outputs[index]; }    
+    const NodeOutputBase& GetOutputHandle(size_t index) const { return *_outputs[index]; }    
+    
+    template <typename ValueType>
+    std::vector<ValueType> GetOutputValue(size_t outputIndex) const;
     
 protected:
     // The constructor for Node is kind of 

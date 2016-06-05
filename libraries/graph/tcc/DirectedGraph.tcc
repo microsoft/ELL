@@ -2,6 +2,8 @@
 // DirectedGraph.tcc
 //
 
+#include "NodeInput.h"
+
 #include <unordered_set>
 
 
@@ -39,6 +41,16 @@ std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
     _nodeMap[result->Id()] = result;
     result->AddDependents();
     return result;
+}
+
+//
+// Compute output value
+//
+template <typename ValueType>
+std::vector<ValueType> DirectedGraph::GetNodeOutput(const std::shared_ptr<Node>& outputNode, size_t outputIndex) const
+{
+    outputNode->ComputeOutput();
+    return outputNode->GetOutputValue<ValueType>(outputIndex);
 }
 
 //

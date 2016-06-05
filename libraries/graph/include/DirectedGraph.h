@@ -23,6 +23,9 @@ public:
     // shared_ptr<Node> --- pro: easier to use than weak_ptr, con: wrong
     std::weak_ptr<Node> GetNode(Node::NodeId id);
 
+    template <typename ValueType>
+    std::vector<ValueType> GetNodeOutput(const std::shared_ptr<Node>& node, size_t outputIndex) const;
+    
     // Visitors
     // The visitor functions visit the nodes in the graph in dependency order. No nodes
     // will be visited until all their inputs have first been visited. 

@@ -8,7 +8,7 @@ InputNode<ValueType>::InputNode(size_t dimension) : Node({}, {&_output}), _outpu
 };
 
 template <typename ValueType>
-InputNode<ValueType>::SetInput(std::vector<ValueType> inputValues)
+void InputNode<ValueType>::SetInput(std::vector<ValueType> inputValues)
 {
     _output.SetOutput(inputValues);
 }

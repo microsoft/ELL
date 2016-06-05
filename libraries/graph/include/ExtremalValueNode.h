@@ -22,6 +22,9 @@ public:
     const NodeOutput<ValueType>& val = _val;
     const NodeOutput<int>& argVal = _argVal;
 
+protected:
+    virtual void ComputeOutput() const override;
+    
 private:
     // My inputs
     NodeInput _input;
