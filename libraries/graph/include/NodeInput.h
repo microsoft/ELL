@@ -36,8 +36,4 @@ private:
     // Later, maybe keep a list of (node*, outputIndex, start, len) tuples    
 };
 
-// If we have a class for crazy swizzled edges, NodeInput should be the class that has that interface 
-// Idea: have NodeInput be base class for NodeOutput (rename appropriately). Then the NodeInput(vector<...>) constructor can be a vector of NodeInputs.
-//       ...then concat and subset operators can return NodeInputs, which is what we'd want them to return 
-
 #include "../tcc/NodeInput.tcc"
