@@ -2,9 +2,10 @@
 // DirectedGraph.tcc
 //
 
+// Just hiding some stuff in this namespace that's unlikely to confict with anything
+// TODO: put this in some utility place
 namespace DirectedGraphImpl
 {
-    // TODO: put this in some utility place
     template <typename ContainerType>
     class ReverseRange
     {
@@ -31,28 +32,17 @@ namespace DirectedGraphImpl
 template <typename NodeType, typename... Args>
 std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
 {
-    // TODO: Store node somewhere
-    auto result = std::make_shared<NodeType>(args...);
-    _nodeMap[result->Id()] = result;
-    result->AddDependents();
-    return result;
+    auto node = std::make_shared<NodeType>(args...);
+    node->AddDependencies();
+    _nodeMap[node->Id()] = node;
+    return node;
 }
 
 //
 // Compute output value
-//
-template <typename ValueType>
-std::vector<ValueType> DirectedGraph::GetNodeOutput(const std::shared_ptr<Node>& outputNode, size_t outputIndex) const
-{
-    auto compute = [](const Node& node)
-    {
-        node.ComputeOutput();
-    };
-    
-    Visit(compute, outputNode);
-
-    return outputNode->GetOutputValue<ValueType>(outputIndex);
-}
+// There are 2 overloads for `GetNodeOutput`. One takes a typed NodeOutput<T>, and its output type is compile-time enforced. The other
+// takes a node and index into its outputs, and requires the user to specify the output type as a template parameter. We must check
+// that the types are compatible at runtime.
 
 template <typename ValueType>
 std::vector<ValueType> DirectedGraph::GetNodeOutput(const NodeOutput<ValueType>& nodeOutput) const
@@ -62,10 +52,27 @@ std::vector<ValueType> DirectedGraph::GetNodeOutput(const NodeOutput<ValueType>&
         node.ComputeOutput();
     };
 
-    // TODO: make version of Visit that doesn't require a shared_ptr
     Visit(compute, {nodeOutput.GetNode()});
 
     return nodeOutput.GetOutput();
+}
+
+template <typename ValueType>
+std::vector<ValueType> DirectedGraph::GetNodeOutput(const std::shared_ptr<Node>& outputNode, size_t outputIndex) const
+{
+    auto compute = [](const Node& node)
+    {
+        node.ComputeOutput();
+    };
+    
+    if(NodeEdge::GetTypeCode<ValueType>() != outputNode->GetOutputType(outputIndex))
+    {
+        throw std::runtime_error("output types don't match");
+    } 
+    
+    Visit(compute, outputNode);
+
+    return outputNode->GetOutputValue<ValueType>(outputIndex);
 }
 
 //
@@ -73,7 +80,6 @@ std::vector<ValueType> DirectedGraph::GetNodeOutput(const NodeOutput<ValueType>&
 //
 
 // Visits the entire graph
-// TODO: merge code for this and active-graph visitor
 template <typename Visitor>
 void DirectedGraph::Visit(Visitor& visitor) const
 {
@@ -81,8 +87,7 @@ void DirectedGraph::Visit(Visitor& visitor) const
     Visit(visitor, emptyVec);
 }
 
-
-// Visits just the parts necessary to compute output
+// Visits just the parts necessary to compute output node
 template <typename Visitor>
 void DirectedGraph::Visit(Visitor& visitor, const std::shared_ptr<Node>& outputNode) const
 {
@@ -90,7 +95,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::shared_ptr<Node>& outputN
     Visit(visitor, {outputNode.get()});
 }
 
-// Visits just the parts necessary to compute outputs
+// Visits just the parts necessary to compute output nodes
 template <typename Visitor>
 void DirectedGraph::Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNodes) const
 {

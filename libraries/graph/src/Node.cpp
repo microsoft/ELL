@@ -13,12 +13,17 @@ Node::Node(const std::vector<NodeInput*>& inputs, const std::vector<NodeOutputBa
     ++_nextNodeId;
 };
 
+NodeEdge::OutputType Node::GetOutputType(size_t outputIndex) const
+{
+    return _outputs[outputIndex]->GetType();    
+}
+
 void Node::AddDependent(const Node* dependent) const
 {
     _dependentNodes.push_back(dependent);
 }
 
-void Node::AddDependents() const
+void Node::AddDependencies() const
 {
     for(const auto& input: _inputs)
     {

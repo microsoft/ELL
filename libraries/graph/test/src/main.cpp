@@ -19,7 +19,7 @@
 //     return { args... };
 // }
 
-void PrintVisitor(const Node& node)
+void NodePrinter(const Node& node)
 {
     bool first = true;
     std::cout << "node_" << node.Id() << " = " << node.NodeType() << "(";
@@ -36,12 +36,12 @@ void PrintVisitor(const Node& node)
 
 void PrintGraph(const DirectedGraph& graph)
 {
-    graph.Visit(PrintVisitor);    
+    graph.Visit(NodePrinter);    
 }
 
 void PrintGraph(const DirectedGraph& graph, const std::shared_ptr<Node>& output)
 {    
-    graph.Visit(PrintVisitor, output);    
+    graph.Visit(NodePrinter, output);    
 }
 
 void CopyGraph(const DirectedGraph& graph1, const std::shared_ptr<Node>& output,  DirectedGraph& graph2)
@@ -56,7 +56,7 @@ void CopyGraph(const DirectedGraph& graph1, const std::shared_ptr<Node>& output,
             auto newInput = oldInput; // copy c'tor 
             // auto newInput = oldInput.CloneButNullifyNodePointers();
             // TODO: replace the _node field in the copy with oldToNewMap[oldInput.GetNode()]
-            // nowInputs.push_back(newInput);
+            // newInputs.push_back(newInput);
         }
         // auto newNode = graph2.MakeNodeByCloningNodeAndReplacingInputs(node, newInputs)
         // oldToNewMap[&node] = newNode;
@@ -68,8 +68,7 @@ void CopyGraph(const DirectedGraph& graph1, const std::shared_ptr<Node>& output,
 
 int main(int argc, char** argv)
 {
-    // Create a graph
-
+    // Create a simple computation graph
     DirectedGraph g;
     auto in = g.AddNode<InputNode<double>>(3);
     auto maxAndArgMax = g.AddNode<ArgMaxNode<double>>(in->output);
@@ -77,7 +76,6 @@ int main(int argc, char** argv)
     auto condition = g.AddNode<ConstantNode<bool>>(true);
     auto valSelector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
     auto indexSelector = g.AddNode<ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
-
 
     // 
     // Print various subgraphs

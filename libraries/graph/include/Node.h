@@ -3,6 +3,7 @@
 // Node
 // 
 
+#include "NodeEdge.h"
 #include "NodeOutput.h"
 
 #include <string>
@@ -25,14 +26,15 @@ public:
     
     const std::vector<NodeInput*>& GetInputs() const { return _inputs; }
     const std::vector<const Node*>& GetDependents() const { return _dependentNodes; }
-
-    const NodeOutputBase& GetOutputHandle(size_t index) const { return *_outputs[index]; }    
     
     template <typename ValueType>
     std::vector<ValueType> GetOutputValue(size_t outputIndex) const;
     
+    NodeEdge::OutputType GetOutputType(size_t outputIndex) const;
+    
 protected:
-    // The constructor for Node is kind of 
+    // The constructor for Node is kind of gross. The arguments (and the _inputs and _outputs members)
+    // should perhaps be vectors of references.
     Node(const std::vector<NodeInput *>& inputs, const std::vector<NodeOutputBase *>& outputs);
 
     virtual void ComputeOutput() const {}; // TODO
@@ -41,7 +43,7 @@ protected:
 private:
     friend class DirectedGraph;
     void AddDependent(const Node* dependent) const;
-    void AddDependents() const;
+    void AddDependencies() const;
 
     static size_t _nextNodeId;
     NodeId _id;    
