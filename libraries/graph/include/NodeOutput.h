@@ -12,7 +12,9 @@
 
 class Node;
 
-// TODO: maybe put type and size into NodeEdge and get rid of NodeOutputBase
+//
+// NodeOutputBase: base class of classes that represent outputs from a function (essentially identical to NodeEdge)
+//
 class NodeOutputBase : public NodeEdge
 {
 public:
@@ -24,6 +26,9 @@ protected:
     };
 };
 
+//
+// NodeOutput<ValueType>: represents an output from a node/function
+//
 template <typename ValueType>
 class NodeOutput : public NodeOutputBase
 {
@@ -32,14 +37,7 @@ public:
 
     void SetOutput(std::vector<ValueType> values) const { _cachedOutput = values; }
     std::vector<ValueType> GetOutput() const { return _cachedOutput; }
-//    NodeOutput<ValueType> operator[](size_t index);
 
 private:
     mutable std::vector<ValueType> _cachedOutput;
 };
-
-// template <typename ValueType>
-// NodeOutput<ValueType> NodeOutput<ValueType>::operator[](size_t index)
-// {
-//     return NodeOutput<ValueType>(1, index);
-// }

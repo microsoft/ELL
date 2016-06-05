@@ -21,17 +21,22 @@ class Node
 public:
     typedef int NodeId;
     
+    // Returns the unique ID for this node
     const NodeId Id() const { return _id; }
-    virtual std::string NodeType() const = 0;
     
+    // Returns the type of this node (e.g., "Input", "Mean")
+    virtual std::string NodeType() const = 0;
+
+    // Returns the input "ports" for this node        
     const std::vector<NodeInput*>& GetInputs() const { return _inputs; }
     
-    // Convenience functions to get properties of outputs
+    // Convenience functions to get various properties of the outputs
     template <typename ValueType>
     std::vector<ValueType> GetOutputValue(size_t outputIndex) const;
     NodeEdge::OutputType GetOutputType(size_t outputIndex) const;
     size_t GetOutputSize(size_t outputIndex) const;
-        
+
+    // Get all nodes that depend (directly) on us        
     const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
     
 protected:

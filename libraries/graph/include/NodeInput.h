@@ -12,19 +12,22 @@
 
 class Node;
 
+//
+// NodeInput: each node/function stores a list of NodeInput objects that represent the inputs to the computation
+//
 class NodeInput : public NodeEdge
 {
 public:
+    // constructor --- takes the output that we take our value from
     template <typename ValueType>
     NodeInput(const NodeOutput<ValueType>& output);
 
     // "concat" version
     // NodeInput(const std::vector<NodeOutput<ValueType>>& outputs);
-    
+
+    // returns the (already-computed) output value corresponding to this input    
     template <typename ValueType>
     std::vector<ValueType> GetValue() const;
-    
-protected:
     
 private:
     // optional offset, size

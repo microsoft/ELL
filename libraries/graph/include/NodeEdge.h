@@ -17,9 +17,16 @@ class NodeEdge
 public:
     enum class OutputType { None, Real, Integer, Categorical, Boolean };
 
+    // The node the output port connected to this edge belongs to
     const class Node* Node() const { return _node; }
+    
+    // The index of the output port within the node
     size_t OutputIndex() const { return _outputIndex; }
+    
+    // The datatype of the output
     OutputType Type() const { return _type; }
+    
+    // The dimensionality of the output
     size_t Size() const { return _size; } // dimension
 
     // `GetTypeCode` maps from C++ type to OutputType enum
