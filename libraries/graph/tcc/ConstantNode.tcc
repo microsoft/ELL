@@ -2,6 +2,8 @@
 // ConstantNode.tcc
 //
 
+#include <iostream>
+
 // Constructor for a scalar constant
 
 // superclass (Node) constructor takes two array arguments: inputs and outputs. These are pointers to our local NodeInput and NodeOutput storage.
@@ -16,5 +18,10 @@ ConstantNode<ValueType>::ConstantNode(ValueType value) : Node({}, {&_output}), _
 template <typename ValueType>
 ConstantNode<ValueType>::ConstantNode(std::vector<ValueType> values) : Node({&_output}), _output(this, values.size()), _values(values)
 {
-    _output.SetOutput(_values);
 };
+
+template <typename ValueType>
+void ConstantNode<ValueType>::ComputeOutput() const
+{
+    _output.SetOutput(_values);
+}

@@ -26,6 +26,9 @@ public:
     template <typename ValueType>
     std::vector<ValueType> GetNodeOutput(const std::shared_ptr<Node>& node, size_t outputIndex) const;
     
+    template <typename ValueType>
+    std::vector<ValueType> GetNodeOutput(const NodeOutput<ValueType>& nodeOutput) const;
+    
     // Visitors
     // The visitor functions visit the nodes in the graph in dependency order. No nodes
     // will be visited until all their inputs have first been visited. 

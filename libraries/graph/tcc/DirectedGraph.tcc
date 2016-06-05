@@ -3,9 +3,9 @@
 //
 
 #include "NodeInput.h"
+#include "NodeOutput.h"
 
 #include <unordered_set>
-
 
 namespace
 {
@@ -49,8 +49,27 @@ std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
 template <typename ValueType>
 std::vector<ValueType> DirectedGraph::GetNodeOutput(const std::shared_ptr<Node>& outputNode, size_t outputIndex) const
 {
-    outputNode->ComputeOutput();
+    auto compute = [](const Node& node)
+    {
+        node.ComputeOutput();
+    };
+    
+    Visit(compute, outputNode);
+
     return outputNode->GetOutputValue<ValueType>(outputIndex);
+}
+
+template <typename ValueType>
+std::vector<ValueType> DirectedGraph::GetNodeOutput(const NodeOutput<ValueType>& nodeOutput) const
+{
+    auto compute = [](const Node& node)
+    {
+        node.ComputeOutput();
+    };
+
+    Visit(compute);
+
+    return nodeOutput.GetOutput();
 }
 
 //

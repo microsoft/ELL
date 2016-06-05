@@ -21,7 +21,11 @@ public:
 
     const NodeOutput<ValueType>& output = _output; // This is a (perhaps too-)clever way to make a read-only property. I don't know if I like it.
 
+protected:
+    virtual void ComputeOutput() const override;
+
 private:
+    std::vector<ValueType> _inputValues;
     NodeOutput<ValueType> _output;
 };
 

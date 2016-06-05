@@ -65,6 +65,7 @@ void CopyGraph(const DirectedGraph& graph1, const std::shared_ptr<Node>& output,
     graph1.Visit(visitor, output);
 }
 
+
 int main(int argc, char** argv)
 {
     // Create a graph
@@ -74,7 +75,7 @@ int main(int argc, char** argv)
     auto maxAndArgMax = g.AddNode<ArgMaxNode<double>>(in->output);
     auto minAndArgMin = g.AddNode<ArgMinNode<double>>(in->output);
     auto condition = g.AddNode<ConstantNode<bool>>(true);
-    auto valSelector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
+    auto valSelector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, maxAndArgMax->val);
     auto indexSelector = g.AddNode<ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
 
@@ -90,6 +91,29 @@ int main(int argc, char** argv)
     std::cout << "\nfullGraph:" << std::endl;
     PrintGraph(g);
 
+    // Set the input node's current values
+    in->SetInput({0.25, 0.5, 0.75});
+
+    std::cout << "\nComputing output of Input node" << std::endl;
+    auto output1 = g.GetNodeOutput(in->output);
+    for(auto x: output1) std::cout << x << "  ";
+    std::cout << std::endl;
+
+    // std::cout << "\nComputing output of ArgMax node" << std::endl;
+    // auto output2 = g.GetNodeOutput(maxAndArgMax->val);
+    // for(auto x: output2) std::cout << x << "  ";
+    // std::cout << std::endl;
+
+    std::cout << "\nComputing output of valSelector node" << std::endl;
+    auto output3 = g.GetNodeOutput(valSelector->output);
+    for(auto x: output3) std::cout << x << "  ";
+    std::cout << std::endl;
+
+    std::cout << "\nComputing output of indexSelector node" << std::endl;
+    auto output4 = g.GetNodeOutput(indexSelector->output);
+    for(auto x: output4) std::cout << x << "  ";
+    std::cout << std::endl;
+    
     // Now copy graph
 
     // g.Compute({ 1,2,3 });

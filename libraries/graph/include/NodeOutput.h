@@ -30,12 +30,12 @@ class NodeOutput : public NodeOutputBase
 public:
     NodeOutput(const Node* node, size_t outputIndex, size_t size) : NodeOutputBase(node, outputIndex, NodeOutputBase::GetTypeCode<ValueType>(), size) {}
 
-    void SetOutput(std::vector<ValueType> values) { _cachedOutput = values; }
-    std::vector<ValueType> GetOutput() { return _cachedOutput; }
+    void SetOutput(std::vector<ValueType> values) const { _cachedOutput = values; }
+    std::vector<ValueType> GetOutput() const { return _cachedOutput; }
 //    NodeOutput<ValueType> operator[](size_t index);
 
 private:
-    std::vector<ValueType> _cachedOutput;
+    mutable std::vector<ValueType> _cachedOutput;
 };
 
 // template <typename ValueType>

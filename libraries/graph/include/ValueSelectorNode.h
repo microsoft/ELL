@@ -21,6 +21,9 @@ public:
     // Output
     const NodeOutput<ValueType>& output = _output;
 
+protected:
+    virtual void ComputeOutput() const override;
+
 private:
     // Inputs
     NodeInput _condition;

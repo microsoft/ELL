@@ -30,10 +30,6 @@ public:
 protected:
     
 private:
-    // keeps info on where the input is coming from (which "port")
-    const Node* _node = nullptr;
-    size_t _outputIndex = 0;
-    
     // optional offset, size
     // maybe a union?
     // Later, maybe keep a list of (node*, outputIndex, start, len) tuples    
