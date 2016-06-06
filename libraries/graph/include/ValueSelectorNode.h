@@ -4,8 +4,8 @@
 // 
 
 #include "Node.h"
-#include "NodeInput.h"
-#include "NodeOutput.h"
+#include "InputPort.h"
+#include "OutputPort.h"
 
 #include <vector>
 #include <memory>
@@ -15,24 +15,24 @@ template <typename ValueType>
 class ValueSelectorNode : public Node
 {
 public:
-    ValueSelectorNode(NodeOutput<bool> condition, NodeOutput<ValueType> value1, NodeOutput<ValueType> value2);
+    ValueSelectorNode(OutputPort<bool> condition, OutputPort<ValueType> value1, OutputPort<ValueType> value2);
 
-    virtual std::string NodeType() const override { return "ValueSelector"; }
+    virtual std::string GetTypeName() const override { return "ValueSelector"; }
 
     // Output
-    const NodeOutput<ValueType>& output = _output;
+    const OutputPort<ValueType>& output = _output;
 
 protected:
-    virtual void ComputeOutput() const override;
+    virtual void Compute() const override;
 
 private:
     // Inputs
-    NodeInput _condition;
-    NodeInput _value1;
-    NodeInput _value2;
+    InputPort _condition;
+    InputPort _value1;
+    InputPort _value2;
     
     // Output
-    NodeOutput<ValueType> _output;
+    OutputPort<ValueType> _output;
 };
 
 #include "../tcc/ValueSelectorNode.tcc"

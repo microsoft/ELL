@@ -4,8 +4,8 @@
 // 
 
 #include "Node.h"
-#include "NodeInput.h"
-#include "NodeOutput.h"
+#include "InputPort.h"
+#include "OutputPort.h"
 
 #include <vector>
 #include <memory>
@@ -15,24 +15,24 @@ template <typename ValueType, bool max>
 class ExtremalValueNode: public Node
 {
 public:
-    ExtremalValueNode(NodeOutput<ValueType> input);
+    ExtremalValueNode(OutputPort<ValueType> input);
 
-    virtual std::string NodeType() const override { return max ? "ArgMax" : "ArgMin"; }
+    virtual std::string GetTypeName() const override { return max ? "ArgMax" : "ArgMin"; }
 
     // read-only properties
-    const NodeOutput<ValueType>& val = _val;
-    const NodeOutput<int>& argVal = _argVal;
+    const OutputPort<ValueType>& val = _val;
+    const OutputPort<int>& argVal = _argVal;
 
 protected:
-    virtual void ComputeOutput() const override;
+    virtual void Compute() const override;
     
 private:
     // My inputs
-    NodeInput _input;
+    InputPort _input;
     
     // My outputs
-    NodeOutput<ValueType> _val;
-    NodeOutput<int> _argVal;
+    OutputPort<ValueType> _val;
+    OutputPort<int> _argVal;
 };
 
 template <typename ValueType>

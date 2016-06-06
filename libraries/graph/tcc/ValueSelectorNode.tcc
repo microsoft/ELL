@@ -3,7 +3,7 @@
 //
 
 template <typename ValueType>
-ValueSelectorNode<ValueType>::ValueSelectorNode(NodeOutput<bool> condition, NodeOutput<ValueType> value1, NodeOutput<ValueType> value2): Node({&_condition, &_value1, &_value2}, {&_output}), _condition(condition), _value1(value1), _value2(value2), _output(this, 0, value1.Size()) 
+ValueSelectorNode<ValueType>::ValueSelectorNode(OutputPort<bool> condition, OutputPort<ValueType> value1, OutputPort<ValueType> value2): Node({&_condition, &_value1, &_value2}, {&_output}), _condition(condition), _value1(value1), _value2(value2), _output(this, 0, value1.Size()) 
 {
     if(condition.Size() != 1)
     {
@@ -16,7 +16,7 @@ ValueSelectorNode<ValueType>::ValueSelectorNode(NodeOutput<bool> condition, Node
 };
 
 template <typename ValueType>
-void ValueSelectorNode<ValueType>::ComputeOutput() const 
+void ValueSelectorNode<ValueType>::Compute() const 
 {
     auto cond = _condition.GetValue<bool>()[0]; // array of size 1
     auto val1 = _value1.GetValue<ValueType>();

@@ -1,7 +1,7 @@
 #pragma once
 
 //
-// NodeEdge
+// Port
 // 
 
 #include <vector>
@@ -10,14 +10,14 @@
 class Node;
 
 //
-// NodeEdge is the common base class for NodeInput and NodeOutput. 
+// Port is the common base class for InputPort and OutputPort. 
 //
-class NodeEdge
+class Port
 {
 public:
     enum class OutputType { None, Real, Integer, Categorical, Boolean };
 
-    // The node the output port connected to this edge belongs to
+    // The node the output port connected to this port belongs to
     const class Node* Node() const { return _node; }
     
     // The index of the output port within the node
@@ -34,7 +34,7 @@ public:
     static OutputType GetTypeCode(); 
 
 protected:
-    NodeEdge(const class Node* node, size_t outputIndex, OutputType type, size_t size): _node(node), _outputIndex(outputIndex), _type(type), _size(size) {}
+    Port(const class Node* node, size_t outputIndex, OutputType type, size_t size): _node(node), _outputIndex(outputIndex), _type(type), _size(size) {}
     
 private:
     // _node and _outputIndex keep info on where the input is coming from (which "port")

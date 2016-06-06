@@ -1,17 +1,17 @@
 //
-// NodeInput.tcc
+// InputPort.tcc
 // 
 
 #include "Node.h"
 
 template <typename ValueType>
-NodeInput::NodeInput(const NodeOutput<ValueType>& output): NodeEdge(output.Node(), output.OutputIndex(), NodeEdge::GetTypeCode<ValueType>(), output.Size()) 
+InputPort::InputPort(const OutputPort<ValueType>& output): Port(output.Node(), output.OutputIndex(), Port::GetTypeCode<ValueType>(), output.Size()) 
 {
-    assert(NodeEdge::GetTypeCode<ValueType>() == output.Type());
+    assert(Port::GetTypeCode<ValueType>() == output.Type());
 }
 
 template <typename ValueType>
-std::vector<ValueType> NodeInput::GetValue() const
+std::vector<ValueType> InputPort::GetValue() const
 {
     assert(Node() != nullptr);
 

@@ -14,7 +14,7 @@ void InputNode<ValueType>::SetInput(std::vector<ValueType> inputValues)
 }
 
 template <typename ValueType>
-void InputNode<ValueType>::ComputeOutput() const
+void InputNode<ValueType>::Compute() const
 {
     _output.SetOutput(_inputValues);
 }

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Node.h"
-#include "NodeInput.h"
-#include "NodeOutput.h"
+#include "InputPort.h"
+#include "OutputPort.h"
 
 #include <unordered_set>
 #include <vector>
@@ -29,14 +29,14 @@ public:
     std::weak_ptr<Node> GetNode(Node::NodeId id);
 
     // `GetNodeOutput` -- Computes and returns the computed output value for a node
-    // There are 2 overloads for `GetNodeOutput`. One takes a typed NodeOutput<T>, and its output type is compile-time enforced. The other
+    // There are 2 overloads for `GetNodeOutput`. One takes a typed OutputPort<T>, and its output type is compile-time enforced. The other
     // takes a node and index into its outputs, and requires the user to specify the output type as a template parameter. We must check
     // that the types are compatible at runtime.
     template <typename ValueType>
     std::vector<ValueType> GetNodeOutput(const std::shared_ptr<Node>& node, size_t outputIndex) const;
     
     template <typename ValueType>
-    std::vector<ValueType> GetNodeOutput(const NodeOutput<ValueType>& nodeOutput) const;
+    std::vector<ValueType> GetNodeOutput(const OutputPort<ValueType>& OutputPort) const;
     
     // Visitors
     // The visitor functions visit the nodes in the graph in dependency order. No nodes

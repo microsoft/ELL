@@ -3,17 +3,17 @@
 //
 
 #include "Node.h"
-#include "NodeInput.h"
+#include "InputPort.h"
 
 size_t Node::_nextNodeId = 0;
 
-Node::Node(const std::vector<NodeInput*>& inputs, const std::vector<NodeOutputBase*>& outputs) : _inputs(inputs), _outputs(outputs)
+Node::Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs) : _inputs(inputs), _outputs(outputs)
 {
     _id = _nextNodeId; // Warning: now node creation isn't threadsafe
     ++_nextNodeId;
 };
 
-NodeEdge::OutputType Node::GetOutputType(size_t outputIndex) const
+Port::OutputType Node::GetOutputType(size_t outputIndex) const
 {
     return _outputs[outputIndex]->Type();    
 }

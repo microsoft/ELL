@@ -42,16 +42,16 @@ std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
 // Compute output value
 //
 template <typename ValueType>
-std::vector<ValueType> DirectedGraph::GetNodeOutput(const NodeOutput<ValueType>& nodeOutput) const
+std::vector<ValueType> DirectedGraph::GetNodeOutput(const OutputPort<ValueType>& OutputPort) const
 {
     auto compute = [](const Node& node)
     {
-        node.ComputeOutput();
+        node.Compute();
     };
 
-    Visit(compute, {nodeOutput.Node()});
+    Visit(compute, {OutputPort.Node()});
 
-    return nodeOutput.GetOutput();
+    return OutputPort.GetOutput();
 }
 
 template <typename ValueType>
@@ -59,10 +59,10 @@ std::vector<ValueType> DirectedGraph::GetNodeOutput(const std::shared_ptr<Node>&
 {
     auto compute = [](const Node& node)
     {
-        node.ComputeOutput();
+        node.Compute();
     };
     
-    if(NodeEdge::GetTypeCode<ValueType>() != outputNode->GetOutputType(outputIndex))
+    if(Port::GetTypeCode<ValueType>() != outputNode->GetOutputType(outputIndex))
     {
         throw std::runtime_error("output types don't match");
     } 
@@ -149,7 +149,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<const Node*>& outp
         bool canVisit = true;
         for (auto input: node->_inputs)
         {
-            // Note: If NodeInputs can point to multiple nodes, we'll have to iterate over them here
+            // Note: If InputPorts can point to multiple nodes, we'll have to iterate over them here
             auto inputNode = input->Node(); 
             canVisit = canVisit && visitedNodes.find(inputNode) != visitedNodes.end();
         }
@@ -181,7 +181,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<const Node*>& outp
         {
             for (auto input: DirectedGraphImpl::Reverse(node->_inputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
             {
-                stack.push_back(input->Node()); // Again, if `NodeInput`s point to multiple nodes, need to iterate here
+                stack.push_back(input->Node()); // Again, if `InputPort`s point to multiple nodes, need to iterate here
             }
         }
     }    

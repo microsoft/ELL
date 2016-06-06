@@ -14,14 +14,14 @@ endif()
 
 set (SRC src/DirectedGraph.cpp
          src/Node.cpp
-         src/NodeEdge.cpp
+         src/Port.cpp
 )
 
 set (INCLUDE include/DirectedGraph.h
              include/Node.h
-             include/NodeEdge.h
-             include/NodeInput.h
-             include/NodeOutput.h
+             include/Port.h
+             include/InputPort.h
+             include/OutputPort.h
              include/ConstantNode.h
              include/InputNode.h
              include/ExtremalValueNode.h
@@ -29,7 +29,7 @@ set (INCLUDE include/DirectedGraph.h
 )
 
 set (TCC tcc/Node.tcc
-         tcc/NodeInput.tcc
+         tcc/InputPort.tcc
          tcc/DirectedGraph.tcc
          tcc/ConstantNode.tcc
          tcc/InputNode.tcc

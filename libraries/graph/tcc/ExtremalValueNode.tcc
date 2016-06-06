@@ -3,12 +3,12 @@
 //
 
 template <typename ValueType, bool max>
-ExtremalValueNode<ValueType, max>::ExtremalValueNode(NodeOutput<ValueType> input) : Node({&_input}, {&_val, &_argVal}), _input(input), _val(this, 0, 1), _argVal(this, 1, 1) 
+ExtremalValueNode<ValueType, max>::ExtremalValueNode(OutputPort<ValueType> input) : Node({&_input}, {&_val, &_argVal}), _input(input), _val(this, 0, 1), _argVal(this, 1, 1) 
 {    
 };
 
 template <typename ValueType, bool max>
-void ExtremalValueNode<ValueType, max>::ComputeOutput() const 
+void ExtremalValueNode<ValueType, max>::Compute() const 
 {
     auto inputValues = _input.GetValue<ValueType>();
     decltype(std::max_element(inputValues.begin(), inputValues.end())) result;    

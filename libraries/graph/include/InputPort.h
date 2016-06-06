@@ -1,10 +1,10 @@
 #pragma once
 
 //
-// NodeInput
+// InputPort
 // 
-#include "NodeEdge.h"
-#include "NodeOutput.h"
+#include "Port.h"
+#include "OutputPort.h"
 
 #include <vector>
 #include <memory>
@@ -13,17 +13,17 @@
 class Node;
 
 //
-// NodeInput: each node/function stores a list of NodeInput objects that represent the inputs to the computation
+// InputPort: each node/function stores a list of InputPort objects that represent the inputs to the computation
 //
-class NodeInput : public NodeEdge
+class InputPort : public Port
 {
 public:
     // constructor --- takes the output that we take our value from
     template <typename ValueType>
-    NodeInput(const NodeOutput<ValueType>& output);
+    InputPort(const OutputPort<ValueType>& output);
 
     // "concat" version
-    // NodeInput(const std::vector<NodeOutput<ValueType>>& outputs);
+    // InputPort(const std::vector<OutputPort<ValueType>>& outputs);
 
     // returns the (already-computed) output value corresponding to this input    
     template <typename ValueType>
@@ -36,8 +36,8 @@ private:
 };
 
 // TODO: if we want to allow functions/nodes to gather values from arbitrary collections of output elements, then
-//       we'll probablay want to make NodeInput not be a subclass of NodeEdge, but for it to contain a vector of
+//       we'll probablay want to make InputPort not be a subclass of Port, but for it to contain a vector of
 //       (Node*, outputIndex, start, len) items.
 //       We'll have to replace `GetNode()` with `GetNodes()` and maybe just remove `OutputIndex()`.
 
-#include "../tcc/NodeInput.tcc"
+#include "../tcc/InputPort.tcc"

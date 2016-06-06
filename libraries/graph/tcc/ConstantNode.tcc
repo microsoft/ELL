@@ -4,7 +4,7 @@
 
 // Constructor for a scalar constant
 
-// superclass (Node) constructor takes two array arguments: inputs and outputs. These are pointers to our local NodeInput and NodeOutput storage.
+// superclass (Node) constructor takes two array arguments: inputs and outputs. These are pointers to our local InputPort and OutputPort storage.
 // I know, kind of gross. 
 template <typename ValueType>
 ConstantNode<ValueType>::ConstantNode(ValueType value) : Node({}, {&_output}), _output(this, 0, 1), _values({value})
@@ -18,7 +18,7 @@ ConstantNode<ValueType>::ConstantNode(std::vector<ValueType> values) : Node({&_o
 };
 
 template <typename ValueType>
-void ConstantNode<ValueType>::ComputeOutput() const
+void ConstantNode<ValueType>::Compute() const
 {
     _output.SetOutput(_values);
 }

@@ -4,7 +4,7 @@
 // 
 
 #include "Node.h"
-#include "NodeOutput.h"
+#include "OutputPort.h"
 
 #include <vector>
 #include <memory>
@@ -17,16 +17,16 @@ public:
     InputNode(size_t dimension);
     void SetInput(std::vector<ValueType> inputValues);
     
-    virtual std::string NodeType() const override { return "Input"; }
+    virtual std::string GetTypeName() const override { return "Input"; }
 
-    const NodeOutput<ValueType>& output = _output; // This is a (perhaps too-)clever way to make a read-only property. I don't know if I like it.
+    const OutputPort<ValueType>& output = _output;
 
 protected:
-    virtual void ComputeOutput() const override;
+    virtual void Compute() const override;
 
 private:
     std::vector<ValueType> _inputValues;
-    NodeOutput<ValueType> _output;
+    OutputPort<ValueType> _output;
 };
 
 #include "../tcc/InputNode.tcc"

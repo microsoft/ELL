@@ -7,8 +7,8 @@
 #include "ExtremalValueNode.h"
 #include "ConstantNode.h"
 #include "InputNode.h"
-#include "NodeInput.h"
-#include "NodeOutput.h"
+#include "InputPort.h"
+#include "OutputPort.h"
 
 // testing
 #include "testing.h"
@@ -27,7 +27,7 @@
 void NodePrinter(const Node& node)
 {
     bool first = true;
-    std::cout << "node_" << node.Id() << " = " << node.NodeType() << "(";
+    std::cout << "node_" << node.Id() << " = " << node.GetTypeName() << "(";
     for(const auto& input: node.GetInputs())
     {
         std::cout << (first ? "" : ", ");
@@ -55,7 +55,7 @@ void CopyGraph(const DirectedGraph& graph1, const std::shared_ptr<Node>& output,
     auto visitor = [&graph1, &graph2, &oldToNewMap](const Node& node)
     {
         auto inputs = node.GetInputs();
-        std::vector<NodeInput> newInputs;
+        std::vector<InputPort> newInputs;
         for(const auto& oldInput: inputs) 
         {
             auto newInput = oldInput; // copy c'tor 
