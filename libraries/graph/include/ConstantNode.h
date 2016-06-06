@@ -33,8 +33,7 @@ protected:
     virtual void Compute() const override;
 
 private:
-    std::vector<ValueType> _values;
-    
+    std::vector<ValueType> _values;    
     OutputPort<ValueType> _output;
 };
 

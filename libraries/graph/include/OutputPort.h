@@ -13,12 +13,11 @@
 class Node;
 
 //
-// OutputPortBase: base class of classes that represent outputs from a function (essentially identical to Port)
+// OutputPortBase: base for classes that represent outputs from a function (essentially identical to Port)
 //
 class OutputPortBase : public Port
 {
 public:
-
 
 protected:
     OutputPortBase(const class Node* node, size_t outputIndex, OutputType type, size_t size) : Port(node, outputIndex, type, size) 
