@@ -50,11 +50,37 @@ namespace evaluators
     template<typename PredictorType, typename ...AggregatorTypes>
     double Evaluator<PredictorType, AggregatorTypes...>::GetGoodness() const
     {
-        if (_valueTuples.size() == 0)
+        if (_values.size() == 0)
         {
             return 0.0;
         }
-        return std::get<0>(_valueTuples.back()).GetGoodness();
+        return _values.back()[0][0];
+    }
+
+    template<typename T>
+    void PrintVector(std::ostream& os, const std::vector<T>& v)
+    {
+        if(v.size() == 0) return;
+
+        os << v[0];
+        for(uint64_t j = 1; j<v.size(); ++j)
+        {
+            os << '\t' << v[j];
+        }
+    }
+
+    template<typename T>
+    std::vector<T> FlattenJaggedVector(const std::vector<std::vector<T>>& v)
+    {
+        std::vector<T> concat;
+        auto iter = v.cbegin();
+        auto end = v.end();
+        while(iter != end)
+        {
+            concat.insert(concat.end(), iter->cbegin(), iter->cend());
+            ++iter;
+        }
+        return concat;
     }
 
     template<typename PredictorType, typename... AggregatorTypes>
@@ -62,7 +88,15 @@ namespace evaluators
     {
         auto originalPrecision = os.precision(6);
         auto originalFlags = os.setf(std::ios::fixed);
-        PrintDispatch(os, std::make_index_sequence<sizeof...(AggregatorTypes)>());
+     
+        PrintVector(os, FlattenJaggedVector(GetValueNames()));
+
+        for(const auto& values : _values)
+        {
+            os << std::endl;
+            PrintVector(os, FlattenJaggedVector(values));
+        }
+        
         os.setf(originalFlags);
         os.precision(originalPrecision);
     }
@@ -98,52 +132,21 @@ namespace evaluators
     template<std::size_t ...Sequence>
     void Evaluator<PredictorType, AggregatorTypes...>::Aggregate(std::index_sequence<Sequence...>)
     {
-        // Call X.GetAndReset() for each X in _aggregatorTuple
-        auto valueTuple = std::make_tuple(std::get<Sequence>(_aggregatorTuple).GetAndReset()...);
-        _valueTuples.push_back(std::move(valueTuple));
+        // Call X.GetAndReset().GetAndReset() for each X in _aggregatorTuple
+        _values.push_back({std::get<Sequence>(_aggregatorTuple).GetAndReset().GetValues()...});
     }
 
-    template<typename T>
-    void printVector(std::ostream& os, const std::vector<T>& v)
+    template<typename PredictorType, typename... AggregatorTypes>
+    std::vector<std::vector<std::string>> Evaluator<PredictorType, AggregatorTypes...>::GetValueNames() const
     {
-        if(v.size() == 0) return;
-
-        os << v[0];
-        for(uint64_t j = 1; j<v.size(); ++j)
-        {
-            os << '\t' << v[j];
-        }
+        return DispatchGetValueNames(std::make_index_sequence<sizeof...(AggregatorTypes)>());
     }
-
 
     template<typename PredictorType, typename... AggregatorTypes>
     template<std::size_t ...Sequence>
-    void Evaluator<PredictorType, AggregatorTypes...>::PrintDispatch(std::ostream& os, std::index_sequence<Sequence...>) const
+    std::vector<std::vector<std::string>> Evaluator<PredictorType, AggregatorTypes...>::DispatchGetValueNames(std::index_sequence<Sequence...>) const
     {
-        // print header
-        std::vector<std::vector<std::string>> header {std::get<Sequence>(_aggregatorTuple).GetValueNames()...};
-
-        printVector(os, header[0]);
-        for(uint64_t i = 1; i<header.size(); ++i)
-        {
-            os << '\t';
-            printVector(os, header[i]);
-        }
-        os << std::endl;
-
-        for(const auto& valueTuple : _valueTuples)
-        {
-            // Call X.ToString() for each X in valueTuple
-            std::vector<std::vector<double>> values {std::get<Sequence>(valueTuple).GetValues()...};
-
-            printVector(os, values[0]);
-            for(uint64_t i = 1; i<values.size(); ++i)
-            {
-                os << '\t';
-                printVector(os, values[i]);
-            }
-            os << std::endl;
-        }
+        return {std::get<Sequence>(_aggregatorTuple).GetValueNames()...};
     }
 
     template<typename PredictorType, typename... AggregatorTypes>

@@ -78,6 +78,17 @@ namespace evaluators
         /// <returns> The goodness of the most recent evaluation. </returns>
         virtual double GetGoodness() const override;
 
+        /// <summary> Returns a vector of names that describe the evaluation values represented in this Evaluator. </summary>
+        ///
+        /// <returns> A vector of names. </returns>
+        std::vector<std::vector<std::string>> GetValueNames() const;
+
+        /// <summary> Returns a constant reference to a datastructure V, where V[i][j][k] is the k'th value
+        /// produced by the j'th aggregator on the i'th evaluation. </summary>
+        ///
+        /// <returns> A reference to the evaluation values. </returns>
+        const std::vector<std::vector<std::vector<double>>>&  GetValues() const { return _values; }
+
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] The output stream. </param>
@@ -86,21 +97,21 @@ namespace evaluators
     protected:
         void EvaluateZero();
 
-        template<std::size_t ...Is>
-        void DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Is...>);
+        template<std::size_t ...Sequence>
+        void DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Sequence...>);
 
-        template<std::size_t ...Is>
-        void Aggregate(std::index_sequence<Is...>);
+        template<std::size_t ...Sequence>
+        void Aggregate(std::index_sequence<Sequence...>);
 
-        template<std::size_t ...Is>
-        void PrintDispatch(std::ostream& os, std::index_sequence<Is...>) const;
+        template<std::size_t ...Sequence>
+        std::vector<std::vector<std::string>> DispatchGetValueNames(std::index_sequence<Sequence...>) const;
 
         // member variables
         dataset::GenericRowDataset _rowDataset;
         EvaluatorParameters _evaluatorParameters;
         uint64_t _evaluateCounter = 0;
         typename std::tuple<AggregatorTypes...> _aggregatorTuple;
-        std::vector<std::tuple<typename AggregatorTypes::Value...>> _valueTuples;
+        std::vector<std::vector<std::vector<double>>> _values;
     };
 
     /// <summary> Makes an evaluator. </summary>

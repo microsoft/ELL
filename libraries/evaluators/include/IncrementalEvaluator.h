@@ -51,6 +51,9 @@ namespace evaluators
     class IncrementalEvaluator : public Evaluator<BasePredictorType, AggregatorTypes...>, public IIncrementalEvaluator<BasePredictorType>
     {
     public:
+
+        using BaseClassType = Evaluator<BasePredictorType, AggregatorTypes...>;
+
         /// <summary> Constructs an instance of IncrementalEvaluator with a given dataset and given aggregators. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the evaluation set. </param>
