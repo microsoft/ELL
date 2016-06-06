@@ -37,7 +37,6 @@ set (TCC tcc/Node.tcc
          tcc/ValueSelectorNode.tcc
 )
 
-
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
@@ -66,6 +65,7 @@ include_directories(../testing/include)
 include_directories(test/include)
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
+
 target_link_libraries(${TEST_NAME} graph)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")

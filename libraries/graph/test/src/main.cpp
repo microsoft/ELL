@@ -10,6 +10,11 @@
 #include "NodeInput.h"
 #include "NodeOutput.h"
 
+// testing
+#include "testing.h"
+
+
+// stl
 #include <iostream>
 #include <unordered_map>
 
@@ -66,7 +71,7 @@ void CopyGraph(const DirectedGraph& graph1, const std::shared_ptr<Node>& output,
 }
 
 
-int main(int argc, char** argv)
+int main()
 {
     // Create a simple computation graph
     DirectedGraph g;
@@ -124,4 +129,6 @@ int main(int argc, char** argv)
     
     //auto map = g.GetMap({ selector.output });
     //auto output2 = map.Compute({ 1,2,3 });
+
+    return 0;
 }
