@@ -57,8 +57,9 @@ set (TEST_NAME ${PROJ_NAME}_test)
 
 PROJECT(${TEST_NAME})
 
-set (TEST_SRC test/src/main.cpp)
-set (TEST_INCLUDE )
+set (TEST_SRC test/src/main.cpp
+              test/src/Graph_test.cpp)
+set (TEST_INCLUDE test/include/Graph_test.h)
 
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})
@@ -68,7 +69,7 @@ include_directories(test/include)
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} graph)
+target_link_libraries(${TEST_NAME} graph testing)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 
