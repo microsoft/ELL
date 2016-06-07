@@ -23,7 +23,7 @@ namespace evaluators
         _aggregates.push_back(Aggregate{ prediction, label, weight });
     }
 
-    AUCAggregator::Value AUCAggregator::GetAndReset()
+    AUCAggregator::Value AUCAggregator::Get() const
     {
         // sort aggregates by prediction
         std::sort(_aggregates.begin(), _aggregates.end());
@@ -55,10 +55,12 @@ namespace evaluators
             value.auc = sumOrderedWeights / sumPositiveWeights / sumNegativeWeights;
         }
         
-        // reset the vector of aggregates
-        _aggregates.resize(0);
-        
         return value;
+    }
+
+    void AUCAggregator::Reset()
+    {
+        _aggregates.resize(0);
     }
 
     bool AUCAggregator::Aggregate::operator<(const Aggregate& other) const

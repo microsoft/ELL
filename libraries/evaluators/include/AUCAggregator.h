@@ -42,10 +42,13 @@ namespace evaluators
         /// <param name="weight"> The weight. </param>
         void Update(double prediction, double label, double weight);
 
-        /// <summary> Returns the current value and resets the aggregator to its initial state. </summary>
+        /// <summary> Returns the current value. </summary>
         ///
         /// <returns> The current value. </returns>
-        Value GetAndReset();
+        Value Get() const;
+
+        /// <summary> Resets the aggregator to its initial state. </summary>
+        void Reset();
 
         /// <summary> Gets a header that describes the values of this aggregator. </summary>
         ///
@@ -63,7 +66,6 @@ namespace evaluators
             bool operator<(const Aggregate& other) const;
         };
 
-        Value _value;
-        std::vector<Aggregate> _aggregates;
+        mutable std::vector<Aggregate> _aggregates; // mutable because Get() const has to sort this vector
     };
 }

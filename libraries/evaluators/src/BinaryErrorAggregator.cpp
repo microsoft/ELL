@@ -52,14 +52,12 @@ namespace evaluators
         }
     }
 
-    BinaryErrorAggregator::Value BinaryErrorAggregator::GetAndReset()
+    void BinaryErrorAggregator::Reset()
     {
-        Value newValue;
-        std::swap(_value, newValue);
-        return newValue;
+        _value = Value();
     }
 
-    std::vector<std::string> BinaryErrorAggregator::GetValueNames() const 
+    std::vector<std::string> BinaryErrorAggregator::GetValueNames() const
     { 
         return {"ErrorRate", "Precision", "Recall", "F1-Score"}; 
     }

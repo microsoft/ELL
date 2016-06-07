@@ -33,11 +33,9 @@ namespace evaluators
     }
 
     template<typename LossFunctionType>
-    typename LossAggregator<LossFunctionType>::Value LossAggregator<LossFunctionType>::GetAndReset()
+    void LossAggregator<LossFunctionType>::Reset()
     {
-        Value newValue;
-        std::swap(_value, newValue);
-        return newValue;
+        _value = Value();
     }
 
     template <typename LossFunctionType>

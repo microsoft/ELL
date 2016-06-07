@@ -54,10 +54,13 @@ namespace evaluators
         /// <param name="weight"> The weight. </param>
         void Update(double prediction, double label, double weight);
 
-        /// <summary> Returns the current value and resets the aggregator to its initial state. </summary>
+        /// <summary> Returns the current value. </summary>
         ///
         /// <returns> The current value. </returns>
-        Value GetAndReset();
+        Value Get() const { return _value; }
+
+        /// <summary> Resets the aggregator to its initial state. </summary>
+        void Reset();
 
         /// <summary> Gets a header that describes the values of this aggregator. </summary>
         ///

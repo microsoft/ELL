@@ -132,8 +132,11 @@ namespace evaluators
     template<std::size_t ...Sequence>
     void Evaluator<PredictorType, AggregatorTypes...>::Aggregate(std::index_sequence<Sequence...>)
     {
-        // Call X.GetAndReset().GetAndReset() for each X in _aggregatorTuple
-        _values.push_back({std::get<Sequence>(_aggregatorTuple).GetAndReset().GetValues()...});
+        // Call X.Get() for each X in _aggregatorTuple
+        _values.push_back({std::get<Sequence>(_aggregatorTuple).Get().GetValues()...});
+
+        // Call X.Reset() for each X in _aggregatorTuple
+        auto dummy = {(std::get<Sequence>(_aggregatorTuple).Reset(), 0)... };
     }
 
     template<typename PredictorType, typename... AggregatorTypes>
