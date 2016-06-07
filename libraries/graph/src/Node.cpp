@@ -5,12 +5,8 @@
 #include "Node.h"
 #include "InputPort.h"
 
-size_t Node::_nextNodeId = 0;
-
-Node::Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs) : _inputs(inputs), _outputs(outputs)
+Node::Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs) : _inputs(inputs), _outputs(outputs), _id(UniqueId())
 {
-    _id = _nextNodeId; // Warning: now node creation isn't threadsafe
-    ++_nextNodeId;
 };
 
 Port::OutputType Node::GetOutputType(size_t outputIndex) const

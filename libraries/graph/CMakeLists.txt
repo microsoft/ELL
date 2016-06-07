@@ -15,6 +15,7 @@ endif()
 set (SRC src/DirectedGraph.cpp
          src/Node.cpp
          src/Port.cpp
+         src/UniqueId.cpp
 )
 
 set (INCLUDE include/DirectedGraph.h
@@ -25,6 +26,7 @@ set (INCLUDE include/DirectedGraph.h
              include/ConstantNode.h
              include/InputNode.h
              include/ExtremalValueNode.h
+             include/UniqueId.h
              include/ValueSelectorNode.h
 )
 

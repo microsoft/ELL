@@ -5,11 +5,13 @@
 
 #include "Port.h"
 #include "OutputPort.h"
+#include "UniqueId.h"
 
 #include <string>
 #include <memory>
 #include <vector>
-#include <set>
+#include <unordered_set>
+#include <unordered_map>
 
 class InputPort;
 
@@ -19,7 +21,7 @@ class InputPort;
 class Node
 {
 public:
-    typedef int NodeId;
+    typedef UniqueId NodeId;
     
     // Returns the unique ID for this node
     const NodeId Id() const { return _id; }
@@ -53,10 +55,11 @@ private:
     void AddDependent(const Node* dependent) const;
     void AddDependencies() const;
 
-    static size_t _nextNodeId;
-    NodeId _id;    
+    NodeId _id;
+
     std::vector<InputPort *> _inputs;
     std::vector<OutputPortBase *> _outputs;
+    std::unordered_map<Port::PortId, OutputPortBase*> _outputs2;
     
     mutable std::vector<const Node *> _dependentNodes;    
 };

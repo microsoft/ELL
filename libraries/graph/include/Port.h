@@ -15,6 +15,7 @@ class Node;
 class Port
 {
 public:
+    typedef int PortId;
     enum class OutputType { None, Real, Integer, Categorical, Boolean };
 
     // The node the output port connected to this port belongs to
@@ -37,9 +38,11 @@ protected:
     Port(const class Node* node, size_t outputIndex, OutputType type, size_t size): _node(node), _outputIndex(outputIndex), _type(type), _size(size) {}
     
 private:
-    // _node and _outputIndex keep info on where the input is coming from (which "port")
+    // _node and _outputIndex keep info on where the input is coming from
     const class Node* _node = nullptr;
     size_t _outputIndex = 0;
+    PortId _outputId;
+    PortId _id; 
     OutputType _type = OutputType::None;
     size_t _size = 0;
 };
