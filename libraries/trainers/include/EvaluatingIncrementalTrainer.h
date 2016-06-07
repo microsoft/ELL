@@ -34,9 +34,7 @@ namespace trainers
         ///
         /// <param name="internalTrainer"> An incremental trainer. </param>
         /// <param name="evaluator"> An evaluator. </param>
-        EvaluatingIncrementalTrainer(
-            std::unique_ptr<InternalTrainerType>&& internalTrainer,
-            std::shared_ptr<EvaluatorType> evaluator);
+        EvaluatingIncrementalTrainer(std::unique_ptr<InternalTrainerType>&& internalTrainer, std::shared_ptr<EvaluatorType> evaluator);
 
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
         ///

@@ -45,9 +45,7 @@ namespace trainers
         ///
         /// <param name="internalTrainer"> An incremental trainer. </param>
         /// <param name="parameters"> Multi-epoch training parameters. </param>
-        MultiEpochIncrementalTrainer(
-            std::unique_ptr<InternalTrainerType>&& internalTrainer, 
-            const MultiEpochIncrementalTrainerParameters& parameters);
+        MultiEpochIncrementalTrainer(std::unique_ptr<InternalTrainerType>&& internalTrainer, const MultiEpochIncrementalTrainerParameters& parameters);
 
         /// <summary> Perform a set of training epochs. </summary>
         ///
