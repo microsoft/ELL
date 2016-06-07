@@ -20,7 +20,7 @@ namespace evaluators
     {
     public:
 
-        struct Value
+        struct Result
         {
             double auc = 0.0;
 
@@ -45,7 +45,7 @@ namespace evaluators
         /// <summary> Returns the current value. </summary>
         ///
         /// <returns> The current value. </returns>
-        Value Get() const;
+        Result GetResult() const;
 
         /// <summary> Resets the aggregator to its initial state. </summary>
         void Reset();

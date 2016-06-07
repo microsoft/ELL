@@ -9,13 +9,13 @@
 namespace evaluators
 {
     template<typename LossFunctionType>
-    std::vector<double> evaluators::LossAggregator<LossFunctionType>::Value::GetValues() const
+    std::vector<double> evaluators::LossAggregator<LossFunctionType>::Result::GetValues() const
     {
         return { GetMeanLoss() };
     }
 
     template<typename LossFunctionType>
-    double evaluators::LossAggregator<LossFunctionType>::Value::GetMeanLoss() const
+    double evaluators::LossAggregator<LossFunctionType>::Result::GetMeanLoss() const
     {
         return sumWeights == 0.0 ? 0.0 : sumWeightedLosses / sumWeights;
     }
@@ -28,14 +28,14 @@ namespace evaluators
     void LossAggregator<LossFunctionType>::Update(double prediction, double label, double weight)
     {
         double loss = _lossFunction.Evaluate(prediction, label);
-        _value.sumWeights += weight;
-        _value.sumWeightedLosses += weight * loss;
+        _result.sumWeights += weight;
+        _result.sumWeightedLosses += weight * loss;
     }
 
     template<typename LossFunctionType>
     void LossAggregator<LossFunctionType>::Reset()
     {
-        _value = Value();
+        _result = Result();
     }
 
     template <typename LossFunctionType>

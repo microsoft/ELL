@@ -23,7 +23,7 @@ namespace evaluators
     {
     public:
 
-        struct Value
+        struct Result
         {
             double sumWeights = 0.0;
             double sumWeightedLosses = 0.0;
@@ -57,7 +57,7 @@ namespace evaluators
         /// <summary> Returns the current value. </summary>
         ///
         /// <returns> The current value. </returns>
-        Value Get() const { return _value; }
+        Result GetResult() const { return _result; }
 
         /// <summary> Resets the aggregator to its initial state. </summary>
         void Reset();
@@ -69,7 +69,7 @@ namespace evaluators
 
     private:
         LossFunctionType _lossFunction;
-        Value _value;
+        Result _result;
     };
 
     template <typename LossFunctionType>

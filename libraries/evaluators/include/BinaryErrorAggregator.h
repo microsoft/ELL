@@ -20,7 +20,7 @@ namespace evaluators
     {
     public:
 
-        struct Value
+        struct Result
         {
             double sumTruePositives = 0.0;
             double sumTrueNegatives = 0.0;
@@ -51,7 +51,7 @@ namespace evaluators
         /// <summary> Returns the current value. </summary>
         ///
         /// <returns> The current value. </returns>
-        Value Get() const { return _value; }
+        Result GetResult() const { return _result; }
 
         /// <summary> Resets the aggregator to its initial state. </summary>
         void Reset();
@@ -62,6 +62,6 @@ namespace evaluators
         std::vector<std::string> GetValueNames() const;
 
     private:
-        Value _value;
+        Result _result;
     };
 }

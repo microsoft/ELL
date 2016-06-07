@@ -10,7 +10,7 @@
 
 namespace evaluators
 {
-    std::vector<double> BinaryErrorAggregator::Value::GetValues() const
+    std::vector<double> BinaryErrorAggregator::Result::GetValues() const
     {
         double precision = sumTruePositives == 0.0 ? 0.0 : sumTruePositives / (sumTruePositives + sumFalsePositives);
         double recall = sumTruePositives == 0.0 ? 0.0 : sumTruePositives / (sumTruePositives + sumFalseNegatives);
@@ -19,7 +19,7 @@ namespace evaluators
         return {GetErrorRate(), precision, recall, f1};
     }
 
-    double BinaryErrorAggregator::Value::GetErrorRate() const
+    double BinaryErrorAggregator::Result::GetErrorRate() const
     {
         double allFalse = sumFalsePositives + sumFalseNegatives;
         double allTrue = sumTruePositives + sumTrueNegatives;
@@ -32,29 +32,29 @@ namespace evaluators
         {
             if (prediction > 0)
             {
-                _value.sumTruePositives += weight;
+                _result.sumTruePositives += weight;
             }
             else
             {
-                _value.sumFalseNegatives += weight;
+                _result.sumFalseNegatives += weight;
             }
         }
         else
         {
             if (prediction >= 0)
             {
-                _value.sumFalsePositives += weight;
+                _result.sumFalsePositives += weight;
             }
             else
             {
-                _value.sumTrueNegatives += weight;
+                _result.sumTrueNegatives += weight;
             }
         }
     }
 
     void BinaryErrorAggregator::Reset()
     {
-        _value = Value();
+        _result = Result();
     }
 
     std::vector<std::string> BinaryErrorAggregator::GetValueNames() const
