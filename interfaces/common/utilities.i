@@ -36,12 +36,13 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 
 %include "SGDIncrementalTrainer_wrap.h"
 
-// This is necessary for us to avoid leaking memory:
-// %template (SupervisedExampleIterator) utilities::AnyIterator<dataset::SupervisedExample<dataset::IDataVector>>;
 
+// This is necessary for us to avoid leaking memory:
+#ifndef SWIGXML
 %template () dataset::SupervisedExample<dataset::IDataVector>;
 %template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
+#endif
 
 // TODO: need to make SWIG aware of utilities::IBinaryClassificationEvaluator<predictors::LinearPredictor>::ExampleIteratorType
 // and that it's the same as dataset::GenericRowDataset::Iterator
