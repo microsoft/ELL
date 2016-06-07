@@ -17,9 +17,11 @@ public:
     InputNode(size_t dimension);
     void SetInput(std::vector<ValueType> inputValues);
     
-    virtual std::string GetTypeName() const override { return "Input"; }
-
     const OutputPort<ValueType>& output = _output;
+
+    // Returns the name for this node class
+    static std::string GetTypeName() { return "Input"; }
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
 protected:
     virtual void Compute() const override;

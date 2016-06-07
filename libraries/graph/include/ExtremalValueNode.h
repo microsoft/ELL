@@ -17,7 +17,9 @@ class ExtremalValueNode: public Node
 public:
     ExtremalValueNode(OutputPort<ValueType> input);
 
-    virtual std::string GetTypeName() const override { return max ? "ArgMax" : "ArgMin"; }
+    // Returns the name for this node class
+    static std::string GetTypeName() { return max ? "ArgMax" : "ArgMin"; }
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     // read-only properties
     const OutputPort<ValueType>& val = _val;

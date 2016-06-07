@@ -17,10 +17,12 @@ class ValueSelectorNode : public Node
 public:
     ValueSelectorNode(OutputPort<bool> condition, OutputPort<ValueType> value1, OutputPort<ValueType> value2);
 
-    virtual std::string GetTypeName() const override { return "ValueSelector"; }
-
     // Output
     const OutputPort<ValueType>& output = _output;
+
+    // Returns the name for this node class
+    static std::string GetTypeName() { return "ValueSelector"; }
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
 protected:
     virtual void Compute() const override;

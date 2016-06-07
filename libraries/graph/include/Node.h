@@ -26,9 +26,6 @@ public:
     // Returns the unique ID for this node
     const NodeId Id() const { return _id; }
     
-    // Returns the type of this node (e.g., "Input", "Mean")
-    virtual std::string GetTypeName() const = 0;
-
     // Returns the input "ports" for this node        
     const std::vector<InputPort*>& GetInputs() const { return _inputs; }
     
@@ -37,6 +34,11 @@ public:
     std::vector<ValueType> GetOutputValue(size_t outputIndex) const;
     Port::OutputType GetOutputType(size_t outputIndex) const;
     size_t GetOutputSize(size_t outputIndex) const;
+
+    /// <summary> Gets the name of this type (for serialization). </summary>
+    ///
+    /// <returns> The name of this type. </returns>
+    virtual std::string GetRuntimeTypeName() const = 0;
 
     // Get all nodes that depend (directly) on us        
     const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }

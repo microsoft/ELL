@@ -29,7 +29,7 @@
 void NodePrinter(const Node& node)
 {
     bool first = true;
-    std::cout << "node_" << node.Id() << " = " << node.GetTypeName() << "(";
+    std::cout << "node_" << node.Id() << " = " << node.GetRuntimeTypeName() << "(";
     for(const auto& input: node.GetInputs())
     {
         std::cout << (first ? "" : ", ");

@@ -24,7 +24,8 @@ public:
     ConstantNode(std::vector<ValueType> values);
 
     // Returns the name for this node class
-    virtual std::string GetTypeName() const override { return "Constant"; }
+    static std::string GetTypeName() { return "Constant"; }
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     // Exposing the output port as a read-only property
     const OutputPort<ValueType>& output = _output;

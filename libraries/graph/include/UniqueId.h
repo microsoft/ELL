@@ -23,6 +23,7 @@ public:
     bool operator!=(const UniqueId& other) const;
 
     friend std::ostream& operator<<(std::ostream& stream, const UniqueId& id) { stream << id._id; return stream; }
+    
 private:
     friend std::hash<UniqueId>;
     size_t _id;
