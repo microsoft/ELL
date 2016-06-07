@@ -40,14 +40,14 @@ set (INCLUDE include/BaggingIncrementalTrainerArguments.h
              include/MapSaveArguments.h
              include/ModelLoadArguments.h
              include/MultiEpochIncrementalTrainerArguments.h
-             include/ParametersGenerator.h
+             include/ParametersEnumerator.h
              include/SGDIncrementalTrainerArguments.h
              include/SortingTreeTrainerArguments.h
              include/TrainerArguments.h
 )
 
 set (TCC tcc/MakeEvaluator.tcc
-         tcc/ParametersGenerator.tcc
+         tcc/ParametersEnumerator.tcc
 )
 
 

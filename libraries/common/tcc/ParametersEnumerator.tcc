@@ -9,18 +9,18 @@
 namespace common
 {
     template<typename ParametersType, typename ...ValueTypes>
-    ParametersGenerator<ParametersType, ValueTypes...>::ParametersGenerator(std::vector<ValueTypes>... valueVectors) :
+    ParametersEnumerator<ParametersType, ValueTypes...>::ParametersEnumerator(std::vector<ValueTypes>... valueVectors) :
         _valueVectorTuple(std::make_tuple(valueVectors...))
     {}
 
     template<typename ParametersType, typename ...ValueTypes>
-    size_t ParametersGenerator<ParametersType, ValueTypes...>::Size() const
+    size_t ParametersEnumerator<ParametersType, ValueTypes...>::Size() const
     {
         return Size(std::make_index_sequence<std::tuple_size<ValueTupleType>::value>());
     }
 
     template<typename ParametersType, typename ...ValueTypes>
-    ParametersType ParametersGenerator<ParametersType, ValueTypes...>::GenerateParameters(size_t index) const
+    ParametersType ParametersEnumerator<ParametersType, ValueTypes...>::GenerateParameters(size_t index) const
     {
         ValueTupleType valueTuple;
         SetValueTuple(valueTuple, index);
@@ -28,7 +28,7 @@ namespace common
     }
 
     template<typename ParametersType, typename ...ValueTypes>
-    std::vector<ParametersType> ParametersGenerator<ParametersType, ValueTypes...>::GenerateParametersVector() const
+    std::vector<ParametersType> ParametersEnumerator<ParametersType, ValueTypes...>::GenerateParametersVector() const
     {
         std::vector<ParametersType> vector;
         auto size = Size();
@@ -41,7 +41,7 @@ namespace common
 
     template<typename ParametersType, typename ...ValueTypes>
     template <size_t Index>
-    void ParametersGenerator<ParametersType, ValueTypes...>::SetValueTuple(ValueTupleType& valueTuple, size_t index) const
+    void ParametersEnumerator<ParametersType, ValueTypes...>::SetValueTuple(ValueTupleType& valueTuple, size_t index) const
     {
         const auto& values = std::get<Index>(_valueVectorTuple);
         std::get<Index>(valueTuple) = values[index % values.size()];
@@ -50,14 +50,14 @@ namespace common
 
     template<typename ParametersType, typename ...ValueTypes>
     template <size_t... Sequence>
-    ParametersType ParametersGenerator<ParametersType, ValueTypes...>::GenerateParameters(const ValueTupleType& valueTuple, std::index_sequence<Sequence...>) const
+    ParametersType ParametersEnumerator<ParametersType, ValueTypes...>::GenerateParameters(const ValueTupleType& valueTuple, std::index_sequence<Sequence...>) const
     {
         return ParametersType{ std::get<Sequence>(valueTuple)... };
     }
 
     template<typename ParametersType, typename ...ValueTypes>
     template <size_t... Sequence>
-    size_t ParametersGenerator<ParametersType, ValueTypes...>::Size(std::index_sequence<Sequence...>) const
+    size_t ParametersEnumerator<ParametersType, ValueTypes...>::Size(std::index_sequence<Sequence...>) const
     {
         auto sizes = {std::get<Sequence>(_valueVectorTuple).size()...};
         size_t totalSize = 0;
@@ -69,8 +69,8 @@ namespace common
     }
 
     template <typename ParametersType, typename... ValueTypes>
-    ParametersGenerator<ParametersType, ValueTypes...> MakeParametersGenerator(std::vector<ValueTypes>... parameterValues)
+    ParametersEnumerator<ParametersType, ValueTypes...> MakeParametersEnumerator(std::vector<ValueTypes>... parameterValues)
     {
-        return ParametersGenerator<ParametersType, ValueTypes...>(parameterValues...);
+        return ParametersEnumerator<ParametersType, ValueTypes...>(parameterValues...);
     }
 }

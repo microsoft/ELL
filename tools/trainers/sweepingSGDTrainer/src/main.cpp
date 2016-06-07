@@ -32,7 +32,7 @@
 #include "LoadModel.h"
 #include "MakeTrainer.h"
 #include "MakeEvaluator.h"
-#include "ParametersGenerator.h"
+#include "ParametersEnumerator.h"
 
 // trainers
 #include "SGDIncrementalTrainer.h"
@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
         evaluators::EvaluatorParameters evaluatorParameters{ multiEpochTrainerArguments.numEpochs, false };
 
         // create trainers
-        auto generator = common::MakeParametersGenerator<trainers::SGDIncrementalTrainerParameters>(regularization);
+        auto generator = common::MakeParametersEnumerator<trainers::SGDIncrementalTrainerParameters>(regularization);
         std::vector<trainers::EvaluatingIncrementalTrainer<PredictorType>> evaluatingTrainers;
         std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators;
         for(uint64_t i = 0; i < regularization.size(); ++i)
