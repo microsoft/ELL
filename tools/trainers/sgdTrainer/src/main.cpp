@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     main.cpp (stochasticGradientDescentTrainer)
+//  File:     main.cpp (sgdTrainer)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,7 +22,7 @@
 #include "SupervisedExample.h"
 
 // common
-#include "sgdIncrementalTrainerArguments.h"
+#include "SGDIncrementalTrainerArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 

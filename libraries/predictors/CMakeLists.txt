@@ -35,6 +35,8 @@ add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
+target_link_libraries(${PROJ_NAME} layers)
+
 #
 # test project
 #

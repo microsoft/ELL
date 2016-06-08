@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <iostream>
 #include <type_traits>
+#include <functional>
 
 namespace linear
 {
