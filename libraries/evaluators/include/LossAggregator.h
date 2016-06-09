@@ -23,20 +23,6 @@ namespace evaluators
     {
     public:
 
-        struct Result
-        {
-            double sumWeights = 0.0;
-            double sumWeightedLosses = 0.0;
-
-            /// <summary> Gets the vector of evaluation values that match the descriptions in GetValueNames(). </summary>
-            ///
-            /// <returns> A vector of evaluation values. </returns>
-            std::vector<double> GetValues() const;
-
-        private:
-            double GetMeanLoss() const;
-        };
-
         /// <summary> Constructs an instance of LossAggregator with a given loss. </summary>
         ///
         /// <param name="lossFunction"> The loss function. </param>
@@ -52,7 +38,7 @@ namespace evaluators
         /// <summary> Returns the current value. </summary>
         ///
         /// <returns> The current value. </returns>
-        Result GetResult() const { return _result; }
+        std::vector<double> GetResult() const;
 
         /// <summary> Resets the aggregator to its initial state. </summary>
         void Reset();
@@ -64,7 +50,8 @@ namespace evaluators
 
     private:
         LossFunctionType _lossFunction;
-        Result _result;
+        double _sumWeights = 0.0;
+        double _sumWeightedLosses = 0.0;
     };
 
     template <typename LossFunctionType>

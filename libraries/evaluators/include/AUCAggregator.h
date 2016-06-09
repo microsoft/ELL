@@ -20,16 +20,6 @@ namespace evaluators
     {
     public:
 
-        struct Result
-        {
-            double auc = 0.0;
-
-            /// <summary> Gets the vector of evaluation values that match the descriptions in GetValueNames(). </summary>
-            ///
-            /// <returns> A vector of evaluation values. </returns>
-            std::vector<double> GetValues() const;
-        };
-
         /// <summary> Updates this aggregator. </summary>
         ///
         /// <param name="prediction"> The real valued prediction. </param>
@@ -40,7 +30,7 @@ namespace evaluators
         /// <summary> Returns the current value. </summary>
         ///
         /// <returns> The current value. </returns>
-        Result GetResult() const;
+        std::vector<double> GetResult() const;
 
         /// <summary> Resets the aggregator to its initial state. </summary>
         void Reset();

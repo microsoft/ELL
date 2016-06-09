@@ -133,7 +133,7 @@ namespace evaluators
     void Evaluator<PredictorType, AggregatorTypes...>::Aggregate(std::index_sequence<Sequence...>)
     {
         // Call X.GetResult() for each X in _aggregatorTuple
-        _values.push_back({std::get<Sequence>(_aggregatorTuple).GetResult().GetValues()...});
+        _values.push_back({std::get<Sequence>(_aggregatorTuple).GetResult()...});
 
         // Call X.Reset() for each X in _aggregatorTuple
         auto dummy = {(std::get<Sequence>(_aggregatorTuple).Reset(), 0)... };

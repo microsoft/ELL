@@ -20,22 +20,6 @@ namespace evaluators
     {
     public:
 
-        struct Result
-        {
-            double sumTruePositives = 0.0;
-            double sumTrueNegatives = 0.0;
-            double sumFalsePositives = 0.0;
-            double sumFalseNegatives = 0.0;
-
-            /// <summary> Gets the vector of evaluation values that match the descriptions in GetValueNames(). </summary>
-            ///
-            /// <returns> A vector of evaluation values. </returns>
-            std::vector<double> GetValues() const;
-
-        private:
-            double GetErrorRate() const;
-        };
-
         /// <summary> Updates this aggregator. </summary>
         ///
         /// <param name="prediction"> The real valued prediction. </param>
@@ -46,7 +30,7 @@ namespace evaluators
         /// <summary> Returns the current value. </summary>
         ///
         /// <returns> The current value. </returns>
-        Result GetResult() const { return _result; }
+        std::vector<double> GetResult() const;
 
         /// <summary> Resets the aggregator to its initial state. </summary>
         void Reset();
@@ -57,6 +41,9 @@ namespace evaluators
         std::vector<std::string> GetValueNames() const;
 
     private:
-        Result _result;
+        double _sumTruePositives = 0.0;
+        double _sumTrueNegatives = 0.0;
+        double _sumFalsePositives = 0.0;
+        double _sumFalseNegatives = 0.0;
     };
 }

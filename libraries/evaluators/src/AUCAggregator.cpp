@@ -13,17 +13,12 @@
 
 namespace evaluators
 {
-    std::vector<double> AUCAggregator::Result::GetValues() const
-    {
-        return {auc};
-    }
-
     void AUCAggregator::Update(double prediction, double label, double weight)
     {
         _aggregates.push_back(Aggregate{ prediction, label, weight });
     }
 
-    AUCAggregator::Result AUCAggregator::GetResult() const
+    std::vector<double> AUCAggregator::GetResult() const
     {
         // sort aggregates by prediction
         std::sort(_aggregates.begin(), _aggregates.end());
@@ -49,13 +44,13 @@ namespace evaluators
         }
 
         // calcluate the AUC
-        Result result;
+        double auc = 0.0;
         if (sumPositiveWeights > 0 && sumNegativeWeights > 0)
         {
-            result.auc = sumOrderedWeights / sumPositiveWeights / sumNegativeWeights;
+            auc = sumOrderedWeights / sumPositiveWeights / sumNegativeWeights;
         }
         
-        return result;
+        return { auc };
     }
 
     void AUCAggregator::Reset()
