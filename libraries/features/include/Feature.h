@@ -99,7 +99,7 @@ namespace features
 
     private:
         friend class FeatureSet;
-        static std::unique_ptr<Feature> FromDescription(const std::vector<std::string>& description, FeatureMap& existingFeatureMap);
+        static std::unique_ptr<Feature> FromDescription(const std::vector<std::string>& description, FeatureMap& previousFeatures);
 
         mutable bool _isDirty = true;
         std::vector<Feature*> _dependents; // children

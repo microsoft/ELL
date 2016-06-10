@@ -28,6 +28,11 @@ namespace features
         /// <param name="size"> The dimensionality of the input </param>
         InputFeature(uint64_t size) : Feature({}) { _outputDimension = size; }
                 
+        /// <summary> Constructor </summary>
+        /// <param name="id"> The id to use for this feature </param>
+        /// <param name="size"> The dimensionality of the input </param>
+        InputFeature(const std::string& id, uint64_t size) : Feature(id, {}) { _outputDimension = size; }
+                
         /// <summary> Sets the current value of the input </summary>
         void SetValue(std::vector<double> val);
 

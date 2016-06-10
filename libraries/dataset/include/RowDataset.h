@@ -81,7 +81,7 @@ namespace dataset
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
         /// <param name="example"> The example. </param>
-        void AddExample(ExampleType&& example);
+        void AddExample(ExampleType example);
 
         /// <summary> Erases all of the examples in the RowDataset. </summary>
         void Reset();

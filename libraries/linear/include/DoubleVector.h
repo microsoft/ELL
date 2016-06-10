@@ -136,6 +136,11 @@ namespace linear
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
 
+        /// <summary> Appends a value to the end of the the vector. </summary>
+        ///
+        /// <param name="value"> The value to append. </param>
+        void Append(double value) { _data.push_back(value); }
+
     private:
         std::vector<double> _data;
     };

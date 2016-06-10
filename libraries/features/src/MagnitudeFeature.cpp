@@ -62,12 +62,23 @@ namespace features
 
     std::unique_ptr<Feature> MagnitudeFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
-        Feature* inputFeature = previousFeatures[params[2]];
-        if (inputFeature == nullptr)
+        // TODO: find a way to do this boilerplate juse once. 
+        // Maybe have a function `GetInputFeatures(params)` that looks up the input features and returns them
+        // but wait: the number of input features is specific to the feature type. Maybe `GetInputFeatures(params, numFeatures)`, then...
+
+        assert(params.size() == 3);        
+        auto featureId = params[0];        
+        
+        auto it = previousFeatures.find(params[2]);
+        if(it != previousFeatures.end())
         {
-            std::string error_msg = std::string("Error deserializing feature description: unknown input feature ") + params[2];
-            throw std::runtime_error(error_msg);
+            auto inputFeature = it->second;
+            return std::make_unique<MagnitudeFeature>(featureId, inputFeature);            
         }
-        return std::make_unique<MagnitudeFeature>(inputFeature);
+        else
+        {
+            std::string error_msg = std::string("Error deserializing feature description: unknown input feature '") + params[2] + "'";
+            throw std::runtime_error(error_msg);            
+        }
     }
 }

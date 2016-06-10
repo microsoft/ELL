@@ -46,7 +46,8 @@ namespace features
     std::unique_ptr<Feature> InputFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
         assert(params.size() == 3);
+        auto featureId = params[0];
         uint64_t size = ParseInt(params[2]);
-        return std::make_unique<InputFeature>(size);
+        return std::make_unique<InputFeature>(featureId, size);
     }    
 }
