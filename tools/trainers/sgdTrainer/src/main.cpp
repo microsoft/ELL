@@ -11,7 +11,6 @@
 #include "OutputStreamImpostor.h" 
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
-#include "BinaryClassificationEvaluator.h"
 
 // layers
 #include "Map.h"
@@ -28,6 +27,7 @@
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 
+#include "EvaluatorArguments.h"
 #include "DataLoaders.h"
 #include "LoadModel.h"
 #include "MakeTrainer.h"
@@ -36,6 +36,12 @@
 // trainers
 #include "SGDIncrementalTrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
+#include "EvaluatingIncrementalTrainer.h"
+
+// evaluators
+#include "Evaluator.h"
+#include "BinaryErrorAggregator.h"
+#include "LossAggregator.h"
 
 // lossFunctions
 #include "HingeLoss.h"
@@ -44,6 +50,8 @@
 // stl
 #include <iostream>
 #include <stdexcept>
+#include <tuple>
+#include <memory>
 
 int main(int argc, char* argv[])
 {
@@ -59,6 +67,7 @@ int main(int argc, char* argv[])
         common::ParsedMapSaveArguments mapSaveArguments;
         common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
+        common::ParsedEvaluatorArguments evaluatorArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
@@ -66,7 +75,8 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
         commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
-        
+        commandLineParser.AddOptionSet(evaluatorArguments);
+
         // parse command line
         commandLineParser.Parse();
 
@@ -90,8 +100,20 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
+        // predictor type
+        using PredictorType = predictors::LinearPredictor;
+
         // create sgd trainer
-        auto sgdIncrementalTrainer = MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
+        auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
+
+        // in verbose mode, create evaluator
+        std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
+        if(trainerArguments.verbose)
+        {
+            evaluator = common::MakeEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
+            sgdIncrementalTrainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<PredictorType>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluator));
+        }
+
         auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments);
 
         // train
@@ -105,12 +127,9 @@ int main(int argc, char* argv[])
         {
             std::cout << "Finished training.\n";
 
-            auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::LinearPredictor>(trainerArguments.lossArguments);           
-            auto evaluationIterator = rowDataset.GetIterator();
-            evaluator->Evaluate(evaluationIterator, *predictor);
-
+            // print evaluation
             std::cout << "Training error\n";
-            evaluator->Print(std::cout); 
+            evaluator->Print(std::cout);
             std::cout << std::endl;
         }
 

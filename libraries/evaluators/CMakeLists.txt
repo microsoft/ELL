@@ -4,7 +4,7 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
-set (PROJ_NAME trainers)
+set (PROJ_NAME evaluators)
 
 PROJECT(${PROJ_NAME})
 
@@ -12,23 +12,18 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/Nothing.cpp)
+set (SRC src/AUCAggregator.cpp
+         src/BinaryErrorAggregator.cpp)
 
-set (INCLUDE include/BaggingIncrementalTrainer.h
-             include/EvaluatingIncrementalTrainer.h
-             include/IIncrementalTrainer.h
-             include/ITrainer.h
-             include/MultiEpochIncrementalTrainer.h
-             include/SortingTreeTrainer.h
-             include/SweepingIncrementalTrainer.h
-             include/SGDIncrementalTrainer.h)
+set (INCLUDE include/AUCAggregator.h
+             include/BinaryErrorAggregator.h
+             include/Evaluator.h
+             include/IncrementalEvaluator.h
+             include/LossAggregator.h)
 
-set (TCC tcc/BaggingIncrementalTrainer.tcc
-         tcc/EvaluatingIncrementalTrainer.tcc         
-         tcc/MultiEpochIncrementalTrainer.tcc
-         tcc/SortingTreeTrainer.tcc
-         tcc/SweepingIncrementalTrainer.tcc
-         tcc/SGDIncrementalTrainer.tcc)
+set (TCC tcc/Evaluator.tcc
+         tcc/IncrementalEvaluator.tcc
+         tcc/LossAggregator.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -39,7 +34,6 @@ include_directories(../linear/include)
 include_directories(../dataset/include)
 include_directories(../layers/include)
 include_directories(../predictors/include)
-include_directories(../evaluators/include)
 include_directories(../utilities/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})

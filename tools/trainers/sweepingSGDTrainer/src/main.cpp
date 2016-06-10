@@ -1,15 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     main.cpp (baggedTreeTrainer)
+//  File:     main.cpp (sweepingSGDTrainer)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 // utilities
 #include "Files.h"
-#include "OutputStreamImpostor.h"
+#include "OutputStreamImpostor.h" 
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
 
@@ -22,8 +21,8 @@
 #include "SupervisedExample.h"
 
 // common
-#include "SortingTreeTrainerArguments.h"
-#include "BaggingIncrementalTrainerArguments.h"
+#include "sgdIncrementalTrainerArguments.h"
+#include "MultiEpochIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
@@ -33,20 +32,27 @@
 #include "LoadModel.h"
 #include "MakeTrainer.h"
 #include "MakeEvaluator.h"
+#include "ParametersEnumerator.h"
 
 // trainers
-#include "SortingTreeTrainer.h"
+#include "SGDIncrementalTrainer.h"
+#include "SweepingIncrementalTrainer.h"
+#include "EvaluatingIncrementalTrainer.h"
 
 // evaluators
-#include "IncrementalEvaluator.h"
+#include "Evaluator.h"
+#include "BinaryErrorAggregator.h"
+#include "LossAggregator.h"
 
 // lossFunctions
-#include "SquaredLoss.h"
+#include "HingeLoss.h"
 #include "LogLoss.h"
 
 // stl
 #include <iostream>
 #include <stdexcept>
+#include <tuple>
+#include <memory>
 
 int main(int argc, char* argv[])
 {
@@ -60,24 +66,25 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
-        common::ParsedSortingTreeTrainerArguments sortingTreeTrainerArguments;
-        common::ParsedBaggingIncrementalTrainerArguments baggingIncrementalTrainerArguments;
-        common::ParsedEvaluatorArguments evaluatorArguments;
+        common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
+        common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
-        commandLineParser.AddOptionSet(sortingTreeTrainerArguments);
-        commandLineParser.AddOptionSet(baggingIncrementalTrainerArguments);
-        commandLineParser.AddOptionSet(evaluatorArguments);
+        commandLineParser.AddOptionSet(multiEpochTrainerArguments);
+        commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
 
         // parse command line
         commandLineParser.Parse();
 
+        // manually define regularization parameters to sweep over
+        std::vector<double> regularization{1.0e-0, 1.0e-1, 1.0e-2, 1.0e-3, 1.0e-4, 1.0e-5, 1.0e-6};
+
         if(trainerArguments.verbose)
         {
-            std::cout << "Bagged Tree Trainer" << std::endl;
+            std::cout << "Sweeping Stochastic Gradient Descent Trainer" << std::endl;
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
@@ -93,27 +100,33 @@ int main(int argc, char* argv[])
 
         // load dataset
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
+        auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
 
-        // predictor type
-        using PredictorType = predictors::DecisionTreePredictor;
+        // get predictor type
+        using PredictorType = predictors::LinearPredictor;
 
-        // create evaluator
-        std::shared_ptr<evaluators::IIncrementalEvaluator<PredictorType>> evaluator = nullptr;
-        if(trainerArguments.verbose)
+        // set up evaluators to only evaluate on the last update of the multi-epoch trainer
+        evaluators::EvaluatorParameters evaluatorParameters{ multiEpochTrainerArguments.numEpochs, false };
+
+        // create trainers
+        auto generator = common::MakeParametersEnumerator<trainers::SGDIncrementalTrainerParameters>(regularization);
+        std::vector<trainers::EvaluatingIncrementalTrainer<PredictorType>> evaluatingTrainers;
+        std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators;
+        for(uint64_t i = 0; i < regularization.size(); ++i)
         {
-            evaluator = common::MakeIncrementalEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
+            auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, generator.GenerateParameters(i));
+            evaluators.push_back(common::MakeEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorParameters, trainerArguments.lossArguments));
+            evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluators.back()));
         }
 
-        // create trainer
-        auto baseTrainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
-        auto trainer = trainers::MakeBaggingIncrementalTrainer(std::move(baseTrainer), baggingIncrementalTrainerArguments, evaluator);
-        
+        // create meta trainer
+        auto trainer = trainers::MakeSweepingIncrementalTrainer(std::move(evaluatingTrainers), multiEpochTrainerArguments);
+
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto trainSetIterator = rowDataset.GetIterator();
         trainer->Update(trainSetIterator);
-        auto ensemble = trainer->GetPredictor();
+        auto predictor = trainer->GetPredictor();
 
         // print loss and errors
         if(trainerArguments.verbose)
@@ -121,17 +134,19 @@ int main(int argc, char* argv[])
             std::cout << "Finished training.\n";
 
             // print evaluation
-            std::cout << "Training error\n";
-            evaluator->Print(std::cout);
-            std::cout << std::endl;
+            for(uint64_t i = 0; i<regularization.size(); ++i)
+            {
+                std::cout << "Trainer " << i << ":\n";
+                evaluators[i]->Print(std::cout);
+                std::cout << std::endl;
+            }
         }
 
         // add predictor to the model
-        ensemble->AddToModel(model, outputCoordinateList);
+        predictor->AddToModel(model, outputCoordinateList);
 
         // save the model
         model.Save(outStream);
-
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
