@@ -48,7 +48,7 @@ namespace interfaces
         return static_cast<dataset::GenericSupervisedExample>(_dataset.GetExample(index));
     }
 
-    dataset::SupervisedExample<dataset::DoubleDataVector> GenericRowDataset::GetDenseExample(uint64_t index) const
+    dataset::SupervisedExample<dataset::DoubleDataVector> GenericRowDataset::GetDenseSupervisedExample(uint64_t index) const
     {
         if(index >= NumExamples())
         {
