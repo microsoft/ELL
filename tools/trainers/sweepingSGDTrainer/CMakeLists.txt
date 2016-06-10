@@ -5,7 +5,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 # define project
-set (PROJ_NAME sgdTrainer)
+set (PROJ_NAME sweepingSGDTrainer)
 PROJECT(${PROJ_NAME})
 
 #enable C++11 in GCC, etc
@@ -43,4 +43,4 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 # tests
 add_test(NAME sgdTrainerTest
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto -omf null -v -ne 20)
+         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto -omf null -v -lf log)

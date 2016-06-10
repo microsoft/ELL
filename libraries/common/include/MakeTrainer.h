@@ -19,9 +19,6 @@
 // trainers
 #include "ITrainer.h"
 #include "IIncrementalTrainer.h"
-#include "SortingTreeTrainer.h"
-#include "SGDIncrementalTrainer.h"
-#include "MultiEpochIncrementalTrainer.h"
 
 // stl
 #include <memory>

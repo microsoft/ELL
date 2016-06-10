@@ -30,7 +30,10 @@ namespace trainers
         double minSplitGain = 0.0;
     };
 
-    /// <summary> Implements a greedy decision tree growing algorithm that operates by repeatedly sorting the data by each feature. </summary>
+    /// <summary>
+    /// Implements a greedy decision tree growing algorithm that operates by repeatedly sorting the
+    /// data by each feature.
+    /// </summary>
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
     template <typename LossFunctionType> 
