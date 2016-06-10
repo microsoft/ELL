@@ -24,7 +24,11 @@
 //%import "Model.h"
 //%import "ModelInterface.h"
 
+#ifndef SWIGJAVASCRIPT
 %shared_ptr(predictors::LinearPredictor) 
+#else
+#endif
+
 %include "LinearPredictor.h"
 %include "DecisionTreePredictor.h"
 

@@ -12,9 +12,11 @@
 namespace trainers
 {
     template <typename PredictorType>
-    MultiEpochIncrementalTrainer<PredictorType>::MultiEpochIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochIncrementalTrainerParameters& parameters) :
-        _incrementalTrainer(std::move(incrementalTrainer)), _parameters(parameters), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
-    {}
+    MultiEpochIncrementalTrainer<PredictorType>::MultiEpochIncrementalTrainer(std::unique_ptr<InternalTrainerType>&& internalTrainer, const MultiEpochIncrementalTrainerParameters& parameters) :
+        _internalTrainer(std::move(internalTrainer)), _parameters(parameters), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
+    {
+        assert(_internalTrainer != nullptr);
+    }
     
     template <typename PredictorType>
     void MultiEpochIncrementalTrainer<PredictorType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
@@ -35,13 +37,13 @@ namespace trainers
 
             // update the incremental trainer
             auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-            _incrementalTrainer->Update(trainSetIterator);
+            _internalTrainer->Update(trainSetIterator);
         }
     }
 
     template <typename PredictorType>
-    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& incrementalTrainer, const MultiEpochIncrementalTrainerParameters& parameters)
+    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer, const MultiEpochIncrementalTrainerParameters& parameters)
     {
-        return std::make_unique<MultiEpochIncrementalTrainer<PredictorType>>(std::move(incrementalTrainer), parameters);
+        return std::make_unique<MultiEpochIncrementalTrainer<PredictorType>>(std::move(internalTrainer), parameters);
     }
 }

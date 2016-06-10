@@ -34,8 +34,10 @@ namespace features
     //
 
     IncrementalVarianceFeature::IncrementalVarianceFeature(Feature* inputFeature, size_t windowSize)  : BufferedFeature({inputFeature}, windowSize) 
-    {
-    }
+    {}
+
+    IncrementalVarianceFeature::IncrementalVarianceFeature(const std::string& id, Feature* inputFeature, size_t windowSize)  : BufferedFeature(id, {inputFeature}, windowSize) 
+    {}
     
     std::vector<double> IncrementalVarianceFeature::ComputeOutput() const
     {
@@ -117,6 +119,7 @@ namespace features
     std::unique_ptr<Feature> IncrementalVarianceFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
         assert(params.size() == 4);
+        auto featureId = params[0];
         Feature* inputFeature = previousFeatures[params[2]];
         uint64_t windowSize = ParseInt(params[3]);
 
@@ -125,6 +128,6 @@ namespace features
             std::string error_msg = std::string("Error deserializing feature description: unknown input feature ") + params[2];
             throw std::runtime_error(error_msg);
         }
-        return std::make_unique<IncrementalVarianceFeature>(inputFeature, windowSize);
+        return std::make_unique<IncrementalVarianceFeature>(featureId, inputFeature, windowSize);
     }
 }

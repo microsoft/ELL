@@ -31,7 +31,7 @@ namespace trainers
     /// <summary> Parameters for the stochastic gradient descent trainer. </summary>
     struct SGDIncrementalTrainerParameters
     {
-        double regularization = 1.0;
+        double regularization;
     };
     
     /// <summary>
@@ -54,7 +54,7 @@ namespace trainers
 
         /// <summary> Performs an epoch of SGD iterations. </summary>
         ///
-        /// <param name="exampleIterator"> [in,out] The data iterator. </param>
+        /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
         virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
 
         /// <summary> Returns The averaged predictor. </summary>
@@ -63,6 +63,10 @@ namespace trainers
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _averagedPredictor; }
 
     private:
+
+        void UpdateSparse(dataset::GenericRowDataset::Iterator exampleIterator);
+        void UpdateDense(dataset::GenericRowDataset::Iterator exampleIterator);
+
         LossFunctionType _lossFunction;
         SGDIncrementalTrainerParameters _parameters;
 

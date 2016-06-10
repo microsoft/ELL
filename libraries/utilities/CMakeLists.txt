@@ -23,8 +23,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/RandomEngines.cpp
          src/XMLSerialization.cpp)
 
-set (INCLUDE include/BinaryClassificationEvaluator.h
-             include/CompressedIntegerList.h
+set (INCLUDE include/CompressedIntegerList.h
              include/CommandLineParser.h
              include/Files.h
              include/Format.h
@@ -42,8 +41,7 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
              include/TypeName.h
              include/XMLSerialization.h)
 
-set (TCC tcc/BinaryClassificationEvaluator.tcc
-         tcc/CommandLineParser.tcc
+set (TCC tcc/CommandLineParser.tcc
          tcc/Format.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
