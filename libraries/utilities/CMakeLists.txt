@@ -39,6 +39,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/TransformIterator.h
              include/TypeFactory.h
              include/TypeName.h
+             include/Variant.h
              include/XMLSerialization.h)
 
 set (TCC tcc/CommandLineParser.tcc
@@ -50,6 +51,7 @@ set (TCC tcc/CommandLineParser.tcc
          tcc/TransformIterator.tcc
          tcc/TypeFactory.tcc
          tcc/TypeName.tcc
+         tcc/Variant.tcc
          tcc/XMLSerialization.tcc)
 
 source_group("src" FILES ${SRC})
@@ -83,9 +85,11 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp 
+              test/src/Variant_test.cpp
               test/src/XMLSerialization_test.cpp)
 
-set (TEST_INCLUDE test/include/XMLSerialization_test.h)
+set (TEST_INCLUDE test/include/Variant_test.h
+                  test/include/XMLSerialization_test.h)
                   
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})
