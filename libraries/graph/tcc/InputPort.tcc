@@ -5,9 +5,9 @@
 #include "Node.h"
 
 template <typename ValueType>
-InputPort::InputPort(const OutputPort<ValueType>& output): Port(output.Node(), output.OutputIndex(), Port::GetTypeCode<ValueType>(), output.Size()) 
+InputPort::InputPort(const OutputPort<ValueType>* output): Port(output->Node(), output->OutputIndex(), Port::GetTypeCode<ValueType>(), output->Size()) 
 {
-    assert(Port::GetTypeCode<ValueType>() == output.Type());
+    assert(Port::GetTypeCode<ValueType>() == output->Type());
 }
 
 template <typename ValueType>

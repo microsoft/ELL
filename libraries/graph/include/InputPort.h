@@ -20,7 +20,7 @@ class InputPort : public Port
 public:
     // constructor --- takes the output that we take our value from
     template <typename ValueType>
-    InputPort(const OutputPort<ValueType>& output);
+    InputPort(const OutputPort<ValueType>* output);
 
     // "concat" version
     // InputPort(const std::vector<OutputPort<ValueType>>& outputs);
@@ -30,6 +30,7 @@ public:
     std::vector<ValueType> GetValue() const;
     
 private:
+    const Port* _inputLocation; // TODO: rename this variable
     // optional offset, size
     // maybe a union?
     // Later, maybe keep a list of     
