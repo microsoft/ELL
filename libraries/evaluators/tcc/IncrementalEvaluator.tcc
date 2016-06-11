@@ -12,16 +12,16 @@ namespace evaluators
     IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators) :
         Evaluator<BasePredictorType, AggregatorTypes...>(exampleIterator, evaluatorParameters, aggregators...)
     {
-        _predictions.resize(_rowDataset.NumExamples());
+        _predictions.resize(BaseClassType::_rowDataset.NumExamples());
     }
 
     template<typename BasePredictorType, typename... AggregatorTypes>
     void IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluate(const BasePredictorType& basePredictor, double basePredictorWeight, double evaluationRescale)
     {
-        ++_evaluateCounter;
-        bool evaluate = _evaluateCounter % _evaluatorParameters.evaluationFrequency == 0 ? true : false;
+        ++BaseClassType::_evaluateCounter;
+        bool evaluate = BaseClassType::_evaluateCounter % BaseClassType::_evaluatorParameters.evaluationFrequency == 0 ? true : false;
 
-        auto iterator = _rowDataset.GetIterator();
+        auto iterator = BaseClassType::_rowDataset.GetIterator();
         uint64_t index = 0;
 
         while (iterator.IsValid())
@@ -34,7 +34,7 @@ namespace evaluators
 
             if (evaluate)
             {
-                DispatchUpdate(_predictions[index] * evaluationRescale, label, exampleWeight, std::make_index_sequence<sizeof...(AggregatorTypes)>());
+                BaseClassType::DispatchUpdate(_predictions[index] * evaluationRescale, label, exampleWeight, std::make_index_sequence<sizeof...(AggregatorTypes)>());
             }
 
             iterator.Next();
@@ -42,7 +42,7 @@ namespace evaluators
         }
         if (evaluate)
         {
-            Aggregate(std::make_index_sequence<sizeof...(AggregatorTypes)>());
+            BaseClassType::Aggregate(std::make_index_sequence<sizeof...(AggregatorTypes)>());
         }
     }
 
@@ -55,7 +55,7 @@ namespace evaluators
     template<typename BasePredictorType, typename... AggregatorTypes>
     void IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::Print(std::ostream& os) const
     {
-        Evaluator<BasePredictorType, AggregatorTypes...>::Print(os);
+        BaseClassType::Print(os);
     }
 
     template<typename BasePredictorType, typename... AggregatorTypes>

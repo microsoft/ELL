@@ -52,8 +52,7 @@ namespace common
         void SetValueTuple(ValueTupleType& valueTuple, size_t index) const;
 
         // termination of template recursion
-        template <>
-        void SetValueTuple<std::tuple_size<ValueTupleType>::value>(ValueTupleType& valueTuple, size_t index) const {}
+        void SetValueTuple(ValueTupleType& valueTuple, size_t index) const {}
 
         template <size_t... Sequence>
         ParametersType GenerateParameters(const ValueTupleType& valueTuple, std::index_sequence<Sequence...>) const;
