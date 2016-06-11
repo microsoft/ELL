@@ -20,7 +20,7 @@ class OutputPortBase : public Port
 public:
 
 protected:
-    OutputPortBase(const class Node* node, size_t outputIndex, OutputType type, size_t size) : Port(node, outputIndex, type, size) 
+    OutputPortBase(const class Node* node, size_t outputIndex, PortType type, size_t size) : Port(node, outputIndex, type, size) 
     {
     };
 };

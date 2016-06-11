@@ -7,19 +7,19 @@
 // Specializations of GetTypeCode
 //
 template<>
-Port::OutputType Port::GetTypeCode<double>() 
+Port::PortType Port::GetTypeCode<double>() 
 { 
-    return Port::OutputType::Real; 
+    return Port::PortType::Real; 
 }
 
 template<>
-Port::OutputType Port::GetTypeCode<int>() 
+Port::PortType Port::GetTypeCode<int>() 
 { 
-    return Port::OutputType::Integer; 
+    return Port::PortType::Integer; 
 }
 
 template<>
-Port::OutputType Port::GetTypeCode<bool>() 
+Port::PortType Port::GetTypeCode<bool>() 
 { 
-    return Port::OutputType::Boolean; 
+    return Port::PortType::Boolean; 
 }

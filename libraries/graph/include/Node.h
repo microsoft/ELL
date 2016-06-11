@@ -32,7 +32,7 @@ public:
     // Convenience functions to get various properties of the outputs
     template <typename ValueType>
     std::vector<ValueType> GetOutputValue(size_t outputIndex) const;
-    Port::OutputType GetOutputType(size_t outputIndex) const;
+    Port::PortType GetOutputType(size_t outputIndex) const;
     size_t GetOutputSize(size_t outputIndex) const;
 
     /// <summary> Gets the name of this type (for serialization). </summary>

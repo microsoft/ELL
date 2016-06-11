@@ -9,7 +9,7 @@ Node::Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBa
 {
 };
 
-Port::OutputType Node::GetOutputType(size_t outputIndex) const
+Port::PortType Node::GetOutputType(size_t outputIndex) const
 {
     return _outputs[outputIndex]->Type();    
 }
