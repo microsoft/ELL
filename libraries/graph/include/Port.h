@@ -16,7 +16,7 @@ class Port
 {
 public:
     typedef int PortId;
-    enum class PortType { None, Real, Integer, Categorical, Boolean };
+    enum class PortType { None, Real, Integer, Categorical, Boolean }; // Maybe these should be C types (double, int, bool) ? TODO: put this type info somewhere common, not in Port
 
     // The node the output port connected to this port belongs to
     const class Node* Node() const { return _node; }
