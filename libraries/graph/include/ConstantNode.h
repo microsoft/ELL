@@ -1,7 +1,7 @@
 #pragma once
 //
 // ConstantNode
-// 
+//
 
 #include "Node.h"
 #include "OutputPort.h"
@@ -10,31 +10,39 @@
 #include <vector>
 #include <memory>
 
-//
-// ConstantNode: A node that contains a constant value. Has no inputs.
-//
+/// <summary> A node that contains a constant value. Has no inputs. </summary>
 template <typename ValueType>
 class ConstantNode : public Node
 {
 public:
-    // Constructor for a scalar constant
+    /// <summary> Constructor for a scalar constant </summary>
+    ///
+    /// <param name="value"> The scalar value </param>
     ConstantNode(ValueType value);
 
-    // Constructor for a vector constant
+    /// Constructor for a vector constant
+    ///
+    /// <param name="value"> The vector value </param>
     ConstantNode(std::vector<ValueType> values);
 
-    // Returns the name for this node class
+    /// <summary> Gets the name of this type (for serialization). </summary>
+    ///
+    /// <returns> The name of this type. </returns>
     static std::string GetTypeName() { return "Constant"; }
+
+    /// <summary> Gets the name of this type (for serialization). </summary>
+    ///
+    /// <returns> The name of this type. </returns>
     virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-    // Exposing the output port as a read-only property
+    /// <summary> Exposes the output port as a read-only property </summary>
     const OutputPort<ValueType>& output = _output;
 
 protected:
     virtual void Compute() const override;
 
 private:
-    std::vector<ValueType> _values;    
+    std::vector<ValueType> _values;
     OutputPort<ValueType> _output;
 };
 

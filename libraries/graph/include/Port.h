@@ -18,19 +18,19 @@ public:
     typedef int PortId;
     enum class PortType { None, Real, Integer, Categorical, Boolean }; // Maybe these should be C types (double, int, bool) ? TODO: put this type info somewhere common, not in Port
 
-    // The node the output port connected to this port belongs to
+    /// <summary> Returns the node the output port connected to this port belongs to </summary>
     const class Node* Node() const { return _node; }
     
-    // The index of the output port within the node
+    /// <summary> Returns the index of the output port within the node </summary>
     size_t OutputIndex() const { return _outputIndex; }
     
-    // The datatype of the output
+    /// <summary> Returns the datatype of the output </summary>
     PortType Type() const { return _type; }
     
-    // The dimensionality of the output
+    /// <summary> Returns the dimensionality of the output </summary>
     size_t Size() const { return _size; } // dimension
 
-    // `GetTypeCode` maps from C++ type to PortType enum
+    /// <summary> Maps from C++ type to PortType enum </summary>
     template <typename ValueType>
     static PortType GetTypeCode(); 
 

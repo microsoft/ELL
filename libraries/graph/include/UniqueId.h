@@ -3,21 +3,14 @@
 #include <functional>
 #include <ostream>
 
-//
-// UniqueId: A placeholder for a real GUID-type class
-//
+/// <summary> UniqueId: A placeholder for a real GUID-type class </summary>
 class UniqueId
 {
 public:    
-    // Constructor for a unique id
+    /// <summary> Constructor </summary>
     UniqueId();
-    UniqueId(const UniqueId& other) : _id(other._id) {}
-
-    UniqueId& operator=(const UniqueId& other)
-    {
-        _id = other._id;
-        return *this;
-    }
+    UniqueId(const UniqueId& other) : _id(other._id) = default;
+    UniqueId& operator=(const UniqueId& other) = default;
 
     bool operator==(const UniqueId& other) const;
     bool operator!=(const UniqueId& other) const;

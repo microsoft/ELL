@@ -12,9 +12,7 @@
 
 class Node;
 
-//
-// OutputPortBase: base for classes that represent outputs from a function (essentially identical to Port)
-//
+/// <summary> Base for classes that represent outputs from a function (essentially identical to Port) </summary>
 class OutputPortBase : public Port
 {
 public:
@@ -25,17 +23,18 @@ protected:
     };
 };
 
-//
-// OutputPort<ValueType>: represents an output from a node/function
-//
+/// <summary> Represents an output from a node </summary>
 template <typename ValueType>
 class OutputPort : public OutputPortBase
 {
 public:
     OutputPort(const class Node* node, size_t outputIndex, size_t size) : OutputPortBase(node, outputIndex, OutputPortBase::GetTypeCode<ValueType>(), size) {}
 
-    void SetOutput(std::vector<ValueType> values) const { _cachedOutput = values; }
+    /// <summary> Returns the cached output from this port </summary>
     std::vector<ValueType> GetOutput() const { return _cachedOutput; }
+
+    /// <summary> Sets the cached output from this port </summary>
+    void SetOutput(std::vector<ValueType> values) const { _cachedOutput = values; }
 
 private:
     mutable std::vector<ValueType> _cachedOutput;

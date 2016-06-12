@@ -11,18 +11,29 @@
 #include <memory>
 #include <algorithm>
 
+/// <summary> A node that computes an extremal value (min or max) of its input, as well as the index of the extremal value. </summary>
 template <typename ValueType, bool max>
 class ExtremalValueNode: public Node
 {
 public:
+    /// <summary> Constructor </summary>
+    ///
+    /// <param name="input"> The node to get the input data from </param>
     ExtremalValueNode(OutputPort<ValueType> input);
 
-    // Returns the name for this node class
+    /// <summary> Gets the name of this type (for serialization). </summary>
+    ///
+    /// <returns> The name of this type. </returns>
     static std::string GetTypeName() { return max ? "ArgMax" : "ArgMin"; }
+
+    /// <summary> Gets the name of this type (for serialization). </summary>
+    ///
+    /// <returns> The name of this type. </returns>
     virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-    // read-only properties
+    /// <summary> Exposes the extremal value port as a read-only property </summary>
     const OutputPort<ValueType>& val = _val;
+    /// <summary> Exposes the extremal value index port as a read-only property </summary>
     const OutputPort<int>& argVal = _argVal;
 
 protected:
@@ -37,9 +48,11 @@ private:
     OutputPort<int> _argVal;
 };
 
+/// <summary> Type alias for argmin node </summary>
 template <typename ValueType>
 using ArgMinNode = ExtremalValueNode<ValueType, false>;
 
+/// <summary> Type alias for argmax node </summary>
 template <typename ValueType>
 using ArgMaxNode = ExtremalValueNode<ValueType, true>;
 

@@ -1,7 +1,7 @@
 #pragma once
 //
 // InputNode
-// 
+//
 
 #include "Node.h"
 #include "OutputPort.h"
@@ -10,18 +10,33 @@
 #include <memory>
 #include <string>
 
+/// <summary> A node that represents an input to the system. </summary>
 template <typename ValueType>
-class InputNode: public Node
+class InputNode : public Node
 {
 public:
+    /// <summary> Constructor </summary>
+    ///
+    /// <param name="dimension"> The input dimension </param>
     InputNode(size_t dimension);
-    void SetInput(std::vector<ValueType> inputValues);
-    
-    const OutputPort<ValueType>& output = _output;
 
-    // Returns the name for this node class
+    /// <summary> Sets the value output by this node </summary>
+    ///
+    /// <param name="inputValues"> The values for this node to output </param>
+    void SetInput(std::vector<ValueType> inputValues);
+
+    /// <summary> Gets the name of this type (for serialization). </summary>
+    ///
+    /// <returns> The name of this type. </returns>
     static std::string GetTypeName() { return "Input"; }
+
+    /// <summary> Gets the name of this type (for serialization). </summary>
+    ///
+    /// <returns> The name of this type. </returns>
     virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+    /// <summary> Exposes the output port as a read-only property </summary>
+    const OutputPort<ValueType>& output = _output;
 
 protected:
     virtual void Compute() const override;

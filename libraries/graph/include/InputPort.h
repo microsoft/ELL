@@ -12,28 +12,22 @@
 
 class Node;
 
-//
-// InputPort: each node/function stores a list of InputPort objects that represent the inputs to the computation
-//
+/// <summary> Class representing an input to a node </summary>
 class InputPort : public Port
 {
 public:
-    // constructor --- takes the output that we take our value from
+    /// <summary> Constructor </summary>
+    ///
+    /// <param name="output"> The output port this port receives values from </param>
     template <typename ValueType>
     InputPort(const OutputPort<ValueType>* output);
 
-    // "concat" version
-    // InputPort(const std::vector<OutputPort<ValueType>>& outputs);
-
-    // returns the (already-computed) output value corresponding to this input    
+    /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
     template <typename ValueType>
     std::vector<ValueType> GetValue() const;
     
 private:
     const Port* _inputLocation; // TODO: rename this variable
-    // optional offset, size
-    // maybe a union?
-    // Later, maybe keep a list of     
 };
 
 // TODO: if we want to allow functions/nodes to gather values from arbitrary collections of output elements, then
