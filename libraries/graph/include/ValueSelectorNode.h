@@ -1,7 +1,12 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     ValueSelectorNode.h (graph)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
-//
-// ValueSelectorNode
-//
 
 #include "Node.h"
 #include "InputPort.h"
@@ -11,7 +16,7 @@
 #include <memory>
 #include <exception>
 
-/// <summary> A node that selects from one of two input values depending on a third input </summary>
+/// <summary> An example node that selects from one of two input values depending on a third input </summary>
 template <typename ValueType>
 class ValueSelectorNode : public Node
 {

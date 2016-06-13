@@ -1,11 +1,14 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// ConstantNode.tcc
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     ConstantNode.tcc (graph)
+//  Authors:  Chuck Jacobs
 //
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Constructor for a scalar constant
 
 // superclass (Node) constructor takes two array arguments: inputs and outputs. These are pointers to our local InputPort and OutputPort storage.
-// I know, kind of gross. 
 template <typename ValueType>
 ConstantNode<ValueType>::ConstantNode(ValueType value) : Node({}, {&_output}), _output(this, 0, 1), _values({value})
 {

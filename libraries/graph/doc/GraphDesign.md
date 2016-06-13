@@ -1,25 +1,23 @@
 Graph library
 =============
 
-The idea with this representation was to make things as simple as possible without sacrificing 
-functionality. It's a very simple standard Graph representation, with a small wrinkly in that nodes may have multiple outputs. 
-There is also type information for the edges, but that's minor.
 
 Node
 ----
-A `Node` represents a piece of computation. You could think of it as a function. It takes some number
-of inputs and returns a number of outputs (imagine returning a struct of outputs). Just to give them a 
-name, I'm calling an individual output (a field in the struct) a `Port`.
+A `Node` represents a unit of computation. You could think of it as a function. It takes some number
+of inputs and returns a number of outputs (imagine returning a struct of outputs). Individual inputs and
+outputs of a node are called a `Port`.
 
 In order to compute values and traverse the graph, we need to keep references to where our inputs come
-from, and who depends on us. Inputs are indicated with an `Edge`, which indicates the specific part
-of another `Node`'s output it consumes from. For these "downstream" dependencies, we don't (I don't think) 
-need to store the particular `Port`, but just a reference/pointer to a `Node`
+from, and who depends on us. Inputs are indicated with an `InputPort`, which has a reference to the specific port
+from another `Node` it consumes from. 
 
-Edge
+Port
 ----
-An `Edge` is a reference to the values needed for a `Node`'s input. One representation would just be a (`Node`, `Port`) 
-pair. 
+An `Port` represents a singly-typed input or output of a `Node`. For instance, an FFT node might have 2 output ports, one for the magnitude
+and one for the phase. Similarly, a pairwise addition node might have 2 input ports and one output port. The `InputPort` subclass keeps a
+reference to the `OutputPort` it gets is output from. An `OutputPort` contains a cached value of the output to be used for computing the
+graph output.
 
 Graph
 -----
@@ -43,7 +41,7 @@ its outputs. The awesome set of features and ML algos I came up with was:
 See the image "HighLevelGraph" ![HighLevelGraph](file://HighLevelGraph.png) for a terrible drawing of 
 the high-level graph of the above series of computations.
 
-*Aside*: On the equivalence between the graph, its serialization, and a functional code-like description of the computation
+## *Aside* On the equivalence between the graph, its serialization, and a functional code-like description of the computation
   
 For the featurization library, I found it somewhat useful to have a simple serialized format that looked like
 
@@ -67,6 +65,8 @@ Using a modified version of that format, the pictured graph would look like:
     fft = FFT(mag, 16);
     out = LinearClassifier(mean, fft.amplitude);
 
+Golly, it looks like code. If the runtime had functions implementing the node types, that would indeed be pretty close to the code.
+
 IR representation
 -----------------
 
@@ -77,87 +77,3 @@ it's not obvious what the hell that picture is supposed to represent: I'll descr
 FullImage.png has both graphs side-by-side. for yuks.
 
 
-Silly reference implementation
-------------------------------
-
-I hacked up some quick classes just to see that these thoughts can at least compile. Here are the class definitions I wrote:
-
-###Node###
-
-    class Node
-    {
-    public:
-        // Q: Do we want to have 2 kinds of ports: input and output (or a flag saying what direction a port points?)
-        class Port
-        {        
-        public:
-            typedef int Id;
-            enum class Type { Real, Boolean, Categorical };
-            size_t GetSize();
-            Type GetType();
-            
-        private:
-            int _size;
-            Type _type;
-        };
-        
-        Node(const std::vector<Edge>& inputs);
-
-        template <typename OutputType>
-        OutputType ComputeOutput(Port::Id portId) const;
-            
-        const std::vector<Edge>& GetInputEdges() const;
-        void AddDependent(const std::shared_ptr<Node>& dependent);
-
-    private:
-        // vector of inputs
-        std::vector<Edge> _inputs;
-            
-        // vector of outputs  
-        std::vector<Port> _outputs;
-
-        // dependents
-        std::vector<std::shared_ptr<Node>> _dependents;
-
-        // Other attributes go here
-    };
-
-
-
-###Edge###
-
-    class Edge
-    {
-    public:
-        const std::shared_ptr<Node>& GetNode() const;
-        Node::Port::Id GetPort();
-        
-    private:
-        std::shared_ptr<Node> _destinationNode;
-        Node::Port::Id _destinationPort;
-    };
-
-
-###Graph###
-
-    class DirectedGraph
-    {
-    public:    
-
-        // Factory method for creating nodes
-        template <NodeType, Args...>
-        std::shared_ptr<NodeType> CreateNode(const std::vector<shared_ptr<Node>>& inputs, args... args);
-        
-        template <typename Visitor>
-        void Visit(Visitor& visitor) const; // Visits all nodes in the graph
-
-        template <typename Visitor>
-        void Visit(const NodeRef outputNode, Visitor& visitor) const; // Visits all nodes in the graph necssary to compute outputNode
-
-        template <typename Visitor>
-        void Visit(const std::vector<NodeRef>& outputNode, Visitor& visitor) const; // Visits all nodes in the graph necssary to compute all outputNodes
-        
-    private:
-        // the nodes (?)
-        // maybe an unordered_map<NodeIdType, shared_ptr<Node>> for lookup
-    };

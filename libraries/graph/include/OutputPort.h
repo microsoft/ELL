@@ -1,8 +1,12 @@
-#pragma once
-
+////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// OutputPort
-// 
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     OutputPort.h (graph)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
 
 #include "Port.h"
 
@@ -15,8 +19,6 @@ class Node;
 /// <summary> Base for classes that represent outputs from a function (essentially identical to Port) </summary>
 class OutputPortBase : public Port
 {
-public:
-
 protected:
     OutputPortBase(const class Node* node, size_t outputIndex, PortType type, size_t size) : Port(node, outputIndex, type, size) 
     {

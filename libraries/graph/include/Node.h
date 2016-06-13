@@ -1,7 +1,12 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     Node.h (graph)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
-//
-// Node
-//
 
 #include "Port.h"
 #include "OutputPort.h"
@@ -62,7 +67,6 @@ private:
 
     std::vector<InputPort*> _inputs;
     std::vector<OutputPortBase*> _outputs;
-    std::unordered_map<Port::PortId, OutputPortBase*> _outputs2;
 
     mutable std::vector<const Node*> _dependentNodes;
 };

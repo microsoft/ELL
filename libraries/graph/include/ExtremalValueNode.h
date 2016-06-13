@@ -1,7 +1,12 @@
-#pragma once
+////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// ExtremalValNode
-// 
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     ExtremalValueNode.h (graph)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
 
 #include "Node.h"
 #include "InputPort.h"
@@ -11,7 +16,7 @@
 #include <memory>
 #include <algorithm>
 
-/// <summary> A node that computes an extremal value (min or max) of its input, as well as the index of the extremal value. </summary>
+/// <summary> An example node that computes an extremal value (min or max) of its input, as well as the index of the extremal value. </summary>
 template <typename ValueType, bool max>
 class ExtremalValueNode: public Node
 {

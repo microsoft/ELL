@@ -1,3 +1,11 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     DirectedGraph.h (graph)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include "Node.h"
@@ -53,8 +61,7 @@ public:
     template <typename Visitor>
     void Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNodes) const;
     
-    // TODO: iterators
-    // TODO begin/end for iterating over entire graph
+    // TODO: iterators, including begin/end for iterating over entire graph
     
 private:
     // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index

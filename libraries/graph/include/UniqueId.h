@@ -1,3 +1,13 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     UniqueId.h (graph)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// TODO: move to utilities (?)
+
 #pragma once
 
 #include <functional>
@@ -9,7 +19,7 @@ class UniqueId
 public:    
     /// <summary> Constructor </summary>
     UniqueId();
-    UniqueId(const UniqueId& other) : _id(other._id) = default;
+    UniqueId(const UniqueId& other) = default;
     UniqueId& operator=(const UniqueId& other) = default;
 
     bool operator==(const UniqueId& other) const;
