@@ -9,6 +9,6 @@
 namespace utilities
 {
     template<typename ErrorCodeType>
-    Exception<ErrorCodeType>::Exception(ErrorCodeType errorCode, const std::string& message) : _errorCode(errorCode), _message(message)
+    ExceptionBase<ErrorCodeType>::ExceptionBase(ErrorCodeType errorCode, const std::string& message) : _errorCode(errorCode), _message(message)
     {}
 }
