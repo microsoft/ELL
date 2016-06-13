@@ -31,7 +31,7 @@ public:
     std::vector<ValueType> GetValue() const;
     
 private:
-    const Port* _inputLocation; // TODO: rename this variable
+    const Port* _referencedPort;
 };
 
 // TODO: if we want to allow functions/nodes to gather values from arbitrary collections of output elements, then
