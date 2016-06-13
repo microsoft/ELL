@@ -34,7 +34,7 @@ void NodePrinter(const Node& node)
     {
         std::cout << (first ? "" : ", ");
         first = false;
-        std::cout << "node_" << input->Node()->Id() << "[" << input->OutputIndex() << "]";
+        std::cout << "node_" << input->Node()->Id() << "[" << input->Index() << "]";
         
     }
     std::cout << ")" << std::endl;        
