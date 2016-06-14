@@ -41,8 +41,8 @@ namespace model
     std::shared_ptr<NodeType> Model::AddNode(Args... args)
     {
         auto node = std::make_shared<NodeType>(args...);
-        node->AddDependencies();
-        _nodeMap[node->Id()] = node;
+        node->RegisterDependencies();
+        _nodeMap[node->GetId()] = node;
         return node;
     }
 
@@ -50,13 +50,13 @@ namespace model
     // Compute output value
     //
     template <typename ValueType>
-    std::vector<ValueType> Model::GetNodeOutput(const OutputPort<ValueType>& OutputPort) const
+    std::vector<ValueType> Model::GetNodeOutput(const OutputPort<ValueType>& outputPort) const
     {
         auto compute = [](const Node& node) { node.Compute(); };
 
-        Visit(compute, { OutputPort.Node() });
+        Visit(compute, { outputPort.Node() });
 
-        return OutputPort.GetOutput();
+        return outputPort.GetOutput();
     }
 
     template <typename ValueType>

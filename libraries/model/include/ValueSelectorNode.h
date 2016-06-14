@@ -19,7 +19,6 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-
     /// <summary> An example node that selects from one of two input values depending on a third input </summary>
     template <typename ValueType>
     class ValueSelectorNode : public Node

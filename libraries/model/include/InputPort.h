@@ -10,6 +10,7 @@
 
 #include "Port.h"
 #include "OutputPort.h"
+#include "Node.h"
 
 #include <vector>
 #include <cassert>
@@ -17,8 +18,6 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-    class Node;
-
     /// <summary> Class representing an input to a node </summary>
     class InputPort : public Port
     {

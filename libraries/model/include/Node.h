@@ -31,17 +31,28 @@ namespace model
         typedef UniqueId NodeId;
 
         /// <summary> Returns the unique ID for this node </summary>
-        const NodeId Id() const { return _id; }
+        const NodeId GetId() const { return _id; }
 
         /// <summary> Returns the input "ports" for this node </summary>
         const std::vector<InputPort*>& GetInputs() const { return _inputs; }
 
-        // Convenience functions to get various properties of the outputs
+        /// <summary> Convenience function to get the output value from a port </summary>
+        ///
+        /// <param name="outputIndex"> The index of the output port </param>
+        /// <returns> The computed output value for the port </param>
         template <typename ValueType>
         std::vector<ValueType> GetOutputValue(size_t outputIndex) const;
 
+        /// <summary> Convenience function to get the output type from a port </summary>
+        ///
+        /// <param name="outputIndex"> The index of the output port </param>
+        /// <returns> The output type for the port </param>
         Port::PortType GetOutputType(size_t outputIndex) const;
 
+        /// <summary> Convenience function to get the dimensionality of a port </summary>
+        ///
+        /// <param name="outputIndex"> The index of the output port </param>
+        /// <returns> The dimensionality of the port </param>
         size_t GetOutputSize(size_t outputIndex) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -49,7 +60,9 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const = 0;
 
-        // Get all nodes that depend (directly) on us
+        /// <summary> Get all nodes that depend (directly) on us </summary>
+        ///
+        /// <returns> a vector of all the nodes that depend on this node </summary>
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
     protected:
@@ -57,20 +70,18 @@ namespace model
         // should perhaps be vectors of references instead of pointers.
         Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
-        // Compute is implemented by subclasses to calculate their result and set them in their outputs
-        virtual void Compute() const {};
+        /// <summary> Computes the output of this node and stores it in the output ports </summary>
+        virtual void Compute() const = 0;
         void RegisterOutputs() const; // TODO
 
     private:
         friend class Model;
         void AddDependent(const Node* dependent) const;
-        void AddDependencies() const;
+        void RegisterDependencies() const;
 
         NodeId _id;
-
         std::vector<InputPort*> _inputs;
         std::vector<OutputPortBase*> _outputs;
-
         mutable std::vector<const Node*> _dependentNodes;
     };
 }

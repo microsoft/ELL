@@ -29,12 +29,12 @@ void
 NodePrinter(const model::Node& node)
 {
     bool first = true;
-    std::cout << "node_" << node.Id() << " = " << node.GetRuntimeTypeName() << "(";
+    std::cout << "node_" << node.GetId() << " = " << node.GetRuntimeTypeName() << "(";
     for(const auto& input: node.GetInputs())
     {
         std::cout << (first ? "" : ", ");
         first = false;
-        std::cout << "node_" << input->Node()->Id() << "[" << input->Index() << "]";
+        std::cout << "node_" << input->Node()->GetId() << "[" << input->Index() << "]";
         
     }
     std::cout << ")" << std::endl;        

@@ -18,7 +18,6 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-
     /// <summary> A node that represents an input to the system. </summary>
     template <typename ValueType>
     class InputNode : public Node
