@@ -17,9 +17,7 @@ namespace model
 
     class Node;
 
-    //
-    // Port is the common base class for InputPort and OutputPort.
-    //
+    /// <summary> Port is the common base class for InputPort and OutputPort. </summary>
     class Port
     {
     public:

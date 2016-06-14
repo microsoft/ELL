@@ -16,7 +16,6 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-
     /// <summary> UniqueId: A placeholder for a real GUID-type class </summary>
     class UniqueId
     {
@@ -26,9 +25,13 @@ namespace model
         UniqueId(const UniqueId& other) = default;
         UniqueId& operator=(const UniqueId& other) = default;
 
+        /// <summary> Equality comparison </summary>
         bool operator==(const UniqueId& other) const;
+
+        /// <summary> Inequality comparison </summary>
         bool operator!=(const UniqueId& other) const;
 
+        /// <summary> Stream output </summary>
         friend std::ostream& operator<<(std::ostream& stream, const UniqueId& id)
         {
             stream << id._id;
@@ -42,7 +45,7 @@ namespace model
     };
 }
 
-// custom specialization of std::hash can be injected in namespace std
+// custom specialization of std::hash so we can keep UniqueIds in containers that require hashable types
 namespace std
 {
     template <>

@@ -17,21 +17,21 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-
     class Node;
 
-    /// <summary> Base for classes that represent outputs from a function (essentially identical to Port) </summary>
-    class OutputPortBase : public Port
-    {
-    protected:
-        OutputPortBase(const class Node* node, size_t outputIndex, PortType type, size_t size) : Port(node, outputIndex, type, size){};
-    };
+    /// <summary> Define a type named OutputPortBase to act as a non-templated base class for all output ports </summary>
+    typedef Port OutputPortBase;    
 
     /// <summary> Represents an output from a node </summary>
     template <typename ValueType>
     class OutputPort : public OutputPortBase
     {
     public:
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="node"> The node this output port is part of </param>
+        /// <param name="outputIndex"> The index in the list of the node's outputs for this port </param>
+        /// <param name="size"> The dimensionality of this port </param>
         OutputPort(const class Node* node, size_t outputIndex, size_t size) : OutputPortBase(node, outputIndex, OutputPortBase::GetTypeCode<ValueType>(), size) {}
 
         /// <summary> Returns the cached output from this port </summary>

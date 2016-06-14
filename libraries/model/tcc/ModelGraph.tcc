@@ -19,7 +19,9 @@ namespace model
         {
         public:
             ReverseRange(const ContainerType& container) : _begin(container.crbegin()), _end(container.crend()) {}
+
             typename ContainerType::const_reverse_iterator begin() const { return _begin; }
+
             typename ContainerType::const_reverse_iterator end() const { return _end; }
 
         private:
@@ -41,8 +43,8 @@ namespace model
     std::shared_ptr<NodeType> Model::AddNode(Args... args)
     {
         auto node = std::make_shared<NodeType>(args...);
-        node->AddDependencies();
-        _nodeMap[node->Id()] = node;
+        node->RegisterDependencies();
+        _nodeMap[node->GetId()] = node;
         return node;
     }
 
@@ -50,13 +52,13 @@ namespace model
     // Compute output value
     //
     template <typename ValueType>
-    std::vector<ValueType> Model::GetNodeOutput(const OutputPort<ValueType>& OutputPort) const
+    std::vector<ValueType> Model::GetNodeOutput(const OutputPort<ValueType>& outputPort) const
     {
         auto compute = [](const Node& node) { node.Compute(); };
 
-        Visit(compute, { OutputPort.Node() });
+        Visit(compute, { outputPort.Node() });
 
-        return OutputPort.GetOutput();
+        return outputPort.GetOutput();
     }
 
     template <typename ValueType>
@@ -64,7 +66,8 @@ namespace model
     {
         auto compute = [](const Node& node) { node.Compute(); };
 
-        if (Port::GetTypeCode<ValueType>() != outputNode->GetOutputType(outputIndex)) {
+        if (Port::GetTypeCode<ValueType>() != outputNode->GetOutputType(outputIndex))
+        {
             throw std::runtime_error("output types don't match");
         }
 
@@ -99,7 +102,8 @@ namespace model
     {
         // start with output nodes in the stack
         std::vector<const Node*> outputNodePtrs;
-        for (auto outputNode : outputNodes) {
+        for (auto outputNode : outputNodes)
+        {
             outputNodePtrs.push_back(outputNode.get());
         }
         Visit(visitor, outputNodePtrs);
@@ -109,7 +113,8 @@ namespace model
     template <typename Visitor>
     void Model::Visit(Visitor& visitor, const std::vector<const Node*>& outputNodePtrs) const
     {
-        if (_nodeMap.size() == 0) {
+        if (_nodeMap.size() == 0)
+        {
             return;
         }
 
@@ -125,37 +130,43 @@ namespace model
             // start with some arbitrary node
             const Node* anOutputNode = _nodeMap.begin()->second.get();
             // follow dependency chain until we get an output node
-            while (!IsLeaf(anOutputNode)) {
+            while (!IsLeaf(anOutputNode))
+            {
                 anOutputNode = anOutputNode->GetDependentNodes()[0];
             }
             stack.push_back(anOutputNode);
             sentinelNode = anOutputNode;
         }
 
-        while (stack.size() > 0) {
+        while (stack.size() > 0)
+        {
             const Node* node = stack.back();
 
             // check if we've already visited this node
-            if (visitedNodes.find(node) != visitedNodes.end()) {
+            if (visitedNodes.find(node) != visitedNodes.end())
+            {
                 stack.pop_back();
                 continue;
             }
 
             // we can visit this node only if all its inputs have been visited already
             bool canVisit = true;
-            for (auto input : node->_inputs) {
+            for (auto input : node->_inputs)
+            {
                 // Note: If InputPorts can point to multiple nodes, we'll have to iterate over them here
                 auto inputNode = input->Node();
                 canVisit = canVisit && visitedNodes.find(inputNode) != visitedNodes.end();
             }
 
-            if (canVisit) {
+            if (canVisit)
+            {
                 stack.pop_back();
                 visitedNodes.insert(node);
 
                 // In "visit whole graph" mode, we want to defer visiting the chosen output node until the end
                 // In "visit active graph" mode, this test should never fail, and we'll always visit the node
-                if (node != sentinelNode) {
+                if (node != sentinelNode)
+                {
                     visitor(*node);
                 }
 
@@ -178,7 +189,8 @@ namespace model
                 }
             }
         }
-        if (sentinelNode != nullptr) {
+        if (sentinelNode != nullptr)
+        {
             visitor(*sentinelNode);
         }
     }

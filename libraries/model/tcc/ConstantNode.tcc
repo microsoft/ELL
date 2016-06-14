@@ -9,7 +9,6 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-
     // Constructor for a scalar constant
 
     // superclass (Node) constructor takes two array arguments: inputs and outputs. These are pointers to our local InputPort and OutputPort storage.

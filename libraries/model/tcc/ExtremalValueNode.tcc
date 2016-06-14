@@ -20,10 +20,12 @@ namespace model
     {
         auto inputValues = _input.GetValue<ValueType>();
         decltype(std::max_element(inputValues.begin(), inputValues.end())) result;
-        if (max) {
+        if (max)
+        {
             result = std::max_element(inputValues.begin(), inputValues.end());
         }
-        else {
+        else
+        {
             result = std::min_element(inputValues.begin(), inputValues.end());
         }
         auto val = *result;

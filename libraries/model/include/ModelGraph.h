@@ -21,48 +21,61 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-
-    //
-    // Model
-    //
+    /// <summary> Model class. Represents a graph of computation </summary>
     class Model
     {
     public:
-        // AddNode is the factory method used to create nodes and add them to the graph.
+        /// <summary> Factory method used to create nodes and add them to the graph. </summary>
         template <typename NodeType, typename... Args>
         std::shared_ptr<NodeType> AddNode(Args... args);
 
-        // `GetNode()` looks up a node by id. Returns nullptr if node not found. Maybe should be called `FindNode()`
-        // Q: should this return a Node*, a weak_ptr<Node>, or a shared_ptr<Node>?
-        // Node* -- pro: easy to use. con: potentially less safe (but not really)
-        // weak_ptr<Node> -- pro: potentially more safe. con: fussy to use. Potentially semantically incorrect
-        // shared_ptr<Node> --- pro: easier to use than weak_ptr, con: wrong
+        /// <summary> Looks up a node by id </summary>
+        ///
+        /// <param name="id"> The id of the node </param>
+        /// <returns> a weak_ptr to the node </param>
         std::weak_ptr<Node> GetNode(Node::NodeId id);
 
-        // `GetNodeOutput` -- Computes and returns the computed output value for a node
-        // There are 2 overloads for `GetNodeOutput`. One takes a typed OutputPort<T>, and its output type is compile-time enforced. The other
-        // takes a node and index into its outputs, and requires the user to specify the output type as a template parameter. We must check
-        // that the types are compatible at runtime.
+        /// <summary> Returns part of the output computed by a node </summary>
+        ///
+        /// <param name="outputPort"> The output port to get the computed value form </param>
+        template <typename ValueType>
+        std::vector<ValueType> GetNodeOutput(const OutputPort<ValueType>& outputPort) const;
+
+        /// <summary> Returns part of the output computed by a node </summary>
+        ///
+        /// <param name="node"> The node to get the output from </param>
+        /// <param name="outputIndex"> The index of the port within the node to get the output from </param>
         template <typename ValueType>
         std::vector<ValueType> GetNodeOutput(const std::shared_ptr<Node>& node, size_t outputIndex) const;
 
-        template <typename ValueType>
-        std::vector<ValueType> GetNodeOutput(const OutputPort<ValueType>& OutputPort) const;
+        ///{
 
-        // Visitors
-        // The visitor functions visit the nodes in the graph in dependency order. No nodes
-        // will be visited until all their inputs have first been visited.
+        /// <summary> Visitors
+        /// The visitor functions visit the nodes in the graph in dependency order. No nodes
+        /// will be visited until all their inputs have first been visited. </summary>
 
-        // This visitor (without any `Node` arguments) visits all nodes in the graph
+        /// <summary> Visits all the nodes in the graph </summary>
+        ///
+        /// <param name="visitor"> The visitor functor to use </param>
         template <typename Visitor>
         void Visit(Visitor& visitor) const;
 
         // These two visitors only visit the nodes in the graph necessary to compute the output of the given node(s)
+        /// <summary> Visits the nodes in the graph necessary to compute the output of a given node </summary>
+        ///
+        /// <param name="visitor"> The visitor functor to use </param>
+        /// <param name="outputNode"> The output node to use for deciding which nodes to visit </param>
         template <typename Visitor>
         void Visit(Visitor& visitor, const std::shared_ptr<Node>& outputNode) const;
 
+        // These two visitors only visit the nodes in the graph necessary to compute the output of the given node(s)
+        /// <summary> Visits the nodes in the graph necessary to compute the outputs of the given nodes </summary>
+        ///
+        /// <param name="visitor"> The visitor functor to use </param>
+        /// <param name="outputNodes"> The output nodes to use for deciding which nodes to visit </param>
         template <typename Visitor>
         void Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNodes) const;
+        ///}
 
         // TODO: iterators, including begin/end for iterating over entire graph
 
