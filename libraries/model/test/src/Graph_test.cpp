@@ -100,13 +100,13 @@ void TestStaticGraph()
     auto output3 = g.GetNodeOutput(valSelector->output);
     for (auto x : output3) std::cout << x << "  ";
     std::cout << std::endl;
-    testing::ProcessTest("Testing min value", testing::IsEqual(output3[0], 0.25));
+    testing::ProcessTest("Testing min value", testing::IsEqual(output3[0], 0.75));
 
     std::cout << "\nComputing output of indexSelector node" << std::endl;
     auto output4 = g.GetNodeOutput(indexSelector->output);
     for (auto x : output4) std::cout << x << "  ";
     std::cout << std::endl;
-    testing::ProcessTest("Testing min index", testing::IsEqual(output4[0], 1));
+    testing::ProcessTest("Testing min index", testing::IsEqual(output4[0], 2));
 }
 
 //

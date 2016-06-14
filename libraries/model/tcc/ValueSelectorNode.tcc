@@ -17,6 +17,7 @@ namespace model
         {
             throw std::runtime_error("Error: Condition must be 1-D signal");
         }
+
         if (value1.Size() != value2.Size())
         {
             throw std::runtime_error("Error: input values must be same dimension");
@@ -26,10 +27,11 @@ namespace model
     template <typename ValueType>
     void ValueSelectorNode<ValueType>::Compute() const
     {
-        auto cond = _condition.GetValue<bool>()[0]; // array of size 1
+        auto condVec = _condition.GetValue<bool>();
         auto val1 = _value1.GetValue<ValueType>();
         auto val2 = _value2.GetValue<ValueType>();
-
+        assert(condVec.size() == 1);
+        bool cond = condVec[0];
         _output.SetOutput(cond ? val1 : val2);
     };
 }
