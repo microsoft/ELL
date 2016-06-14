@@ -86,10 +86,15 @@ void TestStaticGraph()
     for (auto x : output1) std::cout << x << "  ";
     std::cout << std::endl;
 
-    // std::cout << "\nComputing output of ArgMax node" << std::endl;
-    // auto output2 = g.GetNodeOutput(maxAndArgMax->val);
-    // for(auto x: output2) std::cout << x << "  ";
-    // std::cout << std::endl;
+    std::cout << "\nComputing output of condition node" << std::endl;
+    auto conditionOutput = g.GetNodeOutput(condition->output);
+    for (auto x : conditionOutput) std::cout << x << "  ";
+    std::cout << std::endl;
+
+     //std::cout << "\nComputing output of ArgMax node" << std::endl;
+     //auto maxOutput = g.GetNodeOutput(maxAndArgMax->val);
+     //for(auto x: maxOutput) std::cout << x << "  ";
+     //std::cout << std::endl;
 
     std::cout << "\nComputing output of valSelector node" << std::endl;
     auto output3 = g.GetNodeOutput(valSelector->output);
