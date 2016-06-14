@@ -136,7 +136,7 @@ namespace layers
         }
         else
         {
-            throw std::runtime_error("unsupported version: " + std::to_string(version));
+            throw std::runtime_error("unsupported version: " + version);
         }
     }
 

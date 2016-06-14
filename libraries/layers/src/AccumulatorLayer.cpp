@@ -119,7 +119,7 @@ namespace layers
         }
         else
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "unsupported version: " + std::to_string(version));
+            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "unsupported version: " + version);
         }
 
         // check validity of deserialized vectors
