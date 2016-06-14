@@ -52,6 +52,15 @@ public:
     /// <returns> A std::string that represents this LinearOperation. </returns>
     std::string ToString(const std::string& sourceVariableName) const;
 
+	double MultiplyBy() const
+	{
+		return _a;
+	}
+	double IncrementBy() const
+	{
+		return _b;
+	}
+
 private:
     double _a = 0;
     double _b = 0;

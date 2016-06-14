@@ -10,6 +10,7 @@
 #include "CompilableCoordinatewise.h"
 #include "CompilableSum.h"
 #include "DataFlowNode.h"
+#include "CodeEmitter.h"
 
 // utilities
 #include "IntegerStack.h"
@@ -51,7 +52,8 @@ const char* AllocateTempVariableAndGetFormat(DataFlowNode& targetNode, utilities
     }
 }
 
-void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::IntegerStack& stack, std::ostream& os)
+//void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::IntegerStack& stack, CodeGenerator& codeGen)
+void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, CodeEmitter& codeGen)
 {
     auto currentNodeVariableName = currentNode.GetVariableName();
 
@@ -65,11 +67,12 @@ void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::Int
         auto targetCoordinate = action.GetTarget();
         auto& targetNode = graph.GetNode(targetCoordinate);
 
-        const char* format = AllocateTempVariableAndGetFormat(targetNode, stack);
-        auto targetVariableName = targetNode.GetVariableName();
-        auto rhs = action.GetOperation().ToString(currentNodeVariableName);
+        //const char* format = AllocateTempVariableAndGetFormat(targetNode, stack);
+        //auto targetVariableName = targetNode.GetVariableName();
+        //auto rhs = action.GetOperation().ToString(currentNodeVariableName);
+        //utilities::PrintFormat(os, format, targetVariableName, rhs, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
 
-        utilities::PrintFormat(os, format, targetVariableName, rhs, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
+		codeGen.Emit(currentNodeVariableName, targetNode, action.GetOperation(), targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
 
         // indicate that the target node is initialized
         targetNode.SetInitialized();
@@ -77,14 +80,16 @@ void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::Int
         // check if temp variable can be released
         if(currentNode.HasActions() == false && currentNode.HasTempVariableName())
         {
-            stack.Push(currentNode.GetTempVariableIndex());
+            //stack.Push(currentNode.GetTempVariableIndex());
+			codeGen.ReleaseVar(currentNode);
         }
 
         // if target node has all of its inputs, process it 
         targetNode.DecrementUncomputedInputs();
         if(targetNode.IsWaitingForInputs() == false)
         {
-            ProcessNode(targetNode, graph, stack, os);
+            //ProcessNode(targetNode, graph, stack, os);
+			ProcessNode(targetNode, graph, codeGen);
         }
     }
 }
@@ -148,22 +153,24 @@ void CompilableMap::ToCode(std::ostream& os) const
     }
 
     // construct an integer stack, to manage temp variable names;
-    utilities::IntegerStack stack;
-
+    //utilities::IntegerStack stack;
     // print comment
-    auto str = "// Predict function\n// Input dimension: %\n// Output dimension: %\n// Output coordinates:";
-    utilities::PrintFormat(os, str, _requiredInputLayerSize, outputLayerSize);
-    for (uint64_t i = 0; i < _outputCoordinates.Size(); ++i)
-    {
-        os << ' ' << _outputCoordinates[i];
-    }
+    //auto str = "// Predict function\n// Input dimension: %\n// Output dimension: %\n// Output coordinates:";
+    //utilities::PrintFormat(os, str, _requiredInputLayerSize, outputLayerSize);
+    //for (uint64_t i = 0; i < _outputCoordinates.Size(); ++i)
+    //{
+    //    os << ' ' << _outputCoordinates[i];
+    //}
 
     // print function declaration
-    os << "\nvoid Predict(const double* input, double* output)\n{\n";
+    //os << "\nvoid Predict(const double* input, double* output)\n{\n";
 
     // forward pass to generate code
+	CEmitter codeGen(os);
+	codeGen.BeginLinear("Predict", _requiredInputLayerSize, _outputCoordinates);
+
     const std::string inputNamePrefix = "input";
-    for (uint64_t inputElementIndex = 0; inputElementIndex < _requiredInputLayerSize; ++inputElementIndex)
+	for (uint64_t inputElementIndex = 0; inputElementIndex < _requiredInputLayerSize; ++inputElementIndex)
     {
         layers::Coordinate inputCoordinate(0, inputElementIndex);
         auto& inputNode = graph.GetNode(inputCoordinate);
@@ -177,11 +184,14 @@ void CompilableMap::ToCode(std::ostream& os) const
         }
         else
         {
-            const char* format = AllocateTempVariableAndGetFormat(inputNode, stack);
-            utilities::PrintFormat(os, format, inputNode.GetVariableName(), inputVariableName, 0, inputElementIndex);
+            //const char* format = AllocateTempVariableAndGetFormat(inputNode, stack);
+            //utilities::PrintFormat(os, format, inputNode.GetVariableName(), inputVariableName, 0, inputElementIndex);
+			codeGen.Emit(inputVariableName, inputNode, 0, inputElementIndex);
         }
-        ProcessNode(inputNode, graph, stack, os);
+        //ProcessNode(inputNode, graph, stack, codeGen);
+		ProcessNode(inputNode, graph, codeGen);
     }
 
-    os << "}\n";
+   // os << "}\n";
+	codeGen.EndLinear();
 }
