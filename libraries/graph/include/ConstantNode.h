@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ConstantNode.h (graph)
+//  File:     ConstantNode.h (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,5 +50,6 @@ private:
     std::vector<ValueType> _values;
     OutputPort<ValueType> _output;
 };
+}
 
 #include "../tcc/ConstantNode.tcc"
