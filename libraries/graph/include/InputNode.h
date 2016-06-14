@@ -15,40 +15,45 @@
 #include <memory>
 #include <string>
 
-/// <summary> A node that represents an input to the system. </summary>
-template <typename ValueType>
-class InputNode : public Node
+/// <summary> model namespace </summary>
+namespace model
 {
-public:
-    /// <summary> Constructor </summary>
-    ///
-    /// <param name="dimension"> The input dimension </param>
-    InputNode(size_t dimension);
 
-    /// <summary> Sets the value output by this node </summary>
-    ///
-    /// <param name="inputValues"> The values for this node to output </param>
-    void SetInput(std::vector<ValueType> inputValues);
+    /// <summary> A node that represents an input to the system. </summary>
+    template <typename ValueType>
+    class InputNode : public Node
+    {
+    public:
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="dimension"> The input dimension </param>
+        InputNode(size_t dimension);
 
-    /// <summary> Gets the name of this type (for serialization). </summary>
-    ///
-    /// <returns> The name of this type. </returns>
-    static std::string GetTypeName() { return "Input"; }
+        /// <summary> Sets the value output by this node </summary>
+        ///
+        /// <param name="inputValues"> The values for this node to output </param>
+        void SetInput(std::vector<ValueType> inputValues);
 
-    /// <summary> Gets the name of this type (for serialization). </summary>
-    ///
-    /// <returns> The name of this type. </returns>
-    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "Input"; }
 
-    /// <summary> Exposes the output port as a read-only property </summary>
-    const OutputPort<ValueType>& output = _output;
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-protected:
-    virtual void Compute() const override;
+        /// <summary> Exposes the output port as a read-only property </summary>
+        const OutputPort<ValueType>& output = _output;
 
-private:
-    std::vector<ValueType> _inputValues;
-    OutputPort<ValueType> _output;
-};
+    protected:
+        virtual void Compute() const override;
+
+    private:
+        std::vector<ValueType> _inputValues;
+        OutputPort<ValueType> _output;
+    };
+}
 
 #include "../tcc/InputNode.tcc"

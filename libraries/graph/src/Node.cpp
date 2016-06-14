@@ -9,29 +9,22 @@
 #include "Node.h"
 #include "InputPort.h"
 
-Node::Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs) : _inputs(inputs), _outputs(outputs), _id(UniqueId())
+/// <summary> model namespace </summary>
+namespace model
 {
-};
 
-Port::PortType Node::GetOutputType(size_t outputIndex) const
-{
-    return _outputs[outputIndex]->Type();    
-}
+    Node::Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs) : _inputs(inputs), _outputs(outputs), _id(UniqueId()){};
 
-size_t Node::GetOutputSize(size_t outputIndex) const
-{
-    return _outputs[outputIndex]->Size();
-}
+    Port::PortType Node::GetOutputType(size_t outputIndex) const { return _outputs[outputIndex]->Type(); }
 
-void Node::AddDependent(const Node* dependent) const
-{
-    _dependentNodes.push_back(dependent);
-}
+    size_t Node::GetOutputSize(size_t outputIndex) const { return _outputs[outputIndex]->Size(); }
 
-void Node::AddDependencies() const
-{
-    for(const auto& input: _inputs)
+    void Node::AddDependent(const Node* dependent) const { _dependentNodes.push_back(dependent); }
+
+    void Node::AddDependencies() const
     {
-        input->Node()->AddDependent(this);
+        for (const auto& input : _inputs) {
+            input->Node()->AddDependent(this);
+        }
     }
 }

@@ -16,42 +16,47 @@
 #include <memory>
 #include <exception>
 
-/// <summary> An example node that selects from one of two input values depending on a third input </summary>
-template <typename ValueType>
-class ValueSelectorNode : public Node
+/// <summary> model namespace </summary>
+namespace model
 {
-public:
-    /// <summary> Constructor </summary>
-    ///
-    /// <param name="condition"> An input that returns a single boolean value that selects which input to use as output </param>
-    /// <param name="value2"> The input to return if the condition is `true` </param>
-    /// <param name="value2"> The input to return if the condition is `false` </param>
-    ValueSelectorNode(OutputPort<bool> condition, OutputPort<ValueType> value1, OutputPort<ValueType> value2);
 
-    /// <summary> Gets the name of this type (for serialization). </summary>
-    ///
-    /// <returns> The name of this type. </returns>
-    static std::string GetTypeName() { return "ValueSelector"; }
+    /// <summary> An example node that selects from one of two input values depending on a third input </summary>
+    template <typename ValueType>
+    class ValueSelectorNode : public Node
+    {
+    public:
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="condition"> An input that returns a single boolean value that selects which input to use as output </param>
+        /// <param name="value2"> The input to return if the condition is `true` </param>
+        /// <param name="value2"> The input to return if the condition is `false` </param>
+        ValueSelectorNode(OutputPort<bool> condition, OutputPort<ValueType> value1, OutputPort<ValueType> value2);
 
-    /// <summary> Gets the name of this type (for serialization). </summary>
-    ///
-    /// <returns> The name of this type. </returns>
-    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "ValueSelector"; }
 
-    /// <summary> Exposes the output port as a read-only property </summary>
-    const OutputPort<ValueType>& output = _output;
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-protected:
-    virtual void Compute() const override;
+        /// <summary> Exposes the output port as a read-only property </summary>
+        const OutputPort<ValueType>& output = _output;
 
-private:
-    // Inputs
-    InputPort _condition;
-    InputPort _value1;
-    InputPort _value2;
+    protected:
+        virtual void Compute() const override;
 
-    // Output
-    OutputPort<ValueType> _output;
-};
+    private:
+        // Inputs
+        InputPort _condition;
+        InputPort _value1;
+        InputPort _value2;
+
+        // Output
+        OutputPort<ValueType> _output;
+    };
+}
 
 #include "../tcc/ValueSelectorNode.tcc"

@@ -6,26 +6,29 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template <typename ValueType, bool max>
-ExtremalValueNode<ValueType, max>::ExtremalValueNode(OutputPort<ValueType> input) : Node({&_input}, {&_val, &_argVal}), _input(&input), _val(this, 0, 1), _argVal(this, 1, 1) 
+/// <summary> model namespace </summary>
+namespace model
 {
-}
 
-template <typename ValueType, bool max>
-void ExtremalValueNode<ValueType, max>::Compute() const 
-{
-    auto inputValues = _input.GetValue<ValueType>();
-    decltype(std::max_element(inputValues.begin(), inputValues.end())) result;    
-    if(max)
+    template <typename ValueType, bool max>
+    ExtremalValueNode<ValueType, max>::ExtremalValueNode(OutputPort<ValueType> input) : Node({ &_input }, { &_val, &_argVal }), _input(&input), _val(this, 0, 1), _argVal(this, 1, 1)
     {
-        result = std::max_element(inputValues.begin(), inputValues.end());
     }
-    else
+
+    template <typename ValueType, bool max>
+    void ExtremalValueNode<ValueType, max>::Compute() const
     {
-        result = std::min_element(inputValues.begin(), inputValues.end());
-    }    
-    auto val = *result;
-    auto index = result-inputValues.begin();
-    _val.SetOutput({val});
-    _argVal.SetOutput({(int)index});
-};
+        auto inputValues = _input.GetValue<ValueType>();
+        decltype(std::max_element(inputValues.begin(), inputValues.end())) result;
+        if (max) {
+            result = std::max_element(inputValues.begin(), inputValues.end());
+        }
+        else {
+            result = std::min_element(inputValues.begin(), inputValues.end());
+        }
+        auto val = *result;
+        auto index = result - inputValues.begin();
+        _val.SetOutput({ val });
+        _argVal.SetOutput({ (int)index });
+    };
+}

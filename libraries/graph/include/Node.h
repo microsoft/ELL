@@ -18,57 +18,61 @@
 #include <unordered_set>
 #include <unordered_map>
 
-class InputPort;
-
-/// <summary> Superclass for all node types. </summary>
-class Node
+/// <summary> model namespace </summary>
+namespace model
 {
-public:
-    /// <summary> Type to use for our node id </summary>
-    typedef UniqueId NodeId;
+    class InputPort;
 
-    /// <summary> Returns the unique ID for this node </summary>
-    const NodeId Id() const { return _id; }
+    /// <summary> Superclass for all node types. </summary>
+    class Node
+    {
+    public:
+        /// <summary> Type to use for our node id </summary>
+        typedef UniqueId NodeId;
 
-    /// <summary> Returns the input "ports" for this node </summary>
-    const std::vector<InputPort*>& GetInputs() const { return _inputs; }
+        /// <summary> Returns the unique ID for this node </summary>
+        const NodeId Id() const { return _id; }
 
-    // Convenience functions to get various properties of the outputs
-    template <typename ValueType>
-    std::vector<ValueType> GetOutputValue(size_t outputIndex) const;
+        /// <summary> Returns the input "ports" for this node </summary>
+        const std::vector<InputPort*>& GetInputs() const { return _inputs; }
 
-    Port::PortType GetOutputType(size_t outputIndex) const;
+        // Convenience functions to get various properties of the outputs
+        template <typename ValueType>
+        std::vector<ValueType> GetOutputValue(size_t outputIndex) const;
 
-    size_t GetOutputSize(size_t outputIndex) const;
+        Port::PortType GetOutputType(size_t outputIndex) const;
 
-    /// <summary> Gets the name of this type (for serialization). </summary>
-    ///
-    /// <returns> The name of this type. </returns>
-    virtual std::string GetRuntimeTypeName() const = 0;
+        size_t GetOutputSize(size_t outputIndex) const;
 
-    // Get all nodes that depend (directly) on us
-    const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const = 0;
 
-protected:
-    // The constructor for Node is kind of gross. The arguments (and the _inputs and _outputs members)
-    // should perhaps be vectors of references instead of pointers.
-    Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs);
+        // Get all nodes that depend (directly) on us
+        const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
-    // Compute is implemented by subclasses to calculate their result and set them in their outputs
-    virtual void Compute() const {};
-    void RegisterOutputs() const; // TODO
+    protected:
+        // The constructor for Node is kind of gross. The arguments (and the _inputs and _outputs members)
+        // should perhaps be vectors of references instead of pointers.
+        Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
-private:
-    friend class Model;
-    void AddDependent(const Node* dependent) const;
-    void AddDependencies() const;
+        // Compute is implemented by subclasses to calculate their result and set them in their outputs
+        virtual void Compute() const {};
+        void RegisterOutputs() const; // TODO
 
-    NodeId _id;
+    private:
+        friend class Model;
+        void AddDependent(const Node* dependent) const;
+        void AddDependencies() const;
 
-    std::vector<InputPort*> _inputs;
-    std::vector<OutputPortBase*> _outputs;
+        NodeId _id;
 
-    mutable std::vector<const Node*> _dependentNodes;
-};
+        std::vector<InputPort*> _inputs;
+        std::vector<OutputPortBase*> _outputs;
+
+        mutable std::vector<const Node*> _dependentNodes;
+    };
+}
 
 #include "../tcc/Node.tcc"

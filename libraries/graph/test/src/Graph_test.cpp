@@ -15,7 +15,6 @@
 // testing
 #include "testing.h"
 
-
 // stl
 #include <iostream>
 #include <unordered_map>
@@ -26,7 +25,8 @@
 //     return { args... };
 // }
 
-void NodePrinter(const Node& node)
+void
+NodePrinter(const model::Node& node)
 {
     bool first = true;
     std::cout << "node_" << node.Id() << " = " << node.GetRuntimeTypeName() << "(";
@@ -40,13 +40,13 @@ void NodePrinter(const Node& node)
     std::cout << ")" << std::endl;        
 };
 
-
-void PrintGraph(const Model& graph)
+void
+PrintGraph(const model::Model& graph)
 {
     graph.Visit(NodePrinter);    
 }
 
-void PrintGraph(const Model& graph, const std::shared_ptr<Node>& output)
+void PrintGraph(const model::Model& graph, const std::shared_ptr<model::Node>& output)
 {    
     graph.Visit(NodePrinter, output);    
 }
@@ -54,13 +54,13 @@ void PrintGraph(const Model& graph, const std::shared_ptr<Node>& output)
 void TestStaticGraph()
 {
     // Create a simple computation graph
-    Model g;
-    auto in = g.AddNode<InputNode<double>>(3);
-    auto maxAndArgMax = g.AddNode<ArgMaxNode<double>>(in->output);
-    auto minAndArgMin = g.AddNode<ArgMinNode<double>>(in->output);
-    auto condition = g.AddNode<ConstantNode<bool>>(true);
-    auto valSelector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
-    auto indexSelector = g.AddNode<ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
+    model::Model g;
+    auto in = g.AddNode<model::InputNode<double>>(3);
+    auto maxAndArgMax = g.AddNode<model::ArgMaxNode<double>>(in->output);
+    auto minAndArgMin = g.AddNode<model::ArgMinNode<double>>(in->output);
+    auto condition = g.AddNode<model::ConstantNode<bool>>(true);
+    auto valSelector = g.AddNode<model::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
+    auto indexSelector = g.AddNode<model::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
     // 
     // Print various subgraphs
@@ -115,13 +115,12 @@ void TestStaticGraph()
 void TestDynamicGraph()
 {
     // Create a simple computation graph
-    Model model;
+    model::Model model;
 
-    auto in = model.AddNode<InputNode<double>>(3);
-    auto maxAndArgMax = model.AddNode<ArgMaxNode<double>>(in->output);
-    auto minAndArgMin = model.AddNode<ArgMinNode<double>>(in->output);
-    auto condition = model.AddNode<ConstantNode<bool>>(true);
-    auto valSelector = model.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
-    auto indexSelector = model.AddNode<ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
-
+    auto in = model.AddNode<model::InputNode<double>>(3);
+    auto maxAndArgMax = model.AddNode<model::ArgMaxNode<double>>(in->output);
+    auto minAndArgMin = model.AddNode<model::ArgMinNode<double>>(in->output);
+    auto condition = model.AddNode<model::ConstantNode<bool>>(true);
+    auto valSelector = model.AddNode<model::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
+    auto indexSelector = model.AddNode<model::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 }
