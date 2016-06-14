@@ -73,4 +73,4 @@ private:
     void Visit(Visitor& visitor, const std::vector<const Node*>& outputNodePtrs) const;
 };
 
-#include "../tcc/DirectedGraph.tcc"
+#include "../tcc/ModelGraph.tcc"

@@ -4,7 +4,7 @@
 
 #include "Graph_test.h"
 
-#include "DirectedGraph.h"
+#include "ModelGraph.h"
 #include "ValueSelectorNode.h"
 #include "ExtremalValueNode.h"
 #include "ConstantNode.h"

@@ -12,13 +12,13 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/DirectedGraph.cpp
+set (SRC src/ModelGraph.cpp
          src/Node.cpp
          src/Port.cpp
          src/UniqueId.cpp
 )
 
-set (INCLUDE include/DirectedGraph.h
+set (INCLUDE include/ModelGraph.h
              include/Node.h
              include/Port.h
              include/InputPort.h
@@ -32,7 +32,7 @@ set (INCLUDE include/DirectedGraph.h
 
 set (TCC tcc/Node.tcc
          tcc/InputPort.tcc
-         tcc/DirectedGraph.tcc
+         tcc/ModelGraph.tcc
          tcc/ConstantNode.tcc
          tcc/InputNode.tcc
          tcc/ExtremalValueNode.tcc
