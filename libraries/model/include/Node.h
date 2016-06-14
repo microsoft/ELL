@@ -69,7 +69,7 @@ namespace model
         // The constructor for Node is kind of gross. The arguments (and the _inputs and _outputs members)
         // should perhaps be vectors of references instead of pointers.
         Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs);
-
+        
         /// <summary> Computes the output of this node and stores it in the output ports </summary>
         virtual void Compute() const = 0;
         void RegisterOutputs() const; // TODO

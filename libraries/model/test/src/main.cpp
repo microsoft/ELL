@@ -15,8 +15,8 @@
 
 int main()
 {
+    TestMultifariousInputs();
     TestStaticGraph();
-
     TestDynamicGraph();
 
     if (testing::DidTestFail())

@@ -18,24 +18,26 @@ set (SRC src/ModelGraph.cpp
          src/UniqueId.cpp
 )
 
-set (INCLUDE include/ModelGraph.h
-             include/Node.h
-             include/Port.h
-             include/InputPort.h
-             include/OutputPort.h
+set (INCLUDE include/CombinerNode.h 
              include/ConstantNode.h
-             include/InputNode.h
              include/ExtremalValueNode.h
+             include/InputNode.h
+             include/InputPort.h
+             include/ModelGraph.h
+             include/Node.h
+             include/OutputPort.h
+             include/Port.h
              include/UniqueId.h
              include/ValueSelectorNode.h
 )
 
-set (TCC tcc/Node.tcc
+set (TCC tcc/CombinerNode.tcc
+         tcc/ConstantNode.tcc
+         tcc/ExtremalValueNode.tcc
+         tcc/InputNode.tcc
          tcc/InputPort.tcc
          tcc/ModelGraph.tcc
-         tcc/ConstantNode.tcc
-         tcc/InputNode.tcc
-         tcc/ExtremalValueNode.tcc
+         tcc/Node.tcc
          tcc/ValueSelectorNode.tcc
 )
 

@@ -8,6 +8,7 @@
 #include "ValueSelectorNode.h"
 #include "ExtremalValueNode.h"
 #include "ConstantNode.h"
+#include "CombinerNode.h"
 #include "InputNode.h"
 #include "InputPort.h"
 #include "OutputPort.h"
@@ -107,6 +108,25 @@ void TestStaticGraph()
     for (auto x : output4) std::cout << x << "  ";
     std::cout << std::endl;
     testing::ProcessTest("Testing min index", testing::IsEqual(output4[0], 2));
+}
+
+void TestMultifariousInputs()
+{
+    // Create a simple computation graph
+    model::Model model;
+
+    auto in = model.AddNode<model::InputNode<double>>(3);
+    auto minAndArgMin = model.AddNode<model::ArgMinNode<double>>(in->output);
+    auto maxAndArgMax = model.AddNode<model::ArgMaxNode<double>>(in->output);
+    std::vector<model::CombinerNode<double>::InputRange> ranges = { model::CombinerNode<double>::InputRange{ minAndArgMin->val, 0, 1 }, model::CombinerNode<double>::InputRange{maxAndArgMax->val, 0, 1 } };
+    auto minAndMax = model.AddNode<model::CombinerNode<double>>(ranges);
+
+    std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
+    in->SetInput(inputValues);
+    auto output = model.GetNodeOutput(minAndMax->output);
+    for (auto val : output) std::cout << val << "  ";
+    std::cout << std::endl;
+
 }
 
 //
