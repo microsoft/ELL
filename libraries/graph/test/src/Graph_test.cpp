@@ -41,12 +41,12 @@ void NodePrinter(const Node& node)
 };
 
 
-void PrintGraph(const DirectedGraph& graph)
+void PrintGraph(const Model& graph)
 {
     graph.Visit(NodePrinter);    
 }
 
-void PrintGraph(const DirectedGraph& graph, const std::shared_ptr<Node>& output)
+void PrintGraph(const Model& graph, const std::shared_ptr<Node>& output)
 {    
     graph.Visit(NodePrinter, output);    
 }
@@ -54,7 +54,7 @@ void PrintGraph(const DirectedGraph& graph, const std::shared_ptr<Node>& output)
 void TestStaticGraph()
 {
     // Create a simple computation graph
-    DirectedGraph g;
+    Model g;
     auto in = g.AddNode<InputNode<double>>(3);
     auto maxAndArgMax = g.AddNode<ArgMaxNode<double>>(in->output);
     auto minAndArgMin = g.AddNode<ArgMinNode<double>>(in->output);
@@ -110,13 +110,13 @@ void TestStaticGraph()
 void TestDynamicGraph()
 {
     // Create a simple computation graph
-    DirectedGraph g;
+    Model model;
 
-    auto in = g.AddNode<InputNode<double>>(3);
-    auto maxAndArgMax = g.AddNode<ArgMaxNode<double>>(in->output);
-    auto minAndArgMin = g.AddNode<ArgMinNode<double>>(in->output);
-    auto condition = g.AddNode<ConstantNode<bool>>(true);
-    auto valSelector = g.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
-    auto indexSelector = g.AddNode<ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
+    auto in = model.AddNode<InputNode<double>>(3);
+    auto maxAndArgMax = model.AddNode<ArgMaxNode<double>>(in->output);
+    auto minAndArgMin = model.AddNode<ArgMinNode<double>>(in->output);
+    auto condition = model.AddNode<ConstantNode<bool>>(true);
+    auto valSelector = model.AddNode<ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
+    auto indexSelector = model.AddNode<ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
 }

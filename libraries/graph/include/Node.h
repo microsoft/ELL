@@ -59,7 +59,7 @@ protected:
     void RegisterOutputs() const; // TODO
 
 private:
-    friend class DirectedGraph;
+    friend class Model;
     void AddDependent(const Node* dependent) const;
     void AddDependencies() const;
 

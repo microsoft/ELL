@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     DirectedGraph.cpp (graph)
+//  File:     Model.cpp (graph)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DirectedGraph.h"
 
-std::weak_ptr<Node> DirectedGraph::GetNode(Node::NodeId id)
+std::weak_ptr<Node> Model::GetNode(Node::NodeId id)
 {
     auto it = _nodeMap.find(id);
     if(it == _nodeMap.end())

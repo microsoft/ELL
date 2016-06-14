@@ -8,7 +8,7 @@
 
 // Just hiding some stuff in this namespace that's unlikely to confict with anything
 // TODO: put this in some utility place
-namespace DirectedGraphImpl
+namespace ModelImpl
 {
     template <typename ContainerType>
     class ReverseRange
@@ -34,7 +34,7 @@ namespace DirectedGraphImpl
 // Factory method for creating nodes
 //
 template <typename NodeType, typename... Args>
-std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
+std::shared_ptr<NodeType> Model::AddNode(Args... args)
 {
     auto node = std::make_shared<NodeType>(args...);
     node->AddDependencies();
@@ -46,7 +46,7 @@ std::shared_ptr<NodeType> DirectedGraph::AddNode(Args... args)
 // Compute output value
 //
 template <typename ValueType>
-std::vector<ValueType> DirectedGraph::GetNodeOutput(const OutputPort<ValueType>& OutputPort) const
+std::vector<ValueType> Model::GetNodeOutput(const OutputPort<ValueType>& OutputPort) const
 {
     auto compute = [](const Node& node)
     {
@@ -59,7 +59,7 @@ std::vector<ValueType> DirectedGraph::GetNodeOutput(const OutputPort<ValueType>&
 }
 
 template <typename ValueType>
-std::vector<ValueType> DirectedGraph::GetNodeOutput(const std::shared_ptr<Node>& outputNode, size_t outputIndex) const
+std::vector<ValueType> Model::GetNodeOutput(const std::shared_ptr<Node>& outputNode, size_t outputIndex) const
 {
     auto compute = [](const Node& node)
     {
@@ -82,7 +82,7 @@ std::vector<ValueType> DirectedGraph::GetNodeOutput(const std::shared_ptr<Node>&
 
 // Visits the entire graph
 template <typename Visitor>
-void DirectedGraph::Visit(Visitor& visitor) const
+void Model::Visit(Visitor& visitor) const
 {
     std::vector<const Node*> emptyVec;
     Visit(visitor, emptyVec);
@@ -90,7 +90,7 @@ void DirectedGraph::Visit(Visitor& visitor) const
 
 // Visits just the parts necessary to compute output node
 template <typename Visitor>
-void DirectedGraph::Visit(Visitor& visitor, const std::shared_ptr<Node>& outputNode) const
+void Model::Visit(Visitor& visitor, const std::shared_ptr<Node>& outputNode) const
 {
     std::vector<std::shared_ptr<Node>> x = {outputNode};
     Visit(visitor, {outputNode.get()});
@@ -98,7 +98,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::shared_ptr<Node>& outputN
 
 // Visits just the parts necessary to compute output nodes
 template <typename Visitor>
-void DirectedGraph::Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNodes) const
+void Model::Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNodes) const
 {
     // start with output nodes in the stack
     std::vector<const Node*> outputNodePtrs;
@@ -111,7 +111,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<std::shared_ptr<No
 
 // Real implementation function for `Visit()`
 template <typename Visitor>
-void DirectedGraph::Visit(Visitor& visitor, const std::vector<const Node*>& outputNodePtrs) const
+void Model::Visit(Visitor& visitor, const std::vector<const Node*>& outputNodePtrs) const
 {
     if(_nodeMap.size() == 0)
     {
@@ -173,7 +173,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<const Node*>& outp
             if(sentinelNode != nullptr) // sentinelNode is non-null only if we're in visit-whole-graph mode
             {
                 // now add all our children (Note: this part is the only difference between visit-all and visit-active-graph
-                for(const auto& child: DirectedGraphImpl::Reverse(node->_dependentNodes)) // Visiting the children in reverse order more closely retains the order the features were originally created
+                for(const auto& child: ModelImpl::Reverse(node->_dependentNodes)) // Visiting the children in reverse order more closely retains the order the features were originally created
                 {
                     // note: this is kind of inefficient --- we're going to push multiple copies of child on the stack. But we'll check if we've visited it already when we pop it off. 
                     // TODO: optimize this if it's a problem
@@ -183,7 +183,7 @@ void DirectedGraph::Visit(Visitor& visitor, const std::vector<const Node*>& outp
         }
         else // visit node's inputs
         {
-            for (auto input: DirectedGraphImpl::Reverse(node->_inputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
+            for (auto input: ModelImpl::Reverse(node->_inputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
             {
                 stack.push_back(input->Node()); // Again, if `InputPort`s point to multiple nodes, need to iterate here
             }

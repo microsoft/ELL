@@ -21,7 +21,7 @@ graph output.
 
 Graph
 -----
-The basic graph class (here, `DirectedGraph`) would be the primary API point for interacting with the graph of nodes. The user-facing
+The basic graph class (here, `Model`) would be the primary API point for interacting with the graph of nodes. The user-facing
 `Compute`-type operations would be done on the graph object. 
 
 Usage

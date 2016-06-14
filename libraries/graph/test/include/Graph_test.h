@@ -1,4 +1,4 @@
-#pragma oncde
+#pragma once
 //
 // Graph tests
 // 
