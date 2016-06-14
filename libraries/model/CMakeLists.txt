@@ -4,7 +4,7 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
-set (PROJ_NAME graph)
+set (PROJ_NAME model)
 
 PROJECT(${PROJ_NAME})
 
@@ -69,7 +69,7 @@ include_directories(test/include)
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} graph testing)
+target_link_libraries(${TEST_NAME} model testing)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 
