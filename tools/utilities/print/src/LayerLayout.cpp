@@ -8,6 +8,9 @@
 
 #include "LayerLayout.h"
 
+// utilities
+#include "Exception.h"
+
 LayerLayout::LayerLayout(double left, double top, uint64_t size, double layerMaxWidth, ElementLayoutArguments Arguments) : _elementMidX(size)
 {
     _connectorOffset = Arguments.height / 2.0;
@@ -42,7 +45,7 @@ LayerLayout::LayerLayout(double left, double top, uint64_t size, double layerMax
         
         if(elementsWidth <= Arguments.dotsWidth || numVisibleElements < 2)
         {
-            throw std::runtime_error("unable to visualize layer within the specified constraints (increase width, decrease dots width or element width/spacing)");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unable to visualize layer within the specified constraints (increase width, decrease dots width or element width/spacing)");
         }
 
         _numHiddenElements = size - numVisibleElements;

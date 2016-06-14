@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <stdexcept>
 #include <string>
 
 namespace utilities
@@ -17,7 +16,7 @@ namespace utilities
     ///
     /// <typeparam name="ErrorCodeType"> An enum class with error codes. </typeparam>
     template <typename ErrorCodeType>
-    class ExceptionBase : public std::exception
+    class ExceptionBase 
     {
     public:
 
@@ -35,7 +34,7 @@ namespace utilities
         /// <summary> Gets the message. </summary>
         ///
         /// <returns> A message string; </returns>
-        const std::string& What() const noexcept { return _message; }
+        const std::string& GetMessage() const noexcept { return _message; }
 
     private:
         ErrorCodeType _errorCode;
@@ -45,13 +44,15 @@ namespace utilities
     /// <summary> General exception error codes. </summary>
     enum class ExceptionErrorCodes
     {
+        illegalState,
+        badStringFormat,
         invalidArgument,
         indexOutOfRange,
         divideByZero,
         typeMismatch,
         functionNotImplemented,
         nullReference,
-        outOfMemory
+        notYetImplemented
     };
 
     typedef ExceptionBase<ExceptionErrorCodes> Exception;

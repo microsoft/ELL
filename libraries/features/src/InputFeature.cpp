@@ -10,6 +10,10 @@
 #include "InputFeature.h"
 #include "StringUtil.h"
 
+// utilities
+#include "Exception.h"
+
+// stl
 #include <vector>
 #include <memory>
 #include <stdexcept>
@@ -26,7 +30,7 @@ namespace features
         _currentValue = val;
         if(_outputDimension != val.size())
         {
-            throw std::runtime_error("Input feature dimension doesn't match data size");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "Input feature dimension doesn't match data size");
         }
         assert(_outputDimension == val.size());
         SetDirtyFlag(true); // propagates through graph
@@ -34,7 +38,7 @@ namespace features
 
     layers::CoordinateList InputFeature::AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const
     {
-        throw std::runtime_error("Not implemented");
+        throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState);
     }
     
     void InputFeature::AddToDescription(std::vector<std::string>& description) const

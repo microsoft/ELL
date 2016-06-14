@@ -8,6 +8,9 @@
 
 #include "IntegerList.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <stdexcept>
 
@@ -25,7 +28,7 @@ namespace utilities
     {
         if(_list.size()==0)
         {
-            throw std::runtime_error("Can't get max of empty list");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "Can't get max of empty list");
         }
 
         return _list[Size()-1];

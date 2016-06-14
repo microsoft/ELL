@@ -10,6 +10,7 @@
 
 // utilities
 #include "Format.h"
+#include "Exception.h"
 
 LinearOperation::LinearOperation(double a, double b) : _a(a), _b(b)
 {}
@@ -28,7 +29,7 @@ LinearOperation::LinearOperation(layers::Coordinatewise::OperationType operation
     }
     else
     {
-        throw std::runtime_error("unsupported operation");
+        throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument);
     }
 }
 

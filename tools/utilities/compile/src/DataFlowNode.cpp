@@ -11,6 +11,9 @@
 // stl
 #include <cassert>
 
+// utilities
+#include "Exception.h"
+
 void DataFlowNode::SetFixedVariableName(const std::string & name)
 {
     _fixedVariableName = name;
@@ -28,7 +31,7 @@ std::string DataFlowNode::GetVariableName() const
     }
     else
     {
-        throw std::runtime_error("this should never happen");
+        throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState);
     }
 }
 
@@ -40,7 +43,7 @@ uint64_t DataFlowNode::GetTempVariableIndex() const
     }
     else
     {
-        throw std::runtime_error("this should never happen");
+        throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState);
     }
 }
 

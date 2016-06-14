@@ -8,6 +8,9 @@
 
 #include "Coordinatewise.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <stdexcept>
 #include <string>
@@ -45,7 +48,7 @@ namespace layers
         case OperationType::multiply:
             return multiplyOperationName;
         default:
-            throw std::runtime_error("unrecognized operation type");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
         }
     }
 
@@ -61,7 +64,7 @@ namespace layers
         }
         else
         {
-            throw std::runtime_error("unrecognized operation type");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
         }
     }
 
@@ -74,7 +77,7 @@ namespace layers
         case OperationType::multiply:
             return std::multiplies<double>();
         default:
-            throw std::runtime_error("unrecognized operation type");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
         }
     }
 
@@ -114,7 +117,7 @@ namespace layers
         }
         else
         {
-            throw std::runtime_error("unsupported version: " + std::to_string(version));
+            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "unsupported version: " + std::to_string(version));
         }
 
         // check validity of deserialized vectors

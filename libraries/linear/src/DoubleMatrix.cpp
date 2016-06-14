@@ -8,6 +8,9 @@
 
 #include "DoubleMatrix.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <cassert>
 
@@ -233,7 +236,7 @@ namespace linear
     {
         if(i > j)
         {
-            throw std::runtime_error("Cannot set element in the lower triangle of an upper triangular matrix");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "Cannot set element in the lower triangle of an upper triangular matrix");
         }
 
         DoubleMatrixBase::Set(i, j, value);
@@ -276,7 +279,7 @@ namespace linear
     {
         if(i != j)
         {
-            throw std::runtime_error("Cannot set off-diagonal elements of a diagonal matrix");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "Cannot set off-diagonal elements of a diagonal matrix");
         }
 
         DoubleMatrixBase::Set(i, j, value);

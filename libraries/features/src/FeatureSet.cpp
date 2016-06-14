@@ -10,8 +10,15 @@
 #include "Feature.h"
 #include "InputFeature.h"
 #include "StringUtil.h"
+
+// dataset
 #include "DoubleVector.h"
 
+// utilities
+#include "Exception.h"
+
+
+// stl
 #include <vector>
 #include <string>
 #include <sstream>
@@ -75,7 +82,7 @@ namespace features
             }
             else
             {
-                throw std::runtime_error("First feature must be input feature");
+                throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "First feature must be input feature");
             }
         }
 
@@ -88,11 +95,11 @@ namespace features
     {
         if(_inputFeature == nullptr) 
         {
-            throw std::runtime_error("Input feature not assigned");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "Input feature not assigned");
         }
         if(_outputFeature == nullptr)
         {
-            throw std::runtime_error("Output feature not assigned");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "Output feature not assigned");
         }
         
         // need to keep a map of output coordinate lists for the various features

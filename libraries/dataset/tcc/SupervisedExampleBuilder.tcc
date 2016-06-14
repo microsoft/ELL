@@ -11,6 +11,9 @@
 // stl
 #include <cstdlib>
 
+// utilities
+#include "Exception.h"
+
 namespace dataset
 {
     template<typename VectorEntryParserType, typename DefaultDataVectorType>
@@ -55,19 +58,19 @@ namespace dataset
     }
 
     template<typename VectorEntryParserType, typename DefaultDataVectorType>
-    void dataset::SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::HandleErrors(utilities::ParseResult result, const std::string & str)
+    void dataset::SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::HandleErrors(utilities::ParseResult result, const std::string& str)
     {
         if (result == utilities::ParseResult::badFormat)
         {
-            throw std::runtime_error("bad format real value in '" + str + "'");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "bad format in '" + str + "'");
         }
         else if (result == utilities::ParseResult::endOfString || result == utilities::ParseResult::beginComment)
         {
-            throw std::runtime_error("premature end-of-std::string or comment in '" + str + "'");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "premature end-of-std::string or comment in '" + str + "'");
         }
         else if (result == utilities::ParseResult::outOfRange)
         {
-            throw std::runtime_error("real value out of double precision range in '" + str + "'");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "real value out of double precision range in '" + str + "'");
         }
     }
 }

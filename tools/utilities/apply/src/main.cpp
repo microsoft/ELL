@@ -17,12 +17,10 @@
 // utilities
 #include "Files.h"
 #include "OutputStreamImpostor.h"
+#include "Exception.h"
 
 // stl
 #include <iostream>
-
-#include <stdexcept>
-using std::runtime_error;
 
 int main(int argc, char* argv[])
 {
@@ -76,9 +74,9 @@ int main(int argc, char* argv[])
         }
         return 1;
     }
-    catch (std::runtime_error exception)
+    catch (utilities::Exception exception)
     {
-        std::cerr << "runtime error: " << exception.what() << std::endl;
+        std::cerr << "runtime error: " << exception.GetMessage() << std::endl;
         return 1;
     }
 

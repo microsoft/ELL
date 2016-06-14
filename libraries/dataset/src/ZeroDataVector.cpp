@@ -11,18 +11,21 @@
 // stl
 #include <stdexcept>
 
+// utilities
+#include "Exception.h"
+
 namespace dataset
 {
     linear::IndexValue ZeroDataVector::Iterator::Get() const
     {
-        throw std::runtime_error("this code should bever be reached");
+        throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState);
     }
 
     void ZeroDataVector::AppendEntry(uint64_t index, double value)
     {
         if(value != 0)
         {
-            throw std::runtime_error("Cannot set elements of a zero vector");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument);
         }
     }
 

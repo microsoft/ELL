@@ -6,6 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <stdexcept>
 #include <random>
@@ -131,7 +134,7 @@ namespace linear
     template<typename DataVectorType>
     void RowMatrix<DataVectorType>::Gevm(const double* p_x, double* p_y, double alpha, double beta) const
     {
-        throw std::runtime_error("function not implemented");
+        throw utilities::Exception(utilities::ExceptionErrorCodes::notYetImplemented);
     }
 
     template<typename DataVectorType>

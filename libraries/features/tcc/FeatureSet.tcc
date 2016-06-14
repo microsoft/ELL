@@ -6,6 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "Exception.h"
+
+// stl
 #include <unordered_set>
 #include <stdexcept>
 #include <memory>
@@ -48,7 +52,7 @@ namespace features
             }
             else
             {
-                throw std::runtime_error("First feature must be input feature");
+                throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "First feature must be input feature");
             }
         }
                 
