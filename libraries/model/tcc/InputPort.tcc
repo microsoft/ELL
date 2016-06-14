@@ -11,18 +11,21 @@ namespace model
 {
 
     template <typename ValueType>
-    InputPort::InputPort(const OutputPort<ValueType>* output) : Port(output->Node(), output->Index(), Port::GetTypeCode<ValueType>(), output->Size())
+    InputPort::InputPort(const class Node* owningNode, size_t index, const OutputPort<ValueType>* output): Port(nullptr, 0, Port::GetTypeCode<ValueType>(), output->Size()), _referencedPort(output)
     {
-        assert(Port::GetTypeCode<ValueType>() == output->Type());
+        if (Port::GetTypeCode<ValueType>() != output->Type())
+        {
+            throw std::runtime_error("InputPort type doesn't match output");
+        }
     }
 
     template <typename ValueType>
     std::vector<ValueType> InputPort::GetValue() const
     {
-        assert(Node() != nullptr);
+        assert(ReferencedPort()->Node() != nullptr);
 
         // retrieve cached value from our connected output
-        auto result = Node()->GetOutputValue<ValueType>(Index());
+        auto result = ReferencedPort()->Node()->GetOutputValue<ValueType>(Index());
         assert(result.size() == Size());
         return result;
     }

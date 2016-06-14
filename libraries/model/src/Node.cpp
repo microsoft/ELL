@@ -33,7 +33,7 @@ namespace model
     {
         for (const auto& input : _inputs) 
         {
-            input->Node()->AddDependent(this);
+            input->ReferencedPort()->Node()->AddDependent(this);
         }
     }
 }

@@ -154,7 +154,7 @@ namespace model
             for (auto input : node->_inputs)
             {
                 // Note: If InputPorts can point to multiple nodes, we'll have to iterate over them here
-                auto inputNode = input->Node();
+                auto inputNode = input->ReferencedPort()->Node();
                 canVisit = canVisit && visitedNodes.find(inputNode) != visitedNodes.end();
             }
 
@@ -185,7 +185,7 @@ namespace model
             {
                 for (auto input : ModelImpl::Reverse(node->_inputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
                 {
-                    stack.push_back(input->Node()); // Again, if `InputPort`s point to multiple nodes, need to iterate here
+                    stack.push_back(input->ReferencedPort()->Node()); // Again, if `InputPort`s point to multiple nodes, need to iterate here
                 }
             }
         }

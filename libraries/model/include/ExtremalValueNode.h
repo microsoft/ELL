@@ -27,7 +27,7 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ExtremalValueNode(OutputPort<ValueType> input);
+        ExtremalValueNode(const OutputPort<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

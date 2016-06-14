@@ -26,7 +26,10 @@ namespace model
         ///
         /// <param name="output"> The output port this port receives values from </param>
         template <typename ValueType>
-        InputPort(const OutputPort<ValueType>* output);
+        InputPort(const class Node* owningNode, size_t nodeIndex, const OutputPort<ValueType>* output);
+
+        /// <summary> Returns the port that this port is redirecting from </summary>
+        const Port* ReferencedPort() const { return _referencedPort; }
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         template <typename ValueType>
