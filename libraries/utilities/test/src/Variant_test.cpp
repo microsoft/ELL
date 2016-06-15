@@ -24,4 +24,14 @@ void TestVariant()
     testing::ProcessTest("Variant check type", !v.IsType<bool>());
 
     testing::ProcessTest("Variant check value", v.GetValue<int>() == 5);
+
+
+    v = (int)3;
+    testing::ProcessTest("Variant check type", v.IsType<int>());
+    
+    v = (float)3.25;
+    testing::ProcessTest("Variant check type", v.IsType<float>());
+    testing::ProcessTest("Variant check value", v.GetValue<float>() == 3.25);
+
+
 }

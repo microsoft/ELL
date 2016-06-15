@@ -21,6 +21,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/IntegerStack.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
+         src/Variant.cpp
          src/XMLSerialization.cpp)
 
 set (INCLUDE include/CompressedIntegerList.h
