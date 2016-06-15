@@ -22,5 +22,5 @@ namespace model
         {
             return it->second;
         }
-}
+    }
 }

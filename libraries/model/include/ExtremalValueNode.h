@@ -41,7 +41,7 @@ namespace model
 
         /// <summary> Exposes the extremal value port as a read-only property </summary>
         const OutputPort<ValueType>& val = _val;
-        
+
         /// <summary> Exposes the extremal value index port as a read-only property </summary>
         const OutputPort<int>& argVal = _argVal;
 
