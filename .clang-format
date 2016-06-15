@@ -22,7 +22,7 @@ NamespaceIndentation: All
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterClass:      true
-  AfterControlStatement: false
+  AfterControlStatement: true
   AfterEnum:       true
   AfterFunction:   true
   AfterNamespace:  true
@@ -32,6 +32,5 @@ BraceWrapping:
   BeforeCatch:     true
   BeforeElse:      true
   IndentBraces:    false
-
 
 SortIncludes: false
