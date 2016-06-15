@@ -9,7 +9,6 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-
     // Just hiding some stuff in this namespace that's unlikely to confict with anything
     // TODO: put this in some utility place
     namespace ModelImpl
@@ -40,7 +39,7 @@ namespace model
     // Factory method for creating nodes
     //
     template <typename NodeType, typename... Args>
-    std::shared_ptr<NodeType> Model::AddNode(Args... args)
+    std::shared_ptr<NodeType> Model::AddNode(Args&&... args)
     {
         auto node = std::make_shared<NodeType>(args...);
         node->RegisterDependencies();

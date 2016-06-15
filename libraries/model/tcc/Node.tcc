@@ -11,7 +11,6 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-
     template <typename ValueType>
     std::vector<ValueType> Node::GetOutputValue(size_t outputIndex) const
     {

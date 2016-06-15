@@ -12,7 +12,6 @@
 
 #include <vector>
 #include <memory>
-#include <iostream>
 
 /// <summary> model namespace </summary>
 namespace model

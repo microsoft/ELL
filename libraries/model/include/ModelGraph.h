@@ -27,7 +27,7 @@ namespace model
     public:
         /// <summary> Factory method used to create nodes and add them to the graph. </summary>
         template <typename NodeType, typename... Args>
-        std::shared_ptr<NodeType> AddNode(Args... args);
+        std::shared_ptr<NodeType> AddNode(Args&&... args);
 
         /// <summary> Looks up a node by id </summary>
         ///

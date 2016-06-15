@@ -25,7 +25,7 @@ namespace model
         assert(ReferencedPort()->Node() != nullptr);
 
         // retrieve cached value from our connected output
-        auto result = ReferencedPort()->Node()->GetOutputValue<ValueType>(Index());
+        auto result = ReferencedPort()->Node()->GetOutputValue<ValueType>(ReferencedPort()->Index());
         assert(result.size() == Size());
         return result;
     }

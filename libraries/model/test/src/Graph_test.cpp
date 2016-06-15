@@ -34,7 +34,7 @@ NodePrinter(const model::Node& node)
     {
         std::cout << (first ? "" : ", ");
         first = false;
-        std::cout << "node_" << input->ReferencedPort()->Node()->GetId() << "[" << input->Index() << "]";
+        std::cout << "node_" << input->ReferencedPort()->Node()->GetId() << "[" << input->ReferencedPort()->Index() << "]";
         
     }
     std::cout << ")" << std::endl;        
