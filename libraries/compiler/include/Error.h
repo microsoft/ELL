@@ -5,7 +5,7 @@
 
 namespace emll
 {
-	namespace core
+	namespace compiler
 	{
 		template<typename T>
 		class EmllException : public std::exception

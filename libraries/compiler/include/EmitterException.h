@@ -5,34 +5,37 @@ namespace emll
 {
 	namespace compiler
 	{
-		enum EmitterError
+		namespace ir
 		{
-			Unexpected = 0,
-			NotSupported,
-			InvalidValueType,
-			InvalidOperatorType,
-			InvalidFunction,
-			FunctionNotFound,
-			WriteModuleFailed,
-		};
-
-		class EmitterException : core::EmllException<EmitterError>
-		{
-		public:
-			EmitterException(EmitterError error) 
-				: EmllException(error)
+			enum class EmitterError
 			{
-			}
-		};
+				Unexpected = 0,
+				NotSupported,
+				InvalidValueType,
+				InvalidOperatorType,
+				InvalidFunction,
+				FunctionNotFound,
+				WriteModuleFailed,
+			};
 
-		class LLVMException : core::EmllException<std::error_code>
-		{
-		public:
-			LLVMException(std::error_code error)
-				: EmllException(error)
+			class EmitterException : EmllException<EmitterError>
 			{
-			}
-		};
+			public:
+				EmitterException(EmitterError error)
+					: EmllException(error)
+				{
+				}
+			};
+
+			class LLVMException : EmllException<std::error_code>
+			{
+			public:
+				LLVMException(std::error_code error)
+					: EmllException(error)
+				{
+				}
+			};
+		}
 	}
 }
 
