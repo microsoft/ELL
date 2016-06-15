@@ -220,3 +220,7 @@ ModelManifest.xml
 .vs/
 .vscode/
 browse.VC.db
+
+# EMLL External Dependencies
+external/llvm/include/
+external/llvm/lib/

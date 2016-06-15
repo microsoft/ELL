@@ -47,12 +47,26 @@ include_directories(${CMAKE_SOURCE_DIR}/libraries/layers/include)
 include_directories(${CMAKE_SOURCE_DIR}/libraries/linear/include)
 include_directories(${CMAKE_SOURCE_DIR}/libraries/utilities/include)
 include_directories(${CMAKE_SOURCE_DIR}/libraries/common/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/compiler/include)
 
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 
-target_link_libraries(${PROJ_NAME} utilities layers linear common)
+link_directories(${CMAKE_SOURCE_DIR}/external/llvm/lib)
+
+add_library(LLVMAnalysis STATIC IMPORTED)
+set_property(TARGET LLVMAnalysis PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/llvm/lib/LLVMAnalysis.lib)
+add_library(LLVMAsmParser STATIC IMPORTED)
+set_property(TARGET LLVMAsmParser PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/llvm/lib/LLVMAsmParser.lib)
+add_library(LLVMCore STATIC IMPORTED)
+set_property(TARGET LLVMCore PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/llvm/lib/LLVMCore.lib)
+add_library(LLVMSupport STATIC IMPORTED)
+set_property(TARGET LLVMSupport PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/llvm/lib/LLVMSupport.lib)
+add_library(LLVMBitWriter STATIC IMPORTED)
+set_property(TARGET LLVMBitWriter PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/llvm/lib/LLVMBitWriter.lib)
+
+target_link_libraries(${PROJ_NAME} utilities layers linear common LLVMCore LLVMAnalysis LLVMAsmParser LLVMSupport LLVMBitWriter)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")

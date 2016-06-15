@@ -43,6 +43,7 @@ enable_testing()
 
 # Include cmake projects for libraries and executables
 add_subdirectory(libraries/common)
+add_subdirectory(libraries/compiler)
 add_subdirectory(libraries/dataset)
 add_subdirectory(libraries/evaluators)
 add_subdirectory(libraries/features)
