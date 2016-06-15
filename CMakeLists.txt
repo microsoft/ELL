@@ -61,6 +61,7 @@ add_subdirectory(tools/trainers/sortingTreeTrainer)
 add_subdirectory(tools/trainers/sweepingSGDTrainer)
 add_subdirectory(tools/utilities/apply)
 add_subdirectory(tools/utilities/compile)
+add_subdirectory(tools/utilities/compileNew)
 add_subdirectory(tools/utilities/print)
 add_subdirectory(scripts)
 
