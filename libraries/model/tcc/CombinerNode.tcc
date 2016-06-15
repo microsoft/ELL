@@ -11,13 +11,42 @@ namespace model
 {
 
     template <typename ValueType>
-    CombinerNode<ValueType>::CombinerNode(const std::vector<InputRange>& inputs) : Node({}, { &_output }), _inputs(inputs), _output(this, 0, 0)
+    CombinerNode<ValueType>::CombinerNode(const std::vector<OutputRange<ValueType>>& inputs) : Node({}, { &_output }), _output(this, 0, 0)
     {
         size_t totalSize = 0;
-        for(const auto& input: inputs)
+        size_t index = 0;
+        for(auto& input: inputs)
         {
+            _inputRanges.emplace_back(this, index, &(input.port), input.startIndex, input.numValues);
             totalSize += input.numValues;
+            index += 1;
         }
+
+        for (auto& range : _inputRanges)
+        {
+            AddInputPort(&range.port);
+        }
+
+        _output.SetSize(totalSize);
+    };
+
+    template <typename ValueType>
+    CombinerNode<ValueType>::CombinerNode(const std::initializer_list<OutputRange<ValueType>>& inputs) : Node({}, { &_output }), _output(this, 0, 0)
+    {
+        size_t totalSize = 0;
+        size_t index = 0;
+        for (auto& input : inputs)
+        {
+            _inputRanges.emplace_back(this, index, &(input.port), input.startIndex, input.numValues);
+            totalSize += input.numValues;
+            index += 1;
+        }
+
+        for (auto& range : _inputRanges)
+        {
+            AddInputPort(&range.port);
+        }
+
         _output.SetSize(totalSize);
     };
 
@@ -25,9 +54,9 @@ namespace model
     void CombinerNode<ValueType>::Compute() const
     {
         std::vector<ValueType> output;
-        for(const auto& inputRange: _inputs)
+        for(const auto& inputRange: _inputRanges)
         {
-            auto inVec = inputRange.port->GetOutput();
+            auto inVec = inputRange.port.GetValue<ValueType>();
             output.insert(output.end(), inVec.begin()+inputRange.startIndex, inVec.begin()+inputRange.startIndex+inputRange.numValues);
         }
 

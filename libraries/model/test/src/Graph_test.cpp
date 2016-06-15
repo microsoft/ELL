@@ -112,21 +112,22 @@ void TestStaticGraph()
 
 void TestMultifariousInputs()
 {
-    // Create a simple computation graph
+    // Create a simple computation graph that computes both min and max and concatenates them
     model::Model model;
 
     auto in = model.AddNode<model::InputNode<double>>(3);
     auto minAndArgMin = model.AddNode<model::ArgMinNode<double>>(in->output);
     auto maxAndArgMax = model.AddNode<model::ArgMaxNode<double>>(in->output);
-    std::vector<model::CombinerNode<double>::InputRange> ranges = { model::CombinerNode<double>::InputRange{ minAndArgMin->val, 0, 1 }, model::CombinerNode<double>::InputRange{maxAndArgMax->val, 0, 1 } };
+    model::OutputRangeList<double> ranges = { { minAndArgMin->val, 0, 1 }, {maxAndArgMax->val, 0, 1 } };
     auto minAndMax = model.AddNode<model::CombinerNode<double>>(ranges);
 
     std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
     in->SetInput(inputValues);
     auto output = model.GetNodeOutput(minAndMax->output);
+    testing::ProcessTest("Testing combine node", testing::IsEqual(output[0], 0.25));
+    testing::ProcessTest("Testing combine node", testing::IsEqual(output[0], 0.75));
     for (auto val : output) std::cout << val << "  ";
     std::cout << std::endl;
-
 }
 
 //

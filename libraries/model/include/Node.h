@@ -72,6 +72,7 @@ namespace model
         
         /// <summary> Computes the output of this node and stores it in the output ports </summary>
         virtual void Compute() const = 0;
+        void AddInputPort(InputPort* input);
         void RegisterOutputs() const; // TODO
 
     private:
