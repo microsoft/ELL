@@ -10,20 +10,38 @@
 #include "Format.h"
 #include <assert.h>
 
-void CodeEmitter::Emit(const std::string& inputVar, DataFlowNode& inputNode, uint64_t layerIndex, uint64_t elementIndex)
+CodeEmitter::CodeEmitter(DataFlowGraph& graph)
+	: _graph(graph)
 {
-	auto assignment = AllocVar(inputNode);
-	EmitStatement(inputNode.GetVariableName(), assignment, inputVar, layerIndex, elementIndex);
+
 }
 
-void CodeEmitter::Emit(const std::string& sourceVar, DataFlowNode& targetNode, LinearOperation op, uint64_t layerIndex, uint64_t elementIndex)
+void CodeEmitter::Assign(DataFlowNode& srcNode, DataFlowNode& destNode, const layers::Coordinate& destCoordinate)
 {
-	auto assignment = AllocVar(targetNode);
-	auto targetVar= targetNode.GetVariableName();
-	EmitStatement(targetVar, assignment, op, sourceVar, layerIndex, elementIndex);
+	auto assignment = EnsureVar(destNode);
+	EmitAssign(assignment, srcNode.Variable(), destNode.Variable(), destCoordinate);
 }
 
-CodeEmitter::Assignment CodeEmitter::AllocVar(DataFlowNode& node)
+void CodeEmitter::Assign(ScalarVariable& srcVar, DataFlowNode& destNode, const layers::Coordinate& destCoordinate)
+{
+	auto assignment = EnsureVar(destNode);
+	EmitAssign(assignment, srcVar, destNode.Variable(), destCoordinate);
+}
+
+DataFlowNode& CodeEmitter::LinearOp(const LinearOperation& op, DataFlowNode& srcNode, const layers::Coordinate& destCoordinate)
+{
+	auto& destNode = _graph.GetNode(destCoordinate);
+	LinearOp(op, srcNode, destNode, destCoordinate);
+	return destNode;
+}
+
+void CodeEmitter::LinearOp(const LinearOperation& op, DataFlowNode& srcNode, DataFlowNode& destNode, const layers::Coordinate& destCoordinate)
+{
+	auto assignment = EnsureVar(destNode);
+	EmitLinearOp(op, assignment, srcNode.Variable(), destNode.Variable(), destCoordinate);
+}
+
+CodeEmitter::Assignment CodeEmitter::EnsureVar(DataFlowNode& node)
 {
 	if (node.IsInitialized())
 	{
@@ -43,7 +61,7 @@ CodeEmitter::Assignment CodeEmitter::AllocVar(DataFlowNode& node)
 		return CodeEmitter::Assignment::Declare;
 	}
 	
-	return CodeEmitter::Assignment::Set;
+	return CodeEmitter::Assignment::Reset;
 }
 
 void CodeEmitter::ReleaseVar(DataFlowNode& node)
@@ -53,18 +71,18 @@ void CodeEmitter::ReleaseVar(DataFlowNode& node)
 
 //-------------------------------------------------------
 //
-// CGenerator
+// CEmitter
 //
 //-------------------------------------------------------
 
-CEmitter::CEmitter(std::ostream& os)
-	: _os(os)
+CEmitter::CEmitter(DataFlowGraph& graph, std::ostream& os)
+	: CodeEmitter(graph), _os(os)
 {
 }
 
 void CEmitter::BeginLinear(const char* name, uint64_t inputCount, const layers::CoordinateList& outputs)
 {
-	auto str = "// Input dimension: %\n// Output dimension: %\n// Output coordinates:";
+	auto str = "// New Compiler \n// Input dimension: %\n// Output dimension: %\n// Output coordinates:";
 	utilities::PrintFormat(_os, str, inputCount, outputs.Size());
 	for (uint64_t i = 0; i < outputs.Size(); ++i)
 	{
@@ -82,17 +100,38 @@ void CEmitter::EndLinear()
 	_os << "}\n";
 }
 
-void CEmitter::EmitStatement(const std::string& var, Assignment assignment, const std::string& inputVar, uint64_t layerIndex, uint64_t elementIndex)
+void CEmitter::EmitAssign(Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
 {
+	EnsureEmittedName(srcVar);
+	EnsureEmittedName(destVar);
+
 	const char* format = ToString(assignment);
-	utilities::PrintFormat(_os, format, var, inputVar, layerIndex, elementIndex);
+	utilities::PrintFormat(_os, format, destVar.EmittedName(), srcVar.EmittedName(), destCoordinate.GetLayerIndex(), destCoordinate.GetElementIndex());
 }
 
-void CEmitter::EmitStatement(const std::string& var, Assignment assignment, LinearOperation op, const std::string& sourceVar, uint64_t layerIndex, uint64_t elementIndex)
+void CEmitter::EmitLinearOp(const LinearOperation& op, Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
 {
+	EnsureEmittedName(srcVar);
+	EnsureEmittedName(destVar);
+
 	const char* format = ToString(assignment);
-	std::string rhs = ToString(op, sourceVar);
-	utilities::PrintFormat(_os, format, var, rhs, layerIndex, elementIndex);
+	std::string rhs = ToString(op, srcVar.EmittedName());
+	utilities::PrintFormat(_os, format, destVar.EmittedName(), rhs, destCoordinate.GetLayerIndex(), destCoordinate.GetElementIndex());
+}
+
+void CEmitter::EnsureEmittedName(ScalarVariable& var)
+{
+	if (!var.HasEmittedName())
+	{
+		if (var.IsArrayElement())
+		{
+			var.SetEmittedName(var.Name() + "[" + std::to_string(var.ElementOffset()) + "]");
+		}
+		else
+		{
+			var.SetEmittedName(var.Name());
+		}
+	}
 }
 
 const char* CEmitter::ToString(CodeEmitter::Assignment assignment)
@@ -103,23 +142,23 @@ const char* CEmitter::ToString(CodeEmitter::Assignment assignment)
 	default:
 		break;
 	case Assignment::Declare:
-		format = " double % = %; // coordinate (%,%), allocating new temporary variable\n";
+		format = "    double % = %; // coordinate (%,%), allocating new temporary variable\n";
 		break;
 	case Assignment::Set:
-		format = " % = %; // coordinate (%,%)\n";
+		format = "    % = %; // coordinate (%,%)\n";
 		break;
 	case Assignment::IncrementBy:
-		format = " % += %; // coordinate (%,%)\n";
+		format = "    % += %; // coordinate (%,%)\n";
 		break;
 	case Assignment::Reset:
-		format = " % = %; // coordinate (%,%), reassigning temporary variable\n";
+		format = "    % = %; // coordinate (%,%), reassigning temporary variable\n";
 		break;
 	}
 	assert(format != nullptr);
 	return format;
 }
 
-std::string CEmitter::ToString(LinearOperation op, const std::string& sourceVar)
+std::string CEmitter::ToString(const LinearOperation& op, const std::string& sourceVar)
 {
 	double a = op.MultiplyBy();
 	double b = op.IncrementBy();

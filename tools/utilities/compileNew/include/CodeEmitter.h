@@ -9,6 +9,7 @@
 #pragma once
 
 #include "IntegerStack.h"
+#include "DataFlowGraph.h"
 #include "DataFlowNode.h"
 
 #include <string>
@@ -29,40 +30,54 @@ public:
 	};
 
 public:	
+	CodeEmitter(DataFlowGraph& graph);
 
 	virtual void BeginLinear(const char* name, uint64_t inputCount, const layers::CoordinateList& outputs) = 0;
-	void Emit(const std::string& inputVar, DataFlowNode& inputNode, uint64_t layerIndex, uint64_t elementIndex);
-	void Emit(const std::string& sourceVar, DataFlowNode& targetNode, LinearOperation op, uint64_t layerIndex, uint64_t elementIndex);
+
+	void Assign(DataFlowNode& srcNode, DataFlowNode& destNode, const layers::Coordinate& destCoordinate);
+	void Assign(ScalarVariable& srcVar, DataFlowNode& destNode, const layers::Coordinate& destCoordinate);
+
+	DataFlowNode& LinearOp(const LinearOperation& op, DataFlowNode& srcNode, const layers::Coordinate& destCoordinate);
+	void LinearOp(const LinearOperation& op, DataFlowNode& srcNode, DataFlowNode& destNode, const layers::Coordinate& destCoordinate);
+
 	virtual void EndLinear() = 0;
 
-	Assignment AllocVar(DataFlowNode& node);
+	Assignment EnsureVar(DataFlowNode& node);
 	void ReleaseVar(DataFlowNode& node);
+	
+	DataFlowGraph& graph()
+	{
+		return _graph;
+	}
 
 protected:
-	virtual void EmitStatement(const std::string& var, Assignment assignment, const std::string& inputVar, uint64_t layerIndex, uint64_t elementIndex) = 0;
-	virtual void EmitStatement(const std::string& var, Assignment assignment, LinearOperation op, const std::string& sourceVar, uint64_t layerIndex, uint64_t elementIndex) = 0;
+	virtual void EmitAssign(Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate) = 0;
+	virtual void EmitLinearOp(const LinearOperation& op, Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate) = 0;
 
-private:
 	
 private:
 	utilities::IntegerStack _varStack;
+	DataFlowGraph& _graph;
 };
 
 class CEmitter : public CodeEmitter
 {
 public:
-	CEmitter(std::ostream& os);
+	CEmitter(DataFlowGraph& graph, std::ostream& os);
 
 	void BeginLinear(const char* name, uint64_t inputCount, const layers::CoordinateList& outputs) override;
 	void EndLinear() override;
 
 protected:
-	virtual void EmitStatement(const std::string& var, Assignment assignment, const std::string& inputVar, uint64_t layerIndex, uint64_t elementIndex) override;
-	virtual void EmitStatement(const std::string& var, Assignment assignment, LinearOperation op, const std::string& sourceVar, uint64_t layerIndex, uint64_t elementIndex) override;
+	virtual void EmitAssign(Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate) override;
+	virtual void EmitLinearOp(const LinearOperation& op, Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate) override;
 
 private:
+
+	void EnsureEmittedName(ScalarVariable& var);
+
 	const char* ToString(Assignment assignment);
-	std::string ToString(LinearOperation op, const std::string& sourceVar);
+	std::string ToString(const LinearOperation& op, const std::string& sourceVar);
 
 private:
 	std::ostream& _os;

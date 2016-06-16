@@ -18,20 +18,20 @@ namespace emll
 				WriteModuleFailed,
 			};
 
-			class EmitterException : EmllException<EmitterError>
+			class EmitterException : CompilerException<EmitterError>
 			{
 			public:
 				EmitterException(EmitterError error)
-					: EmllException(error)
+					: CompilerException(error)
 				{
 				}
 			};
 
-			class LLVMException : EmllException<std::error_code>
+			class LLVMException : CompilerException<std::error_code>
 			{
 			public:
 				LLVMException(std::error_code error)
-					: EmllException(error)
+					: CompilerException(error)
 				{
 				}
 			};

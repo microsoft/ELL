@@ -8,15 +8,15 @@ namespace emll
 	namespace compiler
 	{
 		template<typename T>
-		class EmllException : public std::exception
+		class CompilerException : public std::exception
 		{
 		public:
-			EmllException(T errorCode)
+			CompilerException(T errorCode)
 				: _error(errorCode)
 			{
 
 			}
-			virtual ~EmllException() {
+			virtual ~CompilerException() {
 
 			}
 

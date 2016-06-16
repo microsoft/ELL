@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     DataFlowNode.h (compile)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Umesh Madan
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -16,6 +16,54 @@
 #include <string>
 #include <stdexcept>
 
+class ScalarVariable
+{
+public:
+	ScalarVariable();
+	ScalarVariable(std::string name);
+	ScalarVariable(std::string name, uint64_t elementOffset);
+
+	const std::string& Name() const 
+	{
+		return _name;
+	}
+	bool HasName() const
+	{
+		return !_name.empty();
+	}
+	uint64_t ElementOffset() const
+	{
+		return _elementOffset;
+	}
+	bool IsArrayElement() const
+	{
+		return _isArray;
+	}
+
+	const std::string& EmittedName()
+	{
+		return _emittedName;
+	}
+	bool HasEmittedName() const
+	{
+		return !_emittedName.empty();
+	}
+
+	void Set(std::string name);
+	void Set(std::string name, const uint64_t elementOffset);
+
+	void SetEmittedName(std::string name);
+
+private:
+	void SetName(std::string&& name);
+
+private:
+	bool _isArray = false;
+	std::string _name;
+	uint64_t _elementOffset = 0;
+	std::string _emittedName;
+};
+
 /// <summary> Implement a node in a data flow graph. </summary>
 class DataFlowNode
 {
@@ -24,7 +72,8 @@ public:
     /// <summary> A signed a fixed variable name to this node. </summary>
     ///
     /// <param name="name"> The fixed variable name. </param>
-    void SetFixedVariableName(const std::string& name);
+    void SetFixedVariableName(const std::string& name);	
+	void SetFixedVariableName(const std::string& name, uint64_t arrayOffset);
 
     /// <summary> Query if this node is initialized, namely, if one of its input actions has been performed. </summary>
     ///
@@ -37,12 +86,18 @@ public:
     /// <summary> Query if this object has a variable name. </summary>
     ///
     /// <returns> true if the node has a fixed variable name. </returns>
-    bool HasFixedVariableName() const { return _fixedVariableName != ""; }
+    bool HasFixedVariableName() const 
+	{ 
+		return _isFixed; 
+	}
 
     /// <summary> Gets the node's variable name. </summary>
     ///
     /// <returns> The variable name. </returns>
-    std::string GetVariableName() const;
+	ScalarVariable& Variable()
+	{
+		return _variable;
+	}
 
     /// <summary> Gets the node's temporary variable index. </summary>
     ///
@@ -98,7 +153,8 @@ public:
 
 private:
     std::vector<AddToAction> _actions;
-    std::string _fixedVariableName = "";
+	ScalarVariable _variable;
+	bool _isFixed = false;
     bool _isInitialized = false;
     int _tempVariableIndex = -1;
     uint64_t _numUncomputedInputs = 0;

@@ -22,57 +22,18 @@
 #include <stdexcept>
 #include <cassert>
 
-const char* assignmentFormat = "    % = %; // coordinate (%,%)\n";
-const char* incrementFormat = "    % += %; // coordinate (%,%)\n";
-const char* allocationFormat = "    double % = %; // coordinate (%,%), allocating new temporary variable\n";
-const char* reallocationFormat = "    % = %; // coordinate (%,%), reassigning temporary variable\n";
 
-const char* AllocateTempVariableAndGetFormat(DataFlowNode& targetNode, utilities::IntegerStack& stack)
+void ProcessNode(DataFlowNode& currentNode, CodeEmitter& codeGen)
 {
-    if (targetNode.IsInitialized() == true)
-    {
-        return incrementFormat;
-    }
-
-    if (targetNode.HasFixedVariableName() == true)
-    {
-        return assignmentFormat;
-    }
-
-    bool isNovel = stack.IsTopNovel();
-    targetNode.SetTempVariableIndex(stack.Pop());
-
-    if (isNovel)
-    {
-        return allocationFormat;
-    }
-    else
-    {
-        return reallocationFormat;
-    }
-}
-
-//void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, utilities::IntegerStack& stack, CodeGenerator& codeGen)
-void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, CodeEmitter& codeGen)
-{
-    auto currentNodeVariableName = currentNode.GetVariableName();
-
     // for each action
     while(currentNode.HasActions())
     {
         // get the next action in the current node
         auto action = currentNode.PopAction();
 
-        // get the target coordinate and target node
-        auto targetCoordinate = action.GetTarget();
-        auto& targetNode = graph.GetNode(targetCoordinate);
+		auto targetCoordinate = action.GetTarget();
 
-        //const char* format = AllocateTempVariableAndGetFormat(targetNode, stack);
-        //auto targetVariableName = targetNode.GetVariableName();
-        //auto rhs = action.GetOperation().ToString(currentNodeVariableName);
-        //utilities::PrintFormat(os, format, targetVariableName, rhs, targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
-
-		codeGen.Emit(currentNodeVariableName, targetNode, action.GetOperation(), targetCoordinate.GetLayerIndex(), targetCoordinate.GetElementIndex());
+		auto& targetNode = codeGen.LinearOp(action.GetOperation(), currentNode, action.GetTarget());
 
         // indicate that the target node is initialized
         targetNode.SetInitialized();
@@ -80,7 +41,6 @@ void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, CodeEmitter& c
         // check if temp variable can be released
         if(currentNode.HasActions() == false && currentNode.HasTempVariableName())
         {
-            //stack.Push(currentNode.GetTempVariableIndex());
 			codeGen.ReleaseVar(currentNode);
         }
 
@@ -88,8 +48,7 @@ void ProcessNode(DataFlowNode& currentNode, DataFlowGraph& graph, CodeEmitter& c
         targetNode.DecrementUncomputedInputs();
         if(targetNode.IsWaitingForInputs() == false)
         {
-            //ProcessNode(targetNode, graph, stack, os);
-			ProcessNode(targetNode, graph, codeGen);
+			ProcessNode(targetNode, codeGen);
         }
     }
 }
@@ -120,6 +79,7 @@ void CompilableMap::ToCode(std::ostream& os) const
 
     // create data flow graph datastructure
     DataFlowGraph graph;
+	CEmitter codeGen(graph, os);
 
     // add graph layer for input
     graph.AddLayer(_requiredInputLayerSize);
@@ -141,9 +101,11 @@ void CompilableMap::ToCode(std::ostream& os) const
     {
         auto inputCoordinate = _outputCoordinates[outputElementIndex];
         layers::Coordinate outputCoordinate(outputLayerIndex, outputElementIndex);
-        graph.GetNode(outputCoordinate).SetFixedVariableName(outputFixedVariableName + "[" + std::to_string(outputElementIndex) + "]");
+
+		auto& outputNode = graph.GetNode(outputCoordinate);
+        outputNode.SetFixedVariableName(outputFixedVariableName, outputElementIndex);
         graph.GetNode(inputCoordinate).EmplaceAction(outputCoordinate);
-        graph.GetNode(outputCoordinate).IncrementUncomputedInputs();
+		outputNode.IncrementUncomputedInputs();
     }
 
     // backwards pass to assign actions to nodes
@@ -152,21 +114,8 @@ void CompilableMap::ToCode(std::ostream& os) const
         _compilableLayers[layerIndex-1]->SetActions(layerIndex, graph);
     }
 
-    // construct an integer stack, to manage temp variable names;
-    //utilities::IntegerStack stack;
-    // print comment
-    //auto str = "// Predict function\n// Input dimension: %\n// Output dimension: %\n// Output coordinates:";
-    //utilities::PrintFormat(os, str, _requiredInputLayerSize, outputLayerSize);
-    //for (uint64_t i = 0; i < _outputCoordinates.Size(); ++i)
-    //{
-    //    os << ' ' << _outputCoordinates[i];
-    //}
-
-    // print function declaration
-    //os << "\nvoid Predict(const double* input, double* output)\n{\n";
 
     // forward pass to generate code
-	CEmitter codeGen(os);
 	codeGen.BeginLinear("Predict", _requiredInputLayerSize, _outputCoordinates);
 
     const std::string inputNamePrefix = "input";
@@ -175,21 +124,18 @@ void CompilableMap::ToCode(std::ostream& os) const
         layers::Coordinate inputCoordinate(0, inputElementIndex);
         auto& inputNode = graph.GetNode(inputCoordinate);
 
-        std::string inputVariableName = inputNamePrefix + "[" + std::to_string(inputElementIndex) + "]";
-
         // if input has multiple actions, first copy it to a temp variable. Otherwise, operate directly on the input array
         if (inputNode.GetActions().size() <= 1)
         {
-            inputNode.SetFixedVariableName(inputVariableName);
+            inputNode.SetFixedVariableName(inputNamePrefix, inputElementIndex);
         }
         else
         {
-            //const char* format = AllocateTempVariableAndGetFormat(inputNode, stack);
-            //utilities::PrintFormat(os, format, inputNode.GetVariableName(), inputVariableName, 0, inputElementIndex);
-			codeGen.Emit(inputVariableName, inputNode, 0, inputElementIndex);
+			ScalarVariable var(inputNamePrefix, inputElementIndex);
+			codeGen.Assign(var, inputNode, inputCoordinate);
         }
-        //ProcessNode(inputNode, graph, stack, codeGen);
-		ProcessNode(inputNode, graph, codeGen);
+
+		ProcessNode(inputNode, codeGen);
     }
 
    // os << "}\n";
