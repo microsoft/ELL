@@ -118,15 +118,23 @@ void TestMultifariousInputs()
     auto in = model.AddNode<model::InputNode<double>>(3);
     auto minAndArgMin = model.AddNode<model::ArgMinNode<double>>(in->output);
     auto maxAndArgMax = model.AddNode<model::ArgMaxNode<double>>(in->output);
-    model::OutputRangeList<double> ranges = { { minAndArgMin->val, 0, 1 }, {maxAndArgMax->val, 0, 1 } };
+    model::OutputRangeList<double> ranges = { { minAndArgMin->val, 0}, {maxAndArgMax->val, 0} };
     auto minAndMax = model.AddNode<model::CombinerNode<double>>(ranges);
+    
+    model::OutputRangeList<double> ranges2 = { { minAndArgMin->val, 0}, {in->output, 1, 2} };
+    auto minAndTail = model.AddNode<model::CombinerNode<double>>(ranges2);
 
+    // set some example input and read the output
     std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
     in->SetInput(inputValues);
     auto output = model.GetNodeOutput(minAndMax->output);
+
     testing::ProcessTest("Testing combine node", testing::IsEqual(output[0], 0.25));
-    testing::ProcessTest("Testing combine node", testing::IsEqual(output[0], 0.75));
-    for (auto val : output) std::cout << val << "  ";
+    testing::ProcessTest("Testing combine node", testing::IsEqual(output[1], 0.75));
+
+    auto output2 = model.GetNodeOutput(minAndTail->output);
+    std::cout << "size: " << output2.size() << std::endl;
+    for (auto val : output2) std::cout << val << "  ";
     std::cout << std::endl;
 }
 

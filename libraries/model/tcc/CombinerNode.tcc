@@ -9,7 +9,27 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    //
+    // OutputRange
+    //
+        template <typename ValueType>
+        OutputRange<ValueType>::OutputRange(const OutputPort<ValueType>& port) : port(port), startIndex(0), numValues(port.Size()) 
+        {
+        }
+        
+        template <typename ValueType>
+        OutputRange<ValueType>::OutputRange(const OutputPort<ValueType>& port, size_t index) : port(port), startIndex(index), numValues(1) 
+        {
+        }
+        
+        template <typename ValueType>
+        OutputRange<ValueType>::OutputRange(const OutputPort<ValueType>& port, size_t index, size_t numValues) : port(port), startIndex(index), numValues(numValues) 
+        {
+        }
 
+    //
+    // CombinerNode
+    //
     template <typename ValueType>
     CombinerNode<ValueType>::CombinerNode(const std::vector<OutputRange<ValueType>>& inputs) : Node({}, { &_output }), _output(this, 0, 0)
     {
@@ -56,7 +76,7 @@ namespace model
         std::vector<ValueType> output;
         for(const auto& inputRange: _inputRanges)
         {
-            auto inVec = inputRange.port.GetValue<ValueType>();
+            auto inVec = (inputRange.port).template GetValue<ValueType>(); // What on earth?!?!
             output.insert(output.end(), inVec.begin()+inputRange.startIndex, inVec.begin()+inputRange.startIndex+inputRange.numValues);
         }
 

@@ -21,8 +21,13 @@
 namespace model
 {
     template <typename ValueType>
-    struct OutputRange
+    class OutputRange
     {
+    public:
+        OutputRange(const OutputPort<ValueType>& port);
+        OutputRange(const OutputPort<ValueType>& port, size_t index);
+        OutputRange(const OutputPort<ValueType>& port, size_t index, size_t numValues);
+
         const OutputPort<ValueType>& port;
         size_t startIndex;
         size_t numValues;
@@ -65,7 +70,6 @@ namespace model
     private:
         struct InputRange
         {
-            //            InputRange(const InputRange& other) = default;
             InputRange(Node* node, size_t portIndex, const OutputPort<ValueType>* refPort, size_t startIndex, size_t numValues) : port(node, portIndex, refPort), startIndex(startIndex), numValues(numValues)
             {}
 
