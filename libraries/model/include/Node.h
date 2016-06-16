@@ -72,7 +72,6 @@ namespace model
 
         /// <summary> Computes the output of this node and stores it in the output ports </summary>
         virtual void Compute() const = 0;
-        void RegisterOutputs() const; // TODO
 
     private:
         friend class Model;
@@ -80,8 +79,10 @@ namespace model
         void RegisterDependencies() const;
 
         NodeId _id;
+        // TODO: these should probably be references, not pointers
         std::vector<InputPort*> _inputs;
         std::vector<OutputPortBase*> _outputs;
+
         mutable std::vector<const Node*> _dependentNodes;
     };
 }
