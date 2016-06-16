@@ -15,7 +15,6 @@
 #include <vector>
 #include <memory>
 #include <exception>
-#include <initializer_list>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -36,20 +35,15 @@ namespace model
     template <typename ValueType>
     using OutputRangeList = std::vector<OutputRange<ValueType>>;
 
-    /// <summary> An node that selects values from a number of inputs </summary>
+    /// <summary> An node that selects values from among a number of inputs </summary>
     template <typename ValueType>
     class CombinerNode : public Node
     {
     public:
-
         /// <summary> Constructor </summary>
         ///
         /// <param name="inputs"> A vector of port ranges that represent the inputs to this node </param>
-        /// <param name="value2"> The input to return if the condition is `true` </param>
-        /// <param name="value2"> The input to return if the condition is `false` </param>
         CombinerNode(const std::vector<OutputRange<ValueType>>& inputs);
-
-        CombinerNode(const std::initializer_list<OutputRange<ValueType>>& inputs);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
