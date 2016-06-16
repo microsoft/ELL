@@ -3,6 +3,6 @@
 // Graph tests
 // 
 
-void TestMultifariousInputs();
+void TestInputRouting();
 void TestStaticGraph();
 void TestDynamicGraph();

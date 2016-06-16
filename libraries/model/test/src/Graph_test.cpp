@@ -110,7 +110,7 @@ void TestStaticGraph()
     testing::ProcessTest("Testing min index", testing::IsEqual(output4[0], 2));
 }
 
-void TestMultifariousInputs()
+void TestInputRouting()
 {
     // Create a simple computation graph that computes both min and max and concatenates them
     model::Model model;

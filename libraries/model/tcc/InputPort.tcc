@@ -10,7 +10,7 @@
 namespace model
 {
     template <typename ValueType>
-    InputPort::InputPort(const class Node* owningNode, size_t index, const OutputPort<ValueType>* output): Port(owningNode, index, Port::GetTypeCode<ValueType>(), output->Size()), _referencedPort(output)
+    InputPort::InputPort(const class Node* owningNode, size_t index, const OutputPort<ValueType>* output) : Port(owningNode, index, Port::GetTypeCode<ValueType>(), output->Size()), _referencedPort(output)
     {
         if (Port::GetTypeCode<ValueType>() != output->Type())
         {
