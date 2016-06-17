@@ -43,7 +43,9 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="inputs"> A vector of port ranges that represent the inputs to this node </param>
-        CombinerNode(const std::vector<OutputRange<ValueType>>& inputs);
+        CombinerNode(const OutputRangeList<ValueType>& inputs);
+
+        CombinerNode(const OutputRange<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

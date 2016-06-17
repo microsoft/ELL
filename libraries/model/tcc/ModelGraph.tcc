@@ -39,24 +39,75 @@ namespace model
     //
     // Factory method for creating nodes
     //
-    template <typename NodeType, typename ArgType, typename std::enable_if<!std::is_same<ArgType, OutputRangeList<NodeType>>::value, int>::type = 0>
-    ArgType ConvertInput(Model* model, ArgType arg)
-    {
-        return arg;
-    }
 
-    template <typename NodeType, typename ArgType, typename std::enable_if<std::is_same<ArgType, OutputRangeList<NodeType>>::value, int>::types = 0>
-    OutputPort<NodeType>& ConvertInput(Model* model, ArgType arg)
+    //template <typename NodeType, typename ArgType>
+    //ArgType ConvertInput(Model* model, ArgType&& arg)
+    //{
+    //    static_assert(!std::is_same<ArgType, OutputRange<NodeType>>::value, "blah");
+    //    std::cout << typeid(NodeType).name() << "\t" << typeid(ArgType).name() << std::endl;
+    //    return arg;
+    //}
+    
+    template <typename InputType>
+    class ConvertInput
     {
-        auto combiner = model->AddNode<CombinerNode<NodeType>>(arg);
-        return combiner.output;
-    }
+    public:
+        static InputType Convert(Model* model, const InputType& input)
+        {
+            return input;
+        }
+    };
+
+    template <typename InputType>
+    class ConvertInput <OutputRange<InputType>>
+    {
+    public:
+        static OutputPort<InputType> Convert(Model* model, const OutputRange<InputType>& input)
+        {
+            auto combiner = model->AddNode<CombinerNode<InputType>>(input);
+            return combiner->output;
+        }
+    };
+
+    template <typename InputType>
+    class ConvertInput <OutputRange<InputType>&>
+    {
+    public:
+        static OutputPort<InputType> Convert(Model* model, const OutputRange<InputType>& input)
+        {
+            auto combiner = model->AddNode<CombinerNode<InputType>>(input);
+            return combiner->output;
+        }
+    };
+
+    template <typename InputType>
+    class ConvertInput <OutputRangeList<InputType>>
+    {
+    public:
+        static OutputPort<InputType> Convert(Model* model, const OutputRangeList<InputType>& inputs)
+        {
+            auto combiner = model->AddNode<CombinerNode<InputType>>(inputs);
+            return combiner->output;
+        }
+    };
+
+    template <typename InputType>
+    class ConvertInput <OutputRangeList<InputType>&>
+    {
+    public:
+        static OutputPort<InputType> Convert(Model* model, const OutputRangeList<InputType>& inputs)
+        {
+            auto combiner = model->AddNode<CombinerNode<InputType>>(inputs);
+            return combiner->output;
+        }
+    };
 
     template <typename NodeType, typename... Args>
     std::shared_ptr<NodeType> Model::AddNode(Args&&... args)
     {
-        //auto node = std::make_shared<NodeType>(args...);
-        auto node = std::make_shared<NodeType>(ConvertInput<NodeType, Args>(this, std::forward<Args>(args))...);
+//        auto node = std::make_shared<NodeType>(args...);
+        //auto node = std::make_shared<NodeType>(ConvertInput<std::decay<Args>::type>::Convert(this, args)...);
+        auto node = std::make_shared<NodeType>(ConvertInput<Args>::Convert(this, std::forward<Args>(args))...);
         node->RegisterDependencies();
         _nodeMap[node->GetId()] = node;
         return node;
