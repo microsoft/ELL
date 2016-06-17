@@ -110,12 +110,13 @@ void TestStaticGraph()
     testing::ProcessTest("Testing min index", testing::IsEqual(output4[0], 2));
 }
 
-void TestInputRouting()
+void TestInputRouting1()
 {
     // Create a simple computation graph that computes both min and max and concatenates them
     model::Model model;
 
     auto in = model.AddNode<model::InputNode<double>>(3);
+
     auto minAndArgMin = model.AddNode<model::ArgMinNode<double>>(in->output);
     auto maxAndArgMax = model.AddNode<model::ArgMaxNode<double>>(in->output);
     model::OutputRangeList<double> ranges = { { minAndArgMin->val, 0}, {maxAndArgMax->val, 0} };
@@ -138,6 +139,23 @@ void TestInputRouting()
     std::cout << std::endl;
 }
 
+void TestInputRouting2()
+{
+    // Create a simple computation graph that computes both min and max and concatenates them
+    model::Model model;
+
+    auto in = model.AddNode<model::InputNode<double>>(3);
+    model::OutputRangeList<double> ranges = { { in->output, 0}, {in->output, 2} };
+
+    auto minAndArgMin = model.AddNode<model::ArgMinNode<double>>(ranges);
+
+    // set some example input and read the output
+    std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
+    in->SetInput(inputValues);
+    auto output = model.GetNodeOutput(minAndArgMin->val);
+
+    testing::ProcessTest("Testing combine node", testing::IsEqual(output[0], 0.5));
+}
 //
 // Placeholder for test function that creates a graph using dynamic-creation routines
 // 

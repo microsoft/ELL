@@ -11,6 +11,7 @@
 #include "Node.h"
 #include "InputPort.h"
 #include "OutputPort.h"
+#include "CombinerNode.h"
 
 #include <unordered_set>
 #include <vector>
@@ -48,18 +49,18 @@ namespace model
         template <typename ValueType>
         std::vector<ValueType> GetNodeOutput(const std::shared_ptr<Node>& node, size_t outputIndex) const;
 
-        /// <summary> 
-        /// Visits all the nodes in the graph in dependency order. No nodes will be visited until all 
-        /// its inputs have first been visited. 
+        /// <summary>
+        /// Visits all the nodes in the graph in dependency order. No nodes will be visited until all
+        /// its inputs have first been visited.
         /// </summary>
         ///
         /// <param name="visitor"> The visitor functor to use </param>
         template <typename Visitor>
         void Visit(Visitor& visitor) const;
 
-        /// <summary> 
+        /// <summary>
         /// Visits the nodes in the graph necessary to compute the output of a given node. Visits the nodes
-        /// in dependency order. No nodes will be visited until all its inputs have first been visited. 
+        /// in dependency order. No nodes will be visited until all its inputs have first been visited.
         /// </summary>
         ///
         /// <param name="visitor"> The visitor functor to use </param>
@@ -67,9 +68,9 @@ namespace model
         template <typename Visitor>
         void Visit(Visitor& visitor, const std::shared_ptr<Node>& outputNode) const;
 
-        /// <summary> 
+        /// <summary>
         /// Visits the nodes in the graph necessary to compute the outputs of the given nodes. Visits the nodes
-        /// in dependency order. No nodes will be visited until all its inputs have first been visited. 
+        /// in dependency order. No nodes will be visited until all its inputs have first been visited.
         /// </summary>
         ///
         /// <param name="visitor"> The visitor functor to use </param>
@@ -80,6 +81,9 @@ namespace model
         // TODO: iterators, including begin/end for iterating over entire graph
 
     private:
+        template <typename NodeType, typename ArgType>
+        ArgType& ConvertInput(ArgType&& arg);
+
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
         // to look nodes up by id.
         std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _nodeMap;

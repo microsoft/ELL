@@ -5,6 +5,7 @@
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+#include <iostream>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -38,10 +39,32 @@ namespace model
     //
     // Factory method for creating nodes
     //
+    template <typename NodeType, typename ArgType>
+    class InputConverter
+    {
+    public:
+        static ArgType& ConvertInput(Model* model, ArgType&& arg)
+        {
+            return arg;
+        }
+    };
+
+    template <typename NodeType>
+    class InputConverter <NodeType, OutputRangeList<NodeType>>
+    {
+    public:
+        static OutputPort<NodeType>& ConvertInput(Model* model, OutputRangeList<NodeType> ranges)
+        {
+            auto combiner = model.AddNode<CombinerNode<NodeType>>(ranges);
+            return combiner.output;
+        }
+    };
+
     template <typename NodeType, typename... Args>
     std::shared_ptr<NodeType> Model::AddNode(Args&&... args)
     {
-        auto node = std::make_shared<NodeType>(args...);
+        //auto node = std::make_shared<NodeType>(args...);
+        auto node = std::make_shared<NodeType>(InputConverter<NodeType, Args>::ConvertInput(this, std::forward<Args>(args))...);
         node->RegisterDependencies();
         _nodeMap[node->GetId()] = node;
         return node;

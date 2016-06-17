@@ -15,7 +15,8 @@
 
 int main()
 {
-    TestMultifariousInputs();
+    TestInputRouting1();
+    TestInputRouting2();
     TestStaticGraph();
     TestDynamicGraph();
 
