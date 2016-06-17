@@ -47,7 +47,7 @@ namespace model
     //    std::cout << typeid(NodeType).name() << "\t" << typeid(ArgType).name() << std::endl;
     //    return arg;
     //}
-    
+    /*
     template <typename InputType>
     class ConvertInput
     {
@@ -100,14 +100,14 @@ namespace model
             auto combiner = model->AddNode<CombinerNode<InputType>>(inputs);
             return combiner->output;
         }
-    };
+    };*/
 
     template <typename NodeType, typename... Args>
     std::shared_ptr<NodeType> Model::AddNode(Args&&... args)
     {
-//        auto node = std::make_shared<NodeType>(args...);
+        auto node = std::make_shared<NodeType>(args...);
         //auto node = std::make_shared<NodeType>(ConvertInput<std::decay<Args>::type>::Convert(this, args)...);
-        auto node = std::make_shared<NodeType>(ConvertInput<Args>::Convert(this, std::forward<Args>(args))...);
+//        auto node = std::make_shared<NodeType>(ConvertInput<Args>::Convert(this, std::forward<Args>(args))...);
         node->RegisterDependencies();
         _nodeMap[node->GetId()] = node;
         return node;
@@ -219,8 +219,11 @@ namespace model
             for (auto input : node->_inputs)
             {
                 // Note: If InputPorts can point to multiple nodes, we'll have to iterate over them here
-                auto inputNode = input->ReferencedPort()->Node();
-                canVisit = canVisit && visitedNodes.find(inputNode) != visitedNodes.end();
+                for (const auto& inputRange : input->GetInputRanges())
+                {
+                    auto inputNode = inputRange.referencedPort->Node();
+                    canVisit = canVisit && visitedNodes.find(inputNode) != visitedNodes.end();
+                }
             }
 
             if (canVisit)
@@ -250,7 +253,10 @@ namespace model
             {
                 for (auto input : ModelImpl::Reverse(node->_inputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
                 {
-                    stack.push_back(input->ReferencedPort()->Node()); // Again, if `InputPort`s point to multiple nodes, need to iterate here
+                    for (const auto& inputRange : input->GetInputRanges())
+                    {
+                        stack.push_back(inputRange.referencedPort->Node()); // Again, if `InputPort`s point to multiple nodes, need to iterate here
+                    }
                 }
             }
         }

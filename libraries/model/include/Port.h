@@ -47,8 +47,8 @@ namespace model
         template <typename ValueType>
         static PortType GetTypeCode();
 
+        void SetType(PortType type) { _type = type; }
         void SetSize(size_t size) { _size = size; }
-
 
     protected:
         Port(const class Node* node, size_t outputIndex, PortType type, size_t size) : _node(node), _portIndex(outputIndex), _type(type), _size(size) {}

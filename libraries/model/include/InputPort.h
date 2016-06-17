@@ -18,6 +18,40 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    class InputRange
+    {
+    public:
+        template <typename ValueType>
+        InputRange(const OutputPort<ValueType>& port);
+
+        template <typename ValueType>
+        InputRange(const OutputPort<ValueType>& port, size_t index);
+
+        template <typename ValueType>
+        InputRange(const OutputPort<ValueType>& port, size_t index, size_t numValues);
+
+        Port::PortType Type() const { return referencedPort->Type(); }
+
+        size_t Size() const
+        {
+            if (isFixedSize)
+            {
+                return referencedPort->Size();
+            }
+            else
+            {
+                return numValues;
+            }
+        }
+
+        const Port* referencedPort;
+        size_t startIndex;
+        size_t numValues;
+        bool isFixedSize;
+    };
+
+    typedef std::vector<InputRange> InputRangeList;
+
     /// <summary> Class representing an input to a node </summary>
     class InputPort : public Port
     {
@@ -27,16 +61,19 @@ namespace model
         /// <param name="output"> The output port this port receives values from </param>
         template <typename ValueType>
         InputPort(const class Node* owningNode, size_t portIndex, const OutputPort<ValueType>* output);
-        
-        /// <summary> Returns the port that this port is redirecting from </summary>
-        const Port* ReferencedPort() const { return _referencedPort; }
+
+        InputPort(const class Node* owningNode, size_t portIndex, const InputRange& inputRange);
+
+        InputPort(const class Node* owningNode, size_t portIndex, const std::vector<InputRange>& inputRanges);
+
+        const std::vector<InputRange>& GetInputRanges() const { return _inputRanges; }
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         template <typename ValueType>
         std::vector<ValueType> GetValue() const;
 
     private:
-        const Port* _referencedPort;
+        std::vector<InputRange> _inputRanges;
     };
 
     // TODO: if we want to allow functions/nodes to gather values from arbitrary collections of output elements, then
