@@ -81,9 +81,6 @@ namespace model
         // TODO: iterators, including begin/end for iterating over entire graph
 
     private:
-        template <typename NodeType, typename ArgType>
-        ArgType& ConvertInput(ArgType&& arg);
-
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
         // to look nodes up by id.
         std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _nodeMap;

@@ -39,32 +39,24 @@ namespace model
     //
     // Factory method for creating nodes
     //
-    template <typename NodeType, typename ArgType>
-    class InputConverter
+    template <typename NodeType, typename ArgType, typename std::enable_if<!std::is_same<ArgType, OutputRangeList<NodeType>>::value, int>::type = 0>
+    ArgType ConvertInput(Model* model, ArgType arg)
     {
-    public:
-        static ArgType& ConvertInput(Model* model, ArgType&& arg)
-        {
-            return arg;
-        }
-    };
+        return arg;
+    }
 
-    template <typename NodeType>
-    class InputConverter <NodeType, OutputRangeList<NodeType>>
+    template <typename NodeType, typename ArgType, typename std::enable_if<std::is_same<ArgType, OutputRangeList<NodeType>>::value, int>::types = 0>
+    OutputPort<NodeType>& ConvertInput(Model* model, ArgType arg)
     {
-    public:
-        static OutputPort<NodeType>& ConvertInput(Model* model, OutputRangeList<NodeType> ranges)
-        {
-            auto combiner = model.AddNode<CombinerNode<NodeType>>(ranges);
-            return combiner.output;
-        }
-    };
+        auto combiner = model->AddNode<CombinerNode<NodeType>>(arg);
+        return combiner.output;
+    }
 
     template <typename NodeType, typename... Args>
     std::shared_ptr<NodeType> Model::AddNode(Args&&... args)
     {
         //auto node = std::make_shared<NodeType>(args...);
-        auto node = std::make_shared<NodeType>(InputConverter<NodeType, Args>::ConvertInput(this, std::forward<Args>(args))...);
+        auto node = std::make_shared<NodeType>(ConvertInput<NodeType, Args>(this, std::forward<Args>(args))...);
         node->RegisterDependencies();
         _nodeMap[node->GetId()] = node;
         return node;
