@@ -82,7 +82,7 @@ namespace emll {
 		{
 		}
 
-		void CEmitter::BeginLinear(const char* name, uint64_t inputCount, const layers::CoordinateList& outputs)
+		void CEmitter::BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs)
 		{
 			auto str = "// New Compiler \n// Input dimension: %\n// Output dimension: %\n// Output coordinates:";
 			utilities::PrintFormat(_os, str, inputCount, outputs.Size());
@@ -94,7 +94,7 @@ namespace emll {
 			//
 			// Function Declaration
 			//
-			utilities::PrintFormat(_os, "void %(const double* input, double* output)\n{\n", name);
+			utilities::PrintFormat(_os, "void %(const double* %, double* %)\n{\n", functionName, inputVarName, outputVarName);
 		}
 
 		void CEmitter::EndLinear()
@@ -205,9 +205,18 @@ namespace emll {
 			_module = std::make_unique<ir::ModuleEmitter>(&_emitter, _emitter.AddModule("EMLL"));
 		}
 
-		void IREmitter::BeginLinear(const char* name, uint64_t inputCount, const layers::CoordinateList& outputs)
+		void IREmitter::BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs)
 		{
-			_fn = _module->Function(name, ir::ValueType::Void, { ir::ValueType::PDouble, ir::ValueType::PDouble });
+			ir::NamedValueTypeList fnArgs;
+			fnArgs.init({ {inputVarName, ir::ValueType::PDouble}, { outputVarName, ir::ValueType::PDouble }});
+			_fn = _module->Function(functionName, ir::ValueType::Void, fnArgs, true);	
+			//
+			// Register input and out as variables for the function body to use
+			//
+			auto args = _fn.Args().begin();
+			_variables.Set(inputVarName, &(*args));
+			args++;
+			_variables.Set(outputVarName, &(*args));
 		}
 
 		void IREmitter::EndLinear()
@@ -222,12 +231,12 @@ namespace emll {
 			llvm::Value *pDest = EnsureVar(destVar);
 			switch (assignment)
 			{
-				case CodeEmitter::Declare:
-				case CodeEmitter::Set:
-				case CodeEmitter::Reset:
+				case Assignment::Declare:
+				case Assignment::Set:
+				case Assignment::Reset:
 					_fn.Store(pDest, pSrc);
 					break;
-				case CodeEmitter::IncrementBy:
+				case Assignment::IncrementBy:
 				{
 					llvm::Value* pSum = _fn.Op(ir::OperatorType::AddF, _fn.Load(pSrc), _fn.Load(pDest));
 					_fn.Store(pDest, pSum);
@@ -247,10 +256,13 @@ namespace emll {
 		llvm::Value* IREmitter::EnsureVar(ScalarVariable& var)
 		{
 			auto name = var.Name();
-			llvm::Value* pValue = _variables.Get(name);
-			// TODO: Handle array variables here
+			llvm::Value* pValue = _variables.Get(name);			
 			if (pValue == nullptr)
 			{
+				if (var.IsArrayElement())
+				{
+					throw new CodeEmitterException(CodeEmitterError::ArrayMustBeAllocated);
+				}
 				// We currently assume that all variables are doubles
 				pValue = _fn.Var(ir::ValueType::Double, name);
 				_variables.Set(name, pValue);

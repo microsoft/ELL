@@ -34,6 +34,17 @@ namespace emll
 				return FunctionEmitter(_pEmitter, pfn);
 			}
 
+			FunctionEmitter ModuleEmitter::Function(const std::string& name, ValueType returnType, NamedValueTypeList& args, bool isPublic)
+			{
+				llvm::Function* pfn = _pEmitter->Function(module(), name, returnType, linkage(isPublic), args);
+				if (pfn == nullptr)
+				{
+					throw new EmitterException(EmitterError::InvalidFunction);
+				}
+				beginFunction(pfn);
+				return FunctionEmitter(_pEmitter, pfn);
+			}
+
 			FunctionEmitter ModuleEmitter::Function(const std::string& name, ValueType returnType, std::initializer_list<ValueType> args, bool isPublic)
 			{
 				_valueTypeList.init(args);

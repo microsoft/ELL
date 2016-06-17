@@ -41,6 +41,7 @@ namespace emll
 				{
 					return Function(name, returnType, &args, isPublic);
 				}
+				FunctionEmitter Function(const std::string& name, ValueType returnType, NamedValueTypeList& args, bool isPublic = false);
 				FunctionEmitter Function(const std::string& name, ValueType returnType, std::initializer_list<ValueType> args, bool isPublic = false);
 
 				//

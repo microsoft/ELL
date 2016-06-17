@@ -76,7 +76,6 @@ namespace emll
 				{
 					return *(Args().begin());
 				}
-
 				llvm::Value* Var(ValueType type)
 				{
 					return _pEmitter->Variable(type);

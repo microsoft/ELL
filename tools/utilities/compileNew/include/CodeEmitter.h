@@ -18,13 +18,23 @@
 
 namespace emll {
 	namespace compiler {
+
+		enum class CodeEmitterError
+		{
+			NotSupported,
+			ArrayMustBeAllocated
+		};
+
+		using CodeEmitterException = CompilerException<CodeEmitterError>;
+
+
 		//
 		// Abstract base class for Code Generators
 		//
 		class CodeEmitter
 		{
 		public:
-			enum Assignment
+			enum class Assignment
 			{
 				Declare,
 				Set,
@@ -35,7 +45,7 @@ namespace emll {
 		public:
 			CodeEmitter(DataFlowGraph& graph);
 
-			virtual void BeginLinear(const char* name, uint64_t inputCount, const layers::CoordinateList& outputs) = 0;
+			virtual void BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs) = 0;
 
 			void Assign(DataFlowNode& srcNode, DataFlowNode& destNode, const layers::Coordinate& destCoordinate);
 			void Assign(ScalarVariable& srcVar, DataFlowNode& destNode, const layers::Coordinate& destCoordinate);
@@ -68,7 +78,7 @@ namespace emll {
 		public:
 			CEmitter(DataFlowGraph& graph, std::ostream& os);
 
-			void BeginLinear(const char* name, uint64_t inputCount, const layers::CoordinateList& outputs) override;
+			void BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs) override;
 			void EndLinear() override;
 
 		protected:
@@ -91,7 +101,7 @@ namespace emll {
 		public:
 			IREmitter(DataFlowGraph& graph, std::ostream& os);
 
-			void BeginLinear(const char* name, uint64_t inputCount, const layers::CoordinateList& outputs) override;
+			void BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs) override;
 			void EndLinear() override;
 
 		protected:
