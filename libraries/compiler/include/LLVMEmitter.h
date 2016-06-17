@@ -24,6 +24,17 @@ namespace emll
 				DivideF,
 			};
 
+			class VariableTable
+			{
+			public:
+				llvm::Value* Get(const std::string& name);
+				void Set(const std::string& name, llvm::Value* pVal);
+
+			private:
+				std::unordered_map<std::string, llvm::Value*> _map;
+			};
+
+
 			class LLVMEmitter
 			{
 			public:
@@ -44,7 +55,7 @@ namespace emll
 				llvm::ReturnInst* Return(llvm::Value* value);
 				llvm::Value* BinaryOp(OperatorType type, llvm::Value* pLVal, llvm::Value* pRVal, const std::string& varName = "");
 
-				std::unique_ptr<llvm::Module> addModule(const std::string& name);
+				std::unique_ptr<llvm::Module> AddModule(const std::string& name);
 
 				llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, ValueType returnType, ValueTypeList* pArgs);
 				llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, ValueType returnType, NamedValueTypeList& args);
@@ -87,6 +98,7 @@ namespace emll
 					return _pBuilder->CreateStore(pVal, pPtr);
 				}
 				llvm::AllocaInst* Variable(ValueType type);
+				llvm::AllocaInst * Variable(ValueType type, const std::string & name);
 				llvm::AllocaInst* StackAlloc(ValueType type, int count);
 
 				llvm::LLVMContext& context()
@@ -104,7 +116,7 @@ namespace emll
 			private:
 				llvm::LLVMContext _context;
 				std::unique_ptr<llvm::IRBuilder<>> _pBuilder;
-				std::unordered_map<std::string, llvm::Value*> _stringLiterals;
+				VariableTable _stringLiterals;
 				// Reusable buffers
 				std::vector<llvm::Type *> _argTypes;
 			};

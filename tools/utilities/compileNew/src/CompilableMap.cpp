@@ -23,7 +23,7 @@
 #include <cassert>
 
 
-void ProcessNode(DataFlowNode& currentNode, CodeEmitter& codeGen)
+void ProcessNode(DataFlowNode& currentNode, emll::compiler::CodeEmitter& codeGen)
 {
     // for each action
     while(currentNode.HasActions())
@@ -79,7 +79,7 @@ void CompilableMap::ToCode(std::ostream& os) const
 
     // create data flow graph datastructure
     DataFlowGraph graph;
-	CEmitter codeGen(graph, os);
+	emll::compiler::CEmitter codeGen(graph, os);
 
     // add graph layer for input
     graph.AddLayer(_requiredInputLayerSize);
@@ -138,6 +138,5 @@ void CompilableMap::ToCode(std::ostream& os) const
 		ProcessNode(inputNode, codeGen);
     }
 
-   // os << "}\n";
-	codeGen.EndLinear();
+  codeGen.EndLinear();
 }

@@ -12,13 +12,10 @@ namespace emll
 				_pModule(std::move(pModule))
 			{
 			}
-			ModuleEmitter::~ModuleEmitter()
-			{
-			}
 
-			FunctionEmitter ModuleEmitter::addMain()
+			FunctionEmitter ModuleEmitter::AddMain()
 			{
-				return function("main", ValueType::Void, true);
+				return Function("main", ValueType::Void, true);
 			}
 
 			llvm::Function* ModuleEmitter::getFunction(const std::string& name)
@@ -26,7 +23,7 @@ namespace emll
 				return _pModule->getFunction(name);
 			}
 
-			FunctionEmitter ModuleEmitter::function(const std::string& name, ValueType returnType, ValueTypeList* pArgs, bool isPublic)
+			FunctionEmitter ModuleEmitter::Function(const std::string& name, ValueType returnType, ValueTypeList* pArgs, bool isPublic)
 			{
 				llvm::Function* pfn = _pEmitter->Function(module(), name, returnType, linkage(isPublic), pArgs);
 				if (pfn == nullptr)
@@ -37,10 +34,10 @@ namespace emll
 				return FunctionEmitter(_pEmitter, pfn);
 			}
 
-			FunctionEmitter ModuleEmitter::function(const std::string& name, ValueType returnType, std::initializer_list<ValueType> args, bool isPublic)
+			FunctionEmitter ModuleEmitter::Function(const std::string& name, ValueType returnType, std::initializer_list<ValueType> args, bool isPublic)
 			{
 				_valueTypeList.init(args);
-				return function(name, returnType, &_valueTypeList, isPublic);
+				return Function(name, returnType, &_valueTypeList, isPublic);
 			}
 
 			llvm::Function::LinkageTypes ModuleEmitter::linkage(bool isPublic)

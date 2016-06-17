@@ -13,6 +13,7 @@ namespace emll
 			class FunctionEmitter
 			{
 			public:
+				FunctionEmitter(void) {}
 				FunctionEmitter(LLVMEmitter* pEmitter, llvm::Function* pfn);
 				FunctionEmitter(const FunctionEmitter& src);
 
@@ -52,7 +53,7 @@ namespace emll
 				llvm::Value* Call(const std::string& name, llvm::Value* pArg = nullptr);
 				llvm::Value* Call(const std::string& name, ValueList& args);
 				llvm::Value* Call(const std::string& name, std::initializer_list<llvm::Value*> args);
-				void ret()
+				void Ret()
 				{
 					_pEmitter->ReturnVoid();
 				}
@@ -80,6 +81,11 @@ namespace emll
 				{
 					return _pEmitter->Variable(type);
 				}
+				llvm::Value* Var(ValueType type, const std::string& name)
+				{
+					return _pEmitter->Variable(type, name);
+				}
+
 				llvm::Value* Var(ValueType type, int count)
 				{
 					return _pEmitter->StackAlloc(type, count);

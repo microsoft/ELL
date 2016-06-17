@@ -14,9 +14,8 @@ namespace emll
 			{
 			public:
 				ModuleEmitter(LLVMEmitter* pEmitter, std::unique_ptr<llvm::Module> pModule);
-				virtual ~ModuleEmitter();
-
-				FunctionEmitter addMain();
+				
+				FunctionEmitter AddMain();
 
 				void declareFunction(const std::string& name, ValueType returnType)
 				{
@@ -34,15 +33,15 @@ namespace emll
 				{
 					_pEmitter->DeclareFunction(module(), name, type);
 				}
-				FunctionEmitter function(const std::string& name, ValueType returnType, bool isPublic = false)
+				FunctionEmitter Function(const std::string& name, ValueType returnType, bool isPublic = false)
 				{
-					return function(name, returnType, nullptr, isPublic);
+					return Function(name, returnType, nullptr, isPublic);
 				}
-				FunctionEmitter function(const std::string& name, ValueType returnType, ValueTypeList& args, bool isPublic = false)
+				FunctionEmitter Function(const std::string& name, ValueType returnType, ValueTypeList& args, bool isPublic = false)
 				{
-					return function(name, returnType, &args, isPublic);
+					return Function(name, returnType, &args, isPublic);
 				}
-				FunctionEmitter function(const std::string& name, ValueType returnType, std::initializer_list<ValueType> args, bool isPublic = false);
+				FunctionEmitter Function(const std::string& name, ValueType returnType, std::initializer_list<ValueType> args, bool isPublic = false);
 
 				//
 				// Serialization
@@ -75,7 +74,7 @@ namespace emll
 					return _pModule.get();
 				}
 				llvm::Function* getFunction(const std::string& name);
-				FunctionEmitter function(const std::string& name, ValueType returnType, ValueTypeList* pArgs, bool isPublic);
+				FunctionEmitter Function(const std::string& name, ValueType returnType, ValueTypeList* pArgs, bool isPublic);
 				void beginFunction(llvm::Function* pfn);
 				void writeToFile(const std::string& filePath, bool isBitCode) const;
 				llvm::Function::LinkageTypes linkage(bool isPublic);

@@ -7,6 +7,22 @@ namespace emll
 	{
 		namespace ir
 		{
+			llvm::Value* VariableTable::Get(const std::string& name)
+			{
+				llvm::Value* value = nullptr;
+				auto search = _map.find(name);
+				if (search != _map.end())
+				{
+					value = search->second;
+				}
+				return value;
+			}
+
+			void VariableTable::Set(const std::string& name, llvm::Value* pValue)
+			{
+				_map[name] = pValue;
+			}
+
 			LLVMEmitter::LLVMEmitter()
 			{
 				_pBuilder = std::make_unique<llvm::IRBuilder<>>(_context);
@@ -69,18 +85,12 @@ namespace emll
 
 			llvm::Value* LLVMEmitter::Literal(const std::string& value)
 			{
-				llvm::Value* literal = nullptr;
-				auto search = _stringLiterals.find(value);
-				if (search != _stringLiterals.end())
-				{
-					literal = search->second;
-				}
-				else
+				llvm::Value* literal = _stringLiterals.Get(value);
+				if (literal == nullptr)
 				{
 					literal = _pBuilder->CreateGlobalStringPtr(value);
-					_stringLiterals[value] = literal;
+					_stringLiterals.Set(value, literal);
 				}
-
 				return literal;
 			}
 
@@ -129,7 +139,7 @@ namespace emll
 				}
 			}
 
-			std::unique_ptr<llvm::Module> LLVMEmitter::addModule(const std::string& name)
+			std::unique_ptr<llvm::Module> LLVMEmitter::AddModule(const std::string& name)
 			{
 				return std::make_unique<llvm::Module>(name, _context);
 			}
@@ -213,6 +223,11 @@ namespace emll
 			llvm::AllocaInst* LLVMEmitter::Variable(ValueType type)
 			{
 				return _pBuilder->CreateAlloca(valueType(type), nullptr);
+			}
+
+			llvm::AllocaInst* LLVMEmitter::Variable(ValueType type, const std::string& name)
+			{
+				return _pBuilder->CreateAlloca(valueType(type), nullptr, name);
 			}
 
 			llvm::AllocaInst* LLVMEmitter::StackAlloc(ValueType type, int size)
