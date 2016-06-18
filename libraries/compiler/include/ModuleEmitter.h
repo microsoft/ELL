@@ -47,13 +47,21 @@ namespace emll
 				//
 				// Serialization
 				//
-				void writeBitcodeToFile(const std::string& filePath) const
+				void WriteBitcodeToFile(const std::string& filePath)
 				{
-					writeToFile(filePath, true);
+					WriteToFile(filePath, true);
 				}
-				void writeAsmToFile(const std::string& filePath) const
+				void WriteBitcodeToStream(std::ostream& os)
 				{
-					writeToFile(filePath, false);
+					WriteToStream(os, true);
+				}
+				void WriteAsmToFile(const std::string& filePath)
+				{
+					WriteToFile(filePath, false);
+				}
+				void WriteAsmToStream(std::ostream& os)
+				{
+					WriteToStream(os, false);
 				}
 				//
 				// To emit declarations for standard C functions
@@ -64,7 +72,7 @@ namespace emll
 				//
 				// Debugging
 				//
-				void dump()
+				void Dump()
 				{
 					_pModule->dump();
 				}
@@ -74,11 +82,12 @@ namespace emll
 				{
 					return _pModule.get();
 				}
-				llvm::Function* getFunction(const std::string& name);
+				llvm::Function* GetFunction(const std::string& name);
 				FunctionEmitter Function(const std::string& name, ValueType returnType, ValueTypeList* pArgs, bool isPublic);
-				void beginFunction(llvm::Function* pfn);
-				void writeToFile(const std::string& filePath, bool isBitCode) const;
-				llvm::Function::LinkageTypes linkage(bool isPublic);
+				void BeginFunction(llvm::Function* pfn);
+				void WriteToFile(const std::string& filePath, bool isBitCode);
+				void WriteToStream(std::ostream& os, bool isBitCode);
+				llvm::Function::LinkageTypes Linkage(bool isPublic);
 
 			private:
 				std::unique_ptr<llvm::Module> _pModule;

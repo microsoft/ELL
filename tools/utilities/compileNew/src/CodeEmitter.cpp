@@ -142,6 +142,7 @@ namespace emll {
 			switch (assignment)
 			{
 				default:
+					throw new CodeEmitterException(CodeEmitterError::NotSupported);
 					break;
 				case Assignment::Declare:
 					format = "    double % = %; // coordinate (%,%), allocating new temporary variable\n";
@@ -156,7 +157,6 @@ namespace emll {
 					format = "    % = %; // coordinate (%,%), reassigning temporary variable\n";
 					break;
 			}
-			assert(format != nullptr);
 			return format;
 		}
 
@@ -222,36 +222,106 @@ namespace emll {
 		void IREmitter::EndLinear()
 		{
 			_fn.Ret();
-			_module->dump();
+			_fn.Verify();
+			_module->WriteAsmToStream(_os);
 		}
 
 		void IREmitter::EmitAssign(Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
 		{
-			llvm::Value *pSrc = EnsureVar(srcVar);
-			llvm::Value *pDest = EnsureVar(destVar);
+			llvm::Value* pSrc = LoadVar(srcVar);
 			switch (assignment)
 			{
+				default:
+					throw new CodeEmitterException(CodeEmitterError::NotSupported);
+					break;
 				case Assignment::Declare:
 				case Assignment::Set:
 				case Assignment::Reset:
-					_fn.Store(pDest, pSrc);
+					Store(destVar, pSrc);
 					break;
 				case Assignment::IncrementBy:
-				{
-					llvm::Value* pSum = _fn.Op(ir::OperatorType::AddF, _fn.Load(pSrc), _fn.Load(pDest));
-					_fn.Store(pDest, pSum);
-					break;
-				}
-				default:
+					Increment(destVar, pSrc);
 					break;
 			}
 		}
 
 		void IREmitter::EmitLinearOp(const LinearOperation& op, Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
 		{
+			llvm::Value* pResult = Emit(srcVar, op);
+			switch (assignment)
+			{
+				default:
+					throw new CodeEmitterException(CodeEmitterError::NotSupported);
+					break;
+				case Assignment::Declare:
+				case Assignment::Set:
+				case Assignment::Reset:
+					Store(destVar, pResult);
+					break;
+				case Assignment::IncrementBy:
+					Increment(destVar, pResult);
+					break;
+			}
+		}
+
+		llvm::Value* IREmitter::Emit(ScalarVariable& srcVar, const LinearOperation& op)
+		{
+			double a = op.MultiplyBy();
+			double b = op.IncrementBy();
+			llvm::Value* pSrc = LoadVar(srcVar);
+			if (b == 0)
+			{
+				if (a != 1)
+				{
+					return _fn.Op(ir::OperatorType::MultiplyF, _fn.Literal(a), pSrc);
+				}
+				else
+				{
+					return pSrc;
+				}
+			}
+			else
+			{
+				if (a == 0)
+				{
+					return _fn.Literal(b);
+				}
+				else if (a == 1)
+				{
+					return _fn.Op(ir::OperatorType::AddF, _fn.Literal(a), pSrc);
+				}
+				else
+				{
+					return _fn.Op(ir::OperatorType::AddF,
+								_fn.Op(ir::OperatorType::MultiplyF, _fn.Literal(a), pSrc),
+								_fn.Literal(b));
+				}
+			}
 
 		}
 
+		void IREmitter::Store(ScalarVariable& destVar, llvm::Value* pValue)
+		{
+			llvm::Value *pDest = EnsureVar(destVar);
+			if (destVar.IsArrayElement())
+			{
+				_fn.SetValueAtA(pDest, destVar.ElementOffset(), pValue);
+			}
+			else
+			{
+				_fn.Store(pDest, pValue);
+			}
+		}
+
+		void IREmitter::Increment(ScalarVariable& destVar, llvm::Value* pValue)
+		{
+			// Load variables into registers
+			llvm::Value *pDest = LoadVar(destVar);
+
+			// pSum is in a register...
+			llvm::Value* pSum = _fn.Op(ir::OperatorType::AddF, pValue, pDest);
+			Store(destVar, pSum);
+		}
 
 		llvm::Value* IREmitter::EnsureVar(ScalarVariable& var)
 		{
@@ -266,6 +336,21 @@ namespace emll {
 				// We currently assume that all variables are doubles
 				pValue = _fn.Var(ir::ValueType::Double, name);
 				_variables.Set(name, pValue);
+			}
+			return pValue;
+		}
+
+		llvm::Value* IREmitter::LoadVar(ScalarVariable& var)
+		{
+			llvm::Value *pValue = EnsureVar(var);
+			if (var.IsArrayElement())
+			{
+				pValue = _fn.ValueAtA(pValue, var.ElementOffset());
+			}
+			else
+			{
+				// All our temporary variables are stack variables, so we must load them
+				pValue = _fn.Load(pValue);
 			}
 			return pValue;
 		}

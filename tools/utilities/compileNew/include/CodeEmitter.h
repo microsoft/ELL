@@ -110,6 +110,11 @@ namespace emll {
 
 		private:
 			llvm::Value* EnsureVar(ScalarVariable& var);
+			llvm::Value* LoadVar(ScalarVariable& var);
+
+			llvm::Value* Emit(ScalarVariable& srcVar, const LinearOperation& op);
+			void Store(ScalarVariable& destVar, llvm::Value* pValue);
+			void Increment(ScalarVariable& destVar, llvm::Value* pValue);
 
 		private:
 			std::ostream& _os;

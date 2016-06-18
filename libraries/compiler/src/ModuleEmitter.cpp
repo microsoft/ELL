@@ -18,30 +18,30 @@ namespace emll
 				return Function("main", ValueType::Void, true);
 			}
 
-			llvm::Function* ModuleEmitter::getFunction(const std::string& name)
+			llvm::Function* ModuleEmitter::GetFunction(const std::string& name)
 			{
 				return _pModule->getFunction(name);
 			}
 
 			FunctionEmitter ModuleEmitter::Function(const std::string& name, ValueType returnType, ValueTypeList* pArgs, bool isPublic)
 			{
-				llvm::Function* pfn = _pEmitter->Function(module(), name, returnType, linkage(isPublic), pArgs);
+				llvm::Function* pfn = _pEmitter->Function(module(), name, returnType, Linkage(isPublic), pArgs);
 				if (pfn == nullptr)
 				{
 					throw new EmitterException(EmitterError::InvalidFunction);
 				}
-				beginFunction(pfn);
+				BeginFunction(pfn);
 				return FunctionEmitter(_pEmitter, pfn);
 			}
 
 			FunctionEmitter ModuleEmitter::Function(const std::string& name, ValueType returnType, NamedValueTypeList& args, bool isPublic)
 			{
-				llvm::Function* pfn = _pEmitter->Function(module(), name, returnType, linkage(isPublic), args);
+				llvm::Function* pfn = _pEmitter->Function(module(), name, returnType, Linkage(isPublic), args);
 				if (pfn == nullptr)
 				{
 					throw new EmitterException(EmitterError::InvalidFunction);
 				}
-				beginFunction(pfn);
+				BeginFunction(pfn);
 				return FunctionEmitter(_pEmitter, pfn);
 			}
 
@@ -51,14 +51,14 @@ namespace emll
 				return Function(name, returnType, &_valueTypeList, isPublic);
 			}
 
-			llvm::Function::LinkageTypes ModuleEmitter::linkage(bool isPublic)
+			llvm::Function::LinkageTypes ModuleEmitter::Linkage(bool isPublic)
 			{
 				return isPublic ?
 					llvm::Function::LinkageTypes::ExternalLinkage :
 					llvm::Function::LinkageTypes::InternalLinkage;
 			}
 
-			void ModuleEmitter::beginFunction(llvm::Function* pfn)
+			void ModuleEmitter::BeginFunction(llvm::Function* pfn)
 			{
 				//
 				// Set us up with a default entry point, since we'll always need one
@@ -68,7 +68,7 @@ namespace emll
 				_pEmitter->SetCurrentBlock(pBlock);
 			}
 
-			void ModuleEmitter::writeToFile(const std::string& filePath, bool isBitCode) const
+			void ModuleEmitter::WriteToFile(const std::string& filePath, bool isBitCode)
 			{
 				std::error_code error;
 
@@ -94,6 +94,18 @@ namespace emll
 				out.keep();
 			}
 
+			void ModuleEmitter::WriteToStream(std::ostream& os, bool isBitCode)
+			{
+				llvm::raw_os_ostream out(os);
+				if (isBitCode)
+				{
+					llvm::WriteBitcodeToFile(_pModule.get(), out);
+				}
+				else
+				{
+					module()->print(out, nullptr);
+				}
+			}
 			//
 			// Standard C Runtime functions
 			//
