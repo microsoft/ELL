@@ -205,6 +205,16 @@ namespace emll {
 			_module = std::make_unique<ir::ModuleEmitter>(&_emitter, _emitter.AddModule("EMLL"));
 		}
 
+		void IREmitter::Begin()
+		{
+			_module->declarePrintf();
+		}
+
+		void IREmitter::End()
+		{
+			_module->WriteAsmToStream(_os);
+		}
+
 		void IREmitter::BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs)
 		{
 			ir::NamedValueTypeList fnArgs;
@@ -214,17 +224,40 @@ namespace emll {
 			// Register input and out as variables for the function body to use
 			//
 			auto args = _fn.Args().begin();
-			_variables.Set(inputVarName, &(*args));
+			auto arg = &(*args);						
+			_variables.Set(inputVarName, arg);
+			
 			args++;
-			_variables.Set(outputVarName, &(*args));
+			arg = &(*args);
+			_variables.Set(outputVarName, arg);
 		}
 
 		void IREmitter::EndLinear()
 		{
 			_fn.Ret();
 			_fn.Verify();
-			_module->WriteAsmToStream(_os);
 		}
+
+		void IREmitter::EmitTest(const std::string& fnName, int featureCount, int outputCount, double startValue)
+		{
+			auto fn = _module->AddMain();
+			llvm::Value* features = fn.Var(ir::ValueType::Double, featureCount);
+			for (int i = 0; i < featureCount; ++i)
+			{
+				fn.SetValueAtA(features, i, fn.Literal(startValue * (i + 1)));
+			}
+			llvm::Value* output = fn.Var(ir::ValueType::Double, outputCount);
+			fn.Call(fnName, { features, output });
+
+			for (int i = 0; i < outputCount; ++i)
+			{
+				llvm::Value* result = fn.ValueAtA(output, i);
+				fn.Call("printf", { fn.Literal("Result = %f\n"), result });
+			}
+			fn.Ret();
+			fn.Verify();
+		}
+
 
 		void IREmitter::EmitAssign(Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
 		{
@@ -288,7 +321,7 @@ namespace emll {
 				}
 				else if (a == 1)
 				{
-					return _fn.Op(ir::OperatorType::AddF, _fn.Literal(a), pSrc);
+					return _fn.Op(ir::OperatorType::AddF, _fn.Literal(b), pSrc);
 				}
 				else
 				{
@@ -297,7 +330,6 @@ namespace emll {
 								_fn.Literal(b));
 				}
 			}
-
 		}
 
 		void IREmitter::Store(ScalarVariable& destVar, llvm::Value* pValue)
@@ -320,6 +352,7 @@ namespace emll {
 
 			// pSum is in a register...
 			llvm::Value* pSum = _fn.Op(ir::OperatorType::AddF, pValue, pDest);
+
 			Store(destVar, pSum);
 		}
 

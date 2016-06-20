@@ -45,6 +45,10 @@ namespace emll {
 		public:
 			CodeEmitter(DataFlowGraph& graph);
 
+			virtual void Begin() {}
+			virtual void End() {}
+			virtual void EmitTest(const std::string& fnName, int featureCount, int outputCount, double startValue) {}
+
 			virtual void BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs) = 0;
 
 			void Assign(DataFlowNode& srcNode, DataFlowNode& destNode, const layers::Coordinate& destCoordinate);
@@ -101,8 +105,13 @@ namespace emll {
 		public:
 			IREmitter(DataFlowGraph& graph, std::ostream& os);
 
+			void Begin() override;
+			void End() override;
+
 			void BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs) override;
 			void EndLinear() override;
+
+			void EmitTest(const std::string& fnName, int featureCount, int outputCount, double startValue) override;
 
 		protected:
 			virtual void EmitAssign(Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate) override;

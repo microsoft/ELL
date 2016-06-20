@@ -33,6 +33,10 @@ namespace emll
 				{
 					return _pEmitter->Literal(value);
 				}
+				llvm::Value* Arg(llvm::ilist_iterator<llvm::Argument>& arg)
+				{
+					return _pEmitter->Load(&(*arg));
+				}
 				llvm::Value* Cast(llvm::Value* pValue, ValueType destType)
 				{
 					return _pEmitter->Cast(pValue, destType);

@@ -119,6 +119,7 @@ void CompilableMap::ToCode(std::ostream& os) const
     // forward pass to generate code
     const std::string inputNamePrefix = "input";
 
+	codeGen.Begin();
 	codeGen.BeginLinear("Predict", inputNamePrefix, _requiredInputLayerSize, outputFixedVariableName, _outputCoordinates);
 
 	for (uint64_t inputElementIndex = 0; inputElementIndex < _requiredInputLayerSize; ++inputElementIndex)
@@ -141,4 +142,6 @@ void CompilableMap::ToCode(std::ostream& os) const
     }
 
   codeGen.EndLinear();
+  codeGen.EmitTest("Predict", 3, 1, 5);
+  codeGen.End();
 }
