@@ -12,6 +12,16 @@
 
 namespace emll {
 	namespace compiler {
+
+		template<typename ... ArgTypes>
+		std::string PrintFormatPrecise(const char* format, const ArgTypes& ...args)
+		{
+			std::stringstream ss;
+			ss.precision(17);
+			utilities::PrintFormat(ss, format, args...);
+			return ss.str();
+		}
+
 		CodeEmitter::CodeEmitter(DataFlowGraph& graph)
 			: _graph(graph)
 		{
@@ -168,7 +178,7 @@ namespace emll {
 			{
 				if (a != 1)
 				{
-					return utilities::PrintFormat("% * %", a, sourceVar);
+					return PrintFormatPrecise("% * %", a, sourceVar);
 				}
 				else
 				{
@@ -183,11 +193,11 @@ namespace emll {
 				}
 				else if (a == 1)
 				{
-					return utilities::PrintFormat("% + %", sourceVar, b);
+					return PrintFormatPrecise("% + %", sourceVar, b);
 				}
 				else
 				{
-					return utilities::PrintFormat("% * % + %", a, sourceVar, b);
+					return PrintFormatPrecise("% * % + %", a, sourceVar, b);
 				}
 			}
 		}
@@ -244,7 +254,8 @@ namespace emll {
 			llvm::Value* features = fn.Var(ir::ValueType::Double, featureCount);
 			for (int i = 0; i < featureCount; ++i)
 			{
-				fn.SetValueAtA(features, i, fn.Literal(startValue * (i + 1)));
+				auto value = startValue * (i + 1);
+				fn.SetValueAtA(features, i, fn.Literal(value));
 			}
 			llvm::Value* output = fn.Var(ir::ValueType::Double, outputCount);
 			fn.Call(fnName, { features, output });

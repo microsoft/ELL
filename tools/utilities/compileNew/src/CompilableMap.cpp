@@ -79,8 +79,8 @@ void CompilableMap::ToCode(std::ostream& os) const
 
     // create data flow graph datastructure
     DataFlowGraph graph;
-	//emll::compiler::CEmitter codeGen(graph, os);
-	emll::compiler::IREmitter codeGen(graph, os);
+	emll::compiler::CEmitter codeGen(graph, os);
+	//emll::compiler::IREmitter codeGen(graph, os);
 
     // add graph layer for input
     graph.AddLayer(_requiredInputLayerSize);
@@ -142,6 +142,6 @@ void CompilableMap::ToCode(std::ostream& os) const
     }
 
   codeGen.EndLinear();
-  codeGen.EmitTest("Predict", 3, 1, 5);
+  //codeGen.EmitTest("Predict", 124, 1, 5);
   codeGen.End();
 }
