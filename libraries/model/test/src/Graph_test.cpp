@@ -144,18 +144,23 @@ void TestInputRouting2()
     model::Model model;
 
     auto in = model.AddNode<model::InputNode<double>>(3);
-    model::InputRangeList ranges = { { in->output, 0}, {in->output, 2} };
-    model::InputRange range(in->output, 0);
+    model::TypedRange<double> range(in->output, 0, 2);
+    model::TypedRanges<double> ranges = std::vector<model::TypedRange<double>>{ model::TypedRange<double>{ in->output, 0}, model::TypedRange<double>{in->output, 2} };
 
-//    auto minAndArgMin = model.AddNode<model::ArgMinNode<double>>(in->output);
-    auto minAndArgMin = model.AddNode<model::ArgMinNode<double>>(ranges);
+    auto minAndArgMin1 = model.AddNode<model::ArgMinNode<double>>(in->output);
+    auto minAndArgMin2 = model.AddNode<model::ArgMinNode<double>>(range);
+    auto minAndArgMin3 = model.AddNode<model::ArgMinNode<double>>(ranges);
 
     //// set some example input and read the output
-    //std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
-    //in->SetInput(inputValues);
-    //auto output = model.GetNodeOutput(minAndArgMin->val);
+    std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
+    in->SetInput(inputValues);
+    auto output1 = model.GetNodeOutput(minAndArgMin1->val);
+    auto output2 = model.GetNodeOutput(minAndArgMin2->val);
+    auto output3 = model.GetNodeOutput(minAndArgMin3->val);
 
-    //testing::ProcessTest("Testing combine node", testing::IsEqual(output[0], 0.5));
+    testing::ProcessTest("testing combine node", testing::IsEqual(output1[0], 0.25));
+    testing::ProcessTest("testing combine node", testing::IsEqual(output2[0], 0.25));
+    testing::ProcessTest("testing combine node", testing::IsEqual(output3[0], 0.5));
 }
 
 //

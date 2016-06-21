@@ -8,38 +8,49 @@
 
 /// <summary> model namespace </summary>
 namespace model
-{
+{    
     //
     // InputRange
     //
-    template <typename ValueType>
-    InputRange::InputRange(const OutputPort<ValueType>& port) : referencedPort(static_cast<const Port*>(&port)), startIndex(0), numValues(port.Size()), isFixedSize(false)
-    {
-    }
 
-    template <typename ValueType>
-    InputRange::InputRange(const OutputPort<ValueType>& port, size_t index) : referencedPort(static_cast<const Port*>(&port)), startIndex(index), numValues(1), isFixedSize(true)
-    {
-    }
 
-    template <typename ValueType>
-    InputRange::InputRange(const OutputPort<ValueType>& port, size_t index, size_t numValues) : referencedPort(static_cast<const Port*>(&port)), startIndex(index), numValues(numValues), isFixedSize(true)
-    {
-    }
+    //template <typename ValueType>
+    //InputRange::InputRange(const OutputRange<ValueType>& input) : referencedPort(input.referencedPort), startIndex(input.startIndex), numValues(input.numValues), isFixedSize(input.isFixedSize)
+    //{
+
+    //}
+
+
+    //template <typename ValueType>
+    //InputRange::InputRange(const OutputPort<ValueType>& port) : referencedPort(static_cast<const Port*>(&port)), startIndex(0), numValues(port.Size()), isFixedSize(false)
+    //{
+    //}
 
     //
     // InputPort
     //
 
-    template <typename ValueType>
-    InputPort::InputPort(const class Node* owningNode, size_t portIndex, const OutputPort<ValueType>* output) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), output->Size())
-    {
-        _inputRanges.emplace_back(InputRange(*output));
+    //template <typename ValueType>
+    //InputPort::InputPort(const class Node* owningNode, size_t portIndex, const OutputPort<ValueType>* output) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), output->Size())
+    //{
+    //    _inputRanges.emplace_back(InputRange(*output));
  
-         if (Port::GetTypeCode<ValueType>() != output->Type())
-        {
-            throw std::runtime_error("InputPort type doesn't match output");
-        }
+    //     if (Port::GetTypeCode<ValueType>() != output->Type())
+    //    {
+    //        throw std::runtime_error("InputPort type doesn't match output");
+    //    }
+    //}
+
+    template <typename ValueType>
+    InputPort::InputPort(const class Node* owningNode, size_t portIndex, const TypedRange<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size())
+    {
+        _inputRanges.emplace_back(InputRange(input));
+    }
+
+    template <typename ValueType>
+    InputPort::InputPort(const class Node* owningNode, size_t portIndex, const TypedRanges<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size())
+    {
+        _inputRanges.insert(_inputRanges.begin(), input.begin(), input.end());
     }
 
     template <typename ValueType>
@@ -53,7 +64,7 @@ namespace model
             if (range.isFixedSize)
             {
                 size += range.referencedPort->Size();
-                result.insert(result.end(), temp.begin()+range.startIndex, temp.end()+range.startIndex+range.numValues);
+                result.insert(result.end(), temp.begin()+range.startIndex, temp.begin()+range.startIndex+range.numValues);
 
             }
             else

@@ -21,14 +21,9 @@ namespace model
     class InputRange
     {
     public:
-        template <typename ValueType>
-        InputRange(const OutputPort<ValueType>& port);
-
-        template <typename ValueType>
-        InputRange(const OutputPort<ValueType>& port, size_t index);
-
-        template <typename ValueType>
-        InputRange(const OutputPort<ValueType>& port, size_t index, size_t numValues);
+        InputRange(const Port& port) : referencedPort(&port), startIndex(0), numValues(port.Size()), isFixedSize(false) {}
+        InputRange(const Port& port, size_t startIndex) : referencedPort(&port), startIndex(startIndex), numValues(1), isFixedSize(false) {}
+        InputRange(const Port& port, size_t startIndex, size_t numValues) : referencedPort(&port), startIndex(startIndex), numValues(numValues), isFixedSize(false) {}
 
         Port::PortType Type() const { return referencedPort->Type(); }
 
@@ -44,13 +39,72 @@ namespace model
             }
         }
 
+//    private:
+        friend class InputPort;
         const Port* referencedPort;
         size_t startIndex;
         size_t numValues;
         bool isFixedSize;
     };
 
-    typedef std::vector<InputRange> InputRangeList;
+    template <typename ValueType>
+    class TypedRange : public InputRange
+    {
+    public:
+        TypedRange(const OutputPort<ValueType>& port) : InputRange(port) {}
+        TypedRange(const OutputPort<ValueType>& port, size_t startIndex) : InputRange(port, startIndex) {}
+        TypedRange(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : InputRange(port, startIndex, numValues) {}
+    };
+
+    class InputRanges
+    {
+    public:
+        InputRanges(const InputRange& range) { _ranges.push_back(range); }
+        InputRanges(const std::vector<InputRange>& ranges) { _ranges.insert(_ranges.end(), ranges.begin(), ranges.end()); }
+        std::vector<InputRange>::const_iterator begin() const { return _ranges.cbegin(); }
+        std::vector<InputRange>::const_iterator end() const { return _ranges.cend(); }
+
+        size_t Size() const
+        {
+            return _size;
+        }
+
+    protected:
+        InputRanges() {};
+        void ComputeSize()
+        {
+            _size = 0;
+            for (const auto& range : _ranges)
+            {
+                _size += range.Size();
+            }
+        }
+        std::vector<InputRange> _ranges;
+        size_t _size = 0;
+    };
+
+    // typed version of range
+    template <typename ValueType>
+    class TypedRanges : public InputRanges
+    {
+    public:
+        TypedRanges(const OutputPort<ValueType>& port) : InputRanges(port) {}
+        TypedRanges(const TypedRange<ValueType>& range) : InputRanges(range) {}
+//        TypedRanges(const std::initializer_list<TypedRange<ValueType>>& ranges) : InputRanges(ranges) {}
+        TypedRanges(const std::vector<TypedRange<ValueType>>& ranges)
+        {
+            for (const auto& range : ranges)
+            {
+               _ranges.push_back(range);
+            }
+        }
+
+        // TypedRange(const OutputPort<ValueType>& port) : InputRange(&port, 0, port.Size(), false) {}
+
+        // TypedRange(const OutputPort<ValueType>& port, size_t index) : InputRange(&port, index, 1, true) {}
+
+        // TypedRange(const OutputPort<ValueType>& port, size_t index, size_t numValues) : InputRange(&port, index, numValues, true){};
+    };
 
     /// <summary> Class representing an input to a node </summary>
     class InputPort : public Port
@@ -58,13 +112,11 @@ namespace model
     public:
         /// <summary> Constructor </summary>
         ///
-        /// <param name="output"> The output port this port receives values from </param>
+        /// <param name="output"> The output elements this port receives values from </param>
         template <typename ValueType>
-        InputPort(const class Node* owningNode, size_t portIndex, const OutputPort<ValueType>* output);
-
-        InputPort(const class Node* owningNode, size_t portIndex, const InputRange& inputRange);
-
-        InputPort(const class Node* owningNode, size_t portIndex, const std::vector<InputRange>& inputRanges);
+        InputPort(const class Node* owningNode, size_t portIndex, const TypedRange<ValueType>& input);
+        template <typename ValueType>
+        InputPort(const class Node* owningNode, size_t portIndex, const TypedRanges<ValueType>& input);
 
         const std::vector<InputRange>& GetInputRanges() const { return _inputRanges; }
 
