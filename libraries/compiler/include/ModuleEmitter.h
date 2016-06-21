@@ -17,21 +17,21 @@ namespace emll
 				
 				FunctionEmitter AddMain();
 
-				void declareFunction(const std::string& name, ValueType returnType)
+				void DeclareFunction(const std::string& name, ValueType returnType)
 				{
-					_pEmitter->DeclareFunction(module(), name, returnType, nullptr);
+					_pEmitter->DeclareFunction(Module(), name, returnType, nullptr);
 				}
-				void declareFunction(const std::string& name, ValueType returnType, ValueTypeList& args)
+				void DeclareFunction(const std::string& name, ValueType returnType, ValueTypeList& args)
 				{
-					_pEmitter->DeclareFunction(module(), name, returnType, &args);
+					_pEmitter->DeclareFunction(Module(), name, returnType, &args);
 				}
-				void declareFunction(const std::string& name, ValueType returnType, NamedValueTypeList& args)
+				void DeclareFunction(const std::string& name, ValueType returnType, NamedValueTypeList& args)
 				{
-					_pEmitter->DeclareFunction(module(), name, returnType, args);
+					_pEmitter->DeclareFunction(Module(), name, returnType, args);
 				}
-				void declareFunction(const std::string& name, llvm::FunctionType* type)
+				void DeclareFunction(const std::string& name, llvm::FunctionType* type)
 				{
-					_pEmitter->DeclareFunction(module(), name, type);
+					_pEmitter->DeclareFunction(Module(), name, type);
 				}
 				FunctionEmitter Function(const std::string& name, ValueType returnType, bool isPublic = false)
 				{
@@ -66,9 +66,9 @@ namespace emll
 				//
 				// To emit declarations for standard C functions
 				//
-				void declarePrintf();
-				void declareMalloc();
-				void declareFree();
+				void DeclarePrintf();
+				void DeclareMalloc();
+				void DeclareFree();
 				//
 				// Debugging
 				//
@@ -78,7 +78,7 @@ namespace emll
 				}
 
 			private:
-				llvm::Module* module() const
+				llvm::Module* Module() const
 				{
 					return _pModule.get();
 				}

@@ -25,7 +25,7 @@ namespace emll
 
 			FunctionEmitter ModuleEmitter::Function(const std::string& name, ValueType returnType, ValueTypeList* pArgs, bool isPublic)
 			{
-				llvm::Function* pfn = _pEmitter->Function(module(), name, returnType, Linkage(isPublic), pArgs);
+				llvm::Function* pfn = _pEmitter->Function(Module(), name, returnType, Linkage(isPublic), pArgs);
 				if (pfn == nullptr)
 				{
 					throw new EmitterException(EmitterError::InvalidFunction);
@@ -36,7 +36,7 @@ namespace emll
 
 			FunctionEmitter ModuleEmitter::Function(const std::string& name, ValueType returnType, NamedValueTypeList& args, bool isPublic)
 			{
-				llvm::Function* pfn = _pEmitter->Function(module(), name, returnType, Linkage(isPublic), args);
+				llvm::Function* pfn = _pEmitter->Function(Module(), name, returnType, Linkage(isPublic), args);
 				if (pfn == nullptr)
 				{
 					throw new EmitterException(EmitterError::InvalidFunction);
@@ -86,7 +86,7 @@ namespace emll
 				}
 				else
 				{
-					module()->print(out.os(), nullptr);
+					Module()->print(out.os(), nullptr);
 				}
 				if (out.os().has_error()) {
 					throw new EmitterException(EmitterError::WriteModuleFailed);
@@ -103,26 +103,26 @@ namespace emll
 				}
 				else
 				{
-					module()->print(out, nullptr);
+					Module()->print(out, nullptr);
 				}
 			}
 			//
 			// Standard C Runtime functions
 			//
-			void ModuleEmitter::declarePrintf()
+			void ModuleEmitter::DeclarePrintf()
 			{
-				llvm::FunctionType* type = llvm::TypeBuilder<void(char*, ...), false>::get(_pEmitter->context());
-				declareFunction("printf", type);
+				llvm::FunctionType* type = llvm::TypeBuilder<void(char*, ...), false>::get(_pEmitter->Context());
+				DeclareFunction("printf", type);
 			}
-			void ModuleEmitter::declareMalloc()
+			void ModuleEmitter::DeclareMalloc()
 			{
 				_valueTypeList.init({ ValueType::Int64 });
-				declareFunction("malloc", ValueType::PByte, _valueTypeList);
+				DeclareFunction("malloc", ValueType::PByte, _valueTypeList);
 			}
-			void ModuleEmitter::declareFree()
+			void ModuleEmitter::DeclareFree()
 			{
 				_valueTypeList.init({ ValueType::PByte });
-				declareFunction("free", ValueType::Void, _valueTypeList);
+				DeclareFunction("free", ValueType::Void, _valueTypeList);
 			}
 		}
 	}

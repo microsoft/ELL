@@ -32,38 +32,38 @@ namespace emll
 
 			}
 
-			llvm::Type* LLVMEmitter::valueType(ValueType type)
+			llvm::Type* LLVMEmitter::Type(ValueType type)
 			{
 				switch (type)
 				{
 				case ValueType::Void:
-					return getValueType(type);
+					return GetValueType(type);
 				case ValueType::PVoid:
-					return getValueType(ValueType::Void)->getPointerTo();
+					return GetValueType(ValueType::Void)->getPointerTo();
 				case ValueType::Byte:
-					return getValueType(type);
+					return GetValueType(type);
 				case ValueType::PByte:
-					return getValueType(ValueType::Byte)->getPointerTo();
+					return GetValueType(ValueType::Byte)->getPointerTo();
 				case ValueType::Short:
-					return getValueType(type);
+					return GetValueType(type);
 				case ValueType::PShort:
-					return getValueType(ValueType::Short)->getPointerTo();
+					return GetValueType(ValueType::Short)->getPointerTo();
 				case ValueType::Int32:
-					return getValueType(type);
+					return GetValueType(type);
 				case ValueType::PInt32:
-					return getValueType(ValueType::Int32)->getPointerTo();
+					return GetValueType(ValueType::Int32)->getPointerTo();
 				case ValueType::Int64:
-					return getValueType(type);
+					return GetValueType(type);
 				case ValueType::PInt64:
-					return getValueType(ValueType::Int64)->getPointerTo();
+					return GetValueType(ValueType::Int64)->getPointerTo();
 				case ValueType::Double:
-					return getValueType(type);
+					return GetValueType(type);
 				case ValueType::PDouble:
-					return getValueType(ValueType::Double)->getPointerTo();
+					return GetValueType(ValueType::Double)->getPointerTo();
 				case ValueType::Char8:
-					return getValueType(type);
+					return GetValueType(type);
 				case ValueType::PChar8:
-					return getValueType(ValueType::Char8)->getPointerTo();
+					return GetValueType(ValueType::Char8)->getPointerTo();
 				default:
 					throw new EmitterException(EmitterError::InvalidValueType);
 				}
@@ -96,7 +96,7 @@ namespace emll
 
 			llvm::Value* LLVMEmitter::Cast(llvm::Value* pValue, ValueType destType)
 			{
-				return _pBuilder->CreateBitCast(pValue, valueType(destType));
+				return _pBuilder->CreateBitCast(pValue, Type(destType));
 			}
 
 			llvm::Value* LLVMEmitter::Global(const std::string& name, const std::string& value)
@@ -161,24 +161,24 @@ namespace emll
 				llvm::FunctionType* pTypeDef = nullptr;
 				if (pArgs != nullptr)
 				{
-					bindArgTypes(*pArgs);
-					pTypeDef = llvm::FunctionType::get(valueType(returnType), _argTypes, false);
+					BindArgTypes(*pArgs);
+					pTypeDef = llvm::FunctionType::get(Type(returnType), _argTypes, false);
 				}
 				else
 				{
-					pTypeDef = llvm::FunctionType::get(valueType(returnType), false);
+					pTypeDef = llvm::FunctionType::get(Type(returnType), false);
 				}
-				return createFunction(pModule, name, linkage, pTypeDef);
+				return CreateFunction(pModule, name, linkage, pTypeDef);
 			}
 
 			llvm::Function* LLVMEmitter::Function(llvm::Module* pModule, const std::string& name, ValueType returnType, llvm::Function::LinkageTypes linkage, NamedValueTypeList& args)
 			{
 				assert(pModule != nullptr);
 
-				bindArgTypes(args);
-				llvm::FunctionType* pTypeDef = llvm::FunctionType::get(valueType(returnType), _argTypes, false);
-				llvm::Function* pfn = createFunction(pModule, name, linkage, pTypeDef);
-				bindArgNames(pfn, args);
+				BindArgTypes(args);
+				llvm::FunctionType* pTypeDef = llvm::FunctionType::get(Type(returnType), _argTypes, false);
+				llvm::Function* pfn = CreateFunction(pModule, name, linkage, pTypeDef);
+				BindArgNames(pfn, args);
 				return pfn;
 			}
 
@@ -214,7 +214,7 @@ namespace emll
 
 			llvm::PHINode* LLVMEmitter::Phi(ValueType type, llvm::Value* pLVal, llvm::BasicBlock* pLBlock, llvm::Value* pRVal, llvm::BasicBlock* pRBlock)
 			{
-				llvm::PHINode* phi = _pBuilder->CreatePHI(valueType(type), 2);
+				llvm::PHINode* phi = _pBuilder->CreatePHI(Type(type), 2);
 				phi->addIncoming(pLVal, pLBlock);
 				phi->addIncoming(pRVal, pRBlock);
 				return phi;
@@ -222,20 +222,20 @@ namespace emll
 
 			llvm::AllocaInst* LLVMEmitter::Variable(ValueType type)
 			{
-				return _pBuilder->CreateAlloca(valueType(type), nullptr);
+				return _pBuilder->CreateAlloca(Type(type), nullptr);
 			}
 
 			llvm::AllocaInst* LLVMEmitter::Variable(ValueType type, const std::string& name)
 			{
-				return _pBuilder->CreateAlloca(valueType(type), nullptr, name);
+				return _pBuilder->CreateAlloca(Type(type), nullptr, name);
 			}
 
 			llvm::AllocaInst* LLVMEmitter::StackAlloc(ValueType type, int size)
 			{
-				return _pBuilder->CreateAlloca(valueType(type), Literal(size));
+				return _pBuilder->CreateAlloca(Type(type), Literal(size));
 			}
 
-			llvm::Type* LLVMEmitter::getValueType(ValueType type)
+			llvm::Type* LLVMEmitter::GetValueType(ValueType type)
 			{
 				switch (type)
 				{
@@ -258,25 +258,25 @@ namespace emll
 				}
 			}
 
-			void LLVMEmitter::bindArgTypes(ValueTypeList& args)
+			void LLVMEmitter::BindArgTypes(ValueTypeList& args)
 			{
 				_argTypes.clear();
 				for (auto arg = args.begin(); arg != args.end(); ++arg)
 				{
-					_argTypes.push_back(valueType(*arg));
+					_argTypes.push_back(Type(*arg));
 				}
 			}
 
-			void LLVMEmitter::bindArgTypes(NamedValueTypeList& args)
+			void LLVMEmitter::BindArgTypes(NamedValueTypeList& args)
 			{
 				_argTypes.clear();
 				for (auto arg = args.begin(); arg != args.end(); ++arg)
 				{
-					_argTypes.push_back(valueType(arg->second));
+					_argTypes.push_back(Type(arg->second));
 				}
 			}
 
-			void LLVMEmitter::bindArgNames(llvm::Function* pfn, NamedValueTypeList& args)
+			void LLVMEmitter::BindArgNames(llvm::Function* pfn, NamedValueTypeList& args)
 			{
 				size_t i = 0;
 				for (auto &arg : pfn->args())
@@ -285,7 +285,7 @@ namespace emll
 				}
 			}
 
-			llvm::Function* LLVMEmitter::createFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pTypeDef)
+			llvm::Function* LLVMEmitter::CreateFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pTypeDef)
 			{
 				llvm::Function* pfn = llvm::Function::Create(pTypeDef, linkage, name, pModule);
 				if (pfn == nullptr)

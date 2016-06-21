@@ -217,7 +217,7 @@ namespace emll {
 
 		void IREmitter::Begin()
 		{
-			_module->declarePrintf();
+			_module->DeclarePrintf();
 		}
 
 		void IREmitter::End()

@@ -41,7 +41,7 @@ namespace emll
 				LLVMEmitter();
 				virtual ~LLVMEmitter();
 
-				llvm::Type* valueType(ValueType type);
+				llvm::Type* Type(ValueType type);
 
 				llvm::Value* Literal(int value);
 				llvm::Value* Literal(int64_t value);
@@ -101,17 +101,17 @@ namespace emll
 				llvm::AllocaInst * Variable(ValueType type, const std::string & name);
 				llvm::AllocaInst* StackAlloc(ValueType type, int count);
 
-				llvm::LLVMContext& context()
+				llvm::LLVMContext& Context()
 				{
 					return _context;
 				}
 
 			private:
-				llvm::Type* getValueType(ValueType type);
-				void bindArgTypes(ValueTypeList& args);
-				void bindArgTypes(NamedValueTypeList& args);
-				void bindArgNames(llvm::Function* pfn, NamedValueTypeList& args);
-				llvm::Function* createFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pTypeDef);
+				llvm::Type* GetValueType(ValueType type);
+				void BindArgTypes(ValueTypeList& args);
+				void BindArgTypes(NamedValueTypeList& args);
+				void BindArgNames(llvm::Function* pfn, NamedValueTypeList& args);
+				llvm::Function* CreateFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pTypeDef);
 
 			private:
 				llvm::LLVMContext _context;
