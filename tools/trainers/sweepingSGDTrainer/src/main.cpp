@@ -21,7 +21,7 @@
 #include "SupervisedExample.h"
 
 // common
-#include "sgdIncrementalTrainerArguments.h"
+#include "SGDIncrementalTrainerArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
