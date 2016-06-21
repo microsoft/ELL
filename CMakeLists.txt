@@ -61,6 +61,8 @@ add_subdirectory(tools/trainers/sweepingSGDTrainer)
 add_subdirectory(tools/utilities/apply)
 add_subdirectory(tools/utilities/compile)
 add_subdirectory(tools/utilities/print)
+add_subdirectory(private/libraries/trainers)
+add_subdirectory(private/tools/trainers/nullTrainer)
 add_subdirectory(scripts)
 
 # Add SWIG-generated interfaces
