@@ -12,7 +12,13 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-    Node::Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs) : _inputs(inputs), _outputs(outputs), _id(UniqueId()){};
+    Node::Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs) : _inputs(inputs), _outputs(outputs), _id(UniqueId())
+    {};
+
+    void Node::AddInputPort(InputPort* input)
+    {
+        _inputs.push_back(input);
+    }
 
     Port::PortType Node::GetOutputType(size_t outputIndex) const 
     { 
@@ -33,7 +39,10 @@ namespace model
     {
         for (const auto& input : _inputs) 
         {
-            input->ReferencedPort()->Node()->AddDependent(this);
+            for (const auto& range : input->GetInputRanges())
+            {
+                range.ReferencedPort()->Node()->AddDependent(this);
+            }
         }
     }
 }

@@ -12,30 +12,31 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/ModelGraph.cpp
+set (SRC src/InputPort.cpp
+         src/ModelGraph.cpp
          src/Node.cpp
          src/Port.cpp
          src/UniqueId.cpp
 )
 
-set (INCLUDE include/ModelGraph.h
-             include/Node.h
-             include/Port.h
-             include/InputPort.h
-             include/OutputPort.h
-             include/ConstantNode.h
-             include/InputNode.h
+set (INCLUDE include/ConstantNode.h
              include/ExtremalValueNode.h
+             include/InputNode.h
+             include/InputPort.h
+             include/ModelGraph.h
+             include/Node.h
+             include/OutputPort.h
+             include/Port.h
              include/UniqueId.h
              include/ValueSelectorNode.h
 )
 
-set (TCC tcc/Node.tcc
+set (TCC tcc/ConstantNode.tcc
+         tcc/ExtremalValueNode.tcc
+         tcc/InputNode.tcc
          tcc/InputPort.tcc
          tcc/ModelGraph.tcc
-         tcc/ConstantNode.tcc
-         tcc/InputNode.tcc
-         tcc/ExtremalValueNode.tcc
+         tcc/Node.tcc
          tcc/ValueSelectorNode.tcc
 )
 

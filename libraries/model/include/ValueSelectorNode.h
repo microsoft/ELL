@@ -29,7 +29,7 @@ namespace model
         /// <param name="condition"> An input that returns a single boolean value that selects which input to use as output </param>
         /// <param name="value2"> The input to return if the condition is `true` </param>
         /// <param name="value2"> The input to return if the condition is `false` </param>
-        ValueSelectorNode(const OutputPort<bool>& condition, const OutputPort<ValueType>& value1, const OutputPort<ValueType>& value2);
+        ValueSelectorNode(const TypedInputGroup<bool>& condition, const TypedInputGroup<ValueType>& value1, const TypedInputGroup<ValueType>& value2);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
