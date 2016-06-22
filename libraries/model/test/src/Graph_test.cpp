@@ -144,12 +144,12 @@ void TestInputRouting2()
     model::Model model;
 
     auto in = model.AddNode<model::InputNode<double>>(3);
-    model::TypedInputGroup<double> range(in->output, 0, 2);
+    model::TypedInputGroup<double> range = {in->output, 0, 2};
     model::TypedInputGroup<double> ranges = { { in->output, 0}, {in->output, 2} };
 
-    auto minAndArgMin1 = model.AddNode<model::ArgMinNode<double>>(in->output);
-    auto minAndArgMin2 = model.AddNode<model::ArgMinNode<double>>(range);
-    auto minAndArgMin3 = model.AddNode<model::ArgMinNode<double>>(ranges);
+    auto minAndArgMin1 = model.AddNode<model::ArgMinNode<double>>(in->output); // a "standard" node that takes its input from an output port
+    auto minAndArgMin2 = model.AddNode<model::ArgMinNode<double>>(range); // a node that takes its input from a range --- a subset of outputs from a port
+    auto minAndArgMin3 = model.AddNode<model::ArgMinNode<double>>(ranges); // a node that takes its input from a "group" --- an arbitrary set of outputs from other ports
 
     auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::TypedInputGroup<double>{in->output, 0, 1});
 
