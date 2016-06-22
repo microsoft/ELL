@@ -8,25 +8,68 @@
 
 #include "InputPort.h"
 
-// InputPort::InputPort(const class Node* owningNode, size_t portIndex, const InputRange& inputRange) : Port(owningNode, portIndex, inputRange.Type(), inputRange.Size())
-// {
-// }
+namespace model
+{
+    //
+    // InputRange
+    //
+    InputRange::InputRange(const Port& port) : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}
 
-// InputPort::InputPort(const class Node* owningNode, size_t portIndex, const std::vector<InputRange>& inputRanges) : Port(owningNode, portIndex, Port::PortType::None, 0)
-// {
-//     // TODO: throw if inputRanges.size() == 0
+    InputRange::InputRange(const Port& port, size_t index) : _referencedPort(&port), _startIndex(index), _numValues(1), _isFixedSize(true) {}
 
-//     Port::PortType portType = inputRanges[0].Type();
-//     size_t size = 0;
-//     for (const auto& range : inputRanges)
-//     {
-//         size += range.Size();
-//         if (range.Type() != portType)
-//         {
-//             throw std::runtime_error("Error, all ranges not of same type");
-//         }
-//     }
+    InputRange::InputRange(const Port& port, size_t startIndex, size_t numValues) : _referencedPort(&port), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true) {}
 
-//     SetSize(size);
-//     Port::SetType(portType);
-// }
+    size_t InputRange::Size() const
+    {
+        if (_isFixedSize)
+        {
+            return _numValues;
+        }
+        else
+        {
+            return _referencedPort->Size();
+        }
+    }
+
+    //
+    // InputGroup
+    //
+    InputGroup::InputGroup(const Port& port)
+    {
+        _ranges.emplace_back(port);
+        ComputeSize();
+    }
+
+    InputGroup::InputGroup(const Port& port, size_t startIndex)
+    {
+        _ranges.emplace_back(port, startIndex);
+        ComputeSize();
+    }
+
+    InputGroup::InputGroup(const Port& port, size_t startIndex, size_t numValues)
+    {
+        _ranges.emplace_back(port, startIndex, numValues);
+        ComputeSize();
+    }
+
+    InputGroup::InputGroup(const InputRange& range)
+    {
+        _ranges.push_back(range);
+        ComputeSize();
+    }
+
+    InputGroup::InputGroup(const std::vector<InputRange>& ranges)
+    {
+        _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
+        ComputeSize();
+    }
+
+    void InputGroup::ComputeSize()
+    {
+        _size = 0;
+        for (const auto& range : _ranges)
+        {
+            _size += range.Size();
+        }
+    }
+}

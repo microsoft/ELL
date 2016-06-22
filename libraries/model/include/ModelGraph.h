@@ -11,7 +11,6 @@
 #include "Node.h"
 #include "InputPort.h"
 #include "OutputPort.h"
-#include "CombinerNode.h"
 
 #include <unordered_set>
 #include <vector>

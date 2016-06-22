@@ -18,27 +18,41 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    /// <summary> Represents a contiguous set of values from an output port </summary>
     class InputRange
     {
     public:
-        InputRange(const Port& port) : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}
-        InputRange(const Port& port, size_t startIndex) : _referencedPort(&port), _startIndex(startIndex), _numValues(1), _isFixedSize(true) {}
-        InputRange(const Port& port, size_t startIndex, size_t numValues) : _referencedPort(&port), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true) {}
+        /// <summary> Creates an InputRange representing all the values from a given port </summary>
+        ///
+        /// <param name="port"> The port to take values from </param>
+        InputRange(const Port& port);
 
+        /// <summary> Creates an InputRange representing a single value from a given port </summary>
+        ///
+        /// <param name="port"> The port to take a value from </param>
+        /// <param name="index"> The index of the value </param>
+        InputRange(const Port& port, size_t index);
+
+        /// <summary> Creates an InputRange representing a range of values from a given port </summary>
+        ///
+        /// <param name="port"> The port to take a value from </param>
+        /// <param name="startIndex"> The index of the first value to take </param>
+        /// <param name="numValues"> The number of values to take </param>
+        InputRange(const Port& port, size_t startIndex, size_t numValues);
+
+        /// <summary> Returns the type of the values referenced </summary>
+        ///
+        /// <returns> The type of the values referenced </returns>
         Port::PortType Type() const { return _referencedPort->Type(); }
 
-        size_t Size() const
-        {
-            if (_isFixedSize)
-            {
-                return _referencedPort->Size();
-            }
-            else
-            {
-                return _numValues;
-            }
-        }
+        /// <summary> The dimensionality of the output </summary>
+        ///
+        /// <returns> The dimensionality of the output </returns>
+        size_t Size() const;
 
+        /// <summary> The port this range refers to </summary>
+        ///
+        /// <returns> The port this range refers to </returns>
         const Port* ReferencedPort() const { return _referencedPort; }
 
     private:
@@ -50,71 +64,85 @@ namespace model
         bool _isFixedSize;
     };
 
+    /// <summary> Represents a set of values from one or more output ports </summary>
     class InputGroup
     {
     public:
-        InputGroup(const InputRange& range)
-        {
-            _ranges.push_back(range);
-            ComputeSize();
-        }
+        /// <summary> Creates an InputGroup representing all the values from a given port </summary>
+        InputGroup(const Port& port);
 
-        InputGroup(const std::vector<InputRange>& ranges)
-        {
-            _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
-            ComputeSize();
-        }
+        /// <summary> Creates an InputGroup representing a single value from a given port </summary>
+        ///
+        /// <param name="port"> The port to take a value from </param>
+        /// <param name="index"> The index of the value </param>
+        InputGroup(const Port& port, size_t startIndex);
 
-        std::vector<InputRange>::const_iterator begin() const { return _ranges.cbegin(); }
-        std::vector<InputRange>::const_iterator end() const { return _ranges.cend(); }
+        /// <summary> Creates an InputGroup representing a range of values from a given port </summary>
+        ///
+        /// <param name="port"> The port to take a value from </param>
+        /// <param name="startIndex"> The index of the first value to take </param>
+        /// <param name="numValues"> The number of values to take </param>
+        InputGroup(const Port& port, size_t startIndex, size_t numValues);
 
+        /// <summary> Creates an InputGroup from an InputRange </summary>
+        ///
+        /// <param name="range"> The range to get values from </param>
+        InputGroup(const InputRange& range);
+
+        /// <summary> Creates an InputGroup from a set of InputRanges </summary>
+        ///
+        /// <param name="range"> The ranges to get values from </param>
+        InputGroup(const std::vector<InputRange>& ranges);
+
+        /// <summary> The dimensionality of the output </summary>
+        ///
+        /// <returns> The dimensionality of the output </returns>
         size_t Size() const { return _size; }
+
+        /// <summary> An STL-type iterator pointing to the beginning of the list of ranges </summary>
+        std::vector<InputRange>::const_iterator begin() const { return _ranges.cbegin(); }
+
+        /// <summary> An STL-type iterator pointing to the end of the list of ranges </summary>
+        std::vector<InputRange>::const_iterator end() const { return _ranges.cend(); }
 
     protected:
         InputGroup(){};
-        void ComputeSize()
-        {
-            _size = 0;
-            for (const auto& range : _ranges)
-            {
-                _size += range.Size();
-            }
-        }
+        void ComputeSize();
+
         std::vector<InputRange> _ranges;
         size_t _size = 0;
     };
 
+    /// <summary> Represents a statically-typed set of values from one or more output ports </summary>
     template <typename ValueType>
     class TypedInputGroup : public InputGroup
     {
     public:
-        TypedInputGroup(const OutputPort<ValueType>& port) : InputGroup(InputRange(port)) {}
-        TypedInputGroup(const OutputPort<ValueType>& port, size_t startIndex) : InputGroup(InputRange(port, startIndex)) {}
-        TypedInputGroup(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : InputGroup(InputRange(port, startIndex, numValues)) {}
-        //        TypedInputGroup(const TypedRange<ValueType>& range) : InputGroup(range) {}
-        TypedInputGroup(const std::initializer_list<TypedInputGroup<ValueType>>& groups)
-        {
-            for (const auto& group : groups)
-            {
-                for (const auto& range : group._ranges)
-                {
-                    _ranges.push_back(range);
-                }
-            }
-            ComputeSize();
-        }
+        /// <summary> Creates a TypedInputGroup representing all the values from a given port </summary>
+        TypedInputGroup(const OutputPort<ValueType>& port);
 
-        TypedInputGroup(const std::vector<TypedInputGroup<ValueType>>& groups)
-        {
-            for (const auto& group : groups)
-            {
-                for (const auto& range : group._ranges)
-                {
-                    _ranges.push_back(range);
-                }
-            }
-            ComputeSize();
-        }
+        /// <summary> Creates a TypedInputGroup representing a single value from a given port </summary>
+        ///
+        /// <param name="port"> The port to take a value from </param>
+        /// <param name="index"> The index of the value </param>
+        TypedInputGroup(const OutputPort<ValueType>& port, size_t startIndex);
+
+        /// <summary> Creates a TypedInputGroup representing a range of values from a given port </summary>
+        ///
+        /// <param name="port"> The port to take a value from </param>
+        /// <param name="startIndex"> The index of the first value to take </param>
+        /// <param name="numValues"> The number of values to take </param>
+        TypedInputGroup(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
+
+        /// <summary> Creates a TypedInputGroup by concatenating a set of them together </summary> 
+        ///
+        /// <param name="groups"> The list of groups to concantenate together </param>
+        TypedInputGroup(const std::initializer_list<TypedInputGroup<ValueType>>& groups);
+
+        /// <summary> Creates a TypedInputGroup by concatenating a set of them together </summary> 
+        ///
+        /// <param name="groups"> The list of groups to concantenate together </param>
+        TypedInputGroup(const std::vector<TypedInputGroup<ValueType>>& groups);
     };
 
     /// <summary> Class representing an input to a node </summary>
@@ -123,27 +151,31 @@ namespace model
     public:
         /// <summary> Constructor </summary>
         ///
-        /// <param name="output"> The output elements this port receives values from </param>
-        // template <typename ValueType>
-        // InputPort(const class Node* owningNode, size_t portIndex, const TypedRange<ValueType>& input);
-
+        /// <param name="owningNode"> The node that contains this port </param>
+        /// <param name="portIndex"> The index of this port within the owning node <param>
+        /// <param name="input"> The input group to fetch input values from </param>
         template <typename ValueType>
         InputPort(const class Node* owningNode, size_t portIndex, const TypedInputGroup<ValueType>& input);
 
-        const std::vector<InputRange>& GetInputRanges() const { return _inputRanges; }
+        /// <summary> Returns the InputGroup containing the ranges of referenced locations to get values from </summary>
+        ///
+        /// <returns> The InputGroup containing the ranges of referenced locations to get values from </returns>
+        const InputGroup& GetInputRanges() const { return _inputRanges; }
+
+        /// <summary> The dimensionality of the output </summary>
+        ///
+        /// <returns> The dimensionality of the output </returns>
+        size_t Size() const { return _inputRanges.Size(); }
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
+        ///
+        /// <returns> The (already-computed) output value corresponding to this input </returns>
         template <typename ValueType>
         std::vector<ValueType> GetValue() const;
 
     private:
-        std::vector<InputRange> _inputRanges;
+        InputGroup _inputRanges;
     };
-
-    // TODO: if we want to allow functions/nodes to gather values from arbitrary collections of output elements, then
-    //       we'll probablay want to make InputPort not be a subclass of Port, but for it to contain a vector of
-    //       (Node*, outputIndex, start, len) items.
-    //       We'll have to replace `GetNode()` with `GetNodes()` and maybe just remove `OutputIndex()`.
 }
 
 #include "../tcc/InputPort.tcc"
