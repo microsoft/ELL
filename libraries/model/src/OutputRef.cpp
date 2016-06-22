@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     InputPort.h (model)
+//  File:     OutputRef.cpp (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "InputPort.h"
+#include "OutputRef.h"
 
 namespace model
 {
@@ -32,39 +32,39 @@ namespace model
     }
 
     //
-    // OutputRef
+    // UntypedOutputRef
     //
-    OutputRef::OutputRef(const Port& port)
+    UntypedOutputRef::UntypedOutputRef(const Port& port)
     {
         _ranges.emplace_back(port);
         ComputeSize();
     }
 
-    OutputRef::OutputRef(const Port& port, size_t startIndex)
+    UntypedOutputRef::UntypedOutputRef(const Port& port, size_t startIndex)
     {
         _ranges.emplace_back(port, startIndex);
         ComputeSize();
     }
 
-    OutputRef::OutputRef(const Port& port, size_t startIndex, size_t numValues)
+    UntypedOutputRef::UntypedOutputRef(const Port& port, size_t startIndex, size_t numValues)
     {
         _ranges.emplace_back(port, startIndex, numValues);
         ComputeSize();
     }
 
-    OutputRef::OutputRef(const OutputRange& range)
+    UntypedOutputRef::UntypedOutputRef(const OutputRange& range)
     {
         _ranges.push_back(range);
         ComputeSize();
     }
 
-    OutputRef::OutputRef(const std::vector<OutputRange>& ranges)
+    UntypedOutputRef::UntypedOutputRef(const std::vector<OutputRange>& ranges)
     {
         _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
         ComputeSize();
     }
 
-    void OutputRef::ComputeSize()
+    void UntypedOutputRef::ComputeSize()
     {
         _size = 0;
         for (const auto& range : _ranges)

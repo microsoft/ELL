@@ -6,56 +6,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-
 /// <summary> model namespace </summary>
 namespace model
 {
-
-    //
-    // TypedOutputRef
-    //
-
-    template <typename ValueType>
-    TypedOutputRef<ValueType>::TypedOutputRef(const OutputPort<ValueType>& port) : OutputRef(port) {}
-
-    template <typename ValueType>
-    TypedOutputRef<ValueType>::TypedOutputRef(const OutputPort<ValueType>& port, size_t startIndex) : OutputRef(OutputRange(port, startIndex)) {}
-
-    template <typename ValueType>
-    TypedOutputRef<ValueType>::TypedOutputRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : OutputRef(OutputRange(port, startIndex, numValues)) {}
-
-    template <typename ValueType>
-    TypedOutputRef<ValueType>::TypedOutputRef(const std::initializer_list<TypedOutputRef<ValueType>>& groups)
-    {
-        for (const auto& group : groups)
-        {
-            for (const auto& range : group._ranges)
-            {
-                _ranges.push_back(range);
-            }
-        }
-        ComputeSize();
-    }
-
-    template <typename ValueType>
-    TypedOutputRef<ValueType>::TypedOutputRef(const std::vector<TypedOutputRef<ValueType>>& groups)
-    {
-        for (const auto& group : groups)
-        {
-            for (const auto& range : group._ranges)
-            {
-                _ranges.push_back(range);
-            }
-        }
-        ComputeSize();
-    }
-
     //
     // InputPort
     //
     template <typename ValueType>
-    InputPort::InputPort(const class Node* owningNode, size_t portIndex, const TypedOutputRef<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)
+    InputPort::InputPort(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)
     {
     }
 
