@@ -218,10 +218,9 @@ namespace model
             bool canVisit = true;
             for (auto input : node->_inputs)
             {
-                // Note: If InputPorts can point to multiple nodes, we'll have to iterate over them here
                 for (const auto& inputRange : input->GetInputRanges())
                 {
-                    auto inputNode = inputRange.referencedPort->Node();
+                    auto inputNode = inputRange.ReferencedPort()->Node();
                     canVisit = canVisit && visitedNodes.find(inputNode) != visitedNodes.end();
                 }
             }
@@ -255,7 +254,7 @@ namespace model
                 {
                     for (const auto& inputRange : input->GetInputRanges())
                     {
-                        stack.push_back(inputRange.referencedPort->Node()); // Again, if `InputPort`s point to multiple nodes, need to iterate here
+                        stack.push_back(inputRange.ReferencedPort()->Node()); 
                     }
                 }
             }

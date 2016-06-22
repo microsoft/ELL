@@ -41,7 +41,7 @@ namespace model
         {
             for (const auto& range : input->GetInputRanges())
             {
-                range.referencedPort->Node()->AddDependent(this);
+                range.ReferencedPort()->Node()->AddDependent(this);
             }
         }
     }

@@ -21,30 +21,32 @@ namespace model
     class InputRange
     {
     public:
-        InputRange(const Port& port) : referencedPort(&port), startIndex(0), numValues(port.Size()), isFixedSize(false) {}
-        InputRange(const Port& port, size_t startIndex) : referencedPort(&port), startIndex(startIndex), numValues(1), isFixedSize(true) {}
-        InputRange(const Port& port, size_t startIndex, size_t numValues) : referencedPort(&port), startIndex(startIndex), numValues(numValues), isFixedSize(true) {}
+        InputRange(const Port& port) : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}
+        InputRange(const Port& port, size_t startIndex) : _referencedPort(&port), _startIndex(startIndex), _numValues(1), _isFixedSize(true) {}
+        InputRange(const Port& port, size_t startIndex, size_t numValues) : _referencedPort(&port), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true) {}
 
-        Port::PortType Type() const { return referencedPort->Type(); }
+        Port::PortType Type() const { return _referencedPort->Type(); }
 
         size_t Size() const
         {
-            if (isFixedSize)
+            if (_isFixedSize)
             {
-                return referencedPort->Size();
+                return _referencedPort->Size();
             }
             else
             {
-                return numValues;
+                return _numValues;
             }
         }
 
-//    private:
+        const Port* ReferencedPort() const { return _referencedPort; }
+
+    private:
         friend class InputPort;
-        const Port* referencedPort;
-        size_t startIndex;
-        size_t numValues;
-        bool isFixedSize;
+        const Port* _referencedPort;
+        size_t _startIndex;
+        size_t _numValues;
+        bool _isFixedSize;
     };
 
     template <typename ValueType>
@@ -59,19 +61,24 @@ namespace model
     class InputRanges
     {
     public:
-        InputRanges(const InputRange& range) { _ranges.push_back(range); ComputeSize(); }
-        InputRanges(const std::vector<InputRange>& ranges) { _ranges.insert(_ranges.end(), ranges.begin(), ranges.end()); ComputeSize(); }
+        InputRanges(const InputRange& range)
+        {
+            _ranges.push_back(range);
+            ComputeSize();
+        }
+        InputRanges(const std::vector<InputRange>& ranges)
+        {
+            _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
+            ComputeSize();
+        }
 
         std::vector<InputRange>::const_iterator begin() const { return _ranges.cbegin(); }
         std::vector<InputRange>::const_iterator end() const { return _ranges.cend(); }
 
-        size_t Size() const
-        {
-            return _size;
-        }
+        size_t Size() const { return _size; }
 
     protected:
-        InputRanges() {};
+        InputRanges(){};
         void ComputeSize()
         {
             _size = 0;
@@ -91,21 +98,23 @@ namespace model
     public:
         TypedRanges(const OutputPort<ValueType>& port) : InputRanges(port) {}
         TypedRanges(const TypedRange<ValueType>& range) : InputRanges(range) {}
-//        TypedRanges(const std::initializer_list<TypedRange<ValueType>>& ranges) : InputRanges(ranges) {}
+        TypedRanges(const std::initializer_list<TypedRange<ValueType>>& ranges)
+        {
+            for (const auto& range : ranges)
+            {
+                _ranges.push_back(range);
+            }
+            ComputeSize();            
+        }
+        
         TypedRanges(const std::vector<TypedRange<ValueType>>& ranges)
         {
             for (const auto& range : ranges)
             {
-               _ranges.push_back(range);
+                _ranges.push_back(range);
             }
             ComputeSize();
         }
-
-        // TypedRange(const OutputPort<ValueType>& port) : InputRange(&port, 0, port.Size(), false) {}
-
-        // TypedRange(const OutputPort<ValueType>& port, size_t index) : InputRange(&port, index, 1, true) {}
-
-        // TypedRange(const OutputPort<ValueType>& port, size_t index, size_t numValues) : InputRange(&port, index, numValues, true){};
     };
 
     /// <summary> Class representing an input to a node </summary>
