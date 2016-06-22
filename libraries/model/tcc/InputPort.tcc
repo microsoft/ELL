@@ -13,20 +13,20 @@ namespace model
 {
 
     //
-    // TypedInputGroup
+    // TypedOutputRef
     //
 
     template <typename ValueType>
-    TypedInputGroup<ValueType>::TypedInputGroup(const OutputPort<ValueType>& port) : InputGroup(port) {}
+    TypedOutputRef<ValueType>::TypedOutputRef(const OutputPort<ValueType>& port) : OutputRef(port) {}
 
     template <typename ValueType>
-    TypedInputGroup<ValueType>::TypedInputGroup(const OutputPort<ValueType>& port, size_t startIndex) : InputGroup(InputRange(port, startIndex)) {}
+    TypedOutputRef<ValueType>::TypedOutputRef(const OutputPort<ValueType>& port, size_t startIndex) : OutputRef(OutputRange(port, startIndex)) {}
 
     template <typename ValueType>
-    TypedInputGroup<ValueType>::TypedInputGroup(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : InputGroup(InputRange(port, startIndex, numValues)) {}
+    TypedOutputRef<ValueType>::TypedOutputRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : OutputRef(OutputRange(port, startIndex, numValues)) {}
 
     template <typename ValueType>
-    TypedInputGroup<ValueType>::TypedInputGroup(const std::initializer_list<TypedInputGroup<ValueType>>& groups)
+    TypedOutputRef<ValueType>::TypedOutputRef(const std::initializer_list<TypedOutputRef<ValueType>>& groups)
     {
         for (const auto& group : groups)
         {
@@ -39,7 +39,7 @@ namespace model
     }
 
     template <typename ValueType>
-    TypedInputGroup<ValueType>::TypedInputGroup(const std::vector<TypedInputGroup<ValueType>>& groups)
+    TypedOutputRef<ValueType>::TypedOutputRef(const std::vector<TypedOutputRef<ValueType>>& groups)
     {
         for (const auto& group : groups)
         {
@@ -55,7 +55,7 @@ namespace model
     // InputPort
     //
     template <typename ValueType>
-    InputPort::InputPort(const class Node* owningNode, size_t portIndex, const TypedInputGroup<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)
+    InputPort::InputPort(const class Node* owningNode, size_t portIndex, const TypedOutputRef<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)
     {
     }
 

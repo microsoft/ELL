@@ -118,8 +118,8 @@ void TestInputRouting1()
 
     //auto minAndArgMin = model.AddNode<model::ArgMinNode<double>>(in->output);
     //auto maxAndArgMax = model.AddNode<model::ArgMaxNode<double>>(in->output);
-    //model::InputRangeList ranges = { { minAndArgMin->val, 0}, {maxAndArgMax->val, 0} };    
-    //model::InputRangeList ranges2 = { { minAndArgMin->val, 0}, {in->output, 1, 2} };
+    //model::OutputRangeList ranges = { { minAndArgMin->val, 0}, {maxAndArgMax->val, 0} };    
+    //model::OutputRangeList ranges2 = { { minAndArgMin->val, 0}, {in->output, 1, 2} };
 
     //auto minAndMax = model.AddNode<model::CombinerNode<double>>(ranges);
     //auto minAndTail = model.AddNode<model::CombinerNode<double>>(ranges2);
@@ -144,14 +144,14 @@ void TestInputRouting2()
     model::Model model;
 
     auto in = model.AddNode<model::InputNode<double>>(3);
-    model::TypedInputGroup<double> range = {in->output, 0, 2};
-    model::TypedInputGroup<double> ranges = { { in->output, 0}, {in->output, 2} };
+    model::TypedOutputRef<double> range = {in->output, 0, 2};
+    model::TypedOutputRef<double> ranges = { { in->output, 0}, {in->output, 2} };
 
     auto minAndArgMin1 = model.AddNode<model::ArgMinNode<double>>(in->output); // a "standard" node that takes its input from an output port
     auto minAndArgMin2 = model.AddNode<model::ArgMinNode<double>>(range); // a node that takes its input from a range --- a subset of outputs from a port
     auto minAndArgMin3 = model.AddNode<model::ArgMinNode<double>>(ranges); // a node that takes its input from a "group" --- an arbitrary set of outputs from other ports
 
-    auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::TypedInputGroup<double>{in->output, 0, 1});
+    auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::TypedOutputRef<double>{in->output, 0, 1});
 
     //// set some example input and read the output
     std::vector<double> inputValues = { 0.5, 0.25, 0.75 };

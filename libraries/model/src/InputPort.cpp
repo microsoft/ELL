@@ -11,15 +11,15 @@
 namespace model
 {
     //
-    // InputRange
+    // OutputRange
     //
-    InputRange::InputRange(const Port& port) : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}
+    OutputRange::OutputRange(const Port& port) : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}
 
-    InputRange::InputRange(const Port& port, size_t index) : _referencedPort(&port), _startIndex(index), _numValues(1), _isFixedSize(true) {}
+    OutputRange::OutputRange(const Port& port, size_t index) : _referencedPort(&port), _startIndex(index), _numValues(1), _isFixedSize(true) {}
 
-    InputRange::InputRange(const Port& port, size_t startIndex, size_t numValues) : _referencedPort(&port), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true) {}
+    OutputRange::OutputRange(const Port& port, size_t startIndex, size_t numValues) : _referencedPort(&port), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true) {}
 
-    size_t InputRange::Size() const
+    size_t OutputRange::Size() const
     {
         if (_isFixedSize)
         {
@@ -32,39 +32,39 @@ namespace model
     }
 
     //
-    // InputGroup
+    // OutputRef
     //
-    InputGroup::InputGroup(const Port& port)
+    OutputRef::OutputRef(const Port& port)
     {
         _ranges.emplace_back(port);
         ComputeSize();
     }
 
-    InputGroup::InputGroup(const Port& port, size_t startIndex)
+    OutputRef::OutputRef(const Port& port, size_t startIndex)
     {
         _ranges.emplace_back(port, startIndex);
         ComputeSize();
     }
 
-    InputGroup::InputGroup(const Port& port, size_t startIndex, size_t numValues)
+    OutputRef::OutputRef(const Port& port, size_t startIndex, size_t numValues)
     {
         _ranges.emplace_back(port, startIndex, numValues);
         ComputeSize();
     }
 
-    InputGroup::InputGroup(const InputRange& range)
+    OutputRef::OutputRef(const OutputRange& range)
     {
         _ranges.push_back(range);
         ComputeSize();
     }
 
-    InputGroup::InputGroup(const std::vector<InputRange>& ranges)
+    OutputRef::OutputRef(const std::vector<OutputRange>& ranges)
     {
         _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
         ComputeSize();
     }
 
-    void InputGroup::ComputeSize()
+    void OutputRef::ComputeSize()
     {
         _size = 0;
         for (const auto& range : _ranges)
