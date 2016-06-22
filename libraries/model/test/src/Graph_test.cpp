@@ -154,6 +154,7 @@ void TestInputRouting2()
     //// set some example input and read the output
     std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
     in->SetInput(inputValues);
+
     auto output1 = model.GetNodeOutput(minAndArgMin1->val);
     auto output2 = model.GetNodeOutput(minAndArgMin2->val);
     auto output3 = model.GetNodeOutput(minAndArgMin3->val);

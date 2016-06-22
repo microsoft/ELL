@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
+
 /// <summary> model namespace </summary>
 namespace model
 {    
@@ -49,27 +51,23 @@ namespace model
 
     template <typename ValueType>
     InputPort::InputPort(const class Node* owningNode, size_t portIndex, const TypedRanges<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size())
-    {
+    { 
         _inputRanges.insert(_inputRanges.begin(), input.begin(), input.end());
     }
 
     template <typename ValueType>
     std::vector<ValueType> InputPort::GetValue() const
     {
-        size_t size = 0;
         std::vector<ValueType> result;
         for (const auto& range : _inputRanges)
         {
             auto temp = range.referencedPort->Node()->GetOutputValue<ValueType>(range.referencedPort->Index());
             if (range.isFixedSize)
             {
-                size += range.referencedPort->Size();
                 result.insert(result.end(), temp.begin()+range.startIndex, temp.begin()+range.startIndex+range.numValues);
-
             }
             else
             {
-                size += range.referencedPort->Size();
                 result.insert(result.end(), temp.begin(), temp.end());
             }
         }

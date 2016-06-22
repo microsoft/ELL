@@ -22,8 +22,8 @@ namespace model
     {
     public:
         InputRange(const Port& port) : referencedPort(&port), startIndex(0), numValues(port.Size()), isFixedSize(false) {}
-        InputRange(const Port& port, size_t startIndex) : referencedPort(&port), startIndex(startIndex), numValues(1), isFixedSize(false) {}
-        InputRange(const Port& port, size_t startIndex, size_t numValues) : referencedPort(&port), startIndex(startIndex), numValues(numValues), isFixedSize(false) {}
+        InputRange(const Port& port, size_t startIndex) : referencedPort(&port), startIndex(startIndex), numValues(1), isFixedSize(true) {}
+        InputRange(const Port& port, size_t startIndex, size_t numValues) : referencedPort(&port), startIndex(startIndex), numValues(numValues), isFixedSize(true) {}
 
         Port::PortType Type() const { return referencedPort->Type(); }
 
@@ -59,8 +59,9 @@ namespace model
     class InputRanges
     {
     public:
-        InputRanges(const InputRange& range) { _ranges.push_back(range); }
-        InputRanges(const std::vector<InputRange>& ranges) { _ranges.insert(_ranges.end(), ranges.begin(), ranges.end()); }
+        InputRanges(const InputRange& range) { _ranges.push_back(range); ComputeSize(); }
+        InputRanges(const std::vector<InputRange>& ranges) { _ranges.insert(_ranges.end(), ranges.begin(), ranges.end()); ComputeSize(); }
+
         std::vector<InputRange>::const_iterator begin() const { return _ranges.cbegin(); }
         std::vector<InputRange>::const_iterator end() const { return _ranges.cend(); }
 
@@ -97,6 +98,7 @@ namespace model
             {
                _ranges.push_back(range);
             }
+            ComputeSize();
         }
 
         // TypedRange(const OutputPort<ValueType>& port) : InputRange(&port, 0, port.Size(), false) {}
@@ -115,6 +117,7 @@ namespace model
         /// <param name="output"> The output elements this port receives values from </param>
         template <typename ValueType>
         InputPort(const class Node* owningNode, size_t portIndex, const TypedRange<ValueType>& input);
+
         template <typename ValueType>
         InputPort(const class Node* owningNode, size_t portIndex, const TypedRanges<ValueType>& input);
 
