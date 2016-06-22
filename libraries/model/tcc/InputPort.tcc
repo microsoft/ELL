@@ -12,11 +12,11 @@
 namespace model
 {
 
-    template <typename ValueType>
-    InputPort::InputPort(const class Node* owningNode, size_t portIndex, const TypedRange<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size())
-    {
-        _inputRanges.emplace_back(InputRange(input));
-    }
+    // template <typename ValueType>
+    // InputPort::InputPort(const class Node* owningNode, size_t portIndex, const TypedRange<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size())
+    // {
+    //     _inputRanges.emplace_back(InputRange(input));
+    // }
 
     template <typename ValueType>
     InputPort::InputPort(const class Node* owningNode, size_t portIndex, const TypedInputGroup<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size())
