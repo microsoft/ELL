@@ -43,6 +43,7 @@ namespace model
 
     private:
         friend class InputPort;
+        
         const Port* _referencedPort;
         size_t _startIndex;
         size_t _numValues;
@@ -58,15 +59,16 @@ namespace model
         TypedRange(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : InputRange(port, startIndex, numValues) {}
     };
 
-    class InputRanges
+    class InputGroup
     {
     public:
-        InputRanges(const InputRange& range)
+        InputGroup(const InputRange& range)
         {
             _ranges.push_back(range);
             ComputeSize();
         }
-        InputRanges(const std::vector<InputRange>& ranges)
+
+        InputGroup(const std::vector<InputRange>& ranges)
         {
             _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
             ComputeSize();
@@ -78,7 +80,7 @@ namespace model
         size_t Size() const { return _size; }
 
     protected:
-        InputRanges(){};
+        InputGroup(){};
         void ComputeSize()
         {
             _size = 0;
@@ -93,12 +95,14 @@ namespace model
 
     // typed version of range
     template <typename ValueType>
-    class TypedRanges : public InputRanges
+    class TypedInputGroup : public InputGroup
     {
     public:
-        TypedRanges(const OutputPort<ValueType>& port) : InputRanges(port) {}
-        TypedRanges(const TypedRange<ValueType>& range) : InputRanges(range) {}
-        TypedRanges(const std::initializer_list<TypedRange<ValueType>>& ranges)
+        TypedInputGroup(const OutputPort<ValueType>& port, size_t startIndex) : InputGroup(InputRange(port, startIndex)) {}
+        TypedInputGroup(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : InputGroup(InputRange(port, startIndex, numValues)) {}
+        TypedInputGroup(const OutputPort<ValueType>& port) : InputGroup(port) {}
+        TypedInputGroup(const TypedRange<ValueType>& range) : InputGroup(range) {}
+        TypedInputGroup(const std::initializer_list<TypedRange<ValueType>>& ranges)
         {
             for (const auto& range : ranges)
             {
@@ -106,8 +110,8 @@ namespace model
             }
             ComputeSize();            
         }
-        
-        TypedRanges(const std::vector<TypedRange<ValueType>>& ranges)
+
+        TypedInputGroup(const std::vector<TypedRange<ValueType>>& ranges)
         {
             for (const auto& range : ranges)
             {
@@ -128,7 +132,7 @@ namespace model
         InputPort(const class Node* owningNode, size_t portIndex, const TypedRange<ValueType>& input);
 
         template <typename ValueType>
-        InputPort(const class Node* owningNode, size_t portIndex, const TypedRanges<ValueType>& input);
+        InputPort(const class Node* owningNode, size_t portIndex, const TypedInputGroup<ValueType>& input);
 
         const std::vector<InputRange>& GetInputRanges() const { return _inputRanges; }
 

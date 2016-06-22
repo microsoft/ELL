@@ -145,7 +145,7 @@ void TestInputRouting2()
 
     auto in = model.AddNode<model::InputNode<double>>(3);
     model::TypedRange<double> range(in->output, 0, 2);
-    model::TypedRanges<double> ranges = { { in->output, 0}, {in->output, 2} };
+    model::TypedInputGroup<double> ranges = { { in->output, 0}, {in->output, 2} };
 
     auto minAndArgMin1 = model.AddNode<model::ArgMinNode<double>>(in->output);
     auto minAndArgMin2 = model.AddNode<model::ArgMinNode<double>>(range);
