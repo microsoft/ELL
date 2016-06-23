@@ -78,6 +78,8 @@ namespace emll
 				llvm::Function* Function(llvm::Module* pModule, const std::string& name, ValueType returnType, llvm::Function::LinkageTypes linkage, NamedValueTypeList& args);
 
 				llvm::BasicBlock* Block(llvm::Function* pfn, const std::string& label);
+				llvm::BasicBlock* BlockAfter(llvm::Function* pfn, llvm::BasicBlock* pPrevBlock, const std::string& label);
+
 				// This block is not part of any function yet. You'll need to insert it manually
 				llvm::BasicBlock* Block(const std::string& label);
 				llvm::BasicBlock* CurrentBlock()

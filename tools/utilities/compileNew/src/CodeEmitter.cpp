@@ -21,12 +21,18 @@ namespace emll {
 			module.DeclarePrintf();
 
 			auto fnMain = module.AddMain();
-			auto loop = fnMain.Loop(0, 4, 1);
+			auto loop = fnMain.Loop(0, 5, 1);
+			
+			// Generate block, trying out some block injection in the process
 			fnMain.CurrentBlock(loop.pBodyBlock);
+			auto printBlock = fnMain.BlockAfter(loop.pBodyBlock, "PrintBlock");
+			fnMain.Branch(printBlock);
+			fnMain.CurrentBlock(printBlock);
 			fnMain.Printf({ fnMain.Literal("%d\n"), fnMain.Load(loop.pIterationNumber) });
 			fnMain.Branch(loop.pIncBlock);
 			fnMain.CurrentBlock(loop.pAfterBlock);
 			fnMain.Ret();
+
 			fnMain.Verify();
 			module.Dump();
 			module.WriteBitcodeToFile("C:\\junk\\model\\loop.bc");

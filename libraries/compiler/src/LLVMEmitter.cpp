@@ -188,6 +188,16 @@ namespace emll
 				return llvm::BasicBlock::Create(_context, label, pfn);
 			}
 
+			llvm::BasicBlock* LLVMEmitter::BlockAfter(llvm::Function* pfn, llvm::BasicBlock* pPrevBlock, const std::string& label)
+			{
+				assert(pfn != nullptr);
+				assert(pPrevBlock != nullptr);
+
+				llvm::BasicBlock* newBlock = Block(label);
+				pfn->getBasicBlockList().insertAfter(pPrevBlock->getIterator(), newBlock);
+				return newBlock;
+			}
+
 			llvm::BasicBlock* LLVMEmitter::Block(const std::string& label)
 			{
 				return llvm::BasicBlock::Create(_context, label);
