@@ -8,6 +8,17 @@ namespace emll
 	{
 		namespace ir
 		{
+			const std::string LoopInitBlockName = "loop.init";
+			const std::string LoopConditionBlockName = "loop.cond";
+			const std::string LoopBodyBlockName = "loop.body";
+			const std::string LoopIncBlockName = "loop.inc";
+			const std::string LoopAfterBlockName = "loop.after";
+			const std::string LoopIncVar = "i";
+
+			const std::string PrintfFnName = "printf";
+			const std::string MallocFnName = "malloc";
+			const std::string FreeFnName = "free";
+
 			FunctionEmitter::FunctionEmitter(LLVMEmitter* pEmitter, llvm::Function* pfn)
 				: _pEmitter(pEmitter),
 				_pfn(pfn)
@@ -18,6 +29,19 @@ namespace emll
 				: _pEmitter(src._pEmitter),
 				_pfn(src._pfn)
 			{
+			}
+
+			void FunctionEmitter::AddBlock(llvm::BasicBlock* pBlock)
+			{
+				assert(pBlock != nullptr);
+				_pfn->getBasicBlockList().push_back(pBlock);
+			}
+
+			llvm::BasicBlock* FunctionEmitter::CurrentBlock(llvm::BasicBlock* pBlock)
+			{
+				llvm::BasicBlock* pCurrentBlock = CurrentBlock();
+				_pEmitter->SetCurrentBlock(pBlock);
+				return pCurrentBlock;
 			}
 
 			llvm::Value* FunctionEmitter::Call(const std::string& name, llvm::Value* pArg)
@@ -55,6 +79,13 @@ namespace emll
 				return _pEmitter->Store(pPtr, pVal);
 			}
 
+			llvm::Value* FunctionEmitter::OpAndUpdate(llvm::Value* pPtr, OperatorType op, llvm::Value* pValue)
+			{
+				llvm::Value* pNextVal = Op(op, Load(pPtr), pValue);
+				Store(pPtr, pNextVal);
+				return pNextVal;
+			}
+
 			llvm::Value* FunctionEmitter::PtrOffsetA(llvm::Value* ptr, int offset)
 			{
 				return _pEmitter->ArrayDeref(ptr, Literal(offset));
@@ -85,15 +116,59 @@ namespace emll
 				return _pEmitter->Store(PtrOffsetH(pPtr, offset), pValue);
 			}
 
+			LoopBlocks FunctionEmitter::Loop(int startAt, int max, int increment)
+			{
+				LoopBlocks loop;
+				llvm::BasicBlock* pCurrentBlock = CurrentBlock();
+
+				llvm::BasicBlock* pInitBlock = Block(LoopInitBlockName);
+				loop.pIncBlock = Block(LoopIncBlockName);
+				loop.pBodyBlock = Block(LoopBodyBlockName);
+				llvm::BasicBlock* pCondBlock = Block(LoopConditionBlockName);
+				loop.pAfterBlock = Block(LoopAfterBlockName);
+
+				// Branch to loop beginning
+				Branch(pInitBlock);
+				//
+				// Initial block	- set up loop counter
+				//
+				CurrentBlock(pInitBlock);
+				loop.pIterationNumber = _pEmitter->Variable(ValueType::Int32, LoopIncVar);
+				Store(loop.pIterationNumber, Literal(startAt));
+				_pEmitter->Branch(pCondBlock);
+				//
+				// Conditional block - should we terminate the loop?
+				//
+				CurrentBlock(pCondBlock);
+				llvm::Value* pMaxIterationNumber = Literal(max);
+				llvm::Value* pCmp = _pEmitter->Cmp(ComparisonType::Lt, Load(loop.pIterationNumber), pMaxIterationNumber);
+				_pEmitter->Branch(pCmp, loop.pBodyBlock, loop.pAfterBlock);
+				//
+				// Increment loop counter
+				//
+				CurrentBlock(loop.pIncBlock);
+				OpAndUpdate(loop.pIterationNumber, OperatorType::Add, Literal(increment));
+				_pEmitter->Branch(pCondBlock);
+
+				CurrentBlock(pCurrentBlock);
+
+				return loop;
+			}
+
 			llvm::Value* FunctionEmitter::Malloc(ValueType type, int64_t size)
 			{
 				_values.init({ Literal(size) });
-				return Cast(Call("malloc", _values), type);
+				return Cast(Call(MallocFnName, _values), type);
 			}
 
 			void FunctionEmitter::Free(llvm::Value* pValue)
 			{
-				Call("free", Cast(pValue, ValueType::PByte));
+				Call(FreeFnName, Cast(pValue, ValueType::PByte));
+			}
+
+			llvm::Value* FunctionEmitter::Printf(std::initializer_list<llvm::Value*> args)
+			{
+				return Call(PrintfFnName, args);
 			}
 
 			llvm::Function* FunctionEmitter::ResolveFunction(const std::string& name)

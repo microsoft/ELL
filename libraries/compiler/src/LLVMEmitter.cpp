@@ -188,6 +188,11 @@ namespace emll
 				return llvm::BasicBlock::Create(_context, label, pfn);
 			}
 
+			llvm::BasicBlock* LLVMEmitter::Block(const std::string& label)
+			{
+				return llvm::BasicBlock::Create(_context, label);
+			}
+
 			void LLVMEmitter::SetCurrentBlock(llvm::BasicBlock* pBlock)
 			{
 				assert(pBlock != nullptr);
@@ -230,9 +235,45 @@ namespace emll
 				return _pBuilder->CreateAlloca(Type(type), nullptr, name);
 			}
 
+			llvm::AllocaInst* LLVMEmitter::Variable(llvm::Type* pType, const std::string& name)
+			{
+				return _pBuilder->CreateAlloca(pType, nullptr, name);
+			}
+
 			llvm::AllocaInst* LLVMEmitter::StackAlloc(ValueType type, int size)
 			{
 				return _pBuilder->CreateAlloca(Type(type), Literal(size));
+			}
+
+			llvm::Value* LLVMEmitter::Cmp(ComparisonType type, llvm::Value* pLVal, llvm::Value* pRVal)
+			{
+				switch (type)
+				{
+				default:
+					throw new EmitterException(EmitterError::InvalidComparisonType);
+				case ComparisonType::Eq:
+					return _pBuilder->CreateICmpEQ(pLVal, pRVal);
+				case ComparisonType::Lt:
+					return _pBuilder->CreateICmpSLT(pLVal, pRVal);
+				case ComparisonType::Lte:
+					return _pBuilder->CreateICmpSLE(pLVal, pRVal);
+				case ComparisonType::Gt:
+					return _pBuilder->CreateICmpSGT(pLVal, pRVal);
+				case ComparisonType::Gte:
+					return _pBuilder->CreateICmpSGE(pLVal, pRVal);
+				case ComparisonType::Neq:
+					return _pBuilder->CreateICmpNE(pLVal, pRVal);
+				}
+			}
+
+			llvm::BranchInst* LLVMEmitter::Branch(llvm::Value* pCondVal, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
+			{
+				return _pBuilder->CreateCondBr(pCondVal, pThenBlock, pElseBlock);
+			}
+
+			llvm::BranchInst* LLVMEmitter::Branch(llvm::BasicBlock* pDest)
+			{
+				return _pBuilder->CreateBr(pDest);
 			}
 
 			llvm::Type* LLVMEmitter::GetValueType(ValueType type)

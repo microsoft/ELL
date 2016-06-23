@@ -13,6 +13,7 @@ namespace emll
 				NotSupported,
 				InvalidValueType,
 				InvalidOperatorType,
+				InvalidComparisonType,
 				InvalidFunction,
 				FunctionNotFound,
 				WriteModuleFailed,

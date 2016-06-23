@@ -10,6 +10,14 @@ namespace emll
 	{
 		namespace ir
 		{
+			struct LoopBlocks
+			{
+				llvm::BasicBlock* pBodyBlock;
+				llvm::BasicBlock* pIncBlock;
+				llvm::BasicBlock* pAfterBlock;
+				llvm::Value* pIterationNumber;
+			};
+
 			class FunctionEmitter
 			{
 			public:
@@ -45,15 +53,16 @@ namespace emll
 				{
 					return _pEmitter->Block(_pfn, label);
 				}
+				void AddBlock(llvm::BasicBlock* pBlock);
+
 				llvm::BasicBlock* CurrentBlock()
 				{
 					return _pEmitter->CurrentBlock();
 				}
-				void CurrentBlock(llvm::BasicBlock* pBlock)
-				{
-					_pEmitter->SetCurrentBlock(pBlock);
-				}
-
+				
+				// Set the block that subsequent code will go into. 
+				// Returns the previous block
+				llvm::BasicBlock* CurrentBlock(llvm::BasicBlock* pBlock);
 				llvm::Value* Call(const std::string& name, llvm::Value* pArg = nullptr);
 				llvm::Value* Call(const std::string& name, ValueList& args);
 				llvm::Value* Call(const std::string& name, std::initializer_list<llvm::Value*> args);
@@ -71,6 +80,16 @@ namespace emll
 					return _pEmitter->BinaryOp(type, pLVal, pRVal);
 				}
 				llvm::Value* Op(OperatorType type, llvm::iterator_range<llvm::Function::arg_iterator>& args);
+
+				void Branch(llvm::BasicBlock* pDestBlock)
+				{
+					_pEmitter->Branch(pDestBlock);
+				}
+				//------------------------------------------
+				//
+				// Variables
+				//
+				//------------------------------------------
 
 				llvm::iterator_range<llvm::Function::arg_iterator> Args()
 				{
@@ -103,17 +122,22 @@ namespace emll
 					return _pEmitter->Load(pPtr, pValue);
 				}
 				llvm::Value* Store(llvm::Value* pPtr, llvm::Value* pValue);
+				llvm::Value* OpAndUpdate(llvm::Value* pPtr, OperatorType op, llvm::Value* pValue);
 
 				llvm::Value* PtrOffsetA(llvm::Value* pPtr, int offset);
 				llvm::Value* ValueAtA(llvm::Value* pPtr, int offset);
 				llvm::Value* SetValueAtA(llvm::Value* pPtr, int offset, llvm::Value* pValue);
-
 				llvm::Value* PtrOffsetH(llvm::Value* pPtr, int offset);
 				llvm::Value* ValueAtH(llvm::Value* pPtr, int offset);
 				llvm::Value* SetValueAtH(llvm::Value* pPtr, int offset, llvm::Value* pValue);
 
+
 				llvm::Value* Malloc(ValueType type, int64_t size);
 				void Free(llvm::Value* pValue);
+				llvm::Value* Printf(std::initializer_list<llvm::Value*> args);
+
+
+				LoopBlocks Loop(int startAt, int max, int increment);
 
 				void Verify()
 				{

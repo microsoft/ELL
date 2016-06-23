@@ -24,6 +24,16 @@ namespace emll
 				DivideF,
 			};
 
+			enum class ComparisonType
+			{
+				Eq,
+				Lt,
+				Lte,
+				Gt,
+				Gte,
+				Neq
+			};
+
 			class VariableTable
 			{
 			public:
@@ -68,6 +78,8 @@ namespace emll
 				llvm::Function* Function(llvm::Module* pModule, const std::string& name, ValueType returnType, llvm::Function::LinkageTypes linkage, NamedValueTypeList& args);
 
 				llvm::BasicBlock* Block(llvm::Function* pfn, const std::string& label);
+				// This block is not part of any function yet. You'll need to insert it manually
+				llvm::BasicBlock* Block(const std::string& label);
 				llvm::BasicBlock* CurrentBlock()
 				{
 					return _pBuilder->GetInsertBlock();
@@ -97,9 +109,18 @@ namespace emll
 				{
 					return _pBuilder->CreateStore(pVal, pPtr);
 				}
+
 				llvm::AllocaInst* Variable(ValueType type);
-				llvm::AllocaInst * Variable(ValueType type, const std::string & name);
+				llvm::AllocaInst* Variable(ValueType type, const std::string& name);
+				llvm::AllocaInst* Variable(llvm::Type* pType, const std::string& name);
+
 				llvm::AllocaInst* StackAlloc(ValueType type, int count);
+
+
+				llvm::Value* Cmp(ComparisonType type, llvm::Value* pLVal, llvm::Value* pRVal);
+
+				llvm::BranchInst* Branch(llvm::Value* pCondVal, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
+				llvm::BranchInst* Branch(llvm::BasicBlock* pDest);
 
 				llvm::LLVMContext& Context()
 				{

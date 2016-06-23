@@ -13,6 +13,25 @@
 namespace emll {
 	namespace compiler {
 
+		void TestCompiler()
+		{
+			ir::LLVMEmitter llvm;
+			ir::ModuleEmitter module(&llvm, llvm.AddModule("Looper"));
+
+			module.DeclarePrintf();
+
+			auto fnMain = module.AddMain();
+			auto loop = fnMain.Loop(0, 4, 1);
+			fnMain.CurrentBlock(loop.pBodyBlock);
+			fnMain.Printf({ fnMain.Literal("%d\n"), fnMain.Load(loop.pIterationNumber) });
+			fnMain.Branch(loop.pIncBlock);
+			fnMain.CurrentBlock(loop.pAfterBlock);
+			fnMain.Ret();
+			fnMain.Verify();
+			module.Dump();
+			module.WriteBitcodeToFile("C:\\junk\\model\\loop.bc");
+		}
+
 		template<typename ... ArgTypes>
 		std::string PrintFormatPrecise(const char* format, const ArgTypes& ...args)
 		{
