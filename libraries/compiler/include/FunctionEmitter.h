@@ -55,7 +55,7 @@ namespace emll
 				}
 				llvm::BasicBlock* BlockAfter(llvm::BasicBlock* pPrevBlock, const std::string& label)
 				{
-					return _pEmitter->BlockAfter(_pfn, prevBlock, label);
+					return _pEmitter->BlockAfter(_pfn, pPrevBlock, label);
 				}
 				void AddBlock(llvm::BasicBlock* pBlock);
 
