@@ -38,4 +38,11 @@ namespace model
     template <typename ValueType>
     InputPort<ValueType>::InputPort(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input) : InputPortBase(owningNode, portIndex, input) {}
 
+    template <typename ValueType>
+    ValueType InputPort<ValueType>::operator[](size_t index) const
+    {
+        // TODO: be less inefficient about this!
+        auto values = GetValue();
+        return values[index];
+    }
 }

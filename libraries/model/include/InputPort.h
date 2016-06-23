@@ -57,6 +57,8 @@ namespace model
     public:
         InputPort(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input);
         std::vector<ValueType> GetValue() const { return GetTypedValue<ValueType>(); }
+
+        ValueType operator[](size_t index) const;
     };
 }
 
