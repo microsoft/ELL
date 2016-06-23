@@ -38,7 +38,6 @@ namespace model
     //
     // Factory method for creating nodes
     //
-
     template <typename NodeType, typename... Args>
     std::shared_ptr<NodeType> Model::AddNode(Args&&... args)
     {

@@ -50,14 +50,17 @@ namespace model
         /// <returns> The dimensionality of the output </returns>
         size_t Size() const;
 
+        /// <summary> The index of the first element this range refers to </summary>
+        ///
+        /// <returns> The index of the first element this range refers to </returns>
+        size_t StartIndex() const;
+
         /// <summary> The port this range refers to </summary>
         ///
         /// <returns> The port this range refers to </returns>
         const Port* ReferencedPort() const { return _referencedPort; }
 
     private:
-        friend class InputPort;
-
         const Port* _referencedPort;
         size_t _startIndex;
         size_t _numValues;
@@ -144,6 +147,36 @@ namespace model
         /// <param name="groups"> The list of groups to concantenate together </param>
         OutputRef(const std::vector<OutputRef<ValueType>>& groups);
     };
+
+    //
+    // Helper functions
+    //
+
+    // MakeRef
+    template <typename ValueType>
+    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port)
+    {
+        return OutputRef<ValueType>(port);
+    }
+
+    template <typename ValueType>
+    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex)
+    {
+        return OutputRef<ValueType>(port, startIndex);
+    }
+
+    template <typename ValueType>
+    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues)
+    {
+        return OutputRef<ValueType>(port, startIndex, numValues);
+    }
+
+    // Concat
+    template <typename RefType, typename... Refs>
+    RefType Concat(const RefType& ref1, Refs&&... refs)
+    {
+        return RefType({ ref1, refs... });
+    }
 }
 
 #include "../tcc/OutputRef.tcc"

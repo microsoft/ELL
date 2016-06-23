@@ -151,7 +151,9 @@ void TestInputRouting2()
     auto minAndArgMin2 = model.AddNode<model::ArgMinNode<double>>(range); // a node that takes its input from a range --- a subset of outputs from a port
     auto minAndArgMin3 = model.AddNode<model::ArgMinNode<double>>(ranges); // a node that takes its input from a "group" --- an arbitrary set of outputs from other ports
 
-    auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::OutputRef<double>{in->output, 0, 1});
+    auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::MakeRef(in->output, 0, 2));
+    auto minAndArgMin5 = model.AddNode<model::ArgMinNode<double>>(model::OutputRef<double>{ { in->output, 0}, {in->output, 0, 2} });
+    auto minAndArgMin6 = model.AddNode<model::ArgMinNode<double>>(model::Concat(model::MakeRef(in->output, 0), model::MakeRef(in->output, 0, 2), model::MakeRef(minAndArgMin1->val, 0, 1)));
 
     //// set some example input and read the output
     std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
@@ -160,10 +162,15 @@ void TestInputRouting2()
     auto output1 = model.GetNodeOutput(minAndArgMin1->val);
     auto output2 = model.GetNodeOutput(minAndArgMin2->val);
     auto output3 = model.GetNodeOutput(minAndArgMin3->val);
+    auto output4 = model.GetNodeOutput(minAndArgMin4->val);
+//    auto output5 = model.GetNodeOutput(minAndArgMin5->val);
+
+    std::cout << "output1: " << output1[0] << ", output2: " << output2[0] << ", output3: " << output3[0] << ", output4: " << output4[0] << std::endl; // ", output5: " << output5[0] << std::endl;
 
     testing::ProcessTest("testing combine node", testing::IsEqual(output1[0], 0.25));
     testing::ProcessTest("testing combine node", testing::IsEqual(output2[0], 0.25));
     testing::ProcessTest("testing combine node", testing::IsEqual(output3[0], 0.5));
+    testing::ProcessTest("testing combine node", testing::IsEqual(output4[0], output2[0]));
 }
 
 //

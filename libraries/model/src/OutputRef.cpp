@@ -31,6 +31,8 @@ namespace model
         }
     }
 
+    size_t OutputRange::StartIndex() const { return _startIndex; }
+
     //
     // UntypedOutputRef
     //

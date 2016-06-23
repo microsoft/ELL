@@ -24,15 +24,8 @@ namespace model
         result.reserve(Size());
         for (const auto& range : _inputRanges)
         {
-            auto temp = range._referencedPort->Node()->GetOutputValue<ValueType>(range._referencedPort->Index());
-            if (range._isFixedSize)
-            {
-                result.insert(result.end(), temp.begin() + range._startIndex, temp.begin() + range._startIndex + range._numValues);
-            }
-            else
-            {
-                result.insert(result.end(), temp.begin(), temp.end());
-            }
+            auto temp = range.ReferencedPort()->Node()->GetOutputValue<ValueType>(range.ReferencedPort()->Index());
+            result.insert(result.end(), temp.begin() + range.StartIndex(), temp.begin() + range.StartIndex() + range.Size());
         }
 
         assert(Size() == result.size());
