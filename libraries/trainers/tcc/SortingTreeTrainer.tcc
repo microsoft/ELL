@@ -194,7 +194,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    std::unique_ptr<ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters)
+    std::unique_ptr<IBlackBoxTrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters)
     {
         return std::make_unique<SortingTreeTrainer<LossFunctionType>>(lossFunction, parameters);
     }
