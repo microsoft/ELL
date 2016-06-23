@@ -27,7 +27,6 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        //ExtremalValueNode(const OutputPort<ValueType>& input);
         ExtremalValueNode(const OutputRef<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -51,7 +50,7 @@ namespace model
 
     private:
         // My inputs
-        InputPort _input;
+        InputPort<ValueType> _input;
 
         // My outputs
         OutputPort<ValueType> _val;

@@ -49,9 +49,9 @@ namespace model
 
     private:
         // Inputs
-        InputPort _condition;
-        InputPort _value1;
-        InputPort _value2;
+        InputPort<bool> _condition;
+        InputPort<ValueType> _value1;
+        InputPort<ValueType> _value2;
 
         // Output
         OutputPort<ValueType> _output;

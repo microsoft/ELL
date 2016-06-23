@@ -17,7 +17,7 @@ namespace model
     template <typename ValueType, bool max>
     void ExtremalValueNode<ValueType, max>::Compute() const
     {
-        auto inputValues = _input.GetValue<ValueType>();
+        auto inputValues = _input.GetValue();
         decltype(std::max_element(inputValues.begin(), inputValues.end())) result;
         if (max)
         {

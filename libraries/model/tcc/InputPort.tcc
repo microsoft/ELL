@@ -13,12 +13,12 @@ namespace model
     // InputPort
     //
     template <typename ValueType>
-    InputPort::InputPort(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)
+    InputPortBase::InputPortBase(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)
     {
     }
 
     template <typename ValueType>
-    std::vector<ValueType> InputPort::GetValue() const
+    std::vector<ValueType> InputPortBase::GetTypedValue() const
     {
         std::vector<ValueType> result;
         result.reserve(Size());
@@ -31,4 +31,11 @@ namespace model
         assert(Size() == result.size());
         return result;
     }
+
+    //
+    // InputPort
+    // 
+    template <typename ValueType>
+    InputPort<ValueType>::InputPort(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input) : InputPortBase(owningNode, portIndex, input) {}
+
 }

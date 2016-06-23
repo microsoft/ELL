@@ -12,10 +12,10 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-    Node::Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs) : _inputs(inputs), _outputs(outputs), _id(UniqueId())
+    Node::Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) : _inputs(inputs), _outputs(outputs), _id(UniqueId())
     {};
 
-    void Node::AddInputPort(InputPort* input)
+    void Node::AddInputPort(InputPortBase* input)
     {
         _inputs.push_back(input);
     }

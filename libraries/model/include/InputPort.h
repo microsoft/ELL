@@ -20,7 +20,7 @@
 namespace model
 {
     /// <summary> Class representing an input to a node </summary>
-    class InputPort : public Port
+    class InputPortBase : public Port
     {
     public:
         /// <summary> Constructor </summary>
@@ -29,7 +29,7 @@ namespace model
         /// <param name="portIndex"> The index of this port within the owning node <param>
         /// <param name="input"> The input group to fetch input values from </param>
         template <typename ValueType>
-        InputPort(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input);
+        InputPortBase(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input);
 
         /// <summary> Returns the UntypedOutputRef containing the ranges of referenced locations to get values from </summary>
         ///
@@ -45,10 +45,18 @@ namespace model
         ///
         /// <returns> The (already-computed) output value corresponding to this input </returns>
         template <typename ValueType>
-        std::vector<ValueType> GetValue() const;
+        std::vector<ValueType> GetTypedValue() const;
 
     private:
         UntypedOutputRef _inputRanges;
+    };
+
+    template <typename ValueType>
+    class InputPort : public InputPortBase
+    {
+    public:
+        InputPort(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input);
+        std::vector<ValueType> GetValue() const { return GetTypedValue<ValueType>(); }
     };
 }
 

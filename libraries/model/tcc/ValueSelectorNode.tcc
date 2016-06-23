@@ -27,9 +27,9 @@ namespace model
     template <typename ValueType>
     void ValueSelectorNode<ValueType>::Compute() const
     {
-        auto condVec = _condition.GetValue<bool>();
-        auto val1 = _value1.GetValue<ValueType>();
-        auto val2 = _value2.GetValue<ValueType>();
+        auto condVec = _condition.GetValue();
+        auto val1 = _value1.GetValue();
+        auto val2 = _value2.GetValue();
         assert(condVec.size() == 1);
         bool cond = condVec[0];
         _output.SetOutput(cond ? val1 : val2);

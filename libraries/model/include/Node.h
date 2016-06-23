@@ -21,7 +21,7 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-    class InputPort;
+    class InputPortBase;
 
     /// <summary> Superclass for all node types. </summary>
     class Node
@@ -34,7 +34,7 @@ namespace model
         const NodeId GetId() const { return _id; }
 
         /// <summary> Returns the input "ports" for this node </summary>
-        const std::vector<InputPort*>& GetInputs() const { return _inputs; }
+        const std::vector<InputPortBase*>& GetInputs() const { return _inputs; }
 
         /// <summary> Convenience function to get the output value from a port </summary>
         ///
@@ -68,11 +68,11 @@ namespace model
     protected:
         // The constructor for Node is kind of gross. The arguments (and the _inputs and _outputs members)
         // should perhaps be vectors of references instead of pointers.
-        Node(const std::vector<InputPort*>& inputs, const std::vector<OutputPortBase*>& outputs);
+        Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
         
         /// <summary> Computes the output of this node and stores it in the output ports </summary>
         virtual void Compute() const = 0;
-        void AddInputPort(InputPort* input);
+        void AddInputPort(InputPortBase* input);
         void RegisterOutputs() const; // TODO
 
     private:
@@ -82,7 +82,7 @@ namespace model
 
         NodeId _id;
         // TODO: these should probably be references, not pointers
-        std::vector<InputPort*> _inputs;
+        std::vector<InputPortBase*> _inputs;
         std::vector<OutputPortBase*> _outputs;
 
         mutable std::vector<const Node*> _dependentNodes;

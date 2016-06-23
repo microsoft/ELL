@@ -10,7 +10,6 @@
 
 #include "Node.h"
 #include "OutputPort.h"
-#include "InputPort.h"
 
 #include <vector>
 #include <memory>
