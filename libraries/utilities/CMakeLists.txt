@@ -25,6 +25,7 @@ set (SRC src/CompressedIntegerList.cpp
 
 set (INCLUDE include/CompressedIntegerList.h
              include/CommandLineParser.h
+             include/Exception.h
              include/Files.h
              include/Format.h
              include/IIterator.h
@@ -42,6 +43,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/XMLSerialization.h)
 
 set (TCC tcc/CommandLineParser.tcc
+         tcc/Exception.tcc
          tcc/Format.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc

@@ -19,6 +19,9 @@
 #include "Sum.h"
 #include "CoordinateListTools.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <cassert>
 #include <cmath>
@@ -44,9 +47,9 @@ namespace features
         assert(_inputFeatures.size() == 1);
         const auto& inputData = _inputFeatures[0]->GetOutput();
         auto inputDimension = inputData.size();    
-        if(inputDimension == 0) // error, should we throw?
+        if(inputDimension == 0) 
         {
-            throw std::runtime_error("Invalid input of size zero");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "Invalid input of size zero");
             return inputData;
         }
         _outputDimension = inputDimension;
@@ -80,7 +83,7 @@ namespace features
         auto inputIterator = featureOutputs.find(_inputFeatures[0]);
         if (inputIterator == featureOutputs.end())
         {
-            throw std::runtime_error("Couldn't find input feature");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "Couldn't find input feature");
         }
        
         auto inputCoordinates = inputIterator->second;
@@ -125,8 +128,7 @@ namespace features
 
         if (inputFeature == nullptr)
         {
-            std::string error_msg = std::string("Error deserializing feature description: unknown input feature ") + params[2];
-            throw std::runtime_error(error_msg);
+            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "Error deserializing feature description: unknown input feature " + params[2]);
         }
         return std::make_unique<IncrementalVarianceFeature>(featureId, inputFeature, windowSize);
     }

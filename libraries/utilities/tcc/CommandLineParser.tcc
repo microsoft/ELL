@@ -6,6 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <sstream>
 
@@ -58,8 +61,7 @@ namespace utilities
 			}
 			else
 			{
-				std::string errorMessage = "Could not parse value for option " + name;
-				throw std::runtime_error(errorMessage);
+				throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "Could not parse value for option " + name);
 				return false;
 			}
 		};

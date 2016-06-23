@@ -8,6 +8,9 @@
 
 #include "UnaryOperationLayer.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <stdexcept>
 #include <string>
@@ -56,7 +59,7 @@ namespace layers
             return sqrtOperationName;
         }
 
-        throw std::runtime_error("unrecognized operation type");
+        throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
     }
 
     UnaryOperationLayer::OperationType UnaryOperationLayer::GetOperationType(const std::string& name)
@@ -67,7 +70,7 @@ namespace layers
         }
         else
         {
-            throw std::runtime_error("unrecognized operation type");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
         }
     }
 
@@ -79,7 +82,7 @@ namespace layers
             return sqrtOperator<double>();
         }
 
-        throw std::runtime_error("unrecognized operation type");
+        throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
     }
 
 

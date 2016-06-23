@@ -8,6 +8,9 @@
 
 #include "CompressedIntegerList.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <cassert>
 #include <stdexcept>
@@ -65,7 +68,7 @@ namespace utilities
     {
         if(_size == 0)
         {
-            throw std::runtime_error("Can't get max of empty list");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "Can't get max of empty list");
         }
 
         return _last;

@@ -8,6 +8,9 @@
 
 #include "BinaryOperationLayer.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <stdexcept>
 #include <string>
@@ -62,7 +65,7 @@ namespace layers
             return divideOperationName;
         }
 
-        throw std::runtime_error("unrecognized operation type");
+        throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
     }
 
     BinaryOperationLayer::OperationType BinaryOperationLayer::GetOperationType(const std::string& name)
@@ -85,7 +88,7 @@ namespace layers
         }
         else
         {
-            throw std::runtime_error("unrecognized operation type");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
         }
     }
 
@@ -103,7 +106,7 @@ namespace layers
             return std::divides<double>();
         }
 
-        throw std::runtime_error("unrecognized operation type");
+        throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
     }
 
     BinaryOperationLayer::OperationType BinaryOperationLayer::GetOperationType() const
@@ -154,7 +157,7 @@ namespace layers
         }
         else
         {
-            throw std::runtime_error("unsupported version: " + std::to_string(version));
+            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "unsupported version: " + std::to_string(version));
         }
     }
 

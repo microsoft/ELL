@@ -12,6 +12,9 @@
 #include <stdexcept>
 #include <cmath>
 
+// utilities
+#include "Exception.h"
+
 namespace dataset
 {
     OnesDataVector::Iterator::Iterator(uint64_t size) : _size(size)
@@ -24,7 +27,7 @@ namespace dataset
     {
         if(value != 1 || index != _size)
         {
-            throw std::runtime_error("Cannot set elements of a ones vector to non-one values");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "Cannot set elements of a ones vector to non-one values");
         }
         ++_size;
     }

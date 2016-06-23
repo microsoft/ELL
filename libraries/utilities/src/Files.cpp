@@ -8,6 +8,9 @@
 
 #include "Files.h"
 
+// utiliites
+#include "Exception.h"
+
 // stl
 #include <stdexcept>
 #include <memory>
@@ -22,7 +25,7 @@ namespace utilities
         // check that it opened
         if(!fs.is_open())
         {
-            throw std::runtime_error("error openning file " + filepath);
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "error openning file " + filepath);
         }
 
         return fs;
@@ -36,7 +39,7 @@ namespace utilities
         // check that it opened
         if (!fs.is_open())
         {
-            throw std::runtime_error("error openning file " + filepath);
+            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "error openning file " + filepath);
         }
 
         return fs;

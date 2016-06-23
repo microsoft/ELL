@@ -10,6 +10,9 @@
 #include "Model.h"
 
 // utilities
+#include "Exception.h"
+
+// utilities
 #include "Parser.h"
 
 namespace
@@ -18,11 +21,11 @@ namespace
     {
         if (result == utilities::ParseResult::badFormat)
         {
-            throw std::runtime_error("bad format in coordinate list definition string");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "bad format in coordinate list definition string");
         }
         else if (result == utilities::ParseResult::endOfString || result == utilities::ParseResult::beginComment)
         {
-            throw std::runtime_error("premature end of coordinate list definition string");
+            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "premature end of coordinate list definition string");
         }
     }
 
@@ -34,7 +37,7 @@ namespace
         {
             if (size == 0)
             {
-                throw std::runtime_error("automatic index 'e' used, but layer size cannot be inferred (for input layer, use -dd <dimension> or -dd auto)");
+                throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "automatic index 'e' used, but layer size cannot be inferred (for input layer, use -dd <dimension> or -dd auto)");
             }
             index = size-1;
             ++pStr;
@@ -113,7 +116,7 @@ namespace layers
 
                     if (endElementIndex <= fromElementIndex)
                     {
-                        throw std::runtime_error("bad format in coordinate list definition string");
+                        throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "bad format in coordinate list definition string");
                     }
                 }
             }
@@ -123,14 +126,14 @@ namespace layers
             {
                 if (endElementIndex == 0)
                 {
-                    throw std::runtime_error("input layer size cannot be inferred (use - dd <dimension> or -dd auto)");
+                    throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "input layer size cannot be inferred (use - dd <dimension> or -dd auto)");
                 }
             }
             else
             {
                 if (endElementIndex > layerSize)
                 {
-                    throw std::runtime_error("coordinate list index exceeds layer size");
+                    throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "coordinate list index exceeds layer size");
                 }
             }
 
