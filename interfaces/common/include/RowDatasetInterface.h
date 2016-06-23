@@ -7,7 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+// dataset
 #include "RowDataset.h"
+#include "DenseDataVector.h"
 #include "SupervisedExample.h"
 
 // utilities
@@ -23,10 +25,8 @@ namespace dataset
     typedef GenericRowDataset::Iterator GenericRowIterator;
 }
 
-
 namespace interfaces
 {
-
     class GenericRowDataset
     {
     public:
@@ -54,13 +54,20 @@ namespace interfaces
         /// <returns> The maximal size of any example. </returns>
         uint64_t GetMaxDataVectorSize() const;
 
-        /// <summary> Returns a reference to an example. </summary>
+        /// <summary> Returns an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
         dataset::GenericSupervisedExample GetExample(uint64_t index) const;
-
+                
+        /// <summary> Returns an example as a `DoubleDataVector`. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the row. </param>
+        ///
+        /// <returns> Reference to the specified example. </returns>
+        dataset::SupervisedExample<dataset::DoubleDataVector> GetDenseSupervisedExample(uint64_t index) const;
+                
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///
         /// <param name="firstExample"> Zero-based index of the first example to iterate over. </param>

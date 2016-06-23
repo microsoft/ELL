@@ -24,7 +24,7 @@
 //%import "Model.h"
 //%import "ModelInterface.h"
 
-#ifndef SWIGXML
+#if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
 %shared_ptr(predictors::LinearPredictor) 
 #endif
 

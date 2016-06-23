@@ -12,7 +12,6 @@
 #include "OutputStreamImpostor.h"
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
-#include "BinaryClassificationEvaluator.h"
 
 // layers
 #include "Map.h"
@@ -29,6 +28,7 @@
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 
+#include "EvaluatorArguments.h"
 #include "DataLoaders.h"
 #include "LoadModel.h"
 #include "MakeTrainer.h"
@@ -36,6 +36,9 @@
 
 // trainers
 #include "SortingTreeTrainer.h"
+
+// evaluators
+#include "IncrementalEvaluator.h"
 
 // lossFunctions
 #include "SquaredLoss.h"
@@ -59,6 +62,7 @@ int main(int argc, char* argv[])
         common::ParsedMapSaveArguments mapSaveArguments;
         common::ParsedSortingTreeTrainerArguments sortingTreeTrainerArguments;
         common::ParsedBaggingIncrementalTrainerArguments baggingIncrementalTrainerArguments;
+        common::ParsedEvaluatorArguments evaluatorArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
@@ -66,13 +70,14 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(sortingTreeTrainerArguments);
         commandLineParser.AddOptionSet(baggingIncrementalTrainerArguments);
-        
+        commandLineParser.AddOptionSet(evaluatorArguments);
+
         // parse command line
         commandLineParser.Parse();
 
         if(trainerArguments.verbose)
         {
-            std::cout << "Bagging Tree Trainer" << std::endl;
+            std::cout << "Bagged Tree Trainer" << std::endl;
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
@@ -90,32 +95,39 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
+        // predictor type
+        using PredictorType = predictors::DecisionTreePredictor;
+
+        // create evaluator
+        std::shared_ptr<evaluators::IIncrementalEvaluator<PredictorType>> evaluator = nullptr;
+        if(trainerArguments.verbose)
+        {
+            evaluator = common::MakeIncrementalEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
+        }
+
         // create trainer
         auto baseTrainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
-        auto trainer = trainers::MakeBaggingIncrementalTrainer(std::move(baseTrainer), baggingIncrementalTrainerArguments);
+        auto trainer = trainers::MakeBaggingIncrementalTrainer(std::move(baseTrainer), baggingIncrementalTrainerArguments, evaluator);
         
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto trainSetIterator = rowDataset.GetIterator();
         trainer->Update(trainSetIterator);
-        auto predictor = trainer->GetPredictor();
+        auto ensemble = trainer->GetPredictor();
 
         // print loss and errors
         if(trainerArguments.verbose)
         {
             std::cout << "Finished training.\n";
 
-            auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::EnsemblePredictor<predictors::DecisionTreePredictor>>(trainerArguments.lossArguments);
-            auto evaluationIterator = rowDataset.GetIterator();
-            evaluator->Evaluate(evaluationIterator, *predictor);
-
+            // print evaluation
             std::cout << "Training error\n";
             evaluator->Print(std::cout);
             std::cout << std::endl;
         }
 
         // add predictor to the model
-        predictor->AddToModel(model, outputCoordinateList);
+        ensemble->AddToModel(model, outputCoordinateList);
 
         // save the model
         model.Save(outStream);

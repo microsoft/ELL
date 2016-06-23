@@ -32,11 +32,15 @@
 %include typemaps.i
 %include "std_string.i"
 %include "std_vector.i"
+#endif
+
+#if !defined(SWIGJAVASCRIPT) && !defined(SWIGXML)
 %include "std_shared_ptr.i"
 #endif
 
 %include "exception.i" 
 %include "unique_ptr.i"
+
 #ifdef SWIGPYTHON
 %include "std_iostream.i"  // Sadly, there is no std_iostream.i for C#
 #endif
@@ -57,6 +61,7 @@ namespace std
 #ifndef SWIGXML
 %template () std::vector<double>;
 %template () std::vector<float>;
+%template (StringVector) std::vector<std::string>;
 #endif
 
 // Add some primitive exception handling
@@ -72,7 +77,8 @@ namespace std
     }
 }
 
-// Macro for exposing operator[] to python
+// Macros for exposing operator[] to python / javascript
+#if defined(SWIGPYTHON)
 %define WRAP_OP_AT(Class, ValueType)
   %extend Class 
   {
@@ -83,7 +89,27 @@ namespace std
   };
 %enddef
 
-// Macro for turning Print(ostream) into __str__ 
+#elif defined(SWIGJAVASCRIPT)
+
+%define WRAP_OP_AT(Class, ValueType)
+  %extend Class 
+  {
+    ValueType get(size_t index)
+    {
+      return (*$self)[index];
+    }
+  };
+%enddef
+
+#else
+
+%define WRAP_OP_AT(Class, ValueType)
+%enddef
+
+#endif
+
+// Macro for exposing Print(ostream) into __str__ / toString in python / javascript
+#if defined(SWIGPYTHON      )
 %define WRAP_PRINT_TO_STR(Class)
     %extend Class
     {
@@ -95,6 +121,27 @@ namespace std
         }
     };
 %enddef
+
+#elif defined(SWIGJAVASCRIPT)
+
+%define WRAP_PRINT_TO_STR(Class)
+    %extend Class
+    {
+        std::string toString() 
+        {        
+            std::ostringstream oss(std::ostringstream::out);
+            ($self)->Print(oss);
+            return oss.str();
+        }
+    };
+%enddef
+
+#else
+
+%define WRAP_PRINT_TO_STR(Class)
+%enddef
+
+#endif
 
 // Define some namespaces so we can refer to them later
 namespace lossFunctions {};
@@ -131,8 +178,6 @@ namespace utilities
 
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>,std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> dataset::GenericRowIterator;
-
-//%import predictors.i
 
 // Interface includes for lossFunctions library
 %include lossFunctions.i
@@ -177,10 +222,9 @@ class trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType
 // Interface for features library
 %include features.i
 
-#ifndef SWIGXML
+#if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
+// TODO: Review rules on when to apply the %shared_ptr() directive and get rid of these altogether if they're not in the right place 
 %shared_ptr(layers::Map)
 %shared_ptr(layers::Model)
-//%template (GenericRowDataset) dataset::RowDataset<dataset::IDataVector>
-//%shared_ptr(GenericRowDataset)
 %shared_ptr(RowDataset)
 #endif

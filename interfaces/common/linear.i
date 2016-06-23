@@ -38,6 +38,7 @@
 WRAP_OP_AT(linear::DoubleVector, double)
 // WRAP_OP_AT(linear::DoubleSubvector, double)
 
+#ifdef SWIGPYTHON
 %extend linear::DoubleMatrix
 {
     const double& __getitem__(size_t i, size_t j)
@@ -45,6 +46,8 @@ WRAP_OP_AT(linear::DoubleVector, double)
         return (*$self)(i,j);
     }
 };
+
+#endif
 
 WRAP_PRINT_TO_STR(linear::DoubleVector)
 WRAP_PRINT_TO_STR(linear::DoubleSubvector)

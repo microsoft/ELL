@@ -11,7 +11,6 @@
 #include "OutputStreamImpostor.h"
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
-#include "BinaryClassificationEvaluator.h"
 
 // layers
 #include "Map.h"
@@ -26,7 +25,7 @@
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
-#include "DataLoadArguments.h" 
+#include "DataLoadArguments.h"
 #include "DataLoaders.h"
 #include "LoadModel.h"
 #include "MakeTrainer.h"
@@ -86,7 +85,7 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
-        // create sgd trainer
+        // create trainer
         auto trainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
 
         // create random number generator
@@ -105,10 +104,9 @@ int main(int argc, char* argv[])
         {
             std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
 
-            auto evaluator = common::MakeBinaryClassificationEvaluator<predictors::DecisionTreePredictor>(trainerArguments.lossArguments);
-            auto evaluationIterator = rowDataset.GetIterator(0, 1000);
-            evaluator->Evaluate(evaluationIterator, tree);
-
+            // evaluate
+            auto evaluator = common::MakeEvaluator<predictors::DecisionTreePredictor>(rowDataset.GetIterator(), evaluators::EvaluatorParameters{1, false}, trainerArguments.lossArguments);
+            evaluator->Evaluate(tree);
             std::cout << "Training error\n";
             evaluator->Print(std::cout);
             std::cout << std::endl;

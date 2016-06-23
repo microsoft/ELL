@@ -101,6 +101,7 @@ namespace features
     std::unique_ptr<Feature> MeanFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
         assert(params.size() == 4);
+        auto featureId = params[0];
         Feature* inputFeature = previousFeatures[params[2]];
         uint64_t windowSize = ParseInt(params[3]);
 
@@ -109,6 +110,6 @@ namespace features
             std::string error_msg = std::string("Error deserializing feature description: unknown input feature ") + params[2];
             throw std::runtime_error(error_msg);
         }
-        return std::make_unique<MeanFeature>(inputFeature, windowSize);
+        return std::make_unique<MeanFeature>(featureId, inputFeature, windowSize);
     }
 }

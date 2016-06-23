@@ -28,6 +28,12 @@ namespace features
         /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
         MeanFeature(Feature* inputFeature, size_t windowSize) : BufferedFeature({inputFeature}, windowSize) {}
 
+        /// <summary> Constructor </summary>
+        /// <param name="id"> The id to use for this feature </param>
+        /// <param name="inputFeature"> The feature to take the mean of </param>
+        /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
+        MeanFeature(const std::string& id, Feature* inputFeature, size_t windowSize) : BufferedFeature(id, {inputFeature}, windowSize) {}
+
         /// <summary> Creates a `MeanFeature` from a vector of strings </summary>
         ///
         /// <param name="params"> The strings describing the parameters </params> 

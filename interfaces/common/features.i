@@ -12,16 +12,21 @@
 %{
 #define SWIG_FILE_WITH_INIT
 #define SWIG_PYTHON_EXTRA_NATIVE_CONTAINERS 
+#include "FeatureSet.h"
 #include "Feature.h"
 #include "InputFeature.h"
 #include "MagnitudeFeature.h"
-#include "FeatureSet.h"
+#include "MeanFeature.h"
+#include "VarianceFeature.h"
+#include "IncrementalMeanFeature.h"
+#include "IncrementalVarianceFeature.h"
 #include <sstream>
 %}
 
 %ignore Create;
 %ignore Deserialize;
 %ignore features::Feature::CreateFunction;
+%ignore features::FeatureSet::AddToModel(layers::Model&, const layers::CoordinateList&) const;
 %ignore std::function<std::unique_ptr<features::Feature>>;
 
 %include "Feature.h"
@@ -63,15 +68,27 @@
     {
         features::Feature::RegisterFeatureType<features::InputFeature>();
         features::Feature::RegisterFeatureType<features::MagnitudeFeature>();
+        features::Feature::RegisterFeatureType<features::MeanFeature>();
+        features::Feature::RegisterFeatureType<features::VarianceFeature>();
+        features::Feature::RegisterFeatureType<features::IncrementalMeanFeature>();
+        features::Feature::RegisterFeatureType<features::IncrementalVarianceFeature>();
     }
 %}
 
-#ifdef SWIGPYTHON
+#if defined(SWIGPYTHON)
 %init
 %{
     InitializeFeatures();
 %}
 #endif
+
+%extend features::FeatureSet
+{
+    layers::CoordinateList AddToModel(interfaces::Model& model, const layers::CoordinateList& inputCoordinates) const
+    {
+        return ($self)->AddToModel(model.GetModel(), inputCoordinates);
+    }    
+}
 
 %include "unique_ptr.i"
 wrap_unique_ptr(FeaturePtr, features::Feature)

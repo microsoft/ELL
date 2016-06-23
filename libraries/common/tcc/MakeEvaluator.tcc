@@ -12,23 +12,49 @@
 #include "LogLoss.h"
 #include "HingeLoss.h"
 
+// evaluators
+#include "BinaryErrorAggregator.h"
+#include "LossAggregator.h"
+#include "AUCAggregator.h"
+
 namespace common
 {
     template<typename PredictorType>
-    std::unique_ptr<utilities::IBinaryClassificationEvaluator<PredictorType>> MakeBinaryClassificationEvaluator(const LossArguments& lossArguments)
+    std::shared_ptr<evaluators::IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const evaluators::EvaluatorParameters& evaluatorParameters, const LossArguments& lossArguments)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
-        switch(lossArguments.lossFunction)
+        switch (lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return std::make_unique<utilities::BinaryClassificationEvaluator<PredictorType, lossFunctions::SquaredLoss>>(lossFunctions::SquaredLoss());
+            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(lossFunctions::SquaredLoss()));
 
         case LossFunctionEnum::log:
-            return std::make_unique<utilities::BinaryClassificationEvaluator<PredictorType, lossFunctions::LogLoss>>(lossFunctions::LogLoss(lossArguments.lossFunctionParameter));
+            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(lossFunctions::LogLoss(lossArguments.lossFunctionParameter)));
 
         case LossFunctionEnum::hinge:
-            return std::make_unique<utilities::BinaryClassificationEvaluator<PredictorType, lossFunctions::HingeLoss>>(lossFunctions::HingeLoss());
+            return evaluators::MakeEvaluator<PredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(lossFunctions::HingeLoss()));
+
+        default:
+            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this evaluator");
+        }
+    }
+
+    template<typename BasePredictorType>
+    std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const evaluators::EvaluatorParameters& evaluatorParameters, const LossArguments& lossArguments)
+    {
+        using LossFunctionEnum = common::LossArguments::LossFunction;
+
+        switch (lossArguments.lossFunction)
+        {
+        case LossFunctionEnum::squared:
+            return evaluators::MakeIncrementalEvaluator<BasePredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(lossFunctions::SquaredLoss()));
+
+        case LossFunctionEnum::log:
+            return evaluators::MakeIncrementalEvaluator<BasePredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(lossFunctions::LogLoss(lossArguments.lossFunctionParameter)));
+
+        case LossFunctionEnum::hinge:
+            return evaluators::MakeIncrementalEvaluator<BasePredictorType>(exampleIterator, evaluatorParameters, evaluators::BinaryErrorAggregator(), evaluators::AUCAggregator(), evaluators::MakeLossAggregator(lossFunctions::HingeLoss()));
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this evaluator");

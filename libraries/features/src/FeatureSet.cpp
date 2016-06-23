@@ -66,16 +66,34 @@ namespace features
     Feature* FeatureSet::CreateFeatureFromDescription(const std::vector<std::string>& description)
     {
         _features.emplace_back(Feature::FromDescription(description, _featureMap));
-        auto ptr = _features.back().get();
-        _featureMap[ptr->Id()] = ptr;
-        return ptr;
+        auto feature = _features.back().get();
+        if(_featureMap.size() == 0)
+        {
+            if(dynamic_cast<InputFeature*>(feature) != nullptr)
+            {
+                _inputFeature = dynamic_cast<InputFeature*>(feature);
+            }
+            else
+            {
+                throw std::runtime_error("First feature must be input feature");
+            }
+        }
+
+        // add to map
+        _featureMap[feature->Id()] = feature;
+        return feature;
     }
 
     layers::CoordinateList FeatureSet::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
     {
-        // TODO: document in Visit that we visit nodes in order --- a node is visited only after its inputs are
-        assert(_inputFeature != nullptr);
-        assert(_outputFeature != nullptr);
+        if(_inputFeature == nullptr) 
+        {
+            throw std::runtime_error("Input feature not assigned");
+        }
+        if(_outputFeature == nullptr)
+        {
+            throw std::runtime_error("Output feature not assigned");
+        }
         
         // need to keep a map of output coordinate lists for the various features
         std::unordered_map<const Feature*, layers::CoordinateList> featureOutputs;

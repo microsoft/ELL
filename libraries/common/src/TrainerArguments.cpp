@@ -39,6 +39,6 @@ namespace common
             "lossFunctionParameter",
             "lfp",
             "Parameter of the loss function",
-            0.0);
+            1.0);
     }
 }

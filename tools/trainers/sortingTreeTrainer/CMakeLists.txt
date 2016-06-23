@@ -25,6 +25,7 @@ include_directories(../../../libraries/layers/include)
 include_directories(../../../libraries/linear/include)
 include_directories(../../../libraries/lossFunctions/include)
 include_directories(../../../libraries/predictors/include)
+include_directories(../../../libraries/evaluators/include)
 include_directories(../../../libraries/trainers/include)
 include_directories(../../../libraries/utilities/include)
 
