@@ -152,9 +152,8 @@ namespace model
             bool canVisit = true;
             for (auto input : node->_inputs)
             {
-                for (const auto& inputRange : input->GetInputRanges())
+                for (const auto& inputNode : input->GetInputNodes())
                 {
-                    auto inputNode = inputRange.ReferencedPort()->GetNode();
                     canVisit = canVisit && visitedNodes.find(inputNode) != visitedNodes.end();
                 }
             }
@@ -186,9 +185,9 @@ namespace model
             {
                 for (auto input : ModelImpl::Reverse(node->_inputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
                 {
-                    for (const auto& inputRange : input->GetInputRanges())
+                    for (const auto& inputNode : input->GetInputNodes())
                     {
-                        stack.push_back(inputRange.ReferencedPort()->GetNode());
+                        stack.push_back(inputNode);
                     }
                 }
             }

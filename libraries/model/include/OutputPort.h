@@ -36,7 +36,13 @@ namespace model
         /// <summary> Returns the cached output from this port </summary>
         ///
         /// <returns> The cached output from this port </returns>
-        std::vector<ValueType> GetOutput() const { return _cachedOutput; }
+        const std::vector<ValueType>& GetOutput() const { return _cachedOutput; }
+
+        /// <summary> Returns one element of the cached output from this port </summary>
+        ///
+        /// <param name="index"> The index of the element to return </param>
+        /// <returns> The cached output for the element </returns>
+        ValueType GetOutput(size_t index) const { return _cachedOutput[index]; }
 
         /// <summary> Sets the cached output from this port </summary>
         ///

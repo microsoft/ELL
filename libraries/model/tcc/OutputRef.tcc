@@ -33,9 +33,9 @@ namespace model
     {
         for (const auto& group : groups)
         {
-            for (const auto& range : group._ranges)
+            for (const auto& range : group)
             {
-                _ranges.push_back(range);
+                AddRange(range);
             }
         }
         ComputeSize();
@@ -46,9 +46,9 @@ namespace model
     {
         for (const auto& group : groups)
         {
-            for (const auto& range : group._ranges)
+            for (const auto& range : group)
             {
-                _ranges.push_back(range);
+                AddRange(range);
             }
         }
         ComputeSize();
@@ -57,7 +57,8 @@ namespace model
     //
     // Convenience functions
     //
-        // MakeRef
+
+    // MakeRef
     template <typename ValueType>
     OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port)
     {

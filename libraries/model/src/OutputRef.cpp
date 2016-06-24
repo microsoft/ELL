@@ -11,6 +11,12 @@
 namespace model
 {
     //
+    // ElementRef
+    //
+
+    ElementRef::ElementRef(const Port* port, size_t index) : _referencedPort(port), _index(index) {}
+
+    //
     // OutputRange
     //
     OutputRange::OutputRange(const Port& port) : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}
@@ -64,6 +70,11 @@ namespace model
     {
         _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
         ComputeSize();
+    }
+
+    void UntypedOutputRef::AddRange(const OutputRange& range)
+    {
+        _ranges.push_back(range);
     }
 
     void UntypedOutputRef::ComputeSize()

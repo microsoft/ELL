@@ -18,6 +18,36 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    /// <summary> Represents a reference to a single element in another node's output </summary>
+    class ElementRef
+    {
+    public:
+        /// <summary> Creates an ElementRef representing a single value from a given port </summary>
+        ///
+        /// <param name="port"> The port to take a value from </param>
+        /// <param name="index"> The index of the value </param>
+        ElementRef(const Port* port, size_t index);
+
+        /// <summary> Returns the type of the values referenced </summary>
+        ///
+        /// <returns> The type of the values referenced </returns>
+        Port::PortType GetType() const { return _referencedPort->GetType(); }
+
+        /// <summary> The index of the element this range refers to </summary>
+        ///
+        /// <returns> The index of the element this range refers to </returns>
+        size_t GetIndex() const { return _index; }
+
+        /// <summary> The port this range refers to </summary>
+        ///
+        /// <returns> The port this range refers to </returns>
+        const Port* ReferencedPort() const { return _referencedPort; }
+
+    private:
+        const Port* _referencedPort;
+        size_t _index;
+    };
+    
     /// <summary> Represents a contiguous set of values from an output port </summary>
     class OutputRange
     {
@@ -99,6 +129,12 @@ namespace model
         /// <param name="range"> The ranges to get values from </param>
         UntypedOutputRef(const std::vector<OutputRange>& ranges);
 
+        /// <summary> Returns a single-element range for the element at the given index </summary>
+        ///
+        /// <param name="index"> The index of the element </param>
+        /// <returns> A single-element range for the element </returns>
+        OutputRange GetElementRef(size_t index) const;
+
         /// <summary> The dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
@@ -113,7 +149,9 @@ namespace model
     protected:
         UntypedOutputRef(){};
         void ComputeSize();
-
+        void AddRange(const OutputRange& range);
+    
+    private:
         std::vector<OutputRange> _ranges;
         size_t _size = 0;
     };

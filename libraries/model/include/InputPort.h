@@ -31,15 +31,26 @@ namespace model
         template <typename ValueType>
         InputPortBase(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input);
 
-        /// <summary> Returns the UntypedOutputRef containing the ranges of referenced locations to get values from </summary>
+        /// <summary> Returns the ElementRefs containing the referenced locations to get values from </summary>
         ///
-        /// <returns> The OutputRef containing the ranges of referenced locations to get values from </returns>
-        const UntypedOutputRef& GetInputRanges() const { return _inputRanges; }
+        /// <returns> The ElementRefs containing the referenced locations to get values from </returns>
+        const std::vector<ElementRef>& GetElementRefs() const { return _inputElements; }
+
+        /// <summary> Returns an ElementRef containing the referenced location to get the value for a specific input element from </summary>
+        ///
+        /// <param name="index"> The index of the element </param>
+        /// <returns> The ElementRef containing the referenced location to get the value from </returns>
+        const ElementRef& GetElementRef(size_t index) const { return _inputElements[index]; }
+
+        /// <summary> Returns the ElementRefs containing the referenced locations to get values from </summary>
+        ///
+        /// <returns> The ElementRefs containing the referenced locations to get values from </returns>
+        const std::vector<const Node*>& GetInputNodes() const { return _inputNodes; }
 
         /// <summary> The dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
-        size_t Size() const { return _inputRanges.Size(); }
+        size_t Size() const { return _inputElements.size(); }
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         ///
@@ -55,7 +66,8 @@ namespace model
         ValueType GetTypedValue(size_t index) const;
 
     private:
-        UntypedOutputRef _inputRanges;
+        std::vector<ElementRef> _inputElements;
+        std::vector<const Node*> _inputNodes;
     };
 
     template <typename ValueType>

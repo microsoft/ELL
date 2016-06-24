@@ -1,7 +1,6 @@
 Graph library
 =============
 
-
 Node
 ----
 A `Node` represents a unit of computation. You could think of it as a function. It takes some number
@@ -19,9 +18,9 @@ and one for the phase. Similarly, a pairwise addition node might have 2 input po
 reference to the `OutputPort` it gets is output from. An `OutputPort` contains a cached value of the output to be used for computing the
 graph output.
 
-Graph
+Model
 -----
-The basic graph class (here, `Model`) would be the primary API point for interacting with the graph of nodes. The user-facing
+The basic graph class  be the primary API point for interacting with the graph of nodes. The user-facing
 `Compute`-type operations would be done on the graph object. 
 
 Usage

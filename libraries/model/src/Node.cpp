@@ -39,9 +39,9 @@ namespace model
     {
         for (const auto& input : _inputs) 
         {
-            for (const auto& range : input->GetInputRanges())
+            for (const auto& node : input->GetInputNodes())
             {
-                range.ReferencedPort()->GetNode()->AddDependent(this);
+                node->AddDependent(this);
             }
         }
     }
