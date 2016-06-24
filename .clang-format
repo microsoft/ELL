@@ -12,8 +12,12 @@
 Language:        Cpp
 BasedOnStyle:  Mozilla
 
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
 AccessModifierOffset: -4
 IndentWidth: 4
+BinPackArguments: true
+BinPackParameters: true
 ContinuationIndentWidth: 4
 ConstructorInitializerIndentWidth: 4
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
