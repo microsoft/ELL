@@ -80,7 +80,7 @@ void CompilableMap::ToCode(std::ostream& os) const
     // create data flow graph datastructure
     DataFlowGraph graph;
 	//emll::compiler::CEmitter codeGen(graph, os);
-	emll::compiler::IREmitter codeGen(graph, os);
+	emll::compiler::IRCodeEmitter codeGen(graph, os);
 
     // add graph layer for input
     graph.AddLayer(_requiredInputLayerSize);

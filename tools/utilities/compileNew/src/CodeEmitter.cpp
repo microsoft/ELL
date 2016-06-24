@@ -10,18 +10,19 @@
 #include "Format.h"
 #include <assert.h>
 
-namespace emll {
-	namespace compiler {
-
+namespace emll 
+{
+	namespace compiler 
+	{
 		void TestCompiler()
 		{
-			ir::LLVMEmitter llvm;
-			ir::ModuleEmitter module(&llvm, llvm.AddModule("Looper"));
+			IREmitter llvm;
+			IRModuleEmitter module(&llvm, llvm.AddModule("Looper"));
 			module.DeclarePrintf();
 
 			auto fnMain = module.AddMain();
 
-			ir::ForLoopEmitter forLoop = fnMain.ForLoop();
+			IRForLoopEmitter forLoop = fnMain.ForLoop();
 			auto pBodyBlock = forLoop.Begin(15);
 			{
 				auto printBlock = fnMain.BlockAfter(pBodyBlock, "PrintBlock");
@@ -112,12 +113,12 @@ namespace emll {
 		//
 		//-------------------------------------------------------
 
-		CEmitter::CEmitter(DataFlowGraph& graph, std::ostream& os)
+		CCodeEmitter::CCodeEmitter(DataFlowGraph& graph, std::ostream& os)
 			: CodeEmitter(graph), _os(os)
 		{
 		}
 
-		void CEmitter::BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs)
+		void CCodeEmitter::BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs)
 		{
 			auto str = "// New Compiler \n// Input dimension: %\n// Output dimension: %\n// Output coordinates:";
 			utilities::PrintFormat(_os, str, inputCount, outputs.Size());
@@ -132,12 +133,12 @@ namespace emll {
 			utilities::PrintFormat(_os, "void %(const double* %, double* %)\n{\n", functionName, inputVarName, outputVarName);
 		}
 
-		void CEmitter::EndLinear()
+		void CCodeEmitter::EndLinear()
 		{
 			_os << "}\n";
 		}
 
-		void CEmitter::EmitAssign(Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
+		void CCodeEmitter::EmitAssign(Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
 		{
 			EnsureEmittedName(srcVar);
 			EnsureEmittedName(destVar);
@@ -146,7 +147,7 @@ namespace emll {
 			utilities::PrintFormat(_os, format, destVar.EmittedName(), srcVar.EmittedName(), destCoordinate.GetLayerIndex(), destCoordinate.GetElementIndex());
 		}
 
-		void CEmitter::EmitLinearOp(const LinearOperation& op, Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
+		void CCodeEmitter::EmitLinearOp(const LinearOperation& op, Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
 		{
 			EnsureEmittedName(srcVar);
 			EnsureEmittedName(destVar);
@@ -156,7 +157,7 @@ namespace emll {
 			utilities::PrintFormat(_os, format, destVar.EmittedName(), rhs, destCoordinate.GetLayerIndex(), destCoordinate.GetElementIndex());
 		}
 
-		void CEmitter::EnsureEmittedName(ScalarVariable& var)
+		void CCodeEmitter::EnsureEmittedName(ScalarVariable& var)
 		{
 			if (!var.HasEmittedName())
 			{
@@ -171,7 +172,7 @@ namespace emll {
 			}
 		}
 
-		const char* CEmitter::ToString(CodeEmitter::Assignment assignment)
+		const char* CCodeEmitter::ToString(CodeEmitter::Assignment assignment)
 		{
 			const char* format = nullptr;
 			switch (assignment)
@@ -195,7 +196,7 @@ namespace emll {
 			return format;
 		}
 
-		std::string CEmitter::ToString(const LinearOperation& op, const std::string& sourceVar)
+		std::string CCodeEmitter::ToString(const LinearOperation& op, const std::string& sourceVar)
 		{
 			double a = op.MultiplyBy();
 			double b = op.IncrementBy();
@@ -230,31 +231,31 @@ namespace emll {
 
 		//-------------------------------------------------------
 		//
-		// IREmitter
+		// IRCodeEmitter
 		//
 		//-------------------------------------------------------
 
-		IREmitter::IREmitter(DataFlowGraph& graph, std::ostream& os)
+		IRCodeEmitter::IRCodeEmitter(DataFlowGraph& graph, std::ostream& os)
 			: CodeEmitter(graph), _os(os)
 		{
-			_module = std::make_unique<ir::ModuleEmitter>(&_emitter, _emitter.AddModule("EMLL"));
+			_module = std::make_unique<IRModuleEmitter>(&_emitter, _emitter.AddModule("EMLL"));
 		}
 
-		void IREmitter::Begin()
+		void IRCodeEmitter::Begin()
 		{
 			_module->DeclarePrintf();
 		}
 
-		void IREmitter::End()
+		void IRCodeEmitter::End()
 		{
 			_module->WriteAsmToStream(_os);
 		}
 
-		void IREmitter::BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs)
+		void IRCodeEmitter::BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs)
 		{
-			ir::NamedValueTypeList fnArgs;
-			fnArgs.init({ {inputVarName, ir::ValueType::PDouble}, { outputVarName, ir::ValueType::PDouble }});
-			_fn = _module->Function(functionName, ir::ValueType::Void, fnArgs, true);	
+			NamedValueTypeList fnArgs;
+			fnArgs.init({ {inputVarName, ValueType::PDouble}, { outputVarName, ValueType::PDouble }});
+			_fn = _module->Function(functionName, ValueType::Void, fnArgs, true);	
 			//
 			// Register input and out as variables for the function body to use
 			//
@@ -267,22 +268,22 @@ namespace emll {
 			_variables.Set(outputVarName, arg);
 		}
 
-		void IREmitter::EndLinear()
+		void IRCodeEmitter::EndLinear()
 		{
 			_fn.Ret();
 			_fn.Verify();
 		}
 
-		void IREmitter::EmitTest(const std::string& fnName, int featureCount, int outputCount, double startValue)
+		void IRCodeEmitter::EmitTest(const std::string& fnName, int featureCount, int outputCount, double startValue)
 		{
 			auto fn = _module->AddMain();
-			llvm::Value* features = fn.Var(ir::ValueType::Double, featureCount);
+			llvm::Value* features = fn.Var(ValueType::Double, featureCount);
 			for (int i = 0; i < featureCount; ++i)
 			{
 				auto value = startValue * (i + 1);
 				fn.SetValueAtA(features, i, fn.Literal(value));
 			}
-			llvm::Value* output = fn.Var(ir::ValueType::Double, outputCount);
+			llvm::Value* output = fn.Var(ValueType::Double, outputCount);
 			fn.Call(fnName, { features, output });
 
 			for (int i = 0; i < outputCount; ++i)
@@ -295,7 +296,7 @@ namespace emll {
 		}
 
 
-		void IREmitter::EmitAssign(Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
+		void IRCodeEmitter::EmitAssign(Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
 		{
 			llvm::Value* pSrc = LoadVar(srcVar);
 			switch (assignment)
@@ -314,7 +315,7 @@ namespace emll {
 			}
 		}
 
-		void IREmitter::EmitLinearOp(const LinearOperation& op, Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
+		void IRCodeEmitter::EmitLinearOp(const LinearOperation& op, Assignment assignment, ScalarVariable& srcVar, ScalarVariable& destVar, const layers::Coordinate& destCoordinate)
 		{
 			llvm::Value* pResult = Emit(srcVar, op);
 			switch (assignment)
@@ -333,7 +334,7 @@ namespace emll {
 			}
 		}
 
-		llvm::Value* IREmitter::Emit(ScalarVariable& srcVar, const LinearOperation& op)
+		llvm::Value* IRCodeEmitter::Emit(ScalarVariable& srcVar, const LinearOperation& op)
 		{
 			double a = op.MultiplyBy();
 			double b = op.IncrementBy();
@@ -342,7 +343,7 @@ namespace emll {
 			{
 				if (a != 1)
 				{
-					return _fn.Op(ir::OperatorType::MultiplyF, _fn.Literal(a), pSrc);
+					return _fn.Op(OperatorType::MultiplyF, _fn.Literal(a), pSrc);
 				}
 				else
 				{
@@ -357,18 +358,18 @@ namespace emll {
 				}
 				else if (a == 1)
 				{
-					return _fn.Op(ir::OperatorType::AddF, _fn.Literal(b), pSrc);
+					return _fn.Op(OperatorType::AddF, _fn.Literal(b), pSrc);
 				}
 				else
 				{
-					return _fn.Op(ir::OperatorType::AddF,
-								_fn.Op(ir::OperatorType::MultiplyF, _fn.Literal(a), pSrc),
+					return _fn.Op(OperatorType::AddF,
+								_fn.Op(OperatorType::MultiplyF, _fn.Literal(a), pSrc),
 								_fn.Literal(b));
 				}
 			}
 		}
 
-		void IREmitter::Store(ScalarVariable& destVar, llvm::Value* pValue)
+		void IRCodeEmitter::Store(ScalarVariable& destVar, llvm::Value* pValue)
 		{
 			llvm::Value *pDest = EnsureVar(destVar);
 			if (destVar.IsArrayElement())
@@ -381,18 +382,18 @@ namespace emll {
 			}
 		}
 
-		void IREmitter::Increment(ScalarVariable& destVar, llvm::Value* pValue)
+		void IRCodeEmitter::Increment(ScalarVariable& destVar, llvm::Value* pValue)
 		{
 			// Load variables into registers
 			llvm::Value *pDest = LoadVar(destVar);
 
 			// pSum is in a register...
-			llvm::Value* pSum = _fn.Op(ir::OperatorType::AddF, pValue, pDest);
+			llvm::Value* pSum = _fn.Op(OperatorType::AddF, pValue, pDest);
 
 			Store(destVar, pSum);
 		}
 
-		llvm::Value* IREmitter::EnsureVar(ScalarVariable& var)
+		llvm::Value* IRCodeEmitter::EnsureVar(ScalarVariable& var)
 		{
 			auto name = var.Name();
 			llvm::Value* pValue = _variables.Get(name);			
@@ -403,13 +404,13 @@ namespace emll {
 					throw new CodeEmitterException(CodeEmitterError::ArrayMustBeAllocated);
 				}
 				// We currently assume that all variables are doubles
-				pValue = _fn.Var(ir::ValueType::Double, name);
+				pValue = _fn.Var(ValueType::Double, name);
 				_variables.Set(name, pValue);
 			}
 			return pValue;
 		}
 
-		llvm::Value* IREmitter::LoadVar(ScalarVariable& var)
+		llvm::Value* IRCodeEmitter::LoadVar(ScalarVariable& var)
 		{
 			llvm::Value *pValue = EnsureVar(var);
 			if (var.IsArrayElement())

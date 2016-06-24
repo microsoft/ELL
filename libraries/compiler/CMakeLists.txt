@@ -15,26 +15,30 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/LLVMEmitter.cpp
-         src/ModuleEmitter.cpp
-         src/LoopEmitter.cpp
-         src/FunctionEmitter.cpp
+set (SRC src/IREmitter.cpp
+         src/IRModuleEmitter.cpp
+         src/IRLoopEmitter.cpp
+         src/IRFunctionEmitter.cpp
 )
 
-set (INCLUDE include/llvmIRInclude.h
-		include/LLVMCompiler.h
+set (INCLUDE include/LLVMInclude.h
 		include/EmitterException.h
-		include/Error.h
-		include/ValueType.h
-		include/LLVMEmitter.h
-		include/LoopEmitter.h
-		include/FunctionEmitter.h
-		include/ModuleEmitter.h
+		include/CompilerException.h
+		include/Types.h
+		include/SymbolTable.h
+		include/IREmitter.h
+		include/IRLoopEmitter.h
+		include/IRFunctionEmitter.h
+		include/IRModuleEmitter.h
+		include/IRCompiler.h
+)
+
+set (TCC tcc/SymbolTable.tcc
 )
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
-# source_group("tcc" FILES ${TCC})
+source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(../utilities/include)

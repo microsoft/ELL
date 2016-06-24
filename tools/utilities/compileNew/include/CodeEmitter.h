@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     CodeGenerator.h (compile)
+//  File:     CodeEmitter.h
 //  Authors:  Umesh Madan
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,14 +11,15 @@
 #include "IntegerStack.h"
 #include "DataFlowGraph.h"
 #include "DataFlowNode.h"
-#include "LLVMCompiler.h"
+#include "IRCompiler.h"
 
 #include <string>
 #include <ostream>
 
-namespace emll {
-	namespace compiler {
-
+namespace emll 
+{
+	namespace compiler 
+	{
 		void TestCompiler();
 
 		enum class CodeEmitterError
@@ -79,10 +80,10 @@ namespace emll {
 			DataFlowGraph& _graph;
 		};
 
-		class CEmitter : public CodeEmitter
+		class CCodeEmitter : public CodeEmitter
 		{
 		public:
-			CEmitter(DataFlowGraph& graph, std::ostream& os);
+			CCodeEmitter(DataFlowGraph& graph, std::ostream& os);
 
 			void BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs) override;
 			void EndLinear() override;
@@ -102,10 +103,10 @@ namespace emll {
 			std::ostream& _os;
 		};
 
-		class IREmitter : public CodeEmitter
+		class IRCodeEmitter : public CodeEmitter
 		{
 		public:
-			IREmitter(DataFlowGraph& graph, std::ostream& os);
+			IRCodeEmitter(DataFlowGraph& graph, std::ostream& os);
 
 			void Begin() override;
 			void End() override;
@@ -129,10 +130,10 @@ namespace emll {
 
 		private:
 			std::ostream& _os;
-			ir::LLVMEmitter _emitter;
-			ir::FunctionEmitter _fn;
-			std::unique_ptr<ir::ModuleEmitter> _module;
-			ir::VariableTable _variables;
+			IREmitter _emitter;
+			IRFunctionEmitter _fn;
+			std::unique_ptr<IRModuleEmitter> _module;
+			IRVariableTable _variables;
 		};
 	}
 }

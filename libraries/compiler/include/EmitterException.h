@@ -1,42 +1,30 @@
 #pragma once
-#include "Error.h"
+#include "CompilerException.h"
 
 namespace emll
 {
 	namespace compiler
 	{
-		namespace ir
+		enum class EmitterError
 		{
-			enum class EmitterError
-			{
-				Unexpected = 0,
-				NotSupported,
-				InvalidValueType,
-				InvalidOperatorType,
-				InvalidComparisonType,
-				InvalidFunction,
-				FunctionNotFound,
-				WriteModuleFailed,
-			};
+			Unexpected = 0,
+			NotSupported,
+			InvalidValueType,
+			InvalidOperatorType,
+			InvalidComparisonType,
+			InvalidFunction,
+			FunctionNotFound,
+			WriteStreamFailed,
+		};
 
-			class EmitterException : CompilerException<EmitterError>
+		class EmitterException : CompilerException<EmitterError>
+		{
+		public:
+			EmitterException(EmitterError error)
+				: CompilerException(error)
 			{
-			public:
-				EmitterException(EmitterError error)
-					: CompilerException(error)
-				{
-				}
-			};
-
-			class LLVMException : CompilerException<std::error_code>
-			{
-			public:
-				LLVMException(std::error_code error)
-					: CompilerException(error)
-				{
-				}
-			};
-		}
+			}
+		};
 	}
 }
 
