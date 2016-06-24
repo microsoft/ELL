@@ -43,7 +43,7 @@ namespace model
         /// <summary> Returns the type of the values referenced </summary>
         ///
         /// <returns> The type of the values referenced </returns>
-        Port::PortType Type() const { return _referencedPort->Type(); }
+        Port::PortType GetType() const { return _referencedPort->GetType(); }
 
         /// <summary> The dimensionality of the output </summary>
         ///
@@ -53,7 +53,7 @@ namespace model
         /// <summary> The index of the first element this range refers to </summary>
         ///
         /// <returns> The index of the first element this range refers to </returns>
-        size_t StartIndex() const;
+        size_t GetStartIndex() const;
 
         /// <summary> The port this range refers to </summary>
         ///
@@ -72,6 +72,8 @@ namespace model
     {
     public:
         /// <summary> Creates an UntypedOutputRef representing all the values from a given port </summary>
+        ///
+        /// <param name="port"> The port to take values from </param>
         UntypedOutputRef(const Port& port);
 
         /// <summary> Creates an UntypedOutputRef representing a single value from a given port </summary>
@@ -122,6 +124,8 @@ namespace model
     {
     public:
         /// <summary> Creates a OutputRef representing all the values from a given port </summary>
+        ///
+        /// <param name="port"> The port to take values from </param>
         OutputRef(const OutputPort<ValueType>& port);
 
         /// <summary> Creates a OutputRef representing a single value from a given port </summary>
@@ -152,31 +156,36 @@ namespace model
     // Helper functions
     //
 
-    // MakeRef
+    /// <summary> Creates a OutputRef representing all the values from a given port </summary>
+    ///
+    /// <param name="port"> The port to take values from </param>
+    /// <returns> The composite OutputRef </returns>
     template <typename ValueType>
-    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port)
-    {
-        return OutputRef<ValueType>(port);
-    }
+    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port);
 
+    /// <summary> Creates a OutputRef representing a single value from a given port </summary>
+    ///
+    /// <param name="port"> The port to take a value from </param>
+    /// <param name="index"> The index of the value </param>
+    /// <returns> The composite OutputRef </returns>
     template <typename ValueType>
-    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex)
-    {
-        return OutputRef<ValueType>(port, startIndex);
-    }
+    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex);
 
+    /// <summary> Creates a OutputRef representing a range of values from a given port </summary>
+    ///
+    /// <param name="port"> The port to take a value from </param>
+    /// <param name="startIndex"> The index of the first value to take </param>
+    /// <param name="numValues"> The number of values to take </param>
+    /// <returns> The composite OutputRef </returns>
     template <typename ValueType>
-    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues)
-    {
-        return OutputRef<ValueType>(port, startIndex, numValues);
-    }
+    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
 
-    // Concat
+    /// <summary> Creates a OutputRef by concatenating together one or more OutputRefs
+    ///
+    /// <param name="ref"> The OutputRefs to concatenate together </param>
+    /// <returns> The composite OutputRef </returns>
     template <typename RefType, typename... Refs>
-    RefType Concat(const RefType& ref1, Refs&&... refs)
-    {
-        return RefType({ ref1, refs... });
-    }
+    RefType Concat(const RefType& ref1, Refs&&... refs);
 }
 
 #include "../tcc/OutputRef.tcc"

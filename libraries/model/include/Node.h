@@ -31,6 +31,8 @@ namespace model
         typedef UniqueId NodeId;
 
         /// <summary> Returns the unique ID for this node </summary>
+        ///
+        /// <returns> The unique ID for this node </returns>
         const NodeId GetId() const { return _id; }
 
         /// <summary> Returns the input "ports" for this node </summary>
@@ -66,7 +68,7 @@ namespace model
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
     protected:
-        // The constructor for Node is kind of gross. The arguments (and the _inputs and _outputs members)
+        // TODO: the arguments (and the _inputs and _outputs members)
         // should perhaps be vectors of references instead of pointers.
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
         

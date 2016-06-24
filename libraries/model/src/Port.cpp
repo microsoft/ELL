@@ -11,6 +11,16 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    void Port::SetType(PortType type) 
+    { 
+        _type = type; 
+    }
+
+    void Port::SetSize(size_t size) 
+    { 
+        _size = size; 
+    }
+
     //
     // Specializations of GetTypeCode
     //
@@ -31,4 +41,5 @@ namespace model
     {
         return Port::PortType::Boolean;
     }
+
 }

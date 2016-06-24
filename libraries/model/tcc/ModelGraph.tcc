@@ -55,7 +55,7 @@ namespace model
     {
         auto compute = [](const Node& node) { node.Compute(); };
 
-        Visit(compute, { outputPort.Node() });
+        Visit(compute, { outputPort.GetNode() });
 
         return outputPort.GetOutput();
     }
@@ -154,7 +154,7 @@ namespace model
             {
                 for (const auto& inputRange : input->GetInputRanges())
                 {
-                    auto inputNode = inputRange.ReferencedPort()->Node();
+                    auto inputNode = inputRange.ReferencedPort()->GetNode();
                     canVisit = canVisit && visitedNodes.find(inputNode) != visitedNodes.end();
                 }
             }
@@ -188,7 +188,7 @@ namespace model
                 {
                     for (const auto& inputRange : input->GetInputRanges())
                     {
-                        stack.push_back(inputRange.ReferencedPort()->Node());
+                        stack.push_back(inputRange.ReferencedPort()->GetNode());
                     }
                 }
             }

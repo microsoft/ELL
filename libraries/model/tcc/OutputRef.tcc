@@ -53,4 +53,33 @@ namespace model
         }
         ComputeSize();
     }
+
+    //
+    // Convenience functions
+    //
+        // MakeRef
+    template <typename ValueType>
+    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port)
+    {
+        return OutputRef<ValueType>(port);
+    }
+
+    template <typename ValueType>
+    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex)
+    {
+        return OutputRef<ValueType>(port, startIndex);
+    }
+
+    template <typename ValueType>
+    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues)
+    {
+        return OutputRef<ValueType>(port, startIndex, numValues);
+    }
+
+    // Concat
+    template <typename RefType, typename... Refs>
+    RefType Concat(const RefType& ref1, Refs&&... refs)
+    {
+        return RefType({ ref1, refs... });
+    }
 }

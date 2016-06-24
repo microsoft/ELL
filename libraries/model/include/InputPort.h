@@ -62,6 +62,11 @@ namespace model
     class InputPort : public InputPortBase
     {
     public:
+        /// <summary> Creates an input port </summary>
+        ///
+        /// <param name="owningNode"> The node this port belongs to </param>
+        /// <param name="portIneex"> The index of this port within the owning node </param>
+        /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
         InputPort(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input);
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>

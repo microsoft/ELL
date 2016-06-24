@@ -22,7 +22,7 @@ namespace model
 
     Port::PortType Node::GetOutputType(size_t outputIndex) const 
     { 
-        return _outputs[outputIndex]->Type(); 
+        return _outputs[outputIndex]->GetType(); 
     }
 
     size_t Node::GetOutputSize(size_t outputIndex) const 
@@ -41,7 +41,7 @@ namespace model
         {
             for (const auto& range : input->GetInputRanges())
             {
-                range.ReferencedPort()->Node()->AddDependent(this);
+                range.ReferencedPort()->GetNode()->AddDependent(this);
             }
         }
     }

@@ -34,9 +34,13 @@ namespace model
         OutputPort(const class Node* node, size_t outputIndex, size_t size) : OutputPortBase(node, outputIndex, OutputPortBase::GetTypeCode<ValueType>(), size) {}
 
         /// <summary> Returns the cached output from this port </summary>
+        ///
+        /// <returns> The cached output from this port </returns>
         std::vector<ValueType> GetOutput() const { return _cachedOutput; }
 
         /// <summary> Sets the cached output from this port </summary>
+        ///
+        /// <param name=values> The values this port should output </param>
         void SetOutput(std::vector<ValueType> values) const { _cachedOutput = values; }
 
     private:

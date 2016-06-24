@@ -28,16 +28,16 @@ namespace model
             Integer,
             Categorical,
             Boolean
-        }; // Maybe these should be C types (double, int, bool) ? TODO: put this type info somewhere common, not in Port
+        };
 
         /// <summary> Returns the node the output port connected to this port belongs to </summary>
-        const class Node* Node() const { return _node; }
+        const class Node* GetNode() const { return _node; }
 
         /// <summary> Returns the index of the port within the node </summary>
-        size_t Index() const { return _portIndex; }
+        size_t GetIndex() const { return _portIndex; }
 
         /// <summary> Returns the datatype of the output </summary>
-        PortType Type() const { return _type; }
+        PortType GetType() const { return _type; }
 
         /// <summary> Returns the dimensionality of the output </summary>
         size_t Size() const { return _size; } // dimension
@@ -46,8 +46,11 @@ namespace model
         template <typename ValueType>
         static PortType GetTypeCode();
 
-        void SetType(PortType type) { _type = type; }
-        void SetSize(size_t size) { _size = size; }
+        /// <summary> Sets the underlying type of the port </summary>
+        void SetType(PortType type);
+
+        /// <summary> Sets the dimension of the port </summary>
+        void SetSize(size_t size);
 
     protected:
         Port(const class Node* node, size_t outputIndex, PortType type, size_t size) : _node(node), _portIndex(outputIndex), _type(type), _size(size) {}
