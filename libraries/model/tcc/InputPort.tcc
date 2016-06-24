@@ -32,6 +32,13 @@ namespace model
         return result;
     }
 
+    template <typename ValueType>
+    ValueType InputPortBase::GetTypedValue(size_t index) const
+    {
+        // TODO: be less inefficient about this!
+        return GetTypedValue<ValueType>()[index];
+    }
+
     //
     // InputPort
     // 
@@ -39,10 +46,14 @@ namespace model
     InputPort<ValueType>::InputPort(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input) : InputPortBase(owningNode, portIndex, input) {}
 
     template <typename ValueType>
+    ValueType InputPort<ValueType>::GetValue(size_t index) const
+    {
+        return GetTypedValue<ValueType>(index);
+    }
+
+    template <typename ValueType>
     ValueType InputPort<ValueType>::operator[](size_t index) const
     {
-        // TODO: be less inefficient about this!
-        auto values = GetValue();
-        return values[index];
+        return GetTypedValue<ValueType>(index);
     }
 }
