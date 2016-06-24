@@ -31,25 +31,40 @@ namespace model
         };
 
         /// <summary> Returns the node the output port connected to this port belongs to </summary>
+        ///
+        /// <returns> The node the output port connected to this port belongs to </returns>
         const class Node* GetNode() const { return _node; }
 
         /// <summary> Returns the index of the port within the node </summary>
+        ///
+        /// <returns> The index of the port within the node </returns>
         size_t GetIndex() const { return _portIndex; }
 
         /// <summary> Returns the datatype of the output </summary>
+        ///
+        /// <returns> The datatype of the output </returns>
         PortType GetType() const { return _type; }
 
         /// <summary> Returns the dimensionality of the output </summary>
+        ///
+        /// <returns> The dimensionality of the output </returns>
         size_t Size() const { return _size; } // dimension
 
         /// <summary> Maps from C++ type to PortType enum </summary>
+        ///
+        /// <typeparam name="ValueType"> The C++ type </typeparam>
+        /// <returns> The corresponding PortType enum value </returns>
         template <typename ValueType>
         static PortType GetTypeCode();
 
         /// <summary> Sets the underlying type of the port </summary>
+        ///
+        /// <param name="type"> The type of the port </param>
         void SetType(PortType type);
 
         /// <summary> Sets the dimension of the port </summary>
+        ///
+        /// <param name="size"> The dimension of the port </param>
         void SetSize(size_t size);
 
     protected:
