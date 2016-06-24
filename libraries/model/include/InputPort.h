@@ -66,6 +66,7 @@ namespace model
         ValueType GetTypedValue(size_t index) const;
 
     private:
+        UntypedOutputRef _inputRanges;
         std::vector<ElementRef> _inputElements;
         std::vector<const Node*> _inputNodes;
     };
