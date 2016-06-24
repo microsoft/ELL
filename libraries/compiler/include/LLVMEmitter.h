@@ -63,7 +63,10 @@ namespace emll
 
 				llvm::ReturnInst* ReturnVoid();
 				llvm::ReturnInst* Return(llvm::Value* value);
+
 				llvm::Value* BinaryOp(OperatorType type, llvm::Value* pLVal, llvm::Value* pRVal, const std::string& varName = "");
+
+				llvm::Value* Cmp(ComparisonType type, llvm::Value* pLVal, llvm::Value* pRVal);
 
 				std::unique_ptr<llvm::Module> AddModule(const std::string& name);
 
@@ -118,8 +121,6 @@ namespace emll
 
 				llvm::AllocaInst* StackAlloc(ValueType type, int count);
 
-
-				llvm::Value* Cmp(ComparisonType type, llvm::Value* pLVal, llvm::Value* pRVal);
 
 				llvm::BranchInst* Branch(llvm::Value* pCondVal, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
 				llvm::BranchInst* Branch(llvm::BasicBlock* pDest);

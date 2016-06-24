@@ -1,8 +1,7 @@
 #pragma once
 
-#include "ValueType.h"
 #include "LLVMEmitter.h"
-
+#include "LoopEmitter.h"
 
 namespace emll
 {
@@ -89,6 +88,15 @@ namespace emll
 				{
 					_pEmitter->Branch(pDestBlock);
 				}
+				void Branch(llvm::Value* pCondVal, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
+				{
+					_pEmitter->Branch(pCondVal, pThenBlock, pElseBlock);
+				}
+
+				llvm::Value* Cmp(ComparisonType type, llvm::Value* pValue, llvm::Value* pTestValue)
+				{
+					return _pEmitter->Cmp(type, pValue, pTestValue);
+				}
 				//------------------------------------------
 				//
 				// Variables
@@ -141,7 +149,7 @@ namespace emll
 				llvm::Value* Printf(std::initializer_list<llvm::Value*> args);
 
 
-				LoopBlocks Loop(int startAt, int max, int increment);
+				ForLoopEmitter ForLoop();
 
 				void Verify()
 				{
@@ -156,8 +164,8 @@ namespace emll
 				llvm::Function* ResolveFunction(const std::string& name);
 
 			private:
-				llvm::Function* _pfn;
-				LLVMEmitter* _pEmitter;
+				llvm::Function* _pfn = nullptr;
+				LLVMEmitter* _pEmitter = nullptr;
 				ValueList _values;
 			};
 		}

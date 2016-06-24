@@ -139,6 +139,27 @@ namespace emll
 				}
 			}
 
+			llvm::Value* LLVMEmitter::Cmp(ComparisonType type, llvm::Value* pLVal, llvm::Value* pRVal)
+			{
+				switch (type)
+				{
+				default:
+					throw new EmitterException(EmitterError::InvalidComparisonType);
+				case ComparisonType::Eq:
+					return _pBuilder->CreateICmpEQ(pLVal, pRVal);
+				case ComparisonType::Lt:
+					return _pBuilder->CreateICmpSLT(pLVal, pRVal);
+				case ComparisonType::Lte:
+					return _pBuilder->CreateICmpSLE(pLVal, pRVal);
+				case ComparisonType::Gt:
+					return _pBuilder->CreateICmpSGT(pLVal, pRVal);
+				case ComparisonType::Gte:
+					return _pBuilder->CreateICmpSGE(pLVal, pRVal);
+				case ComparisonType::Neq:
+					return _pBuilder->CreateICmpNE(pLVal, pRVal);
+				}
+			}
+
 			std::unique_ptr<llvm::Module> LLVMEmitter::AddModule(const std::string& name)
 			{
 				return std::make_unique<llvm::Module>(name, _context);
@@ -253,27 +274,6 @@ namespace emll
 			llvm::AllocaInst* LLVMEmitter::StackAlloc(ValueType type, int size)
 			{
 				return _pBuilder->CreateAlloca(Type(type), Literal(size));
-			}
-
-			llvm::Value* LLVMEmitter::Cmp(ComparisonType type, llvm::Value* pLVal, llvm::Value* pRVal)
-			{
-				switch (type)
-				{
-				default:
-					throw new EmitterException(EmitterError::InvalidComparisonType);
-				case ComparisonType::Eq:
-					return _pBuilder->CreateICmpEQ(pLVal, pRVal);
-				case ComparisonType::Lt:
-					return _pBuilder->CreateICmpSLT(pLVal, pRVal);
-				case ComparisonType::Lte:
-					return _pBuilder->CreateICmpSLE(pLVal, pRVal);
-				case ComparisonType::Gt:
-					return _pBuilder->CreateICmpSGT(pLVal, pRVal);
-				case ComparisonType::Gte:
-					return _pBuilder->CreateICmpSGE(pLVal, pRVal);
-				case ComparisonType::Neq:
-					return _pBuilder->CreateICmpNE(pLVal, pRVal);
-				}
 			}
 
 			llvm::BranchInst* LLVMEmitter::Branch(llvm::Value* pCondVal, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)

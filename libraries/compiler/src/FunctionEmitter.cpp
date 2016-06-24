@@ -116,43 +116,9 @@ namespace emll
 				return _pEmitter->Store(PtrOffsetH(pPtr, offset), pValue);
 			}
 
-			LoopBlocks FunctionEmitter::Loop(int startAt, int max, int increment)
+			ForLoopEmitter FunctionEmitter::ForLoop()
 			{
-				LoopBlocks loop;
-				llvm::BasicBlock* pCurrentBlock = CurrentBlock();
-
-				llvm::BasicBlock* pInitBlock = Block(LoopInitBlockName);
-				loop.pIncBlock = Block(LoopIncBlockName);
-				loop.pBodyBlock = Block(LoopBodyBlockName);
-				llvm::BasicBlock* pCondBlock = Block(LoopConditionBlockName);
-				loop.pAfterBlock = Block(LoopAfterBlockName);
-
-				// Branch to loop beginning
-				Branch(pInitBlock);
-				//
-				// Initial block	- set up loop counter
-				//
-				CurrentBlock(pInitBlock);
-				loop.pIterationNumber = _pEmitter->Variable(ValueType::Int32, LoopIncVar);
-				Store(loop.pIterationNumber, Literal(startAt));
-				_pEmitter->Branch(pCondBlock);
-				//
-				// Conditional block - should we terminate the loop?
-				//
-				CurrentBlock(pCondBlock);
-				llvm::Value* pMaxIterationNumber = Literal(max);
-				llvm::Value* pCmp = _pEmitter->Cmp(ComparisonType::Lt, Load(loop.pIterationNumber), pMaxIterationNumber);
-				_pEmitter->Branch(pCmp, loop.pBodyBlock, loop.pAfterBlock);
-				//
-				// Increment loop counter
-				//
-				CurrentBlock(loop.pIncBlock);
-				OpAndUpdate(loop.pIterationNumber, OperatorType::Add, Literal(increment));
-				_pEmitter->Branch(pCondBlock);
-
-				CurrentBlock(pCurrentBlock);
-
-				return loop;
+				return ForLoopEmitter(*this);
 			}
 
 			llvm::Value* FunctionEmitter::Malloc(ValueType type, int64_t size)

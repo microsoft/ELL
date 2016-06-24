@@ -17,6 +17,7 @@ endif()
 
 set (SRC src/LLVMEmitter.cpp
          src/ModuleEmitter.cpp
+         src/LoopEmitter.cpp
          src/FunctionEmitter.cpp
 )
 
@@ -26,6 +27,7 @@ set (INCLUDE include/llvmIRInclude.h
 		include/Error.h
 		include/ValueType.h
 		include/LLVMEmitter.h
+		include/LoopEmitter.h
 		include/FunctionEmitter.h
 		include/ModuleEmitter.h
 )

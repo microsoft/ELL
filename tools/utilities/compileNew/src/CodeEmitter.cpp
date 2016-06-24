@@ -17,20 +17,20 @@ namespace emll {
 		{
 			ir::LLVMEmitter llvm;
 			ir::ModuleEmitter module(&llvm, llvm.AddModule("Looper"));
-
 			module.DeclarePrintf();
 
 			auto fnMain = module.AddMain();
-			auto loop = fnMain.Loop(0, 5, 1);
+
+			ir::ForLoopEmitter forLoop = fnMain.ForLoop();
+			auto pBodyBlock = forLoop.Begin(15);
+			{
+				auto printBlock = fnMain.BlockAfter(pBodyBlock, "PrintBlock");
+				fnMain.Branch(printBlock);
+				fnMain.CurrentBlock(printBlock);
+				fnMain.Printf({ fnMain.Literal("%d\n"), fnMain.Load(forLoop.IterationVar()) });
+			}
+			forLoop.End();
 			
-			// Generate block, trying out some block injection in the process
-			fnMain.CurrentBlock(loop.pBodyBlock);
-			auto printBlock = fnMain.BlockAfter(loop.pBodyBlock, "PrintBlock");
-			fnMain.Branch(printBlock);
-			fnMain.CurrentBlock(printBlock);
-			fnMain.Printf({ fnMain.Literal("%d\n"), fnMain.Load(loop.pIterationNumber) });
-			fnMain.Branch(loop.pIncBlock);
-			fnMain.CurrentBlock(loop.pAfterBlock);
 			fnMain.Ret();
 
 			fnMain.Verify();
