@@ -38,25 +38,6 @@ namespace model
         /// <summary> Returns the input "ports" for this node </summary>
         const std::vector<InputPortBase*>& GetInputs() const { return _inputs; }
 
-        /// <summary> Convenience function to get the output value from a port </summary>
-        ///
-        /// <param name="outputIndex"> The index of the output port </param>
-        /// <returns> The computed output value for the port </param>
-        template <typename ValueType>
-        std::vector<ValueType> GetOutputValue(size_t outputIndex) const;
-
-        /// <summary> Convenience function to get the output type from a port </summary>
-        ///
-        /// <param name="outputIndex"> The index of the output port </param>
-        /// <returns> The output type for the port </param>
-        Port::PortType GetOutputType(size_t outputIndex) const;
-
-        /// <summary> Convenience function to get the dimensionality of a port </summary>
-        ///
-        /// <param name="outputIndex"> The index of the output port </param>
-        /// <returns> The dimensionality of the port </param>
-        size_t GetOutputSize(size_t outputIndex) const;
-
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -90,5 +71,3 @@ namespace model
         mutable std::vector<const Node*> _dependentNodes;
     };
 }
-
-#include "../tcc/Node.tcc"

@@ -37,7 +37,6 @@ set (TCC tcc/ConstantNode.tcc
          tcc/InputNode.tcc
          tcc/InputPort.tcc
          tcc/ModelGraph.tcc
-         tcc/Node.tcc
          tcc/OutputPort.tcc
          tcc/OutputRef.tcc
          tcc/ValueSelectorNode.tcc

@@ -20,16 +20,6 @@ namespace model
         _inputs.push_back(input);
     }
 
-    Port::PortType Node::GetOutputType(size_t outputIndex) const 
-    { 
-        return _outputs[outputIndex]->GetType(); 
-    }
-
-    size_t Node::GetOutputSize(size_t outputIndex) const 
-    {
-        return _outputs[outputIndex]->Size(); 
-    }
-
     void Node::AddDependent(const Node* dependent) const 
     {
         _dependentNodes.push_back(dependent); 

@@ -41,13 +41,6 @@ namespace model
         template <typename ValueType>
         std::vector<ValueType> GetNodeOutput(const OutputPort<ValueType>& outputPort) const;
 
-        /// <summary> Returns part of the output computed by a node </summary>
-        ///
-        /// <param name="node"> The node to get the output from </param>
-        /// <param name="outputIndex"> The index of the port within the node to get the output from </param>
-        template <typename ValueType>
-        std::vector<ValueType> GetNodeOutput(const std::shared_ptr<Node>& node, size_t outputIndex) const;
-
         /// <summary>
         /// Visits all the nodes in the graph in dependency order. No nodes will be visited until all
         /// its inputs have first been visited.

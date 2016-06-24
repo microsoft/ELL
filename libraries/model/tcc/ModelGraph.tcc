@@ -60,21 +60,6 @@ namespace model
         return outputPort.GetOutput();
     }
 
-    template <typename ValueType>
-    std::vector<ValueType> Model::GetNodeOutput(const std::shared_ptr<Node>& outputNode, size_t outputIndex) const
-    {
-        auto compute = [](const Node& node) { node.Compute(); };
-
-        if (Port::GetTypeCode<ValueType>() != outputNode->GetOutputType(outputIndex))
-        {
-            throw std::runtime_error("output types don't match");
-        }
-
-        Visit(compute, outputNode);
-
-        return outputNode->GetOutputValue<ValueType>(outputIndex);
-    }
-
     //
     // Visitors
     //
