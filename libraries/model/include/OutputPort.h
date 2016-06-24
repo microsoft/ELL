@@ -29,9 +29,8 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="node"> The node this output port is part of </param>
-        /// <param name="outputIndex"> The index in the list of the node's outputs for this port </param>
         /// <param name="size"> The dimensionality of this port </param>
-        OutputPort(const class Node* node, size_t outputIndex, size_t size) : OutputPortBase(node, outputIndex, OutputPortBase::GetTypeCode<ValueType>(), size) {}
+        OutputPort(const class Node* node, size_t size) : OutputPortBase(node, OutputPortBase::GetTypeCode<ValueType>(), size) {}
 
         /// <summary> Returns the cached output from this port </summary>
         ///

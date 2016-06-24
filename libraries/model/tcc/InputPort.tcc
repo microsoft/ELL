@@ -13,7 +13,7 @@ namespace model
     // InputPort
     //
     template <typename ValueType>
-    InputPortBase::InputPortBase(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input) : Port(owningNode, portIndex, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)
+    InputPortBase::InputPortBase(const class Node* owningNode, const OutputRef<ValueType>& input) : Port(owningNode, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)
     {
         
         for (const auto& range : input)
@@ -58,7 +58,7 @@ namespace model
     // InputPort
     //
     template <typename ValueType>
-    InputPort<ValueType>::InputPort(const class Node* owningNode, size_t portIndex, const OutputRef<ValueType>& input) : InputPortBase(owningNode, portIndex, input)
+    InputPort<ValueType>::InputPort(const class Node* owningNode, const OutputRef<ValueType>& input) : InputPortBase(owningNode, input)
     {
     }
 
