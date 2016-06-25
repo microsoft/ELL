@@ -17,18 +17,24 @@ namespace emll
 		void TestCompiler()
 		{
 			IREmitter llvm;
-			IRModuleEmitter module(&llvm, llvm.AddModule("Looper"));
+			IRModuleEmitter module(llvm, llvm.AddModule("Looper"));
 			module.DeclarePrintf();
+
+			std::vector<double> data({3.3, 4.4, 5.5, 6.6, 7.7});
+			llvm::GlobalVariable* pData = module.Global("g_weights", data);
 
 			auto fnMain = module.AddMain();
 
 			IRForLoopEmitter forLoop = fnMain.ForLoop();
-			auto pBodyBlock = forLoop.Begin(15);
+			auto pBodyBlock = forLoop.Begin(data.size());
 			{
 				auto printBlock = fnMain.BlockAfter(pBodyBlock, "PrintBlock");
 				fnMain.Branch(printBlock);
 				fnMain.CurrentBlock(printBlock);
-				fnMain.Printf({ fnMain.Literal("%d\n"), fnMain.Load(forLoop.IterationVar()) });
+
+				auto i = fnMain.Load(forLoop.IterationVar());
+				auto item = fnMain.ValueAtGlobal(pData, i);
+				fnMain.Printf({ fnMain.Literal("%d, %f\n"), i,  item});
 			}
 			forLoop.End();
 			
@@ -236,26 +242,27 @@ namespace emll
 		//-------------------------------------------------------
 
 		IRCodeEmitter::IRCodeEmitter(DataFlowGraph& graph, std::ostream& os)
-			: CodeEmitter(graph), _os(os)
+			: CodeEmitter(graph), 
+			_os(os), 
+			_module(_emitter, "EMLL")
 		{
-			_module = std::make_unique<IRModuleEmitter>(&_emitter, _emitter.AddModule("EMLL"));
 		}
 
 		void IRCodeEmitter::Begin()
 		{
-			_module->DeclarePrintf();
+			_module.DeclarePrintf();
 		}
 
 		void IRCodeEmitter::End()
 		{
-			_module->WriteAsmToStream(_os);
+			_module.WriteAsmToStream(_os);
 		}
 
 		void IRCodeEmitter::BeginLinear(const std::string& functionName, const std::string& inputVarName, uint64_t inputCount, const std::string& outputVarName, const layers::CoordinateList& outputs)
 		{
 			NamedValueTypeList fnArgs;
 			fnArgs.init({ {inputVarName, ValueType::PDouble}, { outputVarName, ValueType::PDouble }});
-			_fn = _module->Function(functionName, ValueType::Void, fnArgs, true);	
+			_fn = _module.Function(functionName, ValueType::Void, fnArgs, true);	
 			//
 			// Register input and out as variables for the function body to use
 			//
@@ -276,7 +283,7 @@ namespace emll
 
 		void IRCodeEmitter::EmitTest(const std::string& fnName, int featureCount, int outputCount, double startValue)
 		{
-			auto fn = _module->AddMain();
+			auto fn = _module.AddMain();
 			llvm::Value* features = fn.Var(ValueType::Double, featureCount);
 			for (int i = 0; i < featureCount; ++i)
 			{

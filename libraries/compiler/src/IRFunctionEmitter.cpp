@@ -94,7 +94,14 @@ namespace emll
 
 		llvm::Value* IRFunctionEmitter::PtrOffsetH(llvm::Value* ptr, int offset)
 		{
-			return _pEmitter->ArrayDeref(Load(ptr), Literal(offset));
+			return PtrOffsetH(ptr, Literal(offset));
+		}
+
+		llvm::Value* IRFunctionEmitter::PtrOffsetH(llvm::Value* ptr, llvm::Value* pOffset)
+		{
+			assert(ptr != nullptr);
+			assert(pOffset != nullptr);
+			return _pEmitter->ArrayDeref(Load(ptr), pOffset);
 		}
 
 		llvm::Value* IRFunctionEmitter::ValueAtH(llvm::Value* ptr, int offset)
@@ -102,9 +109,19 @@ namespace emll
 			return _pEmitter->Load(PtrOffsetH(ptr, offset));
 		}
 
+		llvm::Value* IRFunctionEmitter::ValueAtH(llvm::Value* ptr, llvm::Value* pOffset)
+		{
+			return _pEmitter->Load(PtrOffsetH(ptr, pOffset));
+		}
+
 		llvm::Value* IRFunctionEmitter::SetValueAtH(llvm::Value* pPtr, int offset, llvm::Value* pValue)
 		{
 			return _pEmitter->Store(PtrOffsetH(pPtr, offset), pValue);
+		}
+
+		llvm::Value* IRFunctionEmitter::ValueAtGlobal(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset)
+		{
+			return Load(_pEmitter->GlobalArrayDeref(pGlobal, pOffset));
 		}
 
 		IRForLoopEmitter IRFunctionEmitter::ForLoop()

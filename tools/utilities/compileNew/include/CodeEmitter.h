@@ -131,8 +131,8 @@ namespace emll
 		private:
 			std::ostream& _os;
 			IREmitter _emitter;
+			IRModuleEmitter _module;
 			IRFunctionEmitter _fn;
-			std::unique_ptr<IRModuleEmitter> _module;
 			IRVariableTable _variables;
 		};
 	}

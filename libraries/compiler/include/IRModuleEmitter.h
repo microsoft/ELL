@@ -11,36 +11,39 @@ namespace emll
 		class IRModuleEmitter
 		{
 		public:
-			IRModuleEmitter(IREmitter* pEmitter, std::unique_ptr<llvm::Module> pModule);
-				
+			IRModuleEmitter(IREmitter& emitter, const std::string& name);
+			IRModuleEmitter(IREmitter& emitter, std::unique_ptr<llvm::Module> pModule);
+
+			llvm::GlobalVariable* Global(const std::string&name, const std::vector<double>& value);
+
 			IRFunctionEmitter AddMain();
 
-			void DeclareFunction(const std::string& name, ValueType returnType)
+			void DeclareFunction(const std::string& name, const ValueType returnType)
 			{
-				_pEmitter->DeclareFunction(Module(), name, returnType, nullptr);
+				_emitter.DeclareFunction(Module(), name, returnType, nullptr);
 			}
-			void DeclareFunction(const std::string& name, ValueType returnType, ValueTypeList& args)
+			void DeclareFunction(const std::string& name, const ValueType returnType, const ValueTypeList& args)
 			{
-				_pEmitter->DeclareFunction(Module(), name, returnType, &args);
+				_emitter.DeclareFunction(Module(), name, returnType, &args);
 			}
-			void DeclareFunction(const std::string& name, ValueType returnType, NamedValueTypeList& args)
+			void DeclareFunction(const std::string& name, const ValueType returnType, const NamedValueTypeList& args)
 			{
-				_pEmitter->DeclareFunction(Module(), name, returnType, args);
+				_emitter.DeclareFunction(Module(), name, returnType, args);
 			}
 			void DeclareFunction(const std::string& name, llvm::FunctionType* type)
 			{
-				_pEmitter->DeclareFunction(Module(), name, type);
+				_emitter.DeclareFunction(Module(), name, type);
 			}
-			IRFunctionEmitter Function(const std::string& name, ValueType returnType, bool isPublic = false)
+			IRFunctionEmitter Function(const std::string& name, const ValueType returnType, bool isPublic = false)
 			{
 				return Function(name, returnType, nullptr, isPublic);
 			}
-			IRFunctionEmitter Function(const std::string& name, ValueType returnType, ValueTypeList& args, bool isPublic = false)
+			IRFunctionEmitter Function(const std::string& name, const ValueType returnType, const ValueTypeList& args, bool isPublic = false)
 			{
 				return Function(name, returnType, &args, isPublic);
 			}
-			IRFunctionEmitter Function(const std::string& name, ValueType returnType, NamedValueTypeList& args, bool isPublic = false);
-			IRFunctionEmitter Function(const std::string& name, ValueType returnType, std::initializer_list<ValueType> args, bool isPublic = false);
+			IRFunctionEmitter Function(const std::string& name, const ValueType returnType, const NamedValueTypeList& args, bool isPublic = false);
+			IRFunctionEmitter Function(const std::string& name, const ValueType returnType, std::initializer_list<ValueType> args, bool isPublic = false);
 
 			//
 			// Serialization
@@ -80,8 +83,10 @@ namespace emll
 			{
 				return _pModule.get();
 			}
+
+			llvm::GlobalVariable* Global(const std::string& name, llvm::Constant* pData, const ValueType dataType, const size_t size);
 			llvm::Function* GetFunction(const std::string& name);
-			IRFunctionEmitter Function(const std::string& name, ValueType returnType, ValueTypeList* pArgs, bool isPublic);
+			IRFunctionEmitter Function(const std::string& name, const ValueType returnType, const ValueTypeList* pArgs, bool isPublic);
 			void BeginFunction(llvm::Function* pfn);
 			void WriteToFile(const std::string& filePath, bool isBitCode);
 			void WriteToStream(std::ostream& os, bool isBitCode);
@@ -89,7 +94,7 @@ namespace emll
 
 		private:
 			std::unique_ptr<llvm::Module> _pModule;
-			IREmitter* _pEmitter;
+			IREmitter& _emitter;
 			// Reusable buffers
 			ValueTypeList _valueTypeList;
 		};

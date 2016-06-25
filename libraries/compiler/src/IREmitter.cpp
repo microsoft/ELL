@@ -9,12 +9,8 @@ namespace emll
 		{
 			_pBuilder = std::make_unique<llvm::IRBuilder<>>(_context);
 		}
-		IREmitter::~IREmitter()
-		{
 
-		}
-
-		llvm::Type* IREmitter::Type(ValueType type)
+		llvm::Type* IREmitter::Type(const ValueType type)
 		{
 			switch (type)
 			{
@@ -51,16 +47,17 @@ namespace emll
 			}
 		}
 
-		llvm::Value* IREmitter::Literal(int value)
+		llvm::Value* IREmitter::Literal(const int value)
 		{
 			return llvm::ConstantInt::get(_context, llvm::APInt(32, value, true));
 		}
-		llvm::Value* IREmitter::Literal(int64_t value)
+
+		llvm::Value* IREmitter::Literal(const int64_t value)
 		{
 			return llvm::ConstantInt::get(_context, llvm::APInt(64, value, true));
 		}
 
-		llvm::Value* IREmitter::Literal(double value)
+		llvm::Value* IREmitter::Literal(const double value)
 		{
 			return llvm::ConstantFP::get(_context, llvm::APFloat(value));
 		}
@@ -76,8 +73,15 @@ namespace emll
 			return literal;
 		}
 
-		llvm::Value* IREmitter::Cast(llvm::Value* pValue, ValueType destType)
+		llvm::Constant* IREmitter::Literal(const std::vector<double>& value)
 		{
+			return llvm::ConstantDataArray::get(_context, value);
+		}
+
+		llvm::Value* IREmitter::Cast(llvm::Value* pValue, const ValueType destType)
+		{
+			assert(pValue != nullptr);
+
 			return _pBuilder->CreateBitCast(pValue, Type(destType));
 		}
 
@@ -91,13 +95,17 @@ namespace emll
 			return _pBuilder->CreateRetVoid();
 		}
 
-		llvm::ReturnInst* IREmitter::Return(llvm::Value* value)
+		llvm::ReturnInst* IREmitter::Return(llvm::Value* pValue)
 		{
-			return _pBuilder->CreateRet(value);
+			assert(pValue != nullptr);
+			return _pBuilder->CreateRet(pValue);
 		}
 
-		llvm::Value* IREmitter::BinaryOp(OperatorType type, llvm::Value* pLVal, llvm::Value* pRVal, const std::string& varName)
+		llvm::Value* IREmitter::BinaryOp(const OperatorType type, llvm::Value* pLVal, llvm::Value* pRVal, const std::string& varName)
 		{
+			assert(pLVal != nullptr);
+			assert(pRVal != nullptr);
+
 			switch (type)
 			{
 			case OperatorType::Add:
@@ -121,8 +129,11 @@ namespace emll
 			}
 		}
 
-		llvm::Value* IREmitter::Cmp(ComparisonType type, llvm::Value* pLVal, llvm::Value* pRVal)
+		llvm::Value* IREmitter::Cmp(const ComparisonType type, llvm::Value* pLVal, llvm::Value* pRVal)
 		{
+			assert(pLVal != nullptr);
+			assert(pRVal != nullptr);
+
 			switch (type)
 			{
 			default:
@@ -147,17 +158,24 @@ namespace emll
 			return std::make_unique<llvm::Module>(name, _context);
 		}
 
-		llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, ValueType returnType, ValueTypeList* pArgs)
+		llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, const ValueType returnType, const ValueTypeList* pArgs)
 		{
 			return Function(pModule, name, returnType, llvm::Function::LinkageTypes::ExternalLinkage, pArgs);
 		}
 
-		llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, ValueType returnType, NamedValueTypeList& args)
+		llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, ValueType returnType, const NamedValueTypeList& args)
 		{
 			return Function(pModule, name, returnType, llvm::Function::LinkageTypes::ExternalLinkage, args);
 		}
 
-		llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, ValueType returnType, llvm::Function::LinkageTypes linkage, ValueTypeList* pArgs)
+		llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, llvm::FunctionType* type)
+		{
+			assert(pModule != nullptr);
+
+			return static_cast<llvm::Function*>(pModule->getOrInsertFunction(name, type));
+		}
+
+		llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, ValueType returnType, llvm::Function::LinkageTypes linkage, const ValueTypeList* pArgs)
 		{
 			assert(pModule != nullptr);
 
@@ -174,7 +192,7 @@ namespace emll
 			return CreateFunction(pModule, name, linkage, pTypeDef);
 		}
 
-		llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, ValueType returnType, llvm::Function::LinkageTypes linkage, NamedValueTypeList& args)
+		llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, const ValueType returnType, llvm::Function::LinkageTypes linkage, const NamedValueTypeList& args)
 		{
 			assert(pModule != nullptr);
 
@@ -224,51 +242,93 @@ namespace emll
 			return _pBuilder->CreateCall(pfn, pArg);
 		}
 
-		llvm::CallInst* IREmitter::Call(llvm::Function* pfn, IRValueList& args)
+		llvm::CallInst* IREmitter::Call(llvm::Function* pfn, const IRValueList& args)
 		{
 			assert(pfn != nullptr);
 			return _pBuilder->CreateCall(pfn, args);
 		}
 
-		llvm::PHINode* IREmitter::Phi(ValueType type, llvm::Value* pLVal, llvm::BasicBlock* pLBlock, llvm::Value* pRVal, llvm::BasicBlock* pRBlock)
+		llvm::PHINode* IREmitter::Phi(const ValueType type, llvm::Value* pLVal, llvm::BasicBlock* pLBlock, llvm::Value* pRVal, llvm::BasicBlock* pRBlock)
 		{
+			assert(pLBlock != nullptr);
+			assert(pRBlock != nullptr);
+			assert(pRVal != nullptr);
+			assert(pRBlock != nullptr);
+
 			llvm::PHINode* phi = _pBuilder->CreatePHI(Type(type), 2);
 			phi->addIncoming(pLVal, pLBlock);
 			phi->addIncoming(pRVal, pRBlock);
 			return phi;
 		}
 
-		llvm::AllocaInst* IREmitter::Variable(ValueType type)
+		llvm::Value* IREmitter::ArrayDeref(llvm::Value* pArray, llvm::Value* pOffset)
+		{
+			assert(pArray != nullptr);
+			assert(pOffset != nullptr);
+			return _pBuilder->CreateGEP(pArray, pOffset);
+		}
+
+		llvm::Value* IREmitter::GlobalArrayDeref(llvm::GlobalVariable* pArray, llvm::Value* pOffset)
+		{
+			assert(pArray != nullptr);
+			assert(pOffset != nullptr);
+
+			llvm::Value *args[] = { Literal(0), pOffset };
+			return _pBuilder->CreateInBoundsGEP(pArray->getValueType(), pArray, args);
+		}
+
+		llvm::LoadInst* IREmitter::Load(llvm::Value* pPtr)
+		{
+			assert(pPtr != nullptr);
+			return _pBuilder->CreateLoad(pPtr);
+		}
+
+		llvm::StoreInst* IREmitter::Store(llvm::Value* pPtr, llvm::Value* pVal)
+		{
+			assert(pPtr != nullptr);
+			assert(pVal != nullptr);
+			return _pBuilder->CreateStore(pVal, pPtr);
+		}
+
+		llvm::AllocaInst* IREmitter::Variable(const ValueType type)
 		{
 			return _pBuilder->CreateAlloca(Type(type), nullptr);
 		}
 
-		llvm::AllocaInst* IREmitter::Variable(ValueType type, const std::string& name)
+		llvm::AllocaInst* IREmitter::Variable(const ValueType type, const std::string& name)
 		{
 			return _pBuilder->CreateAlloca(Type(type), nullptr, name);
 		}
 
 		llvm::AllocaInst* IREmitter::Variable(llvm::Type* pType, const std::string& name)
 		{
+			assert(pType != nullptr);
+
 			return _pBuilder->CreateAlloca(pType, nullptr, name);
 		}
 
-		llvm::AllocaInst* IREmitter::StackAlloc(ValueType type, int size)
+		llvm::AllocaInst* IREmitter::StackAlloc(const ValueType type, int size)
 		{
 			return _pBuilder->CreateAlloca(Type(type), Literal(size));
 		}
 
 		llvm::BranchInst* IREmitter::Branch(llvm::Value* pCondVal, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
 		{
+			assert(pCondVal != nullptr);
+			assert(pThenBlock != nullptr);
+			assert(pElseBlock != nullptr);
+
 			return _pBuilder->CreateCondBr(pCondVal, pThenBlock, pElseBlock);
 		}
 
 		llvm::BranchInst* IREmitter::Branch(llvm::BasicBlock* pDest)
 		{
+			assert(pDest != nullptr);
+
 			return _pBuilder->CreateBr(pDest);
 		}
 
-		llvm::Type* IREmitter::GetValueType(ValueType type)
+		llvm::Type* IREmitter::GetValueType(const ValueType type)
 		{
 			switch (type)
 			{
@@ -291,7 +351,7 @@ namespace emll
 			}
 		}
 
-		void IREmitter::BindArgTypes(ValueTypeList& args)
+		void IREmitter::BindArgTypes(const ValueTypeList& args)
 		{
 			_argTypes.clear();
 			for (auto arg = args.begin(); arg != args.end(); ++arg)
@@ -300,7 +360,7 @@ namespace emll
 			}
 		}
 
-		void IREmitter::BindArgTypes(NamedValueTypeList& args)
+		void IREmitter::BindArgTypes(const NamedValueTypeList& args)
 		{
 			_argTypes.clear();
 			for (auto arg = args.begin(); arg != args.end(); ++arg)
@@ -309,7 +369,7 @@ namespace emll
 			}
 		}
 
-		void IREmitter::BindArgNames(llvm::Function* pfn, NamedValueTypeList& args)
+		void IREmitter::BindArgNames(llvm::Function* pfn, const NamedValueTypeList& args)
 		{
 			size_t i = 0;
 			for (auto &arg : pfn->args())

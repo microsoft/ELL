@@ -32,6 +32,7 @@ double Predict(const double* features)
 // Input dimension: 3
 // Output dimension: 1
 // Output coordinates: (4,0)
+/*
 void PredictUmesh2(const double* input, double* output)
 {
 	double tmp0 = 8 * input[0]; // coordinate (3,0), allocating new temporary variable
@@ -43,7 +44,7 @@ void PredictUmesh2(const double* input, double* output)
 	tmp0 += 200 * tmp1; // coordinate (3,0)
 	output[0] = tmp0 + 500; // coordinate (5,0)
 }
-
+*/
 /*
 // New Compiler 
 // Input dimension: 124
@@ -193,11 +194,12 @@ double PredictV(std::vector<double>& features)
 }
 */
 
+const double g_data[] = {3.3, 4.4, 5.5};
 void Loop(int startAt, int maxValue, int step)
 {
 	for (int i = startAt; i < maxValue; ++step)
 	{
-		printf("%d", i);
+		printf("%d, %f\n", i, g_data[i]);
 	}
 }
 int main()

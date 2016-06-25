@@ -5,10 +5,20 @@ namespace emll
 {
 	namespace compiler
 	{
-		IRModuleEmitter::IRModuleEmitter(IREmitter* pEmitter, std::unique_ptr<llvm::Module> pModule)
-			: _pEmitter(pEmitter),
-			_pModule(std::move(pModule))
+		IRModuleEmitter::IRModuleEmitter(IREmitter& emitter, const std::string& name)
+			: IRModuleEmitter(emitter, emitter.AddModule(name))
 		{
+		}
+
+		IRModuleEmitter::IRModuleEmitter(IREmitter& emitter, std::unique_ptr<llvm::Module> pModule)
+			: _emitter(emitter), _pModule(std::move(pModule))
+		{
+		}
+
+		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, const std::vector<double>& value)
+		{
+			llvm::Constant* pData = _emitter.Literal(value);
+			return Global(name, pData, ValueType::Double, value.size());
 		}
 
 		IRFunctionEmitter IRModuleEmitter::AddMain()
@@ -16,37 +26,43 @@ namespace emll
 			return Function("main", ValueType::Void, true);
 		}
 
+		IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, const ValueType returnType, const NamedValueTypeList& args, bool isPublic)
+		{
+			llvm::Function* pfn = _emitter.Function(Module(), name, returnType, Linkage(isPublic), args);
+			if (pfn == nullptr)
+			{
+				throw new EmitterException(EmitterError::InvalidFunction);
+			}
+			BeginFunction(pfn);
+			return IRFunctionEmitter(&_emitter, pfn);
+		}
+
+		IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, const ValueType returnType, const std::initializer_list<ValueType> args, bool isPublic)
+		{
+			_valueTypeList.init(args);
+			return Function(name, returnType, &_valueTypeList, isPublic);
+		}
+
+		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, llvm::Constant* pData, const ValueType dataType, const size_t size)
+		{
+			llvm::ArrayType* pType = llvm::ArrayType::get(_emitter.Type(dataType), size);
+			return new llvm::GlobalVariable(*_pModule, pType, true, llvm::GlobalValue::PrivateLinkage, pData, name);
+		}
+
 		llvm::Function* IRModuleEmitter::GetFunction(const std::string& name)
 		{
 			return _pModule->getFunction(name);
 		}
 
-		IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, ValueType returnType, ValueTypeList* pArgs, bool isPublic)
+		IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, const ValueType returnType, const ValueTypeList* pArgs, bool isPublic)
 		{
-			llvm::Function* pfn = _pEmitter->Function(Module(), name, returnType, Linkage(isPublic), pArgs);
+			llvm::Function* pfn = _emitter.Function(Module(), name, returnType, Linkage(isPublic), pArgs);
 			if (pfn == nullptr)
 			{
 				throw new EmitterException(EmitterError::InvalidFunction);
 			}
 			BeginFunction(pfn);
-			return IRFunctionEmitter(_pEmitter, pfn);
-		}
-
-		IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, ValueType returnType, NamedValueTypeList& args, bool isPublic)
-		{
-			llvm::Function* pfn = _pEmitter->Function(Module(), name, returnType, Linkage(isPublic), args);
-			if (pfn == nullptr)
-			{
-				throw new EmitterException(EmitterError::InvalidFunction);
-			}
-			BeginFunction(pfn);
-			return IRFunctionEmitter(_pEmitter, pfn);
-		}
-
-		IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, ValueType returnType, std::initializer_list<ValueType> args, bool isPublic)
-		{
-			_valueTypeList.init(args);
-			return Function(name, returnType, &_valueTypeList, isPublic);
+			return IRFunctionEmitter(&_emitter, pfn);
 		}
 
 		llvm::Function::LinkageTypes IRModuleEmitter::Linkage(bool isPublic)
@@ -62,8 +78,8 @@ namespace emll
 			// Set us up with a default entry point, since we'll always need one
 			// We may add additional annotations here
 			//
-			auto pBlock = _pEmitter->Block(pfn, "entry");
-			_pEmitter->SetCurrentBlock(pBlock);
+			auto pBlock = _emitter.Block(pfn, "entry");
+			_emitter.SetCurrentBlock(pBlock);
 		}
 
 		void IRModuleEmitter::WriteToFile(const std::string& filePath, bool isBitCode)
@@ -109,7 +125,7 @@ namespace emll
 		//
 		void IRModuleEmitter::DeclarePrintf()
 		{
-			llvm::FunctionType* type = llvm::TypeBuilder<void(char*, ...), false>::get(_pEmitter->Context());
+			llvm::FunctionType* type = llvm::TypeBuilder<void(char*, ...), false>::get(_emitter.Context());
 			DeclareFunction("printf", type);
 		}
 		void IRModuleEmitter::DeclareMalloc()

@@ -26,36 +26,34 @@ namespace emll
 		{
 		public:
 			IREmitter();
-			virtual ~IREmitter();
 
-			llvm::Type* Type(ValueType type);
+			llvm::Type* Type(const ValueType type);
 
-			llvm::Value* Literal(int value);
-			llvm::Value* Literal(int64_t value);
-			llvm::Value* Literal(double value);
+			llvm::Value* Literal(const int value);
+			llvm::Value* Literal(const int64_t value);
+			llvm::Value* Literal(const double value);
 			llvm::Value* Literal(const std::string& value);
+			llvm::Constant* Literal(const std::vector<double>& value);
 
-			llvm::Value* Cast(llvm::Value* pValue, ValueType destType);
 			llvm::Value* Global(const std::string& name, const std::string& value);
 
+			llvm::Value* Cast(llvm::Value* pValue, const ValueType destType);
+
 			llvm::ReturnInst* ReturnVoid();
-			llvm::ReturnInst* Return(llvm::Value* value);
+			llvm::ReturnInst* Return(llvm::Value* pValue);
 
-			llvm::Value* BinaryOp(OperatorType type, llvm::Value* pLVal, llvm::Value* pRVal, const std::string& varName = "");
+			llvm::Value* BinaryOp(const OperatorType type, llvm::Value* pLVal, llvm::Value* pRVal, const std::string& varName = "");
 
-			llvm::Value* Cmp(ComparisonType type, llvm::Value* pLVal, llvm::Value* pRVal);
+			llvm::Value* Cmp(const ComparisonType type, llvm::Value* pLVal, llvm::Value* pRVal);
 
 			std::unique_ptr<llvm::Module> AddModule(const std::string& name);
 
-			llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, ValueType returnType, ValueTypeList* pArgs);
-			llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, ValueType returnType, NamedValueTypeList& args);
-			llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, llvm::FunctionType* type)
-			{
-				return static_cast<llvm::Function*>(pModule->getOrInsertFunction(name, type));
-			}
+			llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, const ValueType returnType, const ValueTypeList* pArgs);
+			llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, const ValueType returnType, const NamedValueTypeList& args);
+			llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, llvm::FunctionType* type);
 
-			llvm::Function* Function(llvm::Module* pModule, const std::string& name, ValueType returnType, llvm::Function::LinkageTypes linkage, ValueTypeList* pArgs);
-			llvm::Function* Function(llvm::Module* pModule, const std::string& name, ValueType returnType, llvm::Function::LinkageTypes linkage, NamedValueTypeList& args);
+			llvm::Function* Function(llvm::Module* pModule, const std::string& name, const ValueType returnType, llvm::Function::LinkageTypes linkage, const ValueTypeList* pArgs);
+			llvm::Function* Function(llvm::Module* pModule, const std::string& name, const ValueType returnType, llvm::Function::LinkageTypes linkage, const NamedValueTypeList& args);
 
 			llvm::BasicBlock* Block(llvm::Function* pfn, const std::string& label);
 			llvm::BasicBlock* BlockAfter(llvm::Function* pfn, llvm::BasicBlock* pPrevBlock, const std::string& label);
@@ -70,33 +68,21 @@ namespace emll
 
 			llvm::CallInst* Call(llvm::Function* pfn);
 			llvm::CallInst* Call(llvm::Function* pfn, llvm::Value* pArg);
-			llvm::CallInst* Call(llvm::Function* pfn, IRValueList& args);
+			llvm::CallInst* Call(llvm::Function* pfn, const IRValueList& args);
 
-			llvm::PHINode* Phi(ValueType type, llvm::Value* pLVal, llvm::BasicBlock* plBlock, llvm::Value* pRVal, llvm::BasicBlock* prBlock);
+			llvm::PHINode* Phi(const ValueType type, llvm::Value* pLVal, llvm::BasicBlock* plBlock, llvm::Value* pRVal, llvm::BasicBlock* prBlock);
 
-			llvm::Value* ArrayDeref(llvm::Value* pArray, llvm::Value* offset)
-			{
-				return _pBuilder->CreateGEP(pArray, offset);
-			}
+			llvm::Value* ArrayDeref(llvm::Value* pArray, llvm::Value* pOffset);
+			llvm::Value* GlobalArrayDeref(llvm::GlobalVariable* pArray, llvm::Value* pOffset);
 
-			llvm::LoadInst* Load(llvm::Value* pPtr)
-			{
-				return _pBuilder->CreateLoad(pPtr);
-			}
-			llvm::LoadInst* Load(llvm::Value* pPtr, llvm::Value* pValue)
-			{
-				return _pBuilder->CreateLoad(pPtr, pValue);
-			}
-			llvm::StoreInst* Store(llvm::Value* pPtr, llvm::Value* pVal)
-			{
-				return _pBuilder->CreateStore(pVal, pPtr);
-			}
+			llvm::LoadInst* Load(llvm::Value* pPtr);
+			llvm::StoreInst* Store(llvm::Value* pPtr, llvm::Value* pVal);
 
-			llvm::AllocaInst* Variable(ValueType type);
-			llvm::AllocaInst* Variable(ValueType type, const std::string& name);
+			llvm::AllocaInst* Variable(const ValueType type);
+			llvm::AllocaInst* Variable(const ValueType type, const std::string& name);
 			llvm::AllocaInst* Variable(llvm::Type* pType, const std::string& name);
 
-			llvm::AllocaInst* StackAlloc(ValueType type, int count);
+			llvm::AllocaInst* StackAlloc(const ValueType type, int count);
 
 
 			llvm::BranchInst* Branch(llvm::Value* pCondVal, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
@@ -108,10 +94,10 @@ namespace emll
 			}
 
 		private:
-			llvm::Type* GetValueType(ValueType type);
-			void BindArgTypes(ValueTypeList& args);
-			void BindArgTypes(NamedValueTypeList& args);
-			void BindArgNames(llvm::Function* pfn, NamedValueTypeList& args);
+			llvm::Type* GetValueType(const ValueType type);
+			void BindArgTypes(const ValueTypeList& args);
+			void BindArgTypes(const NamedValueTypeList& args);
+			void BindArgNames(llvm::Function* pfn, const NamedValueTypeList& args);
 			llvm::Function* CreateFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pTypeDef);
 
 		private:

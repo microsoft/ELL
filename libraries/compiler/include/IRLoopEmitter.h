@@ -28,6 +28,7 @@ namespace emll
 				return Begin(0, repeatCount, 1);
 			}
 			llvm::BasicBlock* Begin(const int iStartAt, const int iMaxValue, const int stepSize);
+
 			void End();
 
 		private:

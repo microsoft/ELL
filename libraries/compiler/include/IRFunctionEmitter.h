@@ -119,10 +119,6 @@ namespace emll
 			{
 				return _pEmitter->Load(pPtr);
 			}
-			llvm::Value* Load(llvm::Value* pPtr, llvm::Value* pValue)
-			{
-				return _pEmitter->Load(pPtr, pValue);
-			}
 			llvm::Value* Store(llvm::Value* pPtr, llvm::Value* pValue);
 			llvm::Value* OpAndUpdate(llvm::Value* pPtr, OperatorType op, llvm::Value* pValue);
 
@@ -130,8 +126,12 @@ namespace emll
 			llvm::Value* ValueAtA(llvm::Value* pPtr, int offset);
 			llvm::Value* SetValueAtA(llvm::Value* pPtr, int offset, llvm::Value* pValue);
 			llvm::Value* PtrOffsetH(llvm::Value* pPtr, int offset);
+			llvm::Value* PtrOffsetH(llvm::Value* pPtr, llvm::Value* pOffset);
 			llvm::Value* ValueAtH(llvm::Value* pPtr, int offset);
+			llvm::Value* ValueAtH(llvm::Value* pPtr, llvm::Value* pOffset);
 			llvm::Value* SetValueAtH(llvm::Value* pPtr, int offset, llvm::Value* pValue);
+
+			llvm::Value* ValueAtGlobal(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset);
 
 
 			llvm::Value* Malloc(ValueType type, int64_t size);
