@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     OutputRef.tcc (model)
+//  File:     OutputPortRef.tcc (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,26 +10,26 @@
 namespace model
 {
     //
-    // OutputRef
+    // OutputPortRef
     //
 
     template <typename ValueType>
-    OutputRef<ValueType>::OutputRef(const OutputPort<ValueType>& port) : UntypedOutputRef(port)
+    OutputPortRef<ValueType>::OutputPortRef(const OutputPort<ValueType>& port) : OutputPortRefUntyped(port)
     {
     }
 
     template <typename ValueType>
-    OutputRef<ValueType>::OutputRef(const OutputPort<ValueType>& port, size_t startIndex) : UntypedOutputRef(OutputRange(port, startIndex))
+    OutputPortRef<ValueType>::OutputPortRef(const OutputPort<ValueType>& port, size_t startIndex) : OutputPortRefUntyped(OutputPortRange(port, startIndex))
     {
     }
 
     template <typename ValueType>
-    OutputRef<ValueType>::OutputRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : UntypedOutputRef(OutputRange(port, startIndex, numValues))
+    OutputPortRef<ValueType>::OutputPortRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : OutputPortRefUntyped(OutputPortRange(port, startIndex, numValues))
     {
     }
 
     template <typename ValueType>
-    OutputRef<ValueType>::OutputRef(const std::initializer_list<OutputRef<ValueType>>& groups)
+    OutputPortRef<ValueType>::OutputPortRef(const std::initializer_list<OutputPortRef<ValueType>>& groups)
     {
         for (const auto& group : groups)
         {
@@ -42,7 +42,7 @@ namespace model
     }
 
     template <typename ValueType>
-    OutputRef<ValueType>::OutputRef(const std::vector<OutputRef<ValueType>>& groups)
+    OutputPortRef<ValueType>::OutputPortRef(const std::vector<OutputPortRef<ValueType>>& groups)
     {
         for (const auto& group : groups)
         {
@@ -60,21 +60,21 @@ namespace model
 
     // MakeRef
     template <typename ValueType>
-    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port)
+    OutputPortRef<ValueType> MakeRef(const OutputPort<ValueType>& port)
     {
-        return OutputRef<ValueType>(port);
+        return OutputPortRef<ValueType>(port);
     }
 
     template <typename ValueType>
-    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex)
+    OutputPortRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex)
     {
-        return OutputRef<ValueType>(port, startIndex);
+        return OutputPortRef<ValueType>(port, startIndex);
     }
 
     template <typename ValueType>
-    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues)
+    OutputPortRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues)
     {
-        return OutputRef<ValueType>(port, startIndex, numValues);
+        return OutputPortRef<ValueType>(port, startIndex, numValues);
     }
 
     // Concat

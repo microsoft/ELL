@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     OutputRef.h (model)
+//  File:     OutputPortRef.h (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,14 +19,14 @@
 namespace model
 {
     /// <summary> Represents a reference to a single element in another node's output </summary>
-    class ElementRef
+    class OutputPortElementRef
     {
     public:
-        /// <summary> Creates an ElementRef representing a single value from a given port </summary>
+        /// <summary> Creates an OutputPortElementRef representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        ElementRef(const Port* port, size_t index);
+        OutputPortElementRef(const Port* port, size_t index);
 
         /// <summary> Returns the type of the values referenced </summary>
         ///
@@ -49,26 +49,26 @@ namespace model
     };
     
     /// <summary> Represents a contiguous set of values from an output port </summary>
-    class OutputRange
+    class OutputPortRange
     {
     public:
-        /// <summary> Creates an OutputRange representing all the values from a given port </summary>
+        /// <summary> Creates an OutputPortRange representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
-        OutputRange(const Port& port);
+        OutputPortRange(const Port& port);
 
-        /// <summary> Creates an OutputRange representing a single value from a given port </summary>
+        /// <summary> Creates an OutputPortRange representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        OutputRange(const Port& port, size_t index);
+        OutputPortRange(const Port& port, size_t index);
 
-        /// <summary> Creates an OutputRange representing a range of values from a given port </summary>
+        /// <summary> Creates an OutputPortRange representing a range of values from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="startIndex"> The index of the first value to take </param>
         /// <param name="numValues"> The number of values to take </param>
-        OutputRange(const Port& port, size_t startIndex, size_t numValues);
+        OutputPortRange(const Port& port, size_t startIndex, size_t numValues);
 
         /// <summary> Returns the type of the values referenced </summary>
         ///
@@ -98,42 +98,42 @@ namespace model
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>
-    class UntypedOutputRef
+    class OutputPortRefUntyped
     {
     public:
-        /// <summary> Creates an UntypedOutputRef representing all the values from a given port </summary>
+        /// <summary> Creates an OutputPortRefUntyped representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
-        UntypedOutputRef(const Port& port);
+        OutputPortRefUntyped(const Port& port);
 
-        /// <summary> Creates an UntypedOutputRef representing a single value from a given port </summary>
+        /// <summary> Creates an OutputPortRefUntyped representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        UntypedOutputRef(const Port& port, size_t startIndex);
+        OutputPortRefUntyped(const Port& port, size_t startIndex);
 
-        /// <summary> Creates an UntypedOutputRef representing a range of values from a given port </summary>
+        /// <summary> Creates an OutputPortRefUntyped representing a range of values from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="startIndex"> The index of the first value to take </param>
         /// <param name="numValues"> The number of values to take </param>
-        UntypedOutputRef(const Port& port, size_t startIndex, size_t numValues);
+        OutputPortRefUntyped(const Port& port, size_t startIndex, size_t numValues);
 
-        /// <summary> Creates an UntypedOutputRef from an OutputRange </summary>
+        /// <summary> Creates an OutputPortRefUntyped from an OutputPortRange </summary>
         ///
         /// <param name="range"> The range to get values from </param>
-        UntypedOutputRef(const OutputRange& range);
+        OutputPortRefUntyped(const OutputPortRange& range);
 
-        /// <summary> Creates an UntypedOutputRef from a set of OutputRange </summary>
+        /// <summary> Creates an OutputPortRefUntyped from a set of OutputPortRange </summary>
         ///
         /// <param name="range"> The ranges to get values from </param>
-        UntypedOutputRef(const std::vector<OutputRange>& ranges);
+        OutputPortRefUntyped(const std::vector<OutputPortRange>& ranges);
 
         /// <summary> Returns a single-element range for the element at the given index </summary>
         ///
         /// <param name="index"> The index of the element </param>
         /// <returns> A single-element range for the element </returns>
-        OutputRange GetElementRef(size_t index) const;
+        OutputPortRange GetOutputPortElementRef(size_t index) const;
 
         /// <summary> The dimensionality of the output </summary>
         ///
@@ -141,89 +141,89 @@ namespace model
         size_t Size() const { return _size; }
 
         /// <summary> An STL-type iterator pointing to the beginning of the list of ranges </summary>
-        std::vector<OutputRange>::const_iterator begin() const { return _ranges.cbegin(); }
+        std::vector<OutputPortRange>::const_iterator begin() const { return _ranges.cbegin(); }
 
         /// <summary> An STL-type iterator pointing to the end of the list of ranges </summary>
-        std::vector<OutputRange>::const_iterator end() const { return _ranges.cend(); }
+        std::vector<OutputPortRange>::const_iterator end() const { return _ranges.cend(); }
 
     protected:
-        UntypedOutputRef(){};
+        OutputPortRefUntyped(){};
         void ComputeSize();
-        void AddRange(const OutputRange& range);
+        void AddRange(const OutputPortRange& range);
     
     private:
-        std::vector<OutputRange> _ranges;
+        std::vector<OutputPortRange> _ranges;
         size_t _size = 0;
     };
 
     /// <summary> Represents a statically-typed set of values from one or more output ports </summary>
     template <typename ValueType>
-    class OutputRef : public UntypedOutputRef
+    class OutputPortRef : public OutputPortRefUntyped
     {
     public:
-        /// <summary> Creates a OutputRef representing all the values from a given port </summary>
+        /// <summary> Creates a OutputPortRef representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
-        OutputRef(const OutputPort<ValueType>& port);
+        OutputPortRef(const OutputPort<ValueType>& port);
 
-        /// <summary> Creates a OutputRef representing a single value from a given port </summary>
+        /// <summary> Creates a OutputPortRef representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        OutputRef(const OutputPort<ValueType>& port, size_t startIndex);
+        OutputPortRef(const OutputPort<ValueType>& port, size_t startIndex);
 
-        /// <summary> Creates a OutputRef representing a range of values from a given port </summary>
+        /// <summary> Creates a OutputPortRef representing a range of values from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="startIndex"> The index of the first value to take </param>
         /// <param name="numValues"> The number of values to take </param>
-        OutputRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
+        OutputPortRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
 
-        /// <summary> Creates a OutputRef by concatenating a set of them together </summary>
+        /// <summary> Creates a OutputPortRef by concatenating a set of them together </summary>
         ///
         /// <param name="groups"> The list of groups to concantenate together </param>
-        OutputRef(const std::initializer_list<OutputRef<ValueType>>& groups);
+        OutputPortRef(const std::initializer_list<OutputPortRef<ValueType>>& groups);
 
-        /// <summary> Creates a OutputRef by concatenating a set of them together </summary>
+        /// <summary> Creates a OutputPortRef by concatenating a set of them together </summary>
         ///
         /// <param name="groups"> The list of groups to concantenate together </param>
-        OutputRef(const std::vector<OutputRef<ValueType>>& groups);
+        OutputPortRef(const std::vector<OutputPortRef<ValueType>>& groups);
     };
 
     //
     // Helper functions
     //
 
-    /// <summary> Creates a OutputRef representing all the values from a given port </summary>
+    /// <summary> Creates a OutputPortRef representing all the values from a given port </summary>
     ///
     /// <param name="port"> The port to take values from </param>
-    /// <returns> The composite OutputRef </returns>
+    /// <returns> The composite OutputPortRef </returns>
     template <typename ValueType>
-    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port);
+    OutputPortRef<ValueType> MakeRef(const OutputPort<ValueType>& port);
 
-    /// <summary> Creates a OutputRef representing a single value from a given port </summary>
+    /// <summary> Creates a OutputPortRef representing a single value from a given port </summary>
     ///
     /// <param name="port"> The port to take a value from </param>
     /// <param name="index"> The index of the value </param>
-    /// <returns> The composite OutputRef </returns>
+    /// <returns> The composite OutputPortRef </returns>
     template <typename ValueType>
-    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex);
+    OutputPortRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex);
 
-    /// <summary> Creates a OutputRef representing a range of values from a given port </summary>
+    /// <summary> Creates a OutputPortRef representing a range of values from a given port </summary>
     ///
     /// <param name="port"> The port to take a value from </param>
     /// <param name="startIndex"> The index of the first value to take </param>
     /// <param name="numValues"> The number of values to take </param>
-    /// <returns> The composite OutputRef </returns>
+    /// <returns> The composite OutputPortRef </returns>
     template <typename ValueType>
-    OutputRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
+    OutputPortRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
 
-    /// <summary> Creates a OutputRef by concatenating together one or more OutputRefs
+    /// <summary> Creates a OutputPortRef by concatenating together one or more OutputPortRefs
     ///
-    /// <param name="ref"> The OutputRefs to concatenate together </param>
-    /// <returns> The composite OutputRef </returns>
+    /// <param name="ref"> The OutputPortRefs to concatenate together </param>
+    /// <returns> The composite OutputPortRef </returns>
     template <typename RefType, typename... Refs>
     RefType Concat(const RefType& ref1, Refs&&... refs);
 }
 
-#include "../tcc/OutputRef.tcc"
+#include "../tcc/OutputPortRef.tcc"

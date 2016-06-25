@@ -11,7 +11,7 @@ namespace model
 {
 
     template <typename ValueType>
-    ValueSelectorNode<ValueType>::ValueSelectorNode(const OutputRef<bool>& condition, const OutputRef<ValueType>& value1, const OutputRef<ValueType>& value2) : Node({ &_condition, &_value1, &_value2 }, { &_output }), _condition(this, condition), _value1(this, value1), _value2(this, value2), _output(this, value1.Size())
+    ValueSelectorNode<ValueType>::ValueSelectorNode(const OutputPortRef<bool>& condition, const OutputPortRef<ValueType>& value1, const OutputPortRef<ValueType>& value2) : Node({ &_condition, &_value1, &_value2 }, { &_output }), _condition(this, condition), _value1(this, value1), _value2(this, value2), _output(this, value1.Size())
     {
         if (condition.Size() != 1)
         {

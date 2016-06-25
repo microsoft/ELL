@@ -11,7 +11,7 @@
 #include "Port.h"
 #include "OutputPort.h"
 #include "Node.h"
-#include "OutputRef.h"
+#include "OutputPortRef.h"
 
 #include <vector>
 #include <cassert>
@@ -28,22 +28,22 @@ namespace model
         /// <param name="owningNode"> The node that contains this port </param>
         /// <param name="input"> The input group to fetch input values from </param>
         template <typename ValueType>
-        InputPortBase(const class Node* owningNode, const OutputRef<ValueType>& input);
+        InputPortBase(const class Node* owningNode, const OutputPortRef<ValueType>& input);
 
-        /// <summary> Returns the ElementRefs containing the referenced locations to get values from </summary>
+        /// <summary> Returns the OutputPortElementRefs containing the referenced locations to get values from </summary>
         ///
-        /// <returns> The ElementRefs containing the referenced locations to get values from </returns>
-        const std::vector<ElementRef>& GetElementRefs() const { return _inputElements; }
+        /// <returns> The OutputPortElementRefs containing the referenced locations to get values from </returns>
+        const std::vector<OutputPortElementRef>& GetOutputPortElementRefs() const { return _inputElements; }
 
-        /// <summary> Returns an ElementRef containing the referenced location to get the value for a specific input element from </summary>
+        /// <summary> Returns an OutputPortElementRef containing the referenced location to get the value for a specific input element from </summary>
         ///
         /// <param name="index"> The index of the element </param>
-        /// <returns> The ElementRef containing the referenced location to get the value from </returns>
-        const ElementRef& GetElementRef(size_t index) const { return _inputElements[index]; }
+        /// <returns> The OutputPortElementRef containing the referenced location to get the value from </returns>
+        const OutputPortElementRef& GetOutputPortElementRef(size_t index) const { return _inputElements[index]; }
 
-        /// <summary> Returns the ElementRefs containing the referenced locations to get values from </summary>
+        /// <summary> Returns the OutputPortElementRefs containing the referenced locations to get values from </summary>
         ///
-        /// <returns> The ElementRefs containing the referenced locations to get values from </returns>
+        /// <returns> The OutputPortElementRefs containing the referenced locations to get values from </returns>
         const std::vector<const Node*>& GetInputNodes() const { return _inputNodes; }
 
         /// <summary> The dimensionality of the output </summary>
@@ -65,8 +65,8 @@ namespace model
         ValueType GetTypedValue(size_t index) const;
 
     private:
-        UntypedOutputRef _inputRanges;
-        std::vector<ElementRef> _inputElements;
+        OutputPortRefUntyped _inputRanges;
+        std::vector<OutputPortElementRef> _inputElements;
         std::vector<const Node*> _inputNodes;
     };
 
@@ -78,7 +78,7 @@ namespace model
         ///
         /// <param name="owningNode"> The node this port belongs to </param>
         /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
-        InputPort(const class Node* owningNode, const OutputRef<ValueType>& input);
+        InputPort(const class Node* owningNode, const OutputPortRef<ValueType>& input);
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         ///
