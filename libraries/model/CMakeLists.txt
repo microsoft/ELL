@@ -16,7 +16,6 @@ set (SRC src/ModelGraph.cpp
          src/Node.cpp
          src/OutputRef.cpp
          src/Port.cpp
-         src/UniqueId.cpp
 )
 
 set (INCLUDE include/ConstantNode.h
@@ -28,7 +27,6 @@ set (INCLUDE include/ConstantNode.h
              include/OutputPort.h
              include/OutputRef.h
              include/Port.h
-             include/UniqueId.h
              include/ValueSelectorNode.h
 )
 
@@ -47,6 +45,7 @@ source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
 include_directories(include)
+include_directories(../utilities/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 
@@ -72,7 +71,7 @@ include_directories(test/include)
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} model testing)
+target_link_libraries(${TEST_NAME} model testing utilities)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

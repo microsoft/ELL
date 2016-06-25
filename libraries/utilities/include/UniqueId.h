@@ -1,12 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     UniqueId.h (model)
+//  File:     UniqueId.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// TODO: move to utilities (?)
 
 #pragma once
 
@@ -14,7 +12,7 @@
 #include <ostream>
 
 /// <summary> model namespace </summary>
-namespace model
+namespace utilities
 {
     /// <summary> UniqueId: A placeholder for a real GUID-type class </summary>
     class UniqueId
@@ -49,10 +47,10 @@ namespace model
 namespace std
 {
     template <>
-    class hash<model::UniqueId>
+    class hash<utilities::UniqueId>
     {
     public:
-        typedef model::UniqueId argument_type;
+        typedef utilities::UniqueId argument_type;
         typedef std::size_t result_type;
         result_type operator()(argument_type const& id) const;
     };

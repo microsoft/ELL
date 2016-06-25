@@ -52,16 +52,6 @@ namespace model
         template <typename ValueType>
         static PortType GetTypeCode();
 
-        /// <summary> Sets the underlying type of the port </summary>
-        ///
-        /// <param name="type"> The type of the port </param>
-        void SetType(PortType type);
-
-        /// <summary> Sets the dimension of the port </summary>
-        ///
-        /// <param name="size"> The dimension of the port </param>
-        void SetSize(size_t size);
-
     protected:
         Port(const class Node* node, PortType type, size_t size) : _node(node), _type(type), _size(size) {}
 

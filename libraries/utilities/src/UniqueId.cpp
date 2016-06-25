@@ -1,15 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     UniqueId.cpp (model)
+//  File:     UniqueId.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "UniqueId.h"
 
-/// <summary> model namespace </summary>
-namespace model
+/// <summary> utilities namespace </summary>
+namespace utilities
 {
     size_t UniqueId::_nextId = 1000;
 
@@ -24,7 +24,7 @@ namespace model
     bool UniqueId::operator!=(const UniqueId& other) const { return !(other == *this); }
 }
 
-std::hash<model::UniqueId>::result_type std::hash<model::UniqueId>::operator()(argument_type const& id) const
+std::hash<utilities::UniqueId>::result_type std::hash<utilities::UniqueId>::operator()(argument_type const& id) const
 {
     return std::hash<size_t>()(id._id);
 }

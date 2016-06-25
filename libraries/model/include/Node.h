@@ -28,7 +28,7 @@ namespace model
     {
     public:
         /// <summary> Type to use for our node id </summary>
-        typedef UniqueId NodeId;
+        typedef utilities::UniqueId NodeId;
 
         /// <summary> Returns the unique ID for this node </summary>
         ///
