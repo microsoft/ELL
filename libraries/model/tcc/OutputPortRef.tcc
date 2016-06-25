@@ -58,21 +58,21 @@ namespace model
     // Convenience functions
     //
 
-    // MakeRef
+    // MakeOutputPortRef
     template <typename ValueType>
-    OutputPortRef<ValueType> MakeRef(const OutputPort<ValueType>& port)
+    OutputPortRef<ValueType> MakeOutputPortRef(const OutputPort<ValueType>& port)
     {
         return OutputPortRef<ValueType>(port);
     }
 
     template <typename ValueType>
-    OutputPortRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex)
+    OutputPortRef<ValueType> MakeOutputPortRef(const OutputPort<ValueType>& port, size_t startIndex)
     {
         return OutputPortRef<ValueType>(port, startIndex);
     }
 
     template <typename ValueType>
-    OutputPortRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues)
+    OutputPortRef<ValueType> MakeOutputPortRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues)
     {
         return OutputPortRef<ValueType>(port, startIndex, numValues);
     }

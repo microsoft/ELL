@@ -199,7 +199,7 @@ namespace model
     /// <param name="port"> The port to take values from </param>
     /// <returns> The composite OutputPortRef </returns>
     template <typename ValueType>
-    OutputPortRef<ValueType> MakeRef(const OutputPort<ValueType>& port);
+    OutputPortRef<ValueType> MakeOutputPortRef(const OutputPort<ValueType>& port);
 
     /// <summary> Creates a OutputPortRef representing a single value from a given port </summary>
     ///
@@ -207,7 +207,7 @@ namespace model
     /// <param name="index"> The index of the value </param>
     /// <returns> The composite OutputPortRef </returns>
     template <typename ValueType>
-    OutputPortRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex);
+    OutputPortRef<ValueType> MakeOutputPortRef(const OutputPort<ValueType>& port, size_t startIndex);
 
     /// <summary> Creates a OutputPortRef representing a range of values from a given port </summary>
     ///
@@ -216,7 +216,7 @@ namespace model
     /// <param name="numValues"> The number of values to take </param>
     /// <returns> The composite OutputPortRef </returns>
     template <typename ValueType>
-    OutputPortRef<ValueType> MakeRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
+    OutputPortRef<ValueType> MakeOutputPortRef(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
 
     /// <summary> Creates a OutputPortRef by concatenating together one or more OutputPortRefs
     ///
