@@ -54,20 +54,21 @@ namespace utilities
     enum class LogicExceptionErrors
     {
         illegalState,
-        notYetImplemented
+        notImplemented
     };
 
     /// <summary> Error codes for exceptions that are the system's fault (missing files, serial ports, TCP ports, etc). </summary>
     enum class SystemExceptionErrors
     {
         fileNotFound,
-        serialPortDropped
+        serialPortUnavailable
     };
 
     /// <summary> Error codes for exceptions due to the numeric values in the data. </summary>
     enum class NumericExceptionErrors
     {
         divideByZero,
+        overflow,
         didNotConverge
     };
 
