@@ -62,7 +62,7 @@ namespace emll
 			llvm::BasicBlock* Block(const std::string& label);
 			llvm::BasicBlock* CurrentBlock()
 			{
-				return _pBuilder->GetInsertBlock();
+				return _builder.GetInsertBlock();
 			}
 			void SetCurrentBlock(llvm::BasicBlock* pBlock);
 
@@ -102,10 +102,12 @@ namespace emll
 
 		private:
 			llvm::LLVMContext _context;
-			std::unique_ptr<llvm::IRBuilder<>> _pBuilder;
+			llvm::IRBuilder<> _builder;
 			IRVariableTable _stringLiterals;
 			// Reusable buffers
 			std::vector<llvm::Type *> _argTypes;
+			llvm::Value* _derefArgs[2];
+			llvm::Value* _pZeroLiteral = nullptr;
 		};
 	}
 }

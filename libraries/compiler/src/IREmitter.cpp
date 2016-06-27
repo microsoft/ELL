@@ -6,8 +6,8 @@ namespace emll
 	namespace compiler
 	{
 		IREmitter::IREmitter()
+			: _builder(_context)
 		{
-			_pBuilder = std::make_unique<llvm::IRBuilder<>>(_context);
 		}
 
 		llvm::Type* IREmitter::Type(const ValueType type)
@@ -67,7 +67,7 @@ namespace emll
 			llvm::Value* literal = _stringLiterals.Get(value);
 			if (literal == nullptr)
 			{
-				literal = _pBuilder->CreateGlobalStringPtr(value);
+				literal = _builder.CreateGlobalStringPtr(value);
 				_stringLiterals.Set(value, literal);
 			}
 			return literal;
@@ -82,23 +82,23 @@ namespace emll
 		{
 			assert(pValue != nullptr);
 
-			return _pBuilder->CreateBitCast(pValue, Type(destType));
+			return _builder.CreateBitCast(pValue, Type(destType));
 		}
 
 		llvm::Value* IREmitter::Global(const std::string& name, const std::string& value)
 		{
-			return _pBuilder->CreateGlobalStringPtr(value, name);
+			return _builder.CreateGlobalStringPtr(value, name);
 		}
 
 		llvm::ReturnInst* IREmitter::ReturnVoid()
 		{
-			return _pBuilder->CreateRetVoid();
+			return _builder.CreateRetVoid();
 		}
 
 		llvm::ReturnInst* IREmitter::Return(llvm::Value* pValue)
 		{
 			assert(pValue != nullptr);
-			return _pBuilder->CreateRet(pValue);
+			return _builder.CreateRet(pValue);
 		}
 
 		llvm::Value* IREmitter::BinaryOp(const OperatorType type, llvm::Value* pLVal, llvm::Value* pRVal, const std::string& varName)
@@ -109,21 +109,21 @@ namespace emll
 			switch (type)
 			{
 			case OperatorType::Add:
-				return _pBuilder->CreateAdd(pLVal, pRVal, varName);
+				return _builder.CreateAdd(pLVal, pRVal, varName);
 			case OperatorType::Subtract:
-				return _pBuilder->CreateSub(pLVal, pRVal, varName);
+				return _builder.CreateSub(pLVal, pRVal, varName);
 			case OperatorType::Multiply:
-				return _pBuilder->CreateMul(pLVal, pRVal, varName);
+				return _builder.CreateMul(pLVal, pRVal, varName);
 			case OperatorType::DivideS:
-				return _pBuilder->CreateSDiv(pLVal, pRVal, varName);
+				return _builder.CreateSDiv(pLVal, pRVal, varName);
 			case OperatorType::AddF:
-				return _pBuilder->CreateFAdd(pLVal, pRVal, varName);
+				return _builder.CreateFAdd(pLVal, pRVal, varName);
 			case OperatorType::SubtractF:
-				return _pBuilder->CreateFSub(pLVal, pRVal, varName);
+				return _builder.CreateFSub(pLVal, pRVal, varName);
 			case OperatorType::MultiplyF:
-				return _pBuilder->CreateFMul(pLVal, pRVal, varName);
+				return _builder.CreateFMul(pLVal, pRVal, varName);
 			case OperatorType::DivideF:
-				return _pBuilder->CreateFDiv(pLVal, pRVal, varName);
+				return _builder.CreateFDiv(pLVal, pRVal, varName);
 			default:
 				throw new EmitterException(EmitterError::InvalidOperatorType);
 			}
@@ -139,17 +139,17 @@ namespace emll
 			default:
 				throw new EmitterException(EmitterError::InvalidComparisonType);
 			case ComparisonType::Eq:
-				return _pBuilder->CreateICmpEQ(pLVal, pRVal);
+				return _builder.CreateICmpEQ(pLVal, pRVal);
 			case ComparisonType::Lt:
-				return _pBuilder->CreateICmpSLT(pLVal, pRVal);
+				return _builder.CreateICmpSLT(pLVal, pRVal);
 			case ComparisonType::Lte:
-				return _pBuilder->CreateICmpSLE(pLVal, pRVal);
+				return _builder.CreateICmpSLE(pLVal, pRVal);
 			case ComparisonType::Gt:
-				return _pBuilder->CreateICmpSGT(pLVal, pRVal);
+				return _builder.CreateICmpSGT(pLVal, pRVal);
 			case ComparisonType::Gte:
-				return _pBuilder->CreateICmpSGE(pLVal, pRVal);
+				return _builder.CreateICmpSGE(pLVal, pRVal);
 			case ComparisonType::Neq:
-				return _pBuilder->CreateICmpNE(pLVal, pRVal);
+				return _builder.CreateICmpNE(pLVal, pRVal);
 			}
 		}
 
@@ -227,25 +227,25 @@ namespace emll
 		void IREmitter::SetCurrentBlock(llvm::BasicBlock* pBlock)
 		{
 			assert(pBlock != nullptr);
-			_pBuilder->SetInsertPoint(pBlock);
+			_builder.SetInsertPoint(pBlock);
 		}
 
 		llvm::CallInst* IREmitter::Call(llvm::Function* pfn)
 		{
 			assert(pfn != nullptr);
-			return _pBuilder->CreateCall(pfn, llvm::None);
+			return _builder.CreateCall(pfn, llvm::None);
 		}
 
 		llvm::CallInst* IREmitter::Call(llvm::Function* pfn, llvm::Value* pArg)
 		{
 			assert(pfn != nullptr);
-			return _pBuilder->CreateCall(pfn, pArg);
+			return _builder.CreateCall(pfn, pArg);
 		}
 
 		llvm::CallInst* IREmitter::Call(llvm::Function* pfn, const IRValueList& args)
 		{
 			assert(pfn != nullptr);
-			return _pBuilder->CreateCall(pfn, args);
+			return _builder.CreateCall(pfn, args);
 		}
 
 		llvm::PHINode* IREmitter::Phi(const ValueType type, llvm::Value* pLVal, llvm::BasicBlock* pLBlock, llvm::Value* pRVal, llvm::BasicBlock* pRBlock)
@@ -255,7 +255,7 @@ namespace emll
 			assert(pRVal != nullptr);
 			assert(pRBlock != nullptr);
 
-			llvm::PHINode* phi = _pBuilder->CreatePHI(Type(type), 2);
+			llvm::PHINode* phi = _builder.CreatePHI(Type(type), 2);
 			phi->addIncoming(pLVal, pLBlock);
 			phi->addIncoming(pRVal, pRBlock);
 			return phi;
@@ -265,7 +265,7 @@ namespace emll
 		{
 			assert(pArray != nullptr);
 			assert(pOffset != nullptr);
-			return _pBuilder->CreateGEP(pArray, pOffset);
+			return _builder.CreateGEP(pArray, pOffset);
 		}
 
 		llvm::Value* IREmitter::GlobalArrayDeref(llvm::GlobalVariable* pArray, llvm::Value* pOffset)
@@ -273,43 +273,48 @@ namespace emll
 			assert(pArray != nullptr);
 			assert(pOffset != nullptr);
 
-			llvm::Value *args[] = { Literal(0), pOffset };
-			return _pBuilder->CreateInBoundsGEP(pArray->getValueType(), pArray, args);
+			if (_pZeroLiteral == nullptr)
+			{
+				_pZeroLiteral = Literal(0);
+			}
+			_derefArgs[0] = _pZeroLiteral;
+			_derefArgs[1] = pOffset;
+			return _builder.CreateInBoundsGEP(pArray->getValueType(), pArray, _derefArgs);
 		}
 
 		llvm::LoadInst* IREmitter::Load(llvm::Value* pPtr)
 		{
 			assert(pPtr != nullptr);
-			return _pBuilder->CreateLoad(pPtr);
+			return _builder.CreateLoad(pPtr);
 		}
 
 		llvm::StoreInst* IREmitter::Store(llvm::Value* pPtr, llvm::Value* pVal)
 		{
 			assert(pPtr != nullptr);
 			assert(pVal != nullptr);
-			return _pBuilder->CreateStore(pVal, pPtr);
+			return _builder.CreateStore(pVal, pPtr);
 		}
 
 		llvm::AllocaInst* IREmitter::Variable(const ValueType type)
 		{
-			return _pBuilder->CreateAlloca(Type(type), nullptr);
+			return _builder.CreateAlloca(Type(type), nullptr);
 		}
 
 		llvm::AllocaInst* IREmitter::Variable(const ValueType type, const std::string& name)
 		{
-			return _pBuilder->CreateAlloca(Type(type), nullptr, name);
+			return _builder.CreateAlloca(Type(type), nullptr, name);
 		}
 
 		llvm::AllocaInst* IREmitter::Variable(llvm::Type* pType, const std::string& name)
 		{
 			assert(pType != nullptr);
 
-			return _pBuilder->CreateAlloca(pType, nullptr, name);
+			return _builder.CreateAlloca(pType, nullptr, name);
 		}
 
 		llvm::AllocaInst* IREmitter::StackAlloc(const ValueType type, int size)
 		{
-			return _pBuilder->CreateAlloca(Type(type), Literal(size));
+			return _builder.CreateAlloca(Type(type), Literal(size));
 		}
 
 		llvm::BranchInst* IREmitter::Branch(llvm::Value* pCondVal, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
@@ -318,14 +323,14 @@ namespace emll
 			assert(pThenBlock != nullptr);
 			assert(pElseBlock != nullptr);
 
-			return _pBuilder->CreateCondBr(pCondVal, pThenBlock, pElseBlock);
+			return _builder.CreateCondBr(pCondVal, pThenBlock, pElseBlock);
 		}
 
 		llvm::BranchInst* IREmitter::Branch(llvm::BasicBlock* pDest)
 		{
 			assert(pDest != nullptr);
 
-			return _pBuilder->CreateBr(pDest);
+			return _builder.CreateBr(pDest);
 		}
 
 		llvm::Type* IREmitter::GetValueType(const ValueType type)
@@ -333,19 +338,19 @@ namespace emll
 			switch (type)
 			{
 			case ValueType::Void:
-				return _pBuilder->getVoidTy();
+				return _builder.getVoidTy();
 			case ValueType::Byte:
-				return _pBuilder->getInt8Ty();
+				return _builder.getInt8Ty();
 			case ValueType::Short:
-				return _pBuilder->getInt16Ty();
+				return _builder.getInt16Ty();
 			case ValueType::Int32:
-				return _pBuilder->getInt32Ty();
+				return _builder.getInt32Ty();
 			case ValueType::Int64:
-				return _pBuilder->getInt64Ty();
+				return _builder.getInt64Ty();
 			case ValueType::Double:
-				return _pBuilder->getDoubleTy();
+				return _builder.getDoubleTy();
 			case ValueType::Char8:
-				return _pBuilder->getInt8Ty();
+				return _builder.getInt8Ty();
 			default:
 				throw new EmitterException(EmitterError::InvalidValueType);
 			}
