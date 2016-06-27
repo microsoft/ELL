@@ -17,11 +17,12 @@
 %}
 
 %ignore dataset::RowDataset::operator[];
+
 namespace dataset
 {
     %ignore IDataVector::Clone;
-    %ignore SupervisedExample(SupervisedExample<IDataVector>&& other);
-    %ignore GenericSupervisedExample::GenericSupervisedExample(GenericSupervisedExample&& other);
+    %ignore SupervisedExample<IDataVector>::SupervisedExample(SupervisedExample&&);
+    %ignore GenericSupervisedExample::GenericSupervisedExample(GenericSupervisedExample&&);
     %ignore GenericSupervisedExample::GetDataVector;
     %ignore GenericSupervisedExample::GenericSupervisedExample;
 
@@ -33,7 +34,7 @@ namespace dataset
     %ignore SparseDataVector<short, utilities::CompressedIntegerList>;
 }
 
-%ignore dataset::SupervisedExample<dataset::IDataVector>::SupervisedExample(SupervisedExample&&);
+%ignore dataset::SupervisedExample<dataset::DoubleDataVector>::SupervisedExample(SupervisedExample&&);
 %ignore interfaces::GenericRowDataset::GenericRowDataset(GenericRowDataset &&);
 
 %include "noncopyable.i"

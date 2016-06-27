@@ -8,6 +8,8 @@
 
 %ignore layers::BuildCoordinateList;
 %ignore layers::CoordinateList::operator[];
+%ignore layers::CoordinateList::begin() const;
+%ignore layers::CoordinateList::end() const;
 %ignore interfaces::Model::GetModel() const;
 
 %{
