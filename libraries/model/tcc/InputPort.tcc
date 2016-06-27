@@ -15,7 +15,7 @@ namespace model
     template <typename ValueType>
     InputPortBase::InputPortBase(const class Node* owningNode, const OutputPortRef<ValueType>& input) : Port(owningNode, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)
     {
-        
+        assert(owningNode != nullptr);        
         for (const auto& range : input)
         {
             auto port = range.ReferencedPort();
@@ -24,7 +24,7 @@ namespace model
             auto numElements = range.Size();
             for (size_t index = 0; index < numElements; ++index)
             {
-                _inputElements.emplace_back(port, index + start);
+                _inputElements.emplace_back(*port, index + start);
             }
             _inputNodes.push_back(node);
         }

@@ -59,7 +59,6 @@ namespace model
         // _node keeps info on where the input is coming from
         const class Node* _node = nullptr;
 
-        PortId _id;
         PortType _type = PortType::None;
         size_t _size = 0;
     };

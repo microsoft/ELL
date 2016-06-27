@@ -11,10 +11,10 @@
 namespace model
 {
     //
-    // OutputPortElementRef
+    // OutputPortElement
     //
 
-    OutputPortElementRef::OutputPortElementRef(const Port* port, size_t index) : _referencedPort(port), _index(index) {}
+    OutputPortElement::OutputPortElement(const Port& port, size_t index) : _referencedPort(&port), _index(index) {}
 
     //
     // OutputPortRange

@@ -30,20 +30,20 @@ namespace model
         template <typename ValueType>
         InputPortBase(const class Node* owningNode, const OutputPortRef<ValueType>& input);
 
-        /// <summary> Returns the OutputPortElementRefs containing the referenced locations to get values from </summary>
+        /// <summary> Returns the OutputPortElements containing the referenced locations to get values from </summary>
         ///
-        /// <returns> The OutputPortElementRefs containing the referenced locations to get values from </returns>
-        const std::vector<OutputPortElementRef>& GetOutputPortElementRefs() const { return _inputElements; }
+        /// <returns> The OutputPortElements containing the referenced locations to get values from </returns>
+        const std::vector<OutputPortElement>& GetOutputPortElements() const { return _inputElements; }
 
-        /// <summary> Returns an OutputPortElementRef containing the referenced location to get the value for a specific input element from </summary>
+        /// <summary> Returns an OutputPortElement containing the referenced location to get the value for a specific input element from </summary>
         ///
         /// <param name="index"> The index of the element </param>
-        /// <returns> The OutputPortElementRef containing the referenced location to get the value from </returns>
-        const OutputPortElementRef& GetOutputPortElementRef(size_t index) const { return _inputElements[index]; }
+        /// <returns> The OutputPortElement containing the referenced location to get the value from </returns>
+        const OutputPortElement& GetOutputPortElement(size_t index) const { return _inputElements[index]; }
 
-        /// <summary> Returns the OutputPortElementRefs containing the referenced locations to get values from </summary>
+        /// <summary> Returns the list nodes this input port gets values from </summary>
         ///
-        /// <returns> The OutputPortElementRefs containing the referenced locations to get values from </returns>
+        /// <returns> The list nodes this input port gets values from </returns>
         const std::vector<const Node*>& GetInputNodes() const { return _inputNodes; }
 
         /// <summary> The dimensionality of the output </summary>
@@ -66,7 +66,7 @@ namespace model
 
     private:
         OutputPortRefUntyped _inputRanges;
-        std::vector<OutputPortElementRef> _inputElements;
+        std::vector<OutputPortElement> _inputElements;
         std::vector<const Node*> _inputNodes;
     };
 

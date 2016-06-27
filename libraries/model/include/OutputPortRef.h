@@ -19,14 +19,14 @@
 namespace model
 {
     /// <summary> Represents a reference to a single element in another node's output </summary>
-    class OutputPortElementRef
+    class OutputPortElement
     {
     public:
-        /// <summary> Creates an OutputPortElementRef representing a single value from a given port </summary>
+        /// <summary> Creates an OutputPortElement representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        OutputPortElementRef(const Port* port, size_t index);
+        OutputPortElement(const Port& port, size_t index);
 
         /// <summary> Returns the type of the values referenced </summary>
         ///
@@ -133,7 +133,7 @@ namespace model
         ///
         /// <param name="index"> The index of the element </param>
         /// <returns> A single-element range for the element </returns>
-        OutputPortRange GetOutputPortElementRef(size_t index) const;
+        OutputPortRange GetOutputPortElement(size_t index) const;
 
         /// <summary> The dimensionality of the output </summary>
         ///
