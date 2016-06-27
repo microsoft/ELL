@@ -13,17 +13,15 @@
 
 namespace utilities
 {
-
-
     /// <summary> Base class for exceptions. </summary>
     class Exception : public std::exception
     {
         /// <summary> Gets the message. </summary>
         ///
         /// <returns> A message string; </returns>
-        virtual const std::string& GetMessage() const noexcept = 0;    
+        virtual const std::string& GetMessage() const noexcept = 0;
     };
-    
+
     /// <summary> Base class for exceptions with error codes. </summary>
     ///
     /// <typeparam name="ErrorCodeType"> An enum class with error codes. </typeparam>
@@ -31,7 +29,6 @@ namespace utilities
     class ErrorCodeException : public Exception
     {
     public:
-
         /// <summary> Constructs an exception with a give error code from the enum ErrorCodeType. </summary>
         ///
         /// <param name="errorCode"> The error code from ErrorCodeType. </param>
@@ -92,4 +89,3 @@ namespace utilities
 }
 
 #include "../tcc/Exception.tcc"
-
