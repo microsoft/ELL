@@ -17,7 +17,9 @@ namespace utilities
 
     /// <summary> Base class for exceptions. </summary>
     class Exception : public std::exception
-    {};
+    {
+        virtual const std::string& GetMessage() const noexcept = 0;    
+    };
     
     /// <summary> Base class for exceptions with error codes. </summary>
     ///
@@ -41,7 +43,7 @@ namespace utilities
         /// <summary> Gets the message. </summary>
         ///
         /// <returns> A message string; </returns>
-        const std::string& GetMessage() const noexcept { return _message; }
+        virtual const std::string& GetMessage() const noexcept override { return _message; }
 
     private:
         ErrorCodeType _errorCode;
