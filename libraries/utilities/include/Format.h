@@ -131,7 +131,7 @@ namespace utilities
     MatchResult MatchFormat(const char*& content, const char* format);
 
     /// <summary> Match content to a format, while parsing values in the position where the format
-    /// contains the character %. This version of the function throws a runtime_error when it
+    /// contains the character %. This version of the function throws an exception when it
     /// encounters a mismatch or a parsing error. </summary>
     ///
     /// <typeparam name="ArgType"> Type of the first argument to parse. </typeparam>

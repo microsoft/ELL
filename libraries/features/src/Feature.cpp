@@ -10,6 +10,10 @@
 #include "InputFeature.h"
 #include "StringUtil.h"
 
+// utilities
+#include "Exception.h"
+
+// stl
 #include <cassert>
 #include <algorithm>
 #include <stdexcept>
@@ -159,15 +163,13 @@ namespace features
 
         if(previousFeatures.find(featureId) != previousFeatures.end())
         {
-            std::string error_msg = std::string("Error deserializing feature description: non-unique ID ") + featureId;
-            throw std::runtime_error(error_msg);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Error deserializing feature description: non-unique ID " + featureId);
         }
         
         auto createFunction = _createTypeMap[featureClass];
         if (createFunction == nullptr)
         {
-            std::string error = std::string("Error deserializing feature description: unknown feature type '") + featureClass + "'";
-            throw std::runtime_error(error);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Error deserializing feature description: unknown feature type '" + featureClass + "'");
         }
         return createFunction(description, previousFeatures);
     }

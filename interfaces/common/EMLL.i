@@ -73,7 +73,7 @@ namespace std
         SWIG_exception(SWIG_RuntimeError, const_cast<char*>(err.what()));        
     }    
     catch (...) {
-        SWIG_exception(SWIG_RuntimeError, "Exception in EMLL library");
+        SWIG_exception(SWIG_RuntimeError, "LogicException in EMLL library");
     }
 }
 

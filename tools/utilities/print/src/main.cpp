@@ -18,6 +18,7 @@
 #include "Files.h"
 #include "OutputStreamImpostor.h"
 #include "CommandLineParser.h"
+#include "Exception.h"
 
 // layers
 #include "Map.h"
@@ -69,9 +70,9 @@ int main(int argc, char* argv[])
         }
         return 1;
     }
-    catch (std::runtime_error exception)
+    catch (utilities::LogicException exception)
     {
-        std::cerr << "runtime error: " << exception.what() << std::endl;
+        std::cerr << "runtime error: " << exception.GetMessage() << std::endl;
         return 1;
     }
 
