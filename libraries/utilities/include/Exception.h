@@ -18,6 +18,9 @@ namespace utilities
     /// <summary> Base class for exceptions. </summary>
     class Exception : public std::exception
     {
+        /// <summary> Gets the message. </summary>
+        ///
+        /// <returns> A message string; </returns>
         virtual const std::string& GetMessage() const noexcept = 0;    
     };
     
