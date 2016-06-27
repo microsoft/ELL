@@ -236,7 +236,7 @@ namespace linear
     {
         if(i > j)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "Cannot set element in the lower triangle of an upper triangular matrix");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Cannot set element in the lower triangle of an upper triangular matrix");
         }
 
         DoubleMatrixBase::Set(i, j, value);
@@ -279,7 +279,7 @@ namespace linear
     {
         if(i != j)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "Cannot set off-diagonal elements of a diagonal matrix");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Cannot set off-diagonal elements of a diagonal matrix");
         }
 
         DoubleMatrixBase::Set(i, j, value);

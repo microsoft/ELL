@@ -49,7 +49,7 @@ namespace features
         auto inputDimension = inputData.size();    
         if(inputDimension == 0) 
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "Invalid input of size zero");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Invalid input of size zero");
             return inputData;
         }
         _outputDimension = inputDimension;
@@ -83,7 +83,7 @@ namespace features
         auto inputIterator = featureOutputs.find(_inputFeatures[0]);
         if (inputIterator == featureOutputs.end())
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "Couldn't find input feature");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Couldn't find input feature");
         }
        
         auto inputCoordinates = inputIterator->second;
@@ -128,7 +128,7 @@ namespace features
 
         if (inputFeature == nullptr)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "Error deserializing feature description: unknown input feature " + params[2]);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Error deserializing feature description: unknown input feature " + params[2]);
         }
         return std::make_unique<IncrementalVarianceFeature>(featureId, inputFeature, windowSize);
     }

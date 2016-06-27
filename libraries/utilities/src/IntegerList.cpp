@@ -28,7 +28,7 @@ namespace utilities
     {
         if(_list.size()==0)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "Can't get max of empty list");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can't get max of empty list");
         }
 
         return _list[Size()-1];

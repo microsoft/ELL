@@ -53,7 +53,7 @@ namespace features
         const auto& inputData = _inputFeatures[0]->GetOutput();
         if(inputData.size() == 0) 
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "Invalid input of size zero");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Invalid input of size zero");
             return inputData;
         }
         
@@ -79,7 +79,7 @@ namespace features
         auto it = featureOutputs.find(_inputFeatures[0]);
         if (it == featureOutputs.end())
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "Couldn't find input feature");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Couldn't find input feature");
         }
        
         auto inputCoordinates = it->second;
@@ -112,7 +112,7 @@ namespace features
 
         if (inputFeature == nullptr)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "Error deserializing feature description: unknown input feature " + params[2]);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Error deserializing feature description: unknown input feature " + params[2]);
         }
         return std::make_unique<MeanFeature>(featureId, inputFeature, windowSize);
     }

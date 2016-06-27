@@ -46,18 +46,18 @@ namespace dataset
             }
             if(result == utilities::ParseResult::badFormat)
             {
-                throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "expected unsigned integer near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "expected unsigned integer near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
             else if(result == utilities::ParseResult::outOfRange)
             {
-                throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "out of unsigned integer range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "out of unsigned integer range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
         }
 
         // expect ':' character between index and value
         if(*_currentPos != ':')
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "expected ':' between index and value near '" + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "expected ':' between index and value near '" + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
         }
         ++_currentPos;
 
@@ -68,15 +68,15 @@ namespace dataset
         {
             if(result == utilities::ParseResult::endOfString || result == utilities::ParseResult::beginComment)
             {
-                throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "string ended prematurely in " + *_spExampleString);
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "string ended prematurely in " + *_spExampleString);
             }
             if(result == utilities::ParseResult::badFormat)
             {
-                throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "expected double near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "expected double near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
             else if(result == utilities::ParseResult::outOfRange)
             {
-                throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "out of double range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "out of double range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
             }
         }
 

@@ -138,19 +138,19 @@ namespace utilities
         switch(result)
         {
         case MatchResult::earlyEndOfContent:
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "content ended before format near: \"" + formatSnippet + "\"");
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "content ended before format near: \"" + formatSnippet + "\"");
 
         case MatchResult::mismatch:
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "mismatch between content and format near: " + snippets);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "mismatch between content and format near: " + snippets);
 
         case MatchResult::parserError:
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "parser error near: " + snippets);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "parser error near: " + snippets);
 
         case MatchResult::missingArgument:
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "missing argument near: " + snippets);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "missing argument near: " + snippets);
 
         case MatchResult::unexpectedPercentSymbol:
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "unexpected symbol '" + std::to_string(substitutionSymbol) + "' in string argument near: " + snippets);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "unexpected symbol '" + std::to_string(substitutionSymbol) + "' in string argument near: " + snippets);
 
         case MatchResult::success:
             ; // nothing

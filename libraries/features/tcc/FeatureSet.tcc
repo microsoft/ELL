@@ -52,7 +52,7 @@ namespace features
             }
             else
             {
-                throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "First feature must be input feature");
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "First feature must be input feature");
             }
         }
                 

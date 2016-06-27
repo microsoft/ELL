@@ -59,7 +59,7 @@ namespace layers
             return sqrtOperationName;
         }
 
-        throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized operation type");
     }
 
     UnaryOperationLayer::OperationType UnaryOperationLayer::GetOperationType(const std::string& name)
@@ -70,7 +70,7 @@ namespace layers
         }
         else
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized operation type");
         }
     }
 
@@ -82,7 +82,7 @@ namespace layers
             return sqrtOperator<double>();
         }
 
-        throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized operation type");
     }
 
 
@@ -136,7 +136,7 @@ namespace layers
         }
         else
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "unsupported version: " + version);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "unsupported version: " + version);
         }
     }
 

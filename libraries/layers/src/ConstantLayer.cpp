@@ -52,7 +52,7 @@ namespace layers
         }
         else
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "unsupported version: " + version);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "unsupported version: " + version);
         }
     }
 

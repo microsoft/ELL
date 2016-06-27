@@ -17,7 +17,7 @@ namespace utilities
         auto entry = _typeMap.find(typeName);
         if (entry == _typeMap.end())
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "type " + typeName + " not registered in TypeFactory<" + BaseType::GetTypeName() + ">");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "type " + typeName + " not registered in TypeFactory<" + BaseType::GetTypeName() + ">");
         }
 
         return entry->second();

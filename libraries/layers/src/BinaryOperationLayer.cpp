@@ -65,7 +65,7 @@ namespace layers
             return divideOperationName;
         }
 
-        throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized operation type");
     }
 
     BinaryOperationLayer::OperationType BinaryOperationLayer::GetOperationType(const std::string& name)
@@ -88,7 +88,7 @@ namespace layers
         }
         else
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized operation type");
         }
     }
 
@@ -106,7 +106,7 @@ namespace layers
             return std::divides<double>();
         }
 
-        throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized operation type");
     }
 
     BinaryOperationLayer::OperationType BinaryOperationLayer::GetOperationType() const
@@ -157,7 +157,7 @@ namespace layers
         }
         else
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "unsupported version: " + version);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "unsupported version: " + version);
         }
     }
 

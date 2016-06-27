@@ -46,11 +46,11 @@ namespace layers
                 auto coord = inputCoordIterator.Get();
                 if(coord.GetLayerIndex() >= numLayers)
                 {
-                    throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "new layer references nonexistent layers");
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "new layer references nonexistent layers");
                 }
                 else if(coord.GetLayerIndex()>0 && coord.GetElementIndex() >= GetLayer(coord.GetLayerIndex()).GetOutputDimension())
                 {
-                    throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "new layer references nonexistent elements");
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "new layer references nonexistent elements");
                 }
                 inputCoordIterator.Next();
             }
@@ -109,7 +109,7 @@ namespace layers
         }
         else
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "unsupported version: " + version);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "unsupported version: " + version);
         }
     }
 

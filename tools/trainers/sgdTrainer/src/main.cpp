@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
         }
         return 1;
     }
-    catch (utilities::Exception exception)
+    catch (utilities::LogicException exception)
     {
         std::cerr << "runtime error: " << exception.GetMessage() << std::endl;
         return 1;
