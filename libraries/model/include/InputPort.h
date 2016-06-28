@@ -100,22 +100,7 @@ namespace model
         ValueType operator[](size_t index) const;
     };
 
-    template <typename ValueType>
-    OutputPortElementList<ValueType> CopyInputPort(const InputPort<ValueType>& input, std::unordered_map<const Port*, Port*>& portMap)
-    {
-        const auto& ranges = input.GetInputRanges();
-        std::vector<OutputPortElementList<ValueType>> newRanges;
-        for (const auto& range : ranges)
-        {
-            auto oldPort = range.ReferencedPort();
-            auto newPort = portMap[oldPort];
-            auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPort);
-            auto start = range.GetStartIndex();
-            auto size = range.Size();
-            newRanges.emplace_back(*outputPort, start, size);
-        }
-        return OutputPortElementList<ValueType>(newRanges);
-    }
+
 }
 
 #include "../tcc/InputPort.tcc"

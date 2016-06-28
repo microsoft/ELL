@@ -84,6 +84,42 @@ namespace model
         template <typename Visitor>
         void Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodePtrs) const;
     };
+
+
+    // TODO: maybe ModelTransformer contains the new model, instead of having it in the Refine/Transform method?
+    // Stuff for refinement / copying
+    class ModelTransformer
+    {
+    public:
+        void MapPort(const Port* oldPort, Port* newPort)
+        {
+            _portMap[oldPort] = newPort;
+        }
+
+        template <typename ValueType>
+        OutputPortElementList<ValueType> CopyInputPort(const InputPort<ValueType>& input)
+        {
+            const auto& ranges = input.GetInputRanges();
+            std::vector<OutputPortElementList<ValueType>> newRanges;
+            for (const auto& range : ranges)
+            {
+                auto oldPort = range.ReferencedPort();
+                auto newPort = _portMap[oldPort];
+                auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPort);
+                // TODO: ensure dynamic cast worked
+                auto start = range.GetStartIndex();
+                auto size = range.Size();
+                newRanges.emplace_back(*outputPort, start, size);
+            }
+            return OutputPortElementList<ValueType>(newRanges);
+        }
+
+
+    private:
+        std::unordered_map<const Port*, Port*> _portMap;
+    };
 }
 
 #include "../tcc/ModelGraph.tcc"
+
+

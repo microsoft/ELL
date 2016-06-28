@@ -34,26 +34,24 @@ namespace model
     };
 
     template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::Copy(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const
+    void ExtremalValueNode<ValueType, max>::Copy(Model& newModel, ModelTransformer& transformer) const
     {
-        auto newInputs = CopyInputPort(_input, portMap);
+        auto newInputs = transformer.CopyInputPort(_input);
 
         auto newNode = newModel.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
-        nodeMap[this] = newNode.get();
 
-        portMap[&_val] = &(newNode->_val);
-        portMap[&_argVal] = &(newNode->_argVal);
+        transformer.MapPort(&_val, &(newNode->_val));
+        transformer.MapPort(&_argVal, &(newNode->_argVal));
     }
 
     template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::Refine(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const
+    void ExtremalValueNode<ValueType, max>::Refine(Model& newModel, ModelTransformer& transformer) const
     {
-        auto newInputs = CopyInputPort(_input, portMap);
+        auto newInputs = transformer.CopyInputPort(_input);
 
         auto newNode = newModel.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
-        nodeMap[this] = newNode.get();
 
-        portMap[&_val] = &(newNode->_val);
-        portMap[&_argVal] = &(newNode->_argVal);
+        transformer.MapPort(&_val, &(newNode->_val));
+        transformer.MapPort(&_argVal, &(newNode->_argVal));
     }
 }

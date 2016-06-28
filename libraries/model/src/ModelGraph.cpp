@@ -31,13 +31,11 @@ namespace model
 
     Model Model::Copy() const
     {
-        std::unordered_map<const Node*, Node*> nodeMap;
-        std::unordered_map<const Port*, Port*> portMap;
-
+        ModelTransformer transformer;
         Model newModel;
-        Visit([&newModel, &portMap, &nodeMap](const Node& node)
+        Visit([&newModel, &transformer](const Node& node)
         {
-            node.Copy(newModel, nodeMap, portMap);
+            node.Copy(newModel, transformer);
         });
 
         return newModel;
@@ -45,13 +43,11 @@ namespace model
 
     Model Model::Refine() const
     {
-        std::unordered_map<const Node*, Node*> nodeMap;
-        std::unordered_map<const Port*, Port*> portMap;
-
+        ModelTransformer transformer;
         Model newModel;
-        Visit([&newModel, &portMap, &nodeMap](const Node& node)
+        Visit([&newModel, &transformer](const Node& node)
         {
-            node.Refine(newModel, nodeMap, portMap);
+            node.Refine(newModel, transformer);
         });
 
         return newModel;

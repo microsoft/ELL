@@ -32,28 +32,26 @@ namespace model
     };
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::Copy(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const
+    void ValueSelectorNode<ValueType>::Copy(Model& newModel, ModelTransformer& transformer) const
     {
-        auto newCondition = CopyInputPort(_condition, portMap);
-        auto newValue1 = CopyInputPort(_value1, portMap);
-        auto newValue2 = CopyInputPort(_value2, portMap);
+        auto newCondition = transformer.CopyInputPort(_condition);
+        auto newValue1 = transformer.CopyInputPort(_value1);
+        auto newValue2 = transformer.CopyInputPort(_value2);
 
         auto newNode = newModel.AddNode<ValueSelectorNode<ValueType>>(newCondition, newValue1, newValue2);
-        nodeMap[this] = newNode.get();
 
-        portMap[&_output] = &(newNode->_output);
+        transformer.MapPort(&_output, &(newNode->_output));
     }
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::Refine(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const
+    void ValueSelectorNode<ValueType>::Refine(Model& newModel, ModelTransformer& transformer) const
     {
-        auto newCondition = CopyInputPort(_condition, portMap);
-        auto newValue1 = CopyInputPort(_value1, portMap);
-        auto newValue2 = CopyInputPort(_value2, portMap);
+        auto newCondition = transformer.CopyInputPort(_condition);
+        auto newValue1 = transformer.CopyInputPort(_value1);
+        auto newValue2 = transformer.CopyInputPort(_value2);
 
         auto newNode = newModel.AddNode<ValueSelectorNode<ValueType>>(newCondition, newValue1, newValue2);
-        nodeMap[this] = newNode.get();
 
-        portMap[&_output] = &(newNode->_output);
+        transformer.MapPort(&_output, &(newNode->_output));
     }
 }

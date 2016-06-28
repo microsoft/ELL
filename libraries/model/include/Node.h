@@ -24,6 +24,7 @@ namespace model
 {
     class InputPortBase;
     class Model;
+    class ModelTransformer;
 
     /// <summary> Superclass for all node types. </summary>
     class Node
@@ -50,8 +51,8 @@ namespace model
         /// <returns> a vector of all the nodes that depend on this node </summary>
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
-        virtual void Copy(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const = 0;
-        virtual void Refine(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const = 0;
+        virtual void Copy(Model& newModel, ModelTransformer& transformer) const = 0;
+        virtual void Refine(Model& newModel, ModelTransformer& transformer) const = 0;
 
     protected:
         // TODO: the arguments (and the _inputs and _outputs members)

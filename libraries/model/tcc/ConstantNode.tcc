@@ -26,20 +26,16 @@ namespace model
     }
 
     template <typename ValueType>
-    void ConstantNode<ValueType>::Copy(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const
+    void ConstantNode<ValueType>::Copy(Model& newModel, ModelTransformer& transformer) const
     {
         auto newNode = newModel.AddNode<ConstantNode<ValueType>>(_values[0]);
-        nodeMap[this] = newNode.get();
-
-        portMap[&_output] = &(newNode->_output);
+        transformer.MapPort(&_output, &(newNode->_output));
     }
-    
+
     template <typename ValueType>
-    void ConstantNode<ValueType>::Refine(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const
+    void ConstantNode<ValueType>::Refine(Model& newModel, ModelTransformer& transformer) const
     {
         auto newNode = newModel.AddNode<ConstantNode<ValueType>>(_values[0]);
-        nodeMap[this] = newNode.get();
-
-        portMap[&_output] = &(newNode->_output);
+        transformer.MapPort(&_output, &(newNode->_output));
     }
 }
