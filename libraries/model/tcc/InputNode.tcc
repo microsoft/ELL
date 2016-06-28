@@ -27,6 +27,15 @@ namespace model
     }
 
     template <typename ValueType>
+    void InputNode<ValueType>::Copy(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const
+    {
+        auto newNode = newModel.AddNode<InputNode<ValueType>>(_output.Size());
+        nodeMap[this] = newNode.get();
+
+        portMap[&_output] = &(newNode->_output);
+    }
+
+    template <typename ValueType>
     void InputNode<ValueType>::Refine(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const
     {
         auto newNode = newModel.AddNode<InputNode<ValueType>>(_output.Size());

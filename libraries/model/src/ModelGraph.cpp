@@ -29,6 +29,20 @@ namespace model
         }
     }
 
+    Model Model::Copy() const
+    {
+        std::unordered_map<const Node*, Node*> nodeMap;
+        std::unordered_map<const Port*, Port*> portMap;
+
+        Model newModel;
+        Visit([&newModel, &portMap, &nodeMap](const Node& node)
+        {
+            node.Copy(newModel, nodeMap, portMap);
+        });
+
+        return newModel;
+    }
+
     Model Model::Refine() const
     {
         std::unordered_map<const Node*, Node*> nodeMap;
@@ -39,7 +53,6 @@ namespace model
         {
             node.Refine(newModel, nodeMap, portMap);
         });
-
 
         return newModel;
     }

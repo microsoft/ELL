@@ -48,7 +48,7 @@ namespace model
         ///
         /// <param name="visitor"> The visitor functor to use </param>
         template <typename Visitor>
-        void Visit(Visitor& visitor) const;
+        void Visit(Visitor&& visitor) const;
 
         /// <summary>
         /// Visits the nodes in the graph necessary to compute the output of a given node. Visits the nodes
@@ -58,7 +58,7 @@ namespace model
         /// <param name="visitor"> The visitor functor to use </param>
         /// <param name="outputNode"> The output node to use for deciding which nodes to visit </param>
         template <typename Visitor>
-        void Visit(Visitor& visitor, const std::shared_ptr<Node>& outputNode) const;
+        void Visit(Visitor&& visitor, const std::shared_ptr<Node>& outputNode) const;
 
         /// <summary>
         /// Visits the nodes in the graph necessary to compute the outputs of the given nodes. Visits the nodes
@@ -68,10 +68,11 @@ namespace model
         /// <param name="visitor"> The visitor functor to use </param>
         /// <param name="outputNode"> The output node to use for deciding which nodes to visit </param>
         template <typename Visitor>
-        void Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNodes) const;
+        void Visit(Visitor&& visitor, const std::vector<std::shared_ptr<Node>>& outputNodes) const;
 
         // TODO: iterators, including begin/end for iterating over entire graph
 
+        Model Copy() const;
         Model Refine() const;
 
     private:
@@ -81,7 +82,7 @@ namespace model
 
         // This is the single implementation of Visit, invoked by the publicly-visible ones
         template <typename Visitor>
-        void Visit(Visitor& visitor, const std::vector<const Node*>& outputNodePtrs) const;
+        void Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodePtrs) const;
     };
 }
 

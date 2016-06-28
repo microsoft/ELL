@@ -66,7 +66,7 @@ namespace model
 
     // Visits the entire graph
     template <typename Visitor>
-    void Model::Visit(Visitor& visitor) const
+    void Model::Visit(Visitor&& visitor) const
     {
         std::vector<const Node*> emptyVec;
         Visit(visitor, emptyVec);
@@ -74,7 +74,7 @@ namespace model
 
     // Visits just the parts necessary to compute output node
     template <typename Visitor>
-    void Model::Visit(Visitor& visitor, const std::shared_ptr<Node>& outputNode) const
+    void Model::Visit(Visitor&& visitor, const std::shared_ptr<Node>& outputNode) const
     {
         std::vector<std::shared_ptr<Node>> x = { outputNode };
         Visit(visitor, { outputNode.get() });
@@ -82,7 +82,7 @@ namespace model
 
     // Visits just the parts necessary to compute output nodes
     template <typename Visitor>
-    void Model::Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNodes) const
+    void Model::Visit(Visitor&& visitor, const std::vector<std::shared_ptr<Node>>& outputNodes) const
     {
         // start with output nodes in the stack
         std::vector<const Node*> outputNodePtrs;
@@ -95,7 +95,7 @@ namespace model
 
     // Real implementation function for `Visit()`
     template <typename Visitor>
-    void Model::Visit(Visitor& visitor, const std::vector<const Node*>& outputNodePtrs) const
+    void Model::Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodePtrs) const
     {
         if (_nodeMap.size() == 0)
         {
