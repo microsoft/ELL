@@ -9,7 +9,7 @@
 #pragma once
 
 #include "IIncrementalTrainer.h"
-#include "ITrainer.h"
+#include "IBlackBoxTrainer.h"
 
 // predictors
 #include "EnsemblePredictor.h"
@@ -38,7 +38,7 @@ namespace trainers
     {
     public:
         typedef predictors::EnsemblePredictor<BasePredictorType> EnsembleType;
-        typedef ITrainer<BasePredictorType> BaseTrainerType;
+        typedef IBlackBoxTrainer<BasePredictorType> BaseTrainerType;
         typedef evaluators::IIncrementalEvaluator<BasePredictorType> EvaluatorType;
 
         BaggingIncrementalTrainer() = delete;
@@ -80,7 +80,7 @@ namespace trainers
     /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
     template <typename BasePredictorType>
     std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(
-        std::unique_ptr<ITrainer<BasePredictorType>>&& baseTrainer,
+        std::unique_ptr<IBlackBoxTrainer<BasePredictorType>>&& baseTrainer,
         const BaggingIncrementalTrainerParameters& baggingParameters,
         std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> evaluator = nullptr);
 }

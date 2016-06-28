@@ -45,6 +45,7 @@ enable_testing()
 add_subdirectory(libraries)
 add_subdirectory(tools)
 add_subdirectory(scripts)
+add_subdirectory(private)
 
 # Add SWIG-generated interfaces
 
