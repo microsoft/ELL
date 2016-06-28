@@ -52,7 +52,7 @@ namespace features
         auto it = featureOutputs.find(_inputFeatures[0]);
         if (it == featureOutputs.end())
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "Couldn't find input feature");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Couldn't find input feature");
         }
        
         auto inputCoordinates = it->second;
@@ -81,7 +81,7 @@ namespace features
         }
         else
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "Error deserializing feature description: unknown input feature " + params[2]);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Error deserializing feature description: unknown input feature " + params[2]);
         }
     }
 }

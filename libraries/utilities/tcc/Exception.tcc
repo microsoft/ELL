@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Exception.tcc (utilities)
+//  File:     LogicException.tcc (utilities)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace utilities
 {
-    template<typename ErrorCodeType>
-    ExceptionBase<ErrorCodeType>::ExceptionBase(ErrorCodeType errorCode, const std::string& message) : _errorCode(errorCode), _message(message)
+    template <typename ErrorCodeType>
+    ErrorCodeException<ErrorCodeType>::ErrorCodeException(ErrorCodeType errorCode, const std::string& message) : _errorCode(errorCode), _message(message)
     {}
 }

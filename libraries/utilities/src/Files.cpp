@@ -25,7 +25,7 @@ namespace utilities
         // check that it opened
         if(!fs.is_open())
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "error openning file " + filepath);
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "error openning file " + filepath);
         }
 
         return fs;
@@ -39,7 +39,7 @@ namespace utilities
         // check that it opened
         if (!fs.is_open())
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "error openning file " + filepath);
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "error openning file " + filepath);
         }
 
         return fs;

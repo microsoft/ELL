@@ -31,7 +31,7 @@ std::string DataFlowNode::GetVariableName() const
     }
     else
     {
-        throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState);
+        throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
     }
 }
 
@@ -43,7 +43,7 @@ uint64_t DataFlowNode::GetTempVariableIndex() const
     }
     else
     {
-        throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState);
+        throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
     }
 }
 

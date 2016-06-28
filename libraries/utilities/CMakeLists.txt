@@ -21,6 +21,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/IntegerStack.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
+         src/UniqueId.cpp
          src/XMLSerialization.cpp)
 
 set (INCLUDE include/CompressedIntegerList.h
@@ -40,6 +41,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/TransformIterator.h
              include/TypeFactory.h
              include/TypeName.h
+             include/UniqueId.h
              include/XMLSerialization.h)
 
 set (TCC tcc/CommandLineParser.tcc

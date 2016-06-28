@@ -49,7 +49,7 @@ namespace layers
         case OperationType::multiply:
             return multiplyOperationName;
         default:
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized operation type");
         }
     }
 
@@ -65,7 +65,7 @@ namespace layers
         }
         else
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized operation type");
         }
     }
 
@@ -78,7 +78,7 @@ namespace layers
         case OperationType::multiply:
             return std::multiplies<double>();
         default:
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "unrecognized operation type");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized operation type");
         }
     }
 
@@ -119,7 +119,7 @@ namespace layers
         }
         else
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "unsupported version: " + std::to_string(version));
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "unsupported version: " + version);
         }
 
         // check validity of deserialized vectors

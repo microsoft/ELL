@@ -134,7 +134,7 @@ namespace linear
     template<typename DataVectorType>
     void RowMatrix<DataVectorType>::Gevm(const double* p_x, double* p_y, double alpha, double beta) const
     {
-        throw utilities::Exception(utilities::ExceptionErrorCodes::notYetImplemented);
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notYetImplemented);
     }
 
     template<typename DataVectorType>

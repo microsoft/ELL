@@ -30,7 +30,7 @@ namespace features
         _currentValue = val;
         if(_outputDimension != val.size())
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "Input feature dimension doesn't match data size");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input feature dimension doesn't match data size");
         }
         assert(_outputDimension == val.size());
         SetDirtyFlag(true); // propagates through graph
@@ -38,7 +38,7 @@ namespace features
 
     layers::CoordinateList InputFeature::AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const
     {
-        throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState);
+        throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
     }
     
     void InputFeature::AddToDescription(std::vector<std::string>& description) const
