@@ -17,6 +17,10 @@
 #include "BinaryOperationLayer.h"
 #include "Sum.h"
 
+// utilities
+#include "Exception.h"
+
+//stl
 #include <cassert>
 #include <cmath>
 #include <algorithm>
@@ -57,8 +61,10 @@ namespace features
     //
 
     VarianceFeature::VarianceFeature(Feature* inputFeature, size_t windowSize)  : BufferedFeature({inputFeature}, windowSize) 
-    {
-    }
+    {}
+    
+    VarianceFeature::VarianceFeature(const std::string& id, Feature* inputFeature, size_t windowSize)  : BufferedFeature(id, {inputFeature}, windowSize) 
+    {}
     
     //VarianceFeature::VarianceFeature(Feature* inputFeature, Feature* meanFeature, size_t windowSize)  : BufferedFeature({inputFeature}, windowSize), _meanFeature(meanFeature)
     //{}
@@ -67,8 +73,9 @@ namespace features
     {
         assert(_inputFeatures.size() == 1);
         const auto& inputData = _inputFeatures[0]->GetOutput();
-        if(inputData.size() == 0) // error, should we throw?
+        if(inputData.size() == 0) 
         {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Invalid input of size zero");
             return inputData;
         }
         
@@ -96,7 +103,7 @@ namespace features
         auto it = featureOutputs.find(_inputFeatures[0]);
         if (it == featureOutputs.end())
         {
-            throw std::runtime_error("Couldn't find input feature");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Couldn't find input feature");
         }
        
         auto inputCoordinates = it->second;
@@ -159,14 +166,14 @@ namespace features
     std::unique_ptr<Feature> VarianceFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
         assert(params.size() == 4);
+        auto featureId = params[0];
         Feature* inputFeature = previousFeatures[params[2]];
         uint64_t windowSize = ParseInt(params[3]);
 
         if (inputFeature == nullptr)
         {
-            std::string error_msg = std::string("Error deserializing feature description: unknown input feature ") + params[2];
-            throw std::runtime_error(error_msg);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Error deserializing feature description: unknown input feature " + params[2]);
         }
-        return std::make_unique<VarianceFeature>(inputFeature, windowSize);
+        return std::make_unique<VarianceFeature>(featureId, inputFeature, windowSize);
     }
 }

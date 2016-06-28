@@ -1,12 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StringFormat.tcc (utilities)
+//  File:     Format.tcc (utilities)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Parser.h"
+#include "Exception.h"
 
 // stl
 #include <iostream>
@@ -137,19 +138,19 @@ namespace utilities
         switch(result)
         {
         case MatchResult::earlyEndOfContent:
-            throw std::runtime_error("Error scanning text: content ended before format near: \"" + formatSnippet + "\"");
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "content ended before format near: \"" + formatSnippet + "\"");
 
         case MatchResult::mismatch:
-            throw std::runtime_error("Error scanning text: mismatch between content and format near: " + snippets);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "mismatch between content and format near: " + snippets);
 
         case MatchResult::parserError:
-            throw std::runtime_error("Error scanning text: parser error near: " + snippets);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "parser error near: " + snippets);
 
         case MatchResult::missingArgument:
-            throw std::runtime_error("Error scanning text: missing argument near: " + snippets);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "missing argument near: " + snippets);
 
         case MatchResult::unexpectedPercentSymbol:
-            throw std::runtime_error("Error scanning text: unexpected symbol '" + std::to_string(substitutionSymbol) + "' in string argument near: " + snippets);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "unexpected symbol '" + std::to_string(substitutionSymbol) + "' in string argument near: " + snippets);
 
         case MatchResult::success:
             ; // nothing

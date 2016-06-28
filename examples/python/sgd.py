@@ -42,7 +42,7 @@ def sgd():
     map = Map(model, outputCoordinates);
 
     #  Get the dataset
-    dataset = GetDataset(dataFilename, map);
+    dataset = GetMappedDataset(dataFilename, map);
 
     # create sgd trainer    
     loss = LogLoss()
@@ -50,8 +50,8 @@ def sgd():
     params.regularization = l2Regularization
     trainer = LogLossSGDTrainer(outputCoordinates.Size(), loss, params)
 
-    # create evaluator
-    evaluator = LinearLogLossClassificationEvaluator(loss)
+    # TODO: create evaluator
+    # evaluator = LinearLogLossClassificationEvaluator(loss)
 
     numExamples = dataset.NumExamples()
     if not epochSize or epochSize >= numExamples:
@@ -71,11 +71,11 @@ def sgd():
 
         evalIterator = dataset.GetIterator()
         predictor = trainer.GetPredictor()
-        evaluator.Evaluate(evalIterator, predictor)
-        print "{}".format(evaluator.GetLastLoss())
+        #evaluator.Evaluate(evalIterator, predictor)
+        #print "{}".format(evaluator.GetLastLoss())
         
-    print "binary classification evaluation"
-    print "Loss: {0}\tError: {1}".format(evaluator.GetLastLoss(), evaluator.GetLastError())
+    #print "binary classification evaluation"
+    #print "Loss: {0}\tError: {1}".format(evaluator.GetLastLoss(), evaluator.GetLastError())
     
     # update the map with the newly learned layers
     predictor = trainer.GetPredictor()

@@ -122,8 +122,8 @@ namespace features
     private:
         std::vector<std::unique_ptr<Feature>> _features;
         Feature::FeatureMap _featureMap;
-        InputFeature* _inputFeature;
-        Feature* _outputFeature;
+        InputFeature* _inputFeature = nullptr;
+        Feature* _outputFeature = nullptr;
         mutable size_t _numItemsProcessed = 0;
     };
 }

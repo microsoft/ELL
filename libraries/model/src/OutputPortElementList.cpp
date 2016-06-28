@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     OutputPortRef.cpp (model)
+//  File:     OutputPortElementList.cpp (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "OutputPortRef.h"
+#include "OutputPortElementList.h"
 
 namespace model
 {
@@ -40,44 +40,44 @@ namespace model
     size_t OutputPortRange::GetStartIndex() const { return _startIndex; }
 
     //
-    // OutputPortRefUntyped
+    // OutputPortElementListUntyped
     //
-    OutputPortRefUntyped::OutputPortRefUntyped(const Port& port)
+    OutputPortElementListUntyped::OutputPortElementListUntyped(const Port& port)
     {
         _ranges.emplace_back(port);
         ComputeSize();
     }
 
-    OutputPortRefUntyped::OutputPortRefUntyped(const Port& port, size_t startIndex)
+    OutputPortElementListUntyped::OutputPortElementListUntyped(const Port& port, size_t startIndex)
     {
         _ranges.emplace_back(port, startIndex);
         ComputeSize();
     }
 
-    OutputPortRefUntyped::OutputPortRefUntyped(const Port& port, size_t startIndex, size_t numValues)
+    OutputPortElementListUntyped::OutputPortElementListUntyped(const Port& port, size_t startIndex, size_t numValues)
     {
         _ranges.emplace_back(port, startIndex, numValues);
         ComputeSize();
     }
 
-    OutputPortRefUntyped::OutputPortRefUntyped(const OutputPortRange& range)
+    OutputPortElementListUntyped::OutputPortElementListUntyped(const OutputPortRange& range)
     {
         _ranges.push_back(range);
         ComputeSize();
     }
 
-    OutputPortRefUntyped::OutputPortRefUntyped(const std::vector<OutputPortRange>& ranges)
+    OutputPortElementListUntyped::OutputPortElementListUntyped(const std::vector<OutputPortRange>& ranges)
     {
         _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
         ComputeSize();
     }
 
-    void OutputPortRefUntyped::AddRange(const OutputPortRange& range)
+    void OutputPortElementListUntyped::AddRange(const OutputPortRange& range)
     {
         _ranges.push_back(range);
     }
 
-    void OutputPortRefUntyped::ComputeSize()
+    void OutputPortElementListUntyped::ComputeSize()
     {
         _size = 0;
         for (const auto& range : _ranges)

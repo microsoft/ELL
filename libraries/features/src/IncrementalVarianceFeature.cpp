@@ -19,6 +19,9 @@
 #include "Sum.h"
 #include "CoordinateListTools.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <cassert>
 #include <cmath>
@@ -34,17 +37,19 @@ namespace features
     //
 
     IncrementalVarianceFeature::IncrementalVarianceFeature(Feature* inputFeature, size_t windowSize)  : BufferedFeature({inputFeature}, windowSize) 
-    {
-    }
+    {}
+
+    IncrementalVarianceFeature::IncrementalVarianceFeature(const std::string& id, Feature* inputFeature, size_t windowSize)  : BufferedFeature(id, {inputFeature}, windowSize) 
+    {}
     
     std::vector<double> IncrementalVarianceFeature::ComputeOutput() const
     {
         assert(_inputFeatures.size() == 1);
         const auto& inputData = _inputFeatures[0]->GetOutput();
         auto inputDimension = inputData.size();    
-        if(inputDimension == 0) // error, should we throw?
+        if(inputDimension == 0) 
         {
-            throw std::runtime_error("Invalid input of size zero");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Invalid input of size zero");
             return inputData;
         }
         _outputDimension = inputDimension;
@@ -78,7 +83,7 @@ namespace features
         auto inputIterator = featureOutputs.find(_inputFeatures[0]);
         if (inputIterator == featureOutputs.end())
         {
-            throw std::runtime_error("Couldn't find input feature");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Couldn't find input feature");
         }
        
         auto inputCoordinates = inputIterator->second;
@@ -117,14 +122,14 @@ namespace features
     std::unique_ptr<Feature> IncrementalVarianceFeature::Create(std::vector<std::string> params, Feature::FeatureMap& previousFeatures)
     {
         assert(params.size() == 4);
+        auto featureId = params[0];
         Feature* inputFeature = previousFeatures[params[2]];
         uint64_t windowSize = ParseInt(params[3]);
 
         if (inputFeature == nullptr)
         {
-            std::string error_msg = std::string("Error deserializing feature description: unknown input feature ") + params[2];
-            throw std::runtime_error(error_msg);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Error deserializing feature description: unknown input feature " + params[2]);
         }
-        return std::make_unique<IncrementalVarianceFeature>(inputFeature, windowSize);
+        return std::make_unique<IncrementalVarianceFeature>(featureId, inputFeature, windowSize);
     }
 }

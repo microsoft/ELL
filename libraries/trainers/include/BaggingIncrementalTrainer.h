@@ -14,6 +14,9 @@
 // predictors
 #include "EnsemblePredictor.h"
 
+// evaluators
+#include "IncrementalEvaluator.h"
+
 namespace trainers
 {
     /// <summary> Parameters for the bagging incremental trainer. </summary>
@@ -24,21 +27,30 @@ namespace trainers
         std::string dataPermutationRandomSeed = "123456";
     };
 
-    /// <summary> Implements a bagging incremental trainer. </summary>
+    /// <summary>
+    /// Implements a bagging incremental trainer. A bagging trainer runs a base trainer on random
+    /// subsets of the training data and averages the resulting predictors to create an ensemble.
+    /// </summary>
     ///
     /// <typeparam name="BasePredictorType"> Type of the base predictor type. </typeparam>
     template <typename BasePredictorType>
     class BaggingIncrementalTrainer : public IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>
     {
     public:
-        using PredictorType = predictors::EnsemblePredictor<BasePredictorType>;
+        typedef predictors::EnsemblePredictor<BasePredictorType> EnsembleType;
+        typedef ITrainer<BasePredictorType> BaseTrainerType;
+        typedef evaluators::IIncrementalEvaluator<BasePredictorType> EvaluatorType;
 
         BaggingIncrementalTrainer() = delete;
 
-        /// <summary> Constructs an instance of SingleEpochTrainer. </summary>
+        /// <summary> Constructs an instance of BaggingIncrementalTrainer. </summary>
         ///
-        /// <param name="incrementalTrainer"> [in,out] The stateful trainer. </param>
-        BaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters);
+        /// <param name="trainer"> A base trainer. </param>
+        /// <param name="baggingParameters"> Bagging paramters. </param>
+        /// <param name="evaluator"> An optional evaluator, or nullptr. </param>
+        BaggingIncrementalTrainer(std::unique_ptr<BaseTrainerType>&& baseTrainer, 
+            const BaggingIncrementalTrainerParameters& baggingParameters, 
+            std::shared_ptr<EvaluatorType> evaluator);
 
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
         ///
@@ -48,24 +60,29 @@ namespace trainers
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
         /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _ensemble; }
+        virtual const std::shared_ptr<const EnsembleType> GetPredictor() const override { return _ensemble; }
 
     private:
-        std::unique_ptr<ITrainer<BasePredictorType>> _trainer;
+        std::unique_ptr<BaseTrainerType> _baseTrainer;
         BaggingIncrementalTrainerParameters _baggingParameters;
-        std::shared_ptr<PredictorType> _ensemble;
+        std::shared_ptr<EvaluatorType> _evaluator;
+        std::shared_ptr<EnsembleType> _ensemble;
         std::default_random_engine _random;
     };
 
     /// <summary> Makes a bagging incremental trainer. </summary>
     ///
     /// <typeparam name="BasePredictorType"> Type of base predictor used to build the ensemble. </typeparam>
-    /// <param name="trainer"> [in,out] The incremental trainer. </param>
-    /// <param name="baggingParameters"> Bagging parameters. </param>
+    /// <param name="trainer"> A trainer. </param>
+    /// <param name="baggingParameters"> Bagging paramters. </param>
+    /// <param name="evaluator"> An optional evaluator. </param>
     ///
     /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
     template <typename BasePredictorType>
-    std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(std::unique_ptr<ITrainer<BasePredictorType>>&& trainer, const BaggingIncrementalTrainerParameters& baggingParameters);
+    std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(
+        std::unique_ptr<ITrainer<BasePredictorType>>&& baseTrainer,
+        const BaggingIncrementalTrainerParameters& baggingParameters,
+        std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> evaluator = nullptr);
 }
 
 #include "../tcc/BaggingIncrementalTrainer.tcc"

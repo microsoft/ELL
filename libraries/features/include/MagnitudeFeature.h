@@ -22,9 +22,14 @@ namespace features
     class MagnitudeFeature : public Feature
     {
     public:
-        /// <summary> Constructor from magnitude feature </summary>
+        /// <summary> Constructor from inputs feature </summary>
         /// <param name="inputFeature"> The feature to take the magnitude of </param>
         MagnitudeFeature(Feature* inputFeature) : Feature({inputFeature}) {}
+
+        /// <summary> Constructor from inputs feature </summary>
+        /// <param name="id"> The id to use for this feature </param>
+        /// <param name="inputFeature"> The feature to take the magnitude of </param>
+        MagnitudeFeature(const std::string& id, Feature* inputFeature) : Feature(id, {inputFeature}) {}
 
         /// <summary> Creates a `MagnitudeFeature` from a vector of strings </summary>
         ///

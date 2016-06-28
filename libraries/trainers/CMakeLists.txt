@@ -15,15 +15,19 @@ endif()
 set (SRC src/Nothing.cpp)
 
 set (INCLUDE include/BaggingIncrementalTrainer.h
+             include/EvaluatingIncrementalTrainer.h
              include/IIncrementalTrainer.h
              include/ITrainer.h
              include/MultiEpochIncrementalTrainer.h
              include/SortingTreeTrainer.h
+             include/SweepingIncrementalTrainer.h
              include/SGDIncrementalTrainer.h)
 
 set (TCC tcc/BaggingIncrementalTrainer.tcc
+         tcc/EvaluatingIncrementalTrainer.tcc         
          tcc/MultiEpochIncrementalTrainer.tcc
          tcc/SortingTreeTrainer.tcc
+         tcc/SweepingIncrementalTrainer.tcc
          tcc/SGDIncrementalTrainer.tcc)
 
 source_group("src" FILES ${SRC})
@@ -35,6 +39,7 @@ include_directories(../linear/include)
 include_directories(../dataset/include)
 include_directories(../layers/include)
 include_directories(../predictors/include)
+include_directories(../evaluators/include)
 include_directories(../utilities/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})

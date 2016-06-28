@@ -10,8 +10,15 @@
 #include "Feature.h"
 #include "InputFeature.h"
 #include "StringUtil.h"
+
+// dataset
 #include "DoubleVector.h"
 
+// utilities
+#include "Exception.h"
+
+
+// stl
 #include <vector>
 #include <string>
 #include <sstream>
@@ -66,16 +73,34 @@ namespace features
     Feature* FeatureSet::CreateFeatureFromDescription(const std::vector<std::string>& description)
     {
         _features.emplace_back(Feature::FromDescription(description, _featureMap));
-        auto ptr = _features.back().get();
-        _featureMap[ptr->Id()] = ptr;
-        return ptr;
+        auto feature = _features.back().get();
+        if(_featureMap.size() == 0)
+        {
+            if(dynamic_cast<InputFeature*>(feature) != nullptr)
+            {
+                _inputFeature = dynamic_cast<InputFeature*>(feature);
+            }
+            else
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "First feature must be input feature");
+            }
+        }
+
+        // add to map
+        _featureMap[feature->Id()] = feature;
+        return feature;
     }
 
     layers::CoordinateList FeatureSet::AddToModel(layers::Model& model, const layers::CoordinateList& inputCoordinates) const
     {
-        // TODO: document in Visit that we visit nodes in order --- a node is visited only after its inputs are
-        assert(_inputFeature != nullptr);
-        assert(_outputFeature != nullptr);
+        if(_inputFeature == nullptr) 
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Input feature not assigned");
+        }
+        if(_outputFeature == nullptr)
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Output feature not assigned");
+        }
         
         // need to keep a map of output coordinate lists for the various features
         std::unordered_map<const Feature*, layers::CoordinateList> featureOutputs;

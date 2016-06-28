@@ -24,9 +24,9 @@ set (SRC src/CompressedIntegerList.cpp
          src/UniqueId.cpp
          src/XMLSerialization.cpp)
 
-set (INCLUDE include/BinaryClassificationEvaluator.h
-             include/CompressedIntegerList.h
+set (INCLUDE include/CompressedIntegerList.h
              include/CommandLineParser.h
+             include/Exception.h
              include/Files.h
              include/Format.h
              include/IIterator.h
@@ -44,8 +44,8 @@ set (INCLUDE include/BinaryClassificationEvaluator.h
              include/UniqueId.h
              include/XMLSerialization.h)
 
-set (TCC tcc/BinaryClassificationEvaluator.tcc
-         tcc/CommandLineParser.tcc
+set (TCC tcc/CommandLineParser.tcc
+         tcc/Exception.tcc
          tcc/Format.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc

@@ -14,7 +14,7 @@ endif()
 
 set (SRC src/ModelGraph.cpp
          src/Node.cpp
-         src/OutputPortRef.cpp
+         src/OutputPortElementList.cpp
          src/Port.cpp
 )
 
@@ -25,7 +25,7 @@ set (INCLUDE include/ConstantNode.h
              include/ModelGraph.h
              include/Node.h
              include/OutputPort.h
-             include/OutputPortRef.h
+             include/OutputPortElementList.h
              include/Port.h
              include/ValueSelectorNode.h
 )
@@ -36,7 +36,7 @@ set (TCC tcc/ConstantNode.tcc
          tcc/InputPort.tcc
          tcc/ModelGraph.tcc
          tcc/OutputPort.tcc
-         tcc/OutputPortRef.tcc
+         tcc/OutputPortElementList.tcc
          tcc/ValueSelectorNode.tcc
 )
 

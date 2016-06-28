@@ -44,7 +44,7 @@ namespace dataset
     }
 
     template<typename DataVectorType>
-    void RowDataset<DataVectorType>::AddExample(ExampleType&& example)
+    void RowDataset<DataVectorType>::AddExample(ExampleType example)
     {
         uint64_t size = example.GetDataVector().Size();
         _examples.push_back(std::move(example));

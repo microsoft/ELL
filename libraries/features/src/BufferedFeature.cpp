@@ -25,6 +25,11 @@ namespace features
         // TODO: resize _samples buffer to be windowSize here?
     }
 
+    BufferedFeature::BufferedFeature(const std::string& id, const std::vector<Feature*>& inputs, size_t windowSize) : Feature(id, {inputs}), _windowSize(windowSize), _currentIndex(0)
+    {
+        // TODO: resize _samples buffer to be windowSize here?
+    }
+
     void BufferedFeature::Reset()
     {
         auto oldSize = _samples.size() > 0 ? _samples[0].size() : 0;
@@ -59,7 +64,7 @@ namespace features
 
         // allocate samples if necessary
         auto numColumns = row.size();
-        if (_samples.size() < numColumns)
+        if (_samples.size() < numColumns || (_samples.size() >0 && _samples[0].size() < _windowSize))
         {
             AllocateSampleBuffer(numColumns);
         }

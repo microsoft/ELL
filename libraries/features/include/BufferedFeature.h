@@ -32,6 +32,7 @@ namespace features
 
     protected:        
         BufferedFeature(const std::vector<Feature*>& inputs, size_t windowSize);
+        BufferedFeature(const std::string& id, const std::vector<Feature*>& inputs, size_t windowSize);
         
         // BufferedFeature-specific routines
         size_t NumSamples() const;

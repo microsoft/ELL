@@ -31,6 +31,12 @@ namespace features
         /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
         IncrementalMeanFeature(Feature* inputFeature, size_t windowSize);
 
+        /// <summary> Constructor </summary>
+        /// <param name="id"> The id to use for this feature </param>
+        /// <param name="inputFeature"> The feature to take the mean of </param>
+        /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
+        IncrementalMeanFeature(const std::string& id, Feature* inputFeature, size_t windowSize);
+
         /// <summary> Creates an `IncrementalMeanFeature` from a vector of strings </summary>
         ///
         /// <param name="params"> The strings describing the parameters </params> 
