@@ -61,7 +61,7 @@ namespace utilities
 			}
 			else
 			{
-				throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "Could not parse value for option " + name);
+				throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Could not parse value for option " + name);
 				return false;
 			}
 		};

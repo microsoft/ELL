@@ -29,7 +29,7 @@ LinearOperation::LinearOperation(layers::Coordinatewise::OperationType operation
     }
     else
     {
-        throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument);
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
     }
 }
 

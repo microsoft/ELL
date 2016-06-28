@@ -18,14 +18,14 @@ namespace dataset
 {
     linear::IndexValue ZeroDataVector::Iterator::Get() const
     {
-        throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState);
+        throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
     }
 
     void ZeroDataVector::AppendEntry(uint64_t index, double value)
     {
         if(value != 0)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument);
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
         }
     }
 

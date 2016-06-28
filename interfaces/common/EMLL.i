@@ -28,16 +28,19 @@
 #include <stdexcept>
 %}
 
+#ifndef SWIGXML
 %include typemaps.i
-%include "exception.i" 
 %include "std_string.i"
 %include "std_vector.i"
+#endif
 
-#if !defined(SWIGJAVASCRIPT)
+#if !defined(SWIGJAVASCRIPT) && !defined(SWIGXML)
 %include "std_shared_ptr.i"
 #endif
 
+%include "exception.i" 
 %include "unique_ptr.i"
+
 #ifdef SWIGPYTHON
 %include "std_iostream.i"  // Sadly, there is no std_iostream.i for C#
 #endif
@@ -55,9 +58,11 @@ namespace std
 %typemap(in) int64_t = long;
 %apply long {int64_t}
 
+#ifndef SWIGXML
 %template () std::vector<double>;
 %template () std::vector<float>;
 %template (StringVector) std::vector<std::string>;
+#endif
 
 // Add some primitive exception handling
 %exception {
@@ -68,7 +73,7 @@ namespace std
         SWIG_exception(SWIG_RuntimeError, const_cast<char*>(err.what()));        
     }    
     catch (...) {
-        SWIG_exception(SWIG_RuntimeError, "Exception in EMLL library");
+        SWIG_exception(SWIG_RuntimeError, "LogicException in EMLL library");
     }
 }
 
@@ -147,7 +152,10 @@ namespace dataset {};
 %import "RowDataset.h"
 %import "IDataVector.h"
 
+#ifndef SWIGXML
 %template () std::vector<dataset::IDataVector>;
+#endif
+
 namespace dataset
 {
     class GenericRowIterator {}; // This is necessary to prevent memory leak of datasets::GenericRowIterator
@@ -199,12 +207,14 @@ typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<d
 
 wrap_unique_ptr(LayerPtr, layers::Layer)
 
+#ifndef SWIGXML
 %template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>, std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 
 %template () dataset::RowDataset<dataset::IDataVector>;
 %template () trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
+#endif
 
 typedef trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType predictors::LinearPredictor;
 class trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType {};
@@ -212,8 +222,7 @@ class trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType
 // Interface for features library
 %include features.i
 
-
-#ifndef SWIGJAVASCRIPT
+#if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
 // TODO: Review rules on when to apply the %shared_ptr() directive and get rid of these altogether if they're not in the right place 
 %shared_ptr(layers::Map)
 %shared_ptr(layers::Model)

@@ -21,11 +21,11 @@ namespace
     {
         if (result == utilities::ParseResult::badFormat)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "bad format in coordinate list definition string");
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "bad format in coordinate list definition string");
         }
         else if (result == utilities::ParseResult::endOfString || result == utilities::ParseResult::beginComment)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "premature end of coordinate list definition string");
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "premature end of coordinate list definition string");
         }
     }
 
@@ -37,7 +37,7 @@ namespace
         {
             if (size == 0)
             {
-                throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "automatic index 'e' used, but layer size cannot be inferred (for input layer, use -dd <dimension> or -dd auto)");
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "automatic index 'e' used, but layer size cannot be inferred (for input layer, use -dd <dimension> or -dd auto)");
             }
             index = size-1;
             ++pStr;
@@ -116,7 +116,7 @@ namespace layers
 
                     if (endElementIndex <= fromElementIndex)
                     {
-                        throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "bad format in coordinate list definition string");
+                        throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "bad format in coordinate list definition string");
                     }
                 }
             }
@@ -126,14 +126,14 @@ namespace layers
             {
                 if (endElementIndex == 0)
                 {
-                    throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "input layer size cannot be inferred (use - dd <dimension> or -dd auto)");
+                    throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "input layer size cannot be inferred (use - dd <dimension> or -dd auto)");
                 }
             }
             else
             {
                 if (endElementIndex > layerSize)
                 {
-                    throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "coordinate list index exceeds layer size");
+                    throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "coordinate list index exceeds layer size");
                 }
             }
 

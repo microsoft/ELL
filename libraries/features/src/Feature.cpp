@@ -163,13 +163,13 @@ namespace features
 
         if(previousFeatures.find(featureId) != previousFeatures.end())
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "Error deserializing feature description: non-unique ID " + featureId);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Error deserializing feature description: non-unique ID " + featureId);
         }
         
         auto createFunction = _createTypeMap[featureClass];
         if (createFunction == nullptr)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "Error deserializing feature description: unknown feature type '" + featureClass + "'");
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Error deserializing feature description: unknown feature type '" + featureClass + "'");
         }
         return createFunction(description, previousFeatures);
     }

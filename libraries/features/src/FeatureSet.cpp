@@ -82,7 +82,7 @@ namespace features
             }
             else
             {
-                throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "First feature must be input feature");
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "First feature must be input feature");
             }
         }
 
@@ -95,11 +95,11 @@ namespace features
     {
         if(_inputFeature == nullptr) 
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "Input feature not assigned");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Input feature not assigned");
         }
         if(_outputFeature == nullptr)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::illegalState, "Output feature not assigned");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Output feature not assigned");
         }
         
         // need to keep a map of output coordinate lists for the various features

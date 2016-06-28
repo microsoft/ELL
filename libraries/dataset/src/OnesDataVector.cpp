@@ -27,7 +27,7 @@ namespace dataset
     {
         if(value != 1 || index != _size)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::invalidArgument, "Cannot set elements of a ones vector to non-one values");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Cannot set elements of a ones vector to non-one values");
         }
         ++_size;
     }

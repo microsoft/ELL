@@ -62,15 +62,15 @@ namespace dataset
     {
         if (result == utilities::ParseResult::badFormat)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "bad format in '" + str + "'");
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "bad format in '" + str + "'");
         }
         else if (result == utilities::ParseResult::endOfString || result == utilities::ParseResult::beginComment)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "premature end-of-std::string or comment in '" + str + "'");
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "premature end-of-std::string or comment in '" + str + "'");
         }
         else if (result == utilities::ParseResult::outOfRange)
         {
-            throw utilities::Exception(utilities::ExceptionErrorCodes::badStringFormat, "real value out of double precision range in '" + str + "'");
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "real value out of double precision range in '" + str + "'");
         }
     }
 }
