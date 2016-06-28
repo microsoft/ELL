@@ -32,24 +32,22 @@ namespace model
     Model Model::Copy() const
     {
         ModelTransformer transformer;
-        Model newModel;
-        Visit([&newModel, &transformer](const Node& node)
+        Visit([&transformer](const Node& node)
         {
-            node.Copy(newModel, transformer);
+            node.Copy(transformer);
         });
 
-        return newModel;
+        return transformer.GetModel();
     }
 
     Model Model::Refine() const
     {
         ModelTransformer transformer;
-        Model newModel;
-        Visit([&newModel, &transformer](const Node& node)
+        Visit([&transformer](const Node& node)
         {
-            node.Refine(newModel, transformer);
+            node.Refine(transformer);
         });
 
-        return newModel;
+        return transformer.GetModel();
     }
 }

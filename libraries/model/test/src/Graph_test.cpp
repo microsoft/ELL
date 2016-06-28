@@ -177,7 +177,7 @@ void TestInputRouting2()
 // Placeholder for test function that creates a graph using dynamic-creation routines
 //
 
-void TestRefineGraph()
+void TestCopyGraph()
 {
     // Create a simple computation graph
     model::Model model;
@@ -188,6 +188,31 @@ void TestRefineGraph()
     auto condition = model.AddNode<model::ConstantNode<bool>>(true);
     auto valSelector = model.AddNode<model::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
     auto indexSelector = model.AddNode<model::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
+
+    auto newModel = model.Refine();
+
+    std::cout << "\n\nOld graph" << std::endl;
+    std::cout << "---------" << std::endl;
+    PrintGraph(model);
+
+    std::cout << "\n\nNew graph" << std::endl;
+    std::cout << "---------" << std::endl;
+    PrintGraph(newModel);
+}
+
+void TestRefineGraph()
+{
+    // Create a simple computation graph
+    model::Model model;
+
+    auto in = model.AddNode<model::InputNode<double>>(2);
+    model::OutputPortElementList<double> inputValue = { in->output, 0 };
+    model::OutputPortElementList<double> inputThresh = { in->output, 1 };
+
+    auto value1 = model.AddNode<model::ConstantNode<double>>(std::vector<double>{1.0, 2.0, 3.0});
+    auto value2 = model.AddNode<model::ConstantNode<double>>(std::vector<double>{100.0, 200.0, 300.0});
+
+    auto selectIfLessNode = model.AddNode<model::SelectIfLessNode<double>>(inputValue, inputThresh, value1->output, value2->output);
 
     auto newModel = model.Refine();
 

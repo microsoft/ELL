@@ -18,6 +18,8 @@ int main()
     TestInputRouting1();
     TestInputRouting2();
     TestStaticGraph();
+
+    TestCopyGraph();
     TestRefineGraph();
 
     if (testing::DidTestFail())

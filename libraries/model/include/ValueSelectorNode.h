@@ -44,8 +44,8 @@ namespace model
         /// <summary> Exposes the output port as a read-only property </summary>
         const OutputPort<ValueType>& output = _output;
 
-        virtual void Copy(Model& newModel, ModelTransformer& transformer) const override;
-        virtual void Refine(Model& newModel, ModelTransformer& transformer) const override;
+        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Refine(ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;
@@ -59,6 +59,66 @@ namespace model
         // Output
         OutputPort<ValueType> _output;
     };
+
+//
+// Crud to throw away
+//
+
+    /// <summary> An example node that selects from one of two input values depending on a third input </summary>
+    template <typename ValueType>
+    class SelectIfLessNode : public Node
+    {
+    public:
+        SelectIfLessNode(const OutputPortElementList<ValueType>& input1, const OutputPortElementList<ValueType>& input2, const OutputPortElementList<ValueType>& value1, const OutputPortElementList<ValueType>& value2);
+        static std::string GetTypeName() { return "SelectIfLess"; }
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        const OutputPort<ValueType>& output = _output;
+
+        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Refine(ModelTransformer& transformer) const override;
+
+    protected:
+        virtual void Compute() const override;
+
+    private:
+        // Inputs
+        InputPort<ValueType> _input1;
+        InputPort<ValueType> _input2;
+        InputPort<ValueType> _value1;
+        InputPort<ValueType> _value2;
+
+        // Output
+        OutputPort<ValueType> _output;
+    };
+
+
+    /// <summary> An example node that selects from one of two input values depending on a third input </summary>
+    template <typename ValueType>
+    class IfLessNode : public Node
+    {
+    public:
+        IfLessNode(const OutputPortElementList<ValueType>& value, const OutputPortElementList<ValueType>& threshold);
+        static std::string GetTypeName() { return "IfLess"; }
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        const OutputPort<bool>& output = _output;
+
+        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Refine(ModelTransformer& transformer) const override;
+
+    protected:
+        virtual void Compute() const override;
+
+    private:
+        // Inputs
+        InputPort<ValueType> _value;
+        InputPort<ValueType> _threshold;
+
+        // Output
+        OutputPort<bool> _output;
+    };
+
 }
 
 #include "../tcc/ValueSelectorNode.tcc"

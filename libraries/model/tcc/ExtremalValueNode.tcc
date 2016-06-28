@@ -34,22 +34,22 @@ namespace model
     };
 
     template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::Copy(Model& newModel, ModelTransformer& transformer) const
+    void ExtremalValueNode<ValueType, max>::Copy(ModelTransformer& transformer) const
     {
-        auto newInputs = transformer.CopyInputPort(_input);
+        auto newInputs = transformer.TransformInputPort(_input);
 
-        auto newNode = newModel.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
+        auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
 
         transformer.MapPort(&_val, &(newNode->_val));
         transformer.MapPort(&_argVal, &(newNode->_argVal));
     }
 
     template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::Refine(Model& newModel, ModelTransformer& transformer) const
+    void ExtremalValueNode<ValueType, max>::Refine(ModelTransformer& transformer) const
     {
-        auto newInputs = transformer.CopyInputPort(_input);
+        auto newInputs = transformer.TransformInputPort(_input);
 
-        auto newNode = newModel.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
+        auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
 
         transformer.MapPort(&_val, &(newNode->_val));
         transformer.MapPort(&_argVal, &(newNode->_argVal));
