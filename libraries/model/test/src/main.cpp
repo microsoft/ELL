@@ -18,7 +18,7 @@ int main()
     TestInputRouting1();
     TestInputRouting2();
     TestStaticGraph();
-    TestDynamicGraph();
+    TestRefineGraph();
 
     if (testing::DidTestFail())
     {

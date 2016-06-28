@@ -46,6 +46,8 @@ namespace model
         /// <returns> The list nodes this input port gets values from </returns>
         const std::vector<const Node*>& GetInputNodes() const { return _inputNodes; }
 
+        const OutputPortElementListUntyped& GetInputRanges() const { return _inputRanges; }
+
         /// <summary> The dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
@@ -97,6 +99,23 @@ namespace model
         /// <returns> The output value at the corresponding index </returns>
         ValueType operator[](size_t index) const;
     };
+
+    template <typename ValueType>
+    OutputPortElementList<ValueType> CopyInputPort(const InputPort<ValueType>& input, std::unordered_map<const Port*, Port*>& portMap)
+    {
+        const auto& ranges = input.GetInputRanges();
+        std::vector<OutputPortElementList<ValueType>> newRanges;
+        for (const auto& range : ranges)
+        {
+            auto oldPort = range.ReferencedPort();
+            auto newPort = portMap[oldPort];
+            auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPort);
+            auto start = range.GetStartIndex();
+            auto size = range.Size();
+            newRanges.emplace_back(*outputPort, start, size);
+        }
+        return OutputPortElementList<ValueType>(newRanges);
+    }
 }
 
 #include "../tcc/InputPort.tcc"

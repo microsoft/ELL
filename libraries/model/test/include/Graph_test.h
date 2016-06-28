@@ -6,4 +6,4 @@
 void TestInputRouting1();
 void TestInputRouting2();
 void TestStaticGraph();
-void TestDynamicGraph();
+void TestRefineGraph();

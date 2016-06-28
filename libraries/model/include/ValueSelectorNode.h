@@ -44,6 +44,8 @@ namespace model
         /// <summary> Exposes the output port as a read-only property </summary>
         const OutputPort<ValueType>& output = _output;
 
+        virtual void Refine(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const;
+
     protected:
         virtual void Compute() const override;
 

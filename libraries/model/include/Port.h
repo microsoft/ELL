@@ -8,6 +8,10 @@
 
 #pragma once
 
+// utilities
+#include "UniqueId.h"
+
+// stl
 #include <vector>
 #include <memory>
 
@@ -20,7 +24,8 @@ namespace model
     class Port
     {
     public:
-        typedef int PortId;
+        typedef utilities::UniqueId PortId;
+
         enum class PortType
         {
             None,
@@ -40,6 +45,7 @@ namespace model
         /// <returns> The datatype of the output </returns>
         PortType GetType() const { return _type; }
 
+        PortId GetId() const { return _id; }
         /// <summary> Returns the dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
@@ -52,13 +58,15 @@ namespace model
         template <typename ValueType>
         static PortType GetTypeCode();
 
+        virtual ~Port() = default;
+
     protected:
-        Port(const class Node* node, PortType type, size_t size) : _node(node), _type(type), _size(size) {}
+        Port(const class Node* node, PortType type, size_t size) : _node(node), _type(type), _size(size), _id(PortId()) {}
 
     private:
         // _node keeps info on where the input is coming from
         const class Node* _node = nullptr;
-
+        PortId _id;
         PortType _type = PortType::None;
         size_t _size = 0;
     };

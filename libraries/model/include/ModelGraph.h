@@ -72,6 +72,8 @@ namespace model
 
         // TODO: iterators, including begin/end for iterating over entire graph
 
+        Model Refine() const;
+
     private:
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
         // to look nodes up by id.

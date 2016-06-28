@@ -17,11 +17,20 @@ namespace model
 
     // Constructor for a vector constant
     template <typename ValueType>
-    ConstantNode<ValueType>::ConstantNode(std::vector<ValueType> values) : Node({ &_output }), _output(this, values.size()), _values(values){};
+    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values, bool) : Node({ &_output }), _output(this, values.size()), _values(values){};
 
     template <typename ValueType>
     void ConstantNode<ValueType>::Compute() const
     {
         _output.SetOutput(_values);
+    }
+
+    template <typename ValueType>
+    void ConstantNode<ValueType>::Refine(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const
+    {
+        auto newNode = newModel.AddNode<ConstantNode<ValueType>>(_values[0]);
+        nodeMap[this] = newNode.get();
+
+        portMap[&_output] = &(newNode->_output);
     }
 }

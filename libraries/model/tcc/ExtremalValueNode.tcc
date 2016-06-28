@@ -32,4 +32,16 @@ namespace model
         _val.SetOutput({ val });
         _argVal.SetOutput({ (int)index });
     };
+
+    template <typename ValueType, bool max>
+    void ExtremalValueNode<ValueType, max>::Refine(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const
+    {
+        auto newInputs = CopyInputPort(_input, portMap);
+
+        auto newNode = newModel.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
+        nodeMap[this] = newNode.get();
+
+        portMap[&_val] = &(newNode->_val);
+        portMap[&_argVal] = &(newNode->_argVal);
+    }
 }

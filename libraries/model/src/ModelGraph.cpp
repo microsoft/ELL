@@ -7,6 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ModelGraph.h"
+#include "Port.h"
+
+// stl
+#include <unordered_map>
+#include <iostream>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -22,5 +27,20 @@ namespace model
         {
             return it->second;
         }
+    }
+
+    Model Model::Refine() const
+    {
+        std::unordered_map<const Node*, Node*> nodeMap;
+        std::unordered_map<const Port*, Port*> portMap;
+
+        Model newModel;
+        Visit([&newModel, &portMap, &nodeMap](const Node& node)
+        {
+            node.Refine(newModel, nodeMap, portMap);
+        });
+
+
+        return newModel;
     }
 }

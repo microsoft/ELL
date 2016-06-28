@@ -12,6 +12,7 @@
 #include "OutputPort.h"
 #include "UniqueId.h"
 
+// stl
 #include <string>
 #include <memory>
 #include <vector>
@@ -22,6 +23,7 @@
 namespace model
 {
     class InputPortBase;
+    class Model;
 
     /// <summary> Superclass for all node types. </summary>
     class Node
@@ -47,6 +49,8 @@ namespace model
         ///
         /// <returns> a vector of all the nodes that depend on this node </summary>
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
+
+        virtual void Refine(Model& newModel, std::unordered_map<const Node*, Node*>& nodeMap, std::unordered_map<const Port*, Port*>& portMap) const = 0;
 
     protected:
         // TODO: the arguments (and the _inputs and _outputs members)
