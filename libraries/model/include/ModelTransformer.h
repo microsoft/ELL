@@ -28,26 +28,40 @@ namespace model
     class ModelTransformer
     {
     public:
+        /// <summary> Creates a ModelTransformer object than can transform the given model </summary>
         ModelTransformer(const Model& model) : _oldModel(model) {}
 
+        /// <summary> Returns a copy of the input model, by calling Copy() on each of the model's nodes </summary>
         Model CopyModel();
+
+        /// <summary> Returns a refined version of the input model, by calling Refine() on each of the model's nodes </summary>
         Model RefineModel();
 
+        /// <summary> Returns the (untyped) Port from new new model corresponding to the given port on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         const Port* GetCorrespondingPort(const Port* port);
 
+        /// <summary> Returns the  OutputPort from new new model corresponding to the given port on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
         const OutputPort<ValueType>* GetCorrespondingOutputPort(const OutputPort<ValueType>* port);
 
+        /// <summary> Returns the input node from new new model corresponding to the given input node on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
         InputNode<ValueType>* GetCorrespondingInputNode(const InputNode<ValueType>* node);
 
+        /// <summary> Returns the model generated from the last CopyModel or RefineModel call </summary>
         Model GetModel() { return _model; }
 
+        /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
         void MapPort(const Port* oldPort, const Port* newPort);
 
+        /// <summary> Returns an OutputPortElementList for the new model corresponding the the set of inputs referenced by the given input port. Called by node implementors. </summary>
         template <typename ValueType>
         OutputPortElementList<ValueType> TransformInputPort(const InputPort<ValueType>& input);
 
+        /// <summary> Creates a new node in the transformed model graph. Called by node implementors. </summary>
         template <typename NodeType, typename... Args>
         std::shared_ptr<NodeType> AddNode(Args&&... args);
 

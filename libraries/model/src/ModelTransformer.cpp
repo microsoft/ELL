@@ -25,6 +25,8 @@ namespace model
 
     Model ModelTransformer::CopyModel()
     {
+        _model = Model();
+        _portMap.clear();
         _oldModel.Visit([&](const Node& node) { node.Copy(*this); });
 
         return GetModel();
@@ -32,6 +34,8 @@ namespace model
 
     Model ModelTransformer::RefineModel()
     {
+        _model = Model();
+        _portMap.clear();
         _oldModel.Visit([&](const Node& node) { node.Refine(*this); });
 
         return GetModel();
