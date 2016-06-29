@@ -16,7 +16,12 @@ namespace model
 {
     const Port* ModelTransformer::GetCorrespondingPort(const Port* port) { return _portMap[port]; }
 
-    void ModelTransformer::MapPort(const Port* oldPort, const Port* newPort) { _portMap[oldPort] = newPort; }
+    void ModelTransformer::MapPort(const Port* oldPort, const Port* newPort)
+    {
+        // this is hideous
+        auto nonconstPort = const_cast<Port*>(newPort);
+        _portMap[oldPort] = nonconstPort;
+    }
 
     Model ModelTransformer::CopyModel()
     {

@@ -14,6 +14,7 @@
 #include "OutputPort.h"
 #include "OutputPortElementList.h"
 #include "Node.h"
+#include "InputNode.h"
 #include "OutputPort.h"
 
 #include <memory>
@@ -34,10 +35,11 @@ namespace model
 
         const Port* GetCorrespondingPort(const Port* port);
 
-        // const Node* GetCorrespondingInputNode(const Node* node)
-        // {
-        //     return nullptr;
-        // }
+        template <typename ValueType>
+        const OutputPort<ValueType>* GetCorrespondingOutputPort(const OutputPort<ValueType>* port);
+
+        template <typename ValueType>
+        InputNode<ValueType>* GetCorrespondingInputNode(const InputNode<ValueType>* node);
 
         Model GetModel() { return _model; }
 
@@ -52,7 +54,7 @@ namespace model
     private:
         const Model& _oldModel;
         Model _model;
-        std::unordered_map<const Port*, const Port*> _portMap;
+        std::unordered_map<const Port*, Port*> _portMap;
     };
 }
 

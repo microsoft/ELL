@@ -221,23 +221,15 @@ void TestRefineGraph()
     std::cout << "---------" << std::endl;
     PrintGraph(newModel);
 
-    // This sucks:
-    const auto inputNodeOutputPort = inputNode->GetOutputs()[0];
-    auto newInputNodeOutputPort = transformer.GetCorrespondingPort(inputNodeOutputPort);
-    auto newInputNodeConst = dynamic_cast<const model::InputNode<double>*>(newInputNodeOutputPort->GetNode());
-
-    assert(newInputNodeConst != nullptr);
-    auto newInputNode = const_cast<model::InputNode<double>*>(newInputNodeConst);
-
+    // Now run data through the graphs and make sure they agree
+    auto newInputNode = transformer.GetCorrespondingInputNode(inputNode.get());
     auto newOutputPort = dynamic_cast<const model::OutputPort<double>*>(transformer.GetCorrespondingPort(&(outputNode->output)));
-    assert(newOutputPort != nullptr);
 
     std::vector<std::vector<double>> inputValues = { { 1.0, 2.0 }, { 1.0, 0.5 }, { 2.0, 4.0 } };
     for (const auto& inputValue : inputValues)
     {
         inputNode->SetInput(inputValue);
         auto output = model.GetNodeOutput(outputNode->output);
-        std::cout << inputValue[0] << " < " << inputValue[1] << " : " << output[0] << std::endl;
 
         newInputNode->SetInput(inputValue);
         auto newOutput = newModel.GetNodeOutput(*newOutputPort);
