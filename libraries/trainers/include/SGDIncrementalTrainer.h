@@ -9,7 +9,6 @@
 #pragma once
 
 #include "IIncrementalTrainer.h"
-#include "ITrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
 
 // predictors
