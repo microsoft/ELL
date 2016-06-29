@@ -27,8 +27,7 @@ namespace model
     class ModelTransformer
     {
     public:
-        ModelTransformer(const Model& model) : _oldModel(model)
-        {}
+        ModelTransformer(const Model& model) : _oldModel(model) {}
 
         Model CopyModel();
         Model RefineModel();

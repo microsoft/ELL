@@ -15,7 +15,7 @@ namespace model
     template <typename ValueType>
     InputPortBase::InputPortBase(const class Node* owningNode, const OutputPortElementList<ValueType>& input) : Port(owningNode, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)
     {
-        assert(owningNode != nullptr);        
+        assert(owningNode != nullptr);
         for (const auto& range : input)
         {
             auto port = range.ReferencedPort();

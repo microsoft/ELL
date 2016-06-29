@@ -49,7 +49,7 @@ namespace model
         const Port* _referencedPort;
         size_t _index;
     };
-    
+
     /// <summary> Represents a contiguous set of values from an output port </summary>
     class OutputPortRange
     {
@@ -153,7 +153,7 @@ namespace model
     protected:
         OutputPortElementListUntyped(){};
         void ComputeSize();
-    
+
     private:
         std::vector<OutputPortRange> _ranges;
         size_t _size = 0;

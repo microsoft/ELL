@@ -99,8 +99,6 @@ namespace model
         /// <returns> The output value at the corresponding index </returns>
         ValueType operator[](size_t index) const;
     };
-
-
 }
 
 #include "../tcc/InputPort.tcc"

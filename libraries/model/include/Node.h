@@ -51,7 +51,6 @@ namespace model
         /// <returns> a vector of all the nodes that depend on this node </summary>
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
-
         const std::vector<OutputPortBase*>& GetOutputs() const { return _outputs; }
         virtual void Copy(ModelTransformer& transformer) const = 0;
         virtual void Refine(ModelTransformer& transformer) const = 0;
@@ -60,7 +59,7 @@ namespace model
         // TODO: the arguments (and the _inputs and _outputs members)
         // should perhaps be vectors of references instead of pointers.
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
-        
+
         /// <summary> Computes the output of this node and stores it in the output ports </summary>
         virtual void Compute() const = 0;
         void AddInputPort(InputPortBase* input);

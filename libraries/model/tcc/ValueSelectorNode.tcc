@@ -58,8 +58,7 @@ namespace model
     // Cheese
     //
     template <typename ValueType>
-    SelectIfLessNode<ValueType>::SelectIfLessNode(const OutputPortElementList<ValueType>& input1, const OutputPortElementList<ValueType>& input2, const OutputPortElementList<ValueType>& value1, const OutputPortElementList<ValueType>& value2)
-     : Node({ &_input1, &_input2, &_value1, &_value2 }, { &_output }), _input1(this, input1), _input2(this, input2), _value1(this, value1), _value2(this, value2), _output(this, value1.Size())
+    SelectIfLessNode<ValueType>::SelectIfLessNode(const OutputPortElementList<ValueType>& input1, const OutputPortElementList<ValueType>& input2, const OutputPortElementList<ValueType>& value1, const OutputPortElementList<ValueType>& value2) : Node({ &_input1, &_input2, &_value1, &_value2 }, { &_output }), _input1(this, input1), _input2(this, input2), _value1(this, value1), _value2(this, value2), _output(this, value1.Size())
     {
         if (input1.Size() != input2.Size())
         {
@@ -113,8 +112,7 @@ namespace model
     // More cheese
     //
     template <typename ValueType>
-    IfLessNode<ValueType>::IfLessNode(const OutputPortElementList<ValueType>& value, const OutputPortElementList<ValueType>& threshold) 
-    : Node({ &_value, &_threshold }, { &_output }), _value(this, value), _threshold(this, threshold), _output(this, 1)
+    IfLessNode<ValueType>::IfLessNode(const OutputPortElementList<ValueType>& value, const OutputPortElementList<ValueType>& threshold) : Node({ &_value, &_threshold }, { &_output }), _value(this, value), _threshold(this, threshold), _output(this, 1)
     {
         if (value.Size() != threshold.Size())
         {

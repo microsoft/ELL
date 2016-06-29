@@ -60,9 +60,9 @@ namespace model
         OutputPort<ValueType> _output;
     };
 
-//
-// Crud to throw away
-//
+    //
+    // Crud to throw away
+    //
 
     /// <summary> An example node that selects from one of two input values depending on a third input </summary>
     template <typename ValueType>
@@ -92,7 +92,6 @@ namespace model
         OutputPort<ValueType> _output;
     };
 
-
     /// <summary> An example node that selects from one of two input values depending on a third input </summary>
     template <typename ValueType>
     class IfLessNode : public Node
@@ -118,7 +117,6 @@ namespace model
         // Output
         OutputPort<bool> _output;
     };
-
 }
 
 #include "../tcc/ValueSelectorNode.tcc"
