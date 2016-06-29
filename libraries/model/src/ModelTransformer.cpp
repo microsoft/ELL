@@ -14,13 +14,13 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-    const Port* ModelTransformer::GetCorrespondingPort(const Port* port) { return _portMap[port]; }
+    const Port* ModelTransformer::GetCorrespondingPort(const Port& port) { return _portMap[&port]; }
 
-    void ModelTransformer::MapPort(const Port* oldPort, const Port* newPort)
+    void ModelTransformer::MapPort(const Port& oldPort, const Port& newPort)
     {
         // this is hideous
-        auto nonconstPort = const_cast<Port*>(newPort);
-        _portMap[oldPort] = nonconstPort;
+        auto nonconstPort = const_cast<Port*>(&newPort);
+        _portMap[&oldPort] = nonconstPort;
     }
 
     Model ModelTransformer::CopyModel()
@@ -29,7 +29,7 @@ namespace model
         _portMap.clear();
         _oldModel.Visit([&](const Node& node) { node.Copy(*this); });
 
-        return GetModel();
+        return _model;
     }
 
     Model ModelTransformer::RefineModel()
@@ -38,6 +38,6 @@ namespace model
         _portMap.clear();
         _oldModel.Visit([&](const Node& node) { node.Refine(*this); });
 
-        return GetModel();
+        return _model;
     }
 }

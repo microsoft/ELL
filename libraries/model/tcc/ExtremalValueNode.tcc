@@ -40,8 +40,8 @@ namespace model
 
         auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
 
-        transformer.MapPort(&_val, &(newNode->_val));
-        transformer.MapPort(&_argVal, &(newNode->_argVal));
+        transformer.MapPort(_val, newNode->_val);
+        transformer.MapPort(_argVal, newNode->_argVal);
     }
 
     template <typename ValueType, bool max>
@@ -51,7 +51,7 @@ namespace model
 
         auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
 
-        transformer.MapPort(&_val, &(newNode->_val));
-        transformer.MapPort(&_argVal, &(newNode->_argVal));
+        transformer.MapPort(_val, newNode->_val);
+        transformer.MapPort(_argVal, newNode->_argVal);
     }
 }

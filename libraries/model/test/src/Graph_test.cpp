@@ -223,7 +223,8 @@ void TestRefineGraph()
 
     // Now run data through the graphs and make sure they agree
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode.get());
-    auto newOutputPort = dynamic_cast<const model::OutputPort<double>*>(transformer.GetCorrespondingPort(&(outputNode->output)));
+    auto newOutputPort = transformer.GetCorrespondingOutputPort(outputNode->output);
+//    auto newOutputPort = dynamic_cast<const model::OutputPort<double>*>(transformer.GetCorrespondingPort(&(outputNode->output)));
 
     std::vector<std::vector<double>> inputValues = { { 1.0, 2.0 }, { 1.0, 0.5 }, { 2.0, 4.0 } };
     for (const auto& inputValue : inputValues)

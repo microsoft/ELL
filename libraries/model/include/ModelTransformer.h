@@ -39,23 +39,20 @@ namespace model
 
         /// <summary> Returns the (untyped) Port from new new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        const Port* GetCorrespondingPort(const Port* port);
+        const Port* GetCorrespondingPort(const Port& port);
 
         /// <summary> Returns the  OutputPort from new new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
-        const OutputPort<ValueType>* GetCorrespondingOutputPort(const OutputPort<ValueType>* port);
+        const OutputPort<ValueType>* GetCorrespondingOutputPort(const OutputPort<ValueType>& port);
 
         /// <summary> Returns the input node from new new model corresponding to the given input node on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
         InputNode<ValueType>* GetCorrespondingInputNode(const InputNode<ValueType>* node);
 
-        /// <summary> Returns the model generated from the last CopyModel or RefineModel call </summary>
-        Model GetModel() { return _model; }
-
         /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
-        void MapPort(const Port* oldPort, const Port* newPort);
+        void MapPort(const Port& oldPort, const Port& newPort);
 
         /// <summary> Returns an OutputPortElementList for the new model corresponding the the set of inputs referenced by the given input port. Called by node implementors. </summary>
         template <typename ValueType>
@@ -66,6 +63,7 @@ namespace model
         std::shared_ptr<NodeType> AddNode(Args&&... args);
 
     private:
+
         const Model& _oldModel;
         Model _model;
         std::unordered_map<const Port*, Port*> _portMap;

@@ -39,7 +39,14 @@ namespace model
         const NodeId GetId() const { return _id; }
 
         /// <summary> Returns the input "ports" for this node </summary>
+        ///
+        /// <returns> The input "ports" for this node </returns>
         const std::vector<InputPortBase*>& GetInputs() const { return _inputs; }
+
+        /// <summary> Returns the output "ports" for this node </summary>
+        ///
+        /// <returns> The output "ports" for this node </returns>
+        const std::vector<OutputPortBase*>& GetOutputs() const { return _outputs; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -51,7 +58,7 @@ namespace model
         /// <returns> a vector of all the nodes that depend on this node </summary>
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
-        const std::vector<OutputPortBase*>& GetOutputs() const { return _outputs; }
+
         virtual void Copy(ModelTransformer& transformer) const = 0;
         virtual void Refine(ModelTransformer& transformer) const = 0;
 

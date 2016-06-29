@@ -30,13 +30,13 @@ namespace model
     void InputNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<InputNode<ValueType>>(_output.Size());
-        transformer.MapPort(&_output, &(newNode->_output));
+        transformer.MapPort(_output, newNode->_output);
     }
 
     template <typename ValueType>
     void InputNode<ValueType>::Refine(ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<InputNode<ValueType>>(_output.Size());
-        transformer.MapPort(&_output, &(newNode->_output));
+        transformer.MapPort(_output, newNode->_output);
     }
 }
