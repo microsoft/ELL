@@ -143,5 +143,6 @@ void CompilableMap::ToCode(std::ostream& os) const
 
   codeGen.EndLinear();
   //codeGen.EmitTest("Predict", 124, 1, 5);
+  //codeGen.EmitTest("Predict", 4, 1, 5);
   codeGen.End();
 }

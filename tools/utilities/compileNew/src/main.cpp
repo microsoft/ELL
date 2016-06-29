@@ -30,8 +30,6 @@
 
 int main(int argc, char* argv[])
 {
-	emll::compiler::TestCompiler();
-
     try
     {
         // create a command line parser

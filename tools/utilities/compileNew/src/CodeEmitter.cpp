@@ -250,7 +250,6 @@ namespace emll
 
 		void IRCodeEmitter::Begin()
 		{
-			_module.DeclarePrintf();
 		}
 
 		void IRCodeEmitter::End()
@@ -282,7 +281,9 @@ namespace emll
 		}
 
 		void IRCodeEmitter::EmitTest(const std::string& fnName, int featureCount, int outputCount, double startValue)
-		{
+		{			
+			_module.DeclarePrintf();
+
 			auto fn = _module.AddMain();
 			llvm::Value* features = fn.Var(ValueType::Double, featureCount);
 			for (int i = 0; i < featureCount; ++i)
