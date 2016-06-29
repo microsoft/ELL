@@ -177,7 +177,6 @@ void TestCopyGraph()
 {
     // Create a simple computation graph
     model::Model model;
-
     auto in = model.AddNode<model::InputNode<double>>(3);
     auto maxAndArgMax = model.AddNode<model::ArgMaxNode<double>>(in->output);
     auto minAndArgMin = model.AddNode<model::ArgMinNode<double>>(in->output);
@@ -185,9 +184,11 @@ void TestCopyGraph()
     auto valSelector = model.AddNode<model::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
     auto indexSelector = model.AddNode<model::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
+    // Now make a copy
     model::ModelTransformer transformer(model);
     auto newModel = transformer.CopyModel();
 
+    // Print them both:
     std::cout << "\n\nOld graph" << std::endl;
     std::cout << "---------" << std::endl;
     PrintGraph(model);
@@ -210,9 +211,11 @@ void TestRefineGraph()
     auto value2 = model.AddNode<model::ConstantNode<double>>(std::vector<double>{ 100.0, 200.0, 300.0 });
     auto outputNode = model.AddNode<model::SelectIfLessNode<double>>(inputValue, inputThresh, value1->output, value2->output);
 
+    // Now transform it
     model::ModelTransformer transformer(model);
     auto newModel = transformer.RefineModel();
 
+    // Print both graphs
     std::cout << "\n\nOld graph" << std::endl;
     std::cout << "---------" << std::endl;
     PrintGraph(model);
@@ -222,9 +225,8 @@ void TestRefineGraph()
     PrintGraph(newModel);
 
     // Now run data through the graphs and make sure they agree
-    auto newInputNode = transformer.GetCorrespondingInputNode(inputNode.get());
+    auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newOutputPort = transformer.GetCorrespondingOutputPort(outputNode->output);
-//    auto newOutputPort = dynamic_cast<const model::OutputPort<double>*>(transformer.GetCorrespondingPort(&(outputNode->output)));
 
     std::vector<std::vector<double>> inputValues = { { 1.0, 2.0 }, { 1.0, 0.5 }, { 2.0, 4.0 } };
     for (const auto& inputValue : inputValues)

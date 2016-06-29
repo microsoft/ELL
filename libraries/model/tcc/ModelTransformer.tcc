@@ -48,6 +48,12 @@ namespace model
         return newInputNode;
     }
 
+    template <typename ValueType>
+    InputNode<ValueType>* ModelTransformer::GetCorrespondingInputNode(const std::shared_ptr<InputNode<ValueType>>& inputNode)
+    {
+        return GetCorrespondingInputNode(inputNode.get());
+    }
+    
     template <typename NodeType, typename... Args>
     std::shared_ptr<NodeType> ModelTransformer::AddNode(Args&&... args)
     {

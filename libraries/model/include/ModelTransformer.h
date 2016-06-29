@@ -51,6 +51,9 @@ namespace model
         template <typename ValueType>
         InputNode<ValueType>* GetCorrespondingInputNode(const InputNode<ValueType>* node);
 
+        template <typename ValueType>
+        InputNode<ValueType>* GetCorrespondingInputNode(const std::shared_ptr<InputNode<ValueType>>& node);
+
         /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
         void MapPort(const Port& oldPort, const Port& newPort);
 
