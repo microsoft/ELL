@@ -29,25 +29,23 @@ namespace model
         }
     }
 
-    Model Model::Copy() const
+    Model ModelTransformer::CopyModel()
     {
-        ModelTransformer transformer;
-        Visit([&transformer](const Node& node)
+        _oldModel.Visit([&](const Node& node)
         {
-            node.Copy(transformer);
+            node.Copy(*this);
         });
 
-        return transformer.GetModel();
+        return GetModel();
     }
 
-    Model Model::Refine() const
+    Model ModelTransformer::RefineModel()
     {
-        ModelTransformer transformer;
-        Visit([&transformer](const Node& node)
+        _oldModel.Visit([&](const Node& node)
         {
-            node.Refine(transformer);
+            node.Refine(*this);
         });
 
-        return transformer.GetModel();
+        return GetModel();
     }
 }

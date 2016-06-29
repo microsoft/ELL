@@ -17,10 +17,7 @@ namespace model
 
     // Constructor for a vector constant
     template <typename ValueType>
-    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values) : Node({}, { &_output }), _output(this, values.size()) // , _values(values)
-    {
-        _values = values;
-    };
+    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values) : Node({}, { &_output }), _output(this, values.size()), _values(values){};
 
     template <typename ValueType>
     void ConstantNode<ValueType>::Compute() const
@@ -31,14 +28,14 @@ namespace model
     template <typename ValueType>
     void ConstantNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values[0]);
+        auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values);
         transformer.MapPort(&_output, &(newNode->_output));
     }
 
     template <typename ValueType>
     void ConstantNode<ValueType>::Refine(ModelTransformer& transformer) const
     {
-        auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values[0]);
+        auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values);
         transformer.MapPort(&_output, &(newNode->_output));
     }
 }

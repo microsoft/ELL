@@ -72,9 +72,6 @@ namespace model
 
         // TODO: iterators, including begin/end for iterating over entire graph
 
-        Model Copy() const;
-        Model Refine() const;
-
     private:
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
         // to look nodes up by id.
@@ -91,6 +88,26 @@ namespace model
     class ModelTransformer
     {
     public:
+        ModelTransformer(const Model& model) : _oldModel(model)
+        {}
+
+        Model CopyModel();
+        Model RefineModel();
+
+        const Port* GetCorrespondingPort(const Port* port)
+        {
+            return _portMap[port];
+        }
+
+        // const Node* GetCorrespondingInputNode(const Node* node)
+        // {
+        //     return nullptr;
+        // }
+
+        Model GetModel() { return _model; }
+        //
+        // 
+        //
         void MapPort(const Port* oldPort, const Port* newPort)
         {
             _portMap[oldPort] = newPort;
@@ -121,12 +138,8 @@ namespace model
             return _model.AddNode<NodeType>(std::forward<Args>(args)...);
         }
 
-        Model GetModel()
-        {
-            return _model;
-        }
-
     private:
+        const Model& _oldModel;
         Model _model;
         std::unordered_map<const Port*, const Port*> _portMap;
     };

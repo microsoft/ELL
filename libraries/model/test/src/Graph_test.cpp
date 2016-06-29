@@ -189,13 +189,14 @@ void TestCopyGraph()
     auto valSelector = model.AddNode<model::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
     auto indexSelector = model.AddNode<model::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
-    auto newModel = model.Refine();
+    model::ModelTransformer transformer(model);
+    auto newModel = transformer.CopyModel();
 
     std::cout << "\n\nOld graph" << std::endl;
     std::cout << "---------" << std::endl;
     PrintGraph(model);
 
-    std::cout << "\n\nNew graph" << std::endl;
+    std::cout << "\n\nCopied graph" << std::endl;
     std::cout << "---------" << std::endl;
     PrintGraph(newModel);
 }
@@ -205,22 +206,56 @@ void TestRefineGraph()
     // Create a simple computation graph
     model::Model model;
 
-    auto in = model.AddNode<model::InputNode<double>>(2);
-    model::OutputPortElementList<double> inputValue = { in->output, 0 };
-    model::OutputPortElementList<double> inputThresh = { in->output, 1 };
+    auto inputNode = model.AddNode<model::InputNode<double>>(2);
+    model::OutputPortElementList<double> inputValue = { inputNode->output, 0 };
+    model::OutputPortElementList<double> inputThresh = { inputNode->output, 1 };
 
     auto value1 = model.AddNode<model::ConstantNode<double>>(std::vector<double>{1.0, 2.0, 3.0});
     auto value2 = model.AddNode<model::ConstantNode<double>>(std::vector<double>{100.0, 200.0, 300.0});
+    auto outputNode = model.AddNode<model::SelectIfLessNode<double>>(inputValue, inputThresh, value1->output, value2->output);
 
-    auto selectIfLessNode = model.AddNode<model::SelectIfLessNode<double>>(inputValue, inputThresh, value1->output, value2->output);
-
-    auto newModel = model.Refine();
+    model::ModelTransformer transformer(model);
+    auto newModel = transformer.RefineModel();
 
     std::cout << "\n\nOld graph" << std::endl;
     std::cout << "---------" << std::endl;
     PrintGraph(model);
 
-    std::cout << "\n\nNew graph" << std::endl;
+    std::cout << "\n\nRefined graph" << std::endl;
     std::cout << "---------" << std::endl;
     PrintGraph(newModel);
+
+
+    // This sucks:
+    const auto inputNodeOutputPort = inputNode->GetOutputs()[0];
+    auto newInputNodeOutputPort = transformer.GetCorrespondingPort(inputNodeOutputPort);
+    auto newInputNodeConst = dynamic_cast<const model::InputNode<double>*>(newInputNodeOutputPort->GetNode());
+
+    assert(newInputNodeConst != nullptr);
+    auto newInputNode = const_cast<model::InputNode<double>*>(newInputNodeConst);
+
+    auto newOutputPort = dynamic_cast<const model::OutputPort<double>*>(transformer.GetCorrespondingPort(&(outputNode->output)));
+    assert(newOutputPort != nullptr);
+
+    std::vector<std::vector<double>> inputValues = { { 1.0, 2.0}, {1.0, 0.5}, {2.0, 4.0}};
+    for(const auto& inputValue: inputValues)
+    {
+        inputNode->SetInput(inputValue);
+        auto output = model.GetNodeOutput(outputNode->output);
+        std::cout << inputValue[0] << " < " << inputValue[1] << " : " << output[0] << std::endl;
+
+        newInputNode->SetInput(inputValue);
+        auto newOutput = newModel.GetNodeOutput(*newOutputPort);
+
+        testing::ProcessTest("testing refined graph", testing::IsEqual(output[0], newOutput[0]));
+        testing::ProcessTest("testing refined graph", testing::IsEqual(output[1], newOutput[1]));
+        testing::ProcessTest("testing refined graph", testing::IsEqual(output[2], newOutput[2]));
+    }
+
+
+
+
+
+
+
 }
