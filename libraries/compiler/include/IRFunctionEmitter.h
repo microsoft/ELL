@@ -2,6 +2,7 @@
 
 #include "IREmitter.h"
 #include "IRLoopEmitter.h"
+#include "IRIfEmitter.h"
 
 namespace emll
 {
@@ -37,6 +38,10 @@ namespace emll
 			llvm::Value* Cast(llvm::Value* pValue, ValueType destType)
 			{
 				return _pEmitter->Cast(pValue, destType);
+			}
+			llvm::Value* CastFloatToInt(llvm::Value* pValue)
+			{
+				return _pEmitter->CastFloat(pValue, ValueType::Int32);
 			}
 			llvm::BasicBlock* Block(const std::string& label)
 			{
@@ -82,6 +87,7 @@ namespace emll
 			{
 				_pEmitter->Branch(pCondVal, pThenBlock, pElseBlock);
 			}
+			void Branch(ComparisonType comparision, llvm::Value* pValue, llvm::Value* pTestValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
 
 			llvm::Value* Cmp(ComparisonType type, llvm::Value* pValue, llvm::Value* pTestValue)
 			{
@@ -133,13 +139,24 @@ namespace emll
 
 			llvm::Value* ValueAtGlobal(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset);
 
+			//------------------------------------------
+			//
+			// Expressions
+			//
+			//------------------------------------------
+			IRForLoopEmitter ForLoop();
+			IRIfEmitter If();
+			//------------------------------------------
+			//
+			// Standard function calls
+			//
+			//------------------------------------------
 
 			llvm::Value* Malloc(ValueType type, int64_t size);
 			void Free(llvm::Value* pValue);
+
+			llvm::Value* Print(const std::string& text);
 			llvm::Value* Printf(std::initializer_list<llvm::Value*> args);
-
-
-			IRForLoopEmitter ForLoop();
 
 			void Verify()
 			{

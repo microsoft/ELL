@@ -15,6 +15,7 @@ namespace emll
 		{
 			assert(_pIncBlock != nullptr);
 
+			// Caller is done generating the body. Add a branch from the Body block to the increment block
 			_fn.Branch(_pIncBlock);
 			_fn.CurrentBlock(_pAfterBlock);
 		}
@@ -49,8 +50,7 @@ namespace emll
 		{
 			_fn.Branch(_pConditionBlock);
 			_fn.CurrentBlock(_pConditionBlock);
-			llvm::Value* pCmp = _fn.Cmp(type, _fn.Load(_pIterationVar), pTestValue);
-			_fn.Branch(pCmp, _pBodyBlock, _pAfterBlock);
+			_fn.Branch(type, _fn.Load(_pIterationVar), pTestValue, _pBodyBlock, _pAfterBlock);
 		}
 
 		void IRForLoopEmitter::EmitIncrement(ValueType type, llvm::Value* pIncValue)

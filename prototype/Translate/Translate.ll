@@ -15,10 +15,22 @@ $__local_stdio_printf_options = comdat any
 
 $"\01??_C@_07MEEEMOAP@?$CFd?0?5?$CFf?6?$AA@" = comdat any
 
+$"\01??_C@_03MBCKNMHH@Foo?$AA@" = comdat any
+
+$"\01??_C@_03HJJGLLBC@Goo?$AA@" = comdat any
+
+$"\01??_C@_03LLLKAKDG@Bar?$AA@" = comdat any
+
+$"\01??_C@_03LGBJPEEI@moo?$AA@" = comdat any
+
 $"\01?_OptionsStorage@?1??__local_stdio_printf_options@@9@4_KA" = comdat any
 
 @g_data = internal constant [3 x double] [double 3.300000e+00, double 4.400000e+00, double 5.500000e+00], align 16
 @"\01??_C@_07MEEEMOAP@?$CFd?0?5?$CFf?6?$AA@" = linkonce_odr unnamed_addr constant [8 x i8] c"%d, %f\0A\00", comdat, align 1
+@"\01??_C@_03MBCKNMHH@Foo?$AA@" = linkonce_odr unnamed_addr constant [4 x i8] c"Foo\00", comdat, align 1
+@"\01??_C@_03HJJGLLBC@Goo?$AA@" = linkonce_odr unnamed_addr constant [4 x i8] c"Goo\00", comdat, align 1
+@"\01??_C@_03LLLKAKDG@Bar?$AA@" = linkonce_odr unnamed_addr constant [4 x i8] c"Bar\00", comdat, align 1
+@"\01??_C@_03LGBJPEEI@moo?$AA@" = linkonce_odr unnamed_addr constant [4 x i8] c"moo\00", comdat, align 1
 @"\01?_OptionsStorage@?1??__local_stdio_printf_options@@9@4_KA" = linkonce_odr global i64 0, comdat, align 8
 
 ; Function Attrs: nounwind uwtable
@@ -78,6 +90,53 @@ entry:
   call void @llvm.va_end(i8* %_ArgList3)
   %2 = load i32, i32* %_Result, align 4
   ret i32 %2
+}
+
+; Function Attrs: nounwind uwtable
+define void @"\01?IfThen@@YAXHH@Z"(i32 %x, i32 %y) #0 {
+entry:
+  %y.addr = alloca i32, align 4
+  %x.addr = alloca i32, align 4
+  store i32 %y, i32* %y.addr, align 4
+  store i32 %x, i32* %x.addr, align 4
+  %0 = load i32, i32* %x.addr, align 4
+  %cmp = icmp sgt i32 %0, 35
+  br i1 %cmp, label %if.then, label %if.else4
+
+if.then:                                          ; preds = %entry
+  %1 = load i32, i32* %y.addr, align 4
+  %cmp1 = icmp slt i32 %1, 50
+  br i1 %cmp1, label %if.then2, label %if.else
+
+if.then2:                                         ; preds = %if.then
+  %call = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @"\01??_C@_03MBCKNMHH@Foo?$AA@", i32 0, i32 0))
+  br label %if.end
+
+if.else:                                          ; preds = %if.then
+  %call3 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @"\01??_C@_03HJJGLLBC@Goo?$AA@", i32 0, i32 0))
+  br label %if.end
+
+if.end:                                           ; preds = %if.else, %if.then2
+  br label %if.end11
+
+if.else4:                                         ; preds = %entry
+  %2 = load i32, i32* %y.addr, align 4
+  %cmp5 = icmp sgt i32 %2, 43
+  br i1 %cmp5, label %if.then6, label %if.else8
+
+if.then6:                                         ; preds = %if.else4
+  %call7 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @"\01??_C@_03LLLKAKDG@Bar?$AA@", i32 0, i32 0))
+  br label %if.end10
+
+if.else8:                                         ; preds = %if.else4
+  %call9 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @"\01??_C@_03LGBJPEEI@moo?$AA@", i32 0, i32 0))
+  br label %if.end10
+
+if.end10:                                         ; preds = %if.else8, %if.then6
+  br label %if.end11
+
+if.end11:                                         ; preds = %if.end10, %if.end
+  ret void
 }
 
 ; Function Attrs: norecurse nounwind uwtable

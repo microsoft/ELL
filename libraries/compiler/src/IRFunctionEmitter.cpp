@@ -64,6 +64,12 @@ namespace emll
 			auto r = &(*values);
 			return Op(type, l, r);
 		}
+		
+		void IRFunctionEmitter::Branch(ComparisonType comparision, llvm::Value* pValue, llvm::Value* pTestValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
+		{
+			llvm::Value* pResult = Cmp(comparision, pValue, pTestValue);
+			Branch(pResult, pThenBlock, pElseBlock);
+		}
 
 		llvm::Value* IRFunctionEmitter::Store(llvm::Value* pPtr, llvm::Value* pVal)
 		{
@@ -128,6 +134,11 @@ namespace emll
 		{
 			return IRForLoopEmitter(*this);
 		}
+		
+		IRIfEmitter IRFunctionEmitter::If()
+		{
+			return IRIfEmitter(*this);
+		}
 
 		llvm::Value* IRFunctionEmitter::Malloc(ValueType type, int64_t size)
 		{
@@ -138,6 +149,11 @@ namespace emll
 		void IRFunctionEmitter::Free(llvm::Value* pValue)
 		{
 			Call(FreeFnName, Cast(pValue, ValueType::PByte));
+		}
+
+		llvm::Value* IRFunctionEmitter::Print(const std::string& text)
+		{
+			return Printf({ Literal(text) });
 		}
 
 		llvm::Value* IRFunctionEmitter::Printf(std::initializer_list<llvm::Value*> args)

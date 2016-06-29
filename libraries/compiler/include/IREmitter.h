@@ -38,6 +38,7 @@ namespace emll
 			llvm::Value* Global(const std::string& name, const std::string& value);
 
 			llvm::Value* Cast(llvm::Value* pValue, const ValueType destType);
+			llvm::Value* CastFloat(llvm::Value* pValue, const ValueType destType);
 
 			llvm::ReturnInst* ReturnVoid();
 			llvm::ReturnInst* Return(llvm::Value* pValue);
@@ -83,7 +84,6 @@ namespace emll
 			llvm::AllocaInst* Variable(llvm::Type* pType, const std::string& name);
 
 			llvm::AllocaInst* StackAlloc(const ValueType type, int count);
-
 
 			llvm::BranchInst* Branch(llvm::Value* pCondVal, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
 			llvm::BranchInst* Branch(llvm::BasicBlock* pDest);

@@ -18,6 +18,7 @@ endif()
 set (SRC src/IREmitter.cpp
          src/IRModuleEmitter.cpp
          src/IRLoopEmitter.cpp
+		 src/IRIfEmitter.cpp
          src/IRFunctionEmitter.cpp
 )
 
@@ -28,6 +29,7 @@ set (INCLUDE include/LLVMInclude.h
 		include/SymbolTable.h
 		include/IREmitter.h
 		include/IRLoopEmitter.h
+		include/IRIfEmitter.h
 		include/IRFunctionEmitter.h
 		include/IRModuleEmitter.h
 		include/IRCompiler.h

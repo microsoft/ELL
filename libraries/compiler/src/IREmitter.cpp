@@ -85,6 +85,26 @@ namespace emll
 			return _builder.CreateBitCast(pValue, Type(destType));
 		}
 
+		llvm::Value* IREmitter::CastFloat(llvm::Value* pValue, const ValueType destType)
+		{
+			assert(pValue != nullptr);
+
+			auto type = Type(destType);
+			switch (destType)
+			{
+				case ValueType::Byte:
+					return _builder.CreateFPToUI(pValue, type);
+
+				case ValueType::Short:
+				case ValueType::Int32:
+				case ValueType::Int64:
+					return _builder.CreateFPToSI(pValue, type);
+				
+				default:
+					throw new EmitterException(EmitterError::NotSupported);
+			}
+		}
+
 		llvm::Value* IREmitter::Global(const std::string& name, const std::string& value)
 		{
 			return _builder.CreateGlobalStringPtr(value, name);
@@ -108,24 +128,24 @@ namespace emll
 
 			switch (type)
 			{
-			case OperatorType::Add:
-				return _builder.CreateAdd(pLVal, pRVal, varName);
-			case OperatorType::Subtract:
-				return _builder.CreateSub(pLVal, pRVal, varName);
-			case OperatorType::Multiply:
-				return _builder.CreateMul(pLVal, pRVal, varName);
-			case OperatorType::DivideS:
-				return _builder.CreateSDiv(pLVal, pRVal, varName);
-			case OperatorType::AddF:
-				return _builder.CreateFAdd(pLVal, pRVal, varName);
-			case OperatorType::SubtractF:
-				return _builder.CreateFSub(pLVal, pRVal, varName);
-			case OperatorType::MultiplyF:
-				return _builder.CreateFMul(pLVal, pRVal, varName);
-			case OperatorType::DivideF:
-				return _builder.CreateFDiv(pLVal, pRVal, varName);
-			default:
-				throw new EmitterException(EmitterError::InvalidOperatorType);
+				case OperatorType::Add:
+					return _builder.CreateAdd(pLVal, pRVal, varName);
+				case OperatorType::Subtract:
+					return _builder.CreateSub(pLVal, pRVal, varName);
+				case OperatorType::Multiply:
+					return _builder.CreateMul(pLVal, pRVal, varName);
+				case OperatorType::DivideS:
+					return _builder.CreateSDiv(pLVal, pRVal, varName);
+				case OperatorType::AddF:
+					return _builder.CreateFAdd(pLVal, pRVal, varName);
+				case OperatorType::SubtractF:
+					return _builder.CreateFSub(pLVal, pRVal, varName);
+				case OperatorType::MultiplyF:
+					return _builder.CreateFMul(pLVal, pRVal, varName);
+				case OperatorType::DivideF:
+					return _builder.CreateFDiv(pLVal, pRVal, varName);
+				default:
+					throw new EmitterException(EmitterError::InvalidOperatorType);
 			}
 		}
 
@@ -136,20 +156,30 @@ namespace emll
 
 			switch (type)
 			{
-			default:
-				throw new EmitterException(EmitterError::InvalidComparisonType);
-			case ComparisonType::Eq:
-				return _builder.CreateICmpEQ(pLVal, pRVal);
-			case ComparisonType::Lt:
-				return _builder.CreateICmpSLT(pLVal, pRVal);
-			case ComparisonType::Lte:
-				return _builder.CreateICmpSLE(pLVal, pRVal);
-			case ComparisonType::Gt:
-				return _builder.CreateICmpSGT(pLVal, pRVal);
-			case ComparisonType::Gte:
-				return _builder.CreateICmpSGE(pLVal, pRVal);
-			case ComparisonType::Neq:
-				return _builder.CreateICmpNE(pLVal, pRVal);
+				default:
+					throw new EmitterException(EmitterError::InvalidComparisonType);
+				case ComparisonType::Eq:
+					return _builder.CreateICmpEQ(pLVal, pRVal);
+				case ComparisonType::Lt:
+					return _builder.CreateICmpSLT(pLVal, pRVal);
+				case ComparisonType::Lte:
+					return _builder.CreateICmpSLE(pLVal, pRVal);
+				case ComparisonType::Gt:
+					return _builder.CreateICmpSGT(pLVal, pRVal);
+				case ComparisonType::Gte:
+					return _builder.CreateICmpSGE(pLVal, pRVal);
+				case ComparisonType::Neq:
+					return _builder.CreateICmpNE(pLVal, pRVal);
+				case ComparisonType::EqF:
+					return _builder.CreateFCmpOEQ(pLVal, pRVal);
+				case ComparisonType::LtF:
+					return _builder.CreateFCmpOLT(pLVal, pRVal);
+				case ComparisonType::LteF:
+					return _builder.CreateFCmpOLE(pLVal, pRVal);
+				case ComparisonType::GtF:
+					return _builder.CreateFCmpOGT(pLVal, pRVal);
+				case ComparisonType::GteF:
+					return _builder.CreateFCmpOGE(pLVal, pRVal);
 			}
 		}
 

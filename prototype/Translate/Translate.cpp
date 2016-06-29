@@ -202,6 +202,31 @@ void Loop(int startAt, int maxValue, int step)
 		printf("%d, %f\n", i, g_data[i]);
 	}
 }
+
+void IfThen(int x, int y)
+{
+	if (x > 35)
+	{
+		if (y < 50)
+		{
+			printf("Foo");
+		}
+		else
+		{
+			printf("Goo");
+
+		}
+	}
+	else if (y > 43)
+	{
+		printf("Bar");
+	}
+	else
+	{
+		printf("moo");
+	}
+}
+
 int main()
 {
 	Loop(0, 10, 1);

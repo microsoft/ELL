@@ -45,7 +45,13 @@ namespace emll
 			Lte,
 			Gt,
 			Gte,
-			Neq
+			Neq,
+			EqF,
+			LtF,
+			LteF,
+			GtF,
+			GteF,
+			NeqF
 		};
 
 		template<typename T>

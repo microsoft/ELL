@@ -25,7 +25,7 @@ namespace emll
 
 			auto fnMain = module.AddMain();
 
-			IRForLoopEmitter forLoop = fnMain.ForLoop();
+			IRForLoopEmitter forLoop(fnMain);
 			auto pBodyBlock = forLoop.Begin(data.size());
 			{
 				auto printBlock = fnMain.BlockAfter(pBodyBlock, "PrintBlock");
@@ -34,9 +34,25 @@ namespace emll
 
 				auto i = fnMain.Load(forLoop.IterationVar());
 				auto item = fnMain.ValueAtGlobal(pData, i);
+				//auto itemInt = fnMain.CastFloatToInt(item);
+				IRIfEmitter ife(fnMain);				
+				ife.If(ComparisonType::LtF, item, fnMain.Literal(5.7));
+				{
+					fnMain.Print("First IF!\n");
+				}
+				ife.If(ComparisonType::EqF, item, fnMain.Literal(6.6));
+				{
+					fnMain.Print("Second If!\n");
+				}
+				ife.Else();
+				{
+					fnMain.Print("Else\n");
+				}
+				ife.End();
 				fnMain.Printf({ fnMain.Literal("%d, %f\n"), i,  item});
 			}
 			forLoop.End();
+			
 			
 			fnMain.Ret();
 
