@@ -27,18 +27,25 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override;
 
+        /// <summary> Exposes the ensemble prediction as a read-only property </summary>
+        const model::OutputPort<double>& ensemblePrediction = _ensemblePrediction;
+
+        /// <summary> Exposes individual tree predictions as a read-only property </summary>
+        const model::OutputPort<double>& treePredictions = _treePredictions;
+
+        /// <summary> Exposes the path indicator vectors of individual trees as a read-only property </summary>
+        const std::vector<model::OutputPort<bool>>& treePathIndicators = _treePathIndicators;
+    
     protected:
         virtual void Compute() const override;
 
     private:
-
         // input ports
-        model::InputPort<double> featureValues;
+        model::InputPort<double> _featureValues;
         
         // output ports
-        model::OutputPort<double> ensemblePrediction;
-        model::OutputPort<double> treePredictions;
-        std::vector<model::OutputPort<bool>> treePathIndicators;
-        std::vector<model::OutputPort<bool>> treeLeafIndicators;
+        model::OutputPort<double> _ensemblePrediction;
+        model::OutputPort<double> _treePredictions;
+        std::vector<model::OutputPort<bool>> _treePathIndicators;
     };
 }
