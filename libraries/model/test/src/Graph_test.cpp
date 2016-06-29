@@ -5,6 +5,7 @@
 #include "Graph_test.h"
 
 #include "ModelGraph.h"
+#include "ModelTransformer.h"
 #include "ValueSelectorNode.h"
 #include "ExtremalValueNode.h"
 #include "ConstantNode.h"

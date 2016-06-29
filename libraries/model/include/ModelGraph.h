@@ -81,68 +81,6 @@ namespace model
         template <typename Visitor>
         void Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodePtrs) const;
     };
-
-    //
-    // TODO: move to own file(s)
-    //
-    class ModelTransformer
-    {
-    public:
-        ModelTransformer(const Model& model) : _oldModel(model)
-        {}
-
-        Model CopyModel();
-        Model RefineModel();
-
-        const Port* GetCorrespondingPort(const Port* port)
-        {
-            return _portMap[port];
-        }
-
-        // const Node* GetCorrespondingInputNode(const Node* node)
-        // {
-        //     return nullptr;
-        // }
-
-        Model GetModel() { return _model; }
-        //
-        // 
-        //
-        void MapPort(const Port* oldPort, const Port* newPort)
-        {
-            _portMap[oldPort] = newPort;
-        }
-
-        template <typename ValueType>
-        OutputPortElementList<ValueType> TransformInputPort(const InputPort<ValueType>& input)
-        {
-            const auto& ranges = input.GetInputRanges();
-            std::vector<OutputPortElementList<ValueType>> newRanges;
-            for (const auto& range : ranges)
-            {
-                auto oldPort = range.ReferencedPort();
-                auto newPort = _portMap[oldPort];
-                auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPort);
-                // TODO: ensure dynamic cast worked
-                
-                auto start = range.GetStartIndex();
-                auto size = range.Size();
-                newRanges.emplace_back(*outputPort, start, size);
-            }
-            return OutputPortElementList<ValueType>(newRanges);
-        }
-
-        template <typename NodeType, typename... Args>
-        std::shared_ptr<NodeType> AddNode(Args&&... args)
-        {
-            return _model.AddNode<NodeType>(std::forward<Args>(args)...);
-        }
-
-    private:
-        const Model& _oldModel;
-        Model _model;
-        std::unordered_map<const Port*, const Port*> _portMap;
-    };
 }
 
 #include "../tcc/ModelGraph.tcc"

@@ -28,24 +28,4 @@ namespace model
             return it->second;
         }
     }
-
-    Model ModelTransformer::CopyModel()
-    {
-        _oldModel.Visit([&](const Node& node)
-        {
-            node.Copy(*this);
-        });
-
-        return GetModel();
-    }
-
-    Model ModelTransformer::RefineModel()
-    {
-        _oldModel.Visit([&](const Node& node)
-        {
-            node.Refine(*this);
-        });
-
-        return GetModel();
-    }
 }
