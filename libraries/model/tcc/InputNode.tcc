@@ -31,7 +31,6 @@ namespace model
     {
         auto newNode = transformer.AddNode<InputNode<ValueType>>(_output.Size());
         MapOutputPorts(transformer, newNode);
-//        transformer.MapPort(_output, newNode->_output);
     }
 
     template <typename ValueType>
@@ -39,6 +38,5 @@ namespace model
     {
         auto newNode = transformer.AddNode<InputNode<ValueType>>(_output.Size());
         MapOutputPorts(transformer, newNode);
-//        transformer.MapPort(_output, newNode->_output);
     }
 }

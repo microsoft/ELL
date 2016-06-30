@@ -31,14 +31,11 @@ namespace model
     class ModelTransformer
     {
     public:
-        /// <summary> Creates a ModelTransformer object than can transform the given model </summary>
-        ModelTransformer(const Model& model) : _oldModel(model) {}
-
         /// <summary> Returns a copy of the input model, by calling Copy() on each of the model's nodes </summary>
-        Model CopyModel();
+        Model CopyModel(const Model& model);
 
         /// <summary> Returns a refined version of the input model, by calling Refine() on each of the model's nodes </summary>
-        Model RefineModel();
+        Model RefineModel(const Model& model);
 
         /// <summary> Returns the (untyped) Port from new new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
@@ -57,9 +54,6 @@ namespace model
         template <typename ValueType>
         InputNode<ValueType>* GetCorrespondingInputNode(const std::shared_ptr<InputNode<ValueType>>& node);
 
-        /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
-        void MapPort(const Port& oldPort, const Port& newPort);
-
         /// <summary> Returns an OutputPortElementList for the new model corresponding the the set of inputs referenced by the given input port. Called by node implementors. </summary>
         template <typename ValueType>
         OutputPortElementList<ValueType> TransformInputPort(const InputPort<ValueType>& input);
@@ -69,8 +63,10 @@ namespace model
         std::shared_ptr<NodeType> AddNode(Args&&... args);
 
     private:
+        friend class Node;
+        /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
+        void MapPort(const Port& oldPort, const Port& newPort);
 
-        const Model& _oldModel;
         Model _model;
         std::unordered_map<const Port*, Port*> _portMap;
     };
