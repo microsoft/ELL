@@ -31,7 +31,7 @@ namespace model
         return transformer.GetModel();
     }
 
-    Model ModelTransformer::RefineModel()
+    Model ModelTransformer::RefineModel(const Model& oldModel)
     {
         ModelTransformer transformer(oldModel);
         _oldModel.Visit([&](const Node& node) { node.Refine(transformer); });
