@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     TreeEnsembleNode.h (nodes)
+//  File:     BinaryDecisionTreeNode.h (nodes)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,7 +19,7 @@
 
 namespace nodes
 {
-    class TreeEnsembleNode : public model::Node
+    class BinaryDecisionTreeNode : public model::Node
     {
     public:
         /// <summary> Gets the name of this type. </summary>
@@ -28,13 +28,10 @@ namespace nodes
         virtual std::string GetRuntimeTypeName() const override;
 
         /// <summary> Exposes the ensemble prediction as a read-only property </summary>
-        const model::OutputPort<double>& ensemblePrediction = _ensemblePrediction;
-
-        /// <summary> Exposes individual tree predictions as a read-only property </summary>
-        const model::OutputPort<double>& treePredictions = _treePredictions;
+        const model::OutputPort<double>& prediction = _prediction;
 
         /// <summary> Exposes the path indicator vectors of individual trees as a read-only property </summary>
-        const std::vector<model::OutputPort<bool>>& treePathIndicators = _treePathIndicators;
+        const model::OutputPort<bool>& pathIndicator = _pathIndicator;
     
     protected:
         virtual void Compute() const override;
@@ -44,8 +41,7 @@ namespace nodes
         model::InputPort<double> _featureValues;
         
         // output ports
-        model::OutputPort<double> _ensemblePrediction;
-        model::OutputPort<double> _treePredictions;
-        std::vector<model::OutputPort<bool>> _treePathIndicators;
+        model::OutputPort<double> _prediction;
+        model::OutputPort<bool> _pathIndicator;
     };
 }

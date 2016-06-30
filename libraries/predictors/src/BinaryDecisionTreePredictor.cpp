@@ -1,22 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     TreeEnsembleNode.cpp (nodes)
+//  File:     BinaryDecisionTreePredictor.cpp (predictors)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "TreeEnsembleNode.h"
+#include "BinaryDecisionTreePredictor.h"
 
-namespace nodes
+namespace predictors
 {
-    std::string TreeEnsembleNode::GetRuntimeTypeName() const
-    {
-        return "TreeEnsembleNode";
-    }
 
-    void TreeEnsembleNode::Compute() const
-    {
 
-    }
 }

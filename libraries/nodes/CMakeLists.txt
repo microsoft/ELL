@@ -12,9 +12,9 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/TreeEnsembleNode.cpp)
+set (SRC src/BinaryDecisionTreeNode.cpp)
 
-set (INCLUDE include/TreeEnsembleNode.h)
+set (INCLUDE include/BinaryDecisionTreeNode.h)
 
 set (TCC )
 
