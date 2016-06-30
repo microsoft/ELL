@@ -53,7 +53,25 @@ namespace model
     {
         return GetCorrespondingInputNode(inputNode.get());
     }
-    
+
+    template <typename ValueType>
+    void ModelTransformer::MapOutputPort(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort)
+    {
+        MapPort(oldPort, newPort);
+    }
+
+    template <typename NodeType>
+    void ModelTransformer::MapAllOutputPorts(const NodeType* oldNode, NodeType* newNode)
+    {
+        oldNode->MapAllOutputPorts(*this, newNode);
+    }
+
+    template <typename NodeType>
+    void ModelTransformer::MapAllOutputPorts(const NodeType* oldNode, std::shared_ptr<NodeType> newNode)
+    {
+        oldNode->MapAllOutputPorts(*this, newNode);
+    }
+
     template <typename NodeType, typename... Args>
     std::shared_ptr<NodeType> ModelTransformer::AddNode(Args&&... args)
     {

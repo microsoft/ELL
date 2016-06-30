@@ -72,11 +72,12 @@ namespace model
 
         virtual void CopyImpl(ModelTransformer& transformer) const = 0;
         virtual void RefineImpl(ModelTransformer& transformer) const = 0;
-        void MapOutputPorts(ModelTransformer& transformer, Node* other) const;
-        void MapOutputPorts(ModelTransformer& transformer, const std::shared_ptr<Node>& other) const;
+        void MapAllOutputPorts(ModelTransformer& transformer, Node* other) const;
+        void MapAllOutputPorts(ModelTransformer& transformer, const std::shared_ptr<Node>& other) const;
 
     private:
         friend class Model;
+        friend class ModelTransformer;
         void AddDependent(const Node* dependent) const;
         void RegisterDependencies() const;
 

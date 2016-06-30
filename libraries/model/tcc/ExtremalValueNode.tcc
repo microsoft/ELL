@@ -38,7 +38,7 @@ namespace model
     {
         auto newInputs = transformer.TransformInputPort(_input);
         auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
-        MapOutputPorts(transformer, newNode);
+        transformer.MapAllOutputPorts(this, newNode);
     }
 
     template <typename ValueType, bool max>
@@ -46,6 +46,6 @@ namespace model
     {
         auto newInputs = transformer.TransformInputPort(_input);
         auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
-        MapOutputPorts(transformer, newNode);
+        transformer.MapAllOutputPorts(this, newNode);
     }
 }

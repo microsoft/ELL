@@ -29,13 +29,13 @@ namespace model
     void ConstantNode<ValueType>::CopyImpl(ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values);
-        MapOutputPorts(transformer, newNode);
+        transformer.MapAllOutputPorts(this, newNode);
     }
 
     template <typename ValueType>
     void ConstantNode<ValueType>::RefineImpl(ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values);
-        MapOutputPorts(transformer, newNode);
+        transformer.MapAllOutputPorts(this, newNode);
     }
 }

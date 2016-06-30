@@ -64,10 +64,24 @@ namespace model
         template <typename NodeType, typename... Args>
         std::shared_ptr<NodeType> AddNode(Args&&... args);
 
+        /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
+        template <typename ValueType>
+        void MapOutputPort(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort);
+
+        /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
+        template <typename NodeType>
+        void MapAllOutputPorts(const NodeType* oldNode, NodeType* newNode);
+
+        /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
+        template <typename NodeType>
+        void MapAllOutputPorts(const NodeType* oldNode, std::shared_ptr<NodeType> newNode);
+
     private:
         friend class Node;
+
         /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
         void MapPort(const Port& oldPort, const Port& newPort);
+
 
         Model _model;
         std::unordered_map<const Port*, Port*> _portMap;

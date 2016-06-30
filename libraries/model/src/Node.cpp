@@ -31,12 +31,12 @@ namespace model
         RefineImpl(transformer);
     }
 
-    void Node::MapOutputPorts(ModelTransformer& transformer, const std::shared_ptr<Node>& other) const
+    void Node::MapAllOutputPorts(ModelTransformer& transformer, const std::shared_ptr<Node>& other) const
     {
-        MapOutputPorts(transformer, other.get());
+        MapAllOutputPorts(transformer, other.get());
     }
 
-    void Node::MapOutputPorts(ModelTransformer& transformer, Node* other) const
+    void Node::MapAllOutputPorts(ModelTransformer& transformer, Node* other) const
     {
         auto numOutputs = _outputs.size();
         assert(other->_outputs.size() == numOutputs);
