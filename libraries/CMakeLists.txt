@@ -5,6 +5,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 add_subdirectory(common)
+if (LLVM_ENABLED)
+  add_subdirectory(compiler)
+endif()
 add_subdirectory(dataset)
 add_subdirectory(evaluators)
 add_subdirectory(features)
