@@ -9,12 +9,20 @@
 #include "ModelTransformer.h"
 #include "Node.h"
 
-// stl
+// utilities
+#include "Exception.h"
 
 /// <summary> model namespace </summary>
 namespace model
 {
-    const Port* ModelTransformer::GetCorrespondingPort(const Port& port) { return _portMap[&port]; }
+    const Port* ModelTransformer::GetCorrespondingPort(const Port& port)
+    {
+        if (_portMap.find(&port) == _portMap.end())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find port in new model.");
+        }
+        return _portMap[&port];
+    }
 
     void ModelTransformer::MapPort(const Port& oldPort, const Port& newPort)
     {
