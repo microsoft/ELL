@@ -21,16 +21,6 @@ namespace model
         _inputs.push_back(input);
     }
 
-    void Node::Copy(ModelTransformer& transformer) const
-    {
-        CopyImpl(transformer);
-    }
-
-    void Node::Refine(ModelTransformer& transformer) const
-    {
-        RefineImpl(transformer);
-    }
-
     void Node::MapAllOutputPorts(ModelTransformer& transformer, const std::shared_ptr<Node>& other) const
     {
         MapAllOutputPorts(transformer, other.get());

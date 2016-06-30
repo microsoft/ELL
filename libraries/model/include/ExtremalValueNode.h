@@ -45,8 +45,8 @@ namespace model
         /// <summary> Exposes the extremal value index port as a read-only property </summary>
         const OutputPort<int>& argVal = _argVal;
 
-        virtual void CopyImpl(ModelTransformer& transformer) const override;
-        virtual void RefineImpl(ModelTransformer& transformer) const override;
+        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Refine(ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;

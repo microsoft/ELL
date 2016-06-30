@@ -34,7 +34,7 @@ namespace model
     };
 
     template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::CopyImpl(ModelTransformer& transformer) const
+    void ExtremalValueNode<ValueType, max>::Copy(ModelTransformer& transformer) const
     {
         auto newInputs = transformer.TransformInputPort(_input);
         auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
@@ -42,7 +42,7 @@ namespace model
     }
 
     template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::RefineImpl(ModelTransformer& transformer) const
+    void ExtremalValueNode<ValueType, max>::Refine(ModelTransformer& transformer) const
     {
         auto newInputs = transformer.TransformInputPort(_input);
         auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);

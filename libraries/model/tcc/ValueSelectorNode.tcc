@@ -31,7 +31,7 @@ namespace model
     };
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::CopyImpl(ModelTransformer& transformer) const
+    void ValueSelectorNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
         auto newCondition = transformer.TransformInputPort(_condition);
         auto newValue1 = transformer.TransformInputPort(_value1);
@@ -43,7 +43,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::RefineImpl(ModelTransformer& transformer) const
+    void ValueSelectorNode<ValueType>::Refine(ModelTransformer& transformer) const
     {
         auto newCondition = transformer.TransformInputPort(_condition);
         auto newValue1 = transformer.TransformInputPort(_value1);
@@ -81,7 +81,7 @@ namespace model
     };
 
     template <typename ValueType>
-    void SelectIfLessNode<ValueType>::CopyImpl(ModelTransformer& transformer) const
+    void SelectIfLessNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
         auto newInput1 = transformer.TransformInputPort(_input1);
         auto newInput2 = transformer.TransformInputPort(_input2);
@@ -93,7 +93,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void SelectIfLessNode<ValueType>::RefineImpl(ModelTransformer& transformer) const
+    void SelectIfLessNode<ValueType>::Refine(ModelTransformer& transformer) const
     {
         auto newInput1 = transformer.TransformInputPort(_input1);
         auto newInput2 = transformer.TransformInputPort(_input2);
@@ -127,7 +127,7 @@ namespace model
     };
 
     template <typename ValueType>
-    void IfLessNode<ValueType>::CopyImpl(ModelTransformer& transformer) const
+    void IfLessNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
         auto newValue = transformer.TransformInputPort(_value);
         auto newThreshold = transformer.TransformInputPort(_threshold);
@@ -138,7 +138,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void IfLessNode<ValueType>::RefineImpl(ModelTransformer& transformer) const
+    void IfLessNode<ValueType>::Refine(ModelTransformer& transformer) const
     {
         auto newValue = transformer.TransformInputPort(_value);
         auto newThreshold = transformer.TransformInputPort(_threshold);

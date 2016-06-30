@@ -58,8 +58,8 @@ namespace model
         /// <returns> a vector of all the nodes that depend on this node </summary>
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
-        void Copy(ModelTransformer& transformer) const;
-        void Refine(ModelTransformer& transformer) const;
+        virtual void Copy(ModelTransformer& transformer) const = 0;
+        virtual void Refine(ModelTransformer& transformer) const = 0;
 
     protected:
         // TODO: the arguments (and the _inputs and _outputs members)
@@ -70,8 +70,6 @@ namespace model
         virtual void Compute() const = 0;
         void AddInputPort(InputPortBase* input);
 
-        virtual void CopyImpl(ModelTransformer& transformer) const = 0;
-        virtual void RefineImpl(ModelTransformer& transformer) const = 0;
         void MapAllOutputPorts(ModelTransformer& transformer, Node* other) const;
         void MapAllOutputPorts(ModelTransformer& transformer, const std::shared_ptr<Node>& other) const;
 

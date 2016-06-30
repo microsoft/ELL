@@ -44,8 +44,8 @@ namespace model
         /// <summary> Exposes the output port as a read-only property </summary>
         const OutputPort<ValueType>& output = _output;
 
-        virtual void CopyImpl(ModelTransformer& transformer) const override;
-        virtual void RefineImpl(ModelTransformer& transformer) const override;
+        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Refine(ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;
@@ -75,8 +75,8 @@ namespace model
 
         const OutputPort<ValueType>& output = _output;
 
-        virtual void CopyImpl(ModelTransformer& transformer) const override;
-        virtual void RefineImpl(ModelTransformer& transformer) const override;
+        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Refine(ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;
@@ -103,8 +103,8 @@ namespace model
 
         const OutputPort<bool>& output = _output;
 
-        virtual void CopyImpl(ModelTransformer& transformer) const override;
-        virtual void RefineImpl(ModelTransformer& transformer) const override;
+        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Refine(ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;

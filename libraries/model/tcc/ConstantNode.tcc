@@ -26,14 +26,14 @@ namespace model
     }
 
     template <typename ValueType>
-    void ConstantNode<ValueType>::CopyImpl(ModelTransformer& transformer) const
+    void ConstantNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values);
         transformer.MapAllOutputPorts(this, newNode);
     }
 
     template <typename ValueType>
-    void ConstantNode<ValueType>::RefineImpl(ModelTransformer& transformer) const
+    void ConstantNode<ValueType>::Refine(ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values);
         transformer.MapAllOutputPorts(this, newNode);
