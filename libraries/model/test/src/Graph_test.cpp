@@ -185,7 +185,8 @@ void TestCopyGraph()
     auto indexSelector = model.AddNode<model::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
     // Now make a copy
-    auto newModel = model::ModelTransformer::CopyModel();
+    model::ModelTransformer transformer(model);
+    auto newModel = transformer.CopyModel();
 
     // Print them both:
     std::cout << "\n\nOld graph" << std::endl;
@@ -211,7 +212,8 @@ void TestRefineGraph()
     auto outputNode = model.AddNode<model::SelectIfLessNode<double>>(inputValue, inputThresh, value1->output, value2->output);
 
     // Now transform it
-    auto newModel = model::ModelTransformer::RefineModel(model);
+    model::ModelTransformer transformer(model);
+    auto newModel = transformer.RefineModel();
 
     // Print both graphs
     std::cout << "\n\nOld graph" << std::endl;

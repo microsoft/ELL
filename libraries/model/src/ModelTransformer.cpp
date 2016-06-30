@@ -23,19 +23,21 @@ namespace model
         _portMap[&oldPort] = nonconstPort;
     }
 
-    Model ModelTransformer::CopyModel(const Model& oldModel)
+    Model ModelTransformer::CopyModel()
     {
-        ModelTransformer transformer(oldModel);
-        oldModel.Visit([&](const Node& node) { node.Copy(transformer); });
+        _model = Model();
+        _portMap.clear();
+        _oldModel.Visit([&](const Node& node) { node.Copy(*this); });
 
-        return transformer.GetModel();
+        return _model;
     }
 
-    Model ModelTransformer::RefineModel(const Model& oldModel)
+    Model ModelTransformer::RefineModel()
     {
-        ModelTransformer transformer(oldModel);
-        oldModel.Visit([&](const Node& node) { node.Refine(transformer); });
+        _model = Model();
+        _portMap.clear();
+        _oldModel.Visit([&](const Node& node) { node.Refine(*this); });
 
-        return transformer.GetModel();
+        return _model;
     }
 }
