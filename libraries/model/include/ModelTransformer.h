@@ -14,7 +14,7 @@
 #include "OutputPort.h"
 #include "OutputPortElementList.h"
 #include "Node.h"
-#include "InputNode.h"
+//#include "InputNode.h"
 #include "OutputPort.h"
 
 #include <memory>
@@ -25,6 +25,9 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    template <typename ValueType>
+    class InputNode;
+
     class ModelTransformer
     {
     public:

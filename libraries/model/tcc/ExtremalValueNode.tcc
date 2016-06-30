@@ -37,21 +37,20 @@ namespace model
     void ExtremalValueNode<ValueType, max>::Copy(ModelTransformer& transformer) const
     {
         auto newInputs = transformer.TransformInputPort(_input);
-
         auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
-
-        transformer.MapPort(_val, newNode->_val);
-        transformer.MapPort(_argVal, newNode->_argVal);
+        MapOutputPorts(transformer, newNode);
+        // transformer.MapPort(_val, newNode->_val);
+        // transformer.MapPort(_argVal, newNode->_argVal);
     }
 
     template <typename ValueType, bool max>
     void ExtremalValueNode<ValueType, max>::Refine(ModelTransformer& transformer) const
     {
         auto newInputs = transformer.TransformInputPort(_input);
-
         auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
+        MapOutputPorts(transformer, newNode);
 
-        transformer.MapPort(_val, newNode->_val);
-        transformer.MapPort(_argVal, newNode->_argVal);
+        // transformer.MapPort(_val, newNode->_val);
+        // transformer.MapPort(_argVal, newNode->_argVal);
     }
 }

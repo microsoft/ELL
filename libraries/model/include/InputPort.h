@@ -10,7 +10,6 @@
 
 #include "Port.h"
 #include "OutputPort.h"
-#include "Node.h"
 #include "OutputPortElementList.h"
 
 #include <vector>
@@ -19,6 +18,8 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    class Node;
+
     /// <summary> Class representing an input to a node </summary>
     class InputPortBase : public Port
     {

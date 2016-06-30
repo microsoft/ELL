@@ -10,6 +10,7 @@
 
 #include "Node.h"
 #include "OutputPort.h"
+#include "ModelTransformer.h"
 
 #include <vector>
 #include <memory>
