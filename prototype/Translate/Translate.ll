@@ -19,8 +19,6 @@ $"\01??_C@_03MBCKNMHH@Foo?$AA@" = comdat any
 
 $"\01??_C@_03HJJGLLBC@Goo?$AA@" = comdat any
 
-$"\01??_C@_03LLLKAKDG@Bar?$AA@" = comdat any
-
 $"\01??_C@_03LGBJPEEI@moo?$AA@" = comdat any
 
 $"\01?_OptionsStorage@?1??__local_stdio_printf_options@@9@4_KA" = comdat any
@@ -29,7 +27,6 @@ $"\01?_OptionsStorage@?1??__local_stdio_printf_options@@9@4_KA" = comdat any
 @"\01??_C@_07MEEEMOAP@?$CFd?0?5?$CFf?6?$AA@" = linkonce_odr unnamed_addr constant [8 x i8] c"%d, %f\0A\00", comdat, align 1
 @"\01??_C@_03MBCKNMHH@Foo?$AA@" = linkonce_odr unnamed_addr constant [4 x i8] c"Foo\00", comdat, align 1
 @"\01??_C@_03HJJGLLBC@Goo?$AA@" = linkonce_odr unnamed_addr constant [4 x i8] c"Goo\00", comdat, align 1
-@"\01??_C@_03LLLKAKDG@Bar?$AA@" = linkonce_odr unnamed_addr constant [4 x i8] c"Bar\00", comdat, align 1
 @"\01??_C@_03LGBJPEEI@moo?$AA@" = linkonce_odr unnamed_addr constant [4 x i8] c"moo\00", comdat, align 1
 @"\01?_OptionsStorage@?1??__local_stdio_printf_options@@9@4_KA" = linkonce_odr global i64 0, comdat, align 8
 
@@ -125,7 +122,9 @@ if.else4:                                         ; preds = %entry
   br i1 %cmp5, label %if.then6, label %if.else8
 
 if.then6:                                         ; preds = %if.else4
-  %call7 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @"\01??_C@_03LLLKAKDG@Bar?$AA@", i32 0, i32 0))
+  %3 = load i32, i32* %y.addr, align 4
+  %conv = sitofp i32 %3 to double
+  %call7 = call double @sin(double %conv) #4
   br label %if.end10
 
 if.else8:                                         ; preds = %if.else4
@@ -139,15 +138,18 @@ if.end11:                                         ; preds = %if.end10, %if.end
   ret void
 }
 
+; Function Attrs: nounwind
+declare double @sin(double) #2
+
 ; Function Attrs: norecurse nounwind uwtable
-define i32 @main() #2 {
+define i32 @main() #3 {
 entry:
   call void @"\01?Loop@@YAXHHH@Z"(i32 0, i32 10, i32 1)
   ret i32 0
 }
 
 ; Function Attrs: nounwind
-declare void @llvm.va_start(i8*) #3
+declare void @llvm.va_start(i8*) #4
 
 ; Function Attrs: inlinehint nounwind uwtable
 define linkonce_odr i32 @_vfprintf_l(%struct._iobuf* %_Stream, i8* %_Format, %struct.__crt_locale_pointers* %_Locale, i8* %_ArgList) #1 comdat {
@@ -170,25 +172,26 @@ entry:
   ret i32 %call1
 }
 
-declare %struct._iobuf* @__acrt_iob_func(i32) #4
+declare %struct._iobuf* @__acrt_iob_func(i32) #5
 
 ; Function Attrs: nounwind
-declare void @llvm.va_end(i8*) #3
+declare void @llvm.va_end(i8*) #4
 
-declare i32 @__stdio_common_vfprintf(i64, %struct._iobuf*, i8*, %struct.__crt_locale_pointers*, i8*) #4
+declare i32 @__stdio_common_vfprintf(i64, %struct._iobuf*, i8*, %struct.__crt_locale_pointers*, i8*) #5
 
 ; Function Attrs: inlinehint noinline nounwind uwtable
-define linkonce_odr i64* @__local_stdio_printf_options() #5 comdat {
+define linkonce_odr i64* @__local_stdio_printf_options() #6 comdat {
 entry:
   ret i64* @"\01?_OptionsStorage@?1??__local_stdio_printf_options@@9@4_KA"
 }
 
 attributes #0 = { nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #1 = { inlinehint nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
-attributes #2 = { norecurse nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
-attributes #3 = { nounwind }
-attributes #4 = { "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
-attributes #5 = { inlinehint noinline nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #2 = { nounwind "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #3 = { norecurse nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #4 = { nounwind }
+attributes #5 = { "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #6 = { inlinehint noinline nounwind uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2" "unsafe-fp-math"="false" "use-soft-float"="false" }
 
 !llvm.module.flags = !{!0, !3}
 !llvm.ident = !{!4}

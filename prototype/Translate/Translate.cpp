@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <malloc.h>
+#include <math.h>
 //#include <tchar.h>
 //#include <vector>
 //#include <uchar.h>
@@ -219,12 +220,13 @@ void IfThen(int x, int y)
 	}
 	else if (y > 43)
 	{
-		printf("Bar");
+		sin(y);
 	}
 	else
 	{
 		printf("moo");
 	}
+
 }
 
 int main()
