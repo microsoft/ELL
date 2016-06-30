@@ -27,7 +27,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputNode<ValueType>::Copy(ModelTransformer& transformer) const
+    void InputNode<ValueType>::CopyImpl(ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<InputNode<ValueType>>(_output.Size());
         MapOutputPorts(transformer, newNode);
@@ -35,7 +35,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputNode<ValueType>::Refine(ModelTransformer& transformer) const
+    void InputNode<ValueType>::RefineImpl(ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<InputNode<ValueType>>(_output.Size());
         MapOutputPorts(transformer, newNode);
