@@ -16,6 +16,10 @@
 #include "BinaryOperationLayer.h"
 #include "Sum.h"
 
+// utilities
+#include "Exception.h"
+
+// stl
 #include <cassert>
 #include <cmath>
 #include <algorithm>
@@ -47,8 +51,9 @@ namespace features
     {
         assert(_inputFeatures.size() == 1);
         const auto& inputData = _inputFeatures[0]->GetOutput();
-        if(inputData.size() == 0) // error, should we throw?
+        if(inputData.size() == 0) 
         {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Invalid input of size zero");
             return inputData;
         }
         
@@ -74,7 +79,7 @@ namespace features
         auto it = featureOutputs.find(_inputFeatures[0]);
         if (it == featureOutputs.end())
         {
-            throw std::runtime_error("Couldn't find input feature");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Couldn't find input feature");
         }
        
         auto inputCoordinates = it->second;
@@ -107,8 +112,7 @@ namespace features
 
         if (inputFeature == nullptr)
         {
-            std::string error_msg = std::string("Error deserializing feature description: unknown input feature ") + params[2];
-            throw std::runtime_error(error_msg);
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Error deserializing feature description: unknown input feature " + params[2]);
         }
         return std::make_unique<MeanFeature>(featureId, inputFeature, windowSize);
     }

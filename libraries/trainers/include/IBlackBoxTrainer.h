@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ITrainer.h (trainers)
+//  File:     IBlackBoxTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,11 +17,11 @@ namespace trainers
     ///
     /// <typeparam name="PredictorType"> Type of the predictor created by the trainer. </typeparam>
     template <typename PredictorType>
-    class ITrainer
+    class IBlackBoxTrainer
     {
     public:
 
-        virtual ~ITrainer() = default;
+        virtual ~IBlackBoxTrainer() = default;
 
         /// <summary> Trains and returns a predictor. </summary>
         ///

@@ -6,6 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "Exception.h"
+
 namespace utilities
 {
     template<typename BaseType>
@@ -14,7 +17,7 @@ namespace utilities
         auto entry = _typeMap.find(typeName);
         if (entry == _typeMap.end())
         {
-            throw std::runtime_error("type " + typeName + " not registered in TypeFactory<" + BaseType::GetTypeName() + ">");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "type " + typeName + " not registered in TypeFactory<" + BaseType::GetTypeName() + ">");
         }
 
         return entry->second();

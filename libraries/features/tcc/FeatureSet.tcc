@@ -6,6 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "Exception.h"
+
+// stl
 #include <unordered_set>
 #include <stdexcept>
 #include <memory>
@@ -48,7 +52,7 @@ namespace features
             }
             else
             {
-                throw std::runtime_error("First feature must be input feature");
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "First feature must be input feature");
             }
         }
                 
@@ -160,7 +164,7 @@ namespace features
             }
             else // visit f's input features
             {
-                for (auto input : f->_inputFeatures)
+                for (auto input : f->_inputFeatures) // TODO: visit these in reverse order?
                 {
                     stack.push_back(input);
                 }

@@ -112,10 +112,12 @@ if(${LANGUAGE_NAME} STREQUAL "python")
 endif()
 
 swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC}) # ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
-swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset evaluators features layers linear lossFunctions trainers predictors utilities)
-set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}EMLL)
-add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} EMLL_common)
 
+if( NOT (${LANGUAGE_NAME} STREQUAL "xml"))
+    swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset evaluators features layers linear lossFunctions trainers predictors utilities)
+    set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}EMLL)
+    add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} EMLL_common)
+endif()
 endif()
 
 set_property(TARGET ${PREPEND_TARGET}${module_name} PROPERTY FOLDER "interfaces") 
