@@ -28,7 +28,7 @@ endif()
 # Options
 option(SWIG_ENABLED "Enable swig interfaces" ON)
 option(DOXYGEN_ENABLED "Enable Doxygen interfaces" ON)
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/private/binaries/llvm")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/llvm")
   set(LLVM_ENABLED ON)
   message("LLVM Compilation Enabled")
 else()
