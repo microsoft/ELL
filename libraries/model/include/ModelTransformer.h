@@ -37,10 +37,6 @@ namespace model
         /// <summary> Returns a refined version of the input model, by calling Refine() on each of the model's nodes </summary>
         Model RefineModel(const Model& model);
 
-        /// <summary> Returns the (untyped) Port from new new model corresponding to the given port on the input model </summary>
-        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        const Port* GetCorrespondingPort(const Port& port);
-
         /// <summary> Returns the  OutputPort from new new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
@@ -55,6 +51,14 @@ namespace model
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
         InputNode<ValueType>* GetCorrespondingInputNode(const std::shared_ptr<InputNode<ValueType>>& node);
+
+        /// <summary> Returns the (untyped) Port from new new model corresponding to the given port on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
+        const Port* GetCorrespondingPort(const Port& port);
+
+        ///
+        /// Functions used by node implementors
+        ///
 
         /// <summary> Returns an OutputPortElementList for the new model corresponding the the set of inputs referenced by the given input port. Called by node implementors. </summary>
         template <typename ValueType>
