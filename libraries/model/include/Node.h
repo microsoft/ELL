@@ -70,9 +70,6 @@ namespace model
         virtual void Compute() const = 0;
         void AddInputPort(InputPortBase* input);
 
-        void MapAllOutputPorts(ModelTransformer& transformer, Node* other) const;
-        void MapAllOutputPorts(ModelTransformer& transformer, const std::shared_ptr<Node>& other) const;
-
     private:
         friend class Model;
         friend class ModelTransformer;
