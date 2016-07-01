@@ -17,11 +17,42 @@
 
 namespace predictors
 {
+    /// <summary> A split rule that compares a single feature to a threshold. </summary>
+    class SingleInputThresholdRule
+    {
+    public:
+
+        /// <summary> The number of outputs (or, put another way, the max output plus one). </summary>
+        constexpr static size_t NumOutputs = 2;
+
+        /// <summary> Constructs a single-input threshold rule. </summary>
+        ///
+        /// <param name="inputIndex"> Zero-based index of the input coordinate. </param>
+        /// <param name="threshold"> The threshold. </param>
+        SingleInputThresholdRule(size_t inputIndex, double threshold);
+
+        /// <summary> Evaluates the split rule. </summary>
+        ///
+        /// <param name="dataVector"> The data vector. </param>
+        ///
+        /// <returns> The result of the split rule. </returns>
+        size_t operator()(const dataset::DoubleDataVector& dataVector) const;
+
+        ///
+        /// <returns> The total number of outputs. </returns>
+        size_t NumOutputs() const { return 2; }
+
+    private:
+        size_t _inputIndex;
+        double _threshold;
+    };
+
     /// <summary> Implements a proper binary decision tree ('proper binary' means that each interior
     /// node has exactly two children). Each edge is assigned a weight and the output of the tree is
     /// the sum along the path from the tree root to a leaf. Note that assigning weights to edges is
     /// equivalent to assigning weights to all nodes other than the root. </summary>
-    class BinaryDecisionTreePredictor
+    template<typename RuleType>
+    class TreePredictor
     {
     public:
 
@@ -30,29 +61,6 @@ namespace predictors
         {
             size_t interiorNodeIndex;
             bool leafIndex;
-        };
-
-        /// <summary> A split rule that compares a single feature to a threshold. </summary>
-        class Rule
-        {
-        public:
-
-            /// <summary> Constructs a rule. </summary>
-            ///
-            /// <param name="inputIndex"> Zero-based index of the input coordinate. </param>
-            /// <param name="threshold"> The threshold. </param>
-            Rule(size_t inputIndex, double threshold);
-
-            /// <summary> Evaluates the split rule. </summary>
-            ///
-            /// <param name="dataVector"> The data vector. </param>
-            ///
-            /// <returns> The result of the split rule. </returns>
-            size_t operator()(const dataset::DoubleDataVector& dataVector) const;
-
-        private:
-            size_t _inputIndex;
-            double _threshold;
         };
 
         /// <summary> Information need to split a leaf of the tree. </summary>
@@ -65,7 +73,7 @@ namespace predictors
             Rule rule;
 
             /// <summary> The weights of the two new edges. </summary>
-            std::array<double, 2> edgeWeights;
+            std::array<double, Rule::NumOutputs> edgeWeights;
         };
 
         /// <summary> Gets the number of interior nodes. </summary>
@@ -76,7 +84,7 @@ namespace predictors
         /// <summary> Gets the number of edges. </summary>
         ///
         /// <returns> The number of edges. </returns>
-        size_t NumEdges() const { return 2 * _interiorNodes.size(); }
+        size_t NumEdges() const;
 
         /// <summary> Returns the output of the tree for a given input. </summary>
         ///
@@ -110,9 +118,12 @@ namespace predictors
         struct InteriorNodeData
         {
             Rule rule;
-            std::array<EdgeData, 2> edgeData;
+            std::array<EdgeData, Rule::NumOutputs> edgeData;
         };
 
         std::vector<InteriorNodeData> _interiorNodes;
     };
+
+    /// <summary> A simple binary tree with single-input threshold rules. </summary>
+    typedef TreePredictor<SingleInputThresholdRule> SimpleTreePredictor;
 }
