@@ -38,7 +38,7 @@ void PrintGraph(const model::Model& graph)
     graph.Visit(NodePrinter);
 }
 
-void PrintGraph(const model::Model& graph, const std::shared_ptr<model::Node>& output)
+void PrintGraph(const model::Model& graph, const model::Node* output)
 {
     graph.Visit(NodePrinter, output);
 }

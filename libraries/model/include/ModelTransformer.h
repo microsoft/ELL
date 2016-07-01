@@ -28,6 +28,12 @@ namespace model
     template <typename ValueType>
     class InputNode;
 
+    class TransformContext
+    {
+
+    };
+
+    // TODO: template transformer on the context type
     class ModelTransformer
     {
     public:
@@ -66,7 +72,7 @@ namespace model
 
         /// <summary> Creates a new node in the transformed model graph. Called by node implementors. </summary>
         template <typename NodeType, typename... Args>
-        std::shared_ptr<NodeType> AddNode(Args&&... args);
+        NodeType* AddNode(Args&&... args);
 
         /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
         template <typename ValueType>
@@ -79,6 +85,7 @@ namespace model
         void MapPort(const Port& oldPort, const Port& newPort);
 
         Model _model;
+        TransformContext _context;
         std::unordered_map<const Port*, Port*> _portMap;
     };
 }

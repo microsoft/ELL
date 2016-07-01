@@ -61,7 +61,7 @@ namespace model
     }
 
     template <typename NodeType, typename... Args>
-    std::shared_ptr<NodeType> ModelTransformer::AddNode(Args&&... args)
+    NodeType* ModelTransformer::AddNode(Args&&... args)
     {
         return _model.AddNode<NodeType>(std::forward<Args>(args)...);
     }
