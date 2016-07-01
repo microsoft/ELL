@@ -35,7 +35,7 @@ namespace model
     {
         _model = Model();
         _portMap.clear();
-        oldModel.Visit([&](const Node& node) { node.Copy(*this); });
+        oldModel.Visit([this](const Node& node) { node.Copy(*this); });
 
         return _model;
     }
@@ -44,7 +44,7 @@ namespace model
     {
         _model = Model();
         _portMap.clear();
-        oldModel.Visit([&](const Node& node) { node.Refine(*this); });
+        oldModel.Visit([this](const Node& node) { node.Refine(*this); });
 
         return _model;
     }

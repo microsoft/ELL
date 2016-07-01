@@ -37,6 +37,8 @@ namespace model
     class ModelTransformer
     {
     public:
+        ModelTransformer(TransformContext context) : _context(context) {}
+
         /// <summary> Returns a copy of the input model, by calling Copy() on each of the model's nodes </summary>
         Model CopyModel(const Model& model);
 
@@ -77,6 +79,8 @@ namespace model
         /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
         template <typename ValueType>
         void MapOutputPort(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort);
+
+        TransformContext& GetContext() { return _context; }
 
     private:
         friend class Node;
