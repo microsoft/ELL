@@ -10,6 +10,9 @@
 
 namespace predictors
 {
+    BinaryDecisionTreePredictor::Rule::Rule(size_t inputIndex, double threshold) : _inputIndex(inputIndex), _threshold(threshold)
+    {}
+
     size_t BinaryDecisionTreePredictor::Rule::operator()(const dataset::DoubleDataVector& dataVector) const
     {
         return dataVector[_inputIndex] <= _threshold ? 0 : 1;

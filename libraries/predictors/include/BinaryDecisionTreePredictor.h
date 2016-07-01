@@ -103,7 +103,6 @@ namespace predictors
         struct EdgeData
         {
             EdgeData(double weight);
-
             double weight;
             size_t targetNodeIndex;
         };
