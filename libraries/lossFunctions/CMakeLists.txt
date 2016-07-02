@@ -24,9 +24,8 @@ set (INCLUDE include/HingeLoss.h
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 
-include_directories(include)
-
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE})
+target_include_directories(${PROJ_NAME} PUBLIC include)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 

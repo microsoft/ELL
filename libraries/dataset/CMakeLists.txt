@@ -49,14 +49,14 @@ source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
-include_directories(include)
-include_directories(tcc)
 include_directories(../linear/include)
 include_directories(../layers/include)
 include_directories(../utilities/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_link_libraries(${PROJ_NAME} utilities)
+target_include_directories(${PROJ_NAME} PUBLIC include)
+
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 #
