@@ -70,16 +70,6 @@ namespace model
         template <typename Visitor>
         void Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodes) const;
 
-        /// <summary>
-        /// Visits the nodes in the graph necessary to compute the outputs of the given nodes. Visits the nodes
-        /// in dependency order. No nodes will be visited until all its inputs have first been visited.
-        /// </summary>
-        ///
-        /// <param name="visitor"> The visitor functor to use </param>
-        /// <param name="outputNode"> The output node to use for deciding which nodes to visit </param>
-        template <typename Visitor>
-        void Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodes) const;
-
         // TODO: iterators, including begin/end for iterating over entire graph
 
     private:
