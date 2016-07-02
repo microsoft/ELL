@@ -22,14 +22,18 @@ source_group("include" FILES ${INCLUDE})
 source_group("src" FILES ${SRC})
 source_group("tcc" FILES ${TCC})
 
-include_directories(include)
-include_directories(../model/include)
-include_directories(../utilities/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
+target_include_directories(${PROJ_NAME} INTERFACE include)
+target_include_directories(${PROJ_NAME} INTERFACE ../model/include)
+target_include_directories(${PROJ_NAME} INTERFACE ../utilities/include)
+
 target_link_libraries(${PROJ_NAME} model nodes utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+#    add_library(Catch INTERFACE)
+#    add_dependencies(Catch CatchDownload)
+#    target_include_directories(Catch INTERFACE ${CATCH_DOWNLOAD_DIR}/include)
 
 #
 # test project
@@ -47,7 +51,6 @@ source_group("include" FILES ${TEST_INCLUDE})
 
 include_directories(../testing/include)
 include_directories(test/include)
-include_directories(include)
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 
