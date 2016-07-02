@@ -25,14 +25,9 @@ source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
-include_directories(../layers/include)
-include_directories(../dataset/include)
-include_directories(../linear/include)
-include_directories(../utilities/include)
-
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include)
-target_link_libraries(${PROJ_NAME} layers)
+target_link_libraries(${PROJ_NAME} dataset layers)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 

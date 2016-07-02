@@ -24,11 +24,9 @@ source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
-include_directories(../utilities/include)
-
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include)
-
+target_link_libraries(${PROJ_NAME} utilities)
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 #
