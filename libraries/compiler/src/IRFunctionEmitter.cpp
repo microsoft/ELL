@@ -170,6 +170,15 @@ namespace emll
 			return Call(PrintfFnName, args);
 		}
 
+		void IRFunctionEmitter::MemMove(llvm::Value* pPtr, int fromOffset, int destOffset, int count)
+		{
+			assert(pPtr	!= nullptr);
+
+			auto pSrc = _pEmitter->PtrOffset(pPtr, Literal(fromOffset));
+			auto pDest = _pEmitter->PtrOffset(pPtr, Literal(destOffset));
+			_pEmitter->MemMove(pSrc, pDest, Literal(count));
+		}
+
 		llvm::Function* IRFunctionEmitter::ResolveFunction(const std::string& name)
 		{
 			llvm::Function* pfn = Module()->getFunction(name);

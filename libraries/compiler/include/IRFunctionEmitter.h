@@ -149,6 +149,7 @@ namespace emll
 			//------------------------------------------
 			IRForLoopEmitter ForLoop();
 			IRIfEmitter If();
+
 			//------------------------------------------
 			//
 			// Standard function calls
@@ -160,6 +161,8 @@ namespace emll
 
 			llvm::Value* Print(const std::string& text);
 			llvm::Value* Printf(std::initializer_list<llvm::Value*> args);
+
+			void MemMove(llvm::Value* pPtr, int fromOffset, int destOffset, int count);
 
 			void Verify()
 			{

@@ -58,18 +58,25 @@ namespace emll
 				fnMain.Printf({ fnMain.Literal("%d, %f\n"), i,  item});
 			}
 			forLoop.End();
-			
+
+			fnMain.MemMove(pOutput, 2, 0, 3);
+			fnMain.SetValueAt(pOutput, fnMain.Literal(3), fnMain.Literal(10.0));
+			fnMain.SetValueAt(pOutput, fnMain.Literal(4), fnMain.Literal(20.0));
+
+			auto pOtherTotal = module.Global("g_total", ValueType::Double);
 			forLoop.Clear();
 			forLoop.Begin(data.size());
 			{
-				auto v = fnMain.ValueAt(pOutput, forLoop.LoadIterationVar());
+				auto ival = forLoop.LoadIterationVar();
+				auto v = fnMain.ValueAt(pOutput, ival);
+				fnMain.OpAndUpdate(pOtherTotal, OperatorType::AddF, v);
 				fnMain.Printf({fnMain.Literal("%f\n"), v});
 			}
 			forLoop.End();
-			fnMain.Printf({fnMain.Literal("Total = %f\n"), fnMain.Load(pTotal)});
+			fnMain.Printf({fnMain.Literal("Total = %f, OtherTotal= %f\n"), fnMain.Load(pTotal), fnMain.Load(pOtherTotal)});
 
 			fnMain.Ret();
-
+			
 			fnMain.Verify();
 			module.Dump();
 			module.WriteBitcodeToFile("C:\\junk\\model\\loop.bc");

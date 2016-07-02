@@ -310,6 +310,14 @@ namespace emll
 			return _builder.CreateCall(pfn, args);
 		}
 
+		llvm::CallInst* IREmitter::MemMove(llvm::Value* pSrc, llvm::Value* pDest, llvm::Value* pCount)
+		{
+			assert(pSrc != nullptr);
+			assert(pDest != nullptr);
+			assert(pCount != nullptr);
+			return _builder.CreateMemMove(pDest, pSrc, pCount, 8);
+		}
+
 		llvm::PHINode* IREmitter::Phi(const ValueType type, llvm::Value* pLVal, llvm::BasicBlock* pLBlock, llvm::Value* pRVal, llvm::BasicBlock* pRBlock)
 		{
 			assert(pLBlock != nullptr);
