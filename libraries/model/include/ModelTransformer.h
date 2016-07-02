@@ -55,11 +55,6 @@ namespace model
         template <typename ValueType>
         InputNode<ValueType>* GetCorrespondingInputNode(const InputNode<ValueType>* node);
 
-        /// <summary> Returns the input node from new new model corresponding to the given input node on the input model </summary>
-        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        template <typename ValueType>
-        InputNode<ValueType>* GetCorrespondingInputNode(const std::shared_ptr<InputNode<ValueType>>& node);
-
         /// <summary> Returns the (untyped) Port from new new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         const Port* GetCorrespondingPort(const Port& port);
