@@ -47,17 +47,32 @@ namespace emll
 			}
 		}
 
-		llvm::Value* IREmitter::Literal(const int value)
+		llvm::ArrayType* IREmitter::ArrayType(const ValueType type, uint64_t size)
 		{
-			return llvm::ConstantInt::get(_context, llvm::APInt(32, value, true));
+			return llvm::ArrayType::get(Type(type), size);
 		}
 
-		llvm::Value* IREmitter::Literal(const int64_t value)
+		llvm::Constant* IREmitter::Literal(const unsigned char value)
 		{
-			return llvm::ConstantInt::get(_context, llvm::APInt(64, value, true));
+			return Integer(ValueType::Byte, value);
 		}
 
-		llvm::Value* IREmitter::Literal(const double value)
+		llvm::Constant* IREmitter::Literal(const short value)
+		{
+			return Integer(ValueType::Short, value);
+		}
+
+		llvm::Constant* IREmitter::Literal(const int value)
+		{
+			return Integer(ValueType::Int32, value);
+		}
+
+		llvm::Constant* IREmitter::Literal(const int64_t value)
+		{
+			return Integer(ValueType::Int64, value);
+		}
+
+		llvm::Constant* IREmitter::Literal(const double value)
 		{
 			return llvm::ConstantFP::get(_context, llvm::APFloat(value));
 		}
@@ -76,6 +91,28 @@ namespace emll
 		llvm::Constant* IREmitter::Literal(const std::vector<double>& value)
 		{
 			return llvm::ConstantDataArray::get(_context, value);
+		}
+
+		llvm::Value* IREmitter::Literal(const std::string& name, const std::string& value)
+		{
+			return _builder.CreateGlobalStringPtr(value, name);
+		}
+
+		llvm::Constant* IREmitter::Zero(ValueType type)
+		{
+			switch (type)
+			{
+				case ValueType::Byte:
+				case ValueType::Short:
+				case ValueType::Int32:
+				case ValueType::Int64:
+					return Integer(type, 0);
+				case ValueType::Double:
+					return Literal(0.0);
+				default:
+					break;
+			}
+			return nullptr;
 		}
 
 		llvm::Value* IREmitter::Cast(llvm::Value* pValue, const ValueType destType)
@@ -103,11 +140,6 @@ namespace emll
 				default:
 					throw new EmitterException(EmitterError::NotSupported);
 			}
-		}
-
-		llvm::Value* IREmitter::Global(const std::string& name, const std::string& value)
-		{
-			return _builder.CreateGlobalStringPtr(value, name);
 		}
 
 		llvm::ReturnInst* IREmitter::ReturnVoid()
@@ -291,14 +323,14 @@ namespace emll
 			return phi;
 		}
 
-		llvm::Value* IREmitter::ArrayDeref(llvm::Value* pArray, llvm::Value* pOffset)
+		llvm::Value* IREmitter::PtrOffset(llvm::Value* pArray, llvm::Value* pOffset)
 		{
 			assert(pArray != nullptr);
 			assert(pOffset != nullptr);
 			return _builder.CreateGEP(pArray, pOffset);
 		}
 
-		llvm::Value* IREmitter::GlobalArrayDeref(llvm::GlobalVariable* pArray, llvm::Value* pOffset)
+		llvm::Value* IREmitter::GlobalPtrOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset)
 		{
 			assert(pArray != nullptr);
 			assert(pOffset != nullptr);
@@ -384,6 +416,32 @@ namespace emll
 			default:
 				throw new EmitterException(EmitterError::InvalidValueType);
 			}
+		}
+
+		int IREmitter::SizeOf(const ValueType type)
+		{
+			switch (type)
+			{
+			case ValueType::Byte:
+				return 8;
+			case ValueType::Short:
+				return 16;
+			case ValueType::Int32:
+				return 32;
+			case ValueType::Int64:
+				return 64;
+			case ValueType::Double:
+				return 8;
+			case ValueType::Char8:
+				return 8;
+			default:
+				throw new EmitterException(EmitterError::InvalidValueType);
+			}
+		}
+
+		llvm::Constant* IREmitter::Integer(const ValueType type, const uint64_t value)
+		{
+			return llvm::ConstantInt::get(_context, llvm::APInt(SizeOf(type), value, true));
 		}
 
 		void IREmitter::BindArgTypes(const ValueTypeList& args)

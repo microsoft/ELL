@@ -22,7 +22,7 @@ namespace emll
 			{
 				return _pIterationVar;
 			}
-
+			llvm::Value* LoadIterationVar();
 			llvm::BasicBlock* Begin(const int repeatCount)
 			{
 				return Begin(0, repeatCount, 1);
@@ -30,6 +30,7 @@ namespace emll
 			llvm::BasicBlock* Begin(const int iStartAt, const int iMaxValue, const int stepSize);
 
 			void End();
+			void Clear();
 
 		private:
 			void CreateBlocks();

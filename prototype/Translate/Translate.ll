@@ -15,6 +15,8 @@ $__local_stdio_printf_options = comdat any
 
 $"\01??_C@_07MEEEMOAP@?$CFd?0?5?$CFf?6?$AA@" = comdat any
 
+$"\01??_C@_03PPOCCAPH@?$CFf?6?$AA@" = comdat any
+
 $"\01??_C@_03MBCKNMHH@Foo?$AA@" = comdat any
 
 $"\01??_C@_03HJJGLLBC@Goo?$AA@" = comdat any
@@ -23,8 +25,11 @@ $"\01??_C@_03LGBJPEEI@moo?$AA@" = comdat any
 
 $"\01?_OptionsStorage@?1??__local_stdio_printf_options@@9@4_KA" = comdat any
 
-@g_data = internal constant [3 x double] [double 3.300000e+00, double 4.400000e+00, double 5.500000e+00], align 16
+@g_value = internal global double 0.000000e+00, align 8
+@g_constData = internal constant [3 x double] [double 3.300000e+00, double 4.400000e+00, double 5.500000e+00], align 16
+@g_data = internal global [3 x double] zeroinitializer, align 16
 @"\01??_C@_07MEEEMOAP@?$CFd?0?5?$CFf?6?$AA@" = linkonce_odr unnamed_addr constant [8 x i8] c"%d, %f\0A\00", comdat, align 1
+@"\01??_C@_03PPOCCAPH@?$CFf?6?$AA@" = linkonce_odr unnamed_addr constant [4 x i8] c"%f\0A\00", comdat, align 1
 @"\01??_C@_03MBCKNMHH@Foo?$AA@" = linkonce_odr unnamed_addr constant [4 x i8] c"Foo\00", comdat, align 1
 @"\01??_C@_03HJJGLLBC@Goo?$AA@" = linkonce_odr unnamed_addr constant [4 x i8] c"Goo\00", comdat, align 1
 @"\01??_C@_03LGBJPEEI@moo?$AA@" = linkonce_odr unnamed_addr constant [4 x i8] c"moo\00", comdat, align 1
@@ -40,6 +45,7 @@ entry:
   store i32 %step, i32* %step.addr, align 4
   store i32 %maxValue, i32* %maxValue.addr, align 4
   store i32 %startAt, i32* %startAt.addr, align 4
+  store double 0.000000e+00, double* @g_value, align 8
   %0 = load i32, i32* %startAt.addr, align 4
   store i32 %0, i32* %i, align 4
   br label %for.cond
@@ -53,19 +59,36 @@ for.cond:                                         ; preds = %for.inc, %entry
 for.body:                                         ; preds = %for.cond
   %3 = load i32, i32* %i, align 4
   %idxprom = sext i32 %3 to i64
-  %arrayidx = getelementptr inbounds [3 x double], [3 x double]* @g_data, i64 0, i64 %idxprom
+  %arrayidx = getelementptr inbounds [3 x double], [3 x double]* @g_constData, i64 0, i64 %idxprom
   %4 = load double, double* %arrayidx, align 8
   %5 = load i32, i32* %i, align 4
-  %call = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([8 x i8], [8 x i8]* @"\01??_C@_07MEEEMOAP@?$CFd?0?5?$CFf?6?$AA@", i32 0, i32 0), i32 %5, double %4)
+  %idxprom1 = sext i32 %5 to i64
+  %arrayidx2 = getelementptr inbounds [3 x double], [3 x double]* @g_data, i64 0, i64 %idxprom1
+  store double %4, double* %arrayidx2, align 8
+  %6 = load i32, i32* %i, align 4
+  %idxprom3 = sext i32 %6 to i64
+  %arrayidx4 = getelementptr inbounds [3 x double], [3 x double]* @g_data, i64 0, i64 %idxprom3
+  %7 = load double, double* %arrayidx4, align 8
+  %8 = load i32, i32* %i, align 4
+  %call = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([8 x i8], [8 x i8]* @"\01??_C@_07MEEEMOAP@?$CFd?0?5?$CFf?6?$AA@", i32 0, i32 0), i32 %8, double %7)
+  %9 = load i32, i32* %i, align 4
+  %idxprom5 = sext i32 %9 to i64
+  %arrayidx6 = getelementptr inbounds [3 x double], [3 x double]* @g_data, i64 0, i64 %idxprom5
+  %10 = load double, double* %arrayidx6, align 8
+  %11 = load double, double* @g_value, align 8
+  %add = fadd double %11, %10
+  store double %add, double* @g_value, align 8
   br label %for.inc
 
 for.inc:                                          ; preds = %for.body
-  %6 = load i32, i32* %step.addr, align 4
-  %inc = add nsw i32 %6, 1
+  %12 = load i32, i32* %step.addr, align 4
+  %inc = add nsw i32 %12, 1
   store i32 %inc, i32* %step.addr, align 4
   br label %for.cond
 
 for.end:                                          ; preds = %for.cond
+  %13 = load double, double* @g_value, align 8
+  %call7 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @"\01??_C@_03PPOCCAPH@?$CFf?6?$AA@", i32 0, i32 0), double %13)
   ret void
 }
 

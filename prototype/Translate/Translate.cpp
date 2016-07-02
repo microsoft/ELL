@@ -195,13 +195,20 @@ double PredictV(std::vector<double>& features)
 }
 */
 
-const double g_data[] = {3.3, 4.4, 5.5};
+static double g_value;
+static double g_data[3];
+static const double g_constData[3] = { 3.3, 4.4, 5.5 };;
+
 void Loop(int startAt, int maxValue, int step)
 {
+	g_value = 0.0;
 	for (int i = startAt; i < maxValue; ++step)
 	{
+		g_data[i] = g_constData[i];
 		printf("%d, %f\n", i, g_data[i]);
+		g_value += g_data[i];
 	}
+	printf("%f\n", g_value);
 }
 
 void IfThen(int x, int y)

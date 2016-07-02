@@ -21,7 +21,9 @@ namespace emll
 			module.DeclarePrintf();
 
 			std::vector<double> data({3.3, 4.4, 5.5, 6.6, 7.7});
-			llvm::GlobalVariable* pData = module.Global("g_weights", data);
+			llvm::GlobalVariable* pData = module.Constant("g_weights", data);
+			llvm::GlobalVariable* pOutput = module.Global("g_output", ValueType::Double, data.size());
+			llvm::GlobalVariable* pTotal = module.Global("g_total", ValueType::Double);
 
 			auto fnMain = module.AddMain();
 
@@ -32,8 +34,12 @@ namespace emll
 				fnMain.Branch(printBlock);
 				fnMain.CurrentBlock(printBlock);
 
-				auto i = fnMain.Load(forLoop.IterationVar());
-				auto item = fnMain.ValueAtGlobal(pData, i);
+				auto i = forLoop.LoadIterationVar();
+				auto item = fnMain.ValueAt(pData, i);
+				auto sum = fnMain.Op(OperatorType::AddF, fnMain.Literal(0.3), item);
+				fnMain.SetValueAt(pOutput, i, sum);
+				fnMain.OpAndUpdate(pTotal, OperatorType::AddF, sum);
+
 				//auto itemInt = fnMain.CastFloatToInt(item);
 				IRIfEmitter ife(fnMain);				
 				ife.If(ComparisonType::LtF, item, fnMain.Literal(5.7));
@@ -53,7 +59,15 @@ namespace emll
 			}
 			forLoop.End();
 			
-			
+			forLoop.Clear();
+			forLoop.Begin(data.size());
+			{
+				auto v = fnMain.ValueAt(pOutput, forLoop.LoadIterationVar());
+				fnMain.Printf({fnMain.Literal("%f\n"), v});
+			}
+			forLoop.End();
+			fnMain.Printf({fnMain.Literal("Total = %f\n"), fnMain.Load(pTotal)});
+
 			fnMain.Ret();
 
 			fnMain.Verify();

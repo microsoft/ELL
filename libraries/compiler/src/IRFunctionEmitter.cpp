@@ -85,7 +85,7 @@ namespace emll
 
 		llvm::Value* IRFunctionEmitter::PtrOffsetA(llvm::Value* ptr, int offset)
 		{
-			return _pEmitter->ArrayDeref(ptr, Literal(offset));
+			return _pEmitter->PtrOffset(ptr, Literal(offset));
 		}
 
 		llvm::Value* IRFunctionEmitter::ValueAtA(llvm::Value* ptr, int offset)
@@ -106,8 +106,7 @@ namespace emll
 		llvm::Value* IRFunctionEmitter::PtrOffsetH(llvm::Value* ptr, llvm::Value* pOffset)
 		{
 			assert(ptr != nullptr);
-			assert(pOffset != nullptr);
-			return _pEmitter->ArrayDeref(Load(ptr), pOffset);
+			return _pEmitter->PtrOffset(Load(ptr), pOffset);
 		}
 
 		llvm::Value* IRFunctionEmitter::ValueAtH(llvm::Value* ptr, int offset)
@@ -125,9 +124,19 @@ namespace emll
 			return _pEmitter->Store(PtrOffsetH(pPtr, offset), pValue);
 		}
 
-		llvm::Value* IRFunctionEmitter::ValueAtGlobal(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset)
+		llvm::Value* IRFunctionEmitter::PtrOffset(llvm::GlobalVariable* pPtr, llvm::Value* pOffset)
 		{
-			return Load(_pEmitter->GlobalArrayDeref(pGlobal, pOffset));
+			return _pEmitter->GlobalPtrOffset(pPtr, pOffset);
+		}
+
+		llvm::Value* IRFunctionEmitter::ValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset)
+		{
+			return Load(_pEmitter->GlobalPtrOffset(pGlobal, pOffset));
+		}
+
+		llvm::Value* IRFunctionEmitter::SetValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pVal)
+		{
+			return Store(PtrOffset(pGlobal, pOffset), pVal);
 		}
 
 		IRForLoopEmitter IRFunctionEmitter::ForLoop()

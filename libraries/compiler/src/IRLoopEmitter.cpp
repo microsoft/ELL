@@ -20,6 +20,21 @@ namespace emll
 			_fn.CurrentBlock(_pAfterBlock);
 		}
 
+		void IRForLoopEmitter::Clear()
+		{
+			_pInitBlock = nullptr;
+			_pConditionBlock = nullptr;
+			_pBodyBlock = nullptr;
+			_pIncBlock = nullptr;
+			_pAfterBlock = nullptr;
+			_pIterationVar = nullptr;
+		}
+
+		llvm::Value* IRForLoopEmitter::LoadIterationVar()
+		{
+			return _fn.Load(_pIterationVar);
+		}
+
 		llvm::BasicBlock* IRForLoopEmitter::Begin(const int iStartAt, const int iMaxValue, const int stepSize)
 		{
 			CreateBlocks();

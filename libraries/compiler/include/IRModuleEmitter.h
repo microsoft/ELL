@@ -14,7 +14,9 @@ namespace emll
 			IRModuleEmitter(IREmitter& emitter, const std::string& name);
 			IRModuleEmitter(IREmitter& emitter, std::unique_ptr<llvm::Module> pModule);
 
-			llvm::GlobalVariable* Global(const std::string&name, const std::vector<double>& value);
+			llvm::GlobalVariable* Constant(const std::string&name, const std::vector<double>& value);
+			llvm::GlobalVariable* Global(const std::string& name, const ValueType type);
+			llvm::GlobalVariable* Global(const std::string& name, const ValueType type, uint64_t size);
 
 			IRFunctionEmitter AddMain();
 
@@ -84,7 +86,7 @@ namespace emll
 				return _pModule.get();
 			}
 
-			llvm::GlobalVariable* Global(const std::string& name, llvm::Constant* pData, const ValueType dataType, const size_t size);
+			llvm::GlobalVariable* Global(const std::string& name, llvm::Type *pType, llvm::Constant* pInitial, bool isConst);
 			llvm::Function* GetFunction(const std::string& name);
 			IRFunctionEmitter Function(const std::string& name, const ValueType returnType, const ValueTypeList* pArgs, bool isPublic);
 			void BeginFunction(llvm::Function* pfn);

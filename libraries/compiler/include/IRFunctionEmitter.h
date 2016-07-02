@@ -131,13 +131,16 @@ namespace emll
 			llvm::Value* PtrOffsetA(llvm::Value* pPtr, int offset);
 			llvm::Value* ValueAtA(llvm::Value* pPtr, int offset);
 			llvm::Value* SetValueAtA(llvm::Value* pPtr, int offset, llvm::Value* pValue);
+
 			llvm::Value* PtrOffsetH(llvm::Value* pPtr, int offset);
 			llvm::Value* PtrOffsetH(llvm::Value* pPtr, llvm::Value* pOffset);
 			llvm::Value* ValueAtH(llvm::Value* pPtr, int offset);
 			llvm::Value* ValueAtH(llvm::Value* pPtr, llvm::Value* pOffset);
 			llvm::Value* SetValueAtH(llvm::Value* pPtr, int offset, llvm::Value* pValue);
 
-			llvm::Value* ValueAtGlobal(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset);
+			llvm::Value* PtrOffset(llvm::GlobalVariable* pPtr, llvm::Value* pOffset);
+			llvm::Value* ValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset);
+			llvm::Value* SetValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pVal);
 
 			//------------------------------------------
 			//

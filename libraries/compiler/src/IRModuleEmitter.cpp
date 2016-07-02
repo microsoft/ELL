@@ -15,10 +15,20 @@ namespace emll
 		{
 		}
 
-		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, const std::vector<double>& value)
+		llvm::GlobalVariable* IRModuleEmitter::Constant(const std::string& name, const std::vector<double>& value)
 		{
-			llvm::Constant* pData = _emitter.Literal(value);
-			return Global(name, pData, ValueType::Double, value.size());
+			return Global(name, _emitter.ArrayType(ValueType::Double, value.size()), _emitter.Literal(value), true);
+		}
+
+		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, const ValueType type)
+		{
+			return Global(name, _emitter.Type(type), _emitter.Zero(type), false);
+		}
+
+		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, const ValueType type, uint64_t size)
+		{
+			auto arrayType = _emitter.ArrayType(type, size);
+			return Global(name, arrayType, llvm::ConstantAggregateZero::get(arrayType), false);
 		}
 
 		IRFunctionEmitter IRModuleEmitter::AddMain()
@@ -43,11 +53,11 @@ namespace emll
 			return Function(name, returnType, &_valueTypeList, isPublic);
 		}
 
-		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, llvm::Constant* pData, const ValueType dataType, const size_t size)
+		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, llvm::Type *pType, llvm::Constant* pInitial, bool isConst)
 		{
-			llvm::ArrayType* pType = llvm::ArrayType::get(_emitter.Type(dataType), size);
-			return new llvm::GlobalVariable(*_pModule, pType, true, llvm::GlobalValue::PrivateLinkage, pData, name);
+			return new llvm::GlobalVariable(*_pModule, pType, isConst, llvm::GlobalValue::InternalLinkage, pInitial, name);
 		}
+
 
 		llvm::Function* IRModuleEmitter::GetFunction(const std::string& name)
 		{

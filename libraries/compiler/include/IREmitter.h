@@ -28,14 +28,17 @@ namespace emll
 			IREmitter();
 
 			llvm::Type* Type(const ValueType type);
+			llvm::ArrayType* ArrayType(const ValueType type, uint64_t size);
 
-			llvm::Value* Literal(const int value);
-			llvm::Value* Literal(const int64_t value);
-			llvm::Value* Literal(const double value);
+			llvm::Constant* Literal(const unsigned char value);
+			llvm::Constant* Literal(const short value);
+			llvm::Constant* Literal(const int value);
+			llvm::Constant* Literal(const int64_t value);
+			llvm::Constant* Literal(const double value);
 			llvm::Value* Literal(const std::string& value);
 			llvm::Constant* Literal(const std::vector<double>& value);
-
-			llvm::Value* Global(const std::string& name, const std::string& value);
+			llvm::Value* Literal(const std::string& name, const std::string& value);
+			llvm::Constant* Zero(const ValueType type);
 
 			llvm::Value* Cast(llvm::Value* pValue, const ValueType destType);
 			llvm::Value* CastFloat(llvm::Value* pValue, const ValueType destType);
@@ -73,8 +76,8 @@ namespace emll
 
 			llvm::PHINode* Phi(const ValueType type, llvm::Value* pLVal, llvm::BasicBlock* plBlock, llvm::Value* pRVal, llvm::BasicBlock* prBlock);
 
-			llvm::Value* ArrayDeref(llvm::Value* pArray, llvm::Value* pOffset);
-			llvm::Value* GlobalArrayDeref(llvm::GlobalVariable* pArray, llvm::Value* pOffset);
+			llvm::Value* PtrOffset(llvm::Value* pArray, llvm::Value* pOffset);
+			llvm::Value* GlobalPtrOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset);
 
 			llvm::LoadInst* Load(llvm::Value* pPtr);
 			llvm::StoreInst* Store(llvm::Value* pPtr, llvm::Value* pVal);
@@ -95,6 +98,8 @@ namespace emll
 
 		private:
 			llvm::Type* GetValueType(const ValueType type);
+			int SizeOf(const ValueType type);
+			llvm::Constant* Integer(const ValueType type, const uint64_t value);
 			void BindArgTypes(const ValueTypeList& args);
 			void BindArgTypes(const NamedValueTypeList& args);
 			void BindArgNames(llvm::Function* pfn, const NamedValueTypeList& args);
