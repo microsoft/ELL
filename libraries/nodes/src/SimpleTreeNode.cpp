@@ -17,7 +17,7 @@ namespace nodes
 
     void SimpleTreeNode::Compute() const
     {
-        auto outputValue = Predict(_input);
+        auto outputValue = predictors::SimpleTreePredictor::Compute(_input);
         _output.SetOutput({ outputValue });
     }
 }

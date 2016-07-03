@@ -71,7 +71,7 @@ namespace predictors
         ///
         /// <returns> The prediction. </returns>
         template<typename RandomAccessVectorType>
-        double Predict(const RandomAccessVectorType& input) const;
+        double Compute(const RandomAccessVectorType& input) const;
         
         /// <summary> Returns the edge path indicator vector for a given input. </summary>
         ///

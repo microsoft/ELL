@@ -12,7 +12,7 @@ namespace predictors
 {
     template<typename SplitRuleType>
     template<typename RandomAccessVectorType>
-    double TreePredictor<SplitRuleType>::Predict(const RandomAccessVectorType& input) const // rename to Compute
+    double TreePredictor<SplitRuleType>::Compute(const RandomAccessVectorType& input) const
     {
         // handle empty trees
         if (_interiorNodes.size() == 0)
