@@ -57,7 +57,7 @@ namespace predictors
         /// <summary> Gets the number of interior nodes. </summary>
         ///
         /// <returns> The number of interior nodes. </returns>
-        size_t NumInteriorNodes() const { _interiorNodes.size(); }
+        size_t NumInteriorNodes() const { return _interiorNodes.size(); }
 
         /// <summary> Gets the number of edges. </summary>
         ///

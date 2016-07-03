@@ -11,6 +11,12 @@
 namespace predictors
 {
     template<typename SplitRuleType>
+    size_t predictors::TreePredictor<SplitRuleType>::NumEdges() const
+    {
+        return _interiorNodes.size() * FanOut;
+    }
+
+    template<typename SplitRuleType>
     template<typename RandomAccessVectorType>
     double TreePredictor<SplitRuleType>::Compute(const RandomAccessVectorType& input) const
     {
