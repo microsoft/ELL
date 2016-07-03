@@ -1,24 +1,24 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     BinaryDecisionTreePredictor.cpp (predictors)
+//  File:     TreePredictor.cpp (predictors)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "BinaryDecisionTreePredictor.h"
+#include "TreePredictor.h"
 
 namespace predictors
 {
-    BinaryDecisionTreePredictor::Rule::Rule(size_t inputIndex, double threshold) : _inputIndex(inputIndex), _threshold(threshold)
+    TreePredictor::Rule::Rule(size_t inputIndex, double threshold) : _inputIndex(inputIndex), _threshold(threshold)
     {}
 
-    size_t BinaryDecisionTreePredictor::Rule::operator()(const dataset::DoubleDataVector& dataVector) const
+    size_t TreePredictor::Rule::operator()(const dataset::DoubleDataVector& dataVector) const
     {
         return dataVector[_inputIndex] <= _threshold ? 0 : 1;
     }
 
-    double BinaryDecisionTreePredictor::Predict(const dataset::DoubleDataVector& input) const
+    double TreePredictor::Predict(const dataset::DoubleDataVector& input) const
     {
         // handle empty trees
         if (_interiorNodes.size() == 0)
@@ -44,7 +44,7 @@ namespace predictors
         return prediction;
     }
 
-    std::vector<bool> BinaryDecisionTreePredictor::GetEdgePathIndicator(const dataset::DoubleDataVector& input) const
+    std::vector<bool> TreePredictor::GetEdgePathIndicator(const dataset::DoubleDataVector& input) const
     {
         // handle empty trees
         if (_interiorNodes.size() == 0)
@@ -70,7 +70,7 @@ namespace predictors
         return pathIndicator;
     }
 
-    size_t BinaryDecisionTreePredictor::Split(const SplitInfo& splitInfo)
+    size_t TreePredictor::Split(const SplitInfo& splitInfo)
     {
         // get the index of the new interior node
         size_t interiorNodeIndex = _interiorNodes.size();
@@ -84,6 +84,6 @@ namespace predictors
         return interiorNodeIndex;
     }
 
-    BinaryDecisionTreePredictor::EdgeData::EdgeData(double w) : weight(w), targetNodeIndex(0)
+    TreePredictor::EdgeData::EdgeData(double w) : weight(w), targetNodeIndex(0)
     {}
 }

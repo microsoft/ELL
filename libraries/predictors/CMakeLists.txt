@@ -12,16 +12,18 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/BinaryDecisionTreePredictor.cpp
-         src/DecisionTreePredictor.cpp
-         src/LinearPredictor.cpp)
+set (SRC src/DecisionTreePredictor.cpp
+         src/LinearPredictor.cpp
+         src/SingleInputThresholdRule.cpp)
 
-set (INCLUDE include/BinaryDecisionTreePredictor.h
+set (INCLUDE include/TreePredictor.h
              include/DecisionTreePredictor.h
              include/EnsemblePredictor.h
-             include/LinearPredictor.h)
+             include/LinearPredictor.h
+             include/SingleInputThresholdRule.h)
 
-set (TCC tcc/EnsemblePredictor.tcc)
+set (TCC tcc/EnsemblePredictor.tcc
+         tcc/TreePredictor.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

@@ -1,12 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     BinaryDecisionTreePredictor.h (predictors)
+//  File:     TreePredictor.h (predictors)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
+#include "SingleInputThresholdRule.h"
 
 // dataset
 #include "DenseDataVector.h"
@@ -17,50 +19,26 @@
 
 namespace predictors
 {
-    /// <summary> A split rule that compares a single feature to a threshold. </summary>
-    class SingleInputThresholdRule
-    {
-    public:
-
-        /// <summary> The number of outputs (or, put another way, the max output plus one). </summary>
-        constexpr static size_t NumOutputs = 2;
-
-        /// <summary> Constructs a single-input threshold rule. </summary>
-        ///
-        /// <param name="inputIndex"> Zero-based index of the input coordinate. </param>
-        /// <param name="threshold"> The threshold. </param>
-        SingleInputThresholdRule(size_t inputIndex, double threshold);
-
-        /// <summary> Evaluates the split rule. </summary>
-        ///
-        /// <param name="dataVector"> The data vector. </param>
-        ///
-        /// <returns> The result of the split rule. </returns>
-        size_t operator()(const dataset::DoubleDataVector& dataVector) const;
-
-        ///
-        /// <returns> The total number of outputs. </returns>
-        size_t NumOutputs() const { return 2; }
-
-    private:
-        size_t _inputIndex;
-        double _threshold;
-    };
-
-    /// <summary> Implements a proper binary decision tree ('proper binary' means that each interior
-    /// node has exactly two children). Each edge is assigned a weight and the output of the tree is
-    /// the sum along the path from the tree root to a leaf. Note that assigning weights to edges is
-    /// equivalent to assigning weights to all nodes other than the root. </summary>
-    template<typename RuleType>
+    /// <summary>
+    /// Implements a proper binary decision tree ('proper binary' means that all interior nodes have
+    /// the same fan-out). Each edge is assigned a weight and the output of the tree is the sum
+    /// along the path from the tree root to a leaf. Note that assigning weights to edges is
+    /// equivalent to assigning weights to all nodes other than the root.
+    /// </summary>
+    ///
+    /// <typeparam name="SplitRuleType"> Type of split rule to use (also determines the fan-out). </typeparam>
+    template<typename SplitRuleType>
     class TreePredictor
     {
     public:
+        /// <summary> The fan out of interior nodes. </summary>
+        static constexpr size_t FanOut = SplitRuleType::NumOutputs;
 
         /// <summary> Struct that represents a leaf in the tree. </summary>
         struct Leaf
         {
             size_t interiorNodeIndex;
-            bool leafIndex;
+            size_t leafIndex;
         };
 
         /// <summary> Information need to split a leaf of the tree. </summary>
@@ -70,10 +48,10 @@ namespace predictors
             Leaf leaf;
 
             /// <summary> The rule in the new interior node. </summary>
-            Rule rule;
+            SplitRuleType splitRule;
 
-            /// <summary> The weights of the two new edges. </summary>
-            std::array<double, Rule::NumOutputs> edgeWeights;
+            /// <summary> The weights of the outgoing edges. </summary>
+            std::array<double, FanOut> edgeWeights;
         };
 
         /// <summary> Gets the number of interior nodes. </summary>
@@ -117,8 +95,8 @@ namespace predictors
 
         struct InteriorNodeData
         {
-            Rule rule;
-            std::array<EdgeData, Rule::NumOutputs> edgeData;
+            SplitRuleType splitRule;
+            std::array<EdgeData, FanOut> outgoingEdges;
         };
 
         std::vector<InteriorNodeData> _interiorNodes;
