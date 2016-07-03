@@ -10,15 +10,15 @@
 
 namespace predictors
 {
-    template<typename SplitRuleType>
-    size_t predictors::TreePredictor<SplitRuleType>::NumEdges() const
+    template<typename SplitRuleType, typename EdgeOutputType>
+    size_t predictors::TreePredictor<SplitRuleType, EdgeOutputType>::NumEdges() const
     {
         return _interiorNodes.size() * FanOut;
     }
 
-    template<typename SplitRuleType>
+    template<typename SplitRuleType, typename EdgeOutputType>
     template<typename RandomAccessVectorType>
-    double TreePredictor<SplitRuleType>::Compute(const RandomAccessVectorType& input) const
+    double TreePredictor<SplitRuleType, EdgeOutputType>::Compute(const RandomAccessVectorType& input) const
     {
         // handle empty trees
         if (_interiorNodes.size() == 0)
@@ -44,9 +44,9 @@ namespace predictors
         return output;
     }
 
-    template<typename SplitRuleType>
+    template<typename SplitRuleType, typename EdgeOutputType>
     template<typename RandomAccessVectorType>
-    std::vector<bool> TreePredictor<SplitRuleType>::GetEdgePathIndicatorVector(const RandomAccessVectorType& input) const
+    std::vector<bool> TreePredictor<SplitRuleType, EdgeOutputType>::GetEdgePathIndicatorVector(const RandomAccessVectorType& input) const
     {
         // handle empty trees
         if (_interiorNodes.size() == 0)
@@ -72,8 +72,8 @@ namespace predictors
         return pathIndicator;
     }
 
-    template<typename SplitRuleType>
-    size_t TreePredictor<SplitRuleType>::Split(const SplitInfo& splitInfo)
+    template<typename SplitRuleType, typename EdgeOutputType>
+    size_t TreePredictor<SplitRuleType, EdgeOutputType>::Split(const SplitInfo& splitInfo)
     {
         // get the index of the new interior node
         size_t interiorNodeIndex = _interiorNodes.size();
@@ -87,7 +87,7 @@ namespace predictors
         return interiorNodeIndex;
     }
 
-    template<typename SplitRuleType>
-    TreePredictor<SplitRuleType>::EdgeData::EdgeData(double w) : weight(w), targetNodeIndex(0)
+    template<typename SplitRuleType, typename EdgeOutputType>
+    TreePredictor<SplitRuleType, EdgeOutputType>::EdgeData::EdgeData(double w) : weight(w), targetNodeIndex(0)
     {}
 }

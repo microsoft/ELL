@@ -9,6 +9,7 @@
 #pragma once
 
 #include "SingleInputThresholdRule.h"
+#include "ConstantPredictor.h"
 
 // dataset
 #include "DenseDataVector.h"
@@ -27,7 +28,7 @@ namespace predictors
     /// </summary>
     ///
     /// <typeparam name="SplitRuleType"> Type of split rule to use (also determines the fan-out). </typeparam>
-    template<typename SplitRuleType>
+    template<typename SplitRuleType, typename EdgeOutputType>
     class TreePredictor
     {
     public:
@@ -51,7 +52,7 @@ namespace predictors
             SplitRuleType splitRule;
 
             /// <summary> The weights of the outgoing edges. </summary>
-            std::array<double, FanOut> edgeWeights;
+            std::array<double, FanOut> edgeWeights; // (1) Make ConstantPredictor class (2) Add it here
         };
 
         /// <summary> Gets the number of interior nodes. </summary>
@@ -107,5 +108,5 @@ namespace predictors
     };
 
     /// <summary> A simple binary tree with single-input threshold rules. </summary>
-    typedef TreePredictor<SingleInputThresholdRule> SimpleTreePredictor;
+    typedef TreePredictor<SingleInputThresholdRule, ConstantPredictor> SimpleTreePredictor;
 }
