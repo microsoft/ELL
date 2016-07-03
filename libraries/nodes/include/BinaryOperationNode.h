@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MeanFeature.h (features)
+//  File:     BinaryOperationNode.h (features)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,18 +18,18 @@ namespace nodes
 {
     /// <summary> A feature that takes a vector input and returns its mean over some window of time </summary>
     template <typename ValueType>
-    class MeanFeatureNode : public model::Node
+    class BinaryOperationNode : public model::Node
     {
     public:
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the mean of </param>
         /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
-        MeanFeatureNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize);
+        BinaryOperationNode(const model::OutputPortElementList<ValueType>& input1, const model::OutputPortElementList<ValueType>& input2);
         
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "MeanFeature"; }
+        static std::string GetTypeName() { return "BinaryOperationNode"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -47,16 +47,12 @@ namespace nodes
 
     private:
         // Inputs
-        model::InputPort<ValueType> _input;
+        model::InputPort<ValueType> _input1;
+        model::InputPort<ValueType> _input2;
 
         // Output
         model::OutputPort<ValueType> _output;
-
-        // Buffer
-        mutable std::vector<std::vector<ValueType>> _samples;
-        mutable std::vector<ValueType> _runningSum;
-        size_t _windowSize;
     };
 }
 
-#include "../tcc/MeanFeatureNode.tcc"
+#include "../tcc/BinaryOperationNode.tcc"

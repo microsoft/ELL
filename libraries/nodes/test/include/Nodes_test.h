@@ -8,6 +8,6 @@
 
 #pragma once
 
-void TestMeanFeatureNodeCompute();
-void TestMeanFeatureNodeRefine();
+void TestMeanNodeCompute();
+void TestMeanNodeRefine();
 

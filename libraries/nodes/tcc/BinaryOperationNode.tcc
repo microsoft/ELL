@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MeanFeatureNode.cpp (nodes)
+//  File:     BinaryOperationNode.tcc (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "MeanFeatureNode.h"
+#include "BinaryOperationNode.h"
 
 // utilities
 #include "Exception.h"
@@ -14,50 +14,36 @@
 // stl
 #include <string>
 #include <vector>
+#include <cassert>
 
 namespace nodes
 {
     template <typename ValueType>
-    MeanFeatureNode<ValueType>::MeanFeatureNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize) : Node({&_input}, {&_output}), _input(this, input), _output(this, _input.Size()), _windowSize(windowSize)
+    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::OutputPortElementList<ValueType>& input1, const model::OutputPortElementList<ValueType>& input2) : Node({&_input1, &_input2}, {&_output}), _input1(this, input1), _input2(this, input2) _output(this, _input1.Size())
     {
-        auto dimension = input.Size();
-        for(size_t index = 0; index < windowSize; ++index)
-        {
-            _samples.push_back(std::vector<ValueType>(dimension));
-        }
-        _runningSum = std::vector<ValueType>(dimension);
+        assert(input1.Size == input2.Size());
     }
 
     template <typename ValueType>
-    void MeanFeatureNode<ValueType>::Compute() const
+    void BinaryOperationNode<ValueType>::Compute() const
     {
-        auto inputSample = _input.GetValue();
-        auto lastBufferedSample = _samples[0];
-        _samples.push_back(inputSample);
-        _samples.erase(_samples.begin());
-
-        std::vector<ValueType> result(_input.Size());
-        for(size_t index = 0; index < inputSample.size(); ++index)
-        {
-            _runningSum[index] += (inputSample[index]-lastBufferedSample[index]);
-            result[index] = _runningSum[index] / _windowSize;
-        }
-        _output.SetOutput(result);
+        auto inputSample = _input1.GetValue();
+        _output.SetOutput(inputSample);
     };
 
     template <typename ValueType>
-    void MeanFeatureNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    void BinaryOperationNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<MeanFeatureNode<ValueType>>(newInput, _windowSize);
+        auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput, _windowSize);
         transformer.MapOutputPort(output, newNode->output);
     }
 
     template <typename ValueType>
-    void MeanFeatureNode<ValueType>::Refine(model::ModelTransformer& transformer) const
+    void BinaryOperationNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<MeanFeatureNode<ValueType>>(newInput, _windowSize);
+        auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput, _windowSize);
         transformer.MapOutputPort(output, newNode->output);
     }
     

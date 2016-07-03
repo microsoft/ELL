@@ -12,11 +12,23 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (INCLUDE include/MeanFeatureNode.h)
+set (INCLUDE include/AccumulatorNode.h
+             include/BinaryOperationNode.h
+             include/DelayNode.h
+             include/MagnitudeNode.h
+             include/MeanNode.h
+             include/UnaryOperationNode.h
+             include/VarianceNode.h)
 
 set (SRC src/Nothing.cpp)
 
-set (TCC tcc/MeanFeatureNode.tcc)
+set (TCC tcc/AccumulatorNode.tcc
+         tcc/BinaryOperationNode.tcc
+         tcc/DelayNode.tcc
+         tcc/MagnitudeNode.tcc
+         tcc/MeanNode.tcc
+         tcc/UnaryOperationNode.tcc
+         tcc/VarianceNode.tcc)
 
 source_group("include" FILES ${INCLUDE})
 source_group("src" FILES ${SRC})

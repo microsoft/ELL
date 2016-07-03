@@ -16,10 +16,8 @@
 ///
 int main()
 {
-//     TestMagnitudeFeatureNode();
-    
-     TestMeanFeatureNodeCompute();
-     TestMeanFeatureNodeRefine();
+     TestMeanNodeCompute();
+     TestMeanNodeRefine();
 
     if(testing::DidTestFail())
     {

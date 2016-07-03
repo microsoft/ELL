@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Nodes_test.h"
-#include "MeanFeatureNode.h"
+#include "MeanNode.h"
 
 // model
 #include "ModelGraph.h"
@@ -125,13 +125,13 @@ void TestMagnitudeFeature()
     // testing::ProcessTest("Testing MagnitudeFeature model", testing::IsEqual(outputVec[0], expectedOutput));
 }
 
-void TestMeanFeatureNodeCompute()
+void TestMeanNodeCompute()
 {
     const int windowSize = 4;
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
-    auto meanNode = model.AddNode<nodes::MeanFeatureNode<double>>(inputNode->output, windowSize);
+    auto meanNode = model.AddNode<nodes::MeanNode<double>>(inputNode->output, windowSize);
 
     std::vector<std::vector<double>> data = { {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} };
     double expectedOutput = VectorMean({7.0, 8.0, 9.0, 10.0}); 
@@ -145,16 +145,16 @@ void TestMeanFeatureNodeCompute()
         outputVec = model.GetNodeOutput(meanNode->output);
     }
     std::cout << "Node compute output: " << outputVec[0] <<", expected: " << expectedOutput << std::endl;
-    testing::ProcessTest("Testing MeanFeatureNode compute", testing::IsEqual(outputVec[0], expectedOutput));
+    testing::ProcessTest("Testing MeanNode compute", testing::IsEqual(outputVec[0], expectedOutput));
 }
 
-void TestMeanFeatureNodeRefine()
+void TestMeanNodeRefine()
 {
     const int windowSize = 4;
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
-    auto meanNode = model.AddNode<nodes::MeanFeatureNode<double>>(inputNode->output, windowSize);
+    auto meanNode = model.AddNode<nodes::MeanNode<double>>(inputNode->output, windowSize);
 
     std::vector<std::vector<double>> data = { {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} };
     double expectedOutput = VectorMean({7.0, 8.0, 9.0, 10.0}); 
@@ -173,6 +173,6 @@ void TestMeanFeatureNodeRefine()
         newInputNode->SetInput(inputValue);
         auto outputVec2 = newModel.GetNodeOutput(*newOutputPort);
 
-        testing::ProcessTest("Testing MeanFeatureNode compute", testing::IsEqual(outputVec1, outputVec2));
+        testing::ProcessTest("Testing MeanNode compute", testing::IsEqual(outputVec1, outputVec2));
     }
 }
