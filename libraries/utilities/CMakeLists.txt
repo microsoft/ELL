@@ -87,11 +87,8 @@ set (TEST_INCLUDE test/include/XMLSerialization_test.h)
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})
 
-include_directories(../testing/include)
-include_directories(test/include)
-
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
-include_directories(../testing/include)
+target_include_directories(${TEST_NAME} PRIVATE test/include)
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(utilities_test utilities dataset linear layers testing -pthread)

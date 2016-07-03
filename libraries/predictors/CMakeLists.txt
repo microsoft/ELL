@@ -45,11 +45,8 @@ set (TEST_INCLUDE )
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})
 
-include_directories(../testing/include)
-include_directories(test/include)
-
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE} ${TCC})
-
+target_include_directories(${TEST_NAME} PRIVATE test/include)
 target_link_libraries(${TEST_NAME} dataset linear)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
