@@ -38,33 +38,33 @@ namespace predictors
         return output;
     }
 
-    //template<typename SplitRuleType>
-    //template<typename RandomAccessVectorType>
-    //std::vector<bool> TreePredictor::GetEdgePathIndicator(const dataset::DoubleDataVector& input) const
-    //{
-    //    // handle empty trees
-    //    if (_interiorNodes.size() == 0)
-    //    {
-    //        return std::vector<bool>(0);
-    //    }
+    template<typename SplitRuleType>
+    template<typename RandomAccessVectorType>
+    std::vector<bool> TreePredictor<SplitRuleType>::GetEdgePathIndicatorVector(const RandomAccessVectorType& input) const
+    {
+        // handle empty trees
+        if (_interiorNodes.size() == 0)
+        {
+            return std::vector<bool>(0);
+        }
 
-    //    size_t nodeIndex = 0;
-    //    std::vector<bool> pathIndicator(NumEdges());
+        size_t nodeIndex = 0;
+        std::vector<bool> pathIndicator(NumEdges());
 
-    //    do
-    //    {
-    //        // which way do we go?
-    //        size_t ruleEvaluation = _interiorNodes[nodeIndex].rule(input);
+        do
+        {
+            // which way do we go?
+            size_t edgeIndex = _interiorNodes[nodeIndex].splitRule.Compute(input);
 
-    //        // follow the edge and mark it in the path indicator vector
-    //        auto edge = _interiorNodes[nodeIndex].edgeData[ruleEvaluation];
-    //        nodeIndex = edge.targetNodeIndex;
-    //        pathIndicator[nodeIndex] = true;
-    //    } 
-    //    while (nodeIndex != 0);
+            // follow the edge and add its weight to the output
+            auto edge = _interiorNodes[nodeIndex].edgeData[edgeIndex];
+            nodeIndex = edge.targetNodeIndex;
+            pathIndicator[nodeIndex] = true;
+        } 
+        while (nodeIndex != 0);
 
-    //    return pathIndicator;
-    //}
+        return pathIndicator;
+    }
 
     //size_t TreePredictor::Split(const SplitInfo& splitInfo)
     //{

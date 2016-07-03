@@ -22,7 +22,7 @@
 
 namespace nodes
 {
-    class SimpleTreeNode : public model::Node, public predictors::SimpleTreePredictor
+    class SimpleTreeNode : public model::Node
     {
     public:
         /// <summary> Gets the name of this type. </summary>
@@ -33,8 +33,8 @@ namespace nodes
         /// <summary> Exposes the tree output as a read-only property </summary>
         const model::OutputPort<double>& output = _output;
 
-        /// <summary> Exposes the path indicator vectors as a read-only property </summary>
-        const model::OutputPort<bool>& pathIndicator = _pathIndicator;
+        /// <summary> Exposes the edge-path indicator vectors as a read-only property </summary>
+        const model::OutputPort<bool>& edgePathIndicatorVector = _edgePathIndicatorVector;
     
     protected:
         virtual void Compute() const override;
@@ -45,6 +45,9 @@ namespace nodes
         
         // output ports
         model::OutputPort<double> _output;
-        model::OutputPort<bool> _pathIndicator;
+        model::OutputPort<bool> _edgePathIndicatorVector;
+
+        // the tree
+        predictors::SimpleTreePredictor _tree;
     };
 }

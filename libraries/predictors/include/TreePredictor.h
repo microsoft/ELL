@@ -72,13 +72,15 @@ namespace predictors
         /// <returns> The prediction. </returns>
         template<typename RandomAccessVectorType>
         double Compute(const RandomAccessVectorType& input) const;
-        
+
         /// <summary> Returns the edge path indicator vector for a given input. </summary>
         ///
+        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the input. </typeparam>
         /// <param name="input"> The input vector. </param>
         ///
         /// <returns> The edge path indicator vector. </returns>
-        //std::vector<bool> GetEdgePathIndicator(const dataset::DoubleDataVector& input) const;
+        template<typename RandomAccessVectorType>
+        std::vector<bool> GetEdgePathIndicatorVector(const RandomAccessVectorType& input) const;
 
         /// <summary> Performs a split in the tree. </summary>
         ///
