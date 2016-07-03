@@ -66,24 +66,26 @@ namespace predictors
 
         /// <summary> Returns the output of the tree for a given input. </summary>
         ///
+        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the input. </typeparam>
         /// <param name="input"> The input vector. </param>
         ///
         /// <returns> The prediction. </returns>
-        double Predict(const dataset::DoubleDataVector& input) const;
+        template<typename RandomAccessVectorType>
+        double Predict(const RandomAccessVectorType& input) const;
         
         /// <summary> Returns the edge path indicator vector for a given input. </summary>
         ///
         /// <param name="input"> The input vector. </param>
         ///
         /// <returns> The edge path indicator vector. </returns>
-        std::vector<bool> GetEdgePathIndicator(const dataset::DoubleDataVector& input) const;
+        //std::vector<bool> GetEdgePathIndicator(const dataset::DoubleDataVector& input) const;
 
         /// <summary> Performs a split in the tree. </summary>
         ///
         /// <param name="splitInfo"> Information describing the split. </param>
         ///
         /// <returns> Index of the newly created interior node. </returns>
-        size_t Split(const SplitInfo& splitInfo);
+        //size_t Split(const SplitInfo& splitInfo);
 
     protected:
         struct EdgeData

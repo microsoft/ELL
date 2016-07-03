@@ -1,15 +1,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SingleInputThresholdRule.cpp (predictors)
+//  File:     SingleInputThresholdRule.tcc (predictors)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SingleInputThresholdRule.h"
-
 namespace predictors
 {
-    SingleInputThresholdRule::SingleInputThresholdRule(size_t index, double threshold) : _index(index), _threshold(threshold)
-    {}
+    template<typename RandomAccessVectorType>
+    size_t predictors::SingleInputThresholdRule::Compute(const RandomAccessVectorType& inputVector) const
+    {
+        return inputVector[_index] > _threshold ? 1 : 0;
+    }
 }

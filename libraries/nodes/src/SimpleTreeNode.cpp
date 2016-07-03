@@ -1,22 +1,23 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     BinaryDecisionTreeNode.cpp (nodes)
+//  File:     SimpleTreeNode.cpp (nodes)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "BinaryDecisionTreeNode.h"
+#include "SimpleTreeNode.h"
 
 namespace nodes
 {
-    std::string BinaryDecisionTreeNode::GetRuntimeTypeName() const
+    std::string SimpleTreeNode::GetRuntimeTypeName() const
     {
-        return "BinaryDecisionTreeNode";
+        return "SimpleTreeNode";
     }
 
-    void BinaryDecisionTreeNode::Compute() const
+    void SimpleTreeNode::Compute() const
     {
-
+        auto outputValue = Predict(_input);
+        _output.SetOutput({ outputValue });
     }
 }

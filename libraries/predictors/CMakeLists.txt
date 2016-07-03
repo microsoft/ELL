@@ -16,13 +16,14 @@ set (SRC src/DecisionTreePredictor.cpp
          src/LinearPredictor.cpp
          src/SingleInputThresholdRule.cpp)
 
-set (INCLUDE include/TreePredictor.h
-             include/DecisionTreePredictor.h
+set (INCLUDE include/DecisionTreePredictor.h
              include/EnsemblePredictor.h
              include/LinearPredictor.h
-             include/SingleInputThresholdRule.h)
+             include/SingleInputThresholdRule.h
+             include/TreePredictor.h)
 
 set (TCC tcc/EnsemblePredictor.tcc
+         tcc/SingleInputThresholdRule.tcc
          tcc/TreePredictor.tcc)
 
 source_group("src" FILES ${SRC})

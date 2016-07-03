@@ -8,9 +8,6 @@
 
 #pragma once
 
-// dataset
-#include "DenseDataVector.h"
-
 namespace predictors
 {
     /// <summary> A split rule that compares a single feature to a threshold. </summary>
@@ -23,23 +20,23 @@ namespace predictors
 
         /// <summary> Constructs a single-input threshold rule. </summary>
         ///
-        /// <param name="inputIndex"> Zero-based index of the input coordinate. </param>
+        /// <param name="index"> Zero-based index of the input coordinate. </param>
         /// <param name="threshold"> The threshold. </param>
-        SingleInputThresholdRule(size_t inputIndex, double threshold);
+        SingleInputThresholdRule(size_t index, double threshold);
 
         /// <summary> Evaluates the split rule. </summary>
         ///
-        /// <param name="dataVector"> The data vector. </param>
+        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the input. </typeparam>
+        /// <param name="dataVector"> The input vector. </param>
         ///
         /// <returns> The result of the split rule. </returns>
-        size_t operator()(const dataset::DoubleDataVector& dataVector) const;
-
-        ///
-        /// <returns> The total number of outputs. </returns>
-        size_t NumOutputs() const { return 2; }
+        template<typename RandomAccessVectorType>
+        size_t Compute(const RandomAccessVectorType& inputVector) const;
 
     private:
-        size_t _inputIndex;
+        size_t _index;
         double _threshold;
     };
 }
+
+#include "../tcc/SingleInputThresholdRule.tcc"

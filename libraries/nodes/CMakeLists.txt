@@ -12,9 +12,9 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/BinaryDecisionTreeNode.cpp)
+set (SRC src/SimpleTreeNode.cpp)
 
-set (INCLUDE include/BinaryDecisionTreeNode.h)
+set (INCLUDE include/SimpleTreeNode.h)
 
 set (TCC )
 
@@ -25,6 +25,9 @@ source_group("tcc" FILES ${TCC})
 include_directories(include)
 include_directories(${CMAKE_SOURCE_DIR}/libraries/model/include)
 include_directories(${CMAKE_SOURCE_DIR}/libraries/utilities/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/predictors/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/dataset/include)
+include_directories(${CMAKE_SOURCE_DIR}/libraries/linear/include)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 
@@ -49,7 +52,7 @@ include_directories(test/include)
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} model testing)
+target_link_libraries(${TEST_NAME} model testing predictors dataset linear)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 
