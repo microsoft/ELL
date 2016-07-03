@@ -87,7 +87,7 @@ namespace predictors
         /// <param name="splitInfo"> Information describing the split. </param>
         ///
         /// <returns> Index of the newly created interior node. </returns>
-        //size_t Split(const SplitInfo& splitInfo);
+        size_t Split(const SplitInfo& splitInfo);
 
     protected:
         struct EdgeData

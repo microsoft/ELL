@@ -66,20 +66,22 @@ namespace predictors
         return pathIndicator;
     }
 
-    //size_t TreePredictor::Split(const SplitInfo& splitInfo)
-    //{
-    //    // get the index of the new interior node
-    //    size_t interiorNodeIndex = _interiorNodes.size();
+    template<typename SplitRuleType>
+    size_t TreePredictor<SplitRuleType>::Split(const SplitInfo& splitInfo)
+    {
+        // get the index of the new interior node
+        size_t interiorNodeIndex = _interiorNodes.size();
 
-    //    // create the new interior node
-    //    _interiorNodes.push_back({ splitInfo.rule,{ splitInfo.edgeWeights[0], splitInfo.edgeWeights[1] } });
+        // create the new interior node
+        _interiorNodes.push_back({ splitInfo.rule, splitInfo.edgeWeights[0] });
 
-    //    // connect the new interior node to its parent
-    //    _interiorNodes[splitInfo.leaf.interiorNodeIndex].edgeData[splitInfo.leaf.leafIndex].targetNodeIndex = interiorNodeIndex;
-    //    
-    //    return interiorNodeIndex;
-    //}
+        // connect the new interior node to its parent
+        _interiorNodes[splitInfo.leaf.interiorNodeIndex].edgeData[splitInfo.leaf.leafIndex].targetNodeIndex = interiorNodeIndex;
+        
+        return interiorNodeIndex;
+    }
 
-    //TreePredictor::EdgeData::EdgeData(double w) : weight(w), targetNodeIndex(0)
-    //{}
+    template<typename SplitRuleType>
+    TreePredictor<SplitRuleType>::EdgeData::EdgeData(double w) : weight(w), targetNodeIndex(0)
+    {}
 }
