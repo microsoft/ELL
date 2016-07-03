@@ -25,7 +25,6 @@ namespace nodes
         {
             _samples.push_back(std::vector<ValueType>(dimension));
         }
-        _runningSum = std::vector<ValueType>(dimension);
     }
 
     template <typename ValueType>
@@ -34,7 +33,7 @@ namespace nodes
         auto lastBufferedSample = _samples[0];        
         _samples.push_back(_input.GetValue());
         _samples.erase(_samples.begin());
-        return lastBufferedSample;
+        _output.SetOutput(lastBufferedSample);
     };
 
     template <typename ValueType>

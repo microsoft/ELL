@@ -18,7 +18,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize) : Node({&_input}, {&_output}), _input(this, input), _output(this, _input.Size())
+    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input), _output(this, _input.Size())
     {
     }
 
@@ -33,15 +33,7 @@ namespace nodes
     void UnaryOperationNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<UnaryOperationNode<ValueType>>(newInput, _windowSize);
-        transformer.MapOutputPort(output, newNode->output);
-    }
-
-    template <typename ValueType>
-    void UnaryOperationNode<ValueType>::Refine(model::ModelTransformer& transformer) const
-    {
-        auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<UnaryOperationNode<ValueType>>(newInput, _windowSize);
+        auto newNode = transformer.AddNode<UnaryOperationNode<ValueType>>(newInput);
         transformer.MapOutputPort(output, newNode->output);
     }
     

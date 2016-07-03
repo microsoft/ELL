@@ -59,7 +59,7 @@ namespace model
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
         virtual void Copy(ModelTransformer& transformer) const = 0;
-        virtual void Refine(ModelTransformer& transformer) const = 0;
+        virtual void Refine(ModelTransformer& transformer) const;
 
     protected:
         // TODO: the arguments (and the _inputs and _outputs members)

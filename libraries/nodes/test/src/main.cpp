@@ -11,22 +11,20 @@
 // testing
 #include "testing.h"
 
-
 /// Runs all tests
 ///
 int main()
 {
-     TestMeanNodeCompute();
-     TestMeanNodeRefine();
+    TestMagnitudeNodeCompute();
+    TestAccumulatorNodeCompute();
+    TestDelayNodeCompute();
+    TestMeanNodeCompute();
+    TestMeanNodeRefine();
 
-    if(testing::DidTestFail())
+    if (testing::DidTestFail())
     {
         return 1;
     }
 
     return 0;
 }
-
-
-
-

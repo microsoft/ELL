@@ -19,7 +19,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    MagnitudeNode<ValueType>::MagnitudeNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input), _output(this, _input.Size())
+    MagnitudeNode<ValueType>::MagnitudeNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input), _output(this, 1)
     {
     }
 
@@ -27,7 +27,7 @@ namespace nodes
     void MagnitudeNode<ValueType>::Compute() const
     {
         ValueType result = 0;
-        for(size_t index = 0; index < inputSample.size(); ++index)
+        for(size_t index = 0; index < _input.Size(); ++index)
         {
             auto v = _input[index];
             result += (v*v);
@@ -39,7 +39,7 @@ namespace nodes
     void MagnitudeNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<MagnitudeNode<ValueType>>(newInput, _windowSize);
+        auto newNode = transformer.AddNode<MagnitudeNode<ValueType>>(newInput);
         transformer.MapOutputPort(output, newNode->output);
     }
 
@@ -47,7 +47,7 @@ namespace nodes
     void MagnitudeNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<MagnitudeNode<ValueType>>(newInput, _windowSize);
+        auto newNode = transformer.AddNode<MagnitudeNode<ValueType>>(newInput);
         transformer.MapOutputPort(output, newNode->output);
     }
     

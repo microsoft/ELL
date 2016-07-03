@@ -52,7 +52,7 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         // Buffer
-        mutable std::vector<ValueType> _runningSum;
+        mutable std::vector<ValueType> _accumulator;
     };
 }
 

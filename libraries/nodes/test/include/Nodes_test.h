@@ -8,6 +8,10 @@
 
 #pragma once
 
+void TestMagnitudeNodeCompute();
+void TestAccumulatorNodeCompute();
+void TestDelayNodeCompute();
+
 void TestMeanNodeCompute();
 void TestMeanNodeRefine();
 

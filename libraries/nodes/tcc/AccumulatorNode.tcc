@@ -21,24 +21,24 @@ namespace nodes
     AccumulatorNode<ValueType>::AccumulatorNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input), _output(this, _input.Size())
     {
         auto dimension = input.Size();
-        _runningSum = std::vector<ValueType>(dimension);
+        _accumulator = std::vector<ValueType>(dimension);
     }
 
     template <typename ValueType>
     void AccumulatorNode<ValueType>::Compute() const
     {
-        for(size_t index = 0; index < inputSample.size(); ++index)
+        for(size_t index = 0; index < _input.Size(); ++index)
         {
-            _runningSum[index] += input[index];
+            _accumulator[index] += _input[index];
         }
-        _output.SetOutput(_runningSum);
+        _output.SetOutput(_accumulator);
     };
 
     template <typename ValueType>
     void AccumulatorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newInput, _windowSize);
+        auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newInput);
         transformer.MapOutputPort(output, newNode->output);
     }
 
@@ -46,7 +46,7 @@ namespace nodes
     void AccumulatorNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newInput, _windowSize);
+        auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newInput);
         transformer.MapOutputPort(output, newNode->output);
     }
     

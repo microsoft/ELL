@@ -38,7 +38,6 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
 
         virtual void Copy(model::ModelTransformer& transformer) const override;
-        virtual void Refine(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;

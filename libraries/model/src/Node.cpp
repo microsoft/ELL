@@ -36,4 +36,9 @@ namespace model
             }
         }
     }
+
+    void Node::Refine(ModelTransformer& transformer) const
+    {
+        Copy(transformer);
+    }
 }
