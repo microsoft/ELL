@@ -11,7 +11,11 @@
 void TestMagnitudeNodeCompute();
 void TestAccumulatorNodeCompute();
 void TestDelayNodeCompute();
-
 void TestMeanNodeCompute();
+void TestVarianceNodeCompute();
+void TestUnaryOperationNodeCompute();
+void TestBinaryOperationNodeCompute();
+
+// Refinement
 void TestMeanNodeRefine();
 

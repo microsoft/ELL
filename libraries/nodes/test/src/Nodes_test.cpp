@@ -8,6 +8,7 @@
 
 #include "Nodes_test.h"
 #include "MeanNode.h"
+#include "VarianceNode.h"
 #include "DelayNode.h"
 #include "AccumulatorNode.h"
 #include "BinaryOperationNode.h"
@@ -77,7 +78,7 @@ namespace
 }
 
 //
-// Test functions
+// Test compute functions
 //
 
 void TestMagnitudeNodeCompute()
@@ -109,7 +110,7 @@ void TestAccumulatorNodeCompute()
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
-    auto delayNode = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
+    auto outputNode = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
 
     std::vector<double> accumOutput(data[0].size());
 
@@ -122,7 +123,7 @@ void TestAccumulatorNodeCompute()
             accumOutput[d] += inputValue[d];
         }
         inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.GetNodeOutput(delayNode->output);
+        std::vector<double> outputVec = model.GetNodeOutput(outputNode->output);
 
         testing::ProcessTest("Testing AccumulatorNode compute", testing::IsEqual(outputVec, accumOutput));
     }
@@ -134,7 +135,7 @@ void TestDelayNodeCompute()
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
-    auto delayNode = model.AddNode<nodes::DelayNode<double>>(inputNode->output, delay);
+    auto outputNode = model.AddNode<nodes::DelayNode<double>>(inputNode->output, delay);
 
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
 
@@ -145,7 +146,7 @@ void TestDelayNodeCompute()
     {
         auto inputValue = data[index];
         inputNode->SetInput(inputValue);
-        outputVec = model.GetNodeOutput(delayNode->output);
+        outputVec = model.GetNodeOutput(outputNode->output);
         if (index >= delay)
         {
             testing::ProcessTest("Testing DelayNode compute", testing::IsEqual(outputVec, data[index - delay]));
@@ -159,7 +160,7 @@ void TestMeanNodeCompute()
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
-    auto meanNode = model.AddNode<nodes::MeanNode<double>>(inputNode->output, windowSize);
+    auto outputNode = model.AddNode<nodes::MeanNode<double>>(inputNode->output, windowSize);
 
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
     double expectedOutput = VectorMean({ 7.0, 8.0, 9.0, 10.0 });
@@ -169,11 +170,78 @@ void TestMeanNodeCompute()
     for (const auto& inputValue : data)
     {
         inputNode->SetInput(inputValue);
-        outputVec = model.GetNodeOutput(meanNode->output);
+        outputVec = model.GetNodeOutput(outputNode->output);
     }
     testing::ProcessTest("Testing MeanNode compute", testing::IsEqual(outputVec[0], expectedOutput));
 }
 
+void TestVarianceNodeCompute()
+{
+    const int windowSize = 4;
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(1);
+    auto outputNode = model.AddNode<nodes::VarianceNode<double>>(inputNode->output, windowSize);
+
+    std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
+    double mean = VectorMean({ 7.0, 8.0, 9.0, 10.0 });
+    double expectedOutput = VectorVariance({ 7.0, 8.0, 9.0, 10.0 }, mean);
+
+    std::vector<double> outputVec;
+
+    for (const auto& inputValue : data)
+    {
+        inputNode->SetInput(inputValue);
+        outputVec = model.GetNodeOutput(outputNode->output);
+    }
+    testing::ProcessTest("Testing VarianceNode compute", testing::IsEqual(outputVec[0], expectedOutput));
+}
+
+void TestUnaryOperationNodeCompute()
+{
+    std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
+    auto outputNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, nodes::UnaryOperationNode<double>::OperationType::sqrt);
+
+    for (int index = 0; index < data.size(); ++index)
+    {
+        auto inputValue = data[index];
+
+        inputNode->SetInput(inputValue);
+        std::vector<double> outputVec = model.GetNodeOutput(outputNode->output);
+
+        for (int d = 0; d < inputValue.size(); ++d)
+        {
+            auto expectedOutput = std::sqrt(inputValue[d]);
+            testing::ProcessTest("Testing UnaryOperationNode compute", testing::IsEqual(outputVec[d], expectedOutput));
+        }
+    }
+}
+
+void TestBinaryOperationNodeCompute()
+{
+    std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
+    auto outputNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, inputNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
+
+    for (int index = 0; index < data.size(); ++index)
+    {
+        auto inputValue = data[index];
+
+        inputNode->SetInput(inputValue);
+        std::vector<double> outputVec = model.GetNodeOutput(outputNode->output);
+
+        for (int d = 0; d < inputValue.size(); ++d)
+        {
+            auto expectedOutput = 2*inputValue[d];
+            testing::ProcessTest("Testing BinaryOperationNode compute", testing::IsEqual(outputVec[d], expectedOutput));
+        }
+    }
+}
 
 //
 // Node refinements

@@ -42,12 +42,4 @@ namespace nodes
         transformer.MapOutputPort(output, newNode->output);
     }
 
-    template <typename ValueType>
-    void AccumulatorNode<ValueType>::Refine(model::ModelTransformer& transformer) const
-    {
-        auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newInput);
-        transformer.MapOutputPort(output, newNode->output);
-    }
-    
 }

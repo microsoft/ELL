@@ -21,11 +21,19 @@ namespace nodes
     class BinaryOperationNode : public model::Node
     {
     public:
+        enum class OperationType
+        {
+            add,
+            subtract,
+            multiply,
+            divide
+        };
+
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the mean of </param>
         /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
-        BinaryOperationNode(const model::OutputPortElementList<ValueType>& input1, const model::OutputPortElementList<ValueType>& input2);
-        
+        BinaryOperationNode(const model::OutputPortElementList<ValueType>& input1, const model::OutputPortElementList<ValueType>& input2, OperationType operation);
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -45,6 +53,11 @@ namespace nodes
         virtual void Compute() const override;
 
     private:
+        template <typename Operation>
+        std::vector<ValueType> ComputeOutput(Operation&& fn) const;
+
+        OperationType _operation;
+
         // Inputs
         model::InputPort<ValueType> _input1;
         model::InputPort<ValueType> _input2;

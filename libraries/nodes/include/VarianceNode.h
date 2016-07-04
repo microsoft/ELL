@@ -55,6 +55,7 @@ namespace nodes
         // Buffer
         mutable std::vector<std::vector<ValueType>> _samples;
         mutable std::vector<ValueType> _runningSum;
+        mutable std::vector<ValueType> _runningSquaredSum;
         size_t _windowSize;
     };
 }

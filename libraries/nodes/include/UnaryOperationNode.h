@@ -20,10 +20,15 @@ namespace nodes
     class UnaryOperationNode : public model::Node
     {
     public:
+        enum class OperationType
+        {
+            sqrt
+        };
+
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the mean of </param>
-        UnaryOperationNode(const model::OutputPortElementList<ValueType>& input);
-        
+        UnaryOperationNode(const model::OutputPortElementList<ValueType>& input, OperationType operation);
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -43,6 +48,12 @@ namespace nodes
         virtual void Compute() const override;
 
     private:
+        template <typename Operation>
+        std::vector<ValueType> ComputeOutput(Operation&& fn) const;
+
+        // Operation
+        OperationType _operation;
+
         // Inputs
         model::InputPort<ValueType> _input;
 

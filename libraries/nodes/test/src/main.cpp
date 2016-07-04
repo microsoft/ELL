@@ -19,6 +19,10 @@ int main()
     TestAccumulatorNodeCompute();
     TestDelayNodeCompute();
     TestMeanNodeCompute();
+    TestVarianceNodeCompute(); 
+    TestUnaryOperationNodeCompute();
+    TestBinaryOperationNodeCompute();
+    
     TestMeanNodeRefine();
 
     if (testing::DidTestFail())
