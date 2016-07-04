@@ -81,8 +81,9 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    size_t TreePredictor<SplitRuleType, EdgePredictorType>::Split(const SplitInfo& splitInfo)
+    size_t TreePredictor<SplitRuleType, EdgePredictorType>::Split(const SplitCandidate& splitCandidate)
     {
+        auto splitInfo = splitCandidate.splitInfo;
     
         // check correctness of splitInfo
         if (splitInfo.predictors.size() != splitInfo.splitRule.NumOutputs())
@@ -93,14 +94,17 @@ namespace predictors
         // get the index of the new interior node
         size_t interiorNodeIndex = _interiorNodes.size();
 
-        auto interiorNode = InteriorNodeData(splitInfo); 
+        // create the new interior node
+        _interiorNodes.emplace_back(splitInfo);
 
-        //// create the new interior node
-        //_interiorNodes.push_back();
+        // increment edge count
+        _numEdges += splitInfo.predictors.size();
 
-        //// connect the new interior node to its parent
-        //_interiorNodes[splitInfo.leaf.interiorNodeIndex].outgoingEdges[splitInfo.leaf.leafIndex].targetNodeIndex = interiorNodeIndex;
+        // connect the new interior node to its parent
+        auto leaf = splitCandidate.leaf;
+        _interiorNodes[leaf.interiorNodeIndex].outgoingEdges[leaf.leafIndex].targetNodeIndex = interiorNodeIndex;
         
+        // return index of new interior node
         return interiorNodeIndex;
     }
 

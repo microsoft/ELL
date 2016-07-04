@@ -92,10 +92,10 @@ namespace predictors
 
         /// <summary> Performs a split in the tree. </summary>
         ///
-        /// <param name="splitInfo"> Information describing the split. </param>
+        /// <param name="splitCandidate"> Information describing the split. </param>
         ///
         /// <returns> Index of the newly created interior node. </returns>
-        size_t Split(const SplitInfo& splitInfo);
+        size_t Split(const SplitCandidate& splitCandidate);
 
     protected:
 

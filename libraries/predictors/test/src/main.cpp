@@ -18,10 +18,10 @@ void TreePredictorTest()
     predictors::SimpleTreePredictor::SplitInfo splitInfo{ rule, edgePredictors };
 
     predictors::SimpleTreePredictor::Leaf leaf{ 0, 0 };
-    predictors::SimpleTreePredictor::SplitCandidate{ leaf, splitInfo };
+    predictors::SimpleTreePredictor::SplitCandidate splitCandidate{ leaf, splitInfo };
     
     predictors::SimpleTreePredictor simpleTree;
-    simpleTree.Split(splitInfo);
+    simpleTree.Split(splitCandidate);
 }
 
 /// Runs all tests
