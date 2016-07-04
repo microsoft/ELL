@@ -85,14 +85,14 @@ namespace predictors
     {
         auto splitInfo = splitCandidate.splitInfo;
     
-        // check correctness of splitInfo
+        // sanity check - check correctness of splitInfo
         if (splitInfo.predictors.size() != splitInfo.splitRule.NumOutputs())
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - number of split rule outputs doesn't match fan-out");
         }
 
         // get the index of the new interior node
-        size_t interiorNodeIndex = _interiorNodes.size();
+        size_t newInteriorNodeIndex = _interiorNodes.size();
 
         // create the new interior node
         _interiorNodes.emplace_back(splitInfo);
@@ -100,21 +100,28 @@ namespace predictors
         // increment edge count
         _numEdges += splitInfo.predictors.size();
 
-        // connect the new interior node to its parent
+        // sanity check - check that split refers to a leaf
         auto leaf = splitCandidate.leaf;
-        _interiorNodes[leaf.interiorNodeIndex].outgoingEdges[leaf.leafIndex].targetNodeIndex = interiorNodeIndex;
+        auto& parentOutgoing = _interiorNodes[leaf.interiorNodeIndex].outgoingEdges[leaf.leafIndex].targetNodeIndex;
+        if (parentOutgoing != 0)
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - attempted to split a non-leaf");
+        }
+
+        // update the parent about the new interior node
+        parentOutgoing = newInteriorNodeIndex;
         
         // return index of new interior node
-        return interiorNodeIndex;
+        return newInteriorNodeIndex;
     }
 
-    //template<typename SplitRuleType, typename EdgePredictorType>
-    //TreePredictor<SplitRuleType, EdgePredictorType>::EdgeData::EdgeData(const EdgePredictorType& predictor) : predictor(predictor), targetNodeIndex(0)
-    //{}
+    template<typename SplitRuleType, typename EdgePredictorType>
+    TreePredictor<SplitRuleType, EdgePredictorType>::Edge::Edge(const EdgePredictorType& predictor) : predictor(predictor), targetNodeIndex(0) 
+    {}
 
-    //template<typename SplitRuleType, typename EdgePredictorType>
-    //TreePredictor<SplitRuleType, EdgePredictorType>::InteriorNodeData::InteriorNodeData(const SplitRuleType& splitRule, const std::array<EdgePredictorType, FanOut>& edgePredictors) : splitRule(splitRule)
-    //{
-    //    // TODO
-    //}
+    template<typename SplitRuleType, typename EdgePredictorType>
+    TreePredictor<SplitRuleType, EdgePredictorType>::InteriorNode::InteriorNode(const SplitInfo& splitInfo) : splitRule(splitInfo.splitRule)
+    {
+        std::copy(splitInfo.predictors.begin(), splitInfo.predictors.end(), std::back_inserter(outgoingEdges));
+    }
 }

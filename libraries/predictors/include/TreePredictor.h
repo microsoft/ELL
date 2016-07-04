@@ -99,24 +99,21 @@ namespace predictors
 
     protected:
 
-        struct EdgeData // TODO remove the Data prefix everwhere?
+        struct Edge
         {
-            EdgeData(const EdgePredictorType& predictor) : predictor(predictor), targetNodeIndex(0) {} // TODO
+            Edge(const EdgePredictorType& predictor);
             EdgePredictorType predictor;
             size_t targetNodeIndex;
         };
 
-        struct InteriorNodeData
+        struct InteriorNode
         {
-            InteriorNodeData(const SplitInfo& splitInfo) : splitRule(splitInfo.splitRule) 
-            {
-                std::copy(splitInfo.predictors.begin(), splitInfo.predictors.end(), std::back_inserter(outgoingEdges));
-            }
+            InteriorNode(const SplitInfo& splitInfo);
             SplitRuleType splitRule;
-            std::vector<EdgeData> outgoingEdges;
+            std::vector<Edge> outgoingEdges;
         };
 
-        std::vector<InteriorNodeData> _interiorNodes;
+        std::vector<InteriorNode> _interiorNodes;
         size_t _numEdges;
     };
 
