@@ -8,15 +8,12 @@
 
 #pragma once
 
-#include "Port.h"
 #include "OutputPort.h"
 #include "UniqueId.h"
 
 #include <string>
 #include <memory>
 #include <vector>
-#include <unordered_set>
-#include <unordered_map>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -47,6 +44,8 @@ namespace model
         ///
         /// <returns> a vector of all the nodes that depend on this node </summary>
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
+
+        virtual ~Node() {}
 
     protected:
         // TODO: the arguments (and the _inputs and _outputs members)

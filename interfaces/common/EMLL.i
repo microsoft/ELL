@@ -205,6 +205,9 @@ typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<d
 // Interface for common library
 %include common.i
 
+// Interface for model library
+%include model.i
+
 wrap_unique_ptr(LayerPtr, layers::Layer)
 
 #ifndef SWIGXML
