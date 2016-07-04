@@ -12,6 +12,9 @@ namespace predictors
 {
     class ConstantPredictor
     {
+    public:
+        ConstantPredictor() = default;
+
         ConstantPredictor(double value);
 
         template<typename AnyType>

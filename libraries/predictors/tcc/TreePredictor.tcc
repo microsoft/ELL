@@ -8,17 +8,14 @@
 
 #include "TreePredictor.h"
 
+// utilities
+#include "Exception.h"
+
 namespace predictors
 {
-    template<typename SplitRuleType, typename EdgeOutputType>
-    size_t predictors::TreePredictor<SplitRuleType, EdgeOutputType>::NumEdges() const
-    {
-        return _interiorNodes.size() * FanOut;
-    }
-
-    template<typename SplitRuleType, typename EdgeOutputType>
+    template<typename SplitRuleType, typename EdgePredictorType>
     template<typename RandomAccessVectorType>
-    double TreePredictor<SplitRuleType, EdgeOutputType>::Compute(const RandomAccessVectorType& input) const
+    double TreePredictor<SplitRuleType, EdgePredictorType>::Compute(const RandomAccessVectorType& input) const
     {
         // handle empty trees
         if (_interiorNodes.size() == 0)
@@ -32,21 +29,27 @@ namespace predictors
         do
         {
             // which way do we go?
-            size_t edgeIndex = _interiorNodes[nodeIndex].splitRule.Compute(input);
-            
+            int edgeIndex = _interiorNodes[nodeIndex].splitRule.Compute(input);
+
+            // check for early eject
+            if (edgeIndex < 0)
+            {
+                break;
+            }
+
             // follow the edge and add its weight to the output
-            auto edge = _interiorNodes[nodeIndex].edgeData[edgeIndex];
+            auto edge = _interiorNodes[nodeIndex].outgoingEdges[edgeIndex];
             nodeIndex = edge.targetNodeIndex;
-            output += edge.weight;
+            output += edge.predictor.Compute(input);
         } 
         while (nodeIndex != 0);
 
         return output;
     }
 
-    template<typename SplitRuleType, typename EdgeOutputType>
+    template<typename SplitRuleType, typename EdgePredictorType>
     template<typename RandomAccessVectorType>
-    std::vector<bool> TreePredictor<SplitRuleType, EdgeOutputType>::GetEdgePathIndicatorVector(const RandomAccessVectorType& input) const
+    std::vector<bool> TreePredictor<SplitRuleType, EdgePredictorType>::GetEdgePathIndicatorVector(const RandomAccessVectorType& input) const
     {
         // handle empty trees
         if (_interiorNodes.size() == 0)
@@ -55,15 +58,20 @@ namespace predictors
         }
 
         size_t nodeIndex = 0;
-        std::vector<bool> pathIndicator(NumEdges());
+        std::vector<bool> pathIndicator(_numEdges);
 
         do
         {
             // which way do we go?
-            size_t edgeIndex = _interiorNodes[nodeIndex].splitRule.Compute(input);
+            int edgeIndex = _interiorNodes[nodeIndex].splitRule.Compute(input);
 
+            // check for early eject
+            if (edgeIndex < 0)
+            {
+                break;
+            }
             // follow the edge and add its weight to the output
-            auto edge = _interiorNodes[nodeIndex].edgeData[edgeIndex];
+            auto edge = _interiorNodes[nodeIndex].outgoingEdges[edgeIndex];
             nodeIndex = edge.targetNodeIndex;
             pathIndicator[nodeIndex] = true;
         } 
@@ -72,22 +80,37 @@ namespace predictors
         return pathIndicator;
     }
 
-    template<typename SplitRuleType, typename EdgeOutputType>
-    size_t TreePredictor<SplitRuleType, EdgeOutputType>::Split(const SplitInfo& splitInfo)
+    template<typename SplitRuleType, typename EdgePredictorType>
+    size_t TreePredictor<SplitRuleType, EdgePredictorType>::Split(const SplitInfo& splitInfo)
     {
+    
+        // check correctness of splitInfo
+        if (splitInfo.predictors.size() != splitInfo.splitRule.NumOutputs())
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - number of split rule outputs doesn't match fan-out");
+        }
+
         // get the index of the new interior node
         size_t interiorNodeIndex = _interiorNodes.size();
 
-        // create the new interior node
-        _interiorNodes.push_back({ splitInfo.rule, splitInfo.edgeWeights[0] });
+        auto interiorNode = InteriorNodeData(splitInfo); 
 
-        // connect the new interior node to its parent
-        _interiorNodes[splitInfo.leaf.interiorNodeIndex].edgeData[splitInfo.leaf.leafIndex].targetNodeIndex = interiorNodeIndex;
+        //// create the new interior node
+        //_interiorNodes.push_back();
+
+        //// connect the new interior node to its parent
+        //_interiorNodes[splitInfo.leaf.interiorNodeIndex].outgoingEdges[splitInfo.leaf.leafIndex].targetNodeIndex = interiorNodeIndex;
         
         return interiorNodeIndex;
     }
 
-    template<typename SplitRuleType, typename EdgeOutputType>
-    TreePredictor<SplitRuleType, EdgeOutputType>::EdgeData::EdgeData(double w) : weight(w), targetNodeIndex(0)
-    {}
+    //template<typename SplitRuleType, typename EdgePredictorType>
+    //TreePredictor<SplitRuleType, EdgePredictorType>::EdgeData::EdgeData(const EdgePredictorType& predictor) : predictor(predictor), targetNodeIndex(0)
+    //{}
+
+    //template<typename SplitRuleType, typename EdgePredictorType>
+    //TreePredictor<SplitRuleType, EdgePredictorType>::InteriorNodeData::InteriorNodeData(const SplitRuleType& splitRule, const std::array<EdgePredictorType, FanOut>& edgePredictors) : splitRule(splitRule)
+    //{
+    //    // TODO
+    //}
 }

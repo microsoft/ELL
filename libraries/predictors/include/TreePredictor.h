@@ -16,25 +16,30 @@
 
 // stl
 #include <vector>
-#include <array>
+#include <algorithm>
+#include <iterator>
 
 namespace predictors
 {
     /// <summary>
-    /// Implements a proper binary decision tree ('proper binary' means that all interior nodes have
-    /// the same fan-out). Each edge is assigned a weight and the output of the tree is the sum
-    /// along the path from the tree root to a leaf. Note that assigning weights to edges is
-    /// equivalent to assigning weights to all nodes other than the root.
+    /// Implements a tree predictor. Split rules: Each interior node is associated with a split rule.
+    /// The split rule type is set by a template argument (namely, the type can be arbitrary but a
+    /// single type is used throughout the tree). A split rule returns an outgoing edge index, or
+    /// -1 to early-stop. The fan-out at each interior node can be arbitrary. Tree output: Each edge
+    /// in the tree is associated with a predictor and the output of the tree is the sum of
+    /// predictions made along the path from the root to a leaf. The type of predictor is set by a
+    /// template argument (namely, the type can be arbitrary but a single type is used throughout the
+    /// tree). Note that assigning outputs to edges is equivalent to assigning them to all non-root
+    /// nodes, and therefore associating outputs with leaves is a special case. If a split rule along
+    /// the path returns -1, the output is the sum of predictions made so far.
     /// </summary>
     ///
-    /// <typeparam name="SplitRuleType"> Type of split rule to use (also determines the fan-out). </typeparam>
-    template<typename SplitRuleType, typename EdgeOutputType>
+    /// <typeparam name="SplitRuleType"> Type of split rule to use. </typeparam>
+    /// <typeparam name="EdgePredictorType"> Type of predictor to associate with each edge. </typeparam>
+    template<typename SplitRuleType, typename EdgePredictorType>
     class TreePredictor
     {
     public:
-        /// <summary> The fan out of interior nodes. </summary>
-        static constexpr size_t FanOut = SplitRuleType::NumOutputs;
-
         /// <summary> Struct that represents a leaf in the tree. </summary>
         struct Leaf
         {
@@ -42,17 +47,19 @@ namespace predictors
             size_t leafIndex;
         };
 
-        /// <summary> Information need to split a leaf of the tree. </summary>
         struct SplitInfo
+        {
+            SplitRuleType splitRule;
+            std::vector<EdgePredictorType> predictors;
+        };
+
+
+        /// <summary> Information need to split a leaf of the tree. </summary>
+        struct SplitCandidate
         {
             /// <summary> The leaf to split. </summary>
             Leaf leaf;
-
-            /// <summary> The rule in the new interior node. </summary>
-            SplitRuleType splitRule;
-
-            /// <summary> The weights of the outgoing edges. </summary>
-            std::array<double, FanOut> edgeWeights; // (1) Make ConstantPredictor class (2) Add it here
+            SplitInfo splitInfo;
         };
 
         /// <summary> Gets the number of interior nodes. </summary>
@@ -63,7 +70,7 @@ namespace predictors
         /// <summary> Gets the number of edges. </summary>
         ///
         /// <returns> The number of edges. </returns>
-        size_t NumEdges() const;
+        size_t NumEdges() const { return _numEdges; }
 
         /// <summary> Returns the output of the tree for a given input. </summary>
         ///
@@ -91,22 +98,30 @@ namespace predictors
         size_t Split(const SplitInfo& splitInfo);
 
     protected:
-        struct EdgeData
+
+        struct EdgeData // TODO remove the Data prefix everwhere?
         {
-            EdgeData(double weight);
-            double weight;
+            EdgeData(const EdgePredictorType& predictor) : predictor(predictor), targetNodeIndex(0) {} // TODO
+            EdgePredictorType predictor;
             size_t targetNodeIndex;
         };
 
         struct InteriorNodeData
         {
+            InteriorNodeData(const SplitInfo& splitInfo) : splitRule(splitInfo.splitRule) 
+            {
+                std::copy(splitInfo.predictors.begin(), splitInfo.predictors.end(), std::back_inserter(outgoingEdges));
+            }
             SplitRuleType splitRule;
-            std::array<EdgeData, FanOut> outgoingEdges;
+            std::vector<EdgeData> outgoingEdges;
         };
 
         std::vector<InteriorNodeData> _interiorNodes;
+        size_t _numEdges;
     };
 
     /// <summary> A simple binary tree with single-input threshold rules. </summary>
     typedef TreePredictor<SingleInputThresholdRule, ConstantPredictor> SimpleTreePredictor;
 }
+
+#include "../tcc/TreePredictor.tcc"

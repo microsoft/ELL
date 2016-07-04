@@ -14,10 +14,6 @@ namespace predictors
     class SingleInputThresholdRule
     {
     public:
-
-        /// <summary> The number of outputs (or, put another way, the max output plus one). </summary>
-        constexpr static size_t NumOutputs = 2;
-
         /// <summary> Constructs a single-input threshold rule. </summary>
         ///
         /// <param name="index"> Zero-based index of the input coordinate. </param>
@@ -31,7 +27,12 @@ namespace predictors
         ///
         /// <returns> The result of the split rule. </returns>
         template<typename RandomAccessVectorType>
-        size_t Compute(const RandomAccessVectorType& inputVector) const;
+        int Compute(const RandomAccessVectorType& inputVector) const;
+
+        /// <summary> Returns the number of outputs (the max output value plus one). </summary>
+        ///
+        /// <returns> The number of outputs. </returns>
+        size_t NumOutputs() const { return 2; }
 
     private:
         size_t _index;
