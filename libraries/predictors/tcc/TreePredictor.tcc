@@ -85,7 +85,7 @@ namespace predictors
     {
         auto splitInfo = splitCandidate.splitInfo;
     
-        // sanity check - check correctness of splitInfo
+        // check correctness of splitInfo
         if (splitInfo.predictors.size() != splitInfo.splitRule.NumOutputs())
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - number of split rule outputs doesn't match fan-out");
@@ -100,7 +100,7 @@ namespace predictors
         // increment edge count
         _numEdges += splitInfo.predictors.size();
 
-        // sanity check - check that split refers to a leaf
+        // check that split indeed refers to a leaf
         auto leaf = splitCandidate.leaf;
         auto& parentOutgoing = _interiorNodes[leaf.interiorNodeIndex].outgoingEdges[leaf.leafIndex].targetNodeIndex;
         if (parentOutgoing != 0)
