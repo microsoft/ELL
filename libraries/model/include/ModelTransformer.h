@@ -14,7 +14,6 @@
 #include "OutputPort.h"
 #include "OutputPortElementList.h"
 #include "Node.h"
-//#include "InputNode.h"
 #include "OutputPort.h"
 
 #include <memory>
@@ -30,7 +29,6 @@ namespace model
 
     class TransformContext
     {
-
     };
 
     // TODO: template transformer on the context type
