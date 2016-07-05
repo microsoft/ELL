@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ConstantNode.tcc (model)
+//  File:     ConstantNode.tcc (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// <summary> model namespace </summary>
-namespace model
+/// <summary> nodes namespace </summary>
+namespace nodes
 {
     // Constructor for a scalar constant
 
@@ -26,14 +26,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void ConstantNode<ValueType>::Copy(ModelTransformer& transformer) const
-    {
-        auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values);
-         transformer.MapOutputPort(output, newNode->output);
-    }
-
-    template <typename ValueType>
-    void ConstantNode<ValueType>::Refine(ModelTransformer& transformer) const
+    void ConstantNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values);
          transformer.MapOutputPort(output, newNode->output);

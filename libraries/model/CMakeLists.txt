@@ -19,8 +19,7 @@ set (SRC src/ModelGraph.cpp
          src/Port.cpp
 )
 
-set (INCLUDE include/ConstantNode.h
-             include/ExtremalValueNode.h
+set (INCLUDE include/ExtremalValueNode.h
              include/InputNode.h
              include/InputPort.h
              include/ModelGraph.h
@@ -32,8 +31,7 @@ set (INCLUDE include/ConstantNode.h
              include/ValueSelectorNode.h
 )
 
-set (TCC tcc/ConstantNode.tcc
-         tcc/ExtremalValueNode.tcc
+set (TCC tcc/ExtremalValueNode.tcc
          tcc/InputNode.tcc
          tcc/InputPort.tcc
          tcc/ModelGraph.tcc

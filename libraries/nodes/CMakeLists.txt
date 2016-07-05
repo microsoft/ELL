@@ -14,6 +14,7 @@ endif()
 
 set (INCLUDE include/AccumulatorNode.h
              include/BinaryOperationNode.h
+             include/ConstantNode.h
              include/DelayNode.h
              include/MagnitudeNode.h
              include/MeanNode.h
@@ -24,6 +25,7 @@ set (SRC src/Nothing.cpp)
 
 set (TCC tcc/AccumulatorNode.tcc
          tcc/BinaryOperationNode.tcc
+         tcc/ConstantNode.tcc
          tcc/DelayNode.tcc
          tcc/MagnitudeNode.tcc
          tcc/MeanNode.tcc
