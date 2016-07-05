@@ -6,6 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <stdexcept>
 #include <iostream>
@@ -71,7 +74,7 @@ namespace treeLayout
         uint64_t depth = (uint64_t)ancestors.size();
         if (depth > (uint64_t)Children.size())
         {
-            throw std::runtime_error("infinite recursion: perhaps the Children structure is loopy");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "infinite recursion: perhaps the Children structure is loopy");
         }
 
         // record the depth

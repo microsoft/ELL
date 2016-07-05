@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ITrainer.h"
+#include "IBlackBoxTrainer.h"
 
 // dataset
 #include "RowDataset.h"
@@ -37,7 +37,7 @@ namespace trainers
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
     template <typename LossFunctionType> 
-    class SortingTreeTrainer : public ITrainer<predictors::DecisionTreePredictor>
+    class SortingTreeTrainer : public IBlackBoxTrainer<predictors::DecisionTreePredictor>
     {
     public:
 
@@ -108,7 +108,7 @@ namespace trainers
     ///
     /// <returns> A nique_ptr to a sorting tree trainer. </returns>
     template<typename LossFunctionType>
-    std::unique_ptr<ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters);
+    std::unique_ptr<IBlackBoxTrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossFunctionType& lossFunction, const SortingTreeTrainerParameters& parameters);
 }
 
 #include "../tcc/SortingTreeTrainer.tcc"

@@ -57,7 +57,7 @@ namespace trainers
 
     template<typename BasePredictorType>
     std::unique_ptr<IIncrementalTrainer<predictors::EnsemblePredictor<BasePredictorType>>> MakeBaggingIncrementalTrainer(
-        std::unique_ptr<ITrainer<BasePredictorType>>&& baseTrainer,
+        std::unique_ptr<IBlackBoxTrainer<BasePredictorType>>&& baseTrainer,
         const BaggingIncrementalTrainerParameters& baggingParameters, 
         std::shared_ptr<evaluators::IIncrementalEvaluator<BasePredictorType>> evaluator)
     {

@@ -8,6 +8,7 @@
 
 #include "TypeName.h"
 #include "Format.h"
+#include "Exception.h"
 
 namespace
 {
@@ -44,7 +45,7 @@ namespace utilities
         static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
         if (value == nullptr)
         {
-            throw std::runtime_error("cannot serialize a null pointer");
+            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "cannot serialize a null pointer");
         }
 
         auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();
@@ -98,7 +99,7 @@ namespace utilities
         static_assert(std::is_polymorphic<ValueType>::value, "can only serialize unique_ptr to polymorphic classes");
         if (value == nullptr)
         {
-            throw std::runtime_error("cannot serialize a null pointer");
+            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "cannot serialize a null pointer");
         }
 
         auto typeName = TypeName<std::unique_ptr<ValueType>>::GetName();

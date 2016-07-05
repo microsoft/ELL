@@ -12,6 +12,7 @@
 #include "OutputStreamImpostor.h"
 #include "CommandLineParser.h" 
 #include "RandomEngines.h"
+#include "Exception.h"
 
 // layers
 #include "Map.h"
@@ -147,9 +148,9 @@ int main(int argc, char* argv[])
         }
         return 1;
     }
-    catch (std::runtime_error exception)
+    catch (const utilities::Exception& exception)
     {
-        std::cerr << "runtime error: " << exception.what() << std::endl;
+        std::cerr << "exception: " << exception.GetMessage() << std::endl;
         return 1;
     }
 

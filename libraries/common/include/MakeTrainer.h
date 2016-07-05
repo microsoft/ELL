@@ -17,7 +17,7 @@
 #include "LinearPredictor.h"
 
 // trainers
-#include "ITrainer.h"
+#include "IBlackBoxTrainer.h"
 #include "IIncrementalTrainer.h"
 
 // stl
@@ -40,7 +40,7 @@ namespace common
     /// <param name="trainerArguments"> Trainer command line arguments. </param>
     ///
     /// <returns> A unique_ptr to a sorting tree trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossArguments& lossArguments, const SortingTreeTrainerArguments& sortingTreeArguments);
+    std::unique_ptr<trainers::IBlackBoxTrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossArguments& lossArguments, const SortingTreeTrainerArguments& sortingTreeArguments);
 
 
 

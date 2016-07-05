@@ -17,7 +17,7 @@ set (SRC src/Nothing.cpp)
 set (INCLUDE include/BaggingIncrementalTrainer.h
              include/EvaluatingIncrementalTrainer.h
              include/IIncrementalTrainer.h
-             include/ITrainer.h
+             include/IBlackBoxTrainer.h
              include/MultiEpochIncrementalTrainer.h
              include/SortingTreeTrainer.h
              include/SweepingIncrementalTrainer.h

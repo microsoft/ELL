@@ -8,6 +8,9 @@
 
 #include "ConstantLayer.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <string>
 #include <stdexcept>
@@ -49,7 +52,7 @@ namespace layers
         }
         else
         {
-            throw std::runtime_error("unsupported version: " + std::to_string(version));
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "unsupported version: " + version);
         }
     }
 
