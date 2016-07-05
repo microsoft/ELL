@@ -13,7 +13,7 @@ namespace predictors
     template<typename RandomAccessVectorType>
     int predictors::SingleInputThresholdRule::Compute(const RandomAccessVectorType& inputVector) const
     {
-        if (inputVector.size() <= _index)
+        if (inputVector.Size() <= _index)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
         }
