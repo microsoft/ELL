@@ -61,33 +61,34 @@ namespace nodes
         transformer.MapOutputPort(output, newNode->output);
     }
     
-    // layers::CoordinateList MeanFeature::AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const
+    // layers::CoordinateList IncrementalMeanFeature::AddToModel(layers::Model& model, const std::unordered_map<const Feature*, layers::CoordinateList>& featureOutputs) const
     // {
-    //     // TODO: reimplement this using incremental computation (with an accumulator layer)
-    //     auto it = featureOutputs.find(_inputFeatures[0]);
-    //     if (it == featureOutputs.end())
+    //     auto inputIterator = featureOutputs.find(_inputFeatures[0]);
+    //     if (inputIterator == featureOutputs.end())
     //     {
     //         throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Couldn't find input feature");
     //     }
-       
-    //     auto inputCoordinates = it->second;
+
+    //     auto inputData = inputIterator->second;
+    //     auto inputDimension = inputData.Size();
     //     auto windowSize = GetWindowSize();
 
-    //     // Compute mean
-    //     auto bufferOutputCoordinates = model.EmplaceLayer<layers::ShiftRegisterLayer>(inputCoordinates, windowSize);        
-    //     // TODO: find a better way to extract the per-channel coordinates
-    //     std::vector<layers::CoordinateList> perChannelBufferOutputCoordinates;
-    //     auto dimension = inputCoordinates.Size();
-    //     auto shiftRegisterLayer = dynamic_cast<const layers::ShiftRegisterLayer&>(model.GetLastLayer());
-    //     for(size_t channel = 0; channel < dimension; channel++)
-    //     {
-    //         perChannelBufferOutputCoordinates.push_back(shiftRegisterLayer.GetChannelOutputCoordinates(bufferOutputCoordinates, channel));
-    //     }
-
-    //     auto sumCoordinates = model.EmplaceLayer<layers::Sum>(perChannelBufferOutputCoordinates);
-    //     auto divisorCoordinates = model.EmplaceLayer<layers::ConstantLayer>(std::vector<double>(dimension, windowSize));
+    //     // We implement mean by keeping a running sum over `windowSize` samples, and then divide 
+    //     // the result by the number of samples
         
-    //     auto meanCoordinates = model.EmplaceLayer<layers::BinaryOperationLayer>(sumCoordinates, divisorCoordinates, layers::BinaryOperationLayer::OperationType::divide);
-    //     return meanCoordinates;
+    //     // Make a buffer that will hold `windowSize` samples
+    //     auto bufferOutput = model.EmplaceLayer<layers::ShiftRegisterLayer>(inputData, windowSize+1);
+    //     auto shiftRegisterLayer = dynamic_cast<const layers::ShiftRegisterLayer&>(model.GetLastLayer());
+
+    //     // Compute running sum by subtracting oldest value and adding newest
+    //     auto oldestSample = shiftRegisterLayer.GetDelayedOutputCoordinates(bufferOutput, windowSize);
+    //     auto diff = model.EmplaceLayer<layers::BinaryOperationLayer>(inputData, oldestSample, layers::BinaryOperationLayer::OperationType::subtract);
+    //     auto runningSum = model.EmplaceLayer<layers::AccumulatorLayer>(diff);
+
+    //     // Make a layer holding the constant `windowSize`, broadcast to be wide enough to apply to all input dimensions, and divide running sum by it
+    //     auto divisor = model.EmplaceLayer<layers::ConstantLayer>(std::vector<double>{(double)windowSize});
+    //     auto divisorVector = layers::RepeatCoordinates(divisor, inputDimension);
+    //     auto mean = model.EmplaceLayer<layers::BinaryOperationLayer>(runningSum, divisorVector, layers::BinaryOperationLayer::OperationType::divide);
+    //     return mean;
     // }
 }

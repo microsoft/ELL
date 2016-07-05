@@ -41,5 +41,4 @@ namespace nodes
         auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newInput);
         transformer.MapOutputPort(output, newNode->output);
     }
-
 }
