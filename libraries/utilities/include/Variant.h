@@ -37,7 +37,7 @@ namespace utilities
 
         /// <summary> Assignment operator from basic (non-variant) types </summary>
         template <typename ValueType>
-        Variant& operator=(const ValueType& value);
+        Variant& operator=(ValueType&& value);
 
         /// <summary> Get a type-safe value from the variant. </summary>
         ///
