@@ -131,9 +131,9 @@ namespace model
 
         /// <summary> Returns a single-element range for the element at the given index </summary>
         ///
-        /// <param name="index"> The index of the element </param>
+        /// <param name="elementIndex"> The index of the element </param>
         /// <returns> A single-element range for the element </returns>
-        OutputPortRange GetOutputPortElement(size_t index) const;
+        // OutputPortRange GetOutputPortElement(size_t elementIndex) const;
 
         /// <summary> The dimensionality of the output </summary>
         ///

@@ -72,6 +72,11 @@ namespace model
         ComputeSize();
     }
 
+    // OutputPortRange OutputPortElementListUntyped::GetOutputPortElement(size_t elementIndex) const_iterator
+    // {
+    //     return _ranges[index].GetOutputPort();
+    // }
+    
     void OutputPortElementListUntyped::AddRange(const OutputPortRange& range)
     {
         _ranges.push_back(range);
