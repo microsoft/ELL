@@ -57,16 +57,6 @@ namespace predictors
             std::vector<EdgePredictorType> predictors;
         };
 
-        /// <summary> Struct that contains info on a candidate split at a specific leaf. </summary>
-        struct SplitCandidate
-        {
-            /// <summary> The leaf to split. </summary>
-            Leaf leaf;
-
-            /// <summary> Information describing the split. </summary>
-            SplitInfo splitInfo;
-        };
-
         /// <summary> Gets the number of interior nodes. </summary>
         ///
         /// <returns> The number of interior nodes. </returns>
@@ -84,7 +74,7 @@ namespace predictors
         ///
         /// <returns> The prediction. </returns>
         template<typename RandomAccessVectorType>
-        double Compute(const RandomAccessVectorType& input) const;
+        double Compute(const RandomAccessVectorType& input) const; // change this to take index and compute each individual tree
 
         /// <summary> Returns the edge path indicator vector for a given input. </summary>
         ///
@@ -95,12 +85,18 @@ namespace predictors
         template<typename RandomAccessVectorType>
         std::vector<bool> GetEdgePathIndicatorVector(const RandomAccessVectorType& input) const;
 
-        /// <summary> Performs a split in the tree. </summary>
+        /// <summary> Performs a split in the tree root. </summary>
         ///
-        /// <param name="splitCandidate"> Information describing the split. </param>
+        /// <param name="splitInfo"> Information describing the split. </param>
+        void Split(const SplitInfo& splitInfo); // TODO - change to add tree
+
+        /// <summary> Performs a split in a leaf of the tree. </summary>
+        ///
+        /// <param name="leaf"> The leaf to split. </param>
+        /// <param name="splitInfo"> Information describing the split. </param>
         ///
         /// <returns> Index of the newly created interior node. </returns>
-        size_t Split(const SplitCandidate& splitCandidate);
+        size_t Split(const Leaf& leaf, const SplitInfo& splitInfo);
 
     protected:
         struct Edge
@@ -118,7 +114,7 @@ namespace predictors
         };
 
         std::vector<InteriorNode> _interiorNodes;
-        size_t _numEdges;
+        size_t _numEdges; // todo change to vector - one per tree - with numEdges and location of root
     };
 
     /// <summary> A simple binary tree with single-input threshold rules and constant predictors in its edges. </summary>

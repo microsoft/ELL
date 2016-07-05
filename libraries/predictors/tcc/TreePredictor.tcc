@@ -81,38 +81,54 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    size_t TreePredictor<SplitRuleType, EdgePredictorType>::Split(const SplitCandidate& splitCandidate)
-    {
-        auto splitInfo = splitCandidate.splitInfo;
-    
-        // check correctness of splitInfo
-        if (splitInfo.predictors.size() != splitInfo.splitRule.NumOutputs())
+    size_t TreePredictor<SplitRuleType, EdgePredictorType>::Split(const Leaf& leaf, const SplitInfo& splitInfo)
+    {   
+        // check that the parent of the leaf exists
+        if(leaf.interiorNodeIndex >= _interiorNodes.size())
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - number of split rule outputs doesn't match fan-out");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - parent of leaf does not exist");
         }
 
-        // get the index of the new interior node
-        size_t newInteriorNodeIndex = _interiorNodes.size();
+        // check that this leaf exists
+        if(leaf.leafIndex >= _interiorNodes[leaf.interiorNodeIndex].outgoingEdges.size())
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - leaf does not exist");
+        }
 
-        // create the new interior node
-        _interiorNodes.emplace_back(splitInfo);
-
-        // increment edge count
-        _numEdges += splitInfo.predictors.size();
-
-        // check that split indeed refers to a leaf
-        auto leaf = splitCandidate.leaf;
+        // check that this node wasn't previously split
         auto& parentOutgoing = _interiorNodes[leaf.interiorNodeIndex].outgoingEdges[leaf.leafIndex].targetNodeIndex;
         if (parentOutgoing != 0)
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - attempted to split a non-leaf");
         }
 
+        // get the index of the new interior node
+        size_t newInteriorNodeIndex = _interiorNodes.size();
+
+        // perform the split
+        Split(splitInfo);
+
         // update the parent about the new interior node
         parentOutgoing = newInteriorNodeIndex;
-        
+
         // return index of new interior node
         return newInteriorNodeIndex;
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void TreePredictor<SplitRuleType, EdgePredictorType>::Split(const SplitInfo& splitInfo)
+    {   
+        // check correctness of splitInfo
+        if (splitInfo.predictors.size() != splitInfo.splitRule.NumOutputs())
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - number of split rule outputs doesn't match fan-out");
+        }
+
+        // create the new interior node
+        _interiorNodes.emplace_back(splitInfo);
+
+        // increment edge count
+        _numEdges += splitInfo.predictors.size();
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
