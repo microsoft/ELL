@@ -47,18 +47,23 @@ namespace predictors
             size_t leafIndex;
         };
 
+        /// <summary> Struct that defines a split rule and the predictors in its outgoing edges. </summary>
         struct SplitInfo
         {
+            /// <summary> The split rule. </summary>
             SplitRuleType splitRule;
+            
+            /// <summary> The predictors in the outgoing edges. </summary>
             std::vector<EdgePredictorType> predictors;
         };
 
-
-        /// <summary> Information need to split a leaf of the tree. </summary>
+        /// <summary> Struct that contains info on a candidate split at a specific leaf. </summary>
         struct SplitCandidate
         {
             /// <summary> The leaf to split. </summary>
             Leaf leaf;
+
+            /// <summary> Information describing the split. </summary>
             SplitInfo splitInfo;
         };
 
@@ -98,7 +103,6 @@ namespace predictors
         size_t Split(const SplitCandidate& splitCandidate);
 
     protected:
-
         struct Edge
         {
             Edge(const EdgePredictorType& predictor);
@@ -117,7 +121,7 @@ namespace predictors
         size_t _numEdges;
     };
 
-    /// <summary> A simple binary tree with single-input threshold rules. </summary>
+    /// <summary> A simple binary tree with single-input threshold rules and constant predictors in its edges. </summary>
     typedef TreePredictor<SingleInputThresholdRule, ConstantPredictor> SimpleTreePredictor;
 }
 
