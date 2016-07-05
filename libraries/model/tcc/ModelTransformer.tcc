@@ -19,7 +19,7 @@ namespace model
             auto oldPort = range.ReferencedPort();
             auto newPort = _portMap[oldPort];
             auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPort);
-            // TODO: ensure dynamic cast worked
+            assert(outputPort != nullptr);
 
             auto start = range.GetStartIndex();
             auto size = range.Size();
@@ -46,12 +46,6 @@ namespace model
         assert(newInputNodeConst != nullptr);
         auto newInputNode = const_cast<model::InputNode<ValueType>*>(newInputNodeConst);
         return newInputNode;
-    }
-
-    template <typename ValueType>
-    InputNode<ValueType>* ModelTransformer::GetCorrespondingInputNode(const std::shared_ptr<InputNode<ValueType>>& inputNode)
-    {
-        return GetCorrespondingInputNode(inputNode.get());
     }
 
     template <typename ValueType>
