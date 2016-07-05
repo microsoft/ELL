@@ -14,7 +14,6 @@ namespace predictors
     class ConstantPredictor
     {
     public:
-
         /// <summary> Constructs an instance of ConstantPredictor. </summary>
         ///
         /// <param name="value"> The constant output value. </param>
