@@ -16,8 +16,11 @@ set (INCLUDE include/AccumulatorNode.h
              include/BinaryOperationNode.h
              include/ConstantNode.h
              include/DelayNode.h
+             include/DotProductNode.h
+             include/LinearNode.h
              include/MagnitudeNode.h
              include/MeanNode.h
+             include/SumNode.h
              include/UnaryOperationNode.h
              include/VarianceNode.h)
 
@@ -27,8 +30,11 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/BinaryOperationNode.tcc
          tcc/ConstantNode.tcc
          tcc/DelayNode.tcc
+         tcc/DotProductNode.tcc
+         tcc/LinearNode.tcc
          tcc/MagnitudeNode.tcc
          tcc/MeanNode.tcc
+         tcc/SumNode.tcc
          tcc/UnaryOperationNode.tcc
          tcc/VarianceNode.tcc)
 
