@@ -22,6 +22,10 @@
 
 namespace nodes
 {
+    /// <summary>
+    /// Implements a simple binary decision/regression tree node, with single-input threshold split
+    /// rules in interior nodes and constant outputs on all edges.
+    /// </summary>
     class SimpleTreeNode : public model::Node
     {
     public:
