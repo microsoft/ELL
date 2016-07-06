@@ -110,11 +110,12 @@ namespace predictors
         /// <summary> Generates the edge path indicator vector of the entire forest. </summary>
         ///
         /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
-        /// input. </typeparam>
+        ///  input. </typeparam>
         /// <param name="input"> The input vector. </param>
-        /// <param name="output"> [in,out] The output vector, which should be of size NumEdges(). </param>
+        ///
+        /// <returns> The edge indicator vector. </returns>
         template<typename RandomAccessVectorType>
-        void GetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& output) const;
+        std::vector<bool> GetEdgeIndicatorVector(const RandomAccessVectorType& input) const;
 
         /// <summary> Generates the edge path indicator vector of a given subtree for a given input. The
         /// dimension of this vector is NumEdges() (regardless of the subtree chosen). </summary>
@@ -122,10 +123,11 @@ namespace predictors
         /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
         ///  input. </typeparam>
         /// <param name="input"> The input vector. </param>
-        /// <param name="output"> [in,out] The output vector, which should be of size NumEdges(). </param>
         /// <param name="interiorNodeIndex"> Zero-based index of the interior node. </param>
+        ///
+        /// <returns> The edge indicator vector. </returns>
         template<typename RandomAccessVectorType>
-        void GetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& output, size_t interiorNodeIndex) const;
+        std::vector<bool> GetEdgeIndicatorVector(const RandomAccessVectorType& input, size_t interiorNodeIndex) const;
 
         /// <summary> Adds a new depth-1 tree to the forest. </summary>
         ///
@@ -162,6 +164,9 @@ namespace predictors
         {
             size_t rootIndex;
         };
+
+        template<typename RandomAccessVectorType>
+        void SetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& edgeIndicator, size_t interiorNodeIndex) const;
 
         size_t AddInteriorNode(const SplitInfo& splitInfo);
 

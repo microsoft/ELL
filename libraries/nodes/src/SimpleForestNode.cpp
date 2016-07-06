@@ -10,6 +10,7 @@
 
 // stl
 #include <vector>
+#include <memory>
 
 namespace nodes
 {
@@ -29,11 +30,10 @@ namespace nodes
         {
             treeOutputs[i] = _forest.Compute(_input, _forest.GetRootIndex(i));
         }
-        _treeOutputs.SetOutput(treeOutputs);
+        _treeOutputs.SetOutput(std::move(treeOutputs));
 
         // path indicator
-        std::vector<bool> edgeIndicator(_forest.NumEdges());
-        _forest.GetEdgeIndicatorVector(_input, edgeIndicator);
-        _edgeIndicatorVector.SetOutput(edgeIndicator);
+        auto edgeIndicator = _forest.GetEdgeIndicatorVector(_input);
+        _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
     }
 }
