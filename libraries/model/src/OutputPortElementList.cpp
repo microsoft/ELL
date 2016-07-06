@@ -71,8 +71,11 @@ namespace model
         _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
         ComputeSize();
     }
-
-    void OutputPortElementListUntyped::AddRange(const OutputPortRange& range) { _ranges.push_back(range); }
+    
+    void OutputPortElementListUntyped::AddRange(const OutputPortRange& range)
+    {
+        _ranges.push_back(range);
+    }
 
     void OutputPortElementListUntyped::ComputeSize()
     {

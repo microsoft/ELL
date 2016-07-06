@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "Port.h"
 #include "OutputPort.h"
 #include "UniqueId.h"
 
@@ -16,8 +15,6 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include <unordered_set>
-#include <unordered_map>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -60,6 +57,7 @@ namespace model
 
         virtual void Copy(ModelTransformer& transformer) const = 0;
         virtual void Refine(ModelTransformer& transformer) const;
+        virtual ~Node() {}
 
     protected:
         // TODO: the arguments (and the _inputs and _outputs members)

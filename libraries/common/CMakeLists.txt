@@ -18,6 +18,7 @@ set (SRC src/BaggingIncrementalTrainerArguments.cpp
          src/DataLoaders.cpp
          src/EvaluatorArguments.cpp
          src/LoadModel.cpp
+         src/LoadModelGraph.cpp
          src/MakeTrainer.cpp
          src/MapLoadArguments.cpp
          src/MapSaveArguments.cpp
@@ -34,6 +35,7 @@ set (INCLUDE include/BaggingIncrementalTrainerArguments.h
              include/DataLoaders.h
              include/EvaluatorArguments.h
              include/LoadModel.h
+             include/LoadModelGraph.h
              include/MakeEvaluator.h
              include/MakeTrainer.h
              include/MapLoadArguments.h
@@ -59,6 +61,8 @@ include_directories(include)
 include_directories(../dataset/include)
 include_directories(../layers/include)
 include_directories(../linear/include)
+include_directories(../model/include)
+include_directories(../nodes/include)
 include_directories(../utilities/include)
 include_directories(../lossFunctions/include)
 include_directories(../predictors/include)
