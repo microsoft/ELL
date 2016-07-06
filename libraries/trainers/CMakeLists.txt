@@ -16,6 +16,7 @@ set (SRC src/Nothing.cpp)
 
 set (INCLUDE include/BaggingIncrementalTrainer.h
              include/EvaluatingIncrementalTrainer.h
+             include/ForestTrainer.h
              include/IIncrementalTrainer.h
              include/IBlackBoxTrainer.h
              include/MultiEpochIncrementalTrainer.h
@@ -24,7 +25,8 @@ set (INCLUDE include/BaggingIncrementalTrainer.h
              include/SGDIncrementalTrainer.h)
 
 set (TCC tcc/BaggingIncrementalTrainer.tcc
-         tcc/EvaluatingIncrementalTrainer.tcc         
+         tcc/EvaluatingIncrementalTrainer.tcc
+         tcc/ForestTrainer.tcc     
          tcc/MultiEpochIncrementalTrainer.tcc
          tcc/SortingTreeTrainer.tcc
          tcc/SweepingIncrementalTrainer.tcc
