@@ -65,6 +65,10 @@ set (TEST_NAME ${PROJ_NAME}_test)
 
 PROJECT(${TEST_NAME})
 
+if(MSVC)
+	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
+endif()
+
 set (TEST_SRC test/src/main.cpp
               test/src/CompilerTest.cpp)
 set (TEST_INCLUDE test/include/CompilerTest.h)
