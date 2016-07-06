@@ -21,15 +21,9 @@
 
 namespace predictors
 {
-    struct ForestPredictorInteriorNodeId
-    {
-        size_t treeIndex;
-        size_t interiorNodeIndex;
-    };
-
     struct ForestPredictorLeafId
     {
-        ForestPredictorInteriorNodeId ForestPredictorInteriorNodeId;
+        size_t interiorNodeIndex;
         size_t leafIndex;
     };
 
@@ -67,6 +61,13 @@ namespace predictors
         /// <returns> The number of tress. </returns>
         size_t NumTrees() const { return _tree.size(); }
 
+        /// <summary> Gets the index of the root node of a given tree. </summary>
+        ///
+        /// <param name="treeIndex"> The tree index. </param>
+        ///
+        /// <returns> The root index. </returns>
+        size_t GetRootIndex(size_t treeIndex) const { return _trees[treeIndex].rootIndex; }
+
         /// <summary> Gets the total number of interior nodes in the entire forest. </summary>
         ///
         /// <returns> The number of interior nodes. </returns>
@@ -74,18 +75,18 @@ namespace predictors
 
         /// <summary> Gets the number of interior nodes in a given tree. </summary>
         ///
-        /// <returns> The number of interior nodes. </returns>
-        size_t NumInteriorNodes(size_t treeIndex) const;
+        /// <returns> The number of interior nodes under a given interior node. </returns>
+        size_t NumInteriorNodes(size_t interiorNodeIndex) const;
 
         /// <summary> Gets the number of edges in the entire forest. </summary>
         ///
         /// <returns> The number of edges. </returns>
         size_t NumEdges() const { return _numEdges; }
 
-        /// <summary> Gets the number of edges in a given tree. </summary>
+        /// <summary> Gets the number of edges in the subtree under a given interior node. </summary>
         ///
         /// <returns> The number of edges. </returns>
-        size_t NumEdges(size_t treeIndex) const;
+        size_t NumEdges(size_t interiorNodeIndex) const;
 
         /// <summary> Returns the output of the entire forest for a given input. </summary>
         ///
@@ -96,42 +97,51 @@ namespace predictors
         template<typename RandomAccessVectorType>
         double Compute(const RandomAccessVectorType& input) const;
 
-        /// <summary> Returns the output of a given tree for a given input. </summary>
+        /// <summary> Returns the output of a given subtree for a given input. </summary>
         ///
         /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
         /// input. </typeparam>
         /// <param name="input"> The input vector. </param>
-        /// <param name="treeIndex"> Zero-based index of a tree. </param>
+        /// <param name="treeIndex"> The index of the subtree root. </param>
         ///
         /// <returns> The prediction. </returns>
         template<typename RandomAccessVectorType>
-        double Compute(const RandomAccessVectorType& input, size_t treeIndex) const;
+        double Compute(const RandomAccessVectorType& input, size_t interiorNodeIndex) const;
 
-        /// <summary> Returns the edge path indicator vector of a given tree for a given input. </summary>
+        /// <summary> Returns the edge path indicator vector of the entire forest. </summary>
         ///
         /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
         /// input. </typeparam>
         /// <param name="input"> The input vector. </param>
-        /// <param name="treeIndex"> Zero-based index of a tree. </param>
-        ///
-        /// <returns> The edge path indicator vector. </returns>
+        /// <param name="output"> [in,out] The output vector, which should be of size NumEdges(). </param>
         template<typename RandomAccessVectorType>
-        std::vector<bool> GetEdgePathIndicatorVector(const RandomAccessVectorType& input, size_t treeIndex) const;
+        void GetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& output) const;
+
+        /// <summary> Returns the edge path indicator vector of a given subtree for a given input. The
+        /// dimension of this vector is NumEdges() (regardless of the subtree chosen). </summary>
+        ///
+        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
+        ///  input. </typeparam>
+        /// <param name="input"> The input vector. </param>
+        /// <param name="output"> [in,out] The output vector, which should be of size NumEdges(). </param>
+        /// <param name="interiorNodeIndex"> Zero-based index of the interior node. </param>
+        template<typename RandomAccessVectorType>
+        void GetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& output, size_t interiorNodeIndex) const;
 
         /// <summary> Adds a new tree (a stump) to the forest. </summary>
         ///
         /// <param name="splitInfo"> Information describing the split of the root node. </param>
         ///
-        /// <returns> The ID of the newly created root node. </returns>
-        ForestPredictorInteriorNodeId AddTree(const SplitInfo& splitInfo);
+        /// <returns> The index of the newly created root node. </returns>
+        size_t AddTree(const SplitInfo& splitInfo);
 
         /// <summary> Splits a leaf of one of the trees. </summary>
         ///
         /// <param name="splitInfo"> Information describing the split. </param>
         /// <param name="leaf"> The leaf to split. </param>
         ///
-        /// <returns> The ID of the newly created interior node. </returns>
-        ForestPredictorInteriorNodeId SplitLeaf(const SplitInfo& splitInfo, ForestPredictorLeafId ForestPredictorLeafId);
+        /// <returns> The index of the newly created interior node. </returns>
+        size_t SplitLeaf(const SplitInfo& splitInfo, ForestPredictorLeafId ForestPredictorLeafId);
 
     protected:
         struct Edge
@@ -152,11 +162,9 @@ namespace predictors
         struct Tree
         {
             size_t rootNodeIndex;
-            size_t numInteriorNodes;
-            size_t numEdges;
         };
 
-        size_t AddInteriorNode(const SplitInfo& splitInfo, size_t firstEdgeIndex);
+        size_t AddInteriorNode(const SplitInfo& splitInfo);
 
         std::vector<InteriorNode> _interiorNodes;
         std::vector<Tree> _trees;

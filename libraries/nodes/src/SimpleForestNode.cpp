@@ -18,6 +18,6 @@ namespace nodes
     void SimpleForestNode::Compute() const
     {
 //        _output.SetOutput({ _tree.Compute(_input) });
-//        _edgePathIndicatorVector.SetOutput(_tree.GetEdgePathIndicatorVector(_input));
+//        _edgePathIndicatorVector.SetOutput(_tree.GetEdgeIndicatorVector(_input));
     }
 }

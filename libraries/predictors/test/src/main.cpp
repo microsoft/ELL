@@ -31,7 +31,7 @@ void TreePredictorTest()
     //// create an feature vector
     //linear::DoubleVector x({1,2,3,4,5});
     //auto output = simpleTree.Compute(x);
-    //auto pathIndicator = simpleTree.GetEdgePathIndicatorVector(x);
+    //auto pathIndicator = simpleTree.GetEdgeIndicatorVector(x);
 }
 
 /// Runs all tests
