@@ -15,12 +15,6 @@ endif()
 
 set (SRC src/main.cpp)
 
-include_directories(${CMAKE_SOURCE_DIR}/libraries/linear/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/layers/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/dataset/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/common/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/utilities/include)
-
 source_group("src" FILES ${SRC})
 
 # create executable in build\bin
@@ -29,6 +23,5 @@ set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR})
 add_executable(${PROJ_NAME} ${SRC})
 
 target_link_libraries(${PROJ_NAME} utilities layers linear dataset common)
-
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")
 
