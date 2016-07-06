@@ -18,13 +18,12 @@
 
 // stl
 #include <string>
-#include <vector>
 
 namespace nodes
 {
     /// <summary>
-    /// Implements a simple binary decision/regression tree node, with single-input threshold split
-    /// rules in interior nodes and constant outputs on all edges.
+    /// Implements a forest node, where each tree in the forest uses single-input threshold split
+    /// rules and constant outputs on all edges.
     /// </summary>
     class SimpleForestNode : public model::Node
     {
@@ -34,11 +33,14 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override;
 
-        /// <summary> Exposes the tree output as a read-only property </summary>
+        /// <summary> Exposes the forest output as a read-only property </summary>
         const model::OutputPort<double>& output = _output;
 
-        /// <summary> Exposes the edge-path indicator vectors as a read-only property </summary>
-        //const model::OutputPort<bool>& edgePathIndicatorVector = _edgePathIndicatorVector;
+        /// <summary> Exposes the individual tree outputs as a read-only property </summary>
+        const model::OutputPort<double>& treeOutputs = _treeOutputs;
+
+        /// <summary> Exposes the forest edge indicator vector as a read-only property </summary>
+        const model::OutputPort<bool>& edgeIndicatorVector = _edgeIndicatorVector;
     
     protected:
         virtual void Compute() const override;
@@ -50,7 +52,7 @@ namespace nodes
         // output ports
         model::OutputPort<double> _output;
         model::OutputPort<double> _treeOutputs;
-        std::vector<model::OutputPort<bool>> _edgePathIndicatorVectors;
+        model::OutputPort<bool> _edgeIndicatorVector;
 
         // the tree
         predictors::SimpleForestPredictor _forest;
