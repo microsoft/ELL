@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ConstantNode.h (model)
+//  File:     ConstantNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,12 +15,12 @@
 #include <vector>
 #include <memory>
 
-/// <summary> model namespace </summary>
-namespace model
+/// <summary> nodes namespace </summary>
+namespace nodes
 {
     /// <summary> A node that contains a constant value. Has no inputs. </summary>
     template <typename ValueType>
-    class ConstantNode : public Node
+    class ConstantNode : public model::Node
     {
     public:
         /// <summary> Constructor for a scalar constant </summary>
@@ -44,17 +44,16 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Exposes the output port as a read-only property </summary>
-        const OutputPort<ValueType>& output = _output;
+        const model::OutputPort<ValueType>& output = _output;
 
-        virtual void Copy(ModelTransformer& transformer) const override;
-        virtual void Refine(ModelTransformer& transformer) const override;
+        virtual void Copy(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;
 
     private:
         std::vector<ValueType> _values;
-        OutputPort<ValueType> _output;
+        model::OutputPort<ValueType> _output;
     };
 }
 

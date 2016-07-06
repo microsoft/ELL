@@ -51,7 +51,7 @@ source_group("tcc" FILES ${TCC})
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include)
-target_link_libraries(${PROJ_NAME} linear utilities)
+target_link_libraries(${PROJ_NAME} linear model nodes utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 

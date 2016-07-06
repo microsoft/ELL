@@ -50,7 +50,7 @@ void TestStaticGraph()
     auto in = g.AddNode<model::InputNode<double>>(3);
     auto maxAndArgMax = g.AddNode<model::ArgMaxNode<double>>(in->output);
     auto minAndArgMin = g.AddNode<model::ArgMinNode<double>>(in->output);
-    auto condition = g.AddNode<model::ConstantNode<bool>>(true);
+    auto condition = g.AddNode<nodes::ConstantNode<bool>>(true);
     auto valSelector = g.AddNode<model::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
     auto indexSelector = g.AddNode<model::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
@@ -180,7 +180,7 @@ void TestCopyGraph()
     auto in = model.AddNode<model::InputNode<double>>(3);
     auto maxAndArgMax = model.AddNode<model::ArgMaxNode<double>>(in->output);
     auto minAndArgMin = model.AddNode<model::ArgMinNode<double>>(in->output);
-    auto condition = model.AddNode<model::ConstantNode<bool>>(true);
+    auto condition = model.AddNode<nodes::ConstantNode<bool>>(true);
     auto valSelector = model.AddNode<model::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
     auto indexSelector = model.AddNode<model::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
@@ -208,8 +208,8 @@ void TestRefineGraph()
     model::OutputPortElementList<double> inputValue = { inputNode->output, 0 };
     model::OutputPortElementList<double> inputThresh = { inputNode->output, 1 };
 
-    auto value1 = model.AddNode<model::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
-    auto value2 = model.AddNode<model::ConstantNode<double>>(std::vector<double>{ 100.0, 200.0, 300.0 });
+    auto value1 = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
+    auto value2 = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 100.0, 200.0, 300.0 });
     auto outputNode = model.AddNode<model::SelectIfLessNode<double>>(inputValue, inputThresh, value1->output, value2->output);
 
     // Now transform it
