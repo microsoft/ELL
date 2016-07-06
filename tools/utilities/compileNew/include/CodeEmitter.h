@@ -20,8 +20,6 @@ namespace emll
 {
 	namespace compiler 
 	{
-		void TestCompiler();
-
 		enum class CodeEmitterError
 		{
 			NotSupported,

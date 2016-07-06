@@ -44,6 +44,7 @@ source_group("tcc" FILES ${TCC})
 
 include_directories(include)
 include_directories(../utilities/include)
+include_directories(../model/include)
 include_directories(${CMAKE_SOURCE_DIR}/external/llvm/include)
 include_directories(${CMAKE_SOURCE_DIR}/external/llvm/include/llvm)
 include_directories(${CMAKE_SOURCE_DIR}/external/llvm/include/Support)
@@ -53,4 +54,48 @@ include_directories(${CMAKE_SOURCE_DIR}/external/llvm/include/IR)
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+
+#
+# test project
+#
+
+set (TEST_NAME ${PROJ_NAME}_test)
+
+PROJECT(${TEST_NAME})
+
+set (TEST_SRC test/src/main.cpp
+              test/src/CompilerTest.cpp)
+set (TEST_INCLUDE test/include/CompilerTest.h)
+
+source_group("src" FILES ${TEST_SRC})
+source_group("include" FILES ${TEST_INCLUDE})
+
+include_directories(../testing/include)
+include_directories(test/include)
+
+add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
+
+# LLVM Dependencies
+
+link_directories(${CMAKE_SOURCE_DIR}/external/llvm/lib)
+
+add_library(LLVMAnalysis STATIC IMPORTED)
+set_property(TARGET LLVMAnalysis PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/llvm/lib/LLVMAnalysis.lib)
+add_library(LLVMAsmParser STATIC IMPORTED)
+set_property(TARGET LLVMAsmParser PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/llvm/lib/LLVMAsmParser.lib)
+add_library(LLVMCore STATIC IMPORTED)
+set_property(TARGET LLVMCore PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/llvm/lib/LLVMCore.lib)
+add_library(LLVMSupport STATIC IMPORTED)
+set_property(TARGET LLVMSupport PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/llvm/lib/LLVMSupport.lib)
+add_library(LLVMBitWriter STATIC IMPORTED)
+set_property(TARGET LLVMBitWriter PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/llvm/lib/LLVMBitWriter.lib)
+
+message("${TEST_NAME}")
+target_link_libraries(${TEST_NAME} nodes model testing utilities compiler LLVMCore LLVMAnalysis LLVMAsmParser LLVMSupport LLVMBitWriter)
+
+set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
+
+add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+
+
 
