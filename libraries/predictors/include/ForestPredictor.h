@@ -59,7 +59,7 @@ namespace predictors
         /// <summary> Gets the number of trees i nthe forest. </summary>
         ///
         /// <returns> The number of tress. </returns>
-        size_t NumTrees() const { return _tree.size(); }
+        size_t NumTrees() const { return _trees.size(); }
 
         /// <summary> Gets the index of the root node of a given tree. </summary>
         ///
@@ -141,7 +141,7 @@ namespace predictors
         /// <param name="leaf"> The leaf to split. </param>
         ///
         /// <returns> The index of the newly created interior node. </returns>
-        size_t SplitLeaf(const SplitInfo& splitInfo, ForestPredictorLeafId ForestPredictorLeafId);
+        size_t SplitLeaf(const SplitInfo& splitInfo, ForestPredictorLeafId leaf);
 
     protected:
         struct Edge
@@ -161,14 +161,14 @@ namespace predictors
 
         struct Tree
         {
-            size_t rootNodeIndex;
+            size_t rootIndex;
         };
 
         size_t AddInteriorNode(const SplitInfo& splitInfo);
 
         std::vector<InteriorNode> _interiorNodes;
         std::vector<Tree> _trees;
-        size_t _numEdges; 
+        size_t _numEdges = 0; 
     };
 
     /// <summary> A simple binary tree with single-input threshold rules and constant predictors in its edges. </summary>

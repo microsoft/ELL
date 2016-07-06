@@ -63,7 +63,7 @@ include_directories(test/include)
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE} ${TCC})
 
-target_link_libraries(${TEST_NAME} predictors dataset linear)
+target_link_libraries(${TEST_NAME} testing predictors dataset linear)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

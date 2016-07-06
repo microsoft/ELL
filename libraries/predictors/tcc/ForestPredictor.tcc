@@ -13,16 +13,15 @@
 
 namespace predictors
 {
-
     template<typename SplitRuleType, typename EdgePredictorType>
     size_t ForestPredictor<SplitRuleType, EdgePredictorType>::NumInteriorNodes(size_t interiorNodeIndex) const
     {
-        if (interiorNodeIndex >= interiorNodeIndex.size())
+        if (interiorNodeIndex >= _interiorNodes.size())
         {
             return 0;
         }
 
-        auto const& iteriorNode = _interiorNodes[interiorNodeIndex];
+        auto const& interiorNode = _interiorNodes[interiorNodeIndex];
         size_t numInteriorNodes = 1;
 
         for(const auto& edge : interiorNode.outgoingEdges)
@@ -39,19 +38,19 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     size_t ForestPredictor<SplitRuleType, EdgePredictorType>::NumEdges(size_t interiorNodeIndex) const
     {
-        if (interiorNodeIndex >= interiorNodeIndex.size())
+        if (interiorNodeIndex >= _interiorNodes.size())
         {
             return 0;
         }
 
-        auto const& iteriorNode = _interiorNodes[interiorNodeIndex];
-        size_t numEdges = interiorNode.outgoingEdges;
+        auto const& interiorNode = _interiorNodes[interiorNodeIndex];
+        size_t numEdges = interiorNode.outgoingEdges.size();
 
         for(const auto& edge : interiorNode.outgoingEdges)
         {
             if(edge.targetNodeIndex > 0)
             {
-                numEdges += NumInteriorNodes(edge.targetNodeIndex);
+                numEdges += NumEdges(edge.targetNodeIndex);
             }
         }
 
@@ -74,7 +73,7 @@ namespace predictors
     template<typename RandomAccessVectorType>
     double ForestPredictor<SplitRuleType, EdgePredictorType>::Compute(const RandomAccessVectorType& input, size_t interiorNodeIndex) const
     {
-        if (interiorNodeIndex >= interiorNodeIndex.size())
+        if (interiorNodeIndex >= _interiorNodes.size())
         {
             return 0.0;
         }
@@ -111,7 +110,7 @@ namespace predictors
     {
         for (const auto& tree : _trees)
         {
-            GetEdgeIndicatorVector(input, output, output, tree.rootIndex);
+            GetEdgeIndicatorVector(input, output, tree.rootIndex);
         }
     }
 
@@ -119,7 +118,7 @@ namespace predictors
     template<typename RandomAccessVectorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::GetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& output, size_t interiorNodeIndex) const
     {
-        if (interiorNodeIndex >= interiorNodeIndex.size())
+        if (interiorNodeIndex >= _interiorNodes.size())
         {
             return;
         }
@@ -141,7 +140,7 @@ namespace predictors
 
             // indicate the edge in the vector and follow the edge to the next node
             auto edge = interiorNode.outgoingEdges[edgeIndex];
-            pathIndicator[interiorNode.firstEdgeIndex + edgeIndex] = true;
+            output[interiorNode.firstEdgeIndex + edgeIndex] = true;
             nodeIndex = edge.targetNodeIndex;
         }
         while (nodeIndex != 0);
@@ -156,14 +155,14 @@ namespace predictors
         size_t interiorNodeIndex = AddInteriorNode(splitInfo);
 
         // add new tree
-        _trees.emplace_back({ interiorNodeIndex });
+        _trees.push_back({ interiorNodeIndex });
 
         // return ID of new root
         return interiorNodeIndex;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::SplitLeaf(const SplitInfo& splitInfo, ForestPredictorLeafId ForestPredictorLeafId)
+    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::SplitLeaf(const SplitInfo& splitInfo, ForestPredictorLeafId leaf)
     {   
         // check that the parent of the leaf exists
         if(leaf.interiorNodeIndex >= _interiorNodes.size())

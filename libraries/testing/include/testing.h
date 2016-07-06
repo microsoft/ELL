@@ -35,6 +35,16 @@ namespace testing
     /// <returns> true if equal, false if not. </returns>
     bool IsEqual(const std::vector<double>& a, const std::vector<double>& b, double tolerance = 1.0e-8);
 
+    /// <summary>
+    /// Checks if two bool vectors are equal.
+    /// </summary>
+    ///
+    /// <param name="a"> The first vector. </param>
+    /// <param name="b"> The second vector. </param>
+    ///
+    /// <returns> true if equal, false if not. </returns>
+    bool IsEqual(const std::vector<bool>& a, const std::vector<bool>& b);
+
     /// <summary> Process the test. </summary>
     ///
     /// <param name="testDescription"> Information describing the test. </param>
