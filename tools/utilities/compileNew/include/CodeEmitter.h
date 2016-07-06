@@ -8,10 +8,11 @@
 
 #pragma once
 
+#include "Exception.h"
 #include "IntegerStack.h"
 #include "DataFlowGraph.h"
 #include "DataFlowNode.h"
-#include "IRCompiler.h"
+#include "IRInclude.h"
 
 #include <string>
 #include <ostream>
@@ -26,7 +27,7 @@ namespace emll
 			ArrayMustBeAllocated
 		};
 
-		using CodeEmitterException = CompilerException<CodeEmitterError>;
+		using CodeEmitterException = utilities::ErrorCodeException<CodeEmitterError>;
 
 
 		//

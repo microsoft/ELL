@@ -2,6 +2,8 @@
 
 int main(int argc, char* argv[])
 {
-	TestCompiler();
+	TestLLVM();
+
+	TestBinaryOp();
 	return 0;
 }

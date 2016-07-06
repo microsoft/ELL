@@ -3,7 +3,7 @@
 #include "LLVMInclude.h"
 #include "Types.h"
 #include <unordered_map>
-#include "CompilerException.h"
+#include "Exception.h"
 #include "SymbolTable.h"
 
 namespace emll
@@ -12,15 +12,7 @@ namespace emll
 	{
 		using IRValueList = TypeList<llvm::Value*>;
 		using IRVariableTable = SymbolTable<llvm::Value>;
-
-		class LLVMException : CompilerException<std::error_code>
-		{
-		public:
-			LLVMException(std::error_code error)
-				: CompilerException(error)
-			{
-			}
-		};
+		using LLVMException = utilities::ErrorCodeException<std::error_code>;
 
 		class IREmitter
 		{

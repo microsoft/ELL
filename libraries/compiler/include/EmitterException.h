@@ -1,5 +1,5 @@
 #pragma once
-#include "CompilerException.h"
+#include "Exception.h"
 
 namespace emll
 {
@@ -17,14 +17,7 @@ namespace emll
 			WriteStreamFailed,
 		};
 
-		class EmitterException : CompilerException<EmitterError>
-		{
-		public:
-			EmitterException(EmitterError error)
-				: CompilerException(error)
-			{
-			}
-		};
+		using EmitterException = utilities::ErrorCodeException<EmitterError>;
 	}
 }
 

@@ -1,11 +1,12 @@
 #include "CompilerTest.h"
-#include "IRCompiler.h"
+#include "IRInclude.h"
 #include <string>
 #include <ostream>
 
+
 using namespace emll::compiler;
 
-void TestCompiler()
+void TestLLVM()
 {
 	IREmitter llvm;
 	IRModuleEmitter module(llvm, llvm.AddModule("Looper"));
@@ -80,4 +81,42 @@ void TestCompiler()
 	fnMain.Verify();
 	module.Dump();
 	module.WriteBitcodeToFile("C:\\junk\\model\\loop.bc");
+}
+
+template<typename T>
+model::InputNode<T>* ModelBuilder::Inputs(std::vector<T>& values)
+{
+	auto node = _model.AddNode<model::InputNode<T>>(values.size());
+	node->SetInput(values);
+	return node;
+}
+
+template<typename T>
+nodes::BinaryOperationNode<T>* ModelBuilder::Add(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
+{
+	return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationNode<T>::OperationType::add);
+}
+
+void TestBinaryOp()
+{
+	ModelBuilder builder;
+	std::vector<double> data = {10, 100, 1000, 10000};
+
+	auto input = builder.Inputs<double>(data);
+
+	nodes::BinaryOperationNode<double>* addNode = builder.Add<double>(input->output, input->output);
+
+	auto result = builder.Model.GetNodeOutput(addNode->output);
+
+	model::Node* pNode = addNode;
+
+	switch (Compiler::GetNodeDataType(pNode))
+	{
+		default:
+			break;
+		case model::Port::PortType::Real:
+			nodes::BinaryOperationNode<double>* pOp = static_cast<nodes::BinaryOperationNode<double>*>(pNode);
+			std::cout << pOp->GetRuntimeTypeName();
+			break;
+	}
 }

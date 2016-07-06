@@ -20,11 +20,11 @@ set (SRC src/IREmitter.cpp
          src/IRLoopEmitter.cpp
 		 src/IRIfEmitter.cpp
          src/IRFunctionEmitter.cpp
+		 src/Compiler.cpp
 )
 
 set (INCLUDE include/LLVMInclude.h
 		include/EmitterException.h
-		include/CompilerException.h
 		include/Types.h
 		include/SymbolTable.h
 		include/IREmitter.h
@@ -32,7 +32,8 @@ set (INCLUDE include/LLVMInclude.h
 		include/IRIfEmitter.h
 		include/IRFunctionEmitter.h
 		include/IRModuleEmitter.h
-		include/IRCompiler.h
+		include/IRInclude.h
+		include/Compiler.h
 )
 
 set (TCC tcc/SymbolTable.tcc
@@ -45,6 +46,7 @@ source_group("tcc" FILES ${TCC})
 include_directories(include)
 include_directories(../utilities/include)
 include_directories(../model/include)
+include_directories(../nodes/include)
 include_directories(${CMAKE_SOURCE_DIR}/external/llvm/include)
 include_directories(${CMAKE_SOURCE_DIR}/external/llvm/include/llvm)
 include_directories(${CMAKE_SOURCE_DIR}/external/llvm/include/Support)
@@ -90,7 +92,6 @@ set_property(TARGET LLVMSupport PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/e
 add_library(LLVMBitWriter STATIC IMPORTED)
 set_property(TARGET LLVMBitWriter PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/llvm/lib/LLVMBitWriter.lib)
 
-message("${TEST_NAME}")
 target_link_libraries(${TEST_NAME} nodes model testing utilities compiler LLVMCore LLVMAnalysis LLVMAsmParser LLVMSupport LLVMBitWriter)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
