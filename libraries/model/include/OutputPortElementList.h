@@ -10,7 +10,7 @@
 
 #include "Port.h"
 #include "OutputPort.h"
-#include "Node.h"
+//#include "Node.h"
 
 #include <vector>
 #include <cassert>
@@ -18,6 +18,8 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    class Node;
+
     /// <summary> Represents a reference to a single element in another node's output </summary>
     class OutputPortElement
     {
@@ -26,7 +28,7 @@ namespace model
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        OutputPortElement(const Port& port, size_t index);
+        OutputPortElement(const OutputPortBase& port, size_t index);
 
         /// <summary> Returns the type of the values referenced </summary>
         ///
@@ -41,13 +43,13 @@ namespace model
         /// <summary> The port this range refers to </summary>
         ///
         /// <returns> The port this range refers to </returns>
-        const Port* ReferencedPort() const { return _referencedPort; }
+        const OutputPortBase* ReferencedPort() const { return _referencedPort; }
 
     private:
-        const Port* _referencedPort;
+        const OutputPortBase* _referencedPort;
         size_t _index;
     };
-    
+
     /// <summary> Represents a contiguous set of values from an output port </summary>
     class OutputPortRange
     {
@@ -55,20 +57,20 @@ namespace model
         /// <summary> Creates an OutputPortRange representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
-        OutputPortRange(const Port& port);
+        OutputPortRange(const OutputPortBase& port);
 
         /// <summary> Creates an OutputPortRange representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        OutputPortRange(const Port& port, size_t index);
+        OutputPortRange(const OutputPortBase& port, size_t index);
 
         /// <summary> Creates an OutputPortRange representing a range of values from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="startIndex"> The index of the first value to take </param>
         /// <param name="numValues"> The number of values to take </param>
-        OutputPortRange(const Port& port, size_t startIndex, size_t numValues);
+        OutputPortRange(const OutputPortBase& port, size_t startIndex, size_t numValues);
 
         /// <summary> Returns the type of the values referenced </summary>
         ///
@@ -88,10 +90,10 @@ namespace model
         /// <summary> The port this range refers to </summary>
         ///
         /// <returns> The port this range refers to </returns>
-        const Port* ReferencedPort() const { return _referencedPort; }
+        const OutputPortBase* ReferencedPort() const { return _referencedPort; }
 
     private:
-        const Port* _referencedPort;
+        const OutputPortBase* _referencedPort;
         size_t _startIndex;
         size_t _numValues;
         bool _isFixedSize;
@@ -104,20 +106,20 @@ namespace model
         /// <summary> Creates an OutputPortElementListUntyped representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
-        OutputPortElementListUntyped(const Port& port);
+        OutputPortElementListUntyped(const OutputPortBase& port);
 
         /// <summary> Creates an OutputPortElementListUntyped representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        OutputPortElementListUntyped(const Port& port, size_t startIndex);
+        OutputPortElementListUntyped(const OutputPortBase& port, size_t startIndex);
 
         /// <summary> Creates an OutputPortElementListUntyped representing a range of values from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="startIndex"> The index of the first value to take </param>
         /// <param name="numValues"> The number of values to take </param>
-        OutputPortElementListUntyped(const Port& port, size_t startIndex, size_t numValues);
+        OutputPortElementListUntyped(const OutputPortBase& port, size_t startIndex, size_t numValues);
 
         /// <summary> Creates an OutputPortElementListUntyped from an OutputPortRange </summary>
         ///
@@ -146,11 +148,12 @@ namespace model
         /// <summary> An STL-type iterator pointing to the end of the list of ranges </summary>
         std::vector<OutputPortRange>::const_iterator end() const { return _ranges.cend(); }
 
+        void AddRange(const OutputPortRange& range);
+
     protected:
         OutputPortElementListUntyped(){};
         void ComputeSize();
-        void AddRange(const OutputPortRange& range);
-    
+
     private:
         std::vector<OutputPortRange> _ranges;
         size_t _size = 0;
@@ -161,6 +164,8 @@ namespace model
     class OutputPortElementList : public OutputPortElementListUntyped
     {
     public:
+        OutputPortElementList() = default;
+
         /// <summary> Creates a OutputPortElementList representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>

@@ -18,8 +18,18 @@ namespace model
 {
     class Node;
 
-    /// <summary> Define a type named OutputPortBase to act as a non-templated base class for all output ports </summary>
-    typedef Port OutputPortBase;    
+    /// <summary> Base class for output ports </summary>
+    class OutputPortBase : public Port
+    {
+    public:
+        void ReferencePort() const { _isReferenced = true; }
+        bool IsReferenced() { return _isReferenced; }
+
+    protected:
+        OutputPortBase(const class Node* node, PortType type, size_t size) : Port(node, type, size), _isReferenced(false) {}
+
+        mutable bool _isReferenced;
+    };
 
     /// <summary> Represents an output from a node </summary>
     template <typename ValueType>

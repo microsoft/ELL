@@ -10,6 +10,7 @@
 
 #include "Node.h"
 #include "OutputPort.h"
+#include "ModelTransformer.h"
 
 #include <vector>
 #include <memory>
@@ -18,6 +19,16 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    // TODO:
+    // InputNode<InputType>
+
+    // SimpleInputNode<InputType==OutputType>
+
+    // class MyInputNode : public InputNode<InputType> { OutputPort<double> _out1; OutputPort<bool> _out2; ...}
+
+    // OR: have input node as-is, but then have translator nodes to change from weird input type into ports of "reasonable" types 
+
+
     /// <summary> A node that represents an input to the system. </summary>
     template <typename ValueType>
     class InputNode : public Node
@@ -45,6 +56,9 @@ namespace model
 
         /// <summary> Exposes the output port as a read-only property </summary>
         const OutputPort<ValueType>& output = _output;
+
+        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Refine(ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;

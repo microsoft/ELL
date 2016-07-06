@@ -14,16 +14,16 @@ namespace model
     // OutputPortElement
     //
 
-    OutputPortElement::OutputPortElement(const Port& port, size_t index) : _referencedPort(&port), _index(index) {}
+    OutputPortElement::OutputPortElement(const OutputPortBase& port, size_t index) : _referencedPort(&port), _index(index) {}
 
     //
     // OutputPortRange
     //
-    OutputPortRange::OutputPortRange(const Port& port) : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}
+    OutputPortRange::OutputPortRange(const OutputPortBase& port) : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}
 
-    OutputPortRange::OutputPortRange(const Port& port, size_t index) : _referencedPort(&port), _startIndex(index), _numValues(1), _isFixedSize(true) {}
+    OutputPortRange::OutputPortRange(const OutputPortBase& port, size_t index) : _referencedPort(&port), _startIndex(index), _numValues(1), _isFixedSize(true) {}
 
-    OutputPortRange::OutputPortRange(const Port& port, size_t startIndex, size_t numValues) : _referencedPort(&port), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true) {}
+    OutputPortRange::OutputPortRange(const OutputPortBase& port, size_t startIndex, size_t numValues) : _referencedPort(&port), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true) {}
 
     size_t OutputPortRange::Size() const
     {
@@ -42,19 +42,19 @@ namespace model
     //
     // OutputPortElementListUntyped
     //
-    OutputPortElementListUntyped::OutputPortElementListUntyped(const Port& port)
+    OutputPortElementListUntyped::OutputPortElementListUntyped(const OutputPortBase& port)
     {
         _ranges.emplace_back(port);
         ComputeSize();
     }
 
-    OutputPortElementListUntyped::OutputPortElementListUntyped(const Port& port, size_t startIndex)
+    OutputPortElementListUntyped::OutputPortElementListUntyped(const OutputPortBase& port, size_t startIndex)
     {
         _ranges.emplace_back(port, startIndex);
         ComputeSize();
     }
 
-    OutputPortElementListUntyped::OutputPortElementListUntyped(const Port& port, size_t startIndex, size_t numValues)
+    OutputPortElementListUntyped::OutputPortElementListUntyped(const OutputPortBase& port, size_t startIndex, size_t numValues)
     {
         _ranges.emplace_back(port, startIndex, numValues);
         ComputeSize();
@@ -72,10 +72,7 @@ namespace model
         ComputeSize();
     }
 
-    void OutputPortElementListUntyped::AddRange(const OutputPortRange& range)
-    {
-        _ranges.push_back(range);
-    }
+    void OutputPortElementListUntyped::AddRange(const OutputPortRange& range) { _ranges.push_back(range); }
 
     void OutputPortElementListUntyped::ComputeSize()
     {

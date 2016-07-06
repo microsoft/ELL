@@ -1,41 +1,34 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ConstantNode.h (model)
+//  File:     AccumulatorNode.h (features)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
 #include "Node.h"
-#include "OutputPort.h"
+#include "ModelGraph.h"
+#include "ModelTransformer.h"
 
-#include <vector>
-#include <memory>
+// stl
+#include <string>
 
-/// <summary> model namespace </summary>
-namespace model
+namespace nodes
 {
-    /// <summary> A node that contains a constant value. Has no inputs. </summary>
+    /// <summary> A feature that accumulates its input </summary>
     template <typename ValueType>
-    class ConstantNode : public Node
+    class AccumulatorNode : public model::Node
     {
     public:
-        /// <summary> Constructor for a scalar constant </summary>
-        ///
-        /// <param name="value"> The scalar value </param>
-        ConstantNode(ValueType value);
-
-        /// Constructor for a vector constant
-        ///
-        /// <param name="value"> The vector value </param>
-        ConstantNode(std::vector<ValueType> values);
-
+        /// <summary> Constructor </summary>
+        /// <param name="input"> The signal to accumulate </param>
+        AccumulatorNode(const model::OutputPortElementList<ValueType>& input);
+        
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "Constant"; }
+        static std::string GetTypeName() { return "AccumulatorNode"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -43,15 +36,23 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Exposes the output port as a read-only property </summary>
-        const OutputPort<ValueType>& output = _output;
+        const model::OutputPort<ValueType>& output = _output;
+
+        virtual void Copy(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;
 
     private:
-        std::vector<ValueType> _values;
-        OutputPort<ValueType> _output;
+        // Inputs
+        model::InputPort<ValueType> _input;
+
+        // Output
+        model::OutputPort<ValueType> _output;
+
+        // Buffer
+        mutable std::vector<ValueType> _accumulator;
     };
 }
 
-#include "../tcc/ConstantNode.tcc"
+#include "../tcc/AccumulatorNode.tcc"

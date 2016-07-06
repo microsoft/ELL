@@ -8,6 +8,7 @@
 
 #include "Node.h"
 #include "InputPort.h"
+#include "ModelTransformer.h"
 
 /// <summary> model namespace </summary>
 namespace model
@@ -33,6 +34,15 @@ namespace model
             {
                 node->AddDependent(this);
             }
+            for (const auto& range : input->GetInputRanges())
+            {
+                range.ReferencedPort()->ReferencePort();
+            }
         }
+    }
+
+    void Node::Refine(ModelTransformer& transformer) const
+    {
+        Copy(transformer);
     }
 }

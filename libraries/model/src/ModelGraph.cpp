@@ -7,20 +7,25 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ModelGraph.h"
+#include "Port.h"
+
+// stl
+#include <unordered_map>
+#include <iostream>
 
 /// <summary> model namespace </summary>
 namespace model
 {
-    std::weak_ptr<Node> Model::GetNode(Node::NodeId id)
+    Node* Model::GetNode(Node::NodeId id)
     {
         auto it = _nodeMap.find(id);
         if (it == _nodeMap.end())
         {
-            return std::weak_ptr<Node>(); // weak_ptr equivalent of nullptr
+            return nullptr; // weak_ptr equivalent of nullptr
         }
         else
         {
-            return it->second;
+            return it->second.get();
         }
     }
 }

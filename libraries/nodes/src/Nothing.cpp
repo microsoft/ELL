@@ -1,20 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     OutputPort.tcc (model)
+//  File:     Nothing.cpp (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// <summary> model namespace </summary>
-namespace model
-{
-    //
-    // OutputPort
-    //
-    template <typename ValueType>
-    void OutputPort<ValueType>::SetOutput(std::vector<ValueType> values) const
-    {
-        _cachedOutput = values;
-    }
-}
+// Empty file, to ensure that CMake creates a project for this library

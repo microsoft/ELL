@@ -218,6 +218,9 @@ ModelManifest.xml
 \#*\#
 .#*
 
+# Mac stuff
+.DS_Store
+
 # VS Code stuff
 .vs/
 .vscode/

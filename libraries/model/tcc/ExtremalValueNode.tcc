@@ -32,4 +32,22 @@ namespace model
         _val.SetOutput({ val });
         _argVal.SetOutput({ (int)index });
     };
+
+    template <typename ValueType, bool max>
+    void ExtremalValueNode<ValueType, max>::Copy(ModelTransformer& transformer) const
+    {
+        auto newInputs = transformer.TransformInputPort(_input);
+        auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
+        transformer.MapOutputPort(val, newNode->val);
+        transformer.MapOutputPort(argVal, newNode->argVal);
+    }
+
+    template <typename ValueType, bool max>
+    void ExtremalValueNode<ValueType, max>::Refine(ModelTransformer& transformer) const
+    {
+        auto newInputs = transformer.TransformInputPort(_input);
+        auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
+        transformer.MapOutputPort(val, newNode->val);
+        transformer.MapOutputPort(argVal, newNode->argVal);
+    }
 }
