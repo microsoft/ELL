@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <math.h>
+#include <stdlib.h>
 //#include <tchar.h>
 //#include <vector>
 //#include <uchar.h>
@@ -236,9 +237,32 @@ void IfThen(int x, int y)
 
 }
 
+struct ShiftRegister
+{
+	int _one;
+	int _two[4];
+};
+
+ShiftRegister g_registers[10];
+
 int main()
 {
-	Loop(0, 10, 1);
+	//Loop(0, 10, 1);
+	for (int i = 0; i < 10; ++i)
+	{
+		ShiftRegister* pRegister = &g_registers[i];
+		pRegister->_one = rand();
+
+		for (int j = 0; j < 4; ++j)
+		{
+			pRegister->_two[i] = rand();
+		}
+	}
+
+	for (int i = 0; i < 10; ++i)
+	{
+		printf("%d, %d", g_registers[i]._one, g_registers[i]._two[2]);			 
+	}
 	//HelloData h;
 	//h.XValue = 1;
 	//h.YValue = 32;

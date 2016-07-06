@@ -52,7 +52,7 @@ namespace emll
 
 			std::unique_ptr<llvm::Module> AddModule(const std::string& name);
 
-			llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, const ValueType returnType, const ValueTypeList* pArgs);
+			llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, const ValueType returnType, const ValueTypeList* pArgs = nullptr);
 			llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, const ValueType returnType, const NamedValueTypeList& args);
 			llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, llvm::FunctionType* type);
 
@@ -79,6 +79,7 @@ namespace emll
 
 			llvm::Value* PtrOffset(llvm::Value* pArray, llvm::Value* pOffset);
 			llvm::Value* GlobalPtrOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset);
+			llvm::Value* GlobalPtrOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset);
 
 			llvm::LoadInst* Load(llvm::Value* pPtr);
 			llvm::StoreInst* Store(llvm::Value* pPtr, llvm::Value* pVal);
@@ -92,6 +93,7 @@ namespace emll
 			llvm::BranchInst* Branch(llvm::Value* pCondVal, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
 			llvm::BranchInst* Branch(llvm::BasicBlock* pDest);
 
+			llvm::StructType* Struct(const std::string& name, ValueTypeList& members);
 
 			llvm::LLVMContext& Context()
 			{
@@ -99,21 +101,22 @@ namespace emll
 			}
 
 		private:
+
 			llvm::Type* GetValueType(const ValueType type);
 			int SizeOf(const ValueType type);
 			llvm::Constant* Integer(const ValueType type, const uint64_t value);
-			void BindArgTypes(const ValueTypeList& args);
+			void BindTypes(const ValueTypeList& args);
 			void BindArgTypes(const NamedValueTypeList& args);
 			void BindArgNames(llvm::Function* pfn, const NamedValueTypeList& args);
 			llvm::Function* CreateFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pTypeDef);
+			llvm::Value* Zero();
 
 		private:
 			llvm::LLVMContext _context;
 			llvm::IRBuilder<> _builder;
 			IRVariableTable _stringLiterals;
 			// Reusable buffers
-			std::vector<llvm::Type *> _argTypes;
-			llvm::Value* _derefArgs[2];
+			std::vector<llvm::Type *> _types;
 			llvm::Value* _pZeroLiteral = nullptr;
 		};
 	}

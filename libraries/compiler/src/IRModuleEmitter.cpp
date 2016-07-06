@@ -25,10 +25,25 @@ namespace emll
 			return Global(name, _emitter.Type(type), _emitter.Zero(type), false);
 		}
 
-		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, const ValueType type, uint64_t size)
+		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, const ValueType type, const uint64_t size)
 		{
-			auto arrayType = _emitter.ArrayType(type, size);
-			return Global(name, arrayType, llvm::ConstantAggregateZero::get(arrayType), false);
+			llvm::ArrayType* pArrayType = _emitter.ArrayType(type, size);
+			return Global(name, pArrayType, InitializeArray(pArrayType), false);
+		}
+
+		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, llvm::Type* pType, const uint64_t size)
+		{
+			assert(pType != nullptr);
+
+			llvm::ArrayType* pArrayType = llvm::ArrayType::get(pType, size);
+			return Global(name, pArrayType, InitializeArray(pArrayType), false);
+
+		}
+
+		llvm::StructType* IRModuleEmitter::Struct(const std::string& name, std::initializer_list<ValueType> fields)
+		{
+			_valueTypeList.init(fields);
+			return _emitter.Struct(name, _valueTypeList);
 		}
 
 		IRFunctionEmitter IRModuleEmitter::AddMain()
@@ -80,6 +95,12 @@ namespace emll
 			return isPublic ?
 				llvm::Function::LinkageTypes::ExternalLinkage :
 				llvm::Function::LinkageTypes::InternalLinkage;
+		}
+
+		llvm::ConstantAggregateZero* IRModuleEmitter::InitializeArray(llvm::ArrayType* pType)
+		{
+			assert(pType != nullptr);
+			return llvm::ConstantAggregateZero::get(pType);
 		}
 
 		void IRModuleEmitter::BeginFunction(llvm::Function* pfn)

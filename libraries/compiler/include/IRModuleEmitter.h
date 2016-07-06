@@ -15,9 +15,16 @@ namespace emll
 			IRModuleEmitter(IREmitter& emitter, std::unique_ptr<llvm::Module> pModule);
 
 			llvm::GlobalVariable* Constant(const std::string&name, const std::vector<double>& value);
-			llvm::GlobalVariable* Global(const std::string& name, const ValueType type);
-			llvm::GlobalVariable* Global(const std::string& name, const ValueType type, uint64_t size);
 
+			llvm::GlobalVariable* Global(const std::string& name, const ValueType type);
+			llvm::GlobalVariable* Global(const std::string& name, const ValueType type, const uint64_t size);
+			llvm::GlobalVariable* Global(const std::string& name, llvm::Type* pType)
+			{
+				return Global(name, pType, nullptr, false);
+			}
+			llvm::GlobalVariable* Global(const std::string& name, llvm::Type* pType, const uint64_t size);
+			llvm::StructType* Struct(const std::string& name, std::initializer_list<ValueType> fields);
+			
 			IRFunctionEmitter AddMain();
 
 			void DeclareFunction(const std::string& name, const ValueType returnType)
@@ -93,6 +100,7 @@ namespace emll
 			void WriteToFile(const std::string& filePath, bool isBitCode);
 			void WriteToStream(std::ostream& os, bool isBitCode);
 			llvm::Function::LinkageTypes Linkage(bool isPublic);
+			llvm::ConstantAggregateZero* InitializeArray(llvm::ArrayType* pType);
 
 		private:
 			std::unique_ptr<llvm::Module> _pModule;

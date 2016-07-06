@@ -244,8 +244,8 @@ namespace emll
 			llvm::FunctionType* pTypeDef = nullptr;
 			if (pArgs != nullptr)
 			{
-				BindArgTypes(*pArgs);
-				pTypeDef = llvm::FunctionType::get(Type(returnType), _argTypes, false);
+				BindTypes(*pArgs);
+				pTypeDef = llvm::FunctionType::get(Type(returnType), _types, false);
 			}
 			else
 			{
@@ -259,7 +259,7 @@ namespace emll
 			assert(pModule != nullptr);
 
 			BindArgTypes(args);
-			llvm::FunctionType* pTypeDef = llvm::FunctionType::get(Type(returnType), _argTypes, false);
+			llvm::FunctionType* pTypeDef = llvm::FunctionType::get(Type(returnType), _types, false);
 			llvm::Function* pfn = CreateFunction(pModule, name, linkage, pTypeDef);
 			BindArgNames(pfn, args);
 			return pfn;
@@ -343,13 +343,25 @@ namespace emll
 			assert(pArray != nullptr);
 			assert(pOffset != nullptr);
 
-			if (_pZeroLiteral == nullptr)
-			{
-				_pZeroLiteral = Literal(0);
-			}
-			_derefArgs[0] = _pZeroLiteral;
-			_derefArgs[1] = pOffset;
-			return _builder.CreateInBoundsGEP(pArray->getValueType(), pArray, _derefArgs);
+			llvm::Value* derefArgs[2]{
+				Zero(),
+				pOffset
+			};
+			return _builder.CreateInBoundsGEP(pArray->getValueType(), pArray, derefArgs);
+		}
+
+		llvm::Value* IREmitter::GlobalPtrOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset)
+		{
+			assert(pArray != nullptr);
+			assert(pOffset != nullptr);
+			assert(pFieldOffset != nullptr);
+			
+			llvm::Value* derefArgs[3]{
+				Zero(),
+				pOffset, 
+				pFieldOffset
+			};
+			return _builder.CreateInBoundsGEP(pArray->getValueType(), pArray, derefArgs);
 		}
 
 		llvm::LoadInst* IREmitter::Load(llvm::Value* pPtr)
@@ -403,6 +415,12 @@ namespace emll
 			return _builder.CreateBr(pDest);
 		}
 
+		llvm::StructType* IREmitter::Struct(const std::string& name, ValueTypeList& fields)
+		{
+			BindTypes(fields);
+			return llvm::StructType::create(_context, _types, name);
+		}
+
 		llvm::Type* IREmitter::GetValueType(const ValueType type)
 		{
 			switch (type)
@@ -452,21 +470,21 @@ namespace emll
 			return llvm::ConstantInt::get(_context, llvm::APInt(SizeOf(type), value, true));
 		}
 
-		void IREmitter::BindArgTypes(const ValueTypeList& args)
+		void IREmitter::BindTypes(const ValueTypeList& args)
 		{
-			_argTypes.clear();
+			_types.clear();
 			for (auto arg = args.begin(); arg != args.end(); ++arg)
 			{
-				_argTypes.push_back(Type(*arg));
+				_types.push_back(Type(*arg));
 			}
 		}
 
 		void IREmitter::BindArgTypes(const NamedValueTypeList& args)
 		{
-			_argTypes.clear();
+			_types.clear();
 			for (auto arg = args.begin(); arg != args.end(); ++arg)
 			{
-				_argTypes.push_back(Type(arg->second));
+				_types.push_back(Type(arg->second));
 			}
 		}
 
@@ -487,6 +505,15 @@ namespace emll
 				throw new EmitterException(EmitterError::InvalidFunction);
 			}
 			return pfn;
+		}
+
+		llvm::Value* IREmitter::Zero()
+		{
+			if (_pZeroLiteral == nullptr)
+			{
+				_pZeroLiteral = Literal(0);
+			}
+			return _pZeroLiteral;
 		}
 	}
 }

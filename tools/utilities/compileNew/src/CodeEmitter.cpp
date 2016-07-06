@@ -20,10 +20,13 @@ namespace emll
 			IRModuleEmitter module(llvm, llvm.AddModule("Looper"));
 			module.DeclarePrintf();
 
+			llvm::StructType* structType = module.Struct("ShiftRegister", { ValueType::Int32, ValueType::Double });
+
 			std::vector<double> data({3.3, 4.4, 5.5, 6.6, 7.7});
 			llvm::GlobalVariable* pData = module.Constant("g_weights", data);
 			llvm::GlobalVariable* pOutput = module.Global("g_output", ValueType::Double, data.size());
 			llvm::GlobalVariable* pTotal = module.Global("g_total", ValueType::Double);
+			llvm::GlobalVariable* pRegisters = module.Global("g_registers", structType, data.size());
 
 			auto fnMain = module.AddMain();
 
@@ -39,6 +42,9 @@ namespace emll
 				auto sum = fnMain.Op(OperatorType::AddF, fnMain.Literal(0.3), item);
 				fnMain.SetValueAt(pOutput, i, sum);
 				fnMain.OpAndUpdate(pTotal, OperatorType::AddF, sum);
+
+				llvm::Value* pRegisterSum = fnMain.PtrOffset(pRegisters, i, fnMain.Literal(1));
+				fnMain.Store(pRegisterSum, sum);
 
 				//auto itemInt = fnMain.CastFloatToInt(item);
 				IRIfEmitter ife(fnMain);				
@@ -69,8 +75,11 @@ namespace emll
 			{
 				auto ival = forLoop.LoadIterationVar();
 				auto v = fnMain.ValueAt(pOutput, ival);
+
+				llvm::Value* pRegisterSum = fnMain.Load(fnMain.PtrOffset(pRegisters, ival, fnMain.Literal(1)));
+
 				fnMain.OpAndUpdate(pOtherTotal, OperatorType::AddF, v);
-				fnMain.Printf({fnMain.Literal("%f\n"), v});
+				fnMain.Printf({fnMain.Literal("%f, %f\n"), v, pRegisterSum});
 			}
 			forLoop.End();
 			fnMain.Printf({fnMain.Literal("Total = %f, OtherTotal= %f\n"), fnMain.Load(pTotal), fnMain.Load(pOtherTotal)});

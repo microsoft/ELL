@@ -129,6 +129,11 @@ namespace emll
 			return _pEmitter->GlobalPtrOffset(pPtr, pOffset);
 		}
 
+		llvm::Value* IRFunctionEmitter::PtrOffset(llvm::GlobalVariable* pPtr, llvm::Value* pOffset, llvm::Value* pFieldOffset)
+		{
+			return _pEmitter->GlobalPtrOffset(pPtr, pOffset, pFieldOffset);
+		}
+
 		llvm::Value* IRFunctionEmitter::ValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset)
 		{
 			return Load(_pEmitter->GlobalPtrOffset(pGlobal, pOffset));
