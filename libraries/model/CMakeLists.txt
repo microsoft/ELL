@@ -47,10 +47,9 @@ source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
-include_directories(include)
-include_directories(../utilities/include)
-
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
+target_include_directories(${PROJ_NAME} PUBLIC include)
+target_link_libraries(${PROJ_NAME} utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
@@ -69,11 +68,8 @@ set (TEST_INCLUDE test/include/Graph_test.h)
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})
 
-include_directories(../testing/include)
-include_directories(test/include)
-
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
-
+target_include_directories(${TEST_NAME} PRIVATE test/include)
 target_link_libraries(${TEST_NAME} model testing utilities)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
