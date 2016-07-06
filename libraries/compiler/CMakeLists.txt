@@ -24,7 +24,7 @@ set (SRC src/IREmitter.cpp
 )
 
 set (INCLUDE include/LLVMInclude.h
-		include/EmitterException.h
+		include/CompilerException.h
 		include/Types.h
 		include/SymbolTable.h
 		include/IREmitter.h

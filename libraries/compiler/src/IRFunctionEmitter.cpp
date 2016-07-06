@@ -1,6 +1,6 @@
 #include "IRFunctionEmitter.h"
 #include "IREmitter.h"
-#include "EmitterException.h"
+#include "CompilerException.h"
 
 namespace emll
 {
@@ -189,7 +189,7 @@ namespace emll
 			llvm::Function* pfn = Module()->getFunction(name);
 			if (pfn == nullptr)
 			{
-				throw new EmitterException(EmitterError::FunctionNotFound);
+				throw new CompilerException(CompilerError::FunctionNotFound);
 			}
 			return pfn;
 		}

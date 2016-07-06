@@ -1,5 +1,5 @@
 #pragma once
-#include "EmitterException.h"
+#include "CompilerException.h"
 #include "Types.h"
 #include "IREmitter.h"
 #include "IRFunctionEmitter.h"

@@ -1,4 +1,4 @@
-#include "EmitterException.h"
+#include "CompilerException.h"
 #include "IRModuleEmitter.h"
 
 namespace emll
@@ -56,7 +56,7 @@ namespace emll
 			llvm::Function* pfn = _emitter.Function(Module(), name, returnType, Linkage(isPublic), args);
 			if (pfn == nullptr)
 			{
-				throw new EmitterException(EmitterError::InvalidFunction);
+				throw new CompilerException(CompilerError::InvalidFunction);
 			}
 			BeginFunction(pfn);
 			return IRFunctionEmitter(&_emitter, pfn);
@@ -84,7 +84,7 @@ namespace emll
 			llvm::Function* pfn = _emitter.Function(Module(), name, returnType, Linkage(isPublic), pArgs);
 			if (pfn == nullptr)
 			{
-				throw new EmitterException(EmitterError::InvalidFunction);
+				throw new CompilerException(CompilerError::InvalidFunction);
 			}
 			BeginFunction(pfn);
 			return IRFunctionEmitter(&_emitter, pfn);
@@ -134,7 +134,7 @@ namespace emll
 				Module()->print(out.os(), nullptr);
 			}
 			if (out.os().has_error()) {
-				throw new EmitterException(EmitterError::WriteStreamFailed);
+				throw new CompilerException(CompilerError::WriteStreamFailed);
 			}
 			out.keep();
 		}

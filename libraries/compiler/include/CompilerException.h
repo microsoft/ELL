@@ -5,7 +5,8 @@ namespace emll
 {
 	namespace compiler
 	{
-		enum class EmitterError
+		///<summary>A list of error codes thrown by the compiler</summary>
+		enum class CompilerError
 		{
 			Unexpected = 0,
 			NotSupported,
@@ -17,7 +18,7 @@ namespace emll
 			WriteStreamFailed,
 		};
 
-		using EmitterException = utilities::ErrorCodeException<EmitterError>;
+		using CompilerException = utilities::ErrorCodeException<CompilerError>;
 	}
 }
 

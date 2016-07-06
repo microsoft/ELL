@@ -1,5 +1,5 @@
 #include "IREmitter.h"
-#include "EmitterException.h"
+#include "CompilerException.h"
 
 namespace emll
 {
@@ -43,7 +43,7 @@ namespace emll
 			case ValueType::PChar8:
 				return GetValueType(ValueType::Char8)->getPointerTo();
 			default:
-				throw new EmitterException(EmitterError::InvalidValueType);
+				throw new CompilerException(CompilerError::InvalidValueType);
 			}
 		}
 
@@ -138,7 +138,7 @@ namespace emll
 					return _builder.CreateFPToSI(pValue, type);
 				
 				default:
-					throw new EmitterException(EmitterError::NotSupported);
+					throw new CompilerException(CompilerError::NotSupported);
 			}
 		}
 
@@ -177,7 +177,7 @@ namespace emll
 				case OperatorType::DivideF:
 					return _builder.CreateFDiv(pLVal, pRVal, varName);
 				default:
-					throw new EmitterException(EmitterError::InvalidOperatorType);
+					throw new CompilerException(CompilerError::InvalidOperatorType);
 			}
 		}
 
@@ -188,8 +188,6 @@ namespace emll
 
 			switch (type)
 			{
-				default:
-					throw new EmitterException(EmitterError::InvalidComparisonType);
 				case ComparisonType::Eq:
 					return _builder.CreateICmpEQ(pLVal, pRVal);
 				case ComparisonType::Lt:
@@ -212,6 +210,8 @@ namespace emll
 					return _builder.CreateFCmpOGT(pLVal, pRVal);
 				case ComparisonType::GteF:
 					return _builder.CreateFCmpOGE(pLVal, pRVal);
+				default:
+					throw new CompilerException(CompilerError::InvalidComparisonType);
 			}
 		}
 
@@ -440,7 +440,7 @@ namespace emll
 			case ValueType::Char8:
 				return _builder.getInt8Ty();
 			default:
-				throw new EmitterException(EmitterError::InvalidValueType);
+				throw new CompilerException(CompilerError::InvalidValueType);
 			}
 		}
 
@@ -461,7 +461,7 @@ namespace emll
 			case ValueType::Char8:
 				return 8;
 			default:
-				throw new EmitterException(EmitterError::InvalidValueType);
+				throw new CompilerException(CompilerError::InvalidValueType);
 			}
 		}
 
@@ -502,7 +502,7 @@ namespace emll
 			llvm::Function* pfn = llvm::Function::Create(pTypeDef, linkage, name, pModule);
 			if (pfn == nullptr)
 			{
-				throw new EmitterException(EmitterError::InvalidFunction);
+				throw new CompilerException(CompilerError::InvalidFunction);
 			}
 			return pfn;
 		}
