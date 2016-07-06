@@ -15,6 +15,7 @@ void TestMeanNodeCompute();
 void TestVarianceNodeCompute();
 void TestUnaryOperationNodeCompute();
 void TestBinaryOperationNodeCompute();
+void TestLinearPredictorNodeCompute();
 
 // Refinement
 void TestMeanNodeRefine();

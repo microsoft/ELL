@@ -19,6 +19,16 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    // TODO:
+    // InputNode<InputType>
+
+    // SimpleInputNode<InputType==OutputType>
+
+    // class MyInputNode : public InputNode<InputType> { OutputPort<double> _out1; OutputPort<bool> _out2; ...}
+
+    // OR: have input node as-is, but then have translator nodes to change from weird input type into ports of "reasonable" types 
+
+
     /// <summary> A node that represents an input to the system. </summary>
     template <typename ValueType>
     class InputNode : public Node

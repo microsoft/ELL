@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     LinearNode.h (features)
+//  File:     LinearPredictorNode.h (features)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,18 +11,20 @@
 #include "ModelGraph.h"
 #include "ModelTransformer.h"
 
+// predictors
+#include "LinearPredictor.h"
+
 // stl
 #include <string>
 
 namespace nodes
 {
     /// <summary> A feature that takes a vector input and returns its mean over some window of time </summary>
-    template <typename ValueType>
-    class LinearNode : public model::Node
+    class LinearPredictorNode : public model::Node
     {
     public:
         /// <summary> Constructor </summary>
-        LinearNode(const model::OutputPortElementList<ValueType>& input);
+        LinearPredictorNode(const model::OutputPortElementList<double>& input, const predictors::LinearPredictor& predictor);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -35,7 +37,7 @@ namespace nodes
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<ValueType>& output = _output;
+        const model::OutputPort<double>& output = _output;
 
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
@@ -43,19 +45,14 @@ namespace nodes
         virtual void Compute() const override;
 
     private:
-        template <typename Operation>
-        std::vector<ValueType> ComputeOutput(Operation&& fn) const;
 
         // Inputs
-        model::InputPort<ValueType> _input;
+        model::InputPort<double> _input;
 
         // Output
-        model::OutputPort<ValueType> _output;
+        model::OutputPort<double> _output;
 
         // Parameters
-        std::vector<ValueType> _weights;
-        ValueType _bias;
+        predictors::LinearPredictor _predictor;
     };
 }
-
-#include "../tcc/LinearNode.tcc"

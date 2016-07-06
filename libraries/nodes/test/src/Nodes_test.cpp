@@ -14,11 +14,15 @@
 #include "BinaryOperationNode.h"
 #include "UnaryOperationNode.h"
 #include "MagnitudeNode.h"
+#include "LinearPredictorNode.h"
 
 // model
 #include "ModelGraph.h"
 #include "Node.h"
 #include "InputNode.h"
+
+// predictors
+#include "LinearPredictor.h"
 
 // testing
 #include "testing.h"
@@ -276,3 +280,17 @@ void TestMeanNodeRefine()
         testing::ProcessTest("Testing MeanNode refine", testing::IsEqual(outputVec1, outputVec2));
     }
 }
+
+void TestLinearPredictorNodeCompute()
+{
+    const int dim = 10;
+    predictors::LinearPredictor predictor(dim);
+    // TODO: set it's vector and bias
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(dim);
+    auto predNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
+
+    // TODO: test it
+}
+

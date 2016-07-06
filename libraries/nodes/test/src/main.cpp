@@ -22,6 +22,7 @@ int main()
     TestVarianceNodeCompute(); 
     TestUnaryOperationNodeCompute();
     TestBinaryOperationNodeCompute();
+    TestLinearPredictorNodeCompute();
     
     TestMeanNodeRefine();
 

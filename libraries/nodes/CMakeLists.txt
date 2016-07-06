@@ -17,21 +17,21 @@ set (INCLUDE include/AccumulatorNode.h
              include/ConstantNode.h
              include/DelayNode.h
              include/DotProductNode.h
-             include/LinearNode.h
+             include/LinearPredictorNode.h
              include/MagnitudeNode.h
              include/MeanNode.h
              include/SumNode.h
              include/UnaryOperationNode.h
              include/VarianceNode.h)
 
-set (SRC src/Nothing.cpp)
+set (SRC src/LinearPredictorNode.cpp
+         src/Nothing.cpp)
 
 set (TCC tcc/AccumulatorNode.tcc
          tcc/BinaryOperationNode.tcc
          tcc/ConstantNode.tcc
          tcc/DelayNode.tcc
          tcc/DotProductNode.tcc
-         tcc/LinearNode.tcc
          tcc/MagnitudeNode.tcc
          tcc/MeanNode.tcc
          tcc/SumNode.tcc
@@ -43,9 +43,9 @@ source_group("src" FILES ${SRC})
 source_group("tcc" FILES ${TCC})
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_include_directories(${PROJ_NAME} INTERFACE include)
-target_include_directories(${PROJ_NAME} INTERFACE ../model/include)
-target_include_directories(${PROJ_NAME} INTERFACE ../utilities/include)
+target_include_directories(${PROJ_NAME} PUBLIC include)
+target_include_directories(${PROJ_NAME} PUBLIC ../model/include)
+target_include_directories(${PROJ_NAME} PUBLIC ../utilities/include)
 target_link_libraries(${PROJ_NAME} model utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
@@ -65,11 +65,15 @@ source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})
 
 include_directories(../testing/include)
+include_directories(../dataset/include)
+include_directories(../linear/include)
+include_directories(../layers/include)
+include_directories(../predictors/include)
 include_directories(test/include)
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 
-target_link_libraries(${TEST_NAME} testing model nodes utilities)
+target_link_libraries(${TEST_NAME} testing linear model nodes predictors utilities)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 
