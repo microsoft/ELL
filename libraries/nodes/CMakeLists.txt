@@ -12,9 +12,9 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/SimpleTreeNode.cpp)
+set (SRC src/SimpleForestNode.cpp)
 
-set (INCLUDE include/SimpleTreeNode.h)
+set (INCLUDE include/SimpleForestNode.h)
 
 set (TCC )
 

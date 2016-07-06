@@ -22,11 +22,11 @@ set (INCLUDE include/ConstantPredictor.h
              include/EnsemblePredictor.h
              include/LinearPredictor.h
              include/SingleInputThresholdRule.h
-             include/TreePredictor.h)
+             include/ForestPredictor.h)
 
 set (TCC tcc/EnsemblePredictor.tcc
          tcc/SingleInputThresholdRule.tcc
-         tcc/TreePredictor.tcc)
+         tcc/ForestPredictor.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

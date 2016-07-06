@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleTreeNode.h (nodes)
+//  File:     SimpleForestNode.h (nodes)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,7 +14,7 @@
 #include "OutputPort.h"
 
 // predictors
-#include "TreePredictor.h"
+#include "ForestPredictor.h"
 
 // stl
 #include <string>
@@ -26,7 +26,7 @@ namespace nodes
     /// Implements a simple binary decision/regression tree node, with single-input threshold split
     /// rules in interior nodes and constant outputs on all edges.
     /// </summary>
-    class SimpleTreeNode : public model::Node
+    class SimpleForestNode : public model::Node
     {
     public:
         /// <summary> Gets the name of this type. </summary>
@@ -38,7 +38,7 @@ namespace nodes
         const model::OutputPort<double>& output = _output;
 
         /// <summary> Exposes the edge-path indicator vectors as a read-only property </summary>
-        const model::OutputPort<bool>& edgePathIndicatorVector = _edgePathIndicatorVector;
+        //const model::OutputPort<bool>& edgePathIndicatorVector = _edgePathIndicatorVector;
     
     protected:
         virtual void Compute() const override;
@@ -49,9 +49,10 @@ namespace nodes
         
         // output ports
         model::OutputPort<double> _output;
-        model::OutputPort<bool> _edgePathIndicatorVector;
+        model::OutputPort<double> _treeOutputs;
+        std::vector<model::OutputPort<bool>> _edgePathIndicatorVectors;
 
         // the tree
-        predictors::SimpleTreePredictor _tree;
+        predictors::SimpleForestPredictor _forest;
     };
 }
