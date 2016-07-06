@@ -21,24 +21,16 @@
 
 namespace predictors
 {
-    struct ForestPredictorLeafId
-    {
-        size_t interiorNodeIndex;
-        size_t leafIndex;
-    };
-
-    /// <summary>
-    /// Implements a forest of decision/regression trees. Split rules: Each interior node in a tree
-    /// is associated with a split rule. The split rule type is set by a template argument (namely,
-    /// the type can be arbitrary but a single type is used throughout the forest). A split rule is a
-    /// predictor that returns an index of an outgoing edge index, or -1 to early-stop. The fan-out
-    /// at each interior node can be arbitrary. Tree output: Each edge in each tree is associated
-    /// with a predictor, the output of a tree is the sum of predictions made along the path from the
-    /// root to a leaf, and the output of the forest is the sum over trees. The type of predictor is
-    /// set by a template argument (namely, the type can be arbitrary but a single type is used
-    /// throughout the forest). Note that assigning outputs to edges is equivalent to assigning them to
-    /// all non-root nodes (so, outputs in leaves is a special case).
-    /// </summary>
+    /// <summary> Implements a forest of decision/regression trees. Split rules: Each interior node in
+    /// each tree is associated with a split rule. The split rule type is set by a template argument
+    /// (namely, the type can be arbitrary but a single type is used throughout the forest). A split
+    /// rule is a predictor that returns an index of an outgoing edge, or -1 to early-stop the path
+    /// in a tree. The fan-out at each interior node can be arbitrary. Tree output: Each edge in each
+    /// tree is associated with a predictor, the output of a tree is the sum of predictions made
+    /// along the path from the root to a leaf, and the output of the forest is the sum over trees.
+    /// The type of predictor is set by a template argument (namely, the type can be arbitrary but a
+    /// single type is used throughout the forest). Note that assigning outputs to edges is
+    /// equivalent to assigning them to all non-root nodes (so, outputs in leaves is a special case). </summary>
     ///
     /// <typeparam name="SplitRuleType"> Type of split rule to use in interior nodes. </typeparam>
     /// <typeparam name="EdgePredictorType"> Type of predictor to associate with each edge. </typeparam>
@@ -46,6 +38,13 @@ namespace predictors
     class ForestPredictor
     {
     public:
+        /// <summary> A struct that identifies a leaf. </summary>
+        struct LeafId
+        {
+            size_t interiorNodeIndex;
+            size_t leafIndex;
+        };
+
         /// <summary> Struct that defines a split rule and the predictors assigned to the outgoing edges. </summary>
         struct SplitInfo
         {
@@ -56,7 +55,7 @@ namespace predictors
             std::vector<EdgePredictorType> predictors;
         };
 
-        /// <summary> Gets the number of trees i nthe forest. </summary>
+        /// <summary> Gets the number of trees in the forest. </summary>
         ///
         /// <returns> The number of tress. </returns>
         size_t NumTrees() const { return _trees.size(); }
@@ -73,7 +72,7 @@ namespace predictors
         /// <returns> The number of interior nodes. </returns>
         size_t NumInteriorNodes() const { return _interiorNodes.size(); }
 
-        /// <summary> Gets the number of interior nodes in a given tree. </summary>
+        /// <summary> Gets the number of interior nodes in the subtree under a given interior node. </summary>
         ///
         /// <returns> The number of interior nodes under a given interior node. </returns>
         size_t NumInteriorNodes(size_t interiorNodeIndex) const;
@@ -88,7 +87,7 @@ namespace predictors
         /// <returns> The number of edges. </returns>
         size_t NumEdges(size_t interiorNodeIndex) const;
 
-        /// <summary> Returns the output of the entire forest for a given input. </summary>
+        /// <summary> Returns the output of the forest for a given input. </summary>
         ///
         /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the input. </typeparam>
         /// <param name="input"> The input vector. </param>
@@ -108,7 +107,7 @@ namespace predictors
         template<typename RandomAccessVectorType>
         double Compute(const RandomAccessVectorType& input, size_t interiorNodeIndex) const;
 
-        /// <summary> Returns the edge path indicator vector of the entire forest. </summary>
+        /// <summary> Generates the edge path indicator vector of the entire forest. </summary>
         ///
         /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
         /// input. </typeparam>
@@ -117,7 +116,7 @@ namespace predictors
         template<typename RandomAccessVectorType>
         void GetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& output) const;
 
-        /// <summary> Returns the edge path indicator vector of a given subtree for a given input. The
+        /// <summary> Generates the edge path indicator vector of a given subtree for a given input. The
         /// dimension of this vector is NumEdges() (regardless of the subtree chosen). </summary>
         ///
         /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
@@ -128,7 +127,7 @@ namespace predictors
         template<typename RandomAccessVectorType>
         void GetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& output, size_t interiorNodeIndex) const;
 
-        /// <summary> Adds a new tree (a stump) to the forest. </summary>
+        /// <summary> Adds a new depth-1 tree to the forest. </summary>
         ///
         /// <param name="splitInfo"> Information describing the split of the root node. </param>
         ///
@@ -141,7 +140,7 @@ namespace predictors
         /// <param name="leaf"> The leaf to split. </param>
         ///
         /// <returns> The index of the newly created interior node. </returns>
-        size_t SplitLeaf(const SplitInfo& splitInfo, ForestPredictorLeafId leaf);
+        size_t SplitLeaf(const SplitInfo& splitInfo, LeafId leaf);
 
     protected:
         struct Edge

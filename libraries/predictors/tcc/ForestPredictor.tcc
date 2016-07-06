@@ -162,7 +162,7 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::SplitLeaf(const SplitInfo& splitInfo, ForestPredictorLeafId leaf)
+    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::SplitLeaf(const SplitInfo& splitInfo, LeafId leaf)
     {   
         // check that the parent of the leaf exists
         if(leaf.interiorNodeIndex >= _interiorNodes.size())

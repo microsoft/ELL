@@ -20,7 +20,7 @@ void ForestPredictorTest()
     using SplitInfo = predictors::SimpleForestPredictor::SplitInfo;
     using SplitRule = predictors::SingleInputThresholdRule;
     using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
-    using LeafId = predictors::ForestPredictorLeafId;
+    using LeafId = predictors::SimpleForestPredictor::LeafId;
 
     // add a tree
     predictors::SimpleForestPredictor forest;
@@ -67,7 +67,6 @@ void ForestPredictorTest()
     std::vector<bool> path(forest.NumEdges());
     forest.GetEdgeIndicatorVector(linear::DoubleVector({0.25, 0.7, 0.0}), path);
     testing::ProcessTest("Testing GetEdgeIndicatorVector()", testing::IsEqual(path, std::vector<bool>{1, 0, 0, 1, 0, 0, 0, 1}));
-
 }
 
 /// Runs all tests
