@@ -21,6 +21,7 @@ set (SRC src/IREmitter.cpp
 		 src/IRIfEmitter.cpp
          src/IRFunctionEmitter.cpp
 		 src/Compiler.cpp
+		 src/IRCompiler.cpp
 )
 
 set (INCLUDE include/LLVMInclude.h
@@ -34,6 +35,7 @@ set (INCLUDE include/LLVMInclude.h
 		include/IRModuleEmitter.h
 		include/IRInclude.h
 		include/Compiler.h
+		include/IRCompiler.h
 )
 
 set (TCC tcc/SymbolTable.tcc

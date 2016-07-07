@@ -366,7 +366,6 @@ namespace emll
 
 			// pSum is in a register...
 			llvm::Value* pSum = _fn.Op(OperatorType::AddF, pValue, pDest);
-
 			Store(destVar, pSum);
 		}
 

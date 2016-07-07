@@ -97,6 +97,18 @@ nodes::BinaryOperationNode<T>* ModelBuilder::Add(const model::OutputPort<T>& x, 
 	return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationNode<T>::OperationType::add);
 }
 
+template<typename T>
+nodes::ConstantNode<T>* ModelBuilder::Constant(const T value)
+{
+	return _model.AddNode<nodes::ConstantNode<T>>(value);
+}
+
+template<typename T>
+nodes::ConstantNode<T>* ModelBuilder::Constant(const std::vector<T>& values)
+{
+	return _model.AddNode<nodes::ConstantNode<T>>(values);
+}
+
 void TestBinaryOp()
 {
 	ModelBuilder builder;
@@ -104,9 +116,23 @@ void TestBinaryOp()
 
 	auto input = builder.Inputs<double>(data);
 
-	nodes::BinaryOperationNode<double>* addNode = builder.Add<double>(input->output, input->output);
+	auto c = builder.Constant<double>({ 5, 50, 500, 5000 });
 
+	nodes::BinaryOperationNode<double>* addNode = builder.Add<double>(input->output, c->output);
+	
+	std::cout << typeid(addNode).name() << std::endl;
+	std::cout << typeid(nodes::BinaryOperationNode<double>).name() << std::endl;
+	std::cout << typeid(nodes::BinaryOperationNode<int>).name() << std::endl;
+
+	if (typeid(*addNode) ==  typeid(nodes::BinaryOperationNode<double>))
+	{
+		std::cout << "Hoo" << std::endl;
+	}
 	auto result = builder.Model.GetNodeOutput(addNode->output);
+	for (auto r : result)
+	{
+		std::cout << r << ";";
+	}
 
 	model::Node* pNode = addNode;
 
