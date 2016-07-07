@@ -13,6 +13,8 @@
 
 // model
 #include "ModelGraph.h"
+#include "ModelTransformer.h"
+#include "InputNode.h"
 
 // common
 #include "LoadModelGraph.h"
@@ -34,6 +36,16 @@ int main(int argc, char* argv[])
 
         // parse command line
         commandLineParser.Parse();
+
+        auto model = common::LoadModelGraph(filename);
+        model::TransformContext context;
+        model::ModelTransformer transformer(context);
+        auto newModel = transformer.RefineModel(model);
+        // TODO: need to get the output port we care about somehow
+
+        auto inputNodes = newModel.GetNodesByType<model::InputNode<double>>();
+        // auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
+        // auto newOutputPort = transformer.GetCorrespondingOutputPort(meanNode->output);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

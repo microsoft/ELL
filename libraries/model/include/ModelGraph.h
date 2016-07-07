@@ -35,6 +35,13 @@ namespace model
         /// <returns> a weak_ptr to the node </param>
         Node* GetNode(Node::NodeId id);
 
+        /// <summary> Retrieves a set of nodes by type </summary>
+        ///
+        /// <typeparam name="NodeType"> The type of the node </typeparam>
+        /// <returns> A vector of nodes of the requested type </returns>
+        template <typename NodeType>
+        std::vector<const NodeType*> GetNodesByType();
+
         /// <summary> Returns part of the output computed by a node </summary>
         ///
         /// <param name="outputPort"> The output port to get the computed value form </param>

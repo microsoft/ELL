@@ -39,6 +39,11 @@ namespace common
         // classifier
         auto inputs = model::Concat(model::MakeOutputPortElementList(mean8->output), model::MakeOutputPortElementList(var8->output), model::MakeOutputPortElementList(mean16->output), model::MakeOutputPortElementList(var16->output));
         predictors::LinearPredictor predictor(inputs.Size());
+        // Set some values into the predictor's vector
+        for(int index = 0; index < inputs.Size(); ++index)
+        {
+            predictor.GetVector()[index] = (double)(index%5);
+        }
         auto classifierNode = model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
 
         return model;

@@ -15,10 +15,11 @@
 
 int main()
 {
+    TestStaticGraph();
+    TestExampleGraph();
     TestInputRouting1();
     TestInputRouting2();
-    TestStaticGraph();
-
+    
     TestCopyGraph();
     TestRefineGraph();
 

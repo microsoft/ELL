@@ -4,14 +4,20 @@
 
 #include "Graph_test.h"
 
+// model
 #include "ModelGraph.h"
 #include "ModelTransformer.h"
 #include "ValueSelectorNode.h"
 #include "ExtremalValueNode.h"
-#include "ConstantNode.h"
 #include "InputNode.h"
 #include "InputPort.h"
 #include "OutputPort.h"
+
+// nodes
+#include "ConstantNode.h"
+
+// common
+#include "LoadModelGraph.h"
 
 // testing
 #include "testing.h"
@@ -103,6 +109,16 @@ void TestStaticGraph()
         std::cout << x << "  ";
     std::cout << std::endl;
     testing::ProcessTest("Testing min index", testing::IsEqual(output4[0], 2));
+}
+
+void TestExampleGraph()
+{
+    auto model = common::LoadModelGraph("");
+    PrintGraph(model);
+
+    auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
+    std::cout << "# input nodes: " << inputNodes.size() << std::endl;
+
 }
 
 void TestInputRouting1()
