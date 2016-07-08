@@ -78,6 +78,13 @@ namespace model
         void Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodes) const;
 
         // TODO: iterators, including begin/end for iterating over entire graph
+        class NodeIterator
+        {
+        };
+
+        NodeIterator GetNodeIterator() const;
+        NodeIterator GetNodeIterator(const Node* outputNode) const;
+        NodeIterator GetNodeIterator(const std::vector<const Node*>& outputNodes) const;
 
     private:
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
