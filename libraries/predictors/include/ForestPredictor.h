@@ -38,11 +38,12 @@ namespace predictors
     class ForestPredictor
     {
     public:
-        /// <summary> A struct that identifies a leaf. </summary>
-        struct LeafId
+        /// <summary> A struct that identifies a splittable node in the forest. The splittable node can be
+        /// the root of a new tree, or a node in an existing tree. </summary>
+        struct SplittableNodeId
         {
-            size_t interiorNodeIndex;
-            size_t leafIndex;
+            int parentNodeIndex;
+            size_t childPosition;
         };
 
         /// <summary> Struct that defines a split rule and the predictors assigned to the outgoing edges. </summary>
@@ -129,20 +130,25 @@ namespace predictors
         template<typename RandomAccessVectorType>
         std::vector<bool> GetEdgeIndicatorVector(const RandomAccessVectorType& input, size_t interiorNodeIndex) const;
 
-        /// <summary> Adds a new depth-1 tree to the forest. </summary>
+        /// <summary> Gets a SplittableNodeId that represents the root of a new tree. </summary>
         ///
-        /// <param name="splitInfo"> Information describing the split of the root node. </param>
-        ///
-        /// <returns> The index of the newly created root node. </returns>
-        size_t AddTree(const SplitInfo& splitInfo);
+        /// <returns> A root node identifier. </returns>
+        SplittableNodeId GetRootId() const { return {-1, 0}; }
 
         /// <summary> Splits a leaf of one of the trees. </summary>
         ///
         /// <param name="splitInfo"> Information describing the split. </param>
-        /// <param name="leaf"> The leaf to split. </param>
+        /// <param name="nodeId"> The identifier of the node being split. </param>
         ///
         /// <returns> The index of the newly created interior node. </returns>
-        size_t SplitLeaf(const SplitInfo& splitInfo, LeafId leaf);
+        size_t Split(const SplitInfo& splitInfo, SplittableNodeId nodeId);
+
+        /// <summary> Gets the number of children of a given interior node. </summary>
+        ///
+        /// <param name="interiorNodeIndex"> Index of the interior node. </param>
+        ///
+        /// <returns> The number of children. </returns>
+        size_t NumChildren(size_t interiorNodeIndex) const;
 
     protected:
         struct Edge
@@ -168,6 +174,8 @@ namespace predictors
         template<typename RandomAccessVectorType>
         void SetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& edgeIndicator, size_t interiorNodeIndex) const;
 
+        size_t SplitNode(const SplitInfo& splitInfo, SplittableNodeId nodeId);
+        size_t AddTree(const SplitInfo& splitInfo);
         size_t AddInteriorNode(const SplitInfo& splitInfo);
 
         std::vector<InteriorNode> _interiorNodes;

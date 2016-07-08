@@ -22,7 +22,7 @@
 #include "SupervisedExample.h"
 
 // common
-#include "SortingTreeTrainerArguments.h"
+#include "ForestTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
@@ -33,7 +33,7 @@
 #include "MakeEvaluator.h"
 
 // trainers
-#include "SortingTreeTrainer.h"
+#include "ForestTrainer.h"
 
 // lossFunctions
 #include "SquaredLoss.h"
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
-        common::ParsedSortingTreeTrainerArguments sortingTreeTrainerArguments;
+        common::ParsedForestTrainerArguments sortingTreeTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);

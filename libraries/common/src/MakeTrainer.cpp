@@ -16,6 +16,9 @@
 // utilities
 #include "CommandLineParser.h"
 
+// trainers
+#include "ForestTrainer.h"
+
 namespace common
 {
     std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& sgdArguments)
@@ -38,14 +41,14 @@ namespace common
         }
     }
 
-    std::unique_ptr<trainers::IBlackBoxTrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossArguments& lossArguments, const SortingTreeTrainerArguments& sortingTreeArguments)
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& forestTrainerArguments)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
         switch(lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return trainers::MakeSortingTreeTrainer(lossFunctions::SquaredLoss(), sortingTreeArguments);
+            return trainers::MakeForestTrainer(lossFunctions::SquaredLoss(), forestTrainerArguments);
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");

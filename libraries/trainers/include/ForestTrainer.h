@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include "IBlackBoxTrainer.h"
+#include "IIncrementalTrainer.h"
 
 // dataset
 #include "RowDataset.h"
 #include "DenseDataVector.h"
 
 // predictors
-#include "DecisionTreePredictor.h"
+#include "ForestPredictor.h"
 
 // stl
 #include <queue>
@@ -37,7 +37,7 @@ namespace trainers
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
     template <typename LossFunctionType> 
-    class ForestTrainer : public IBlackBoxTrainer<predictors::DecisionTreePredictor>
+    class ForestTrainer : public IIncrementalTrainer<predictors::SimpleForestPredictor>
     {
     public:
 
@@ -52,9 +52,15 @@ namespace trainers
         /// <param name="exampleIterator"> An example iterator that represents the training set.  </param>
         ///
         /// <returns> The trained decision tree. </returns>
-        virtual predictors::DecisionTreePredictor Train(dataset::GenericRowDataset::Iterator exampleIterator) const override;
+        virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
 
     private:
+        // Specify how the trainer identifies which node it is splitting. 
+        using SplittableNodeId = predictors::SimpleForestPredictor::SplittableNodeId;
+
+        // Specify how the trainer defines a split.
+        using SplitInfo = predictors::SimpleForestPredictor::SplitInfo;
+
         // struct used to keep statistics about tree leaves
         struct Sums
         {
@@ -64,17 +70,19 @@ namespace trainers
             Sums operator-(const Sums& other) const; 
         };
 
-        // struct used to keep info about the gain maximizing split of each leaf in the tree
+        // struct used to keep info about the gain maximizing split of each splittable node in the tree
         struct SplitCandidate
         {
-            predictors::DecisionTreePredictor::Node* leaf;
-            predictors::DecisionTreePredictor::SplitRule splitRule;
+            SplitInfo splitInfo;
+            SplittableNodeId nodeId;
+
             double gain = 0;
+
             uint64_t fromRowIndex;
             uint64_t size;
-            uint64_t negativeSize;
+            uint64_t size0;
             Sums sums;
-            Sums negativeSums;
+            Sums sums0;
 
             bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
             void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
@@ -86,18 +94,19 @@ namespace trainers
             using std::priority_queue<SplitCandidate>::size;
         };
 
-        Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator) const;
-        void AddSplitCandidateToQueue(predictors::DecisionTreePredictor::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums) const;
-        void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size) const;
+        Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
+        void AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, uint64_t size, Sums sums);
+        void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size);
         double CalculateGain(Sums sums, Sums negativeSums) const;
         double GetOutputValue(Sums sums) const;
-        void Cleanup() const;
 
         // member variables
         LossFunctionType _lossFunction;
         ForestTrainerParameters _parameters;
-        mutable dataset::RowDataset<dataset::DoubleDataVector> _dataset;
-        mutable PriorityQueue _queue;
+        predictors::SimpleForestPredictor _forest;
+
+        dataset::RowDataset<dataset::DoubleDataVector> _dataset;
+        PriorityQueue _queue;
     };
 
     /// <summary> Makes a sorting tree trainer. </summary>
@@ -108,7 +117,7 @@ namespace trainers
     ///
     /// <returns> A nique_ptr to a sorting tree trainer. </returns>
     template<typename LossFunctionType>
-    std::unique_ptr<IBlackBoxTrainer<predictors::DecisionTreePredictor>> MakeForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters);
+    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters);
 }
 
 #include "../tcc/ForestTrainer.tcc"

@@ -126,6 +126,29 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
+    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::NumChildren(size_t interiorNodeIndex) const
+    {
+        if (interiorNodeIndex >= _interiorNodes.size())
+        {
+            return 0;
+        }
+        return _interiorNodes[interiorNodeIndex].outgoingEdges.size();
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::Split(const SplitInfo& splitInfo, SplittableNodeId nodeId)
+    {
+        if(nodeId.parentNodeIndex < 0)
+        {
+            return AddTree(splitInfo);
+        }
+        else
+        {
+            return SplitNode(splitInfo, nodeId);
+        }
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
     template<typename RandomAccessVectorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::SetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& output, size_t interiorNodeIndex) const
     {
@@ -173,25 +196,25 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::SplitLeaf(const SplitInfo& splitInfo, LeafId leaf)
+    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::SplitNode(const SplitInfo& splitInfo, SplittableNodeId nodeId)
     {   
-        // check that the parent of the leaf exists
-        if(leaf.interiorNodeIndex >= _interiorNodes.size())
+        // check that the parent of the splittable node exists
+        if(nodeId.parentNodeIndex >= _interiorNodes.size())
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - parent of leaf does not exist");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - parent does not exist");
         }
 
-        // check that this leaf exists
-        if(leaf.leafIndex >= _interiorNodes[leaf.interiorNodeIndex].outgoingEdges.size())
+        // check that the splittable node exists
+        if(nodeId.childPosition >= _interiorNodes[nodeId.parentNodeIndex].outgoingEdges.size())
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - leaf does not exist");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - node does not exist");
         }
 
         // check that this node wasn't previously split
-        auto& parentOutgoing = _interiorNodes[leaf.interiorNodeIndex].outgoingEdges[leaf.leafIndex].targetNodeIndex;
+        auto& parentOutgoing = _interiorNodes[nodeId.parentNodeIndex].outgoingEdges[nodeId.childPosition].targetNodeIndex;
         if (parentOutgoing != 0)
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - attempted to split a non-leaf");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - node previously split");
         }
 
         // add interior Node

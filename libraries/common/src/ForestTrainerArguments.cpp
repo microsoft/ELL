@@ -1,16 +1,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SortingTreeTrainerArguments.cpp (common)
+//  File:     ForestTrainerArguments.cpp (common)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SortingTreeTrainerArguments.h"
+#include "ForestTrainerArguments.h"
 
 namespace common
 {
-    void ParsedSortingTreeTrainerArguments::AddArgs(utilities::CommandLineParser & parser) 
+    void ParsedForestTrainerArguments::AddArgs(utilities::CommandLineParser & parser) 
     {
         parser.AddOption(minSplitGain,
                          "minSplitGain",

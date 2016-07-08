@@ -16,15 +16,13 @@ namespace trainers
     {}
 
     template <typename LossFunctionType>
-    predictors::DecisionTreePredictor ForestTrainer<LossFunctionType>::Train(dataset::GenericRowDataset::Iterator exampleIterator) const
+    void ForestTrainer<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         // convert data fron iterator to dense row dataset; compute sums statistics of the tree root
         auto sums = LoadData(exampleIterator);
 
-        predictors::DecisionTreePredictor tree(GetOutputValue(sums));
-
         // find split candidate for root node and push it onto the priority queue
-        AddSplitCandidateToQueue(&tree.GetRoot(), 0, _dataset.NumExamples(), sums);
+        AddSplitCandidateToQueue(_forest.GetRootId(), 0, _dataset.NumExamples(), sums);
 
         // as long as positive gains can be attained, keep growing the tree
         while(!_queue.empty())
@@ -71,7 +69,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    typename ForestTrainer<LossFunctionType>::Sums ForestTrainer<LossFunctionType>::LoadData(dataset::GenericRowDataset::Iterator exampleIterator) const
+    typename ForestTrainer<LossFunctionType>::Sums ForestTrainer<LossFunctionType>::LoadData(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         Sums sums;
 
@@ -91,7 +89,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::AddSplitCandidateToQueue(predictors::DecisionTreePredictor::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums) const
+    void ForestTrainer<LossFunctionType>::AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, uint64_t size, Sums sums)
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 
@@ -107,6 +105,7 @@ namespace trainers
 
             Sums negativeSums;
 
+            // consider all thresholds
             for (uint64_t rowIndex = fromRowIndex; rowIndex < fromRowIndex + size-1; ++rowIndex)
             {
                 // get friendly names
@@ -155,7 +154,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size) const
+    void ForestTrainer<LossFunctionType>::SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size)
     {
         _dataset.Sort([featureIndex](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[featureIndex]; },
             fromRowIndex,
@@ -184,22 +183,6 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::Cleanup() const
-    {
-        _dataset.Reset();
-        while (!_queue.empty())
-        {
-            _queue.pop();
-        }
-    }
-
-    template<typename LossFunctionType>
-    std::unique_ptr<IBlackBoxTrainer<predictors::DecisionTreePredictor>> MakeForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters)
-    {
-        return std::make_unique<ForestTrainer<LossFunctionType>>(lossFunction, parameters);
-    }
-
-    template<typename LossFunctionType>
     void ForestTrainer<LossFunctionType>::SplitCandidate::Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const
     {
         os << "Leaf: " << leaf <<
@@ -224,5 +207,11 @@ namespace trainers
         {
             candidate.Print(os, dataset);
         }
+    }
+
+    template<typename LossFunctionType>
+    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters)
+    {
+        return std::make_unique<ForestTrainer<LossFunctionType>>(lossFunction, parameters);
     }
 }

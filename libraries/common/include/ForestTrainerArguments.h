@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SortingTreeTrainerArguments.h (common)
+//  File:     ForestTrainerArguments.h (common)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,14 +12,14 @@
 #include "CommandLineParser.h"
 
 // trainers
-#include "SortingTreeTrainer.h"
+#include "ForestTrainer.h"
 
 namespace common
 {
-    using SortingTreeTrainerArguments = trainers::SortingTreeTrainerParameters;
+    using ForestTrainerArguments = trainers::ForestTrainerParameters;
 
     /// <summary> Parsed version of sorting tree trainer parameters. </summary>
-    struct ParsedSortingTreeTrainerArguments : public SortingTreeTrainerArguments, public utilities::ParsedArgSet
+    struct ParsedForestTrainerArguments : public ForestTrainerArguments, public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///
