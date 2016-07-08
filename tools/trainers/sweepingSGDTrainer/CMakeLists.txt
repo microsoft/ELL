@@ -17,21 +17,11 @@ set (SRC src/main.cpp)
 
 source_group("src" FILES ${SRC})
 
-include_directories(include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/common/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/dataset/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/layers/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/linear/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/lossFunctions/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/predictors/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/trainers/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/evaluators/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/utilities/include)
-
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC})
+target_include_directories(${PROJ_NAME} PRIVATE include)
 target_link_libraries(${PROJ_NAME} common dataset layers linear lossFunctions predictors trainers evaluators utilities)
 
 # put this project in the trainers folder in the IDE 
