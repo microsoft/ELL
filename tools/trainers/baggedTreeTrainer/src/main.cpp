@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
-        common::ParsedForestTrainerArguments sortingTreeTrainerArguments;
+//        common::ParsedForestTrainerArguments sortingTreeTrainerArguments;
         common::ParsedBaggingIncrementalTrainerArguments baggingIncrementalTrainerArguments;
         common::ParsedEvaluatorArguments evaluatorArguments;
 
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
-        commandLineParser.AddOptionSet(sortingTreeTrainerArguments);
+ //       commandLineParser.AddOptionSet(sortingTreeTrainerArguments);
         commandLineParser.AddOptionSet(baggingIncrementalTrainerArguments);
         commandLineParser.AddOptionSet(evaluatorArguments);
 
@@ -107,14 +107,14 @@ int main(int argc, char* argv[])
         }
 
         // create trainer
-        auto baseTrainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
-        auto trainer = trainers::MakeBaggingIncrementalTrainer(std::move(baseTrainer), baggingIncrementalTrainerArguments, evaluator);
+//        auto baseTrainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
+//        auto trainer = trainers::MakeBaggingIncrementalTrainer(std::move(baseTrainer), baggingIncrementalTrainerArguments, evaluator);
         
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto trainSetIterator = rowDataset.GetIterator();
-        trainer->Update(trainSetIterator);
-        auto ensemble = trainer->GetPredictor();
+//        trainer->Update(trainSetIterator);
+//        auto ensemble = trainer->GetPredictor();
 
         // print loss and errors
         if(trainerArguments.verbose)
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
         }
 
         // add predictor to the model
-        ensemble->AddToModel(model, outputCoordinateList);
+//        ensemble->AddToModel(model, outputCoordinateList);
 
         // save the model
         model.Save(outStream);

@@ -40,9 +40,10 @@ namespace predictors
     public:
         /// <summary> A struct that identifies a splittable node in the forest. The splittable node can be
         /// the root of a new tree, or a node in an existing tree. </summary>
-        struct SplittableNodeId
+        struct SplittableNodeId // TODO: give it a private ctor and make the forest a friend
         {
-            int parentNodeIndex;
+            bool isRoot;
+            size_t parentNodeIndex;
             size_t childPosition;
         };
 
@@ -133,7 +134,22 @@ namespace predictors
         /// <summary> Gets a SplittableNodeId that represents the root of a new tree. </summary>
         ///
         /// <returns> A root node identifier. </returns>
-        SplittableNodeId GetRootId() const { return {-1, 0}; }
+        SplittableNodeId GetRootId() const { return {true, 0, 0}; }
+
+        /// <summary> Gets the number of children of a given interior node. </summary>
+        ///
+        /// <param name="interiorNodeIndex"> Index of the interior node. </param>
+        ///
+        /// <returns> The number of children. </returns>
+        size_t NumChildren(size_t interiorNodeIndex) const;
+
+        /// <summary> Gets a SplittableNodeId that represents the child of an interior node. </summary>
+        ///
+        /// <param name="parentNodeIndex"> Index of the parent node. </param>
+        /// <param name="childPosition"> The position of the child. </param>
+        ///
+        /// <returns> The child identifier. </returns>
+        SplittableNodeId GetChildId(size_t parentNodeIndex, size_t childPosition) const;
 
         /// <summary> Splits a leaf of one of the trees. </summary>
         ///
@@ -142,13 +158,6 @@ namespace predictors
         ///
         /// <returns> The index of the newly created interior node. </returns>
         size_t Split(const SplitInfo& splitInfo, SplittableNodeId nodeId);
-
-        /// <summary> Gets the number of children of a given interior node. </summary>
-        ///
-        /// <param name="interiorNodeIndex"> Index of the interior node. </param>
-        ///
-        /// <returns> The number of children. </returns>
-        size_t NumChildren(size_t interiorNodeIndex) const;
 
     protected:
         struct Edge

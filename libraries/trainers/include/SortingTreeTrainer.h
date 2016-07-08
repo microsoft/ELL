@@ -72,9 +72,9 @@ namespace trainers
             double gain = 0;
             uint64_t fromRowIndex;
             uint64_t size;
-            uint64_t negativeSize;
+            uint64_t size0;
             Sums sums;
-            Sums negativeSums;
+            Sums sums0;
 
             bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
             void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
@@ -89,7 +89,7 @@ namespace trainers
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator) const;
         void AddSplitCandidateToQueue(predictors::DecisionTreePredictor::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums) const;
         void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size) const;
-        double CalculateGain(Sums sums, Sums negativeSums) const;
+        double CalculateGain(Sums sums, Sums sums0) const;
         double GetOutputValue(Sums sums) const;
         void Cleanup() const;
 

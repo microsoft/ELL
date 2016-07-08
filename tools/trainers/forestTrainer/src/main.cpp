@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     main.cpp (sortingTreeLearner)
+//  File:     main.cpp (forestTrainer)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
         // create trainer
-        auto trainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
+        auto trainer = common::MakeForestTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
 
         // create random number generator
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
@@ -98,23 +98,23 @@ int main(int argc, char* argv[])
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto dataIterator = rowDataset.GetIterator(0, 1000);
-        auto tree = trainer->Train(dataIterator);
+        trainer->Update(dataIterator);
 
         // print loss and errors
         if(trainerArguments.verbose)
         {
-            std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
+            //std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
 
             // evaluate
-            auto evaluator = common::MakeEvaluator<predictors::DecisionTreePredictor>(rowDataset.GetIterator(), evaluators::EvaluatorParameters{1, false}, trainerArguments.lossArguments);
-            evaluator->Evaluate(tree);
-            std::cout << "Training error\n";
-            evaluator->Print(std::cout);
-            std::cout << std::endl;
+            //auto evaluator = common::MakeEvaluator<predictors::DecisionTreePredictor>(rowDataset.GetIterator(), evaluators::EvaluatorParameters{1, false}, trainerArguments.lossArguments);
+            //evaluator->Evaluate(tree);
+            //std::cout << "Training error\n";
+            //evaluator->Print(std::cout);
+            //std::cout << std::endl;
         }
 
         // add tree to model
-        tree.AddToModel(model, outputCoordinateList);
+      //  tree.AddToModel(model, outputCoordinateList);
 
         // output map
         model.Save(outStream);

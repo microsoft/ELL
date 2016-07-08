@@ -12,7 +12,7 @@ namespace trainers
 {    
     template <typename LossFunctionType>
     ForestTrainer<LossFunctionType>::ForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters) :
-        _lossFunction(lossFunction), _parameters(parameters)
+        _lossFunction(lossFunction), _parameters(parameters), _forest(std::make_shared<predictors::SimpleForestPredictor>())
     {}
 
     template <typename LossFunctionType>
@@ -22,7 +22,7 @@ namespace trainers
         auto sums = LoadData(exampleIterator);
 
         // find split candidate for root node and push it onto the priority queue
-        AddSplitCandidateToQueue(_forest.GetRootId(), 0, _dataset.NumExamples(), sums);
+        AddSplitCandidateToQueue(_forest->GetRootId(), 0, _dataset.NumExamples(), sums);
 
         // as long as positive gains can be attained, keep growing the tree
         while(!_queue.empty())
@@ -33,30 +33,28 @@ namespace trainers
              _queue.Print(std::cout, _dataset);
 #endif
 
-            auto splitInfo = _queue.top();
+            auto splitCandidate = _queue.top();
             _queue.pop();
 
-            auto positiveSums = splitInfo.sums - splitInfo.negativeSums;
+            const auto& sums = splitCandidate.nodeStats.sums;
+            const auto& sums0 = splitCandidate.nodeStats.sums0;
+            auto sums1 = sums - sums0;
 
             // perform the split
-            double outputValueSoFar = GetOutputValue(splitInfo.sums);
-            double negativeOutputValue = GetOutputValue(splitInfo.negativeSums) - outputValueSoFar;
-            double positiveOutputValue = GetOutputValue(positiveSums) - outputValueSoFar;
-            auto& interiorNode = splitInfo.leaf->Split(splitInfo.splitRule, negativeOutputValue, positiveOutputValue);
+            double outputValueSoFar = GetOutputValue(sums);
+            double negativeOutputValue = GetOutputValue(sums0) - outputValueSoFar;
+            double positiveOutputValue = GetOutputValue(sums1) - outputValueSoFar;
+            auto interiorNodeIndex = _forest->Split(splitCandidate.splitInfo, splitCandidate.nodeId);
 
             // sort the data according to the performed split
-            SortDatasetByFeature(splitInfo.splitRule.featureIndex, splitInfo.fromRowIndex, splitInfo.size);
+            SortDatasetByFeature(splitCandidate.featureIndex, splitCandidate.nodeStats.fromRowIndex, splitCandidate.nodeStats.size);
 
-            // queue split candidate for negative child
-            AddSplitCandidateToQueue(&interiorNode.GetNegativeChild(), splitInfo.fromRowIndex, splitInfo.negativeSize, splitInfo.negativeSums);
+            // queue split candidate for child 0
+            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), splitCandidate.nodeStats.fromRowIndex, splitCandidate.nodeStats.size0, sums0);
 
-            // queue split candidate for positive child
-            AddSplitCandidateToQueue(&interiorNode.GetPositiveChild(), splitInfo.fromRowIndex + splitInfo.negativeSize, splitInfo.size - splitInfo.negativeSize, positiveSums);
+            // queue split candidate for child 1
+            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 1), splitCandidate.nodeStats.fromRowIndex + splitCandidate.nodeStats.size0, splitCandidate.nodeStats.size - splitCandidate.nodeStats.size0, sums1);
         }
-
-        Cleanup();
-
-        return tree;
     }
 
     template<typename LossFunctionType>
@@ -93,17 +91,17 @@ namespace trainers
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 
-        SplitCandidate splitCandidate;
-        splitCandidate.leaf = leaf;
-        splitCandidate.fromRowIndex = fromRowIndex;
-        splitCandidate.size = size;
+        double bestGain = 0;
+        size_t bestFeatureIndex;
+        double bestThreshold;
+        NodeStats bestNodeStats;
 
         for (uint64_t featureIndex = 0; featureIndex < numFeatures; ++featureIndex)
         {
             // sort the relevant rows of dataset in ascending order by featureIndex
             SortDatasetByFeature(featureIndex, fromRowIndex, size);
 
-            Sums negativeSums;
+            Sums sums0;
 
             // consider all thresholds
             for (uint64_t rowIndex = fromRowIndex; rowIndex < fromRowIndex + size-1; ++rowIndex)
@@ -115,8 +113,8 @@ namespace trainers
                 double label = _dataset[rowIndex].GetLabel();
 
                 // increment sums
-                negativeSums.sumWeights += weight;
-                negativeSums.sumWeightedLabels += weight * label;
+                sums0.sumWeights += weight;
+                sums0.sumWeightedLabels += weight * label;
 
                 // only split between rows with different feature values
                 if (currentRow[featureIndex] == nextRow[featureIndex])
@@ -125,22 +123,29 @@ namespace trainers
                 }
 
                 // find gain maximizer
-                double gain = CalculateGain(sums, negativeSums);
-                if (gain > splitCandidate.gain)
+                double gain = CalculateGain(sums, sums0);
+                if (gain > bestGain)
                 {
-                    splitCandidate.gain = gain;
-                    splitCandidate.splitRule.featureIndex = featureIndex;
-                    splitCandidate.splitRule.threshold = 0.5 * (currentRow[featureIndex] + nextRow[featureIndex]);
-                    splitCandidate.negativeSize = rowIndex + 1 - fromRowIndex;
-                    splitCandidate.sums = sums;
-                    splitCandidate.negativeSums = negativeSums;
+                    bestGain = gain;
+                    bestFeatureIndex = featureIndex;
+                    bestThreshold = 0.5 * (currentRow[featureIndex] + nextRow[featureIndex]);
+                    
+                    bestNodeStats.size = size;
+                    bestNodeStats.size0 = rowIndex + 1 - fromRowIndex;
+                    bestNodeStats.sums = sums;
+                    bestNodeStats.sums0 = sums0;
                 }
             }
         }
 
+        using SplitRule = predictors::SingleInputThresholdRule;
+        using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
+
         // if found a good split candidate, queue it
-        if (splitCandidate.gain > 0.0)
+        if (bestGain > 0.0)
         {
+            SplitInfo splitInfo{SplitRule{ bestFeatureIndex, bestThreshold }, EdgePredictorVector{ GetOutputValue(bestNodeStats.sums0), GetOutputValue(bestNodeStats.sums0) }}; // TODO
+            SplitCandidate splitCandidate{splitInfo, nodeId, bestNodeStats, bestGain, bestFeatureIndex, bestThreshold};
             _queue.push(std::move(splitCandidate));
         }
 
@@ -162,16 +167,16 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    double ForestTrainer<LossFunctionType>::CalculateGain(Sums sums, Sums negativeSums) const
+    double ForestTrainer<LossFunctionType>::CalculateGain(Sums sums, Sums sums0) const
     {
-        auto positiveSums = sums - negativeSums;
+        auto positiveSums = sums - sums0;
 
-        if(negativeSums.sumWeights == 0 || positiveSums.sumWeights == 0)
+        if(sums0.sumWeights == 0 || positiveSums.sumWeights == 0)
         {
             return 0;
         }
         
-        return negativeSums.sumWeights * _lossFunction.BregmanGenerator(negativeSums.sumWeightedLabels/negativeSums.sumWeights) +
+        return sums0.sumWeights * _lossFunction.BregmanGenerator(sums0.sumWeightedLabels/sums0.sumWeights) +
             positiveSums.sumWeights * _lossFunction.BregmanGenerator(positiveSums.sumWeightedLabels/positiveSums.sumWeights) -
             sums.sumWeights * _lossFunction.BregmanGenerator(sums.sumWeightedLabels/sums.sumWeights);
     }
@@ -189,9 +194,9 @@ namespace trainers
             "\tSplitRule: (" << splitRule.featureIndex << "," << splitRule.threshold << ")" <<
             "\tGain: " << gain <<
             "\tSize: " << size <<
-            "\tNegativeSize: " << negativeSize <<
+            "\tNegativeSize: " << size0 <<
             "\tSums: (" << sums.sumWeights << "," << sums.sumWeightedLabels << ")" <<
-            "\tNegativeSums: (" << negativeSums.sumWeights << "," << negativeSums.sumWeightedLabels << ")\n";
+            "\tNegativeSums: (" << sums0.sumWeights << "," << sums0.sumWeightedLabels << ")\n";
 
         dataset.Print(os, fromRowIndex, size);
         os << std::endl;

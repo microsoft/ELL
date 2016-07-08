@@ -38,11 +38,11 @@ namespace trainers
             auto splitInfo = _queue.top();
             _queue.pop();
 
-            auto positiveSums = splitInfo.sums - splitInfo.negativeSums;
+            auto positiveSums = splitInfo.sums - splitInfo.sums0;
 
             // perform the split
             double outputValueSoFar = GetOutputValue(splitInfo.sums);
-            double negativeOutputValue = GetOutputValue(splitInfo.negativeSums) - outputValueSoFar;
+            double negativeOutputValue = GetOutputValue(splitInfo.sums0) - outputValueSoFar;
             double positiveOutputValue = GetOutputValue(positiveSums) - outputValueSoFar;
             auto& interiorNode = splitInfo.leaf->Split(splitInfo.splitRule, negativeOutputValue, positiveOutputValue);
 
@@ -50,10 +50,10 @@ namespace trainers
             SortDatasetByFeature(splitInfo.splitRule.featureIndex, splitInfo.fromRowIndex, splitInfo.size);
 
             // queue split candidate for negative child
-            AddSplitCandidateToQueue(&interiorNode.GetNegativeChild(), splitInfo.fromRowIndex, splitInfo.negativeSize, splitInfo.negativeSums);
+            AddSplitCandidateToQueue(&interiorNode.GetNegativeChild(), splitInfo.fromRowIndex, splitInfo.size0, splitInfo.sums0);
 
             // queue split candidate for positive child
-            AddSplitCandidateToQueue(&interiorNode.GetPositiveChild(), splitInfo.fromRowIndex + splitInfo.negativeSize, splitInfo.size - splitInfo.negativeSize, positiveSums);
+            AddSplitCandidateToQueue(&interiorNode.GetPositiveChild(), splitInfo.fromRowIndex + splitInfo.size0, splitInfo.size - splitInfo.size0, positiveSums);
         }
 
         Cleanup();
@@ -105,7 +105,7 @@ namespace trainers
             // sort the relevant rows of dataset in ascending order by featureIndex
             SortDatasetByFeature(featureIndex, fromRowIndex, size);
 
-            Sums negativeSums;
+            Sums sums0;
 
             for (uint64_t rowIndex = fromRowIndex; rowIndex < fromRowIndex + size-1; ++rowIndex)
             {
@@ -116,8 +116,8 @@ namespace trainers
                 double label = _dataset[rowIndex].GetLabel();
 
                 // increment sums
-                negativeSums.sumWeights += weight;
-                negativeSums.sumWeightedLabels += weight * label;
+                sums0.sumWeights += weight;
+                sums0.sumWeightedLabels += weight * label;
 
                 // only split between rows with different feature values
                 if (currentRow[featureIndex] == nextRow[featureIndex])
@@ -126,15 +126,15 @@ namespace trainers
                 }
 
                 // find gain maximizer
-                double gain = CalculateGain(sums, negativeSums);
+                double gain = CalculateGain(sums, sums0);
                 if (gain > splitCandidate.gain)
                 {
                     splitCandidate.gain = gain;
                     splitCandidate.splitRule.featureIndex = featureIndex;
                     splitCandidate.splitRule.threshold = 0.5 * (currentRow[featureIndex] + nextRow[featureIndex]);
-                    splitCandidate.negativeSize = rowIndex + 1 - fromRowIndex;
+                    splitCandidate.size0 = rowIndex + 1 - fromRowIndex;
                     splitCandidate.sums = sums;
-                    splitCandidate.negativeSums = negativeSums;
+                    splitCandidate.sums0 = sums0;
                 }
             }
         }
@@ -163,16 +163,16 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    double SortingTreeTrainer<LossFunctionType>::CalculateGain(Sums sums, Sums negativeSums) const
+    double SortingTreeTrainer<LossFunctionType>::CalculateGain(Sums sums, Sums sums0) const
     {
-        auto positiveSums = sums - negativeSums;
+        auto positiveSums = sums - sums0;
 
-        if(negativeSums.sumWeights == 0 || positiveSums.sumWeights == 0)
+        if(sums0.sumWeights == 0 || positiveSums.sumWeights == 0)
         {
             return 0;
         }
         
-        return negativeSums.sumWeights * _lossFunction.BregmanGenerator(negativeSums.sumWeightedLabels/negativeSums.sumWeights) +
+        return sums0.sumWeights * _lossFunction.BregmanGenerator(sums0.sumWeightedLabels/sums0.sumWeights) +
             positiveSums.sumWeights * _lossFunction.BregmanGenerator(positiveSums.sumWeightedLabels/positiveSums.sumWeights) -
             sums.sumWeights * _lossFunction.BregmanGenerator(sums.sumWeightedLabels/sums.sumWeights);
     }
@@ -206,9 +206,9 @@ namespace trainers
             "\tSplitRule: (" << splitRule.featureIndex << "," << splitRule.threshold << ")" <<
             "\tGain: " << gain <<
             "\tSize: " << size <<
-            "\tNegativeSize: " << negativeSize <<
+            "\tNegativeSize: " << size0 <<
             "\tSums: (" << sums.sumWeights << "," << sums.sumWeightedLabels << ")" <<
-            "\tNegativeSums: (" << negativeSums.sumWeights << "," << negativeSums.sumWeightedLabels << ")\n";
+            "\tNegativeSums: (" << sums0.sumWeights << "," << sums0.sumWeightedLabels << ")\n";
 
         dataset.Print(os, fromRowIndex, size);
         os << std::endl;

@@ -19,6 +19,7 @@
 
 // stl
 #include <queue>
+#include <memory>
 #include <iostream>
 
 /// <summary> trainers namespace </summary>
@@ -54,6 +55,11 @@ namespace trainers
         /// <returns> The trained decision tree. </returns>
         virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
 
+        /// <summary> Gets a const reference to the current predictor. </summary>
+        ///
+        /// <returns> A shared pointer to the current predictor. </returns>
+        virtual const std::shared_ptr<const predictors::SimpleForestPredictor> GetPredictor() const { return _forest; };
+
     private:
         // Specify how the trainer identifies which node it is splitting. 
         using SplittableNodeId = predictors::SimpleForestPredictor::SplittableNodeId;
@@ -61,7 +67,7 @@ namespace trainers
         // Specify how the trainer defines a split.
         using SplitInfo = predictors::SimpleForestPredictor::SplitInfo;
 
-        // struct used to keep statistics about tree leaves
+        // struct used to keep histograms of tree nodes
         struct Sums
         {
             double sumWeights = 0;
@@ -70,19 +76,27 @@ namespace trainers
             Sums operator-(const Sums& other) const; 
         };
 
-        // struct used to keep info about the gain maximizing split of each splittable node in the tree
-        struct SplitCandidate
+        // struct used to keep statistics about tree nodes
+        struct NodeStats
         {
-            SplitInfo splitInfo;
-            SplittableNodeId nodeId;
-
-            double gain = 0;
-
             uint64_t fromRowIndex;
             uint64_t size;
             uint64_t size0;
             Sums sums;
             Sums sums0;
+        };
+
+        // struct used to keep info about the gain maximizing split of each splittable node in the tree
+        struct SplitCandidate
+        {
+            SplitInfo splitInfo;
+            SplittableNodeId nodeId;
+            NodeStats nodeStats;
+
+            double gain;
+
+            size_t featureIndex;
+            double threshold;
 
             bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
             void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
@@ -97,13 +111,13 @@ namespace trainers
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
         void AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, uint64_t size, Sums sums);
         void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size);
-        double CalculateGain(Sums sums, Sums negativeSums) const;
+        double CalculateGain(Sums sums, Sums sums0) const;
         double GetOutputValue(Sums sums) const;
 
         // member variables
         LossFunctionType _lossFunction;
         ForestTrainerParameters _parameters;
-        predictors::SimpleForestPredictor _forest;
+        std::shared_ptr<predictors::SimpleForestPredictor> _forest;
 
         dataset::RowDataset<dataset::DoubleDataVector> _dataset;
         PriorityQueue _queue;

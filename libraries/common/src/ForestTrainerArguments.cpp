@@ -10,7 +10,7 @@
 
 namespace common
 {
-    void ParsedForestTrainerArguments::AddArgs(utilities::CommandLineParser & parser) 
+    void ParsedForestTrainerArguments::AddArgs(utilities::CommandLineParser& parser) 
     {
         parser.AddOption(minSplitGain,
                          "minSplitGain",

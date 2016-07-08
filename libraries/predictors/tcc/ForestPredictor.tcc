@@ -136,6 +136,24 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
+    typename ForestPredictor<SplitRuleType, EdgePredictorType>::SplittableNodeId ForestPredictor<SplitRuleType, EdgePredictorType>::GetChildId(size_t parentNodeIndex, size_t childPosition) const
+    {
+        // check that the parent exists
+        if(parentNodeIndex >= _interiorNodes.size())
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid identifier requested - parent does not exist");
+        }
+
+        // check that the splittable node exists
+        if(childPosition >= _interiorNodes[parentNodeIndex].outgoingEdges.size())
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid identifier requested - child does not exist");
+        }
+
+        return SplittableNodeId{false, parentNodeIndex, childPosition};
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
     size_t ForestPredictor<SplitRuleType, EdgePredictorType>::Split(const SplitInfo& splitInfo, SplittableNodeId nodeId)
     {
         if(nodeId.parentNodeIndex < 0)
@@ -198,18 +216,6 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     size_t ForestPredictor<SplitRuleType, EdgePredictorType>::SplitNode(const SplitInfo& splitInfo, SplittableNodeId nodeId)
     {   
-        // check that the parent of the splittable node exists
-        if(nodeId.parentNodeIndex >= _interiorNodes.size())
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - parent does not exist");
-        }
-
-        // check that the splittable node exists
-        if(nodeId.childPosition >= _interiorNodes[nodeId.parentNodeIndex].outgoingEdges.size())
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - node does not exist");
-        }
-
         // check that this node wasn't previously split
         auto& parentOutgoing = _interiorNodes[nodeId.parentNodeIndex].outgoingEdges[nodeId.childPosition].targetNodeIndex;
         if (parentOutgoing != 0)
