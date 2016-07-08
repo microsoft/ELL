@@ -12,6 +12,9 @@
 #include "InputPort.h"
 #include "OutputPort.h"
 
+// utilities
+#include "IIterator.h"
+
 #include <unordered_set>
 #include <vector>
 #include <memory>
@@ -34,6 +37,11 @@ namespace model
         /// <param name="id"> The id of the node </param>
         /// <returns> a weak_ptr to the node </param>
         Node* GetNode(Node::NodeId id);
+
+        /// <summary> Get number of nodes </summary>
+        ///
+        /// <returns> The number of nodes in the model </summary>
+        size_t Size() const { return _nodeMap.size(); }
 
         /// <summary> Retrieves a set of nodes by type </summary>
         ///
@@ -78,8 +86,24 @@ namespace model
         void Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodes) const;
 
         // TODO: iterators, including begin/end for iterating over entire graph
-        class NodeIterator
+        class NodeIterator : public utilities::IIterator<const Node*>
         {
+        public:
+            virtual bool IsValid() const override { return _currentNode != nullptr; }
+            virtual void Next() override;
+            virtual const Node* Get() const override { return _currentNode; }
+            NodeIterator() {}
+
+        private:
+            friend class Model;
+            NodeIterator(const Model* model, const std::vector<const Node*>& outputNodes);
+
+            const Model* _model = nullptr;
+            std::unordered_set<const Node*> _visitedNodes;
+            std::vector<const Node*> _stack;
+
+            const Node* _sentinelNode = nullptr;
+            const Node* _currentNode = nullptr;
         };
 
         NodeIterator GetNodeIterator() const;
