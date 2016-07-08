@@ -3,9 +3,13 @@
 // Graph tests
 // 
 
+void TestNodeIterator();
+void TestStaticGraph();
+void TestNodeIterator();
+void TestExampleGraph();
+
 void TestInputRouting1();
 void TestInputRouting2();
-void TestStaticGraph();
 
 void TestCopyGraph();
 void TestRefineGraph();

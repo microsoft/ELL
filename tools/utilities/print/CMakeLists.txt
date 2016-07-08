@@ -37,17 +37,11 @@ set (INCLUDE include/LayerLayout.h
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 
-include_directories(include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/linear/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/layers/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/utilities/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/common/include)
-
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
-
+target_include_directories(${PROJ_NAME} PRIVATE include)
 target_link_libraries(${PROJ_NAME} utilities layers common)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")

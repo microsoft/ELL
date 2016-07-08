@@ -43,6 +43,11 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Gets the values contained in this node </summary>
+        ///
+        /// <returns> The values contained in this node </returns>
+        const std::vector<ValueType>& GetValues() { return _values; }
+
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<ValueType>& output = _output;
 

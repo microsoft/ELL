@@ -4,14 +4,20 @@
 
 #include "Graph_test.h"
 
+// model
 #include "ModelGraph.h"
 #include "ModelTransformer.h"
 #include "ValueSelectorNode.h"
 #include "ExtremalValueNode.h"
-#include "ConstantNode.h"
 #include "InputNode.h"
 #include "InputPort.h"
 #include "OutputPort.h"
+
+// nodes
+#include "ConstantNode.h"
+
+// common
+#include "LoadModelGraph.h"
 
 // testing
 #include "testing.h"
@@ -36,6 +42,16 @@ void NodePrinter(const model::Node& node)
 void PrintGraph(const model::Model& graph)
 {
     graph.Visit(NodePrinter);
+}
+
+void PrintGraphIterator(const model::Model& graph)
+{
+    auto iter = graph.GetNodeIterator();
+    while(iter.IsValid())
+    {
+        NodePrinter(*iter.Get());
+        iter.Next();
+    }
 }
 
 void PrintGraph(const model::Model& graph, const model::Node* output)
@@ -103,6 +119,27 @@ void TestStaticGraph()
         std::cout << x << "  ";
     std::cout << std::endl;
     testing::ProcessTest("Testing min index", testing::IsEqual(output4[0], 2));
+}
+
+void TestNodeIterator()
+{
+    auto model = common::LoadModelGraph("");
+
+    std::cout << "Printing via Visit:" << std::endl;
+    PrintGraph(model);
+
+    std::cout << "\n\nPrinting via iterator:" << std::endl;
+    PrintGraphIterator(model);
+}
+
+void TestExampleGraph()
+{
+    auto model = common::LoadModelGraph("");
+    PrintGraph(model);
+
+    auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
+    std::cout << "# input nodes: " << inputNodes.size() << std::endl;
+
 }
 
 void TestInputRouting1()
