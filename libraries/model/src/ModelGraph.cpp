@@ -81,6 +81,7 @@ namespace model
 
     void Model::NodeIterator::Next()
     {
+        _currentNode = nullptr;
         while (_stack.size() > 0)
         {
             const Node* node = _stack.back();
@@ -111,9 +112,9 @@ namespace model
                 // In "visit active graph" mode, this test should never fail, and we'll always visit the node
                 if (node != _sentinelNode)
                 {
-                    // TODO:
+                    // visitor(*node);
                     _currentNode = node;
-                    //                    visitor(*node);
+                    break;
                 }
 
                 if (_sentinelNode != nullptr) // sentinelNode is non-null only if we're in visit-whole-graph mode
@@ -139,7 +140,7 @@ namespace model
             }
         }
 
-        if (_sentinelNode != nullptr)
+        if (_currentNode == nullptr && _sentinelNode != nullptr)
         {
             //            visitor(*sentinelNode);
             _currentNode = _sentinelNode;

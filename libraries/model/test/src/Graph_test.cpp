@@ -44,6 +44,16 @@ void PrintGraph(const model::Model& graph)
     graph.Visit(NodePrinter);
 }
 
+void PrintGraphIterator(const model::Model& graph)
+{
+    auto iter = graph.GetNodeIterator();
+    while(iter.IsValid())
+    {
+        NodePrinter(*iter.Get());
+        iter.Next();
+    }
+}
+
 void PrintGraph(const model::Model& graph, const model::Node* output)
 {
     graph.Visit(NodePrinter, output);
@@ -109,6 +119,17 @@ void TestStaticGraph()
         std::cout << x << "  ";
     std::cout << std::endl;
     testing::ProcessTest("Testing min index", testing::IsEqual(output4[0], 2));
+}
+
+void TestNodeIterator()
+{
+    auto model = common::LoadModelGraph("");
+
+    std::cout << "Printing via Visit:" << std::endl;
+    PrintGraph(model);
+
+    std::cout << "\n\nPrinting via iterator:" << std::endl;
+    PrintGraphIterator(model);
 }
 
 void TestExampleGraph()

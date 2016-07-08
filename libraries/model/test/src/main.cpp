@@ -16,6 +16,7 @@
 int main()
 {
     TestStaticGraph();
+    TestNodeIterator();
     TestExampleGraph();
     TestInputRouting1();
     TestInputRouting2();
