@@ -2,10 +2,19 @@ namespace emll
 {
 	namespace compiler
 	{
-		template<typename T>
-		T* SymbolTable<T>::Get(const std::string& name)
+		template<typename T, T Default>
+		void SymbolTable<T, Default>::Init(std::initializer_list<SymbolValue> values)
 		{
-			T* value = nullptr;
+			for(SymbolValue v : values)
+			{
+				Set(v.first, v.second);
+			}
+		}
+
+		template<typename T, T Default>
+		T SymbolTable<T, Default>::Get(const std::string& name) const
+		{
+			T value = Default;
 			auto search = _map.find(name);
 			if (search != _map.end())
 			{
@@ -14,20 +23,20 @@ namespace emll
 			return value;
 		}
 
-		template<typename T>
-		void SymbolTable<T>::Set(const std::string name, T* pValue)
+		template<typename T, T Default>
+		void SymbolTable<T, Default>::Set(const std::string name, T value) 
 		{
-			_map[std::move(name)] = pValue;
+			_map[std::move(name)] = value;
 		}
 
-		template<typename T>
-		bool SymbolTable<T>::Contains(const std::string& name)
+		template<typename T, T Default>
+		bool SymbolTable<T, Default>::Contains(const std::string& name) const
 		{
 			return (Get(name) != nullptr);
 		}
 			
-		template<typename T>
-		void SymbolTable<T>::Remove(const std::string& name)
+		template<typename T, T Default>
+		void SymbolTable<T, Default>::Remove(const std::string& name)
 		{
 			auto search = _map.find(name);
 			if (search != _map.end())
@@ -36,8 +45,8 @@ namespace emll
 			}
 		}
 
-		template<typename T>
-		void SymbolTable<T>::Clear()
+		template<typename T, T Default>
+		void SymbolTable<T, Default>::Clear()
 		{
 			_map.clear();
 		}

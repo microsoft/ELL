@@ -54,6 +54,7 @@ namespace emll
 			NeqF
 		};
 
+
 		template<typename T>
 		class TypeList : public std::vector<T>
 		{

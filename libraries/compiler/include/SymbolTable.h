@@ -6,18 +6,30 @@ namespace emll
 {
 	namespace compiler
 	{
-		template<typename T>
+		template<class T, T Default>
 		class SymbolTable
 		{
 		public:
-			T* Get(const std::string& name);
-			void Set(const std::string name, T* pValue);
-			bool Contains(const std::string& name);
+			using SymbolValue = std::pair<std::string, T>;
+
+		public:
+			SymbolTable() {}
+			SymbolTable(std::initializer_list<SymbolValue> values)
+			{
+				Init(values);
+			}
+
+			void Init(std::initializer_list<SymbolValue> values);
+
+			T Get(const std::string& name) const;
+			void Set(const std::string name, T value);
+			bool Contains(const std::string& name) const;
 			void Remove(const std::string& name);
 
 			void Clear();
+
 		private:
-			std::unordered_map<std::string, T*> _map;
+			std::unordered_map<std::string, T> _map;
 		};
 	}
 }

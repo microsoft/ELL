@@ -136,7 +136,10 @@ void TestBinaryOp()
 
 	model::Node* pNode = addNode;
 
-	switch (Compiler::GetNodeDataType(pNode))
+	Compiler compiler;
+	Compiler::NodeType nodeType = compiler.GetNodeType(*pNode);
+
+	switch (compiler.GetNodeDataType(*pNode))
 	{
 		default:
 			break;

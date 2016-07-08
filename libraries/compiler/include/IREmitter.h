@@ -11,7 +11,7 @@ namespace emll
 	namespace compiler
 	{
 		using IRValueList = TypeList<llvm::Value*>;
-		using IRVariableTable = SymbolTable<llvm::Value>;
+		using IRVariableTable = SymbolTable<llvm::Value*, nullptr>;
 		using LLVMException = utilities::ErrorCodeException<std::error_code>;
 
 		class IREmitter

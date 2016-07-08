@@ -4,10 +4,28 @@ namespace emll
 {
 	namespace compiler
 	{
-		model::Port::PortType Compiler::GetNodeDataType(model::Node* pNode)
+		Compiler::Compiler()
+			: _nodeTypes()
 		{
-			assert(pNode != nullptr);
-			return pNode->GetOutputs()[0]->GetType();
+			InitSupportedNodeTypes();
+		}
+
+		model::Port::PortType Compiler::GetNodeDataType(model::Node& node)
+		{
+			return node.GetOutputs()[0]->GetType();
+		}
+
+		Compiler::NodeType Compiler::GetNodeType(model::Node& node)
+		{
+			return _nodeTypes.Get(node.GetRuntimeTypeName());
+		}
+
+		void Compiler::InitSupportedNodeTypes()
+		{
+			_nodeTypes.Init	({
+				{"ConstantNode", NodeType::constant},
+				{"BinaryOperationNode", NodeType::binaryOp}
+			});
 		}
 	}
 }
