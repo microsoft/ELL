@@ -89,9 +89,9 @@ namespace utilities
     }
 
     template <typename ValueType, typename... Args>
-    Variant MakeVariant(Args... args)
+    Variant MakeVariant(Args&&... args)
     {
-        auto derivedPtr = new VariantDerived<ValueType>(args...);
+        auto derivedPtr = new VariantDerived<ValueType>(std::forward<Args>(args)...);
         auto basePtr = static_cast<VariantBase*>(derivedPtr);
         return Variant(std::type_index(typeid(ValueType)), std::unique_ptr<VariantBase>(basePtr));
     }

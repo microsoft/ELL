@@ -29,8 +29,6 @@ namespace utilities
         Variant(const Variant& other);
         Variant(Variant&& other) = default;
 
-        Variant(std::type_index type, std::unique_ptr<VariantBase>&& variantValue);
-
         /// <summary> Copy assignment operator </summary>
         Variant& operator=(const Variant& other);
         Variant& operator=(Variant&& other) = default;
@@ -52,23 +50,18 @@ namespace utilities
         bool IsType() const;
 
     private:
+        template <typename ValueType, typename... Args>
+        friend Variant MakeVariant(Args&&... args);
+        
+        Variant(std::type_index type, std::unique_ptr<VariantBase>&& variantValue);
+
         std::type_index _type;
         std::unique_ptr<VariantBase> _value;
-
-        // efficiency hack:
-        // for often-used simple types, have a union of them and use that instead of a pointer
-        /*
-        union
-        {
-            bool boolValue;
-            int32_t int32Value;
-            // ...
-        } _simpleValue;
-        */
     };
 
+    /// <summary> Convenience function to create a Variant </summary>
     template <typename ValueType, typename... Args>
-    Variant MakeVariant(Args... args);
+    Variant MakeVariant(Args&&... args);
 }
 
 #include "../tcc/Variant.tcc"
