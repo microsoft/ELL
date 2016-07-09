@@ -1,2 +1,2 @@
-/// <reference path="emll.d.ts" />
-/// <reference path="emll_manual.d.ts" />
+export * from "emll"
+export * from "emll_manual"
