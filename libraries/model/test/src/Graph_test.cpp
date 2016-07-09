@@ -139,7 +139,6 @@ void TestExampleGraph()
 
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     std::cout << "# input nodes: " << inputNodes.size() << std::endl;
-
 }
 
 void TestInputRouting1()

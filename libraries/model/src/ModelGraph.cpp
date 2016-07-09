@@ -51,15 +51,15 @@ namespace model
     // Real implementation function for `Visit()`
     Model::NodeIterator::NodeIterator(const Model* model, const std::vector<const Node*>& outputNodes) : _model(model)
     {
+        _currentNode = nullptr;
+        _sentinelNode = nullptr;
         if (_model->Size() == 0)
         {
-            _currentNode = nullptr;
             return;
         }
 
         // start with output nodes in the stack
         _stack = outputNodes;
-        _sentinelNode = nullptr;
 
         if (_stack.size() == 0) // Visit full graph
         {
@@ -77,6 +77,8 @@ namespace model
             _stack.push_back(anOutputNode);
             _sentinelNode = anOutputNode;
         }
+
+        Next();
     }
 
     void Model::NodeIterator::Next()
@@ -112,7 +114,6 @@ namespace model
                 // In "visit active graph" mode, this test should never fail, and we'll always visit the node
                 if (node != _sentinelNode)
                 {
-                    // visitor(*node);
                     _currentNode = node;
                     break;
                 }
@@ -140,10 +141,10 @@ namespace model
             }
         }
 
-        if (_currentNode == nullptr && _sentinelNode != nullptr)
+        if(_stack.size() == 0 && _currentNode == nullptr && _sentinelNode != nullptr)
         {
-            //            visitor(*sentinelNode);
             _currentNode = _sentinelNode;
+            _sentinelNode = nullptr;
         }
     }
 }
