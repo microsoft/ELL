@@ -7,7 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "XMLSerialization_test.h"
+#include "Variant_test.h"
 
+// utilities
 #include "IIterator.h"
 #include "StlIterator.h"
 #include "TransformIterator.h"
@@ -201,14 +203,19 @@ void testMatchFormat()
 ///
 int main()
 {
+    // misc tests
     testIteratorAdapter();
     testTransformIterator();
     testParallelTransformIterator();
     testMatchFormat();
     
+
     // XMLSerialization tests
     XMLSerializationTest();
     TypeFactoryTest();
+
+    // Variant tests
+    TestVariant();
 
     if (testing::DidTestFail())
     {
