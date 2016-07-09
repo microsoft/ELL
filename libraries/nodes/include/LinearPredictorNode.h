@@ -19,11 +19,14 @@
 
 namespace nodes
 {
-    /// <summary> A feature that takes a vector input and returns its mean over some window of time </summary>
+    /// <summary> A node that represents a linear predictor. </summary>
     class LinearPredictorNode : public model::Node
     {
     public:
         /// <summary> Constructor </summary>
+        ///
+        /// <param name="input"> The signal to predict from </param>
+        /// <param name="predictor"> The linear predictor to use when making the prediction. </param>
         LinearPredictorNode(const model::OutputPortElementList<double>& input, const predictors::LinearPredictor& predictor);
 
         /// <summary> Gets the name of this type (for serialization). </summary>

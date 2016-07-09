@@ -16,6 +16,7 @@
 
 namespace nodes
 {
+    /// <summary> A node that represents a unary function of its input </summary>
     template <typename ValueType>
     class UnaryOperationNode : public model::Node
     {
@@ -26,7 +27,9 @@ namespace nodes
         };
 
         /// <summary> Constructor </summary>
-        /// <param name="input"> The signal to take the mean of </param>
+        ///
+        /// <param name="input"> The signal to process. </param>
+        /// <param name="operation"> The function to use to process the signal. </param>
         UnaryOperationNode(const model::OutputPortElementList<ValueType>& input, OperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>

@@ -22,8 +22,8 @@ namespace nodes
     {
     public:
         /// <summary> Constructor </summary>
-        /// <param name="input"> The signal to take the mean of </param>
-        /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
+        /// <param name="input"> The signal to delay </param>
+        /// <param name="windowSize"> The number of samples to delay the signal </param>
         DelayNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize);
         
         /// <summary> Gets the name of this type (for serialization). </summary>
