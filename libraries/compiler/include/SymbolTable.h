@@ -10,7 +10,7 @@ namespace emll
 		class SymbolTable
 		{
 		public:
-			using SymbolValue = std::pair<std::string, T>;
+			using SymbolValue = std::pair<const std::string, T>;
 
 		public:
 			SymbolTable() {}

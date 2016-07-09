@@ -5,10 +5,8 @@ namespace emll
 		template<typename T, T Default>
 		void SymbolTable<T, Default>::Init(std::initializer_list<SymbolValue> values)
 		{
-			for(SymbolValue v : values)
-			{
-				Set(v.first, v.second);
-			}
+			_map.clear();
+			_map.insert(values);
 		}
 
 		template<typename T, T Default>

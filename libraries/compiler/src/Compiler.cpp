@@ -10,6 +10,10 @@ namespace emll
 			InitSupportedNodeTypes();
 		}
 
+		void Compiler::Compile(model::Node& modelRoot)
+		{
+		}
+
 		model::Port::PortType Compiler::GetNodeDataType(model::Node& node)
 		{
 			return node.GetOutputs()[0]->GetType();
