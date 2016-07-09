@@ -21,7 +21,7 @@
                 'variables': {
                     'swig_include_path%':'..',
                     'include_path%':'..',
-                    'library_path%':'../../..',
+                    'library_path%':'../..',
                     'library_suffix%': ''
                 },
             }
