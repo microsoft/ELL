@@ -7,12 +7,17 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
 #include "Node.h"
 #include "ModelGraph.h"
 #include "ModelTransformer.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <string>
+#include <vector>
 
 namespace nodes
 {

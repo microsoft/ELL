@@ -6,15 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "AccumulatorNode.h"
-
-// utilities
-#include "Exception.h"
-
-// stl
-#include <string>
-#include <vector>
-
 namespace nodes
 {
     template <typename ValueType>

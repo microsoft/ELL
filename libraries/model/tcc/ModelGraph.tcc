@@ -9,7 +9,7 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-    // Just hiding some stuff in this namespace that's unlikely to confict with anything
+    // Hiding some stuff in this namespace that's unlikely to confict with anything
     // TODO: put this in some utility place
     namespace ModelImpl
     {

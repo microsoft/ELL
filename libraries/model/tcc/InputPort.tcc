@@ -10,7 +10,7 @@
 namespace model
 {
     //
-    // InputPort
+    // InputPortBase
     //
     template <typename ValueType>
     InputPortBase::InputPortBase(const class Node* owningNode, const OutputPortElementList<ValueType>& input) : Port(owningNode, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)

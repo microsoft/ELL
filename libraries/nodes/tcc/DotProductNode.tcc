@@ -6,17 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "DotProductNode.h"
-#include "BinaryOperationNode.h"
-
-// utilities
-#include "Exception.h"
-
-// stl
-#include <string>
-#include <vector>
-#include <cmath>
-
 namespace nodes
 {
     template <typename ValueType>
