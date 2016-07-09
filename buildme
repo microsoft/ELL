@@ -1,0 +1,5 @@
+# Build the EMLL module
+
+node-gyp rebuild
+
+# TODO: copy the module from node_src/build/Release to somewhere sane (e.g., ../lib/emllModule/win)

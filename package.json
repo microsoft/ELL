@@ -2,20 +2,21 @@
   "name": "emll",
   "version": "0.1.0",
   "description": "A native node module with interfaces to the Embedded Machine Learning Library (EMLL)",
-  "scripts" : {
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "install": "",
-      "preinstall" : "",
-      "preuninstall" : "rm -rf build/*"
-    },
-  "main" : "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "echo ",
+    "build": "./buildme",
+    "preinstall": "",
+    "preuninstall": "rm -rf build/*"
+  },
+  "main": "index.js",
   "typings": "emll.d.ts",
-  "homepage" : "",
-  "author" : {
-      "name" : "Charles Jacobs",
-      "email" : "cjacobs@microsoft.com",
-      "url" : "http://www.microsoft.com/"
-    },
+  "homepage": "",
+  "author": {
+    "name": "Charles Jacobs",
+    "email": "cjacobs@microsoft.com",
+    "url": "http://www.microsoft.com/"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
