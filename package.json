@@ -6,6 +6,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "echo ",
     "build": "./buildme",
+    "buildmac": "./buildme && ./copyMacLib.sh",
+    "buildwin": "./buildme && ./copyWindowsLib",
+    "buildlinux": "./buildme && ./copyLinuxLib",
     "preinstall": "",
     "preuninstall": "rm -rf build/*"
   },
