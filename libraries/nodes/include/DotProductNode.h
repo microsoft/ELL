@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "SumNode.h"
+
 // model
 #include "Node.h"
 #include "ModelTransformer.h"
