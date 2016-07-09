@@ -16,7 +16,7 @@ namespace utilities
     class VariantBase
     {
     public:
-        VariantBase(std::type_index type): _type(type) {};
+        VariantBase(std::type_index type) : _type(type){};
         virtual ~VariantBase() = default;
 
         template <typename ValueType>
@@ -25,7 +25,7 @@ namespace utilities
             auto thisPtr = dynamic_cast<const VariantDerived<ValueType>*>(this);
             if (thisPtr == nullptr)
             {
-                throw std::runtime_error("Bad dynamic cast!");
+                throw InputException(InputExceptionErrors::typeMismatch, "Variant::GetValue called with wrong type.");
             }
 
             return thisPtr->GetValue();
@@ -33,10 +33,8 @@ namespace utilities
 
         virtual std::unique_ptr<VariantBase> Clone() const = 0;
 
-        //std::type_index GetType() const { return _type; }
-
     private:
-        std::type_index _type; // redundant with type in Variant class. 
+        std::type_index _type; // redundant with type in Variant class.
     };
 
     /// <summary>

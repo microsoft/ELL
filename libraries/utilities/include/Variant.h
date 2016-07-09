@@ -8,13 +8,11 @@
 
 #pragma once
 
-//
-// Variant class
-//
+#include "Exception.h"
 
+// stl
 #include <memory>
 #include <typeindex>
-#include <stdexcept>
 
 /// <summary> utilities namespace </summary>
 namespace utilities
@@ -39,7 +37,7 @@ namespace utilities
 
         /// <summary> Get a type-safe value from the variant. </summary>
         ///
-        /// <returns> The variant's current value 
+        /// <returns> The variant's current value
         template <typename ValueType>
         ValueType GetValue() const;
 
@@ -52,7 +50,7 @@ namespace utilities
     private:
         template <typename ValueType, typename... Args>
         friend Variant MakeVariant(Args&&... args);
-        
+
         Variant(std::type_index type, std::unique_ptr<VariantBase>&& variantValue);
 
         std::type_index _type;
