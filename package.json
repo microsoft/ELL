@@ -13,7 +13,7 @@
     "preuninstall": "rm -rf build/*"
   },
   "main": "index.js",
-  "typings": "emll.d.ts",
+  "typings": "index.d.ts",
   "homepage": "",
   "author": {
     "name": "Charles Jacobs",
