@@ -24,7 +24,7 @@ namespace emll
 		template<typename T, T Default>
 		void SymbolTable<T, Default>::Set(const std::string name, T value) 
 		{
-			_map[std::move(name)] = value;
+			_map[std::move(name)] = std::move(value);
 		}
 
 		template<typename T, T Default>

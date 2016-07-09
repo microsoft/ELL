@@ -22,7 +22,7 @@ namespace emll
 			void Init(std::initializer_list<SymbolValue> values);
 
 			T Get(const std::string& name) const;
-			void Set(const std::string name, T value);
+			void Set(std::string name, T value);
 			bool Contains(const std::string& name) const;
 			void Remove(const std::string& name);
 
