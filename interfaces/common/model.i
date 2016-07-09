@@ -8,7 +8,8 @@
 
 %{
 #define SWIG_FILE_WITH_INIT
-#include "../../libraries/model/include/Node.h"
+// #include "../../libraries/model/include/Node.h"
+#include "Node.h"
 #include "ModelGraph.h"
 #include "Port.h"
 #include "InputPort.h"
@@ -21,7 +22,8 @@
 %include "Port.h"
 %include "OutputPort.h"
 %include "OutputPortElementList.h"
-%include "../../libraries/model/include/Node.h" // Path necessary because of node.js's header file...
+// %include "../../libraries/model/include/Node.h" // Path necessary because of node.js's header file...
+%include "Node.h"
 %include "ModelGraph.h"
 %include "InputPort.h"
 

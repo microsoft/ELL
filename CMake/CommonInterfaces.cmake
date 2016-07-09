@@ -2,7 +2,7 @@
 # CMake macro to create swig-generated language wrapper for Embedded Machine Learning Library
 #
 
-macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INTERFACE)
+macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INTERFACE EXTRA_INCLUDE_PATHS)
 
 cmake_minimum_required(VERSION 2.8.11)
 find_package(SWIG REQUIRED)
@@ -47,6 +47,7 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/linear.i
                      ../common/lossFunctions.i
                      ../common/model.i
+                     ../common/nodes.i
                      ../common/noncopyable.i
                      ../common/trainers.i
                      ../common/predictors.i
@@ -74,10 +75,13 @@ include_directories(../../libraries/features/include)
 include_directories(../../libraries/layers/include)
 include_directories(../../libraries/linear/include)
 include_directories(../../libraries/model/include)
+include_directories(../../libraries/nodes/include)
 include_directories(../../libraries/lossFunctions/include)
 include_directories(../../libraries/predictors/include)
 include_directories(../../libraries/trainers/include)
 include_directories(../../libraries/utilities/include)
+
+include_directories(${EXTRA_INCLUDE_PATHS})
 
 # FOREACH(file ${INTERFACE_FILES} ${INTERFACE_MAIN})
 # 	get_filename_component(fname ${file} NAME)

@@ -208,6 +208,9 @@ typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<d
 // Interface for model library
 %include model.i
 
+// Interface for model library
+%include nodes.i
+
 wrap_unique_ptr(LayerPtr, layers::Layer)
 
 #ifndef SWIGXML

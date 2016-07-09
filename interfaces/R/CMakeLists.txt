@@ -3,6 +3,6 @@
 #
 include (CommonInterfaces)
 
-generate_interface(r ${CMAKE_CURRENT_SOURCE_DIR} "" "")
+generate_interface(r ${CMAKE_CURRENT_SOURCE_DIR} "" "" "")
 add_dependencies(EMLL_r EMLL_common)
 
