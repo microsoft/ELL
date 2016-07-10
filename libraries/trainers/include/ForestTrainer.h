@@ -84,6 +84,7 @@ namespace trainers
             uint64_t size0;
             Sums sums;
             Sums sums0;
+            Sums sums1;
         };
 
         // struct used to keep info about the gain maximizing split of each splittable node in the tree

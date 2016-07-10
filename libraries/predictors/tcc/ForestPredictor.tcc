@@ -156,7 +156,7 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     size_t ForestPredictor<SplitRuleType, EdgePredictorType>::Split(const SplitInfo& splitInfo, SplittableNodeId nodeId)
     {
-        if(nodeId.parentNodeIndex < 0)
+        if(nodeId.isRoot)
         {
             return AddTree(splitInfo);
         }
