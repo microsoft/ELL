@@ -9,8 +9,8 @@
             {
                 'variables': {
                     'swig_include_path%': '../..',
-                    'include_path%': '../../..',
-                    'library_path%': '../..',
+                    'include_path%': '..',
+                    'library_path%': '..',
                     'library_suffix%': '/Release'
                 },
             }
@@ -132,6 +132,8 @@
                                 '-lfeatures.lib',
                                 '-llayers.lib',
                                 '-llinear.lib',
+                                '-lmodel.lib',
+                                '-lnodes.lib',
                                 '-llossFunctions.lib',
                                 '-lpredictors.lib',
                                 '-ltrainers.lib',

@@ -7,7 +7,7 @@
     "install": "echo ",
     "build": "./buildme",
     "buildmac": "./buildme && ./copyMacLib.sh",
-    "buildwin": "./buildme && ./copyWindowsLib",
+    "buildwin": "buildme && copyWindowsLib",
     "buildlinux": "./buildme && ./copyLinuxLib",
     "preinstall": "",
     "preuninstall": "rm -rf build/*"
