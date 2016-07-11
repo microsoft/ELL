@@ -17,6 +17,7 @@
 #include "AnyIterator.h"
 #include "RandomEngines.h"
 #include "StlIterator.h"
+#include "UniqueId.h"
 
 #include "LogLoss.h"
 #include "HingeLoss.h"
@@ -34,6 +35,9 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 
 %include "SGDIncrementalTrainer_wrap.h"
 
+%include "UniqueId.h"
+
+WRAP_OSTREAM_OUT_TO_STR(utilities::UniqueId)
 
 // This is necessary for us to avoid leaking memory:
 #ifndef SWIGXML

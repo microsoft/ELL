@@ -109,7 +109,7 @@ namespace std
 #endif
 
 // Macro for exposing Print(ostream) into __str__ / toString in python / javascript
-#if defined(SWIGPYTHON      )
+#if defined(SWIGPYTHON)
 %define WRAP_PRINT_TO_STR(Class)
     %extend Class
     {
@@ -142,6 +142,44 @@ namespace std
 %enddef
 
 #endif
+
+// Macro for exposing ostream.operator<<() into __str__ / toString in python / javascript
+#if defined(SWIGPYTHON)
+%define WRAP_OSTREAM_OUT_TO_STR(Class)
+    %extend Class
+    {
+        std::string __str__() 
+        {
+            std::ostringstream oss(std::ostringstream::out);
+            oss << *($self);
+            return oss.str();
+        }
+    };
+%enddef
+
+#elif defined(SWIGJAVASCRIPT)
+
+%define WRAP_OSTREAM_OUT_TO_STR(Class)
+    %extend Class
+    {
+        std::string toString() 
+        {        
+            std::ostringstream oss(std::ostringstream::out);
+            oss << *($self);
+            return oss.str();
+        }
+    };
+%enddef
+
+#else
+
+%define WRAP_OSTREAM_OUT_TO_STR(Class)
+%enddef
+
+#endif
+
+
+
 
 // Define some namespaces so we can refer to them later
 namespace lossFunctions {};
