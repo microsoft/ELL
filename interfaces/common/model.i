@@ -18,6 +18,11 @@
 
 %rename (ModelGraph) model::Model;
 
+%nodefaultctor model::Node;
+%nodefaultctor model::Port;
+%nodefaultctor model::OutputPortBase;
+%nodefaultctor model::InputPortBase;
+
 %include "Port.h"
 %include "OutputPort.h"
 %include "OutputPortElementList.h"
@@ -26,4 +31,13 @@
 %include "InputPort.h"
 
 %template () model::OutputPort<double>;
+%template () model::OutputPort<bool>;
 %template () model::OutputPortElementList<double>;
+%template () model::OutputPortElementList<bool>;
+
+#ifndef SWIGXML
+%template (NodeVector) std::vector<model::Node*>;
+%template (PortVector) std::vector<model::Port*>;
+%template (InputPortVector) std::vector<model::InputPortBase*>;
+%template (OutputPortVector) std::vector<model::OutputPortBase*>;
+#endif
