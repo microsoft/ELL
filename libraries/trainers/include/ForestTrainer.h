@@ -98,9 +98,6 @@ namespace trainers
 
             double gain;
 
-            size_t featureIndex;
-            double threshold;
-
             bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
             void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
         };

@@ -154,7 +154,7 @@ namespace trainers
 
             EdgePredictorVector edgePredictorVector{ GetOutputValue(bestNodeStats.sums0) , GetOutputValue(bestNodeStats.sums1) };
             SplitAction splitAction{ nodeId, SplitRule{ bestFeatureIndex, bestThreshold }, edgePredictorVector };
-            _queue.push(SplitCandidate{ splitAction, nodeId, bestNodeStats, bestGain, bestFeatureIndex, bestThreshold });
+            _queue.push(SplitCandidate{ splitAction, nodeId, bestNodeStats, bestGain });
         }
 
 #ifdef VERY_VERBOSE
