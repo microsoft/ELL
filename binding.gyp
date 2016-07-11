@@ -16,7 +16,18 @@
             }
         ],
         [
-            'OS!="win"', 
+            'OS=="mac"', 
+            {
+                'variables': {
+                    'swig_include_path_prefix%':'..',
+                    'include_path_prefix%':'..',
+                    'library_path_prefix%':'../..',
+                    'library_path_suffix%': ''
+                },
+            }
+        ],
+        [
+            'OS=="linux"', 
             {
                 'variables': {
                     'swig_include_path_prefix%':'..',
@@ -39,7 +50,7 @@
                         '-javascript',
                         '-node',
                         '-DV8_VERSION=0x032530',
-                        '-I<(swig_include_path_prefix)/EMLL/interfaces/Common/include',
+                        '-I<(swig_include_path_prefix)/EMLL/interfaces/common/include',
                         '-I<(swig_include_path_prefix)/EMLL/libraries/common/include',
                         '-I<(swig_include_path_prefix)/EMLL/libraries/dataset/include',
                         '-I<(swig_include_path_prefix)/EMLL/libraries/evaluators/include',
@@ -66,7 +77,7 @@
                         'swig',
                         '-c++',
                         '-xml',
-                        '-I<(swig_include_path_prefix)/EMLL/interfaces/Common/include',
+                        '-I<(swig_include_path_prefix)/EMLL/interfaces/common/include',
                         '-I<(swig_include_path_prefix)/EMLL/libraries/common/include',
                         '-I<(swig_include_path_prefix)/EMLL/libraries/dataset/include',
                         '-I<(swig_include_path_prefix)/EMLL/libraries/evaluators/include',
@@ -192,7 +203,7 @@
                         ],
                         'xcode_settings': {
                             'OTHER_CPLUSPLUSFLAGS': [
-                                '-std=c++1y',
+                                '-std=c++14',
                                 '-stdlib=libc++',
                                 '-v'
                             ],
@@ -208,6 +219,14 @@
                 [
                     'OS=="linux"',
                     {
+                        'cflags_cc': [
+                            '-std=c++1y',
+                            '-fexceptions'
+                        ],
+                        'cflags_cc!': [
+                            '-fno-rtti',
+                            '-fno-exceptions'
+                        ],
                         'link_settings': {
                             'libraries': [
                                 'libcommon.a',
