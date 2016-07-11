@@ -52,7 +52,7 @@ namespace trainers
             auto interiorNodeIndex = _forest->Split(splitCandidate.splitAction);
 
             // sort the data according to the performed split
-            SortDatasetByFeature(splitCandidate.featureIndex, splitCandidate.nodeStats.fromRowIndex, size);
+            SortDatasetBySplitRule(splitCandidate.splitAction.splitRule, splitCandidate.nodeStats.fromRowIndex, size);
 
             // queue split candidate for child 0
             AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), fromRowIndex0, size0, sums0);
@@ -107,7 +107,7 @@ namespace trainers
         for (uint64_t featureIndex = 0; featureIndex < numFeatures; ++featureIndex)
         {
             // sort the relevant rows of dataset in ascending order by featureIndex
-            SortDatasetByFeature(featureIndex, fromRowIndex, size);
+            SortDatasetBySplitRule(featureIndex, fromRowIndex, size);
 
             Sums sums0;
 
@@ -151,6 +151,7 @@ namespace trainers
         {
             using SplitRule = predictors::SingleInputThresholdRule;
             using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
+
             EdgePredictorVector edgePredictorVector{ GetOutputValue(bestNodeStats.sums0) , GetOutputValue(bestNodeStats.sums1) };
             SplitAction splitAction{ nodeId, SplitRule{ bestFeatureIndex, bestThreshold }, edgePredictorVector };
             _queue.push(SplitCandidate{ splitAction, nodeId, bestNodeStats, bestGain, bestFeatureIndex, bestThreshold });
@@ -165,11 +166,19 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size)
+    void ForestTrainer<LossFunctionType>::SortDatasetBySplitRule(size_t featureIndex, uint64_t fromRowIndex, uint64_t size) // to be deprecated
     {
-        _dataset.Sort([featureIndex](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[featureIndex]; },
-            fromRowIndex,
-            size);
+        _dataset.Sort([featureIndex](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) { return example.GetDataVector()[featureIndex]; },
+                      fromRowIndex,
+                      size);
+    }
+
+    template<typename LossFunctionType>
+    void ForestTrainer<LossFunctionType>::SortDatasetBySplitRule(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size)
+    {
+        _dataset.Sort([splitRule](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) { return splitRule.Compute(example.GetDataVector()); },
+                      fromRowIndex,
+                      size);
     }
 
     template<typename LossFunctionType>

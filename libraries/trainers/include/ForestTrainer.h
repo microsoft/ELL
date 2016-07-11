@@ -41,6 +41,8 @@ namespace trainers
     class ForestTrainer : public IIncrementalTrainer<predictors::SimpleForestPredictor>
     {
     public:
+        using SplitRuleType = predictors::SingleInputThresholdRule;
+        using EdgePredictorType = predictors::ConstantPredictor;
 
         /// <summary> Constructs an instance of ForestTrainer. </summary>
         ///
@@ -111,7 +113,10 @@ namespace trainers
 
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
         void AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, uint64_t size, Sums sums);
-        void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size);
+
+        void SortDatasetBySplitRule(size_t featureIndex, uint64_t fromRowIndex, uint64_t size);
+        void SortDatasetBySplitRule(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size);
+
         double CalculateGain(Sums sums, Sums sums0) const;
         double GetOutputValue(Sums sums) const;
 

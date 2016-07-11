@@ -88,7 +88,7 @@ namespace trainers
 
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator) const;
         void AddSplitCandidateToQueue(predictors::DecisionTreePredictor::Node* leaf, uint64_t fromRowIndex, uint64_t size, Sums sums) const;
-        void SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size) const;
+        void SortDatasetBySplitRule(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size) const;
         double CalculateGain(Sums sums, Sums sums0) const;
         double GetOutputValue(Sums sums) const;
         void Cleanup() const;

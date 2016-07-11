@@ -50,7 +50,6 @@ namespace predictors
         /// <summary> Struct that defines a split rule and the predictors assigned to the outgoing edges. </summary>
         struct SplitAction
         {
-
             /// <summary> Identifier of the node to split. </summary>
             SplittableNodeId nodeId;
 
@@ -59,8 +58,6 @@ namespace predictors
             
             /// <summary> The predictors in the outgoing edges. </summary>
             std::vector<EdgePredictorType> predictors;
-
-
         };
 
         /// <summary> Gets the number of trees in the forest. </summary>

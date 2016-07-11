@@ -47,7 +47,7 @@ namespace trainers
             auto& interiorNode = splitInfo.leaf->Split(splitInfo.splitRule, negativeOutputValue, positiveOutputValue);
 
             // sort the data according to the performed split
-            SortDatasetByFeature(splitInfo.splitRule.featureIndex, splitInfo.fromRowIndex, splitInfo.size);
+            SortDatasetBySplitRule(splitInfo.splitRule.featureIndex, splitInfo.fromRowIndex, splitInfo.size);
 
             // queue split candidate for negative child
             AddSplitCandidateToQueue(&interiorNode.GetNegativeChild(), splitInfo.fromRowIndex, splitInfo.size0, splitInfo.sums0);
@@ -103,7 +103,7 @@ namespace trainers
         for (uint64_t featureIndex = 0; featureIndex < numFeatures; ++featureIndex)
         {
             // sort the relevant rows of dataset in ascending order by featureIndex
-            SortDatasetByFeature(featureIndex, fromRowIndex, size);
+            SortDatasetBySplitRule(featureIndex, fromRowIndex, size);
 
             Sums sums0;
 
@@ -155,7 +155,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void SortingTreeTrainer<LossFunctionType>::SortDatasetByFeature(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size) const
+    void SortingTreeTrainer<LossFunctionType>::SortDatasetBySplitRule(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size) const
     {
         _dataset.Sort([featureIndex](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[featureIndex]; },
             fromRowIndex,
