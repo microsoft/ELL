@@ -37,6 +37,7 @@
 
 #ifndef SWIGXML
 %template (NodeVector) std::vector<model::Node*>;
+%template (ConstNodeVector) std::vector<const model::Node*>;
 %template (PortVector) std::vector<model::Port*>;
 %template (InputPortVector) std::vector<model::InputPortBase*>;
 %template (OutputPortVector) std::vector<model::OutputPortBase*>;
