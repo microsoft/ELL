@@ -1,7 +1,6 @@
 mkdir -p ./dist/linux/build/Release
 
 cp -f build/Release/emll.node ./dist/linux/build/Release
-# cp -f package.json ./dist
-# cp -f index_multiplat.js ./dist/index.js
-# cp -f emll.d.ts ./dist
-# cp -f swig/EMLL_wrap.xml ./dist
+
+echo "EMLL revision: " > ./dist/linux/EMLL_revision.txt
+git -C ../EMLL rev-parse HEAD >> ./dist/linux/EMLL_revision.txt
