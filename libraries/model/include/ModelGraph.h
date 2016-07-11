@@ -24,6 +24,27 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    /// <summary> An iterator over the nodes in a Model graph </summary>
+    class NodeIterator : public utilities::IIterator<const Node*>
+    {
+    public:
+        virtual bool IsValid() const override { return _currentNode != nullptr; }
+        virtual void Next() override;
+        virtual const Node* Get() const override { return _currentNode; }
+        NodeIterator() {}
+
+    private:
+        friend class Model;
+        NodeIterator(const Model* model, const std::vector<const Node*>& outputNodes);
+
+        const Model* _model = nullptr;
+        std::unordered_set<const Node*> _visitedNodes;
+        std::vector<const Node*> _stack;
+
+        const Node* _sentinelNode = nullptr;
+        const Node* _currentNode = nullptr;
+    };
+
     /// <summary> Model class. Represents a graph of computation </summary>
     class Model
     {
@@ -85,32 +106,12 @@ namespace model
         template <typename Visitor>
         void Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodes) const;
 
-        // TODO: iterators, including begin/end for iterating over entire graph
-        class NodeIterator : public utilities::IIterator<const Node*>
-        {
-        public:
-            virtual bool IsValid() const override { return _currentNode != nullptr; }
-            virtual void Next() override;
-            virtual const Node* Get() const override { return _currentNode; }
-            NodeIterator() {}
-
-        private:
-            friend class Model;
-            NodeIterator(const Model* model, const std::vector<const Node*>& outputNodes);
-
-            const Model* _model = nullptr;
-            std::unordered_set<const Node*> _visitedNodes;
-            std::vector<const Node*> _stack;
-
-            const Node* _sentinelNode = nullptr;
-            const Node* _currentNode = nullptr;
-        };
-
         NodeIterator GetNodeIterator() const;
         NodeIterator GetNodeIterator(const Node* outputNode) const;
         NodeIterator GetNodeIterator(const std::vector<const Node*>& outputNodes) const;
 
     private:
+        friend class NodeIterator;
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
         // to look nodes up by id.
         std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _nodeMap;

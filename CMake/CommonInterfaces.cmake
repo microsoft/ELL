@@ -64,7 +64,7 @@ if(${LANGUAGE_NAME} STREQUAL "common")
     add_custom_target(${module_name} ALL DEPENDS ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} SOURCES ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} ${THIS_FILE_PATH})
 
     # Make interface code be dependent on all libraries
-    add_dependencies(${module_name} common dataset evaluators features layers linear lossFunctions model trainers predictors testing treeLayout utilities)
+    add_dependencies(${module_name} common dataset evaluators features layers linear lossFunctions model nodes trainers predictors testing treeLayout utilities)
 else()
 
 # Add EMLL library include directories
@@ -120,7 +120,7 @@ endif()
 swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC}) # ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
 
 if( NOT (${LANGUAGE_NAME} STREQUAL "xml"))
-    swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset evaluators features layers linear lossFunctions model trainers predictors utilities)
+    swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset evaluators features layers linear lossFunctions model nodes trainers predictors utilities)
     set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}EMLL)
     add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} EMLL_common)
 endif()
