@@ -17,19 +17,19 @@
 void ForestPredictorTest()
 {
     // define some abbreviations
-    using SplitInfo = predictors::SimpleForestPredictor::SplitInfo;
+    using SplitAction = predictors::SimpleForestPredictor::SplitAction;
     using SplitRule = predictors::SingleInputThresholdRule;
     using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
     using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
     // add a tree
     predictors::SimpleForestPredictor forest;
-    auto tree0Root = forest.Split(SplitInfo{SplitRule{ 0, 0.3 }, EdgePredictorVector{ -1.0, 1.0 }}, forest.GetRootId());
-    forest.Split(SplitInfo{SplitRule{ 1, 0.6 }, EdgePredictorVector{ -2.0, 2.0 }}, NodeId{ 0, 0 });
-    forest.Split(SplitInfo{SplitRule{ 2, 0.9 }, EdgePredictorVector{ -4.0, 4.0 }}, NodeId{ 0, 1 });
+    auto tree0Root = forest.Split(SplitAction{forest.GetNewRootId(), SplitRule{ 0, 0.3 }, EdgePredictorVector{ -1.0, 1.0 }});
+    forest.Split(SplitAction{NodeId{ 0, 0 }, SplitRule{ 1, 0.6 }, EdgePredictorVector{ -2.0, 2.0 }});
+    forest.Split(SplitAction{NodeId{ 0, 1 }, SplitRule{ 2, 0.9 }, EdgePredictorVector{ -4.0, 4.0 }});
 
     // add another tree
-    auto tree1Root = forest.Split(SplitInfo{SplitRule{ 0, 0.2 }, EdgePredictorVector{ -3.0, 3.0 }}, forest.GetRootId());
+    auto tree1Root = forest.Split(SplitAction{forest.GetNewRootId(), SplitRule{ 0, 0.2 }, EdgePredictorVector{ -3.0, 3.0 }});
 
     // test NumTrees
     testing::ProcessTest("Testing NumTrees()", forest.NumTrees() == 2);

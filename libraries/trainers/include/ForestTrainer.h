@@ -65,7 +65,7 @@ namespace trainers
         using SplittableNodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
         // Specify how the trainer defines a split.
-        using SplitInfo = predictors::SimpleForestPredictor::SplitInfo;
+        using SplitAction = predictors::SimpleForestPredictor::SplitAction;
 
         // struct used to keep histograms of tree nodes
         struct Sums
@@ -90,7 +90,7 @@ namespace trainers
         // struct used to keep info about the gain maximizing split of each splittable node in the tree
         struct SplitCandidate
         {
-            SplitInfo splitInfo;
+            SplitAction splitAction;
             SplittableNodeId nodeId;
             NodeStats nodeStats;
 

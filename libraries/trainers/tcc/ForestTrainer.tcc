@@ -22,7 +22,7 @@ namespace trainers
         auto sums = LoadData(exampleIterator);
 
         // find split candidate for root node and push it onto the priority queue
-        AddSplitCandidateToQueue(_forest->GetRootId(), 0, _dataset.NumExamples(), sums);
+        AddSplitCandidateToQueue(_forest->GetNewRootId(), 0, _dataset.NumExamples(), sums);
 
         // as long as positive gains can be attained, keep growing the tree
         while(!_queue.empty())
@@ -49,7 +49,7 @@ namespace trainers
             double outputValueSoFar = GetOutputValue(sums); // TODO - root split creates a bug, send this as function argument
             double negativeOutputValue = GetOutputValue(sums0) - outputValueSoFar;
             double positiveOutputValue = GetOutputValue(sums1) - outputValueSoFar;
-            auto interiorNodeIndex = _forest->Split(splitCandidate.splitInfo, splitCandidate.nodeId);
+            auto interiorNodeIndex = _forest->Split(splitCandidate.splitAction);
 
             // sort the data according to the performed split
             SortDatasetByFeature(splitCandidate.featureIndex, splitCandidate.nodeStats.fromRowIndex, size);
@@ -152,8 +152,8 @@ namespace trainers
             using SplitRule = predictors::SingleInputThresholdRule;
             using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
             EdgePredictorVector edgePredictorVector{ GetOutputValue(bestNodeStats.sums0) , GetOutputValue(bestNodeStats.sums1) };
-            SplitInfo splitInfo{ SplitRule{ bestFeatureIndex, bestThreshold }, edgePredictorVector };
-            _queue.push(SplitCandidate{ splitInfo, nodeId, bestNodeStats, bestGain, bestFeatureIndex, bestThreshold });
+            SplitAction splitAction{ nodeId, SplitRule{ bestFeatureIndex, bestThreshold }, edgePredictorVector };
+            _queue.push(SplitCandidate{ splitAction, nodeId, bestNodeStats, bestGain, bestFeatureIndex, bestThreshold });
         }
 
 #ifdef VERY_VERBOSE

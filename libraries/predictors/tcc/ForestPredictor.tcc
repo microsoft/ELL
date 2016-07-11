@@ -154,15 +154,36 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::Split(const SplitInfo& splitInfo, SplittableNodeId nodeId)
+    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::Split(const SplitAction& splitAction)
     {
-        if(nodeId.isRoot)
+        if(splitAction.nodeId.isRoot)
         {
-            return AddTree(splitInfo);
+            // add interior Node
+            size_t interiorNodeIndex = AddInteriorNode(splitAction);
+
+            // add new tree
+            _trees.push_back({ interiorNodeIndex });
+
+            // return ID of new root
+            return interiorNodeIndex;
         }
         else
         {
-            return SplitNode(splitInfo, nodeId);
+            // check that this node wasn't previously split
+            auto& parentOutgoing = _interiorNodes[splitAction.nodeId.parentNodeIndex].outgoingEdges[splitAction.nodeId.childPosition].targetNodeIndex;
+            if (parentOutgoing != 0)
+            {
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - node previously split");
+            }
+
+            // add interior Node
+            size_t interiorNodeIndex = AddInteriorNode(splitAction);
+
+            // update the parent about the new interior node
+            parentOutgoing = interiorNodeIndex;
+
+            // return ID of new interior node
+            return interiorNodeIndex;
         }
     }
 
@@ -199,47 +220,12 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::AddTree(const SplitInfo& splitInfo)
+    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::AddInteriorNode(const SplitAction& splitAction)
     {
-        size_t treeIndex = _trees.size();
+        size_t numEdges = splitAction.predictors.size();
 
-        // add interior Node
-        size_t interiorNodeIndex = AddInteriorNode(splitInfo);
-
-        // add new tree
-        _trees.push_back({ interiorNodeIndex });
-
-        // return ID of new root
-        return interiorNodeIndex;
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType>
-    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::SplitNode(const SplitInfo& splitInfo, SplittableNodeId nodeId)
-    {   
-        // check that this node wasn't previously split
-        auto& parentOutgoing = _interiorNodes[nodeId.parentNodeIndex].outgoingEdges[nodeId.childPosition].targetNodeIndex;
-        if (parentOutgoing != 0)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - node previously split");
-        }
-
-        // add interior Node
-        size_t interiorNodeIndex = AddInteriorNode(splitInfo);
-
-        // update the parent about the new interior node
-        parentOutgoing = interiorNodeIndex;
-
-        // return ID of new interior node
-        return interiorNodeIndex;
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType>
-    size_t ForestPredictor<SplitRuleType, EdgePredictorType>::AddInteriorNode(const SplitInfo& splitInfo)
-    {
-        size_t numEdges = splitInfo.predictors.size();
-
-        // check correctness of splitInfo
-        if (numEdges != splitInfo.splitRule.NumOutputs())
+        // check correctness of splitAction
+        if (numEdges != splitAction.splitRule.NumOutputs())
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - number of split rule outputs doesn't match fan-out");
         }
@@ -248,7 +234,7 @@ namespace predictors
         size_t interiorNodeIndex = _interiorNodes.size();
 
         // create the new interior node
-        _interiorNodes.emplace_back(splitInfo, _numEdges);
+        _interiorNodes.emplace_back(splitAction, _numEdges);
 
         // increment global edge count
         _numEdges += numEdges;
@@ -261,8 +247,8 @@ namespace predictors
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::InteriorNode(const SplitInfo& splitInfo, size_t firstEdgeIndex) : splitRule(splitInfo.splitRule), firstEdgeIndex(firstEdgeIndex)
+    ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::InteriorNode(const SplitAction& splitAction, size_t firstEdgeIndex) : splitRule(splitAction.splitRule), firstEdgeIndex(firstEdgeIndex)
     {
-        std::copy(splitInfo.predictors.begin(), splitInfo.predictors.end(), std::back_inserter(outgoingEdges));
+        std::copy(splitAction.predictors.begin(), splitAction.predictors.end(), std::back_inserter(outgoingEdges));
     }
 }

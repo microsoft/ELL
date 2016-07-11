@@ -48,13 +48,19 @@ namespace predictors
         };
 
         /// <summary> Struct that defines a split rule and the predictors assigned to the outgoing edges. </summary>
-        struct SplitInfo
+        struct SplitAction
         {
+
+            /// <summary> Identifier of the node to split. </summary>
+            SplittableNodeId nodeId;
+
             /// <summary> The split rule. </summary>
             SplitRuleType splitRule;
             
             /// <summary> The predictors in the outgoing edges. </summary>
             std::vector<EdgePredictorType> predictors;
+
+
         };
 
         /// <summary> Gets the number of trees in the forest. </summary>
@@ -134,7 +140,7 @@ namespace predictors
         /// <summary> Gets a SplittableNodeId that represents the root of a new tree. </summary>
         ///
         /// <returns> A root node identifier. </returns>
-        SplittableNodeId GetRootId() const { return {true, 0, 0}; }
+        SplittableNodeId GetNewRootId() const { return {true, 0, 0}; }
 
         /// <summary> Gets the number of children of a given interior node. </summary>
         ///
@@ -151,13 +157,12 @@ namespace predictors
         /// <returns> The child identifier. </returns>
         SplittableNodeId GetChildId(size_t parentNodeIndex, size_t childPosition) const;
 
-        /// <summary> Splits a leaf of one of the trees. </summary>
+        /// <summary> Splits a leaf of one of the existing trees or the root of a new tree. </summary>
         ///
-        /// <param name="splitInfo"> Information describing the split. </param>
-        /// <param name="nodeId"> The identifier of the node being split. </param>
+        /// <param name="splitAction"> Information describing the split. </param>
         ///
         /// <returns> The index of the newly created interior node. </returns>
-        size_t Split(const SplitInfo& splitInfo, SplittableNodeId nodeId);
+        size_t Split(const SplitAction& splitAction);
 
     protected:
         struct Edge
@@ -169,7 +174,7 @@ namespace predictors
 
         struct InteriorNode
         {
-            InteriorNode(const SplitInfo& splitInfo, size_t firstEdgeIndex);
+            InteriorNode(const SplitAction& splitAction, size_t firstEdgeIndex);
             SplitRuleType splitRule;
             std::vector<Edge> outgoingEdges;
             size_t firstEdgeIndex;
@@ -183,9 +188,7 @@ namespace predictors
         template<typename RandomAccessVectorType>
         void SetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& edgeIndicator, size_t interiorNodeIndex) const;
 
-        size_t SplitNode(const SplitInfo& splitInfo, SplittableNodeId nodeId);
-        size_t AddTree(const SplitInfo& splitInfo);
-        size_t AddInteriorNode(const SplitInfo& splitInfo);
+        size_t AddInteriorNode(const SplitAction& splitAction);
 
         std::vector<InteriorNode> _interiorNodes;
         std::vector<Tree> _trees;
