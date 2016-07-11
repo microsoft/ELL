@@ -8,7 +8,7 @@
     "build": "./buildme",
     "buildmac": "./buildme && ./copyMacLib.sh",
     "buildwin": "buildme && copyWindowsLib",
-    "buildlinux": "./buildme && ./copyLinuxLib",
+    "buildlinux": "./buildme && ./copyLinuxLib.sh",
     "preinstall": "",
     "preuninstall": "rm -rf build/*"
   },
