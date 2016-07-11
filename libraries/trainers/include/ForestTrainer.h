@@ -74,6 +74,7 @@ namespace trainers
         {
             double sumWeights = 0;
             double sumWeightedLabels = 0;
+            size_t size = 0;
 
             Sums operator-(const Sums& other) const; 
         };
@@ -82,8 +83,6 @@ namespace trainers
         struct NodeStats
         {
             uint64_t fromRowIndex;
-            uint64_t size;
-            uint64_t size0;
             Sums sums;
             Sums sums0;
             Sums sums1;
@@ -97,8 +96,8 @@ namespace trainers
             NodeStats nodeStats;
 
             double gain;
-
             bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
+
             void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
         };
 
@@ -109,13 +108,13 @@ namespace trainers
         };
 
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
-        void AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, uint64_t size, Sums sums);
+        void AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, Sums sums);
 
         void SortDatasetBySplitRule(size_t featureIndex, uint64_t fromRowIndex, uint64_t size);
         void SortDatasetBySplitRule(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size);
 
-        double CalculateGain(Sums sums, Sums sums0) const;
-        double GetOutputValue(Sums sums) const;
+        double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
+        double GetOutputValue(const Sums& sums) const;
 
         // member variables
         LossFunctionType _lossFunction;
