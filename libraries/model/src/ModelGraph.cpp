@@ -96,7 +96,7 @@ namespace model
 
             // we can visit this node only if all its inputs have been visited already
             bool canVisit = true;
-            const auto& nodeInputs = node->GetInputs();
+            const auto& nodeInputs = node->GetInputPorts();
             for (auto input : nodeInputs)
             {
                 for (const auto& inputNode : input->GetInputNodes())
@@ -132,7 +132,7 @@ namespace model
             }
             else // visit node's inputs
             {
-                const auto& nodeInputs = node->GetInputs();
+                const auto& nodeInputs = node->GetInputPorts();
                 for (auto input : ModelImpl::Reverse(nodeInputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
                 {
                     for (const auto& inputNode : input->GetInputNodes())

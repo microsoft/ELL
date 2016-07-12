@@ -10,6 +10,9 @@
 #include "InputPort.h"
 #include "ModelTransformer.h"
 
+// stl
+#include <unordered_set>
+
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -19,6 +22,19 @@ namespace model
     void Node::AddInputPort(InputPortBase* input)
     {
         _inputs.push_back(input);
+    }
+
+    std::vector<const Node*> Node::GetInputNodes() const
+    {
+        std::unordered_set<const Node*> nodes;
+        for (const auto& port : _inputs)
+        {
+            for (const auto& node : port->GetInputNodes())
+            {
+                nodes.insert(node);
+            }
+        }
+        return std::vector<const Node*>{ nodes.begin(), nodes.end() };
     }
 
     void Node::AddDependent(const Node* dependent) const 
