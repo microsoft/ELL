@@ -204,7 +204,17 @@ namespace trainers
         return sums.sumWeightedLabels / sums.sumWeights;
     }
 
-     template<typename LossFunctionType>
+    template<typename LossFunctionType>
+    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters)
+    {
+        return std::make_unique<ForestTrainer<LossFunctionType>>(lossFunction, parameters);
+    }
+
+    //
+    // debugging code
+    //
+    
+    template<typename LossFunctionType>
     void ForestTrainer<LossFunctionType>::Sums::Print(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "sumWeights = " << sumWeights << ", sumWeightedLabels = " << sumWeightedLabels;
@@ -235,18 +245,11 @@ namespace trainers
     {
         os << "Priority Queue Size: " << size() << "\n";
 
-        // TODO: use the heapify routines on a normal vector if we want to iterate over the items
         for(const auto& candidate : std::priority_queue<SplitCandidate>::c) // c is a protected member of std::priority_queue
         {
             os << "\n";
             candidate.Print(os, 1);
             os << "\n";
         }
-    }
-
-    template<typename LossFunctionType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters)
-    {
-        return std::make_unique<ForestTrainer<LossFunctionType>>(lossFunction, parameters);
     }
 }
