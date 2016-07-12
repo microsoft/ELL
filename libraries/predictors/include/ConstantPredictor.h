@@ -8,6 +8,9 @@
 
 #pragma once
 
+//stl
+#include <iostream>
+
 namespace predictors
 {
     /// <summary> A predictor that ignores its input and outputs a constant number. This class is used to define decision trees. </summary>
@@ -29,6 +32,12 @@ namespace predictors
         ///
         /// <returns> The constant value. </returns>
         double GetValue() const { return _value; }
+
+        /// <summary> Prints a representation of the predictor to the output stream. </summary>
+        ///
+        /// <param name="os"> [in,out] The output stream. </param>
+        /// <param name="tabs"> The number of tabs. </param>
+        void Print(std::ostream& os, size_t tabs) const;
 
     private:
         double _value;

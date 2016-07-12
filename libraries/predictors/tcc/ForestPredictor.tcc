@@ -14,6 +14,31 @@
 namespace predictors
 {
     template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::SplitAction::Print(std::ostream& os, size_t tabs) const
+    {
+        os << std::string(tabs * 4, ' ') << "action = ";
+        if(nodeId.isRoot)
+        {
+            os << "add tree\n";
+        }
+        else
+        {
+            os << "split child " << nodeId.childPosition << " of node " << nodeId.parentNodeIndex << "\n";
+        }
+
+        os << std::string(tabs * 4, ' ') << "rule:\n";
+        splitRule.Print(os, tabs + 1);
+
+        os << "\n";
+        os << std::string(tabs * 4, ' ') << "edge predictors:\n";
+        for(const auto& predictor : predictors)
+        {
+            predictor.Print(os, tabs + 1);
+            os << "\n";
+        }
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
     size_t ForestPredictor<SplitRuleType, EdgePredictorType>::NumInteriorNodes(size_t interiorNodeIndex) const
     {
         if (interiorNodeIndex >= _interiorNodes.size())

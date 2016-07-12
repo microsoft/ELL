@@ -48,7 +48,7 @@ namespace predictors
         };
 
         /// <summary> Struct that defines a split rule and the predictors assigned to the outgoing edges. </summary>
-        struct SplitAction
+        struct SplitAction // TODO: add ctor and make members private
         {
             /// <summary> Identifier of the node to split. </summary>
             SplittableNodeId nodeId;
@@ -58,6 +58,12 @@ namespace predictors
             
             /// <summary> The predictors in the outgoing edges. </summary>
             std::vector<EdgePredictorType> predictors;
+
+            /// <summary> Prints the split action to an output stream. </summary>
+            ///
+            /// <param name="os"> The output stream. </param>
+            /// <param name="tabs"> The number of tabs. </param>
+            void Print(std::ostream& os, size_t tabs=0) const;
         };
 
         /// <summary> Gets the number of trees in the forest. </summary>

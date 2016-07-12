@@ -158,7 +158,7 @@ namespace trainers
             EdgePredictorVector edgePredictorVector{ GetOutputValue(bestNodeStats.sums0) , GetOutputValue(bestNodeStats.sums1) };
             SplitAction splitAction{ nodeId, SplitRule{ bestFeatureIndex, bestThreshold }, edgePredictorVector };
             NodeExamples nodeExamples{ fromRowIndex, size, bestSize0, size - bestSize0 };
-            _queue.push(SplitCandidate{ splitAction, nodeId, bestNodeStats, nodeExamples, bestGain });
+            _queue.push(SplitCandidate{ splitAction, bestNodeStats, nodeExamples, bestGain });
         }
 
 #ifdef VERY_VERBOSE
@@ -204,31 +204,30 @@ namespace trainers
         return sums.sumWeightedLabels / sums.sumWeights;
     }
 
-    template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::Sums::Print(std::ostream& os) const
+     template<typename LossFunctionType>
+    void ForestTrainer<LossFunctionType>::Sums::Print(std::ostream& os, size_t tabs) const
     {
-        os << "sumWeights: " << sumWeights << "\t" << "sumWeightedLabels: " << sumWeightedLabels;
+        os << std::string(tabs * 4, ' ') << "sumWeights = " << sumWeights << ", sumWeightedLabels = " << sumWeightedLabels;
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::NodeStats::Print(std::ostream& os) const
+    void ForestTrainer<LossFunctionType>::NodeStats::Print(std::ostream& os, size_t tabs) const
     {
-        os << "    sums:\t";
-        sums.Print(os);
+        os << std::string(tabs * 4, ' ') << "stats:\n";
+        sums.Print(os, tabs+1);
         os << "\n";
-        os << "    sums0:\t";
-        sums0.Print(os);
+        sums0.Print(os, tabs+1);
         os << "\n";
-        os << "    sums1:\t";
-        sums1.Print(os);
+        sums1.Print(os, tabs+1);
         os << "\n";
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SplitCandidate::Print(std::ostream& os) const
+    void ForestTrainer<LossFunctionType>::SplitCandidate::Print(std::ostream& os, size_t tabs) const
     {
-        os << "gain: " << gain << "\n";
-        nodeStats.Print(os);
+        os << std::string(tabs * 4, ' ') << "gain = " << gain << "\n";
+        splitAction.Print(os, tabs);
+        nodeStats.Print(os, tabs);
     }
 
     template<typename LossFunctionType>
@@ -239,8 +238,8 @@ namespace trainers
         // TODO: use the heapify routines on a normal vector if we want to iterate over the items
         for(const auto& candidate : std::priority_queue<SplitCandidate>::c) // c is a protected member of std::priority_queue
         {
-            os << "--> ";
-            candidate.Print(os);
+            os << "\n";
+            candidate.Print(os, 1);
             os << "\n";
         }
     }

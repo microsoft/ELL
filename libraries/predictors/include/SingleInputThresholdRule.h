@@ -8,6 +8,9 @@
 
 #pragma once
 
+// stl
+#include <iostream>
+
 namespace predictors
 {
     /// <summary> A split rule that compares a single feature to a threshold. </summary>
@@ -33,6 +36,12 @@ namespace predictors
         ///
         /// <returns> The number of outputs. </returns>
         size_t NumOutputs() const { return 2; }
+
+        /// <summary> Prints the rule to an output stream. </summary>
+        ///
+        /// <param name="os"> The output stream. </param>
+        ///  <param name="tabs"> The number of tabs. </param>
+        void Print(std::ostream& os, size_t tabs=0) const;
 
     private:
         size_t _index;

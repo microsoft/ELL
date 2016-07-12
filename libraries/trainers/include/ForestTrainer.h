@@ -76,7 +76,7 @@ namespace trainers
             double sumWeightedLabels = 0;
 
             Sums operator-(const Sums& other) const;
-            void Print(std::ostream& os) const;
+            void Print(std::ostream& os, size_t tabs=0) const;
         };
 
         // struct used to keep statistics about tree nodes
@@ -86,7 +86,7 @@ namespace trainers
             Sums sums0;
             Sums sums1;
 
-            void Print(std::ostream& os) const;
+            void Print(std::ostream& os, size_t tabs=0) const;
         };
 
         struct NodeExamples
@@ -101,14 +101,13 @@ namespace trainers
         struct SplitCandidate
         {
             SplitAction splitAction;
-            SplittableNodeId nodeId;
             NodeStats nodeStats;
             NodeExamples nodeExamples;
 
             double gain;
             bool operator<(const SplitCandidate& other) const { return gain < other.gain; }
 
-            void Print(std::ostream& os) const;
+            void Print(std::ostream& os, size_t tabs=0) const;
         };
 
         struct PriorityQueue : public std::priority_queue<SplitCandidate>
