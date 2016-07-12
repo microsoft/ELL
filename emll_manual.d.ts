@@ -75,9 +75,9 @@ export class MeanNode extends Node {
     constructor();
 }
 
-
 //
 // misc
 //
 export function LoadModelGraph(filename: string): ModelGraph;
 export class UniqueId { }
+export class Variant {}

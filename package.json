@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "echo ",
-    "build": "./buildme",
+    "build": "buildme",
     "buildmac": "./buildme && ./copyMacLib.sh",
     "buildwin": "buildme && copyWindowsLib",
     "buildlinux": "./buildme && ./copyLinuxLib.sh",
