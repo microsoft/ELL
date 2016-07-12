@@ -4,6 +4,6 @@ int main(int argc, char* argv[])
 {
 	TestLLVM();
 
-	TestBinaryOp();
+	TestModelEx();
 	return 0;
 }

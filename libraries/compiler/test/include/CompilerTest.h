@@ -9,7 +9,12 @@ void TestLLVM();
 class ModelBuilder
 {
 public:
-	
+	ModelBuilder();
+	ModelBuilder(const ModelBuilder& src);
+	ModelBuilder(ModelBuilder&& src);
+
+	template<typename T>
+	model::InputNode<T>* Inputs(size_t count);
 	template<typename T>
 	model::InputNode<T>* Inputs(std::vector<T>& values);
 
@@ -28,4 +33,4 @@ private:
 	model::Model _model;
 };
 
-void TestBinaryOp();
+void TestModelEx();

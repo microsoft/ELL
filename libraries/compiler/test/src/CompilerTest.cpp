@@ -1,10 +1,16 @@
 #include "CompilerTest.h"
 #include "IRInclude.h"
+#include "IRCompiler.h"
+#include "testing.h"
 #include <string>
 #include <ostream>
 
-
 using namespace emll::compiler;
+
+void NodePrinter(const model::Node& node)
+{
+	std::cout << "node_" << node.GetId() << " = " << node.GetRuntimeTypeName() << std::endl;
+}
 
 void TestLLVM()
 {
@@ -83,10 +89,30 @@ void TestLLVM()
 	module.WriteBitcodeToFile("C:\\junk\\model\\loop.bc");
 }
 
+ModelBuilder::ModelBuilder()
+{
+}
+
+ModelBuilder::ModelBuilder(const ModelBuilder& src)
+	: _model(src._model)
+{
+}
+
+ModelBuilder::ModelBuilder(ModelBuilder&& src)
+	: _model(std::move(src._model))
+{
+}
+
+template<typename T>
+model::InputNode<T>* ModelBuilder::Inputs(size_t count)
+{
+	return _model.AddNode<model::InputNode<T>>(count);
+}
+
 template<typename T>
 model::InputNode<T>* ModelBuilder::Inputs(std::vector<T>& values)
 {
-	auto node = _model.AddNode<model::InputNode<T>>(values.size());
+	auto node = Inputs<T>(values.size());
 	node->SetInput(values);
 	return node;
 }
@@ -109,43 +135,28 @@ nodes::ConstantNode<T>* ModelBuilder::Constant(const std::vector<T>& values)
 	return _model.AddNode<nodes::ConstantNode<T>>(values);
 }
 
-void TestBinaryOp()
+
+model::Model InitTestModelBinOp()
 {
 	ModelBuilder builder;
-	std::vector<double> data = {10, 100, 1000, 10000};
+	std::vector<double> data = { 10, 100, 1000, 10000 };
 
 	auto input = builder.Inputs<double>(data);
-
 	auto c = builder.Constant<double>({ 5, 50, 500, 5000 });
-
 	nodes::BinaryOperationNode<double>* addNode = builder.Add<double>(input->output, c->output);
+	builder.Add<double>(addNode->output, c->output);
+	builder.Add<double>(input->output, c->output);
 	
-	std::cout << typeid(addNode).name() << std::endl;
-	std::cout << typeid(nodes::BinaryOperationNode<double>).name() << std::endl;
-	std::cout << typeid(nodes::BinaryOperationNode<int>).name() << std::endl;
+	return builder.Model;
+}
 
-	if (typeid(*addNode) ==  typeid(nodes::BinaryOperationNode<double>))
-	{
-		std::cout << "Hoo" << std::endl;
-	}
-	auto result = builder.Model.GetNodeOutput(addNode->output);
-	for (auto r : result)
-	{
-		std::cout << r << ";";
-	}
+void TestModelEx()
+{
+	model::Model model = InitTestModelBinOp();
 
-	model::Node* pNode = addNode;
+	std::vector<const model::Node*> nodes = ModelEx::CollectOutputNodes(model);
+	testing::ProcessTest("CollectOutputNodes", nodes.size() == 2);
 
-	Compiler compiler;
-	Compiler::NodeType nodeType = compiler.GetNodeType(*pNode);
-
-	switch (compiler.GetNodeDataType(*pNode))
-	{
-		default:
-			break;
-		case model::Port::PortType::Real:
-			nodes::BinaryOperationNode<double>* pOp = static_cast<nodes::BinaryOperationNode<double>*>(pNode);
-			std::cout << pOp->GetRuntimeTypeName();
-			break;
-	}
+	nodes = ModelEx::CollectInputNodes(model);
+	testing::ProcessTest("CollectInputNodes", nodes.size() == 1);
 }
