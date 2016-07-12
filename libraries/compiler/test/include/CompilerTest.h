@@ -34,3 +34,4 @@ private:
 };
 
 void TestModelEx();
+void TestCompiler();

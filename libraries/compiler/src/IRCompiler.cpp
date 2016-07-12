@@ -24,18 +24,54 @@ namespace emll
 
 		}
 
-		void IRCompiler::BeginFunction(const std::string& functionName, const VariableDecl& input, const VariableDecl& output)
+		void IRCompiler::BeginMain(const std::string& functionName)
 		{
 			NamedValueTypeList fnArgs;
-			fnArgs.init({ { input.name, input.type },{ output.name, output.type } });
+			AddArgs(fnArgs, InputName(), Inputs());
+			AddArgs(fnArgs, OutputName(), Outputs());
 			_fn = _module.Function(functionName, ValueType::Void, fnArgs, true);
 		}
-
-		void IRCompiler::EndFunction()
+		
+		void IRCompiler::EndMain()
 		{
 			_fn.Ret();
 			_fn.Verify();
 		}
 
+		void IRCompiler::AddArgs(NamedValueTypeList& args, const std::string& namePrefix, const std::vector<const model::Node*>& nodes)
+		{
+			for (size_t n = 0; n < nodes.size(); ++n)
+			{
+				auto node = nodes[n];
+				std::string argNamePrefix = namePrefix;
+				argNamePrefix.append(std::to_string(n));
+				auto outputs = node->GetOutputs();
+				for (size_t i = 0; i < outputs.size(); ++i)
+				{
+					std::string argName = argNamePrefix;
+					if (i > 0)
+					{
+						argName.append(std::to_string(i));
+					}
+					AddArgs(args, argName, outputs[i]);
+				}
+			}
+		}
+
+		void IRCompiler::AddArgs(NamedValueTypeList& args, const std::string& name, const model::OutputPortBase* pOutput)
+		{
+			model::Port::PortType type = pOutput->GetType();
+			switch (type)
+			{
+				case model::Port::PortType::Real:
+					args.push_back({name, ValueType::PDouble});
+					break;
+				case model::Port::PortType::Integer:
+					args.push_back({ name, ValueType::PInt32 });
+					break;
+				default:
+					throw new CompilerException(CompilerError::inputPortTypeNotSupported);
+			}
+		}
 	}
 }

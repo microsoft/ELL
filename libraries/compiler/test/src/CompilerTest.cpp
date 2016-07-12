@@ -150,6 +150,15 @@ model::Model InitTestModelBinOp()
 	return builder.Model;
 }
 
+void TestCompiler()
+{
+	model::Model model = InitTestModelBinOp();
+	
+	IRCompiler compiler("EMLL", std::cout);
+	compiler.Compile(model);
+	compiler.DebugDump();
+}
+
 void TestModelEx()
 {
 	model::Model model = InitTestModelBinOp();

@@ -41,23 +41,31 @@ namespace emll
 			/// <summary>Compile the given model</summary>
 			virtual void Compile(const model::Model& model);
 
-			virtual void CompileLinear(const model::Node& modelRoot, const std::string& functionName);
-
 			/// <summary>Return the type of the given node</summary>
 			NodeType GetNodeType(const model::Node& node) const;
 
 		protected:
 			virtual void Begin() = 0;
 			virtual void End() = 0;			
-			virtual void BeginFunction(const std::string& functionName, const VariableDecl& input, const VariableDecl& output) = 0;
-			virtual void EndFunction() = 0;
-
-			virtual void CompileInput(const model::Node& input);
+			virtual void BeginMain(const std::string& functionName) = 0;
+			virtual void EndMain() = 0;
 			
 			virtual void InitSupportedNodeTypes();
 			
 			void VerifyInputType(const model::Node& node, const model::Port::PortType type);
 			void VerifyOutputType(const model::Node& node, const model::Port::PortType type);
+
+			const std::string& InputName() const;
+			const std::string& OutputName() const;
+
+			const std::vector<const model::Node*>& Inputs() const
+			{
+				return _inputs;
+			}
+			const std::vector<const model::Node*>& Outputs() const
+			{
+				return _outputs;
+			}
 
 		private:
 			void Reset();

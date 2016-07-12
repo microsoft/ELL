@@ -17,10 +17,13 @@ namespace emll
 		protected:
 			virtual void Begin() override;
 			virtual void End() override;
-			virtual void BeginFunction(const std::string& functionName, const VariableDecl& input, const VariableDecl& output) override;
-			virtual void EndFunction() override;
+			virtual void BeginMain(const std::string& functionName) override;
+			virtual void EndMain() override;
 
 		private:
+
+			void AddArgs(NamedValueTypeList& args, const std::string& namePrefix, const std::vector<const model::Node*>& nodes);
+			void AddArgs(NamedValueTypeList& args, const std::string& name, const model::OutputPortBase* pOutput);
 
 		private:
 			std::ostream& _os;

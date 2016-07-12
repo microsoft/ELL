@@ -15,6 +15,7 @@ namespace emll
 	{
 		const std::string c_InputVariableName = "input";
 		const std::string c_OutputVariableName = "output";
+		const std::string c_PredictFunctionName = "Predict";
 
 		/// <summary>Base class for ML Compiler.</summary>
 		Compiler::Compiler()
@@ -23,27 +24,22 @@ namespace emll
 			InitSupportedNodeTypes();
 		}
 
+		const std::string& Compiler::InputName() const
+		{
+			return c_InputVariableName;
+		}
+
+		const std::string& Compiler::OutputName() const
+		{
+			return c_OutputVariableName;
+		}
+
 		void Compiler::Compile(const model::Model& model)
 		{
 			_inputs = ModelEx::CollectInputNodes(model);
 			_outputs = ModelEx::CollectOutputNodes(model);
-		}
-
-		void Compiler::CompileLinear(const model::Node& modelRoot, const std::string& functionName)
-		{
-			VariableDecl input = { ValueType::PDouble, c_InputVariableName };
-			VariableDecl output = { ValueType::PDouble, c_OutputVariableName };
-			BeginFunction(functionName, input, output);
-		}
-
-		void Compiler::CompileInput(const model::Node& input)
-		{
-			NodeType type = GetNodeType(input);
-			if (type != NodeType::input)
-			{
-				throw new CompilerException(CompilerError::InputNodeExpected);
-			}
-			VerifyOutputType(input, model::Port::PortType::Real);
+			BeginMain(c_PredictFunctionName);
+			EndMain();
 		}
 
 		Compiler::NodeType Compiler::GetNodeType(const model::Node& node) const
@@ -58,7 +54,7 @@ namespace emll
 			{
 				if (port->GetType() != type)
 				{
-					throw new CompilerException(CompilerError::InputPortTypeNotSupported);
+					throw new CompilerException(CompilerError::inputPortTypeNotSupported);
 				}
 			}
 		}
@@ -70,7 +66,7 @@ namespace emll
 			{
 				if (port->GetType() != type)
 				{
-					throw new CompilerException(CompilerError::OutputPortTypeNotSupported);
+					throw new CompilerException(CompilerError::outputPortTypeNotSupported);
 				}
 			}
 		}
