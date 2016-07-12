@@ -74,18 +74,27 @@ namespace trainers
         {
             double sumWeights = 0;
             double sumWeightedLabels = 0;
-            size_t size = 0;
 
-            Sums operator-(const Sums& other) const; 
+            Sums operator-(const Sums& other) const;
+            void Print(std::ostream& os) const;
         };
 
         // struct used to keep statistics about tree nodes
         struct NodeStats
         {
-            uint64_t fromRowIndex;
             Sums sums;
             Sums sums0;
             Sums sums1;
+
+            void Print(std::ostream& os) const;
+        };
+
+        struct NodeExamples
+        {
+            uint64_t fromRowIndex;
+            size_t size;
+            size_t size0;
+            size_t size1;
         };
 
         // struct used to keep info about the gain maximizing split of each splittable node in the tree
@@ -94,21 +103,22 @@ namespace trainers
             SplitAction splitAction;
             SplittableNodeId nodeId;
             NodeStats nodeStats;
+            NodeExamples nodeExamples;
 
             double gain;
-            bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
+            bool operator<(const SplitCandidate& other) const { return gain < other.gain; }
 
-            void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
+            void Print(std::ostream& os) const;
         };
 
         struct PriorityQueue : public std::priority_queue<SplitCandidate>
         {
-            void Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const;
+            void Print(std::ostream& os) const;
             using std::priority_queue<SplitCandidate>::size;
         };
 
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
-        void AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, Sums sums);
+        void AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, size_t size, Sums sums);
 
         void SortDatasetBySplitRule(size_t featureIndex, uint64_t fromRowIndex, uint64_t size);
         void SortDatasetBySplitRule(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size);

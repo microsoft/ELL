@@ -22,7 +22,7 @@ namespace trainers
         auto sums = LoadData(exampleIterator);
 
         // find split candidate for root node and push it onto the priority queue
-        AddSplitCandidateToQueue(_forest->GetNewRootId(), 0, sums);
+        AddSplitCandidateToQueue(_forest->GetNewRootId(), 0, _dataset.NumExamples(), sums);
 
         // as long as positive gains can be attained, keep growing the tree
         while(!_queue.empty())
@@ -30,7 +30,7 @@ namespace trainers
 
 #ifdef VERY_VERBOSE
              std::cout << "Iteration\n";
-             _queue.Print(std::cout, _dataset);
+             _queue.Print(std::cout);
 #endif
 
             auto splitCandidate = _queue.top();
@@ -39,10 +39,10 @@ namespace trainers
             const auto& sums = splitCandidate.nodeStats.sums;
             const auto& sums0 = splitCandidate.nodeStats.sums0;
             const auto& sums1 = splitCandidate.nodeStats.sums1;
-            auto size = splitCandidate.nodeStats.sums.size;
-            auto size0 = splitCandidate.nodeStats.sums0.size;
-            auto size1 = splitCandidate.nodeStats.sums1.size;
-            auto fromRowIndex0 = splitCandidate.nodeStats.fromRowIndex;
+            auto size = splitCandidate.nodeExamples.size;
+            auto size0 = splitCandidate.nodeExamples.size0;
+            auto size1 = splitCandidate.nodeExamples.size1;
+            auto fromRowIndex0 = splitCandidate.nodeExamples.fromRowIndex;
             auto fromRowIndex1 = fromRowIndex0 + size0;
 
             // perform the split
@@ -52,13 +52,13 @@ namespace trainers
             auto interiorNodeIndex = _forest->Split(splitCandidate.splitAction);
 
             // sort the data according to the performed split
-            SortDatasetBySplitRule(splitCandidate.splitAction.splitRule, splitCandidate.nodeStats.fromRowIndex, size);
+            SortDatasetBySplitRule(splitCandidate.splitAction.splitRule, splitCandidate.nodeExamples.fromRowIndex, size);
 
             // queue split candidate for child 0
-            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), fromRowIndex0, sums0);
+            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), fromRowIndex0, size0, sums0);
 
             // queue split candidate for child 1
-            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 1), fromRowIndex1, sums1);
+            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 1), fromRowIndex1, size1, sums1);
         }
     }
 
@@ -68,7 +68,6 @@ namespace trainers
         Sums difference;
         difference.sumWeights = sumWeights - other.sumWeights;
         difference.sumWeightedLabels = sumWeightedLabels - other.sumWeightedLabels;
-        difference.size = size - other.size;
         return difference;
     }
 
@@ -84,7 +83,6 @@ namespace trainers
             
             sums.sumWeights += example.GetWeight();
             sums.sumWeightedLabels += example.GetWeight() * example.GetLabel();
-            ++sums.size;
 
             auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
             auto denseSupervisedExample = dataset::SupervisedExample<dataset::DoubleDataVector>(std::move(denseDataVector), example.GetLabel(), example.GetWeight());
@@ -96,26 +94,27 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, Sums sums)
+    void ForestTrainer<LossFunctionType>::AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, size_t size, Sums sums)
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 
         double bestGain = 0;
         size_t bestFeatureIndex;
         double bestThreshold;
+        size_t bestSize0;
         
         NodeStats bestNodeStats;
-        bestNodeStats.fromRowIndex = fromRowIndex;
+        bestNodeStats.sums = sums;
 
         for (uint64_t featureIndex = 0; featureIndex < numFeatures; ++featureIndex)
         {
             // sort the relevant rows of dataset in ascending order by featureIndex
-            SortDatasetBySplitRule(featureIndex, fromRowIndex, sums.size);
+            SortDatasetBySplitRule(featureIndex, fromRowIndex, size);
 
             Sums sums0;
 
             // consider all thresholds
-            for (uint64_t rowIndex = fromRowIndex; rowIndex < fromRowIndex + sums.size-1; ++rowIndex)
+            for (uint64_t rowIndex = fromRowIndex; rowIndex < fromRowIndex + size-1; ++rowIndex)
             {
                 // get friendly names
                 const auto& currentRow = _dataset[rowIndex].GetDataVector();
@@ -126,7 +125,6 @@ namespace trainers
                 // increment sums 
                 sums0.sumWeights += weight; // TODO - make function called increment( . . . )
                 sums0.sumWeightedLabels += weight * label;
-                ++(sums0.size);
 
                 // only split between rows with different feature values
                 if (currentRow[featureIndex] == nextRow[featureIndex])
@@ -144,9 +142,9 @@ namespace trainers
                     bestGain = gain;
                     bestFeatureIndex = featureIndex;
                     bestThreshold = 0.5 * (currentRow[featureIndex] + nextRow[featureIndex]);
-
+                    bestSize0 = rowIndex - fromRowIndex + 1;
                     bestNodeStats.sums0 = sums0;
-                    bestNodeStats.sums1 = sums - sums0;
+                    bestNodeStats.sums1 = sums1; // TODO move?
                 }
             }
         }
@@ -159,7 +157,8 @@ namespace trainers
 
             EdgePredictorVector edgePredictorVector{ GetOutputValue(bestNodeStats.sums0) , GetOutputValue(bestNodeStats.sums1) };
             SplitAction splitAction{ nodeId, SplitRule{ bestFeatureIndex, bestThreshold }, edgePredictorVector };
-            _queue.push(SplitCandidate{ splitAction, nodeId, bestNodeStats, bestGain });
+            NodeExamples nodeExamples{ fromRowIndex, size, bestSize0, size - bestSize0 };
+            _queue.push(SplitCandidate{ splitAction, nodeId, bestNodeStats, nodeExamples, bestGain });
         }
 
 #ifdef VERY_VERBOSE
@@ -206,22 +205,43 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SplitCandidate::Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const
+    void ForestTrainer<LossFunctionType>::Sums::Print(std::ostream& os) const
     {
-        os << "Gain: " << gain << "\n";
-//        dataset.Print(os, fromRowIndex, size);
-//        os << std::endl;
+        os << "sumWeights: " << sumWeights << "\t" << "sumWeightedLabels: " << sumWeightedLabels;
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::PriorityQueue::Print(std::ostream& os, const dataset::RowDataset<dataset::DoubleDataVector>& dataset) const
+    void ForestTrainer<LossFunctionType>::NodeStats::Print(std::ostream& os) const
+    {
+        os << "    sums:\t";
+        sums.Print(os);
+        os << "\n";
+        os << "    sums0:\t";
+        sums0.Print(os);
+        os << "\n";
+        os << "    sums1:\t";
+        sums1.Print(os);
+        os << "\n";
+    }
+
+    template<typename LossFunctionType>
+    void ForestTrainer<LossFunctionType>::SplitCandidate::Print(std::ostream& os) const
+    {
+        os << "gain: " << gain << "\n";
+        nodeStats.Print(os);
+    }
+
+    template<typename LossFunctionType>
+    void ForestTrainer<LossFunctionType>::PriorityQueue::Print(std::ostream& os) const
     {
         os << "Priority Queue Size: " << size() << "\n";
 
         // TODO: use the heapify routines on a normal vector if we want to iterate over the items
         for(const auto& candidate : std::priority_queue<SplitCandidate>::c) // c is a protected member of std::priority_queue
         {
-            candidate.Print(os, dataset);
+            os << "--> ";
+            candidate.Print(os);
+            os << "\n";
         }
     }
 
