@@ -24,8 +24,7 @@ set (INCLUDE include/AccumulatorNode.h
              include/UnaryOperationNode.h
              include/VarianceNode.h)
 
-set (SRC src/LinearPredictorNode.cpp
-         src/Nothing.cpp)
+set (SRC src/LinearPredictorNode.cpp)
 
 set (TCC tcc/AccumulatorNode.tcc
          tcc/BinaryOperationNode.tcc
