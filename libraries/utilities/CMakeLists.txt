@@ -22,6 +22,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
          src/UniqueId.cpp
+         src/Variant.cpp
          src/XMLSerialization.cpp)
 
 set (INCLUDE include/CompressedIntegerList.h
@@ -42,6 +43,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/TypeFactory.h
              include/TypeName.h
              include/UniqueId.h
+             include/Variant.h
              include/XMLSerialization.h)
 
 set (TCC tcc/CommandLineParser.tcc
@@ -54,21 +56,15 @@ set (TCC tcc/CommandLineParser.tcc
          tcc/TransformIterator.tcc
          tcc/TypeFactory.tcc
          tcc/TypeName.tcc
+         tcc/Variant.tcc
          tcc/XMLSerialization.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
-include_directories(include)
-include_directories(tcc)
-include_directories(../dataset/include)
-include_directories(../layers/include)
-include_directories(../linear/include)
-include_directories(../predictors/include)
-include_directories(../lossFunctions/include)
-
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
+target_include_directories(${PROJ_NAME} PUBLIC include)
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(${PROJ_NAME} -pthread)
@@ -87,18 +83,17 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp 
+              test/src/Variant_test.cpp
               test/src/XMLSerialization_test.cpp)
 
-set (TEST_INCLUDE test/include/XMLSerialization_test.h)
+set (TEST_INCLUDE test/include/Variant_test.h
+                  test/include/XMLSerialization_test.h)
                   
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})
 
-include_directories(../testing/include)
-include_directories(test/include)
-
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
-include_directories(../testing/include)
+target_include_directories(${TEST_NAME} PRIVATE test/include)
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(utilities_test utilities dataset linear layers testing -pthread)
