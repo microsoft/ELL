@@ -39,31 +39,45 @@ namespace predictors
     {
     public:
         /// <summary> A struct that identifies a splittable node in the forest. The splittable node can be
-        /// the root of a new tree, or a node in an existing tree. </summary>
-        struct SplittableNodeId // TODO: give it a private ctor and make the forest a friend
+        /// the root of a new tree, or a node in an existing tree. This stuct can only be created by
+        /// calling GetNewRootId() or GetChildId(). </summary>
+        class SplittableNodeId 
         {
-            bool isRoot;
-            size_t parentNodeIndex;
-            size_t childPosition;
+        private:
+            friend ForestPredictor<SplitRuleType, EdgePredictorType>;
+            SplittableNodeId(bool isRoot, size_t parentNodeIndex, size_t childPosition);
+            bool _isRoot;
+            size_t _parentNodeIndex;
+            size_t _childPosition;
         };
 
         /// <summary> Struct that defines a split rule and the predictors assigned to the outgoing edges. </summary>
-        struct SplitAction // TODO: add ctor and make members private
+        class SplitAction // TODO: add ctor and make members private
         {
-            /// <summary> Identifier of the node to split. </summary>
-            SplittableNodeId nodeId;
+        public:
+            /// <summary> Constructs an instance of SplitAction. </summary>
+            ///
+            /// <param name="nodeId"> Identifier for the node to split. </param>
+            /// <param name="splitRule"> The split rule. </param>
+            /// <param name="predictors"> The edge predictors to use. </param>
+            SplitAction(SplittableNodeId nodeId, SplitRuleType splitRule, std::vector<EdgePredictorType> edgePredictors);
 
-            /// <summary> The split rule. </summary>
-            SplitRuleType splitRule;
-            
-            /// <summary> The predictors in the outgoing edges. </summary>
-            std::vector<EdgePredictorType> predictors;
+            /// <summary> Gets the split rule. </summary>
+            ///
+            /// <returns> The split rule. </returns>
+            const SplitRuleType& GetSplitRule() const { return _splitRule; }
 
             /// <summary> Prints the split action to an output stream. </summary>
             ///
             /// <param name="os"> The output stream. </param>
             /// <param name="tabs"> The number of tabs. </param>
             void Print(std::ostream& os, size_t tabs=0) const;
+
+        private:
+            friend ForestPredictor<SplitRuleType, EdgePredictorType>;
+            SplittableNodeId _nodeId;
+            SplitRuleType _splitRule;           
+            std::vector<EdgePredictorType> _edgePredictors;
         };
 
         /// <summary> Gets the number of trees in the forest. </summary>

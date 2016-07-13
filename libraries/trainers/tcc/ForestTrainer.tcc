@@ -52,13 +52,13 @@ namespace trainers
             auto interiorNodeIndex = _forest->Split(splitCandidate.splitAction);
 
             // sort the data according to the performed split
-            SortDatasetBySplitRule(splitCandidate.splitAction.splitRule, splitCandidate.nodeExamples.fromRowIndex, size);
+            SortDatasetBySplitRule(splitCandidate.splitAction.GetSplitRule(), splitCandidate.nodeExamples.fromRowIndex, size);
 
             // queue split candidate for child 0
-            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), fromRowIndex0, size0, sums0);
+            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), fromRowIndex0, size0, std::move(sums0));
 
             // queue split candidate for child 1
-            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 1), fromRowIndex1, size1, sums1);
+            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 1), fromRowIndex1, size1, std::move(sums1));
         }
     }
 
@@ -81,8 +81,7 @@ namespace trainers
         {
             const auto& example = exampleIterator.Get();
             
-            sums.sumWeights += example.GetWeight();
-            sums.sumWeightedLabels += example.GetWeight() * example.GetLabel();
+            sums.Increment(example.GetWeight(), example.GetLabel());
 
             auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
             auto denseSupervisedExample = dataset::SupervisedExample<dataset::DoubleDataVector>(std::move(denseDataVector), example.GetLabel(), example.GetWeight());
@@ -123,8 +122,7 @@ namespace trainers
                 double label = _dataset[rowIndex].GetLabel();
 
                 // increment sums 
-                sums0.sumWeights += weight; // TODO - make function called increment( . . . )
-                sums0.sumWeightedLabels += weight * label;
+                sums0.Increment(weight, label); 
 
                 // only split between rows with different feature values
                 if (currentRow[featureIndex] == nextRow[featureIndex])
@@ -144,7 +142,7 @@ namespace trainers
                     bestThreshold = 0.5 * (currentRow[featureIndex] + nextRow[featureIndex]);
                     bestSize0 = rowIndex - fromRowIndex + 1;
                     bestNodeStats.sums0 = sums0;
-                    bestNodeStats.sums1 = sums1; // TODO move?
+                    bestNodeStats.sums1 = sums1; 
                 }
             }
         }
@@ -156,9 +154,9 @@ namespace trainers
             using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
 
             EdgePredictorVector edgePredictorVector{ GetOutputValue(bestNodeStats.sums0) , GetOutputValue(bestNodeStats.sums1) };
-            SplitAction splitAction{ nodeId, SplitRule{ bestFeatureIndex, bestThreshold }, edgePredictorVector };
+            SplitAction splitAction(nodeId, SplitRule{ bestFeatureIndex, bestThreshold }, std::move(edgePredictorVector));
             NodeExamples nodeExamples{ fromRowIndex, size, bestSize0, size - bestSize0 };
-            _queue.push(SplitCandidate{ splitAction, bestNodeStats, nodeExamples, bestGain });
+            _queue.push(SplitCandidate{ std::move(splitAction), std::move(bestNodeStats), std::move(nodeExamples), bestGain });
         }
 
 #ifdef VERY_VERBOSE
@@ -202,6 +200,13 @@ namespace trainers
     double ForestTrainer<LossFunctionType>::GetOutputValue(const Sums& sums) const
     {
         return sums.sumWeightedLabels / sums.sumWeights;
+    }
+
+    template<typename LossFunctionType>
+    void trainers::ForestTrainer<LossFunctionType>::Sums::Increment(double weight, double label)
+    {
+        sumWeights += weight;
+        sumWeightedLabels += weight * label;
     }
 
     template<typename LossFunctionType>

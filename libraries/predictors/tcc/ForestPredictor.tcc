@@ -14,6 +14,14 @@
 namespace predictors
 {
     template<typename SplitRuleType, typename EdgePredictorType>
+    ForestPredictor<SplitRuleType, EdgePredictorType>::SplittableNodeId::SplittableNodeId(bool isRoot, size_t parentNodeIndex, size_t childPosition) : _isRoot(isRoot), _parentNodeIndex(parentNodeIndex), _childPosition(childPosition)
+    {}
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    ForestPredictor<SplitRuleType, EdgePredictorType>::SplitAction::SplitAction(SplittableNodeId nodeId, SplitRuleType splitRule, std::vector<EdgePredictorType> edgePredictors) : _nodeId(std::move(nodeId)), _splitRule(std::move(splitRule)), _edgePredictors(std::move(edgePredictors))
+    {}
+
+    template<typename SplitRuleType, typename EdgePredictorType>
     size_t ForestPredictor<SplitRuleType, EdgePredictorType>::NumInteriorNodes(size_t interiorNodeIndex) const
     {
         if (interiorNodeIndex >= _interiorNodes.size())
@@ -156,7 +164,7 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     size_t ForestPredictor<SplitRuleType, EdgePredictorType>::Split(const SplitAction& splitAction)
     {
-        if(splitAction.nodeId.isRoot)
+        if(splitAction._nodeId._isRoot)
         {
             // add interior Node
             size_t interiorNodeIndex = AddInteriorNode(splitAction);
@@ -170,7 +178,7 @@ namespace predictors
         else
         {
             // check that this node wasn't previously split
-            auto& parentOutgoing = _interiorNodes[splitAction.nodeId.parentNodeIndex].outgoingEdges[splitAction.nodeId.childPosition].targetNodeIndex;
+            auto& parentOutgoing = _interiorNodes[splitAction._nodeId._parentNodeIndex].outgoingEdges[splitAction._nodeId._childPosition].targetNodeIndex;
             if (parentOutgoing != 0)
             {
                 throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - node previously split");
@@ -222,10 +230,10 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     size_t ForestPredictor<SplitRuleType, EdgePredictorType>::AddInteriorNode(const SplitAction& splitAction)
     {
-        size_t numEdges = splitAction.predictors.size();
+        size_t numEdges = splitAction._edgePredictors.size();
 
         // check correctness of splitAction
-        if (numEdges != splitAction.splitRule.NumOutputs())
+        if (numEdges != splitAction._splitRule.NumOutputs())
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - number of split rule outputs doesn't match fan-out");
         }
@@ -247,9 +255,9 @@ namespace predictors
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::InteriorNode(const SplitAction& splitAction, size_t firstEdgeIndex) : splitRule(splitAction.splitRule), firstEdgeIndex(firstEdgeIndex)
+    ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::InteriorNode(const SplitAction& splitAction, size_t firstEdgeIndex) : splitRule(splitAction._splitRule), firstEdgeIndex(firstEdgeIndex)
     {
-        std::copy(splitAction.predictors.begin(), splitAction.predictors.end(), std::back_inserter(outgoingEdges));
+        std::copy(splitAction._edgePredictors.begin(), splitAction._edgePredictors.end(), std::back_inserter(outgoingEdges));
     }
 
     //
@@ -260,21 +268,21 @@ namespace predictors
     void ForestPredictor<SplitRuleType, EdgePredictorType>::SplitAction::Print(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "action = ";
-        if(nodeId.isRoot)
+        if(_nodeId._isRoot)
         {
             os << "add tree\n";
         }
         else
         {
-            os << "split child " << nodeId.childPosition << " of node " << nodeId.parentNodeIndex << "\n";
+            os << "split child " << _nodeId._childPosition << " of node " << _nodeId._parentNodeIndex << "\n";
         }
 
         os << std::string(tabs * 4, ' ') << "rule:\n";
-        splitRule.Print(os, tabs + 1);
+        _splitRule.Print(os, tabs + 1);
 
         os << "\n";
         os << std::string(tabs * 4, ' ') << "edge predictors:\n";
-        for(const auto& predictor : predictors)
+        for(const auto& predictor : _edgePredictors)
         {
             predictor.Print(os, tabs + 1);
             os << "\n";

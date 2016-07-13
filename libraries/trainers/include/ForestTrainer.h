@@ -75,6 +75,7 @@ namespace trainers
             double sumWeights = 0;
             double sumWeightedLabels = 0;
 
+            void Increment(double weight, double label);
             Sums operator-(const Sums& other) const;
             void Print(std::ostream& os, size_t tabs=0) const;
         };
