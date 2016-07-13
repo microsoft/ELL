@@ -29,8 +29,16 @@ public:
 	// Expose as a property!
 	model::Model& Model = _model;
 
+	const std::string& Name = _name;
+
+	void SetName(const std::string name)
+	{
+		_name = std::move(name);
+	}
+
 private:
 	model::Model _model;
+	std::string _name;
 };
 
 void TestModelEx();

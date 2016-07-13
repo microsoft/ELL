@@ -43,15 +43,18 @@ namespace emll
 			for (size_t n = 0; n < nodes.size(); ++n)
 			{
 				auto node = nodes[n];
-				std::string argNamePrefix = namePrefix;
-				argNamePrefix.append(std::to_string(n));
+				std::string argNamePrefix = MakeVarName(namePrefix, n);
 				auto outputs = node->GetOutputs();
 				for (size_t i = 0; i < outputs.size(); ++i)
 				{
-					std::string argName = argNamePrefix;
+					std::string argName;
 					if (i > 0)
 					{
-						argName.append(std::to_string(i));
+						argName = MakeVarName(argName, i);
+					}
+					else
+					{
+						argName = argNamePrefix;
 					}
 					AddArgs(args, argName, outputs[i]);
 				}
@@ -72,6 +75,13 @@ namespace emll
 				default:
 					throw new CompilerException(CompilerError::inputPortTypeNotSupported);
 			}
+		}
+
+		std::string IRCompiler::MakeVarName(const std::string& namePrefix, size_t i)
+		{
+			std::string name = namePrefix;
+			name.append(std::to_string(i));
+			return name;
 		}
 	}
 }

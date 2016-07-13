@@ -25,11 +25,14 @@ namespace emll
 			void AddArgs(NamedValueTypeList& args, const std::string& namePrefix, const std::vector<const model::Node*>& nodes);
 			void AddArgs(NamedValueTypeList& args, const std::string& name, const model::OutputPortBase* pOutput);
 
+			std::string MakeVarName(const std::string& namePrefix, size_t i);
+
 		private:
 			std::ostream& _os;
 			IREmitter _emitter;
 			IRModuleEmitter _module;
 			IRFunctionEmitter _fn;
+			IRVariableTable _vars;
 		};
 	}
 }

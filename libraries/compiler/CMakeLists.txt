@@ -20,6 +20,7 @@ set (SRC src/IREmitter.cpp
          src/IRLoopEmitter.cpp
 		 src/IRIfEmitter.cpp
          src/IRFunctionEmitter.cpp
+		 src/Variable.cpp
 		 src/Compiler.cpp
 		 src/IRCompiler.cpp
 )
@@ -34,6 +35,7 @@ set (INCLUDE include/LLVMInclude.h
 		include/IRFunctionEmitter.h
 		include/IRModuleEmitter.h
 		include/IRInclude.h
+		include/Variable.h
 		include/Compiler.h
 		include/IRCompiler.h
 )
