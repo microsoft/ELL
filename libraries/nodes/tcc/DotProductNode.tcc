@@ -6,17 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "DotProductNode.h"
-#include "BinaryOperationNode.h"
-
-// utilities
-#include "Exception.h"
-
-// stl
-#include <string>
-#include <vector>
-#include <cmath>
-
 namespace nodes
 {
     template <typename ValueType>
@@ -28,7 +17,7 @@ namespace nodes
     void DotProductNode<ValueType>::Compute() const
     {
         ValueType result = 0;
-        for(size_t index = 0; index < _input.Size(); ++index)
+        for(size_t index = 0; index < _input1.Size(); ++index)
         {
             result += _input1[index] * _input2[index];
         }
@@ -38,8 +27,9 @@ namespace nodes
     template <typename ValueType>
     void DotProductNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<DotProductNode<ValueType>>(newInput);
+        auto newInput1 = transformer.TransformInputPort(_input1);
+        auto newInput2 = transformer.TransformInputPort(_input2);
+        auto newNode = transformer.AddNode<DotProductNode<ValueType>>(newInput1, newInput2);
         transformer.MapOutputPort(output, newNode->output);
     }
 

@@ -2,7 +2,7 @@
 # CMake macro to create swig-generated language wrapper for Embedded Machine Learning Library
 #
 
-macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INTERFACE)
+macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INTERFACE EXTRA_INCLUDE_PATHS)
 
 cmake_minimum_required(VERSION 2.8.11)
 find_package(SWIG REQUIRED)
@@ -47,6 +47,7 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/linear.i
                      ../common/lossFunctions.i
                      ../common/model.i
+                     ../common/nodes.i
                      ../common/noncopyable.i
                      ../common/trainers.i
                      ../common/predictors.i
@@ -63,7 +64,7 @@ if(${LANGUAGE_NAME} STREQUAL "common")
     add_custom_target(${module_name} ALL DEPENDS ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} SOURCES ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} ${THIS_FILE_PATH})
 
     # Make interface code be dependent on all libraries
-    add_dependencies(${module_name} common dataset evaluators features layers linear lossFunctions model trainers predictors testing treeLayout utilities)
+    add_dependencies(${module_name} common dataset evaluators features layers linear lossFunctions model nodes trainers predictors testing treeLayout utilities)
 else()
 
 # Add EMLL library include directories
@@ -74,10 +75,13 @@ include_directories(../../libraries/features/include)
 include_directories(../../libraries/layers/include)
 include_directories(../../libraries/linear/include)
 include_directories(../../libraries/model/include)
+include_directories(../../libraries/nodes/include)
 include_directories(../../libraries/lossFunctions/include)
 include_directories(../../libraries/predictors/include)
 include_directories(../../libraries/trainers/include)
 include_directories(../../libraries/utilities/include)
+
+include_directories(${EXTRA_INCLUDE_PATHS})
 
 # FOREACH(file ${INTERFACE_FILES} ${INTERFACE_MAIN})
 # 	get_filename_component(fname ${file} NAME)
@@ -116,7 +120,7 @@ endif()
 swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC}) # ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
 
 if( NOT (${LANGUAGE_NAME} STREQUAL "xml"))
-    swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset evaluators features layers linear lossFunctions model trainers predictors utilities)
+    swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset evaluators features layers linear lossFunctions model nodes trainers predictors utilities)
     set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}EMLL)
     add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} EMLL_common)
 endif()

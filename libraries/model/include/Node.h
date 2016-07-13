@@ -38,17 +38,22 @@ namespace model
         /// <summary> Returns the input "ports" for this node </summary>
         ///
         /// <returns> The input "ports" for this node </returns>
-        const std::vector<InputPortBase*>& GetInputs() const { return _inputs; }
+        const std::vector<InputPortBase*>& GetInputPorts() const { return _inputs; }
 
         /// <summary> Returns the output "ports" for this node </summary>
         ///
         /// <returns> The output "ports" for this node </returns>
-        const std::vector<OutputPortBase*>& GetOutputs() const { return _outputs; }
+        const std::vector<OutputPortBase*>& GetOutputPorts() const { return _outputs; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const = 0;
+
+        /// <summary> Get all nodes that this nodes uses for input </summary>
+        ///
+        /// <returns> a vector of all the nodes used for input </summary>
+        std::vector<const Node*> GetInputNodes() const;
 
         /// <summary> Get all nodes that depend (directly) on us </summary>
         ///

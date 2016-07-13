@@ -40,7 +40,7 @@ namespace model
     InputNode<ValueType>* ModelTransformer::GetCorrespondingInputNode(const InputNode<ValueType>* inputNode)
     {
         // This sucks:
-        const auto inputNodeOutputPort = inputNode->GetOutputs()[0];
+        const auto inputNodeOutputPort = inputNode->GetOutputPorts()[0];
         auto newInputNodeOutputPort = GetCorrespondingPort(*inputNodeOutputPort);
         auto newInputNodeConst = dynamic_cast<const model::InputNode<ValueType>*>(newInputNodeOutputPort->GetNode());
         assert(newInputNodeConst != nullptr);

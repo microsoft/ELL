@@ -7,16 +7,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
 #include "Node.h"
 #include "ModelGraph.h"
 #include "ModelTransformer.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <string>
+#include <vector>
 
 namespace nodes
 {
-    /// <summary> A feature that takes a vector input and returns its mean over some window of time </summary>
+    /// <summary> A node that performs a binary arithmetic operation on its inputs </summary>
     template <typename ValueType>
     class BinaryOperationNode : public model::Node
     {
@@ -30,8 +35,8 @@ namespace nodes
         };
 
         /// <summary> Constructor </summary>
-        /// <param name="input"> The signal to take the mean of </param>
-        /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
+        /// <param name="input1"> The left-hand input of the arithmetic expression </param>
+        /// <param name="input2"> The right-hand input of the arithmetic expression </param>
         BinaryOperationNode(const model::OutputPortElementList<ValueType>& input1, const model::OutputPortElementList<ValueType>& input2, OperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>

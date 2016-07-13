@@ -3,4 +3,4 @@
 #
 include (CommonInterfaces)
 
-generate_interface(common ${CMAKE_CURRENT_SOURCE_DIR} "" "")
+generate_interface(common ${CMAKE_CURRENT_SOURCE_DIR} "" "" "")

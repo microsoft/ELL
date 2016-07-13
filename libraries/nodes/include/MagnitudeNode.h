@@ -7,12 +7,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
 #include "Node.h"
-#include "ModelGraph.h"
 #include "ModelTransformer.h"
+#include "OutputPortElementList.h"
+#include "InputPort.h"
+#include "OutputPort.h"
 
 // stl
 #include <string>
+#include <cmath>
 
 namespace nodes
 {

@@ -7,9 +7,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
+#include "SumNode.h"
+
+// model
 #include "Node.h"
-#include "ModelGraph.h"
 #include "ModelTransformer.h"
+#include "OutputPortElementList.h"
+#include "InputPort.h"
+#include "OutputPort.h"
 
 // stl
 #include <string>
@@ -22,7 +28,8 @@ namespace nodes
     {
     public:
         /// <summary> Constructor </summary>
-        /// <param name="input"> The signal to take the dot product of </param>
+        /// <param name="input1"> One of the signals to take the dot product of </param>
+        /// <param name="input2"> The other signal to take the dot product of </param>
         DotProductNode(const model::OutputPortElementList<ValueType>& input1, const model::OutputPortElementList<ValueType>& input2);
         
         /// <summary> Gets the name of this type (for serialization). </summary>

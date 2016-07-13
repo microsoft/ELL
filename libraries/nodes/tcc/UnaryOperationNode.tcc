@@ -6,17 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "UnaryOperationNode.h"
-
-// utilities
-#include "Exception.h"
-
-// stl
-#include <string>
-#include <vector>
-#include <cmath>
-#include <iostream>
-
 namespace nodes
 {
     template <typename ValueType>

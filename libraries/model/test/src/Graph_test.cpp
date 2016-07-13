@@ -30,7 +30,7 @@ void NodePrinter(const model::Node& node)
 {
     bool first = true;
     std::cout << "node_" << node.GetId() << " = " << node.GetRuntimeTypeName() << "(";
-    for (const auto& input : node.GetInputs())
+    for (const auto& input : node.GetInputPorts())
     {
         std::cout << (first ? "" : ", ");
         first = false;
@@ -139,7 +139,6 @@ void TestExampleGraph()
 
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     std::cout << "# input nodes: " << inputNodes.size() << std::endl;
-
 }
 
 void TestInputRouting1()
