@@ -22,12 +22,11 @@
 
 namespace dataset
 {
-    /// <summary> A row-wise dataset of `SupervisedExample<DataVectorType>` items. </summary>
-    template<typename DataVectorType>
+    /// <summary> A row-major dataset of examples. </summary>
+    template<typename ExampleType>
     class RowDataset 
     {
     public:
-        typedef SupervisedExample<DataVectorType> ExampleType;
         typedef utilities::VectorIterator<ExampleType> Iterator;
 
         RowDataset() = default;
@@ -41,9 +40,9 @@ namespace dataset
         /// <param name="exampleIterator"> The example iterator. </param>
         RowDataset(Iterator exampleIterator);
 
-        RowDataset<DataVectorType>& operator=(RowDataset&&) = default;
+        RowDataset<ExampleType>& operator=(RowDataset&&) = default;
 
-        RowDataset<DataVectorType>& operator=(const RowDataset&) = delete;
+        RowDataset<ExampleType>& operator=(const RowDataset&) = delete;
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
@@ -122,10 +121,10 @@ namespace dataset
         uint64_t _maxExampleSize = 0;
     };
 
-    typedef RowDataset<IDataVector> GenericRowDataset;
+    typedef RowDataset<SupervisedExample<IDataVector>> GenericRowDataset;
     
-    template<typename DataVectorType>
-    std::ostream& operator<<(std::ostream& os, RowDataset<DataVectorType>& dataset);
+    template<typename ExampleType>
+    std::ostream& operator<<(std::ostream& os, RowDataset<ExampleType>& dataset);
 }
 
 #include "../tcc/RowDataset.tcc"

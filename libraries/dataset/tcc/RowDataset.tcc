@@ -14,37 +14,37 @@
 
 namespace dataset
 {
-    template<typename DataVectorType>
-    RowDataset<DataVectorType>::RowDataset(Iterator exampleIterator)
+    template<typename ExampleType>
+    RowDataset<ExampleType>::RowDataset(Iterator exampleIterator)
     {
         while(exampleIterator.IsValid())
         {
-            AddExample(SupervisedExample<DataVectorType>(exampleIterator.Get()));
+            AddExample(ExampleType(exampleIterator.Get()));
             exampleIterator.Next();
         }
     }
 
-    template<typename DataVectorType>
-    const SupervisedExample<DataVectorType>& RowDataset<DataVectorType>::GetExample(uint64_t index) const
+    template<typename ExampleType>
+    const ExampleType& RowDataset<ExampleType>::GetExample(uint64_t index) const
     {
         return _examples[index];
     }
 
-    template<typename DataVectorType>
-    const SupervisedExample<DataVectorType>& RowDataset<DataVectorType>::operator[](uint64_t index) const
+    template<typename ExampleType>
+    const ExampleType& RowDataset<ExampleType>::operator[](uint64_t index) const
     {
         return _examples[index];
     }
 
-    template<typename DataVectorType>
-    typename RowDataset<DataVectorType>::Iterator RowDataset<DataVectorType>::GetIterator(uint64_t fromRowIndex, uint64_t size) const
+    template<typename ExampleType>
+    typename RowDataset<ExampleType>::Iterator RowDataset<ExampleType>::GetIterator(uint64_t fromRowIndex, uint64_t size) const
     {
         size = CorrectRangeSize(fromRowIndex, size);
         return utilities::MakeStlIterator(_examples.cbegin() + fromRowIndex, _examples.cbegin() + fromRowIndex + size);
     }
 
-    template<typename DataVectorType>
-    void RowDataset<DataVectorType>::AddExample(ExampleType example)
+    template<typename ExampleType>
+    void RowDataset<ExampleType>::AddExample(ExampleType example)
     {
         uint64_t size = example.GetDataVector().Size();
         _examples.push_back(std::move(example));
@@ -55,21 +55,21 @@ namespace dataset
         }
     }
 
-    template<typename DataVectorType>
-    void RowDataset<DataVectorType>::Reset()
+    template<typename ExampleType>
+    void RowDataset<ExampleType>::Reset()
     {
         _examples.clear();
         _maxExampleSize = 0;
     }
 
-    template<typename DataVectorType>
-    void RowDataset<DataVectorType>::RandomPermute(std::default_random_engine& rng)
+    template<typename ExampleType>
+    void RowDataset<ExampleType>::RandomPermute(std::default_random_engine& rng)
     {
         RandomPermute(rng, NumExamples());
     }
 
-    template<typename DataVectorType>
-    void RowDataset<DataVectorType>::RandomPermute(std::default_random_engine& rng, uint64_t count)
+    template<typename ExampleType>
+    void RowDataset<ExampleType>::RandomPermute(std::default_random_engine& rng, uint64_t count)
     {
         using std::swap;
         uint64_t lastIndex = NumExamples() - 1;
@@ -82,9 +82,9 @@ namespace dataset
         }
     }
 
-    template<typename DataVectorType>
+    template<typename ExampleType>
     template<typename SortKeyType>
-    void RowDataset<DataVectorType>::Sort(SortKeyType sortKey, uint64_t fromRowIndex, uint64_t size)
+    void RowDataset<ExampleType>::Sort(SortKeyType sortKey, uint64_t fromRowIndex, uint64_t size)
     {
         size = CorrectRangeSize(fromRowIndex, size);
 
@@ -101,8 +101,8 @@ namespace dataset
         });
     }
 
-    template<typename DataVectorType>
-    void RowDataset<DataVectorType>::Print(std::ostream& os, uint64_t fromRowIndex, uint64_t size) const
+    template<typename ExampleType>
+    void RowDataset<ExampleType>::Print(std::ostream& os, uint64_t fromRowIndex, uint64_t size) const
     {
         size = CorrectRangeSize(fromRowIndex, size);
 
@@ -112,15 +112,15 @@ namespace dataset
         }
     }
 
-    template<typename DataVectorType>
-    std::ostream& operator<<(std::ostream& os, RowDataset<DataVectorType>& dataset)
+    template<typename ExampleType>
+    std::ostream& operator<<(std::ostream& os, RowDataset<ExampleType>& dataset)
     {
         dataset.Print(os);
         return os;
     }
 
-    template<typename DataVectorType>
-    uint64_t RowDataset<DataVectorType>::CorrectRangeSize(uint64_t fromRowIndex, uint64_t size) const {
+    template<typename ExampleType>
+    uint64_t RowDataset<ExampleType>::CorrectRangeSize(uint64_t fromRowIndex, uint64_t size) const {
         if(size == 0 || fromRowIndex + size > _examples.size())
         {
             return _examples.size() - fromRowIndex;

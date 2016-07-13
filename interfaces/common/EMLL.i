@@ -161,7 +161,7 @@ namespace dataset
     class GenericRowIterator {}; // This is necessary to prevent memory leak of datasets::GenericRowIterator
 }
 
-typedef dataset::RowDataset<IDataVector> dataset::GenericRowDataset;
+typedef dataset::RowDataset<SupervisedExample<IDataVector>> dataset::GenericRowDataset;
 typedef dataset::GenericRowDataset::Iterator dataset::GenericRowIterator;
 
 namespace utilities
@@ -212,7 +212,7 @@ wrap_unique_ptr(LayerPtr, layers::Layer)
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 %template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>, std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 
-%template () dataset::RowDataset<dataset::IDataVector>;
+%template () dataset::RowDataset<SupervisedExample<dataset::IDataVector>>;
 %template () trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
 #endif
 

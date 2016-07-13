@@ -46,7 +46,7 @@ namespace dataset
 %include "SupervisedExample.h"
 %include "RowDataset.h"
 
-%template() dataset::RowDataset<dataset::IDataVector>;
+%template() dataset::RowDataset<dataset::SupervisedExample<dataset::IDataVector>>;
 %template() dataset::DenseDataVector<double>;
 %template(DenseSupervisedExample) dataset::SupervisedExample<dataset::DoubleDataVector>;
 
@@ -54,7 +54,7 @@ namespace dataset
 {
     wrap_noncopyable(SupervisedExample<IDataVector>);
     %template() SupervisedExample<IDataVector>;
-    %template() RowDataset<IDataVector>;
+    %template() RowDataset<SupervisedExample<IDataVector>>;
 }
 
 %include "RowDatasetInterface.h"
@@ -72,7 +72,7 @@ namespace dataset
     %template () SparseDataVector<double, utilities::CompressedIntegerList>;
     %template () SparseDataVector<float, utilities::CompressedIntegerList>;
     %template () SparseDataVector<short, utilities::CompressedIntegerList>;
-    %template () RowDataset<IDataVector>;
+    %template () RowDataset<SupervisedExample<IDataVector>>;
     
     // Bafflingly, the below causes SWIG to give an error about no default constructor for SparseDataVector<>
     // %template (SparseDoubleDataVectorBase) SparseDataVector<double, utilities::CompressedIntegerList>;

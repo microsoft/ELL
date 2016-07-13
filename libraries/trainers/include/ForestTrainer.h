@@ -131,7 +131,7 @@ namespace trainers
         ForestTrainerParameters _parameters;
         std::shared_ptr<predictors::SimpleForestPredictor> _forest;
 
-        dataset::RowDataset<dataset::DoubleDataVector> _dataset;
+        dataset::RowDataset<dataset::SupervisedExample<dataset::DoubleDataVector>> _dataset;
         PriorityQueue _queue;
     };
 
