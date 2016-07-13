@@ -12,13 +12,14 @@ export class ModelGraph {
 
   GetNodeIterator(): NodeIterator;
   GetNodeIterator(outputNode: Node): NodeIterator;
-  
+
+  GetNodeOutputDouble(outputPort: OutputPortBase): DoubleVector;
+
   //	GetNodeIterator(const std::vector<const Node*>& outputNodes):
-  //NodeIterator;;
+  // NodeIterator;;
 }
 
-export class TransformContext {
-}
+export class TransformContext {}
 
 export class ModelTransformer {
   constructor(context: TransformContext);
@@ -33,6 +34,15 @@ export class Node {
   GetInputNodes(): ConstNodeVector;
   GetDependentNodes(): ConstNodeVector;
   GetRuntimeTypeName(): string;
+
+  AsDoubleInputNode(): DoubleInputNode;
+  AsDoubleOutputNode(): DoubleOutputNode;
+}
+
+export class DoubleInputNode extends Node {
+}
+
+export class DoubleOutputNode extends Node {
 }
 
 export enum PortType {
@@ -54,7 +64,7 @@ export class InputPortBase extends Port {
   GetInputNodes(): ConstNodeVector;
 }
 
-export class OutputPortBase extends Port { }
+export class OutputPortBase extends Port {}
 
 export class OutputPortElement {
   GetIndex(): number;
@@ -62,6 +72,11 @@ export class OutputPortElement {
 }
 
 // template collections
+export class DoubleVector {
+  size(): number;
+  get(index: number): number;
+}
+
 export class NodeVector {
   size(): number;
   get(index: number): Node;
@@ -96,5 +111,5 @@ export class MeanNode extends Node { constructor(); }
 // misc
 //
 export function LoadModelGraph(filename: string): ModelGraph;
-export class UniqueId { }
-export class Variant { }
+export class UniqueId {}
+export class Variant {}
