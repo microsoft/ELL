@@ -12,9 +12,18 @@ export class ModelGraph {
 
   GetNodeIterator(): NodeIterator;
   GetNodeIterator(outputNode: Node): NodeIterator;
-  ;
+  
   //	GetNodeIterator(const std::vector<const Node*>& outputNodes):
   //NodeIterator;;
+}
+
+export class TransformContext {
+}
+
+export class ModelTransformer {
+  constructor(context: TransformContext);
+  CopyModel(model: ModelGraph): ModelGraph;
+  RefineModel(model: ModelGraph): ModelGraph;
 }
 
 export class Node {
@@ -45,7 +54,7 @@ export class InputPortBase extends Port {
   GetInputNodes(): ConstNodeVector;
 }
 
-export class OutputPortBase extends Port {}
+export class OutputPortBase extends Port { }
 
 export class OutputPortElement {
   GetIndex(): number;
@@ -87,5 +96,5 @@ export class MeanNode extends Node { constructor(); }
 // misc
 //
 export function LoadModelGraph(filename: string): ModelGraph;
-export class UniqueId {}
-export class Variant {}
+export class UniqueId { }
+export class Variant { }
