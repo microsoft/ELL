@@ -8,6 +8,7 @@
 
 #include "Node.h"
 #include "InputPort.h"
+#include "ModelTransformer.h"
 
 /// <summary> model namespace </summary>
 namespace model

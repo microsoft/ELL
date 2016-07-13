@@ -10,7 +10,7 @@
 
 #include "Port.h"
 #include "OutputPort.h"
-#include "Node.h"
+//#include "Node.h"
 
 #include <vector>
 #include <cassert>
@@ -18,6 +18,8 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    class Node;
+
     /// <summary> Represents a reference to a single element in another node's output </summary>
     class OutputPortElement
     {
@@ -47,7 +49,7 @@ namespace model
         const Port* _referencedPort;
         size_t _index;
     };
-    
+
     /// <summary> Represents a contiguous set of values from an output port </summary>
     class OutputPortRange
     {
@@ -146,11 +148,12 @@ namespace model
         /// <summary> An STL-type iterator pointing to the end of the list of ranges </summary>
         std::vector<OutputPortRange>::const_iterator end() const { return _ranges.cend(); }
 
+        void AddRange(const OutputPortRange& range);
+
     protected:
         OutputPortElementListUntyped(){};
         void ComputeSize();
-        void AddRange(const OutputPortRange& range);
-    
+
     private:
         std::vector<OutputPortRange> _ranges;
         size_t _size = 0;
@@ -161,6 +164,8 @@ namespace model
     class OutputPortElementList : public OutputPortElementListUntyped
     {
     public:
+        OutputPortElementList() = default;
+
         /// <summary> Creates a OutputPortElementList representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>

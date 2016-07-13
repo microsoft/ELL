@@ -13,6 +13,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/ModelGraph.cpp
+         src/ModelTransformer.cpp
          src/Node.cpp
          src/OutputPortElementList.cpp
          src/Port.cpp
@@ -23,6 +24,7 @@ set (INCLUDE include/ConstantNode.h
              include/InputNode.h
              include/InputPort.h
              include/ModelGraph.h
+             include/ModelTransformer.h
              include/Node.h
              include/OutputPort.h
              include/OutputPortElementList.h
@@ -35,6 +37,7 @@ set (TCC tcc/ConstantNode.tcc
          tcc/InputNode.tcc
          tcc/InputPort.tcc
          tcc/ModelGraph.tcc
+         tcc/ModelTransformer.tcc
          tcc/OutputPort.tcc
          tcc/OutputPortElementList.tcc
          tcc/ValueSelectorNode.tcc

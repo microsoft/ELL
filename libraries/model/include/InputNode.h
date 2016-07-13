@@ -10,6 +10,7 @@
 
 #include "Node.h"
 #include "OutputPort.h"
+#include "ModelTransformer.h"
 
 #include <vector>
 #include <memory>
@@ -45,6 +46,9 @@ namespace model
 
         /// <summary> Exposes the output port as a read-only property </summary>
         const OutputPort<ValueType>& output = _output;
+
+        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Refine(ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;

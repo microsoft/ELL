@@ -10,6 +10,7 @@
 
 #include "Node.h"
 #include "OutputPort.h"
+#include "ModelTransformer.h"
 
 #include <vector>
 #include <memory>
@@ -30,7 +31,7 @@ namespace model
         /// Constructor for a vector constant
         ///
         /// <param name="value"> The vector value </param>
-        ConstantNode(std::vector<ValueType> values);
+        ConstantNode(const std::vector<ValueType>& values);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -44,6 +45,9 @@ namespace model
 
         /// <summary> Exposes the output port as a read-only property </summary>
         const OutputPort<ValueType>& output = _output;
+
+        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Refine(ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;

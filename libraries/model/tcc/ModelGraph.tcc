@@ -39,12 +39,12 @@ namespace model
     // Factory method for creating nodes
     //
     template <typename NodeType, typename... Args>
-    std::shared_ptr<NodeType> Model::AddNode(Args&&... args)
+    NodeType* Model::AddNode(Args&&... args)
     {
         auto node = std::make_shared<NodeType>(args...);
         node->RegisterDependencies();
         _nodeMap[node->GetId()] = node;
-        return node;
+        return node.get();
     }
 
     //
@@ -66,7 +66,7 @@ namespace model
 
     // Visits the entire graph
     template <typename Visitor>
-    void Model::Visit(Visitor& visitor) const
+    void Model::Visit(Visitor&& visitor) const
     {
         std::vector<const Node*> emptyVec;
         Visit(visitor, emptyVec);
@@ -74,28 +74,14 @@ namespace model
 
     // Visits just the parts necessary to compute output node
     template <typename Visitor>
-    void Model::Visit(Visitor& visitor, const std::shared_ptr<Node>& outputNode) const
+    void Model::Visit(Visitor&& visitor, const Node* outputNode) const
     {
-        std::vector<std::shared_ptr<Node>> x = { outputNode };
-        Visit(visitor, { outputNode.get() });
-    }
-
-    // Visits just the parts necessary to compute output nodes
-    template <typename Visitor>
-    void Model::Visit(Visitor& visitor, const std::vector<std::shared_ptr<Node>>& outputNodes) const
-    {
-        // start with output nodes in the stack
-        std::vector<const Node*> outputNodePtrs;
-        for (auto outputNode : outputNodes)
-        {
-            outputNodePtrs.push_back(outputNode.get());
-        }
-        Visit(visitor, outputNodePtrs);
+        Visit(visitor, std::vector<const Node*>{ outputNode });
     }
 
     // Real implementation function for `Visit()`
     template <typename Visitor>
-    void Model::Visit(Visitor& visitor, const std::vector<const Node*>& outputNodePtrs) const
+    void Model::Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodes) const
     {
         if (_nodeMap.size() == 0)
         {
@@ -104,7 +90,7 @@ namespace model
 
         // start with output nodes in the stack
         std::unordered_set<const Node*> visitedNodes;
-        std::vector<const Node*> stack = outputNodePtrs;
+        std::vector<const Node*> stack = outputNodes;
 
         const Node* sentinelNode = nullptr;
         if (stack.size() == 0) // Visit full graph

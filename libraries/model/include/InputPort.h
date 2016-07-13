@@ -10,7 +10,6 @@
 
 #include "Port.h"
 #include "OutputPort.h"
-#include "Node.h"
 #include "OutputPortElementList.h"
 
 #include <vector>
@@ -19,6 +18,8 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    class Node;
+
     /// <summary> Class representing an input to a node </summary>
     class InputPortBase : public Port
     {
@@ -45,6 +46,8 @@ namespace model
         ///
         /// <returns> The list nodes this input port gets values from </returns>
         const std::vector<const Node*>& GetInputNodes() const { return _inputNodes; }
+
+        const OutputPortElementListUntyped& GetInputRanges() const { return _inputRanges; }
 
         /// <summary> The dimensionality of the output </summary>
         ///
