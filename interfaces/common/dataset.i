@@ -74,7 +74,7 @@ namespace dataset
     WRAP_OP_AT(DoubleDataVector, double)
 
     // wrap "Print" method for python
-    WRAP_PRINT_TO_STR(GenericSupervisedExample)
+//    WRAP_PRINT_TO_STR(GenericSupervisedExample)
     WRAP_PRINT_TO_STR(FloatDataVector)
     WRAP_PRINT_TO_STR(DoubleDataVector)
 

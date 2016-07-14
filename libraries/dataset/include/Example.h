@@ -71,8 +71,8 @@ namespace dataset
         MetaDataType _metaData;
     };
 
-    typedef Example<IDataVector, WeightLabel> GenericSupervisedExample;
-    typedef Example<DoubleDataVector, WeightLabel> DenseSupervisedExample;
+    typedef Example<IDataVector, dataset::WeightLabel> GenericSupervisedExample; // 'dataset::' prefix required due to SWIG bug
+    typedef Example<DoubleDataVector,dataset::WeightLabel> DenseSupervisedExample; // 'dataset::' prefix required due to SWIG bug
 
     /// <summary> Stream insertion operator. </summary>
     ///
