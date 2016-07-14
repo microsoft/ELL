@@ -71,8 +71,11 @@ namespace dataset
         MetaDataType _metaData;
     };
 
+    //template<typename DataVectorType>
+    //using SSupervisedExample = Example<DataVectorType, dataset::WeightLabel>; // TODO: warning 342: The 'using' keyword in template aliasing is not fully supported yet.
+
     typedef Example<IDataVector, dataset::WeightLabel> GenericSupervisedExample; // 'dataset::' prefix required due to SWIG bug
-    typedef Example<DoubleDataVector,dataset::WeightLabel> DenseSupervisedExample; // 'dataset::' prefix required due to SWIG bug
+    typedef Example<DoubleDataVector, dataset::WeightLabel> DenseSupervisedExample; // 'dataset::' prefix required due to SWIG bug
 
     /// <summary> Stream insertion operator. </summary>
     ///

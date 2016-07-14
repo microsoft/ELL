@@ -111,11 +111,24 @@ namespace trainers
             void Print(std::ostream& os, size_t tabs=0) const;
         };
 
+        // implements a priority queue of split candidates that can print itself (useful for debugging)
         struct PriorityQueue : public std::priority_queue<SplitCandidate>
         {
             void Print(std::ostream& os) const;
             using std::priority_queue<SplitCandidate>::size;
         };
+
+        // Metadata that the forest trainer keeps with each example - weight and label are inherited from dataset::WeightLabel
+        struct ExampleMetaData : public dataset::WeightLabel
+        {
+            ExampleMetaData(const dataset::WeightLabel& weightLabel);
+            
+            // the output of the forest on this example
+            double currentForestOutput;
+        };
+
+        // the type of example used by the forest trainer
+        typedef dataset::Example<dataset::DoubleDataVector, ExampleMetaData> ForestTrainerExample; 
 
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
         void AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, size_t size, Sums sums);
@@ -129,9 +142,14 @@ namespace trainers
         // member variables
         LossFunctionType _lossFunction;
         ForestTrainerParameters _parameters;
+
+        // the forest being trained
         std::shared_ptr<predictors::SimpleForestPredictor> _forest;
 
-        dataset::RowDataset<dataset::DenseSupervisedExample> _dataset;
+        // local copy of the dataset, with metadata attached to each example
+        dataset::RowDataset<ForestTrainerExample> _dataset;
+
+        // priority queue used to identify the gain-maximizing split candidate
         PriorityQueue _queue;
     };
 

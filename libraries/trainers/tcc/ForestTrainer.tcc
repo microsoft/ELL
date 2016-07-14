@@ -84,7 +84,7 @@ namespace trainers
             sums.Increment(example.GetMetaData().GetWeight(), example.GetMetaData().GetLabel()); // TODO - maybe this func should just take a WeightLabel?
 
             auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
-            auto denseSupervisedExample = dataset::DenseSupervisedExample(std::move(denseDataVector), example.GetMetaData());
+            auto denseSupervisedExample = ForestTrainerExample(std::move(denseDataVector), example.GetMetaData());
             _dataset.AddExample(std::move(denseSupervisedExample));
             exampleIterator.Next();
         }
@@ -170,7 +170,7 @@ namespace trainers
     template<typename LossFunctionType>
     void ForestTrainer<LossFunctionType>::SortDatasetBySplitRule(size_t featureIndex, uint64_t fromRowIndex, uint64_t size) // to be deprecated
     {
-        _dataset.Sort([featureIndex](const dataset::DenseSupervisedExample& example) { return example.GetDataVector()[featureIndex]; },
+        _dataset.Sort([featureIndex](const ForestTrainerExample& example) { return example.GetDataVector()[featureIndex]; },
                       fromRowIndex,
                       size);
     }
@@ -178,7 +178,7 @@ namespace trainers
     template<typename LossFunctionType>
     void ForestTrainer<LossFunctionType>::SortDatasetBySplitRule(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size)
     {
-        _dataset.Sort([splitRule](const dataset::DenseSupervisedExample& example) { return splitRule.Compute(example.GetDataVector()); },
+        _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()); },
                       fromRowIndex,
                       size);
     }
@@ -208,6 +208,10 @@ namespace trainers
         sumWeights += weight;
         sumWeightedLabels += weight * label;
     }
+
+    template<typename LossFunctionType>
+    ForestTrainer<LossFunctionType>::ExampleMetaData::ExampleMetaData(const dataset::WeightLabel & weightLabel) : dataset::WeightLabel(weightLabel), currentForestOutput(0)
+    {} 
 
     template<typename LossFunctionType>
     std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters)
