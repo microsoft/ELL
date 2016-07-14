@@ -40,71 +40,8 @@
     ],
     'targets': [
         {
-            'target_name': 'swigInterfaces',
-            'actions': [
-                {
-                    'action_name': 'swig',
-                    'action': [
-                        'swig',
-                        '-c++',
-                        '-javascript',
-                        '-node',
-                        '-DV8_VERSION=0x032530',
-                        '-I<(swig_include_path_prefix)/EMLL/interfaces/common/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/common/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/dataset/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/evaluators/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/features/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/layers/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/linear/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/model/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/nodes/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/lossFunctions/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/predictors/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/trainers/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/utilities/include',
-                        '-o', 'swig/EMLL_wrap.cxx',
-                        '<(swig_include_path_prefix)/EMLL/interfaces/common/EMLL.i'
-                    ],
-                    'inputs': [],
-                    'outputs': [
-                        'swig/EMLL_wrap.cxx'
-                    ]
-                },
-                {
-                    'action_name': 'swig_xml',
-                    'action': [
-                        'swig',
-                        '-c++',
-                        '-xml',
-                        '-I<(swig_include_path_prefix)/EMLL/interfaces/common/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/common/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/dataset/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/evaluators/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/features/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/layers/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/linear/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/model/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/nodes/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/lossFunctions/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/predictors/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/trainers/include',
-                        '-I<(swig_include_path_prefix)/EMLL/libraries/utilities/include',
-                        '-o', 'swig/EMLL_wrap.xml',
-                        '<(swig_include_path_prefix)/EMLL/interfaces/common/EMLL.i'
-                    ],
-                    'inputs': [],
-                    'outputs': [
-                        'swig/EMLL_wrap.xml'
-                    ]
-                }
-            ]
-        },
-        {
             'target_name': 'emll',
-            'dependencies': [
-                'swigInterfaces'
-            ],
+            'dependencies': [],
             'include_dirs': [
                 '<(include_path_prefix)/EMLL/libraries/common/include',
                 '<(include_path_prefix)/EMLL/libraries/dataset/include',
@@ -113,7 +50,6 @@
                 '<(include_path_prefix)/EMLL/libraries/layers/include',
                 '<(include_path_prefix)/EMLL/libraries/linear/include',
                 '<(include_path_prefix)/EMLL/libraries/model/include',
-                '<(include_path_prefix)/EMLL/libraries/nodes/include',
                 '<(include_path_prefix)/EMLL/libraries/lossFunctions/include',
                 '<(include_path_prefix)/EMLL/libraries/predictors/include',
                 '<(include_path_prefix)/EMLL/libraries/trainers/include',
@@ -126,7 +62,7 @@
                 '<(include_path_prefix)/EMLL/interfaces/common/src/MapInterface.cpp',
                 '<(include_path_prefix)/EMLL/interfaces/common/src/ModelInterface.cpp',
                 '<(include_path_prefix)/EMLL/interfaces/common/src/RowDatasetInterface.cpp',
-                './swig/EMLL_wrap.cxx'
+                '<(include_path_prefix)/EMLL/build/interfaces/javascript/EMLLJAVASCRIPT_wrap.cxx'
             ],
             'link_settings': {
                 'library_dirs': [
@@ -137,7 +73,6 @@
                     '<(library_path_prefix)/EMLL/build/libraries/layers<(library_path_suffix)',
                     '<(library_path_prefix)/EMLL/build/libraries/linear<(library_path_suffix)',
                     '<(library_path_prefix)/EMLL/build/libraries/model<(library_path_suffix)',
-                    '<(library_path_prefix)/EMLL/build/libraries/nodes<(library_path_suffix)',
                     '<(library_path_prefix)/EMLL/build/libraries/lossFunctions<(library_path_suffix)',
                     '<(library_path_prefix)/EMLL/build/libraries/predictors<(library_path_suffix)',
                     '<(library_path_prefix)/EMLL/build/libraries/trainers<(library_path_suffix)',
@@ -157,7 +92,6 @@
                                 '-llayers.lib',
                                 '-llinear.lib',
                                 '-lmodel.lib',
-                                '-lnodes.lib',
                                 '-llossFunctions.lib',
                                 '-lpredictors.lib',
                                 '-ltrainers.lib',
@@ -187,7 +121,6 @@
                                 'liblayers.a',
                                 'liblinear.a',
                                 'libmodel.a',
-                                'libnodes.a',
                                 'liblossFunctions.a',
                                 'libpredictors.a',
                                 'libtrainers.a',
@@ -236,7 +169,6 @@
                                 'liblayers.a',
                                 'liblinear.a',
                                 'libmodel.a',
-                                'libnodes.a',
                                 'liblossFunctions.a',
                                 'libpredictors.a',
                                 'libtrainers.a',
