@@ -9,7 +9,7 @@
 #pragma once
 
 #include "RowDataset.h"
-#include "SupervisedExample.h"
+#include "Example.h"
 #include "IDataVector.h"
 
 // utilities
@@ -121,7 +121,7 @@ namespace dataset
         uint64_t _maxExampleSize = 0;
     };
 
-    typedef RowDataset<SupervisedExample<IDataVector>> GenericRowDataset;
+    typedef RowDataset<GenericSupervisedExample> GenericRowDataset;
     
     template<typename ExampleType>
     std::ostream& operator<<(std::ostream& os, RowDataset<ExampleType>& dataset);

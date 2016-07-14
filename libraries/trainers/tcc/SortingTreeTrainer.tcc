@@ -80,9 +80,9 @@ namespace trainers
         {
             const auto& example = exampleIterator.Get();
             sums.sumWeights += example.GetWeight();
-            sums.sumWeightedLabels += example.GetWeight() * example.GetLabel();
+            sums.sumWeightedLabels += example.GetWeight() * example.GetMetaData().GetLabel();
             auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
-            auto denseSupervisedExample = dataset::SupervisedExample<dataset::DoubleDataVector>(std::move(denseDataVector), example.GetLabel(), example.GetWeight());
+            auto denseSupervisedExample = dataset::DenseSupervisedExample(std::move(denseDataVector), example.GetMetaData().GetLabel(), example.GetWeight());
             _dataset.AddExample(std::move(denseSupervisedExample));
             exampleIterator.Next();
         }
@@ -113,7 +113,7 @@ namespace trainers
                 const auto& currentRow = _dataset[rowIndex].GetDataVector();
                 const auto& nextRow = _dataset[rowIndex+1].GetDataVector();
                 double weight = _dataset[rowIndex].GetWeight();
-                double label = _dataset[rowIndex].GetLabel();
+                double label = _dataset[rowIndex].GetMetaData().GetLabel();
 
                 // increment sums
                 sums0.sumWeights += weight;
@@ -157,7 +157,7 @@ namespace trainers
     template<typename LossFunctionType>
     void SortingTreeTrainer<LossFunctionType>::SortDatasetBySplitRule(uint64_t featureIndex, uint64_t fromRowIndex, uint64_t size) const
     {
-        _dataset.Sort([featureIndex](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) {return example.GetDataVector()[featureIndex]; },
+        _dataset.Sort([featureIndex](const dataset::DenseSupervisedExample& example) {return example.GetDataVector()[featureIndex]; },
             fromRowIndex,
             size);
     }
@@ -200,7 +200,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void SortingTreeTrainer<LossFunctionType>::SplitCandidate::Print(std::ostream& os, const dataset::RowDataset<dataset::SupervisedExample<dataset::DoubleDataVector>>& dataset) const
+    void SortingTreeTrainer<LossFunctionType>::SplitCandidate::Print(std::ostream& os, const dataset::RowDataset<dataset::DenseSupervisedExample>& dataset) const
     {
         os << "Leaf: " << leaf <<
             "\tSplitRule: (" << splitRule.featureIndex << "," << splitRule.threshold << ")" <<
@@ -215,7 +215,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void SortingTreeTrainer<LossFunctionType>::PriorityQueue::Print(std::ostream& os, const dataset::RowDataset<dataset::SupervisedExample<dataset::DoubleDataVector>>& dataset) const
+    void SortingTreeTrainer<LossFunctionType>::PriorityQueue::Print(std::ostream& os, const dataset::RowDataset<dataset::DenseSupervisedExample>& dataset) const
     {
         os << "Priority Queue Size: " << size() << "\n";
 

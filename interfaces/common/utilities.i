@@ -37,9 +37,8 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 
 // This is necessary for us to avoid leaking memory:
 #ifndef SWIGXML
-%template () dataset::SupervisedExample<dataset::IDataVector>;
-%template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
-%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
+%template () std::vector<dataset::GenericSupervisedExample>;
+%template () utilities::StlIterator<typename std::vector<dataset::GenericSupervisedExample>::const_iterator, dataset::GenericSupervisedExample>;
 #endif
 
 %include "LogLoss.h"

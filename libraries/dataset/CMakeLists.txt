@@ -18,10 +18,12 @@ set (SRC src/DenseDataVector.cpp
          src/SparseBinaryDataVector.cpp
          src/SparseDataVector.cpp
          src/SparseEntryParser.cpp
+         src/WeightLabel.cpp
          src/ZeroDataVector.cpp)
 
 set (INCLUDE include/DataVectorBuilder.h
              include/DenseDataVector.h
+             include/Example.h
              include/IDataVector.h
              include/MappedParser.h
              include/OnesDataVector.h
@@ -33,10 +35,12 @@ set (INCLUDE include/DataVectorBuilder.h
              include/SparseEntryParser.h
              include/SupervisedExample.h
              include/SupervisedExampleBuilder.h
+             include/WeightLabel.h
              include/ZeroDataVector.h)
 
 set (TCC tcc/DataVectorBuilder.tcc
          tcc/DenseDataVector.tcc
+         tcc/Example.tcc
          tcc/MappedParser.tcc
          tcc/ParsingIterator.tcc
          tcc/RowDataset.tcc

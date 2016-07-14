@@ -54,7 +54,7 @@ namespace dataset
         auto instance = DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIterator);
 
         // return supervised example
-        return GenericSupervisedExample(std::move(instance), label, weight);
+        return GenericSupervisedExample(std::move(instance), WeightLabel(weight, label));
     }
 
     template<typename VectorEntryParserType, typename DefaultDataVectorType>

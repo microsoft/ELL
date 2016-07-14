@@ -12,7 +12,7 @@
 #include "DenseDataVector.h"
 #include "IDataVector.h"
 #include "SparseDataVector.h"
-#include "SupervisedExample.h"
+#include "Example.h"
 #include "RowDatasetInterface.h"
 %}
 
@@ -21,7 +21,6 @@
 namespace dataset
 {
     %ignore IDataVector::Clone;
-    %ignore SupervisedExample<IDataVector>::SupervisedExample(SupervisedExample&&);
     %ignore GenericSupervisedExample::GenericSupervisedExample(GenericSupervisedExample&&);
     %ignore GenericSupervisedExample::GetDataVector;
     %ignore GenericSupervisedExample::GenericSupervisedExample;
@@ -34,7 +33,7 @@ namespace dataset
     %ignore SparseDataVector<short, utilities::CompressedIntegerList>;
 }
 
-%ignore dataset::SupervisedExample<dataset::DoubleDataVector>::SupervisedExample(SupervisedExample&&);
+%ignore dataset::DenseSupervisedExample::DenseSupervisedExample(DenseSupervisedExample&&);
 %ignore interfaces::GenericRowDataset::GenericRowDataset(GenericRowDataset &&);
 
 %include "noncopyable.i"
@@ -43,19 +42,11 @@ namespace dataset
 %include "IDataVector.h"
 %include "DenseDataVector.h"
 %include "SparseDataVector.h"
-%include "SupervisedExample.h"
+%include "Example.h"
 %include "RowDataset.h"
 
-%template() dataset::RowDataset<dataset::SupervisedExample<dataset::IDataVector>>;
+%template() dataset::RowDataset<dataset::GenericSupervisedExample>;
 %template() dataset::DenseDataVector<double>;
-%template(DenseSupervisedExample) dataset::SupervisedExample<dataset::DoubleDataVector>;
-
-namespace dataset
-{
-    wrap_noncopyable(SupervisedExample<IDataVector>);
-    %template() SupervisedExample<IDataVector>;
-    %template() RowDataset<SupervisedExample<IDataVector>>;
-}
 
 %include "RowDatasetInterface.h"
 %import "RowDataset.h"
@@ -72,7 +63,7 @@ namespace dataset
     %template () SparseDataVector<double, utilities::CompressedIntegerList>;
     %template () SparseDataVector<float, utilities::CompressedIntegerList>;
     %template () SparseDataVector<short, utilities::CompressedIntegerList>;
-    %template () RowDataset<SupervisedExample<IDataVector>>;
+    %template () RowDataset<GenericSupervisedExample>;
     
     // Bafflingly, the below causes SWIG to give an error about no default constructor for SparseDataVector<>
     // %template (SparseDoubleDataVectorBase) SparseDataVector<double, utilities::CompressedIntegerList>;
@@ -83,7 +74,7 @@ namespace dataset
     WRAP_OP_AT(DoubleDataVector, double)
 
     // wrap "Print" method for python
-    WRAP_PRINT_TO_STR(SupervisedExample<IDataVector>)
+    WRAP_PRINT_TO_STR(GenericSupervisedExample)
     WRAP_PRINT_TO_STR(FloatDataVector)
     WRAP_PRINT_TO_STR(DoubleDataVector)
 

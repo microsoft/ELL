@@ -16,7 +16,7 @@
 #include "DataLoadArguments.h"
 #include "MapLoadArguments.h"
 #include "ModelLoadArguments.h"
-#include "SupervisedExample.h"
+#include "Example.h"
 #include "AnyIterator.h"
 #include "Map.h"
 

@@ -81,10 +81,10 @@ namespace trainers
         {
             const auto& example = exampleIterator.Get();
             
-            sums.Increment(example.GetWeight(), example.GetLabel());
+            sums.Increment(example.GetMetaData().GetWeight(), example.GetMetaData().GetLabel()); // TODO - maybe this func should just take a WeightLabel?
 
             auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
-            auto denseSupervisedExample = dataset::SupervisedExample<dataset::DoubleDataVector>(std::move(denseDataVector), example.GetLabel(), example.GetWeight());
+            auto denseSupervisedExample = dataset::DenseSupervisedExample(std::move(denseDataVector), example.GetMetaData());
             _dataset.AddExample(std::move(denseSupervisedExample));
             exampleIterator.Next();
         }
@@ -118,8 +118,8 @@ namespace trainers
                 // get friendly names
                 const auto& currentRow = _dataset[rowIndex].GetDataVector();
                 const auto& nextRow = _dataset[rowIndex+1].GetDataVector();
-                double weight = _dataset[rowIndex].GetWeight();
-                double label = _dataset[rowIndex].GetLabel();
+                double weight = _dataset[rowIndex].GetMetaData().GetWeight();
+                double label = _dataset[rowIndex].GetMetaData().GetLabel();
 
                 // increment sums 
                 sums0.Increment(weight, label); 
@@ -170,7 +170,7 @@ namespace trainers
     template<typename LossFunctionType>
     void ForestTrainer<LossFunctionType>::SortDatasetBySplitRule(size_t featureIndex, uint64_t fromRowIndex, uint64_t size) // to be deprecated
     {
-        _dataset.Sort([featureIndex](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) { return example.GetDataVector()[featureIndex]; },
+        _dataset.Sort([featureIndex](const dataset::DenseSupervisedExample& example) { return example.GetDataVector()[featureIndex]; },
                       fromRowIndex,
                       size);
     }
@@ -178,7 +178,7 @@ namespace trainers
     template<typename LossFunctionType>
     void ForestTrainer<LossFunctionType>::SortDatasetBySplitRule(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size)
     {
-        _dataset.Sort([splitRule](const dataset::SupervisedExample<dataset::DoubleDataVector>& example) { return splitRule.Compute(example.GetDataVector()); },
+        _dataset.Sort([splitRule](const dataset::DenseSupervisedExample& example) { return splitRule.Compute(example.GetDataVector()); },
                       fromRowIndex,
                       size);
     }

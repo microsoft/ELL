@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SupervisedExample.h (dataset)
+//  File:     Example.h (dataset)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,6 +9,8 @@
 #pragma once
 
 #include "IDataVector.h"
+#include "DenseDataVector.h"
+#include "WeightLabel.h"
 
 // stl
 #include <cstdint>
@@ -18,52 +20,46 @@
 namespace dataset
 {
     /// <summary> A supervised example. </summary>
-    template<typename DataVectorType>
-    class SupervisedExample 
+    template<typename DataVectorType, typename MetaDataType>
+    class Example 
     {
     public:
 
-        SupervisedExample() = default;
+        Example() = default;
 
-        explicit SupervisedExample(const SupervisedExample<DataVectorType>& other) = default;
+        explicit Example(const Example<DataVectorType, MetaDataType>& other) = default;
 
-        SupervisedExample(SupervisedExample<DataVectorType>&& other) = default;
-        
+        Example(Example<DataVectorType, MetaDataType>&& other) = default;
+
         /// <summary> Constructs a supervised example. </summary>
         ///
         /// <param name="dataVector"> The data vector. </param>
-        /// <param name="label"> The label. </param>
-        /// <param name="weight"> The weight. </param>
-        SupervisedExample(const std::shared_ptr<DataVectorType>& dataVector, double label, double weight = 1.0);
+        /// <param name="metaDataType"> The metadata. </param>
+        Example(const std::shared_ptr<DataVectorType>& dataVector, const MetaDataType& metaData);
 
         /// <summary> Assignment operator. </summary>
         ///
         /// <param name="other"> The other. </param>
         ///
-        /// <returns> A reference to this SupervisedExample. </returns>
-        SupervisedExample& operator=(const SupervisedExample<DataVectorType>& other) = delete;
+        /// <returns> A reference to this Example. </returns>
+        Example& operator=(const Example<DataVectorType, MetaDataType>& other) = delete;
 
         /// <summary> Move assignment operator. </summary>
         ///
         /// <param name="other"> [in,out] The other. </param>
         ///
-        /// <returns> A reference to this SupervisedExample. </returns>
-        SupervisedExample& operator=(SupervisedExample<DataVectorType>&& other) = default;
+        /// <returns> A reference to this Example. </returns>
+        Example& operator=(Example<DataVectorType, MetaDataType>&& other) = default;
 
         /// <summary> Gets the data vector. </summary>
         ///
         /// <returns> The data vector. </returns>
         const DataVectorType& GetDataVector() const { return *_dataVector.get(); }
 
-        /// <summary> Gets the weight. </summary>
+        /// <summary> Gets the metadata. </summary>
         ///
-        /// <returns> The weight. </returns>
-        double GetWeight() const { return _weight; }
-
-        /// <summary> Gets the label. </summary>
-        ///
-        /// <returns> The label. </returns>
-        double GetLabel() const { return _label; }
+        /// <returns> The metadata. </returns>
+        const MetaDataType& GetMetaData() const { return _metaData; }
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///
@@ -72,9 +68,11 @@ namespace dataset
 
     private:
         std::shared_ptr<const DataVectorType> _dataVector;
-        double _label;
-        double _weight;
+        MetaDataType _metaData;
     };
+
+    typedef Example<IDataVector, WeightLabel> GenericSupervisedExample;
+    typedef Example<DoubleDataVector, WeightLabel> DenseSupervisedExample;
 
     /// <summary> Stream insertion operator. </summary>
     ///
@@ -82,10 +80,8 @@ namespace dataset
     /// <param name="example"> The example. </param>
     ///
     /// <returns> The shifted ostream. </returns>
-    template<typename DataVectorType>
-    std::ostream& operator<<(std::ostream& ostream, const SupervisedExample<DataVectorType>& example);
-
-    //typedef SupervisedExample<IDataVector> GenericSupervisedExample;
+    template<typename DataVectorType, typename MetaDataType>
+    std::ostream& operator<<(std::ostream& ostream, const Example<DataVectorType, MetaDataType>& example);
 }
 
-#include "../tcc/SupervisedExample.tcc"
+#include "../tcc/Example.tcc"

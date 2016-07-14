@@ -77,12 +77,12 @@ namespace trainers
             Sums sums0;
 
             bool operator<(const SplitCandidate& other) const { return gain > other.gain; }
-            void Print(std::ostream& os, const dataset::RowDataset<dataset::SupervisedExample<dataset::DoubleDataVector>>& dataset) const;
+            void Print(std::ostream& os, const dataset::RowDataset<dataset::DenseSupervisedExample>& dataset) const;
         };
 
         struct PriorityQueue : public std::priority_queue<SplitCandidate>
         {
-            void Print(std::ostream& os, const dataset::RowDataset<dataset::SupervisedExample<dataset::DoubleDataVector>>& dataset) const;
+            void Print(std::ostream& os, const dataset::RowDataset<dataset::DenseSupervisedExample>& dataset) const;
             using std::priority_queue<SplitCandidate>::size;
         };
 
@@ -96,7 +96,7 @@ namespace trainers
         // member variables
         LossFunctionType _lossFunction;
         SortingTreeTrainerParameters _parameters;
-        mutable dataset::RowDataset<dataset::SupervisedExample<dataset::DoubleDataVector>> _dataset;
+        mutable dataset::RowDataset<dataset::DenseSupervisedExample> _dataset;
         mutable PriorityQueue _queue;
     };
 

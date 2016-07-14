@@ -19,7 +19,7 @@
 #include "CoordinateListTools.h"
 
 // dataset
-#include "SupervisedExample.h"
+#include "Example.h"
 
 // common
 #include "ForestTrainerArguments.h"

@@ -48,7 +48,7 @@ namespace interfaces
         return static_cast<dataset::GenericSupervisedExample>(_dataset.GetExample(index));
     }
 
-    dataset::SupervisedExample<dataset::DoubleDataVector> GenericRowDataset::GetDenseSupervisedExample(uint64_t index) const
+    dataset::DenseSupervisedExample GenericRowDataset::GetDenseSupervisedExample(uint64_t index) const
     {
         if(index >= NumExamples())
         {
@@ -59,7 +59,7 @@ namespace interfaces
         const auto& exampleData = example.GetDataVector();
         auto exampleDataArray = exampleData.ToArray();        
         auto resultData = std::make_shared<dataset::DoubleDataVector>(exampleDataArray);
-        dataset::SupervisedExample<dataset::DoubleDataVector> result(resultData, example.GetLabel(), example.GetWeight());
+        dataset::DenseSupervisedExample result(resultData, example.GetMetaData());
         return result;
     }
 
