@@ -106,6 +106,7 @@ namespace trainers
             NodeExamples nodeExamples;
 
             double gain;
+
             bool operator<(const SplitCandidate& other) const { return gain < other.gain; }
 
             void Print(std::ostream& os, size_t tabs=0) const;
@@ -118,13 +119,13 @@ namespace trainers
             using std::priority_queue<SplitCandidate>::size;
         };
 
-        // Metadata that the forest trainer keeps with each example - weight and label are inherited from dataset::WeightLabel
+        // Metadata that the forest trainer keeps with each example
         struct ExampleMetaData : public dataset::WeightLabel
         {
             ExampleMetaData(const dataset::WeightLabel& weightLabel);
             
             // the output of the forest on this example
-            double currentForestOutput;
+            //double currentForestOutput;
         };
 
         // the type of example used by the forest trainer
@@ -133,8 +134,8 @@ namespace trainers
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
         void AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, size_t size, Sums sums);
 
-        void SortDatasetBySplitRule(size_t featureIndex, uint64_t fromRowIndex, uint64_t size);
-        void SortDatasetBySplitRule(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size);
+        void UpdateDataset(size_t featureIndex, uint64_t fromRowIndex, uint64_t size);
+        void UpdateDataset(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size);
 
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
         double GetOutputValue(const Sums& sums) const;

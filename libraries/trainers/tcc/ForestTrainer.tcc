@@ -46,13 +46,10 @@ namespace trainers
             auto fromRowIndex1 = fromRowIndex0 + size0;
 
             // perform the split
-            double outputValueSoFar = GetOutputValue(sums); // TODO - root split creates a bug, send this as function argument
-            double negativeOutputValue = GetOutputValue(sums0) - outputValueSoFar;
-            double positiveOutputValue = GetOutputValue(sums1) - outputValueSoFar;
             auto interiorNodeIndex = _forest->Split(splitCandidate.splitAction);
 
             // sort the data according to the performed split
-            SortDatasetBySplitRule(splitCandidate.splitAction.GetSplitRule(), splitCandidate.nodeExamples.fromRowIndex, size);
+            UpdateDataset(splitCandidate.splitAction.GetSplitRule(), splitCandidate.nodeExamples.fromRowIndex, size);
 
             // queue split candidate for child 0
             AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), fromRowIndex0, size0, std::move(sums0));
@@ -108,7 +105,7 @@ namespace trainers
         for (uint64_t featureIndex = 0; featureIndex < numFeatures; ++featureIndex)
         {
             // sort the relevant rows of dataset in ascending order by featureIndex
-            SortDatasetBySplitRule(featureIndex, fromRowIndex, size);
+            UpdateDataset(featureIndex, fromRowIndex, size);
 
             Sums sums0;
 
@@ -153,7 +150,10 @@ namespace trainers
             using SplitRule = predictors::SingleInputThresholdRule;
             using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
 
-            EdgePredictorVector edgePredictorVector{ GetOutputValue(bestNodeStats.sums0) , GetOutputValue(bestNodeStats.sums1) };
+            double output0 = GetOutputValue(bestNodeStats.sums0);
+            double output1 = GetOutputValue(bestNodeStats.sums1); // bug - doesn't account for path output so far
+
+            EdgePredictorVector edgePredictorVector{ output0, output1 };
             SplitAction splitAction(nodeId, SplitRule{ bestFeatureIndex, bestThreshold }, std::move(edgePredictorVector));
             NodeExamples nodeExamples{ fromRowIndex, size, bestSize0, size - bestSize0 };
             _queue.push(SplitCandidate{ std::move(splitAction), std::move(bestNodeStats), std::move(nodeExamples), bestGain });
@@ -168,19 +168,23 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SortDatasetBySplitRule(size_t featureIndex, uint64_t fromRowIndex, uint64_t size) // to be deprecated
+    void ForestTrainer<LossFunctionType>::UpdateDataset(size_t featureIndex, uint64_t fromRowIndex, uint64_t size) // to be deprecated
     {
         _dataset.Sort([featureIndex](const ForestTrainerExample& example) { return example.GetDataVector()[featureIndex]; },
                       fromRowIndex,
                       size);
+
+        // TODO: do we need to do anything here - I think not.
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SortDatasetBySplitRule(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size)
+    void ForestTrainer<LossFunctionType>::UpdateDataset(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size)
     {
         _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()); },
                       fromRowIndex,
                       size);
+
+        // TODO: update metadata.currentForestOutput; get the vector of predictors as arguments to this function
     }
 
     template<typename LossFunctionType>
@@ -210,7 +214,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    ForestTrainer<LossFunctionType>::ExampleMetaData::ExampleMetaData(const dataset::WeightLabel & weightLabel) : dataset::WeightLabel(weightLabel), currentForestOutput(0)
+    ForestTrainer<LossFunctionType>::ExampleMetaData::ExampleMetaData(const dataset::WeightLabel & weightLabel) : dataset::WeightLabel(weightLabel)
     {} 
 
     template<typename LossFunctionType>
