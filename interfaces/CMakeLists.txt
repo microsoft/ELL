@@ -50,6 +50,6 @@ add_subdirectory(common)
 add_subdirectory(python)
 # add_subdirectory(R) # currently doesn't compile because std_shared_ptr.i doesn't exist for R
 add_subdirectory(csharp)
-# add_subdirectory(javascript) # Problem: node.h not found :(
-# add_subdirectory(xml) # currently doesn't compile because CMake wants to compile SWIG's ouptut code file, which doesn't work when it's XML
+add_subdirectory(javascript) # Problem: node.h not found :(
+add_subdirectory(xml) # currently doesn't compile because CMake wants to compile SWIG's ouptut code file, which doesn't work when it's XML
 

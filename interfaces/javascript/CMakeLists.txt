@@ -11,3 +11,4 @@ include (CommonInterfaces)
 
 generate_interface(javascript ${CMAKE_CURRENT_SOURCE_DIR} "" "")
 add_dependencies(EMLL_javascript EMLL_common)
+
