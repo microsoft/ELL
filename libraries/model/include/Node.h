@@ -27,6 +27,9 @@ namespace model
     class Node
     {
     public:
+        Node() = default;
+        virtual ~Node() = default;
+
         /// <summary> Type to use for our node id </summary>
         typedef utilities::UniqueId NodeId;
 
@@ -62,7 +65,6 @@ namespace model
 
         virtual void Copy(ModelTransformer& transformer) const = 0;
         virtual void Refine(ModelTransformer& transformer) const;
-        virtual ~Node() {}
 
     protected:
         // TODO: the arguments (and the _inputs and _outputs members)
