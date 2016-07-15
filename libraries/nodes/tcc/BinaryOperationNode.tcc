@@ -11,7 +11,10 @@ namespace nodes
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode(const model::OutputPortElementList<ValueType>& input1, const model::OutputPortElementList<ValueType>& input2, OperationType operation) : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1), _input2(this, input2), _output(this, _input1.Size()), _operation(operation)
     {
-        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input sizes must match");
+        if (input1.Size() != input2.Size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input sizes must match");
+        }
         assert(input1.Size() == input2.Size());
     }
 
