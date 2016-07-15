@@ -52,7 +52,7 @@ namespace model
         /// <summary> Returns the name of this port </summary>
         ///
         /// <returns> The name of this port </returns>
-        std::string GetName() { return _name; }
+        std::string GetName() const { return _name; }
 
         /// <summary> Maps from C++ type to PortType enum </summary>
         ///

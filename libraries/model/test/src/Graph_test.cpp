@@ -29,13 +29,39 @@
 
 void NodePrinter(const model::Node& node)
 {
-    bool first = true;
+    bool isFirstInputPort = true;
     std::cout << "node_" << node.GetId() << " = " << node.GetRuntimeTypeName() << "(";
-    for (const auto& input : node.GetInputPorts())
+    for (const auto& inputPort : node.GetInputPorts())
     {
-        std::cout << (first ? "" : ", ");
-        first = false;
-        //        std::cout << "node_" << input->ReferencedPort()->Node()->GetId() << "[" << input->ReferencedPort()->Index() << "]";
+        std::cout << (isFirstInputPort ? "" : ", ");
+        isFirstInputPort = false;
+
+        auto ranges = inputPort->GetInputRanges();
+        if(ranges.NumRanges() > 1)
+        {
+            std::cout << "{";
+        }
+
+        bool isFirstRange = true;
+        for(const auto& range: ranges)
+        {
+            std::cout << (isFirstRange ? "" : ", ");
+            isFirstRange = false;
+
+            auto port = range.ReferencedPort();
+            std::cout << "node_" << port->GetNode()->GetId() << "." << port->GetName();
+            if(!range.IsFullPortRange())
+            {
+                auto start = range.GetStartIndex();
+                auto size = range.Size();
+                std::cout << "[" << start << ":" << (start+size) << "]";
+            }
+        }
+
+        if(ranges.NumRanges() > 1)
+        {
+            std::cout << "}";
+        }
     }
     std::cout << ")" << std::endl;
 };

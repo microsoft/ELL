@@ -39,6 +39,11 @@ namespace model
 
     size_t OutputPortRange::GetStartIndex() const { return _startIndex; }
 
+    bool OutputPortRange::IsFullPortRange() const
+    {
+        return GetStartIndex() == 0 && Size() == ReferencedPort()->Size();
+    }
+
     //
     // OutputPortElementListUntyped
     //

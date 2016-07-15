@@ -92,6 +92,11 @@ namespace model
         /// <returns> The port this range refers to </returns>
         const OutputPortBase* ReferencedPort() const { return _referencedPort; }
 
+        /// <summary> Indicates if this range consists of the entire port's output </summary>
+        ///
+        /// <returns> true if this range spans the port's entire range </returns>
+        bool IsFullPortRange() const;
+
     private:
         const OutputPortBase* _referencedPort;
         size_t _startIndex;
@@ -135,6 +140,11 @@ namespace model
         ///
         /// <returns> The dimensionality of the output </returns>
         size_t Size() const { return _size; }
+
+        /// <summary> The number of ranges in this list </summary>
+        ///
+        /// <returns> The number of ranges in this list </returns>
+        size_t NumRanges() const { return _ranges.size(); }
 
         /// <summary> An STL-type iterator pointing to the beginning of the list of ranges </summary>
         std::vector<OutputPortRange>::const_iterator begin() const { return _ranges.cbegin(); }
