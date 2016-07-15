@@ -125,7 +125,7 @@ namespace trainers
             ExampleMetaData(const dataset::WeightLabel& weightLabel);
             
             // the output of the forest on this example
-            double currentForestOutput = 0;
+            double currentOutput = 0;
             double weakLabel = 0;
             double weakWeight = 1;
         };
@@ -134,10 +134,13 @@ namespace trainers
         typedef dataset::Example<dataset::DoubleDataVector, ExampleMetaData> ForestTrainerExample; 
 
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
+
+        void AddToCurrentOutput(uint64_t fromRowIndex, uint64_t size, double addValue);
+
         void AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, size_t size, Sums sums);
 
-        void UpdateDataset(size_t featureIndex, uint64_t fromRowIndex, uint64_t size);
-        void UpdateDataset(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size);
+        void SortNodeDataset(size_t featureIndex, uint64_t fromRowIndex, uint64_t size);
+        void SortNodeDataset(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size);
 
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
         double GetOutputValue(const Sums& sums) const;

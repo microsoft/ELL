@@ -59,6 +59,11 @@ namespace dataset
         /// <summary> Gets the metadata. </summary>
         ///
         /// <returns> The metadata. </returns>
+        MetaDataType& GetMetaData() { return _metaData; }
+
+        /// <summary> Gets the metadata. </summary>
+        ///
+        /// <returns> The metadata. </returns>
         const MetaDataType& GetMetaData() const { return _metaData; }
 
         /// <summary> Prints the datavector to an output stream. </summary>

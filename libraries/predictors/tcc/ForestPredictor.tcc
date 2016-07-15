@@ -69,7 +69,7 @@ namespace predictors
     template<typename RandomAccessVectorType>
     double ForestPredictor<SplitRuleType, EdgePredictorType>::Compute(const RandomAccessVectorType& input) const
     {
-        double output = 0.0;
+        double output = _bias;
         for (const auto& tree : _trees)
         {
             output += Compute(input, tree.rootIndex);
@@ -193,6 +193,12 @@ namespace predictors
             // return ID of new interior node
             return interiorNodeIndex;
         }
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::SetBias(double value)
+    {
+        _bias = value;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>

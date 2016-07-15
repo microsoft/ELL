@@ -1,3 +1,4 @@
+#include "..\include\ForestTrainer.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
@@ -20,6 +21,11 @@ namespace trainers
     {
         // convert data fron iterator to dense row dataset; compute sums statistics of the tree root
         auto sums = LoadData(exampleIterator);
+
+        // computes the bias term, sets it in the forest and the dataset
+        double bias = GetOutputValue(sums);
+        _forest->SetBias(bias);
+        AddToCurrentOutput(0, _dataset.NumExamples(), bias);
 
         // find split candidate for root node and push it onto the priority queue
         AddSplitCandidateToQueue(_forest->GetNewRootId(), 0, _dataset.NumExamples(), sums);
@@ -49,13 +55,15 @@ namespace trainers
             auto interiorNodeIndex = _forest->Split(splitCandidate.splitAction);
 
             // sort the data according to the performed split
-            UpdateDataset(splitCandidate.splitAction.GetSplitRule(), splitCandidate.nodeExamples.fromRowIndex, size);
+            SortNodeDataset(splitCandidate.splitAction.GetSplitRule(), splitCandidate.nodeExamples.fromRowIndex, size);
 
             // queue split candidate for child 0
             AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), fromRowIndex0, size0, std::move(sums0));
+            AddToCurrentOutput(fromRowIndex0, size0, GetOutputValue(sums0));
 
             // queue split candidate for child 1
             AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 1), fromRowIndex1, size1, std::move(sums1));
+            AddToCurrentOutput(fromRowIndex1, size1, GetOutputValue(sums1));
         }
     }
 
@@ -81,12 +89,29 @@ namespace trainers
             sums.Increment(example.GetMetaData().GetWeight(), example.GetMetaData().GetLabel()); // TODO - maybe this func should just take a WeightLabel?
 
             auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
-            auto denseSupervisedExample = ForestTrainerExample(std::move(denseDataVector), example.GetMetaData());
+            
+            ExampleMetaData metaData = example.GetMetaData();
+            
+            // set weak label/weight to equal strong label/weight
+            metaData.weakLabel = metaData.GetLabel();
+            metaData.weakWeight = metaData.GetWeight();
+
+            auto denseSupervisedExample = ForestTrainerExample(std::move(denseDataVector), metaData);
             _dataset.AddExample(std::move(denseSupervisedExample));
             exampleIterator.Next();
         }
 
         return sums;
+    }
+
+    template<typename LossFunctionType>
+    void ForestTrainer<LossFunctionType>::AddToCurrentOutput(uint64_t fromRowIndex, uint64_t size, double addValue)
+    {
+        for (uint64_t rowIndex = fromRowIndex; rowIndex < fromRowIndex + size; ++rowIndex)
+        {
+            auto& example = _dataset[rowIndex];
+            example.GetMetaData().currentOutput += addValue;
+        }
     }
 
     template<typename LossFunctionType>
@@ -105,7 +130,7 @@ namespace trainers
         for (uint64_t featureIndex = 0; featureIndex < numFeatures; ++featureIndex)
         {
             // sort the relevant rows of dataset in ascending order by featureIndex
-            UpdateDataset(featureIndex, fromRowIndex, size);
+            SortNodeDataset(featureIndex, fromRowIndex, size);
 
             Sums sums0;
 
@@ -168,7 +193,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::UpdateDataset(size_t featureIndex, uint64_t fromRowIndex, uint64_t size) // to be deprecated
+    void ForestTrainer<LossFunctionType>::SortNodeDataset(size_t featureIndex, uint64_t fromRowIndex, uint64_t size) // to be deprecated
     {
         _dataset.Sort([featureIndex](const ForestTrainerExample& example) { return example.GetDataVector()[featureIndex]; },
                       fromRowIndex,
@@ -178,7 +203,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::UpdateDataset(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size)
+    void ForestTrainer<LossFunctionType>::SortNodeDataset(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size)
     {
         _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()); },
                       fromRowIndex,

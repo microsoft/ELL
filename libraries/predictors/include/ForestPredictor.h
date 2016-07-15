@@ -112,7 +112,7 @@ namespace predictors
         /// <returns> The number of edges. </returns>
         size_t NumEdges(size_t interiorNodeIndex) const;
 
-        /// <summary> Returns the output of the forest for a given input. </summary>
+        /// <summary> Returns the output of the forest (including all trees and the bias term) for a given input. </summary>
         ///
         /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the input. </typeparam>
         /// <param name="input"> The input vector. </param>
@@ -181,6 +181,16 @@ namespace predictors
         /// <returns> The index of the newly created interior node. </returns>
         size_t Split(const SplitAction& splitAction);
 
+        /// <summary> Gets the bias value. </summary>
+        ///
+        /// <returns> The bias. </returns>
+        double GetBias() const { return _bias; }
+
+        /// <summary> Sets the bias value. </summary>
+        ///
+        /// <param name="value"> The value. </param>
+        void SetBias(double value);
+
     protected:
         struct Edge
         {
@@ -207,8 +217,10 @@ namespace predictors
 
         size_t AddInteriorNode(const SplitAction& splitAction);
 
+        // members
         std::vector<InteriorNode> _interiorNodes;
         std::vector<Tree> _trees;
+        double _bias = 0.0;
         size_t _numEdges = 0; 
     };
 

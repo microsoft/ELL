@@ -25,7 +25,19 @@ namespace dataset
     }
 
     template<typename ExampleType>
+    ExampleType& RowDataset<ExampleType>::GetExample(uint64_t index)
+    {
+        return _examples[index];
+    }
+
+    template<typename ExampleType>
     const ExampleType& RowDataset<ExampleType>::GetExample(uint64_t index) const
+    {
+        return _examples[index];
+    }
+
+    template<typename ExampleType>
+    ExampleType& RowDataset<ExampleType>::operator[](uint64_t index)
     {
         return _examples[index];
     }
