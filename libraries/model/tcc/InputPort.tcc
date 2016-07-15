@@ -42,7 +42,10 @@ namespace model
             result.push_back(temp);
         }
 
-        assert(Size() == result.size());
+        if(Size() != result.size())
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
+        }
         return result;
     }
 

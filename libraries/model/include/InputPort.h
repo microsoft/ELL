@@ -12,6 +12,9 @@
 #include "OutputPort.h"
 #include "OutputPortElementList.h"
 
+// utilities
+#include "Exception.h"
+
 #include <vector>
 #include <cassert>
 
