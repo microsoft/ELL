@@ -32,7 +32,7 @@ namespace model
         /// <param name="owningNode"> The node that contains this port </param>
         /// <param name="input"> The input group to fetch input values from </param>
         template <typename ValueType>
-        InputPortBase(const class Node* owningNode, const OutputPortElementList<ValueType>& input);
+        InputPortBase(const class Node* owningNode, const OutputPortElementList<ValueType>& input, std::string name);
 
         /// <summary> Returns the OutputPortElements containing the referenced locations to get values from </summary>
         ///
@@ -84,7 +84,7 @@ namespace model
         ///
         /// <param name="owningNode"> The node this port belongs to </param>
         /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
-        InputPort(const class Node* owningNode, const OutputPortElementList<ValueType>& input);
+        InputPort(const class Node* owningNode, const OutputPortElementList<ValueType>& input, std::string name);
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         ///

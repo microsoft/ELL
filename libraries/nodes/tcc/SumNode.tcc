@@ -9,7 +9,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    SumNode<ValueType>::SumNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input), _output(this, 1)
+    SumNode<ValueType>::SumNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input, "input"), _output(this, "output", 1)
     {
     }
 

@@ -10,7 +10,7 @@
 namespace model
 {
     template <typename ValueType, bool max>
-    ExtremalValueNode<ValueType, max>::ExtremalValueNode(const OutputPortElementList<ValueType>& input) : Node({ &_input }, { &_val, &_argVal }), _input(this, input), _val(this, 1), _argVal(this, 1)
+    ExtremalValueNode<ValueType, max>::ExtremalValueNode(const OutputPortElementList<ValueType>& input) : Node({ &_input }, { &_val, &_argVal }), _input(this, input, "input"), _val(this, "val", 1), _argVal(this, "argVal", 1)
     {
     }
 

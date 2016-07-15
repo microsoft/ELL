@@ -9,7 +9,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::OutputPortElementList<ValueType>& input, OperationType operation) : Node({ &_input }, { &_output }), _input(this, input), _output(this, _input.Size()), _operation(operation)
+    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::OutputPortElementList<ValueType>& input, OperationType operation) : Node({ &_input }, { &_output }), _input(this, input, "input"), _output(this, "output", _input.Size()), _operation(operation)
     {
     }
 

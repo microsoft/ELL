@@ -9,7 +9,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    MovingAverageNode<ValueType>::MovingAverageNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize) : Node({&_input}, {&_output}), _input(this, input), _output(this, _input.Size()), _windowSize(windowSize)
+    MovingAverageNode<ValueType>::MovingAverageNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize) : Node({&_input}, {&_output}), _input(this, input, "input"), _output(this, "output", _input.Size()), _windowSize(windowSize)
     {
         auto dimension = input.Size();
         for(size_t index = 0; index < windowSize; ++index)

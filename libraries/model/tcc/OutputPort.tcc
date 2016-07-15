@@ -13,7 +13,7 @@ namespace model
     // OutputPort
     //
     template <typename ValueType>
-    OutputPort<ValueType>::OutputPort(const class Node* node, size_t size) : OutputPortBase(node, OutputPortBase::GetTypeCode<ValueType>(), size)
+    OutputPort<ValueType>::OutputPort(const class Node* node, std::string name, size_t size) : OutputPortBase(node, name, OutputPortBase::GetTypeCode<ValueType>(), size)
     {}
 
     template <typename ValueType>

@@ -9,7 +9,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    DotProductNode<ValueType>::DotProductNode(const model::OutputPortElementList<ValueType>& input1, const model::OutputPortElementList<ValueType>& input2) : Node({&_input1, &_input2}, {&_output}), _input1(this, input1), _input2(this, input2), _output(this, 1)
+    DotProductNode<ValueType>::DotProductNode(const model::OutputPortElementList<ValueType>& input1, const model::OutputPortElementList<ValueType>& input2) : Node({&_input1, &_input2}, {&_output}), _input1(this, input1, "input1"), _input2(this, input2, "input2"), _output(this, "output", 1)
     {
     }
 
