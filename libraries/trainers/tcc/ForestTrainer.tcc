@@ -54,16 +54,16 @@ namespace trainers
             // perform the split
             auto interiorNodeIndex = _forest->Split(splitCandidate.splitAction);
 
-            // sort the data according to the performed split
+            // sort the data according to the performed split and update the metadata
             SortNodeDataset(splitCandidate.splitAction.GetSplitRule(), splitCandidate.nodeExamples.fromRowIndex, size);
+            AddToCurrentOutput(fromRowIndex0, size0, splitCandidate.constEdgePrediction0);
+            AddToCurrentOutput(fromRowIndex1, size1, splitCandidate.constEdgePrediction1);
 
             // queue split candidate for child 0
             AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), fromRowIndex0, size0, std::move(sums0));
-            AddToCurrentOutput(fromRowIndex0, size0, GetOutputValue(sums0));
 
             // queue split candidate for child 1
             AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 1), fromRowIndex1, size1, std::move(sums1));
-            AddToCurrentOutput(fromRowIndex1, size1, GetOutputValue(sums1));
         }
     }
 
@@ -175,13 +175,14 @@ namespace trainers
             using SplitRule = predictors::SingleInputThresholdRule;
             using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
 
-            double output0 = GetOutputValue(bestNodeStats.sums0);
-            double output1 = GetOutputValue(bestNodeStats.sums1); // bug - doesn't account for path output so far
+            double output = GetOutputValue(sums);
+            double output0 = GetOutputValue(bestNodeStats.sums0) - output;
+            double output1 = GetOutputValue(bestNodeStats.sums1) - output;
 
             EdgePredictorVector edgePredictorVector{ output0, output1 };
             SplitAction splitAction(nodeId, SplitRule{ bestFeatureIndex, bestThreshold }, std::move(edgePredictorVector));
             NodeExamples nodeExamples{ fromRowIndex, size, bestSize0, size - bestSize0 };
-            _queue.push(SplitCandidate{ std::move(splitAction), std::move(bestNodeStats), std::move(nodeExamples), bestGain });
+            _queue.push(SplitCandidate{ std::move(splitAction), std::move(bestNodeStats), std::move(nodeExamples), bestGain, output0, output1 });
         }
 
 #ifdef VERY_VERBOSE
