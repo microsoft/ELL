@@ -35,13 +35,11 @@ namespace model
     class ModelTransformer
     {
     public:
-        ModelTransformer(TransformContext context) : _context(context) {}
-
         /// <summary> Returns a copy of the input model, by calling Copy() on each of the model's nodes </summary>
-        Model CopyModel(const Model& model);
+        Model CopyModel(const Model& model, const TransformContext& context);
 
         /// <summary> Returns a refined version of the input model, by calling Refine() on each of the model's nodes </summary>
-        Model RefineModel(const Model& model);
+        Model RefineModel(const Model& model, const TransformContext& context);
 
         /// <summary> Returns the  OutputPort from new new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>

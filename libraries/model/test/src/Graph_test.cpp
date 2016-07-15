@@ -222,8 +222,8 @@ void TestCopyGraph()
 
     // Now make a copy
     model::TransformContext context;
-    model::ModelTransformer transformer(context);
-    auto newModel = transformer.CopyModel(model);
+    model::ModelTransformer transformer;
+    auto newModel = transformer.CopyModel(model, context);
 
     // Print them both:
     std::cout << "\n\nOld graph" << std::endl;
@@ -250,8 +250,8 @@ void TestRefineGraph()
 
     // Now transform it
     model::TransformContext context;
-    model::ModelTransformer transformer(context);
-    auto newModel = transformer.RefineModel(model);
+    model::ModelTransformer transformer;
+    auto newModel = transformer.RefineModel(model, context);
 
     // Print both graphs
     std::cout << "\n\nOld graph" << std::endl;

@@ -265,8 +265,8 @@ void TestMeanNodeRefine()
     double expectedOutput = VectorMean({ 7.0, 8.0, 9.0, 10.0 });
 
     model::TransformContext context;
-    model::ModelTransformer transformer(context);
-    auto newModel = transformer.RefineModel(model);
+    model::ModelTransformer transformer;
+    auto newModel = transformer.RefineModel(model, context);
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newOutputPort = transformer.GetCorrespondingOutputPort(meanNode->output);
 
