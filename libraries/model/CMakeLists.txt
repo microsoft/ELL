@@ -15,6 +15,7 @@ endif()
 set (SRC src/ModelGraph.cpp
          src/ModelTransformer.cpp
          src/Node.cpp
+         src/OutputPort.cpp
          src/OutputPortElementList.cpp
          src/Port.cpp
 )

@@ -19,7 +19,7 @@ namespace model
     {
         _context = context;
         _model = Model();
-        _portMap.clear();
+        _portToPortMap.clear();
         oldModel.Visit([this](const Node& node) { node.Copy(*this); });
         _context = TransformContext();
 
@@ -30,7 +30,7 @@ namespace model
     {
         _context = context;
         _model = Model();
-        _portMap.clear();
+        _portToPortMap.clear();
         oldModel.Visit([this](const Node& node) { node.Refine(*this); });
         _context = TransformContext();
 
@@ -39,17 +39,17 @@ namespace model
 
     const Port* ModelTransformer::GetCorrespondingPort(const Port& port)
     {
-        if (_portMap.find(&port) == _portMap.end())
+        if (_portToPortMap.find(&port) == _portToPortMap.end())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find port in new model.");
         }
-        return _portMap[&port];
+        return _portToPortMap[&port];
     }
 
     void ModelTransformer::MapPort(const Port& oldPort, const Port& newPort)
     {
         // this is hideous
         auto nonconstPort = const_cast<Port*>(&newPort);
-        _portMap[&oldPort] = nonconstPort;
+        _portToPortMap[&oldPort] = nonconstPort;
     }
 }

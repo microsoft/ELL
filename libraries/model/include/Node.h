@@ -63,12 +63,13 @@ namespace model
         /// <returns> a vector of all the nodes that depend on this node </summary>
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(ModelTransformer& transformer) const = 0;
+
+        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(ModelTransformer& transformer) const;
 
     protected:
-        // TODO: the arguments (and the _inputs and _outputs members)
-        // should perhaps be vectors of references instead of pointers.
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
         /// <summary> Computes the output of this node and stores it in the output ports </summary>
@@ -82,7 +83,6 @@ namespace model
         void RegisterDependencies() const;
 
         NodeId _id;
-        // TODO: these should probably be references, not pointers
         std::vector<InputPortBase*> _inputs;
         std::vector<OutputPortBase*> _outputs;
 

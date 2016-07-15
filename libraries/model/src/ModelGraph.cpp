@@ -18,8 +18,8 @@ namespace model
 {
     Node* Model::GetNode(Node::NodeId id)
     {
-        auto it = _nodeMap.find(id);
-        if (it == _nodeMap.end())
+        auto it = _idToNodeMap.find(id);
+        if (it == _idToNodeMap.end())
         {
             return nullptr; // weak_ptr equivalent of nullptr
         }
@@ -27,16 +27,6 @@ namespace model
         {
             return it->second.get();
         }
-    }
-
-    NodeIterator Model::GetNodeIterator() const
-    {
-        return NodeIterator(this, {});
-    };
-
-    NodeIterator Model::GetNodeIterator(const Node* outputNode) const
-    {
-        return NodeIterator(this, {outputNode});
     }
 
     NodeIterator Model::GetNodeIterator(const std::vector<const Node*>& outputNodes) const
@@ -66,7 +56,7 @@ namespace model
             auto IsLeaf = [](const Node* node) { return node->GetDependentNodes().size() == 0; };
 
             // start with some arbitrary node
-            const Node* anOutputNode = _model->_nodeMap.begin()->second.get(); // !!! need private access
+            const Node* anOutputNode = _model->_idToNodeMap.begin()->second.get(); // !!! need private access
 
             // follow dependency chain until we get an output node
             while (!IsLeaf(anOutputNode))

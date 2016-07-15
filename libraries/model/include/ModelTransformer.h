@@ -81,7 +81,7 @@ namespace model
 
         Model _model;
         TransformContext _context;
-        std::unordered_map<const Port*, Port*> _portMap;
+        std::unordered_map<const Port*, Port*> _portToPortMap;
     };
 }
 

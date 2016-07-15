@@ -142,6 +142,9 @@ namespace model
         /// <summary> An STL-type iterator pointing to the end of the list of ranges </summary>
         std::vector<OutputPortRange>::const_iterator end() const { return _ranges.cend(); }
 
+        /// <summary> Adds a range of values to this list </summary>
+        ///
+        /// <param name="range"> The range of values to add to this list </param>
         void AddRange(const OutputPortRange& range);
 
     protected:
