@@ -12,6 +12,9 @@
 #include "InputPort.h"
 #include "OutputPort.h"
 
+// utilities
+#include "TypeName.h"
+
 #include <vector>
 #include <memory>
 #include <algorithm>
@@ -32,7 +35,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return max ? "ArgMax" : "ArgMin"; }
+        static std::string GetTypeName() { return std::string(max ? "ArgMax" : "ArgMin")+"<" + utilities::TypeName<ValueType>::GetName()+">"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

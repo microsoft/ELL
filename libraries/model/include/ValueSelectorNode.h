@@ -12,6 +12,10 @@
 #include "InputPort.h"
 #include "OutputPort.h"
 
+// utilities
+#include "TypeName.h"
+
+// stl
 #include <vector>
 #include <memory>
 #include <exception>
@@ -34,7 +38,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "ValueSelector"; }
+        static std::string GetTypeName() { return "ValueSelector<"+utilities::TypeName<ValueType>::GetName()+">"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

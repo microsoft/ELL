@@ -14,6 +14,7 @@
 
 // utilities
 #include "Exception.h"
+#include "TypeName.h"
 
 // stl
 #include <string>
@@ -33,7 +34,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "AccumulatorNode"; }
+        static std::string GetTypeName() { return "AccumulatorNode<"+utilities::TypeName<ValueType>::GetName()+">"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

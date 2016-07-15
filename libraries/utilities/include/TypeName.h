@@ -57,6 +57,18 @@ namespace utilities
         static std::string GetName();
     };
 
+    /// <summary> Class used to get information about the bool type. </summary>
+    ///
+    /// <typeparam name="T"> Generic type parameter. </typeparam>
+    template<>
+    struct TypeName<bool>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "bool"; }
+    };
+
     /// <summary> Class used to get information about the 8-bit integer type. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>

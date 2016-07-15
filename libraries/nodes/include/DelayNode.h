@@ -15,6 +15,9 @@
 #include "InputPort.h"
 #include "OutputPort.h"
 
+// utilities
+#include "TypeName.h"
+
 // stl
 #include <string>
 #include <vector>
@@ -34,7 +37,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "DelayNode"; }
+        static std::string GetTypeName() { return "DelayNode<"+utilities::TypeName<ValueType>::GetName()+">"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

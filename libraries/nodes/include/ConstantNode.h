@@ -12,6 +12,9 @@
 #include "OutputPort.h"
 #include "ModelTransformer.h"
 
+// utilities
+#include "TypeName.h"
+
 #include <vector>
 #include <memory>
 
@@ -36,7 +39,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "Constant"; }
+        static std::string GetTypeName() { return "ConstantNode<"+utilities::TypeName<ValueType>::GetName()+">"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
