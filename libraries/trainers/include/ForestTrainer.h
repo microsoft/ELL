@@ -125,7 +125,9 @@ namespace trainers
             ExampleMetaData(const dataset::WeightLabel& weightLabel);
             
             // the output of the forest on this example
-            //double currentForestOutput;
+            double currentForestOutput = 0;
+            double weakLabel = 0;
+            double weakWeight = 1;
         };
 
         // the type of example used by the forest trainer
