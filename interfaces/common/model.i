@@ -19,6 +19,7 @@
 
 %rename (ModelGraph) model::Model;
 
+%nodefaultctor model::NodeIterator;
 %nodefaultctor model::Node;
 %nodefaultctor model::Port;
 %nodefaultctor model::OutputPortBase;

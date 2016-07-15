@@ -31,7 +31,6 @@ namespace model
         virtual bool IsValid() const override { return _currentNode != nullptr; }
         virtual void Next() override;
         virtual const Node* Get() const override { return _currentNode; }
-        NodeIterator() {}
 
     private:
         friend class Model;
