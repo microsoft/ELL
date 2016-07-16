@@ -44,9 +44,6 @@ namespace predictors
         class SplittableNodeId 
         {
         public:
-            /// <summary> Constructs a node Id that refers ot a new tree root. </summary>
-            SplittableNodeId() : _isRoot(true) {}
-
             /// <summary> Prints the node Id. </summary>
             ///
             /// <param name="os"> The output stream. </param>
@@ -54,6 +51,7 @@ namespace predictors
 
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
+            SplittableNodeId() : _isRoot(true) {}
             SplittableNodeId(size_t parentNodeIndex, size_t childPosition);
             bool _isRoot;
             size_t _parentNodeIndex;
