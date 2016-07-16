@@ -36,7 +36,7 @@ namespace trainers
 
 #ifdef VERY_VERBOSE
              std::cout << "Iteration\n";
-             _queue.Print(std::cout);
+             _queue.PrintLine(std::cout);
 #endif
 
             auto splitCandidate = _queue.top();
@@ -52,10 +52,12 @@ namespace trainers
             auto fromRowIndex1 = fromRowIndex0 + size0;
 
             // perform the split
-            auto interiorNodeIndex = _forest->Split(splitCandidate.splitAction);
+            std::vector<EdgePredictorType> edgePredictorVector{ splitCandidate.output0, splitCandidate.output1 };
+            SplitAction splitAction(splitCandidate.nodeId, splitCandidate.splitRule, std::move(edgePredictorVector));
+            auto interiorNodeIndex = _forest->Split(splitAction);
 
             // sort the data according to the performed split and update the metadata
-            SortNodeDataset(splitCandidate.splitAction.GetSplitRule(), splitCandidate.nodeExamples.fromRowIndex, size);
+            SortNodeDataset(splitCandidate.splitRule, splitCandidate.nodeExamples.fromRowIndex, size);
             AddToCurrentOutput(fromRowIndex0, size0, splitCandidate.output0);
             AddToCurrentOutput(fromRowIndex1, size1, splitCandidate.output1);
 
@@ -138,7 +140,7 @@ namespace trainers
             {
                 // get friendly names
                 double currentFeatureValue = nextFeatureValue;
-                double nextFeatureValue = _dataset[rowIndex + 1].GetDataVector()[featureIndex];
+                nextFeatureValue = _dataset[rowIndex + 1].GetDataVector()[featureIndex];
 
                 // increment sums 
                 sums0.Increment(_dataset[rowIndex].GetMetaData());
@@ -169,17 +171,14 @@ namespace trainers
         // if found a good split candidate, queue it
         if (bestGain > 0.0)
         {
-            using SplitRule = predictors::SingleInputThresholdRule;
-            using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
 
             double output = GetOutputValue(sums);
             double output0 = GetOutputValue(bestNodeStats.sums0) - output;
             double output1 = GetOutputValue(bestNodeStats.sums1) - output;
 
-            EdgePredictorVector edgePredictorVector{ output0, output1 };
-            SplitAction splitAction(nodeId, SplitRule{ bestFeatureIndex, bestThreshold }, std::move(edgePredictorVector));
+            SplitRuleType splitRule{ bestFeatureIndex, bestThreshold };
             NodeExamples nodeExamples{ fromRowIndex, size, bestSize0, size - bestSize0 };
-            _queue.push(SplitCandidate{ std::move(splitAction), std::move(bestNodeStats), std::move(nodeExamples), bestGain, output0, output1 });
+            _queue.push(SplitCandidate{ nodeId, splitRule, std::move(bestNodeStats), nodeExamples, bestGain, output0, output1 });
         }
 
 #ifdef VERY_VERBOSE
@@ -251,40 +250,46 @@ namespace trainers
     //
     
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::Sums::Print(std::ostream& os, size_t tabs) const
+    void ForestTrainer<LossFunctionType>::Sums::PrintLine(std::ostream& os, size_t tabs) const
     {
-        os << std::string(tabs * 4, ' ') << "sumWeights = " << sumWeights << ", sumWeightedLabels = " << sumWeightedLabels;
+        os << std::string(tabs * 4, ' ') << "sumWeights = " << sumWeights << ", sumWeightedLabels = " << sumWeightedLabels << "\n";
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::NodeStats::Print(std::ostream& os, size_t tabs) const
+    void ForestTrainer<LossFunctionType>::NodeStats::PrintLine(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "stats:\n";
-        sums.Print(os, tabs+1);
-        os << "\n";
-        sums0.Print(os, tabs+1);
-        os << "\n";
-        sums1.Print(os, tabs+1);
-        os << "\n";
+        
+        os << "sums:\t";
+        sums.PrintLine(os, tabs+1);
+
+        os << "sums0:\t";
+        sums0.PrintLine(os, tabs+1);
+
+        os << "sums1:\t";
+        sums1.PrintLine(os, tabs+1);
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SplitCandidate::Print(std::ostream& os, size_t tabs) const
+    void ForestTrainer<LossFunctionType>::SplitCandidate::PrintLine(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "gain = " << gain << "\n";
-        splitAction.Print(os, tabs);
-        nodeStats.Print(os, tabs);
+        os << std::string(tabs * 4, ' ') << "node = ";
+        nodeId.Print(os);
+        os << "\n";
+        splitRule.PrintLine(os, tabs);
+        nodeStats.PrintLine(os, tabs);
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::PriorityQueue::Print(std::ostream& os) const
+    void ForestTrainer<LossFunctionType>::PriorityQueue::PrintLine(std::ostream& os, size_t tabs) const
     {
-        os << "Priority Queue Size: " << size() << "\n";
+        os << std::string(tabs * 4, ' ') << "Priority Queue Size: " << size() << "\n";
 
         for(const auto& candidate : std::priority_queue<SplitCandidate>::c) // c is a protected member of std::priority_queue
         {
             os << "\n";
-            candidate.Print(os, 1);
+            candidate.PrintLine(os, tabs + 1);
             os << "\n";
         }
     }

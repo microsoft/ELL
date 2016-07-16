@@ -37,11 +37,11 @@ namespace predictors
         /// <returns> The number of outputs. </returns>
         size_t NumOutputs() const { return 2; }
 
-        /// <summary> Prints the rule to an output stream. </summary>
+        /// <summary> Prints the rule to an output stream on a separate line. </summary>
         ///
         /// <param name="os"> The output stream. </param>
         ///  <param name="tabs"> The number of tabs. </param>
-        void Print(std::ostream& os, size_t tabs=0) const;
+        void PrintLine(std::ostream& os, size_t tabs=0) const;
 
     private:
         size_t _index;

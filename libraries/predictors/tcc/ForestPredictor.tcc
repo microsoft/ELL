@@ -271,27 +271,32 @@ namespace predictors
     //
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::SplitAction::Print(std::ostream& os, size_t tabs) const
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::SplittableNodeId::Print(std::ostream & os) const
     {
-        os << std::string(tabs * 4, ' ') << "action = ";
-        if(_nodeId._isRoot)
+        if (_isRoot)
         {
-            os << "add tree\n";
+            os << "root";
         }
         else
         {
-            os << "split child " << _nodeId._childPosition << " of node " << _nodeId._parentNodeIndex << "\n";
+            os << "child " << _childPosition << " of node " << _parentNodeIndex;
         }
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::SplitAction::PrintLine(std::ostream& os, size_t tabs) const
+    {
+        os << std::string(tabs * 4, ' ') << "action = split ";
+        _nodeId.Print(os);
+        os << "\n";
 
         os << std::string(tabs * 4, ' ') << "rule:\n";
-        _splitRule.Print(os, tabs + 1);
+        _splitRule.PrintLine(os, tabs + 1);
 
-        os << "\n";
         os << std::string(tabs * 4, ' ') << "edge predictors:\n";
         for(const auto& predictor : _edgePredictors)
         {
-            predictor.Print(os, tabs + 1);
-            os << "\n";
+            predictor.PrintLine(os, tabs + 1);
         }
     }
 

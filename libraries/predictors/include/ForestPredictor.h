@@ -43,6 +43,12 @@ namespace predictors
         /// calling GetNewRootId() or GetChildId(). </summary>
         class SplittableNodeId 
         {
+        public:
+            /// <summary> Prints the node Id. </summary>
+            ///
+            /// <param name="os"> The output stream. </param>
+            void Print(std::ostream& os) const;
+
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
             SplittableNodeId(bool isRoot, size_t parentNodeIndex, size_t childPosition);
@@ -67,11 +73,11 @@ namespace predictors
             /// <returns> The split rule. </returns>
             const SplitRuleType& GetSplitRule() const { return _splitRule; }
 
-            /// <summary> Prints the split action to an output stream. </summary>
+            /// <summary> Prints the split action to an output stream on a separate line. </summary>
             ///
             /// <param name="os"> The output stream. </param>
             /// <param name="tabs"> The number of tabs. </param>
-            void Print(std::ostream& os, size_t tabs=0) const;
+            void PrintLine(std::ostream& os, size_t tabs=0) const;
 
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;

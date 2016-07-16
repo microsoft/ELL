@@ -88,7 +88,7 @@ namespace trainers
 
             void Increment(const ExampleMetaData& metaData);
             Sums operator-(const Sums& other) const;
-            void Print(std::ostream& os, size_t tabs=0) const;
+            void PrintLine(std::ostream& os, size_t tabs=0) const;
         };
 
         // struct used to keep statistics about tree nodes
@@ -98,7 +98,7 @@ namespace trainers
             Sums sums0;
             Sums sums1;
 
-            void Print(std::ostream& os, size_t tabs=0) const;
+            void PrintLine(std::ostream& os, size_t tabs=0) const;
         };
 
         struct NodeExamples
@@ -112,7 +112,10 @@ namespace trainers
         // struct used to keep info about the gain maximizing split of each splittable node in the tree
         struct SplitCandidate
         {
-            SplitAction splitAction;
+
+            SplittableNodeId nodeId;
+            SplitRuleType splitRule;
+
             NodeStats nodeStats;
             NodeExamples nodeExamples;
 
@@ -122,13 +125,13 @@ namespace trainers
 
             bool operator<(const SplitCandidate& other) const { return gain < other.gain; }
 
-            void Print(std::ostream& os, size_t tabs=0) const;
+            void PrintLine(std::ostream& os, size_t tabs=0) const;
         };
 
         // implements a priority queue of split candidates that can print itself (useful for debugging)
         struct PriorityQueue : public std::priority_queue<SplitCandidate>
         {
-            void Print(std::ostream& os) const;
+            void PrintLine(std::ostream& os, size_t tabs=0) const;
             using std::priority_queue<SplitCandidate>::size;
         };
 
