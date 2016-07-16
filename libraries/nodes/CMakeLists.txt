@@ -18,7 +18,7 @@ set (INCLUDE include/AccumulatorNode.h
              include/DelayNode.h
              include/DotProductNode.h
              include/LinearPredictorNode.h
-             include/MagnitudeNode.h
+             include/L2NormNode.h
              include/MovingAverageNode.h
              include/SumNode.h
              include/UnaryOperationNode.h
@@ -31,7 +31,7 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/ConstantNode.tcc
          tcc/DelayNode.tcc
          tcc/DotProductNode.tcc
-         tcc/MagnitudeNode.tcc
+         tcc/L2NormNode.tcc
          tcc/MovingAverageNode.tcc
          tcc/SumNode.tcc
          tcc/UnaryOperationNode.tcc

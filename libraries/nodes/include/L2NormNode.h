@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MagnitudeNode.h (features)
+//  File:     L2NormNode.h (features)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,17 +22,17 @@ namespace nodes
 {
     /// <summary> A feature that takes a vector input and returns its magnitude </summary>
     template <typename ValueType>
-    class MagnitudeNode : public model::Node
+    class L2NormNode : public model::Node
     {
     public:
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the magnitude of </param>
-        MagnitudeNode(const model::OutputPortElementList<ValueType>& input);
+        L2NormNode(const model::OutputPortElementList<ValueType>& input);
         
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "MagnitudeNode"; }
+        static std::string GetTypeName() { return "L2NormNode"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -60,4 +60,4 @@ namespace nodes
     };
 }
 
-#include "../tcc/MagnitudeNode.tcc"
+#include "../tcc/L2NormNode.tcc"

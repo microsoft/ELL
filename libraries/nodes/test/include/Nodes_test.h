@@ -8,7 +8,7 @@
 
 #pragma once
 
-void TestMagnitudeNodeCompute();
+void TestL2NormNodeCompute();
 void TestAccumulatorNodeCompute();
 void TestDelayNodeCompute();
 void TestMovingAverageNodeCompute();

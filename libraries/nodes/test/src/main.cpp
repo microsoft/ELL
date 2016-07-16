@@ -15,7 +15,7 @@
 ///
 int main()
 {
-    TestMagnitudeNodeCompute();
+    TestL2NormNodeCompute();
     TestAccumulatorNodeCompute();
     TestDelayNodeCompute();
     TestMovingAverageNodeCompute();

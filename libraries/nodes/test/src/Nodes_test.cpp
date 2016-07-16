@@ -13,7 +13,7 @@
 #include "AccumulatorNode.h"
 #include "BinaryOperationNode.h"
 #include "UnaryOperationNode.h"
-#include "MagnitudeNode.h"
+#include "L2NormNode.h"
 #include "LinearPredictorNode.h"
 
 // model
@@ -85,13 +85,13 @@ namespace
 // Test compute functions
 //
 
-void TestMagnitudeNodeCompute()
+void TestL2NormNodeCompute()
 {
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
-    auto outputNode = model.AddNode<nodes::MagnitudeNode<double>>(inputNode->output);
+    auto outputNode = model.AddNode<nodes::L2NormNode<double>>(inputNode->output);
 
     bool okSize = true;
     bool okResult = true;
@@ -103,8 +103,8 @@ void TestMagnitudeNodeCompute()
         inputNode->SetInput(inputValue);
         std::vector<double> outputVec = model.ComputeNodeOutput(outputNode->output);
 
-        testing::ProcessTest("Testing MagnitudeNode output size", testing::IsEqual(outputVec.size(), 1));
-        testing::ProcessTest("Testing MagnitudeNode compute", testing::IsEqual(outputVec[0], expectedOutput));
+        testing::ProcessTest("Testing L2NormNode output size", testing::IsEqual(outputVec.size(), 1));
+        testing::ProcessTest("Testing L2NormNode compute", testing::IsEqual(outputVec[0], expectedOutput));
     }
 }
 
