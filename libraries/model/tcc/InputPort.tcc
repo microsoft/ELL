@@ -26,7 +26,7 @@ namespace model
             {
                 _inputElements.emplace_back(*port, index + start);
             }
-            _inputNodes.push_back(node);
+            _parentNodes.push_back(node);
         }
     }
 

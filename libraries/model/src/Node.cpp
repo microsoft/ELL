@@ -24,12 +24,12 @@ namespace model
         _inputs.push_back(input);
     }
 
-    std::vector<const Node*> Node::GetInputNodes() const
+    std::vector<const Node*> Node::GetParentNodes() const
     {
         std::unordered_set<const Node*> nodes;
         for (const auto& port : _inputs)
         {
-            for (const auto& node : port->GetInputNodes())
+            for (const auto& node : port->GetParentNodes())
             {
                 nodes.insert(node);
             }
@@ -46,7 +46,7 @@ namespace model
     {
         for (const auto& input : _inputs) 
         {
-            for (const auto& node : input->GetInputNodes())
+            for (const auto& node : input->GetParentNodes())
             {
                 node->AddDependent(this);
             }

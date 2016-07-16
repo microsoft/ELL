@@ -53,10 +53,10 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const = 0;
 
-        /// <summary> Get all nodes that this nodes uses for input </summary>
+        /// <summary> Get all nodes that this nodes uses for input (and therefore depends on) </summary>
         ///
         /// <returns> a vector of all the nodes used for input </summary>
-        std::vector<const Node*> GetInputNodes() const;
+        std::vector<const Node*> GetParentNodes() const;
 
         /// <summary> Get all nodes that depend (directly) on us </summary>
         ///

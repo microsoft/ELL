@@ -48,7 +48,7 @@ namespace model
         /// <summary> Returns the list nodes this input port gets values from </summary>
         ///
         /// <returns> The list nodes this input port gets values from </returns>
-        const std::vector<const Node*>& GetInputNodes() const { return _inputNodes; }
+        const std::vector<const Node*>& GetParentNodes() const { return _parentNodes; }
 
         const OutputPortElementListUntyped& GetInputRanges() const { return _inputRanges; }
 
@@ -73,7 +73,7 @@ namespace model
     private:
         OutputPortElementListUntyped _inputRanges;
         std::vector<OutputPortElement> _inputElements;
-        std::vector<const Node*> _inputNodes;
+        std::vector<const Node*> _parentNodes;
     };
 
     template <typename ValueType>

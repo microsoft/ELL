@@ -89,7 +89,7 @@ namespace model
             const auto& nodeInputs = node->GetInputPorts();
             for (auto input : nodeInputs)
             {
-                for (const auto& inputNode : input->GetInputNodes())
+                for (const auto& inputNode : input->GetParentNodes())
                 {
                     canVisit = canVisit && _visitedNodes.find(inputNode) != _visitedNodes.end();
                 }
@@ -125,7 +125,7 @@ namespace model
                 const auto& nodeInputs = node->GetInputPorts();
                 for (auto input : ModelImpl::Reverse(nodeInputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
                 {
-                    for (const auto& inputNode : input->GetInputNodes())
+                    for (const auto& inputNode : input->GetParentNodes())
                     {
                         _stack.push_back(inputNode);
                     }
