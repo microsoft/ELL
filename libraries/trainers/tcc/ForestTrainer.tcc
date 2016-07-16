@@ -86,16 +86,14 @@ namespace trainers
         {
             const auto& example = exampleIterator.Get();
             
-            sums.Increment(example.GetMetaData().GetWeight(), example.GetMetaData().GetLabel()); // TODO - maybe this func should just take a WeightLabel?
-
-            auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
-            
             ExampleMetaData metaData = example.GetMetaData();
             
             // set weak label/weight to equal strong label/weight
             metaData.weakLabel = metaData.GetLabel();
             metaData.weakWeight = metaData.GetWeight();
+            sums.Increment(metaData);
 
+            auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
             auto denseSupervisedExample = ForestTrainerExample(std::move(denseDataVector), metaData);
             _dataset.AddExample(std::move(denseSupervisedExample));
             exampleIterator.Next();
@@ -135,19 +133,18 @@ namespace trainers
             Sums sums0;
 
             // consider all thresholds
+            double nextFeatureValue = _dataset[fromRowIndex].GetDataVector()[featureIndex];
             for (uint64_t rowIndex = fromRowIndex; rowIndex < fromRowIndex + size-1; ++rowIndex)
             {
                 // get friendly names
-                const auto& currentRow = _dataset[rowIndex].GetDataVector();
-                const auto& nextRow = _dataset[rowIndex+1].GetDataVector();
-                double weight = _dataset[rowIndex].GetMetaData().GetWeight();
-                double label = _dataset[rowIndex].GetMetaData().GetLabel();
+                double currentFeatureValue = nextFeatureValue;
+                double nextFeatureValue = _dataset[rowIndex + 1].GetDataVector()[featureIndex];
 
                 // increment sums 
-                sums0.Increment(weight, label); 
+                sums0.Increment(_dataset[rowIndex].GetMetaData());
 
                 // only split between rows with different feature values
-                if (currentRow[featureIndex] == nextRow[featureIndex])
+                if (currentFeatureValue == nextFeatureValue)
                 {
                     continue;
                 }
@@ -161,7 +158,7 @@ namespace trainers
                 {
                     bestGain = gain;
                     bestFeatureIndex = featureIndex;
-                    bestThreshold = 0.5 * (currentRow[featureIndex] + nextRow[featureIndex]);
+                    bestThreshold = 0.5 * (currentFeatureValue + nextFeatureValue);
                     bestSize0 = rowIndex - fromRowIndex + 1;
                     bestNodeStats.sums0 = sums0;
                     bestNodeStats.sums1 = sums1; 
@@ -233,10 +230,10 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void trainers::ForestTrainer<LossFunctionType>::Sums::Increment(double weight, double label)
+    void trainers::ForestTrainer<LossFunctionType>::Sums::Increment(const ExampleMetaData& metaData)
     {
-        sumWeights += weight;
-        sumWeightedLabels += weight * label;
+        sumWeights += metaData.weakWeight;
+        sumWeightedLabels += metaData.weakWeight * metaData.weakLabel;
     }
 
     template<typename LossFunctionType>

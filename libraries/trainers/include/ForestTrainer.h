@@ -69,13 +69,24 @@ namespace trainers
         // Specify how the trainer defines a split.
         using SplitAction = predictors::SimpleForestPredictor::SplitAction;
 
+        // Metadata that the forest trainer keeps with each example
+        struct ExampleMetaData : public dataset::WeightLabel
+        {
+            ExampleMetaData(const dataset::WeightLabel& weightLabel);
+
+            // the output of the forest on this example
+            double currentOutput = 0;
+            double weakLabel = 0;
+            double weakWeight = 1;
+        };
+
         // struct used to keep histograms of tree nodes
         struct Sums
         {
             double sumWeights = 0;
             double sumWeightedLabels = 0;
 
-            void Increment(double weight, double label);
+            void Increment(const ExampleMetaData& metaData);
             Sums operator-(const Sums& other) const;
             void Print(std::ostream& os, size_t tabs=0) const;
         };
@@ -119,17 +130,6 @@ namespace trainers
         {
             void Print(std::ostream& os) const;
             using std::priority_queue<SplitCandidate>::size;
-        };
-
-        // Metadata that the forest trainer keeps with each example
-        struct ExampleMetaData : public dataset::WeightLabel
-        {
-            ExampleMetaData(const dataset::WeightLabel& weightLabel);
-            
-            // the output of the forest on this example
-            double currentOutput = 0;
-            double weakLabel = 0;
-            double weakWeight = 1;
         };
 
         // the type of example used by the forest trainer
