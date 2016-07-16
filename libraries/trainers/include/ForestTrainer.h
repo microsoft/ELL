@@ -117,8 +117,8 @@ namespace trainers
             NodeExamples nodeExamples;
 
             double gain;
-            double constEdgePrediction0;
-            double constEdgePrediction1;
+            double output0;
+            double output1;
 
             bool operator<(const SplitCandidate& other) const { return gain < other.gain; }
 

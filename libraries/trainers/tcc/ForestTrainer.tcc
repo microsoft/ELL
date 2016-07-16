@@ -56,8 +56,8 @@ namespace trainers
 
             // sort the data according to the performed split and update the metadata
             SortNodeDataset(splitCandidate.splitAction.GetSplitRule(), splitCandidate.nodeExamples.fromRowIndex, size);
-            AddToCurrentOutput(fromRowIndex0, size0, splitCandidate.constEdgePrediction0);
-            AddToCurrentOutput(fromRowIndex1, size1, splitCandidate.constEdgePrediction1);
+            AddToCurrentOutput(fromRowIndex0, size0, splitCandidate.output0);
+            AddToCurrentOutput(fromRowIndex1, size1, splitCandidate.output1);
 
             // queue split candidate for child 0
             AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), fromRowIndex0, size0, std::move(sums0));
