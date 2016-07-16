@@ -14,7 +14,7 @@
 namespace predictors
 {
     template<typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictor<SplitRuleType, EdgePredictorType>::SplittableNodeId::SplittableNodeId(bool isRoot, size_t parentNodeIndex, size_t childPosition) : _isRoot(isRoot), _parentNodeIndex(parentNodeIndex), _childPosition(childPosition)
+    ForestPredictor<SplitRuleType, EdgePredictorType>::SplittableNodeId::SplittableNodeId(size_t parentNodeIndex, size_t childPosition) : _isRoot(false), _parentNodeIndex(parentNodeIndex), _childPosition(childPosition)
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType>
@@ -158,7 +158,7 @@ namespace predictors
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid identifier requested - child does not exist");
         }
 
-        return SplittableNodeId{false, parentNodeIndex, childPosition};
+        return SplittableNodeId(parentNodeIndex, childPosition);
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>

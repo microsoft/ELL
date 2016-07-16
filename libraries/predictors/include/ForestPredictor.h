@@ -44,6 +44,9 @@ namespace predictors
         class SplittableNodeId 
         {
         public:
+            /// <summary> Constructs a node Id that refers ot a new tree root. </summary>
+            SplittableNodeId() : _isRoot(true) {}
+
             /// <summary> Prints the node Id. </summary>
             ///
             /// <param name="os"> The output stream. </param>
@@ -51,14 +54,14 @@ namespace predictors
 
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
-            SplittableNodeId(bool isRoot, size_t parentNodeIndex, size_t childPosition);
+            SplittableNodeId(size_t parentNodeIndex, size_t childPosition);
             bool _isRoot;
             size_t _parentNodeIndex;
             size_t _childPosition;
         };
 
         /// <summary> Struct that defines a split rule and the predictors assigned to the outgoing edges. </summary>
-        class SplitAction // TODO: add ctor and make members private
+        class SplitAction
         {
         public:
             /// <summary> Constructs an instance of SplitAction. </summary>
@@ -163,7 +166,7 @@ namespace predictors
         /// <summary> Gets a SplittableNodeId that represents the root of a new tree. </summary>
         ///
         /// <returns> A root node identifier. </returns>
-        SplittableNodeId GetNewRootId() const { return {true, 0, 0}; }
+        SplittableNodeId GetNewRootId() const { return {}; }
 
         /// <summary> Gets the number of children of a given interior node. </summary>
         ///

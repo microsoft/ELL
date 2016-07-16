@@ -21,7 +21,7 @@ namespace predictors
         ///
         /// <param name="index"> Zero-based index of the input coordinate. </param>
         /// <param name="threshold"> The threshold. </param>
-        SingleInputThresholdRule(size_t index, double threshold);
+        SingleInputThresholdRule(size_t index = 0, double threshold = 0.0);
 
         /// <summary> Evaluates the split rule. </summary>
         ///

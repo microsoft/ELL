@@ -42,30 +42,35 @@ namespace trainers
             auto splitCandidate = _queue.top();
             _queue.pop();
 
-            const auto& sums = splitCandidate.nodeStats.sums;
-            const auto& sums0 = splitCandidate.nodeStats.sums0;
-            const auto& sums1 = splitCandidate.nodeStats.sums1;
+            const auto& stats = splitCandidate.nodeStats;
+
+            // TODO refactor NodeExamples - add a new struct exampleRange that has a from and a size; keep three of those null,0,1; change private members to take such a range
             auto size = splitCandidate.nodeExamples.size;
             auto size0 = splitCandidate.nodeExamples.size0;
             auto size1 = splitCandidate.nodeExamples.size1;
             auto fromRowIndex0 = splitCandidate.nodeExamples.fromRowIndex;
             auto fromRowIndex1 = fromRowIndex0 + size0;
 
+            // compute the constant output values on the new edges
+            double output = GetOutputValue(stats.sums); 
+            double output0 = GetOutputValue(stats.sums0) - output;
+            double output1 = GetOutputValue(stats.sums1) - output;
+
             // perform the split
-            std::vector<EdgePredictorType> edgePredictorVector{ splitCandidate.output0, splitCandidate.output1 };
+            std::vector<EdgePredictorType> edgePredictorVector{ output0, output1 };
             SplitAction splitAction(splitCandidate.nodeId, splitCandidate.splitRule, std::move(edgePredictorVector));
             auto interiorNodeIndex = _forest->Split(splitAction);
 
-            // sort the data according to the performed split and update the metadata
+            // sort the data according to the performed split and update the metadata to reflect this change
             SortNodeDataset(splitCandidate.splitRule, splitCandidate.nodeExamples.fromRowIndex, size);
-            AddToCurrentOutput(fromRowIndex0, size0, splitCandidate.output0);
-            AddToCurrentOutput(fromRowIndex1, size1, splitCandidate.output1);
+            AddToCurrentOutput(fromRowIndex0, size0, output0);
+            AddToCurrentOutput(fromRowIndex1, size1, output1);
 
             // queue split candidate for child 0
-            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), fromRowIndex0, size0, std::move(sums0));
+            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), fromRowIndex0, size0, stats.sums0);
 
             // queue split candidate for child 1
-            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 1), fromRowIndex1, size1, std::move(sums1));
+            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 1), fromRowIndex1, size1, stats.sums1);
         }
     }
 
@@ -119,28 +124,22 @@ namespace trainers
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 
-        double bestGain = 0;
-        size_t bestFeatureIndex;
-        double bestThreshold;
-        size_t bestSize0;
+        SplitCandidate bestSplitCandidate(nodeId, fromRowIndex, size, sums);
         
-        NodeStats bestNodeStats;
-        bestNodeStats.sums = sums;
-
-        for (uint64_t featureIndex = 0; featureIndex < numFeatures; ++featureIndex)
+        for (uint64_t inputIndex = 0; inputIndex < numFeatures; ++inputIndex)
         {
-            // sort the relevant rows of dataset in ascending order by featureIndex
-            SortNodeDataset(featureIndex, fromRowIndex, size);
+            // sort the relevant rows of dataset in ascending order by inputIndex
+            SortNodeDataset(inputIndex, fromRowIndex, size);
 
             Sums sums0;
 
             // consider all thresholds
-            double nextFeatureValue = _dataset[fromRowIndex].GetDataVector()[featureIndex];
+            double nextFeatureValue = _dataset[fromRowIndex].GetDataVector()[inputIndex];
             for (uint64_t rowIndex = fromRowIndex; rowIndex < fromRowIndex + size-1; ++rowIndex)
             {
                 // get friendly names
                 double currentFeatureValue = nextFeatureValue;
-                nextFeatureValue = _dataset[rowIndex + 1].GetDataVector()[featureIndex];
+                nextFeatureValue = _dataset[rowIndex + 1].GetDataVector()[inputIndex];
 
                 // increment sums 
                 sums0.Increment(_dataset[rowIndex].GetMetaData());
@@ -151,34 +150,27 @@ namespace trainers
                     continue;
                 }
 
-                // compute sums1
+                // compute sums1 and gain
                 auto sums1 = sums - sums0;
+                double gain = CalculateGain(sums, sums0, sums1);
 
                 // find gain maximizer
-                double gain = CalculateGain(sums, sums0, sums1);
-                if (gain > bestGain)
+                if (gain > bestSplitCandidate.gain)
                 {
-                    bestGain = gain;
-                    bestFeatureIndex = featureIndex;
-                    bestThreshold = 0.5 * (currentFeatureValue + nextFeatureValue);
-                    bestSize0 = rowIndex - fromRowIndex + 1;
-                    bestNodeStats.sums0 = sums0;
-                    bestNodeStats.sums1 = sums1; 
+                    bestSplitCandidate.gain = gain;
+                    bestSplitCandidate.splitRule = SplitRuleType{ inputIndex, 0.5 * (currentFeatureValue + nextFeatureValue) };
+                    bestSplitCandidate.nodeExamples.size0 = rowIndex - fromRowIndex + 1;
+                    bestSplitCandidate.nodeExamples.size1 = size - bestSplitCandidate.nodeExamples.size0;
+                    bestSplitCandidate.nodeStats.sums0 = sums0;
+                    bestSplitCandidate.nodeStats.sums1 = sums1;
                 }
             }
         }
 
         // if found a good split candidate, queue it
-        if (bestGain > 0.0)
+        if (bestSplitCandidate.gain > 0.0)
         {
-
-            double output = GetOutputValue(sums);
-            double output0 = GetOutputValue(bestNodeStats.sums0) - output;
-            double output1 = GetOutputValue(bestNodeStats.sums1) - output;
-
-            SplitRuleType splitRule{ bestFeatureIndex, bestThreshold };
-            NodeExamples nodeExamples{ fromRowIndex, size, bestSize0, size - bestSize0 };
-            _queue.push(SplitCandidate{ nodeId, splitRule, std::move(bestNodeStats), nodeExamples, bestGain, output0, output1 });
+            _queue.push(std::move(bestSplitCandidate));
         }
 
 #ifdef VERY_VERBOSE
@@ -190,13 +182,11 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SortNodeDataset(size_t featureIndex, uint64_t fromRowIndex, uint64_t size) // to be deprecated
+    void ForestTrainer<LossFunctionType>::SortNodeDataset(size_t inputIndex, uint64_t fromRowIndex, uint64_t size) // to be deprecated
     {
-        _dataset.Sort([featureIndex](const ForestTrainerExample& example) { return example.GetDataVector()[featureIndex]; },
+        _dataset.Sort([inputIndex](const ForestTrainerExample& example) { return example.GetDataVector()[inputIndex]; },
                       fromRowIndex,
                       size);
-
-        // TODO: do we need to do anything here - I think not.
     }
 
     template<typename LossFunctionType>
@@ -205,8 +195,6 @@ namespace trainers
         _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()); },
                       fromRowIndex,
                       size);
-
-        // TODO: update metadata.currentForestOutput; get the vector of predictors as arguments to this function
     }
 
     template<typename LossFunctionType>
@@ -268,6 +256,14 @@ namespace trainers
 
         os << "sums1:\t";
         sums1.PrintLine(os, tabs+1);
+    }
+
+    template<typename LossFunctionType>
+    ForestTrainer<LossFunctionType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, uint64_t fromRowIndex, size_t size, Sums sums) : gain(0), nodeId(nodeId)
+    {
+        nodeExamples.fromRowIndex = fromRowIndex;
+        nodeExamples.size = size;
+        nodeStats.sums = sums;
     }
 
     template<typename LossFunctionType>

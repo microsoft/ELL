@@ -112,20 +112,15 @@ namespace trainers
         // struct used to keep info about the gain maximizing split of each splittable node in the tree
         struct SplitCandidate
         {
-
-            SplittableNodeId nodeId;
-            SplitRuleType splitRule;
-
-            NodeStats nodeStats;
-            NodeExamples nodeExamples;
+            SplitCandidate(SplittableNodeId nodeId, uint64_t fromRowIndex, size_t size, Sums sums);
+            bool operator<(const SplitCandidate& other) const { return gain < other.gain; }
+            void PrintLine(std::ostream& os, size_t tabs = 0) const;
 
             double gain;
-            double output0;
-            double output1;
-
-            bool operator<(const SplitCandidate& other) const { return gain < other.gain; }
-
-            void PrintLine(std::ostream& os, size_t tabs=0) const;
+            SplittableNodeId nodeId;
+            SplitRuleType splitRule;
+            NodeStats nodeStats;
+            NodeExamples nodeExamples;
         };
 
         // implements a priority queue of split candidates that can print itself (useful for debugging)
