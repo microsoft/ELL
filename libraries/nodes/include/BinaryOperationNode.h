@@ -21,7 +21,7 @@
 
 namespace nodes
 {
-    /// <summary> A node that performs a binary arithmetic operation on its inputs </summary>
+    /// <summary> A node that performs a coordinatewise binary arithmetic operation on its inputs </summary>
     template <typename ValueType>
     class BinaryOperationNode : public model::Node
     {
@@ -30,8 +30,8 @@ namespace nodes
         {
             add,
             subtract,
-            multiply,
-            divide
+            coordinatewiseMultiply, // coordinatewise multiplication
+            divide // coordinatewise division
         };
 
         /// <summary> Constructor </summary>

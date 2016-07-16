@@ -42,7 +42,7 @@ namespace nodes
             case OperationType::subtract:
                 output = ComputeOutput([](ValueType x, ValueType y) { return x - y; });
                 break;
-            case OperationType::multiply:
+            case OperationType::coordinatewiseMultiply:
                 output = ComputeOutput([](ValueType x, ValueType y) { return x * y; });
                 break;
             case OperationType::divide:
