@@ -28,7 +28,16 @@ namespace trainers
         AddToCurrentOutput(Range{ 0, _dataset.NumExamples() }, bias);
 
         // find split candidate for root node and push it onto the priority queue
-        AddSplitCandidateToQueue(_forest->GetNewRootId(), Range{ 0, _dataset.NumExamples() }, sums);
+        auto rootSplit = GetBestSplitCandidateAtNode(_forest->GetNewRootId(), Range{ 0, _dataset.NumExamples() }, sums);
+
+        // check for positive gain 
+        if(rootSplit.gain == 0)
+        {
+            return; // TODO - perhaps throw an exception
+        }
+
+        // add the root split from the graph
+        _queue.push(std::move(rootSplit));
 
         // as long as positive gains can be attained, keep growing the tree
         while(!_queue.empty()) // TODO: let user specify how many steps
@@ -61,10 +70,18 @@ namespace trainers
             AddToCurrentOutput(ranges.GetChildRange(1), output1);
 
             // queue split candidate for child 0
-            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), ranges.GetChildRange(0), stats.sums0);
+            auto splitCandidate0 = GetBestSplitCandidateAtNode(_forest->GetChildId(interiorNodeIndex, 0), ranges.GetChildRange(0), stats.sums0);
+            if (splitCandidate0.gain > 0.0)
+            {
+                _queue.push(std::move(splitCandidate0));
+            }
 
             // queue split candidate for child 1
-            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 1), ranges.GetChildRange(1), stats.sums1);
+            auto splitCandidate1 = GetBestSplitCandidateAtNode(_forest->GetChildId(interiorNodeIndex, 1), ranges.GetChildRange(1), stats.sums1);
+            if (splitCandidate1.gain > 0.0)
+            {
+                _queue.push(std::move(splitCandidate1));
+            }
         }
     }
 
@@ -116,13 +133,13 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::AddSplitCandidateToQueue(SplittableNodeId nodeId, Range range, Sums sums)
+    typename ForestTrainer<LossFunctionType>::SplitCandidate ForestTrainer<LossFunctionType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums)
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 
         SplitCandidate bestSplitCandidate(nodeId, range, sums);
-        
-        for (uint64_t inputIndex = 0; inputIndex < numFeatures; ++inputIndex)
+
+        for(uint64_t inputIndex = 0; inputIndex < numFeatures; ++inputIndex)
         {
             // sort the relevant rows of dataset in ascending order by inputIndex
             SortNodeDataset(range, inputIndex);
@@ -131,7 +148,7 @@ namespace trainers
 
             // consider all thresholds
             double nextFeatureValue = _dataset[range.firstIndex].GetDataVector()[inputIndex];
-            for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size-1; ++rowIndex)
+            for(uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size-1; ++rowIndex)
             {
                 // get friendly names
                 double currentFeatureValue = nextFeatureValue;
@@ -141,7 +158,7 @@ namespace trainers
                 sums0.Increment(_dataset[rowIndex].GetMetaData());
 
                 // only split between rows with different feature values
-                if (currentFeatureValue == nextFeatureValue)
+                if(currentFeatureValue == nextFeatureValue)
                 {
                     continue;
                 }
@@ -151,10 +168,10 @@ namespace trainers
                 double gain = CalculateGain(sums, sums0, sums1);
 
                 // find gain maximizer
-                if (gain > bestSplitCandidate.gain)
+                if(gain > bestSplitCandidate.gain)
                 {
                     bestSplitCandidate.gain = gain;
-                    bestSplitCandidate.splitRule = SplitRuleType{ inputIndex, 0.5 * (currentFeatureValue + nextFeatureValue) };
+                    bestSplitCandidate.splitRule = SplitRuleType{inputIndex, 0.5 * (currentFeatureValue + nextFeatureValue)};
                     bestSplitCandidate.ranges.SetSize0(rowIndex - range.firstIndex + 1);
                     bestSplitCandidate.stats.sums0 = sums0;
                     bestSplitCandidate.stats.sums1 = sums1;
@@ -162,18 +179,7 @@ namespace trainers
             }
         }
 
-        // if found a good split candidate, queue it
-        if (bestSplitCandidate.gain > 0.0)
-        {
-            _queue.push(std::move(bestSplitCandidate));
-        }
-
-#ifdef VERY_VERBOSE
-        else
-        {
-            std::cout << "No positive-gain split candidate found - queue unmodified\n";
-        }
-#endif
+        return bestSplitCandidate;
     }
 
     template<typename LossFunctionType>

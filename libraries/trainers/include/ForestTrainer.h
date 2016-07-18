@@ -154,7 +154,7 @@ namespace trainers
 
         void AddToCurrentOutput(Range range, double addValue);
 
-        void AddSplitCandidateToQueue(SplittableNodeId nodeId, Range range, Sums sums);
+        SplitCandidate GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums);
 
         void SortNodeDataset(Range range, size_t featureIndex);
         void SortNodeDataset(Range range, const SplitRuleType& splitRule);
