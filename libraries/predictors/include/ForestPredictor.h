@@ -53,6 +53,7 @@ namespace predictors
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
             SplittableNodeId() : _isRoot(true) {}
             SplittableNodeId(size_t parentNodeIndex, size_t childPosition);
+
             bool _isRoot;
             size_t _parentNodeIndex;
             size_t _childPosition;

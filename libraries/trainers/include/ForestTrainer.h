@@ -101,26 +101,33 @@ namespace trainers
             void PrintLine(std::ostream& os, size_t tabs=0) const;
         };
 
-        struct NodeExamples
+        struct Range
         {
-            uint64_t fromRowIndex;
+            size_t firstIndex;
             size_t size;
+        };
+
+
+        struct NodeRanges
+        {
+            Range total;
             size_t size0;
-            size_t size1;
+
+            Range GetChildRange(size_t childPosition) const;
         };
 
         // struct used to keep info about the gain maximizing split of each splittable node in the tree
         struct SplitCandidate
         {
-            SplitCandidate(SplittableNodeId nodeId, uint64_t fromRowIndex, size_t size, Sums sums);
+            SplitCandidate(SplittableNodeId nodeId, Range range, Sums sums);
             bool operator<(const SplitCandidate& other) const { return gain < other.gain; }
             void PrintLine(std::ostream& os, size_t tabs = 0) const;
 
             double gain;
             SplittableNodeId nodeId;
             SplitRuleType splitRule;
-            NodeStats nodeStats;
-            NodeExamples nodeExamples;
+            NodeStats stats;
+            NodeRanges ranges;
         };
 
         // implements a priority queue of split candidates that can print itself (useful for debugging)
@@ -135,12 +142,12 @@ namespace trainers
 
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
 
-        void AddToCurrentOutput(uint64_t fromRowIndex, uint64_t size, double addValue);
+        void AddToCurrentOutput(Range range, double addValue);
 
-        void AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, size_t size, Sums sums);
+        void AddSplitCandidateToQueue(SplittableNodeId nodeId, Range range, Sums sums);
 
-        void SortNodeDataset(size_t featureIndex, uint64_t fromRowIndex, uint64_t size);
-        void SortNodeDataset(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size);
+        void SortNodeDataset(size_t featureIndex, Range range);
+        void SortNodeDataset(const SplitRuleType& splitRule, Range range);
 
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
         double GetOutputValue(const Sums& sums) const;

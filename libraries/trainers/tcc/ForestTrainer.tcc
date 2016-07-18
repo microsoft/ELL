@@ -17,7 +17,7 @@ namespace trainers
     {}
 
     template <typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
+    void ForestTrainer<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator) 
     {
         // convert data fron iterator to dense row dataset; compute sums statistics of the tree root
         auto sums = LoadData(exampleIterator);
@@ -25,13 +25,13 @@ namespace trainers
         // computes the bias term, sets it in the forest and the dataset
         double bias = GetOutputValue(sums);
         _forest->SetBias(bias);
-        AddToCurrentOutput(0, _dataset.NumExamples(), bias);
+        AddToCurrentOutput(Range{ 0, _dataset.NumExamples() }, bias);
 
         // find split candidate for root node and push it onto the priority queue
-        AddSplitCandidateToQueue(_forest->GetNewRootId(), 0, _dataset.NumExamples(), sums);
+        AddSplitCandidateToQueue(_forest->GetNewRootId(), Range{ 0, _dataset.NumExamples() }, sums);
 
         // as long as positive gains can be attained, keep growing the tree
-        while(!_queue.empty())
+        while(!_queue.empty()) // TODO: let user specify how many steps
         {
 
 #ifdef VERY_VERBOSE
@@ -42,14 +42,8 @@ namespace trainers
             auto splitCandidate = _queue.top();
             _queue.pop();
 
-            const auto& stats = splitCandidate.nodeStats;
-
-            // TODO refactor NodeExamples - add a new struct exampleRange that has a from and a size; keep three of those null,0,1; change private members to take such a range
-            auto size = splitCandidate.nodeExamples.size;
-            auto size0 = splitCandidate.nodeExamples.size0;
-            auto size1 = splitCandidate.nodeExamples.size1;
-            auto fromRowIndex0 = splitCandidate.nodeExamples.fromRowIndex;
-            auto fromRowIndex1 = fromRowIndex0 + size0;
+            const auto& stats = splitCandidate.stats;
+            const auto& ranges = splitCandidate.ranges;
 
             // compute the constant output values on the new edges
             double output = GetOutputValue(stats.sums); 
@@ -62,15 +56,15 @@ namespace trainers
             auto interiorNodeIndex = _forest->Split(splitAction);
 
             // sort the data according to the performed split and update the metadata to reflect this change
-            SortNodeDataset(splitCandidate.splitRule, splitCandidate.nodeExamples.fromRowIndex, size);
-            AddToCurrentOutput(fromRowIndex0, size0, output0);
-            AddToCurrentOutput(fromRowIndex1, size1, output1);
+            SortNodeDataset(splitCandidate.splitRule, ranges.total); // TODO flip arg order
+            AddToCurrentOutput(ranges.GetChildRange(0), output0);
+            AddToCurrentOutput(ranges.GetChildRange(1), output1);
 
             // queue split candidate for child 0
-            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), fromRowIndex0, size0, stats.sums0);
+            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 0), ranges.GetChildRange(0), stats.sums0);
 
             // queue split candidate for child 1
-            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 1), fromRowIndex1, size1, stats.sums1);
+            AddSplitCandidateToQueue(_forest->GetChildId(interiorNodeIndex, 1), ranges.GetChildRange(1), stats.sums1);
         }
     }
 
@@ -84,11 +78,24 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
+    typename ForestTrainer<LossFunctionType>::Range ForestTrainer<LossFunctionType>::NodeRanges::GetChildRange(size_t childPosition) const
+    {
+        if (childPosition == 0)
+        {
+            return Range{ total.firstIndex, size0 };
+        }
+        else
+        {
+            return Range{ total.firstIndex+size0, total.size-size0 };
+        }
+    }
+
+    template<typename LossFunctionType>
     typename ForestTrainer<LossFunctionType>::Sums ForestTrainer<LossFunctionType>::LoadData(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         Sums sums;
 
-        // create DenseRowDataset: TODO this code breaks encapsulation
+        // create DenseRowDataset
         while (exampleIterator.IsValid())
         {
             const auto& example = exampleIterator.Get();
@@ -100,9 +107,11 @@ namespace trainers
             metaData.weakWeight = metaData.GetWeight();
             sums.Increment(metaData);
 
+            // TODO this code breaks encapsulation - give ForestTrainer a ctor that takes an IDataVector
             auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
-            auto denseSupervisedExample = ForestTrainerExample(std::move(denseDataVector), metaData);
-            _dataset.AddExample(std::move(denseSupervisedExample));
+            auto forestTrainerExample = ForestTrainerExample(std::move(denseDataVector), metaData);
+            _dataset.AddExample(std::move(forestTrainerExample));
+
             exampleIterator.Next();
         }
 
@@ -110,9 +119,9 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::AddToCurrentOutput(uint64_t fromRowIndex, uint64_t size, double addValue)
+    void ForestTrainer<LossFunctionType>::AddToCurrentOutput(Range range, double addValue)
     {
-        for (uint64_t rowIndex = fromRowIndex; rowIndex < fromRowIndex + size; ++rowIndex)
+        for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size; ++rowIndex)
         {
             auto& example = _dataset[rowIndex];
             example.GetMetaData().currentOutput += addValue;
@@ -120,22 +129,22 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::AddSplitCandidateToQueue(SplittableNodeId nodeId, uint64_t fromRowIndex, size_t size, Sums sums)
+    void ForestTrainer<LossFunctionType>::AddSplitCandidateToQueue(SplittableNodeId nodeId, Range range, Sums sums)
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 
-        SplitCandidate bestSplitCandidate(nodeId, fromRowIndex, size, sums);
+        SplitCandidate bestSplitCandidate(nodeId, range, sums);
         
         for (uint64_t inputIndex = 0; inputIndex < numFeatures; ++inputIndex)
         {
             // sort the relevant rows of dataset in ascending order by inputIndex
-            SortNodeDataset(inputIndex, fromRowIndex, size);
+            SortNodeDataset(inputIndex, range);
 
             Sums sums0;
 
             // consider all thresholds
-            double nextFeatureValue = _dataset[fromRowIndex].GetDataVector()[inputIndex];
-            for (uint64_t rowIndex = fromRowIndex; rowIndex < fromRowIndex + size-1; ++rowIndex)
+            double nextFeatureValue = _dataset[range.firstIndex].GetDataVector()[inputIndex];
+            for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size-1; ++rowIndex)
             {
                 // get friendly names
                 double currentFeatureValue = nextFeatureValue;
@@ -159,10 +168,9 @@ namespace trainers
                 {
                     bestSplitCandidate.gain = gain;
                     bestSplitCandidate.splitRule = SplitRuleType{ inputIndex, 0.5 * (currentFeatureValue + nextFeatureValue) };
-                    bestSplitCandidate.nodeExamples.size0 = rowIndex - fromRowIndex + 1;
-                    bestSplitCandidate.nodeExamples.size1 = size - bestSplitCandidate.nodeExamples.size0;
-                    bestSplitCandidate.nodeStats.sums0 = sums0;
-                    bestSplitCandidate.nodeStats.sums1 = sums1;
+                    bestSplitCandidate.ranges.size0 = rowIndex - range.firstIndex + 1;
+                    bestSplitCandidate.stats.sums0 = sums0;
+                    bestSplitCandidate.stats.sums1 = sums1;
                 }
             }
         }
@@ -182,19 +190,19 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SortNodeDataset(size_t inputIndex, uint64_t fromRowIndex, uint64_t size) // to be deprecated
+    void ForestTrainer<LossFunctionType>::SortNodeDataset(size_t inputIndex, Range range) // to be deprecated
     {
         _dataset.Sort([inputIndex](const ForestTrainerExample& example) { return example.GetDataVector()[inputIndex]; },
-                      fromRowIndex,
-                      size);
+                      range.firstIndex,
+                      range.size);
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SortNodeDataset(const SplitRuleType& splitRule, uint64_t fromRowIndex, uint64_t size)
+    void ForestTrainer<LossFunctionType>::SortNodeDataset(const SplitRuleType& splitRule, Range range)
     {
         _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()); },
-                      fromRowIndex,
-                      size);
+                      range.firstIndex,
+                      range.size);
     }
 
     template<typename LossFunctionType>
@@ -233,6 +241,13 @@ namespace trainers
         return std::make_unique<ForestTrainer<LossFunctionType>>(lossFunction, parameters);
     }
 
+    template<typename LossFunctionType>
+    ForestTrainer<LossFunctionType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range range, Sums sums) : gain(0), nodeId(nodeId)
+    {
+        ranges.total = range;
+        stats.sums = sums;
+    }
+    
     //
     // debugging code
     //
@@ -257,15 +272,7 @@ namespace trainers
         os << "sums1:\t";
         sums1.PrintLine(os, tabs+1);
     }
-
-    template<typename LossFunctionType>
-    ForestTrainer<LossFunctionType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, uint64_t fromRowIndex, size_t size, Sums sums) : gain(0), nodeId(nodeId)
-    {
-        nodeExamples.fromRowIndex = fromRowIndex;
-        nodeExamples.size = size;
-        nodeStats.sums = sums;
-    }
-
+ 
     template<typename LossFunctionType>
     void ForestTrainer<LossFunctionType>::SplitCandidate::PrintLine(std::ostream& os, size_t tabs) const
     {
@@ -274,7 +281,7 @@ namespace trainers
         nodeId.Print(os);
         os << "\n";
         splitRule.PrintLine(os, tabs);
-        nodeStats.PrintLine(os, tabs);
+        stats.PrintLine(os, tabs);
     }
 
     template<typename LossFunctionType>
