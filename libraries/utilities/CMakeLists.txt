@@ -19,6 +19,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/Format.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
+         src/ISerializable.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
          src/UniqueId.cpp
@@ -33,6 +34,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/IIterator.h
              include/IntegerList.h
              include/IntegerStack.h
+             include/ISerializable.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
              include/Parser.h
@@ -83,10 +85,12 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp 
+              test/src/ISerializable_test.cpp
               test/src/Variant_test.cpp
               test/src/XMLSerialization_test.cpp)
 
-set (TEST_INCLUDE test/include/Variant_test.h
+set (TEST_INCLUDE test/include/ISerializable_test.h
+                  test/include/Variant_test.h
                   test/include/XMLSerialization_test.h)
                   
 source_group("src" FILES ${TEST_SRC})
