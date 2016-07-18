@@ -18,8 +18,23 @@ namespace model
 {
     class Node;
 
-    /// <summary> Define a type named OutputPortBase to act as a non-templated base class for all output ports </summary>
-    typedef Port OutputPortBase;    
+    /// <summary> Base class for output ports </summary>
+    class OutputPortBase : public Port
+    {
+    public:
+        /// <summary> Notify this port that it is being referenced </summary>
+        void ReferencePort() const { _isReferenced = true; }
+
+        /// <summary> Indicate if this port is referenced. </summary>
+        ///
+        /// <returns> Returns true if the port is referenced by another node. </returns>
+        bool IsReferenced() { return _isReferenced; }
+
+    protected:
+        OutputPortBase(const class Node* node, PortType type, size_t size);
+
+        mutable bool _isReferenced;
+    };
 
     /// <summary> Represents an output from a node </summary>
     template <typename ValueType>
@@ -30,7 +45,7 @@ namespace model
         ///
         /// <param name="node"> The node this output port is part of </param>
         /// <param name="size"> The dimensionality of this port </param>
-        OutputPort(const class Node* node, size_t size) : OutputPortBase(node, OutputPortBase::GetTypeCode<ValueType>(), size) {}
+        OutputPort(const class Node* node, size_t size);
 
         /// <summary> Returns the cached output from this port </summary>
         ///
@@ -41,14 +56,16 @@ namespace model
         ///
         /// <param name="index"> The index of the element to return </param>
         /// <returns> The cached output for the element </returns>
-        ValueType GetOutput(size_t index) const { return _cachedOutput[index]; }
+        ValueType GetOutput(size_t index) const;
 
         /// <summary> Sets the cached output from this port </summary>
         ///
         /// <param name=values> The values this port should output </param>
-        void SetOutput(std::vector<ValueType> values) const { _cachedOutput = values; }
+        void SetOutput(std::vector<ValueType> values) const;
 
     private:
         mutable std::vector<ValueType> _cachedOutput;
     };
 }
+
+#include "../tcc/OutputPort.tcc"

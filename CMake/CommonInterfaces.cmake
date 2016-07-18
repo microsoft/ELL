@@ -44,6 +44,8 @@ if(${language} STREQUAL "common")
 
 else()
 
+include_directories(${EXTRA_INCLUDE_PATHS})
+
 # FOREACH(file ${INTERFACE_FILES} ${INTERFACE_MAIN})
 # 	get_filename_component(fname ${file} NAME)
 # 	add_custon_command(OUTPUT ${fname}

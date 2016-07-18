@@ -10,7 +10,7 @@
 namespace model
 {
     //
-    // InputPort
+    // InputPortBase
     //
     template <typename ValueType>
     InputPortBase::InputPortBase(const class Node* owningNode, const OutputPortElementList<ValueType>& input) : Port(owningNode, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)
@@ -26,7 +26,7 @@ namespace model
             {
                 _inputElements.emplace_back(*port, index + start);
             }
-            _inputNodes.push_back(node);
+            _parentNodes.push_back(node);
         }
     }
 
@@ -42,7 +42,10 @@ namespace model
             result.push_back(temp);
         }
 
-        assert(Size() == result.size());
+        if(Size() != result.size())
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
+        }
         return result;
     }
 

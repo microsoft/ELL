@@ -212,11 +212,18 @@ _Pvt_Extensions/
 ModelManifest.xml
 /compile/doc/tex
 
+# Mac stuff
+.DS_Store
+
 # Emacs autosaves
 \#*\#
 .#*
+
+# Mac stuff
+.DS_Store
 
 # VS Code stuff
 .vs/
 .vscode/
 browse.VC.db
+
