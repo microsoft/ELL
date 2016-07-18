@@ -56,7 +56,7 @@ namespace trainers
             auto interiorNodeIndex = _forest->Split(splitAction);
 
             // sort the data according to the performed split and update the metadata to reflect this change
-            SortNodeDataset(splitCandidate.splitRule, ranges.total); // TODO flip arg order
+            SortNodeDataset(ranges.GetTotalRange(), splitCandidate.splitRule);
             AddToCurrentOutput(ranges.GetChildRange(0), output0);
             AddToCurrentOutput(ranges.GetChildRange(1), output1);
 
@@ -75,19 +75,6 @@ namespace trainers
         difference.sumWeights = sumWeights - other.sumWeights;
         difference.sumWeightedLabels = sumWeightedLabels - other.sumWeightedLabels;
         return difference;
-    }
-
-    template<typename LossFunctionType>
-    typename ForestTrainer<LossFunctionType>::Range ForestTrainer<LossFunctionType>::NodeRanges::GetChildRange(size_t childPosition) const
-    {
-        if (childPosition == 0)
-        {
-            return Range{ total.firstIndex, size0 };
-        }
-        else
-        {
-            return Range{ total.firstIndex+size0, total.size-size0 };
-        }
     }
 
     template<typename LossFunctionType>
@@ -138,7 +125,7 @@ namespace trainers
         for (uint64_t inputIndex = 0; inputIndex < numFeatures; ++inputIndex)
         {
             // sort the relevant rows of dataset in ascending order by inputIndex
-            SortNodeDataset(inputIndex, range);
+            SortNodeDataset(range, inputIndex);
 
             Sums sums0;
 
@@ -168,7 +155,7 @@ namespace trainers
                 {
                     bestSplitCandidate.gain = gain;
                     bestSplitCandidate.splitRule = SplitRuleType{ inputIndex, 0.5 * (currentFeatureValue + nextFeatureValue) };
-                    bestSplitCandidate.ranges.size0 = rowIndex - range.firstIndex + 1;
+                    bestSplitCandidate.ranges.SetSize0(rowIndex - range.firstIndex + 1);
                     bestSplitCandidate.stats.sums0 = sums0;
                     bestSplitCandidate.stats.sums1 = sums1;
                 }
@@ -190,7 +177,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SortNodeDataset(size_t inputIndex, Range range) // to be deprecated
+    void ForestTrainer<LossFunctionType>::SortNodeDataset(Range range, size_t inputIndex) // to be deprecated
     {
         _dataset.Sort([inputIndex](const ForestTrainerExample& example) { return example.GetDataVector()[inputIndex]; },
                       range.firstIndex,
@@ -198,7 +185,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SortNodeDataset(const SplitRuleType& splitRule, Range range)
+    void ForestTrainer<LossFunctionType>::SortNodeDataset(Range range, const SplitRuleType& splitRule)
     {
         _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()); },
                       range.firstIndex,
@@ -232,19 +219,14 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    ForestTrainer<LossFunctionType>::ExampleMetaData::ExampleMetaData(const dataset::WeightLabel & weightLabel) : dataset::WeightLabel(weightLabel)
-    {} 
-
-    template<typename LossFunctionType>
     std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters)
     {
         return std::make_unique<ForestTrainer<LossFunctionType>>(lossFunction, parameters);
     }
 
     template<typename LossFunctionType>
-    ForestTrainer<LossFunctionType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range range, Sums sums) : gain(0), nodeId(nodeId)
+    ForestTrainer<LossFunctionType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums sums) : gain(0), nodeId(nodeId), ranges(totalRange)
     {
-        ranges.total = range;
         stats.sums = sums;
     }
     
@@ -253,9 +235,9 @@ namespace trainers
     //
     
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::Sums::PrintLine(std::ostream& os, size_t tabs) const
+    void ForestTrainer<LossFunctionType>::Sums::Print(std::ostream& os) const
     {
-        os << std::string(tabs * 4, ' ') << "sumWeights = " << sumWeights << ", sumWeightedLabels = " << sumWeightedLabels << "\n";
+        os << "sumWeights = " << sumWeights << ", sumWeightedLabels = " << sumWeightedLabels;
     }
 
     template<typename LossFunctionType>
@@ -263,14 +245,17 @@ namespace trainers
     {
         os << std::string(tabs * 4, ' ') << "stats:\n";
         
-        os << "sums:\t";
-        sums.PrintLine(os, tabs+1);
+        os << std::string((tabs+1) * 4, ' ') <<  "sums:\t";
+        sums.Print(os);
+        os << "\n";
 
-        os << "sums0:\t";
-        sums0.PrintLine(os, tabs+1);
+        os << std::string((tabs+1) * 4, ' ') <<  "sums0:\t";
+        sums0.Print(os);
+        os << "\n";
 
-        os << "sums1:\t";
-        sums1.PrintLine(os, tabs+1);
+        os << std::string((tabs+1) * 4, ' ') <<  "sums1:\t";
+        sums1.Print(os);
+        os << "\n";
     }
  
     template<typename LossFunctionType>

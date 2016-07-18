@@ -25,20 +25,56 @@
 /// <summary> trainers namespace </summary>
 namespace trainers
 {
-    /// <summary> Parameters for the sorting tree trainer. </summary>
+    /// <summary> Parameters for the forest trainer. </summary>
     struct ForestTrainerParameters
     {
         double minSplitGain = 0.0;
     };
 
+    class ForestTrainerBase
+    {
+    protected:
+
+        // Represents a range in an array
+        struct Range
+        {
+            size_t firstIndex;
+            size_t size;
+        };
+
+        // A struct that describes the range of training examples associated with a given node and its children
+        class NodeRanges // TODO: document
+        {
+        public:
+            NodeRanges(const Range& totalRange);
+            Range GetTotalRange() const { return _total; }
+            Range GetChildRange(size_t childPosition) const;
+            void SetSize0(size_t value);
+
+        private:
+            Range _total;
+            size_t _size0;
+        };
+
+        // Metadata that the forest trainer keeps with each example
+        struct ExampleMetaData : public dataset::WeightLabel
+        {
+            ExampleMetaData(const dataset::WeightLabel& weightLabel);
+
+            // the output of the forest on this example
+            double currentOutput = 0;
+            double weakLabel = 0;
+            double weakWeight = 1;
+        };
+    };
+
     /// <summary>
-    /// Implements a greedy decision tree growing algorithm that operates by repeatedly sorting the
-    /// data by each feature.
+    /// Implements a greedy forest growing algorithm.
     /// </summary>
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
     template <typename LossFunctionType> 
-    class ForestTrainer : public IIncrementalTrainer<predictors::SimpleForestPredictor>
+    class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::SimpleForestPredictor>
     {
     public:
         using SplitRuleType = predictors::SingleInputThresholdRule;
@@ -69,17 +105,6 @@ namespace trainers
         // Specify how the trainer defines a split.
         using SplitAction = predictors::SimpleForestPredictor::SplitAction;
 
-        // Metadata that the forest trainer keeps with each example
-        struct ExampleMetaData : public dataset::WeightLabel
-        {
-            ExampleMetaData(const dataset::WeightLabel& weightLabel);
-
-            // the output of the forest on this example
-            double currentOutput = 0;
-            double weakLabel = 0;
-            double weakWeight = 1;
-        };
-
         // struct used to keep histograms of tree nodes
         struct Sums
         {
@@ -88,7 +113,7 @@ namespace trainers
 
             void Increment(const ExampleMetaData& metaData);
             Sums operator-(const Sums& other) const;
-            void PrintLine(std::ostream& os, size_t tabs=0) const;
+            void Print(std::ostream& os) const;
         };
 
         // struct used to keep statistics about tree nodes
@@ -101,25 +126,10 @@ namespace trainers
             void PrintLine(std::ostream& os, size_t tabs=0) const;
         };
 
-        struct Range
-        {
-            size_t firstIndex;
-            size_t size;
-        };
-
-
-        struct NodeRanges
-        {
-            Range total;
-            size_t size0;
-
-            Range GetChildRange(size_t childPosition) const;
-        };
-
         // struct used to keep info about the gain maximizing split of each splittable node in the tree
-        struct SplitCandidate
+        struct SplitCandidate                                                   // TODO: unclear yet if this belongs here or in the Base class - depends how we keep the node stats
         {
-            SplitCandidate(SplittableNodeId nodeId, Range range, Sums sums);
+            SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums sums);
             bool operator<(const SplitCandidate& other) const { return gain < other.gain; }
             void PrintLine(std::ostream& os, size_t tabs = 0) const;
 
@@ -146,8 +156,8 @@ namespace trainers
 
         void AddSplitCandidateToQueue(SplittableNodeId nodeId, Range range, Sums sums);
 
-        void SortNodeDataset(size_t featureIndex, Range range);
-        void SortNodeDataset(const SplitRuleType& splitRule, Range range);
+        void SortNodeDataset(Range range, size_t featureIndex);
+        void SortNodeDataset(Range range, const SplitRuleType& splitRule);
 
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
         double GetOutputValue(const Sums& sums) const;
@@ -166,13 +176,13 @@ namespace trainers
         PriorityQueue _queue;
     };
 
-    /// <summary> Makes a sorting tree trainer. </summary>
+    /// <summary> Makes a forest trainer. </summary>
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
     /// <param name="parameters"> The trainer parameters. </param>
     /// <param name="lossFunction"> The loss function. </param>
     ///
-    /// <returns> A nique_ptr to a sorting tree trainer. </returns>
+    /// <returns> A unique_ptr to a forest trainer. </returns>
     template<typename LossFunctionType>
     std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters);
 }
