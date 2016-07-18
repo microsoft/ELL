@@ -15,7 +15,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/IREmitter.cpp
+set (SRC src/Types.cpp
+		 src/IREmitter.cpp
          src/IRModuleEmitter.cpp
          src/IRLoopEmitter.cpp
 		 src/IRIfEmitter.cpp

@@ -41,6 +41,10 @@ namespace emll
 			{
 				return IsFlagSet(VariableFlags::isMutable);
 			}
+			bool IsConstant() const
+			{
+				return !IsMutable();
+			}
 			bool IsGlobal() const
 			{
 				return IsFlagSet(VariableFlags::isGlobal);
@@ -48,6 +52,10 @@ namespace emll
 			bool IsVectorRef() const
 			{
 				return IsFlagSet(VariableFlags::isOffset);
+			}
+			bool IsComputed() const
+			{
+				return IsFlagSet(VariableFlags::isComputed);
 			}
 
 		protected:
@@ -57,6 +65,7 @@ namespace emll
 				isMutable = 0x00000001,
 				isGlobal = 0x00000002,
 				isOffset = 0x00000004,
+				isComputed = 0x00000008
 			};
 
 			Variable(const ValueType type, const VariableFlags flags = VariableFlags::none);
@@ -80,7 +89,7 @@ namespace emll
 			int _flags;
 		};
 
-		template<ValueType DataType, typename T>
+		template<typename T>
 		class ScalarVar : public Variable
 		{
 		public:
@@ -95,9 +104,9 @@ namespace emll
 			T _data;
 		};
 
-		using ScalarF = ScalarVar<ValueType::Double, double>;
+		using ScalarF = ScalarVar<double>;
 
-		template<ValueType DataType, typename T>
+		template<typename T>
 		class VectorVar : public Variable
 		{
 		public:
@@ -115,7 +124,7 @@ namespace emll
 			std::vector<T> _data;
 		};
 		
-		using VectorF = VectorVar<ValueType::Double, double>;
+		using VectorF = VectorVar<double>;
 
 		class RefVar : public Variable
 		{
@@ -131,6 +140,28 @@ namespace emll
 		
 		private:
 			size_t _offset;
+		};
+
+		template<typename T>
+		class ComputedVar : public Variable
+		{
+		public:
+			ComputedVar();
+
+			OperatorType Op() const
+			{
+				return _op;
+			}
+			T Value() const
+			{
+				return _value;
+			}
+			bool Combine(ComputedVar& other);
+
+		private:
+			std::string _sourceVarName;
+			OperatorType _op;
+			T _value;
 		};
 	}
 }

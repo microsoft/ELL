@@ -17,6 +17,7 @@ namespace emll
 			InvalidValueType,
 			InvalidOperatorType,
 			InvalidComparisonType,
+			operatorTypeNotSupported,
 			InvalidFunction,
 			FunctionNotFound,
 			WriteStreamFailed,
