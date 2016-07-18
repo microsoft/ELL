@@ -26,6 +26,7 @@ set (INCLUDE include/ExtremalValueNode.h
              include/ModelGraph.h
              include/ModelTransformer.h
              include/Node.h
+             include/OutputNode.h
              include/OutputPort.h
              include/OutputPortElementList.h
              include/Port.h
@@ -37,6 +38,7 @@ set (TCC tcc/ExtremalValueNode.tcc
          tcc/InputPort.tcc
          tcc/ModelGraph.tcc
          tcc/ModelTransformer.tcc
+         tcc/OutputNode.tcc
          tcc/OutputPort.tcc
          tcc/OutputPortElementList.tcc
          tcc/ValueSelectorNode.tcc

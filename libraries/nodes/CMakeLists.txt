@@ -20,7 +20,6 @@ set (INCLUDE include/AccumulatorNode.h
              include/LinearPredictorNode.h
              include/L2NormNode.h
              include/MovingAverageNode.h
-             include/OutputNode.h
              include/SumNode.h
              include/UnaryOperationNode.h
              include/MovingVarianceNode.h)
@@ -34,7 +33,6 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/DotProductNode.tcc
          tcc/L2NormNode.tcc
          tcc/MovingAverageNode.tcc
-         tcc/OutputNode.tcc
          tcc/SumNode.tcc
          tcc/UnaryOperationNode.tcc
          tcc/MovingVarianceNode.tcc)
