@@ -41,6 +41,14 @@
     'targets': [
         {
             'target_name': 'emll',
+            'copies' : [
+                {
+                    'destination': 'dist',
+                    'files': [
+                        '<(include_path_prefix)/EMLL/build/interfaces/xml/EMLLXML_wrap.xml'
+                    ]    
+                }                
+            ],
             'dependencies': [],
             'include_dirs': [
                 '<(include_path_prefix)/EMLL/libraries/common/include',
@@ -50,6 +58,7 @@
                 '<(include_path_prefix)/EMLL/libraries/layers/include',
                 '<(include_path_prefix)/EMLL/libraries/linear/include',
                 '<(include_path_prefix)/EMLL/libraries/model/include',
+                '<(include_path_prefix)/EMLL/libraries/nodes/include',
                 '<(include_path_prefix)/EMLL/libraries/lossFunctions/include',
                 '<(include_path_prefix)/EMLL/libraries/predictors/include',
                 '<(include_path_prefix)/EMLL/libraries/trainers/include',
@@ -73,6 +82,7 @@
                     '<(library_path_prefix)/EMLL/build/libraries/layers<(library_path_suffix)',
                     '<(library_path_prefix)/EMLL/build/libraries/linear<(library_path_suffix)',
                     '<(library_path_prefix)/EMLL/build/libraries/model<(library_path_suffix)',
+                    '<(library_path_prefix)/EMLL/build/libraries/nodes<(library_path_suffix)',
                     '<(library_path_prefix)/EMLL/build/libraries/lossFunctions<(library_path_suffix)',
                     '<(library_path_prefix)/EMLL/build/libraries/predictors<(library_path_suffix)',
                     '<(library_path_prefix)/EMLL/build/libraries/trainers<(library_path_suffix)',
@@ -92,6 +102,7 @@
                                 '-llayers.lib',
                                 '-llinear.lib',
                                 '-lmodel.lib',
+                                '-lnodes.lib',
                                 '-llossFunctions.lib',
                                 '-lpredictors.lib',
                                 '-ltrainers.lib',
@@ -121,6 +132,7 @@
                                 'liblayers.a',
                                 'liblinear.a',
                                 'libmodel.a',
+                                'libnodes.a',
                                 'liblossFunctions.a',
                                 'libpredictors.a',
                                 'libtrainers.a',
@@ -169,6 +181,7 @@
                                 'liblayers.a',
                                 'liblinear.a',
                                 'libmodel.a',
+                                'libnodes.a',
                                 'liblossFunctions.a',
                                 'libpredictors.a',
                                 'libtrainers.a',
