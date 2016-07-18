@@ -20,7 +20,7 @@ int main()
     TestExampleGraph();
     TestInputRouting1();
     TestInputRouting2();
-    
+
     TestCopyGraph();
     TestRefineGraph();
 

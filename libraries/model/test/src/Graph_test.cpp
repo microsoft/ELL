@@ -15,6 +15,7 @@
 
 // nodes
 #include "ConstantNode.h"
+#include "MovingAverageNode.h"
 
 // common
 #include "LoadModelGraph.h"
@@ -121,15 +122,32 @@ void TestStaticGraph()
     testing::ProcessTest("Testing min index", testing::IsEqual(output4[0], 2));
 }
 
+model::Model GetCompoundGraph()
+{
+    model::Model g;
+    auto in = g.AddNode<model::InputNode<double>>(3);
+    auto minAndArgMin = g.AddNode<model::ArgMinNode<double>>(in->output);
+    auto maxAndArgMax = g.AddNode<model::ArgMaxNode<double>>(in->output);
+    auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 8);
+    auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 8);
+    return g;
+}
+
 void TestNodeIterator()
 {
-    auto model = common::LoadModelGraph("");
+    auto model = GetCompoundGraph();
+    auto size1 = model.Size();
+    auto size2 = 0;
+    auto iter = model.GetNodeIterator();
+    while(iter.IsValid())
+    {
+        ++size2;
+        iter.Next();
+    }
+    testing::ProcessTest("Testing Size() and iterator count", testing::IsEqual(size1, size2));
+    testing::ProcessTest("Testing Size() and known node count", testing::IsEqual(size1, 5));
 
-    std::cout << "Printing via Visit:" << std::endl;
-    PrintGraph(model);
-
-    std::cout << "\n\nPrinting via iterator:" << std::endl;
-    PrintGraphIterator(model);
+    std::cout << std::endl << std::endl;
 }
 
 void TestExampleGraph()

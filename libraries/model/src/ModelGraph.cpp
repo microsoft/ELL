@@ -52,7 +52,7 @@ namespace model
 
         if (_stack.size() == 0) // Visit full graph
         {
-            // helper function to find a terminal node
+            // helper function to find a terminal (output) node
             auto IsLeaf = [](const Node* node) { return node->GetDependentNodes().size() == 0; };
 
             // start with some arbitrary node
@@ -100,16 +100,11 @@ namespace model
                 _stack.pop_back();
                 _visitedNodes.insert(node);
 
-                // In "visit whole graph" mode, we want to defer visiting the chosen output node until the end
-                // In "visit active graph" mode, this test should never fail, and we'll always visit the node
-                if (node != _sentinelNode)
-                {
-                    _currentNode = node;
-                    break;
-                }
-
+                // In "visit whole graph" mode, we want to add dependent nodes, so we can get to parts of the graph
+                // that the original leaf node doesn't depend on
                 if (_sentinelNode != nullptr) // sentinelNode is non-null only if we're in visit-whole-graph mode
                 {
+
                     // now add all our children (Note: this part is the only difference between visit-all and visit-active-graph
                     const auto& dependentNodes = node->GetDependentNodes();
                     for (const auto& child : ModelImpl::Reverse(dependentNodes)) // Visiting the children in reverse order more closely retains the order the features were originally created
@@ -119,6 +114,15 @@ namespace model
                         _stack.push_back(child);
                     }
                 }
+
+                // In "visit whole graph" mode, we want to defer visiting the chosen output node until the end
+                // In "visit active graph" mode, this test should never fail, and we'll always visit the node
+                if (node != _sentinelNode)
+                {
+                    _currentNode = node;
+                    break;
+                }
+
             }
             else // visit node's inputs
             {
