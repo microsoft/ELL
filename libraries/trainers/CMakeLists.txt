@@ -19,6 +19,7 @@ set (INCLUDE include/BaggingIncrementalTrainer.h
              include/ForestTrainer.h
              include/IIncrementalTrainer.h
              include/IBlackBoxTrainer.h
+             include/MaxGainSingleInputBinarySplitter.h
              include/MultiEpochIncrementalTrainer.h
              include/SortingTreeTrainer.h
              include/SweepingIncrementalTrainer.h
@@ -26,7 +27,8 @@ set (INCLUDE include/BaggingIncrementalTrainer.h
 
 set (TCC tcc/BaggingIncrementalTrainer.tcc
          tcc/EvaluatingIncrementalTrainer.tcc
-         tcc/ForestTrainer.tcc     
+         tcc/ForestTrainer.tcc
+         tcc/MaxGainSingleInputBinarySplitter.tcc
          tcc/MultiEpochIncrementalTrainer.tcc
          tcc/SortingTreeTrainer.tcc
          tcc/SweepingIncrementalTrainer.tcc

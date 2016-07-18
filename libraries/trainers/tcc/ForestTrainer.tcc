@@ -54,44 +54,28 @@ namespace trainers
             const auto& stats = splitCandidate.stats;
             const auto& ranges = splitCandidate.ranges;
 
-            // compute the constant output values on the new edges
-            double output = GetOutputValue(stats.sums); 
-            double output0 = GetOutputValue(stats.sums0) - output;
-            double output1 = GetOutputValue(stats.sums1) - output;
-
-            // perform the split
-            std::vector<EdgePredictorType> edgePredictorVector{ output0, output1 };
-            SplitAction splitAction(splitCandidate.nodeId, splitCandidate.splitRule, std::move(edgePredictorVector));
-            auto interiorNodeIndex = _forest->Split(splitAction);
-
             // sort the data according to the performed split and update the metadata to reflect this change
             SortNodeDataset(ranges.GetTotalRange(), splitCandidate.splitRule);
-            AddToCurrentOutput(ranges.GetChildRange(0), output0);
-            AddToCurrentOutput(ranges.GetChildRange(1), output1);
 
-            // queue split candidate for child 0
-            auto splitCandidate0 = GetBestSplitCandidateAtNode(_forest->GetChildId(interiorNodeIndex, 0), ranges.GetChildRange(0), stats.sums0);
-            if (splitCandidate0.gain > 0.0)
-            {
-                _queue.push(std::move(splitCandidate0));
-            }
+            auto edgePredictors = GetEdgePredictors(stats);
 
-            // queue split candidate for child 1
-            auto splitCandidate1 = GetBestSplitCandidateAtNode(_forest->GetChildId(interiorNodeIndex, 1), ranges.GetChildRange(1), stats.sums1);
-            if (splitCandidate1.gain > 0.0)
+            using SplitAction = predictors::SimpleForestPredictor::SplitAction; // TODO: this depends on predictors and on split rules
+            SplitAction splitAction(splitCandidate.nodeId, splitCandidate.splitRule, edgePredictors);
+            auto interiorNodeIndex = _forest->Split(splitAction);
+
+            for(size_t i = 0; i<2; ++i)
             {
-                _queue.push(std::move(splitCandidate1));
+                // update metadata in dataset
+                AddToCurrentOutput(ranges.GetChildRange(i), edgePredictors[i]);
+
+                // queue new split candidate
+                auto splitCandidate = GetBestSplitCandidateAtNode(_forest->GetChildId(interiorNodeIndex, i), ranges.GetChildRange(i), stats.GetChildSums(i));
+                if(splitCandidate.gain > 0.0)
+                {
+                    _queue.push(std::move(splitCandidate));
+                }
             }
         }
-    }
-
-    template<typename LossFunctionType>
-    typename ForestTrainer<LossFunctionType>::Sums ForestTrainer<LossFunctionType>::Sums::operator-(const typename ForestTrainer<LossFunctionType>::Sums& other) const
-    {
-        Sums difference;
-        difference.sumWeights = sumWeights - other.sumWeights;
-        difference.sumWeightedLabels = sumWeightedLabels - other.sumWeightedLabels;
-        return difference;
     }
 
     template<typename LossFunctionType>
@@ -123,12 +107,12 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::AddToCurrentOutput(Range range, double addValue)
+    void ForestTrainer<LossFunctionType>::AddToCurrentOutput(Range range, const EdgePredictorType& edgePredictor)
     {
         for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size; ++rowIndex)
         {
             auto& example = _dataset[rowIndex];
-            example.GetMetaData().currentOutput += addValue;
+            example.GetMetaData().currentOutput += edgePredictor.Compute(example.GetDataVector());
         }
     }
 
@@ -199,6 +183,15 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
+    std::vector<typename ForestTrainer<LossFunctionType>::EdgePredictorType> ForestTrainer<LossFunctionType>::GetEdgePredictors(const NodeStats& nodeStats)
+    {
+        double output = GetOutputValue(nodeStats.sums);               
+        double output0 = GetOutputValue(nodeStats.sums0) - output;    
+        double output1 = GetOutputValue(nodeStats.sums1) - output;    
+        return std::vector<EdgePredictorType>{ output0, output1 };
+    }
+
+    template<typename LossFunctionType>
     double ForestTrainer<LossFunctionType>::CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const
     {
         if(sums0.sumWeights == 0 || sums1.sumWeights == 0)
@@ -218,51 +211,18 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    void trainers::ForestTrainer<LossFunctionType>::Sums::Increment(const ExampleMetaData& metaData)
-    {
-        sumWeights += metaData.weakWeight;
-        sumWeightedLabels += metaData.weakWeight * metaData.weakLabel;
-    }
-
-    template<typename LossFunctionType>
     std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters)
     {
         return std::make_unique<ForestTrainer<LossFunctionType>>(lossFunction, parameters);
     }
 
     template<typename LossFunctionType>
-    ForestTrainer<LossFunctionType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums sums) : gain(0), nodeId(nodeId), ranges(totalRange)
-    {
-        stats.sums = sums;
-    }
+    ForestTrainer<LossFunctionType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums) : gain(0), nodeId(nodeId), ranges(totalRange), stats(totalSums)
+    {}
     
     //
     // debugging code
     //
-    
-    template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::Sums::Print(std::ostream& os) const
-    {
-        os << "sumWeights = " << sumWeights << ", sumWeightedLabels = " << sumWeightedLabels;
-    }
-
-    template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::NodeStats::PrintLine(std::ostream& os, size_t tabs) const
-    {
-        os << std::string(tabs * 4, ' ') << "stats:\n";
-        
-        os << std::string((tabs+1) * 4, ' ') <<  "sums:\t";
-        sums.Print(os);
-        os << "\n";
-
-        os << std::string((tabs+1) * 4, ' ') <<  "sums0:\t";
-        sums0.Print(os);
-        os << "\n";
-
-        os << std::string((tabs+1) * 4, ' ') <<  "sums1:\t";
-        sums1.Print(os);
-        os << "\n";
-    }
  
     template<typename LossFunctionType>
     void ForestTrainer<LossFunctionType>::SplitCandidate::PrintLine(std::ostream& os, size_t tabs) const

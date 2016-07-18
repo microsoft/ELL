@@ -66,6 +66,38 @@ namespace trainers
             double weakLabel = 0;
             double weakWeight = 1;
         };
+
+        // struct used to keep histograms of tree nodes
+        struct Sums
+        {
+            double sumWeights = 0;
+            double sumWeightedLabels = 0;
+
+            void Increment(const ExampleMetaData& metaData);
+            Sums operator-(const Sums& other) const;
+            void Print(std::ostream& os) const;
+        };
+
+        // struct used to keep statistics about tree nodes
+        struct NodeStats
+        {
+            Sums sums; // TODO rename totalSums
+            Sums sums0;
+            Sums sums1;
+
+            NodeStats(const Sums& totalSums) : sums(totalSums)
+            {}
+
+            const Sums& GetTotalSums() { return sums; }
+
+            const Sums& GetChildSums(size_t position) const // TODO: fix this!!!!!
+            {
+                if(position ==0) return sums0;
+                return sums1;
+            }
+
+            void PrintLine(std::ostream& os, size_t tabs=0) const;
+        };
     };
 
     /// <summary>
@@ -102,32 +134,8 @@ namespace trainers
         // Specify how the trainer identifies which node it is splitting. 
         using SplittableNodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
-        // Specify how the trainer defines a split.
-        using SplitAction = predictors::SimpleForestPredictor::SplitAction;
-
-        // struct used to keep histograms of tree nodes
-        struct Sums
-        {
-            double sumWeights = 0;
-            double sumWeightedLabels = 0;
-
-            void Increment(const ExampleMetaData& metaData);
-            Sums operator-(const Sums& other) const;
-            void Print(std::ostream& os) const;
-        };
-
-        // struct used to keep statistics about tree nodes
-        struct NodeStats
-        {
-            Sums sums;
-            Sums sums0;
-            Sums sums1;
-
-            void PrintLine(std::ostream& os, size_t tabs=0) const;
-        };
-
         // struct used to keep info about the gain maximizing split of each splittable node in the tree
-        struct SplitCandidate                                                   // TODO: unclear yet if this belongs here or in the Base class - depends how we keep the node stats
+        struct SplitCandidate                                                   // TODO: this depends on template param SplitRuleType
         {
             SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums sums);
             bool operator<(const SplitCandidate& other) const { return gain < other.gain; }
@@ -152,12 +160,14 @@ namespace trainers
 
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
 
-        void AddToCurrentOutput(Range range, double addValue);
+        void AddToCurrentOutput(Range range, const EdgePredictorType& edgePredictor);
 
         SplitCandidate GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums);
 
         void SortNodeDataset(Range range, size_t featureIndex);
         void SortNodeDataset(Range range, const SplitRuleType& splitRule);
+
+        std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats);
 
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
         double GetOutputValue(const Sums& sums) const;
