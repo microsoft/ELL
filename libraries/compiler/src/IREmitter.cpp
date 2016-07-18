@@ -52,6 +52,11 @@ namespace emll
 			return llvm::ArrayType::get(Type(type), size);
 		}
 
+		llvm::VectorType* IREmitter::VectorType(const ValueType type, uint64_t size)
+		{
+			return llvm::VectorType::get(Type(type), size);
+		}
+
 		llvm::Constant* IREmitter::Literal(const unsigned char value)
 		{
 			return Integer(ValueType::Byte, value);
@@ -338,7 +343,16 @@ namespace emll
 			return _builder.CreateGEP(pArray, pOffset);
 		}
 
-		llvm::Value* IREmitter::GlobalPtrOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset)
+		llvm::Value* IREmitter::Ptr(llvm::GlobalVariable* pArray)
+		{
+			assert(pArray != nullptr);
+			llvm::Value* derefArgs[1]{
+				Zero()
+			};
+			return _builder.CreateGEP(pArray->getValueType(), pArray, derefArgs);
+		}
+
+		llvm::Value* IREmitter::PtrOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset)
 		{
 			assert(pArray != nullptr);
 			assert(pOffset != nullptr);
@@ -347,10 +361,10 @@ namespace emll
 				Zero(),
 				pOffset
 			};
-			return _builder.CreateInBoundsGEP(pArray->getValueType(), pArray, derefArgs);
+			return _builder.CreateGEP(pArray->getValueType(), pArray, derefArgs);
 		}
 
-		llvm::Value* IREmitter::GlobalPtrOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset)
+		llvm::Value* IREmitter::PtrOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset)
 		{
 			assert(pArray != nullptr);
 			assert(pOffset != nullptr);

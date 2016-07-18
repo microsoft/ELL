@@ -4,18 +4,14 @@ namespace emll
 {
 	namespace compiler
 	{
-		Variable::Variable()
+		Variable::Variable(const ValueType type, const VariableFlags flags)
+			: _type(type), _flags((int) flags)
 		{
 		}
 
-		Variable::Variable(std::string name)
-			: _name(std::move(name))
+		void Variable::SetEmitted(std::string name)
 		{
-		}
-
-		void Variable::SetName(std::string name)
-		{
-			_name = std::move(name);
+			_emittedName = std::move(name);
 		}
 	}
 }

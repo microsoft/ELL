@@ -42,4 +42,5 @@ private:
 };
 
 void TestModelEx();
+void TestDataFlowGraph();
 void TestCompiler();

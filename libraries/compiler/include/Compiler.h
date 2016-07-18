@@ -13,8 +13,11 @@
 #include "InputNode.h"
 #include "BinaryOperationNode.h"
 #include "ConstantNode.h"
+
 #include "Types.h"
 #include "SymbolTable.h"
+#include "DataFlow.h"
+
 #include <functional>
 
 namespace emll

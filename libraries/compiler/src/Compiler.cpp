@@ -49,7 +49,7 @@ namespace emll
 
 		void Compiler::VerifyInputType(const model::Node& node, const model::Port::PortType type)
 		{
-			auto inputs = node.GetInputs();
+			auto inputs = node.GetInputPorts();
 			for (auto& port : inputs)
 			{
 				if (port->GetType() != type)
@@ -61,7 +61,7 @@ namespace emll
 
 		void Compiler::VerifyOutputType(const model::Node& node, const model::Port::PortType type)
 		{
-			auto outputs = node.GetOutputs();
+			auto outputs = node.GetOutputPorts();
 			for (auto& port : outputs)
 			{
 				if (port->GetType() != type)
@@ -86,7 +86,7 @@ namespace emll
 
 		model::Port::PortType ModelEx::GetNodeDataType(const model::Node& node)
 		{
-			return node.GetOutputs()[0]->GetType();
+			return node.GetOutputPorts()[0]->GetType();
 		}
 
 		std::vector<const model::Node*> ModelEx::CollectOutputNodes(const model::Model& model)
@@ -127,7 +127,7 @@ namespace emll
 			size_t count = 0;
 			for (auto n : nodes)
 			{
-				count += n->GetOutputs().size();
+				count += n->GetOutputPorts().size();
 			}
 			return count;
 		}
@@ -137,7 +137,7 @@ namespace emll
 			size_t count = 0;
 			for (auto n : nodes)
 			{
-				count += n->GetInputs().size();
+				count += n->GetInputPorts().size();
 			}
 			return count;
 		}

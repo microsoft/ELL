@@ -44,7 +44,7 @@ namespace emll
 			{
 				auto node = nodes[n];
 				std::string argNamePrefix = MakeVarName(namePrefix, n);
-				auto outputs = node->GetOutputs();
+				auto outputs = node->GetOutputPorts();
 				for (size_t i = 0; i < outputs.size(); ++i)
 				{
 					std::string argName;

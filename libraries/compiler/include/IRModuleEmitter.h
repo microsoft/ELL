@@ -74,7 +74,7 @@ namespace emll
 				WriteToStream(os, false);
 			}
 			//
-			// To emit declarations for standard C functions
+			// To emit declarations for standard C and vector functions
 			//
 			void DeclarePrintf();
 			void DeclareMalloc();

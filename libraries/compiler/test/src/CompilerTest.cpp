@@ -1,9 +1,11 @@
+#include <iostream>
+#include <string>
+#include <ostream>
+
 #include "CompilerTest.h"
 #include "IRInclude.h"
 #include "IRCompiler.h"
 #include "testing.h"
-#include <string>
-#include <ostream>
 
 using namespace emll::compiler;
 
@@ -27,6 +29,9 @@ void TestLLVM()
 	llvm::GlobalVariable* pRegisters = module.Global("g_registers", structType, data.size());
 
 	auto fnMain = module.AddMain();
+
+	auto vectorResult = fnMain.DotProductF(data.size(), fnMain.Ptr(pData), fnMain.Ptr(pData));
+	fnMain.Printf({ fnMain.Literal("DOT %f\n"), fnMain.Load(vectorResult)});
 
 	IRForLoopEmitter forLoop(fnMain);
 	auto pBodyBlock = forLoop.Begin(data.size());
@@ -150,8 +155,21 @@ model::Model InitTestModelBinOp()
 	return builder.Model;
 }
 
+void TestDataFlowGraph()
+{
+	DataFlowGraph graph;
+	auto node = graph.AddNode<LiteralNode>(3.3);
+	auto var = dynamic_cast<ScalarF *>(node->Var());
+	std::cout <<  var->Data() << std::endl;
+
+	IRCompiler compiler("EMLL", std::cout);
+	compiler.DebugDump();
+}
+
 void TestCompiler()
 {
+	TestDataFlowGraph();
+
 	model::Model model = InitTestModelBinOp();
 	
 	IRCompiler compiler("EMLL", std::cout);
@@ -169,3 +187,4 @@ void TestModelEx()
 	nodes = ModelEx::CollectInputNodes(model);
 	testing::ProcessTest("CollectInputNodes", nodes.size() == 1);
 }
+

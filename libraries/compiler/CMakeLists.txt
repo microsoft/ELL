@@ -21,6 +21,7 @@ set (SRC src/IREmitter.cpp
 		 src/IRIfEmitter.cpp
          src/IRFunctionEmitter.cpp
 		 src/Variable.cpp
+		 src/Dataflow.cpp
 		 src/Compiler.cpp
 		 src/IRCompiler.cpp
 )
@@ -36,11 +37,14 @@ set (INCLUDE include/LLVMInclude.h
 		include/IRModuleEmitter.h
 		include/IRInclude.h
 		include/Variable.h
+		include/Dataflow.h
 		include/Compiler.h
 		include/IRCompiler.h
 )
 
 set (TCC tcc/SymbolTable.tcc
+		 tcc/Variable.tcc
+		 tcc/DataFlow.tcc
 )
 
 source_group("src" FILES ${SRC})

@@ -64,7 +64,31 @@ namespace emll
 			auto r = &(*values);
 			return Op(type, l, r);
 		}
-		
+
+		void IRFunctionEmitter::OpV(OperatorType type, size_t count, llvm::Value* pLVal, llvm::Value* pRVal, std::function<void(llvm::Value*)> aggregator)
+		{
+			assert(pLVal != nullptr);
+			assert(pRVal != nullptr);
+
+			llvm::GlobalVariable* pLGlobal = llvm::dyn_cast<llvm::GlobalVariable>(pLVal);
+			llvm::GlobalVariable* pRGlobal = llvm::dyn_cast<llvm::GlobalVariable>(pLVal);
+
+			auto forLoop = ForLoop();
+			auto pBodyBlock = forLoop.Begin(count);
+			{
+				auto i = forLoop.LoadIterationVar();
+				llvm::Value* pLItem = (pLGlobal != nullptr) ? 
+										ValueAt(pLGlobal, i) :
+										ValueAtA(pLVal, i);
+				llvm::Value* pRItem =  (pRGlobal != nullptr) ?
+										ValueAt(pRGlobal, i) :
+										ValueAtA(pRVal, i);
+				llvm::Value* pTemp = Op(type, pLItem, pRItem);
+				aggregator(pTemp);
+			}
+			forLoop.End();
+		}
+
 		void IRFunctionEmitter::Branch(ComparisonType comparision, llvm::Value* pValue, llvm::Value* pTestValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
 		{
 			llvm::Value* pResult = Cmp(comparision, pValue, pTestValue);
@@ -88,9 +112,19 @@ namespace emll
 			return _pEmitter->PtrOffset(ptr, Literal(offset));
 		}
 
+		llvm::Value* IRFunctionEmitter::PtrOffsetA(llvm::Value* ptr, llvm::Value* pOffset)
+		{
+			return _pEmitter->PtrOffset(ptr, pOffset);
+		}
+
 		llvm::Value* IRFunctionEmitter::ValueAtA(llvm::Value* ptr, int offset)
 		{
 			return _pEmitter->Load(PtrOffsetA(ptr, offset));
+		}
+
+		llvm::Value* IRFunctionEmitter::ValueAtA(llvm::Value* ptr, llvm::Value* pOffset)
+		{
+			return _pEmitter->Load(PtrOffsetA(ptr, pOffset));
 		}
 
 		llvm::Value* IRFunctionEmitter::SetValueAtA(llvm::Value* pPtr, int offset, llvm::Value* pValue)
@@ -124,19 +158,24 @@ namespace emll
 			return _pEmitter->Store(PtrOffsetH(pPtr, offset), pValue);
 		}
 
-		llvm::Value* IRFunctionEmitter::PtrOffset(llvm::GlobalVariable* pPtr, llvm::Value* pOffset)
+		llvm::Value* IRFunctionEmitter::Ptr(llvm::GlobalVariable* pGlobal)
 		{
-			return _pEmitter->GlobalPtrOffset(pPtr, pOffset);
+			return _pEmitter->Ptr(pGlobal);
 		}
 
-		llvm::Value* IRFunctionEmitter::PtrOffset(llvm::GlobalVariable* pPtr, llvm::Value* pOffset, llvm::Value* pFieldOffset)
+		llvm::Value* IRFunctionEmitter::PtrOffset(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset)
 		{
-			return _pEmitter->GlobalPtrOffset(pPtr, pOffset, pFieldOffset);
+			return _pEmitter->PtrOffset(pGlobal, pOffset);
+		}
+
+		llvm::Value* IRFunctionEmitter::PtrOffset(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pFieldOffset)
+		{
+			return _pEmitter->PtrOffset(pGlobal, pOffset, pFieldOffset);
 		}
 
 		llvm::Value* IRFunctionEmitter::ValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset)
 		{
-			return Load(_pEmitter->GlobalPtrOffset(pGlobal, pOffset));
+			return Load(_pEmitter->PtrOffset(pGlobal, pOffset));
 		}
 
 		llvm::Value* IRFunctionEmitter::SetValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pVal)
@@ -182,6 +221,16 @@ namespace emll
 			auto pSrc = _pEmitter->PtrOffset(pPtr, Literal(fromOffset));
 			auto pDest = _pEmitter->PtrOffset(pPtr, Literal(destOffset));
 			_pEmitter->MemMove(pSrc, pDest, Literal(count));
+		}
+
+		llvm::Value* IRFunctionEmitter::DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal)
+		{
+			llvm::Value* pTotal = Var(ValueType::Double);
+			Store(pTotal, Literal(0.0));
+			OpV(OperatorType::MultiplyF, count, pLVal, pRVal, [&pTotal, this](llvm::Value* pValue) {
+				OpAndUpdate(pTotal, OperatorType::AddF, pValue);
+			});
+			return pTotal;
 		}
 
 		llvm::Function* IRFunctionEmitter::ResolveFunction(const std::string& name)
