@@ -41,7 +41,7 @@ namespace model
     NodeIterator::NodeIterator(const Model* model, const std::vector<const Node*>& outputNodes) : _model(model)
     {
         _currentNode = nullptr;
-        _sentinelNode = nullptr;
+        _visitFullGraph = false;
         if (_model->Size() == 0)
         {
             return;
@@ -64,7 +64,7 @@ namespace model
                 anOutputNode = anOutputNode->GetDependentNodes()[0];
             }
             _stack.push_back(anOutputNode);
-            _sentinelNode = anOutputNode;
+            _visitFullGraph = true;
         }
 
         Next();
@@ -102,7 +102,7 @@ namespace model
 
                 // In "visit whole graph" mode, we want to add dependent nodes, so we can get to parts of the graph
                 // that the original leaf node doesn't depend on
-                if (_sentinelNode != nullptr) // sentinelNode is non-null only if we're in visit-whole-graph mode
+                if (_visitFullGraph)
                 {
 
                     // now add all our children (Note: this part is the only difference between visit-all and visit-active-graph
@@ -115,14 +115,8 @@ namespace model
                     }
                 }
 
-                // In "visit whole graph" mode, we want to defer visiting the chosen output node until the end
-                // In "visit active graph" mode, this test should never fail, and we'll always visit the node
-                if (node != _sentinelNode)
-                {
-                    _currentNode = node;
-                    break;
-                }
-
+                _currentNode = node;
+                break;
             }
             else // visit node's inputs
             {
@@ -135,12 +129,6 @@ namespace model
                     }
                 }
             }
-        }
-
-        if(_stack.size() == 0 && _currentNode == nullptr && _sentinelNode != nullptr)
-        {
-            _currentNode = _sentinelNode;
-            _sentinelNode = nullptr;
         }
     }
 }

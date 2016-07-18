@@ -49,7 +49,7 @@ namespace model
         std::unordered_set<const Node*> _visitedNodes;
         std::vector<const Node*> _stack;
 
-        const Node* _sentinelNode = nullptr;
+        bool _visitFullGraph = false;
         const Node* _currentNode = nullptr;
     };
 
