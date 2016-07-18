@@ -8,6 +8,12 @@
 
 #pragma once
 
+#include "AccumulatorNode.h"
+#include "BinaryOperationNode.h"
+#include "ConstantNode.h"
+#include "DelayNode.h"
+
+// model
 #include "Node.h"
 #include "ModelTransformer.h"
 #include "OutputPortElementList.h"
