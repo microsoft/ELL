@@ -22,6 +22,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/ISerializable.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
+         src/TypeName.cpp
          src/UniqueId.cpp
          src/Variant.cpp
          src/XMLSerialization.cpp)

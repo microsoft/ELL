@@ -17,7 +17,6 @@
 
 namespace utilities
 {
-
     const char typeNameLeftBracket = '(';
     const char typeNameRightBracket = ')';
 
@@ -189,6 +188,14 @@ namespace utilities
         /// <returns> The serialization name. </returns>
         static std::string GetName() { return "double"; }
     };
+
+    //
+    // Utility function to get templated type names
+    //
+    std::string GetCompositeTypeName(std::string baseType, const std::vector<std::string>& subtypes);
+
+    template <typename... Types>
+    std::string GetCompositeTypeName(std::string baseType);
 }
 
 #include "../tcc/TypeName.tcc"
