@@ -42,25 +42,30 @@ namespace emll
 			virtual ~Compiler() = default;
 
 			/// <summary>Compile the given model</summary>
-			virtual void Compile(const model::Model& model);
+			virtual void CompileModel(const model::Model& model);
+			virtual void CompileNode(DataNode& node);
+			virtual void Begin() = 0;
+			virtual void End() = 0;
 
 			/// <summary>Return the type of the given node</summary>
 			NodeType GetNodeType(const model::Node& node) const;
 
+			TempVar AllocTemp();
+			void FreeTemp(TempVar var);
+			uint64_t AllocGlobal();
+
 		protected:
-			virtual void Begin() = 0;
-			virtual void End() = 0;			
 			virtual void BeginMain(const std::string& functionName) = 0;
 			virtual void EndMain() = 0;
-			
+			virtual void Compile(LiteralNode& node) = 0;
+
 			virtual void InitSupportedNodeTypes();
 			
+
 			void VerifyInputType(const model::Node& node, const model::Port::PortType type);
 			void VerifyOutputType(const model::Node& node, const model::Port::PortType type);
-
 			const std::string& InputName() const;
 			const std::string& OutputName() const;
-
 			const std::vector<const model::Node*>& Inputs() const
 			{
 				return _inputs;
@@ -77,6 +82,8 @@ namespace emll
 			SymbolTable<NodeType, NodeType::unsupported> _nodeTypes;
 			std::vector<const model::Node*> _inputs;
 			std::vector<const model::Node*> _outputs;
+			TempVarAllocator _tempVars;
+			uint64_t _globalVars = 0;
 		};
 
 		class ModelEx

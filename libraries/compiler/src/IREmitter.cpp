@@ -143,7 +143,7 @@ namespace emll
 					return _builder.CreateFPToSI(pValue, type);
 				
 				default:
-					throw new CompilerException(CompilerError::NotSupported);
+					throw new CompilerException(CompilerError::notSupported);
 			}
 		}
 

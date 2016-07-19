@@ -1,4 +1,5 @@
 #include "Dataflow.h"
+#include "ScalarVar.h"
 
 namespace emll
 {
@@ -14,7 +15,7 @@ namespace emll
 
 		LiteralNode::LiteralNode(double value)
 		{
-			_pVar = std::make_unique<ScalarF>(value);
+			_pVar = std::make_unique<GlobalScalarF>(value);
 		}
 	}
 }

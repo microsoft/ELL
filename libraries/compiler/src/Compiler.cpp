@@ -34,11 +34,41 @@ namespace emll
 			return c_OutputVariableName;
 		}
 
-		void Compiler::Compile(const model::Model& model)
+		TempVar Compiler::AllocTemp()
+		{
+			return _tempVars.Alloc();
+		}
+
+		void Compiler::FreeTemp(TempVar var)
+		{
+			_tempVars.Free(var);
+		}
+
+		uint64_t Compiler::AllocGlobal()
+		{
+			_globalVars++;
+			return _globalVars;
+		}
+
+		void Compiler::CompileModel(const model::Model& model)
 		{
 			_inputs = ModelEx::CollectInputNodes(model);
 			_outputs = ModelEx::CollectOutputNodes(model);
 			BeginMain(c_PredictFunctionName);
+			EndMain();
+		}
+
+		void Compiler::CompileNode(DataNode& node)
+		{
+			BeginMain(c_PredictFunctionName);
+			switch (node.Type())
+			{
+				case DataNodeType::Literal:
+					Compile(static_cast<LiteralNode&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::notSupported);
+			}
 			EndMain();
 		}
 

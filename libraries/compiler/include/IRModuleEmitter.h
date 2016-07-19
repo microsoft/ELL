@@ -14,11 +14,12 @@ namespace emll
 			IRModuleEmitter(IREmitter& emitter, const std::string& name);
 			IRModuleEmitter(IREmitter& emitter, std::unique_ptr<llvm::Module> pModule);
 
+			llvm::GlobalVariable* Constant(const ValueType type, const std::string& name, double value);
 			llvm::GlobalVariable* Constant(const std::string&name, const std::vector<double>& value);
 
-			llvm::GlobalVariable* Global(const std::string& name, const ValueType type);
-			llvm::GlobalVariable* Global(const std::string& name, const ValueType type, const uint64_t size);
-			llvm::GlobalVariable* Global(const std::string& name, llvm::Type* pType)
+			llvm::GlobalVariable* Global(const ValueType type, const std::string& name);
+			llvm::GlobalVariable* Global(const ValueType type, const std::string& name, const uint64_t size);
+			llvm::GlobalVariable* Global(llvm::Type* pType, const std::string& name)
 			{
 				return Global(name, pType, nullptr, false);
 			}

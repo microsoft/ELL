@@ -9,7 +9,7 @@ namespace emll
 		enum class CompilerError
 		{
 			Unexpected = 0,
-			NotSupported,
+			notSupported,
 			inputPortTypeNotSupported,
 			outputPortTypeNotSupported,
 			InputOutputPortTypeMismatch,
@@ -17,7 +17,9 @@ namespace emll
 			InvalidValueType,
 			InvalidOperatorType,
 			InvalidComparisonType,
-			operatorTypeNotSupported,
+			variableHasNoName,
+			variableTypeNotSupported,
+			valueTypeNotSupported,
 			InvalidFunction,
 			FunctionNotFound,
 			WriteStreamFailed,

@@ -5,6 +5,7 @@
 #include "CompilerTest.h"
 #include "IRInclude.h"
 #include "IRCompiler.h"
+#include "ScalarVar.h"
 #include "testing.h"
 
 using namespace emll::compiler;
@@ -24,8 +25,8 @@ void TestLLVM()
 
 	std::vector<double> data({ 3.3, 4.4, 5.5, 6.6, 7.7 });
 	llvm::GlobalVariable* pData = module.Constant("g_weights", data);
-	llvm::GlobalVariable* pOutput = module.Global("g_output", ValueType::Double, data.size());
-	llvm::GlobalVariable* pTotal = module.Global("g_total", ValueType::Double);
+	llvm::GlobalVariable* pOutput = module.Global(ValueType::Double, "g_output", data.size());
+	llvm::GlobalVariable* pTotal = module.Global(ValueType::Double, "g_total");
 	llvm::GlobalVariable* pRegisters = module.Global("g_registers", structType, data.size());
 
 	auto fnMain = module.AddMain();
@@ -72,7 +73,7 @@ void TestLLVM()
 	fnMain.SetValueAt(pOutput, fnMain.Literal(3), fnMain.Literal(10.0));
 	fnMain.SetValueAt(pOutput, fnMain.Literal(4), fnMain.Literal(20.0));
 
-	auto pOtherTotal = module.Global("g_total", ValueType::Double);
+	auto pOtherTotal = module.Global(ValueType::Double, "g_total");
 	forLoop.Clear();
 	forLoop.Begin(data.size());
 	{
@@ -158,11 +159,12 @@ model::Model InitTestModelBinOp()
 void TestDataFlowGraph()
 {
 	DataFlowGraph graph;
-	auto node = graph.AddNode<LiteralNode>(3.3);
-	auto var = dynamic_cast<ScalarF *>(node->Var());
-	std::cout <<  var->Data() << std::endl;
+	DataNode* node = graph.AddNode<LiteralNode>(3.3);
 
 	IRCompiler compiler("EMLL", std::cout);
+	compiler.Begin();
+	compiler.CompileNode(*node);
+	compiler.End();
 	compiler.DebugDump();
 }
 
@@ -173,7 +175,7 @@ void TestCompiler()
 	model::Model model = InitTestModelBinOp();
 	
 	IRCompiler compiler("EMLL", std::cout);
-	compiler.Compile(model);
+	compiler.CompileModel(model);
 	compiler.DebugDump();
 }
 

@@ -15,17 +15,22 @@ namespace emll
 		{
 		}
 
+		llvm::GlobalVariable* IRModuleEmitter::Constant(const ValueType type, const std::string& name, double value)
+		{
+			return Global(name, _emitter.Type(type), _emitter.Literal(value), true);
+		}
+
 		llvm::GlobalVariable* IRModuleEmitter::Constant(const std::string& name, const std::vector<double>& value)
 		{
 			return Global(name, _emitter.ArrayType(ValueType::Double, value.size()), _emitter.Literal(value), true);
 		}
 
-		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, const ValueType type)
+		llvm::GlobalVariable* IRModuleEmitter::Global(const ValueType type, const std::string& name)
 		{
 			return Global(name, _emitter.Type(type), _emitter.Zero(type), false);
 		}
 
-		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, const ValueType type, const uint64_t size)
+		llvm::GlobalVariable* IRModuleEmitter::Global(const ValueType type, const std::string& name, const uint64_t size)
 		{
 			llvm::ArrayType* pArrayType = _emitter.ArrayType(type, size);
 			return Global(name, pArrayType, InitializeArray(pArrayType), false);

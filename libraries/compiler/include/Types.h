@@ -54,12 +54,6 @@ namespace emll
 			NeqF
 		};
 
-		struct VariableDecl
-		{
-			ValueType type;
-			const std::string& name;
-		};
-
 		template<typename T>
 		class TypeList : public std::vector<T>
 		{

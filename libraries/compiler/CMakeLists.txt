@@ -38,6 +38,7 @@ set (INCLUDE include/LLVMInclude.h
 		include/IRModuleEmitter.h
 		include/IRInclude.h
 		include/Variable.h
+		include/ScalarVar.h
 		include/Dataflow.h
 		include/Compiler.h
 		include/IRCompiler.h
@@ -45,7 +46,9 @@ set (INCLUDE include/LLVMInclude.h
 
 set (TCC tcc/SymbolTable.tcc
 		 tcc/Variable.tcc
+		 tcc/ScalarVar.tcc
 		 tcc/DataFlow.tcc
+		 tcc/IRCompiler.tcc
 )
 
 source_group("src" FILES ${SRC})

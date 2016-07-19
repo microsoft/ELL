@@ -1,6 +1,7 @@
 #pragma once
 #include "Compiler.h"
 #include "IRInclude.h"
+#include "ScalarVar.h"
 #include <stdio.h>
 
 namespace emll
@@ -12,13 +13,28 @@ namespace emll
 		public:
 			IRCompiler(const std::string& moduleName, std::ostream& os);
 
+			virtual void Begin() override;
+			virtual void End() override;
+
+			llvm::Value* GetVariable(const std::string& name);
+
+			llvm::Value* EnsureVariable(Variable& var);
+
 			void DebugDump();
 
 		protected:
-			virtual void Begin() override;
-			virtual void End() override;
 			virtual void BeginMain(const std::string& functionName) override;
 			virtual void EndMain() override;
+			virtual void Compile(LiteralNode& node) override;
+
+			llvm::Value* EmitScalar(Variable& var);
+
+			llvm::Value* EmitLocalScalar(Variable& var);
+			template<typename T>
+			llvm::Value* EmitLocalScalar(LocalScalarVar<T>& var);
+			llvm::Value* EmitGlobalScalar(Variable& var);
+			template<typename T>
+			llvm::Value* EmitGlobalScalar(GlobalScalarVar<T>& var);
 
 		private:
 
@@ -36,3 +52,5 @@ namespace emll
 		};
 	}
 }
+
+#include "../tcc/IRCompiler.tcc"

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Types.h"
+#include "IntegerStack.h"
 #include <string>
 #include <vector>
 
@@ -8,18 +9,58 @@ namespace emll
 {
 	namespace compiler
 	{
+		struct TempVar
+		{
+			bool isNew;
+			uint64_t varIndex;
+
+			void Clear();
+		};
+
+		class TempVarAllocator
+		{
+		public:
+			TempVar Alloc();
+			void Free(TempVar& var);
+
+		private:
+			utilities::IntegerStack _varStack;
+		};
+
+		enum class VariableScope
+		{
+			Local,
+			Global,
+			Heap
+		};
+
+
+		class IRCompiler;
+
 		class Variable
 		{
 		public:
-			virtual ValueType Type() const
+			enum class VariableFlags
+			{
+				none = 0,
+				isMutable = 0x00000001,
+				isOffset = 0x00000002,
+				isComputed = 0x00000004,
+			};
+
+		public:
+			ValueType Type() const
 			{
 				return _type;
+			}
+			VariableScope Scope() const
+			{
+				return _scope;
 			}
 			virtual size_t Dimension() const
 			{
 				return 1;
 			}
-
 			bool IsVector() const
 			{
 				return (Dimension() > 1);
@@ -32,85 +73,56 @@ namespace emll
 			{
 				return _emittedName;
 			}
-			void SetEmitted(std::string emittedName);
-			bool IsEmitted() const
+			bool HasEmittedName() const
 			{
 				return (_emittedName.length() > 0);
 			}
+			void SetEmittedName(std::string emittedName);
 			bool IsMutable() const
 			{
-				return IsFlagSet(VariableFlags::isMutable);
+				return TestFlags(VariableFlags::isMutable);
 			}
 			bool IsConstant() const
 			{
 				return !IsMutable();
-			}
-			bool IsGlobal() const
-			{
-				return IsFlagSet(VariableFlags::isGlobal);
-			}
+			}		
 			bool IsVectorRef() const
 			{
-				return IsFlagSet(VariableFlags::isOffset);
+				return TestFlags(VariableFlags::isOffset);
 			}
 			bool IsComputed() const
 			{
-				return IsFlagSet(VariableFlags::isComputed);
+				return TestFlags(VariableFlags::isComputed);
+			}
+			bool TestFlags(const VariableFlags flag) const
+			{
+				return ((_flags & (int)flag) != 0);
 			}
 
 		protected:
-			enum class VariableFlags
-			{
-				none = 0,
-				isMutable = 0x00000001,
-				isGlobal = 0x00000002,
-				isOffset = 0x00000004,
-				isComputed = 0x00000008
-			};
 
-			Variable(const ValueType type, const VariableFlags flags = VariableFlags::none);
-
-			bool IsFlagSet(const VariableFlags flag) const
+			Variable(const ValueType type, const VariableScope scope, const VariableFlags flags = VariableFlags::none);
+			void SetFlags(const VariableFlags flag)
 			{
-				return ((_flags & (int) flag) != 0);
+				_flags |= (int)flag;
 			}
-			void SetFlag(const VariableFlags flag)
+			void ClearFlags(const VariableFlags flag)
 			{
-				_flags |= (int) flag;
-			}
-			void ClearFlag(const VariableFlags flag)
-			{
-				_flags &= (~ ((int) flag));
+				_flags &= (~((int)flag));
 			}
 
 		private:
-			ValueType _type;
 			std::string _emittedName;
+			ValueType _type;
+			VariableScope _scope;
 			int _flags;
 		};
-
-		template<typename T>
-		class ScalarVar : public Variable
-		{
-		public:
-			ScalarVar(T data);
-
-			T& Data()
-			{
-				return _data;
-			}
-
-		private:
-			T _data;
-		};
-
-		using ScalarF = ScalarVar<double>;
 
 		template<typename T>
 		class VectorVar : public Variable
 		{
 		public:
-			VectorVar();
+			VectorVar(const VariableScope scope);
 
 			T& Data()
 			{
@@ -140,28 +152,6 @@ namespace emll
 		
 		private:
 			size_t _offset;
-		};
-
-		template<typename T>
-		class ComputedVar : public Variable
-		{
-		public:
-			ComputedVar();
-
-			OperatorType Op() const
-			{
-				return _op;
-			}
-			T Value() const
-			{
-				return _value;
-			}
-			bool Combine(ComputedVar& other);
-
-		private:
-			std::string _sourceVarName;
-			OperatorType _op;
-			T _value;
 		};
 	}
 }
