@@ -31,9 +31,13 @@ namespace trainers
         double minSplitGain = 0.0;
     };
 
+    /// <summary> Base class for all forest trainers. </summary>
     class ForestTrainerBase
     {
     protected:
+        // protected ctor - makes sure that a ForestTrainerBase is never created directly
+        ForestTrainerBase(){}
+
         // Represents a range in an array
         struct Range
         {
@@ -115,17 +119,15 @@ namespace trainers
         /// <param name="parameters"> Training Parameters. </param>
         ForestTrainer(const ForestTrainerParameters& parameters);
 
-        /// <summary> Trains a decision tree. </summary>
+        /// <summary> Grows the decision forest. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the training set.  </param>
-        ///
-        /// <returns> The trained decision tree. </returns>
         virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
         /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const predictors::SimpleForestPredictor> GetPredictor() const { return _forest; };
+        virtual const std::shared_ptr<const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> GetPredictor() const { return _forest; };
 
     protected:
         // Specify how the trainer identifies which node it is splitting. 
@@ -164,7 +166,7 @@ namespace trainers
         ForestTrainerParameters _parameters;
 
         // the forest
-        std::shared_ptr<predictors::SimpleForestPredictor> _forest;
+        std::shared_ptr<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> _forest;
 
         // priority queue used to identify the gain-maximizing split candidate
         PriorityQueue _queue;
