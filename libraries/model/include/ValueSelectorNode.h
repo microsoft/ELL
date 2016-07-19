@@ -38,7 +38,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "ValueSelector<"+utilities::TypeName<ValueType>::GetName()+">"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("ValueSelectorNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -77,7 +77,7 @@ namespace model
     {
     public:
         SelectIfLessNode(const OutputPortElementList<ValueType>& input1, const OutputPortElementList<ValueType>& input2, const OutputPortElementList<ValueType>& value1, const OutputPortElementList<ValueType>& value2);
-        static std::string GetTypeName() { return "SelectIfLess"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SelectIfLessNode"); }
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         const OutputPort<ValueType>& output = _output;
@@ -108,7 +108,7 @@ namespace model
     {
     public:
         IfLessNode(const OutputPortElementList<ValueType>& value, const OutputPortElementList<ValueType>& threshold);
-        static std::string GetTypeName() { return "IfLess"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("IfLessNode"); }
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         const OutputPort<bool>& output = _output;

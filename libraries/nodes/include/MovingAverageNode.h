@@ -38,11 +38,11 @@ namespace nodes
         /// <param name="input"> The signal to take the mean of </param>
         /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
         MovingAverageNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize);
-        
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "MovingAverageNode<"+utilities::TypeName<ValueType>::GetName()+">"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("MovingAverageNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

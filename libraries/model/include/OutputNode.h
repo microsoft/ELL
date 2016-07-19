@@ -32,7 +32,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "OutputNode"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("OutputNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

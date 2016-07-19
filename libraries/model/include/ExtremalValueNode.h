@@ -35,7 +35,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return std::string(max ? "ArgMax" : "ArgMin")+"<" + utilities::TypeName<ValueType>::GetName()+">"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>(std::string(max ? "ArgMax" : "ArgMin")); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
