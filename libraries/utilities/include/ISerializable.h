@@ -19,7 +19,9 @@ namespace utilities
     class ObjectDescription
     {
     public:
+        /// <summary> Adds an entry to the ObjectDescription </summary>
         void AddField(std::string name, const Variant& value);
+        
         void Print(std::ostream& os, size_t indent = 0);
 
     private:
@@ -29,6 +31,7 @@ namespace utilities
     class ISerializable
     {
     public:
+        /// <summary> Get an ObjectDescription describing how to serialize this object </summary>
         virtual ObjectDescription GetDescription() const = 0;
     };
 }

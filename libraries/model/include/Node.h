@@ -11,6 +11,9 @@
 #include "OutputPort.h"
 #include "UniqueId.h"
 
+// utilities
+#include "ISerializable.h"
+
 // stl
 #include <string>
 #include <memory>
@@ -24,7 +27,7 @@ namespace model
     class ModelTransformer;
 
     /// <summary> Superclass for all node types. </summary>
-    class Node
+    class Node : utilities::ISerializable
     {
     public:
         Node() = default;
@@ -68,6 +71,9 @@ namespace model
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(ModelTransformer& transformer) const;
+
+        /// Inherited from ISerializable
+        virtual utilities::ObjectDescription GetDescription() const override;
 
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);

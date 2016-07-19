@@ -10,6 +10,10 @@
 #include "InputPort.h"
 #include "ModelTransformer.h"
 
+// utilities
+#include "Variant.h"
+#include "ISerializable.h"
+
 // stl
 #include <unordered_set>
 
@@ -61,4 +65,12 @@ namespace model
     {
         Copy(transformer);
     }
+
+    utilities::ObjectDescription Node::GetDescription() const
+    {
+        utilities::ObjectDescription result;
+        result.AddField("id", utilities::MakeVariant<NodeId>(_id));
+        return result;
+    }
+
 }

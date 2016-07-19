@@ -324,3 +324,21 @@ void TestRefineGraph()
         testing::ProcessTest("testing refined graph", testing::IsEqual(output[2], newOutput[2]));
     }
 }
+
+void TestSerialization()
+{
+    std::cout << "Serialization" << std::endl;
+    model::Model g;
+    g.AddNode<model::InputNode<double>>(3);
+
+    auto nodeIter = g.GetNodeIterator();
+    while(nodeIter.IsValid())
+    {
+        auto node = nodeIter.Get();
+        auto description = node->GetDescription();
+        description.Print(std::cout);
+        std::cout << std::endl;
+        nodeIter.Next();
+    }
+}
+

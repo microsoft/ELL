@@ -24,6 +24,8 @@ int main()
     TestCopyGraph();
     TestRefineGraph();
 
+    TestSerialization();
+
     if (testing::DidTestFail())
     {
         return 1;
