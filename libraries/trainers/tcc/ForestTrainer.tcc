@@ -1,4 +1,3 @@
-#include "..\include\ForestTrainer.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
@@ -11,21 +10,21 @@
 
 namespace trainers
 {    
-    template <typename LossFunctionType>
-    ForestTrainer<LossFunctionType>::ForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters) :
-        _lossFunction(lossFunction), _parameters(parameters), _forest(std::make_shared<predictors::SimpleForestPredictor>())
+    template <typename SplitRuleType, typename EdgePredictorType>
+    ForestTrainer<SplitRuleType, EdgePredictorType>::ForestTrainer(const ForestTrainerParameters& parameters) :
+        _parameters(parameters), _forest(std::make_shared<predictors::SimpleForestPredictor>())
     {}
 
-    template <typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator) 
+    template <typename SplitRuleType, typename EdgePredictorType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType>::Update(dataset::GenericRowDataset::Iterator exampleIterator) 
     {
         // convert data fron iterator to dense row dataset; compute sums statistics of the tree root
         auto sums = LoadData(exampleIterator);
 
         // computes the bias term, sets it in the forest and the dataset
-        double bias = GetOutputValue(sums);
+        double bias = sums.sumWeightedLabels / sums.sumWeights; // TODO: check for zero denominator
         _forest->SetBias(bias);
-        AddToCurrentOutput(Range{ 0, _dataset.NumExamples() }, bias);
+        AddToCurrentOutput(Range{ 0, _dataset.NumExamples() }, bias); // TODO - replace with InitializeCurrentOutput, where you run the predictor on the dataset
 
         // find split candidate for root node and push it onto the priority queue
         auto rootSplit = GetBestSplitCandidateAtNode(_forest->GetNewRootId(), Range{ 0, _dataset.NumExamples() }, sums);
@@ -78,8 +77,8 @@ namespace trainers
         }
     }
 
-    template<typename LossFunctionType>
-    typename ForestTrainer<LossFunctionType>::Sums ForestTrainer<LossFunctionType>::LoadData(dataset::GenericRowDataset::Iterator exampleIterator)
+    template<typename SplitRuleType, typename EdgePredictorType>
+    typename ForestTrainer<SplitRuleType, EdgePredictorType>::Sums ForestTrainer<SplitRuleType, EdgePredictorType>::LoadData(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         Sums sums;
 
@@ -106,8 +105,8 @@ namespace trainers
         return sums;
     }
 
-    template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::AddToCurrentOutput(Range range, const EdgePredictorType& edgePredictor)
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType>::AddToCurrentOutput(Range range, const EdgePredictorType& edgePredictor)
     {
         for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size; ++rowIndex)
         {
@@ -116,51 +115,24 @@ namespace trainers
         }
     }
 
-    template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SortNodeDataset(Range range, size_t inputIndex) // to be deprecated
-    {
-        _dataset.Sort([inputIndex](const ForestTrainerExample& example) { return example.GetDataVector()[inputIndex]; },
-                      range.firstIndex,
-                      range.size);
-    }
-
-    template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SortNodeDataset(Range range, const SplitRuleType& splitRule)
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType>::SortNodeDataset(Range range, const SplitRuleType& splitRule)
     {
         _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()); },
                       range.firstIndex,
                       range.size);
     }
 
-    template<typename LossFunctionType>
-    double ForestTrainer<LossFunctionType>::CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const
-    {
-        if(sums0.sumWeights == 0 || sums1.sumWeights == 0)
-        {
-            return 0;
-        }
-        
-        return sums0.sumWeights * _lossFunction.BregmanGenerator(sums0.sumWeightedLabels/sums0.sumWeights) +
-               sums1.sumWeights * _lossFunction.BregmanGenerator(sums1.sumWeightedLabels/sums1.sumWeights) -
-               sums.sumWeights * _lossFunction.BregmanGenerator(sums.sumWeightedLabels/sums.sumWeights);
-    }
-
-    template<typename LossFunctionType>
-    double ForestTrainer<LossFunctionType>::GetOutputValue(const Sums& sums) const
-    {
-        return sums.sumWeightedLabels / sums.sumWeights;
-    }
-
-    template<typename LossFunctionType>
-    ForestTrainer<LossFunctionType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums) : gain(0), nodeId(nodeId), ranges(totalRange), stats(totalSums)
+    template<typename SplitRuleType, typename EdgePredictorType>
+    ForestTrainer<SplitRuleType, EdgePredictorType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums) : gain(0), nodeId(nodeId), ranges(totalRange), stats(totalSums)
     {}
     
     //
     // debugging code
     //
  
-    template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::SplitCandidate::PrintLine(std::ostream& os, size_t tabs) const
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType>::SplitCandidate::PrintLine(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "gain = " << gain << "\n";
         os << std::string(tabs * 4, ' ') << "node = ";
@@ -170,8 +142,8 @@ namespace trainers
         stats.PrintLine(os, tabs);
     }
 
-    template<typename LossFunctionType>
-    void ForestTrainer<LossFunctionType>::PriorityQueue::PrintLine(std::ostream& os, size_t tabs) const
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType>::PriorityQueue::PrintLine(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "Priority Queue Size: " << size() << "\n";
 

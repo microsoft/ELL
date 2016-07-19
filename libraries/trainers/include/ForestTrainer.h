@@ -105,19 +105,14 @@ namespace trainers
     /// </summary>
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
-    template <typename LossFunctionType> 
-    class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::SimpleForestPredictor>
-    {
+    template <typename SplitRuleType, typename EdgePredictorType> 
+    class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> 
+    { 
     public:
-
-        using SplitRuleType = predictors::SingleInputThresholdRule;
-        using EdgePredictorType = predictors::ConstantPredictor;
-
         /// <summary> Constructs an instance of ForestTrainer. </summary>
         ///
-        /// <param name="lossFunction"> The loss function. </param>
         /// <param name="parameters"> Training Parameters. </param>
-        ForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters);
+        ForestTrainer(const ForestTrainerParameters& parameters);
 
         /// <summary> Trains a decision tree. </summary>
         ///
@@ -160,24 +155,18 @@ namespace trainers
         typedef dataset::Example<dataset::DoubleDataVector, ExampleMetaData> ForestTrainerExample; 
 
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
-
         void AddToCurrentOutput(Range range, const EdgePredictorType& edgePredictor);
+        void SortNodeDataset(Range range, const SplitRuleType& splitRule); // TODO implement bucket sort
 
         virtual SplitCandidate GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums) = 0;
-
-        void SortNodeDataset(Range range, size_t featureIndex);
-        void SortNodeDataset(Range range, const SplitRuleType& splitRule);
-
         virtual std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) = 0;
-
-        double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
-        double GetOutputValue(const Sums& sums) const;
-
+        
+        //
         // member variables
-        LossFunctionType _lossFunction;
+        //
         ForestTrainerParameters _parameters;
 
-        // the forest being trained
+        // the forest
         std::shared_ptr<predictors::SimpleForestPredictor> _forest;
 
         // local copy of the dataset, with metadata attached to each example

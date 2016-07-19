@@ -9,16 +9,11 @@
 namespace trainers
 {
     template<typename LossFunctionType>
-    std::vector<typename SimpleForestTrainer<LossFunctionType>::EdgePredictorType> SimpleForestTrainer<LossFunctionType>::GetEdgePredictors(const ForestTrainerBase::NodeStats& nodeStats)
-    {
-        double output = GetOutputValue(nodeStats.sums);
-        double output0 = GetOutputValue(nodeStats.sums0) - output;
-        double output1 = GetOutputValue(nodeStats.sums1) - output;
-        return std::vector<EdgePredictorType>{ output0, output1 };
-    }
+    SimpleForestTrainer<LossFunctionType>::SimpleForestTrainer(const LossFunctionType & lossFunction, const ForestTrainerParameters & parameters) : ForestTrainer<SplitRuleType, EdgePredictorType>(parameters), _lossFunction(lossFunction)
+    {}
 
     template<typename LossFunctionType>
-    typename ForestTrainer<LossFunctionType>::SplitCandidate SimpleForestTrainer<LossFunctionType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums)
+    typename SimpleForestTrainer<LossFunctionType>::SplitCandidate SimpleForestTrainer<LossFunctionType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums)
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 
@@ -67,6 +62,41 @@ namespace trainers
         return bestSplitCandidate;
     }
 
+    template<typename LossFunctionType>
+    std::vector<typename SimpleForestTrainer<LossFunctionType>::EdgePredictorType> SimpleForestTrainer<LossFunctionType>::GetEdgePredictors(const ForestTrainerBase::NodeStats& nodeStats)
+    {
+        double output = GetOutputValue(nodeStats.sums);
+        double output0 = GetOutputValue(nodeStats.sums0) - output;
+        double output1 = GetOutputValue(nodeStats.sums1) - output;
+        return std::vector<EdgePredictorType>{ output0, output1 };
+    }
+
+    template<typename LossFunctionType>
+    void SimpleForestTrainer<LossFunctionType>::SortNodeDataset(Range range, size_t inputIndex) // to be deprecated
+    {
+        _dataset.Sort([inputIndex](const ForestTrainerExample& example) { return example.GetDataVector()[inputIndex]; },
+                      range.firstIndex,
+                      range.size);
+    }
+
+    template<typename LossFunctionType>
+    double SimpleForestTrainer<LossFunctionType>::CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const
+    {
+        if(sums0.sumWeights == 0 || sums1.sumWeights == 0)
+        {
+            return 0;
+        }
+
+        return sums0.sumWeights * _lossFunction.BregmanGenerator(sums0.sumWeightedLabels/sums0.sumWeights) +
+            sums1.sumWeights * _lossFunction.BregmanGenerator(sums1.sumWeightedLabels/sums1.sumWeights) -
+            sums.sumWeights * _lossFunction.BregmanGenerator(sums.sumWeightedLabels/sums.sumWeights);
+    }
+
+    template<typename LossFunctionType>
+    double SimpleForestTrainer<LossFunctionType>::GetOutputValue(const Sums& sums) const
+    {
+        return sums.sumWeightedLabels / sums.sumWeights;
+    }
 
     template<typename LossFunctionType>
     std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSimpleForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters)
