@@ -18,6 +18,15 @@ namespace trainers
     public:
         using ForestTrainer<LossFunctionType>::ForestTrainer;
 
+        using SplitRuleType = predictors::SingleInputThresholdRule;
+        using EdgePredictorType = predictors::ConstantPredictor;
+
+    protected:
+        virtual SplitCandidate GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums) override;
+
+        virtual std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) override;
+
+
     };
 
     /// <summary> Makes a simple forest trainer. </summary>

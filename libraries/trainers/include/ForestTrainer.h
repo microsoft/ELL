@@ -131,7 +131,7 @@ namespace trainers
         /// <returns> A shared pointer to the current predictor. </returns>
         virtual const std::shared_ptr<const predictors::SimpleForestPredictor> GetPredictor() const { return _forest; };
 
-    private:
+    protected:
         // Specify how the trainer identifies which node it is splitting. 
         using SplittableNodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
@@ -163,12 +163,12 @@ namespace trainers
 
         void AddToCurrentOutput(Range range, const EdgePredictorType& edgePredictor);
 
-        SplitCandidate GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums);
+        virtual SplitCandidate GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums) = 0;
 
         void SortNodeDataset(Range range, size_t featureIndex);
         void SortNodeDataset(Range range, const SplitRuleType& splitRule);
 
-        std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats);
+        virtual std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) = 0;
 
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
         double GetOutputValue(const Sums& sums) const;

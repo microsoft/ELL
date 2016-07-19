@@ -117,56 +117,6 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    typename ForestTrainer<LossFunctionType>::SplitCandidate ForestTrainer<LossFunctionType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums)
-    {
-        auto numFeatures = _dataset.GetMaxDataVectorSize();
-
-        SplitCandidate bestSplitCandidate(nodeId, range, sums);
-
-        for(uint64_t inputIndex = 0; inputIndex < numFeatures; ++inputIndex)
-        {
-            // sort the relevant rows of dataset in ascending order by inputIndex
-            SortNodeDataset(range, inputIndex);
-
-            Sums sums0;
-
-            // consider all thresholds
-            double nextFeatureValue = _dataset[range.firstIndex].GetDataVector()[inputIndex];
-            for(uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size-1; ++rowIndex)
-            {
-                // get friendly names
-                double currentFeatureValue = nextFeatureValue;
-                nextFeatureValue = _dataset[rowIndex + 1].GetDataVector()[inputIndex];
-
-                // increment sums 
-                sums0.Increment(_dataset[rowIndex].GetMetaData());
-
-                // only split between rows with different feature values
-                if(currentFeatureValue == nextFeatureValue)
-                {
-                    continue;
-                }
-
-                // compute sums1 and gain
-                auto sums1 = sums - sums0;
-                double gain = CalculateGain(sums, sums0, sums1);
-
-                // find gain maximizer
-                if(gain > bestSplitCandidate.gain)
-                {
-                    bestSplitCandidate.gain = gain;
-                    bestSplitCandidate.splitRule = SplitRuleType{inputIndex, 0.5 * (currentFeatureValue + nextFeatureValue)};
-                    bestSplitCandidate.ranges.SetSize0(rowIndex - range.firstIndex + 1);
-                    bestSplitCandidate.stats.sums0 = sums0;
-                    bestSplitCandidate.stats.sums1 = sums1;
-                }
-            }
-        }
-
-        return bestSplitCandidate;
-    }
-
-    template<typename LossFunctionType>
     void ForestTrainer<LossFunctionType>::SortNodeDataset(Range range, size_t inputIndex) // to be deprecated
     {
         _dataset.Sort([inputIndex](const ForestTrainerExample& example) { return example.GetDataVector()[inputIndex]; },
@@ -180,15 +130,6 @@ namespace trainers
         _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()); },
                       range.firstIndex,
                       range.size);
-    }
-
-    template<typename LossFunctionType>
-    std::vector<typename ForestTrainer<LossFunctionType>::EdgePredictorType> ForestTrainer<LossFunctionType>::GetEdgePredictors(const NodeStats& nodeStats)
-    {
-        double output = GetOutputValue(nodeStats.sums);               
-        double output0 = GetOutputValue(nodeStats.sums0) - output;    
-        double output1 = GetOutputValue(nodeStats.sums1) - output;    
-        return std::vector<EdgePredictorType>{ output0, output1 };
     }
 
     template<typename LossFunctionType>
