@@ -42,7 +42,7 @@ namespace trainers
         };
 
         // A struct that describes the range of training examples associated with a given node and its children
-        class NodeRanges // TODO: document
+        class NodeRanges 
         {
         public:
             NodeRanges(const Range& totalRange);
@@ -80,26 +80,21 @@ namespace trainers
         // struct used to keep statistics about tree nodes
         struct NodeStats
         {
-            Sums sums; // TODO rename totalSums
-            Sums sums0;
-            Sums sums1;
-
-            NodeStats(const Sums& totalSums) : sums(totalSums)
-            {}
-
-            const Sums& GetTotalSums() { return sums; }
-
-            const Sums& GetChildSums(size_t position) const // TODO: fix this!!!!!
-            {
-                if(position ==0) return sums0;
-                return sums1;
-            }
-
+            NodeStats(const Sums& totalSums);
+            const Sums& GetTotalSums() const { return _totalSums; }
+            void SetChildSums(std::vector<Sums> childSums);
+            const Sums& GetChildSums(size_t position) const;
             void PrintLine(std::ostream& os, size_t tabs=0) const;
+
+        private:
+            Sums _totalSums; 
+            std::vector<Sums> _childSums;
         };
 
         // the type of example used by the forest trainer
         typedef dataset::Example<dataset::DoubleDataVector, ExampleMetaData> ForestTrainerExample; 
+
+        // loads a dataset and computes its sums
         Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
 
         // local copy of the dataset, with metadata attached to each example
@@ -137,7 +132,7 @@ namespace trainers
         using SplittableNodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
         // struct used to keep info about the gain maximizing split of each splittable node in the tree
-        struct SplitCandidate                                                   // TODO: this depends on template param SplitRuleType
+        struct SplitCandidate
         {
             SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums sums);
             bool operator<(const SplitCandidate& other) const { return gain < other.gain; }

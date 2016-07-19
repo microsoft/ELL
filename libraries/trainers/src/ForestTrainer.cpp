@@ -8,6 +8,9 @@
 
 #include "ForestTrainer.h"
 
+// utilites
+#include "Exception.h"
+
 namespace trainers
 {
     ForestTrainerBase::NodeRanges::NodeRanges(const ForestTrainerBase::Range& totalRange) : _total(totalRange)
@@ -47,6 +50,19 @@ namespace trainers
         return difference;
     }
 
+    void ForestTrainerBase::NodeStats::SetChildSums(std::vector<ForestTrainerBase::Sums> childSums) 
+    { 
+        _childSums = childSums; 
+    } 
+
+    ForestTrainerBase::NodeStats::NodeStats(const ForestTrainerBase::Sums& totalSums) : _totalSums(totalSums), _childSums(2)
+    {}
+
+    const ForestTrainerBase::Sums& ForestTrainerBase::NodeStats::GetChildSums(size_t position) const
+    {
+        return _childSums[position];
+    }
+
     ForestTrainerBase::Sums ForestTrainerBase::LoadData(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         Sums sums;
@@ -70,6 +86,12 @@ namespace trainers
 
             exampleIterator.Next();
         }
+
+        if(sums.sumWeights == 0.0)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::badData, "sum of weights in data is zero");
+        }
+
         return sums;
     }
 
@@ -87,15 +109,15 @@ namespace trainers
         os << std::string(tabs * 4, ' ') << "stats:\n";
 
         os << std::string((tabs+1) * 4, ' ') <<  "sums:\t";
-        sums.Print(os);
+        _totalSums.Print(os);
         os << "\n";
 
         os << std::string((tabs+1) * 4, ' ') <<  "sums0:\t";
-        sums0.Print(os);
+        _childSums[0].Print(os);
         os << "\n";
 
         os << std::string((tabs+1) * 4, ' ') <<  "sums1:\t";
-        sums1.Print(os);
+        _childSums[1].Print(os);
         os << "\n";
     }
 }

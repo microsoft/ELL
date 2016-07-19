@@ -53,8 +53,7 @@ namespace trainers
                     bestSplitCandidate.gain = gain;
                     bestSplitCandidate.splitRule = SplitRuleType{ inputIndex, 0.5 * (currentFeatureValue + nextFeatureValue) };
                     bestSplitCandidate.ranges.SetSize0(rowIndex - range.firstIndex + 1);
-                    bestSplitCandidate.stats.sums0 = sums0;
-                    bestSplitCandidate.stats.sums1 = sums1;
+                    bestSplitCandidate.stats.SetChildSums({sums0, sums1});
                 }
             }
         }
@@ -65,14 +64,14 @@ namespace trainers
     template<typename LossFunctionType>
     std::vector<typename SimpleForestTrainer<LossFunctionType>::EdgePredictorType> SimpleForestTrainer<LossFunctionType>::GetEdgePredictors(const ForestTrainerBase::NodeStats& nodeStats)
     {
-        double output = GetOutputValue(nodeStats.sums);
-        double output0 = GetOutputValue(nodeStats.sums0) - output;
-        double output1 = GetOutputValue(nodeStats.sums1) - output;
+        double output = GetOutputValue(nodeStats.GetTotalSums());
+        double output0 = GetOutputValue(nodeStats.GetChildSums(0)) - output;
+        double output1 = GetOutputValue(nodeStats.GetChildSums(1)) - output;
         return std::vector<EdgePredictorType>{ output0, output1 };
     }
 
     template<typename LossFunctionType>
-    void SimpleForestTrainer<LossFunctionType>::SortNodeDataset(Range range, size_t inputIndex) // to be deprecated
+    void SimpleForestTrainer<LossFunctionType>::SortNodeDataset(Range range, size_t inputIndex)
     {
         _dataset.Sort([inputIndex](const ForestTrainerExample& example) { return example.GetDataVector()[inputIndex]; },
                       range.firstIndex,
