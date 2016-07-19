@@ -211,12 +211,6 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters)
-    {
-        return std::make_unique<ForestTrainer<LossFunctionType>>(lossFunction, parameters);
-    }
-
-    template<typename LossFunctionType>
     ForestTrainer<LossFunctionType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums) : gain(0), nodeId(nodeId), ranges(totalRange), stats(totalSums)
     {}
     

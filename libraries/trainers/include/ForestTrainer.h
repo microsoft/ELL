@@ -109,6 +109,7 @@ namespace trainers
     class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::SimpleForestPredictor>
     {
     public:
+
         using SplitRuleType = predictors::SingleInputThresholdRule;
         using EdgePredictorType = predictors::ConstantPredictor;
 
@@ -185,16 +186,6 @@ namespace trainers
         // priority queue used to identify the gain-maximizing split candidate
         PriorityQueue _queue;
     };
-
-    /// <summary> Makes a forest trainer. </summary>
-    ///
-    /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
-    /// <param name="parameters"> The trainer parameters. </param>
-    /// <param name="lossFunction"> The loss function. </param>
-    ///
-    /// <returns> A unique_ptr to a forest trainer. </returns>
-    template<typename LossFunctionType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionType& lossFunction, const ForestTrainerParameters& parameters);
 }
 
 #include "../tcc/ForestTrainer.tcc"
