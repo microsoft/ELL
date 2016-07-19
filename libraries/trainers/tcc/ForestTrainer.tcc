@@ -78,34 +78,6 @@ namespace trainers
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    typename ForestTrainer<SplitRuleType, EdgePredictorType>::Sums ForestTrainer<SplitRuleType, EdgePredictorType>::LoadData(dataset::GenericRowDataset::Iterator exampleIterator)
-    {
-        Sums sums;
-
-        // create DenseRowDataset
-        while (exampleIterator.IsValid())
-        {
-            const auto& example = exampleIterator.Get();
-            
-            ExampleMetaData metaData = example.GetMetaData();
-            
-            // set weak label/weight to equal strong label/weight
-            metaData.weakLabel = metaData.GetLabel();
-            metaData.weakWeight = metaData.GetWeight();
-            sums.Increment(metaData);
-
-            // TODO this code breaks encapsulation - give ForestTrainer a ctor that takes an IDataVector
-            auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
-            auto forestTrainerExample = ForestTrainerExample(std::move(denseDataVector), metaData);
-            _dataset.AddExample(std::move(forestTrainerExample));
-
-            exampleIterator.Next();
-        }
-
-        return sums;
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType>
     void ForestTrainer<SplitRuleType, EdgePredictorType>::AddToCurrentOutput(Range range, const EdgePredictorType& edgePredictor)
     {
         for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size; ++rowIndex)

@@ -47,6 +47,32 @@ namespace trainers
         return difference;
     }
 
+    ForestTrainerBase::Sums ForestTrainerBase::LoadData(dataset::GenericRowDataset::Iterator exampleIterator)
+    {
+        Sums sums;
+
+        // create DenseRowDataset
+        while (exampleIterator.IsValid())
+        {
+            const auto& example = exampleIterator.Get();
+
+            ExampleMetaData metaData = example.GetMetaData();
+
+            // set weak label/weight to equal strong label/weight
+            metaData.weakLabel = metaData.GetLabel();
+            metaData.weakWeight = metaData.GetWeight();
+            sums.Increment(metaData);
+
+            // TODO this code breaks encapsulation - give ForestTrainer a ctor that takes an IDataVector
+            auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
+            auto forestTrainerExample = ForestTrainerExample(std::move(denseDataVector), metaData);
+            _dataset.AddExample(std::move(forestTrainerExample));
+
+            exampleIterator.Next();
+        }
+        return sums;
+    }
+
     //
     // debugging code
     // 

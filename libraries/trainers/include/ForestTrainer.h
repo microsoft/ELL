@@ -34,7 +34,6 @@ namespace trainers
     class ForestTrainerBase
     {
     protected:
-
         // Represents a range in an array
         struct Range
         {
@@ -98,6 +97,13 @@ namespace trainers
 
             void PrintLine(std::ostream& os, size_t tabs=0) const;
         };
+
+        // the type of example used by the forest trainer
+        typedef dataset::Example<dataset::DoubleDataVector, ExampleMetaData> ForestTrainerExample; 
+        Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
+
+        // local copy of the dataset, with metadata attached to each example
+        dataset::RowDataset<ForestTrainerExample> _dataset;
     };
 
     /// <summary>
@@ -151,10 +157,6 @@ namespace trainers
             using std::priority_queue<SplitCandidate>::size;
         };
 
-        // the type of example used by the forest trainer
-        typedef dataset::Example<dataset::DoubleDataVector, ExampleMetaData> ForestTrainerExample; 
-
-        Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
         void AddToCurrentOutput(Range range, const EdgePredictorType& edgePredictor);
         void SortNodeDataset(Range range, const SplitRuleType& splitRule); // TODO implement bucket sort
 
@@ -168,9 +170,6 @@ namespace trainers
 
         // the forest
         std::shared_ptr<predictors::SimpleForestPredictor> _forest;
-
-        // local copy of the dataset, with metadata attached to each example
-        dataset::RowDataset<ForestTrainerExample> _dataset;
 
         // priority queue used to identify the gain-maximizing split candidate
         PriorityQueue _queue;
