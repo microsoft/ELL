@@ -204,10 +204,18 @@ namespace predictors
         /// <param name="value"> The value. </param>
         void SetBias(double value);
 
+        /// <summary> Prints a representation of the forest to an output stream. </summary>
+        ///
+        /// <param name="os"> [in,out] The output stream. </param>
+        /// <param name="tabs"> The number of tabs. </param>
+        void PrintLine(std::ostream& os, size_t tabs=0) const;
+
     protected:
         struct Edge
         {
             Edge(const EdgePredictorType& predictor);
+            void PrintLine(std::ostream& os, size_t tabs=0) const;
+
             EdgePredictorType predictor;
             size_t targetNodeIndex;
         };
@@ -215,6 +223,8 @@ namespace predictors
         struct InteriorNode
         {
             InteriorNode(const SplitAction& splitAction, size_t firstEdgeIndex);
+            void PrintLine(std::ostream& os, size_t tabs=0) const;
+
             SplitRuleType splitRule;
             std::vector<Edge> outgoingEdges;
             size_t firstEdgeIndex;

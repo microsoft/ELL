@@ -77,7 +77,7 @@ namespace trainers
 
 #ifdef VERY_VERBOSE
             _dataset.Print(std::cout);
-            // _forest->Print(std::cout);
+            _forest->PrintLine(std::cout);
 #endif
 
             // if max number of splits reached, exit the loop
