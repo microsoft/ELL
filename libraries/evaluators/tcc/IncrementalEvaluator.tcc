@@ -28,8 +28,8 @@ namespace evaluators
         {
             const auto& example = iterator.Get();
 
-            double exampleWeight = example.GetMetaData().GetWeight();
-            double label = example.GetMetaData().GetLabel();
+            double exampleWeight = example.GetMetaData().weight;
+            double label = example.GetMetaData().label;
             _predictions[index] += basePredictorWeight * basePredictor.Predict(example.GetDataVector());
 
             if (evaluate)

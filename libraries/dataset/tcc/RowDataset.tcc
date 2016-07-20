@@ -11,6 +11,7 @@
 #include <random>
 #include <cassert>
 #include <algorithm>
+#include "..\include\RowDataset.h"
 
 namespace dataset
 {
@@ -100,11 +101,6 @@ namespace dataset
     {
         size = CorrectRangeSize(fromRowIndex, size);
 
-        if(size <= 1)
-        {
-            return;
-        }
-
         std::sort(_examples.begin() + fromRowIndex, 
         _examples.begin() + fromRowIndex + size, 
         [&](const ExampleType& a, const ExampleType& b) -> bool 
@@ -114,13 +110,22 @@ namespace dataset
     }
 
     template<typename ExampleType>
+    template<typename PartitionKeyType>
+    void RowDataset<ExampleType>::Partition(PartitionKeyType partitionKey, uint64_t fromRowIndex, uint64_t size)
+    {
+        size = CorrectRangeSize(fromRowIndex, size);
+        std::partition(_examples.begin() + fromRowIndex, _examples.begin() + fromRowIndex + size, partitionKey);
+    }
+
+    template<typename ExampleType>
     void RowDataset<ExampleType>::Print(std::ostream& os, uint64_t fromRowIndex, uint64_t size) const
     {
         size = CorrectRangeSize(fromRowIndex, size);
 
         for(uint64_t index = fromRowIndex; index < fromRowIndex + size; ++index)
         {
-            os << _examples[index] << std::endl;
+            _examples[index].Print(os);
+            os << "\n";
         }
     }
 

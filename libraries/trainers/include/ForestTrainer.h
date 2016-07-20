@@ -6,6 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// TODO - second call to Update should run data through the forest and update the "currentOutput"
+// TODO - set number of splits as parameter
+// 
+// TODO - bucket sort
+// TODO - add a Template booster that sets weak labels and weights
+// TODO - add parameters to set epoch sizes, how often to reboost
+
 #pragma once
 
 #include "IIncrementalTrainer.h"
@@ -63,6 +70,7 @@ namespace trainers
         struct ExampleMetaData : public dataset::WeightLabel
         {
             ExampleMetaData(const dataset::WeightLabel& weightLabel);
+            void Print(std::ostream& os) const;
 
             // the output of the forest on this example
             double currentOutput = 0;

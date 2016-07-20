@@ -79,10 +79,10 @@ namespace trainers
         while (exampleIterator.IsValid())
         {
             const auto& example = exampleIterator.Get();
-            sums.sumWeights += example.GetWeight();
-            sums.sumWeightedLabels += example.GetWeight() * example.GetMetaData().GetLabel();
+            sums.sumWeights += example.weight;
+            sums.sumWeightedLabels += example.weight * example.GetMetaData().label;
             auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
-            auto denseSupervisedExample = dataset::DenseSupervisedExample(std::move(denseDataVector), example.GetMetaData().GetLabel(), example.GetWeight());
+            auto denseSupervisedExample = dataset::DenseSupervisedExample(std::move(denseDataVector), example.GetMetaData().label, example.weight);
             _dataset.AddExample(std::move(denseSupervisedExample));
             exampleIterator.Next();
         }
@@ -112,8 +112,8 @@ namespace trainers
                 // get friendly names
                 const auto& currentRow = _dataset[rowIndex].GetDataVector();
                 const auto& nextRow = _dataset[rowIndex+1].GetDataVector();
-                double weight = _dataset[rowIndex].GetWeight();
-                double label = _dataset[rowIndex].GetMetaData().GetLabel();
+                double weight = _dataset[rowIndex].weight;
+                double label = _dataset[rowIndex].GetMetaData().label;
 
                 // increment sums
                 sums0.sumWeights += weight;

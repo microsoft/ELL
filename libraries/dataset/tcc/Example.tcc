@@ -16,6 +16,7 @@ namespace dataset
     void Example<DataVectorType, MetaDataType>::Print(std::ostream & os) const
     {
         _metaData.Print(os);
+        os << "\t";
         _dataVector->Print(os);
     }
 

@@ -34,7 +34,12 @@ namespace trainers
     }
 
     ForestTrainerBase::ExampleMetaData::ExampleMetaData(const dataset::WeightLabel& weightLabel) : dataset::WeightLabel(weightLabel)
-    {} 
+    {}
+
+    void ForestTrainerBase::ExampleMetaData::Print(std::ostream & os) const
+    {
+        os << "(" << weight << ", " << label << ", " << weakWeight << ", " << weakLabel << ")";
+    }
 
     void ForestTrainerBase::Sums::Increment(const ExampleMetaData& metaData)
     {
@@ -75,8 +80,8 @@ namespace trainers
             ExampleMetaData metaData = example.GetMetaData();
 
             // set weak label/weight to equal strong label/weight
-            metaData.weakLabel = metaData.GetLabel();
-            metaData.weakWeight = metaData.GetWeight();
+            metaData.weakLabel = metaData.label;
+            metaData.weakWeight = metaData.weight;
             sums.Increment(metaData);
 
             // TODO this code breaks encapsulation - give ForestTrainer a ctor that takes an IDataVector

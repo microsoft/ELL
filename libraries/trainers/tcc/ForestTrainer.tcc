@@ -56,6 +56,10 @@ namespace trainers
             // sort the data according to the performed split and update the metadata to reflect this change
             SortNodeDataset(ranges.GetTotalRange(), splitCandidate.splitRule);
 
+#ifdef VERY_VERBOSE
+            _dataset.Print(std::cout);
+#endif
+
             auto edgePredictors = GetEdgePredictors(stats);
 
             using SplitAction = predictors::SimpleForestPredictor::SplitAction; // TODO: this depends on predictors and on split rules
@@ -90,9 +94,18 @@ namespace trainers
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestTrainer<SplitRuleType, EdgePredictorType>::SortNodeDataset(Range range, const SplitRuleType& splitRule)
     {
-        _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()); },
-                      range.firstIndex,
-                      range.size);
+        if(splitRule.NumOutputs() == 2)
+        {
+            _dataset.Partition([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()) == 0 ? true : false; },
+                               range.firstIndex,
+                               range.size);
+        }
+        else
+        {
+            _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()); },
+                          range.firstIndex,
+                          range.size);
+        }
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>

@@ -112,7 +112,7 @@ namespace dataset
         /// <param name="count"> Number of examples to permute. </param>
         void RandomPermute(std::default_random_engine& rng, uint64_t count);
 
-        /// <summary> Sorts the given row dataset by a certain key. </summary>
+        /// <summary> Sorts an interval of examples by a certain key. </summary>
         ///
         /// <typeparam name="SortKeyType"> Type of the sort key. </typeparam>
         /// <param name="sortKey"> A function that takes const reference to ExampleType and returns a sort key. </param>
@@ -120,6 +120,17 @@ namespace dataset
         /// <param name="size"> The number of examples to sort. </param>
         template<typename SortKeyType>
         void Sort(SortKeyType sortKey, uint64_t fromRowIndex = 0, uint64_t size = 0);
+
+        /// <summary> Partitions an iterval of examples by a certain Boolean predicate (similar to sorting
+        /// by the predicate, but in linear time). </summary>
+        ///
+        /// <typeparam name="PartitionKeyType"> Type of predicate. </typeparam>
+        /// <param name="sortKey"> A function that takes const reference to ExampleType and returns a
+        ///  bool. </param>
+        /// <param name="fromRowIndex"> Zero-based index of the first row of the interval. </param>
+        /// <param name="size"> The number of examples in the interval. </param>
+        template<typename PartitionKeyType>
+        void Partition(PartitionKeyType partitionKey, uint64_t fromRowIndex = 0, uint64_t size = 0);
 
         /// <summary> Prints this object. </summary>
         ///

@@ -37,8 +37,8 @@ namespace evaluators
         {
             const auto& example = iterator.Get();
 
-            double weight = example.GetMetaData().GetWeight();
-            double label = example.GetMetaData().GetLabel();
+            double weight = example.GetMetaData().weight;
+            double label = example.GetMetaData().label;
             double prediction = predictor.Predict(example.GetDataVector());
 
             DispatchUpdate(prediction, label, weight, std::make_index_sequence<sizeof...(AggregatorTypes)>());
@@ -110,8 +110,8 @@ namespace evaluators
         {
             const auto& example = iterator.Get();
 
-            double weight = example.GetMetaData().GetWeight();
-            double label = example.GetMetaData().GetLabel();
+            double weight = example.GetMetaData().weight;
+            double label = example.GetMetaData().label;
 
             DispatchUpdate(0.0, label, weight, std::make_index_sequence<sizeof...(AggregatorTypes)>());
             iterator.Next();
