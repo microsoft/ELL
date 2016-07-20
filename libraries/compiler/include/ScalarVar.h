@@ -12,7 +12,8 @@ namespace emll
 		public:
 			ScalarVar(const VariableScope scope, const VariableFlags flags);
 
-			void AssignVar(EmittedVar var);
+			virtual void AssignVar(EmittedVar var) override;
+			virtual EmittedVar GetAssignedVar() override;
 
 		private:
 			EmittedVar _emittedVar;

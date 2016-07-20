@@ -15,12 +15,31 @@ namespace emll
 			BinaryNode,
 		};
 
+		class Compiler;
 		class DataNode
 		{
 		public:
 
-			virtual void Process() {}
+			void Process(Compiler& compiler);
+			void Process(Compiler& compiler, Variable* pVar) {}
+
 			virtual DataNodeType Type() const = 0;
+
+			std::vector<DataNode*>& Dependencies()
+			{
+				return _dependencies;
+			}
+
+		protected:
+			virtual Variable* OnProcess(Compiler& compiler)
+			{
+				return nullptr;
+			}
+			void NotifyDependencies(Compiler& compiler, Variable* pResult);
+			void ReleaseVariable(Compiler& compiler, Variable* pResult);
+
+		private:
+			std::vector<DataNode*> _dependencies;
 		};
 
 		class DataFlowGraph

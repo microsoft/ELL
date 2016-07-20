@@ -125,6 +125,10 @@ namespace emll
 			{
 				return _pEmitter->Load(pPtr);
 			}
+			llvm::Value* Load(llvm::Value* pPtr, const std::string& name)
+			{
+				return _pEmitter->Load(pPtr, name);
+			}
 			llvm::Value* Store(llvm::Value* pPtr, llvm::Value* pValue);
 			llvm::Value* OpAndUpdate(llvm::Value* pPtr, OperatorType op, llvm::Value* pValue);
 

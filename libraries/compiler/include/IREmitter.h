@@ -76,6 +76,7 @@ namespace emll
 			llvm::Value* PtrOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset);
 
 			llvm::LoadInst* Load(llvm::Value* pPtr);
+			llvm::LoadInst* Load(llvm::Value* pPtr, const std::string& name);
 			llvm::StoreInst* Store(llvm::Value* pPtr, llvm::Value* pVal);
 
 			llvm::AllocaInst* Variable(const ValueType type);

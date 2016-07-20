@@ -15,6 +15,16 @@ namespace emll
 			_emittedName = std::move(name);
 		}
 
+		void Variable::AssignVar(EmittedVar var)
+		{
+			throw new CompilerException(CompilerError::notSupported);
+		}
+
+		EmittedVar Variable::GetAssignedVar()
+		{
+			throw new CompilerException(CompilerError::notSupported);
+		}
+
 		void EmittedVar::Clear()
 		{
 			isNew = false;

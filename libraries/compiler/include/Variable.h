@@ -11,8 +11,8 @@ namespace emll
 	{
 		struct EmittedVar
 		{
-			bool isNew;
-			uint64_t varIndex;
+			bool isNew = false;
+			uint64_t varIndex = 0;
 
 			void Clear();
 		};
@@ -103,6 +103,9 @@ namespace emll
 			{
 				return ((_flags & (int)flag) != 0);
 			}
+
+			virtual void AssignVar(EmittedVar var);
+			virtual EmittedVar GetAssignedVar();
 
 		protected:
 

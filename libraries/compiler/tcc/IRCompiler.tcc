@@ -28,9 +28,8 @@ namespace emll
 				case VariableScope::Local:
 				{
 					llvm::Value* pVector = GetVariable(var.SrcName());
-					llvm::Value* pVal = _fn.ValueAtA(pVector, _fn.Literal(var.Offset()));
-					pVar = _fn.Var(var.Type(), var.EmittedName());
-					_fn.Store(pVar, pVal);
+					assert(pVector != nullptr);
+					pVar = _fn.Load(_fn.PtrOffsetA(pVector, _fn.Literal(var.Offset())), var.EmittedName());
 				}
 				break;
 

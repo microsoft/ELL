@@ -384,6 +384,12 @@ namespace emll
 			return _builder.CreateLoad(pPtr);
 		}
 
+		llvm::LoadInst* IREmitter::Load(llvm::Value* pPtr, const std::string& name)
+		{
+			assert(pPtr != nullptr);
+			return _builder.CreateLoad(pPtr, name);
+		}
+
 		llvm::StoreInst* IREmitter::Store(llvm::Value* pPtr, llvm::Value* pVal)
 		{
 			assert(pPtr != nullptr);

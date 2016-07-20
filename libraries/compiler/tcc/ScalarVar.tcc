@@ -31,6 +31,12 @@ namespace emll
 		}
 
 		template<typename T>
+		EmittedVar ScalarVar<T>::GetAssignedVar()
+		{
+			return _emittedVar;
+		}
+
+		template<typename T>
 		InitializedScalarVar<T>::InitializedScalarVar(const VariableScope scope, T data, bool isMutable)
 			: ScalarVar(scope, isMutable ? VariableFlags::isMutable : VariableFlags::none), _data(data)
 		{
