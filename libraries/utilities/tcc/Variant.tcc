@@ -35,6 +35,8 @@ namespace utilities
 
         virtual std::string ToString() const = 0;
 
+        virtual std::string GetStoredTypeName() const = 0;
+
     private:
         std::type_index _type; // redundant with type in Variant class.
     };
@@ -47,13 +49,15 @@ namespace utilities
         VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) {}
         const ValueType& GetValue() const { return _value; }
 
-        virtual std::unique_ptr<VariantBase> Clone() const
+        virtual std::unique_ptr<VariantBase> Clone() const override
         {
             auto ptr = static_cast<VariantBase*>(new VariantDerived<ValueType>(_value));
             return std::unique_ptr<VariantBase>(ptr);
         }
 
-        virtual std::string ToString() const;
+        virtual std::string ToString() const override;
+
+        virtual std::string GetStoredTypeName() const override;
 
     private:
         ValueType _value;
@@ -84,6 +88,12 @@ namespace utilities
     inline std::string VariantDerived<ValueType>::ToString() const
     {
         return VariantNamespace::GetValueString(_value, (int)0);
+    }
+
+    template <typename ValueType>
+    inline std::string VariantDerived<ValueType>::GetStoredTypeName() const
+    {
+        return TypeName<ValueType>::GetName();
     }
 
     //

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Exception.h"
+#include "TypeName.h"
 
 // stl
 #include <memory>
@@ -49,6 +50,8 @@ namespace utilities
         /// <returns> True if the variant currently holds a value of type `ValueType` </returns>
         template <typename ValueType>
         bool IsType() const;
+
+        std::string GetStoredTypeName() const;
 
     private:
         friend std::string to_string(const Variant& variant);

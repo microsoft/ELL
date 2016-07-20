@@ -33,6 +33,16 @@ namespace utilities
         friend std::ostream& operator<<(std::ostream& stream, const UniqueId& id);
         friend std::string to_string(const UniqueId& id);
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "UniqueId"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
+
     private:
         friend std::hash<UniqueId>;
         size_t _id;

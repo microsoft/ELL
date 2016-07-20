@@ -165,6 +165,18 @@ namespace utilities
         static std::string GetName() { return "uint64"; }
     };
 
+    /// <summary> Class used to get information about the unsigned long integer type. </summary>
+    ///
+    /// <typeparam name="T"> Generic type parameter. </typeparam>
+    template<>
+    struct TypeName<unsigned long>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "unsigned_long"; }
+    };
+
     /// <summary> Class used to get information about the float type. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>

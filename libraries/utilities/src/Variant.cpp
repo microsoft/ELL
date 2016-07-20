@@ -34,4 +34,9 @@ namespace utilities
         using utilities::to_string;
         return variant._value->ToString();
     }
+
+    std::string Variant::GetStoredTypeName() const
+    {
+        return _value->GetStoredTypeName();
+    }
 }
