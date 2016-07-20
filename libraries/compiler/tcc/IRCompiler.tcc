@@ -3,11 +3,18 @@ namespace emll
 	namespace compiler
 	{
 		template<typename T>
+		llvm::Value* IRCompiler::EmitLiteral(LiteralVar<T>& var)
+		{
+			llvm::Value* pVar = _fn.Literal(var.Data());
+			return pVar;
+		}
+
+		template<typename T>
 		llvm::Value* IRCompiler::EmitLocal(InitializedScalarVar<T>& var)
 		{
 			if (!var.HasEmittedName())
 			{
-				var.AssignVar(AllocTemp());
+				var.AssignVar(AllocLocal());
 			}
 			llvm::Value* pVar = _fn.Var(var.Type(), var.EmittedName());
 			_fn.Store(pVar, _fn.Literal(var.Data()));
@@ -19,24 +26,13 @@ namespace emll
 		{
 			if (!var.HasEmittedName())
 			{
-				var.AssignVar(AllocTemp());
+				var.AssignVar(AllocLocal());
 			}
 
-			llvm::Value* pVar = nullptr;
-			switch (var.SrcScope())
-			{
-				case VariableScope::Local:
-				{
-					llvm::Value* pVector = GetVariable(var.SrcName());
-					assert(pVector != nullptr);
-					pVar = _fn.Load(_fn.PtrOffsetA(pVector, _fn.Literal(var.Offset())), var.EmittedName());
-				}
-				break;
-
-				default:
-					throw new CompilerException(CompilerError::notSupported);
-			}
-			return pVar;
+			llvm::Value* pSrcVar = GetEmittedVariable(var.SrcScope(), var.SrcName());
+			assert(pSrcVar != nullptr);
+			llvm::Value* pPtr = _fn.PtrOffsetA(pSrcVar, _fn.Literal(var.Offset()));
+			return _fn.Load(pPtr, var.EmittedName());
 		}
 
 		template<typename T>

@@ -16,7 +16,7 @@ namespace emll
 			virtual void Begin() override;
 			virtual void End() override;
 
-			llvm::Value* GetVariable(const std::string& name);
+			llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
 			llvm::Value* EnsureVariable(Variable& var);
 
 			void DebugDump();
@@ -31,10 +31,13 @@ namespace emll
 
 			llvm::Value* EmitScalar(Variable& var);
 
+			llvm::Value* EmitLiteral(Variable& var);
 			llvm::Value* EmitLocalScalar(Variable& var);
 			llvm::Value* EmitGlobalScalar(Variable& var);
 			llvm::Value* EmitVectorRef(Variable& var);
 
+			template<typename T>
+			llvm::Value* EmitLiteral(LiteralVar<T>& var);
 			template<typename T>
 			llvm::Value* EmitLocal(InitializedScalarVar<T>& var);
 			template<typename T>
@@ -47,7 +50,8 @@ namespace emll
 			IREmitter _emitter;
 			IRModuleEmitter _module;
 			IRFunctionEmitter _fn;
-			IRVariableTable _vars;
+			IRVariableTable _literals;
+			IRVariableTable _locals;
 			IRVariableTable _globals;
 		};
 	}

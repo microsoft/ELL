@@ -12,7 +12,13 @@ namespace emll
 			if (pResult != nullptr)
 			{
 				NotifyDependencies(compiler, pResult);
+				OnProcessComplete(compiler, pResult);
 			}
+		}
+
+		void DataNode::OnProcessComplete(Compiler& compiler, Variable* pResult)
+		{
+			compiler.ReleaseVariable(pResult);
 		}
 
 		void DataNode::NotifyDependencies(Compiler& compiler, Variable* pResult)
@@ -20,17 +26,6 @@ namespace emll
 			for (size_t i = 0; i < _dependencies.size(); ++i)
 			{
 				_dependencies[i]->Process(compiler, pResult);
-			}
-		}
-
-		void DataNode::ReleaseVariable(Compiler& compiler, Variable* pResult)
-		{
-			if (pResult->IsScalar())
-			{
-				if (pResult->Scope() == VariableScope::Local)
-				{
-					compiler.FreeTemp(pResult->GetAssignedVar());
-				}
 			}
 		}
 

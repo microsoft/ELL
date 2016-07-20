@@ -44,9 +44,22 @@ namespace emll
 			_fn.Verify();
 		}
 
-		llvm::Value* IRCompiler::GetVariable(const std::string& name)
+		llvm::Value* IRCompiler::GetEmittedVariable(const VariableScope scope, const std::string& name)
 		{
-			return _vars.Get(name);
+			switch (scope)
+			{
+				case VariableScope::Literal:
+					return _literals.Get(name);
+				
+				case VariableScope::Global:
+					return _globals.Get(name);
+
+				case VariableScope::Local:
+					return _locals.Get(name);
+				
+				default:
+					throw new CompilerException(CompilerError::variableScopeNotSupported);
+			}
 		}
 
 		llvm::Value* IRCompiler::EnsureVariable(Variable& var)
@@ -54,7 +67,7 @@ namespace emll
 			llvm::Value* pVal = nullptr;
 			if (var.HasEmittedName())
 			{
-				pVal = _vars.Get(var.EmittedName());
+				pVal = GetEmittedVariable(var.Scope(), var.EmittedName());
 			}
 			if (pVal == nullptr)
 			{
@@ -66,7 +79,7 @@ namespace emll
 				{
 					throw new CompilerException(CompilerError::variableTypeNotSupported);
 				}
-				_vars.Set(var.EmittedName(), pVal);
+				_locals.Set(var.EmittedName(), pVal);
 			}
 			return pVal;
 		}
@@ -77,7 +90,7 @@ namespace emll
 			for (size_t i = 0; i < args.size(); ++i)
 			{
 				auto arg = &(*fnArgs);
-				_vars.Set(args[i].first, arg);
+				_locals.Set(args[i].first, arg);
 			}
 		}
 
@@ -87,17 +100,37 @@ namespace emll
 
 			switch (var.Scope())
 			{
-				case VariableScope::Global:
-					pVal = EmitGlobalScalar(var);
+				case VariableScope::Literal:
+					pVal = EmitLiteral(var);
 					break;
 
 				case VariableScope::Local:
 					pVal = EmitLocalScalar(var);
 					break;
 
+				case VariableScope::Global:
+					pVal = EmitGlobalScalar(var);
+					break;
+
 				default:
 					throw new CompilerException(CompilerError::variableTypeNotSupported);
 			}
+			return pVal;
+		}
+
+		llvm::Value* IRCompiler::EmitLiteral(Variable& var)
+		{
+			llvm::Value* pVal = nullptr;
+			switch (var.Type())
+			{
+				case ValueType::Double:
+					pVal = EmitLiteral<double>(static_cast<LiteralF&>(var));
+					break;
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
+			}
+
+			assert(pVal != nullptr);
 			return pVal;
 		}
 

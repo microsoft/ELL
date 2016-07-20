@@ -35,8 +35,8 @@ namespace emll
 			{
 				return nullptr;
 			}
+			virtual void OnProcessComplete(Compiler& compiler, Variable* pResult);
 			void NotifyDependencies(Compiler& compiler, Variable* pResult);
-			void ReleaseVariable(Compiler& compiler, Variable* pResult);
 
 		private:
 			std::vector<DataNode*> _dependencies;

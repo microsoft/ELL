@@ -20,6 +20,22 @@ namespace emll
 		};
 
 		template<typename T>
+		class LiteralVar : public ScalarVar<T>
+		{
+		public:
+			LiteralVar(T data);
+
+			T& Data()
+			{
+				return _data;
+			}
+
+		private:
+			T _data;
+		};
+		using LiteralF = LiteralVar<double>;
+
+		template<typename T>
 		class InitializedScalarVar : public ScalarVar<T>
 		{
 		public:
@@ -39,7 +55,7 @@ namespace emll
 		class VectorRefScalarVar : public ScalarVar<T>
 		{
 		public:
-			VectorRefScalarVar(std::string srcName, int offset, VariableScope srcScope);
+			VectorRefScalarVar(VariableScope srcScope, std::string srcName, int offset);
 
 			const std::string& SrcName() const
 			{

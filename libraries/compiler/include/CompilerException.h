@@ -17,6 +17,7 @@ namespace emll
 			InvalidOperatorType,
 			InvalidComparisonType,
 			variableHasNoName,
+			variableScopeNotSupported,
 			variableTypeNotSupported,
 			valueTypeNotSupported,
 			InvalidFunction,

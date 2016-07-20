@@ -177,7 +177,7 @@ void TestDataFlowGraph()
 	compiler.BeginMain("Predict");
 	//compiler.CompileNode(*node);
 	compiler.EmitScalar(InitializedScalarF(VariableScope::Global, 3.3));
-	compiler.EmitVectorRef(VectorRefScalarVarF("input", 1, VariableScope::Local));
+	compiler.EmitVectorRef(VectorRefScalarVarF(VariableScope::Local, "input", 1));
 	compiler.EndMain();
 	compiler.End();
 	compiler.DebugDump();

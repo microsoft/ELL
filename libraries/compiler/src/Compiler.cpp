@@ -34,14 +34,14 @@ namespace emll
 			return c_OutputVariableName;
 		}
 
-		EmittedVar Compiler::AllocTemp()
+		EmittedVar Compiler::AllocLocal()
 		{
-			return _tempVars.Alloc();
+			return _localVars.Alloc();
 		}
 
-		void Compiler::FreeTemp(EmittedVar var)
+		void Compiler::FreeLocal(EmittedVar var)
 		{
-			_tempVars.Free(var);
+			_localVars.Free(var);
 		}
 
 		EmittedVar Compiler::AllocGlobal()
@@ -52,6 +52,25 @@ namespace emll
 		void Compiler::FreeGlobal(EmittedVar var)
 		{
 			_globalVars.Free(var);
+		}
+		
+		void Compiler::ReleaseVariable(Variable* pVar)
+		{
+			assert(pVar != nullptr);
+
+			switch (pVar->Scope())
+			{
+				case VariableScope::Literal:
+					break;
+				case VariableScope::Local:
+					FreeLocal(pVar->GetAssignedVar());
+					break;
+				case VariableScope::Global:
+					FreeGlobal(pVar->GetAssignedVar());
+					break;
+				default:
+					break;
+			}
 		}
 
 		void Compiler::CompileModel(const model::Model& model)

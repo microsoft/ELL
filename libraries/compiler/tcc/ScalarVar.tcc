@@ -12,7 +12,7 @@ namespace emll
 
 		static const std::string c_globalVarPrefix = "g_";
 		static std::string c_tempVarPrefix = "t_";
-
+		
 		template<typename T>
 		void ScalarVar<T>::AssignVar(EmittedVar var)
 		{
@@ -26,7 +26,7 @@ namespace emll
 					SetEmittedName(c_globalVarPrefix + std::to_string(var.varIndex));
 					break;
 				default:
-					throw new CompilerException(CompilerError::notSupported);
+					throw new CompilerException(CompilerError::variableScopeNotSupported);
 			}
 		}
 
@@ -37,8 +37,16 @@ namespace emll
 		}
 
 		template<typename T>
+		LiteralVar<T>::LiteralVar(T data)
+			: ScalarVar(VariableScope::Literal, VariableFlags::none), 
+			 _data(data)
+		{
+		}
+
+		template<typename T>
 		InitializedScalarVar<T>::InitializedScalarVar(const VariableScope scope, T data, bool isMutable)
-			: ScalarVar(scope, isMutable ? VariableFlags::isMutable : VariableFlags::none), _data(data)
+			: ScalarVar(scope, isMutable ? VariableFlags::isMutable : VariableFlags::none), 
+			 _data(data)
 		{
 		}
 
@@ -49,11 +57,11 @@ namespace emll
 		}
 
 		template<typename T>
-		VectorRefScalarVar<T>::VectorRefScalarVar(std::string sourceName, int offset, VariableScope srcScope)
+		VectorRefScalarVar<T>::VectorRefScalarVar(VariableScope srcScope, std::string sourceName, int offset)
 			: ScalarVar(VariableScope::Local, VariableFlags::isVectorRef),
+			_srcScope(srcScope),
 			_srcName(std::move(sourceName)),
-			_offset(offset),
-			_srcScope(srcScope)
+			_offset(offset)
 		{
 		}
 
@@ -68,19 +76,19 @@ namespace emll
 
 			switch (_op)
 			{
-			case OperatorType::Add:
-			case OperatorType::AddF:
-			case OperatorType::Subtract:
-			case OperatorType::SubtractF:
-				_value += other._value;
-				break;
-			case OperatorType::Multiply:
-			case OperatorType::MultiplyF:
-			case OperatorType::DivideF:
-				_value *= other._value;
-				break;
-			default:
-				throw new CompilerException(CompilerError::notSupported);
+				case OperatorType::Add:
+				case OperatorType::AddF:
+				case OperatorType::Subtract:
+				case OperatorType::SubtractF:
+					_value += other._value;
+					break;
+				case OperatorType::Multiply:
+				case OperatorType::MultiplyF:
+				case OperatorType::DivideF:
+					_value *= other._value;
+					break;
+				default:
+					throw new CompilerException(CompilerError::notSupported);
 			}
 
 			return true;

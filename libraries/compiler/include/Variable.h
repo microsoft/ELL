@@ -29,6 +29,7 @@ namespace emll
 
 		enum class VariableScope
 		{
+			Literal,
 			Local,
 			Global,
 			Heap
@@ -39,8 +40,6 @@ namespace emll
 			Scalar,
 			Vector
 		};
-
-		class IRCompiler;
 
 		class Variable
 		{
