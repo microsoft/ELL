@@ -27,4 +27,11 @@ namespace utilities
         }
         return *this;
     }
+
+    std::string to_string(const Variant& variant)
+    {
+        using std::to_string;
+        using utilities::to_string;
+        return variant._value->ToString();
+    }
 }

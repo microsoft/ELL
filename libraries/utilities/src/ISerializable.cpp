@@ -23,7 +23,7 @@ namespace utilities
         const std::string indentStr = std::string(indent, ' ');
         for (const auto& pair : _description)
         {
-//            os << indentStr << pair.first << ": " << to_string(pair.second) << std::endl;
+            os << indentStr << pair.first << ": " << to_string(pair.second) << std::endl;
         }
     }
 }

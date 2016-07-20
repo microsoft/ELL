@@ -60,6 +60,10 @@ namespace utilities
     /// <summary> Convenience function to create a Variant </summary>
     template <typename ValueType, typename... Args>
     Variant MakeVariant(Args&&... args);
+
+    /// <summary> Get string representation of a Variant </summary>
+    std::string to_string(const Variant& variant);
+
 }
 
 #include "../tcc/Variant.tcc"
