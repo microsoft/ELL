@@ -17,5 +17,11 @@ namespace common
                          "msg",
                          "The minimal gain required to split a leaf node",
                          0.0);
+
+        parser.AddOption(maxSplitsPerEpoch,
+                         "maxSplitsPerEpoch",
+                         "ms",
+                         "The number of split operations to perform on each epoch",
+                         "10");
     }
 }

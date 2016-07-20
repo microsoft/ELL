@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // TODO - second call to Update should run data through the forest and update the "currentOutput"
-// TODO - set number of splits as parameter
 // 
 // TODO - bucket sort
 // TODO - add a Template booster that sets weak labels and weights
@@ -36,6 +35,7 @@ namespace trainers
     struct ForestTrainerParameters
     {
         double minSplitGain = 0.0;
+        size_t maxSplitsPerEpoch = 0;
     };
 
     /// <summary> Base class for all forest trainers. </summary>

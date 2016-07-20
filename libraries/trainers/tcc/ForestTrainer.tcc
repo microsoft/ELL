@@ -30,12 +30,19 @@ namespace trainers
         auto rootSplit = GetBestSplitCandidateAtNode(_forest->GetNewRootId(), Range{ 0, _dataset.NumExamples() }, sums);
 
         // check for positive gain 
-        if(rootSplit.gain == 0)
+        if(rootSplit.gain < _parameters.minSplitGain || _parameters.maxSplitsPerEpoch == 0)
         {
-            return; // TODO - perhaps throw an exception
+            return; 
         }
 
-        // add the root split from the graph
+        // count splits
+        size_t splitCount = 0;
+
+        // reset the queue and add the root split from the graph
+        if(_queue.size() > 0)
+        {
+            _queue = PriorityQueue();
+        }
         _queue.push(std::move(rootSplit));
 
         // as long as positive gains can be attained, keep growing the tree
@@ -66,14 +73,23 @@ namespace trainers
             SplitAction splitAction(splitCandidate.nodeId, splitCandidate.splitRule, edgePredictors);
             auto interiorNodeIndex = _forest->Split(splitAction);
 
+            // update current output field in metadata
             for(size_t i = 0; i<2; ++i)
             {
-                // update metadata in dataset
                 AddToCurrentOutput(ranges.GetChildRange(i), edgePredictors[i]);
+            }
 
-                // queue new split candidate
+            // if max number of splits reached, exit the loop
+            if(++splitCount == _parameters.maxSplitsPerEpoch)
+            {
+                break;
+            }
+
+            // queue new split candidates
+            for(size_t i = 0; i<2; ++i)
+            {
                 auto splitCandidate = GetBestSplitCandidateAtNode(_forest->GetChildId(interiorNodeIndex, i), ranges.GetChildRange(i), stats.GetChildSums(i));
-                if(splitCandidate.gain > 0.0)
+                if(splitCandidate.gain > _parameters.minSplitGain)
                 {
                     _queue.push(std::move(splitCandidate));
                 }
