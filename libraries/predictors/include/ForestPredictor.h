@@ -88,6 +88,11 @@ namespace predictors
             std::vector<EdgePredictorType> _edgePredictors;
         };
 
+        /// <summary> Query if this forest has no trees and a zero bias. </summary>
+        ///
+        /// <returns> true if the forest is trivial. </returns>
+        bool IsTrivial() const;
+        
         /// <summary> Gets the number of trees in the forest. </summary>
         ///
         /// <returns> The number of tress. </returns>

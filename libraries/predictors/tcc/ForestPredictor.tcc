@@ -22,6 +22,19 @@ namespace predictors
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType>
+    bool ForestPredictor<SplitRuleType, EdgePredictorType>::IsTrivial() const
+    {
+        if(_trees.size() == 0 && _bias == 0.0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
     size_t ForestPredictor<SplitRuleType, EdgePredictorType>::NumInteriorNodes(size_t interiorNodeIndex) const
     {
         if (interiorNodeIndex >= _interiorNodes.size())

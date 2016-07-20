@@ -36,11 +36,6 @@ namespace trainers
     ForestTrainerBase::ExampleMetaData::ExampleMetaData(const dataset::WeightLabel& weightLabel) : dataset::WeightLabel(weightLabel)
     {}
 
-    void ForestTrainerBase::ExampleMetaData::Print(std::ostream & os) const
-    {
-        os << "(" << weight << ", " << label << ", " << weakWeight << ", " << weakLabel << ")";
-    }
-
     void ForestTrainerBase::Sums::Increment(const ExampleMetaData& metaData)
     {
         sumWeights += metaData.weakWeight;
@@ -103,6 +98,11 @@ namespace trainers
     //
     // debugging code
     // 
+
+    void ForestTrainerBase::ExampleMetaData::Print(std::ostream & os) const
+    {
+        os << "(" << weight << ", " << label << ", " << currentOutput << ", " << weakWeight << ", " << weakLabel << ")";
+    }
 
     void ForestTrainerBase::Sums::Print(std::ostream& os) const
     {

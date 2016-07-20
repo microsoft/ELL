@@ -24,7 +24,7 @@ namespace trainers
         // computes the bias term, sets it in the forest and the dataset
         double bias = sums.sumWeightedLabels / sums.sumWeights; // TODO: check for zero denominator
         _forest->SetBias(bias);
-        AddToCurrentOutput(Range{ 0, _dataset.NumExamples() }, bias); // TODO - replace with InitializeCurrentOutput, where you run the predictor on the dataset
+        InitializeCurrentOutputs(bias);
 
         // find split candidate for root node and push it onto the priority queue
         auto rootSplit = GetBestSplitCandidateAtNode(_forest->GetNewRootId(), Range{ 0, _dataset.NumExamples() }, sums);
@@ -63,21 +63,22 @@ namespace trainers
             // sort the data according to the performed split and update the metadata to reflect this change
             SortNodeDataset(ranges.GetTotalRange(), splitCandidate.splitRule);
 
-#ifdef VERY_VERBOSE
-            _dataset.Print(std::cout);
-#endif
-
+            // update current output field in metadata
             auto edgePredictors = GetEdgePredictors(stats);
+            for(size_t i = 0; i<2; ++i)
+            {
+                UpdateCurrentOutput(ranges.GetChildRange(i), edgePredictors[i]);
+            }
 
-            using SplitAction = predictors::SimpleForestPredictor::SplitAction; // TODO: this depends on predictors and on split rules
+            // have the forest perform the split
+            using SplitAction = predictors::SimpleForestPredictor::SplitAction;
             SplitAction splitAction(splitCandidate.nodeId, splitCandidate.splitRule, edgePredictors);
             auto interiorNodeIndex = _forest->Split(splitAction);
 
-            // update current output field in metadata
-            for(size_t i = 0; i<2; ++i)
-            {
-                AddToCurrentOutput(ranges.GetChildRange(i), edgePredictors[i]);
-            }
+#ifdef VERY_VERBOSE
+            _dataset.Print(std::cout);
+            // _forest->Print(std::cout);
+#endif
 
             // if max number of splits reached, exit the loop
             if(++splitCount == _parameters.maxSplitsPerEpoch)
@@ -98,7 +99,18 @@ namespace trainers
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::AddToCurrentOutput(Range range, const EdgePredictorType& edgePredictor)
+    void ForestTrainer<SplitRuleType, EdgePredictorType>::InitializeCurrentOutputs(double bias)
+    {
+        for(uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
+        {
+            auto& example = _dataset[rowIndex];
+            auto& metaData = example.GetMetaData();
+            metaData.currentOutput = _forest->Compute(example.GetDataVector()) + bias;
+        }
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType>::UpdateCurrentOutput(Range range, const EdgePredictorType& edgePredictor)
     {
         for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size; ++rowIndex)
         {
