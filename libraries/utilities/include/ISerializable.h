@@ -34,4 +34,23 @@ namespace utilities
         /// <summary> Get an ObjectDescription describing how to serialize this object </summary>
         virtual ObjectDescription GetDescription() const = 0;
     };
+
+    class Serializer
+    {
+    public:
+        template <typename T>
+        void Serialize(T&& obj);
+
+    protected:
+        virtual void SerializeField(std::string name, const Variant& variant) = 0;
+    };
+
+    class SimpleSerializer : public Serializer
+    {
+    protected:
+        virtual void SerializeField(std::string name, const Variant& variant) override
+        {
+
+        }
+    };
 }

@@ -10,7 +10,7 @@
 namespace model
 {
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, { &_output }), _input(this, "input", input), _output(this, "output", input.Size()){};
+    OutputNode<ValueType>::OutputNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, { &_output }), _input(this, input, "input"), _output(this, "output", input.Size()){};
 
     template <typename ValueType>
     void OutputNode<ValueType>::Compute() const
@@ -24,5 +24,14 @@ namespace model
         auto newInput = transformer.TransformInputPort(_input);
         auto newNode = transformer.AddNode<OutputNode<ValueType>>(newInput);
         transformer.MapOutputPort(output, newNode->output);
+    }
+
+    /// Inherited from ISerializable
+    template <typename ValueType>
+    utilities::ObjectDescription OutputNode<ValueType>::GetDescription() const
+    {
+        auto result = Node::GetDescription();
+//        result.AddField("input", utilities::MakeVariant<InputPort<ValueType>>(_input));
+        return result;
     }
 }

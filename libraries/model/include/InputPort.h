@@ -45,11 +45,14 @@ namespace model
         /// <returns> The OutputPortElement containing the referenced location to get the value from </returns>
         const OutputPortElement& GetOutputPortElement(size_t index) const { return _inputElements[index]; }
 
-        /// <summary> Returns the list nodes this input port gets values from </summary>
+        /// <summary> Returns the list of nodes this input port gets values from </summary>
         ///
         /// <returns> The list nodes this input port gets values from </returns>
         const std::vector<const Node*>& GetParentNodes() const { return _parentNodes; }
 
+        /// <summary> Returns the list of port ranges this input port gets values from </summary>
+        ///
+        /// <returns> The list nodes this input port gets values from </returns>
         const OutputPortElementListUntyped& GetInputRanges() const { return _inputRanges; }
 
         /// <summary> The dimensionality of the output </summary>

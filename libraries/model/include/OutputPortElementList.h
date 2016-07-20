@@ -105,7 +105,7 @@ namespace model
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>
-    class OutputPortElementListUntyped
+    class OutputPortElementListUntyped 
     {
     public:
         /// <summary> Creates an OutputPortElementListUntyped representing all the values from a given port </summary>

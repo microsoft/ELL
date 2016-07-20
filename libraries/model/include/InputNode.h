@@ -53,9 +53,6 @@ namespace model
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(ModelTransformer& transformer) const override;
 
-        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(ModelTransformer& transformer) const override;
-
         /// Inherited from ISerializable
         virtual utilities::ObjectDescription GetDescription() const override;
 

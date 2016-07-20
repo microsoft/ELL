@@ -31,13 +31,6 @@ namespace model
         transformer.MapOutputPort(output, newNode->output);
     }
 
-    template <typename ValueType>
-    void InputNode<ValueType>::Refine(ModelTransformer& transformer) const
-    {
-        auto newNode = transformer.AddNode<InputNode<ValueType>>(_output.Size());
-         transformer.MapOutputPort(output, newNode->output);
-    }
-
     /// Inherited from ISerializable
     template <typename ValueType>
     utilities::ObjectDescription InputNode<ValueType>::GetDescription() const

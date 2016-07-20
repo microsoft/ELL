@@ -32,6 +32,18 @@ namespace utilities
         static std::string GetName() { return std::string(T::GetTypeName()); }
     };
 
+    /// <summary> Class used to get information about pointer types. </summary>
+    ///
+    /// <typeparam name="T"> Generic type parameter. </typeparam>
+    template<typename T>
+    struct TypeName<T*>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName();
+    };
+
     /// <summary> Class used to get information about unique_ptr types. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>

@@ -10,6 +10,7 @@
 #include "ValueSelectorNode.h"
 #include "ExtremalValueNode.h"
 #include "InputNode.h"
+#include "OutputNode.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
@@ -329,7 +330,8 @@ void TestSerialization()
 {
     std::cout << "Serialization" << std::endl;
     model::Model g;
-    g.AddNode<model::InputNode<double>>(3);
+    auto in = g.AddNode<model::InputNode<double>>(3);
+    auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
     auto nodeIter = g.GetNodeIterator();
     while(nodeIter.IsValid())
@@ -337,7 +339,6 @@ void TestSerialization()
         auto node = nodeIter.Get();
         auto description = node->GetDescription();
         description.Print(std::cout);
-        std::cout << std::endl;
         nodeIter.Next();
     }
 }

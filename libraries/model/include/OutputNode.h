@@ -42,7 +42,11 @@ namespace model
         /// <summary> Exposes the output port as a read-only property </summary>
         const OutputPort<ValueType>& output = _output;
 
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(ModelTransformer& transformer) const override;
+
+        /// Inherited from ISerializable
+        virtual utilities::ObjectDescription GetDescription() const override;
 
     protected:
         virtual void Compute() const override;

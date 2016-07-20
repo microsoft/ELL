@@ -10,6 +10,7 @@
 
 // utilities
 #include "UniqueId.h"
+#include "ISerializable.h"
 
 // stl
 #include <vector>
@@ -22,7 +23,7 @@ namespace model
     class Node;
 
     /// <summary> Port is the common base class for InputPort and OutputPort. </summary>
-    class Port
+    class Port : utilities::ISerializable
     {
     public:
         enum class PortType
@@ -60,6 +61,19 @@ namespace model
         /// <returns> The corresponding PortType enum value </returns>
         template <typename ValueType>
         static PortType GetTypeCode();
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "Port"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
+
+        /// Inherited from ISerializable
+        virtual utilities::ObjectDescription GetDescription() const override;
 
         virtual ~Port() = default;
 

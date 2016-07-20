@@ -31,4 +31,14 @@ namespace model
     {
         return Port::PortType::Boolean;
     }
+
+    /// Inherited from ISerializable
+    utilities::ObjectDescription Port::GetDescription() const
+    {
+        utilities::ObjectDescription result;
+        result.AddField("dummy", utilities::MakeVariant<int>(0));
+        // ???
+        return result;
+    }
+
 }
