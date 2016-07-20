@@ -30,11 +30,8 @@ namespace utilities
         bool operator!=(const UniqueId& other) const;
 
         /// <summary> Stream output </summary>
-        friend std::ostream& operator<<(std::ostream& stream, const UniqueId& id)
-        {
-            stream << id._id;
-            return stream;
-        }
+        friend std::ostream& operator<<(std::ostream& stream, const UniqueId& id);
+        friend std::string to_string(const UniqueId& id);
 
     private:
         friend std::hash<UniqueId>;

@@ -33,6 +33,8 @@ namespace utilities
 
         virtual std::unique_ptr<VariantBase> Clone() const = 0;
 
+        virtual std::string ToString() const = 0;
+
     private:
         std::type_index _type; // redundant with type in Variant class.
     };
@@ -51,9 +53,38 @@ namespace utilities
             return std::unique_ptr<VariantBase>(ptr);
         }
 
+        virtual std::string ToString() const;
+
     private:
         ValueType _value;
     };
+
+    //
+    // Private code we'd like to hide:
+    //
+    namespace VariantNamespace
+    {
+        template <typename ValueType>
+        auto GetValueString(const ValueType& value, double) -> std::string
+        {
+            return std::string("[No to_string for type ") + typeid(ValueType).name() + "]";
+        }
+
+        using std::to_string;
+        using utilities::to_string;
+        inline std::string to_string(const std::string& str) { return str; }
+        template <typename ValueType>
+        auto GetValueString(const ValueType& value, int) -> decltype(to_string(value), std::string())
+        {
+            return to_string(value);
+        }
+    }
+
+    template <typename ValueType>
+    inline std::string VariantDerived<ValueType>::ToString() const
+    {
+        return VariantNamespace::GetValueString(_value, (int)0);
+    }
 
     //
     // Variant

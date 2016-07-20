@@ -13,6 +13,9 @@
 // stl
 #include <memory>
 #include <typeindex>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 /// <summary> utilities namespace </summary>
 namespace utilities
@@ -48,6 +51,8 @@ namespace utilities
         bool IsType() const;
 
     private:
+        friend std::string to_string(const Variant& variant);
+
         template <typename ValueType, typename... Args>
         friend Variant MakeVariant(Args&&... args);
 
