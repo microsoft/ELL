@@ -5,43 +5,49 @@ namespace emll
 	namespace compiler
 	{
 		template<typename T>
-		ScalarVar<T>::ScalarVar(const VariableScope scope, T data)
-			: Variable(GetValueType<T>(), scope), _data(data)
+		ScalarVar<T>::ScalarVar(const VariableScope scope, const VariableFlags flags)
+			: Variable(GetValueType<T>(), scope, flags)
 		{
 		}
 
-		const std::string c_globalVarPrefix = "g_";
+		static const std::string c_globalVarPrefix = "g_";
+		static std::string c_tempVarPrefix = "t_";
 
 		template<typename T>
-		GlobalScalarVar<T>::GlobalScalarVar(T data)
-			: ScalarVar(VariableScope::Global, data)
+		void ScalarVar<T>::AssignVar(EmittedVar var)
 		{
+			_emittedVar = var;
+			switch (Scope())
+			{
+				case VariableScope::Local:
+					SetEmittedName(c_tempVarPrefix + std::to_string(var.varIndex));
+					break;
+				case VariableScope::Global:
+					SetEmittedName(c_globalVarPrefix + std::to_string(var.varIndex));
+					break;
+				default:
+					throw new CompilerException(CompilerError::notSupported);
+			}
 		}
 
 		template<typename T>
-		void GlobalScalarVar<T>::AssignVar(uint64_t var)
+		InitializedScalarVar<T>::InitializedScalarVar(const VariableScope scope, T data, bool isMutable)
+			: ScalarVar(scope, isMutable ? VariableFlags::isMutable : VariableFlags::none), _data(data)
 		{
-			SetEmittedName(c_globalVarPrefix + std::to_string(var));
-		}
-
-		const std::string c_tempVarPrefix = "t_";
-
-		template<typename T>
-		LocalScalarVar<T>::LocalScalarVar(T data)
-			: ScalarVar(VariableScope::Local, data)
-		{
-		}
-
-		template<typename T>
-		void LocalScalarVar<T>::AssignTempVar(TempVar var)
-		{
-			_tempVar = std::move(var);
-			SetEmittedName(c_tempVarPrefix + std::to_string(_tempVar.varIndex));
 		}
 
 		template<typename T>
 		ComputedVar<T>::ComputedVar()
 			: Variable(GetValueType<T>(), VariableScope::Local)
+		{
+		}
+
+		template<typename T>
+		VectorRefScalarVar<T>::VectorRefScalarVar(std::string sourceName, int offset, VariableScope srcScope)
+			: ScalarVar(VariableScope::Local, VariableFlags::isVectorRef),
+			_srcName(std::move(sourceName)),
+			_offset(offset),
+			_srcScope(srcScope)
 		{
 		}
 
@@ -73,6 +79,5 @@ namespace emll
 
 			return true;
 		}
-
 	}
 }

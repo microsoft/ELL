@@ -25,9 +25,17 @@ namespace emll
 
 		}
 
-		void IRCompiler::BeginMain(const std::string& functionName, NamedValueTypeList& args)
+		void IRCompiler::BeginMain(const std::string& functionName)
 		{
+			NamedValueTypeList fnArgs;
+			fnArgs.init({ { InputName(), ValueType::PDouble },{ OutputName(), ValueType::PDouble } });
+			BeginMain(functionName, fnArgs);
+		}
+
+		void IRCompiler::BeginMain(const std::string& functionName, NamedValueTypeList& args)
+		{			
 			_fn = _module.Function(functionName, ValueType::Void, args, true);
+			RegisterFunctionArgs(args);
 		}
 
 		void IRCompiler::EndMain()
@@ -63,9 +71,20 @@ namespace emll
 			return pVal;
 		}
 
+		void IRCompiler::RegisterFunctionArgs(NamedValueTypeList& args)
+		{
+			auto fnArgs = _fn.Args().begin();
+			for (size_t i = 0; i < args.size(); ++i)
+			{
+				auto arg = &(*fnArgs);
+				_vars.Set(args[i].first, arg);
+			}
+		}
+
 		llvm::Value* IRCompiler::EmitScalar(Variable& var)
 		{
 			llvm::Value* pVal = nullptr;	
+
 			switch (var.Scope())
 			{
 				case VariableScope::Global:
@@ -88,7 +107,14 @@ namespace emll
 			switch (var.Type())
 			{
 				case ValueType::Double:
-					pVal = EmitLocalScalar<double>(static_cast<LocalScalarF&>(var));
+					if (var.IsVectorRef())
+					{
+						pVal = EmitVectorRef(var);
+					}
+					else
+					{
+						pVal = EmitLocal<double>(static_cast<InitializedScalarF&>(var));
+					}
 					break;
 				default:
 					throw new CompilerException(CompilerError::valueTypeNotSupported);
@@ -103,14 +129,30 @@ namespace emll
 			llvm::Value* pVal = nullptr;
 			switch (var.Type())
 			{
+				case ValueType::Double:
+					pVal = EmitGlobal<double>(static_cast<InitializedScalarF&>(var));
+					break;
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
+			}
+			assert(pVal != nullptr);
+			return pVal;
+		}
+
+		llvm::Value* IRCompiler::EmitVectorRef(Variable& var)
+		{
+			llvm::Value* pVal = nullptr;
+			switch (var.Type())
+			{
 			case ValueType::Double:
-				pVal = EmitGlobalScalar<double>(static_cast<GlobalScalarF&>(var));
+				pVal = EmitRef<double>(static_cast<VectorRefScalarVarF&>(var));
 				break;
 			default:
 				throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 			assert(pVal != nullptr);
 			return pVal;
+
 		}
 
 		void IRCompiler::DebugDump()

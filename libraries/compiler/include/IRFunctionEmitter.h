@@ -116,7 +116,6 @@ namespace emll
 			{
 				return _pEmitter->Variable(type, name);
 			}
-
 			llvm::Value* Var(ValueType type, int count)
 			{
 				return _pEmitter->StackAlloc(type, count);

@@ -9,7 +9,7 @@ namespace emll
 {
 	namespace compiler
 	{
-		struct TempVar
+		struct EmittedVar
 		{
 			bool isNew;
 			uint64_t varIndex;
@@ -17,11 +17,11 @@ namespace emll
 			void Clear();
 		};
 
-		class TempVarAllocator
+		class EmittedVarAllocator
 		{
 		public:
-			TempVar Alloc();
-			void Free(TempVar& var);
+			EmittedVar Alloc();
+			void Free(EmittedVar& var);
 
 		private:
 			utilities::IntegerStack _varStack;
@@ -32,6 +32,12 @@ namespace emll
 			Local,
 			Global,
 			Heap
+		};
+
+		enum class VariableType
+		{
+			Scalar,
+			Vector
 		};
 
 		class IRCompiler;
@@ -136,33 +142,6 @@ namespace emll
 		};
 		
 		using VectorF = VectorVar<double>;
-
-		template<typename T>
-		class VectorRefVar : public Variable
-		{
-		public:
-			VectorRefVar(std::string name);
-			
-			const std::string& SourceName() const
-			{
-				return _sourceName;
-			}
-			const size_t Offset() const
-			{
-				return _offset;
-			}
-			const bool IsGlobal() const
-			{
-				return _isGlobal;
-			}
-		protected:
-			const size_t MAX_OFFSET = UINT_MAX;
-		
-		private:
-			std::string _sourceName;
-			size_t _offset = MAX_OFFSET;
-			bool _isGlobal = false;
-		};
 	}
 }
 

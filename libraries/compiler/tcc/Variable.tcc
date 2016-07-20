@@ -9,11 +9,5 @@ namespace emll
 			: Variable(GetValueType<T>(), scope)
 		{
 		}
-
-		template<typename T>
-		VectorRefVar<T>::VectorRefVar(std::string name)
-			: Variable(GetValueType<T>(), VariableScope::Local, VariableFlags::isVectorRef), _sourceName(std::move(name))
-		{
-		}
 	}
 }

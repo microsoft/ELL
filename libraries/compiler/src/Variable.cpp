@@ -15,21 +15,21 @@ namespace emll
 			_emittedName = std::move(name);
 		}
 
-		void TempVar::Clear()
+		void EmittedVar::Clear()
 		{
 			isNew = false;
 			varIndex = 0;
 		}
 
-		TempVar TempVarAllocator::Alloc()
+		EmittedVar EmittedVarAllocator::Alloc()
 		{
-			TempVar var;
+			EmittedVar var;
 			var.isNew = _varStack.IsTopNovel();
 			var.varIndex = _varStack.Pop();
 			return var;
 		}
 
-		void TempVarAllocator::Free(TempVar& var)
+		void EmittedVarAllocator::Free(EmittedVar& var)
 		{
 			_varStack.Push(var.varIndex);
 			var.Clear();

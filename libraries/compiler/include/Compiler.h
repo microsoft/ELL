@@ -45,9 +45,10 @@ namespace emll
 			/// <summary>Return the type of the given node</summary>
 			NodeType GetNodeType(const model::Node& node) const;
 
-			TempVar AllocTemp();
-			void FreeTemp(TempVar var);
-			uint64_t AllocGlobal();
+			EmittedVar AllocTemp();
+			void FreeTemp(EmittedVar var);
+			EmittedVar AllocGlobal();
+			void FreeGlobal(EmittedVar var);
 
 		protected:
 			virtual void BeginMain(const std::string& functionName, NamedValueTypeList& args) = 0;
@@ -81,8 +82,8 @@ namespace emll
 			SymbolTable<NodeType, NodeType::unsupported> _nodeTypes;
 			std::vector<const model::Node*> _inputs;
 			std::vector<const model::Node*> _outputs;
-			TempVarAllocator _tempVars;
-			uint64_t _globalVars = 0;
+			EmittedVarAllocator _tempVars;
+			EmittedVarAllocator _globalVars;
 		};
 	}
 }

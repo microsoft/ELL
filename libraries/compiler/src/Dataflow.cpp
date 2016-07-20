@@ -20,7 +20,7 @@ namespace emll
 
 		LiteralNode::LiteralNode(double value)
 		{
-			_pVar = std::make_unique<GlobalScalarF>(value);
+			_pVar = std::make_unique<InitializedScalarF>(VariableScope::Local, value);
 		}
 	}
 }

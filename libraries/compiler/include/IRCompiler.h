@@ -21,10 +21,13 @@ namespace emll
 
 			void DebugDump();
 
-		protected:
+		public:
+			void BeginMain(const std::string& functionName);
 			virtual void BeginMain(const std::string& functionName, NamedValueTypeList& args) override;
 			virtual void EndMain() override;
 			virtual void Compile(LiteralNode& node) override;
+
+			void RegisterFunctionArgs(NamedValueTypeList& args);
 
 			llvm::Value* EmitScalar(Variable& var);
 
@@ -33,11 +36,11 @@ namespace emll
 			llvm::Value* EmitVectorRef(Variable& var);
 
 			template<typename T>
-			llvm::Value* EmitLocalScalar(LocalScalarVar<T>& var);
+			llvm::Value* EmitLocal(InitializedScalarVar<T>& var);
 			template<typename T>
-			llvm::Value* EmitGlobalScalar(GlobalScalarVar<T>& var);
-
-		private:
+			llvm::Value* EmitRef(VectorRefScalarVar<T>& var);
+			template<typename T>
+			llvm::Value* EmitGlobal(InitializedScalarVar<T>& var);
 
 		private:
 			std::ostream& _os;

@@ -34,20 +34,24 @@ namespace emll
 			return c_OutputVariableName;
 		}
 
-		TempVar Compiler::AllocTemp()
+		EmittedVar Compiler::AllocTemp()
 		{
 			return _tempVars.Alloc();
 		}
 
-		void Compiler::FreeTemp(TempVar var)
+		void Compiler::FreeTemp(EmittedVar var)
 		{
 			_tempVars.Free(var);
 		}
 
-		uint64_t Compiler::AllocGlobal()
+		EmittedVar Compiler::AllocGlobal()
 		{
-			_globalVars++;
-			return _globalVars;
+			return _globalVars.Alloc();
+		}
+
+		void Compiler::FreeGlobal(EmittedVar var)
+		{
+			_globalVars.Free(var);
 		}
 
 		void Compiler::CompileModel(const model::Model& model)

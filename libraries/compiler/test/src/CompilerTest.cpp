@@ -174,8 +174,11 @@ void TestDataFlowGraph()
 	testing::ProcessTest("OutputPortNodesMap", portNodes->Size() == 2);
 
 	IRCompiler compiler("EMLL", std::cout);
-	compiler.Begin();
-	compiler.CompileNode(*node);
+	compiler.BeginMain("Predict");
+	//compiler.CompileNode(*node);
+	compiler.EmitScalar(InitializedScalarF(VariableScope::Global, 3.3));
+	compiler.EmitVectorRef(VectorRefScalarVarF("input", 1, VariableScope::Local));
+	compiler.EndMain();
 	compiler.End();
 	compiler.DebugDump();
 }

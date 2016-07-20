@@ -10,45 +10,57 @@ namespace emll
 		class ScalarVar : public Variable
 		{
 		public:
-			ScalarVar(T data)
-				: _data(data) {}
+			ScalarVar(const VariableScope scope, const VariableFlags flags);
+
+			void AssignVar(EmittedVar var);
+
+		private:
+			EmittedVar _emittedVar;
+		};
+
+		template<typename T>
+		class InitializedScalarVar : public ScalarVar<T>
+		{
+		public:
+			InitializedScalarVar(const VariableScope scope, T data, bool isMutable = true);
 
 			T& Data()
 			{
 				return _data;
 			}
-		protected:
-			ScalarVar(const VariableScope scope, T data);
 
 		private:
 			T _data;
 		};
+		using InitializedScalarF = InitializedScalarVar<double>;
 
 		template<typename T>
-		class GlobalScalarVar : public ScalarVar<T>
+		class VectorRefScalarVar : public ScalarVar<T>
 		{
 		public:
-			GlobalScalarVar(T data);
+			VectorRefScalarVar(std::string srcName, int offset, VariableScope srcScope);
 
-			void AssignVar(uint64_t var);
-		};
-		using GlobalScalarF = GlobalScalarVar<double>;
-
-		template<typename T>
-		class LocalScalarVar : public ScalarVar<T>
-		{
-		public:
-			LocalScalarVar(T data);
-
-			virtual void AssignTempVar(TempVar var);
-
+			const std::string& SrcName() const
+			{
+				return _srcName;
+			}
+			const int Offset() const
+			{
+				return _offset;
+			}
+			const VariableScope SrcScope() const
+			{
+				return _srcScope;
+			}
 		private:
-			TempVar _tempVar;
+			VariableScope _srcScope;
+			std::string _srcName;
+			int _offset;
 		};
-		using LocalScalarF = LocalScalarVar<double>;
+		using VectorRefScalarVarF = VectorRefScalarVar<double>;
 
 		template<typename T>
-		class ComputedVar : public LocalScalarVar<T>
+		class ComputedVar : public ScalarVar<T>
 		{
 		public:
 			ComputedVar();
