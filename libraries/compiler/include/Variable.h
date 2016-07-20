@@ -34,7 +34,6 @@ namespace emll
 			Heap
 		};
 
-
 		class IRCompiler;
 
 		class Variable
@@ -44,7 +43,7 @@ namespace emll
 			{
 				none = 0,
 				isMutable = 0x00000001,
-				isOffset = 0x00000002,
+				isVectorRef = 0x00000002,
 				isComputed = 0x00000004,
 			};
 
@@ -88,7 +87,7 @@ namespace emll
 			}		
 			bool IsVectorRef() const
 			{
-				return TestFlags(VariableFlags::isOffset);
+				return TestFlags(VariableFlags::isVectorRef);
 			}
 			bool IsComputed() const
 			{
@@ -138,20 +137,31 @@ namespace emll
 		
 		using VectorF = VectorVar<double>;
 
-		class RefVar : public Variable
-		{
-		private:
-			std::string _sourceName;
-		};
-
-		class VectorRefVar : public RefVar
+		template<typename T>
+		class VectorRefVar : public Variable
 		{
 		public:
+			VectorRefVar(std::string name);
+			
+			const std::string& SourceName() const
+			{
+				return _sourceName;
+			}
+			const size_t Offset() const
+			{
+				return _offset;
+			}
+			const bool IsGlobal() const
+			{
+				return _isGlobal;
+			}
 		protected:
 			const size_t MAX_OFFSET = UINT_MAX;
 		
 		private:
-			size_t _offset;
+			std::string _sourceName;
+			size_t _offset = MAX_OFFSET;
+			bool _isGlobal = false;
 		};
 	}
 }

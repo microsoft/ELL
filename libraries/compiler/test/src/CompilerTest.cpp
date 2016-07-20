@@ -6,6 +6,7 @@
 #include "IRInclude.h"
 #include "IRCompiler.h"
 #include "ScalarVar.h"
+#include "DataFlowBuilder.h"
 #include "testing.h"
 
 using namespace emll::compiler;
@@ -158,8 +159,19 @@ model::Model InitTestModelBinOp()
 
 void TestDataFlowGraph()
 {
+	model::Model model = InitTestModelBinOp();
+	auto inputs = ModelEx::CollectInputNodes(model);
+
 	DataFlowGraph graph;
 	DataNode* node = graph.AddNode<LiteralNode>(3.3);
+	auto outputPort = inputs[0]->GetOutputPorts()[0];
+
+	OutputPortDataNodesMap omap;
+	auto portNodes = omap.Ensure(outputPort);
+	portNodes->Add(node);
+	portNodes = omap.Get(outputPort);
+	portNodes->Add(node);
+	testing::ProcessTest("OutputPortNodesMap", portNodes->Size() == 2);
 
 	IRCompiler compiler("EMLL", std::cout);
 	compiler.Begin();

@@ -54,13 +54,21 @@ namespace emll
 		{
 			_inputs = ModelEx::CollectInputNodes(model);
 			_outputs = ModelEx::CollectOutputNodes(model);
-			BeginMain(c_PredictFunctionName);
+
+			NamedValueTypeList fnArgs;
+			AddArgs(fnArgs, InputName(), Inputs());
+			AddArgs(fnArgs, OutputName(), Outputs());
+
+			BeginMain(c_PredictFunctionName, fnArgs);
 			EndMain();
 		}
 
 		void Compiler::CompileNode(DataNode& node)
 		{
-			BeginMain(c_PredictFunctionName);
+			NamedValueTypeList fnArgs;
+			fnArgs.init({ { InputName(), ValueType::PDouble },{ OutputName(), ValueType::PDouble } });
+
+			BeginMain(c_PredictFunctionName, fnArgs);
 			switch (node.Type())
 			{
 				case DataNodeType::Literal:
@@ -70,6 +78,52 @@ namespace emll
 					throw new CompilerException(CompilerError::notSupported);
 			}
 			EndMain();
+		}
+
+		void Compiler::AddArgs(NamedValueTypeList& args, const std::string& namePrefix, const std::vector<const model::Node*>& nodes)
+		{
+			for (size_t n = 0; n < nodes.size(); ++n)
+			{
+				auto node = nodes[n];
+				std::string argNamePrefix = MakeVarName(namePrefix, n);
+				auto outputs = node->GetOutputPorts();
+				for (size_t i = 0; i < outputs.size(); ++i)
+				{
+					std::string argName;
+					if (i > 0)
+					{
+						argName = MakeVarName(argName, i);
+					}
+					else
+					{
+						argName = argNamePrefix;
+					}
+					AddArgs(args, argName, outputs[i]);
+				}
+			}
+		}
+
+		void Compiler::AddArgs(NamedValueTypeList& args, const std::string& name, const model::OutputPortBase* pOutput)
+		{
+			model::Port::PortType type = pOutput->GetType();
+			switch (type)
+			{
+			case model::Port::PortType::Real:
+				args.push_back({ name, ValueType::PDouble });
+				break;
+			case model::Port::PortType::Integer:
+				args.push_back({ name, ValueType::PInt32 });
+				break;
+			default:
+				throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		std::string Compiler::MakeVarName(const std::string& namePrefix, size_t i)
+		{
+			std::string name = namePrefix;
+			name.append(std::to_string(i));
+			return name;
 		}
 
 		Compiler::NodeType Compiler::GetNodeType(const model::Node& node) const
@@ -84,7 +138,7 @@ namespace emll
 			{
 				if (port->GetType() != type)
 				{
-					throw new CompilerException(CompilerError::inputPortTypeNotSupported);
+					throw new CompilerException(CompilerError::portTypeNotSupported);
 				}
 			}
 		}
@@ -96,7 +150,7 @@ namespace emll
 			{
 				if (port->GetType() != type)
 				{
-					throw new CompilerException(CompilerError::outputPortTypeNotSupported);
+					throw new CompilerException(CompilerError::portTypeNotSupported);
 				}
 			}
 		}
@@ -112,69 +166,6 @@ namespace emll
 
 		void Compiler::Reset()
 		{
-		}
-
-		model::Port::PortType ModelEx::GetNodeDataType(const model::Node& node)
-		{
-			return node.GetOutputPorts()[0]->GetType();
-		}
-
-		std::vector<const model::Node*> ModelEx::CollectOutputNodes(const model::Model& model)
-		{
-			auto findNodes = [](const model::Node& node)
-			{
-				return (typeid(node) == typeid(model::InputNode<double>) ||
-					typeid(node) == typeid(model::InputNode<int>));
-			};
-			return CollectNodes(model, [](const model::Node& node) { return IsLeafNode(node); });
-		}
-
-		std::vector<const model::Node*> ModelEx::CollectInputNodes(const model::Model& model)
-		{
-			auto findNodes = [](const model::Node& node)
-			{
-				return (typeid(node) == typeid(model::InputNode<double>) ||
-						typeid(node) == typeid(model::InputNode<int>));
-			};
-			return CollectNodes(model, findNodes);
-		}
-
-		std::vector<const model::Node*> ModelEx::CollectNodes(const model::Model& model, std::function<bool(const model::Node& node)> predicate)
-		{
-			std::vector<const model::Node*> matches;
-			model.Visit([&matches, &predicate](const model::Node& node) {
-				if (predicate(node))
-				{
-					matches.push_back(&node);
-				}
-			});
-			return matches;
-		}
-
-
-		size_t ModelEx::CountOutputs(std::vector<const model::Node*>& nodes)
-		{
-			size_t count = 0;
-			for (auto n : nodes)
-			{
-				count += n->GetOutputPorts().size();
-			}
-			return count;
-		}
-
-		size_t ModelEx::CountInputs(std::vector<const model::Node*>& nodes)
-		{
-			size_t count = 0;
-			for (auto n : nodes)
-			{
-				count += n->GetInputPorts().size();
-			}
-			return count;
-		}
-
-		bool ModelEx::IsLeafNode(const model::Node& node)
-		{
-			return (node.GetDependentNodes().size() == 0);
 		}
 	}
 }

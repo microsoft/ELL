@@ -21,8 +21,10 @@ set (SRC src/Types.cpp
          src/IRLoopEmitter.cpp
 		 src/IRIfEmitter.cpp
          src/IRFunctionEmitter.cpp
+		 src/ModelEx.cpp
 		 src/Variable.cpp
 		 src/Dataflow.cpp
+		 src/DataFlowBuilder.cpp
 		 src/Compiler.cpp
 		 src/IRCompiler.cpp
 )
@@ -37,9 +39,11 @@ set (INCLUDE include/LLVMInclude.h
 		include/IRFunctionEmitter.h
 		include/IRModuleEmitter.h
 		include/IRInclude.h
+		include/ModelEx.h
 		include/Variable.h
 		include/ScalarVar.h
 		include/Dataflow.h
+		include/DataFlowBuilder.h
 		include/Compiler.h
 		include/IRCompiler.h
 )

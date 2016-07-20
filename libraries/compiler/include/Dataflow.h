@@ -1,10 +1,9 @@
 #pragma once
 
-#include "ModelGraph.h"
-#include "ConstantNode.h"
-#include "Types.h"
 #include "Variable.h"
+
 #include <vector>
+#include <memory>
 
 namespace emll
 {
@@ -13,6 +12,7 @@ namespace emll
 		enum class DataNodeType
 		{
 			Literal,
+			BinaryNode,
 		};
 
 		class DataNode
@@ -23,15 +23,6 @@ namespace emll
 			virtual DataNodeType Type() const = 0;
 		};
 
-		class BinaryNode
-		{
-		public:
-			BinaryNode();
-			~BinaryNode();
-
-		private:
-		};
-
 		class DataFlowGraph
 		{
 		public:
@@ -39,9 +30,22 @@ namespace emll
 			template <class NodeType, typename... Args>
 			NodeType* AddNode(Args&&... args);
 
+			DataNode* GetNodeAt(size_t offset) const;
+
 		private:
 			// The data flow graph owns all pointers
-			std::vector<std::unique_ptr<DataNode>> _nodes;
+			std::vector<std::shared_ptr<DataNode>> _nodes;
+		};
+
+		class BinaryNode : public DataNode
+		{
+		public:
+			BinaryNode();
+			~BinaryNode();
+
+		private:
+			Variable* _pVar1 = nullptr;
+			Variable* _pVar2 = nullptr;
 		};
 
 		class LiteralNode : public DataNode

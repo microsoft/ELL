@@ -5,6 +5,11 @@ namespace emll
 {
 	namespace compiler
 	{
+		DataNode* DataFlowGraph::GetNodeAt(size_t offset) const
+		{
+			return _nodes[offset].get();
+		}
+
 		BinaryNode::BinaryNode()
 		{
 		}
