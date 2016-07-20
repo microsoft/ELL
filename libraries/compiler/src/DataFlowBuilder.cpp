@@ -11,9 +11,13 @@ namespace emll
 			_nodes.push_back(pNode);
 		}
 
-		DataNode* OutputPortDataNodes::Get(size_t position)
+		DataNode* OutputPortDataNodes::Get(size_t position) const
 		{
-			return _nodes[position];
+			if (position < _nodes.size())
+			{
+				return _nodes[position];
+			}
+			return nullptr;
 		}
 
 
@@ -30,7 +34,7 @@ namespace emll
 			return pPortNodes;
 		}
 
-		OutputPortDataNodes* OutputPortDataNodesMap::Get(const model::OutputPortBase* pPort)
+		OutputPortDataNodes* OutputPortDataNodesMap::Get(const model::OutputPortBase* pPort) const
 		{
 			auto search = _map.find(pPort);
 			if (search != _map.end())
@@ -38,10 +42,25 @@ namespace emll
 				return search->second.get();
 			}
 			return nullptr;
-
 		}
 
-		const std::string c_ConstantNodeType = "Constant";
+		void OutputPortDataNodesMap::Add(DataNode* pNode, const model::OutputPortBase* pPort)
+		{
+			Ensure(pPort)->Add(pNode);
+		}
+
+		DataNode* OutputPortDataNodesMap::Get(const model::OutputPortBase* pPort, size_t position) const
+		{
+			OutputPortDataNodes* pPortNodes = Get(pPort);
+			if (pPortNodes != nullptr)
+			{
+				return pPortNodes->Get(position);
+			}
+			return nullptr;
+		}
+
+		static const std::string c_ConstantNodeType = "Constant";
+		static const std::string c_BinaryNodeType = "BinaryOperationNode";
 
 		void DataFlowBuilder::Process(const model::Node& node)
 		{
@@ -50,14 +69,30 @@ namespace emll
 			{
 				ProcessConstant(node);
 			}
+			else if (node.GetRuntimeTypeName() == c_BinaryNodeType)
+			{
+				ProcessBinaryOperation(node);
+			}
 		}
 
 		void DataFlowBuilder::ProcessConstant(const model::Node& node)
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
+				case model::Port::PortType::Real:
+					Process(static_cast<const ConstantF&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void DataFlowBuilder::ProcessBinaryOperation(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
 			case model::Port::PortType::Real:
-				Process(static_cast<const ConstantF&>(node));
+				Process(static_cast<const BinaryOperationF&>(node));
 				break;
 			default:
 				throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -66,7 +101,17 @@ namespace emll
 
 		void DataFlowBuilder::Process(const ConstantF& node)
 		{
-			// TODO: support vector literals
+			auto outputPort = node.output;
+			auto output = outputPort.GetOutput();
+			for (size_t i = 0; i < output.size(); ++i)
+			{
+				auto *pNode = _graph.AddLiteral<double>(output[i]);
+				_outputPortMap.Add(pNode, &outputPort);
+			}
+		}
+
+		void DataFlowBuilder::Process(const BinaryOperationF& node)
+		{
 
 		}
 	}

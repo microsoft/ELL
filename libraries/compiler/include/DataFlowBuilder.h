@@ -2,7 +2,7 @@
 
 #include "ModelGraph.h"
 #include "ConstantNode.h"
-
+#include "BinaryOperationNode.h"
 #include "Dataflow.h"
 
 namespace emll
@@ -17,7 +17,7 @@ namespace emll
 				return _nodes.size();
 			}
 			void Add(DataNode* pNode);
-			DataNode* Get(size_t position);
+			DataNode* Get(size_t position) const;
 
 		private:
 			std::vector<DataNode*> _nodes;
@@ -28,7 +28,10 @@ namespace emll
 		public:
 
 			OutputPortDataNodes* Ensure(const model::OutputPortBase* pPort);
-			OutputPortDataNodes* Get(const model::OutputPortBase* pPort);
+			OutputPortDataNodes* Get(const model::OutputPortBase* pPort) const;
+
+			void Add(DataNode* pNode, const model::OutputPortBase* pPort);
+			DataNode* Get(const model::OutputPortBase* pPort, const size_t position) const;
 
 		private:
 
@@ -42,14 +45,18 @@ namespace emll
 
 			void Process(const model::Node& node);
 			void ProcessConstant(const model::Node& node);
+			void ProcessBinaryOperation(const model::Node& node);
 
 		private:
 			using ConstantF = nodes::ConstantNode<double>;
+			using BinaryOperationF = nodes::BinaryOperationNode<double>;
 
 			void Process(const ConstantF& node);
+			void Process(const BinaryOperationF& node);
 
 		private:
 			DataFlowGraph _graph;
+			OutputPortDataNodesMap _outputPortMap;
 		};
 	}
 }

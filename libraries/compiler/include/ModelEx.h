@@ -15,6 +15,7 @@ namespace emll
 		class ModelEx
 		{
 		public:
+			
 			/// <summary>Return the data type of the given node</summary>
 			static model::Port::PortType GetNodeDataType(const model::Node& node);
 

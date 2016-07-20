@@ -157,13 +157,24 @@ model::Model InitTestModelBinOp()
 	return builder.Model;
 }
 
+void TestDataFlowBuilder()
+{
+	ModelBuilder mb;
+	auto c = mb.Constant<double>({ 5, 50, 500, 5000 });
+	auto addNode = mb.Add<double>(c->output, c->output);
+	mb.Model.GetNodeOutput<double>(c->output);
+	
+	DataFlowBuilder db;
+	db.ProcessConstant(*c);
+}
+
 void TestDataFlowGraph()
 {
 	model::Model model = InitTestModelBinOp();
 	auto inputs = ModelEx::CollectInputNodes(model);
 
 	DataFlowGraph graph;
-	DataNode* node = graph.AddNode<LiteralNode>(3.3);
+	DataNode* node = graph.AddLiteral<double>(3.3);
 	auto outputPort = inputs[0]->GetOutputPorts()[0];
 
 	OutputPortDataNodesMap omap;

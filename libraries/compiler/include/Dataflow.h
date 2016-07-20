@@ -16,12 +16,14 @@ namespace emll
 		};
 
 		class Compiler;
+		class DataFlowGraph;
+
 		class DataNode
 		{
 		public:
 
-			void Process(Compiler& compiler);
-			void Process(Compiler& compiler, Variable& varResult) {}
+			void Process(DataFlowGraph& graph, Compiler& compiler);
+			void Process(DataFlowGraph& graph, Compiler& compiler, Variable& varResult) {}
 
 			virtual DataNodeType Type() const = 0;
 
@@ -31,29 +33,15 @@ namespace emll
 			}
 
 		protected:
-			virtual Variable* OnProcess(Compiler& compiler)
+			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler)
 			{
 				return nullptr;
 			}
-			virtual void OnProcessComplete(Compiler& compiler, Variable& varResult);
-			void NotifyDependencies(Compiler& compiler, Variable& varResult);
+			virtual void OnProcessComplete(DataFlowGraph& graph, Compiler& compiler, Variable& varResult);
+			void NotifyDependencies(DataFlowGraph& graph, Compiler& compiler, Variable& varResult);
 
 		private:
 			std::vector<DataNode*> _dependencies;
-		};
-
-		class DataFlowGraph
-		{
-		public:
-
-			template <class NodeType, typename... Args>
-			NodeType* AddNode(Args&&... args);
-
-			DataNode* GetNodeAt(size_t offset) const;
-
-		private:
-			// The data flow graph owns all pointers
-			std::vector<std::shared_ptr<DataNode>> _nodes;
 		};
 
 		class BinaryNode : public DataNode
@@ -70,18 +58,41 @@ namespace emll
 		class LiteralNode : public DataNode
 		{
 		public:
-			LiteralNode(double value);
+			LiteralNode(Variable* pVar);
+		
 			DataNodeType Type() const
 			{
 				return DataNodeType::Literal;
 			}
 			Variable* Var()
 			{
-				return _pVar.get();
+				return _pVar;
 			}
 
 		private:
-			std::unique_ptr<Variable> _pVar;
+			Variable* _pVar;
+		};
+
+		class DataFlowGraph
+		{
+		public:
+
+			template <class NodeType, typename... Args>
+			NodeType* AddNode(Args&&... args);
+
+			template <class VarType, typename... Args>
+			VarType* AddVariable(Args&&... args);
+
+			template <class DataType>
+			LiteralNode* AddLiteral(DataType type);
+
+			DataNode* GetNodeAt(size_t offset) const;
+
+		private:
+			// The data flow graph owns all pointers
+			std::vector<std::shared_ptr<DataNode>> _nodes;
+			std::vector<std::shared_ptr<Variable>> _variables;
+			std::vector<DataNode*> _literals;
 		};
 	}
 }
