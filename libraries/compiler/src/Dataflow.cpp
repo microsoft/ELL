@@ -11,21 +11,21 @@ namespace emll
 			Variable* pResult = OnProcess(compiler);
 			if (pResult != nullptr)
 			{
-				NotifyDependencies(compiler, pResult);
-				OnProcessComplete(compiler, pResult);
+				NotifyDependencies(compiler, *pResult);
+				OnProcessComplete(compiler, *pResult);
 			}
 		}
 
-		void DataNode::OnProcessComplete(Compiler& compiler, Variable* pResult)
+		void DataNode::OnProcessComplete(Compiler& compiler, Variable& varResult)
 		{
-			compiler.ReleaseVariable(pResult);
+			compiler.FreeVar(varResult);
 		}
 
-		void DataNode::NotifyDependencies(Compiler& compiler, Variable* pResult)
+		void DataNode::NotifyDependencies(Compiler& compiler, Variable& varResult)
 		{
 			for (size_t i = 0; i < _dependencies.size(); ++i)
 			{
-				_dependencies[i]->Process(compiler, pResult);
+				_dependencies[i]->Process(compiler, varResult);
 			}
 		}
 

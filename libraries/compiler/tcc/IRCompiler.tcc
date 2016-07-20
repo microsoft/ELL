@@ -12,10 +12,6 @@ namespace emll
 		template<typename T>
 		llvm::Value* IRCompiler::EmitLocal(InitializedScalarVar<T>& var)
 		{
-			if (!var.HasEmittedName())
-			{
-				var.AssignVar(AllocLocal());
-			}
 			llvm::Value* pVar = _fn.Var(var.Type(), var.EmittedName());
 			_fn.Store(pVar, _fn.Literal(var.Data()));
 			return pVar;
@@ -24,11 +20,6 @@ namespace emll
 		template<typename T>
 		llvm::Value* IRCompiler::EmitRef(VectorRefScalarVar<T>& var)
 		{
-			if (!var.HasEmittedName())
-			{
-				var.AssignVar(AllocLocal());
-			}
-
 			llvm::Value* pSrcVar = GetEmittedVariable(var.SrcScope(), var.SrcName());
 			assert(pSrcVar != nullptr);
 			llvm::Value* pPtr = _fn.PtrOffsetA(pSrcVar, _fn.Literal(var.Offset()));
@@ -38,10 +29,6 @@ namespace emll
 		template<typename T>
 		llvm::Value* IRCompiler::EmitGlobal(InitializedScalarVar<T>& var)
 		{
-			if (!var.HasEmittedName())
-			{
-				var.AssignVar(AllocGlobal());
-			}
 			llvm::Value* pVal = nullptr;
 			if (var.IsMutable())
 			{

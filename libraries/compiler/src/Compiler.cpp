@@ -13,9 +13,12 @@ namespace emll
 {
 	namespace compiler
 	{
-		const std::string c_InputVariableName = "input";
-		const std::string c_OutputVariableName = "output";
-		const std::string c_PredictFunctionName = "Predict";
+		static const std::string c_InputVariableName = "input";
+		static const std::string c_OutputVariableName = "output";
+		static const std::string c_PredictFunctionName = "Predict";
+		static const std::string c_literalVar = "c";
+		static const std::string c_globalVar = "g";
+		static const std::string c_localVar = "t";
 
 		/// <summary>Base class for ML Compiler.</summary>
 		Compiler::Compiler()
@@ -44,6 +47,11 @@ namespace emll
 			_localVars.Free(var);
 		}
 
+		EmittedVar Compiler::AllocLiteral()
+		{
+			return _literalVars.Alloc();
+		}
+
 		EmittedVar Compiler::AllocGlobal()
 		{
 			return _globalVars.Alloc();
@@ -53,20 +61,49 @@ namespace emll
 		{
 			_globalVars.Free(var);
 		}
-		
-		void Compiler::ReleaseVariable(Variable* pVar)
-		{
-			assert(pVar != nullptr);
 
-			switch (pVar->Scope())
+		void Compiler::AllocVar(Variable& var)
+		{
+			EmittedVar emittedVar;
+			const std::string* pPrefix = nullptr;
+			switch (var.Scope())
 			{
 				case VariableScope::Literal:
+					emittedVar = AllocLiteral();
+					pPrefix = &c_literalVar;
 					break;
 				case VariableScope::Local:
-					FreeLocal(pVar->GetAssignedVar());
+					emittedVar = AllocLocal();
+					pPrefix = &c_localVar;
 					break;
 				case VariableScope::Global:
-					FreeGlobal(pVar->GetAssignedVar());
+					emittedVar = AllocGlobal();
+					pPrefix = &c_globalVar;
+					break;
+				default:
+					throw new CompilerException(CompilerError::variableScopeNotSupported);
+			}			
+			var.AssignVar(emittedVar);
+			var.SetEmittedName(*pPrefix + std::to_string(emittedVar.varIndex));
+		}
+
+		void Compiler::FreeVar(Variable& var)
+		{
+			if (!var.HasEmittedName())
+			{
+				return;
+			}
+
+			switch (var.Scope())
+			{
+				case VariableScope::Literal:
+					// We never free literals
+					break;
+				case VariableScope::Local:
+					FreeLocal(var.GetAssignedVar());
+					break;
+				case VariableScope::Global:
+					FreeGlobal(var.GetAssignedVar());
 					break;
 				default:
 					break;

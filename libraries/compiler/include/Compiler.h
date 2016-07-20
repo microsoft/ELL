@@ -45,12 +45,15 @@ namespace emll
 			/// <summary>Return the type of the given node</summary>
 			NodeType GetNodeType(const model::Node& node) const;
 
+			EmittedVar AllocLiteral();
 			EmittedVar AllocLocal();
 			void FreeLocal(EmittedVar var);
 			EmittedVar AllocGlobal();
 			void FreeGlobal(EmittedVar var);
 
-			virtual void ReleaseVariable(Variable* pVar);
+
+			virtual void AllocVar(Variable& var);
+			virtual void FreeVar(Variable& var);
 
 		protected:
 			virtual void BeginMain(const std::string& functionName, NamedValueTypeList& args) = 0;
@@ -84,6 +87,7 @@ namespace emll
 			SymbolTable<NodeType, NodeType::unsupported> _nodeTypes;
 			std::vector<const model::Node*> _inputs;
 			std::vector<const model::Node*> _outputs;
+			EmittedVarAllocator _literalVars;
 			EmittedVarAllocator _localVars;
 			EmittedVarAllocator _globalVars;
 		};

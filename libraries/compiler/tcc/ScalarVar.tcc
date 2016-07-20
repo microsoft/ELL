@@ -10,24 +10,10 @@ namespace emll
 		{
 		}
 
-		static const std::string c_globalVarPrefix = "g_";
-		static std::string c_tempVarPrefix = "t_";
-		
 		template<typename T>
 		void ScalarVar<T>::AssignVar(EmittedVar var)
 		{
 			_emittedVar = var;
-			switch (Scope())
-			{
-				case VariableScope::Local:
-					SetEmittedName(c_tempVarPrefix + std::to_string(var.varIndex));
-					break;
-				case VariableScope::Global:
-					SetEmittedName(c_globalVarPrefix + std::to_string(var.varIndex));
-					break;
-				default:
-					throw new CompilerException(CompilerError::variableScopeNotSupported);
-			}
 		}
 
 		template<typename T>

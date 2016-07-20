@@ -17,7 +17,7 @@ namespace emll
 			virtual void End() override;
 
 			llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
-			llvm::Value* EnsureVariable(Variable& var);
+			llvm::Value* EnsureEmitted(Variable& var);
 
 			void DebugDump();
 

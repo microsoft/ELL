@@ -13,7 +13,7 @@ namespace emll
 
 		void IRCompiler::Compile(LiteralNode& node)
 		{
-			EnsureVariable(*(node.Var()));
+			EnsureEmitted(*(node.Var()));
 		}
 
 		void IRCompiler::Begin()
@@ -62,7 +62,7 @@ namespace emll
 			}
 		}
 
-		llvm::Value* IRCompiler::EnsureVariable(Variable& var)
+		llvm::Value* IRCompiler::EnsureEmitted(Variable& var)
 		{
 			llvm::Value* pVal = nullptr;
 			if (var.HasEmittedName())
@@ -79,7 +79,6 @@ namespace emll
 				{
 					throw new CompilerException(CompilerError::variableTypeNotSupported);
 				}
-				_locals.Set(var.EmittedName(), pVal);
 			}
 			return pVal;
 		}
@@ -96,8 +95,8 @@ namespace emll
 
 		llvm::Value* IRCompiler::EmitScalar(Variable& var)
 		{
+			AllocVar(var);
 			llvm::Value* pVal = nullptr;	
-
 			switch (var.Scope())
 			{
 				case VariableScope::Literal:
@@ -105,7 +104,14 @@ namespace emll
 					break;
 
 				case VariableScope::Local:
-					pVal = EmitLocalScalar(var);
+					if (var.IsVectorRef())
+					{
+						pVal = EmitVectorRef(var);
+					}
+					else
+					{
+						pVal = EmitLocalScalar(var);
+					}
 					break;
 
 				case VariableScope::Global:
@@ -131,6 +137,7 @@ namespace emll
 			}
 
 			assert(pVal != nullptr);
+			_literals.Set(var.EmittedName(), pVal);
 			return pVal;
 		}
 
@@ -140,20 +147,14 @@ namespace emll
 			switch (var.Type())
 			{
 				case ValueType::Double:
-					if (var.IsVectorRef())
-					{
-						pVal = EmitVectorRef(var);
-					}
-					else
-					{
-						pVal = EmitLocal<double>(static_cast<InitializedScalarF&>(var));
-					}
+					pVal = EmitLocal<double>(static_cast<InitializedScalarF&>(var));
 					break;
 				default:
 					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 
 			assert(pVal != nullptr);
+			_locals.Set(var.EmittedName(), pVal);
 			return pVal;
 		}
 
@@ -169,6 +170,7 @@ namespace emll
 					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 			assert(pVal != nullptr);
+			_globals.Set(var.EmittedName(), pVal);
 			return pVal;
 		}
 
@@ -184,8 +186,8 @@ namespace emll
 				throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 			assert(pVal != nullptr);
+			_locals.Set(var.EmittedName(), pVal);
 			return pVal;
-
 		}
 
 		void IRCompiler::DebugDump()

@@ -21,7 +21,7 @@ namespace emll
 		public:
 
 			void Process(Compiler& compiler);
-			void Process(Compiler& compiler, Variable* pVar) {}
+			void Process(Compiler& compiler, Variable& varResult) {}
 
 			virtual DataNodeType Type() const = 0;
 
@@ -35,8 +35,8 @@ namespace emll
 			{
 				return nullptr;
 			}
-			virtual void OnProcessComplete(Compiler& compiler, Variable* pResult);
-			void NotifyDependencies(Compiler& compiler, Variable* pResult);
+			virtual void OnProcessComplete(Compiler& compiler, Variable& varResult);
+			void NotifyDependencies(Compiler& compiler, Variable& varResult);
 
 		private:
 			std::vector<DataNode*> _dependencies;
