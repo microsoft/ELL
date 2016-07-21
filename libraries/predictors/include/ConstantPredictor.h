@@ -33,7 +33,12 @@ namespace predictors
         /// <returns> The constant value. </returns>
         double GetValue() const { return _value; }
 
-        /// <summary> Prints a representation of the predictor to the output stream on a separate line. </summary>
+        /// <summary> Prints a representation of the predictor to the output stream. </summary>
+        ///
+        /// <param name="os"> [in,out] The output stream. </param>
+        void Print(std::ostream& os) const;
+
+        /// <summary> Prints a representation of the predictor to the output stream. </summary>
         ///
         /// <param name="os"> [in,out] The output stream. </param>
         /// <param name="tabs"> The number of tabs. </param>

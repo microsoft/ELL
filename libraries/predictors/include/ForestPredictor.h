@@ -199,10 +199,10 @@ namespace predictors
         /// <returns> The bias. </returns>
         double GetBias() const { return _bias; }
 
-        /// <summary> Sets the bias value. </summary>
+        /// <summary> Adds a constant value to the bias term. </summary>
         ///
         /// <param name="value"> The value. </param>
-        void SetBias(double value);
+        void AddToBias(double value);
 
         /// <summary> Prints a representation of the forest to an output stream. </summary>
         ///

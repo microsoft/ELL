@@ -162,7 +162,7 @@ namespace trainers
             using std::priority_queue<SplitCandidate>::size;
         };
 
-        void InitializeCurrentOutputs(double bias);
+        void InitializeCurrentOutputs();
         void UpdateCurrentOutput(Range range, const EdgePredictorType& edgePredictor);
         void SortNodeDataset(Range range, const SplitRuleType& splitRule); // TODO implement bucket sort
 

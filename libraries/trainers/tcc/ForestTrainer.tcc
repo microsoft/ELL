@@ -23,8 +23,14 @@ namespace trainers
 
         // computes the bias term, sets it in the forest and the dataset
         double bias = sums.sumWeightedLabels / sums.sumWeights; // TODO: check for zero denominator
-        _forest->SetBias(bias);
-        InitializeCurrentOutputs(bias);
+        _forest->AddToBias(bias);
+        InitializeCurrentOutputs();
+
+#ifdef VERY_VERBOSE
+        _dataset.Print(std::cout);
+        std::cout << "\n";
+        _forest->PrintLine(std::cout);
+#endif
 
         // find split candidate for root node and push it onto the priority queue
         auto rootSplit = GetBestSplitCandidateAtNode(_forest->GetNewRootId(), Range{ 0, _dataset.NumExamples() }, sums);
@@ -77,6 +83,7 @@ namespace trainers
 
 #ifdef VERY_VERBOSE
             _dataset.Print(std::cout);
+            std::cout << "\n";
             _forest->PrintLine(std::cout);
 #endif
 
@@ -99,13 +106,13 @@ namespace trainers
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::InitializeCurrentOutputs(double bias)
+    void ForestTrainer<SplitRuleType, EdgePredictorType>::InitializeCurrentOutputs()
     {
         for(uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
         {
             auto& example = _dataset[rowIndex];
             auto& metaData = example.GetMetaData();
-            metaData.currentOutput = _forest->Compute(example.GetDataVector()) + bias;
+            metaData.currentOutput = _forest->Compute(example.GetDataVector());
         }
     }
 

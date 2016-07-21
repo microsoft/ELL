@@ -209,9 +209,9 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::SetBias(double value)
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::AddToBias(double value)
     {
-        _bias = value;
+        _bias += value;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
@@ -320,16 +320,30 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::PrintLine(std::ostream& os, size_t tabs) const
     {
-
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::PrintLine(std::ostream & os, size_t tabs) const
-    {
+        os << std::string(tabs * 4, ' ') << "Forest Predictor:\tbias = " << _bias << "\n";
+        for (const auto& interiorNode : _interiorNodes)
+        {
+            interiorNode.PrintLine(os, tabs + 1);
+        }
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::PrintLine(std::ostream & os, size_t tabs) const
     {
+        os << std::string(tabs * 4, ' ') << "InteriorNode:\n";
+        for (const auto& edge : outgoingEdges)
+        {
+            edge.PrintLine(os, tabs + 1);
+        }
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::PrintLine(std::ostream & os, size_t tabs) const
+    {
+        os << std::string(tabs * 4, ' ') << "Edge:\n";
+        os << std::string((tabs + 1) * 4, ' ') << "Predictor:\t";
+        predictor.Print(os);
+        os << "\n";
+        os << std::string((tabs + 1) * 4, ' ') << "Target node index = " << targetNodeIndex << "\n";
     }
 }
