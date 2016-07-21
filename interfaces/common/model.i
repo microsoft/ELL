@@ -51,4 +51,23 @@
 %template (BoolInputNode) model::InputNode<bool>;
 %template (DoubleOutputNode) model::OutputNode<double>;
 
+%template (DoubleInputNodeVector) std::vector<const model::InputNode<double>*>;
+%template (DoubleOutputNodeVector) std::vector<const model::OutputNode<double>*>;
+
 #endif
+
+%extend model::Model 
+{
+    // get input nodes
+    std::vector<const model::InputNode<double>*> GetDoubleInputNodes()
+    {
+        return $self->GetNodesByType<model::InputNode<double>>();
+    }
+
+    // get output nodes
+    std::vector<const model::OutputNode<double>*> GetDoubleOutputNodes()
+    {
+        return $self->GetNodesByType<model::OutputNode<double>>();
+    }
+}
+
