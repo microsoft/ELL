@@ -9,7 +9,7 @@
 namespace utilities
 {
     template <typename ValueType>
-    ObjectDescription::ObjectDescription(ValueType&& obj) : _typeName(TypeName<std::decay<ValueType>::type>::GetName())
+    ObjectDescription::ObjectDescription(ValueType&& obj) : _typeName(TypeName<typename std::decay<ValueType>::type>::GetName())
     {}
 
     template <typename T>

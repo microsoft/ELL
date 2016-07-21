@@ -53,6 +53,13 @@ namespace utilities
     template <typename T>
     ObjectDescription GetDescription(T&& obj);
 
+    // TODO: put these someplace that makes sense
+    template <typename ValueType>
+    using IsFundamental = typename std::enable_if_t<std::is_fundamental<ValueType>::value, int>;
+
+    template <typename ValueType>
+    using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, int>;
+
     //
     // Serializer class
     //
@@ -61,7 +68,6 @@ namespace utilities
     public:
         template <typename T>
         void Serialize(T&& obj);
-
 
         /// <summary> Serialize fundamental types. </summary>
         ///
