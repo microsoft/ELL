@@ -46,7 +46,7 @@ namespace common
             predictor.GetVector()[index] = (double)(index % 5);
         }
         auto classifierNode = model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
-
+        auto outputNode = model.AddNode<model::OutputNode<double>>(classifierNode->output);
         return model;
     }
 
@@ -69,8 +69,7 @@ namespace common
             predictor.GetVector()[index] = (double)(index % 5);
         }
         auto classifierNode = model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
-
-//        auto output = model.AddNode<model::OutputNode<double>>(classifierNode->output);
+        auto outputNode = model.AddNode<model::OutputNode<double>>(classifierNode->output);
         return model;
     }
 

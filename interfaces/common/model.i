@@ -56,6 +56,8 @@
 
 #endif
 
+%ignore model::Model::ComputeNodeOutput;
+
 %extend model::Model 
 {
     // get input nodes
@@ -69,5 +71,10 @@
     {
         return $self->GetNodesByType<model::OutputNode<double>>();
     }
-}
 
+    // compute output
+    std::vector<double> ComputeDoubleOutput(const OutputPort<double>& outputPort) const
+    {
+        return $self->ComputeNodeOutput(outputPort);
+    }
+}
