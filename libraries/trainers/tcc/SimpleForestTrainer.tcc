@@ -62,7 +62,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType>
-    std::vector<typename SimpleForestTrainer<LossFunctionType>::EdgePredictorType> SimpleForestTrainer<LossFunctionType>::GetEdgePredictors(const ForestTrainerBase::NodeStats& nodeStats)
+    std::vector<typename SimpleForestTrainer<LossFunctionType>::EdgePredictorType> SimpleForestTrainer<LossFunctionType>::GetEdgePredictors(const NodeStats& nodeStats)
     {
         double output = GetOutputValue(nodeStats.GetTotalSums());
         double output0 = GetOutputValue(nodeStats.GetChildSums(0)) - output;

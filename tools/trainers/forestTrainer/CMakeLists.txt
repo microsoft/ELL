@@ -31,6 +31,6 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/trainers")
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 
 # tests
-add_test(NAME sgdTrainerTest
+add_test(NAME forestTrainerTest
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/tinyTestData.txt -dd auto -omf null -v)

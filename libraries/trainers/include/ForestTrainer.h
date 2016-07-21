@@ -38,88 +38,13 @@ namespace trainers
         size_t maxSplitsPerEpoch = 0;
     };
 
-    /// <summary> Base class for all forest trainers. </summary>
-    class ForestTrainerBase
-    {
-    protected:
-        // protected ctor - makes sure that a ForestTrainerBase is never created directly
-        ForestTrainerBase(){}
-
-        // Represents a range in an array
-        struct Range
-        {
-            size_t firstIndex;
-            size_t size;
-        };
-
-        // A struct that describes the range of training examples associated with a given node and its children
-        class NodeRanges 
-        {
-        public:
-            NodeRanges(const Range& totalRange);
-            Range GetTotalRange() const { return _total; }
-            Range GetChildRange(size_t childPosition) const;
-            void SetSize0(size_t value);
-
-        private:
-            Range _total;
-            size_t _size0;
-        };
-
-        // Metadata that the forest trainer keeps with each example
-        struct ExampleMetaData : public dataset::WeightLabel
-        {
-            ExampleMetaData(const dataset::WeightLabel& weightLabel);
-            void Print(std::ostream& os) const;
-
-            // the output of the forest on this example
-            double currentOutput = 0;
-            double weakLabel = 0;
-            double weakWeight = 1;
-        };
-
-        // struct used to keep histograms of tree nodes
-        struct Sums
-        {
-            double sumWeights = 0;
-            double sumWeightedLabels = 0;
-
-            void Increment(const ExampleMetaData& metaData);
-            Sums operator-(const Sums& other) const;
-            void Print(std::ostream& os) const;
-        };
-
-        // struct used to keep statistics about tree nodes
-        struct NodeStats
-        {
-            NodeStats(const Sums& totalSums);
-            const Sums& GetTotalSums() const { return _totalSums; }
-            void SetChildSums(std::vector<Sums> childSums);
-            const Sums& GetChildSums(size_t position) const;
-            void PrintLine(std::ostream& os, size_t tabs=0) const;
-
-        private:
-            Sums _totalSums; 
-            std::vector<Sums> _childSums;
-        };
-
-        // the type of example used by the forest trainer
-        typedef dataset::Example<dataset::DoubleDataVector, ExampleMetaData> ForestTrainerExample; 
-
-        // loads a dataset and computes its sums
-        Sums LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
-
-        // local copy of the dataset, with metadata attached to each example
-        dataset::RowDataset<ForestTrainerExample> _dataset;
-    };
-
     /// <summary>
     /// Implements a greedy forest growing algorithm.
     /// </summary>
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
     template <typename SplitRuleType, typename EdgePredictorType> 
-    class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> 
+    class ForestTrainer : public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> 
     { 
     public:
         /// <summary> Constructs an instance of ForestTrainer. </summary>
@@ -137,11 +62,74 @@ namespace trainers
         /// <returns> A shared pointer to the current predictor. </returns>
         virtual const std::shared_ptr<const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> GetPredictor() const { return _forest; };
 
-    protected:
-        // Specify how the trainer identifies which node it is splitting. 
+    protected:       
+
+        //
+        // Private internal structs 
+        //
+
+        // represents a range in an array
+        struct Range
+        {
+            size_t firstIndex;
+            size_t size;
+        };
+
+        // describes the range of training examples associated with a given node and its children
+        class NodeRanges 
+        {
+        public:
+            NodeRanges(const Range& totalRange);
+            Range GetTotalRange() const { return _total; }
+            Range GetChildRange(size_t childPosition) const;
+            void SetSize0(size_t value);
+
+        private:
+            Range _total;
+            size_t _size0;
+        };
+
+        // metadata that the forest trainer keeps with each example
+        struct ExampleMetaData : public dataset::WeightLabel
+        {
+            ExampleMetaData(const dataset::WeightLabel& weightLabel);
+            void Print(std::ostream& os) const;
+
+            // the output of the forest on this example
+            double currentOutput = 0;
+            double weakLabel = 0;
+            double weakWeight = 1;
+        };
+
+        // keeps track of the total weight and total weight-weak-label in a set of examples
+        struct Sums
+        {
+            double sumWeights = 0;
+            double sumWeightedLabels = 0;
+
+            void Increment(const ExampleMetaData& metaData);
+            Sums operator-(const Sums& other) const;
+            void Print(std::ostream& os) const;
+        };
+
+        // keeps statistics about tree nodes
+        struct NodeStats
+        {
+            NodeStats(const Sums& totalSums);
+            const Sums& GetTotalSums() const { return _totalSums; }
+            void SetChildSums(std::vector<Sums> childSums);
+            const Sums& GetChildSums(size_t position) const;
+            void PrintLine(std::ostream& os, size_t tabs=0) const;
+
+        private:
+            Sums _totalSums; 
+            std::vector<Sums> _childSums;
+        };
+        
+        // node identifier - borrowed from the forest predictor class 
         using SplittableNodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
-        // struct used to keep info about the gain maximizing split of each splittable node in the tree
+        // keeps info about the gain maximizing split of each splittable node in the forest - the greedy algo maintains a priority queue of these
         struct SplitCandidate
         {
             SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums sums);
@@ -155,16 +143,33 @@ namespace trainers
             NodeRanges ranges;
         };
 
-        // implements a priority queue of split candidates that can print itself (useful for debugging)
+        // a priority queue of SplitCandidates
         struct PriorityQueue : public std::priority_queue<SplitCandidate>
         {
             void PrintLine(std::ostream& os, size_t tabs=0) const;
             using std::priority_queue<SplitCandidate>::size;
         };
 
-        void InitializeCurrentOutputs();
-        void UpdateCurrentOutput(Range range, const EdgePredictorType& edgePredictor);
+        //
+        // private member functions
+        // 
+
+        // loads a dataset and initializes the currentOutput field in the metadata
+        void LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
+
+        // runs the booster and sets the weak weight and weak labels
+        Sums SetWeakWeightsLabels();
+
+        // updates the currentOutput field in the metadata of a range of examples
+        void UpdateCurrentOutputs(double value);
+        void UpdateCurrentOutputs(Range range, const EdgePredictorType& edgePredictor);
+
+        // after performing a split, we rearrange the dataset to ensure that each node's examples occupy contiguous rows in the dataset
         void SortNodeDataset(Range range, const SplitRuleType& splitRule); // TODO implement bucket sort
+
+        //
+        // implementation specific functions that must be implemented by a derived class
+        // 
 
         virtual SplitCandidate GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums) = 0;
         virtual std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) = 0;
@@ -172,13 +177,20 @@ namespace trainers
         //
         // member variables
         //
+
+        // user defined parameters 
         ForestTrainerParameters _parameters;
 
-        // the forest
+        // the forest being grown
         std::shared_ptr<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> _forest;
 
-        // priority queue used to identify the gain-maximizing split candidate
+        // the priority queue that holds the split candidates
         PriorityQueue _queue;
+
+        // the dataset
+        typedef dataset::Example<dataset::DoubleDataVector, ExampleMetaData> ForestTrainerExample; 
+        dataset::RowDataset<ForestTrainerExample> _dataset;
+
     };
 }
 
