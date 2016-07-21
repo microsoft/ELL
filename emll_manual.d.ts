@@ -31,7 +31,7 @@ export class Node {
   GetId(): UniqueId;
   GetInputPorts(): InputPortVector;
   GetOutputPorts(): OutputPortVector;
-  GetInputNodes(): ConstNodeVector;
+  GetParentNodes(): ConstNodeVector;
   GetDependentNodes(): ConstNodeVector;
   GetRuntimeTypeName(): string;
 
@@ -61,7 +61,7 @@ export class Port {
 
 export class InputPortBase extends Port {
   GetOutputPortElements: OutputPortElementVector;
-  GetInputNodes(): ConstNodeVector;
+  GetParentNodes(): ConstNodeVector;
 }
 
 export class OutputPortBase extends Port {}
@@ -72,10 +72,10 @@ export class OutputPortElement {
 }
 
 // template collections
-export class DoubleVector {
-  size(): number;
-  get(index: number): number;
-}
+// export class DoubleVector {
+//   size(): number;
+//   get(index: number): number;
+// }
 
 export class NodeVector {
   size(): number;
