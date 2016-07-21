@@ -51,8 +51,11 @@ namespace emll
 			using ConstantF = nodes::ConstantNode<double>;
 			using BinaryOperationF = nodes::BinaryOperationNode<double>;
 
-			void Process(const ConstantF& node);
-			void Process(const BinaryOperationF& node);
+			template<typename DataType>
+			void Process(const nodes::ConstantNode<DataType>& node);
+			
+			template<typename DataType>
+			void Process(const nodes::BinaryOperationNode<DataType>& node);
 
 			DataNode* GetSourceNode(const model::InputPortBase* pPort, size_t index) const;
 
@@ -62,3 +65,6 @@ namespace emll
 		};
 	}
 }
+
+#include "../tcc/DataFlowBuilder.tcc"
+

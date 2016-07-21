@@ -52,6 +52,7 @@ set (TCC tcc/SymbolTable.tcc
 		 tcc/Variable.tcc
 		 tcc/ScalarVar.tcc
 		 tcc/DataFlow.tcc
+		 tcc/DataFlowBuilder.tcc
 		 tcc/IRCompiler.tcc
 )
 
