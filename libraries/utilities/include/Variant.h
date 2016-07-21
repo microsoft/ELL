@@ -18,6 +18,8 @@
 #include <type_traits>
 #include <utility>
 
+class ISerializable;
+
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
@@ -44,14 +46,22 @@ namespace utilities
         /// <returns> The variant's current value
         template <typename ValueType>
         ValueType GetValue() const;
-
+    
         /// <summary> Checks the current type of the variant </summary>
         ///
         /// <returns> True if the variant currently holds a value of type `ValueType` </returns>
         template <typename ValueType>
         bool IsType() const;
 
+        bool IsPrimitiveType() const;
+
+        bool IsSerializable() const;
+
+        bool IsPointer() const;
+
         std::string GetStoredTypeName() const;
+
+        ISerializable* GetSerializableInterface() const;
 
     private:
         friend std::string to_string(const Variant& variant);

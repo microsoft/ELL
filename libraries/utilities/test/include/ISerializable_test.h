@@ -8,5 +8,5 @@
 
 #pragma once
 
-void ISerializableTest();
+void TestISerializable();
 

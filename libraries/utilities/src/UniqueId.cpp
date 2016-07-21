@@ -7,6 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "UniqueId.h"
+#include "Variant.h"
+
+#include <string>
 
 /// <summary> utilities namespace </summary>
 namespace utilities
@@ -29,12 +32,18 @@ namespace utilities
         return stream;
     }
 
+    ObjectDescription UniqueId::GetDescription() const
+    {
+        ObjectDescription result(*this);
+        result.AddField("id", MakeVariant<int>(_id));
+        return result;
+    }
+
     std::string to_string(const UniqueId& id)
     {
         using std::to_string;
         return to_string(id._id);
     }
-
 }
 
 std::hash<utilities::UniqueId>::result_type std::hash<utilities::UniqueId>::operator()(argument_type const& id) const

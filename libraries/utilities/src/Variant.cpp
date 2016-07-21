@@ -39,4 +39,19 @@ namespace utilities
     {
         return _value->GetStoredTypeName();
     }
+
+    bool Variant::IsPrimitiveType() const
+    {
+        return _value->IsPrimitiveType();
+    }
+
+    bool Variant::IsSerializable() const
+    {
+        return _value->IsSerializable();
+    }
+
+    bool Variant::IsPointer() const
+    {
+        return _value->IsPointer();
+    }
 }

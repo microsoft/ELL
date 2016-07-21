@@ -8,14 +8,17 @@
 
 #pragma once
 
+#include "ISerializable.h"
+
 #include <functional>
 #include <ostream>
+#include <string>
 
 /// <summary> model namespace </summary>
 namespace utilities
 {
     /// <summary> UniqueId: A placeholder for a real GUID-type class </summary>
-    class UniqueId
+    class UniqueId : public ISerializable
     {
     public:
         /// <summary> Constructor </summary>
@@ -43,6 +46,9 @@ namespace utilities
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
 
+        /// Inherited from ISerializable
+        virtual ObjectDescription GetDescription() const override;
+        
     private:
         friend std::hash<UniqueId>;
         size_t _id;

@@ -37,6 +37,14 @@ namespace utilities
 
         virtual std::string GetStoredTypeName() const = 0;
 
+        virtual bool IsPrimitiveType() const = 0;
+
+        virtual bool IsSerializable() const = 0;
+
+        virtual bool IsPointer() const = 0;
+
+        virtual ISerializable* GetSerializableInterface() const = 0;
+
     private:
         std::type_index _type; // redundant with type in Variant class.
     };
@@ -47,6 +55,7 @@ namespace utilities
     {
     public:
         VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) {}
+
         const ValueType& GetValue() const { return _value; }
 
         virtual std::unique_ptr<VariantBase> Clone() const override
@@ -58,6 +67,14 @@ namespace utilities
         virtual std::string ToString() const override;
 
         virtual std::string GetStoredTypeName() const override;
+
+        virtual bool IsPrimitiveType() const override { return std::is_fundamental<ValueType>::value; }
+
+        virtual bool IsSerializable() const override { return !IsPrimitiveType(); }
+
+        virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
+
+        virtual ISerializable* GetSerializableInterface() const override { return dynamic_cast<ISerializable*>(&_value); }
 
     private:
         ValueType _value;
@@ -93,7 +110,9 @@ namespace utilities
     template <typename ValueType>
     inline std::string VariantDerived<ValueType>::GetStoredTypeName() const
     {
-        return TypeName<ValueType>::GetName();
+        // TODO: call GetRuntimeTypeName if we can
+//        return TypeName<ValueType>::GetName();
+        return "";
     }
 
     //

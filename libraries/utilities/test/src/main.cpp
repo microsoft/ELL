@@ -8,6 +8,7 @@
 
 #include "XMLSerialization_test.h"
 #include "Variant_test.h"
+#include "ISerializable_test.h"
 
 // utilities
 #include "IIterator.h"
@@ -208,7 +209,6 @@ int main()
     testTransformIterator();
     testParallelTransformIterator();
     testMatchFormat();
-    
 
     // XMLSerialization tests
     XMLSerializationTest();
@@ -216,6 +216,8 @@ int main()
 
     // Variant tests
     TestVariant();
+
+    TestISerializable();
 
     if (testing::DidTestFail())
     {

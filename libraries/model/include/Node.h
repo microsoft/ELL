@@ -27,7 +27,7 @@ namespace model
     class ModelTransformer;
 
     /// <summary> Superclass for all node types. </summary>
-    class Node : utilities::ISerializable
+    class Node : public utilities::ISerializable
     {
     public:
         Node() = default;

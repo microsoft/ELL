@@ -23,7 +23,7 @@ namespace model
     class Node;
 
     /// <summary> Port is the common base class for InputPort and OutputPort. </summary>
-    class Port : utilities::ISerializable
+    class Port : public utilities::ISerializable
     {
     public:
         enum class PortType
