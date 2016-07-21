@@ -54,6 +54,8 @@ namespace emll
 			void Process(const ConstantF& node);
 			void Process(const BinaryOperationF& node);
 
+			DataNode* GetSourceNode(const model::InputPortBase* pPort, size_t index) const;
+
 		private:
 			DataFlowGraph _graph;
 			OutputPortDataNodesMap _outputPortMap;

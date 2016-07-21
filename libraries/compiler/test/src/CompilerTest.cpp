@@ -166,6 +166,7 @@ void TestDataFlowBuilder()
 	
 	DataFlowBuilder db;
 	db.ProcessConstant(*c);
+	db.ProcessBinaryOperation(*addNode);
 }
 
 void TestDataFlowGraph()

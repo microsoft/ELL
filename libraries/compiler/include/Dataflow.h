@@ -11,7 +11,7 @@ namespace emll
 	{
 		enum class DataNodeType
 		{
-			Literal,
+			LiteralNode,
 			BinaryNode,
 		};
 
@@ -27,10 +27,12 @@ namespace emll
 
 			virtual DataNodeType Type() const = 0;
 
-			std::vector<DataNode*>& Dependencies()
+			const std::vector<DataNode*>& Dependencies()
 			{
 				return _dependencies;
 			}
+
+			void AddDependent(DataNode* pNode);
 
 		protected:
 			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler)
@@ -47,10 +49,17 @@ namespace emll
 		class BinaryNode : public DataNode
 		{
 		public:
-			BinaryNode();
-			~BinaryNode();
+			BinaryNode(OperatorType op);
+
+			virtual DataNodeType Type() const override
+			{
+				return DataNodeType::BinaryNode;
+			}
+
+		protected:
 
 		private:
+			OperatorType _op;
 			Variable* _pVar1 = nullptr;
 			Variable* _pVar2 = nullptr;
 		};
@@ -60,9 +69,9 @@ namespace emll
 		public:
 			LiteralNode(Variable* pVar);
 		
-			DataNodeType Type() const
+			virtual DataNodeType Type() const override
 			{
-				return DataNodeType::Literal;
+				return DataNodeType::LiteralNode;
 			}
 			Variable* Var()
 			{
@@ -80,11 +89,13 @@ namespace emll
 			template <class NodeType, typename... Args>
 			NodeType* AddNode(Args&&... args);
 
-			template <class VarType, typename... Args>
+			template <typename VarType, typename... Args>
 			VarType* AddVariable(Args&&... args);
 
-			template <class DataType>
+			template <typename DataType>
 			LiteralNode* AddLiteral(DataType type);
+
+			BinaryNode* AddBinary(OperatorType op);
 
 			DataNode* GetNodeAt(size_t offset) const;
 

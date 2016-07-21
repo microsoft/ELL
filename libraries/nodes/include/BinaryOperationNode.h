@@ -54,6 +54,9 @@ namespace nodes
 
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
+		/// <summary>Return the operation performed by this node</summary>
+		OperationType GetOperation() const { return _operation;}
+
     protected:
         virtual void Compute() const override;
 

@@ -131,7 +131,7 @@ namespace emll
 			BeginMain(c_PredictFunctionName, fnArgs);
 			switch (node.Type())
 			{
-				case DataNodeType::Literal:
+				case DataNodeType::LiteralNode:
 					Compile(static_cast<LiteralNode&>(node));
 					break;
 				default:

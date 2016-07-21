@@ -16,6 +16,12 @@ namespace emll
 			}
 		}
 
+		void DataNode::AddDependent(DataNode* pNode)
+		{
+			assert(pNode != nullptr);
+			_dependencies.push_back(pNode);
+		}
+
 		void DataNode::OnProcessComplete(DataFlowGraph& graph, Compiler& compiler, Variable& varResult)
 		{
 			compiler.FreeVar(varResult);
@@ -34,11 +40,13 @@ namespace emll
 			return _nodes[offset].get();
 		}
 
-		BinaryNode::BinaryNode()
+		BinaryNode* DataFlowGraph::AddBinary(OperatorType op)
 		{
+			return AddNode<BinaryNode>(op);
 		}
 
-		BinaryNode::~BinaryNode()
+		BinaryNode::BinaryNode(OperatorType op)
+			: _op(op)
 		{
 		}
 

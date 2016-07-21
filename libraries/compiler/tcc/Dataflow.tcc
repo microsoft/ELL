@@ -16,7 +16,7 @@ namespace emll
 			return pNode;
 		}		
 
-		template <class VarType, typename... Args>
+		template <typename VarType, typename... Args>
 		VarType* DataFlowGraph::AddVariable(Args&&... args)
 		{
 			static_assert(std::is_base_of<Variable, VarType>::value, "AddVariable requires you inherit from Variable");
@@ -27,11 +27,12 @@ namespace emll
 			return pVar;
 		}
 
-		template <class DataType>
+		template <typename DataType>
 		LiteralNode* DataFlowGraph::AddLiteral(DataType value)
 		{
 			Variable* pVar = AddVariable<LiteralVar<DataType>>(value);
 			LiteralNode* pNode = AddNode<LiteralNode>(pVar);
+			_literals.push_back(pNode);
 			return pNode;
 		}
 	}

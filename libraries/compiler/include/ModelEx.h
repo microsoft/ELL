@@ -4,6 +4,7 @@
 #include "Node.h"
 #include "InputNode.h"
 #include "OutputPort.h"
+#include "OutputPortElementList.h"
 #include "BinaryOperationNode.h"
 #include "ConstantNode.h"
 #include <functional>
