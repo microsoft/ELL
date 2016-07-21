@@ -15,6 +15,7 @@
 #include "OutputPort.h"
 #include "OutputPortElementList.h"
 #include "InputNode.h"
+#include "OutputNode.h"
 %}
 
 %rename (ModelGraph) model::Model;
@@ -32,6 +33,7 @@
 %include "ModelGraph.h"
 %include "InputPort.h"
 %include "InputNode.h"
+%include "OutputNode.h"
 
 %template (DoubleOutputPort) model::OutputPort<double>;
 %template (BoolOutputPort) model::OutputPort<bool>;
@@ -47,5 +49,6 @@
 
 %template (DoubleInputNode) model::InputNode<double>;
 %template (BoolInputNode) model::InputNode<bool>;
+%template (DoubleOutputNode) model::OutputNode<double>;
 
 #endif
