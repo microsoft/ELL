@@ -62,6 +62,13 @@ namespace emll
 		static const std::string c_ConstantNodeType = "Constant";
 		static const std::string c_BinaryNodeType = "BinaryOperationNode";
 
+		void DataFlowBuilder::Process(const model::Model& mode)
+		{
+			mode.Visit([this](const model::Node& node){
+				Process(node);
+			});
+		}
+
 		void DataFlowBuilder::Process(const model::Node& node)
 		{
 			// TODO: Make this a lookup table

@@ -97,7 +97,9 @@ namespace emll
 
 			BinaryNode* AddBinary(OperatorType op);
 
+			size_t Size() const { return _nodes.size(); }
 			DataNode* GetNodeAt(size_t offset) const;
+
 
 		private:
 			// The data flow graph owns all pointers

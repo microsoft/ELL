@@ -165,8 +165,8 @@ void TestDataFlowBuilder()
 	mb.Model.GetNodeOutput<double>(c->output);
 	
 	DataFlowBuilder db;
-	db.ProcessConstant(*c);
-	db.ProcessBinaryOperation(*addNode);
+	db.Process(mb.Model);
+	testing::ProcessTest("DataFlowBuilder", db.Graph().Size() == 8);
 }
 
 void TestDataFlowGraph()

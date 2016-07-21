@@ -43,9 +43,12 @@ namespace emll
 		{
 		public:
 
+			void Process(const model::Model& model);
 			void Process(const model::Node& node);
 			void ProcessConstant(const model::Node& node);
 			void ProcessBinaryOperation(const model::Node& node);
+
+			DataFlowGraph& Graph() { return _graph; }
 
 		private:
 			using ConstantF = nodes::ConstantNode<double>;
