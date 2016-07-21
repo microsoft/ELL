@@ -232,6 +232,8 @@ namespace predictors
 
         struct Tree
         {
+            void PrintLine(std::ostream& os, size_t tabs) const;
+
             size_t rootIndex;
         };
 

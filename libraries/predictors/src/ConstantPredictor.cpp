@@ -18,7 +18,7 @@ namespace predictors
 
     void ConstantPredictor::Print(std::ostream& os) const
     {
-        os << "constant = " << _value;
+        os << "Constant predictor = " << _value;
     }
 
     void ConstantPredictor::PrintLine(std::ostream& os, size_t tabs) const

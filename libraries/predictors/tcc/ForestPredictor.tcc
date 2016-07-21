@@ -320,10 +320,14 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::PrintLine(std::ostream& os, size_t tabs) const
     {
-        os << std::string(tabs * 4, ' ') << "Forest Predictor:\tbias = " << _bias << "\n";
+        os << std::string(tabs * 4, ' ') << "Forest Predictor: bias = " << _bias << "\n";
         for (const auto& interiorNode : _interiorNodes)
         {
             interiorNode.PrintLine(os, tabs + 1);
+        }
+        for (const auto& tree : _trees)
+        {
+            tree.PrintLine(os, tabs + 1);
         }
     }
 
@@ -331,6 +335,7 @@ namespace predictors
     void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::PrintLine(std::ostream & os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "InteriorNode:\n";
+        splitRule.PrintLine(os, tabs + 1);
         for (const auto& edge : outgoingEdges)
         {
             edge.PrintLine(os, tabs + 1);
@@ -341,9 +346,13 @@ namespace predictors
     void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::PrintLine(std::ostream & os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "Edge:\n";
-        os << std::string((tabs + 1) * 4, ' ') << "Predictor:\t";
-        predictor.Print(os);
-        os << "\n";
-        os << std::string((tabs + 1) * 4, ' ') << "Target node index = " << targetNodeIndex << "\n";
+        predictor.PrintLine(os, tabs + 1);
+        os << std::string(tabs * 4, ' ') << "Target node index = " << targetNodeIndex << "\n";
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void predictors::ForestPredictor<SplitRuleType, EdgePredictorType>::Tree::PrintLine(std::ostream & os, size_t tabs) const
+    {
+        os << std::string(tabs * 4, ' ') << "Tree: root index = " << rootIndex << "\n";
     }
 }
