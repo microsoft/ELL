@@ -22,8 +22,7 @@ namespace emll
 			auto rightInput = node.GetInputPorts()[1];
 			for (size_t i = 0; i < pOutputPort->Size(); ++i)
 			{
-				// Todo - get operator from binary node
-				auto *pNode = _graph.AddBinary(OperatorType::AddF);
+				auto *pNode = _graph.AddBinary(GetOperator<DataType>(node));
 				_outputPortMap.Add(pNode, pOutputPort);
 				AddDependency(leftInput, i, pNode);
 				AddDependency(rightInput, i, pNode);

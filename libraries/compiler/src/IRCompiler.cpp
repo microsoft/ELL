@@ -18,10 +18,9 @@ namespace emll
 
 		void IRCompiler::Compile(BinaryNode& node)
 		{
-			llvm::Value* pVar1 = EnsureEmitted(node.Var1());
-			llvm::Value* pVar2 = EnsureEmitted(node.Var2());
+			llvm::Value* pVar1 = LoadVar(node.Var1());
+			llvm::Value* pVar2 = LoadVar(node.Var2());
 			llvm::Value* pDest = EnsureEmitted(node.Result());
-
 			llvm::Value* pResult = _fn.Op(node.Op(), pVar1, pVar2);
 			_fn.Store(pDest, pResult);
 		}
@@ -215,6 +214,16 @@ namespace emll
 			}
 			assert(pVal != nullptr);
 			_locals.Set(var.EmittedName(), pVal);
+			return pVal;
+		}
+
+		llvm::Value* IRCompiler::LoadVar(Variable& var)
+		{
+			llvm::Value* pVal = EnsureEmitted(var);
+			if (!var.IsLiteral())
+			{
+				pVal = _fn.Load(pVal);
+			}
 			return pVal;
 		}
 

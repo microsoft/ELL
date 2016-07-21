@@ -50,6 +50,8 @@ namespace emll
 			template<typename T>
 			llvm::Value* EmitGlobal(InitializedScalarVar<T>& var);
 
+			llvm::Value* LoadVar(Variable& var);
+
 		private:
 			std::ostream& _os;
 			IREmitter _emitter;

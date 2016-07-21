@@ -98,11 +98,11 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-			case model::Port::PortType::Real:
-				Process<double>(static_cast<const BinaryOperationF&>(node));
-				break;
-			default:
-				throw new CompilerException(CompilerError::portTypeNotSupported);
+				case model::Port::PortType::Real:
+					Process<double>(static_cast<const BinaryOperationF&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
 		}
 
@@ -120,5 +120,29 @@ namespace emll
 			DataNode* pNode = GetSourceNode(pPort, elementIndex);
 			pNode->AddDependent(pDependant);
 		}
+
+		template<>
+		OperatorType DataFlowBuilder::GetOperator<double>(const nodes::BinaryOperationNode<double>& node)
+		{
+			using Bop = nodes::BinaryOperationNode<double>;
+			switch (node.GetOperation())
+			{
+				case Bop::OperationType::add:
+					return OperatorType::AddF;
+
+				case Bop::OperationType::subtract:
+					return OperatorType::SubtractF;
+
+				case Bop::OperationType::multiply:
+					return OperatorType::MultiplyF;
+
+				case Bop::OperationType::divide:
+					return OperatorType::DivideF;
+
+				default:
+					throw new CompilerException(CompilerError::operationTypeNotSupported);
+			}
+		}
+
 	}
 }

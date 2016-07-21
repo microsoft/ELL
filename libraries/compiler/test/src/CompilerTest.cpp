@@ -131,6 +131,12 @@ nodes::BinaryOperationNode<T>* ModelBuilder::Add(const model::OutputPort<T>& x, 
 }
 
 template<typename T>
+nodes::BinaryOperationNode<T>* ModelBuilder::Multiply(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
+{
+	return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationNode<T>::OperationType::multiply);
+}
+
+template<typename T>
 nodes::ConstantNode<T>* ModelBuilder::Constant(const T value)
 {
 	return _model.AddNode<nodes::ConstantNode<T>>(value);
@@ -160,9 +166,13 @@ model::Model InitTestModelBinOp()
 model::Model InitTestModelSimple()
 {
 	ModelBuilder mb;
-	auto c = mb.Constant<double>({ 5, 50, 500, 5000 });
-	auto addNode = mb.Add<double>(c->output, c->output);
-	mb.Model.GetNodeOutput<double>(c->output);
+	auto c1 = mb.Constant<double>({ 5, 50, 500, 5000 });
+	mb.Model.GetNodeOutput<double>(c1->output);
+	auto c2 = mb.Constant<double>({ 2, 3, 4, 5});
+	mb.Model.GetNodeOutput<double>(c2->output);
+	
+	auto addNode = mb.Multiply<double>(c1->output, c2->output);
+	mb.Add<double>(addNode->output, c2->output);
 	return mb.Model;
 }
 

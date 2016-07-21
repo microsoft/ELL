@@ -83,6 +83,12 @@ namespace emll
 				return (_emittedName.length() > 0);
 			}
 			void SetEmittedName(std::string emittedName);
+
+			bool IsLiteral() const
+			{
+				return (_scope == VariableScope::Literal);
+			}
+
 			bool IsMutable() const
 			{
 				return TestFlags(VariableFlags::isMutable);

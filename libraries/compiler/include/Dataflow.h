@@ -67,6 +67,11 @@ namespace emll
 			Variable* _pVar;
 		};
 
+		class InputNode : public DataNode
+		{
+		public:
+		};
+
 		class BinaryNode : public DataNode
 		{
 		public:

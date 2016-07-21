@@ -63,6 +63,9 @@ namespace emll
 			DataNode* GetSourceNode(const model::InputPortBase* pPort, size_t elementIndex) const;
 			void AddDependency(const model::InputPortBase* pPort, size_t elementIndex, DataNode* pDependant);
 
+			template<typename DataType>
+			OperatorType GetOperator(const nodes::BinaryOperationNode<DataType>& node);
+
 		private:
 			DataFlowGraph _graph;
 			OutputPortDataNodesMap _outputPortMap;

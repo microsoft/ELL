@@ -20,6 +20,8 @@ public:
 
 	template<typename T>
 	nodes::BinaryOperationNode<T>* Add(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
+	template<typename T>
+	nodes::BinaryOperationNode<T>* Multiply(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 
 	template<typename T>
 	nodes::ConstantNode<T>* Constant(const T value);
