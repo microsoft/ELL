@@ -19,14 +19,14 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-    /// <summary> A node that represents an input to the system. </summary>
+    /// <summary> A node that represents an output from the system. </summary>
     template <typename ValueType>
     class OutputNode : public Node
     {
     public:
         /// <summary> Constructor </summary>
         ///
-        /// <param name="dimension"> The input dimension </param>
+        /// <param name="input"> The node to get the input data from </param>
         OutputNode(const model::OutputPortElementList<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
