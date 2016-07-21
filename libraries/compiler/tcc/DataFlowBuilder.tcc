@@ -22,16 +22,11 @@ namespace emll
 			auto rightInput = node.GetInputPorts()[1];
 			for (size_t i = 0; i < pOutputPort->Size(); ++i)
 			{
-				DataNode* pLeftSrc = GetSourceNode(leftInput, i);
-				DataNode* pRightSrc = GetSourceNode(rightInput, i);
-				assert(pLeftSrc != nullptr && pRightSrc != nullptr);
-
 				// Todo - get operator from binary node
 				auto *pNode = _graph.AddBinary(OperatorType::AddF);
 				_outputPortMap.Add(pNode, pOutputPort);
-
-				pLeftSrc->AddDependent(pNode);
-				pRightSrc->AddDependent(pNode);
+				AddDependency(leftInput, i, pNode);
+				AddDependency(rightInput, i, pNode);
 			}
 		}
 	}

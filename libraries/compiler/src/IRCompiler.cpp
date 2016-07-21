@@ -16,6 +16,16 @@ namespace emll
 			EnsureEmitted(*(node.Var()));
 		}
 
+		void IRCompiler::Compile(BinaryNode& node)
+		{
+			llvm::Value* pVar1 = EnsureEmitted(node.Var1());
+			llvm::Value* pVar2 = EnsureEmitted(node.Var2());
+			llvm::Value* pDest = EnsureEmitted(node.Result());
+
+			llvm::Value* pResult = _fn.Op(node.Op(), pVar1, pVar2);
+			_fn.Store(pDest, pResult);
+		}
+
 		void IRCompiler::Begin()
 		{
 		}
@@ -62,27 +72,6 @@ namespace emll
 			}
 		}
 
-		llvm::Value* IRCompiler::EnsureEmitted(Variable& var)
-		{
-			llvm::Value* pVal = nullptr;
-			if (var.HasEmittedName())
-			{
-				pVal = GetEmittedVariable(var.Scope(), var.EmittedName());
-			}
-			if (pVal == nullptr)
-			{
-				if (var.IsScalar())
-				{
-					pVal = EmitScalar(var);
-				}
-				else
-				{
-					throw new CompilerException(CompilerError::variableTypeNotSupported);
-				}
-			}
-			return pVal;
-		}
-
 		void IRCompiler::RegisterFunctionArgs(NamedValueTypeList& args)
 		{
 			auto fnArgs = _fn.Args().begin();
@@ -93,9 +82,41 @@ namespace emll
 			}
 		}
 
+		llvm::Value* IRCompiler::EnsureEmitted(Variable& var)
+		{
+			llvm::Value* pVal = nullptr;
+			if (var.HasEmittedName())
+			{
+				pVal = GetEmittedVariable(var.Scope(), var.EmittedName());
+			}
+			if (pVal == nullptr)
+			{
+				AllocVar(var);
+				pVal = GetEmittedVariable(var.Scope(), var.EmittedName());
+				if (pVal == nullptr)
+				{
+					pVal = Emit(var);
+				}
+			}
+			return pVal;
+		}
+
+		llvm::Value* IRCompiler::Emit(Variable& var)
+		{
+			assert(var.HasEmittedName());
+
+			if (var.IsScalar())
+			{
+				return EmitScalar(var);
+			}
+			else
+			{
+				throw new CompilerException(CompilerError::variableTypeNotSupported);
+			}
+		}
+
 		llvm::Value* IRCompiler::EmitScalar(Variable& var)
 		{
-			AllocVar(var);
 			llvm::Value* pVal = nullptr;	
 			switch (var.Scope())
 			{
@@ -147,7 +168,14 @@ namespace emll
 			switch (var.Type())
 			{
 				case ValueType::Double:
-					pVal = EmitLocal<double>(static_cast<InitializedScalarF&>(var));
+					if (var.HasInitValue())
+					{
+						pVal = EmitLocal<double>(static_cast<InitializedScalarF&>(var));
+					}
+					else
+					{
+						pVal = EmitLocal<double>(static_cast<ScalarF&>(var));
+					}
 					break;
 				default:
 					throw new CompilerException(CompilerError::valueTypeNotSupported);

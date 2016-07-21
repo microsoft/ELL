@@ -5,7 +5,7 @@ namespace emll
 	namespace compiler
 	{
 		template<typename T>
-		ScalarVar<T>::ScalarVar(const VariableScope scope, const VariableFlags flags)
+		ScalarVar<T>::ScalarVar(const VariableScope scope, int flags)
 			: Variable(GetValueType<T>(), scope, flags)
 		{
 		}
@@ -31,7 +31,7 @@ namespace emll
 
 		template<typename T>
 		InitializedScalarVar<T>::InitializedScalarVar(const VariableScope scope, T data, bool isMutable)
-			: ScalarVar(scope, isMutable ? VariableFlags::isMutable : VariableFlags::none), 
+			: ScalarVar(scope, isMutable ? (VariableFlags::isMutable | VariableFlags::hasInitValue) : VariableFlags::hasInitValue),
 			 _data(data)
 		{
 		}

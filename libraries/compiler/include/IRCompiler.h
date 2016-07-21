@@ -16,6 +16,9 @@ namespace emll
 			virtual void Begin() override;
 			virtual void End() override;
 
+			virtual void Compile(LiteralNode& node) override;
+			virtual void Compile(BinaryNode& node) override;
+
 			llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
 			llvm::Value* EnsureEmitted(Variable& var);
 
@@ -25,12 +28,12 @@ namespace emll
 			void BeginMain(const std::string& functionName);
 			virtual void BeginMain(const std::string& functionName, NamedValueTypeList& args) override;
 			virtual void EndMain() override;
-			virtual void Compile(LiteralNode& node) override;
-
+		
+		private:
 			void RegisterFunctionArgs(NamedValueTypeList& args);
 
+			llvm::Value* Emit(Variable& var);
 			llvm::Value* EmitScalar(Variable& var);
-
 			llvm::Value* EmitLiteral(Variable& var);
 			llvm::Value* EmitLocalScalar(Variable& var);
 			llvm::Value* EmitGlobalScalar(Variable& var);
@@ -38,6 +41,8 @@ namespace emll
 
 			template<typename T>
 			llvm::Value* EmitLiteral(LiteralVar<T>& var);
+			template<typename T>
+			llvm::Value* EmitLocal(ScalarVar<T>& var);
 			template<typename T>
 			llvm::Value* EmitLocal(InitializedScalarVar<T>& var);
 			template<typename T>

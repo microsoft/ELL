@@ -44,12 +44,13 @@ namespace emll
 		class Variable
 		{
 		public:
-			enum class VariableFlags
+			enum VariableFlags
 			{
 				none = 0,
-				isMutable = 0x00000001,
-				isVectorRef = 0x00000002,
-				isComputed = 0x00000004,
+				isMutable		= 0x00000001,
+				hasInitValue		= 0x00000002,
+				isVectorRef		= 0x00000004,
+				isComputed		= 0x00000008,
 			};
 
 		public:
@@ -94,13 +95,17 @@ namespace emll
 			{
 				return TestFlags(VariableFlags::isVectorRef);
 			}
+			bool HasInitValue() const
+			{
+				return TestFlags(VariableFlags::hasInitValue);
+			}
 			bool IsComputed() const
 			{
 				return TestFlags(VariableFlags::isComputed);
 			}
-			bool TestFlags(const VariableFlags flag) const
+			bool TestFlags(int flags) const
 			{
-				return ((_flags & (int)flag) != 0);
+				return ((_flags & flags) != 0);
 			}
 
 			virtual void AssignVar(EmittedVar var);
@@ -108,7 +113,7 @@ namespace emll
 
 		protected:
 
-			Variable(const ValueType type, const VariableScope scope, const VariableFlags flags = VariableFlags::none);
+			Variable(const ValueType type, const VariableScope scope, int flags = VariableFlags::none);
 			void SetFlags(const VariableFlags flag)
 			{
 				_flags |= (int)flag;

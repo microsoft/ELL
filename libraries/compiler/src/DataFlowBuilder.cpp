@@ -106,10 +106,19 @@ namespace emll
 			}
 		}
 
-		DataNode* DataFlowBuilder::GetSourceNode(const model::InputPortBase* pPort, size_t index) const
+		DataNode* DataFlowBuilder::GetSourceNode(const model::InputPortBase* pPort, size_t elementIndex) const
 		{
-			auto elt = pPort->GetOutputPortElement(index);
+			assert(pPort != nullptr);
+
+			auto elt = pPort->GetOutputPortElement(elementIndex);
 			return _outputPortMap.Get(elt.ReferencedPort(), elt.GetIndex());
+		}
+
+		void DataFlowBuilder::AddDependency(const model::InputPortBase* pPort, size_t elementIndex, DataNode* pDependant)
+		{			
+			assert(pDependant != nullptr);
+			DataNode* pNode = GetSourceNode(pPort, elementIndex);
+			pNode->AddDependent(pDependant);
 		}
 	}
 }

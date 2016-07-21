@@ -10,7 +10,7 @@ namespace emll
 		class ScalarVar : public Variable
 		{
 		public:
-			ScalarVar(const VariableScope scope, const VariableFlags flags);
+			ScalarVar(const VariableScope scope, int flags = VariableFlags::isMutable);
 
 			virtual void AssignVar(EmittedVar var) override;
 			virtual EmittedVar GetAssignedVar() override;
@@ -18,6 +18,7 @@ namespace emll
 		private:
 			EmittedVar _emittedVar;
 		};
+		using ScalarF = ScalarVar<double>;
 
 		template<typename T>
 		class LiteralVar : public ScalarVar<T>

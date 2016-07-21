@@ -11,11 +11,6 @@ namespace emll
 
 		std::vector<const model::Node*> ModelEx::CollectOutputNodes(const model::Model& model)
 		{
-			auto findNodes = [](const model::Node& node)
-			{
-				return (typeid(node) == typeid(model::InputNode<double>) ||
-					typeid(node) == typeid(model::InputNode<int>));
-			};
 			return CollectNodes(model, [](const model::Node& node) { return IsLeafNode(node); });
 		}
 

@@ -157,48 +157,39 @@ model::Model InitTestModelBinOp()
 	return builder.Model;
 }
 
-void TestDataFlowBuilder()
+model::Model InitTestModelSimple()
 {
 	ModelBuilder mb;
 	auto c = mb.Constant<double>({ 5, 50, 500, 5000 });
 	auto addNode = mb.Add<double>(c->output, c->output);
 	mb.Model.GetNodeOutput<double>(c->output);
-	
+	return mb.Model;
+}
+
+void TestDataFlowBuilder()
+{
+	model::Model model = InitTestModelSimple();
 	DataFlowBuilder db;
-	db.Process(mb.Model);
+	db.Process(model);
 	testing::ProcessTest("DataFlowBuilder", db.Graph().Size() == 8);
 }
 
-void TestDataFlowGraph()
+void TestDataFlowCompiler()
 {
-	model::Model model = InitTestModelBinOp();
-	auto inputs = ModelEx::CollectInputNodes(model);
-
-	DataFlowGraph graph;
-	DataNode* node = graph.AddLiteral<double>(3.3);
-	auto outputPort = inputs[0]->GetOutputPorts()[0];
-
-	OutputPortDataNodesMap omap;
-	auto portNodes = omap.Ensure(outputPort);
-	portNodes->Add(node);
-	portNodes = omap.Get(outputPort);
-	portNodes->Add(node);
-	testing::ProcessTest("OutputPortNodesMap", portNodes->Size() == 2);
-
+	model::Model model = InitTestModelSimple();
+	DataFlowBuilder db;
+	db.Process(model);
+	
 	IRCompiler compiler("EMLL", std::cout);
+
 	compiler.BeginMain("Predict");
-	//compiler.CompileNode(*node);
-	compiler.EmitScalar(InitializedScalarF(VariableScope::Global, 3.3));
-	compiler.EmitScalar(VectorRefScalarVarF(VariableScope::Local, "input", 1));
+	compiler.CompileGraph(db.Graph());
 	compiler.EndMain();
-	compiler.End();
 	compiler.DebugDump();
 }
 
 void TestCompiler()
 {
-	TestDataFlowGraph();
-
 	model::Model model = InitTestModelBinOp();
 	
 	IRCompiler compiler("EMLL", std::cout);

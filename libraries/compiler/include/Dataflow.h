@@ -23,7 +23,8 @@ namespace emll
 		public:
 
 			void Process(DataFlowGraph& graph, Compiler& compiler);
-			void Process(DataFlowGraph& graph, Compiler& compiler, Variable& varResult) {}
+			
+			virtual void ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data) {}
 
 			virtual DataNodeType Type() const = 0;
 
@@ -46,6 +47,26 @@ namespace emll
 			std::vector<DataNode*> _dependencies;
 		};
 
+		class LiteralNode : public DataNode
+		{
+		public:
+			LiteralNode(Variable* pVar);
+
+			virtual DataNodeType Type() const override
+			{
+				return DataNodeType::LiteralNode;
+			}
+			Variable* Var()
+			{
+				return _pVar;
+			}
+		protected:
+			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler);
+
+		private:
+			Variable* _pVar;
+		};
+
 		class BinaryNode : public DataNode
 		{
 		public:
@@ -56,30 +77,32 @@ namespace emll
 				return DataNodeType::BinaryNode;
 			}
 
+			virtual void ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data) override;
+
+			OperatorType Op() const
+			{
+				return _op;
+			}
+			Variable& Var1() const
+			{
+				return *_pVar1;
+			}
+			Variable& Var2() const
+			{
+				return *_pVar2;
+			}
+			Variable& Result() const
+			{
+				return *_pResult;
+			}
 		protected:
+			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler) override;
 
 		private:
 			OperatorType _op;
 			Variable* _pVar1 = nullptr;
 			Variable* _pVar2 = nullptr;
-		};
-
-		class LiteralNode : public DataNode
-		{
-		public:
-			LiteralNode(Variable* pVar);
-		
-			virtual DataNodeType Type() const override
-			{
-				return DataNodeType::LiteralNode;
-			}
-			Variable* Var()
-			{
-				return _pVar;
-			}
-
-		private:
-			Variable* _pVar;
+			Variable* _pResult = nullptr;
 		};
 
 		class DataFlowGraph
@@ -89,9 +112,6 @@ namespace emll
 			template <class NodeType, typename... Args>
 			NodeType* AddNode(Args&&... args);
 
-			template <typename VarType, typename... Args>
-			VarType* AddVariable(Args&&... args);
-
 			template <typename DataType>
 			LiteralNode* AddLiteral(DataType type);
 
@@ -100,6 +120,12 @@ namespace emll
 			size_t Size() const { return _nodes.size(); }
 			DataNode* GetNodeAt(size_t offset) const;
 
+			template <typename VarType, typename... Args>
+			VarType* AddVariable(Args&&... args);
+			
+			Variable* AddLocalScalarVariable(ValueType type);
+
+			std::vector<DataNode*>& Literals() { return _literals;}
 
 		private:
 			// The data flow graph owns all pointers

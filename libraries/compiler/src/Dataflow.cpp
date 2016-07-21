@@ -31,13 +31,24 @@ namespace emll
 		{
 			for (size_t i = 0; i < _dependencies.size(); ++i)
 			{
-				_dependencies[i]->Process(graph, compiler, varResult);
+				_dependencies[i]->ReceiveData(graph, compiler, varResult);
 			}
 		}
 
 		DataNode* DataFlowGraph::GetNodeAt(size_t offset) const
 		{
 			return _nodes[offset].get();
+		}
+
+		Variable* DataFlowGraph::AddLocalScalarVariable(ValueType type)
+		{
+			switch (type)
+			{
+				case ValueType::Double:
+					return AddVariable<ScalarF>(VariableScope::Local);
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
+			}
 		}
 
 		BinaryNode* DataFlowGraph::AddBinary(OperatorType op)
@@ -50,10 +61,43 @@ namespace emll
 		{
 		}
 
+		void BinaryNode::ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data)
+		{
+			if (_pVar1 == nullptr)
+			{
+				_pVar1 = &data;
+			}
+			else if (_pVar2 == nullptr)
+			{
+				_pVar2 = &data;
+			}
+			
+			if (_pVar1 != nullptr && _pVar2 != nullptr)
+			{			
+				assert(_pVar1->Type() == _pVar2->Type());
+				_pResult = graph.AddLocalScalarVariable(_pVar1->Type());
+				Process(graph, compiler);
+			}
+		}
+
+		Variable* BinaryNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
+		{
+			// TODO: Handle Constant folding
+			compiler.Compile(*this);
+			return _pResult;
+		}
+
 		LiteralNode::LiteralNode(Variable* pVar)
 			: _pVar(pVar)
 		{
 			assert(pVar != nullptr);
 		}
+
+		Variable* LiteralNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
+		{
+			compiler.Compile(*this);
+			return _pVar;
+		}
+
 	}
 }

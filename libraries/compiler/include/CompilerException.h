@@ -20,6 +20,7 @@ namespace emll
 			variableScopeNotSupported,
 			variableTypeNotSupported,
 			valueTypeNotSupported,
+			valueTypeMismatch,
 			InvalidFunction,
 			FunctionNotFound,
 			WriteStreamFailed,

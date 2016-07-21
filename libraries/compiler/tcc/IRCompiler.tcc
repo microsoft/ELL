@@ -10,6 +10,12 @@ namespace emll
 		}
 
 		template<typename T>
+		llvm::Value* IRCompiler::EmitLocal(ScalarVar<T>& var)
+		{
+			return _fn.Var(var.Type(), var.EmittedName());
+		}
+
+		template<typename T>
 		llvm::Value* IRCompiler::EmitLocal(InitializedScalarVar<T>& var)
 		{
 			llvm::Value* pVar = _fn.Var(var.Type(), var.EmittedName());

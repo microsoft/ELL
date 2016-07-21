@@ -64,6 +64,11 @@ namespace emll
 
 		void Compiler::AllocVar(Variable& var)
 		{
+			if (var.HasEmittedName())
+			{
+				return;
+			}
+
 			EmittedVar emittedVar;
 			const std::string* pPrefix = nullptr;
 			switch (var.Scope())
@@ -123,21 +128,12 @@ namespace emll
 			EndMain();
 		}
 
-		void Compiler::CompileNode(DataNode& node)
+		void Compiler::CompileGraph(DataFlowGraph& graph)
 		{
-			NamedValueTypeList fnArgs;
-			fnArgs.init({ { InputName(), ValueType::PDouble },{ OutputName(), ValueType::PDouble } });
-
-			BeginMain(c_PredictFunctionName, fnArgs);
-			switch (node.Type())
+			for (auto node : graph.Literals())
 			{
-				case DataNodeType::LiteralNode:
-					Compile(static_cast<LiteralNode&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::notSupported);
+				node->Process(graph, *this);
 			}
-			EndMain();
 		}
 
 		void Compiler::AddArgs(NamedValueTypeList& args, const std::string& namePrefix, const std::vector<const model::Node*>& nodes)

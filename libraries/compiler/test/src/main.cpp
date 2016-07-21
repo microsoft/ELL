@@ -2,9 +2,10 @@
 
 int main(int argc, char* argv[])
 {
-	TestLLVM();
+	//TestLLVM();
 
 	TestDataFlowBuilder();
+	TestDataFlowCompiler();
 
 	TestModelEx();
 	TestCompiler();

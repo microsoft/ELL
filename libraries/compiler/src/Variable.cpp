@@ -5,8 +5,8 @@ namespace emll
 {
 	namespace compiler
 	{
-		Variable::Variable(const ValueType type, const VariableScope scope, const VariableFlags flags)
-			: _type(type), _scope(scope), _flags((int) flags)
+		Variable::Variable(const ValueType type, const VariableScope scope, int flags)
+			: _type(type), _scope(scope), _flags(flags)
 		{
 		}
 

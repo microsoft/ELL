@@ -60,7 +60,8 @@ namespace emll
 			template<typename DataType>
 			void Process(const nodes::BinaryOperationNode<DataType>& node);
 
-			DataNode* GetSourceNode(const model::InputPortBase* pPort, size_t index) const;
+			DataNode* GetSourceNode(const model::InputPortBase* pPort, size_t elementIndex) const;
+			void AddDependency(const model::InputPortBase* pPort, size_t elementIndex, DataNode* pDependant);
 
 		private:
 			DataFlowGraph _graph;

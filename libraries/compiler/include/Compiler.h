@@ -38,7 +38,12 @@ namespace emll
 
 			/// <summary>Compile the given model</summary>
 			virtual void CompileModel(const model::Model& model);
-			virtual void CompileNode(DataNode& node);
+
+			void CompileGraph(DataFlowGraph& graph);
+
+			virtual void Compile(LiteralNode& node) = 0;
+			virtual void Compile(BinaryNode& node) = 0;
+
 			virtual void Begin() = 0;
 			virtual void End() = 0;
 
@@ -58,7 +63,6 @@ namespace emll
 		protected:
 			virtual void BeginMain(const std::string& functionName, NamedValueTypeList& args) = 0;
 			virtual void EndMain() = 0;
-			virtual void Compile(LiteralNode& node) = 0;
 
 			virtual void InitSupportedNodeTypes();
 			
