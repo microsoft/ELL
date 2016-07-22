@@ -112,9 +112,9 @@ namespace emll
 			return _pEmitter->PtrOffset(ptr, Literal(offset));
 		}
 
-		llvm::Value* IRFunctionEmitter::PtrOffsetA(llvm::Value* ptr, llvm::Value* pOffset)
+		llvm::Value* IRFunctionEmitter::PtrOffsetA(llvm::Value* ptr, llvm::Value* pOffset, const std::string& name)
 		{
-			return _pEmitter->PtrOffset(ptr, pOffset);
+			return _pEmitter->PtrOffset(ptr, pOffset, name);
 		}
 
 		llvm::Value* IRFunctionEmitter::ValueAtA(llvm::Value* ptr, int offset)

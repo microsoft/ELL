@@ -166,7 +166,7 @@ namespace emll
 			LiteralNode* AddLiteral(DataType type);
 
 			template <typename DataType>
-			ArgNode* AddArg(size_t size);
+			ArgNode* AddArg(size_t size, bool isInput);
 
 			size_t Size() const { return _nodes.size(); }
 			DataNode* GetNodeAt(size_t offset) const;
@@ -178,14 +178,16 @@ namespace emll
 			Variable* AddVectorElementVariable(ValueType type, Variable& src, int offset);
 			
 			const std::vector<DataNode*>& Literals() { return _literals;}
-			const std::vector<DataNode*>& Arguments() { return _args; }
+			const std::vector<ArgNode*>& Inputs() { return _inputs; }
+			const std::vector<ArgNode*>& Outputs() { return _outputs; }
 
 		private:
 			// The data flow graph owns all pointers
 			std::vector<std::shared_ptr<DataNode>> _nodes;
 			std::vector<std::shared_ptr<Variable>> _variables;
 			std::vector<DataNode*> _literals;
-			std::vector<DataNode*> _args;
+			std::vector<ArgNode*> _inputs;
+			std::vector<ArgNode*> _outputs;
 		};
 	}
 }

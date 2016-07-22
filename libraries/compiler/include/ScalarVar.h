@@ -11,12 +11,6 @@ namespace emll
 		{
 		public:
 			ScalarVar(const VariableScope scope, int flags = VariableFlags::isMutable);
-
-			virtual void AssignVar(EmittedVar var) override;
-			virtual EmittedVar GetAssignedVar() override;
-
-		private:
-			EmittedVar _emittedVar;
 		};
 		using ScalarF = ScalarVar<double>;
 

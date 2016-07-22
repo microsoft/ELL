@@ -336,11 +336,11 @@ namespace emll
 			return phi;
 		}
 
-		llvm::Value* IREmitter::PtrOffset(llvm::Value* pArray, llvm::Value* pOffset)
+		llvm::Value* IREmitter::PtrOffset(llvm::Value* pArray, llvm::Value* pOffset, const std::string& name)
 		{
 			assert(pArray != nullptr);
 			assert(pOffset != nullptr);
-			return _builder.CreateGEP(pArray, pOffset);
+			return _builder.CreateGEP(pArray, pOffset, name);
 		}
 
 		llvm::Value* IREmitter::Ptr(llvm::GlobalVariable* pArray)

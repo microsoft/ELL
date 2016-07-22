@@ -27,8 +27,7 @@ namespace emll
 		llvm::Value* IRCompiler::EmitRef(VectorElementVar<T>& var)
 		{
 			llvm::Value* pSrcVar = EnsureEmitted(var.Src());
-			llvm::Value* pPtr = _fn.PtrOffsetA(pSrcVar, _fn.Literal(var.Offset()));
-			return _fn.Load(pPtr, var.EmittedName());
+			return _fn.PtrOffsetA(pSrcVar, _fn.Literal(var.Offset()), var.EmittedName());
 		}
 
 		template<typename T>

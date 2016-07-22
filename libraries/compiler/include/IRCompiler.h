@@ -23,11 +23,14 @@ namespace emll
 			void DebugDump();
 
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) override;
+			virtual void BeginFunction(const std::string& functionName, DataFlowGraph& graph) override;
 			virtual void EndFunction() override;
 
 		public:
 		
 		private:
+			void AddFunctionArgs(DataFlowGraph& graph, NamedValueTypeList& args);
+			void AddFunctionArgs(const std::vector<ArgNode*>& argNodes, NamedValueTypeList& fnArgs);
 			void RegisterFunctionArgs(NamedValueTypeList& args);
 
 			llvm::Value* Emit(Variable& var);

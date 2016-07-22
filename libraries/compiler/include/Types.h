@@ -68,6 +68,8 @@ namespace emll
 
 		template<typename DataType>
 		ValueType GetValueType();
+
+		ValueType GetPtrType(ValueType type);
 	}
 }
 

@@ -37,19 +37,27 @@ namespace emll
 		}
 
 		template <typename DataType>
-		ArgNode* DataFlowGraph::AddArg(size_t size)
+		ArgNode* DataFlowGraph::AddArg(size_t size, bool isInput)
 		{
 			Variable* pVar = nullptr;
+			VariableScope scope = isInput ? VariableScope::Input : VariableScope::Output;
 			if (size > 0)
 			{
-				pVar = AddVariable<VectorVar<DataType>>(VariableScope::Local, size);
+				pVar = AddVariable<VectorVar<DataType>>(scope, size);
 			}
 			else
 			{
-				pVar = AddVariable<ScalarVar<DataType>>(VariableScope::Local);
+				pVar = AddVariable<ScalarVar<DataType>>(scope);
 			}
 			ArgNode* pNode = AddNode<ArgNode>(pVar);
-			_args.push_back(pNode);
+			if (isInput)
+			{
+				_inputs.push_back(pNode);
+			}
+			else
+			{
+				_outputs.push_back(pNode);
+			}
 			return pNode;
 		}
 	}

@@ -11,18 +11,6 @@ namespace emll
 		}
 
 		template<typename T>
-		void ScalarVar<T>::AssignVar(EmittedVar var)
-		{
-			_emittedVar = var;
-		}
-
-		template<typename T>
-		EmittedVar ScalarVar<T>::GetAssignedVar()
-		{
-			return _emittedVar;
-		}
-
-		template<typename T>
 		LiteralVar<T>::LiteralVar(T data)
 			: ScalarVar(VariableScope::Literal, VariableFlags::none), 
 			 _data(data)

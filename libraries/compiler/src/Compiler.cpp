@@ -19,35 +19,12 @@ namespace emll
 		static const std::string c_literalVar = "c";
 		static const std::string c_globalVar = "g";
 		static const std::string c_localVar = "t";
+		static const std::string c_inputVar = "i";
+		static const std::string c_outputVar = "o";
 
 		/// <summary>Base class for ML Compiler.</summary>
 		Compiler::Compiler()
 		{
-		}
-
-		EmittedVar Compiler::AllocLocal()
-		{
-			return _localVars.Alloc();
-		}
-
-		void Compiler::FreeLocal(EmittedVar var)
-		{
-			_localVars.Free(var);
-		}
-
-		EmittedVar Compiler::AllocLiteral()
-		{
-			return _literalVars.Alloc();
-		}
-
-		EmittedVar Compiler::AllocGlobal()
-		{
-			return _globalVars.Alloc();
-		}
-
-		void Compiler::FreeGlobal(EmittedVar var)
-		{
-			_globalVars.Free(var);
 		}
 
 		void Compiler::AllocVar(Variable& var)
@@ -62,16 +39,24 @@ namespace emll
 			switch (var.Scope())
 			{
 				case VariableScope::Literal:
-					emittedVar = AllocLiteral();
+					emittedVar = _literalVars.Alloc();
 					pPrefix = &c_literalVar;
 					break;
 				case VariableScope::Local:
-					emittedVar = AllocLocal();
+					emittedVar = _localVars.Alloc();
 					pPrefix = &c_localVar;
 					break;
 				case VariableScope::Global:
-					emittedVar = AllocGlobal();
+					emittedVar = _globalVars.Alloc();
 					pPrefix = &c_globalVar;
+					break;
+				case VariableScope::Input:
+					emittedVar = _inputVars.Alloc();
+					pPrefix = &c_inputVar;
+					break;
+				case VariableScope::Output:
+					emittedVar = _outputVars.Alloc();
+					pPrefix = &c_outputVar;
 					break;
 				default:
 					throw new CompilerException(CompilerError::variableScopeNotSupported);
@@ -86,29 +71,37 @@ namespace emll
 			{
 				return;
 			}
-
-			switch (var.Scope())
+			VariableScope scope = var.Scope();
+			switch (scope)
 			{
-				case VariableScope::Literal:
-					// We never free literals
-					break;
 				case VariableScope::Local:
-					FreeLocal(var.GetAssignedVar());
+					_localVars.Free(var.GetAssignedVar());
 					break;
 				case VariableScope::Global:
-					FreeGlobal(var.GetAssignedVar());
+					_globalVars.Free(var.GetAssignedVar());
 					break;
 				default:
+					// We never free other types
+					assert(scope != VariableScope::Local && scope != VariableScope::Global);
 					break;
 			}
 		}
 
-		void Compiler::CompileGraph(DataFlowGraph& graph)
+		void Compiler::CompileGraph(const std::string& functionName, DataFlowGraph& graph)
 		{
+			BeginFunction(functionName, graph);
+
+			// First, process all literals
 			for (auto node : graph.Literals())
 			{
 				node->Process(graph, *this);
 			}
+			// Now start executing the graph
+			for (auto node : graph.Inputs())
+			{
+				node->Process(graph, *this);
+			}
+			EndFunction();
 		}
 
 		void Compiler::BeginFunctionPredict()

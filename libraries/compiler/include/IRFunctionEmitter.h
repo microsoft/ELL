@@ -133,7 +133,8 @@ namespace emll
 			llvm::Value* OpAndUpdate(llvm::Value* pPtr, OperatorType op, llvm::Value* pValue);
 
 			llvm::Value* PtrOffsetA(llvm::Value* pPtr, int offset);
-			llvm::Value* PtrOffsetA(llvm::Value* pPtr, llvm::Value* pOffset);
+			llvm::Value* PtrOffsetA(llvm::Value* pPtr, llvm::Value* pOffset, const std::string& name = "");
+
 			llvm::Value* ValueAtA(llvm::Value* pPtr, int offset);
 			llvm::Value* ValueAtA(llvm::Value* pPtr, llvm::Value* pOffset);
 			llvm::Value* SetValueAtA(llvm::Value* pPtr, int offset, llvm::Value* pValue);

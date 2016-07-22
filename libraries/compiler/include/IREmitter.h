@@ -70,7 +70,7 @@ namespace emll
 
 			llvm::PHINode* Phi(const ValueType type, llvm::Value* pLVal, llvm::BasicBlock* plBlock, llvm::Value* pRVal, llvm::BasicBlock* prBlock);
 
-			llvm::Value* PtrOffset(llvm::Value* pArray, llvm::Value* pOffset);
+			llvm::Value* PtrOffset(llvm::Value* pArray, llvm::Value* pOffset, const std::string& name = "");
 			llvm::Value* Ptr(llvm::GlobalVariable* pArray);
 			llvm::Value* PtrOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset);
 			llvm::Value* PtrOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset);

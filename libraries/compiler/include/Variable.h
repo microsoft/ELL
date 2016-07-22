@@ -32,7 +32,9 @@ namespace emll
 			Literal,
 			Local,
 			Global,
-			Heap
+			Heap,
+			Input,
+			Output
 		};
 
 		enum class VariableType
@@ -114,8 +116,14 @@ namespace emll
 				return ((_flags & flags) != 0);
 			}
 
-			virtual void AssignVar(EmittedVar var);
-			virtual EmittedVar GetAssignedVar();
+			void AssignVar(EmittedVar var) 
+			{
+				_emittedVar = var;
+			}
+			EmittedVar GetAssignedVar()
+			{
+				return _emittedVar;
+			}
 
 		protected:
 
@@ -134,6 +142,7 @@ namespace emll
 			ValueType _type;
 			VariableScope _scope;
 			int _flags;
+			EmittedVar _emittedVar;
 		};
 
 		template<typename T>

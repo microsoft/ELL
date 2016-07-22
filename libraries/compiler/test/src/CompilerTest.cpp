@@ -160,8 +160,8 @@ model::Model InitTestModelBinOp()
 	auto input = builder.Inputs<double>(data);
 	auto c = builder.Constant<double>({ 5, 50, 500, 5000 });
 
-	nodes::BinaryOperationNode<double>* addNode = builder.Add<double>(input->output, c->output);
-	//builder.Add<double>(addNode->output, c->output);	
+	nodes::BinaryOperationNode<double>* multNode = builder.Multiply<double>(input->output, c->output);
+	builder.Add<double>(multNode->output, c->output);	
 	//builder.Add<double>(input->output, c->output);
 	
 	return builder.Model;
@@ -188,16 +188,16 @@ void TestDataFlowBuilder()
 
 void TestDataFlowCompiler()
 {
-	model::Model model = InitTestModelSimple();
-	//model::Model model = InitTestModelBinOp();
+	//model::Model model = InitTestModelSimple();
+	model::Model model = InitTestModelBinOp();
 	DataFlowBuilder db;
 	db.Process(model);
 	
 	IRCompiler compiler("EMLL", std::cout);
 
-	compiler.BeginFunctionPredict();
-	compiler.CompileGraph(db.Graph());
-	compiler.EndFunction();
+	//compiler.BeginFunctionPredict();
+	compiler.CompileGraph("Predict", db.Graph());
+	//compiler.EndFunction();
 	compiler.DebugDump();
 }
 

@@ -33,7 +33,7 @@ namespace emll
 		void DataFlowBuilder::Process(const model::InputNode<DataType>& node)
 		{
 			auto pOutputPort = node.GetOutputPorts()[0];
-			ArgNode* pArg = _graph.AddArg<DataType>(pOutputPort->Size());			
+			ArgNode* pArg = _graph.AddArg<DataType>(pOutputPort->Size(), true);			
 			for (size_t i = 0; i < pOutputPort->Size(); ++i)
 			{
 				auto pNode = _graph.AddNode<InputNode>(i);

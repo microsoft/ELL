@@ -36,6 +36,13 @@ namespace emll
 			RegisterFunctionArgs(args);
 		}
 
+		void IRCompiler::BeginFunction(const std::string& functionName, DataFlowGraph& graph)
+		{
+			NamedValueTypeList fnArgs;
+			AddFunctionArgs(graph, fnArgs);
+			BeginFunction(functionName, fnArgs);
+		}
+
 		void IRCompiler::EndFunction()
 		{
 			_fn.Ret();
@@ -53,10 +60,28 @@ namespace emll
 					return _globals.Get(name);
 
 				case VariableScope::Local:
+				case VariableScope::Input:
+				case VariableScope::Output:
 					return _locals.Get(name);
 				
 				default:
 					throw new CompilerException(CompilerError::variableScopeNotSupported);
+			}
+		}
+
+		void IRCompiler::AddFunctionArgs(DataFlowGraph& graph, NamedValueTypeList& args)
+		{
+			AddFunctionArgs(graph.Inputs(), args);
+			AddFunctionArgs(graph.Outputs(), args);
+		}
+
+		void IRCompiler::AddFunctionArgs(const std::vector<ArgNode*>& argNodes, NamedValueTypeList& fnArgs)
+		{
+			for (ArgNode* pNode : argNodes)
+			{
+				Variable& var = *(pNode->Var());
+				AllocVar(var);
+				fnArgs.emplace_back(var.EmittedName(), GetPtrType(var.Type()));
 			}
 		}
 
