@@ -45,6 +45,12 @@ namespace model
         /// <summary> Exposes the extremal value index port as a read-only property </summary>
         const OutputPort<int>& argVal = _argVal;
 
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(ModelTransformer& transformer) const override;
+
+        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
+        virtual void Refine(ModelTransformer& transformer) const override;
+
     protected:
         virtual void Compute() const override;
 

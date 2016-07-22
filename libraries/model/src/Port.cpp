@@ -31,5 +31,4 @@ namespace model
     {
         return Port::PortType::Boolean;
     }
-
 }

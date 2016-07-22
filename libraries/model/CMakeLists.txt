@@ -13,16 +13,18 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/ModelGraph.cpp
+         src/ModelTransformer.cpp
          src/Node.cpp
+         src/OutputPort.cpp
          src/OutputPortElementList.cpp
          src/Port.cpp
 )
 
-set (INCLUDE include/ConstantNode.h
-             include/ExtremalValueNode.h
+set (INCLUDE include/ExtremalValueNode.h
              include/InputNode.h
              include/InputPort.h
              include/ModelGraph.h
+             include/ModelTransformer.h
              include/Node.h
              include/OutputPort.h
              include/OutputPortElementList.h
@@ -30,11 +32,11 @@ set (INCLUDE include/ConstantNode.h
              include/ValueSelectorNode.h
 )
 
-set (TCC tcc/ConstantNode.tcc
-         tcc/ExtremalValueNode.tcc
+set (TCC tcc/ExtremalValueNode.tcc
          tcc/InputNode.tcc
          tcc/InputPort.tcc
          tcc/ModelGraph.tcc
+         tcc/ModelTransformer.tcc
          tcc/OutputPort.tcc
          tcc/OutputPortElementList.tcc
          tcc/ValueSelectorNode.tcc
@@ -67,7 +69,7 @@ source_group("include" FILES ${TEST_INCLUDE})
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} model testing utilities)
+target_link_libraries(${TEST_NAME} common model nodes testing utilities)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

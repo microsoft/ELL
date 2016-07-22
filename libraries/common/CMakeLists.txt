@@ -18,6 +18,7 @@ set (SRC src/BaggingIncrementalTrainerArguments.cpp
          src/DataLoaders.cpp
          src/EvaluatorArguments.cpp
          src/LoadModel.cpp
+         src/LoadModelGraph.cpp
          src/MakeTrainer.cpp
          src/MapLoadArguments.cpp
          src/MapSaveArguments.cpp
@@ -34,6 +35,7 @@ set (INCLUDE include/BaggingIncrementalTrainerArguments.h
              include/DataLoaders.h
              include/EvaluatorArguments.h
              include/LoadModel.h
+             include/LoadModelGraph.h
              include/MakeEvaluator.h
              include/MakeTrainer.h
              include/MapLoadArguments.h
@@ -57,7 +59,7 @@ source_group("tcc" FILES ${TCC})
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include)
-target_link_libraries(${PROJ_NAME} dataset layers linear utilities lossFunctions predictors evaluators trainers)
+target_link_libraries(${PROJ_NAME} dataset layers linear utilities lossFunctions model nodes predictors evaluators trainers)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 

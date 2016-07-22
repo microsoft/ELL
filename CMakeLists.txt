@@ -26,6 +26,10 @@ if(CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # Options
+# To set an option:
+# cmake -DMyOption=ON|OFF buildDirectory
+# (so if we're running cmake from a 'build' directory inside the main directory, do this:
+#      cmake -DDOXYGEN_ENABLED=OFF ..  )
 option(SWIG_ENABLED "Enable swig interfaces" ON)
 option(DOXYGEN_ENABLED "Enable Doxygen interfaces" ON)
 
