@@ -10,7 +10,6 @@
 
 #include "IDataVector.h"
 #include "DenseDataVector.h"
-#include "WeightLabel.h"
 
 // stl
 #include <cstdint>
@@ -76,8 +75,16 @@ namespace dataset
         MetaDataType _metaData;
     };
 
-    //template<typename DataVectorType>
-    //using SSupervisedExample = Example<DataVectorType, dataset::WeightLabel>; // TODO: warning 342: The 'using' keyword in template aliasing is not fully supported yet.
+    struct WeightLabel
+    {
+        /// <summary> Prints the weight label pair. </summary>
+        ///
+        /// <param name="os"> [in,out] The output stream. </param>
+        void Print(std::ostream& os) const;
+
+        double weight;
+        double label;
+    };
 
     typedef Example<IDataVector, dataset::WeightLabel> GenericSupervisedExample; // 'dataset::' prefix required due to SWIG bug
     typedef Example<DoubleDataVector, dataset::WeightLabel> DenseSupervisedExample; // 'dataset::' prefix required due to SWIG bug

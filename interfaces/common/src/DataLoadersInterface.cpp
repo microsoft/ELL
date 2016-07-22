@@ -19,7 +19,7 @@
 #include "SparseEntryParser.h"
 #include "MappedParser.h"
 #include "ParsingIterator.h"
-#include "WeightLabel.h"
+#include "Example.h"
 
 // layers
 #include "Map.h"

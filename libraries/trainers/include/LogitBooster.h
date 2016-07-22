@@ -9,7 +9,7 @@
 #pragma once
 
 // dataset
-#include "WeightLabel.h"
+#include "Example.h"
 
 namespace trainers
 {
