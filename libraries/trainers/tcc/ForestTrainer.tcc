@@ -16,20 +16,18 @@ namespace trainers
     {}
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(dataset::GenericRowDataset::Iterator exampleIterator) 
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         // convert data from iterator to dense dataset with metadata (weak weight / weak label) associated with each example
         LoadData(exampleIterator);
 
+        // boosting loop (outer loop)
+
+        // call the booster and compute sums for the entire dataset
         Sums sums = SetWeakWeightsLabels();
 
-        // TODO: LoadData, initialize "current output" along the way
-        // --> this is the beginning of the bootinf loop
-        // Boosting - set weak label and weak weight - compute sums here
-        // Get bias: set it in forest and updae the current output
-
-        // computes the bias term, sets it in the forest and the dataset
-        double bias = sums.sumWeightedLabels / sums.sumWeights; // TODO: check for zero denominator
+        // use the computed sums to calaculate the bias term, set it in the forest and the dataset
+        double bias = sums.sumWeightedLabels / sums.sumWeights;
         _forest->AddToBias(bias);
         UpdateCurrentOutputs(bias);
 
@@ -43,73 +41,20 @@ namespace trainers
         auto rootSplit = GetBestSplitCandidateAtNode(_forest->GetNewRootId(), Range{ 0, _dataset.NumExamples() }, sums);
 
         // check for positive gain 
-        if(rootSplit.gain < _parameters.minSplitGain || _parameters.maxSplitsPerEpoch == 0)
+        if (rootSplit.gain < _parameters.minSplitGain || _parameters.maxSplitsPerEpoch == 0)
         {
-            return; 
+            return;
         }
 
-        // count splits
-        size_t splitCount = 0;
-
         // reset the queue and add the root split from the graph
-        if(_queue.size() > 0)
+        if (_queue.size() > 0)
         {
             _queue = PriorityQueue();
         }
         _queue.push(std::move(rootSplit));
 
-        // as long as positive gains can be attained, keep growing the tree
-        while(!_queue.empty()) // TODO: let user specify how many steps
-        {
-
-#ifdef VERY_VERBOSE
-             std::cout << "\n==> Iteration\n";
-             _queue.PrintLine(std::cout);
-#endif
-
-            auto splitCandidate = _queue.top();
-            _queue.pop();
-
-            const auto& stats = splitCandidate.stats;
-            const auto& ranges = splitCandidate.ranges;
-
-            // sort the data according to the performed split and update the metadata to reflect this change
-            SortNodeDataset(ranges.GetTotalRange(), splitCandidate.splitRule);
-
-            // update current output field in metadata
-            auto edgePredictors = GetEdgePredictors(stats);
-            for(size_t i = 0; i<2; ++i)
-            {
-                UpdateCurrentOutputs(ranges.GetChildRange(i), edgePredictors[i]);
-            }
-
-            // have the forest perform the split
-            using SplitAction = predictors::SimpleForestPredictor::SplitAction;
-            SplitAction splitAction(splitCandidate.nodeId, splitCandidate.splitRule, edgePredictors);
-            auto interiorNodeIndex = _forest->Split(splitAction);
-
-#ifdef VERY_VERBOSE
-            _dataset.Print(std::cout);
-            std::cout << "\n";
-            _forest->PrintLine(std::cout);
-#endif
-
-            // if max number of splits reached, exit the loop
-            if(++splitCount == _parameters.maxSplitsPerEpoch)
-            {
-                break;
-            }
-
-            // queue new split candidates
-            for(size_t i = 0; i<2; ++i)
-            {
-                auto splitCandidate = GetBestSplitCandidateAtNode(_forest->GetChildId(interiorNodeIndex, i), ranges.GetChildRange(i), stats.GetChildSums(i));
-                if(splitCandidate.gain > _parameters.minSplitGain)
-                {
-                    _queue.push(std::move(splitCandidate));
-                }
-            }
-        }
+        // start performing splits until the maximum is reached or the queue is empty
+        PerformSplits();
     }
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
@@ -178,7 +123,6 @@ namespace trainers
         {
             const auto& example = exampleIterator.Get();
 
-
             // TODO this code breaks encapsulation - give ForestTrainer a ctor that takes an IDataVector
             auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
 
@@ -229,6 +173,66 @@ namespace trainers
         {
             auto& example = _dataset[rowIndex];
             example.GetMetaData().currentOutput += edgePredictor.Compute(example.GetDataVector());
+        }
+    }
+
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::PerformSplits()
+    {
+        // count splits
+        size_t splitCount = 0;
+
+        // splitting loop (inner loop)
+        while (!_queue.empty())
+        {
+
+#ifdef VERY_VERBOSE
+            std::cout << "\n==> Iteration\n";
+            _queue.PrintLine(std::cout);
+#endif
+
+            auto splitCandidate = _queue.top();
+            _queue.pop();
+
+            const auto& stats = splitCandidate.stats;
+            const auto& ranges = splitCandidate.ranges;
+
+            // sort the data according to the performed split and update the metadata to reflect this change
+            SortNodeDataset(ranges.GetTotalRange(), splitCandidate.splitRule);
+
+            // update current output field in metadata
+            auto edgePredictors = GetEdgePredictors(stats);
+            for (size_t i = 0; i<2; ++i)
+            {
+                UpdateCurrentOutputs(ranges.GetChildRange(i), edgePredictors[i]);
+            }
+
+            // have the forest perform the split
+            using SplitAction = predictors::SimpleForestPredictor::SplitAction;
+            SplitAction splitAction(splitCandidate.nodeId, splitCandidate.splitRule, edgePredictors);
+            auto interiorNodeIndex = _forest->Split(splitAction);
+
+#ifdef VERY_VERBOSE
+            _dataset.Print(std::cout);
+            std::cout << "\n";
+            _forest->PrintLine(std::cout);
+#endif
+
+            // if max number of splits reached, exit the loop
+            if (++splitCount == _parameters.maxSplitsPerEpoch)
+            {
+                break;
+            }
+
+            // queue new split candidates
+            for (size_t i = 0; i<2; ++i)
+            {
+                auto splitCandidate = GetBestSplitCandidateAtNode(_forest->GetChildId(interiorNodeIndex, i), ranges.GetChildRange(i), stats.GetChildSums(i));
+                if (splitCandidate.gain > _parameters.minSplitGain)
+                {
+                    _queue.push(std::move(splitCandidate));
+                }
+            }
         }
     }
 

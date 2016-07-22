@@ -161,6 +161,9 @@ namespace trainers
         // loads a dataset and initializes the currentOutput field in the metadata
         void LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
 
+        // performs an epoch of splits
+        void PerformSplits();
+
         // runs the booster and sets the weak weight and weak labels
         Sums SetWeakWeightsLabels();
 
