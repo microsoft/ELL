@@ -22,39 +22,41 @@ namespace trainers
         LoadData(exampleIterator);
 
         // boosting loop (outer loop)
+        for(size_t round = 0; round < _parameters.numRounds; ++round)
+        {
+            // call the booster and compute sums for the entire dataset
+            Sums sums = SetWeakWeightsLabels();
 
-        // call the booster and compute sums for the entire dataset
-        Sums sums = SetWeakWeightsLabels();
-
-        // use the computed sums to calaculate the bias term, set it in the forest and the dataset
-        double bias = sums.sumWeightedLabels / sums.sumWeights;
-        _forest->AddToBias(bias);
-        UpdateCurrentOutputs(bias);
+            // use the computed sums to calaculate the bias term, set it in the forest and the dataset
+            double bias = sums.sumWeightedLabels / sums.sumWeights;
+            _forest->AddToBias(bias);
+            UpdateCurrentOutputs(bias);
 
 #ifdef VERY_VERBOSE
-        _dataset.Print(std::cout);
-        std::cout << "\n";
-        _forest->PrintLine(std::cout);
+            _dataset.Print(std::cout);
+            std::cout << "\nBoosting iteration\n";
+            _forest->PrintLine(std::cout, 1);
 #endif
 
-        // find split candidate for root node and push it onto the priority queue
-        auto rootSplit = GetBestSplitCandidateAtNode(_forest->GetNewRootId(), Range{ 0, _dataset.NumExamples() }, sums);
+            // find split candidate for root node and push it onto the priority queue
+            auto rootSplit = GetBestSplitCandidateAtNode(_forest->GetNewRootId(), Range{0, _dataset.NumExamples()}, sums);
 
-        // check for positive gain 
-        if (rootSplit.gain < _parameters.minSplitGain || _parameters.maxSplitsPerEpoch == 0)
-        {
-            return;
+            // check for positive gain 
+            if(rootSplit.gain < _parameters.minSplitGain || _parameters.maxSplitsPerRound == 0)
+            {
+                return;
+            }
+
+            // reset the queue and add the root split from the graph
+            if(_queue.size() > 0)
+            {
+                _queue = PriorityQueue();
+            }
+            _queue.push(std::move(rootSplit));
+
+            // start performing splits until the maximum is reached or the queue is empty
+            PerformSplits(_parameters.maxSplitsPerRound);
         }
-
-        // reset the queue and add the root split from the graph
-        if (_queue.size() > 0)
-        {
-            _queue = PriorityQueue();
-        }
-        _queue.push(std::move(rootSplit));
-
-        // start performing splits until the maximum is reached or the queue is empty
-        PerformSplits();
     }
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
@@ -177,7 +179,7 @@ namespace trainers
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::PerformSplits()
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::PerformSplits(size_t maxSplits)
     {
         // count splits
         size_t splitCount = 0;
@@ -187,8 +189,8 @@ namespace trainers
         {
 
 #ifdef VERY_VERBOSE
-            std::cout << "\n==> Iteration\n";
-            _queue.PrintLine(std::cout);
+            std::cout << "\nSplit iteration\n";
+            _queue.PrintLine(std::cout, 1);
 #endif
 
             auto splitCandidate = _queue.top();
@@ -213,13 +215,13 @@ namespace trainers
             auto interiorNodeIndex = _forest->Split(splitAction);
 
 #ifdef VERY_VERBOSE
-            _dataset.Print(std::cout);
+            _dataset.Print(std::cout, 1);
             std::cout << "\n";
-            _forest->PrintLine(std::cout);
+            _forest->PrintLine(std::cout, 1);
 #endif
 
             // if max number of splits reached, exit the loop
-            if (++splitCount == _parameters.maxSplitsPerEpoch)
+            if (++splitCount >= maxSplits)
             {
                 break;
             }

@@ -118,12 +118,13 @@ namespace dataset
     }
 
     template<typename ExampleType>
-    void RowDataset<ExampleType>::Print(std::ostream& os, uint64_t fromRowIndex, uint64_t size) const
+    void RowDataset<ExampleType>::Print(std::ostream& os, size_t tabs, uint64_t fromRowIndex, uint64_t size) const
     {
         size = CorrectRangeSize(fromRowIndex, size);
 
         for(uint64_t index = fromRowIndex; index < fromRowIndex + size; ++index)
         {
+            os << std::string(tabs * 4, ' ');
             _examples[index].Print(os);
             os << "\n";
         }

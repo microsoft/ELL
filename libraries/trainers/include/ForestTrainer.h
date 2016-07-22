@@ -35,7 +35,8 @@ namespace trainers
     struct ForestTrainerParameters
     {
         double minSplitGain = 0.0;
-        size_t maxSplitsPerEpoch = 0;
+        size_t maxSplitsPerRound = 0;
+        size_t numRounds = 0;
     };
 
     /// <summary>
@@ -162,7 +163,7 @@ namespace trainers
         void LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
 
         // performs an epoch of splits
-        void PerformSplits();
+        void PerformSplits(size_t maxSplits);
 
         // runs the booster and sets the weak weight and weak labels
         Sums SetWeakWeightsLabels();

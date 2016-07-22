@@ -18,10 +18,15 @@ namespace common
                          "The minimal gain required to split a leaf node",
                          0.0);
 
-        parser.AddOption(maxSplitsPerEpoch,
-                         "maxSplitsPerEpoch",
+        parser.AddOption(maxSplitsPerRound,
+                         "maxSplitsPerRound",
                          "ms",
-                         "The number of split operations to perform on each epoch",
+                         "The number of split operations to perform on each boosting round",
+                         "1");
+        parser.AddOption(numRounds,
+                         "numRounds",
+                         "nr",
+                         "The number of boosting rounds to perform",
                          "10");
     }
 }
