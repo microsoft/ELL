@@ -18,6 +18,8 @@
 #include "RandomEngines.h"
 #include "StlIterator.h"
 #include "UniqueId.h"
+#include "Variant.h"
+#include "ISerializable.h"
 
 #include "LogLoss.h"
 #include "HingeLoss.h"
@@ -28,7 +30,6 @@
 
 template <typename IteratorType, typename ValueType> class StlIterator {};
 
-
 %include "AnyIterator.h"
 %include "RandomEngines.h"
 %include "RowDataset.h"
@@ -36,6 +37,8 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 %include "SGDIncrementalTrainer_wrap.h"
 
 %include "UniqueId.h"
+%include "Variant.h"
+%include "ISerializable.h"
 
 WRAP_OSTREAM_OUT_TO_STR(utilities::UniqueId)
 

@@ -32,7 +32,7 @@
 %include typemaps.i
 %include "std_string.i"
 %include "std_vector.i"
-#endif
+#endif 
 
 #if !defined(SWIGJAVASCRIPT) && !defined(SWIGXML)
 %include "std_shared_ptr.i"
@@ -86,9 +86,12 @@ namespace lossFunctions {};
 namespace predictors {};
 namespace dataset {};
 
+// import some types early so SWIG puts them in the correct namespace or something
 %ignore dataset::RowDataset::operator[];
 %import "RowDataset.h"
 %import "IDataVector.h"
+%import "Variant.h"
+%import "ISerializable.h"
 
 #ifndef SWIGXML
 %template () std::vector<dataset::IDataVector>;
@@ -104,8 +107,8 @@ typedef dataset::GenericRowDataset::Iterator dataset::GenericRowIterator;
 
 namespace utilities
 {
-    template <typename ValueType>
-    class IIterator {}; 
+//    template <typename ValueType>
+//    class IIterator {}; 
     
     template <typename IteratorType, typename ValueType> class StlIterator {};
     %template () StlIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;

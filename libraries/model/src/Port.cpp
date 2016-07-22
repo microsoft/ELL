@@ -36,7 +36,7 @@ namespace model
     utilities::ObjectDescription Port::GetDescription() const
     {
         utilities::ObjectDescription result(*this);
-        result.AddField("dummy", utilities::MakeVariant<int>(0));
+        result.AddField("dummy", 0);
         // ???
         return result;
     }

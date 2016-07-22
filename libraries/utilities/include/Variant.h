@@ -23,6 +23,7 @@ class ISerializable;
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
+    class ObjectDescription;
     class VariantBase;
 
     /// <summary> A class that can hold any kind of value and provide a type-safe way to access it
@@ -61,7 +62,7 @@ namespace utilities
 
         std::string GetStoredTypeName() const;
 
-        ISerializable* GetSerializableInterface() const;
+        void SetObjectDescription(ObjectDescription& description) const;
 
     private:
         friend std::string to_string(const Variant& variant);
@@ -81,7 +82,8 @@ namespace utilities
 
     /// <summary> Get string representation of a Variant </summary>
     std::string to_string(const Variant& variant);
-
 }
 
+#include "VariantBase.h"
+#include "VariantDerived.h"
 #include "../tcc/Variant.tcc"

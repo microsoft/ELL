@@ -8,37 +8,16 @@
 
 #pragma once
 
+#include "ObjectDescription.h"
 #include "Variant.h"
 #include "TypeName.h"
 
 // stl
-#include <unordered_map>
 #include <string>
 #include <ostream>
 
 namespace utilities
 {
-    // TODO: add type name to ObjectDescription
-    class ObjectDescription
-    {
-    public:
-        template <typename ValueType>
-        ObjectDescription(ValueType&& obj);
-
-        /// <summary> Adds an entry to the ObjectDescription </summary>
-        void AddField(std::string name, const Variant& value);
-
-        void Print(std::ostream& os, size_t indent = 0);
-        std::string GetTypeName() { return _typeName; }
-
-        std::unordered_map<std::string, Variant>::iterator begin() { return _description.begin(); }
-        std::unordered_map<std::string, Variant>::iterator end() { return _description.end(); }
-
-    private:
-        std::string _typeName;
-        std::unordered_map<std::string, Variant> _description;
-    };
-
     class ISerializable
     {
     public:
@@ -47,9 +26,10 @@ namespace utilities
         /// <summary> Get an ObjectDescription describing how to serialize this object </summary>
         virtual ObjectDescription GetDescription() const = 0;
 
-        static std::string GetTypeName() { return "ISerializable"; }
+//        static std::string GetTypeName() { return "ISerializable"; }
     };
 
+    // helper function
     template <typename T>
     ObjectDescription GetDescription(T&& obj);
 
@@ -62,7 +42,7 @@ namespace utilities
         template <typename T>
         void Serialize(T&& obj);
 
-
+/*
         /// <summary> Serialize fundamental types. </summary>
         ///
         /// <typeparam name="ValueType"> The type being serialized. </typeparam>
@@ -133,7 +113,8 @@ namespace utilities
         /// <param name="value"> The variable being serialized. </param>
         template <typename ValueType, IsClass<ValueType> concept = 0>
         void Serialize(const ValueType& value);
-        
+        */
+
         protected:
         virtual void SerializeType(std::string typeName) = 0;
         virtual void SerializeField(std::string name, const Variant& variant) = 0;

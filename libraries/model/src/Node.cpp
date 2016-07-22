@@ -69,10 +69,10 @@ namespace model
     utilities::ObjectDescription Node::GetDescription() const
     {
         utilities::ObjectDescription result(*this);
-        result.AddField("id", utilities::MakeVariant<NodeId>(_id));
+        result.AddField("id", _id);
         if(_inputs.size() > 0)
         {
-            result.AddField("inputs", utilities::MakeVariant<decltype(_inputs)>(_inputs));
+//            result.AddField("inputs", _inputs);
         }
         // TODO: do we just add a single field called inputs, and serialize the whole list of inputs?
         // then we need a way to serialize a vector of arbitrary (serializable) stuff

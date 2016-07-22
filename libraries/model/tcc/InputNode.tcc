@@ -36,7 +36,7 @@ namespace model
     utilities::ObjectDescription InputNode<ValueType>::GetDescription() const
     {
         auto result = Node::GetDescription();
-        result.AddField("size", utilities::MakeVariant<size_t>(_output.Size()));
+        result.AddField("size", _output.Size());
         return result;
     }
 }
