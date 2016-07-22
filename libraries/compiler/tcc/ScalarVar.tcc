@@ -43,11 +43,10 @@ namespace emll
 		}
 
 		template<typename T>
-		VectorRefScalarVar<T>::VectorRefScalarVar(VariableScope srcScope, std::string sourceName, int offset)
+		VectorElementVar<T>::VectorElementVar(Variable& src, int offset)
 			: ScalarVar(VariableScope::Local, VariableFlags::isVectorRef),
-			_srcScope(srcScope),
-			_srcName(std::move(sourceName)),
-			_offset(offset)
+			_src(src),
+			_offset(offset)	
 		{
 		}
 

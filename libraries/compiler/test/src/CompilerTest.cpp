@@ -145,7 +145,10 @@ nodes::ConstantNode<T>* ModelBuilder::Constant(const T value)
 template<typename T>
 nodes::ConstantNode<T>* ModelBuilder::Constant(const std::vector<T>& values)
 {
-	return _model.AddNode<nodes::ConstantNode<T>>(values);
+	auto *pNode = _model.AddNode<nodes::ConstantNode<T>>(values);
+	// Work around a bug. Make sure literal values are propagated to outputs
+	_model.GetNodeOutput<T>(pNode->output);
+	return pNode;
 }
 
 
@@ -156,9 +159,10 @@ model::Model InitTestModelBinOp()
 
 	auto input = builder.Inputs<double>(data);
 	auto c = builder.Constant<double>({ 5, 50, 500, 5000 });
+
 	nodes::BinaryOperationNode<double>* addNode = builder.Add<double>(input->output, c->output);
-	builder.Add<double>(addNode->output, c->output);
-	builder.Add<double>(input->output, c->output);
+	//builder.Add<double>(addNode->output, c->output);	
+	//builder.Add<double>(input->output, c->output);
 	
 	return builder.Model;
 }
@@ -167,9 +171,7 @@ model::Model InitTestModelSimple()
 {
 	ModelBuilder mb;
 	auto c1 = mb.Constant<double>({ 5, 50, 500, 5000 });
-	mb.Model.GetNodeOutput<double>(c1->output);
 	auto c2 = mb.Constant<double>({ 2, 3, 4, 5});
-	mb.Model.GetNodeOutput<double>(c2->output);
 	
 	auto addNode = mb.Multiply<double>(c1->output, c2->output);
 	mb.Add<double>(addNode->output, c2->output);
@@ -181,29 +183,21 @@ void TestDataFlowBuilder()
 	model::Model model = InitTestModelSimple();
 	DataFlowBuilder db;
 	db.Process(model);
-	testing::ProcessTest("DataFlowBuilder", db.Graph().Size() == 8);
+	testing::ProcessTest("DataFlowBuilder", db.Graph().Size() == 16);
 }
 
 void TestDataFlowCompiler()
 {
 	model::Model model = InitTestModelSimple();
+	//model::Model model = InitTestModelBinOp();
 	DataFlowBuilder db;
 	db.Process(model);
 	
 	IRCompiler compiler("EMLL", std::cout);
 
-	compiler.BeginMain("Predict");
+	compiler.BeginFunctionPredict();
 	compiler.CompileGraph(db.Graph());
-	compiler.EndMain();
-	compiler.DebugDump();
-}
-
-void TestCompiler()
-{
-	model::Model model = InitTestModelBinOp();
-	
-	IRCompiler compiler("EMLL", std::cout);
-	compiler.CompileModel(model);
+	compiler.EndFunction();
 	compiler.DebugDump();
 }
 

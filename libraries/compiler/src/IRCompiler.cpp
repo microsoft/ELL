@@ -18,36 +18,25 @@ namespace emll
 
 		void IRCompiler::Compile(BinaryNode& node)
 		{
-			llvm::Value* pVar1 = LoadVar(node.Var1());
-			llvm::Value* pVar2 = LoadVar(node.Var2());
-			llvm::Value* pDest = EnsureEmitted(node.Result());
-			llvm::Value* pResult = _fn.Op(node.Op(), pVar1, pVar2);
+			llvm::Value* pSrc1 = LoadVar(*(node.Src1()));
+			llvm::Value* pSrc2 = LoadVar(*(node.Src2()));
+			llvm::Value* pDest = EnsureEmitted(*(node.Var()));
+			llvm::Value* pResult = _fn.Op(node.Op(), pSrc1, pSrc2);
 			_fn.Store(pDest, pResult);
 		}
 
-		void IRCompiler::Begin()
+		void IRCompiler::Compile(InputNode& node)
 		{
+			EnsureEmitted(*(node.Var()));
 		}
 
-		void IRCompiler::End()
-		{
-
-		}
-
-		void IRCompiler::BeginMain(const std::string& functionName)
-		{
-			NamedValueTypeList fnArgs;
-			fnArgs.init({ { InputName(), ValueType::PDouble },{ OutputName(), ValueType::PDouble } });
-			BeginMain(functionName, fnArgs);
-		}
-
-		void IRCompiler::BeginMain(const std::string& functionName, NamedValueTypeList& args)
+		void IRCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
 		{			
 			_fn = _module.Function(functionName, ValueType::Void, args, true);
 			RegisterFunctionArgs(args);
 		}
 
-		void IRCompiler::EndMain()
+		void IRCompiler::EndFunction()
 		{
 			_fn.Ret();
 			_fn.Verify();

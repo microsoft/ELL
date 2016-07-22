@@ -22,19 +22,7 @@ namespace emll
 
 		/// <summary>Base class for ML Compiler.</summary>
 		Compiler::Compiler()
-			: _nodeTypes()
 		{
-			InitSupportedNodeTypes();
-		}
-
-		const std::string& Compiler::InputName() const
-		{
-			return c_InputVariableName;
-		}
-
-		const std::string& Compiler::OutputName() const
-		{
-			return c_OutputVariableName;
 		}
 
 		EmittedVar Compiler::AllocLocal()
@@ -115,19 +103,6 @@ namespace emll
 			}
 		}
 
-		void Compiler::CompileModel(const model::Model& model)
-		{
-			_inputs = ModelEx::CollectInputNodes(model);
-			_outputs = ModelEx::CollectOutputNodes(model);
-
-			NamedValueTypeList fnArgs;
-			AddArgs(fnArgs, InputName(), Inputs());
-			AddArgs(fnArgs, OutputName(), Outputs());
-
-			BeginMain(c_PredictFunctionName, fnArgs);
-			EndMain();
-		}
-
 		void Compiler::CompileGraph(DataFlowGraph& graph)
 		{
 			for (auto node : graph.Literals())
@@ -136,88 +111,11 @@ namespace emll
 			}
 		}
 
-		void Compiler::AddArgs(NamedValueTypeList& args, const std::string& namePrefix, const std::vector<const model::Node*>& nodes)
+		void Compiler::BeginFunctionPredict()
 		{
-			for (size_t n = 0; n < nodes.size(); ++n)
-			{
-				auto node = nodes[n];
-				std::string argNamePrefix = MakeVarName(namePrefix, n);
-				auto outputs = node->GetOutputPorts();
-				for (size_t i = 0; i < outputs.size(); ++i)
-				{
-					std::string argName;
-					if (i > 0)
-					{
-						argName = MakeVarName(argName, i);
-					}
-					else
-					{
-						argName = argNamePrefix;
-					}
-					AddArgs(args, argName, outputs[i]);
-				}
-			}
-		}
-
-		void Compiler::AddArgs(NamedValueTypeList& args, const std::string& name, const model::OutputPortBase* pOutput)
-		{
-			model::Port::PortType type = pOutput->GetType();
-			switch (type)
-			{
-			case model::Port::PortType::Real:
-				args.push_back({ name, ValueType::PDouble });
-				break;
-			case model::Port::PortType::Integer:
-				args.push_back({ name, ValueType::PInt32 });
-				break;
-			default:
-				throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
-		std::string Compiler::MakeVarName(const std::string& namePrefix, size_t i)
-		{
-			std::string name = namePrefix;
-			name.append(std::to_string(i));
-			return name;
-		}
-
-		Compiler::NodeType Compiler::GetNodeType(const model::Node& node) const
-		{
-			return _nodeTypes.Get(node.GetRuntimeTypeName());
-		}
-
-		void Compiler::VerifyInputType(const model::Node& node, const model::Port::PortType type)
-		{
-			auto inputs = node.GetInputPorts();
-			for (auto& port : inputs)
-			{
-				if (port->GetType() != type)
-				{
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-				}
-			}
-		}
-
-		void Compiler::VerifyOutputType(const model::Node& node, const model::Port::PortType type)
-		{
-			auto outputs = node.GetOutputPorts();
-			for (auto& port : outputs)
-			{
-				if (port->GetType() != type)
-				{
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-				}
-			}
-		}
-
-		void Compiler::InitSupportedNodeTypes()
-		{
-			_nodeTypes.Init	({
-				{"Input", NodeType::input},
-				{"ConstantNode", NodeType::constant},
-				{"BinaryOperationNode", NodeType::binaryOp}
-			});
+			NamedValueTypeList fnArgs;
+			fnArgs.init({ {c_InputVariableName, ValueType::PDouble },{ c_OutputVariableName, ValueType::PDouble } });
+			BeginFunction(c_PredictFunctionName, fnArgs);
 		}
 
 		void Compiler::Reset()

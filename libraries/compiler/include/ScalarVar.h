@@ -53,29 +53,25 @@ namespace emll
 		using InitializedScalarF = InitializedScalarVar<double>;
 
 		template<typename T>
-		class VectorRefScalarVar : public ScalarVar<T>
+		class VectorElementVar : public ScalarVar<T>
 		{
 		public:
-			VectorRefScalarVar(VariableScope srcScope, std::string srcName, int offset);
+			VectorElementVar(Variable& src, int offset);
 
-			const std::string& SrcName() const
+			Variable& Src() const
 			{
-				return _srcName;
+				return _src;
 			}
 			const int Offset() const
 			{
 				return _offset;
 			}
-			const VariableScope SrcScope() const
-			{
-				return _srcScope;
-			}
+
 		private:
-			VariableScope _srcScope;
-			std::string _srcName;
+			Variable& _src;
 			int _offset;
 		};
-		using VectorRefScalarVarF = VectorRefScalarVar<double>;
+		using VectorRefScalarVarF = VectorElementVar<double>;
 
 		template<typename T>
 		class ComputedVar : public ScalarVar<T>

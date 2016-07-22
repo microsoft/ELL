@@ -10,6 +10,7 @@ namespace emll
 		{
 			Unexpected = 0,
 			notSupported,
+			nodeTypeNotSupported,
 			portTypeNotSupported,
 			operationTypeNotSupported,
 			InputOutputPortTypeMismatch,

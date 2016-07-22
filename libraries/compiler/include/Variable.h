@@ -140,18 +140,14 @@ namespace emll
 		class VectorVar : public Variable
 		{
 		public:
-			VectorVar(const VariableScope scope);
+			VectorVar(const VariableScope scope, const size_t size, int flags = VariableFlags::isMutable);
 
-			T& Data()
-			{
-				return _data;
-			}
 			virtual size_t Dimension() const override
 			{
-				return _data.size();
+				return _size;
 			}
 		private:
-			std::vector<T> _data;
+			int _size;
 		};
 		
 		using VectorF = VectorVar<double>;

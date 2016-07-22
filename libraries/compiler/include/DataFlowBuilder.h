@@ -47,18 +47,20 @@ namespace emll
 			void Process(const model::Node& node);
 			void ProcessConstant(const model::Node& node);
 			void ProcessBinaryOperation(const model::Node& node);
+			void ProcessInputNode(const model::Node& node);
 
 			DataFlowGraph& Graph() { return _graph; }
 
 		private:
-			using ConstantF = nodes::ConstantNode<double>;
-			using BinaryOperationF = nodes::BinaryOperationNode<double>;
 
 			template<typename DataType>
 			void Process(const nodes::ConstantNode<DataType>& node);
-			
+
 			template<typename DataType>
 			void Process(const nodes::BinaryOperationNode<DataType>& node);
+
+			template<typename DataType>
+			void Process(const model::InputNode<DataType>& node);
 
 			DataNode* GetSourceNode(const model::InputPortBase* pPort, size_t elementIndex) const;
 			void AddDependency(const model::InputPortBase* pPort, size_t elementIndex, DataNode* pDependant);

@@ -23,32 +23,16 @@ namespace emll
 		class Compiler
 		{
 		public:
-			/// <summary>Map node names to NodeTypes the compiler knows how to compile</summary>
-			enum class NodeType
-			{
-				unsupported,
-				input,
-				constant,
-				binaryOp
-			};
 
 		public:
 			Compiler();
 			virtual ~Compiler() = default;
 
-			/// <summary>Compile the given model</summary>
-			virtual void CompileModel(const model::Model& model);
-
 			void CompileGraph(DataFlowGraph& graph);
 
 			virtual void Compile(LiteralNode& node) = 0;
 			virtual void Compile(BinaryNode& node) = 0;
-
-			virtual void Begin() = 0;
-			virtual void End() = 0;
-
-			/// <summary>Return the type of the given node</summary>
-			NodeType GetNodeType(const model::Node& node) const;
+			virtual void Compile(InputNode& node) = 0;
 
 			EmittedVar AllocLiteral();
 			EmittedVar AllocLocal();
@@ -56,41 +40,19 @@ namespace emll
 			EmittedVar AllocGlobal();
 			void FreeGlobal(EmittedVar var);
 
-
 			virtual void AllocVar(Variable& var);
 			virtual void FreeVar(Variable& var);
 
+			void BeginFunctionPredict();
+			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
+			virtual void EndFunction() = 0;
+
 		protected:
-			virtual void BeginMain(const std::string& functionName, NamedValueTypeList& args) = 0;
-			virtual void EndMain() = 0;
-
-			virtual void InitSupportedNodeTypes();
 			
-			void AddArgs(NamedValueTypeList& args, const std::string& namePrefix, const std::vector<const model::Node*>& nodes);
-			void AddArgs(NamedValueTypeList& args, const std::string& name, const model::OutputPortBase* pOutput);
-
-			std::string MakeVarName(const std::string& namePrefix, size_t i);
-
-			void VerifyInputType(const model::Node& node, const model::Port::PortType type);
-			void VerifyOutputType(const model::Node& node, const model::Port::PortType type);
-			const std::string& InputName() const;
-			const std::string& OutputName() const;
-			const std::vector<const model::Node*>& Inputs() const
-			{
-				return _inputs;
-			}
-			const std::vector<const model::Node*>& Outputs() const
-			{
-				return _outputs;
-			}
-
 		private:
 			void Reset();
 
 		private:
-			SymbolTable<NodeType, NodeType::unsupported> _nodeTypes;
-			std::vector<const model::Node*> _inputs;
-			std::vector<const model::Node*> _outputs;
 			EmittedVarAllocator _literalVars;
 			EmittedVarAllocator _localVars;
 			EmittedVarAllocator _globalVars;

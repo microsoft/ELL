@@ -13,21 +13,19 @@ namespace emll
 		public:
 			IRCompiler(const std::string& moduleName, std::ostream& os);
 
-			virtual void Begin() override;
-			virtual void End() override;
-
 			virtual void Compile(LiteralNode& node) override;
 			virtual void Compile(BinaryNode& node) override;
+			virtual void Compile(InputNode& node) override;
 
 			llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
 			llvm::Value* EnsureEmitted(Variable& var);
 
 			void DebugDump();
 
+			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) override;
+			virtual void EndFunction() override;
+
 		public:
-			void BeginMain(const std::string& functionName);
-			virtual void BeginMain(const std::string& functionName, NamedValueTypeList& args) override;
-			virtual void EndMain() override;
 		
 		private:
 			void RegisterFunctionArgs(NamedValueTypeList& args);
@@ -46,7 +44,7 @@ namespace emll
 			template<typename T>
 			llvm::Value* EmitLocal(InitializedScalarVar<T>& var);
 			template<typename T>
-			llvm::Value* EmitRef(VectorRefScalarVar<T>& var);
+			llvm::Value* EmitRef(VectorElementVar<T>& var);
 			template<typename T>
 			llvm::Value* EmitGlobal(InitializedScalarVar<T>& var);
 

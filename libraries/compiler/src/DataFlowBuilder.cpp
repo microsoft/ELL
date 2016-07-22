@@ -61,6 +61,7 @@ namespace emll
 
 		static const std::string c_ConstantNodeType = "Constant";
 		static const std::string c_BinaryNodeType = "BinaryOperationNode";
+		static const std::string c_InputNodeType = "Input";
 
 		void DataFlowBuilder::Process(const model::Model& mode)
 		{
@@ -71,14 +72,25 @@ namespace emll
 
 		void DataFlowBuilder::Process(const model::Node& node)
 		{
+			std::string typeName = node.GetRuntimeTypeName();
+			//
 			// TODO: Make this a lookup table
-			if (node.GetRuntimeTypeName() == c_ConstantNodeType)
+			//
+			if (typeName == c_BinaryNodeType)
+			{
+				ProcessBinaryOperation(node);
+			}
+			else if (typeName == c_ConstantNodeType)
 			{
 				ProcessConstant(node);
 			}
-			else if (node.GetRuntimeTypeName() == c_BinaryNodeType)
+			else if (typeName == c_InputNodeType)
 			{
-				ProcessBinaryOperation(node);
+				ProcessInputNode(node);
+			}
+			else
+			{
+				throw new CompilerException(CompilerError::nodeTypeNotSupported);
 			}
 		}
 
@@ -87,7 +99,7 @@ namespace emll
 			switch (ModelEx::GetNodeDataType(node))
 			{
 				case model::Port::PortType::Real:
-					Process<double>(static_cast<const ConstantF&>(node));
+					Process<double>(static_cast<const nodes::ConstantNode<double>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -99,10 +111,22 @@ namespace emll
 			switch (ModelEx::GetNodeDataType(node))
 			{
 				case model::Port::PortType::Real:
-					Process<double>(static_cast<const BinaryOperationF&>(node));
+					Process<double>(static_cast<const nodes::BinaryOperationNode<double>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void DataFlowBuilder::ProcessInputNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+			case model::Port::PortType::Real:
+				Process<double>(static_cast<const model::InputNode<double>&>(node));
+				break;
+			default:
+				throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
 		}
 
@@ -118,6 +142,8 @@ namespace emll
 		{			
 			assert(pDependant != nullptr);
 			DataNode* pNode = GetSourceNode(pPort, elementIndex);
+			assert(pNode != nullptr);
+
 			pNode->AddDependent(pDependant);
 		}
 

@@ -11,8 +11,11 @@ namespace emll
 			Variable* pResult = OnProcess(graph, compiler);
 			if (pResult != nullptr)
 			{
-				NotifyDependencies(graph, compiler, *pResult);
-				OnProcessComplete(graph, compiler, *pResult);
+				for (size_t i = 0; i < _dependencies.size(); ++i)
+				{
+					_dependencies[i]->ReceiveData(graph, compiler, *pResult);
+				}
+				compiler.FreeVar(*pResult);
 			}
 		}
 
@@ -20,19 +23,6 @@ namespace emll
 		{
 			assert(pNode != nullptr);
 			_dependencies.push_back(pNode);
-		}
-
-		void DataNode::OnProcessComplete(DataFlowGraph& graph, Compiler& compiler, Variable& varResult)
-		{
-			compiler.FreeVar(varResult);
-		}
-
-		void DataNode::NotifyDependencies(DataFlowGraph& graph, Compiler& compiler, Variable& varResult)
-		{
-			for (size_t i = 0; i < _dependencies.size(); ++i)
-			{
-				_dependencies[i]->ReceiveData(graph, compiler, varResult);
-			}
 		}
 
 		DataNode* DataFlowGraph::GetNodeAt(size_t offset) const
@@ -51,9 +41,56 @@ namespace emll
 			}
 		}
 
-		BinaryNode* DataFlowGraph::AddBinary(OperatorType op)
+		Variable* DataFlowGraph::AddVectorElementVariable(ValueType type, Variable& src, int offset)
 		{
-			return AddNode<BinaryNode>(op);
+			switch (type)
+			{
+				case ValueType::Double:
+					return AddVariable<VectorElementVar<double>>(src, offset);
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
+			}
+		}
+
+
+		LiteralNode::LiteralNode(Variable* pVar)
+			: _pVar(pVar)
+		{
+			assert(pVar != nullptr && pVar->IsLiteral());
+		}
+
+		Variable* LiteralNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
+		{
+			compiler.Compile(*this);
+			return _pVar;
+		}
+
+		ArgNode::ArgNode(Variable *pVar)
+			: _pVar(pVar)
+		{
+		}
+
+		Variable* ArgNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
+		{
+			return _pVar;
+		}
+
+		InputNode::InputNode(int elementIndex)
+			: _elementIndex(elementIndex)
+		{
+		}
+
+		void InputNode::ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data)
+		{
+			assert(data.IsVector());
+			_pVar = graph.AddVectorElementVariable(data.Type(), data, _elementIndex);
+			Process(graph, compiler);
+		}
+
+		Variable* InputNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
+		{
+			compiler.Compile(*this);
+			return _pVar;
 		}
 
 		BinaryNode::BinaryNode(OperatorType op)
@@ -63,41 +100,27 @@ namespace emll
 
 		void BinaryNode::ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data)
 		{
-			if (_pVar1 == nullptr)
+			if (_pSrc1 == nullptr)
 			{
-				_pVar1 = &data;
+				_pSrc1 = &data;
 			}
-			else if (_pVar2 == nullptr)
+			else if (_pSrc2 == nullptr)
 			{
-				_pVar2 = &data;
+				_pSrc2 = &data;
 			}
-			
-			if (_pVar1 != nullptr && _pVar2 != nullptr)
-			{			
-				assert(_pVar1->Type() == _pVar2->Type());
-				_pResult = graph.AddLocalScalarVariable(_pVar1->Type());
+
+			if (_pSrc1 != nullptr && _pSrc2 != nullptr)
+			{
+				assert(_pSrc1->Type() == _pSrc2->Type());
+				_pResult = graph.AddLocalScalarVariable(_pSrc1->Type());
 				Process(graph, compiler);
 			}
 		}
 
 		Variable* BinaryNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
 		{
-			// TODO: Handle Constant folding
 			compiler.Compile(*this);
 			return _pResult;
 		}
-
-		LiteralNode::LiteralNode(Variable* pVar)
-			: _pVar(pVar)
-		{
-			assert(pVar != nullptr);
-		}
-
-		Variable* LiteralNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
-		{
-			compiler.Compile(*this);
-			return _pVar;
-		}
-
 	}
 }

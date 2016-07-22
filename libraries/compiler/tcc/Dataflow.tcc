@@ -35,5 +35,22 @@ namespace emll
 			_literals.push_back(pNode);
 			return pNode;
 		}
+
+		template <typename DataType>
+		ArgNode* DataFlowGraph::AddArg(size_t size)
+		{
+			Variable* pVar = nullptr;
+			if (size > 0)
+			{
+				pVar = AddVariable<VectorVar<DataType>>(VariableScope::Local, size);
+			}
+			else
+			{
+				pVar = AddVariable<ScalarVar<DataType>>(VariableScope::Local);
+			}
+			ArgNode* pNode = AddNode<ArgNode>(pVar);
+			_args.push_back(pNode);
+			return pNode;
+		}
 	}
 }

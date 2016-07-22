@@ -46,4 +46,3 @@ private:
 void TestModelEx();
 void TestDataFlowBuilder();
 void TestDataFlowCompiler();
-void TestCompiler();

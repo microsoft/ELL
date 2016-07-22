@@ -11,7 +11,9 @@ namespace emll
 	{
 		enum class DataNodeType
 		{
+			ArgNode,
 			LiteralNode,
+			InputNode,
 			BinaryNode,
 		};
 
@@ -22,11 +24,16 @@ namespace emll
 		{
 		public:
 
-			void Process(DataFlowGraph& graph, Compiler& compiler);
-			
+			virtual void Process(DataFlowGraph& graph, Compiler& compiler);
+
 			virtual void ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data) {}
 
 			virtual DataNodeType Type() const = 0;
+
+			bool HasDependencies() const
+			{
+				return (_dependencies.size() > 0);
+			}
 
 			const std::vector<DataNode*>& Dependencies()
 			{
@@ -34,17 +41,34 @@ namespace emll
 			}
 
 			void AddDependent(DataNode* pNode);
-
+		
 		protected:
-			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler)
-			{
-				return nullptr;
-			}
-			virtual void OnProcessComplete(DataFlowGraph& graph, Compiler& compiler, Variable& varResult);
-			void NotifyDependencies(DataFlowGraph& graph, Compiler& compiler, Variable& varResult);
-
+			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler) = 0;
+		
 		private:
 			std::vector<DataNode*> _dependencies;
+		};
+
+		class ArgNode : public DataNode
+		{
+		public:
+			ArgNode(Variable* pVar);
+
+			virtual DataNodeType Type() const override
+			{
+				return DataNodeType::ArgNode;
+			}
+
+			Variable* Var()
+			{
+				return _pVar;
+			}
+
+		protected:
+			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler);
+
+		private:
+			Variable* _pVar;
 		};
 
 		class LiteralNode : public DataNode
@@ -60,8 +84,9 @@ namespace emll
 			{
 				return _pVar;
 			}
+
 		protected:
-			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler);
+			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler) override;
 
 		private:
 			Variable* _pVar;
@@ -70,6 +95,25 @@ namespace emll
 		class InputNode : public DataNode
 		{
 		public:
+			InputNode(int elementIndex);
+
+			virtual DataNodeType Type() const override
+			{
+				return DataNodeType::InputNode;
+			}
+			Variable* Var()
+			{
+				return _pVar;
+			}
+
+			virtual void ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data) override;
+
+		protected:
+			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler) override;
+
+		private:
+			int _elementIndex;
+			Variable* _pVar;
 		};
 
 		class BinaryNode : public DataNode
@@ -88,25 +132,26 @@ namespace emll
 			{
 				return _op;
 			}
-			Variable& Var1() const
+			Variable* Var()
 			{
-				return *_pVar1;
+				return _pResult;
 			}
-			Variable& Var2() const
+			Variable* Src1() const
 			{
-				return *_pVar2;
+				return _pSrc1;
 			}
-			Variable& Result() const
+			Variable* Src2() const
 			{
-				return *_pResult;
+				return _pSrc2;
 			}
+
 		protected:
 			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler) override;
 
 		private:
 			OperatorType _op;
-			Variable* _pVar1 = nullptr;
-			Variable* _pVar2 = nullptr;
+			Variable* _pSrc1 = nullptr;
+			Variable* _pSrc2 = nullptr;
 			Variable* _pResult = nullptr;
 		};
 
@@ -120,7 +165,8 @@ namespace emll
 			template <typename DataType>
 			LiteralNode* AddLiteral(DataType type);
 
-			BinaryNode* AddBinary(OperatorType op);
+			template <typename DataType>
+			ArgNode* AddArg(size_t size);
 
 			size_t Size() const { return _nodes.size(); }
 			DataNode* GetNodeAt(size_t offset) const;
@@ -129,14 +175,17 @@ namespace emll
 			VarType* AddVariable(Args&&... args);
 			
 			Variable* AddLocalScalarVariable(ValueType type);
-
-			std::vector<DataNode*>& Literals() { return _literals;}
+			Variable* AddVectorElementVariable(ValueType type, Variable& src, int offset);
+			
+			const std::vector<DataNode*>& Literals() { return _literals;}
+			const std::vector<DataNode*>& Arguments() { return _args; }
 
 		private:
 			// The data flow graph owns all pointers
 			std::vector<std::shared_ptr<DataNode>> _nodes;
 			std::vector<std::shared_ptr<Variable>> _variables;
 			std::vector<DataNode*> _literals;
+			std::vector<DataNode*> _args;
 		};
 	}
 }
