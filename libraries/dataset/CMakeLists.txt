@@ -33,7 +33,6 @@ set (INCLUDE include/DataVectorBuilder.h
              include/SparseBinaryDataVector.h
              include/SparseDataVector.h
              include/SparseEntryParser.h
-             include/SupervisedExample.h
              include/SupervisedExampleBuilder.h
              include/ZeroDataVector.h)
 
@@ -45,7 +44,6 @@ set (TCC tcc/DataVectorBuilder.tcc
          tcc/RowDataset.tcc
          tcc/SparseBinaryDataVector.tcc
          tcc/SparseDataVector.tcc
-         tcc/SupervisedExample.tcc
          tcc/SupervisedExampleBuilder.tcc)
 
 source_group("src" FILES ${SRC})
