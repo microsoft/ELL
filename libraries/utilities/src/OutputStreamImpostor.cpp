@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     OutputStreamImpostor.cpp (utilities)
-//  Authors:  Chuck Jacobs
+//  Authors:  Chuck Jacobs, Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -30,32 +30,25 @@ namespace utilities
 
     NullStreamBuf nullStreamBuf;
 
-    OutputStreamImpostor::OutputStreamImpostor()
+    OutputStreamImpostor::OutputStreamImpostor(StreamType streamType)
     {
-        _outBuf = std::cout.rdbuf();
-        _out = std::make_unique<std::ostream>(_outBuf);
+        if(streamType == StreamType::cout)
+        {
+            _outputStream = std::make_shared<std::ostream>(std::cout.rdbuf());
+        }
+        else if(streamType == StreamType::cerr)
+        {
+            _outputStream = std::make_shared<std::ostream>(std::cerr.rdbuf());
+        }
+        else // null
+        {
+            _outputStream = std::make_shared<std::ostream>(&nullStreamBuf);
+        }
     }
 
-    OutputStreamImpostor::OutputStreamImpostor(std::string filenameOrEmpty)
+    OutputStreamImpostor::OutputStreamImpostor(std::string filename)
     {
-        if (filenameOrEmpty == "")
-        {
-            _outBuf = std::cout.rdbuf();
-        }
-        else if(filenameOrEmpty == "null")
-        {
-            _outBuf = &nullStreamBuf;
-        }
-        else
-        {
-            _outputFileStream = OpenOfstream(filenameOrEmpty);
-            _outBuf = _outputFileStream.rdbuf();
-        }
-        _out = std::make_unique<std::ostream>(_outBuf);
-    }
-
-    OutputStreamImpostor GetOutputStreamImpostor(std::string filenameOrEmpty)
-    {
-        return OutputStreamImpostor(filenameOrEmpty);
+        _outputFileStream = std::make_shared<std::ofstream>(utilities::OpenOfstream(filename));
+        _outputStream = std::make_shared<std::ostream>(_outputFileStream->rdbuf());
     }
 }

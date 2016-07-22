@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
         }
 
         // if output file specified, replace stdout with it 
-        auto outStream = utilities::GetOutputStreamImpostor(mapSaveArguments.outputModelFile);
+        auto& outStream = mapSaveArguments.outputModelStream;
 
         // load a model
         auto model = common::LoadModel(mapLoadArguments.modelLoadArguments);

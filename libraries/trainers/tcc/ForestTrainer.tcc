@@ -6,7 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define VERY_VERBOSE
+//#define VERBOSE_MODE( x ) x   // uncomment this for very verbose mode
+#define VERBOSE_MODE( x )       // uncomment this for nonverbose mode
 
 namespace trainers
 {    
@@ -32,11 +33,9 @@ namespace trainers
             _forest->AddToBias(bias);
             UpdateCurrentOutputs(bias);
 
-#ifdef VERY_VERBOSE
-            _dataset.Print(std::cout);
-            std::cout << "\nBoosting iteration\n";
-            _forest->PrintLine(std::cout, 1);
-#endif
+            VERBOSE_MODE(_dataset.Print(std::cout));
+            VERBOSE_MODE(std::cout << "\nBoosting iteration\n");
+            VERBOSE_MODE(_forest->PrintLine(std::cout, 1));
 
             // find split candidate for root node and push it onto the priority queue
             auto rootSplit = GetBestSplitCandidateAtNode(_forest->GetNewRootId(), Range{0, _dataset.NumExamples()}, sums);
@@ -188,10 +187,9 @@ namespace trainers
         while (!_queue.empty())
         {
 
-#ifdef VERY_VERBOSE
-            std::cout << "\nSplit iteration\n";
-            _queue.PrintLine(std::cout, 1);
-#endif
+
+            VERBOSE_MODE(std::cout << "\nSplit iteration\n");
+            VERBOSE_MODE(_queue.PrintLine(std::cout, 1));
 
             auto splitCandidate = _queue.top();
             _queue.pop();
@@ -214,11 +212,9 @@ namespace trainers
             SplitAction splitAction(splitCandidate.nodeId, splitCandidate.splitRule, edgePredictors);
             auto interiorNodeIndex = _forest->Split(splitAction);
 
-#ifdef VERY_VERBOSE
-            _dataset.Print(std::cout, 1);
-            std::cout << "\n";
-            _forest->PrintLine(std::cout, 1);
-#endif
+            VERBOSE_MODE(_dataset.Print(std::cout, 1));
+            VERBOSE_MODE(std::cout << "\n");
+            VERBOSE_MODE(_forest->PrintLine(std::cout, 1));
 
             // if max number of splits reached, exit the loop
             if (++splitCount >= maxSplits)

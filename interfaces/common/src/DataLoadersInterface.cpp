@@ -46,7 +46,7 @@ namespace
         dataset::MappedParser<dataset::SparseEntryParser> mappedParser(dataset::SparseEntryParser(), map);
 
         // create line iterator - read line by line sequentially
-        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
+        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFilename);
 
         // Create iterator
         return dataset::GetParsingIterator(std::move(lineIterator), std::move(mappedParser));
@@ -58,7 +58,7 @@ namespace
         dataset::MappedParser<dataset::SparseEntryParser> mappedParser(dataset::SparseEntryParser(), map.GetMap());
 
         // create line iterator - read line by line sequentially
-        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
+        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFilename);
 
         // Create iterator
         auto parsingIterator = MakeParsingIterator(std::move(lineIterator), std::move(mappedParser));
@@ -141,7 +141,7 @@ namespace interfaces
     utilities::AnyIterator<dataset::GenericSupervisedExample> GetDataIterator(const std::string& dataFilename, int dimension, const std::string coordinateListString, const std::string& modelFilename)
     {
         common::DataLoadArguments dataLoadArguments;
-        dataLoadArguments.inputDataFile = dataFilename;
+        dataLoadArguments.inputDataFilename = dataFilename;
         
         // read model file
         common::ModelLoadArguments modelLoadArguments;
@@ -167,7 +167,7 @@ namespace interfaces
         else
         {
             common::DataLoadArguments dataLoadArguments;
-            dataLoadArguments.inputDataFile = dataFilename;
+            dataLoadArguments.inputDataFilename = dataFilename;
             auto dataIterator = common::GetDataIterator(dataLoadArguments);
             while (dataIterator->IsValid())
             {
@@ -197,7 +197,7 @@ namespace interfaces
     interfaces::GenericRowDataset GetMappedDataset(const std::string& dataFilename, const interfaces::Map& map)
     {
        common::DataLoadArguments dataLoadArguments;
-       dataLoadArguments.inputDataFile = dataFilename;
+       dataLoadArguments.inputDataFilename = dataFilename;
        return interfaces::GetDataset(dataLoadArguments, map);
     }
     
@@ -206,7 +206,7 @@ namespace interfaces
        common::DataLoadArguments dataLoadArguments;
        common::MapLoadArguments mapLoadArguments;
     
-       dataLoadArguments.inputDataFile = dataFilename;
+       dataLoadArguments.inputDataFilename = dataFilename;
        mapLoadArguments.modelLoadArguments.inputModelFile = mapFilename;
 
        auto dataIterator = common::GetDataIterator(dataLoadArguments, mapLoadArguments);

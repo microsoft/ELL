@@ -23,6 +23,9 @@
 // predictors
 #include "ForestPredictor.h"
 
+// utilities
+#include "OutputStreamImpostor.h"
+
 // stl
 #include <queue>
 #include <memory>
