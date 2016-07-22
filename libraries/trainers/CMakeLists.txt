@@ -12,15 +12,17 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/ForestTrainer.cpp)
+set (SRC src/ForestTrainer.cpp
+         src/LogitBooster.cpp)
 
 set (INCLUDE include/BaggingIncrementalTrainer.h
              include/EvaluatingIncrementalTrainer.h
              include/ForestTrainer.h
              include/IIncrementalTrainer.h
              include/IBlackBoxTrainer.h
-             include/SimpleForestTrainer.h
+             include/LogitBooster.h
              include/MultiEpochIncrementalTrainer.h
+             include/SimpleForestTrainer.h
              include/SortingTreeTrainer.h
              include/SweepingIncrementalTrainer.h
              include/SGDIncrementalTrainer.h)

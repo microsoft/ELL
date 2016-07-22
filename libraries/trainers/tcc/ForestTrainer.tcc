@@ -10,13 +10,13 @@
 
 namespace trainers
 {    
-    template <typename SplitRuleType, typename EdgePredictorType>
-    ForestTrainer<SplitRuleType, EdgePredictorType>::ForestTrainer(const ForestTrainerParameters& parameters) :
-        _parameters(parameters), _forest(std::make_shared<predictors::SimpleForestPredictor>())
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ForestTrainer(const BoosterType& booster, const ForestTrainerParameters& parameters) :
+        _booster(booster), _parameters(parameters), _forest(std::make_shared<predictors::SimpleForestPredictor>())
     {}
 
-    template <typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::Update(dataset::GenericRowDataset::Iterator exampleIterator) 
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(dataset::GenericRowDataset::Iterator exampleIterator) 
     {
         // convert data from iterator to dense dataset with metadata (weak weight / weak label) associated with each example
         LoadData(exampleIterator);
@@ -112,12 +112,12 @@ namespace trainers
         }
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    ForestTrainer<SplitRuleType, EdgePredictorType>::NodeRanges::NodeRanges(const Range& totalRange) : _total(totalRange)
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeRanges::NodeRanges(const Range& totalRange) : _total(totalRange)
     {}
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    typename ForestTrainer<SplitRuleType, EdgePredictorType>::Range ForestTrainer<SplitRuleType, EdgePredictorType>::NodeRanges::GetChildRange(size_t childPosition) const
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Range ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeRanges::GetChildRange(size_t childPosition) const
     {
         if (childPosition == 0)
         {
@@ -129,25 +129,21 @@ namespace trainers
         }
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::NodeRanges::SetSize0(size_t value)
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeRanges::SetSize0(size_t value)
     {
         _size0 = value;
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    ForestTrainer<SplitRuleType, EdgePredictorType>::ExampleMetaData::ExampleMetaData(const dataset::WeightLabel& weightLabel) : dataset::WeightLabel(weightLabel)
-    {}
-
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::Sums::Increment(const ExampleMetaData& metaData)
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums::Increment(const dataset::WeightLabel& weightLabel)
     {
-        sumWeights += metaData.weakWeight;
-        sumWeightedLabels += metaData.weakWeight * metaData.weakLabel;
+        sumWeights += weightLabel.weight;
+        sumWeightedLabels += weightLabel.weight * weightLabel.label;
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    typename ForestTrainer<SplitRuleType, EdgePredictorType>::Sums ForestTrainer<SplitRuleType, EdgePredictorType>::Sums::operator-(const Sums& other) const
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums::operator-(const Sums& other) const
     {
         Sums difference;
         difference.sumWeights = sumWeights - other.sumWeights;
@@ -155,28 +151,28 @@ namespace trainers
         return difference;
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::NodeStats::SetChildSums(std::vector<Sums> childSums) 
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::SetChildSums(std::vector<Sums> childSums) 
     { 
         _childSums = childSums; 
     } 
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    ForestTrainer<SplitRuleType, EdgePredictorType>::NodeStats::NodeStats(const Sums& totalSums) : _totalSums(totalSums), _childSums(2)
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::NodeStats(const Sums& totalSums) : _totalSums(totalSums), _childSums(2)
     {}
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    typename const ForestTrainer<SplitRuleType, EdgePredictorType>::Sums& ForestTrainer<SplitRuleType, EdgePredictorType>::NodeStats::GetChildSums(size_t position) const
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    typename const ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums& ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::GetChildSums(size_t position) const
     {
         return _childSums[position];
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    ForestTrainer<SplitRuleType, EdgePredictorType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums) : gain(0), nodeId(nodeId), ranges(totalRange), stats(totalSums)
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums) : gain(0), nodeId(nodeId), ranges(totalRange), stats(totalSums)
     {}
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::LoadData(dataset::GenericRowDataset::Iterator exampleIterator)
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::LoadData(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         while (exampleIterator.IsValid())
         {
@@ -186,7 +182,8 @@ namespace trainers
             // TODO this code breaks encapsulation - give ForestTrainer a ctor that takes an IDataVector
             auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
 
-            ExampleMetaData metaData = example.GetMetaData();
+            ExampleMetaData metaData;
+            metaData.strong = example.GetMetaData();
             metaData.currentOutput = _forest->Compute(*denseDataVector);
 
             _dataset.AddExample(ForestTrainerExample(std::move(denseDataVector), metaData));
@@ -195,17 +192,16 @@ namespace trainers
         }
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    typename ForestTrainer<SplitRuleType, EdgePredictorType>::Sums ForestTrainer<SplitRuleType, EdgePredictorType>::SetWeakWeightsLabels()
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SetWeakWeightsLabels()
     {
         Sums sums;
 
         for (uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
         {
             auto& metaData = _dataset[rowIndex].GetMetaData();
-            metaData.weakLabel = metaData.label;
-            metaData.weakWeight = metaData.weight;
-            sums.Increment(metaData);
+            metaData.weak = _booster.GetWeakWeightLabel(metaData.strong, metaData.currentOutput);           
+            sums.Increment(metaData.weak);
         }
 
         if(sums.sumWeights == 0.0)
@@ -216,8 +212,8 @@ namespace trainers
         return sums;
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::UpdateCurrentOutputs(double value)
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::UpdateCurrentOutputs(double value)
     {
         for (uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
         {
@@ -226,8 +222,8 @@ namespace trainers
         }
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::UpdateCurrentOutputs(Range range, const EdgePredictorType& edgePredictor)
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::UpdateCurrentOutputs(Range range, const EdgePredictorType& edgePredictor)
     {
         for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size; ++rowIndex)
         {
@@ -236,8 +232,8 @@ namespace trainers
         }
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::SortNodeDataset(Range range, const SplitRuleType& splitRule)
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SortNodeDataset(Range range, const SplitRuleType& splitRule)
     {
         if(splitRule.NumOutputs() == 2)
         {
@@ -257,20 +253,20 @@ namespace trainers
     // debugging code
     //
  
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::ExampleMetaData::Print(std::ostream & os) const
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ExampleMetaData::Print(std::ostream & os) const
     {
-        os << "(" << weight << ", " << label << ", " << currentOutput << ", " << weakWeight << ", " << weakLabel << ")";
+        os << "(" << strong.weight << ", " << strong.label << ", " << weak.weight << ", " << weak.label << ", " << currentOutput << ")";
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::Sums::Print(std::ostream& os) const
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums::Print(std::ostream& os) const
     {
         os << "sumWeights = " << sumWeights << ", sumWeightedLabels = " << sumWeightedLabels;
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::NodeStats::PrintLine(std::ostream& os, size_t tabs) const
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::PrintLine(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "stats:\n";
 
@@ -287,8 +283,8 @@ namespace trainers
         os << "\n";
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::SplitCandidate::PrintLine(std::ostream& os, size_t tabs) const
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate::PrintLine(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "gain = " << gain << "\n";
         os << std::string(tabs * 4, ' ') << "node = ";
@@ -298,8 +294,8 @@ namespace trainers
         stats.PrintLine(os, tabs);
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType>::PriorityQueue::PrintLine(std::ostream& os, size_t tabs) const
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::PriorityQueue::PrintLine(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "Priority Queue Size: " << size() << "\n";
 

@@ -18,6 +18,7 @@
 
 // trainers
 #include "SimpleForestTrainer.h"
+#include "LogitBooster.h"
 
 namespace common
 {
@@ -48,7 +49,7 @@ namespace common
         switch(lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return trainers::MakeSimpleForestTrainer(lossFunctions::SquaredLoss(), forestTrainerArguments);
+            return trainers::MakeSimpleForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), forestTrainerArguments);
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");

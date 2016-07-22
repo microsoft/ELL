@@ -10,9 +10,6 @@
 
 namespace dataset
 {
-    dataset::WeightLabel::WeightLabel(double weight, double label) : weight(weight), label(label)
-    {}
-
     void dataset::WeightLabel::Print(std::ostream & os) const
     {
         os << "(" << weight << ", " << label << ")";

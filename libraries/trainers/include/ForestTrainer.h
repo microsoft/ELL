@@ -43,14 +43,15 @@ namespace trainers
     /// </summary>
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
-    template <typename SplitRuleType, typename EdgePredictorType> 
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType> 
     class ForestTrainer : public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> 
     { 
     public:
         /// <summary> Constructs an instance of ForestTrainer. </summary>
         ///
+        /// <param name="booster"> The booster. </param>
         /// <param name="parameters"> Training Parameters. </param>
-        ForestTrainer(const ForestTrainerParameters& parameters);
+        ForestTrainer(const BoosterType& booster, const ForestTrainerParameters& parameters);
 
         /// <summary> Grows the decision forest. </summary>
         ///
@@ -90,15 +91,18 @@ namespace trainers
         };
 
         // metadata that the forest trainer keeps with each example
-        struct ExampleMetaData : public dataset::WeightLabel
+        struct ExampleMetaData 
         {
-            ExampleMetaData(const dataset::WeightLabel& weightLabel);
             void Print(std::ostream& os) const;
+
+            // strong weight and label
+            dataset::WeightLabel strong;
+
+            // weak weight and label
+            dataset::WeightLabel weak;
 
             // the output of the forest on this example
             double currentOutput = 0;
-            double weakLabel = 0;
-            double weakWeight = 1;
         };
 
         // keeps track of the total weight and total weight-weak-label in a set of examples
@@ -107,7 +111,7 @@ namespace trainers
             double sumWeights = 0;
             double sumWeightedLabels = 0;
 
-            void Increment(const ExampleMetaData& metaData);
+            void Increment(const dataset::WeightLabel& weightLabel);
             Sums operator-(const Sums& other) const;
             void Print(std::ostream& os) const;
         };
@@ -179,6 +183,7 @@ namespace trainers
         //
 
         // user defined parameters 
+        BoosterType _booster;
         ForestTrainerParameters _parameters;
 
         // the forest being grown
