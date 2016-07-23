@@ -33,7 +33,7 @@ namespace utilities
     template<typename ValueType, typename std::enable_if_t<std::is_fundamental<ValueType>::value, int> concept>
     ObjectDescription GetDescription(ValueType&& obj)
     {
-        ObjectDescription description<ValueType>();
+        ObjectDescription description = ObjectDescription{obj};
         return description;
     }
 

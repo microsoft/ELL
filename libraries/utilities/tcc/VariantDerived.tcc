@@ -50,8 +50,6 @@ namespace utilities
         std::cout << "type " << typeid(ValueType).name() << std::endl;
 //        description = GetDescription(_value);
 
-        size_t s = 0;
-        auto foo = GetDescription(s);
     }
 
 }
