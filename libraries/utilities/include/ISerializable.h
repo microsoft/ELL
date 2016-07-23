@@ -25,8 +25,6 @@ namespace utilities
 
         /// <summary> Get an ObjectDescription describing how to serialize this object </summary>
         virtual ObjectDescription GetDescription() const = 0;
-
-//        static std::string GetTypeName() { return "ISerializable"; }
     };
 
     // helper function
@@ -122,7 +120,7 @@ namespace utilities
         void Serialize(const ValueType& value);
         */
 
-        protected:
+    protected:
         virtual void SerializeType(std::string typeName) = 0;
         virtual void SerializeField(std::string name, const Variant& variant) = 0;
     };

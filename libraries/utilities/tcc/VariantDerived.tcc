@@ -46,10 +46,8 @@ namespace utilities
     template <typename ValueType>
     void VariantDerived<ValueType>::SetObjectDescription(ObjectDescription& description) const
     {
-        // ???
-        std::cout << "type " << typeid(ValueType).name() << std::endl;
+        std::cout << "type " << TypeName<ValueType>::GetName() << std::endl;
 //        description = GetDescription(_value);
-
     }
 
 }
