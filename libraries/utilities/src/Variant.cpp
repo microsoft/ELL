@@ -54,4 +54,10 @@ namespace utilities
     {
         return _value->IsPointer();
     }
+
+    void Variant::SetObjectDescription(ObjectDescription& description) const
+    {
+        _value->SetObjectDescription(description);
+    }
+
 }

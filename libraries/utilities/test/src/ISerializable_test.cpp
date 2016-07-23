@@ -31,6 +31,7 @@ void TestISerializable()
     model::Model g;
     auto in = g.AddNode<model::InputNode<double>>(3);
     auto out = g.AddNode<model::OutputNode<double>>(in->output);
+
     std::cout << "--Serializing input node--" << std::endl;
     serializer.Serialize(*in);
 

@@ -20,11 +20,13 @@ set (SRC src/CompressedIntegerList.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
          src/ISerializable.cpp
+         src/ObjectDescription.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
          src/TypeName.cpp
          src/UniqueId.cpp
          src/Variant.cpp
+         src/VariantBase.cpp
          src/XMLSerialization.cpp)
 
 set (INCLUDE include/CompressedIntegerList.h
@@ -36,6 +38,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/IntegerList.h
              include/IntegerStack.h
              include/ISerializable.h
+             include/ObjectDescription.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
              include/Parser.h
@@ -47,11 +50,16 @@ set (INCLUDE include/CompressedIntegerList.h
              include/TypeName.h
              include/UniqueId.h
              include/Variant.h
+             include/VariantBase.h
+             include/VariantDerived.h
              include/XMLSerialization.h)
 
-set (TCC tcc/CommandLineParser.tcc
+set (TCC tcc/AnyIterator.tcc
+         tcc/CommandLineParser.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
+         tcc/ISerializable.tcc
+         tcc/ObjectDescription.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
          tcc/StlIndexValueIterator.tcc
@@ -60,6 +68,7 @@ set (TCC tcc/CommandLineParser.tcc
          tcc/TypeFactory.tcc
          tcc/TypeName.tcc
          tcc/Variant.tcc
+         tcc/VariantDerived.tcc
          tcc/XMLSerialization.tcc)
 
 source_group("src" FILES ${SRC})
