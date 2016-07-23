@@ -173,8 +173,9 @@ model::Model InitTestModelSimple()
 	auto c1 = mb.Constant<double>({ 5, 50, 500, 5000 });
 	auto c2 = mb.Constant<double>({ 2, 3, 4, 5});
 	
-	auto addNode = mb.Multiply<double>(c1->output, c2->output);
+	auto addNode = mb.Add<double>(c1->output, c2->output);
 	mb.Add<double>(addNode->output, c2->output);
+
 	return mb.Model;
 }
 
@@ -188,8 +189,8 @@ void TestDataFlowBuilder()
 
 void TestDataFlowCompiler()
 {
-	//model::Model model = InitTestModelSimple();
-	model::Model model = InitTestModelBinOp();
+	model::Model model = InitTestModelSimple();
+	//model::Model model = InitTestModelBinOp();
 	DataFlowBuilder db;
 	db.Process(model);
 	

@@ -25,6 +25,8 @@ namespace emll
 				return _data;
 			}
 
+			virtual Variable* Combine(VariableAllocator& vAlloc, Variable& other,  OperatorType op) override;
+
 		private:
 			T _data;
 		};
@@ -71,24 +73,45 @@ namespace emll
 		class ComputedVar : public ScalarVar<T>
 		{
 		public:
-			ComputedVar();
+			ComputedVar(Variable& src);
+			ComputedVar(ComputedVar<T>& src);
 
-			OperatorType Op() const
+			Variable& Src() const
 			{
-				return _op;
+				return _src;
 			}
-			T Operand() const
+			T IncrementBy() const
 			{
-				return _value;
+				return _add;
 			}
-			bool Combine(ComputedVar& other);
+			bool HasIncrement() const
+			{
+				return (_add != 0);
+			}
+			T MultiplyBy() const
+			{
+				return _multiply;
+			}
+			bool HasMultiply() const
+			{
+				return (_multiply != 1.0);
+			}
+			bool HasSameSource(ComputedVar<T>& other);
+
+			void Append(T data, OperatorType op);
+
+			virtual Variable* Combine(VariableAllocator& vAlloc, Variable& other, OperatorType op) override;
+			//bool Combine(ComputedVar& other);
 
 		private:
-			std::string _sourceVarName;
-			OperatorType _op;
-			T _value;
+			void Append(ComputedVar<T>& other);
+			
+		private:
+			Variable& _src;
+			T _add;
+			T _multiply;
 		};
-
+		using ComputedVarF = ComputedVar<double>;
 	}
 }
 

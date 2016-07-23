@@ -106,7 +106,7 @@ namespace emll
 			{
 				AllocVar(var);
 				pVal = GetEmittedVariable(var.Scope(), var.EmittedName());
-				if (pVal == nullptr)
+				if (pVal == nullptr)				
 				{
 					pVal = Emit(var);
 				}
@@ -184,6 +184,10 @@ namespace emll
 					if (var.HasInitValue())
 					{
 						pVal = EmitLocal<double>(static_cast<InitializedScalarF&>(var));
+					}
+					else if (var.IsComputed())
+					{
+						pVal = EmitComputed<double>(static_cast<ComputedVarF&>(var));
 					}
 					else
 					{

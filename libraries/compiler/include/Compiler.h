@@ -34,13 +34,13 @@ namespace emll
 			virtual void Compile(BinaryNode& node) = 0;
 			virtual void Compile(InputNode& node) = 0;
 
-			virtual void AllocVar(Variable& var);
-			virtual void FreeVar(Variable& var);
-
 			void BeginFunctionPredict();
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
 			virtual void BeginFunction(const std::string& functionName, DataFlowGraph& graph) = 0;
 			virtual void EndFunction() = 0;
+
+			void AllocVar(Variable& var);
+			void FreeVar(Variable& var);
 
 		private:
 			void Reset();

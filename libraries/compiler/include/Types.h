@@ -69,7 +69,16 @@ namespace emll
 		template<typename DataType>
 		ValueType GetValueType();
 
-		ValueType GetPtrType(ValueType type);
+		ValueType GetPtrType(ValueType type);		
+		
+		template<typename DataType>
+		DataType GetDefaultForValueType();
+		
+		template<typename DataType>
+		OperatorType GetAddForValueType();
+		
+		template<typename DataType>
+		OperatorType GetMultiplyForValueType();
 	}
 }
 

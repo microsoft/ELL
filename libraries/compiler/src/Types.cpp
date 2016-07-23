@@ -24,6 +24,17 @@ namespace emll
 		{
 			return ValueType::PInt32;
 		}
+		
+		template<>
+		double GetDefaultForValueType<double>()
+		{
+			return 0.0;
+		}
+		template<>
+		int GetDefaultForValueType<int>()
+		{
+			return 0;
+		}
 
 		ValueType GetPtrType(ValueType type)
 		{
@@ -48,5 +59,27 @@ namespace emll
 			}
 			return type;
 		}
+
+		template<>
+		OperatorType GetAddForValueType<double>()
+		{
+			return OperatorType::AddF;
+		}
+		template<>
+		OperatorType GetAddForValueType<int>()
+		{
+			return OperatorType::Add;
+		}
+		template<>
+		OperatorType GetMultiplyForValueType<double>()
+		{
+			return OperatorType::MultiplyF;
+		}
+		template<>
+		OperatorType GetMultiplyForValueType<int>()
+		{
+			return OperatorType::Multiply;
+		}
+
 	}
 }

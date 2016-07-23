@@ -2,6 +2,7 @@
 
 #include "Types.h"
 #include "IntegerStack.h"
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -42,6 +43,8 @@ namespace emll
 			Scalar,
 			Vector
 		};
+
+		class VariableAllocator;
 
 		class Variable
 		{
@@ -90,7 +93,6 @@ namespace emll
 			{
 				return (_scope == VariableScope::Literal);
 			}
-
 			bool IsMutable() const
 			{
 				return TestFlags(VariableFlags::isMutable);
@@ -125,6 +127,8 @@ namespace emll
 				return _emittedVar;
 			}
 
+			virtual Variable* Combine(VariableAllocator& vAlloc, Variable& other, OperatorType op);
+		
 		protected:
 
 			Variable(const ValueType type, const VariableScope scope, int flags = VariableFlags::none);
@@ -144,6 +148,20 @@ namespace emll
 			int _flags;
 			EmittedVar _emittedVar;
 		};
+
+		class VariableAllocator
+		{
+		public:
+			template <typename VarType, typename... Args>
+			VarType* AddVariable(Args&&... args);
+
+			Variable* AddLocalScalarVariable(ValueType type);
+			Variable* AddVectorElementVariable(ValueType type, Variable& src, int offset);
+
+		private:
+			std::vector<std::shared_ptr<Variable>> _variables;
+		};
+
 
 		template<typename T>
 		class VectorVar : public Variable

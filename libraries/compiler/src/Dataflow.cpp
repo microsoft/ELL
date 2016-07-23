@@ -30,29 +30,6 @@ namespace emll
 			return _nodes[offset].get();
 		}
 
-		Variable* DataFlowGraph::AddLocalScalarVariable(ValueType type)
-		{
-			switch (type)
-			{
-				case ValueType::Double:
-					return AddVariable<ScalarF>(VariableScope::Local);
-				default:
-					throw new CompilerException(CompilerError::valueTypeNotSupported);
-			}
-		}
-
-		Variable* DataFlowGraph::AddVectorElementVariable(ValueType type, Variable& src, int offset)
-		{
-			switch (type)
-			{
-				case ValueType::Double:
-					return AddVariable<VectorElementVar<double>>(src, offset);
-				default:
-					throw new CompilerException(CompilerError::valueTypeNotSupported);
-			}
-		}
-
-
 		LiteralNode::LiteralNode(Variable* pVar)
 			: _pVar(pVar)
 		{
@@ -83,7 +60,7 @@ namespace emll
 		void InputNode::ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data)
 		{
 			assert(data.IsVector());
-			_pVar = graph.AddVectorElementVariable(data.Type(), data, _elementIndex);
+			_pVar = graph.Variables().AddVectorElementVariable(data.Type(), data, _elementIndex);
 			Process(graph, compiler);
 		}
 
@@ -104,22 +81,24 @@ namespace emll
 			{
 				_pSrc1 = &data;
 			}
-			else if (_pSrc2 == nullptr)
+			else
 			{
 				_pSrc2 = &data;
-			}
-
-			if (_pSrc1 != nullptr && _pSrc2 != nullptr)
-			{
-				assert(_pSrc1->Type() == _pSrc2->Type());
-				_pResult = graph.AddLocalScalarVariable(_pSrc1->Type());
 				Process(graph, compiler);
 			}
 		}
 
 		Variable* BinaryNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
 		{
-			compiler.Compile(*this);
+			assert(_pSrc1->Type() == _pSrc2->Type());
+
+			_pResult = _pSrc1->Combine(graph.Variables(), *_pSrc2, _op);
+			// If we have a computed result, we'll postpone actual code generation
+			if (_pResult == nullptr || !_pResult->IsComputed())
+			{
+				_pResult = graph.Variables().AddLocalScalarVariable(_pSrc1->Type());
+				compiler.Compile(*this);
+			}
 			return _pResult;
 		}
 	}

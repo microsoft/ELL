@@ -16,21 +16,10 @@ namespace emll
 			return pNode;
 		}		
 
-		template <typename VarType, typename... Args>
-		VarType* DataFlowGraph::AddVariable(Args&&... args)
-		{
-			static_assert(std::is_base_of<Variable, VarType>::value, "AddVariable requires you inherit from Variable");
-
-			auto var = std::make_shared<VarType>(args...);
-			VarType* pVar = var.get();
-			_variables.push_back(var);
-			return pVar;
-		}
-
 		template <typename DataType>
 		LiteralNode* DataFlowGraph::AddLiteral(DataType value)
 		{
-			Variable* pVar = AddVariable<LiteralVar<DataType>>(value);
+			Variable* pVar = _variables.AddVariable<LiteralVar<DataType>>(value);
 			LiteralNode* pNode = AddNode<LiteralNode>(pVar);
 			_literals.push_back(pNode);
 			return pNode;
@@ -43,11 +32,11 @@ namespace emll
 			VariableScope scope = isInput ? VariableScope::Input : VariableScope::Output;
 			if (size > 0)
 			{
-				pVar = AddVariable<VectorVar<DataType>>(scope, size);
+				pVar = _variables.AddVariable<VectorVar<DataType>>(scope, size);
 			}
 			else
 			{
-				pVar = AddVariable<ScalarVar<DataType>>(scope);
+				pVar = _variables.AddVariable<ScalarVar<DataType>>(scope);
 			}
 			ArgNode* pNode = AddNode<ArgNode>(pVar);
 			if (isInput)

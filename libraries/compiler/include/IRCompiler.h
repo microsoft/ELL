@@ -50,6 +50,8 @@ namespace emll
 			llvm::Value* EmitRef(VectorElementVar<T>& var);
 			template<typename T>
 			llvm::Value* EmitGlobal(InitializedScalarVar<T>& var);
+			template<typename T>
+			llvm::Value* EmitComputed(ComputedVar<T>& var);
 
 			llvm::Value* LoadVar(Variable& var);
 

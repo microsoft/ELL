@@ -45,5 +45,28 @@ namespace emll
 			}
 			return pVal;
 		}
+
+		template<typename T>
+		llvm::Value* IRCompiler::EmitComputed(ComputedVar<T>& var)
+		{
+			llvm::Value* pSrc = EnsureEmitted(var.Src());
+			if (!(var.HasIncrement() || var.HasMultiply()))
+			{
+				return pSrc;
+			}
+			llvm::Value* pVar = _fn.Var(var.Type(), var.EmittedName());
+			if (var.HasIncrement())
+			{
+				llvm::Value* pResult = _fn.Op(GetAddForValueType<T>(), pSrc, _fn.Literal(var.IncrementBy()));
+				_fn.Store(pVar, pResult);
+			}
+			if (var.HasMultiply())
+			{
+				llvm::Value* pResult = _fn.Op(GetMultiplyForValueType<T>(), pSrc, _fn.Literal(var.MultiplyBy()));
+				_fn.Store(pVar, pResult);
+			}
+			return pVar;
+		}
+
 	}
 }
