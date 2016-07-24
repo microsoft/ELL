@@ -162,20 +162,27 @@ model::Model InitTestModelBinOp()
 
 	nodes::BinaryOperationNode<double>* multNode = builder.Multiply<double>(input->output, c->output);
 	multNode = builder.Multiply<double>(multNode->output, c->output);	
-	builder.Add<double>(input->output, multNode->output);
-	
+	multNode = builder.Multiply<double>(multNode->output, c->output);
+	auto addNode = builder.Add<double>(input->output, multNode->output);
+	addNode = builder.Add<double>(c->output, addNode->output);
+	multNode = builder.Multiply<double>(addNode->output, c->output);
+	multNode = builder.Multiply<double>(multNode->output, c->output);
+	addNode = builder.Add<double>(c->output, multNode->output);
+
 	return builder.Model;
 }
 
 model::Model InitTestModelSimple()
 {
 	ModelBuilder mb;
-	auto c1 = mb.Constant<double>({ 5, 50, 500, 5000 });
-	auto c2 = mb.Constant<double>({ 2, 3, 4, 5});
-	
-	auto addNode = mb.Add<double>(c1->output, c2->output);
-	mb.Add<double>(addNode->output, c2->output);
+	auto input = mb.Inputs<double>(2);
+	auto c = mb.Constant<double>({ 5, 3});
 
+	nodes::BinaryOperationNode<double>* multNode = mb.Multiply<double>(input->output, c->output);
+	//multNode = mb.Multiply<double>(multNode->output, c->output);
+	//multNode = mb.Multiply<double>(multNode->output, c->output);
+	auto addNode = mb.Add<double>(c->output, multNode->output);
+	addNode = mb.Add<double>(c->output, addNode->output);
 	return mb.Model;
 }
 
@@ -195,10 +202,7 @@ void TestDataFlowCompiler()
 	db.Process(model);
 	
 	IRCompiler compiler("EMLL", std::cout);
-
-	//compiler.BeginFunctionPredict();
 	compiler.CompileGraph("Predict", db.Graph());
-	//compiler.EndFunction();
 	compiler.DebugDump();
 }
 

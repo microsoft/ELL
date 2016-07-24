@@ -90,18 +90,24 @@ namespace emll
 			}
 			bool HasSameSource(ComputedVar<T>& other);
 
-			void Append(T data, OperatorType op);
+			bool Append(T data, OperatorType op);
 
 			virtual Variable* Combine(VariableAllocator& vAlloc, Variable& other, OperatorType op) override;
-			//bool Combine(ComputedVar& other);
 
+			OperatorType LastOp() const
+			{
+				return _lastOp;
+			}
 		private:
 			void Append(ComputedVar<T>& other);
+			bool PrepareAppend(OperatorType op);
 			
 		private:
 			Variable& _src;
 			T _add;
 			T _multiply;
+			OperatorType _lastOp = OperatorType::None;
+			int _opCount = 0;
 		};
 		using ComputedVarF = ComputedVar<double>;
 	}

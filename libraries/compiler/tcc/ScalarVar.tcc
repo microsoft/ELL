@@ -33,7 +33,10 @@ namespace emll
 			{
 				pVar = vAlloc.AddVariable<ComputedVar<T>>(other);
 			}
-			pVar->Append(_data, op);
+			if (!pVar->Append(_data, op))
+			{
+				return nullptr;
+			}
 			return pVar;
 		}
 
@@ -100,28 +103,68 @@ namespace emll
 		}
 
 		template<typename T>
-		void ComputedVar<T>::Append(T data, OperatorType op)
+		bool ComputedVar<T>::Append(T data, OperatorType op)
 		{
 			switch (op)
 			{
 				case OperatorType::Add:
 				case OperatorType::AddF:
+					if (!PrepareAppend(OperatorType::Add))
+					{
+						return false;
+					}
 					_add += data;
 					break;
 				case OperatorType::Subtract:
 				case OperatorType::SubtractF:
+					if (!PrepareAppend(OperatorType::Add))
+					{
+						return false;
+					}
 					_add -= data;
 					break;
 				case OperatorType::Multiply:
 				case OperatorType::MultiplyF:
+					if (!PrepareAppend(OperatorType::Multiply))
+					{
+						return false;
+					}
 					_multiply *= data;
 					break;
 				case OperatorType::DivideF:
+					if (!PrepareAppend(OperatorType::Multiply))
+					{
+						return false;
+					}
 					_multiply /= data;
 					break;
 				default:
 					throw new CompilerException(CompilerError::notSupported);
 			}
+			return true;
+		}
+
+		template<typename T>
+		bool ComputedVar<T>::PrepareAppend(OperatorType op)
+		{
+			if (_opCount < 2)
+			{
+				if (op != _lastOp)
+				{
+					_lastOp = op;
+					_opCount++;
+				}
+				return true;
+			}
+			else if (_opCount == 2)
+			{
+				if (op == _lastOp)
+				{
+					return true;
+				}
+				_opCount++;
+			}
+			return false;
 		}
 
 		template<typename T>

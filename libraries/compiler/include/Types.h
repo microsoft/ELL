@@ -28,6 +28,7 @@ namespace emll
 
 		enum class OperatorType
 		{
+			None = 0,
 			Add,
 			Subtract,
 			Multiply,
@@ -40,6 +41,7 @@ namespace emll
 
 		enum class ComparisonType
 		{
+			None = 0,
 			Eq,
 			Lt,
 			Lte,
