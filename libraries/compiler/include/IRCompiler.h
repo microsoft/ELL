@@ -40,6 +40,7 @@ namespace emll
 			llvm::Value* EmitLocalScalar(Variable& var);
 			llvm::Value* EmitGlobalScalar(Variable& var);
 			llvm::Value* EmitVectorRef(Variable& var);
+			void ApplyComputed(Variable& var, llvm::Value* pDest);
 
 			template<typename T>
 			llvm::Value* EmitLiteral(LiteralVar<T>& var);
@@ -52,7 +53,7 @@ namespace emll
 			template<typename T>
 			llvm::Value* EmitGlobal(InitializedScalarVar<T>& var);
 			template<typename T>
-			llvm::Value* EmitComputed(ComputedVar<T>& var);
+			void ApplyComputed(ComputedVar<T>& var, llvm::Value* pDest);
 
 			llvm::Value* LoadVar(Variable& var);
 

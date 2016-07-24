@@ -55,7 +55,7 @@ namespace emll
 				isMutable		= 0x00000001,
 				hasInitValue		= 0x00000002,
 				isVectorRef		= 0x00000004,
-				isComputed		= 0x00000008,
+				isComputed		= 0x00000008
 			};
 
 		public:

@@ -161,8 +161,8 @@ model::Model InitTestModelBinOp()
 	auto c = builder.Constant<double>({ 5, 50, 500, 5000 });
 
 	nodes::BinaryOperationNode<double>* multNode = builder.Multiply<double>(input->output, c->output);
-	//builder.Add<double>(multNode->output, c->output);	
-	//builder.Add<double>(input->output, c->output);
+	multNode = builder.Multiply<double>(multNode->output, c->output);	
+	builder.Add<double>(input->output, multNode->output);
 	
 	return builder.Model;
 }

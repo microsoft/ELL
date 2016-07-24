@@ -109,6 +109,7 @@ namespace emll
 			{
 				auto arg = &(*fnArgs);
 				_locals.Set(args[i].first, arg);
+				++fnArgs;
 			}
 		}
 
@@ -127,6 +128,10 @@ namespace emll
 				{
 					pVal = Emit(var);
 				}
+			}
+			if (var.IsComputed())
+			{
+				ApplyComputed(var, pVal);
 			}
 			return pVal;
 		}
@@ -202,10 +207,6 @@ namespace emll
 					{
 						pVal = EmitLocal<double>(static_cast<InitializedScalarF&>(var));
 					}
-					else if (var.IsComputed())
-					{
-						pVal = EmitComputed<double>(static_cast<ComputedVarF&>(var));
-					}
 					else
 					{
 						pVal = EmitLocal<double>(static_cast<ScalarF&>(var));
@@ -241,15 +242,28 @@ namespace emll
 			llvm::Value* pVal = nullptr;
 			switch (var.Type())
 			{
-			case ValueType::Double:
-				pVal = EmitRef<double>(static_cast<VectorRefScalarVarF&>(var));
-				break;
-			default:
-				throw new CompilerException(CompilerError::valueTypeNotSupported);
+				case ValueType::Double:
+					pVal = EmitRef<double>(static_cast<VectorRefScalarVarF&>(var));
+					break;
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 			assert(pVal != nullptr);
 			_locals.Set(var.EmittedName(), pVal);
 			return pVal;
+		}
+
+		void IRCompiler::ApplyComputed(Variable& var, llvm::Value* pDest)
+		{
+			llvm::Value* pVal = nullptr;
+			switch (var.Type())
+			{
+				case ValueType::Double:
+					ApplyComputed<double>(static_cast<ComputedVar<double>&>(var), pDest);
+					break;
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
+			}
 		}
 
 		llvm::Value* IRCompiler::LoadVar(Variable& var)

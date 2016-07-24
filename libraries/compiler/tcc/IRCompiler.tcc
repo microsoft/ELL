@@ -47,47 +47,44 @@ namespace emll
 		}
 
 		template<typename T>
-		llvm::Value* IRCompiler::EmitComputed(ComputedVar<T>& var)
+		void IRCompiler::ApplyComputed(ComputedVar<T>& var, llvm::Value* pDest)
 		{
 			llvm::Value* pSrc = LoadVar(var.Src());
 			T increment = var.IncrementBy();
 			T multiplyBy = var.MultiplyBy();
 
-			llvm::Value* pVar = _fn.Var(var.Type(), var.EmittedName());
 			llvm::Value* pResult;
 			if (increment == 0.0)
 			{
 				if (multiplyBy != 1.0)
 				{
 					pResult = _fn.Op(GetMultiplyForValueType<T>(), pSrc, _fn.Literal(multiplyBy));
-					_fn.Store(pVar, pResult);
+					_fn.Store(pDest, pResult);
 				}
 				else
 				{
-					_fn.Store(pVar, pSrc);
+					_fn.Store(pDest, pSrc);
 				}
 			}
 			else
 			{
 				if (multiplyBy == 0.0)
 				{
-					_fn.Store(pVar, _fn.Literal(multiplyBy));
+					_fn.Store(pDest, _fn.Literal(multiplyBy));
 				}
 				else if (multiplyBy == 1.0)
 				{
 					pResult = _fn.Op(GetAddForValueType<T>(), pSrc, _fn.Literal(increment));
-					_fn.Store(pVar, pResult);
+					_fn.Store(pDest, pResult);
 				}
 				else
 				{
 					pResult = _fn.Op(GetAddForValueType<T>(),
 								_fn.Op(GetMultiplyForValueType<T>(), _fn.Literal(multiplyBy), pSrc),
 								_fn.Literal(increment));
-					_fn.Store(pVar, pResult);
+					_fn.Store(pDest, pResult);
 				}
 			}
-			return pVar;
 		}
-
 	}
 }
