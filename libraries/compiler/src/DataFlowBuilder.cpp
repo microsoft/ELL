@@ -92,6 +92,11 @@ namespace emll
 			{
 				throw new CompilerException(CompilerError::nodeTypeNotSupported);
 			}
+
+			if (ModelEx::IsLeafNode(node))
+			{
+				ProcessOutputNode(node);
+			}
 		}
 
 		void DataFlowBuilder::ProcessConstant(const model::Node& node)
@@ -122,11 +127,23 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-			case model::Port::PortType::Real:
-				Process<double>(static_cast<const model::InputNode<double>&>(node));
-				break;
-			default:
-				throw new CompilerException(CompilerError::portTypeNotSupported);
+				case model::Port::PortType::Real:
+					Process<double>(static_cast<const model::InputNode<double>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void DataFlowBuilder::ProcessOutputNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					AddOutput<double>(node);
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
 		}
 
@@ -143,7 +160,14 @@ namespace emll
 			assert(pDependant != nullptr);
 			DataNode* pNode = GetSourceNode(pPort, elementIndex);
 			assert(pNode != nullptr);
+			pNode->AddDependent(pDependant);
+		}
 
+		void DataFlowBuilder::AddDependency(const model::OutputPortBase* pPort, size_t elementIndex, DataNode* pDependant)
+		{
+			assert(pDependant != nullptr);
+			DataNode* pNode = _outputPortMap.Get(pPort, elementIndex);
+			assert(pNode != nullptr);
 			pNode->AddDependent(pDependant);
 		}
 

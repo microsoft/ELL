@@ -84,17 +84,9 @@ namespace emll
 			{
 				return _add;
 			}
-			bool HasIncrement() const
-			{
-				return (_add != 0);
-			}
 			T MultiplyBy() const
 			{
 				return _multiply;
-			}
-			bool HasMultiply() const
-			{
-				return (_multiply != 1.0);
 			}
 			bool HasSameSource(ComputedVar<T>& other);
 

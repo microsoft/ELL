@@ -130,36 +130,5 @@ namespace emll
 			_add += other._add;
 			_multiply *= other._multiply;
 		}
-		/*
-		template<typename T>
-		bool ComputedVar<T>::Combine(ComputedVar& other)
-		{
-			if (!other.IsComputed() ||
-				other.Type() != Type() ||
-				other._op != _op)
-			{
-				return false;
-			}
-
-			switch (_op)
-			{
-				case OperatorType::Add:
-				case OperatorType::AddF:
-				case OperatorType::Subtract:
-				case OperatorType::SubtractF:
-					_operand += other._operand;
-					break;
-				case OperatorType::Multiply:
-				case OperatorType::MultiplyF:
-				case OperatorType::DivideF:
-					_operand *= other._operand;
-					break;
-				default:
-					throw new CompilerException(CompilerError::notSupported);
-			}
-
-			return true;
-		}
-		*/
 	}
 }

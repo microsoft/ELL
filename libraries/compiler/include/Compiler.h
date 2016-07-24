@@ -33,6 +33,7 @@ namespace emll
 			virtual void Compile(LiteralNode& node) = 0;
 			virtual void Compile(BinaryNode& node) = 0;
 			virtual void Compile(InputNode& node) = 0;
+			virtual void Compile(OutputNode& node) = 0;
 
 			void BeginFunctionPredict();
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;

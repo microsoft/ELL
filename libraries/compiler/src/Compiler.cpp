@@ -16,11 +16,11 @@ namespace emll
 		static const std::string c_InputVariableName = "input";
 		static const std::string c_OutputVariableName = "output";
 		static const std::string c_PredictFunctionName = "Predict";
-		static const std::string c_literalVar = "c";
-		static const std::string c_globalVar = "g";
-		static const std::string c_localVar = "t";
-		static const std::string c_inputVar = "i";
-		static const std::string c_outputVar = "o";
+		static const std::string c_literalVar = "c_";
+		static const std::string c_globalVar = "g_";
+		static const std::string c_localVar = "t_";
+		static const std::string c_inputVar = "input";
+		static const std::string c_outputVar = "output";
 
 		/// <summary>Base class for ML Compiler.</summary>
 		Compiler::Compiler()
@@ -97,7 +97,7 @@ namespace emll
 				node->Process(graph, *this);
 			}
 			// Now start executing the graph
-			for (auto node : graph.Inputs())
+			for (auto node : graph.InputArgs())
 			{
 				node->Process(graph, *this);
 			}

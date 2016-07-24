@@ -59,12 +59,31 @@ namespace emll
 
 		void InputNode::ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data)
 		{
+			// TODO - support Scalar source arguments
 			assert(data.IsVector());
 			_pVar = graph.Variables().AddVectorElementVariable(data.Type(), data, _elementIndex);
 			Process(graph, compiler);
 		}
 
 		Variable* InputNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
+		{
+			compiler.Compile(*this);
+			return _pVar;
+		}
+
+		OutputNode::OutputNode(Variable* pDestVar,  int elementIndex)
+			: _pDestVar(pDestVar), _elementIndex(elementIndex)
+		{
+		}
+
+		void OutputNode::ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data)
+		{
+			assert(data.IsScalar());
+			_pVar = &data;
+			Process(graph, compiler);
+		}
+
+		Variable* OutputNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
 		{
 			compiler.Compile(*this);
 			return _pVar;

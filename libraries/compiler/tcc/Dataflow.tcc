@@ -30,7 +30,7 @@ namespace emll
 		{
 			Variable* pVar = nullptr;
 			VariableScope scope = isInput ? VariableScope::Input : VariableScope::Output;
-			if (size > 0)
+			if (size > 1)
 			{
 				pVar = _variables.AddVariable<VectorVar<DataType>>(scope, size);
 			}

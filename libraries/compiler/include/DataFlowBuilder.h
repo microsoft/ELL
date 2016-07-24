@@ -48,6 +48,7 @@ namespace emll
 			void ProcessConstant(const model::Node& node);
 			void ProcessBinaryOperation(const model::Node& node);
 			void ProcessInputNode(const model::Node& node);
+			void ProcessOutputNode(const model::Node& node);
 
 			DataFlowGraph& Graph() { return _graph; }
 
@@ -62,8 +63,12 @@ namespace emll
 			template<typename DataType>
 			void Process(const model::InputNode<DataType>& node);
 
+			template<typename DataType> 
+			void AddOutput(const model::Node& leafNode);
+
 			DataNode* GetSourceNode(const model::InputPortBase* pPort, size_t elementIndex) const;
 			void AddDependency(const model::InputPortBase* pPort, size_t elementIndex, DataNode* pDependant);
+			void AddDependency(const model::OutputPortBase* pPort, size_t elementIndex, DataNode* pDependant);
 
 			template<typename DataType>
 			OperatorType GetOperator(const nodes::BinaryOperationNode<DataType>& node);

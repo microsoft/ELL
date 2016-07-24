@@ -14,6 +14,7 @@ namespace emll
 			ArgNode,
 			LiteralNode,
 			InputNode,
+			OutputNode,
 			BinaryNode,
 		};
 
@@ -113,7 +114,43 @@ namespace emll
 
 		private:
 			int _elementIndex;
-			Variable* _pVar;
+			Variable* _pVar = nullptr;
+		};
+
+		class OutputNode : public DataNode
+		{
+		public:
+			OutputNode(Variable* pDestVar, int elementIndex);
+
+			virtual DataNodeType Type() const override
+			{
+				return DataNodeType::OutputNode;
+			}
+
+			Variable* DestVar()
+			{
+				return _pDestVar;
+			}
+
+			int ElementIndex()
+			{
+				return _elementIndex;
+			}
+
+			Variable* Var()
+			{
+				return _pVar;
+			}
+
+			virtual void ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data) override;
+
+		protected:
+			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler) override;
+
+		private:
+			int _elementIndex;
+			Variable* _pDestVar;
+			Variable* _pVar = nullptr;
 		};
 
 		class BinaryNode : public DataNode
@@ -174,8 +211,8 @@ namespace emll
 			VariableAllocator& Variables() { return _variables;}
 			
 			const std::vector<DataNode*>& Literals() { return _literals;}
-			const std::vector<ArgNode*>& Inputs() { return _inputs; }
-			const std::vector<ArgNode*>& Outputs() { return _outputs; }
+			const std::vector<ArgNode*>& InputArgs() { return _inputs; }
+			const std::vector<ArgNode*>& OutputArgs() { return _outputs; }
 
 		private:
 			// The data flow graph owns all pointers

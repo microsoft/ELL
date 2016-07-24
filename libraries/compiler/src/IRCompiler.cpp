@@ -16,6 +16,28 @@ namespace emll
 			EnsureEmitted(*(node.Var()));
 		}
 
+		void IRCompiler::Compile(InputNode& node)
+		{
+			EnsureEmitted(*(node.Var()));
+		}
+
+		void IRCompiler::Compile(OutputNode& node)
+		{
+			Variable& destVar = *(node.DestVar());
+			llvm::Value* pDest = EnsureEmitted(destVar);
+			llvm::Value* pResult = LoadVar(*(node.Var()));
+			if (node.ElementIndex() >= 0)
+			{
+				assert(destVar.IsVector());
+				_fn.SetValueAtA(pDest, node.ElementIndex(), pResult);
+			}
+			else
+			{
+				assert(destVar.IsScalar());
+				_fn.Store(pDest, pResult);
+			}
+		}
+
 		void IRCompiler::Compile(BinaryNode& node)
 		{
 			llvm::Value* pSrc1 = LoadVar(*(node.Src1()));
@@ -23,11 +45,6 @@ namespace emll
 			llvm::Value* pDest = EnsureEmitted(*(node.Var()));
 			llvm::Value* pResult = _fn.Op(node.Op(), pSrc1, pSrc2);
 			_fn.Store(pDest, pResult);
-		}
-
-		void IRCompiler::Compile(InputNode& node)
-		{
-			EnsureEmitted(*(node.Var()));
 		}
 
 		void IRCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
@@ -71,8 +88,8 @@ namespace emll
 
 		void IRCompiler::AddFunctionArgs(DataFlowGraph& graph, NamedValueTypeList& args)
 		{
-			AddFunctionArgs(graph.Inputs(), args);
-			AddFunctionArgs(graph.Outputs(), args);
+			AddFunctionArgs(graph.InputArgs(), args);
+			AddFunctionArgs(graph.OutputArgs(), args);
 		}
 
 		void IRCompiler::AddFunctionArgs(const std::vector<ArgNode*>& argNodes, NamedValueTypeList& fnArgs)
