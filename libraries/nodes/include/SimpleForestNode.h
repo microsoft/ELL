@@ -28,10 +28,25 @@ namespace nodes
     class SimpleForestNode : public model::Node
     {
     public:
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="input"> The predictor's input. </param>
+        /// <param name="forest"> The simple forest predictor. </param>
+        SimpleForestNode(const model::OutputPortElementList<double>& input, const predictors::SimpleForestPredictor& forest);
+
         /// <summary> Gets the name of this type. </summary>
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override;
+
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer. </summary>
+        ///
+        /// <param name="transformer"> [in,out] The transformer. </param>
+        virtual void Copy(model::ModelTransformer& transformer) const override;
+
+        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
+        virtual void Refine(model::ModelTransformer& transformer) const;
 
         /// <summary> Exposes the forest output as a read-only property </summary>
         const model::OutputPort<double>& output = _output;
