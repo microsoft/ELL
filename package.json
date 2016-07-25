@@ -25,5 +25,8 @@
     "type": "git",
     "url": "https://intelligentdevices.visualstudio.com/_git/UX"
   },
-  "gypfile": true
+  "gypfile": true,
+  "dependencies": {
+    "nan": "^2.4.0"
+  }
 }

@@ -51,6 +51,7 @@
             ],
             'dependencies': [],
             'include_dirs': [
+                "<!(node -e \"require('nan')\")",
                 '<(include_path_prefix)/EMLL/libraries/common/include',
                 '<(include_path_prefix)/EMLL/libraries/dataset/include',
                 '<(include_path_prefix)/EMLL/libraries/evaluators/include',

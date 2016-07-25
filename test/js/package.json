@@ -1,0 +1,14 @@
+{
+  "name": "emll_tests",
+  "version": "0.0.1",
+  "description": "Suite of tests for EMLL Core",
+  "main": "LoadModelAsync.js",
+  "devDependencies": {
+    "tap": "^6.2.0"
+  },
+  "dependencies": {
+    "requirejs": "^2.2.0",
+    "nan": "^2.4.0",
+    "emll": "file:../../"
+  }
+}
