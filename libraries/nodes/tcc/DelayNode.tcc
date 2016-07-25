@@ -30,15 +30,7 @@ namespace nodes
     template <typename ValueType>
     void DelayNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<DelayNode<ValueType>>(newInput, _windowSize);
-        transformer.MapOutputPort(output, newNode->output);
-    }
-
-    template <typename ValueType>
-    void DelayNode<ValueType>::Refine(model::ModelTransformer& transformer) const
-    {
-        auto newInput = transformer.TransformInputPort(_input);
+        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<DelayNode<ValueType>>(newInput, _windowSize);
         transformer.MapOutputPort(output, newNode->output);
     }

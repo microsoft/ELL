@@ -57,8 +57,8 @@ namespace nodes
     template <typename ValueType>
     void BinaryOperationNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput1 = transformer.TransformInputPort(_input1);
-        auto newInput2 = transformer.TransformInputPort(_input2);
+        auto newInput1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
+        auto newInput2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
         auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput1, newInput2, _operation);
         transformer.MapOutputPort(output, newNode->output);
     }

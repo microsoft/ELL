@@ -39,7 +39,7 @@ namespace nodes
     template <typename ValueType>
     void MovingAverageNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
+        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<MovingAverageNode<ValueType>>(newInput, _windowSize);
         transformer.MapOutputPort(output, newNode->output);
     }
@@ -47,7 +47,7 @@ namespace nodes
     template <typename ValueType>
     void MovingAverageNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
+        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto delayNode = transformer.AddNode<DelayNode<ValueType>>(newInput, _windowSize);
         auto subtractNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput, delayNode->output, BinaryOperationNode<ValueType>::OperationType::subtract);
         auto accumNode = transformer.AddNode<AccumulatorNode<ValueType>>(subtractNode->output);

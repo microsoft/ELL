@@ -27,8 +27,8 @@ namespace nodes
     template <typename ValueType>
     void DotProductNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput1 = transformer.TransformInputPort(_input1);
-        auto newInput2 = transformer.TransformInputPort(_input2);
+        auto newInput1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
+        auto newInput2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
         auto newNode = transformer.AddNode<DotProductNode<ValueType>>(newInput1, newInput2);
         transformer.MapOutputPort(output, newNode->output);
     }
@@ -37,8 +37,8 @@ namespace nodes
     void DotProductNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         // Maybe... in reality, dot product will likely want to be computed as in Compute() above
-        auto newInput1 = transformer.TransformInputPort(_input1);
-        auto newInput2 = transformer.TransformInputPort(_input2);
+        auto newInput1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
+        auto newInput2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
         auto multNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput1, newInput2, BinaryOperationNode<ValueType>::OperationType::multiply);
         auto sumNode = transformer.AddNode<SumNode<ValueType>>(multNode->output);
 

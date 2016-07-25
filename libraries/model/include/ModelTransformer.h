@@ -60,8 +60,11 @@ namespace model
         ///
 
         /// <summary> Returns an OutputPortElements for the new model corresponding the the set of inputs referenced by the given input port. Called by node implementors. </summary>
+        // template <typename ValueType>
+        // OutputPortElements<ValueType> TransformInputPort(const InputPort<ValueType>& input);
+
         template <typename ValueType>
-        OutputPortElements<ValueType> TransformInputPort(const InputPort<ValueType>& input);
+        OutputPortElements<ValueType> TransformOutputPortElements(const OutputPortElements<ValueType>& elements);
 
         /// <summary> Creates a new node in the transformed model graph. Called by node implementors. </summary>
         template <typename NodeType, typename... Args>

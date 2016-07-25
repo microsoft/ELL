@@ -46,7 +46,7 @@ namespace nodes
     template <typename ValueType>
     void UnaryOperationNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
+        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<UnaryOperationNode<ValueType>>(newInput, _operation);
         transformer.MapOutputPort(output, newNode->output);
     }

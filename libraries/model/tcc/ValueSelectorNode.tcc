@@ -33,11 +33,11 @@ namespace model
     template <typename ValueType>
     void ValueSelectorNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newCondition = transformer.TransformInputPort(_condition);
-        auto newinput1 = transformer.TransformInputPort(_input1);
-        auto newinput2 = transformer.TransformInputPort(_input2);
+        auto newCondition = transformer.TransformOutputPortElements(_condition.GetOutputPortElements());
+        auto newInput1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
+        auto newInput2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
 
-        auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newinput1, newinput2);
+        auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newInput1, newInput2);
 
          transformer.MapOutputPort(output, newNode->output);
     }
@@ -45,11 +45,11 @@ namespace model
     template <typename ValueType>
     void ValueSelectorNode<ValueType>::Refine(ModelTransformer& transformer) const
     {
-        auto newCondition = transformer.TransformInputPort(_condition);
-        auto newinput1 = transformer.TransformInputPort(_input1);
-        auto newinput2 = transformer.TransformInputPort(_input2);
+        auto newCondition = transformer.TransformOutputPortElements(_condition.GetOutputPortElements());
+        auto newInput1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
+        auto newInput2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
 
-        auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newinput1, newinput2);
+        auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newInput1, newInput2);
 
          transformer.MapOutputPort(output, newNode->output);
     }
@@ -84,10 +84,10 @@ namespace model
     template <typename ValueType>
     void SelectIfLessNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newInput1 = transformer.TransformInputPort(_input1);
-        auto newInput2 = transformer.TransformInputPort(_input2);
-        auto newValue1 = transformer.TransformInputPort(_value1);
-        auto newValue2 = transformer.TransformInputPort(_value2);
+        auto newInput1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
+        auto newInput2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
+        auto newValue1 = transformer.TransformOutputPortElements(_value1.GetOutputPortElements());
+        auto newValue2 = transformer.TransformOutputPortElements(_value2.GetOutputPortElements());
 
         auto newNode = transformer.AddNode<SelectIfLessNode<ValueType>>(newInput1, newInput2, newValue1, newValue2);
         transformer.MapOutputPort(_output, newNode->output);
@@ -96,10 +96,10 @@ namespace model
     template <typename ValueType>
     void SelectIfLessNode<ValueType>::Refine(ModelTransformer& transformer) const
     {
-        auto newInput1 = transformer.TransformInputPort(_input1);
-        auto newInput2 = transformer.TransformInputPort(_input2);
-        auto newValue1 = transformer.TransformInputPort(_value1);
-        auto newValue2 = transformer.TransformInputPort(_value2);
+        auto newInput1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
+        auto newInput2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
+        auto newValue1 = transformer.TransformOutputPortElements(_value1.GetOutputPortElements());
+        auto newValue2 = transformer.TransformOutputPortElements(_value2.GetOutputPortElements());
 
         auto ifLessNode = transformer.AddNode<IfLessNode<ValueType>>(newInput1, newInput2);
         auto selectNode = transformer.AddNode<ValueSelectorNode<ValueType>>(ifLessNode->output, newValue1, newValue2);
@@ -130,8 +130,8 @@ namespace model
     template <typename ValueType>
     void IfLessNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newValue = transformer.TransformInputPort(_value);
-        auto newThreshold = transformer.TransformInputPort(_threshold);
+        auto newValue = transformer.TransformOutputPortElements(_value.GetOutputPortElements());
+        auto newThreshold = transformer.TransformOutputPortElements(_threshold.GetOutputPortElements());
 
         auto newNode = transformer.AddNode<IfLessNode<ValueType>>(newValue, newThreshold);
 
@@ -141,8 +141,8 @@ namespace model
     template <typename ValueType>
     void IfLessNode<ValueType>::Refine(ModelTransformer& transformer) const
     {
-        auto newValue = transformer.TransformInputPort(_value);
-        auto newThreshold = transformer.TransformInputPort(_threshold);
+        auto newValue = transformer.TransformOutputPortElements(_value.GetOutputPortElements());
+        auto newThreshold = transformer.TransformOutputPortElements(_threshold.GetOutputPortElements());
 
         auto newNode = transformer.AddNode<IfLessNode<ValueType>>(newValue, newThreshold);
 

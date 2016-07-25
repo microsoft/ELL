@@ -38,13 +38,13 @@ namespace model
         /// <summary> Returns the OutputPortElements containing the referenced locations to get values from </summary>
         ///
         /// <returns> The OutputPortElements containing the referenced locations to get values from </returns>
-        const std::vector<OutputPortElement>& GetOutputPortElements() const { return _inputElements; }
+        const std::vector<OutputPortElement>& GetIndividualOutputPortElements() const { return _individualElements; }
 
         /// <summary> Returns an OutputPortElement containing the referenced location to get the value for a specific input element from </summary>
         ///
         /// <param name="index"> The index of the element </param>
         /// <returns> The OutputPortElement containing the referenced location to get the value from </returns>
-        const OutputPortElement& GetOutputPortElement(size_t index) const { return _inputElements[index]; }
+        const OutputPortElement& GetOutputPortElement(size_t index) const { return _individualElements[index]; }
 
         /// <summary> Returns the list nodes this input port gets values from </summary>
         ///
@@ -59,7 +59,7 @@ namespace model
         /// <summary> The dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
-        size_t Size() const { return _inputElements.size(); }
+        size_t Size() const { return _individualElements.size(); }
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         ///
@@ -76,7 +76,7 @@ namespace model
 
     private:
         OutputPortElementsUntyped _inputRanges;
-        std::vector<OutputPortElement> _inputElements;
+        std::vector<OutputPortElement> _individualElements; // individual elements
         std::vector<const Node*> _parentNodes;
     };
 
@@ -101,11 +101,16 @@ namespace model
         /// <returns> The output value at the corresponding index </returns>
         ValueType GetValue(size_t index) const;
 
+        OutputPortElements<ValueType> GetOutputPortElements() const;
+
         /// <summary> Returns an element from the (already-computed) output value corresponding to this input </summary>
         ///
         /// <param name="index"> The index of the element to return </param>
         /// <returns> The output value at the corresponding index </returns>
         ValueType operator[](size_t index) const;
+
+    private:
+        OutputPortElements<ValueType> _input;
     };
 }
 

@@ -36,7 +36,7 @@ namespace nodes
 
     void LinearPredictorNode::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
+        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<LinearPredictorNode>(newInput, _predictor);
         transformer.MapOutputPort(output, newNode->output);
     }

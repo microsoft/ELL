@@ -28,7 +28,7 @@ namespace nodes
     template <typename ValueType>
     void SumNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
+        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<SumNode<ValueType>>(newInput);
         transformer.MapOutputPort(output, newNode->output);
     }

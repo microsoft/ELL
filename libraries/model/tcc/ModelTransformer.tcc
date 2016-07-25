@@ -9,17 +9,36 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    // template <typename ValueType>
+    // OutputPortElements<ValueType> ModelTransformer::TransformInputPort(const InputPort<ValueType>& input)
+    // {
+    //     const auto& ranges = input.GetInputRanges();
+    //     std::vector<OutputPortElements<ValueType>> newRanges;
+    //     for (const auto& range : ranges)
+    //     {
+    //         auto oldPort = range.ReferencedPort();
+    //         assert(_portToPortMap.find(oldPort) != _portToPortMap.end());
+    //         auto newPort = _portToPortMap[oldPort];
+    //         auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPort);
+    //         assert(outputPort != nullptr);
+
+    //         auto start = range.GetStartIndex();
+    //         auto size = range.Size();
+    //         newRanges.emplace_back(*outputPort, start, size);
+    //     }
+    //     return OutputPortElements<ValueType>(newRanges);
+    // }
+
     template <typename ValueType>
-    OutputPortElements<ValueType> ModelTransformer::TransformInputPort(const InputPort<ValueType>& input)
+    OutputPortElements<ValueType> ModelTransformer::TransformOutputPortElements(const OutputPortElements<ValueType>& elements)
     {
-        const auto& ranges = input.GetInputRanges();
         std::vector<OutputPortElements<ValueType>> newRanges;
-        for (const auto& range : ranges)
+        for (const auto& range : elements)
         {
             auto oldPort = range.ReferencedPort();
             assert(_portToPortMap.find(oldPort) != _portToPortMap.end());
             auto newPort = _portToPortMap[oldPort];
-            auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPort);
+            auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPort); // could be static_cast, couldn't it?
             assert(outputPort != nullptr);
 
             auto start = range.GetStartIndex();
