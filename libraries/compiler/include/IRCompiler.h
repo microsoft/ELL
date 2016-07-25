@@ -2,6 +2,7 @@
 #include "Compiler.h"
 #include "IRInclude.h"
 #include "ScalarVar.h"
+#include "VectorVar.h"
 #include <stdio.h>
 
 namespace emll
@@ -17,8 +18,11 @@ namespace emll
 			virtual void Compile(BinaryNode& node) override;
 			virtual void Compile(InputNode& node) override;
 			virtual void Compile(OutputNode& node) override;
+			virtual void Compile(DotProductNode& node) override;
 
 			llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
+
+			llvm::Value* EnsureEmitted(Variable* pVar);
 			llvm::Value* EnsureEmitted(Variable& var);
 
 			void DebugDump();
@@ -35,6 +39,7 @@ namespace emll
 			void RegisterFunctionArgs(NamedValueTypeList& args);
 
 			llvm::Value* Emit(Variable& var);
+
 			llvm::Value* EmitScalar(Variable& var);
 			llvm::Value* EmitLiteral(Variable& var);
 			llvm::Value* EmitLocalScalar(Variable& var);
@@ -55,6 +60,13 @@ namespace emll
 			template<typename T>
 			void ApplyComputed(ComputedVar<T>& var, llvm::Value* pDest);
 
+			llvm::Value* EmitVector(Variable& var);
+			llvm::Value* EmitLiteralV(Variable& var);
+
+			template<typename T>
+			llvm::Value* EmitLiteralV(LiteralVarV<T>& var);
+
+			llvm::Value* LoadVar(Variable* pVar);
 			llvm::Value* LoadVar(Variable& var);
 
 		private:

@@ -3,6 +3,7 @@
 #include "ModelGraph.h"
 #include "ConstantNode.h"
 #include "BinaryOperationNode.h"
+//#include "LinearPredictorNode.h"
 #include "DataflowGraph.h"
 
 namespace emll
@@ -52,6 +53,7 @@ namespace emll
 			void ProcessBinaryOperation(const model::Node& node);
 			void ProcessInputNode(const model::Node& node);
 			void ProcessOutputNode(const model::Node& node);
+			//void ProcessLinearPredictorNode(const nodes::LinearPredictorNode& node);
 
 			DataFlowGraph& Graph() { return _graph; }
 
@@ -59,13 +61,10 @@ namespace emll
 
 			template<typename DataType>
 			void Process(const nodes::ConstantNode<DataType>& node);
-
 			template<typename DataType>
 			void Process(const nodes::BinaryOperationNode<DataType>& node);
-
 			template<typename DataType>
 			void Process(const model::InputNode<DataType>& node);
-
 			template<typename DataType> 
 			void AddOutput(const model::Node& leafNode);
 

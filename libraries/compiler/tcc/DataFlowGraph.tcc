@@ -1,5 +1,6 @@
 #include <type_traits>
 #include "ScalarVar.h"
+#include "VectorVar.h"
 
 namespace emll
 {
@@ -26,12 +27,23 @@ namespace emll
 		}
 
 		template <typename DataType>
+		LiteralNode* DataFlowGraph::AddLiteralV(const std::vector<DataType>& data)
+		{
+			Variable* pVar = _variables.AddVariable<LiteralVarV<DataType>>(data);
+			LiteralNode* pNode = AddNode<LiteralNode>(pVar);
+			_literals.push_back(pNode);
+			return pNode;
+		}
+
+		template <typename DataType>
 		ArgNode* DataFlowGraph::AddArg(size_t size, bool isInput)
 		{
 			Variable* pVar = nullptr;
 			VariableScope scope = isInput ? VariableScope::Input : VariableScope::Output;
-			pVar = _variables.AddVariable<VectorVar<DataType>>(scope, size);
+			//
 			// Simplification: For now, alll graph arguments are always VECTORs.. i.e. pointers
+			//
+			pVar = _variables.AddVariable<VectorVar<DataType>>(scope, size);
 			/*
 			if (size > 1)
 			{

@@ -1,5 +1,6 @@
 #include "IRCompiler.h"
 #include "ScalarVar.h"
+#include "VectorVar.h"
 #include <stdio.h>
 
 namespace emll
@@ -45,6 +46,14 @@ namespace emll
 			llvm::Value* pDest = EnsureEmitted(*(node.Var()));
 			llvm::Value* pResult = _fn.Op(node.Op(), pSrc1, pSrc2);
 			_fn.Store(pDest, pResult);
+		}
+
+		void IRCompiler::Compile(DotProductNode& node)
+		{
+			llvm::Value* pSrc1 = LoadVar(node.Src1());
+			llvm::Value* pSrc2 = EnsureEmitted(node.Src2());
+			llvm::Value* pDest = EnsureEmitted(node.Var());
+			_fn.DotProductF(node.Var()->Dimension(), pSrc1, pSrc2, pDest);
 		}
 
 		void IRCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
@@ -113,6 +122,12 @@ namespace emll
 			}
 		}
 
+		llvm::Value* IRCompiler::EnsureEmitted(Variable* pVar)
+		{
+			assert(pVar != nullptr);
+			return EnsureEmitted(*pVar);
+		}
+
 		llvm::Value* IRCompiler::EnsureEmitted(Variable& var)
 		{
 			llvm::Value* pVal = nullptr;
@@ -143,6 +158,10 @@ namespace emll
 			if (var.IsScalar())
 			{
 				return EmitScalar(var);
+			}
+			else if (var.IsVector())
+			{
+				return EmitVector(var);
 			}
 			else
 			{
@@ -264,6 +283,41 @@ namespace emll
 				default:
 					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
+		}
+
+		llvm::Value* IRCompiler::EmitVector(Variable& var)
+		{
+			llvm::Value* pVal = nullptr;
+			switch (var.Scope())
+			{
+				case VariableScope::Literal:
+					pVal = EmitLiteralV(var);
+					break;
+
+				default:
+					throw new CompilerException(CompilerError::variableTypeNotSupported);
+			}
+			return pVal;
+		}
+
+		llvm::Value* IRCompiler::EmitLiteralV(Variable& var)
+		{
+			llvm::Value* pVal = nullptr;
+			switch (var.Type())
+			{
+				case ValueType::Double:
+					pVal = EmitLiteralV<double>(static_cast<LiteralVarV<double>&>(var));
+					break;
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
+			}
+			return pVal;
+		}
+
+		llvm::Value* IRCompiler::LoadVar(Variable* pVar)
+		{
+			assert(pVar != nullptr);
+			return LoadVar(*pVar);
 		}
 
 		llvm::Value* IRCompiler::LoadVar(Variable& var)

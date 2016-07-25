@@ -42,6 +42,7 @@ set (INCLUDE include/LLVMInclude.h
 		include/ModelEx.h
 		include/Variable.h
 		include/ScalarVar.h
+		include/VectorVar.h
 		include/Dataflow.h
 		include/DataFlowGraph.h
 		include/DataFlowBuilder.h
@@ -52,6 +53,7 @@ set (INCLUDE include/LLVMInclude.h
 set (TCC tcc/SymbolTable.tcc
 		 tcc/Variable.tcc
 		 tcc/ScalarVar.tcc
+		 tcc/VectorVar.tcc
 		 tcc/DataFlowGraph.tcc
 		 tcc/DataFlowBuilder.tcc
 		 tcc/IRCompiler.tcc

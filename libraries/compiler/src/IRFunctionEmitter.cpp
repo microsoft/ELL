@@ -226,11 +226,16 @@ namespace emll
 		llvm::Value* IRFunctionEmitter::DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal)
 		{
 			llvm::Value* pTotal = Var(ValueType::Double);
-			Store(pTotal, Literal(0.0));
-			OpV(OperatorType::MultiplyF, count, pLVal, pRVal, [&pTotal, this](llvm::Value* pValue) {
-				OpAndUpdate(pTotal, OperatorType::AddF, pValue);
-			});
+			DotProductF(count, pLVal, pRVal, pTotal);
 			return pTotal;
+		}
+
+		void IRFunctionEmitter::DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest)
+		{
+			Store(pDest, Literal(0.0));
+			OpV(OperatorType::MultiplyF, count, pLVal, pRVal, [&pDest, this](llvm::Value* pValue) {
+				OpAndUpdate(pDest, OperatorType::AddF, pValue);
+			});
 		}
 
 		llvm::Function* IRFunctionEmitter::ResolveFunction(const std::string& name)

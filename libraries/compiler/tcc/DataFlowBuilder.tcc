@@ -52,6 +52,7 @@ namespace emll
 			for (auto pOutputPort : leafNode.GetOutputPorts())
 			{
 				ArgNode* pArg = _graph.AddArg<DataType>(pOutputPort->Size(), false);
+				_outputPortMap.SetV(pOutputPort, pArg);
 				for (size_t i = 0; i < pOutputPort->Size(); ++i)
 				{
 					auto pOutput = _graph.AddNode<OutputNode>(pArg->Var(), i);

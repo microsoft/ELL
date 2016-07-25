@@ -95,5 +95,11 @@ namespace emll
 				}
 			}
 		}
+
+		template<typename T>
+		llvm::Value* IRCompiler::EmitLiteralV(LiteralVarV<T>& var)
+		{
+			return _module.Constant(var.EmittedName(), var.Data());
+		}
 	}
 }

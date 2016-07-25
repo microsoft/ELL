@@ -16,6 +16,7 @@ namespace emll
 			InputNode,
 			OutputNode,
 			BinaryNode,
+			DotProductV		// Vector version of LinearPredictor
 		};
 
 		class Compiler;
@@ -185,6 +186,31 @@ namespace emll
 
 		private:
 			OperatorType _op;
+			Variable* _pSrc1 = nullptr;
+			Variable* _pSrc2 = nullptr;
+			Variable* _pResult = nullptr;
+		};
+
+		///<summary>Lineary predictor that operates on purely vector input, with scalar output</summary>
+		class DotProductNode : public DataNode
+		{
+		public:
+			DotProductNode();
+
+			virtual DataNodeType Type() const override
+			{
+				return DataNodeType::BinaryNode;
+			}
+			Variable* Var() const { return _pResult; };
+			Variable* Src1() const { return _pSrc1; }
+			Variable* Src2() const { return _pSrc2; }
+
+			virtual void ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data) override;
+
+		protected:
+			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler) override;
+
+		private:
 			Variable* _pSrc1 = nullptr;
 			Variable* _pSrc2 = nullptr;
 			Variable* _pResult = nullptr;

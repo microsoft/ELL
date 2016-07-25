@@ -12,10 +12,10 @@ namespace emll
 
 			template <class NodeType, typename... Args>
 			NodeType* AddNode(Args&&... args);
-
 			template <typename DataType>
-			LiteralNode* AddLiteral(DataType type);
-
+			LiteralNode* AddLiteral(DataType value);
+			template <typename DataType>
+			LiteralNode* AddLiteralV(const std::vector<DataType>& data);
 			template <typename DataType>
 			ArgNode* AddArg(size_t size, bool isInput);
 

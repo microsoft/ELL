@@ -175,6 +175,7 @@ namespace emll
 			void MemMove(llvm::Value* pPtr, int fromOffset, int destOffset, int count);
 
 			llvm::Value* DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal);
+			void DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest);
 
 			void Verify()
 			{

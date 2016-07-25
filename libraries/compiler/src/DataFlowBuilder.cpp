@@ -168,6 +168,12 @@ namespace emll
 			}
 		}
 
+		/*
+		void DataFlowBuilder::ProcessLinearPredictorNode(const nodes::LinearPredictorNode& node)
+		{
+		}
+		*/
+
 		DataNode* DataFlowBuilder::GetSourceNode(const model::InputPortBase* pPort, size_t elementIndex) const
 		{
 			assert(pPort != nullptr);

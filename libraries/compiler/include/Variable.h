@@ -38,12 +38,6 @@ namespace emll
 			Output
 		};
 
-		enum class VariableType
-		{
-			Scalar,
-			Vector
-		};
-
 		class VariableAllocator;
 
 		class Variable
@@ -161,23 +155,6 @@ namespace emll
 		private:
 			std::vector<std::shared_ptr<Variable>> _variables;
 		};
-
-
-		template<typename T>
-		class VectorVar : public Variable
-		{
-		public:
-			VectorVar(const VariableScope scope, const size_t size, int flags = VariableFlags::isMutable);
-
-			virtual size_t Dimension() const override
-			{
-				return _size;
-			}
-		private:
-			int _size;
-		};
-		
-		using VectorF = VectorVar<double>;
 	}
 }
 

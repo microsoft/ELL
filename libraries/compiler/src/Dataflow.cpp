@@ -1,5 +1,6 @@
 #include "Dataflow.h"
 #include "ScalarVar.h"
+#include "VectorVar.h"
 #include "Compiler.h"
 #include "DataFlowGraph.h"
 
@@ -118,6 +119,33 @@ namespace emll
 				_pResult = graph.Variables().AddLocalScalarVariable(_pSrc1->Type());
 				compiler.Compile(*this);
 			}
+			return _pResult;
+		}
+
+		DotProductNode::DotProductNode()
+		{
+		}
+
+		void DotProductNode::ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data)
+		{
+			if (_pSrc1 == nullptr)
+			{
+				_pSrc1 = &data;
+			}
+			else
+			{
+				_pSrc2 = &data;
+				Process(graph, compiler);
+			}
+		}
+
+		Variable* DotProductNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
+		{
+			assert(_pSrc1->Type() == _pSrc2->Type() && _pSrc1->Dimension() == _pSrc2->Dimension());
+
+			_pResult = graph.Variables().AddLocalScalarVariable(_pSrc1->Type());
+			compiler.Compile(*this);
+
 			return _pResult;
 		}
 	}

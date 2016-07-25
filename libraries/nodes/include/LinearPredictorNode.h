@@ -45,6 +45,7 @@ namespace nodes
 
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
+		const predictors::LinearPredictor& GetPredictor() const { return _predictor;}
     protected:
         virtual void Compute() const override;
 
