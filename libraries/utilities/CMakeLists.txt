@@ -50,6 +50,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/TypeName.h
              include/UniqueId.h
              include/Variant.h
+             include/Variant_def.h
              include/VariantBase.h
              include/VariantDerived.h
              include/XMLSerialization.h)

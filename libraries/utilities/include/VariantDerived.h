@@ -9,6 +9,7 @@
 #pragma once
 
 #include "VariantBase.h"
+#include "ObjectDescription.h"
 
 // stl
 #include <memory>
@@ -49,7 +50,7 @@ namespace utilities
 
         virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
 
-        virtual void SetObjectDescription(ObjectDescription& description) const override;
+        virtual std::unique_ptr<ObjectDescription> GetObjectDescription() const override;
 
     private:
         ValueType _value;

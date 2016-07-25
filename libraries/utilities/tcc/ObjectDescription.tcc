@@ -9,8 +9,20 @@
 namespace utilities
 {
     template <typename ValueType>
-    ObjectDescription::ObjectDescription(ValueType&& obj) : _typeName(TypeName<typename std::decay<ValueType>::type>::GetName())
-    {}
+    ObjectDescription ObjectDescription::FromType() 
+    {
+        auto result = ObjectDescription();
+        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
+        return result;
+    }
+
+    template <typename ValueType>
+    ObjectDescription ObjectDescription::FromType(ValueType&& obj)
+    {
+        auto result = ObjectDescription();
+        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
+        return result;
+    }
 
     template <typename ValueType>
     void ObjectDescription::AddField(std::string name, ValueType&& value)

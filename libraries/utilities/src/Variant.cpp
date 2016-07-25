@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "ObjectDescription.h"
 #include "Variant.h"
 
 namespace utilities
@@ -55,9 +56,9 @@ namespace utilities
         return _value->IsPointer();
     }
 
-    void Variant::SetObjectDescription(ObjectDescription& description) const
+    std::unique_ptr<ObjectDescription> Variant::GetObjectDescription() const
     {
-        _value->SetObjectDescription(description);
+        return _value->GetObjectDescription();
     }
 
 }

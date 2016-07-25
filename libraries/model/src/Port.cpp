@@ -35,7 +35,7 @@ namespace model
     /// Inherited from ISerializable
     utilities::ObjectDescription Port::GetDescription() const
     {
-        utilities::ObjectDescription result(*this);
+        auto result = utilities::ObjectDescription::FromType(*this);
         result.AddField("dummy", 0);
         // ???
         return result;

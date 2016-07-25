@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Variant.h"
+#include "Variant_def.h"
 #include "TypeName.h"
 
 // stl
@@ -23,9 +23,14 @@ namespace utilities
     public:
         ObjectDescription(): _typeName("[none]") {};
 
-        template <typename ValueType>
-        ObjectDescription(ValueType&& obj);
+        ObjectDescription(const ObjectDescription& other) = default;
 
+       template <typename ValueType>
+       static ObjectDescription FromType();
+
+       template <typename ValueType>
+       static ObjectDescription FromType(ValueType&& obj);
+        
         /// <summary> Adds an entry to the ObjectDescription </summary>
         template <typename ValueType>
         void AddField(std::string name, ValueType&& value);

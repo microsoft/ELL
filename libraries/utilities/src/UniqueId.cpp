@@ -34,7 +34,7 @@ namespace utilities
 
     ObjectDescription UniqueId::GetDescription() const
     {
-        ObjectDescription result(*this);
+        ObjectDescription result; // (*this);
         result.AddField("id", _id);
         return result;
     }

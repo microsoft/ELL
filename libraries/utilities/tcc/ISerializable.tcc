@@ -10,23 +10,12 @@
 
 namespace utilities
 {
-    template <typename T>
-    void Serializer::Serialize(T&& obj)
-    {
-        std::cout << "Serialize(T&&)" << std::endl;
-        auto desc = GetDescription(obj);
-        SerializeType(desc.GetTypeName());
-        for (const auto& item : desc)
-        {
-            SerializeField(item.first, item.second);
-        }
-    }
-
-    template <typename ValueType, typename std::enable_if_t<!std::is_fundamental<ValueType>::value, int> concept>
+    // helper function
+    template <typename ValueType> // , typename std::enable_if_t<!std::is_fundamental<ValueType>::value, int> concept>
     ObjectDescription GetDescription(ValueType&& obj)
     {
         std::cout << "GetDescription(T&&)" << std::endl;
-        // TODO: use SFINAE fancyness to return obj.GetDescription if it exists, otherwise allow custom function
+        // TODO: use SFINAE fancyness to return obj.GetDescription if it exists, otherwise allow a free function
         return obj.GetDescription();
     }
 
@@ -45,8 +34,19 @@ namespace utilities
         //        std::cout << "GetDescription(Variant)" << std::endl;
         //        std::cout << "\t" << obj.GetStoredTypeName() << std::endl;
 
-        ObjectDescription result;
-        obj.SetObjectDescription(result);
+        auto result = *(obj.GetObjectDescription());
         return result;
+    }
+
+    template <typename T>
+    void Serializer::Serialize(T&& obj)
+    {
+        std::cout << "Serialize(T&&)" << std::endl;
+        auto desc = GetDescription(obj);
+        SerializeType(desc.GetTypeName());
+        for (const auto& item : desc)
+        {
+            SerializeField(item.first, item.second);
+        }
     }
 }

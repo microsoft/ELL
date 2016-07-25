@@ -6,6 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "ISerializable.h"
+#include "Variant.h"
+
 namespace utilities
 {
     //
@@ -44,10 +47,11 @@ namespace utilities
     }
 
     template <typename ValueType>
-    void VariantDerived<ValueType>::SetObjectDescription(ObjectDescription& description) const
+    std::unique_ptr<ObjectDescription> VariantDerived<ValueType>::GetObjectDescription() const
     {
         std::cout << "type " << TypeName<ValueType>::GetName() << std::endl;
-//        description = GetDescription(_value);
+        auto description = GetDescription(_value);
+        return nullptr;
     }
 
 }

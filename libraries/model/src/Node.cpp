@@ -12,6 +12,7 @@
 
 // utilities
 #include "Variant.h"
+#include "ObjectDescription.h"
 #include "ISerializable.h"
 
 // stl
@@ -68,7 +69,7 @@ namespace model
 
     utilities::ObjectDescription Node::GetDescription() const
     {
-        utilities::ObjectDescription result(*this);
+        auto result = utilities::ObjectDescription::FromType(*this);
         result.AddField("id", _id);
         if(_inputs.size() > 0)
         {

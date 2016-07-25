@@ -9,7 +9,7 @@
 #pragma once
 
 #include "ObjectDescription.h"
-#include "Variant.h"
+#include "Variant_def.h"
 #include "TypeName.h"
 
 // stl
@@ -27,16 +27,21 @@ namespace utilities
         virtual ObjectDescription GetDescription() const = 0;
     };
 
-    // helper function
-    template <typename T>
-    ObjectDescription GetDescription(T&& obj);
-
     // TODO: put these someplace that makes sense
     template <typename ValueType>
     using IsFundamental = typename std::enable_if_t<std::is_fundamental<ValueType>::value, int>;
 
     template <typename ValueType>
     using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, int>;
+
+    // helper function
+    template <typename ValueType> // , typename std::enable_if_t<!std::is_fundamental<ValueType>::value, int> concept>
+    ObjectDescription GetDescription(ValueType&& obj);
+
+    template <typename ValueType, typename std::enable_if_t<std::is_fundamental<ValueType>::value, int> concept>
+    ObjectDescription GetDescription(ValueType&& obj);
+
+    ObjectDescription GetDescription(const Variant& obj);
 
     //
     // Serializer class
