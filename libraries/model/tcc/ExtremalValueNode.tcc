@@ -33,21 +33,25 @@ namespace model
         _argVal.SetOutput({ (int)index });
     };
 
-    template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::Copy(ModelTransformer& transformer) const
+    // 
+    // Copy definitions for subclasses
+    // 
+    template <typename ValueType>
+    void ArgMinNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
         auto newInputs = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
+        auto newNode = transformer.AddNode<ArgMinNode<ValueType>>(newInputs);
         transformer.MapOutputPort(val, newNode->val);
         transformer.MapOutputPort(argVal, newNode->argVal);
     }
 
-    template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::Refine(ModelTransformer& transformer) const
+    template <typename ValueType>
+    void ArgMaxNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
         auto newInputs = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<ExtremalValueNode<ValueType, max>>(newInputs);
+        auto newNode = transformer.AddNode<ArgMaxNode<ValueType>>(newInputs);
         transformer.MapOutputPort(val, newNode->val);
         transformer.MapOutputPort(argVal, newNode->argVal);
     }
+
 }

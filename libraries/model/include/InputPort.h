@@ -31,6 +31,7 @@ namespace model
         ///
         /// <param name="owningNode"> The node that contains this port </param>
         /// <param name="input"> The input group to fetch input values from </param>
+        /// <param name="name"> The name of this port </param>
         template <typename ValueType>
         InputPortBase(const class Node* owningNode, const OutputPortElementList<ValueType>& input, std::string name);
 

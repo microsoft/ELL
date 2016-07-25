@@ -25,6 +25,8 @@ namespace model
     class Port
     {
     public:
+        virtual ~Port() = default;
+
         enum class PortType
         {
             None,
@@ -59,9 +61,7 @@ namespace model
         /// <typeparam name="ValueType"> The C++ type </typeparam>
         /// <returns> The corresponding PortType enum value </returns>
         template <typename ValueType>
-        static PortType GetTypeCode();
-
-        virtual ~Port() = default;
+        static PortType GetPortType();
 
     protected:
         Port(const class Node* node, std::string name, PortType type, size_t size) : _node(node), _name(name), _type(type), _size(size) {}

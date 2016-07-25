@@ -31,7 +31,7 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="condition"> An input that returns a single boolean value that selects which input to use as output </param>
-        /// <param name="value2"> The input to return if the condition is `true` </param>
+        /// <param name="value1"> The input to return if the condition is `true` </param>
         /// <param name="value2"> The input to return if the condition is `false` </param>
         ValueSelectorNode(const OutputPortElementList<bool>& condition, const OutputPortElementList<ValueType>& value1, const OutputPortElementList<ValueType>& value2);
 

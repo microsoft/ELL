@@ -189,13 +189,19 @@ namespace utilities
         static std::string GetName() { return "double"; }
     };
 
-    //
-    // Utility function to get templated type names
-    //
-    std::string GetCompositeTypeName(std::string baseType, const std::vector<std::string>& subtypes);
-
+    /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
+    ///
+    /// <param name="baseType"> The base type (e.g., 'Vector') </param>
+    /// <typeparam name="Types"> The templated type (e.g., 'double') </typeparam>
     template <typename... Types>
     std::string GetCompositeTypeName(std::string baseType);
+
+    /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
+    ///
+    /// <param name="baseType"> The base type (e.g., 'Vector') </param>
+    /// <param name="subtypes"> The list of templated types (e.g., 'double') </param>
+    std::string GetCompositeTypeName(std::string baseType, const std::vector<std::string>& subtypes);
+
 }
 
 #include "../tcc/TypeName.tcc"

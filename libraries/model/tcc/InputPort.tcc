@@ -13,7 +13,7 @@ namespace model
     // InputPortBase
     //
     template <typename ValueType>
-    InputPortBase::InputPortBase(const class Node* owningNode, const OutputPortElementList<ValueType>& input, std::string name) : Port(owningNode, name, Port::GetTypeCode<ValueType>(), input.Size()), _inputRanges(input)
+    InputPortBase::InputPortBase(const class Node* owningNode, const OutputPortElementList<ValueType>& input, std::string name) : Port(owningNode, name, Port::GetPortType<ValueType>(), input.Size()), _inputRanges(input)
     {
         assert(owningNode != nullptr);
         for (const auto& range : input)
