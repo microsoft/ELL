@@ -33,7 +33,7 @@ namespace model
         /// <param name="input"> The input group to fetch input values from </param>
         /// <param name="name"> The name of this port </param>
         template <typename ValueType>
-        InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& input, std::string name);
+        InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputRef, const OutputPortElements<ValueType>& inputValues, std::string name);
 
         /// <summary> Returns the OutputPortElements containing the referenced locations to get values from </summary>
         ///
@@ -75,7 +75,8 @@ namespace model
         ValueType GetTypedValue(size_t index) const;
 
     private:
-        OutputPortElementsUntyped _inputRanges;
+        const OutputPortElementsUntyped& _inputRanges; // Just a reference to the typed elements in concrete subclass
+
         std::vector<OutputPortElement> _individualElements; // individual elements
         std::vector<const Node*> _parentNodes;
     };
