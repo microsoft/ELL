@@ -12,7 +12,7 @@ namespace emll
 			for (size_t i = 0; i < output.size(); ++i)
 			{
 				auto pNode = _graph.AddLiteral<DataType>(output[i]);
-				_outputPortMap.Add(pNode, pOutputPort);
+				_outputPortMap.Add(pOutputPort, pNode);
 			}
 		}
 
@@ -26,7 +26,7 @@ namespace emll
 			for (size_t i = 0; i < pOutputPort->Size(); ++i)
 			{
 				auto pNode = _graph.AddNode<BinaryNode>(GetOperator<DataType>(node));
-				_outputPortMap.Add(pNode, pOutputPort);
+				_outputPortMap.Add(pOutputPort, pNode);
 				AddDependency(leftInput, i, pNode);
 				AddDependency(rightInput, i, pNode);
 			}
@@ -41,7 +41,7 @@ namespace emll
 			for (size_t i = 0; i < pOutputPort->Size(); ++i)
 			{
 				auto pInput = _graph.AddNode<InputNode>(i);
-				_outputPortMap.Add(pInput, pOutputPort);
+				_outputPortMap.Add(pOutputPort, pInput);
 				pArg->AddDependent(pInput);
 			}
 		}

@@ -28,7 +28,7 @@ namespace emll
 			if (pPortNodes == nullptr)
 			{
 				auto portNodes = std::make_shared<OutputPortDataNodes>();
-				_map[pPort] = portNodes;
+				_scalarMap[pPort] = portNodes;
 				pPortNodes = portNodes.get();
 			}
 			return pPortNodes;
@@ -36,15 +36,15 @@ namespace emll
 
 		OutputPortDataNodes* OutputPortDataNodesMap::Get(const model::OutputPortBase* pPort) const
 		{
-			auto search = _map.find(pPort);
-			if (search != _map.end())
+			auto search = _scalarMap.find(pPort);
+			if (search != _scalarMap.end())
 			{
 				return search->second.get();
 			}
 			return nullptr;
 		}
 
-		void OutputPortDataNodesMap::Add(DataNode* pNode, const model::OutputPortBase* pPort)
+		void OutputPortDataNodesMap::Add(const model::OutputPortBase* pPort, DataNode* pNode)
 		{
 			Ensure(pPort)->Add(pNode);
 		}
@@ -57,6 +57,26 @@ namespace emll
 				return pPortNodes->Get(position);
 			}
 			return nullptr;
+		}
+
+		void OutputPortDataNodesMap::SetV(const model::OutputPortBase* pPort, DataNode* pNode)
+		{
+			assert(pNode != nullptr);
+			assert(pNode->HasVectorResult());
+			assert(pPort != nullptr);
+			_vectorMap[pPort] = pNode;
+		}
+
+		DataNode* OutputPortDataNodesMap::GetV(const model::OutputPortBase* pPort) const
+		{
+			assert(pPort != nullptr);
+			auto search = _vectorMap.find(pPort);
+			if (search != _vectorMap.end())
+			{
+				return search->second;
+			}
+			return nullptr;
+
 		}
 
 		static const std::string c_ConstantNodeType = "Constant";

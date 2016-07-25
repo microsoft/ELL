@@ -23,6 +23,7 @@ namespace emll
 			std::vector<DataNode*> _nodes;
 		};
 
+		///<summary>Stores the DataNode allocated for each element in an outport port</summary>
 		class OutputPortDataNodesMap
 		{
 		public:
@@ -30,14 +31,16 @@ namespace emll
 			OutputPortDataNodes* Ensure(const model::OutputPortBase* pPort);
 			OutputPortDataNodes* Get(const model::OutputPortBase* pPort) const;
 
-			void Add(DataNode* pNode, const model::OutputPortBase* pPort);
+			void Add(const model::OutputPortBase* pPort, DataNode* pNode);
 			DataNode* Get(const model::OutputPortBase* pPort, const size_t position) const;
 
-		private:
+			void SetV(const model::OutputPortBase* pPort, DataNode* pNode);
+			DataNode* GetV(const model::OutputPortBase* pPort) const;
 
 		private:
-			std::unordered_map<const model::OutputPortBase*, std::shared_ptr<OutputPortDataNodes>> _map;
-		};
+			std::unordered_map<const model::OutputPortBase*, std::shared_ptr<OutputPortDataNodes>> _scalarMap;
+			std::unordered_map<const model::OutputPortBase*, DataNode*> _vectorMap;
+		};																									 
 
 		class DataFlowBuilder
 		{
