@@ -220,16 +220,16 @@ void TestInputRouting2()
     model::Model model;
 
     auto in = model.AddNode<model::InputNode<double>>(3);
-    model::OutputPortElementList<double> range = { in->output, 0, 2 };
-    model::OutputPortElementList<double> ranges = { { in->output, 0 }, { in->output, 2 } };
+    model::OutputPortElements<double> range = { in->output, 0, 2 };
+    model::OutputPortElements<double> ranges = { { in->output, 0 }, { in->output, 2 } };
 
     auto minAndArgMin1 = model.AddNode<model::ArgMinNode<double>>(in->output); // a "standard" node that takes its input from an output port
     auto minAndArgMin2 = model.AddNode<model::ArgMinNode<double>>(range);      // a node that takes its input from a range --- a subset of outputs from a port
     auto minAndArgMin3 = model.AddNode<model::ArgMinNode<double>>(ranges);     // a node that takes its input from a "group" --- an arbitrary set of outputs from other ports
 
-    auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::MakeOutputPortElementList(in->output, 0, 2));
-    auto minAndArgMin5 = model.AddNode<model::ArgMinNode<double>>(model::OutputPortElementList<double>{ { in->output, 0 }, { in->output, 0, 2 } });
-    auto minAndArgMin6 = model.AddNode<model::ArgMinNode<double>>(model::Concat(model::MakeOutputPortElementList(in->output, 0), model::MakeOutputPortElementList(in->output, 0, 2), model::MakeOutputPortElementList(minAndArgMin1->val, 0, 1)));
+    auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::MakeOutputPortElements(in->output, 0, 2));
+    auto minAndArgMin5 = model.AddNode<model::ArgMinNode<double>>(model::OutputPortElements<double>{ { in->output, 0 }, { in->output, 0, 2 } });
+    auto minAndArgMin6 = model.AddNode<model::ArgMinNode<double>>(model::Concat(model::MakeOutputPortElements(in->output, 0), model::MakeOutputPortElements(in->output, 0, 2), model::MakeOutputPortElements(minAndArgMin1->val, 0, 1)));
 
     //// set some example input and read the output
     std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
@@ -285,8 +285,8 @@ void TestRefineGraph()
     model::Model model;
 
     auto inputNode = model.AddNode<model::InputNode<double>>(2);
-    model::OutputPortElementList<double> inputValue = { inputNode->output, 0 };
-    model::OutputPortElementList<double> inputThresh = { inputNode->output, 1 };
+    model::OutputPortElements<double> inputValue = { inputNode->output, 0 };
+    model::OutputPortElements<double> inputThresh = { inputNode->output, 1 };
 
     auto value1 = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto value2 = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 100.0, 200.0, 300.0 });

@@ -30,7 +30,7 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ExtremalValueNode(const OutputPortElementList<ValueType>& input);
+        ExtremalValueNode(const OutputPortElements<ValueType>& input);
 
         /// <summary> Exposes the extremal value port as a read-only property </summary>
         const OutputPort<ValueType>& val = _val;
@@ -61,7 +61,7 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ArgMinNode(const OutputPortElementList<ValueType>& input) : ExtremalValueNode<ValueType, false>(input) {}
+        ArgMinNode(const OutputPortElements<ValueType>& input) : ExtremalValueNode<ValueType, false>(input) {}
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -85,7 +85,7 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ArgMaxNode(const OutputPortElementList<ValueType>& input) : ExtremalValueNode<ValueType, true>(input) {}
+        ArgMaxNode(const OutputPortElements<ValueType>& input) : ExtremalValueNode<ValueType, true>(input) {}
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

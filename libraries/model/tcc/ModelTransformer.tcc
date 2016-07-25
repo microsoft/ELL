@@ -10,10 +10,10 @@
 namespace model
 {
     template <typename ValueType>
-    OutputPortElementList<ValueType> ModelTransformer::TransformInputPort(const InputPort<ValueType>& input)
+    OutputPortElements<ValueType> ModelTransformer::TransformInputPort(const InputPort<ValueType>& input)
     {
         const auto& ranges = input.GetInputRanges();
-        std::vector<OutputPortElementList<ValueType>> newRanges;
+        std::vector<OutputPortElements<ValueType>> newRanges;
         for (const auto& range : ranges)
         {
             auto oldPort = range.ReferencedPort();
@@ -26,7 +26,7 @@ namespace model
             auto size = range.Size();
             newRanges.emplace_back(*outputPort, start, size);
         }
-        return OutputPortElementList<ValueType>(newRanges);
+        return OutputPortElements<ValueType>(newRanges);
     }
 
     template <typename ValueType>

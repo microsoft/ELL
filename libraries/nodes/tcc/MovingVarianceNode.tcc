@@ -9,7 +9,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    MovingVarianceNode<ValueType>::MovingVarianceNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _windowSize(windowSize)
+    MovingVarianceNode<ValueType>::MovingVarianceNode(const model::OutputPortElements<ValueType>& input, size_t windowSize) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _windowSize(windowSize)
     {
         auto dimension = input.Size();
         for (size_t index = 0; index < windowSize; ++index)

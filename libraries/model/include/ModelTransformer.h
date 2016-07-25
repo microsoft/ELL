@@ -12,7 +12,7 @@
 #include "Port.h"
 #include "InputPort.h"
 #include "OutputPort.h"
-#include "OutputPortElementList.h"
+#include "OutputPortElements.h"
 #include "Node.h"
 #include "OutputPort.h"
 
@@ -59,9 +59,9 @@ namespace model
         /// Functions used by node implementors
         ///
 
-        /// <summary> Returns an OutputPortElementList for the new model corresponding the the set of inputs referenced by the given input port. Called by node implementors. </summary>
+        /// <summary> Returns an OutputPortElements for the new model corresponding the the set of inputs referenced by the given input port. Called by node implementors. </summary>
         template <typename ValueType>
-        OutputPortElementList<ValueType> TransformInputPort(const InputPort<ValueType>& input);
+        OutputPortElements<ValueType> TransformInputPort(const InputPort<ValueType>& input);
 
         /// <summary> Creates a new node in the transformed model graph. Called by node implementors. </summary>
         template <typename NodeType, typename... Args>

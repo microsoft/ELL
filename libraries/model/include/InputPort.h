@@ -10,7 +10,7 @@
 
 #include "Port.h"
 #include "OutputPort.h"
-#include "OutputPortElementList.h"
+#include "OutputPortElements.h"
 
 // utilities
 #include "Exception.h"
@@ -33,7 +33,7 @@ namespace model
         /// <param name="input"> The input group to fetch input values from </param>
         /// <param name="name"> The name of this port </param>
         template <typename ValueType>
-        InputPortBase(const class Node* owningNode, const OutputPortElementList<ValueType>& input, std::string name);
+        InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& input, std::string name);
 
         /// <summary> Returns the OutputPortElements containing the referenced locations to get values from </summary>
         ///
@@ -51,7 +51,10 @@ namespace model
         /// <returns> The list nodes this input port gets values from </returns>
         const std::vector<const Node*>& GetParentNodes() const { return _parentNodes; }
 
-        const OutputPortElementListUntyped& GetInputRanges() const { return _inputRanges; }
+        /// <summary> Returns a list nodes ranges this input port gets values from </summary>
+        ///
+        /// <returns> A list node ranges this input port gets values from </returns>
+        const OutputPortElementsUntyped& GetInputRanges() const { return _inputRanges; }
 
         /// <summary> The dimensionality of the output </summary>
         ///
@@ -72,7 +75,7 @@ namespace model
         ValueType GetTypedValue(size_t index) const;
 
     private:
-        OutputPortElementListUntyped _inputRanges;
+        OutputPortElementsUntyped _inputRanges;
         std::vector<OutputPortElement> _inputElements;
         std::vector<const Node*> _parentNodes;
     };
@@ -85,7 +88,7 @@ namespace model
         ///
         /// <param name="owningNode"> The node this port belongs to </param>
         /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
-        InputPort(const class Node* owningNode, const OutputPortElementList<ValueType>& input, std::string name);
+        InputPort(const class Node* owningNode, const OutputPortElements<ValueType>& input, std::string name);
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         ///

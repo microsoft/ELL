@@ -27,7 +27,7 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        OutputNode(const model::OutputPortElementList<ValueType>& input);
+        OutputNode(const model::OutputPortElements<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

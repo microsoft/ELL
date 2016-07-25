@@ -28,7 +28,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to predict from </param>
         /// <param name="predictor"> The linear predictor to use when making the prediction. </param>
-        LinearPredictorNode(const model::OutputPortElementList<double>& input, const predictors::LinearPredictor& predictor);
+        LinearPredictorNode(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

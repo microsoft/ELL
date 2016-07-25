@@ -10,7 +10,7 @@
 namespace model
 {
     template <typename ValueType>
-    ValueSelectorNode<ValueType>::ValueSelectorNode(const OutputPortElementList<bool>& condition, const OutputPortElementList<ValueType>& input1, const OutputPortElementList<ValueType>& input2) : Node({ &_condition, &_input1, &_input2 }, { &_output }), _condition(this, condition, conditionPortName), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, input1.Size())
+    ValueSelectorNode<ValueType>::ValueSelectorNode(const OutputPortElements<bool>& condition, const OutputPortElements<ValueType>& input1, const OutputPortElements<ValueType>& input2) : Node({ &_condition, &_input1, &_input2 }, { &_output }), _condition(this, condition, conditionPortName), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, input1.Size())
     {
         if (condition.Size() != 1)
         {
@@ -59,7 +59,7 @@ namespace model
     //
     template <typename ValueType>
     
-    SelectIfLessNode<ValueType>::SelectIfLessNode(const OutputPortElementList<ValueType>& input1, const OutputPortElementList<ValueType>& input2, const OutputPortElementList<ValueType>& value1, const OutputPortElementList<ValueType>& value2) : Node({ &_input1, &_input2, &_value1, &_value2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _value1(this, value1, value1PortName), _value2(this, value2, value2PortName), _output(this, outputPortName, input1.Size())
+    SelectIfLessNode<ValueType>::SelectIfLessNode(const OutputPortElements<ValueType>& input1, const OutputPortElements<ValueType>& input2, const OutputPortElements<ValueType>& value1, const OutputPortElements<ValueType>& value2) : Node({ &_input1, &_input2, &_value1, &_value2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _value1(this, value1, value1PortName), _value2(this, value2, value2PortName), _output(this, outputPortName, input1.Size())
     {
         if (input1.Size() != input2.Size())
         {
@@ -111,7 +111,7 @@ namespace model
     // More cheese
     //
     template <typename ValueType>
-    IfLessNode<ValueType>::IfLessNode(const OutputPortElementList<ValueType>& value, const OutputPortElementList<ValueType>& threshold) : Node({ &_value, &_threshold }, { &_output }), _value(this, value, valuePortName), _threshold(this, threshold, thresholdPortName), _output(this, outputPortName, 1)
+    IfLessNode<ValueType>::IfLessNode(const OutputPortElements<ValueType>& value, const OutputPortElements<ValueType>& threshold) : Node({ &_value, &_threshold }, { &_output }), _value(this, value, valuePortName), _threshold(this, threshold, thresholdPortName), _output(this, outputPortName, 1)
     {
         if (value.Size() != threshold.Size())
         {
