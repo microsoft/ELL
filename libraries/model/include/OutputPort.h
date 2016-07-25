@@ -31,7 +31,7 @@ namespace model
         bool IsReferenced() { return _isReferenced; }
 
     protected:
-        OutputPortBase(const class Node* node, PortType type, size_t size);
+        OutputPortBase(const class Node* node, std::string name, PortType type, size_t size);
 
         mutable bool _isReferenced;
     };
@@ -44,8 +44,9 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="node"> The node this output port is part of </param>
+        /// <param name="name"> The name of this port </param>
         /// <param name="size"> The dimensionality of this port </param>
-        OutputPort(const class Node* node, size_t size);
+        OutputPort(const class Node* node, std::string name, size_t size);
 
         /// <summary> Returns the cached output from this port </summary>
         ///

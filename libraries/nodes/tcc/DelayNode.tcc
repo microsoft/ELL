@@ -9,7 +9,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    DelayNode<ValueType>::DelayNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize) : Node({&_input}, {&_output}), _input(this, input), _output(this, _input.Size()), _windowSize(windowSize)
+    DelayNode<ValueType>::DelayNode(const model::OutputPortElements<ValueType>& input, size_t windowSize) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _windowSize(windowSize)
     {
         auto dimension = input.Size();
         for(size_t index = 0; index < windowSize; ++index)
@@ -30,15 +30,7 @@ namespace nodes
     template <typename ValueType>
     void DelayNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<DelayNode<ValueType>>(newInput, _windowSize);
-        transformer.MapOutputPort(output, newNode->output);
-    }
-
-    template <typename ValueType>
-    void DelayNode<ValueType>::Refine(model::ModelTransformer& transformer) const
-    {
-        auto newInput = transformer.TransformInputPort(_input);
+        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<DelayNode<ValueType>>(newInput, _windowSize);
         transformer.MapOutputPort(output, newNode->output);
     }

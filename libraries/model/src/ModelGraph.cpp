@@ -56,7 +56,8 @@ namespace model
             auto IsLeaf = [](const Node* node) { return node->GetDependentNodes().size() == 0; };
 
             // start with some arbitrary node
-            const Node* anOutputNode = _model->_idToNodeMap.begin()->second.get(); // !!! need private access
+            auto iter = _model->_idToNodeMap.begin();
+            const Node* anOutputNode = iter->second.get(); // !!! need private access
 
             // follow dependency chain until we get an output node
             while (!IsLeaf(anOutputNode))

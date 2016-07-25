@@ -12,6 +12,9 @@
 #include "OutputPort.h"
 #include "ModelTransformer.h"
 
+// utilities
+#include "TypeName.h"
+
 #include <vector>
 #include <memory>
 
@@ -36,7 +39,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "Constant"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("ConstantNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -53,6 +56,8 @@ namespace nodes
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
+
+        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

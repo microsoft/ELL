@@ -11,6 +11,6 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-    OutputPortBase::OutputPortBase(const class Node* node, PortType type, size_t size) : Port(node, type, size), _isReferenced(false) 
+    OutputPortBase::OutputPortBase(const class Node* node, std::string name, PortType type, size_t size) : Port(node, name, type, size), _isReferenced(false) 
     {}
 }

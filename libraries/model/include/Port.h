@@ -14,6 +14,7 @@
 // stl
 #include <vector>
 #include <memory>
+#include <string>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -24,6 +25,8 @@ namespace model
     class Port
     {
     public:
+        virtual ~Port() = default;
+
         enum class PortType
         {
             None,
@@ -48,21 +51,25 @@ namespace model
         /// <returns> The dimensionality of the output </returns>
         size_t Size() const { return _size; } // dimension
 
+        /// <summary> Returns the name of this port </summary>
+        ///
+        /// <returns> The name of this port </returns>
+        std::string GetName() const { return _name; }
+
         /// <summary> Maps from C++ type to PortType enum </summary>
         ///
         /// <typeparam name="ValueType"> The C++ type </typeparam>
         /// <returns> The corresponding PortType enum value </returns>
         template <typename ValueType>
-        static PortType GetTypeCode();
-
-        virtual ~Port() = default;
+        static PortType GetPortType();
 
     protected:
-        Port(const class Node* node, PortType type, size_t size) : _node(node), _type(type), _size(size) {}
+        Port(const class Node* node, std::string name, PortType type, size_t size) : _node(node), _name(name), _type(type), _size(size) {}
 
     private:
         // _node keeps info on where the input is coming from
         const class Node* _node = nullptr;
+        std::string _name;
         PortType _type = PortType::None;
         size_t _size = 0;
     };
