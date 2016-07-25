@@ -35,11 +35,6 @@ namespace model
         template <typename ValueType>
         InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputRef, const OutputPortElements<ValueType>& inputValues, std::string name);
 
-        /// <summary> Returns the OutputPortElements containing the referenced locations to get values from </summary>
-        ///
-        /// <returns> The OutputPortElements containing the referenced locations to get values from </returns>
-        const std::vector<OutputPortElement>& GetIndividualOutputPortElements() const { return _individualElements; }
-
         /// <summary> Returns an OutputPortElement containing the referenced location to get the value for a specific input element from </summary>
         ///
         /// <param name="index"> The index of the element </param>
@@ -102,6 +97,9 @@ namespace model
         /// <returns> The output value at the corresponding index </returns>
         ValueType GetValue(size_t index) const;
 
+        /// <summary> Returns the OutputPortElements containing the referenced locations this port gets its values from </summary>
+        ///
+        /// <returns> The OutputPortElements containing the referenced locations to get values from </returns>
         OutputPortElements<ValueType> GetOutputPortElements() const;
 
         /// <summary> Returns an element from the (already-computed) output value corresponding to this input </summary>
