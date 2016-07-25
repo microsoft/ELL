@@ -38,6 +38,10 @@ namespace model
         /// <summary> Exposes the extremal value index port as a read-only property </summary>
         const OutputPort<int>& argVal = _argVal;
 
+        static constexpr char* inputPortName = "input";
+        static constexpr char* valPortName = "val";
+        static constexpr char* argValPortName = "argVal";
+         
     protected:
         virtual void Compute() const override;
 

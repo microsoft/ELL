@@ -18,7 +18,7 @@
 
 namespace nodes
 {
-    LinearPredictorNode::LinearPredictorNode(const model::OutputPortElementList<double>& input, const predictors::LinearPredictor& predictor) : Node({ &_input }, { &_output }), _input(this, input, "input"), _output(this, "output", 1), _predictor(predictor)
+    LinearPredictorNode::LinearPredictorNode(const model::OutputPortElementList<double>& input, const predictors::LinearPredictor& predictor) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _predictor(predictor)
     {
         assert(input.Size() == predictor.GetDimension());
     }

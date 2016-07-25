@@ -31,9 +31,9 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="condition"> An input that returns a single boolean value that selects which input to use as output </param>
-        /// <param name="value1"> The input to return if the condition is `true` </param>
-        /// <param name="value2"> The input to return if the condition is `false` </param>
-        ValueSelectorNode(const OutputPortElementList<bool>& condition, const OutputPortElementList<ValueType>& value1, const OutputPortElementList<ValueType>& value2);
+        /// <param name="input1"> The input to return if the condition is `true` </param>
+        /// <param name="input2"> The input to return if the condition is `false` </param>
+        ValueSelectorNode(const OutputPortElementList<bool>& condition, const OutputPortElementList<ValueType>& input1, const OutputPortElementList<ValueType>& input2);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -54,14 +54,19 @@ namespace model
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(ModelTransformer& transformer) const override;
 
+        static constexpr char* conditionPortName = "condition";
+        static constexpr char* input1PortName = "input1";
+        static constexpr char* input2PortName = "input2";
+        static constexpr char* outputPortName = "output";
+
     protected:
         virtual void Compute() const override;
 
     private:
         // Inputs
         InputPort<bool> _condition;
-        InputPort<ValueType> _value1;
-        InputPort<ValueType> _value2;
+        InputPort<ValueType> _input1;
+        InputPort<ValueType> _input2;
 
         // Output
         OutputPort<ValueType> _output;
@@ -87,6 +92,12 @@ namespace model
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(ModelTransformer& transformer) const override;
+
+        static constexpr char* input1PortName = "input1";
+        static constexpr char* input2PortName = "input2";
+        static constexpr char* value1PortName = "value1";
+        static constexpr char* value2PortName = "value2";
+        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;
@@ -118,6 +129,10 @@ namespace model
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(ModelTransformer& transformer) const override;
+
+        static constexpr char* valuePortName = "value";
+        static constexpr char* thresholdPortName = "threshold";
+        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

@@ -295,7 +295,7 @@ void TestRefineGraph()
     // Now transform it
     model::TransformContext context;
     model::ModelTransformer transformer;
-    auto newModel = transformer.RefineModel(model, context);
+    auto newModel = transformer.CopyModel(model, context);
 
     // Print both graphs
     std::cout << "\n\nOld graph" << std::endl;

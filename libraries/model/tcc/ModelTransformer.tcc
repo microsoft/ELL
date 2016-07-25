@@ -17,6 +17,7 @@ namespace model
         for (const auto& range : ranges)
         {
             auto oldPort = range.ReferencedPort();
+            assert(_portToPortMap.find(oldPort) != _portToPortMap.end());
             auto newPort = _portToPortMap[oldPort];
             auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPort);
             assert(outputPort != nullptr);

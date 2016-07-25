@@ -45,6 +45,9 @@ namespace model
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(ModelTransformer& transformer) const override;
 
+        static constexpr char* inputPortName = "input";
+        static constexpr char* outputPortName = "output";
+
     protected:
         virtual void Compute() const override;
 

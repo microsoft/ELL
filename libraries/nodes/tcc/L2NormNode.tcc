@@ -9,7 +9,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    L2NormNode<ValueType>::L2NormNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input, "input"), _output(this, "output", 1)
+    L2NormNode<ValueType>::L2NormNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, 1)
     {
     }
 
