@@ -64,9 +64,9 @@ source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
 include_directories(include)
-include_directories(../utilities/include)
-include_directories(../model/include)
-include_directories(../nodes/include)
+#include_directories(../utilities/include)
+#include_directories(../model/include)
+#include_directories(../nodes/include)
 include_directories(${CMAKE_SOURCE_DIR}/external/llvm/include)
 include_directories(${CMAKE_SOURCE_DIR}/external/llvm/include/llvm)
 include_directories(${CMAKE_SOURCE_DIR}/external/llvm/include/Support)
@@ -74,6 +74,8 @@ include_directories(${CMAKE_SOURCE_DIR}/external/llvm/include/machine)
 include_directories(${CMAKE_SOURCE_DIR}/external/llvm/include/IR)
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
+target_include_directories(${PROJ_NAME} PUBLIC include)
+target_link_libraries(${PROJ_NAME} utilities model nodes predictors)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 

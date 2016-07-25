@@ -210,7 +210,7 @@ namespace emll
 				case Bop::OperationType::subtract:
 					return OperatorType::SubtractF;
 
-				case Bop::OperationType::multiply:
+				case Bop::OperationType::coordinatewiseMultiply:
 					return OperatorType::MultiplyF;
 
 				case Bop::OperationType::divide:

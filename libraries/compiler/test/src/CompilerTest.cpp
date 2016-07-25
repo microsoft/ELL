@@ -134,7 +134,7 @@ nodes::BinaryOperationNode<T>* ModelBuilder::Add(const model::OutputPort<T>& x, 
 template<typename T>
 nodes::BinaryOperationNode<T>* ModelBuilder::Multiply(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
 {
-	return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationNode<T>::OperationType::multiply);
+	return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationNode<T>::OperationType::coordinatewiseMultiply);
 }
 
 template<typename T>
@@ -148,7 +148,7 @@ nodes::ConstantNode<T>* ModelBuilder::Constant(const std::vector<T>& values)
 {
 	auto *pNode = _model.AddNode<nodes::ConstantNode<T>>(values);
 	// Work around a bug. Make sure literal values are propagated to outputs
-	_model.GetNodeOutput<T>(pNode->output);
+	_model.ComputeNodeOutput<T>(pNode->output);
 	return pNode;
 }
 
