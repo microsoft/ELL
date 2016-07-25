@@ -1,6 +1,7 @@
 #include "Dataflow.h"
 #include "ScalarVar.h"
 #include "Compiler.h"
+#include "DataFlowGraph.h"
 
 namespace emll
 {
@@ -59,7 +60,6 @@ namespace emll
 
 		void InputNode::ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data)
 		{
-			// TODO - support Scalar source arguments
 			assert(data.IsVector());
 			_pVar = graph.Variables().AddVectorElementVariable(data.Type(), data, _elementIndex);
 			Process(graph, compiler);

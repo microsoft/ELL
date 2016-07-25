@@ -11,7 +11,7 @@
 #include "ModelEx.h"
 #include "Types.h"
 #include "SymbolTable.h"
-#include "DataFlow.h"
+#include "DataFlowGraph.h"
 
 #include <functional>
 

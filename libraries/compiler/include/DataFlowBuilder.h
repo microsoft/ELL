@@ -3,7 +3,7 @@
 #include "ModelGraph.h"
 #include "ConstantNode.h"
 #include "BinaryOperationNode.h"
-#include "Dataflow.h"
+#include "DataflowGraph.h"
 
 namespace emll
 {

@@ -62,6 +62,7 @@ namespace emll
 		static const std::string c_ConstantNodeType = "Constant";
 		static const std::string c_BinaryNodeType = "BinaryOperationNode";
 		static const std::string c_InputNodeType = "Input";
+		static const std::string c_LinearNodeType = "LinearNode";
 
 		void DataFlowBuilder::Process(const model::Model& mode)
 		{

@@ -30,6 +30,7 @@ namespace emll
 			virtual void ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data) {}
 
 			virtual DataNodeType Type() const = 0;
+			virtual bool HasVectorResult() { return false; }
 
 			bool HasDependencies() const
 			{
@@ -59,11 +60,8 @@ namespace emll
 			{
 				return DataNodeType::ArgNode;
 			}
-
-			Variable* Var()
-			{
-				return _pVar;
-			}
+			Variable* Var() { return _pVar;}
+			virtual bool HasVectorResult() override { return true; }
 
 		protected:
 			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler);
@@ -191,37 +189,5 @@ namespace emll
 			Variable* _pSrc2 = nullptr;
 			Variable* _pResult = nullptr;
 		};
-
-		class DataFlowGraph
-		{
-		public:
-
-			template <class NodeType, typename... Args>
-			NodeType* AddNode(Args&&... args);
-
-			template <typename DataType>
-			LiteralNode* AddLiteral(DataType type);
-
-			template <typename DataType>
-			ArgNode* AddArg(size_t size, bool isInput);
-
-			size_t Size() const { return _nodes.size(); }
-			DataNode* GetNodeAt(size_t offset) const;
-			
-			VariableAllocator& Variables() { return _variables;}
-			
-			const std::vector<DataNode*>& Literals() { return _literals;}
-			const std::vector<ArgNode*>& InputArgs() { return _inputs; }
-			const std::vector<ArgNode*>& OutputArgs() { return _outputs; }
-
-		private:
-			// The data flow graph owns all pointers
-			std::vector<std::shared_ptr<DataNode>> _nodes;
-			VariableAllocator _variables;
-			std::vector<DataNode*> _literals;
-			std::vector<ArgNode*> _inputs;
-			std::vector<ArgNode*> _outputs;
-		};
 	}
 }
-#include "../tcc/Dataflow.tcc"

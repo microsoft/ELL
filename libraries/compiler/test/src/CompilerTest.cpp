@@ -209,11 +209,5 @@ void TestDataFlowCompiler()
 void TestModelEx()
 {
 	model::Model model = InitTestModelBinOp();
-
-	std::vector<const model::Node*> nodes = ModelEx::CollectOutputNodes(model);
-	testing::ProcessTest("CollectOutputNodes", nodes.size() == 2);
-
-	nodes = ModelEx::CollectInputNodes(model);
-	testing::ProcessTest("CollectInputNodes", nodes.size() == 1);
 }
 

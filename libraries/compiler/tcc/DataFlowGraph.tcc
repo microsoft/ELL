@@ -9,12 +9,12 @@ namespace emll
 		NodeType* DataFlowGraph::AddNode(Args&&... args)
 		{
 			static_assert(std::is_base_of<DataNode, NodeType>::value, "AddNode requires you inherit from DataNode");
-			
+
 			auto node = std::make_shared<NodeType>(args...);
 			NodeType* pNode = node.get();
 			_nodes.push_back(node);
 			return pNode;
-		}		
+		}
 
 		template <typename DataType>
 		LiteralNode* DataFlowGraph::AddLiteral(DataType value)
@@ -30,14 +30,18 @@ namespace emll
 		{
 			Variable* pVar = nullptr;
 			VariableScope scope = isInput ? VariableScope::Input : VariableScope::Output;
+			pVar = _variables.AddVariable<VectorVar<DataType>>(scope, size);
+			// Simplification: For now, alll graph arguments are always VECTORs.. i.e. pointers
+			/*
 			if (size > 1)
 			{
-				pVar = _variables.AddVariable<VectorVar<DataType>>(scope, size);
+			pVar = _variables.AddVariable<VectorVar<DataType>>(scope, size);
 			}
 			else
 			{
-				pVar = _variables.AddVariable<ScalarVar<DataType>>(scope);
+			pVar = _variables.AddVariable<ScalarVar<DataType>>(scope);
 			}
+			*/
 			ArgNode* pNode = AddNode<ArgNode>(pVar);
 			if (isInput)
 			{
