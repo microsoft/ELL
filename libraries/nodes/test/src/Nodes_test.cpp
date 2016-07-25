@@ -7,13 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Nodes_test.h"
-#include "MeanNode.h"
-#include "VarianceNode.h"
+#include "MovingAverageNode.h"
+#include "MovingVarianceNode.h"
 #include "DelayNode.h"
 #include "AccumulatorNode.h"
 #include "BinaryOperationNode.h"
 #include "UnaryOperationNode.h"
-#include "MagnitudeNode.h"
+#include "L2NormNode.h"
 #include "LinearPredictorNode.h"
 
 // model
@@ -85,13 +85,13 @@ namespace
 // Test compute functions
 //
 
-void TestMagnitudeNodeCompute()
+void TestL2NormNodeCompute()
 {
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
-    auto outputNode = model.AddNode<nodes::MagnitudeNode<double>>(inputNode->output);
+    auto outputNode = model.AddNode<nodes::L2NormNode<double>>(inputNode->output);
 
     bool okSize = true;
     bool okResult = true;
@@ -101,10 +101,10 @@ void TestMagnitudeNodeCompute()
         double expectedOutput = VectorMagnitude(inputValue);
 
         inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.GetNodeOutput(outputNode->output);
+        std::vector<double> outputVec = model.ComputeNodeOutput(outputNode->output);
 
-        testing::ProcessTest("Testing MagnitudeNode output size", testing::IsEqual(outputVec.size(), 1));
-        testing::ProcessTest("Testing MagnitudeNode compute", testing::IsEqual(outputVec[0], expectedOutput));
+        testing::ProcessTest("Testing L2NormNode output size", testing::IsEqual(outputVec.size(), 1));
+        testing::ProcessTest("Testing L2NormNode compute", testing::IsEqual(outputVec[0], expectedOutput));
     }
 }
 
@@ -127,7 +127,7 @@ void TestAccumulatorNodeCompute()
             accumOutput[d] += inputValue[d];
         }
         inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.GetNodeOutput(outputNode->output);
+        std::vector<double> outputVec = model.ComputeNodeOutput(outputNode->output);
 
         testing::ProcessTest("Testing AccumulatorNode compute", testing::IsEqual(outputVec, accumOutput));
     }
@@ -150,7 +150,7 @@ void TestDelayNodeCompute()
     {
         auto inputValue = data[index];
         inputNode->SetInput(inputValue);
-        outputVec = model.GetNodeOutput(outputNode->output);
+        outputVec = model.ComputeNodeOutput(outputNode->output);
         if (index >= delay)
         {
             testing::ProcessTest("Testing DelayNode compute", testing::IsEqual(outputVec, data[index - delay]));
@@ -158,13 +158,13 @@ void TestDelayNodeCompute()
     }
 }
 
-void TestMeanNodeCompute()
+void TestMovingAverageNodeCompute()
 {
     const int windowSize = 4;
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
-    auto outputNode = model.AddNode<nodes::MeanNode<double>>(inputNode->output, windowSize);
+    auto outputNode = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, windowSize);
 
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
     double expectedOutput = VectorMean({ 7.0, 8.0, 9.0, 10.0 });
@@ -174,18 +174,18 @@ void TestMeanNodeCompute()
     for (const auto& inputValue : data)
     {
         inputNode->SetInput(inputValue);
-        outputVec = model.GetNodeOutput(outputNode->output);
+        outputVec = model.ComputeNodeOutput(outputNode->output);
     }
-    testing::ProcessTest("Testing MeanNode compute", testing::IsEqual(outputVec[0], expectedOutput));
+    testing::ProcessTest("Testing MovingAverageNode compute", testing::IsEqual(outputVec[0], expectedOutput));
 }
 
-void TestVarianceNodeCompute()
+void TestMovingVarianceNodeCompute()
 {
     const int windowSize = 4;
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
-    auto outputNode = model.AddNode<nodes::VarianceNode<double>>(inputNode->output, windowSize);
+    auto outputNode = model.AddNode<nodes::MovingVarianceNode<double>>(inputNode->output, windowSize);
 
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
     double mean = VectorMean({ 7.0, 8.0, 9.0, 10.0 });
@@ -196,9 +196,9 @@ void TestVarianceNodeCompute()
     for (const auto& inputValue : data)
     {
         inputNode->SetInput(inputValue);
-        outputVec = model.GetNodeOutput(outputNode->output);
+        outputVec = model.ComputeNodeOutput(outputNode->output);
     }
-    testing::ProcessTest("Testing VarianceNode compute", testing::IsEqual(outputVec[0], expectedOutput));
+    testing::ProcessTest("Testing MovingVarianceNode compute", testing::IsEqual(outputVec[0], expectedOutput));
 }
 
 void TestUnaryOperationNodeCompute()
@@ -214,7 +214,7 @@ void TestUnaryOperationNodeCompute()
         auto inputValue = data[index];
 
         inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.GetNodeOutput(outputNode->output);
+        std::vector<double> outputVec = model.ComputeNodeOutput(outputNode->output);
 
         for (int d = 0; d < inputValue.size(); ++d)
         {
@@ -237,7 +237,7 @@ void TestBinaryOperationNodeCompute()
         auto inputValue = data[index];
 
         inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.GetNodeOutput(outputNode->output);
+        std::vector<double> outputVec = model.ComputeNodeOutput(outputNode->output);
 
         for (int d = 0; d < inputValue.size(); ++d)
         {
@@ -253,31 +253,31 @@ void TestBinaryOperationNodeCompute()
 
 // TODO: make a generic TestGraphsEqual function that takes 2 graphs, 2 output nodes, and a test message string
 
-void TestMeanNodeRefine()
+void TestMovingAverageNodeRefine()
 {
     const int windowSize = 4;
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
-    auto meanNode = model.AddNode<nodes::MeanNode<double>>(inputNode->output, windowSize);
+    auto meanNode = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, windowSize);
 
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
     double expectedOutput = VectorMean({ 7.0, 8.0, 9.0, 10.0 });
 
     model::TransformContext context;
-    model::ModelTransformer transformer(context);
-    auto newModel = transformer.RefineModel(model);
+    model::ModelTransformer transformer;
+    auto newModel = transformer.RefineModel(model, context);
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newOutputPort = transformer.GetCorrespondingOutputPort(meanNode->output);
 
     for (const auto& inputValue : data)
     {
         inputNode->SetInput(inputValue);
-        auto outputVec1 = model.GetNodeOutput(meanNode->output);
+        auto outputVec1 = model.ComputeNodeOutput(meanNode->output);
         newInputNode->SetInput(inputValue);
-        auto outputVec2 = newModel.GetNodeOutput(*newOutputPort);
+        auto outputVec2 = newModel.ComputeNodeOutput(*newOutputPort);
 
-        testing::ProcessTest("Testing MeanNode refine", testing::IsEqual(outputVec1, outputVec2));
+        testing::ProcessTest("Testing MovingAverageNode refine", testing::IsEqual(outputVec1, outputVec2));
     }
 }
 

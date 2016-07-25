@@ -13,8 +13,8 @@
 #include "InputNode.h"
 
 // nodes
-#include "MeanNode.h"
-#include "VarianceNode.h"
+#include "MovingAverageNode.h"
+#include "MovingVarianceNode.h"
 #include "LinearPredictorNode.h"
 
 // predictors
@@ -31,10 +31,10 @@ namespace common
         const int dimension = 3;
         model::Model model;
     	auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
-        auto mean8 = model.AddNode<nodes::MeanNode<double>>(inputNode->output, 8);
-        auto var8 = model.AddNode<nodes::VarianceNode<double>>(inputNode->output, 8);
-        auto mean16 = model.AddNode<nodes::MeanNode<double>>(inputNode->output, 16);
-        auto var16 = model.AddNode<nodes::VarianceNode<double>>(inputNode->output, 16);
+        auto mean8 = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 8);
+        auto var8 = model.AddNode<nodes::MovingVarianceNode<double>>(inputNode->output, 8);
+        auto mean16 = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 16);
+        auto var16 = model.AddNode<nodes::MovingVarianceNode<double>>(inputNode->output, 16);
 
         // classifier
         auto inputs = model::Concat(model::MakeOutputPortElementList(mean8->output), model::MakeOutputPortElementList(var8->output), model::MakeOutputPortElementList(mean16->output), model::MakeOutputPortElementList(var16->output));

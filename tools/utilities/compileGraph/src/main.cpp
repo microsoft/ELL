@@ -39,8 +39,8 @@ int main(int argc, char* argv[])
 
         auto model = common::LoadModelGraph(filename);
         model::TransformContext context;
-        model::ModelTransformer transformer(context);
-        auto newModel = transformer.RefineModel(model);
+        model::ModelTransformer transformer;
+        auto newModel = transformer.RefineModel(model, context);
         // TODO: need to get the output port we care about somehow
 
         auto inputNodes = newModel.GetNodesByType<model::InputNode<double>>();

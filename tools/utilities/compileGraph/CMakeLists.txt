@@ -23,18 +23,11 @@ source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
-include_directories(include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/dataset/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/model/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/linear/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/utilities/include)
-include_directories(${CMAKE_SOURCE_DIR}/libraries/common/include)
-
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-
+target_include_directories(${PROJ_NAME} PRIVATE include)
 target_link_libraries(${PROJ_NAME} utilities model linear common)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")

@@ -15,16 +15,16 @@
 ///
 int main()
 {
-    TestMagnitudeNodeCompute();
+    TestL2NormNodeCompute();
     TestAccumulatorNodeCompute();
     TestDelayNodeCompute();
-    TestMeanNodeCompute();
-    TestVarianceNodeCompute(); 
+    TestMovingAverageNodeCompute();
+    TestMovingVarianceNodeCompute(); 
     TestUnaryOperationNodeCompute();
     TestBinaryOperationNodeCompute();
     TestLinearPredictorNodeCompute();
     
-    TestMeanNodeRefine();
+    TestMovingAverageNodeRefine();
 
     if (testing::DidTestFail())
     {

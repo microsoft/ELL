@@ -18,11 +18,11 @@ set (INCLUDE include/AccumulatorNode.h
              include/DelayNode.h
              include/DotProductNode.h
              include/LinearPredictorNode.h
-             include/MagnitudeNode.h
-             include/MeanNode.h
+             include/L2NormNode.h
+             include/MovingAverageNode.h
              include/SumNode.h
              include/UnaryOperationNode.h
-             include/VarianceNode.h)
+             include/MovingVarianceNode.h)
 
 set (SRC src/LinearPredictorNode.cpp)
 
@@ -31,11 +31,11 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/ConstantNode.tcc
          tcc/DelayNode.tcc
          tcc/DotProductNode.tcc
-         tcc/MagnitudeNode.tcc
-         tcc/MeanNode.tcc
+         tcc/L2NormNode.tcc
+         tcc/MovingAverageNode.tcc
          tcc/SumNode.tcc
          tcc/UnaryOperationNode.tcc
-         tcc/VarianceNode.tcc)
+         tcc/MovingVarianceNode.tcc)
 
 source_group("include" FILES ${INCLUDE})
 source_group("src" FILES ${SRC})

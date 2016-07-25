@@ -21,7 +21,7 @@
 
 namespace nodes
 {
-    /// <summary> A node that performs a binary arithmetic operation on its inputs </summary>
+    /// <summary> A node that performs a coordinatewise binary arithmetic operation on its inputs </summary>
     template <typename ValueType>
     class BinaryOperationNode : public model::Node
     {
@@ -30,8 +30,8 @@ namespace nodes
         {
             add,
             subtract,
-            multiply,
-            divide
+            coordinatewiseMultiply, // coordinatewise multiplication
+            divide // coordinatewise division
         };
 
         /// <summary> Constructor </summary>
@@ -52,6 +52,7 @@ namespace nodes
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<ValueType>& output = _output;
 
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
 		/// <summary>Return the operation performed by this node</summary>

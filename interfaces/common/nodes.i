@@ -14,11 +14,11 @@
 #include "DelayNode.h"
 #include "DotProductNode.h"
 #include "LinearPredictorNode.h"
-#include "MagnitudeNode.h"
-#include "MeanNode.h"
+#include "L2NormNode.h"
+#include "MovingAverageNode.h"
 #include "SumNode.h"
 #include "UnaryOperationNode.h"
-#include "VarianceNode.h"
+#include "MovingVarianceNode.h"
 %}
 
 %rename (ModelGraph) model::Model;
@@ -29,8 +29,8 @@
 %include "DelayNode.h"
 %include "DotProductNode.h"
 %include "LinearPredictorNode.h"
-%include "MagnitudeNode.h"
-%include "MeanNode.h"
+%include "L2NormNode.h"
+%include "MovingAverageNode.h"
 %include "SumNode.h"
 %include "UnaryOperationNode.h"
-%include "VarianceNode.h"
+%include "MovingVarianceNode.h"

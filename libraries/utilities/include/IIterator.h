@@ -43,7 +43,7 @@ namespace utilities
         /// <summary> Proceeds to the Next item. </summary>
         virtual void Next() = 0;
 
-        /// <summary> Returns a const reference to the current item`. </summary>
+        /// <summary> Returns a const reference to the current item. </summary>
         ///
         /// <returns> A const reference to the current item; </returns>
         virtual ValueType Get() const = 0;

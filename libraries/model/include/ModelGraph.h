@@ -28,10 +28,18 @@ namespace model
     class NodeIterator : public utilities::IIterator<const Node*>
     {
     public:
+        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
+        ///
+        /// <returns> true if valid, false if not. </returns>
         virtual bool IsValid() const override { return _currentNode != nullptr; }
+
+        /// <summary> Proceeds to the Next item. </summary>
         virtual void Next() override;
+
+        /// <summary> Returns a const reference to the current item. </summary>
+        ///
+        /// <returns> A const reference to the current item; </returns>
         virtual const Node* Get() const override { return _currentNode; }
-        NodeIterator() {}
 
     private:
         friend class Model;
@@ -41,7 +49,7 @@ namespace model
         std::unordered_set<const Node*> _visitedNodes;
         std::vector<const Node*> _stack;
 
-        const Node* _sentinelNode = nullptr;
+        bool _visitFullGraph = false;
         const Node* _currentNode = nullptr;
     };
 
@@ -62,7 +70,7 @@ namespace model
         /// <summary> Get number of nodes </summary>
         ///
         /// <returns> The number of nodes in the model </summary>
-        size_t Size() const { return _nodeMap.size(); }
+        size_t Size() const { return _idToNodeMap.size(); }
 
         /// <summary> Retrieves a set of nodes by type </summary>
         ///
@@ -75,7 +83,7 @@ namespace model
         ///
         /// <param name="outputPort"> The output port to get the computed value form </param>
         template <typename ValueType>
-        std::vector<ValueType> GetNodeOutput(const OutputPort<ValueType>& outputPort) const;
+        std::vector<ValueType> ComputeNodeOutput(const OutputPort<ValueType>& outputPort) const;
 
         /// <summary>
         /// Visits all the nodes in the graph in dependency order. No nodes will be visited until all
@@ -102,19 +110,37 @@ namespace model
         /// </summary>
         ///
         /// <param name="visitor"> The visitor functor to use </param>
-        /// <param name="outputNode"> The output node to use for deciding which nodes to visit </param>
+        /// <param name="outputNodes"> The output nodes to use for deciding which nodes to visit </param>
         template <typename Visitor>
         void Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodes) const;
 
-        NodeIterator GetNodeIterator() const;
-        NodeIterator GetNodeIterator(const Node* outputNode) const;
+        /// <summary>
+        /// Gets an iterator over all the nodes in the graph in dependency order. No nodes will be visited until all
+        /// its inputs have first been visited.
+        /// </summary>
+        NodeIterator GetNodeIterator() const { return GetNodeIterator(std::vector<const Node*>{}); }
+
+        /// <summary>
+        /// Gets an iterator over the nodes in the graph necessary to compute the output of a given node. Visits the nodes
+        /// in dependency order. No nodes will be visited until all its inputs have first been visited.
+        /// </summary>
+        ///
+        /// <param name="outputNode"> The output node to use for deciding which nodes to visit </param>
+        NodeIterator GetNodeIterator(const Node* outputNode) const { return GetNodeIterator(std::vector<const Node*>{ outputNode }); }
+
+        /// <summary>
+        /// Gets an iterator over the nodes in the graph necessary to compute the outputs of the given nodes. Visits the nodes
+        /// in dependency order. No nodes will be visited until all its inputs have first been visited.
+        /// </summary>
+        ///
+        /// <param name="outputNodes"> The output nodes to use for deciding which nodes to visit </param>
         NodeIterator GetNodeIterator(const std::vector<const Node*>& outputNodes) const;
 
     private:
         friend class NodeIterator;
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
         // to look nodes up by id.
-        std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _nodeMap;
+        std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _idToNodeMap;
     };
 }
 

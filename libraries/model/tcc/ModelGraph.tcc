@@ -43,7 +43,7 @@ namespace model
     {
         auto node = std::make_shared<NodeType>(args...);
         node->RegisterDependencies();
-        _nodeMap[node->GetId()] = node;
+        _idToNodeMap[node->GetId()] = node;
         return node.get();
     }
 
@@ -51,7 +51,7 @@ namespace model
     // Compute output value
     //
     template <typename ValueType>
-    std::vector<ValueType> Model::GetNodeOutput(const OutputPort<ValueType>& outputPort) const
+    std::vector<ValueType> Model::ComputeNodeOutput(const OutputPort<ValueType>& outputPort) const
     {
         auto compute = [](const Node& node) { node.Compute(); };
 

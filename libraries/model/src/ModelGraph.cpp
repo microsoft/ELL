@@ -18,8 +18,8 @@ namespace model
 {
     Node* Model::GetNode(Node::NodeId id)
     {
-        auto it = _nodeMap.find(id);
-        if (it == _nodeMap.end())
+        auto it = _idToNodeMap.find(id);
+        if (it == _idToNodeMap.end())
         {
             return nullptr; // weak_ptr equivalent of nullptr
         }
@@ -27,16 +27,6 @@ namespace model
         {
             return it->second.get();
         }
-    }
-
-    NodeIterator Model::GetNodeIterator() const
-    {
-        return NodeIterator(this, {});
-    };
-
-    NodeIterator Model::GetNodeIterator(const Node* outputNode) const
-    {
-        return NodeIterator(this, {outputNode});
     }
 
     NodeIterator Model::GetNodeIterator(const std::vector<const Node*>& outputNodes) const
@@ -51,7 +41,7 @@ namespace model
     NodeIterator::NodeIterator(const Model* model, const std::vector<const Node*>& outputNodes) : _model(model)
     {
         _currentNode = nullptr;
-        _sentinelNode = nullptr;
+        _visitFullGraph = false;
         if (_model->Size() == 0)
         {
             return;
@@ -62,11 +52,11 @@ namespace model
 
         if (_stack.size() == 0) // Visit full graph
         {
-            // helper function to find a terminal node
+            // helper function to find a terminal (output) node
             auto IsLeaf = [](const Node* node) { return node->GetDependentNodes().size() == 0; };
 
             // start with some arbitrary node
-            const Node* anOutputNode = _model->_nodeMap.begin()->second.get(); // !!! need private access
+            const Node* anOutputNode = _model->_idToNodeMap.begin()->second.get(); // !!! need private access
 
             // follow dependency chain until we get an output node
             while (!IsLeaf(anOutputNode))
@@ -74,7 +64,7 @@ namespace model
                 anOutputNode = anOutputNode->GetDependentNodes()[0];
             }
             _stack.push_back(anOutputNode);
-            _sentinelNode = anOutputNode;
+            _visitFullGraph = true;
         }
 
         Next();
@@ -99,7 +89,7 @@ namespace model
             const auto& nodeInputs = node->GetInputPorts();
             for (auto input : nodeInputs)
             {
-                for (const auto& inputNode : input->GetInputNodes())
+                for (const auto& inputNode : input->GetParentNodes())
                 {
                     canVisit = canVisit && _visitedNodes.find(inputNode) != _visitedNodes.end();
                 }
@@ -110,16 +100,11 @@ namespace model
                 _stack.pop_back();
                 _visitedNodes.insert(node);
 
-                // In "visit whole graph" mode, we want to defer visiting the chosen output node until the end
-                // In "visit active graph" mode, this test should never fail, and we'll always visit the node
-                if (node != _sentinelNode)
+                // In "visit whole graph" mode, we want to add dependent nodes, so we can get to parts of the graph
+                // that the original leaf node doesn't depend on
+                if (_visitFullGraph)
                 {
-                    _currentNode = node;
-                    break;
-                }
 
-                if (_sentinelNode != nullptr) // sentinelNode is non-null only if we're in visit-whole-graph mode
-                {
                     // now add all our children (Note: this part is the only difference between visit-all and visit-active-graph
                     const auto& dependentNodes = node->GetDependentNodes();
                     for (const auto& child : ModelImpl::Reverse(dependentNodes)) // Visiting the children in reverse order more closely retains the order the features were originally created
@@ -129,24 +114,21 @@ namespace model
                         _stack.push_back(child);
                     }
                 }
+
+                _currentNode = node;
+                break;
             }
             else // visit node's inputs
             {
                 const auto& nodeInputs = node->GetInputPorts();
                 for (auto input : ModelImpl::Reverse(nodeInputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
                 {
-                    for (const auto& inputNode : input->GetInputNodes())
+                    for (const auto& inputNode : input->GetParentNodes())
                     {
                         _stack.push_back(inputNode);
                     }
                 }
             }
-        }
-
-        if(_stack.size() == 0 && _currentNode == nullptr && _sentinelNode != nullptr)
-        {
-            _currentNode = _sentinelNode;
-            _sentinelNode = nullptr;
         }
     }
 }

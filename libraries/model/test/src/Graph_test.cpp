@@ -15,6 +15,7 @@
 
 // nodes
 #include "ConstantNode.h"
+#include "MovingAverageNode.h"
 
 // common
 #include "LoadModelGraph.h"
@@ -90,46 +91,63 @@ void TestStaticGraph()
     in->SetInput(inputValues);
 
     std::cout << "\nComputing output of Input node" << std::endl;
-    auto output1 = g.GetNodeOutput(in->output);
+    auto output1 = g.ComputeNodeOutput(in->output);
     for (auto x : output1)
         std::cout << x << "  ";
     std::cout << std::endl;
 
     std::cout << "\nComputing output of condition node" << std::endl;
-    auto conditionOutput = g.GetNodeOutput(condition->output);
+    auto conditionOutput = g.ComputeNodeOutput(condition->output);
     for (auto x : conditionOutput)
         std::cout << x << "  ";
     std::cout << std::endl;
 
     // std::cout << "\nComputing output of ArgMax node" << std::endl;
-    // auto maxOutput = g.GetNodeOutput(maxAndArgMax->val);
+    // auto maxOutput = g.ComputeNodeOutput(maxAndArgMax->val);
     // for(auto x: maxOutput) std::cout << x << "  ";
     // std::cout << std::endl;
 
     std::cout << "\nComputing output of valSelector node" << std::endl;
-    auto output3 = g.GetNodeOutput(valSelector->output);
+    auto output3 = g.ComputeNodeOutput(valSelector->output);
     for (auto x : output3)
         std::cout << x << "  ";
     std::cout << std::endl;
     testing::ProcessTest("Testing min value", testing::IsEqual(output3[0], 0.75));
 
     std::cout << "\nComputing output of indexSelector node" << std::endl;
-    auto output4 = g.GetNodeOutput(indexSelector->output);
+    auto output4 = g.ComputeNodeOutput(indexSelector->output);
     for (auto x : output4)
         std::cout << x << "  ";
     std::cout << std::endl;
     testing::ProcessTest("Testing min index", testing::IsEqual(output4[0], 2));
 }
 
+model::Model GetCompoundGraph()
+{
+    model::Model g;
+    auto in = g.AddNode<model::InputNode<double>>(3);
+    auto minAndArgMin = g.AddNode<model::ArgMinNode<double>>(in->output);
+    auto maxAndArgMax = g.AddNode<model::ArgMaxNode<double>>(in->output);
+    auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 8);
+    auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 8);
+    return g;
+}
+
 void TestNodeIterator()
 {
-    auto model = common::LoadModelGraph("");
+    auto model = GetCompoundGraph();
+    auto size1 = model.Size();
+    auto size2 = 0;
+    auto iter = model.GetNodeIterator();
+    while(iter.IsValid())
+    {
+        ++size2;
+        iter.Next();
+    }
+    testing::ProcessTest("Testing Size() and iterator count", testing::IsEqual(size1, size2));
+    testing::ProcessTest("Testing Size() and known node count", testing::IsEqual(size1, 5));
 
-    std::cout << "Printing via Visit:" << std::endl;
-    PrintGraph(model);
-
-    std::cout << "\n\nPrinting via iterator:" << std::endl;
-    PrintGraphIterator(model);
+    std::cout << std::endl << std::endl;
 }
 
 void TestExampleGraph()
@@ -159,12 +177,12 @@ void TestInputRouting1()
     // set some example input and read the output
     // std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
     // in->SetInput(inputValues);
-    // auto output = model.GetNodeOutput(minAndMax->output);
+    // auto output = model.ComputeNodeOutput(minAndMax->output);
 
     // testing::ProcessTest("Testing combine node", testing::IsEqual(output[0], 0.25));
     // testing::ProcessTest("Testing combine node", testing::IsEqual(output[1], 0.75));
 
-    // auto output2 = model.GetNodeOutput(minAndTail->output);
+    // auto output2 = model.ComputeNodeOutput(minAndTail->output);
     // std::cout << "size: " << output2.size() << std::endl;
     // for (auto val : output2) std::cout << val << "  ";
     // std::cout << std::endl;
@@ -191,11 +209,11 @@ void TestInputRouting2()
     std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
     in->SetInput(inputValues);
 
-    auto output1 = model.GetNodeOutput(minAndArgMin1->val);
-    auto output2 = model.GetNodeOutput(minAndArgMin2->val);
-    auto output3 = model.GetNodeOutput(minAndArgMin3->val);
-    auto output4 = model.GetNodeOutput(minAndArgMin4->val);
-    //    auto output5 = model.GetNodeOutput(minAndArgMin5->val);
+    auto output1 = model.ComputeNodeOutput(minAndArgMin1->val);
+    auto output2 = model.ComputeNodeOutput(minAndArgMin2->val);
+    auto output3 = model.ComputeNodeOutput(minAndArgMin3->val);
+    auto output4 = model.ComputeNodeOutput(minAndArgMin4->val);
+    //    auto output5 = model.ComputeNodeOutput(minAndArgMin5->val);
 
     std::cout << "output1: " << output1[0] << ", output2: " << output2[0] << ", output3: " << output3[0] << ", output4: " << output4[0] << std::endl; // ", output5: " << output5[0] << std::endl;
 
@@ -222,8 +240,8 @@ void TestCopyGraph()
 
     // Now make a copy
     model::TransformContext context;
-    model::ModelTransformer transformer(context);
-    auto newModel = transformer.CopyModel(model);
+    model::ModelTransformer transformer;
+    auto newModel = transformer.CopyModel(model, context);
 
     // Print them both:
     std::cout << "\n\nOld graph" << std::endl;
@@ -250,8 +268,8 @@ void TestRefineGraph()
 
     // Now transform it
     model::TransformContext context;
-    model::ModelTransformer transformer(context);
-    auto newModel = transformer.RefineModel(model);
+    model::ModelTransformer transformer;
+    auto newModel = transformer.RefineModel(model, context);
 
     // Print both graphs
     std::cout << "\n\nOld graph" << std::endl;
@@ -270,10 +288,10 @@ void TestRefineGraph()
     for (const auto& inputValue : inputValues)
     {
         inputNode->SetInput(inputValue);
-        auto output = model.GetNodeOutput(outputNode->output);
+        auto output = model.ComputeNodeOutput(outputNode->output);
 
         newInputNode->SetInput(inputValue);
-        auto newOutput = newModel.GetNodeOutput(*newOutputPort);
+        auto newOutput = newModel.ComputeNodeOutput(*newOutputPort);
 
         testing::ProcessTest("testing refined graph", testing::IsEqual(output[0], newOutput[0]));
         testing::ProcessTest("testing refined graph", testing::IsEqual(output[1], newOutput[1]));

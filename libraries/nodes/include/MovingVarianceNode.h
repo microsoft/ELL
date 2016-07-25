@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     VarianceNode.h (features)
+//  File:     MovingVarianceNode.h (features)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,18 +22,18 @@ namespace nodes
 {
     /// <summary> A feature that takes a vector input and returns its variance over some window of time </summary>
     template <typename ValueType>
-    class VarianceNode : public model::Node
+    class MovingVarianceNode : public model::Node
     {
     public:
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the variance of </param>
         /// <param name="windowSize"> The number of samples of history to use in computing the variance </param>
-        VarianceNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize);
+        MovingVarianceNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize);
         
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "VarianceNode"; }
+        static std::string GetTypeName() { return "MovingVarianceNode"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -43,7 +43,10 @@ namespace nodes
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<ValueType>& output = _output;
 
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
+
+        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(model::ModelTransformer& transformer) const override;
 
     protected:
@@ -64,4 +67,4 @@ namespace nodes
     };
 }
 
-#include "../tcc/VarianceNode.tcc"
+#include "../tcc/MovingVarianceNode.tcc"

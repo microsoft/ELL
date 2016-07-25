@@ -43,6 +43,7 @@ namespace nodes
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<double>& output = _output;
 
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
 		const predictors::LinearPredictor& GetPredictor() const { return _predictor;}
