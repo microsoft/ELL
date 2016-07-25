@@ -16,6 +16,10 @@
 #include "Node.h"
 #include "OutputPort.h"
 
+// utilities
+#include "Exception.h"
+
+// stl
 #include <memory>
 #include <vector>
 #include <unordered_map>
@@ -59,21 +63,29 @@ namespace model
         /// Functions used by node implementors
         ///
 
-        /// <summary> Returns an OutputPortElements for the new model corresponding the the set of inputs referenced by the given input port. Called by node implementors. </summary>
-        // template <typename ValueType>
-        // OutputPortElements<ValueType> TransformInputPort(const InputPort<ValueType>& input);
-
+        /// <summary> Transforms a set of output port references from the input model space to the output model space. Called by node implementors. </summary>
+        ///
+        /// <param name="elements"> The elements in the input model graph to transform to the output model space. </param>
+        /// <returns> An OutputPortElements object representing the transformed elements in the space of the new model. </returns>
         template <typename ValueType>
         OutputPortElements<ValueType> TransformOutputPortElements(const OutputPortElements<ValueType>& elements);
 
         /// <summary> Creates a new node in the transformed model graph. Called by node implementors. </summary>
+        ///
+        /// <typeparam name="Args"> The arguments to the constructor of NodeType. </typeparam>
         template <typename NodeType, typename... Args>
         NodeType* AddNode(Args&&... args);
 
         /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
+        ///
+        /// <param name="oldPort"> The port in the old model to map to the new model. </param>
+        /// <param name="newPort"> The port in the new model to be mapped from the old model. </param>
         template <typename ValueType>
         void MapOutputPort(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort);
 
+        /// <summary> Get the context used by the transformer. Called by node implementors </summary>
+        ///
+        /// <returns> The context in use by the transformer. </returns>
         TransformContext& GetContext() { return _context; }
 
     private:
