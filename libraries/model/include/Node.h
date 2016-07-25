@@ -12,7 +12,7 @@
 #include "UniqueId.h"
 
 // utilities
-#include "ISerializable.h"
+//#include "ISerializable.h"
 
 // stl
 #include <string>
@@ -27,7 +27,7 @@ namespace model
     class ModelTransformer;
 
     /// <summary> Superclass for all node types. </summary>
-    class Node : public utilities::ISerializable
+    class Node // : public utilities::ISerializable
     {
     public:
         Node() = default;
@@ -75,7 +75,7 @@ namespace model
         virtual void Refine(ModelTransformer& transformer) const;
 
         /// Inherited from ISerializable
-        virtual utilities::ObjectDescription GetDescription() const override;
+//        virtual utilities::ObjectDescription GetDescription() const override;
 
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);

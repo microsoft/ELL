@@ -32,13 +32,13 @@ namespace model
         return Port::PortType::Boolean;
     }
 
-    /// Inherited from ISerializable
-    utilities::ObjectDescription Port::GetDescription() const
-    {
-        auto result = utilities::ObjectDescription::FromType(*this);
-        result.AddField("dummy", 0);
-        // ???
-        return result;
-    }
+    // /// Inherited from ISerializable
+    // utilities::ObjectDescription Port::GetDescription() const
+    // {
+    //     auto result = utilities::ObjectDescription::FromType(*this);
+    //     result.AddField("dummy", 0);
+    //     // ???
+    //     return result;
+    // }
 
 }

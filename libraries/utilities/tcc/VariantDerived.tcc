@@ -50,7 +50,7 @@ namespace utilities
     std::unique_ptr<ObjectDescription> VariantDerived<ValueType>::GetObjectDescription() const
     {
         std::cout << "type " << TypeName<ValueType>::GetName() << std::endl;
-        auto description = GetDescription(_value);
+//        auto description = GetDescription(_value);
         return nullptr;
     }
 

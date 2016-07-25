@@ -26,7 +26,6 @@ set (SRC src/CompressedIntegerList.cpp
          src/TypeName.cpp
          src/UniqueId.cpp
          src/Variant.cpp
-         src/VariantBase.cpp
          src/XMLSerialization.cpp)
 
 set (INCLUDE include/CompressedIntegerList.h

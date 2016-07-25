@@ -26,12 +26,12 @@ namespace model
         transformer.MapOutputPort(output, newNode->output);
     }
 
-    /// Inherited from ISerializable
-    template <typename ValueType>
-    utilities::ObjectDescription OutputNode<ValueType>::GetDescription() const
-    {
-        auto result = Node::GetDescription();
-//        result.AddField("input", utilities::MakeVariant<InputPort<ValueType>>(_input));
-        return result;
-    }
+//     /// Inherited from ISerializable
+//     template <typename ValueType>
+//     utilities::ObjectDescription OutputNode<ValueType>::GetDescription() const
+//     {
+//         auto result = Node::GetDescription();
+// //        result.AddField("input", utilities::MakeVariant<InputPort<ValueType>>(_input));
+//         return result;
+//     }
 }

@@ -141,4 +141,5 @@ namespace utilities
     };
 }
 
+#include "Variant.h"
 #include "../tcc/ISerializable.tcc"
