@@ -57,6 +57,7 @@ export class Port {
   GetNode(): Node;
   Size(): number;
   GetType(): PortType;
+  GetName(): String;
 }
 
 export class InputPortBase extends Port {
