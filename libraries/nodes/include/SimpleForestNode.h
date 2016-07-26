@@ -33,7 +33,7 @@ namespace nodes
         ///
         /// <param name="input"> The predictor's input. </param>
         /// <param name="forest"> The simple forest predictor. </param>
-        SimpleForestNode(const model::OutputPortElementList<double>& input, const predictors::SimpleForestPredictor& forest);
+        SimpleForestNode(const model::OutputPortElements<double>& input, const predictors::SimpleForestPredictor& forest);
 
         /// <summary> Gets the name of this type. </summary>
         ///
@@ -63,11 +63,17 @@ namespace nodes
     private:
         // input ports
         model::InputPort<double> _input;
-        
+        static constexpr char* inputPortName = "input";
+
         // output ports
         model::OutputPort<double> _output;
+        static constexpr char* outputPortName = "output";
+
         model::OutputPort<double> _treeOutputs;
+        static constexpr char* treeOutputsPortName = "treeOutputs";
+
         model::OutputPort<bool> _edgeIndicatorVector;
+        static constexpr char* edgeIndicatorVectorPortName = "edgeIndicatorVector";
 
         // the tree
         predictors::SimpleForestPredictor _forest;

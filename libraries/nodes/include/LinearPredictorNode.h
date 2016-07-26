@@ -46,9 +46,6 @@ namespace nodes
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-        static constexpr char* inputPortName = "input";
-        static constexpr char* outputPortName = "output";
-
     protected:
         virtual void Compute() const override;
 
@@ -56,9 +53,11 @@ namespace nodes
 
         // Inputs
         model::InputPort<double> _input;
+        static constexpr char* inputPortName = "input";
 
         // Output
         model::OutputPort<double> _output;
+        static constexpr char* outputPortName = "output";
 
         // Parameters
         predictors::LinearPredictor _predictor;
