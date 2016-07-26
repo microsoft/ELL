@@ -7,6 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "LinearPredictorNode.h"
+#include "ConstantNode.h"
+#include "DotProductNode.h"
+#include "BinaryOperationNode.h"
 
 // utilities
 #include "Exception.h"
@@ -26,7 +29,7 @@ namespace nodes
     void LinearPredictorNode::Compute() const
     {
         auto result = _predictor.GetBias();
-        const auto weights = _predictor.GetVector();
+        const auto weights = _predictor.GetWeights();
         for (size_t index = 0; index < _input.Size(); index++)
         {
             result += _input[index] * weights[index];
@@ -36,8 +39,24 @@ namespace nodes
 
     void LinearPredictorNode::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<LinearPredictorNode>(newInput, _predictor);
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newNode = transformer.AddNode<LinearPredictorNode>(newOutputPortElements, _predictor);
         transformer.MapOutputPort(output, newNode->output);
+    }
+
+    void LinearPredictorNode::Refine(model::ModelTransformer& transformer) const
+    {
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newOutputs = BuildSubModel(_predictor, transformer.GetModel(), newOutputPortElements);
+        transformer.MapOutputPort(output, newOutputs.output);
+    }
+
+    LinearPredictorNodeOutputs BuildSubModel(const predictors::LinearPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
+    {
+        auto weightsNode = model.AddNode<ConstantNode<double>>(predictor.GetWeights());
+        auto dotProductNode = model.AddNode<DotProductNode<double>>(weightsNode->output, outputPortElements);
+        auto biasNode = model.AddNode<ConstantNode<double>>(predictor.GetBias());
+        auto addNode = model.AddNode<BinaryOperationNode<double>>(dotProductNode->output, biasNode->output, BinaryOperationNode<double>::OperationType::add);
+        return { addNode->output };
     }
 }

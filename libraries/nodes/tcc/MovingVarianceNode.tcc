@@ -43,8 +43,8 @@ namespace nodes
     template <typename ValueType>
     void MovingVarianceNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<MovingVarianceNode<ValueType>>(newInput, _windowSize);
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newNode = transformer.AddNode<MovingVarianceNode<ValueType>>(newOutputPortElements, _windowSize);
         transformer.MapOutputPort(output, newNode->output);
     }
 }

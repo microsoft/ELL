@@ -28,8 +28,8 @@ namespace nodes
     template <typename ValueType>
     void AccumulatorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newInput);
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newOutputPortElements);
         transformer.MapOutputPort(output, newNode->output);
     }
 }

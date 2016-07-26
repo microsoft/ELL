@@ -36,8 +36,8 @@ namespace trainers
     void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         // get references to the vector and biases
-        auto& vLast = _lastPredictor.GetVector();
-        auto& vAvg = _averagedPredictor->GetVector();
+        auto& vLast = _lastPredictor.GetWeights();
+        auto& vAvg = _averagedPredictor->GetWeights();
 
         double& bLast = _lastPredictor.GetBias();
         double& bAvg = _averagedPredictor->GetBias();
@@ -95,8 +95,8 @@ namespace trainers
     void SGDIncrementalTrainer<LossFunctionType>::UpdateDense(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         // get references to the vector and biases
-        auto& vLast = _lastPredictor.GetVector();
-        auto& vAvg = _averagedPredictor->GetVector();
+        auto& vLast = _lastPredictor.GetWeights();
+        auto& vAvg = _averagedPredictor->GetWeights();
 
         double& bLast = _lastPredictor.GetBias();
         double& bAvg = _averagedPredictor->GetBias();
