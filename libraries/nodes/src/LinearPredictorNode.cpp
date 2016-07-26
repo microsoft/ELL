@@ -18,7 +18,7 @@
 
 namespace nodes
 {
-    LinearPredictorNode::LinearPredictorNode(const model::OutputPortElementList<double>& input, const predictors::LinearPredictor& predictor) : Node({ &_input }, { &_output }), _input(this, input), _output(this, 1), _predictor(predictor)
+    LinearPredictorNode::LinearPredictorNode(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _predictor(predictor)
     {
         assert(input.Size() == predictor.GetDimension());
     }
@@ -36,7 +36,7 @@ namespace nodes
 
     void LinearPredictorNode::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
+        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<LinearPredictorNode>(newInput, _predictor);
         transformer.MapOutputPort(output, newNode->output);
     }

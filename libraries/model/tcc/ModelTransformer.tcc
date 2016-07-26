@@ -10,13 +10,17 @@
 namespace model
 {
     template <typename ValueType>
-    OutputPortElementList<ValueType> ModelTransformer::TransformInputPort(const InputPort<ValueType>& input)
+    OutputPortElements<ValueType> ModelTransformer::TransformOutputPortElements(const OutputPortElements<ValueType>& elements)
     {
-        const auto& ranges = input.GetInputRanges();
-        std::vector<OutputPortElementList<ValueType>> newRanges;
-        for (const auto& range : ranges)
+        std::vector<OutputPortElements<ValueType>> newRanges;
+        for (const auto& range : elements)
         {
             auto oldPort = range.ReferencedPort();
+            assert(_portToPortMap.find(oldPort) != _portToPortMap.end());
+            if(_portToPortMap.find(oldPort) == _portToPortMap.end())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+            }
             auto newPort = _portToPortMap[oldPort];
             auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPort);
             assert(outputPort != nullptr);
@@ -25,7 +29,7 @@ namespace model
             auto size = range.Size();
             newRanges.emplace_back(*outputPort, start, size);
         }
-        return OutputPortElementList<ValueType>(newRanges);
+        return OutputPortElements<ValueType>(newRanges);
     }
 
     template <typename ValueType>
