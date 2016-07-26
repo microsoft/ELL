@@ -47,17 +47,16 @@ namespace nodes
     void LinearPredictorNode::Refine(model::ModelTransformer& transformer) const
     {
         auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newOutputs = BuildSubModel(transformer.GetModel(), newOutputPortElements, _predictor);
+        auto newOutputs = BuildSubModel(_predictor, transformer.GetModel(), newOutputPortElements);
         transformer.MapOutputPort(output, newOutputs.output);
     }
 
-    // TODO: the return type of this function should be a struct of named OutputPortElements 
-    LinearPredictorNodeOutputs BuildSubModel(model::Model& model, const model::OutputPortElements<double>& outputPortElements, const predictors::LinearPredictor& predictor)
+    LinearPredictorNodeOutputs BuildSubModel(const predictors::LinearPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
     {
         auto weightsNode = model.AddNode<ConstantNode<double>>(predictor.GetWeights());
         auto dotProductNode = model.AddNode<DotProductNode<double>>(weightsNode->output, outputPortElements);
         auto biasNode = model.AddNode<ConstantNode<double>>(predictor.GetBias());
         auto addNode = model.AddNode<BinaryOperationNode<double>>(dotProductNode->output, biasNode->output, BinaryOperationNode<double>::OperationType::add);
-        return {addNode->output};
+        return { addNode->output };
     }
 }

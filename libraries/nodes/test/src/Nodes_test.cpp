@@ -251,7 +251,7 @@ void TestLinearPredictorNodeCompute()
 {
     const int dim = 10;
     predictors::LinearPredictor predictor(dim);
-    // TODO: set it's vector and bias
+    // TODO: set its vector and bias
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(dim);

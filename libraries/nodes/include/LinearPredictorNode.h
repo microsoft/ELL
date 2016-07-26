@@ -56,7 +56,6 @@ namespace nodes
         virtual void Compute() const override;
 
     private:
-
         // Inputs
         model::InputPort<double> _input;
 
@@ -70,7 +69,7 @@ namespace nodes
     /// <summary> A struct that represents the outputs of a linear predictor node. </summary>
     struct LinearPredictorNodeOutputs
     {
-        const model::OutputPort<double>& output; // TODO, this should really be an OutputPortElements.
+        const model::OutputPort<double>& output;
     };
 
     /// <summary> Builds a part of the model that represents a linear predictor. </summary>
@@ -80,5 +79,5 @@ namespace nodes
     /// <param name="predictor"> The linear predictor. </param>
     ///
     /// <returns> The LinearPredictorNodeOutputs. </returns>
-    LinearPredictorNodeOutputs BuildSubModel(model::Model& model, const model::OutputPortElements<double>& outputPortElements, const predictors::LinearPredictor& predictor);
+    LinearPredictorNodeOutputs BuildSubModel(const predictors::LinearPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
 }
