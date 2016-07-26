@@ -35,7 +35,6 @@ namespace model
     template <typename ValueType>
     utilities::ObjectDescription InputNode<ValueType>::GetDescription() const
     {
-        std::cout << "Serializing InputNode" << std::endl;
         auto result = Node::GetDescription();
         result.AddField("size", _output.Size());
         return result;

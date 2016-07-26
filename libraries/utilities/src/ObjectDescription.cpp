@@ -18,6 +18,13 @@ namespace utilities
     //
     // ObjectDescription
     //
+    const Variant& ObjectDescription::GetFundamentalType() const
+    {
+        auto it = _description.find("value");
+        return it->second;
+    }
+
+
     void ObjectDescription::Print(std::ostream& os, size_t indent)
     {
         const std::string indentStr = std::string(indent, ' ');

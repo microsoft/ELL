@@ -29,6 +29,8 @@
 #include "SGDIncrementalTrainer.h"
 %}
 
+%nodefaultctor utilities::ObjectDescription;
+
 template <typename IteratorType, typename ValueType> class StlIterator {};
 
 %include "AnyIterator.h"

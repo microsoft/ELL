@@ -16,6 +16,7 @@ namespace utilities
     {
 //        std::cout << "GetDescription(T&&)" << std::endl;
         ObjectDescription description = ObjectDescription::FromType(obj);
+        // throw exception?
         return description;
     }
 
@@ -24,6 +25,7 @@ namespace utilities
     {
 //        std::cout << "GetDescription(fundamental)" << std::endl;
         ObjectDescription description = ObjectDescription::FromType(obj);
+        description.AddField("value", obj);
         return description;
     }
 
@@ -44,16 +46,29 @@ namespace utilities
     //
     // Serialize
     //
+
+    // TODO: just overload Serialize() on fundamental types instead of creating descriptions for them, etc.
     template <typename T>
     void Serializer::Serialize(T&& obj)
     {
-//        std::cout << "Serialize(T&&) -- " << typeid(T).name() << std::endl;
         auto desc = GetDescription(obj);
-
-        SerializeType(desc.GetTypeName());
-        for (const auto& item : desc)
+        if(desc.IsFundamentalType())
         {
-            SerializeField(item.first, item.second);
+            SerializeFundamentalType(desc.GetFundamentalType());
+        }
+        else
+        {
+            BeginSerializeType(desc);
+            int index = desc.GetNumFields();
+            
+            for (const auto& item : desc)
+            {
+                --index;
+                SerializeField(item.first, item.second);
+                if(index > 0) std::cout << ",";
+                std::cout << std::endl;
+            }
+            EndSerializeType(desc);
         }
     }
 }

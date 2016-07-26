@@ -155,15 +155,19 @@ namespace utilities
         */
 
     protected:
-        virtual void SerializeType(std::string typeName) = 0;
+        virtual void SerializeFundamentalType(const Variant& variant) = 0;
+        virtual void BeginSerializeType(const ObjectDescription& desc) = 0;
         virtual void SerializeField(std::string name, const Variant& variant) = 0;
+        virtual void EndSerializeType(const ObjectDescription& desc) = 0;
     };
 
     class SimpleSerializer : public Serializer
     {
     protected:
-        virtual void SerializeType(std::string typeName) override;
+        virtual void SerializeFundamentalType(const Variant& variant) override;
+        virtual void BeginSerializeType(const ObjectDescription& desc) override;
         virtual void SerializeField(std::string name, const Variant& variant) override;
+        virtual void EndSerializeType(const ObjectDescription& desc) override;
 
     private:
         int _indent = 0;

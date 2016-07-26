@@ -17,10 +17,25 @@ namespace utilities
     //
     // SimpleSerializer
     //
-    void SimpleSerializer::SerializeType(std::string typeName)
+    void SimpleSerializer::BeginSerializeType(const ObjectDescription& desc)
+    {
+        auto typeName = desc.GetTypeName();
+        std::cout << "{" << std::endl;
+        std::cout << std::string(2*_indent, ' ');
+        std::cout << "'type': " << typeName;
+        if(desc.GetNumFields() > 0) std::cout << ",";
+        std::cout << std::endl;
+    }
+
+    void SimpleSerializer::EndSerializeType(const ObjectDescription& desc)
     {
         std::cout << std::string(2*_indent, ' ');
-        std::cout << "type: " << typeName << std::endl;
+        std::cout << "}";
+    }
+
+    void SimpleSerializer::SerializeFundamentalType(const Variant& variant)
+    {
+        std::cout << to_string(variant);
     }
 
     void SimpleSerializer::SerializeField(std::string name, const Variant& variant)
@@ -28,12 +43,12 @@ namespace utilities
         ++_indent;
         std::cout << std::string(2*_indent, ' ');
         if(variant.IsPrimitiveType())
-        {            
-            std::cout << name << ":\t" << to_string(variant) << std::endl;
+        {
+            std::cout << "'" << name << "'" << ": " << to_string(variant);
         }
         else if(variant.IsSerializable())
         {
-            std::cout << name << ":" << std::endl;
+            std::cout << "'" << name << "'" << ": ";
             ++_indent;
             Serialize(variant);
             --_indent;
