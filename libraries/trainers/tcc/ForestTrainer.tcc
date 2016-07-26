@@ -186,8 +186,6 @@ namespace trainers
         // splitting loop (inner loop)
         while (!_queue.empty())
         {
-
-
             VERBOSE_MODE(std::cout << "\nSplit iteration\n");
             VERBOSE_MODE(_queue.PrintLine(std::cout, 1));
 

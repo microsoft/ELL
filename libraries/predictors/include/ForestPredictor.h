@@ -67,9 +67,9 @@ namespace predictors
             /// <summary> Constructs an instance of SplitAction. </summary>
             ///
             /// <param name="nodeId"> Identifier for the node to split. </param>
-            /// <param name="splitRule"> The split rule. </param>
+            /// <param name="_splitRule"> The split rule. </param>
             /// <param name="predictors"> The edge predictors to use. </param>
-            SplitAction(SplittableNodeId nodeId, SplitRuleType splitRule, std::vector<EdgePredictorType> edgePredictors);
+            SplitAction(SplittableNodeId nodeId, SplitRuleType _splitRule, std::vector<EdgePredictorType> edgePredictors);
 
             /// <summary> Gets the split rule. </summary>
             ///
@@ -89,6 +89,70 @@ namespace predictors
             std::vector<EdgePredictorType> _edgePredictors;
         };
 
+        class Edge
+        {
+        public:
+            /// <summary> Constructs an instance of Edge. </summary>
+            ///
+            /// <param name="predictor"> The predictor. </param>
+            Edge(const EdgePredictorType& predictor);
+
+            /// <summary> Gets the target node index. </summary>
+            ///
+            /// <returns> The target node index. </returns>
+            size_t GetTargetNodeIndex() const { return _targetNodeIndex; }
+
+            /// <summary> Determines if the target of this edge is an interior node. </summary>
+            ///
+            /// <returns> true if the target is an interior node. </returns>
+            bool IsTargetInterior() const;
+
+            /// <summary> Prints a human readable description of the edge, indented by a given number of tabs - used for debugging. </summary>
+            ///
+            /// <param name="os"> [in,out] Stream to write data to. </param>
+            /// <param name="tabs"> The tabs. </param>
+            void PrintLine(std::ostream& os, size_t tabs=0) const;
+
+        private:
+            friend ForestPredictor<SplitRuleType, EdgePredictorType>;
+            void SetTargetNodeIndex(size_t targetNodeIndex);
+            EdgePredictorType _predictor;
+            size_t _targetNodeIndex;
+        };
+
+        /// <summary> Represents an interior node of one of the trees in the forest. </summary>
+        class InteriorNode
+        {
+        public:
+            /// <summary> Gets the split rule. </summary>
+            ///
+            /// <returns> The split rule. </returns>
+            const SplitRuleType& GetSplitRule() const { return _splitRule; }
+
+            /// <summary> Gets the vector of outgoing edges. </summary>
+            ///
+            /// <returns> The outgoing edges. </returns>
+            const std::vector<Edge>& GetOutgoingEdges() { return _outgoingEdges; }
+
+            /// <summary> Gets the index of the first outgoung edge. </summary>
+            ///
+            /// <returns> The first edge index. </returns>
+            size_t GetFirstEdgeIndex() { return _firstEdgeIndex; }
+
+            /// <summary> Prints a human readable description of the interior node, indented by a given number of tabs - used for debugging. </summary>
+            ///
+            /// <param name="os"> [in,out] The output stream. </param>
+            /// <param name="tabs"> The number of tabs. </param>
+            void PrintLine(std::ostream& os, size_t tabs=0) const;
+
+        private:
+            friend ForestPredictor<SplitRuleType, EdgePredictorType>;
+            InteriorNode(const SplitAction& splitAction, size_t _firstEdgeIndex);
+            SplitRuleType _splitRule;
+            std::vector<Edge> _outgoingEdges;
+            size_t _firstEdgeIndex;
+        };
+
         /// <summary> Query if this forest has no trees and a zero bias. </summary>
         ///
         /// <returns> true if the forest is trivial. </returns>
@@ -97,14 +161,14 @@ namespace predictors
         /// <summary> Gets the number of trees in the forest. </summary>
         ///
         /// <returns> The number of tress. </returns>
-        size_t NumTrees() const { return _trees.size(); }
+        size_t NumTrees() const { return _treeRootIndices.size(); }
 
         /// <summary> Gets the index of the root node of a given tree. </summary>
         ///
         /// <param name="treeIndex"> The tree index. </param>
         ///
         /// <returns> The root index. </returns>
-        size_t GetRootIndex(size_t treeIndex) const { return _trees[treeIndex].rootIndex; }
+        size_t GetRootIndex(size_t treeIndex) const { return _treeRootIndices[treeIndex]; }
 
         /// <summary> Gets the total number of interior nodes in the entire forest. </summary>
         ///
@@ -214,37 +278,6 @@ namespace predictors
     protected:
 
         //
-        // internal structs
-        //
-        
-        struct Edge
-        {
-            Edge(const EdgePredictorType& predictor);
-            void PrintLine(std::ostream& os, size_t tabs=0) const;
-            bool IsTargetInterior() const;
-
-            EdgePredictorType predictor;
-            size_t targetNodeIndex;
-        };
-
-        struct InteriorNode
-        {
-            InteriorNode(const SplitAction& splitAction, size_t firstEdgeIndex);
-            void PrintLine(std::ostream& os, size_t tabs=0) const;
-
-            SplitRuleType splitRule;
-            std::vector<Edge> outgoingEdges;
-            size_t firstEdgeIndex;
-        };
-
-        struct Tree
-        {
-            void PrintLine(std::ostream& os, size_t tabs) const;
-
-            size_t rootIndex;
-        };
-
-        //
         // protected member functions
         // 
         template<typename RandomAccessVectorType>
@@ -259,7 +292,7 @@ namespace predictors
         //  member variables
         //
         std::vector<InteriorNode> _interiorNodes;
-        std::vector<Tree> _trees;
+        std::vector<size_t> _treeRootIndices;
         double _bias = 0.0;
         size_t _numEdges = 0; 
     };

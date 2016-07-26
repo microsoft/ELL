@@ -18,13 +18,23 @@ namespace predictors
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictor<SplitRuleType, EdgePredictorType>::SplitAction::SplitAction(SplittableNodeId nodeId, SplitRuleType splitRule, std::vector<EdgePredictorType> edgePredictors) : _nodeId(std::move(nodeId)), _splitRule(std::move(splitRule)), _edgePredictors(std::move(edgePredictors))
+    ForestPredictor<SplitRuleType, EdgePredictorType>::SplitAction::SplitAction(SplittableNodeId nodeId, SplitRuleType _splitRule, std::vector<EdgePredictorType> edgePredictors) : _nodeId(std::move(nodeId)), _splitRule(std::move(_splitRule)), _edgePredictors(std::move(edgePredictors))
     {}
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::Edge(const EdgePredictorType& predictor) : _predictor(predictor), _targetNodeIndex(0)
+    {}
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::SetTargetNodeIndex(size_t targetNodeIndex)
+    {
+        _targetNodeIndex = targetNodeIndex;
+    }
 
     template<typename SplitRuleType, typename EdgePredictorType>
     bool ForestPredictor<SplitRuleType, EdgePredictorType>::IsTrivial() const
     {
-        if(_trees.size() == 0 && _bias == 0.0)
+        if(_treeRootIndices.size() == 0 && _bias == 0.0)
         {
             return true;
         }
@@ -33,7 +43,7 @@ namespace predictors
             return false;
         }
     }
-
+    
     template<typename SplitRuleType, typename EdgePredictorType>
     size_t ForestPredictor<SplitRuleType, EdgePredictorType>::NumInteriorNodes(size_t interiorNodeIndex) const
     {
@@ -45,11 +55,11 @@ namespace predictors
         auto const& interiorNode = _interiorNodes[interiorNodeIndex];
         size_t numInteriorNodes = 1;
 
-        for(const auto& edge : interiorNode.outgoingEdges)
+        for(const auto& edge : interiorNode._outgoingEdges)
         {
-            if(edge.targetNodeIndex > 0)
+            if(edge.IsTargetInterior())
             {
-                numInteriorNodes += NumInteriorNodes(edge.targetNodeIndex);
+                numInteriorNodes += NumInteriorNodes(edge.GetTargetNodeIndex());
             }
         }
 
@@ -65,13 +75,13 @@ namespace predictors
         }
 
         auto const& interiorNode = _interiorNodes[interiorNodeIndex];
-        size_t numEdges = interiorNode.outgoingEdges.size();
+        size_t numEdges = interiorNode._outgoingEdges.size();
 
-        for(const auto& edge : interiorNode.outgoingEdges)
+        for(const auto& edge : interiorNode._outgoingEdges)
         {
-            if(edge.targetNodeIndex > 0)
+            if(edge.IsTargetInterior())
             {
-                numEdges += NumEdges(edge.targetNodeIndex);
+                numEdges += NumEdges(edge.GetTargetNodeIndex());
             }
         }
 
@@ -83,9 +93,9 @@ namespace predictors
     double ForestPredictor<SplitRuleType, EdgePredictorType>::Compute(const RandomAccessVectorType& input) const
     {
         double output = _bias;
-        for (const auto& tree : _trees)
+        for (auto treeRootIndex : _treeRootIndices)
         {
-            output += Compute(input, tree.rootIndex);
+            output += Compute(input, treeRootIndex);
         }
         return output;
     }
@@ -102,7 +112,7 @@ namespace predictors
         size_t nodeIndex = interiorNodeIndex;
         double output = 0.0;
 
-        VisitEdgePathToLeaf(input, interiorNodeIndex, [&](const InteriorNode& interiorNode, size_t edgePosition) { output += interiorNode.outgoingEdges[edgePosition].predictor.Compute(input); }); 
+        VisitEdgePathToLeaf(input, interiorNodeIndex, [&](const InteriorNode& interiorNode, size_t edgePosition) { output += interiorNode._outgoingEdges[edgePosition]._predictor.Compute(input); }); 
 
         return output;
     }
@@ -112,9 +122,9 @@ namespace predictors
     std::vector<bool> ForestPredictor<SplitRuleType, EdgePredictorType>::GetEdgeIndicatorVector(const RandomAccessVectorType& input) const
     {
         std::vector<bool> edgeIndicator(_numEdges);
-        for (const auto& tree : _trees)
+        for (auto treeRootIndex : _treeRootIndices)
         {
-            SetEdgeIndicatorVector(input, edgeIndicator, tree.rootIndex);
+            SetEdgeIndicatorVector(input, edgeIndicator, treeRootIndex);
         }
         return edgeIndicator;
     }
@@ -135,7 +145,7 @@ namespace predictors
         {
             return 0;
         }
-        return _interiorNodes[interiorNodeIndex].outgoingEdges.size();
+        return _interiorNodes[interiorNodeIndex]._outgoingEdges.size();
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
@@ -148,7 +158,7 @@ namespace predictors
         }
 
         // check that the splittable node exists
-        if(childPosition >= _interiorNodes[parentNodeIndex].outgoingEdges.size())
+        if(childPosition >= _interiorNodes[parentNodeIndex]._outgoingEdges.size())
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid identifier requested - child does not exist");
         }
@@ -165,7 +175,7 @@ namespace predictors
             size_t interiorNodeIndex = AddInteriorNode(splitAction);
 
             // add new tree
-            _trees.push_back({ interiorNodeIndex });
+            _treeRootIndices.push_back(interiorNodeIndex);
 
             // return ID of new root
             return interiorNodeIndex;
@@ -173,7 +183,7 @@ namespace predictors
         else
         {
             // check that this node wasn't previously split
-            auto& incomingEdge = _interiorNodes[splitAction._nodeId._parentNodeIndex].outgoingEdges[splitAction._nodeId._childPosition];
+            auto& incomingEdge = _interiorNodes[splitAction._nodeId._parentNodeIndex]._outgoingEdges[splitAction._nodeId._childPosition];
             if (incomingEdge.IsTargetInterior())
             {
                 throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - node previously split");
@@ -183,7 +193,7 @@ namespace predictors
             size_t interiorNodeIndex = AddInteriorNode(splitAction);
 
             // update the parent about the new interior node
-            incomingEdge.targetNodeIndex = interiorNodeIndex;
+            incomingEdge.SetTargetNodeIndex(interiorNodeIndex);
 
             // return ID of new interior node
             return interiorNodeIndex;
@@ -204,7 +214,7 @@ namespace predictors
         {
             return;
         }
-        VisitEdgePathToLeaf(input, interiorNodeIndex, [&output](const InteriorNode& interiorNode, size_t edgePosition) { output[interiorNode.firstEdgeIndex + edgePosition] = true; }); 
+        VisitEdgePathToLeaf(input, interiorNodeIndex, [&output](const InteriorNode& interiorNode, size_t edgePosition) { output[interiorNode._firstEdgeIndex + edgePosition] = true; }); 
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
@@ -222,7 +232,8 @@ namespace predictors
         size_t interiorNodeIndex = _interiorNodes.size();
 
         // create the new interior node
-        _interiorNodes.emplace_back(splitAction, _numEdges);
+        InteriorNode interiorNode(splitAction, _numEdges);
+        _interiorNodes.push_back(std::move(interiorNode));
 
         // increment global edge count
         _numEdges += numEdges;
@@ -241,7 +252,7 @@ namespace predictors
             const auto& interiorNode = _interiorNodes[nodeIndex];
 
             // which way do we go?
-            int edgePosition = interiorNode.splitRule.Compute(input);
+            int edgePosition = interiorNode._splitRule.Compute(input);
 
             // check for early eject
             if (edgePosition < 0)
@@ -253,20 +264,16 @@ namespace predictors
             operation(interiorNode, edgePosition);
             
             //follow the edge to the next node
-            auto edge = interiorNode.outgoingEdges[edgePosition];
-            nodeIndex = edge.targetNodeIndex;
+            auto edge = interiorNode._outgoingEdges[edgePosition];
+            nodeIndex = edge.GetTargetNodeIndex();
         }
         while (nodeIndex != 0);
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::Edge(const EdgePredictorType& predictor) : predictor(predictor), targetNodeIndex(0) 
-    {}
-
-    template<typename SplitRuleType, typename EdgePredictorType>
-    ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::InteriorNode(const SplitAction& splitAction, size_t firstEdgeIndex) : splitRule(splitAction._splitRule), firstEdgeIndex(firstEdgeIndex)
+    ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::InteriorNode(const SplitAction& splitAction, size_t _firstEdgeIndex) : _splitRule(splitAction._splitRule), _firstEdgeIndex(_firstEdgeIndex)
     {
-        std::copy(splitAction._edgePredictors.begin(), splitAction._edgePredictors.end(), std::back_inserter(outgoingEdges));
+        std::copy(splitAction._edgePredictors.begin(), splitAction._edgePredictors.end(), std::back_inserter(_outgoingEdges));
     }
 
     //
@@ -315,9 +322,9 @@ namespace predictors
         {
             interiorNode.PrintLine(os, tabs + 1);
         }
-        for (const auto& tree : _trees)
+        for (auto treeRootIndex : _treeRootIndices)
         {
-            tree.PrintLine(os, tabs + 1);
+            os << std::string(tabs * 4, ' ') << "Tree: root index = " << treeRootIndex << "\n";
         }
     }
 
@@ -325,8 +332,8 @@ namespace predictors
     void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::PrintLine(std::ostream & os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "InteriorNode:\n";
-        splitRule.PrintLine(os, tabs + 1);
-        for (const auto& edge : outgoingEdges)
+        _splitRule.PrintLine(os, tabs + 1);
+        for (const auto& edge : _outgoingEdges)
         {
             edge.PrintLine(os, tabs + 1);
         }
@@ -336,19 +343,13 @@ namespace predictors
     void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::PrintLine(std::ostream & os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "Edge:\n";
-        predictor.PrintLine(os, tabs + 1);
-        os << std::string(tabs * 4, ' ') << "Target node index = " << targetNodeIndex << "\n";
+        _predictor.PrintLine(os, tabs + 1);
+        os << std::string(tabs * 4, ' ') << "Target node index = " << _targetNodeIndex << "\n";
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
     bool ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::IsTargetInterior() const
     {
-        return targetNodeIndex == 0 ? false : true;
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void predictors::ForestPredictor<SplitRuleType, EdgePredictorType>::Tree::PrintLine(std::ostream & os, size_t tabs) const
-    {
-        os << std::string(tabs * 4, ' ') << "Tree: root index = " << rootIndex << "\n";
+        return _targetNodeIndex == 0 ? false : true;
     }
 }
