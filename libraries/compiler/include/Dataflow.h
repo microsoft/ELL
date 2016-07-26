@@ -197,6 +197,11 @@ namespace emll
 		public:
 			SumNode(OperatorType op, size_t dim);
 
+			virtual DataNodeType Type() const override
+			{
+				return DataNodeType::SumNode;
+			}
+
 			OperatorType Op() { return _op; }
 			size_t Count() { return _count; }
 			Variable* Last() { return _pLast; }

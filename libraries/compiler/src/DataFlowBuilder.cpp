@@ -166,11 +166,23 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-			case model::Port::PortType::Real:
-				AddOutput<double>(node);
-				break;
-			default:
-				throw new CompilerException(CompilerError::portTypeNotSupported);
+				case model::Port::PortType::Real:
+					AddOutput<double>(node);
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void DataFlowBuilder::ProcessSumNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					Process<double>(static_cast<const nodes::SumNode<double>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
 		}
 

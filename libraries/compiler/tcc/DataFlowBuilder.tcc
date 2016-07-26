@@ -46,6 +46,20 @@ namespace emll
 				pArg->AddDependent(pInput);
 			}
 		}
+		
+		template<typename DataType>
+		void DataFlowBuilder::Process(const nodes::SumNode<DataType>& node)
+		{
+			// SumNodes have exactly 1 output and 1 input ports
+			auto pOutputPort = node.GetOutputPorts()[0];
+			auto pInputPort = node.GetInputPorts()[0];
+			auto pNode = _graph.AddNode<SumNode>(GetAddForValueType<DataType>(), pInputPort->Size());
+			_outputPortMap.Add(pOutputPort, pNode);
+			for (size_t i = 0; i < pInputPort->Size(); ++i)
+			{
+				AddDependency(pInputPort, i, pNode);
+			}
+		}
 
 		template<typename DataType>
 		void DataFlowBuilder::AddOutput(const model::Node& leafNode)

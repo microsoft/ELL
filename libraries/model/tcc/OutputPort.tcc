@@ -27,4 +27,11 @@ namespace model
     {
         _cachedOutput = values;
     }
+
+	template <typename ValueType>
+	void OutputPort<ValueType>::SetOutput(ValueType value) const
+	{
+		_cachedOutput.clear();
+		_cachedOutput.push_back(value);
+	}
 }

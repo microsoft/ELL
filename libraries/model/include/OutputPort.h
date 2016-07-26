@@ -63,6 +63,9 @@ namespace model
         /// <param name=values> The values this port should output </param>
         void SetOutput(std::vector<ValueType> values) const;
 
+		/// <summary> Sets the cached output from this port </summary>
+		void SetOutput(ValueType value) const;
+
     private:
         mutable std::vector<ValueType> _cachedOutput;
     };
