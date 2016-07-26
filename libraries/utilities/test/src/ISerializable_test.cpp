@@ -32,27 +32,32 @@
 
 void TestISerializable()
 {
-    utilities::SimpleSerializer serializer;
-
     utilities::UniqueId id;
-    std::cout << "--Serializing UniqueId--" << std::endl;
-    serializer.Serialize(id);
-
     model::Model g;
     auto in = g.AddNode<model::InputNode<double>>(3);
     auto constNode = g.AddNode<nodes::ConstantNode<double>>(std::vector<double>{1.0, 2.0, 3.0});
     auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
     auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
+    utilities::SimpleSerializer serializer;
+    std::cout << "--Serializing UniqueId--" << std::endl;
+    serializer.Serialize(id);
+    std::cout << std::endl;
+
+
     std::cout << "--Serializing input node--" << std::endl;
     serializer.Serialize(*in);
+    std::cout << std::endl;
 
     std::cout << "\n--Serializing output node--" << std::endl;
     serializer.Serialize(*out);
+    std::cout << std::endl;
 
     std::cout << "\n--Serializing constant node--" << std::endl;
     serializer.Serialize(*constNode);
+    std::cout << std::endl;
 
     std::cout << "\n--Serializing binary operation node--" << std::endl;
     serializer.Serialize(*binaryOpNode);
+    std::cout << std::endl;
 }

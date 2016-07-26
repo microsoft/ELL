@@ -25,14 +25,15 @@ namespace utilities
 
     void SimpleSerializer::SerializeField(std::string name, const Variant& variant)
     {
+        ++_indent;
         std::cout << std::string(2*_indent, ' ');
         if(variant.IsPrimitiveType())
         {            
-            std::cout << "P:" << name << ": " << to_string(variant) << std::endl;
+            std::cout << name << ":\t" << to_string(variant) << std::endl;
         }
         else if(variant.IsSerializable())
         {
-            std::cout << "S:" << name << ": " << std::endl;
+            std::cout << name << ":" << std::endl;
             ++_indent;
             Serialize(variant);
             --_indent;
@@ -42,5 +43,7 @@ namespace utilities
             // punt --- should probably throw an exception
             std::cout << "Cannot serialize field " << name << std::endl;
         }
+        --_indent;
+
     }
 }

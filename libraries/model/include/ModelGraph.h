@@ -56,7 +56,7 @@ namespace model
     };
 
     /// <summary> Model class. Represents a graph of computation </summary>
-    class Model
+    class Model : public utilities::ISerializable
     {
     public:
         /// <summary> Factory method used to create nodes and add them to the graph. </summary>
@@ -138,8 +138,18 @@ namespace model
         /// <param name="outputNodes"> The output nodes to use for deciding which nodes to visit </param>
         NodeIterator GetNodeIterator(const std::vector<const Node*>& outputNodes) const;
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "ModelGraph"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
+
         /// <summary> ISerializable interface </summary>
-        virtual ObjectDescription GetDescription() const override;
+        virtual utilities::ObjectDescription GetDescription() const override;
 
     private:
         friend class NodeIterator;

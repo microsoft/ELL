@@ -37,9 +37,9 @@ namespace model
         return NodeIterator(this, outputNodes);
     }
 
-    ObjectDescription Model::GetDescription() const override
+    utilities::ObjectDescription Model::GetDescription() const
     {
-        auto result = ObjectDescription::FromType(*this);
+        auto result = utilities::ObjectDescription::FromType(*this);
         // need to add a field with vector of nodes (or something)
         // need a way to have a sequence of un-named items, so we can say:
         // for(auto node: nodes) { desc.AddItem(node); }
