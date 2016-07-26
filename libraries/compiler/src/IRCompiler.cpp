@@ -317,6 +317,8 @@ namespace emll
 				default:
 					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
+			assert(pVal != nullptr);
+			_literals.Set(var.EmittedName(), pVal);
 			return pVal;
 		}
 

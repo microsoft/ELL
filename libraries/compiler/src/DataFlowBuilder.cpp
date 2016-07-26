@@ -191,18 +191,26 @@ namespace emll
 			const nodes::LinearPredictorNode& lpNode = static_cast<const nodes::LinearPredictorNode&>(node);
 			//
 			// LinearPredictorNode has exactly 1 input Port and 1 output port
-			// TODO: Compilation for cases where the input port is not a "pure" vector - i.e. it takes inputs from multiple
-			// output ports. 
 			//
 			auto inputPort = lpNode.GetInputPorts()[0];
 			if (!ModelEx::IsPureVector(*inputPort))
 			{
+				// TODO: Compilation for cases where the input port is not a "pure" vector - i.e. it takes inputs from multiple output ports
 				throw new CompilerException(CompilerError::notSupported);
 			}
-			auto pOutputPort = lpNode.GetOutputPorts()[0];
+			ProcessLinearPredictorV(lpNode);
+		}
+
+		void DataFlowBuilder::ProcessLinearPredictorV(const nodes::LinearPredictorNode& node)
+		{
+			//
+			// LinearPredictorNode has exactly 1 input Port and 1 output port
+			//
+			auto inputPort = node.GetInputPorts()[0];
+			auto pOutputPort = node.GetOutputPorts()[0];
 			assert(pOutputPort->Size() == 1);
 
-			auto predictor = lpNode.GetPredictor();
+			auto predictor = node.GetPredictor();
 			DotProductNode* pDotProduct = _graph.AddNode<DotProductNode>();
 			LiteralNode* pWeights = _graph.AddLiteralV<double>(predictor.GetVector());
 			pWeights->AddDependent(pDotProduct);

@@ -47,6 +47,7 @@ namespace emll
 			void AddDependent(DataNode* pNode);
 		
 		protected:
+			virtual bool ShouldProcess(DataFlowGraph& graph, Compiler& compiler);
 			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler) = 0;
 		
 		private:
@@ -145,6 +146,7 @@ namespace emll
 			virtual void ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data) override;
 
 		protected:
+			virtual bool ShouldProcess(DataFlowGraph& graph, Compiler& compiler) { return true; }
 			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler) override;
 
 		private:

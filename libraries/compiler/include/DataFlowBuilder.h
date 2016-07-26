@@ -74,14 +74,14 @@ namespace emll
 			template<typename DataType>
 			void Process(const nodes::SumNode<DataType>& node);
 			template<typename DataType> 
-			void AddOutput(const model::Node& leafNode);
+			void AddOutput(const model::Node& leafNode);			
+			void ProcessLinearPredictorV(const nodes::LinearPredictorNode& node);
 
 			DataNode* GetSourceNode(const model::InputPortBase* pPort, size_t elementIndex) const;
 			void AddDependency(const model::InputPortBase* pPort, size_t elementIndex, DataNode* pDependant);
 			void AddDependencyV(const model::InputPortBase* pPort, DataNode* pDependant);
 			void AddDependency(const model::OutputPortBase* pPort, size_t elementIndex, DataNode* pDependant);
 			
-
 			template<typename DataType>
 			OperatorType GetOperator(const nodes::BinaryOperationNode<DataType>& node);
 

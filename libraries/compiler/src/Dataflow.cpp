@@ -8,8 +8,18 @@ namespace emll
 {
 	namespace compiler
 	{
+		bool DataNode::ShouldProcess(DataFlowGraph& graph, Compiler& compiler)
+		{
+			return (_dependencies.size() > 0);
+		}
+
 		void DataNode::Process(DataFlowGraph& graph, Compiler& compiler)
 		{
+			if (!ShouldProcess(graph, compiler))
+			{
+				return;
+			}
+
 			Variable* pResult = OnProcess(graph, compiler);
 			if (pResult != nullptr)
 			{
