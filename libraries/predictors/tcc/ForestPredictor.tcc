@@ -102,25 +102,7 @@ namespace predictors
         size_t nodeIndex = interiorNodeIndex;
         double output = 0.0;
 
-        do
-        {
-            const auto& interiorNode = _interiorNodes[nodeIndex];
-
-            // which way do we go?
-            int edgeIndex = interiorNode.splitRule.Compute(input);
-
-            // check for early eject
-            if (edgeIndex < 0)
-            {
-                break;
-            }
-
-            // add the edge prediction to output and follow the edge to the next node
-            auto edge = interiorNode.outgoingEdges[edgeIndex];
-            output += edge.predictor.Compute(input);
-            nodeIndex = edge.targetNodeIndex;
-        }
-        while (nodeIndex != 0);
+        VisitEdgePathToLeaf(input, interiorNodeIndex, [&](const InteriorNode& interiorNode, size_t edgePosition) { output += interiorNode.outgoingEdges[edgePosition].predictor.Compute(input); }); 
 
         return output;
     }
@@ -222,28 +204,7 @@ namespace predictors
         {
             return;
         }
-
-        size_t nodeIndex = interiorNodeIndex;
-
-        do
-        {
-            const auto& interiorNode = _interiorNodes[nodeIndex];
-
-            // which way do we go?
-            int edgeIndex = interiorNode.splitRule.Compute(input);
-
-            // check for early eject
-            if (edgeIndex < 0)
-            {
-                break;
-            }
-
-            // indicate the edge in the vector and follow the edge to the next node
-            auto edge = interiorNode.outgoingEdges[edgeIndex];
-            output[interiorNode.firstEdgeIndex + edgeIndex] = true;
-            nodeIndex = edge.targetNodeIndex;
-        }
-        while (nodeIndex != 0);
+        VisitEdgePathToLeaf(input, interiorNodeIndex, [&output](const InteriorNode& interiorNode, size_t edgePosition) { output[interiorNode.firstEdgeIndex + edgePosition] = true; }); 
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
@@ -267,6 +228,35 @@ namespace predictors
         _numEdges += numEdges;
 
         return interiorNodeIndex;
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    template<typename RandomAccessVectorType>
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::VisitEdgePathToLeaf(const RandomAccessVectorType& input, size_t interiorNodeIndex, std::function<void(const InteriorNode&, size_t edgePosition)> operation) const
+    {
+        size_t nodeIndex = interiorNodeIndex;
+
+        do
+        {
+            const auto& interiorNode = _interiorNodes[nodeIndex];
+
+            // which way do we go?
+            int edgePosition = interiorNode.splitRule.Compute(input);
+
+            // check for early eject
+            if (edgePosition < 0)
+            {
+                break;
+            }
+
+            // apply the operation
+            operation(interiorNode, edgePosition);
+            
+            //follow the edge to the next node
+            auto edge = interiorNode.outgoingEdges[edgePosition];
+            nodeIndex = edge.targetNodeIndex;
+        }
+        while (nodeIndex != 0);
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>

@@ -18,6 +18,7 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <functional>
 
 namespace predictors
 {
@@ -211,6 +212,11 @@ namespace predictors
         void PrintLine(std::ostream& os, size_t tabs=0) const;
 
     protected:
+
+        //
+        // internal structs
+        //
+        
         struct Edge
         {
             Edge(const EdgePredictorType& predictor);
@@ -237,12 +243,20 @@ namespace predictors
             size_t rootIndex;
         };
 
+        //
+        // protected member functions
+        // 
         template<typename RandomAccessVectorType>
         void SetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& edgeIndicator, size_t interiorNodeIndex) const;
 
         size_t AddInteriorNode(const SplitAction& splitAction);
 
-        // members
+        template<typename RandomAccessVectorType>
+        void VisitEdgePathToLeaf(const RandomAccessVectorType& input, size_t interiorNodeIndex, std::function<void(const InteriorNode&, size_t edgePosition)> operation) const;
+
+        //
+        //  member variables
+        //
         std::vector<InteriorNode> _interiorNodes;
         std::vector<Tree> _trees;
         double _bias = 0.0;
