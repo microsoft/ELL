@@ -247,6 +247,19 @@ void TestBinaryOperationNodeCompute()
     }
 }
 
+void TestLinearPredictorNodeCompute()
+{
+    const int dim = 10;
+    predictors::LinearPredictor predictor(dim);
+    // TODO: set it's vector and bias
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(dim);
+    auto predNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
+
+    // TODO: test it
+}
+
 //
 // Node refinements
 //
@@ -281,16 +294,32 @@ void TestMovingAverageNodeRefine()
     }
 }
 
-void TestLinearPredictorNodeCompute()
+void TestLinearPredictorNodeRefine()
 {
-    const int dim = 10;
+    // make a linear predictor
+    size_t dim = 3;
     predictors::LinearPredictor predictor(dim);
-    // TODO: set it's vector and bias
+    predictor.GetBias() = 2.0;
+    predictor.GetWeights() = std::vector<double>{3.0, 4.0, 5.0};
 
+    // make a model
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(dim);
-    auto predNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
+    auto inputNode = model.AddNode<model::InputNode<double>>(3);
+    auto linearPredictorNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
 
-    // TODO: test it
+    // refine the model
+    model::TransformContext context;
+    model::ModelTransformer transformer;
+    auto newModel = transformer.RefineModel(model, context);
+
+    // check for equality
+    auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
+    auto newOutputPort = transformer.GetCorrespondingOutputPort(linearPredictorNode->output);
+    inputNode->SetInput({1.0, 1.0, 1.0});
+    newInputNode->SetInput({1.0, 1.0, 1.0});
+    auto modelOutputValue = model.ComputeNodeOutput(linearPredictorNode->output);
+    auto newOutputValue = newModel.ComputeNodeOutput(*newOutputPort);
+
+    testing::ProcessTest("Testing LinearPredictorNode refine", testing::IsEqual(modelOutputValue, newOutputValue));
 }
 

@@ -43,7 +43,7 @@ namespace common
         // Set some values into the predictor's vector
         for (int index = 0; index < inputs.Size(); ++index)
         {
-            predictor.GetVector()[index] = (double)(index % 5);
+            predictor.GetWeights()[index] = (double)(index % 5);
         }
         auto classifierNode = model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
         auto outputNode = model.AddNode<model::OutputNode<double>>(classifierNode->output);
@@ -66,7 +66,7 @@ namespace common
         // Set some values into the predictor's vector
         for (int index = 0; index < inputs.Size(); ++index)
         {
-            predictor.GetVector()[index] = (double)(index % 5);
+            predictor.GetWeights()[index] = (double)(index % 5);
         }
         auto classifierNode = model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
         auto outputNode = model.AddNode<model::OutputNode<double>>(classifierNode->output);

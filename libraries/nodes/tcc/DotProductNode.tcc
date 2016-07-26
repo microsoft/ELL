@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "BinaryOperationNode.h"
+
 namespace nodes
 {
     template <typename ValueType>
@@ -21,7 +23,7 @@ namespace nodes
         {
             result += _input1[index] * _input2[index];
         }
-        _output.SetOutput(result);
+        _output.SetOutput({result});
     };
 
     template <typename ValueType>
@@ -39,7 +41,7 @@ namespace nodes
         // Maybe... in reality, dot product will likely want to be computed as in Compute() above
         auto newInput1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
         auto newInput2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
-        auto multNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput1, newInput2, BinaryOperationNode<ValueType>::OperationType::multiply);
+        auto multNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput1, newInput2, BinaryOperationNode<ValueType>::OperationType::coordinatewiseMultiply);
         auto sumNode = transformer.AddNode<SumNode<ValueType>>(multNode->output);
 
         transformer.MapOutputPort(output, sumNode->output);
