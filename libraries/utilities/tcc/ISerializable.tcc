@@ -41,6 +41,9 @@ namespace utilities
         return result;
     }
 
+    //
+    // Serialize
+    //
     template <typename T>
     void Serializer::Serialize(T&& obj)
     {
