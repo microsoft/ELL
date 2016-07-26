@@ -50,7 +50,7 @@ namespace utilities
 
         virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
 
-        virtual std::unique_ptr<ObjectDescription> GetObjectDescription() const override;
+        virtual ObjectDescription GetObjectDescription() const override;
 
     private:
         ValueType _value;

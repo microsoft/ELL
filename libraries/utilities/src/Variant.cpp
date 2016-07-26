@@ -56,9 +56,8 @@ namespace utilities
         return _value->IsPointer();
     }
 
-    std::unique_ptr<ObjectDescription> Variant::GetObjectDescription() const
+    ObjectDescription Variant::GetObjectDescription() const
     {
         return _value->GetObjectDescription();
     }
-
 }

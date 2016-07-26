@@ -60,7 +60,7 @@ namespace utilities
 
         virtual bool IsPointer() const = 0;
 
-        virtual std::unique_ptr<ObjectDescription> GetObjectDescription() const = 0;
+        virtual ObjectDescription GetObjectDescription() const = 0;
     private:
         std::type_index _type; // redundant with type in Variant class.
     };

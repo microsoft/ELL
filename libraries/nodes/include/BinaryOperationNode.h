@@ -56,6 +56,9 @@ namespace nodes
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
+        /// Inherited from ISerializable
+        virtual utilities::ObjectDescription GetDescription() const override;
+
     protected:
         virtual void Compute() const override;
 

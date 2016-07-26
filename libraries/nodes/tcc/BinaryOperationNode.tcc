@@ -62,4 +62,14 @@ namespace nodes
         auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput1, newInput2, _operation);
         transformer.MapOutputPort(output, newNode->output);
     }
+
+    /// Inherited from ISerializable
+    template <typename ValueType>
+    utilities::ObjectDescription BinaryOperationNode<ValueType>::GetDescription() const
+    {
+        std::cout << "Serializing BinaryOperationNode" << std::endl;
+        auto result = Node::GetDescription();
+        result.AddField("operation", (int)_operation);
+        return result;
+    }
 }

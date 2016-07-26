@@ -31,4 +31,14 @@ namespace nodes
         auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values);
          transformer.MapOutputPort(output, newNode->output);
     }
+
+    /// Inherited from ISerializable
+    template <typename ValueType>
+    utilities::ObjectDescription ConstantNode<ValueType>::GetDescription() const
+    {
+        std::cout << "Serializing ConstantNode" << std::endl;
+        auto result = Node::GetDescription();
+        result.AddField("values", _values);
+        return result;
+    }
 }

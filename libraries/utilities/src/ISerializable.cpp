@@ -39,7 +39,7 @@ namespace utilities
         }
         else
         {
-            // punt
+            // punt --- should probably throw an exception
             std::cout << "Cannot serialize field " << name << std::endl;
         }
     }

@@ -14,6 +14,7 @@
 
 // utilities
 #include "TypeName.h"
+#include "ISerializable.h"
 
 #include <vector>
 #include <memory>
@@ -54,7 +55,7 @@ namespace model
         virtual void Copy(ModelTransformer& transformer) const override;
 
         /// Inherited from ISerializable
-//        virtual utilities::ObjectDescription GetDescription() const override;
+        virtual utilities::ObjectDescription GetDescription() const override;
 
     protected:
         virtual void Compute() const override;

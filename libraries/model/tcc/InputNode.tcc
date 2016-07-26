@@ -31,12 +31,13 @@ namespace model
         transformer.MapOutputPort(output, newNode->output);
     }
 
-    // /// Inherited from ISerializable
-    // template <typename ValueType>
-    // utilities::ObjectDescription InputNode<ValueType>::GetDescription() const
-    // {
-    //     auto result = Node::GetDescription();
-    //     result.AddField("size", _output.Size());
-    //     return result;
-    // }
+    /// Inherited from ISerializable
+    template <typename ValueType>
+    utilities::ObjectDescription InputNode<ValueType>::GetDescription() const
+    {
+        std::cout << "Serializing InputNode" << std::endl;
+        auto result = Node::GetDescription();
+        result.AddField("size", _output.Size());
+        return result;
+    }
 }

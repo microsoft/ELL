@@ -62,7 +62,7 @@ namespace utilities
 
         std::string GetStoredTypeName() const;
 
-        std::unique_ptr<ObjectDescription> GetObjectDescription() const;
+        ObjectDescription GetObjectDescription() const;
 
     private:
         friend std::string to_string(const Variant& variant);

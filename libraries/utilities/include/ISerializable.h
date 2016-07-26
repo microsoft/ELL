@@ -15,9 +15,11 @@
 // stl
 #include <string>
 #include <ostream>
+#include <type_traits>
 
 namespace utilities
 {
+    /// <summary> ISerializable interface --- provides one function, GetDescription </summary>
     class ISerializable
     {
     public:
@@ -29,18 +31,45 @@ namespace utilities
 
     // TODO: put these someplace that makes sense
     template <typename ValueType>
-    using IsFundamental = typename std::enable_if_t<std::is_fundamental<ValueType>::value, int>;
+    using IsFundamental2 = typename std::enable_if_t<std::is_fundamental<typename std::decay<ValueType>::type>::value, int>;
+
+    template <typename ValueType>
+    using IsNotFundamental = typename std::enable_if_t<!std::is_fundamental<typename std::decay<ValueType>::type>::value, int>;
 
     template <typename ValueType>
     using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, int>;
 
-    // helper function
-    template <typename ValueType> // , typename std::enable_if_t<!std::is_fundamental<ValueType>::value, int> concept>
+    template <typename ValueType>
+    using IsSerializable = typename std::enable_if_t<std::is_base_of<ISerializable, ValueType>::value, int>;
+
+    template <typename ValueType>
+    using IsNotSerializable = typename std::enable_if_t<(!std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
+
+
+    // // helper function
+    // // See here for advice on overloading with function templates
+    // // http://www.gotw.ca/publications/mill17.htm
+    // template <typename ValueType>
+    // class GetDescriptionHelper;
+
+    // template <typename ValueType>
+    // ObjectDescription GetDescription(ValueType&& obj)
+    // {
+    //     return GetDescriptionHelper<ValueType>::GetDescription(obj);
+    // }
+
+    // template <class ValueType>
+    // {
+    //     static ObjectDescription GetDescription(const ValueType& obj);
+    // }
+
+    template <typename ValueType, IsNotSerializable<ValueType> concept=0>
     ObjectDescription GetDescription(ValueType&& obj);
 
-    template <typename ValueType, typename std::enable_if_t<std::is_fundamental<ValueType>::value, int> concept>
+    template <typename ValueType, IsFundamental2<ValueType> concept=0>
     ObjectDescription GetDescription(ValueType&& obj);
 
+    ObjectDescription GetDescription(const ISerializable& obj);
     ObjectDescription GetDescription(const Variant& obj);
 
     //

@@ -47,11 +47,11 @@ namespace utilities
     }
 
     template <typename ValueType>
-    std::unique_ptr<ObjectDescription> VariantDerived<ValueType>::GetObjectDescription() const
+    ObjectDescription VariantDerived<ValueType>::GetObjectDescription() const
     {
-        std::cout << "type " << TypeName<ValueType>::GetName() << std::endl;
-//        auto description = GetDescription(_value);
-        return nullptr;
+        // std::cout << "type " << TypeName<ValueType>::GetName() << std::endl;
+        // std::cout << "####" << std::endl;
+        auto description = GetDescription(_value);
+        return description;
     }
-
 }

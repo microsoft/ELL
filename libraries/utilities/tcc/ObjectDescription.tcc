@@ -27,6 +27,6 @@ namespace utilities
     template <typename ValueType>
     void ObjectDescription::AddField(std::string name, ValueType&& value)
     {
-        _description.insert(std::make_pair(name, MakeVariant<typename std::decay<ValueType>::type>(value))); 
+        _description.insert(std::make_pair(name, MakeVariant<typename std::decay<ValueType>::type>(value)));
     }
 }
