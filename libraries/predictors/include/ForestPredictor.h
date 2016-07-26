@@ -221,6 +221,7 @@ namespace predictors
         {
             Edge(const EdgePredictorType& predictor);
             void PrintLine(std::ostream& os, size_t tabs=0) const;
+            bool IsTargetInterior() const;
 
             EdgePredictorType predictor;
             size_t targetNodeIndex;

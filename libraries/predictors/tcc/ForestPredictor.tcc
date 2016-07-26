@@ -173,8 +173,8 @@ namespace predictors
         else
         {
             // check that this node wasn't previously split
-            auto& parentOutgoing = _interiorNodes[splitAction._nodeId._parentNodeIndex].outgoingEdges[splitAction._nodeId._childPosition].targetNodeIndex;
-            if (parentOutgoing != 0)
+            auto& incomingEdge = _interiorNodes[splitAction._nodeId._parentNodeIndex].outgoingEdges[splitAction._nodeId._childPosition];
+            if (incomingEdge.IsTargetInterior())
             {
                 throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "invalid split in decision tree - node previously split");
             }
@@ -183,7 +183,7 @@ namespace predictors
             size_t interiorNodeIndex = AddInteriorNode(splitAction);
 
             // update the parent about the new interior node
-            parentOutgoing = interiorNodeIndex;
+            incomingEdge.targetNodeIndex = interiorNodeIndex;
 
             // return ID of new interior node
             return interiorNodeIndex;
@@ -338,6 +338,12 @@ namespace predictors
         os << std::string(tabs * 4, ' ') << "Edge:\n";
         predictor.PrintLine(os, tabs + 1);
         os << std::string(tabs * 4, ' ') << "Target node index = " << targetNodeIndex << "\n";
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    bool ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::IsTargetInterior() const
+    {
+        return targetNodeIndex == 0 ? false : true;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
