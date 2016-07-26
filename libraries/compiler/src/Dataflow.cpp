@@ -35,7 +35,7 @@ namespace emll
 		LiteralNode::LiteralNode(Variable* pVar)
 			: _pVar(pVar)
 		{
-			assert(pVar != nullptr && pVar->IsLiteral());
+			assert(pVar != nullptr && (pVar->IsLiteral() || (pVar->IsGlobal() && !pVar->IsMutable())));
 		}
 
 		Variable* LiteralNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)

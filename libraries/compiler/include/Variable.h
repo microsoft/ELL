@@ -87,6 +87,10 @@ namespace emll
 			{
 				return (_scope == VariableScope::Literal);
 			}
+			bool IsGlobal() const
+			{
+				return (_scope == VariableScope::Global);
+			}
 			bool IsMutable() const
 			{
 				return TestFlags(VariableFlags::isMutable);

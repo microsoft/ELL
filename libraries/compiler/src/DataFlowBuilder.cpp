@@ -82,11 +82,12 @@ namespace emll
 		static const std::string c_ConstantNodeType = "Constant";
 		static const std::string c_BinaryNodeType = "BinaryOperationNode";
 		static const std::string c_InputNodeType = "Input";
+		static const std::string c_DotProductType = "DotProductNode";
 		static const std::string c_LinearNodeType = "LinearNode";
 
 		void DataFlowBuilder::Process(const model::Model& mode)
 		{
-			mode.Visit([this](const model::Node& node){
+			mode.Visit([this](const model::Node& node) {
 				Process(node);
 			});
 		}
@@ -109,6 +110,10 @@ namespace emll
 			{
 				ProcessInputNode(node);
 			}
+			else if (typeName == c_LinearNodeType)
+			{
+				ProcessLinearPredictorNode(node);
+			}
 			else
 			{
 				throw new CompilerException(CompilerError::nodeTypeNotSupported);
@@ -124,11 +129,11 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-				case model::Port::PortType::Real:
-					Process<double>(static_cast<const nodes::ConstantNode<double>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
+			case model::Port::PortType::Real:
+				Process<double>(static_cast<const nodes::ConstantNode<double>&>(node));
+				break;
+			default:
+				throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
 		}
 
@@ -136,11 +141,11 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-				case model::Port::PortType::Real:
-					Process<double>(static_cast<const nodes::BinaryOperationNode<double>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
+			case model::Port::PortType::Real:
+				Process<double>(static_cast<const nodes::BinaryOperationNode<double>&>(node));
+				break;
+			default:
+				throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
 		}
 
@@ -148,11 +153,11 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-				case model::Port::PortType::Real:
-					Process<double>(static_cast<const model::InputNode<double>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
+			case model::Port::PortType::Real:
+				Process<double>(static_cast<const model::InputNode<double>&>(node));
+				break;
+			default:
+				throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
 		}
 
@@ -160,19 +165,42 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-				case model::Port::PortType::Real:
-					AddOutput<double>(node);
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
+			case model::Port::PortType::Real:
+				AddOutput<double>(node);
+				break;
+			default:
+				throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
 		}
 
-		/*
-		void DataFlowBuilder::ProcessLinearPredictorNode(const nodes::LinearPredictorNode& node)
+		void DataFlowBuilder::ProcessLinearPredictorNode(const model::Node& node)
 		{
+			const nodes::LinearPredictorNode& lpNode = static_cast<const nodes::LinearPredictorNode&>(node);
+			//
+			// LinearPredictorNode has exactly 1 input Port and 1 output port
+			// TODO: Compilation for cases where the input port is not a "pure" vector - i.e. it takes inputs from multiple
+			// output ports. 
+			//
+			auto inputPort = lpNode.GetInputPorts()[0];
+			if (!ModelEx::IsPureVector(*inputPort))
+			{
+				throw new CompilerException(CompilerError::notSupported);
+			}
+			auto pOutputPort = lpNode.GetOutputPorts()[0];
+			assert(pOutputPort->Size() == 1);
+
+			auto predictor = lpNode.GetPredictor();
+			DotProductNode* pDotProduct = _graph.AddNode<DotProductNode>();
+			LiteralNode* pWeights = _graph.AddLiteralV<double>(predictor.GetVector());
+			pWeights->AddDependent(pDotProduct);
+			AddDependencyV(inputPort, pDotProduct);
+
+			LiteralNode* pBias = _graph.AddLiteral<double>(predictor.GetBias());
+			BinaryNode *pResult = _graph.AddNode<BinaryNode>(OperatorType::AddF);
+			_outputPortMap.Add(pOutputPort, pResult);
+			pBias->AddDependent(pResult);
+			pDotProduct->AddDependent(pResult);
 		}
-		*/
 
 		DataNode* DataFlowBuilder::GetSourceNode(const model::InputPortBase* pPort, size_t elementIndex) const
 		{
@@ -187,6 +215,17 @@ namespace emll
 			assert(pDependant != nullptr);
 			DataNode* pNode = GetSourceNode(pPort, elementIndex);
 			assert(pNode != nullptr);
+			pNode->AddDependent(pDependant);
+		}
+
+		void DataFlowBuilder::AddDependencyV(const model::InputPortBase* pPort, DataNode* pDependant)
+		{
+			assert(pPort != nullptr);
+			assert(pDependant != nullptr);
+
+			auto elt = pPort->GetOutputPortElement(0);
+			DataNode* pNode = _outputPortMap.GetV(elt.ReferencedPort());
+			assert(pNode != nullptr && pNode->HasVectorResult());
 			pNode->AddDependent(pDependant);
 		}
 

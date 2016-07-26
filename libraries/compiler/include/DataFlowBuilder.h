@@ -1,6 +1,10 @@
 #pragma once
 
 #include "ModelGraph.h"
+#include "Node.h"
+#include "InputNode.h"
+#include "OutputPort.h"
+#include "OutputPortElementList.h"
 #include "ConstantNode.h"
 #include "BinaryOperationNode.h"
 #include "LinearPredictorNode.h"
@@ -53,7 +57,7 @@ namespace emll
 			void ProcessBinaryOperation(const model::Node& node);
 			void ProcessInputNode(const model::Node& node);
 			void ProcessOutputNode(const model::Node& node);
-			//void ProcessLinearPredictorNode(const nodes::LinearPredictorNode& node);
+			void ProcessLinearPredictorNode(const model::Node& node);
 
 			DataFlowGraph& Graph() { return _graph; }
 
@@ -70,7 +74,9 @@ namespace emll
 
 			DataNode* GetSourceNode(const model::InputPortBase* pPort, size_t elementIndex) const;
 			void AddDependency(const model::InputPortBase* pPort, size_t elementIndex, DataNode* pDependant);
+			void AddDependencyV(const model::InputPortBase* pPort, DataNode* pDependant);
 			void AddDependency(const model::OutputPortBase* pPort, size_t elementIndex, DataNode* pDependant);
+			
 
 			template<typename DataType>
 			OperatorType GetOperator(const nodes::BinaryOperationNode<DataType>& node);

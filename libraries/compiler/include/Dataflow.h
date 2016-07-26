@@ -191,7 +191,6 @@ namespace emll
 			Variable* _pResult = nullptr;
 		};
 
-		///<summary>Lineary predictor that operates on purely vector input, with scalar output</summary>
 		class DotProductNode : public DataNode
 		{
 		public:

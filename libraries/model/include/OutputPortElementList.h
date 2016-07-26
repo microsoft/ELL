@@ -147,6 +147,9 @@ namespace model
         /// <param name="range"> The range of values to add to this list </param>
         void AddRange(const OutputPortRange& range);
 
+		/// <summary>Returns the number of output ranges in this list</summary>
+		size_t GetRangeCount() const { return _ranges.size(); }
+
     protected:
         OutputPortElementListUntyped(){};
         void ComputeSize();

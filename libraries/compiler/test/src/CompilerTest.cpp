@@ -152,6 +152,10 @@ nodes::ConstantNode<T>* ModelBuilder::Constant(const std::vector<T>& values)
 	return pNode;
 }
 
+nodes::LinearPredictorNode* ModelBuilder::Linear(const model::OutputPort<double>& features, const predictors::LinearPredictor& predictor)
+{
+	return _model.AddNode<nodes::LinearPredictorNode>(features, predictor);
+}
 
 model::Model InitTestModelBinOp()
 {
@@ -180,8 +184,6 @@ model::Model InitTestModelSimple()
 	auto c = mb.Constant<double>({ 5, 3});
 
 	nodes::BinaryOperationNode<double>* multNode = mb.Multiply<double>(input->output, c->output);
-	//multNode = mb.Multiply<double>(multNode->output, c->output);
-	//multNode = mb.Multiply<double>(multNode->output, c->output);
 	auto addNode = mb.Add<double>(c->output, multNode->output);
 	addNode = mb.Add<double>(c->output, addNode->output);
 	return mb.Model;
@@ -192,7 +194,6 @@ void TestDataFlowBuilder()
 	model::Model model = InitTestModelSimple();
 	DataFlowBuilder db;
 	db.Process(model);
-	testing::ProcessTest("DataFlowBuilder", db.Graph().Size() == 16);
 }
 
 void TestDataFlowCompiler()
@@ -205,6 +206,29 @@ void TestDataFlowCompiler()
 	IRCompiler compiler("EMLL", std::cout);
 	compiler.CompileGraph("Predict", db.Graph());
 	compiler.DebugDump();
+}
+
+void TestLinearPredictor()
+{
+	ModelBuilder mb;
+	predictors::LinearPredictor p(4);
+	p.GetBias() = 0.35;
+	double w = 0.003;
+	for (size_t i = 0; i < p.GetDimension(); ++i)
+	{
+		p.GetVector()[i] = w * i;
+	}
+
+	auto input = mb.Inputs<double>(4);
+	mb.Linear(input->output, p);
+
+	DataFlowBuilder db;
+	db.Process(mb.Model);
+
+	IRCompiler compiler("EMLL", std::cout);
+	compiler.CompileGraph("Predict", db.Graph());
+	compiler.DebugDump();
+
 }
 
 void TestModelEx()

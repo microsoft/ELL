@@ -118,7 +118,7 @@ set_property(TARGET LLVMSupport PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/e
 add_library(LLVMBitWriter STATIC IMPORTED)
 set_property(TARGET LLVMBitWriter PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/llvm/lib/LLVMBitWriter.lib)
 
-target_link_libraries(${TEST_NAME} nodes model testing utilities compiler LLVMCore LLVMAnalysis LLVMAsmParser LLVMSupport LLVMBitWriter)
+target_link_libraries(${TEST_NAME} nodes model testing utilities predictors compiler LLVMCore LLVMAnalysis LLVMAsmParser LLVMSupport LLVMBitWriter)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

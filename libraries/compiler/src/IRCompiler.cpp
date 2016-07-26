@@ -27,16 +27,8 @@ namespace emll
 			Variable& destVar = *(node.DestVar());
 			llvm::Value* pDest = EnsureEmitted(destVar);
 			llvm::Value* pResult = LoadVar(*(node.Var()));
-			if (node.ElementIndex() >= 0)
-			{
-				assert(destVar.IsVector());
-				_fn.SetValueAtA(pDest, node.ElementIndex(), pResult);
-			}
-			else
-			{
-				assert(destVar.IsScalar());
-				_fn.Store(pDest, pResult);
-			}
+			// All inputs and outputs are pointers
+			_fn.SetValueAtA(pDest, node.ElementIndex(), pResult);
 		}
 
 		void IRCompiler::Compile(BinaryNode& node)

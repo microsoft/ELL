@@ -12,6 +12,7 @@
 #include "Types.h"
 #include "SymbolTable.h"
 #include "DataFlowGraph.h"
+#include "DataFlowBuilder.h"
 
 #include <functional>
 
