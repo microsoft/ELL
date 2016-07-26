@@ -19,6 +19,8 @@ set (INTERFACE_INCLUDE ../common/include/DataLoadersInterface.h
 set (INTERFACE_MAIN ../common/EMLL.i)
 
 set (INTERFACE_FILES ../common/common.i
+                     ../common/callback.i
+                     ../common/LoadModelAsync.i
                      ../common/dataset.i
                      ../common/evaluators.i
                      ../common/features.i
