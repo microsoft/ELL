@@ -19,4 +19,5 @@ void TestLinearPredictorNodeCompute();
 
 // Refinement
 void TestMovingAverageNodeRefine();
+void TestLinearPredictorNodeRefine();
 

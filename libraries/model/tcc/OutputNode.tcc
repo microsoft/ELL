@@ -21,8 +21,8 @@ namespace model
     template <typename ValueType>
     void OutputNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<OutputNode<ValueType>>(newInput);
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newNode = transformer.AddNode<OutputNode<ValueType>>(newOutputPortElements);
         transformer.MapOutputPort(output, newNode->output);
     }
 }
