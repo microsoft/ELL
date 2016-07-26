@@ -10,10 +10,7 @@
 // Our interface classes
 #include "ModelInterface.h"
 
-//#include "ModelGraph.h"
-
 #include <string>
-//#include <functional>
 
 namespace interfaces
 {

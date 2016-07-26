@@ -10,13 +10,9 @@
 // common
 #include "ModelLoadArguments.h"
 #include "LoadModel.h"
-#include "LoadModelGraph.h"
 
 // layers
 #include "Model.h"
-
-// model
-#include "ModelGraph.h"
 
 // interface
 #include "ModelInterface.h"
