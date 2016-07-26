@@ -28,5 +28,5 @@
 %include "LoadModelInterface.h" 
 
 #if defined(SWIGJAVASCRIPT)
-%include LoadModelAsync.i 
+%include "loadModelAsync.i"
 #endif
