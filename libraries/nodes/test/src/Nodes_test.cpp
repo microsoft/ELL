@@ -332,7 +332,7 @@ void TestSimpleForestNodeRefine()
     testing::ProcessTest("Testing SimpleForestNode refine", testing::IsEqual(outputValue, refinedOutputValue));
 }
 
-void TestLinearPredictorNodeCompute()
+void TestLinearPredictorNodeRefine()
 {
     // make a linear predictor
     size_t dim = 3;
