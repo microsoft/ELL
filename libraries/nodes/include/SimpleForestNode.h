@@ -28,6 +28,7 @@ namespace nodes
     class SimpleForestNode : public model::Node
     {
     public:
+        static constexpr char* inputPortName = "input";
 
         /// <summary> Constructor </summary>
         ///
@@ -50,30 +51,27 @@ namespace nodes
 
         /// <summary> Exposes the forest output as a read-only property </summary>
         const model::OutputPort<double>& output = _output;
+        static constexpr char* outputPortName = "output";
 
         /// <summary> Exposes the individual tree outputs as a read-only property </summary>
         const model::OutputPort<double>& treeOutputs = _treeOutputs;
+        static constexpr char* treeOutputsPortName = "treeOutputs";
 
         /// <summary> Exposes the forest edge indicator vector as a read-only property </summary>
         const model::OutputPort<bool>& edgeIndicatorVector = _edgeIndicatorVector;
-    
+        static constexpr char* edgeIndicatorVectorPortName = "edgeIndicatorVector";
+
     protected:
         virtual void Compute() const override;
 
     private:
         // input ports
         model::InputPort<double> _input;
-        static constexpr char* inputPortName = "input";
 
         // output ports
         model::OutputPort<double> _output;
-        static constexpr char* outputPortName = "output";
-
         model::OutputPort<double> _treeOutputs;
-        static constexpr char* treeOutputsPortName = "treeOutputs";
-
         model::OutputPort<bool> _edgeIndicatorVector;
-        static constexpr char* edgeIndicatorVectorPortName = "edgeIndicatorVector";
 
         // the tree
         predictors::SimpleForestPredictor _forest;

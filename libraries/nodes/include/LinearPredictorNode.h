@@ -24,6 +24,8 @@ namespace nodes
     class LinearPredictorNode : public model::Node
     {
     public:
+        static constexpr char* inputPortName = "input";
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The signal to predict from </param>
@@ -42,6 +44,7 @@ namespace nodes
 
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<double>& output = _output;
+        static constexpr char* outputPortName = "output";
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
@@ -50,14 +53,11 @@ namespace nodes
         virtual void Compute() const override;
 
     private:
-
         // Inputs
         model::InputPort<double> _input;
-        static constexpr char* inputPortName = "input";
 
         // Output
         model::OutputPort<double> _output;
-        static constexpr char* outputPortName = "output";
 
         // Parameters
         predictors::LinearPredictor _predictor;
