@@ -84,6 +84,7 @@ namespace emll
 		static const std::string c_InputNodeType = "Input";
 		static const std::string c_DotProductType = "DotProductNode";
 		static const std::string c_LinearNodeType = "LinearNode";
+		static const std::string c_SumNodeType = "SumNode";
 
 		void DataFlowBuilder::Process(const model::Model& mode)
 		{

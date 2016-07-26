@@ -16,6 +16,7 @@ namespace emll
 			InputNode,
 			OutputNode,
 			BinaryNode,
+			SumNode,
 			DotProductV		// Vector version of LinearPredictor
 		};
 
@@ -189,6 +190,29 @@ namespace emll
 			Variable* _pSrc1 = nullptr;
 			Variable* _pSrc2 = nullptr;
 			Variable* _pResult = nullptr;
+		};
+
+		class SumNode : public DataNode
+		{
+		public:
+			SumNode(OperatorType op, size_t dim);
+
+			OperatorType Op() { return _op; }
+			size_t Count() { return _count; }
+			Variable* Last() { return _pLast; }
+			Variable* Var() { return _pTotal; }
+
+			virtual void ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data) override;
+
+		protected:
+			virtual Variable* OnProcess(DataFlowGraph& graph, Compiler& compiler) override;
+
+		private:
+			size_t _dim;
+			size_t _count = 0;
+			OperatorType _op;
+			Variable* _pTotal = nullptr;
+			Variable* _pLast = nullptr;
 		};
 
 		class DotProductNode : public DataNode

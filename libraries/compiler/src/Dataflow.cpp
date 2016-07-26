@@ -122,6 +122,31 @@ namespace emll
 			return _pResult;
 		}
 
+		SumNode::SumNode(OperatorType op, size_t dim)
+			: _op(op), _dim(dim)
+		{
+
+		}
+
+		void SumNode::ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data)
+		{
+			if (_count == 0)
+			{
+				_pTotal = graph.Variables().AddLocalScalarVariable(data.Type());
+			}
+			_pLast = &data;
+			_count++;
+			if (_count == _dim)
+			{
+				Process(graph, compiler);
+			}
+		}
+
+		Variable* SumNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
+		{
+			return _pTotal;
+		}
+
 		DotProductNode::DotProductNode()
 		{
 		}
