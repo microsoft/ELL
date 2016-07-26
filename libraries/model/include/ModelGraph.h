@@ -14,6 +14,8 @@
 
 // utilities
 #include "IIterator.h"
+#include "ISerializable.h"
+#include "ObjectDescription.h"
 
 #include <unordered_set>
 #include <vector>
@@ -135,6 +137,9 @@ namespace model
         ///
         /// <param name="outputNodes"> The output nodes to use for deciding which nodes to visit </param>
         NodeIterator GetNodeIterator(const std::vector<const Node*>& outputNodes) const;
+
+        /// <summary> ISerializable interface </summary>
+        virtual ObjectDescription GetDescription() const override;
 
     private:
         friend class NodeIterator;

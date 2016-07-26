@@ -16,6 +16,9 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    //
+    // Model
+    //
     Node* Model::GetNode(Node::NodeId id)
     {
         auto it = _idToNodeMap.find(id);
@@ -32,6 +35,18 @@ namespace model
     NodeIterator Model::GetNodeIterator(const std::vector<const Node*>& outputNodes) const
     {
         return NodeIterator(this, outputNodes);
+    }
+
+    ObjectDescription Model::GetDescription() const override
+    {
+        auto result = ObjectDescription::FromType(*this);
+        // need to add a field with vector of nodes (or something)
+        // need a way to have a sequence of un-named items, so we can say:
+        // for(auto node: nodes) { desc.AddItem(node); }
+
+        // ???
+        
+        return result;
     }
 
     //
