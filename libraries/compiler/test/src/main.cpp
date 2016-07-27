@@ -7,6 +7,8 @@ int main(int argc, char* argv[])
 	TestBinaryScalar();
 	TestDotProduct(false);
 	TestDotProduct(true);
+	TestSum(false);
+	TestSum(true);
 	TestLLVM();
 
 	return 0;

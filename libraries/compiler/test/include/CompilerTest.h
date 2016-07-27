@@ -29,6 +29,8 @@ public:
 	nodes::BinaryOperationNode<T>* Multiply(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 	template<typename T>
 	nodes::DotProductNode<T>* DotProduct(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
+	template<typename T>
+	nodes::SumNode<T>* Sum(const model::OutputPort<T>& x);
 
 	// Expose as a property!
 	model::Model& Model = _model;
@@ -48,3 +50,4 @@ private:
 void TestBinaryVector(bool expanded);
 void TestBinaryScalar();
 void TestDotProduct(bool expanded);
+void TestSum(bool expanded);

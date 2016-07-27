@@ -66,14 +66,29 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-			case model::Port::PortType::Real:
-				Compile<double>(static_cast<const nodes::DotProductNode<double>&>(node));
-				break;
-			case model::Port::PortType::Integer:
-				Compile<int>(static_cast<const nodes::DotProductNode<int>&>(node));
-				break;
-			default:
-				throw new CompilerException(CompilerError::portTypeNotSupported);
+				case model::Port::PortType::Real:
+					Compile<double>(static_cast<const nodes::DotProductNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					Compile<int>(static_cast<const nodes::DotProductNode<int>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void IRCompiler::CompileSumNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					Compile<double>(static_cast<const nodes::SumNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					Compile<int>(static_cast<const nodes::SumNode<int>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
 		}
 

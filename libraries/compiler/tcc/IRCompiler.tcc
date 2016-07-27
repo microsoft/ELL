@@ -82,8 +82,8 @@ namespace emll
 				else if (var.LastOp() == OperatorType::Add)
 				{
 					pResult = _fn.Op(GetAddForValueType<T>(),
-								_fn.Op(GetMultiplyForValueType<T>(), _fn.Literal(multiplyBy), pSrc),
-								_fn.Literal(increment));
+						_fn.Op(GetMultiplyForValueType<T>(), _fn.Literal(multiplyBy), pSrc),
+						_fn.Literal(increment));
 					_fn.Store(pDest, pResult);
 				}
 				else if (var.LastOp() == OperatorType::Multiply)
@@ -229,6 +229,61 @@ namespace emll
 				llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(i));
 				llvm::Value* pMultiplyResult = _fn.Op(GetMultiplyForValueType<T>(), pLVal, pRVal);
 				pTotal = _fn.Op(GetAddForValueType<T>(), pMultiplyResult, pTotal);
+			}
+			_fn.Store(pResult, pTotal);
+		}
+
+		template<typename T>
+		void IRCompiler::Compile(const nodes::SumNode<T>& node)
+		{
+			// SumNode has exactly 1 input and 1 output
+			auto input = node.GetInputPorts()[0];
+			if (ModelEx::IsPureVector(*input))
+			{
+				CompileLoop<T>(node);
+			}
+			else
+			{
+				CompileExpanded<T>(node);
+			}
+		}
+
+		template<typename T>
+		void IRCompiler::CompileLoop(const nodes::SumNode<T>& node)
+		{
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			llvm::Value* pSrcVector = EnsureEmitted(pInput);
+			llvm::Value* pResult = EnsureEmitted(pOutput);
+			Variable& resultVar = *(GetVariableFor(pOutput));
+
+			_fn.Store(pResult, _fn.Literal(0.0));
+			llvm::Value* pTotal = _fn.Load(pResult);  //pTotal is a register
+			auto forLoop = _fn.ForLoop();
+			auto pBodyBlock = forLoop.Begin(pInput->Size());
+			{
+				auto i = forLoop.LoadIterationVar();
+				llvm::Value* pValue  = _fn.ValueAt(pSrcVector, i);
+				pTotal = _fn.Op(GetAddForValueType<T>(), pValue, pTotal);
+			}
+			forLoop.End();
+			_fn.Store(pResult, pTotal);
+		}
+
+		template<typename T>
+		void IRCompiler::CompileExpanded(const nodes::SumNode<T>& node)
+		{
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			llvm::Value* pResult = EnsureEmitted(pOutput);
+			Variable& resultVar = *(GetVariableFor(pOutput));
+
+			_fn.Store(pResult, _fn.Literal(0.0));
+			llvm::Value* pTotal = _fn.Load(pResult);  //pTotal is a register
+			for (size_t i = 0; i < pInput->Size(); ++i)
+			{
+				llvm::Value* pVal = LoadVar(pInput->GetOutputPortElement(i));
+				pTotal = _fn.Op(GetAddForValueType<T>(), pVal, pTotal);
 			}
 			_fn.Store(pResult, pTotal);
 		}

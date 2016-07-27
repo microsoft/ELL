@@ -65,6 +65,10 @@ namespace emll
 				{
 					CompileDotProductNode(node);
 				}
+				else if (IsNodeType(typeName, c_SumNodeType))
+				{
+					CompileSumNode(node);
+				}
 				else
 				{
 					throw new CompilerException(CompilerError::nodeTypeNotSupported);

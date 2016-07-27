@@ -150,6 +150,12 @@ nodes::DotProductNode<T>* ModelBuilder::DotProduct(const model::OutputPort<T>& x
 }
 
 template<typename T>
+nodes::SumNode<T>* ModelBuilder::Sum(const model::OutputPort<T>& x)
+{
+	return _model.AddNode<nodes::SumNode<T>>(x);
+}
+
+template<typename T>
 nodes::ConstantNode<T>* ModelBuilder::Constant(const T value)
 {
 	return _model.AddNode<nodes::ConstantNode<T>>(value);
@@ -247,6 +253,23 @@ void TestDotProduct(bool expanded)
 	auto input1 = mb.Inputs<double>(4);
 	auto dotProduct = mb.DotProduct<double>(c1->output, input1->output);
 	auto output = mb.Outputs<double>(dotProduct->output);
+
+	IRCompiler compiler("EMLL", std::cout);
+	compiler.ShouldUnrollLoops() = expanded;
+	compiler.CompileModel("Predict", mb.Model);
+	compiler.DebugDump();
+}
+
+void TestSum(bool expanded)
+{
+	std::vector<double> data = { 5, 10, 15, 20 };
+
+	ModelBuilder mb;
+	auto c1 = mb.Constant<double>(data);
+	auto input1 = mb.Inputs<double>(4);
+	auto product = mb.Multiply<double>(c1->output, input1->output);
+	auto sum = mb.Sum<double>(product->output);
+	auto output = mb.Outputs<double>(sum->output);
 
 	IRCompiler compiler("EMLL", std::cout);
 	compiler.ShouldUnrollLoops() = expanded;
