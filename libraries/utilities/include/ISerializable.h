@@ -31,7 +31,7 @@ namespace utilities
 
     // TODO: put these someplace that makes sense
     template <typename ValueType>
-    using IsFundamental2 = typename std::enable_if_t<std::is_fundamental<typename std::decay<ValueType>::type>::value, int>;
+    using IsFundamental = typename std::enable_if_t<std::is_fundamental<typename std::decay<ValueType>::type>::value, int>;
 
     template <typename ValueType>
     using IsNotFundamental = typename std::enable_if_t<!std::is_fundamental<typename std::decay<ValueType>::type>::value, int>;
@@ -66,7 +66,7 @@ namespace utilities
     template <typename ValueType, IsNotSerializable<ValueType> concept=0>
     ObjectDescription GetDescription(ValueType&& obj);
 
-    template <typename ValueType, IsFundamental2<ValueType> concept=0>
+    template <typename ValueType, IsFundamental<ValueType> concept=0>
     ObjectDescription GetDescription(ValueType&& obj);
 
     ObjectDescription GetDescription(const ISerializable& obj);
@@ -75,7 +75,7 @@ namespace utilities
     //
     // Serializer class
     //
-    class Serializer
+    class Serializer2
     {
     public:
         template <typename T>
@@ -161,7 +161,7 @@ namespace utilities
         virtual void EndSerializeType(const ObjectDescription& desc) = 0;
     };
 
-    class SimpleSerializer : public Serializer
+    class SimpleSerializer : public Serializer2
     {
     protected:
         virtual void SerializeFundamentalType(const Variant& variant) override;

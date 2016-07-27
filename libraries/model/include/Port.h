@@ -79,6 +79,7 @@ namespace model
 
     protected:
         Port(const class Node* node, std::string name, PortType type, size_t size) : _node(node), _name(name), _type(type), _size(size) {}
+        // Port(const Port& other) = delete;
 
     private:
         // _node keeps info on where the input is coming from

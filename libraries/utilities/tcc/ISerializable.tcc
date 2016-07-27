@@ -20,7 +20,7 @@ namespace utilities
         return description;
     }
 
-    template <typename ValueType, IsFundamental2<ValueType> concept>
+    template <typename ValueType, IsFundamental<ValueType> concept>
     ObjectDescription GetDescription(ValueType&& obj)
     {
 //        std::cout << "GetDescription(fundamental)" << std::endl;
@@ -49,7 +49,7 @@ namespace utilities
 
     // TODO: just overload Serialize() on fundamental types instead of creating descriptions for them, etc. (?)
     template <typename T>
-    void Serializer::Serialize(T&& obj)
+    void Serializer2::Serialize(T&& obj)
     {
         auto desc = GetDescription(obj);
         if(desc.IsFundamentalType())

@@ -10,6 +10,7 @@
 
 #include "Format.h"
 #include "TypeFactory.h"
+#include "ISerializable.h"  // Just to get the IsFundamental and IsClass definitions
 
 // stl
 #include <cstdint>
@@ -22,11 +23,11 @@
 
 namespace utilities
 {
-    template <typename ValueType>
-    using IsFundamental = typename std::enable_if_t<std::is_fundamental<ValueType>::value, int>;
+    // template <typename ValueType>
+    // using IsFundamental = typename std::enable_if_t<std::is_fundamental<ValueType>::value, int>;
 
-    template <typename ValueType>
-    using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, int>;
+    // template <typename ValueType>
+    // using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, int>;
 
     /// <summary>
     /// The XMLSerializer and XMLDeserializer classes facilitate serialization and
