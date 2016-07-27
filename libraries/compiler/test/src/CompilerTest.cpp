@@ -144,6 +144,12 @@ nodes::BinaryOperationNode<T>* ModelBuilder::Multiply(const model::OutputPort<T>
 }
 
 template<typename T>
+nodes::DotProductNode<T>* ModelBuilder::DotProduct(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
+{
+	return _model.AddNode<nodes::DotProductNode<T>>(x, y);
+}
+
+template<typename T>
 nodes::ConstantNode<T>* ModelBuilder::Constant(const T value)
 {
 	return _model.AddNode<nodes::ConstantNode<T>>(value);
@@ -209,7 +215,7 @@ void TestDataFlowCompiler()
 	compiler.DebugDump();
 }
 
-void TestModelCompiler()
+void TestBinaryVector()
 {
 	std::vector<double> data = { 5, 10, 15, 20};
 	std::vector<double> data2 = { 4, 4, 4, 4};
@@ -223,6 +229,21 @@ void TestModelCompiler()
 	auto bop = mb.Add(c1->output, input1->output);
 	auto bop2 = mb.Multiply(bop->output, c2->output);
 	auto output = mb.Outputs<double>(bop2->output);
+
+	IRCompiler compiler("EMLL", std::cout);
+	compiler.CompileModel("Predict", mb.Model);
+	compiler.DebugDump();
+}
+
+void TestDotProduct()
+{
+	std::vector<double> data = { 5, 10, 15, 20 };
+
+	ModelBuilder mb;
+	auto c1 = mb.Constant<double>(data);
+	auto input1 = mb.Inputs<double>(4);
+	auto dotProduct = mb.DotProduct<double>(c1->output, input1->output);
+	auto output = mb.Outputs<double>(dotProduct->output);
 
 	IRCompiler compiler("EMLL", std::cout);
 	compiler.CompileModel("Predict", mb.Model);

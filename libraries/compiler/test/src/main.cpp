@@ -2,7 +2,8 @@
 
 int main(int argc, char* argv[])
 {
-	TestModelCompiler();
+	TestBinaryVector();
+	TestDotProduct();
 	TestLLVM();
 
 	return 0;

@@ -144,7 +144,8 @@ namespace emll
 		{
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
-			if (ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2))
+			if ((ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2)) &&
+				!ShouldUnrollLoops())
 			{
 				CompileLoop<T>(node);
 			}
@@ -180,6 +181,48 @@ namespace emll
 				llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(i));
 				llvm::Value* pOpResult = _fn.Op(GetOperator<T>(node), pLVal, pRVal);
 				_fn.SetValueAt(pResult, _fn.Literal((int)i), pOpResult);
+			}
+		}
+
+		template<typename T>
+		void IRCompiler::Compile(const nodes::DotProductNode<T>& node)
+		{
+			auto pInput1 = node.GetInputPorts()[0];
+			auto pInput2 = node.GetInputPorts()[1];
+			if ((ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2)) &&
+				!ShouldUnrollLoops())
+			{
+				CompileLoop<T>(node);
+			}
+			else
+			{
+				CompileExpanded<T>(node);
+			}
+		}
+
+		template<typename T>
+		void IRCompiler::CompileLoop(const nodes::DotProductNode<T>& node)
+		{
+			llvm::Value* pLVector = EnsureEmitted(node.GetInputPorts()[0]);
+			llvm::Value* pRVector = EnsureEmitted(node.GetInputPorts()[1]);
+			auto pOutput = node.GetOutputPorts()[0];
+			llvm::Value* pResult = EnsureEmitted(pOutput);
+			_fn.DotProductF(pOutput->Size(), pLVector, pRVector, pResult);
+		}
+
+		template<typename T>
+		void IRCompiler::CompileExpanded(const nodes::DotProductNode<T>& node)
+		{
+			auto pInput1 = node.GetInputPorts()[0];
+			auto pInput2 = node.GetInputPorts()[1];
+			llvm::Value* pResult = EnsureEmitted(node.GetOutputPorts()[0]);			
+			_fn.Store(pResult, _fn.Literal(0.0));
+			for (size_t i = 0; i < pInput1->Size(); ++i)
+			{
+				llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(i));
+				llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(i));
+				llvm::Value* pMultiplyResult = _fn.Op(GetMultiplyForValueType<T>(), pLVal, pRVal);
+				_fn.OpAndUpdate(pResult, GetAddForValueType<T>(), pMultiplyResult);
 			}
 		}
 	}

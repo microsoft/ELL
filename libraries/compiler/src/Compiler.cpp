@@ -51,14 +51,19 @@ namespace emll
 				}
 				else if (IsNodeType(typeName, c_ConstantNodeType))
 				{
-					CompileConstant(node);
+					CompileConstantNode(node);
 				}
 				else if (IsNodeType(typeName, c_InputNodeType))
 				{
+					CompileInputNode(node);
 				}
 				else if (IsNodeType(typeName, c_OutputNodeType))
 				{
 					CompileOutputNode(node);
+				}
+				else if (IsNodeType(typeName, c_DotProductType))
+				{
+					CompileDotProductNode(node);
 				}
 				else
 				{

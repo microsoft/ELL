@@ -21,6 +21,7 @@
 #include "InputNode.h"
 #include "OutputNode.h"
 #include "BinaryOperationNode.h"
+#include "DotProductNode.h"
 
 #include <functional>
 
@@ -37,6 +38,8 @@ namespace emll
 			Compiler();
 			virtual ~Compiler() = default;
 
+			bool& ShouldUnrollLoops() { return _unrollLoops; }
+
 			void CompileGraph(const std::string& functionName, DataFlowGraph& graph);
 
 			virtual void Compile(LiteralNode& node) = 0;
@@ -48,9 +51,11 @@ namespace emll
 
 			void CompileModel(const std::string& functionName, model::Model& model);
 
-			virtual void CompileConstant(const model::Node& node) = 0;
+			virtual void CompileConstantNode(const model::Node& node) = 0;
+			virtual void CompileInputNode(const model::Node& node) = 0;
 			virtual void CompileOutputNode(const model::Node& node) = 0;
 			virtual void CompileBinaryNode(const model::Node& node) = 0;
+			virtual void CompileDotProductNode(const model::Node& node) = 0;
 
 			void BeginFunctionPredict();
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
@@ -86,6 +91,11 @@ namespace emll
 			VariableAllocator _variables;
 			NamedValueTypeList _args;
 			std::unordered_map<const model::OutputPortBase*, Variable*> _portToVarMap;
+
+			//
+			// Compiler settings
+			//
+			bool _unrollLoops = false;
 		};
 	}
 }

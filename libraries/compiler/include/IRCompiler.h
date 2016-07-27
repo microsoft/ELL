@@ -21,9 +21,11 @@ namespace emll
 			virtual void Compile(SumNode& node) override;
 			virtual void Compile(DotProductNodeV& node) override;
 
-			virtual void CompileConstant(const model::Node& node) override;
+			virtual void CompileConstantNode(const model::Node& node) override;
+			virtual void CompileInputNode(const model::Node& node) override;
 			virtual void CompileOutputNode(const model::Node& node) override;
 			virtual void CompileBinaryNode(const model::Node& node) override;
+			virtual void CompileDotProductNode(const model::Node& node) override;
 
 			void DebugDump();
 
@@ -91,6 +93,12 @@ namespace emll
 			void CompileLoop(const nodes::BinaryOperationNode<T>& node);
 			template<typename T>
 			void CompileExpanded(const nodes::BinaryOperationNode<T>& node);
+			template<typename T>
+			void Compile(const nodes::DotProductNode<T>& node);
+			template<typename T>
+			void CompileLoop(const nodes::DotProductNode<T>& node);
+			template<typename T>
+			void CompileExpanded(const nodes::DotProductNode<T>& node);
 
 			template<typename T>
 			OperatorType GetOperator(const nodes::BinaryOperationNode<T>& node);

@@ -14,6 +14,10 @@ public:
 	ModelBuilder(ModelBuilder&& src);
 
 	template<typename T>
+	nodes::ConstantNode<T>* Constant(const T value);
+	template<typename T>
+	nodes::ConstantNode<T>* Constant(const std::vector<T>& values);
+	template<typename T>
 	model::InputNode<T>* Inputs(size_t count);
 	template<typename T>
 	model::InputNode<T>* Inputs(std::vector<T>& values);
@@ -24,9 +28,7 @@ public:
 	template<typename T>
 	nodes::BinaryOperationNode<T>* Multiply(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 	template<typename T>
-	nodes::ConstantNode<T>* Constant(const T value);
-	template<typename T>
-	nodes::ConstantNode<T>* Constant(const std::vector<T>& values);
+	nodes::DotProductNode<T>* DotProduct(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 
 	// Expose as a property!
 	model::Model& Model = _model;
@@ -46,4 +48,5 @@ private:
 void TestDataFlowBuilder();
 void TestDataFlowCompiler();
 
-void TestModelCompiler();
+void TestBinaryVector();
+void TestDotProduct();
