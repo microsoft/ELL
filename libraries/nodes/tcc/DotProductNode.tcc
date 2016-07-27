@@ -6,10 +6,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "BinaryOperationNode.h"
+
 namespace nodes
 {
     template <typename ValueType>
-    DotProductNode<ValueType>::DotProductNode(const model::OutputPortElementList<ValueType>& input1, const model::OutputPortElementList<ValueType>& input2) : Node({&_input1, &_input2}, {&_output}), _input1(this, input1), _input2(this, input2), _output(this, 1)
+    DotProductNode<ValueType>::DotProductNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2) : Node({&_input1, &_input2}, {&_output}), _input1(this, input1, "input1"), _input2(this, input2, "input2"), _output(this, outputPortName, 1)
     {
     }
 
@@ -21,14 +23,14 @@ namespace nodes
         {
             result += _input1[index] * _input2[index];
         }
-        _output.SetOutput(result);
+        _output.SetOutput({result});
     };
 
     template <typename ValueType>
     void DotProductNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput1 = transformer.TransformInputPort(_input1);
-        auto newInput2 = transformer.TransformInputPort(_input2);
+        auto newInput1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
+        auto newInput2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
         auto newNode = transformer.AddNode<DotProductNode<ValueType>>(newInput1, newInput2);
         transformer.MapOutputPort(output, newNode->output);
     }
@@ -37,9 +39,9 @@ namespace nodes
     void DotProductNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         // Maybe... in reality, dot product will likely want to be computed as in Compute() above
-        auto newInput1 = transformer.TransformInputPort(_input1);
-        auto newInput2 = transformer.TransformInputPort(_input2);
-        auto multNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput1, newInput2, BinaryOperationNode<ValueType>::OperationType::multiply);
+        auto newInput1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
+        auto newInput2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
+        auto multNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput1, newInput2, BinaryOperationNode<ValueType>::OperationType::coordinatewiseMultiply);
         auto sumNode = transformer.AddNode<SumNode<ValueType>>(multNode->output);
 
         transformer.MapOutputPort(output, sumNode->output);

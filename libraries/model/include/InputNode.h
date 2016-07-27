@@ -12,6 +12,9 @@
 #include "OutputPort.h"
 #include "ModelTransformer.h"
 
+// utilities
+#include "TypeName.h"
+
 #include <vector>
 #include <memory>
 #include <string>
@@ -37,7 +40,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "Input"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("InputNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -52,6 +55,8 @@ namespace model
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(ModelTransformer& transformer) const override;
+
+        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

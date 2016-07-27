@@ -9,7 +9,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::OutputPortElementList<ValueType>& input1, const model::OutputPortElementList<ValueType>& input2, OperationType operation) : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1), _input2(this, input2), _output(this, _input1.Size()), _operation(operation)
+    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2, OperationType operation) : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
     {
         if (input1.Size() != input2.Size())
         {
@@ -57,9 +57,9 @@ namespace nodes
     template <typename ValueType>
     void BinaryOperationNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput1 = transformer.TransformInputPort(_input1);
-        auto newInput2 = transformer.TransformInputPort(_input2);
-        auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput1, newInput2, _operation);
+        auto OutputPortElements1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
+        auto OutputPortElements2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
+        auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(OutputPortElements1, OutputPortElements2, _operation);
         transformer.MapOutputPort(output, newNode->output);
     }
 }

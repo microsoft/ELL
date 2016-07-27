@@ -17,7 +17,6 @@
 
 namespace utilities
 {
-
     const char typeNameLeftBracket = '(';
     const char typeNameRightBracket = ')';
 
@@ -55,6 +54,18 @@ namespace utilities
         ///
         /// <returns> The serialization name. </returns>
         static std::string GetName();
+    };
+
+    /// <summary> Class used to get information about the bool type. </summary>
+    ///
+    /// <typeparam name="T"> Generic type parameter. </typeparam>
+    template<>
+    struct TypeName<bool>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "bool"; }
     };
 
     /// <summary> Class used to get information about the 8-bit integer type. </summary>
@@ -177,6 +188,20 @@ namespace utilities
         /// <returns> The serialization name. </returns>
         static std::string GetName() { return "double"; }
     };
+
+    /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
+    ///
+    /// <param name="baseType"> The base type (e.g., 'Vector') </param>
+    /// <typeparam name="Types"> The templated type (e.g., 'double') </typeparam>
+    template <typename... Types>
+    std::string GetCompositeTypeName(std::string baseType);
+
+    /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
+    ///
+    /// <param name="baseType"> The base type (e.g., 'Vector') </param>
+    /// <param name="subtypes"> The list of templated types (e.g., 'double') </param>
+    std::string GetCompositeTypeName(std::string baseType, const std::vector<std::string>& subtypes);
+
 }
 
 #include "../tcc/TypeName.tcc"

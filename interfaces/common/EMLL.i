@@ -59,7 +59,7 @@ namespace std
 %apply long {int64_t}
 
 #ifndef SWIGXML
-%template () std::vector<double>;
+%template (DoubleStlVector) std::vector<double>;
 %template () std::vector<float>;
 %template (StringVector) std::vector<std::string>;
 #endif
@@ -80,6 +80,10 @@ namespace std
 
 // Useful macros
 %include "macros.i"
+
+// Interface for NaN callbacks
+%include callback.i
+
 
 // Define some namespaces so we can refer to them later
 namespace lossFunctions {};

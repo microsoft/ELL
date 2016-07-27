@@ -19,4 +19,11 @@ namespace utilities
     { 
         return std::string("vector") + typeNameLeftBracket + TypeName<T>::GetName() + typeNameRightBracket; 
     }
+
+    template <typename... Types>
+    std::string GetCompositeTypeName(std::string baseType)
+    {
+        auto typeStrings = std::vector<std::string>{ TypeName<Types>::GetName()... };
+        return GetCompositeTypeName(baseType, typeStrings);
+    }
 }

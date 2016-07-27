@@ -13,8 +13,9 @@
 #include "Port.h"
 #include "InputPort.h"
 #include "OutputPort.h"
-#include "OutputPortElementList.h"
+#include "OutputPortElements.h"
 #include "InputNode.h"
+#include "OutputNode.h"
 %}
 
 %rename (ModelGraph) model::Model;
@@ -27,16 +28,17 @@
 
 %include "Port.h"
 %include "OutputPort.h"
-%include "OutputPortElementList.h"
+%include "OutputPortElements.h"
 %include "Node.h"
 %include "ModelGraph.h"
 %include "InputPort.h"
 %include "InputNode.h"
+%include "OutputNode.h"
 
 %template (DoubleOutputPort) model::OutputPort<double>;
 %template (BoolOutputPort) model::OutputPort<bool>;
-%template () model::OutputPortElementList<double>;
-%template () model::OutputPortElementList<bool>;
+%template () model::OutputPortElements<double>;
+%template () model::OutputPortElements<bool>;
 
 #ifndef SWIGXML
 %template (NodeVector) std::vector<model::Node*>;
@@ -47,5 +49,32 @@
 
 %template (DoubleInputNode) model::InputNode<double>;
 %template (BoolInputNode) model::InputNode<bool>;
+%template (DoubleOutputNode) model::OutputNode<double>;
+
+%template (DoubleInputNodeVector) std::vector<const model::InputNode<double>*>;
+%template (DoubleOutputNodeVector) std::vector<const model::OutputNode<double>*>;
 
 #endif
+
+%ignore model::Model::ComputeNodeOutput;
+
+%extend model::Model 
+{
+    // get input nodes
+    std::vector<const model::InputNode<double>*> GetDoubleInputNodes()
+    {
+        return $self->GetNodesByType<model::InputNode<double>>();
+    }
+
+    // get output nodes
+    std::vector<const model::OutputNode<double>*> GetDoubleOutputNodes()
+    {
+        return $self->GetNodesByType<model::OutputNode<double>>();
+    }
+
+    // compute output
+    std::vector<double> ComputeDoubleOutput(const OutputPort<double>& outputPort) const
+    {
+        return $self->ComputeNodeOutput(outputPort);
+    }
+}

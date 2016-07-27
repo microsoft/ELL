@@ -28,12 +28,12 @@ namespace nodes
         ///
         /// <param name="input"> The signal to predict from </param>
         /// <param name="predictor"> The linear predictor to use when making the prediction. </param>
-        LinearPredictorNode(const model::OutputPortElementList<double>& input, const predictors::LinearPredictor& predictor);
+        LinearPredictorNode(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "LinearNode"; }
+        static std::string GetTypeName() { return "LinearPredictorNode"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -46,6 +46,13 @@ namespace nodes
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
+        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
+        virtual void Refine(model::ModelTransformer& transformer) const override;
+
+        static constexpr char* inputPortName = "input";
+        static constexpr char* outputPortName = "output";
+
+    protected:
 		/// <summary>Get the predictor</summary>
 		const predictors::LinearPredictor& GetPredictor() const { return _predictor;}
     
@@ -53,7 +60,6 @@ namespace nodes
         virtual void Compute() const override;
 
     private:
-
         // Inputs
         model::InputPort<double> _input;
 
@@ -63,4 +69,19 @@ namespace nodes
         // Parameters
         predictors::LinearPredictor _predictor;
     };
+
+    /// <summary> A struct that represents the outputs of a linear predictor node. </summary>
+    struct LinearPredictorNodeOutputs
+    {
+        const model::OutputPort<double>& output;
+    };
+
+    /// <summary> Builds a part of the model that represents a linear predictor. </summary>
+    ///
+    /// <param name="model"> [in,out] The model being modified. </param>
+    /// <param name="outputPortElements"> The output port elements from which the linear predictor takes its inputs. </param>
+    /// <param name="predictor"> The linear predictor. </param>
+    ///
+    /// <returns> The LinearPredictorNodeOutputs. </returns>
+    LinearPredictorNodeOutputs BuildSubModel(const predictors::LinearPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
 }

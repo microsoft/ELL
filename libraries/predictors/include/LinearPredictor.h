@@ -36,12 +36,12 @@ namespace predictors
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        linear::DoubleVector& GetVector() { return _w; }
+        linear::DoubleVector& GetWeights() { return _w; }
 
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        const linear::DoubleVector& GetVector() const { return _w; }
+        const linear::DoubleVector& GetWeights() const { return _w; }
 
         /// <summary> Returns the underlying bias. </summary>
         ///
