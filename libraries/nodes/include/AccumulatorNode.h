@@ -55,7 +55,7 @@ namespace nodes
         virtual void Compute() const override;
 
     private:
-        // Inputs
+        // Input
         model::InputPort<ValueType> _input;
 
         // Output

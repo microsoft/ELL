@@ -64,8 +64,11 @@ namespace nodes
         virtual void Compute() const override;
 
     private:
-        std::vector<ValueType> _values;
+        // Output
         model::OutputPort<ValueType> _output;
+
+        // Constant value
+        std::vector<ValueType> _values;
     };
 }
 

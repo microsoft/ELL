@@ -70,7 +70,7 @@ namespace nodes
         model::OutputPort<double> _treeOutputs;
         model::OutputPort<bool> _edgeIndicatorVector;
 
-        // the forest
+        // Forest
         predictors::SimpleForestPredictor _forest;
     };
 }

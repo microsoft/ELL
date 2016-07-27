@@ -66,7 +66,7 @@ namespace nodes
         model::OutputPort<double> _prediction;
         model::OutputPort<double> _weightedElements;
 
-        // The linear predictor
+        // Linear predictor
         predictors::LinearPredictor _predictor;
     };
 

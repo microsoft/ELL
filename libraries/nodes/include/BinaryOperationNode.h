@@ -69,14 +69,15 @@ namespace nodes
         template <typename Operation>
         std::vector<ValueType> ComputeOutput(Operation&& fn) const;
 
-        OperationType _operation;
-
         // Inputs
         model::InputPort<ValueType> _input1;
         model::InputPort<ValueType> _input2;
 
         // Output
         model::OutputPort<ValueType> _output;
+
+        // Operation
+        OperationType _operation;
     };
 }
 
