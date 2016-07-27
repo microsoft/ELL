@@ -20,6 +20,7 @@ namespace emll
 			int _size;
 		};
 		using VectorF = VectorVar<double>;
+		using VectorI = VectorVar<int>;
 
 		template<typename T>
 		class LiteralVarV : public VectorVar<T>
@@ -33,15 +34,7 @@ namespace emll
 			std::vector<T> _data;
 		};
 		using LiteralVF = LiteralVarV<double>;
-
-		template<typename T>
-		class ShiftRegisterVar : public VectorVar<T>
-		{
-		public:
-			ShiftRegisterVar(size_t windowSize);
-		private:
-			size_t _windowSize;
-		};
+		using LiteralVI = LiteralVarV<int>;
 	}
 }
 

@@ -55,6 +55,8 @@ namespace emll
 			IRFunctionEmitter Function(const std::string& name, const ValueType returnType, const NamedValueTypeList& args, bool isPublic = false);
 			IRFunctionEmitter Function(const std::string& name, const ValueType returnType, std::initializer_list<ValueType> args, bool isPublic = false);
 
+			llvm::Function* GetFunction(const std::string& name);
+
 			//
 			// Serialization
 			//
@@ -95,7 +97,6 @@ namespace emll
 			}
 
 			llvm::GlobalVariable* Global(const std::string& name, llvm::Type *pType, llvm::Constant* pInitial, bool isConst);
-			llvm::Function* GetFunction(const std::string& name);
 			IRFunctionEmitter Function(const std::string& name, const ValueType returnType, const ValueTypeList* pArgs, bool isPublic);
 			void BeginFunction(llvm::Function* pfn);
 			void WriteToFile(const std::string& filePath, bool isBitCode);

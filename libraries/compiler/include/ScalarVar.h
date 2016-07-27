@@ -13,6 +13,7 @@ namespace emll
 			ScalarVar(const VariableScope scope, int flags = VariableFlags::isMutable);
 		};
 		using ScalarF = ScalarVar<double>;
+		using ScalarI = ScalarVar<int>;
 
 		template<typename T>
 		class LiteralVar : public ScalarVar<T>

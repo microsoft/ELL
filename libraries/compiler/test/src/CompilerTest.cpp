@@ -231,8 +231,21 @@ void TestLinearPredictor()
 
 }
 
-void TestModelEx()
+void TestModelCompiler()
 {
-	model::Model model = InitTestModelBinOp();
+	std::vector<double> data = { 5, 10, 15, 20};
+
+	ModelBuilder mb;
+
+	auto constant = mb.Constant<double>(data);
+	auto bop = mb.Add(constant->output, constant->output);
+
+	IRCompiler compiler("EMLL", std::cout);
+
+	compiler.BeginFunctionPredict();
+	compiler.CompileConstant(*constant);
+	compiler.CompileBinaryNode(*bop);
+	compiler.EndFunction();
+	compiler.DebugDump();
 }
 

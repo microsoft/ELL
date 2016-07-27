@@ -27,6 +27,36 @@ namespace emll
 		{
 		}
 
+		void Compiler::CompileConstant(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					CompileConstant(static_cast<const nodes::ConstantNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					CompileConstant(static_cast<const nodes::ConstantNode<int>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void Compiler::CompileBinaryNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					CompileConstant(static_cast<const nodes::BinaryOperationNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					CompileConstant(static_cast<const nodes::BinaryOperationNode<int>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
 		void Compiler::AllocVar(Variable& var)
 		{
 			if (var.HasEmittedName())
@@ -87,6 +117,45 @@ namespace emll
 			}
 		}
 
+		Variable* Compiler::AllocVar(model::OutputPortBase* pPort)
+		{
+			assert(pPort->Size() != 0);
+
+			ValueType type = ToValueType(pPort->GetType());
+			Variable* pVar = nullptr;
+			if (pPort->Size() == 1)
+			{
+				pVar = _variables.AddLocalScalarVariable(type);
+			}
+			else
+			{
+				pVar = _variables.AddVectorVariable(VariableScope::Global, type, pPort->Size());
+			}
+			SetVariableFor(pPort, pVar);
+			return pVar;
+		}
+
+		Variable* Compiler::GetVariableFor(const model::OutputPortBase* pPort)
+		{
+			assert(pPort != nullptr);
+			auto search = _portToVarMap.find(pPort);
+			if (search != _portToVarMap.end())
+			{
+				return search->second;
+			}
+			return nullptr;
+		}
+
+		Variable* Compiler::GetVariableFor(const model::OutputPortElement elt)
+		{
+			return GetVariableFor(elt.ReferencedPort());
+		}
+
+		void Compiler::SetVariableFor(const model::OutputPortBase* pPort, Variable* pVar)
+		{
+			_portToVarMap[pPort] = pVar;
+		}
+
 		void Compiler::CompileGraph(const std::string& functionName, DataFlowGraph& graph)
 		{
 			BeginFunction(functionName, graph);
@@ -109,6 +178,19 @@ namespace emll
 			NamedValueTypeList fnArgs;
 			fnArgs.init({ {c_InputVariableName, ValueType::PDouble },{ c_OutputVariableName, ValueType::PDouble } });
 			BeginFunction(c_PredictFunctionName, fnArgs);
+		}
+
+		ValueType Compiler::ToValueType(model::Port::PortType type)
+		{
+			switch (type)
+			{
+				case model::Port::PortType::Real:
+					return ValueType::Double;
+				case model::Port::PortType::Integer:
+					return ValueType::Int32;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
 		}
 
 		void Compiler::Reset()

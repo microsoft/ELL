@@ -44,7 +44,8 @@ private:
 	std::string _name;
 };
 
-void TestModelEx();
 void TestDataFlowBuilder();
 void TestDataFlowCompiler();
 void TestLinearPredictor();
+
+void TestModelCompiler();

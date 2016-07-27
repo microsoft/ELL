@@ -65,26 +65,39 @@ namespace emll
 			return Op(type, l, r);
 		}
 
-		void IRFunctionEmitter::OpV(OperatorType type, size_t count, llvm::Value* pLVal, llvm::Value* pRVal, std::function<void(llvm::Value*)> aggregator)
+		void IRFunctionEmitter::OpV(OperatorType type, size_t count, llvm::Value* pLVal, llvm::Value* pRVal, std::function<void(llvm::Value*, llvm::Value*)> aggregator)
 		{
 			assert(pLVal != nullptr);
 			assert(pRVal != nullptr);
-
-			llvm::GlobalVariable* pLGlobal = llvm::dyn_cast<llvm::GlobalVariable>(pLVal);
-			llvm::GlobalVariable* pRGlobal = llvm::dyn_cast<llvm::GlobalVariable>(pLVal);
 
 			auto forLoop = ForLoop();
 			auto pBodyBlock = forLoop.Begin(count);
 			{
 				auto i = forLoop.LoadIterationVar();
-				llvm::Value* pLItem = (pLGlobal != nullptr) ? 
-										ValueAt(pLGlobal, i) :
-										ValueAtA(pLVal, i);
-				llvm::Value* pRItem =  (pRGlobal != nullptr) ?
-										ValueAt(pRGlobal, i) :
-										ValueAtA(pRVal, i);
+				llvm::Value* pLItem = ValueAt(pLVal, i);
+				llvm::Value* pRItem =  ValueAt(pRVal, i);
 				llvm::Value* pTemp = Op(type, pLItem, pRItem);
-				aggregator(pTemp);
+				aggregator(i, pTemp);
+			}
+			forLoop.End();
+		}
+
+		void IRFunctionEmitter::OpV(OperatorType type, size_t count, llvm::Value* pLVal, int startAtL, llvm::Value* pRVal, int startAtR, std::function<void(llvm::Value*, llvm::Value*)> aggregator)
+		{
+			assert(pLVal != nullptr);
+			assert(pRVal != nullptr);
+
+			auto forLoop = ForLoop();
+			auto pBodyBlock = forLoop.Begin(count);
+			{
+				auto i = forLoop.LoadIterationVar();
+
+				llvm::Value* lOffset = Op(OperatorType::Add, i, Literal(startAtL));
+				llvm::Value* pLItem = ValueAt(pLVal, lOffset);				
+				llvm::Value* rOffset = Op(OperatorType::Add, i, Literal(startAtR));
+				llvm::Value* pRItem = ValueAt(pRVal, rOffset);
+				llvm::Value* pTemp = Op(type, pLItem, pRItem);				
+				aggregator(i, pTemp);
 			}
 			forLoop.End();
 		}
@@ -130,6 +143,11 @@ namespace emll
 		llvm::Value* IRFunctionEmitter::SetValueAtA(llvm::Value* pPtr, int offset, llvm::Value* pValue)
 		{
 			return _pEmitter->Store(PtrOffsetA(pPtr, offset), pValue);
+		}
+
+		llvm::Value* IRFunctionEmitter::SetValueAtA(llvm::Value* pPtr, llvm::Value* pOffset, llvm::Value* pValue)
+		{
+			return _pEmitter->Store(PtrOffsetA(pPtr, pOffset), pValue);
 		}
 
 		llvm::Value* IRFunctionEmitter::PtrOffsetH(llvm::Value* ptr, int offset)
@@ -178,9 +196,29 @@ namespace emll
 			return Load(_pEmitter->PtrOffset(pGlobal, pOffset));
 		}
 
+		llvm::Value* IRFunctionEmitter::ValueAt(llvm::Value* pPtr, llvm::Value* pOffset)
+		{
+			llvm::GlobalVariable* pGlobal = llvm::dyn_cast<llvm::GlobalVariable>(pPtr);
+			if (pGlobal != nullptr)
+			{
+				return ValueAt(pGlobal, pOffset);
+			}
+			return ValueAtA(pPtr, pOffset);
+		}
+
 		llvm::Value* IRFunctionEmitter::SetValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pVal)
 		{
 			return Store(PtrOffset(pGlobal, pOffset), pVal);
+		}
+
+		llvm::Value* IRFunctionEmitter::SetValueAt(llvm::Value* pPtr, llvm::Value* pOffset, llvm::Value* pVal)
+		{
+			llvm::GlobalVariable* pGlobal = llvm::dyn_cast<llvm::GlobalVariable>(pPtr);
+			if (pGlobal != nullptr)
+			{
+				return SetValueAt(pGlobal, pOffset, pVal);
+			}
+			return SetValueAtA(pPtr, pOffset, pVal);
 		}
 
 		IRForLoopEmitter IRFunctionEmitter::ForLoop()
@@ -233,7 +271,7 @@ namespace emll
 		void IRFunctionEmitter::DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest)
 		{
 			Store(pDest, Literal(0.0));
-			OpV(OperatorType::MultiplyF, count, pLVal, pRVal, [&pDest, this](llvm::Value* pValue) {
+			OpV(OperatorType::MultiplyF, count, pLVal, pRVal, [&pDest, this](llvm::Value* i, llvm::Value* pValue) {
 				OpAndUpdate(pDest, OperatorType::AddF, pValue);
 			});
 		}

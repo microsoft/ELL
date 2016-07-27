@@ -1,5 +1,6 @@
 #include "Variable.h"
-#include "IRCompiler.h"
+#include "ScalarVar.h"
+#include "VectorVar.h"
 
 namespace emll
 {
@@ -44,15 +45,31 @@ namespace emll
 			var.Clear();
 		}
 
-		Variable* VariableAllocator::AddLocalScalarVariable(ValueType type)
+		Variable* VariableAllocator::AddLocalScalarVariable(VariableScope scope, ValueType type)
 		{
 			switch (type)
 			{
-			case ValueType::Double:
-				return AddVariable<ScalarF>(VariableScope::Local);
-			default:
-				throw new CompilerException(CompilerError::valueTypeNotSupported);
+				case ValueType::Double:
+					return AddVariable<ScalarF>(scope);
+				case ValueType::Int32:
+					return AddVariable<ScalarI>(scope);
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
+		}
+
+		Variable* VariableAllocator::AddVectorVariable(VariableScope scope, ValueType type, int size)
+		{
+			switch (type)
+			{
+				case ValueType::Double:
+					return AddVariable<VectorF>(scope, size);
+				case ValueType::Int32:
+					return AddVariable<VectorI>(scope, size);
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
+			}
+
 		}
 
 		Variable* VariableAllocator::AddVectorElementVariable(ValueType type, Variable& src, int offset)

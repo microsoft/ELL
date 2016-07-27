@@ -26,6 +26,7 @@ set (SRC src/Types.cpp
 		 src/Dataflow.cpp
 		 src/DataFlowBuilder.cpp
 		 src/Compiler.cpp
+		 src/IRRuntime.cpp
 		 src/IRCompiler.cpp
 )
 
@@ -47,6 +48,7 @@ set (INCLUDE include/LLVMInclude.h
 		include/DataFlowGraph.h
 		include/DataFlowBuilder.h
 		include/Compiler.h
+		include/IRRuntime.h
 		include/IRCompiler.h
 )
 
@@ -56,6 +58,7 @@ set (TCC tcc/SymbolTable.tcc
 		 tcc/VectorVar.tcc
 		 tcc/DataFlowGraph.tcc
 		 tcc/DataFlowBuilder.tcc
+		 tcc/IRRuntime.tcc
 		 tcc/IRCompiler.tcc
 )
 

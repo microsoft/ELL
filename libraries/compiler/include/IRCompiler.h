@@ -21,10 +21,23 @@ namespace emll
 			virtual void Compile(SumNode& node) override;
 			virtual void Compile(DotProductNodeV& node) override;
 
-			llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
 
-			llvm::Value* EnsureEmitted(Variable* pVar);
-			llvm::Value* EnsureEmitted(Variable& var);
+			virtual void CompileConstant(const nodes::ConstantNode<double>& node) override
+			{
+				Compile<double>(node);
+			}
+			virtual void CompileConstant(const nodes::ConstantNode<int>& node) override
+			{
+				Compile<int>(node);
+			}
+			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<double>& node)
+			{
+				Compile<double>(node);
+			}
+			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<int>& node)
+			{
+				Compile<int>(node);
+			}
 
 			void DebugDump();
 
@@ -62,13 +75,36 @@ namespace emll
 			void ApplyComputed(ComputedVar<T>& var, llvm::Value* pDest);
 
 			llvm::Value* EmitVector(Variable& var);
-			llvm::Value* EmitLiteralV(Variable& var);
+			llvm::Value* EmitLiteralVector(Variable& var);
+			llvm::Value* EmitGlobalVector(Variable& var);
 
 			template<typename T>
-			llvm::Value* EmitLiteralV(LiteralVarV<T>& var);
+			llvm::Value* EmitLiteralVector(LiteralVarV<T>& var);
+			template<typename T>
+			llvm::Value* EmitGlobalVector(VectorVar<T>& var);
+
+			llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
+			llvm::Value* EnsureEmitted(Variable* pVar);
+			llvm::Value* EnsureEmitted(Variable& var);
+			llvm::Value* EnsureEmitted(model::OutputPortBase* pPort);
+			llvm::Value* EnsureEmitted(model::OutputPortElement elt);
+			llvm::Value* EnsureEmitted(model::InputPortBase* pPort);
 
 			llvm::Value* LoadVar(Variable* pVar);
 			llvm::Value* LoadVar(Variable& var);
+			llvm::Value* LoadVar(const model::OutputPortElement elt);
+
+			template<typename T>
+			void Compile(const nodes::ConstantNode<T>& node);
+			template<typename T>
+			void Compile(const nodes::BinaryOperationNode<T>& node);
+			template<typename T>
+			void CompileLoop(const nodes::BinaryOperationNode<T>& node);
+			template<typename T>
+			void CompileExpanded(const nodes::BinaryOperationNode<T>& node);
+
+			template<typename T>
+			OperatorType GetOperator(const nodes::BinaryOperationNode<T>& node);
 
 		private:
 			std::ostream& _os;

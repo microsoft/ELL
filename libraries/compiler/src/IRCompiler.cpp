@@ -62,6 +62,7 @@ namespace emll
 			_fn.DotProductF(node.Var()->Dimension(), pSrc1, pSrc2, pDest);
 		}
 
+
 		void IRCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
 		{			
 			_fn = _module.Function(functionName, ValueType::Void, args, true);
@@ -155,6 +156,34 @@ namespace emll
 				ApplyComputed(var, pVal);
 			}
 			return pVal;
+		}
+
+		llvm::Value* IRCompiler::EnsureEmitted(model::OutputPortElement elt)
+		{
+			Variable* pVar = GetVariableFor(elt);
+			if (pVar == nullptr)
+			{
+				throw new CompilerException(CompilerError::variableForOutputNotFound);
+			}
+			return EnsureEmitted(pVar);
+		}
+
+		llvm::Value* IRCompiler::EnsureEmitted(model::OutputPortBase* pPort)
+		{
+			assert(pPort != nullptr);
+			Variable* pVar = GetVariableFor(pPort);
+			if (pVar == nullptr)
+			{
+				pVar = AllocVar(pPort);
+			}
+			assert(pVar != nullptr);
+			return EnsureEmitted(pVar);
+		}
+
+		llvm::Value* IRCompiler::EnsureEmitted(model::InputPortBase* pPort)
+		{
+			assert(pPort != nullptr);
+			return EnsureEmitted(pPort->GetOutputPortElement(0));
 		}
 
 		llvm::Value* IRCompiler::Emit(Variable& var)
@@ -297,28 +326,46 @@ namespace emll
 			switch (var.Scope())
 			{
 				case VariableScope::Literal:
-					pVal = EmitLiteralV(var);
+					pVal = EmitLiteralVector(var);
 					break;
-
+				case VariableScope::Global:
+					pVal = EmitGlobalVector(var);
+					break;
 				default:
 					throw new CompilerException(CompilerError::variableTypeNotSupported);
 			}
 			return pVal;
 		}
 
-		llvm::Value* IRCompiler::EmitLiteralV(Variable& var)
+		llvm::Value* IRCompiler::EmitLiteralVector(Variable& var)
 		{
 			llvm::Value* pVal = nullptr;
 			switch (var.Type())
 			{
 				case ValueType::Double:
-					pVal = EmitLiteralV<double>(static_cast<LiteralVarV<double>&>(var));
+					pVal = EmitLiteralVector<double>(static_cast<LiteralVarV<double>&>(var));
 					break;
 				default:
 					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 			assert(pVal != nullptr);
 			_literals.Set(var.EmittedName(), pVal);
+			return pVal;
+		}
+
+		llvm::Value* IRCompiler::EmitGlobalVector(Variable& var)
+		{
+			llvm::Value* pVal = nullptr;
+			switch (var.Type())
+			{
+			case ValueType::Double:
+				pVal = EmitGlobalVector<double>(static_cast<VectorVar<double>&>(var));
+				break;
+			default:
+				throw new CompilerException(CompilerError::valueTypeNotSupported);
+			}
+			assert(pVal != nullptr);
+			_globals.Set(var.EmittedName(), pVal);
 			return pVal;
 		}
 
@@ -336,6 +383,72 @@ namespace emll
 				pVal = _fn.Load(pVal);
 			}
 			return pVal;
+		}
+
+		llvm::Value* IRCompiler::LoadVar(const model::OutputPortElement elt)
+		{
+			Variable* pVar = GetVariableFor(elt);
+			if (pVar == nullptr)
+			{
+				throw new CompilerException(CompilerError::variableForOutputNotFound);
+			}
+			llvm::Value* pVal = EnsureEmitted(pVar);
+			if (pVar->IsScalar())
+			{
+				if (elt.GetIndex() > 0)
+				{
+					throw new CompilerException(CompilerError::variableIsNotVector);
+				}
+				if (pVar->IsLiteral())
+				{
+					return pVal;
+				}
+				return _fn.Load(pVal);
+			}
+
+			if (elt.GetIndex() >= pVar->Dimension())
+			{
+				throw new CompilerException(CompilerError::indexOutOfRange);
+			}
+			return _fn.ValueAt(pVal, _fn.Literal((int) elt.GetIndex()));
+		}
+
+		template<>
+		OperatorType IRCompiler::GetOperator<double>(const nodes::BinaryOperationNode<double>& node)
+		{
+			using Bop = nodes::BinaryOperationNode<double>;
+			switch (node.GetOperation())
+			{
+				case Bop::OperationType::add:
+					return OperatorType::AddF;
+				case Bop::OperationType::subtract:
+					return OperatorType::SubtractF;
+				case Bop::OperationType::coordinatewiseMultiply:
+					return OperatorType::MultiplyF;
+				case Bop::OperationType::divide:
+					return OperatorType::DivideF;
+				default:
+					throw new CompilerException(CompilerError::operationTypeNotSupported);
+			}
+		}
+
+		template<>
+		OperatorType IRCompiler::GetOperator<int>(const nodes::BinaryOperationNode<int>& node)
+		{
+			using Bop = nodes::BinaryOperationNode<int>;
+			switch (node.GetOperation())
+			{
+			case Bop::OperationType::add:
+				return OperatorType::Add;
+			case Bop::OperationType::subtract:
+				return OperatorType::Subtract;
+			case Bop::OperationType::coordinatewiseMultiply:
+				return OperatorType::Multiply;
+			case Bop::OperationType::divide:
+				return OperatorType::DivideS;
+			default:
+				throw new CompilerException(CompilerError::operationTypeNotSupported);
+			}
 		}
 
 		void IRCompiler::DebugDump()

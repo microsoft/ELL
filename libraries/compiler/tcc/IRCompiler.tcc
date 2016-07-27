@@ -97,9 +97,77 @@ namespace emll
 		}
 
 		template<typename T>
-		llvm::Value* IRCompiler::EmitLiteralV(LiteralVarV<T>& var)
+		llvm::Value* IRCompiler::EmitLiteralVector(LiteralVarV<T>& var)
 		{
 			return _module.Constant(var.EmittedName(), var.Data());
+		}
+
+		template<typename T>
+		llvm::Value* IRCompiler::EmitGlobalVector(VectorVar<T>& var)
+		{
+			return _module.Global(GetValueType<T>(), var.EmittedName(), var.Dimension());
+		}
+
+		template<typename T>
+		void IRCompiler::Compile(const nodes::ConstantNode<T>& node)
+		{
+			auto output = node.GetOutputPorts()[0];
+			const std::vector<T>& values = node.output.GetOutput();
+			Variable* pVar = nullptr;
+			if (output->Size() == 1)
+			{
+				pVar = Variables().AddVariable<LiteralVar<T>>(values[0]);
+			}
+			else
+			{
+				pVar = Variables().AddVariable<LiteralVarV<T>>(values);
+			}
+			SetVariableFor(output, pVar);
+			EnsureEmitted(pVar);
+		}
+
+		template<typename T>
+		void IRCompiler::Compile(const nodes::BinaryOperationNode<T>& node)
+		{
+			auto input1 = node.GetInputPorts()[0];
+			auto input2 = node.GetInputPorts()[1];
+			if (ModelEx::IsPureVector(*input1) && ModelEx::IsPureVector(*input2))
+			{
+				CompileLoop<T>(node);
+			}
+			else
+			{
+				CompileExpanded<T>(node);
+			}
+		}
+
+		template<typename T>
+		void IRCompiler::CompileLoop(const nodes::BinaryOperationNode<T>& node)
+		{
+			auto pVar1 = EnsureEmitted(node.GetInputPorts()[0]);
+			auto pVar2 = EnsureEmitted(node.GetInputPorts()[1]);
+			auto pOutput = node.GetOutputPorts()[0];
+			auto pResult = EnsureEmitted(pOutput);
+
+			_fn.OpV(GetOperator<T>(node), pOutput->Size(), pVar1, pVar2,
+				[&pResult, this](llvm::Value* i, llvm::Value* pValue) {
+				_fn.SetValueAt(pResult, i, pValue);
+			});
+		}
+
+		template<typename T>
+		void IRCompiler::CompileExpanded(const nodes::BinaryOperationNode<T>& node)
+		{
+			auto input1 = node.GetInputPorts()[0];
+			auto input2 = node.GetInputPorts()[1];
+			llvm::Value* pResult = EnsureEmitted(node.GetOutputPorts()[0]);
+			for (size_t i = 0; i < input1->Size(); ++i)
+			{
+				llvm::Value* pVal1 = LoadVar(input1->GetOutputPortElement(i));
+				llvm::Value* pVal2 = LoadVar(input2->GetOutputPortElement(i));
+				llvm::Value* pOpResult = _fn.Op(GetOperator<T>(node), pVal1, pVal2);
+				_fn.SetValueAt(pResult, _fn.Literal((int)i), pOpResult);
+			}
 		}
 	}
 }

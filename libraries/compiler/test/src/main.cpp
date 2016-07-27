@@ -2,12 +2,12 @@
 
 int main(int argc, char* argv[])
 {
+	TestModelCompiler();
 	TestLinearPredictor();
 	TestDataFlowCompiler();
 
 	TestLLVM();
 	TestDataFlowBuilder();
-	TestModelEx();
 
 	return 0;
 }

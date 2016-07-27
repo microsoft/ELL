@@ -78,7 +78,9 @@ namespace emll
 				return _pEmitter->BinaryOp(type, pLVal, pRVal);
 			}
 			llvm::Value* Op(OperatorType type, llvm::iterator_range<llvm::Function::arg_iterator>& args);
-			void OpV(OperatorType type, size_t count, llvm::Value* pLVal, llvm::Value* pRVal, std::function<void(llvm::Value*)> aggregator);
+			
+			void OpV(OperatorType type, size_t count, llvm::Value* pLVal, llvm::Value* pRVal, std::function<void(llvm::Value*, llvm::Value*)> aggregator);
+			void OpV(OperatorType type, size_t count, llvm::Value* pLVal, int startAtL, llvm::Value* pRVal, int startAtR, std::function<void(llvm::Value*, llvm::Value*)> aggregator);
 
 			void Branch(llvm::BasicBlock* pDestBlock)
 			{
@@ -132,12 +134,16 @@ namespace emll
 			llvm::Value* Store(llvm::Value* pPtr, llvm::Value* pValue);
 			llvm::Value* OpAndUpdate(llvm::Value* pPtr, OperatorType op, llvm::Value* pValue);
 
+			llvm::Value* ValueAt(llvm::Value* pPtr, llvm::Value* pOffset);
+			llvm::Value* SetValueAt(llvm::Value* pPtr, llvm::Value* pOffset, llvm::Value* pVal);
+
 			llvm::Value* PtrOffsetA(llvm::Value* pPtr, int offset);
 			llvm::Value* PtrOffsetA(llvm::Value* pPtr, llvm::Value* pOffset, const std::string& name = "");
 
 			llvm::Value* ValueAtA(llvm::Value* pPtr, int offset);
 			llvm::Value* ValueAtA(llvm::Value* pPtr, llvm::Value* pOffset);
 			llvm::Value* SetValueAtA(llvm::Value* pPtr, int offset, llvm::Value* pValue);
+			llvm::Value* SetValueAtA(llvm::Value* pPtr, llvm::Value* pOffset, llvm::Value* pValue);
 
 			llvm::Value* PtrOffsetH(llvm::Value* pPtr, int offset);
 			llvm::Value* PtrOffsetH(llvm::Value* pPtr, llvm::Value* pOffset);
@@ -148,9 +154,10 @@ namespace emll
 			llvm::Value* Ptr(llvm::GlobalVariable* pGlobal);
 			llvm::Value* PtrOffset(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset);
 			llvm::Value* PtrOffset(llvm::GlobalVariable* pGlobal, llvm::Value* , llvm::Value* pFieldOffset);
-			
+
 			llvm::Value* ValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset);
 			llvm::Value* SetValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pVal);
+
 
 			//------------------------------------------
 			//
@@ -180,6 +187,11 @@ namespace emll
 			void Verify()
 			{
 				llvm::verifyFunction(*_pfn);
+			}
+
+			llvm::Function* Function()
+			{
+				return _pfn;
 			}
 
 		private:

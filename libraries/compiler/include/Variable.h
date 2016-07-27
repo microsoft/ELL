@@ -153,7 +153,12 @@ namespace emll
 			template <typename VarType, typename... Args>
 			VarType* AddVariable(Args&&... args);
 
-			Variable* AddLocalScalarVariable(ValueType type);
+			Variable* AddLocalScalarVariable(ValueType type)
+			{
+				return AddLocalScalarVariable(VariableScope::Local, type);
+			}
+			Variable* AddLocalScalarVariable(VariableScope scope, ValueType type);
+			Variable* AddVectorVariable(VariableScope scope, ValueType type, int size);
 			Variable* AddVectorElementVariable(ValueType type, Variable& src, int offset);
 
 		private:
