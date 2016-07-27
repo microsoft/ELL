@@ -9,7 +9,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    L2NormNode<ValueType>::L2NormNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input, "input"), _output(this, "output", 1)
+    L2NormNode<ValueType>::L2NormNode(const model::OutputPortElements<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, 1)
     {
     }
 
@@ -28,8 +28,8 @@ namespace nodes
     template <typename ValueType>
     void L2NormNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<L2NormNode<ValueType>>(newInput);
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newNode = transformer.AddNode<L2NormNode<ValueType>>(newOutputPortElements);
         transformer.MapOutputPort(output, newNode->output);
     }
 
@@ -37,8 +37,8 @@ namespace nodes
     void L2NormNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         // TODO: elementwise x^2, sum, div by D
-        auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<L2NormNode<ValueType>>(newInput);
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newNode = transformer.AddNode<L2NormNode<ValueType>>(newOutputPortElements);
         transformer.MapOutputPort(output, newNode->output);
     }
 }

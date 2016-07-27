@@ -26,6 +26,8 @@ namespace model
     class Port//: public utilities::ISerializable
     {
     public:
+        virtual ~Port() = default;
+
         enum class PortType
         {
             None,
@@ -60,7 +62,7 @@ namespace model
         /// <typeparam name="ValueType"> The C++ type </typeparam>
         /// <returns> The corresponding PortType enum value </returns>
         template <typename ValueType>
-        static PortType GetTypeCode();
+        static PortType GetPortType();
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -74,8 +76,6 @@ namespace model
 
         /// Inherited from ISerializable
 //        virtual utilities::ObjectDescription GetDescription() const override;
-
-        virtual ~Port() = default;
 
     protected:
         Port(const class Node* node, std::string name, PortType type, size_t size) : _node(node), _name(name), _type(type), _size(size) {}

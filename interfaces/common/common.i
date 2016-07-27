@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     common.i (interfaces)
-//  Authors:  Chuck Jacobs
+//  Authors:  Chuck Jacobs, Piali Choudhury (pialic)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -25,3 +25,7 @@
 // Modified versions of interfaces
 %include "DataLoadersInterface.h"
 %include "LoadModelInterface.h" 
+
+#if defined(SWIGJAVASCRIPT)
+%include "loadModelAsync.i"
+#endif

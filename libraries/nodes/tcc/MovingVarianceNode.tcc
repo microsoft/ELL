@@ -9,7 +9,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    MovingVarianceNode<ValueType>::MovingVarianceNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize) : Node({ &_input }, { &_output }), _input(this, input, "input"), _output(this, "output", _input.Size()), _windowSize(windowSize)
+    MovingVarianceNode<ValueType>::MovingVarianceNode(const model::OutputPortElements<ValueType>& input, size_t windowSize) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _windowSize(windowSize)
     {
         auto dimension = input.Size();
         for (size_t index = 0; index < windowSize; ++index)
@@ -43,16 +43,8 @@ namespace nodes
     template <typename ValueType>
     void MovingVarianceNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<MovingVarianceNode<ValueType>>(newInput, _windowSize);
-        transformer.MapOutputPort(output, newNode->output);
-    }
-
-    template <typename ValueType>
-    void MovingVarianceNode<ValueType>::Refine(model::ModelTransformer& transformer) const
-    {
-        auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<MovingVarianceNode<ValueType>>(newInput, _windowSize);
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newNode = transformer.AddNode<MovingVarianceNode<ValueType>>(newOutputPortElements, _windowSize);
         transformer.MapOutputPort(output, newNode->output);
     }
 }

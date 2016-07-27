@@ -25,6 +25,7 @@ int main()
     TestLinearPredictorNodeCompute();
     
     TestMovingAverageNodeRefine();
+    TestLinearPredictorNodeRefine();
 
     if (testing::DidTestFail())
     {

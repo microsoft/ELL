@@ -30,7 +30,7 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ExtremalValueNode(const OutputPortElementList<ValueType>& input);
+        ExtremalValueNode(const OutputPortElements<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -48,16 +48,13 @@ namespace model
         /// <summary> Exposes the extremal value index port as a read-only property </summary>
         const OutputPort<int>& argVal = _argVal;
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(ModelTransformer& transformer) const override;
-
-        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(ModelTransformer& transformer) const override;
-
+        static constexpr char* inputPortName = "input";
+        static constexpr char* valPortName = "val";
+        static constexpr char* argValPortName = "argVal";
+         
     protected:
         virtual void Compute() const override;
 
-    private:
         // My inputs
         InputPort<ValueType> _input;
 
@@ -66,13 +63,53 @@ namespace model
         OutputPort<int> _argVal;
     };
 
-    /// <summary> Type alias for argmin node </summary>
+    /// <summary> ArgMin node subclass </summary>
     template <typename ValueType>
-    using ArgMinNode = ExtremalValueNode<ValueType, false>;
+    class ArgMinNode : public ExtremalValueNode<ValueType, false>
+    {
+    public:
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="input"> The node to get the input data from </param>
+        ArgMinNode(const OutputPortElements<ValueType>& input) : ExtremalValueNode<ValueType, false>(input) {}
 
-    /// <summary> Type alias for argmax node </summary>
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("ArgMinNode"); }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(ModelTransformer& transformer) const override;
+    };
+
+    /// <summary> ArgMax node subclass </summary>
     template <typename ValueType>
-    using ArgMaxNode = ExtremalValueNode<ValueType, true>;
+    class ArgMaxNode : public ExtremalValueNode<ValueType, true>
+    {
+    public:
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="input"> The node to get the input data from </param>
+        ArgMaxNode(const OutputPortElements<ValueType>& input) : ExtremalValueNode<ValueType, true>(input) {}
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("ArgMaxNode"); }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(ModelTransformer& transformer) const override;
+    };
 }
 
 #include "../tcc/ExtremalValueNode.tcc"

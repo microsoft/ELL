@@ -11,7 +11,7 @@
 // model
 #include "Node.h"
 #include "ModelTransformer.h"
-#include "OutputPortElementList.h"
+#include "OutputPortElements.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
@@ -32,7 +32,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to delay </param>
         /// <param name="windowSize"> The number of samples to delay the signal </param>
-        DelayNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize);
+        DelayNode(const model::OutputPortElements<ValueType>& input, size_t windowSize);
         
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -50,8 +50,8 @@ namespace nodes
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(model::ModelTransformer& transformer) const override;
+        static constexpr char* inputPortName = "input";
+        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

@@ -9,7 +9,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    MovingAverageNode<ValueType>::MovingAverageNode(const model::OutputPortElementList<ValueType>& input, size_t windowSize) : Node({&_input}, {&_output}), _input(this, input, "input"), _output(this, "output", _input.Size()), _windowSize(windowSize)
+    MovingAverageNode<ValueType>::MovingAverageNode(const model::OutputPortElements<ValueType>& input, size_t windowSize) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _windowSize(windowSize)
     {
         auto dimension = input.Size();
         for(size_t index = 0; index < windowSize; ++index)
@@ -39,19 +39,19 @@ namespace nodes
     template <typename ValueType>
     void MovingAverageNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<MovingAverageNode<ValueType>>(newInput, _windowSize);
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newNode = transformer.AddNode<MovingAverageNode<ValueType>>(newOutputPortElements, _windowSize);
         transformer.MapOutputPort(output, newNode->output);
     }
 
     template <typename ValueType>
     void MovingAverageNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
-        auto delayNode = transformer.AddNode<DelayNode<ValueType>>(newInput, _windowSize);
-        auto subtractNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput, delayNode->output, BinaryOperationNode<ValueType>::OperationType::subtract);
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto delayNode = transformer.AddNode<DelayNode<ValueType>>(newOutputPortElements, _windowSize);
+        auto subtractNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newOutputPortElements, delayNode->output, BinaryOperationNode<ValueType>::OperationType::subtract);
         auto accumNode = transformer.AddNode<AccumulatorNode<ValueType>>(subtractNode->output);
-        std::vector<ValueType> literalN(newInput.Size(), (ValueType)_windowSize);
+        std::vector<ValueType> literalN(newOutputPortElements.Size(), (ValueType)_windowSize);
         auto constNode = transformer.AddNode<ConstantNode<ValueType>>(literalN);
         auto divideNode = transformer.AddNode<BinaryOperationNode<ValueType>>(accumNode->output, constNode->output, BinaryOperationNode<ValueType>::OperationType::divide);
         transformer.MapOutputPort(output, divideNode->output);

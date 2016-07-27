@@ -10,7 +10,7 @@
 
 #include "Node.h"
 #include "ModelTransformer.h"
-#include "OutputPortElementList.h"
+#include "OutputPortElements.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
@@ -38,7 +38,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to process. </param>
         /// <param name="operation"> The function to use to process the signal. </param>
-        UnaryOperationNode(const model::OutputPortElementList<ValueType>& input, OperationType operation);
+        UnaryOperationNode(const model::OutputPortElements<ValueType>& input, OperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -55,6 +55,9 @@ namespace nodes
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
+
+        static constexpr char* inputPortName = "input";
+        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

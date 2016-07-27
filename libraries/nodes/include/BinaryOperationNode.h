@@ -38,7 +38,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         /// <param name="input1"> The left-hand input of the arithmetic expression </param>
         /// <param name="input2"> The right-hand input of the arithmetic expression </param>
-        BinaryOperationNode(const model::OutputPortElementList<ValueType>& input1, const model::OutputPortElementList<ValueType>& input2, OperationType operation);
+        BinaryOperationNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2, OperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -58,6 +58,10 @@ namespace nodes
 
         /// Inherited from ISerializable
         virtual utilities::ObjectDescription GetDescription() const override;
+
+        static constexpr char* input1PortName = "input1";
+        static constexpr char* input2PortName = "input2";
+        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

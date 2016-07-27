@@ -10,7 +10,7 @@
 namespace model
 {
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, { &_output }), _input(this, input, "input"), _output(this, "output", input.Size()){};
+    OutputNode<ValueType>::OutputNode(const model::OutputPortElements<ValueType>& input) : Node({&_input}, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
 
     template <typename ValueType>
     void OutputNode<ValueType>::Compute() const
@@ -21,8 +21,8 @@ namespace model
     template <typename ValueType>
     void OutputNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<OutputNode<ValueType>>(newInput);
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newNode = transformer.AddNode<OutputNode<ValueType>>(newOutputPortElements);
         transformer.MapOutputPort(output, newNode->output);
     }
 

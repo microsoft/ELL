@@ -12,22 +12,22 @@
 namespace model
 {
     //
-    // Specializations of GetTypeCode
+    // Specializations of GetPortType
     //
     template <>
-    Port::PortType Port::GetTypeCode<double>()
+    Port::PortType Port::GetPortType<double>()
     {
         return Port::PortType::Real;
     }
 
     template <>
-    Port::PortType Port::GetTypeCode<int>()
+    Port::PortType Port::GetPortType<int>()
     {
         return Port::PortType::Integer;
     }
 
     template <>
-    Port::PortType Port::GetTypeCode<bool>()
+    Port::PortType Port::GetPortType<bool>()
     {
         return Port::PortType::Boolean;
     }

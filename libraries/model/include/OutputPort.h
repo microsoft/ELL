@@ -44,6 +44,7 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="node"> The node this output port is part of </param>
+        /// <param name="name"> The name of this port </param>
         /// <param name="size"> The dimensionality of this port </param>
         OutputPort(const class Node* node, std::string name, size_t size);
 

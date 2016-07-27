@@ -9,7 +9,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    AccumulatorNode<ValueType>::AccumulatorNode(const model::OutputPortElementList<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input, "input"), _output(this, "output", _input.Size())
+    AccumulatorNode<ValueType>::AccumulatorNode(const model::OutputPortElements<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size())
     {
         auto dimension = input.Size();
         _accumulator = std::vector<ValueType>(dimension);
@@ -28,8 +28,8 @@ namespace nodes
     template <typename ValueType>
     void AccumulatorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformInputPort(_input);
-        auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newInput);
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newOutputPortElements);
         transformer.MapOutputPort(output, newNode->output);
     }
 }

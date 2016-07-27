@@ -10,7 +10,7 @@
 
 #include "Node.h"
 #include "ModelTransformer.h"
-#include "OutputPortElementList.h"
+#include "OutputPortElements.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
@@ -30,7 +30,7 @@ namespace nodes
     public:
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the magnitude of </param>
-        L2NormNode(const model::OutputPortElementList<ValueType>& input);
+        L2NormNode(const model::OutputPortElements<ValueType>& input);
         
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -50,6 +50,9 @@ namespace nodes
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(model::ModelTransformer& transformer) const override;
+
+        static constexpr char* inputPortName = "input";
+        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;
