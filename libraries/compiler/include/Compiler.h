@@ -43,6 +43,8 @@ namespace emll
 			virtual void Compile(SumNode& node) = 0;
 			virtual void Compile(DotProductNodeV& node) = 0;
 
+			void CompileModel(model::Model& model);
+
 			void CompileConstant(const model::Node& node);
 			virtual void CompileConstant(const nodes::ConstantNode<double>& node) = 0;
 			virtual void CompileConstant(const nodes::ConstantNode<int>& node) = 0;

@@ -22,9 +22,45 @@ namespace emll
 		static const std::string c_inputVar = "input";
 		static const std::string c_outputVar = "output";
 
+		static const std::string c_ConstantNodeType = "Constant";
+		static const std::string c_BinaryNodeType = "BinaryOperationNode";
+		static const std::string c_InputNodeType = "Input";
+		static const std::string c_DotProductType = "DotProductNode";
+		static const std::string c_LinearNodeType = "LinearNode";
+		static const std::string c_SumNodeType = "SumNode";
+
 		/// <summary>Base class for ML Compiler.</summary>
 		Compiler::Compiler()
 		{
+		}
+
+		void Compiler::CompileModel(model::Model& model)
+		{
+			model.Visit([this](const model::Node& node) {
+				std::string typeName = node.GetRuntimeTypeName();
+				//
+				// TODO: Make this a lookup table
+				//
+				if (typeName == c_BinaryNodeType)
+				{
+					CompileBinaryNode(node);
+				}
+				else if (typeName == c_ConstantNodeType)
+				{
+					CompileConstant(node);
+				}
+				else if (typeName == c_InputNodeType)
+				{
+				}
+				else if (typeName == c_LinearNodeType)
+				{
+				}
+				else
+				{
+					throw new CompilerException(CompilerError::nodeTypeNotSupported);
+				}
+
+			});
 		}
 
 		void Compiler::CompileConstant(const model::Node& node)
@@ -47,10 +83,10 @@ namespace emll
 			switch (ModelEx::GetNodeDataType(node))
 			{
 				case model::Port::PortType::Real:
-					CompileConstant(static_cast<const nodes::BinaryOperationNode<double>&>(node));
+					CompileBinaryNode(static_cast<const nodes::BinaryOperationNode<double>&>(node));
 					break;
 				case model::Port::PortType::Integer:
-					CompileConstant(static_cast<const nodes::BinaryOperationNode<int>&>(node));
+					CompileBinaryNode(static_cast<const nodes::BinaryOperationNode<int>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);

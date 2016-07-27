@@ -234,17 +234,19 @@ void TestLinearPredictor()
 void TestModelCompiler()
 {
 	std::vector<double> data = { 5, 10, 15, 20};
+	std::vector<double> data2 = { 4, 4, 4, 4};
 
 	ModelBuilder mb;
 
-	auto constant = mb.Constant<double>(data);
-	auto bop = mb.Add(constant->output, constant->output);
+	auto c1 = mb.Constant<double>(data);
+	auto c2 = mb.Constant<double>(data2);
+	auto bop = mb.Add(c1->output, c1->output);
+	auto bop2 = mb.Multiply(bop->output, c2->output);
 
 	IRCompiler compiler("EMLL", std::cout);
 
 	compiler.BeginFunctionPredict();
-	compiler.CompileConstant(*constant);
-	compiler.CompileBinaryNode(*bop);
+	compiler.CompileModel(mb.Model);
 	compiler.EndFunction();
 	compiler.DebugDump();
 }
