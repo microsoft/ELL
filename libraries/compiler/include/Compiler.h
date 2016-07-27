@@ -14,9 +14,7 @@
 #include "Variable.h"
 #include "ScalarVar.h"
 #include "VectorVar.h"
-#include "DataFlowGraph.h"
-#include "DataFlowBuilder.h"
-
+#
 #include "ConstantNode.h"
 #include "InputNode.h"
 #include "OutputNode.h"
@@ -41,15 +39,6 @@ namespace emll
 
 			bool& ShouldUnrollLoops() { return _unrollLoops; }
 
-			void CompileGraph(const std::string& functionName, DataFlowGraph& graph);
-
-			virtual void Compile(LiteralNode& node) = 0;
-			virtual void Compile(BinaryNode& node) = 0;
-			virtual void Compile(InputNode& node) = 0;
-			virtual void Compile(OutputNode& node) = 0;
-			virtual void Compile(SumNode& node) = 0;
-			virtual void Compile(DotProductNodeV& node) = 0;
-
 			void CompileModel(const std::string& functionName, model::Model& model);
 
 			virtual void CompileConstantNode(const model::Node& node) = 0;
@@ -61,7 +50,6 @@ namespace emll
 
 			void BeginFunctionPredict();
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
-			virtual void BeginFunction(const std::string& functionName, DataFlowGraph& graph) = 0;
 			virtual void EndFunction() = 0;
 
 			void AllocVar(Variable& var);

@@ -92,68 +92,11 @@ namespace emll
 			}
 		}
 
-		void IRCompiler::Compile(LiteralNode& node)
-		{
-			EnsureEmitted(*(node.Var()));
-		}
-
-		void IRCompiler::Compile(InputNode& node)
-		{
-			EnsureEmitted(*(node.Var()));
-		}
-
-		void IRCompiler::Compile(OutputNode& node)
-		{
-			Variable& destVar = *(node.DestVar());
-			llvm::Value* pDest = EnsureEmitted(destVar);
-			llvm::Value* pResult = LoadVar(*(node.Var()));
-			// All inputs and outputs are pointers
-			_fn.SetValueAtA(pDest, node.ElementIndex(), pResult);
-		}
-
-		void IRCompiler::Compile(BinaryNode& node)
-		{
-			llvm::Value* pSrc1 = LoadVar(node.Src1());
-			llvm::Value* pSrc2 = LoadVar(node.Src2());
-			llvm::Value* pDest = EnsureEmitted(node.Var());
-			llvm::Value* pResult = _fn.Op(node.Op(), pSrc1, pSrc2);
-			_fn.Store(pDest, pResult);
-		}
-
-		void IRCompiler::Compile(SumNode& node)
-		{
-			llvm::Value* pTotal = EnsureEmitted(node.Var());
-			llvm::Value* pLast = LoadVar(node.Last());
-			if (node.Count() == 1)
-			{
-				_fn.Store(pTotal, pLast);
-			}
-			else
-			{
-				_fn.OpAndUpdate(pTotal, node.Op(), pLast);
-			}
-		}
-
-		void IRCompiler::Compile(DotProductNodeV& node)
-		{
-			llvm::Value* pSrc1 = LoadVar(node.Src1());
-			llvm::Value* pSrc2 = EnsureEmitted(node.Src2());
-			llvm::Value* pDest = EnsureEmitted(node.Var());
-			_fn.DotProductF(node.Var()->Dimension(), pSrc1, pSrc2, pDest);
-		}
-
 
 		void IRCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
 		{			
 			_fn = _module.Function(functionName, ValueType::Void, args, true);
 			RegisterFunctionArgs(args);
-		}
-
-		void IRCompiler::BeginFunction(const std::string& functionName, DataFlowGraph& graph)
-		{
-			NamedValueTypeList fnArgs;
-			AddFunctionArgs(graph, fnArgs);
-			BeginFunction(functionName, fnArgs);
 		}
 
 		void IRCompiler::EndFunction()
@@ -179,22 +122,6 @@ namespace emll
 				
 				default:
 					throw new CompilerException(CompilerError::variableScopeNotSupported);
-			}
-		}
-
-		void IRCompiler::AddFunctionArgs(DataFlowGraph& graph, NamedValueTypeList& args)
-		{
-			AddFunctionArgs(graph.InputArgs(), args);
-			AddFunctionArgs(graph.OutputArgs(), args);
-		}
-
-		void IRCompiler::AddFunctionArgs(const std::vector<ArgNode*>& argNodes, NamedValueTypeList& fnArgs)
-		{
-			for (ArgNode* pNode : argNodes)
-			{
-				Variable& var = *(pNode->Var());
-				AllocVar(var);
-				fnArgs.emplace_back(var.EmittedName(), GetPtrType(var.Type()));
 			}
 		}
 

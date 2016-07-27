@@ -193,23 +193,6 @@ namespace emll
 			_portToVarMap[pPort] = pVar;
 		}
 
-		void Compiler::CompileGraph(const std::string& functionName, DataFlowGraph& graph)
-		{
-			BeginFunction(functionName, graph);
-
-			// First, process all literals
-			for (auto node : graph.Literals())
-			{
-				node->Process(graph, *this);
-			}
-			// Now start executing the graph
-			for (auto node : graph.InputArgs())
-			{
-				node->Process(graph, *this);
-			}
-			EndFunction();
-		}
-
 		void Compiler::BeginFunctionPredict()
 		{
 			NamedValueTypeList fnArgs;

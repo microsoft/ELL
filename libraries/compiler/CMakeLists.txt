@@ -23,8 +23,6 @@ set (SRC src/Types.cpp
          src/IRFunctionEmitter.cpp
 		 src/ModelEx.cpp
 		 src/Variable.cpp
-		 src/Dataflow.cpp
-		 src/DataFlowBuilder.cpp
 		 src/Compiler.cpp
 		 src/IRCompiler.cpp
 )
@@ -43,9 +41,6 @@ set (INCLUDE include/LLVMInclude.h
 		include/Variable.h
 		include/ScalarVar.h
 		include/VectorVar.h
-		include/Dataflow.h
-		include/DataFlowGraph.h
-		include/DataFlowBuilder.h
 		include/Compiler.h
 		include/IRCompiler.h
 )
@@ -54,8 +49,6 @@ set (TCC tcc/SymbolTable.tcc
 		 tcc/Variable.tcc
 		 tcc/ScalarVar.tcc
 		 tcc/VectorVar.tcc
-		 tcc/DataFlowGraph.tcc
-		 tcc/DataFlowBuilder.tcc
 		 tcc/IRCompiler.tcc
 )
 

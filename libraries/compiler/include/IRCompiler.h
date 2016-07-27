@@ -14,13 +14,6 @@ namespace emll
 		public:
 			IRCompiler(const std::string& moduleName, std::ostream& os);
 
-			virtual void Compile(LiteralNode& node) override;
-			virtual void Compile(BinaryNode& node) override;
-			virtual void Compile(InputNode& node) override;
-			virtual void Compile(OutputNode& node) override;
-			virtual void Compile(SumNode& node) override;
-			virtual void Compile(DotProductNodeV& node) override;
-
 			virtual void CompileConstantNode(const model::Node& node) override;
 			virtual void CompileInputNode(const model::Node& node) override;
 			virtual void CompileOutputNode(const model::Node& node) override;
@@ -31,14 +24,9 @@ namespace emll
 			void DebugDump();
 
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) override;
-			virtual void BeginFunction(const std::string& functionName, DataFlowGraph& graph) override;
 			virtual void EndFunction() override;
-
-		public:
 		
 		private:
-			void AddFunctionArgs(DataFlowGraph& graph, NamedValueTypeList& args);
-			void AddFunctionArgs(const std::vector<ArgNode*>& argNodes, NamedValueTypeList& fnArgs);
 			void RegisterFunctionArgs(NamedValueTypeList& args);
 
 			llvm::Value* Emit(Variable& var);
