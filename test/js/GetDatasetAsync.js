@@ -16,14 +16,14 @@ const EMLL = require("emll");
 
 
 console.log("Loaded EMLL");
-var dataset = EMLL.GetDataset("F:\\EMLLDepot\\EMLLModule\\test\\data\\testData.txt");
+var dataset = EMLL.GetDataset("..\\data\\testData.txt");
 if(dataset)
 {
   console.log("Sync Mode Size:" + dataset.NumExamples());
   tap.pass('Test GetDataset');
 }
 
-EMLL.GetDatasetAsync("F:\\EMLLDepot\\EMLLModule\\test\\data\\testData.txt", function(datasetasync)
+EMLL.GetDatasetAsync("..\\data\\testData.txt", function(datasetasync)
 {
   if(datasetasync)
   {
