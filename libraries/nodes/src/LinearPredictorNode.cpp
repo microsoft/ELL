@@ -14,6 +14,9 @@
 // utilities
 #include "Exception.h"
 
+// dataset
+#include "DenseDataVector.h"
+
 // stl
 #include <string>
 #include <vector>
@@ -28,13 +31,15 @@ namespace nodes
 
     void LinearPredictorNode::Compute() const
     {
-        auto result = _predictor.GetBias();
-        const auto weights = _predictor.GetWeights();
-        for (size_t index = 0; index < _input.Size(); index++)
+        // create an IDataVector
+        dataset::DoubleDataVector dataVector; 
+        for (size_t i = 0; i < _input.Size(); ++i)
         {
-            result += _input[index] * weights[index];
+            dataVector.AppendEntry(_input[i]);
         }
-        _prediction.SetOutput({ result });
+        
+        double prediction = _predictor.Predict(dataVector);
+        _prediction.SetOutput({ prediction });
     }
 
     void LinearPredictorNode::Copy(model::ModelTransformer& transformer) const
