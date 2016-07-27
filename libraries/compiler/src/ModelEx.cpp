@@ -17,7 +17,7 @@ namespace emll
 		bool ModelEx::IsPureVector(const model::InputPortBase& port)
 		{
 			auto inputs = port.GetInputRanges();
-			return (inputs.GetRangeCount() == 1 && (inputs.begin()->Size() > 1));
+			return (inputs.NumRanges() == 1 && (inputs.begin()->Size() > 1));
 		}
 	}
 }

@@ -79,11 +79,10 @@ namespace emll
 
 		}
 
-		static const std::string c_ConstantNodeType = "Constant";
+		static const std::string c_ConstantNodeType = "ConstantNode";
 		static const std::string c_BinaryNodeType = "BinaryOperationNode";
-		static const std::string c_InputNodeType = "Input";
+		static const std::string c_InputNodeType = "InputNode";
 		static const std::string c_DotProductType = "DotProductNode";
-		static const std::string c_LinearNodeType = "LinearNode";
 		static const std::string c_SumNodeType = "SumNode";
 
 		void DataFlowBuilder::Process(const model::Model& mode)
@@ -110,10 +109,6 @@ namespace emll
 			else if (typeName == c_InputNodeType)
 			{
 				ProcessInputNode(node);
-			}
-			else if (typeName == c_LinearNodeType)
-			{
-				ProcessLinearPredictorNode(node);
 			}
 			else
 			{
@@ -185,7 +180,7 @@ namespace emll
 					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
 		}
-
+		/*
 		void DataFlowBuilder::ProcessLinearPredictorNode(const model::Node& node)
 		{
 			const nodes::LinearPredictorNode& lpNode = static_cast<const nodes::LinearPredictorNode&>(node);
@@ -222,7 +217,7 @@ namespace emll
 			pBias->AddDependent(pResult);
 			pDotProduct->AddDependent(pResult);
 		}
-
+		*/
 		DataNode* DataFlowBuilder::GetSourceNode(const model::InputPortBase* pPort, size_t elementIndex) const
 		{
 			assert(pPort != nullptr);

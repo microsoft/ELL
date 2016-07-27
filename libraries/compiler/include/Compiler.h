@@ -68,6 +68,7 @@ namespace emll
 			void SetVariableFor(const model::OutputPortBase* pPort, Variable* pVar);
 
 		protected:
+			bool IsNodeType(const std::string& nodeTypeName , const std::string& typeName);
 			ValueType ToValueType(model::Port::PortType type);
 			void CollectInputsAndOutputs(model::Model& model);
 

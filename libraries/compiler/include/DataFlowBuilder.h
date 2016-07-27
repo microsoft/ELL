@@ -4,11 +4,10 @@
 #include "Node.h"
 #include "InputNode.h"
 #include "OutputPort.h"
-#include "OutputPortElementList.h"
+#include "OutputPortElements.h"
 #include "ConstantNode.h"
 #include "BinaryOperationNode.h"
 #include "SumNode.h"
-#include "LinearPredictorNode.h"
 #include "DataflowGraph.h"
 
 namespace emll
@@ -59,7 +58,7 @@ namespace emll
 			void ProcessInputNode(const model::Node& node);
 			void ProcessOutputNode(const model::Node& node);
 			void ProcessSumNode(const model::Node& node);
-			void ProcessLinearPredictorNode(const model::Node& node);
+			//void ProcessLinearPredictorNode(const model::Node& node);
 
 			DataFlowGraph& Graph() { return _graph; }
 
@@ -75,7 +74,7 @@ namespace emll
 			void Process(const nodes::SumNode<DataType>& node);
 			template<typename DataType> 
 			void AddOutput(const model::Node& leafNode);			
-			void ProcessLinearPredictorV(const nodes::LinearPredictorNode& node);
+			//void ProcessLinearPredictorV(const nodes::LinearPredictorNode& node);
 
 			DataNode* GetSourceNode(const model::InputPortBase* pPort, size_t elementIndex) const;
 			void AddDependency(const model::InputPortBase* pPort, size_t elementIndex, DataNode* pDependant);

@@ -22,9 +22,9 @@ namespace emll
 		static const std::string c_inputVar = "input";
 		static const std::string c_outputVar = "output";
 
-		static const std::string c_ConstantNodeType = "Constant";
+		static const std::string c_ConstantNodeType = "ConstantNode";
 		static const std::string c_BinaryNodeType = "BinaryOperationNode";
-		static const std::string c_InputNodeType = "Input";
+		static const std::string c_InputNodeType = "InputNode";
 		static const std::string c_DotProductType = "DotProductNode";
 		static const std::string c_LinearNodeType = "LinearNode";
 		static const std::string c_SumNodeType = "SumNode";
@@ -40,22 +40,19 @@ namespace emll
 			CollectInputsAndOutputs(model);
 			BeginFunction(functionName, _args);
 			model.Visit([this](const model::Node& node) {
-				std::string typeName = node.GetRuntimeTypeName();
+				std::string typeName = node.GetRuntimeTypeName();	
 				//
 				// TODO: Make this a lookup table
 				//
-				if (typeName == c_BinaryNodeType)
+				if (IsNodeType(typeName, c_BinaryNodeType))
 				{
 					CompileBinaryNode(node);
 				}
-				else if (typeName == c_ConstantNodeType)
+				else if (IsNodeType(typeName, c_ConstantNodeType))
 				{
 					CompileConstant(node);
 				}
-				else if (typeName == c_InputNodeType)
-				{
-				}
-				else if (typeName == c_LinearNodeType)
+				else if (IsNodeType(typeName, c_InputNodeType))
 				{
 				}
 				else
@@ -236,6 +233,11 @@ namespace emll
 			BeginFunction(c_PredictFunctionName, fnArgs);
 		}
 
+		bool Compiler::IsNodeType(const std::string& nodeTypeName, const std::string& typeName)
+		{
+			return (nodeTypeName.compare(0, typeName.size(), typeName) == 0);
+		}
+
 		ValueType Compiler::ToValueType(model::Port::PortType type)
 		{
 			switch (type)
@@ -253,7 +255,7 @@ namespace emll
 		{
 			model.Visit([this](const model::Node& node) {
 				auto typeName = node.GetRuntimeTypeName();
-				if (typeName == c_InputNodeType)
+				if (IsNodeType(typeName, c_InputNodeType))
 				{
 					AllocArg(node.GetOutputPorts()[0], true);
 				}

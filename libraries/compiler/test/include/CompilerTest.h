@@ -3,7 +3,6 @@
 #include <string>
 #include <ostream>
 #include "Compiler.h"
-#include "LinearPredictorNode.h"
 
 void TestLLVM();
 
@@ -26,8 +25,6 @@ public:
 	nodes::ConstantNode<T>* Constant(const T value);
 	template<typename T>
 	nodes::ConstantNode<T>* Constant(const std::vector<T>& values);
-	
-	nodes::LinearPredictorNode* Linear(const model::OutputPort<double>& x, const predictors::LinearPredictor& predictor);
 
 	// Expose as a property!
 	model::Model& Model = _model;
@@ -46,6 +43,5 @@ private:
 
 void TestDataFlowBuilder();
 void TestDataFlowCompiler();
-void TestLinearPredictor();
 
 void TestModelCompiler();
