@@ -77,7 +77,7 @@ namespace nodes
         const model::OutputPort<double>& weightedElements;
     };
 
-    /// <summary> Builds a part of the model that represents a linear predictor. </summary>
+    /// <summary> Builds a part of the model that represents a refined linear predictor. </summary>
     ///
     /// <param name="model"> [in,out] The model being modified. </param>
     /// <param name="outputPortElements"> The output port elements from which the linear predictor takes its inputs. </param>

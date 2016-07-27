@@ -29,20 +29,6 @@ namespace nodes
         assert(input.Size() == predictor.GetDimension());
     }
 
-    void LinearPredictorNode::Compute() const
-    {
-        // create an IDataVector
-        dataset::DoubleDataVector dataVector; 
-        for (size_t i = 0; i < _input.Size(); ++i)
-        {
-            dataVector.AppendEntry(i, _input[i]);
-        }
-        
-        // predict
-        _prediction.SetOutput({ _predictor.Predict(dataVector) });
-        _weightedElements.SetOutput(_predictor.GetWeightedElements(dataVector));
-    }
-
     void LinearPredictorNode::Copy(model::ModelTransformer& transformer) const
     {
         auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
@@ -57,6 +43,20 @@ namespace nodes
         auto newOutputs = BuildSubModel(_predictor, transformer.GetModel(), newOutputPortElements);
         transformer.MapOutputPort(prediction, newOutputs.prediction);
         transformer.MapOutputPort(weightedElements, newOutputs.weightedElements);
+    }
+
+    void LinearPredictorNode::Compute() const
+    {
+        // create an IDataVector
+        dataset::DoubleDataVector dataVector; 
+        for (size_t i = 0; i < _input.Size(); ++i)
+        {
+            dataVector.AppendEntry(i, _input[i]);
+        }
+
+        // predict
+        _prediction.SetOutput({ _predictor.Predict(dataVector) });
+        _weightedElements.SetOutput(_predictor.GetWeightedElements(dataVector));
     }
 
     LinearPredictorNodeOutputs BuildSubModel(const predictors::LinearPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements)

@@ -52,4 +52,10 @@ namespace nodes
         auto edgeIndicator = _forest.GetEdgeIndicatorVector(_input);
         _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
     }
+
+    SimpleForestPredictorOutputs BuildSubModel(const predictors::SimpleForestPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
+    {
+        auto newNode = model.AddNode<SimpleForestNode>(outputPortElements, predictor);
+        return { newNode->prediction };
+    }
 }
