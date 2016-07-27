@@ -43,7 +43,7 @@
             'target_name': 'emll',
             'copies' : [
                 {
-                    'destination': 'dist',
+                    'destination': 'build',
                     'files': [
                         '<(include_path_prefix)/EMLL/build/interfaces/xml/EMLLXML_wrap.xml'
                     ]    

@@ -15,4 +15,4 @@ IF /I "%1"=="node" (
   call node-gyp rebuild
 )
 
-call copyWindowsLib
+:: call copyWindowsLib
