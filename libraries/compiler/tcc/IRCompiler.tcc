@@ -127,11 +127,24 @@ namespace emll
 		}
 
 		template<typename T>
+		void IRCompiler::Compile(const model::OutputNode<T>& node)
+		{
+			// Output ports have exactly 1 input, output
+			auto pInput = node.GetInputPorts()[0];
+			llvm::Value* pOutputVar = EnsureEmitted(node.GetOutputPorts()[0]);
+			for (size_t i = 0; i < pInput->Size(); ++i)
+			{
+				llvm::Value* pVal = LoadVar(pInput->GetOutputPortElement(i));
+				_fn.SetValueAt(pOutputVar, _fn.Literal((int)i), pVal);
+			}
+		}
+
+		template<typename T>
 		void IRCompiler::Compile(const nodes::BinaryOperationNode<T>& node)
 		{
-			auto input1 = node.GetInputPorts()[0];
-			auto input2 = node.GetInputPorts()[1];
-			if (ModelEx::IsPureVector(*input1) && ModelEx::IsPureVector(*input2))
+			auto pInput1 = node.GetInputPorts()[0];
+			auto pInput2 = node.GetInputPorts()[1];
+			if (ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2))
 			{
 				CompileLoop<T>(node);
 			}
@@ -144,28 +157,28 @@ namespace emll
 		template<typename T>
 		void IRCompiler::CompileLoop(const nodes::BinaryOperationNode<T>& node)
 		{
-			auto pVar1 = EnsureEmitted(node.GetInputPorts()[0]);
-			auto pVar2 = EnsureEmitted(node.GetInputPorts()[1]);
+			llvm::Value* pLVector = EnsureEmitted(node.GetInputPorts()[0]);
+			llvm::Value* pRVector = EnsureEmitted(node.GetInputPorts()[1]);
 			auto pOutput = node.GetOutputPorts()[0];
-			auto pResult = EnsureEmitted(pOutput);
+			llvm::Value* pResultVector = EnsureEmitted(pOutput);
 
-			_fn.OpV(GetOperator<T>(node), pOutput->Size(), pVar1, pVar2,
-				[&pResult, this](llvm::Value* i, llvm::Value* pValue) {
-				_fn.SetValueAt(pResult, i, pValue);
+			_fn.OpV(GetOperator<T>(node), pOutput->Size(), pLVector, pRVector,
+				[&pResultVector, this](llvm::Value* i, llvm::Value* pValue) {
+				_fn.SetValueAt(pResultVector, i, pValue);
 			});
 		}
 
 		template<typename T>
 		void IRCompiler::CompileExpanded(const nodes::BinaryOperationNode<T>& node)
 		{
-			auto input1 = node.GetInputPorts()[0];
-			auto input2 = node.GetInputPorts()[1];
+			auto pInput1 = node.GetInputPorts()[0];
+			auto pInput2 = node.GetInputPorts()[1];
 			llvm::Value* pResult = EnsureEmitted(node.GetOutputPorts()[0]);
-			for (size_t i = 0; i < input1->Size(); ++i)
+			for (size_t i = 0; i < pInput1->Size(); ++i)
 			{
-				llvm::Value* pVal1 = LoadVar(input1->GetOutputPortElement(i));
-				llvm::Value* pVal2 = LoadVar(input2->GetOutputPortElement(i));
-				llvm::Value* pOpResult = _fn.Op(GetOperator<T>(node), pVal1, pVal2);
+				llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(i));
+				llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(i));
+				llvm::Value* pOpResult = _fn.Op(GetOperator<T>(node), pLVal, pRVal);
 				_fn.SetValueAt(pResult, _fn.Literal((int)i), pOpResult);
 			}
 		}

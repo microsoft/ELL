@@ -18,6 +18,8 @@ public:
 	template<typename T>
 	model::InputNode<T>* Inputs(std::vector<T>& values);
 	template<typename T>
+	model::OutputNode<T>* Outputs(const model::OutputPort<T>& x);
+	template<typename T>
 	nodes::BinaryOperationNode<T>* Add(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 	template<typename T>
 	nodes::BinaryOperationNode<T>* Multiply(const model::OutputPort<T>& x, const model::OutputPort<T>& y);

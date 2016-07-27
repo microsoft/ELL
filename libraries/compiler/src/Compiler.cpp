@@ -25,6 +25,7 @@ namespace emll
 		static const std::string c_ConstantNodeType = "ConstantNode";
 		static const std::string c_BinaryNodeType = "BinaryOperationNode";
 		static const std::string c_InputNodeType = "InputNode";
+		static const std::string c_OutputNodeType = "OutputNode";
 		static const std::string c_DotProductType = "DotProductNode";
 		static const std::string c_LinearNodeType = "LinearNode";
 		static const std::string c_SumNodeType = "SumNode";
@@ -55,6 +56,10 @@ namespace emll
 				else if (IsNodeType(typeName, c_InputNodeType))
 				{
 				}
+				else if (IsNodeType(typeName, c_OutputNodeType))
+				{
+					CompileOutputNode(node);
+				}
 				else
 				{
 					throw new CompilerException(CompilerError::nodeTypeNotSupported);
@@ -62,36 +67,6 @@ namespace emll
 
 			});
 			EndFunction();
-		}
-
-		void Compiler::CompileConstant(const model::Node& node)
-		{
-			switch (ModelEx::GetNodeDataType(node))
-			{
-				case model::Port::PortType::Real:
-					CompileConstant(static_cast<const nodes::ConstantNode<double>&>(node));
-					break;
-				case model::Port::PortType::Integer:
-					CompileConstant(static_cast<const nodes::ConstantNode<int>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
-		void Compiler::CompileBinaryNode(const model::Node& node)
-		{
-			switch (ModelEx::GetNodeDataType(node))
-			{
-				case model::Port::PortType::Real:
-					CompileBinaryNode(static_cast<const nodes::BinaryOperationNode<double>&>(node));
-					break;
-				case model::Port::PortType::Integer:
-					CompileBinaryNode(static_cast<const nodes::BinaryOperationNode<int>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
 		}
 
 		void Compiler::AllocVar(Variable& var)
@@ -259,8 +234,9 @@ namespace emll
 				{
 					AllocArg(node.GetOutputPorts()[0], true);
 				}
-				else if (ModelEx::IsLeafNode(node))
+				else if (IsNodeType(typeName, c_OutputNodeType))
 				{
+					AllocArg(node.GetOutputPorts()[0], false);
 				}
 			});
 		}

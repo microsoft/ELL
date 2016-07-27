@@ -21,23 +21,9 @@ namespace emll
 			virtual void Compile(SumNode& node) override;
 			virtual void Compile(DotProductNodeV& node) override;
 
-
-			virtual void CompileConstant(const nodes::ConstantNode<double>& node) override
-			{
-				Compile<double>(node);
-			}
-			virtual void CompileConstant(const nodes::ConstantNode<int>& node) override
-			{
-				Compile<int>(node);
-			}
-			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<double>& node)
-			{
-				Compile<double>(node);
-			}
-			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<int>& node)
-			{
-				Compile<int>(node);
-			}
+			virtual void CompileConstant(const model::Node& node) override;
+			virtual void CompileOutputNode(const model::Node& node) override;
+			virtual void CompileBinaryNode(const model::Node& node) override;
 
 			void DebugDump();
 
@@ -94,8 +80,11 @@ namespace emll
 			llvm::Value* LoadVar(Variable& var);
 			llvm::Value* LoadVar(const model::OutputPortElement elt);
 
+			
 			template<typename T>
 			void Compile(const nodes::ConstantNode<T>& node);
+			template<typename T>
+			void Compile(const model::OutputNode<T>& node);
 			template<typename T>
 			void Compile(const nodes::BinaryOperationNode<T>& node);
 			template<typename T>

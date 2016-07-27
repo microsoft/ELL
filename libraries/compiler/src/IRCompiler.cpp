@@ -12,6 +12,51 @@ namespace emll
 		{
 		}
 
+		void IRCompiler::CompileConstant(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					Compile<double>(static_cast<const nodes::ConstantNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					Compile<int>(static_cast<const nodes::ConstantNode<int>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void IRCompiler::CompileOutputNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					Compile<double>(static_cast<const model::OutputNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					Compile<int>(static_cast<const model::OutputNode<int>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void IRCompiler::CompileBinaryNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+			case model::Port::PortType::Real:
+				Compile<double>(static_cast<const nodes::BinaryOperationNode<double>&>(node));
+				break;
+			case model::Port::PortType::Integer:
+				Compile<int>(static_cast<const nodes::BinaryOperationNode<int>&>(node));
+				break;
+			default:
+				throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
 		void IRCompiler::Compile(LiteralNode& node)
 		{
 			EnsureEmitted(*(node.Var()));

@@ -18,6 +18,9 @@
 #include "DataFlowBuilder.h"
 
 #include "ConstantNode.h"
+#include "InputNode.h"
+#include "OutputNode.h"
+#include "BinaryOperationNode.h"
 
 #include <functional>
 
@@ -45,13 +48,9 @@ namespace emll
 
 			void CompileModel(const std::string& functionName, model::Model& model);
 
-			void CompileConstant(const model::Node& node);
-			virtual void CompileConstant(const nodes::ConstantNode<double>& node) = 0;
-			virtual void CompileConstant(const nodes::ConstantNode<int>& node) = 0;
-
-			void CompileBinaryNode(const model::Node& node);
-			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<double>& node) = 0;
-			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<int>& node) = 0;
+			virtual void CompileConstant(const model::Node& node) = 0;
+			virtual void CompileOutputNode(const model::Node& node) = 0;
+			virtual void CompileBinaryNode(const model::Node& node) = 0;
 
 			void BeginFunctionPredict();
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;

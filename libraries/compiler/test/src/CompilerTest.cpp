@@ -126,6 +126,12 @@ model::InputNode<T>* ModelBuilder::Inputs(std::vector<T>& values)
 }
 
 template<typename T>
+model::OutputNode<T>* ModelBuilder::Outputs(const model::OutputPort<T>& x)
+{
+	return _model.AddNode<model::OutputNode<T>>(x);
+}
+
+template<typename T>
 nodes::BinaryOperationNode<T>* ModelBuilder::Add(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
 {
 	return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationNode<T>::OperationType::add);
@@ -216,6 +222,7 @@ void TestModelCompiler()
 
 	auto bop = mb.Add(c1->output, input1->output);
 	auto bop2 = mb.Multiply(bop->output, c2->output);
+	auto output = mb.Outputs<double>(bop2->output);
 
 	IRCompiler compiler("EMLL", std::cout);
 	compiler.CompileModel("Predict", mb.Model);
