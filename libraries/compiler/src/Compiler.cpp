@@ -34,8 +34,11 @@ namespace emll
 		{
 		}
 
-		void Compiler::CompileModel(model::Model& model)
+		void Compiler::CompileModel(const std::string& functionName, model::Model& model)
 		{
+			_args.clear();
+			CollectInputsAndOutputs(model);
+			BeginFunction(functionName, _args);
 			model.Visit([this](const model::Node& node) {
 				std::string typeName = node.GetRuntimeTypeName();
 				//
@@ -61,6 +64,7 @@ namespace emll
 				}
 
 			});
+			EndFunction();
 		}
 
 		void Compiler::CompileConstant(const model::Node& node)
@@ -171,6 +175,22 @@ namespace emll
 			return pVar;
 		}
 
+		Variable* Compiler::AllocArg(const model::OutputPortBase* pPort, bool isInput)
+		{
+			ValueType varType = ToValueType(pPort->GetType());
+			VariableScope scope = isInput ? VariableScope::Input : VariableScope::Output;
+			//
+			// For now, all inputs and outputs are modelled as Vectors... unlike regular variables, we don't optimize for scalars
+			//
+			Variable* pVar = _variables.AddVectorVariable(scope, varType, pPort->Size());
+			AllocVar(*pVar);
+			SetVariableFor(pPort, pVar);
+
+			_args.push_back({pVar->EmittedName(), GetPtrType(varType)});
+			
+			return pVar;
+		}
+
 		Variable* Compiler::GetVariableFor(const model::OutputPortBase* pPort)
 		{
 			assert(pPort != nullptr);
@@ -227,6 +247,20 @@ namespace emll
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
+		}
+
+		void Compiler::CollectInputsAndOutputs(model::Model& model)
+		{
+			model.Visit([this](const model::Node& node) {
+				auto typeName = node.GetRuntimeTypeName();
+				if (typeName == c_InputNodeType)
+				{
+					AllocArg(node.GetOutputPorts()[0], true);
+				}
+				else if (ModelEx::IsLeafNode(node))
+				{
+				}
+			});
 		}
 
 		void Compiler::Reset()

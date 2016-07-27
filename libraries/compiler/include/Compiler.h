@@ -43,7 +43,7 @@ namespace emll
 			virtual void Compile(SumNode& node) = 0;
 			virtual void Compile(DotProductNodeV& node) = 0;
 
-			void CompileModel(model::Model& model);
+			void CompileModel(const std::string& functionName, model::Model& model);
 
 			void CompileConstant(const model::Node& node);
 			virtual void CompileConstant(const nodes::ConstantNode<double>& node) = 0;
@@ -69,10 +69,13 @@ namespace emll
 
 		protected:
 			ValueType ToValueType(model::Port::PortType type);
+			void CollectInputsAndOutputs(model::Model& model);
+
 
 		private:
+			Variable* AllocArg(const model::OutputPortBase* pPort, bool isInput);
 			void Reset();
-
+			
 		private:
 			EmittedVarAllocator _inputVars;
 			EmittedVarAllocator _outputVars;
@@ -81,6 +84,7 @@ namespace emll
 			EmittedVarAllocator _globalVars;
 
 			VariableAllocator _variables;
+			NamedValueTypeList _args;
 			std::unordered_map<const model::OutputPortBase*, Variable*> _portToVarMap;
 		};
 	}

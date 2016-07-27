@@ -238,16 +238,15 @@ void TestModelCompiler()
 
 	ModelBuilder mb;
 
+	auto input1 = mb.Inputs<double>(4);
 	auto c1 = mb.Constant<double>(data);
 	auto c2 = mb.Constant<double>(data2);
-	auto bop = mb.Add(c1->output, c1->output);
+
+	auto bop = mb.Add(c1->output, input1->output);
 	auto bop2 = mb.Multiply(bop->output, c2->output);
 
 	IRCompiler compiler("EMLL", std::cout);
-
-	compiler.BeginFunctionPredict();
-	compiler.CompileModel(mb.Model);
-	compiler.EndFunction();
+	compiler.CompileModel("Predict", mb.Model);
 	compiler.DebugDump();
 }
 
