@@ -352,10 +352,10 @@ void TestLinearPredictorNodeRefine()
 
     // check for equality
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputPort = transformer.GetCorrespondingOutputPort(linearPredictorNode->output);
+    auto newOutputPort = transformer.GetCorrespondingOutputPort(linearPredictorNode->prediction);
     inputNode->SetInput({1.0, 1.0, 1.0});
     newInputNode->SetInput({1.0, 1.0, 1.0});
-    auto modelOutputValue = model.ComputeNodeOutput(linearPredictorNode->output);
+    auto modelOutputValue = model.ComputeNodeOutput(linearPredictorNode->prediction);
     auto newOutputValue = newModel.ComputeNodeOutput(*newOutputPort);
 
     testing::ProcessTest("Testing LinearPredictorNode refine", testing::IsEqual(modelOutputValue, newOutputValue));

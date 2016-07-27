@@ -43,8 +43,12 @@ namespace nodes
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<double>& output = _prediction;
+        const model::OutputPort<double>& prediction = _prediction;
         static constexpr char* outputPortName = "prediction";
+
+        /// <summary> Exposes the output port as a read-only property </summary>
+        const model::OutputPort<double>& weightedElements = _weightedElements;
+        static constexpr char* weightedElementsPortName = "weightedElements";
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
@@ -61,7 +65,7 @@ namespace nodes
 
         // Output
         model::OutputPort<double> _prediction;
-
+        model::OutputPort<double> _weightedElements;
         // Parameters
         predictors::LinearPredictor _predictor;
     };
@@ -69,7 +73,8 @@ namespace nodes
     /// <summary> A struct that represents the outputs of a linear predictor node. </summary>
     struct LinearPredictorNodeOutputs
     {
-        const model::OutputPort<double>& output;
+        const model::OutputPort<double>& prediction;
+        const model::OutputPort<double>& weightedElements;
     };
 
     /// <summary> Builds a part of the model that represents a linear predictor. </summary>
