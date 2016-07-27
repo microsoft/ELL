@@ -43,8 +43,8 @@ namespace nodes
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<double>& output = _output;
-        static constexpr char* outputPortName = "output";
+        const model::OutputPort<double>& output = _prediction;
+        static constexpr char* outputPortName = "prediction";
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
@@ -60,7 +60,7 @@ namespace nodes
         model::InputPort<double> _input;
 
         // Output
-        model::OutputPort<double> _output;
+        model::OutputPort<double> _prediction;
 
         // Parameters
         predictors::LinearPredictor _predictor;

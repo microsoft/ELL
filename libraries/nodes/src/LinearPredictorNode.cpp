@@ -21,7 +21,7 @@
 
 namespace nodes
 {
-    LinearPredictorNode::LinearPredictorNode(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _predictor(predictor)
+    LinearPredictorNode::LinearPredictorNode(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor) : Node({ &_input }, { &_prediction }), _input(this, input, inputPortName), _prediction(this, outputPortName, 1), _predictor(predictor)
     {
         assert(input.Size() == predictor.GetDimension());
     }
@@ -34,7 +34,7 @@ namespace nodes
         {
             result += _input[index] * weights[index];
         }
-        _output.SetOutput({ result });
+        _prediction.SetOutput({ result });
     }
 
     void LinearPredictorNode::Copy(model::ModelTransformer& transformer) const

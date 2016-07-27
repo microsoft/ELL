@@ -50,8 +50,8 @@ namespace nodes
         virtual void Refine(model::ModelTransformer& transformer) const;
 
         /// <summary> Exposes the forest output as a read-only property </summary>
-        const model::OutputPort<double>& output = _output;
-        static constexpr char* outputPortName = "output";
+        const model::OutputPort<double>& output = _prediction;
+        static constexpr char* outputPortName = "prediction";
 
         /// <summary> Exposes the individual tree outputs as a read-only property </summary>
         const model::OutputPort<double>& treeOutputs = _treeOutputs;
@@ -69,7 +69,7 @@ namespace nodes
         model::InputPort<double> _input;
 
         // output ports
-        model::OutputPort<double> _output;
+        model::OutputPort<double> _prediction;
         model::OutputPort<double> _treeOutputs;
         model::OutputPort<bool> _edgeIndicatorVector;
 

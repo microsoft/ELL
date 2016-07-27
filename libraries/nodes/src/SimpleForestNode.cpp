@@ -14,7 +14,7 @@
 
 namespace nodes
 {
-    SimpleForestNode::SimpleForestNode(const model::OutputPortElements<double>& input, const predictors::SimpleForestPredictor& forest) : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, forest.NumTrees()), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()), _forest(forest)
+    SimpleForestNode::SimpleForestNode(const model::OutputPortElements<double>& input, const predictors::SimpleForestPredictor& forest) : Node({ &_input }, { &_prediction, &_treeOutputs, &_edgeIndicatorVector }), _input(this, input, inputPortName), _prediction(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, forest.NumTrees()), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()), _forest(forest)
     {}
 
     std::string SimpleForestNode::GetRuntimeTypeName() const
@@ -33,7 +33,7 @@ namespace nodes
     void SimpleForestNode::Compute() const
     {
         // forest output
-        _output.SetOutput({ _forest.Predict(_input) });
+        _prediction.SetOutput({ _forest.Predict(_input) });
 
         // individual tree outputs
         std::vector<double> treeOutputs(_forest.NumTrees());
