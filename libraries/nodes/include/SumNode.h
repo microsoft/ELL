@@ -27,6 +27,9 @@ namespace nodes
     class SumNode : public model::Node
     {
     public:
+        /// <summary> Input port name. </summary>
+        static constexpr char* inputPortName = "input";
+
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the sum of </param>
         SumNode(const model::OutputPortElements<ValueType>& input);
@@ -44,11 +47,11 @@ namespace nodes
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<ValueType>& output = _output;
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(model::ModelTransformer& transformer) const override;
-
-        static constexpr char* inputPortName = "input";
+        /// <summary> Output port name. </summary>
         static constexpr char* outputPortName = "output";
+
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(model::ModelTransformer& transformer) const override;     
 
     protected:
         virtual void Compute() const override;

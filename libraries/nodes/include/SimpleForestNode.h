@@ -28,6 +28,7 @@ namespace nodes
     class SimpleForestNode : public model::Node
     {
     public:
+        /// <summary> Input port name. </summary>
         static constexpr char* inputPortName = "input";
 
         /// <summary> Constructor </summary>
@@ -49,31 +50,37 @@ namespace nodes
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(model::ModelTransformer& transformer) const;
 
-        /// <summary> Exposes the forest output as a read-only property </summary>
+        /// <summary> Exposes the prediction port as a read-only property </summary>
         const model::OutputPort<double>& output = _prediction;
+
+        /// <summary> Prediction port name. </summary>
         static constexpr char* outputPortName = "prediction";
 
-        /// <summary> Exposes the individual tree outputs as a read-only property </summary>
+        /// <summary> Exposes the individual tree outputs port as a read-only property </summary>
         const model::OutputPort<double>& treeOutputs = _treeOutputs;
+
+        /// <summary> Tree outputs port name. </summary>
         static constexpr char* treeOutputsPortName = "treeOutputs";
 
-        /// <summary> Exposes the forest edge indicator vector as a read-only property </summary>
+        /// <summary> Exposes the forest edge indicator vector port as a read-only property </summary>
         const model::OutputPort<bool>& edgeIndicatorVector = _edgeIndicatorVector;
+
+        /// <summary> Edge indicator vector port name. </summary>
         static constexpr char* edgeIndicatorVectorPortName = "edgeIndicatorVector";
 
     protected:
         virtual void Compute() const override;
 
     private:
-        // input ports
+        // Input
         model::InputPort<double> _input;
 
-        // output ports
+        // Outputs
         model::OutputPort<double> _prediction;
         model::OutputPort<double> _treeOutputs;
         model::OutputPort<bool> _edgeIndicatorVector;
 
-        // the tree
+        // the forest
         predictors::SimpleForestPredictor _forest;
     };
 }

@@ -30,6 +30,12 @@ namespace nodes
     class DotProductNode : public model::Node
     {
     public:
+        /// <summary> Input port name. </summary>
+        static constexpr char* input1PortName = "input1";
+
+        /// <summary> Input port name. </summary>
+        static constexpr char* input2PortName = "input2";
+
         /// <summary> Constructor </summary>
         /// <param name="input1"> One of the signals to take the dot product of </param>
         /// <param name="input2"> The other signal to take the dot product of </param>
@@ -48,15 +54,15 @@ namespace nodes
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<ValueType>& output = _output;
 
+        /// <summary> Output port name. </summary>
+        static constexpr char* outputPortName = "output";
+
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(model::ModelTransformer& transformer) const override;
-
-        static constexpr char* inputPortName = "input";
-        static constexpr char* outputPortName = "output";
-
+    
     protected:
         virtual void Compute() const override;
 

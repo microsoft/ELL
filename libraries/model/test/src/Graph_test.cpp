@@ -170,8 +170,8 @@ void TestNodeIterator()
         ++size2;
         iter.Next();
     }
-    testing::ProcessTest("Testing Size() and iterator count", testing::IsEqual(size1, size2));
-    testing::ProcessTest("Testing Size() and known node count", testing::IsEqual(size1, 5));
+    testing::ProcessTest("Testing Size() and iterator count", size1 == size2);
+    testing::ProcessTest("Testing Size() and known node count", size1 == 5);
 
     std::cout << std::endl << std::endl;
 }

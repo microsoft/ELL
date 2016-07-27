@@ -28,6 +28,9 @@ namespace nodes
     class MovingVarianceNode : public model::Node
     {
     public:
+        /// <summary> Input port name. </summary>
+        static constexpr char* inputPortName = "input";
+
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the variance of </param>
         /// <param name="windowSize"> The number of samples of history to use in computing the variance </param>
@@ -46,11 +49,11 @@ namespace nodes
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<ValueType>& output = _output;
 
+        /// <summary> Output port name. </summary>
+        static constexpr char* outputPortName = "output";
+
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
-
-        static constexpr char* inputPortName = "input";
-        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;
