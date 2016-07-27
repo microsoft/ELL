@@ -24,8 +24,14 @@ namespace nodes
     class LinearPredictorNode : public model::Node
     {
     public:
-        /// <summary> Input port name. </summary>
+        /// @name Input and Output Ports
+        /// @{
         static constexpr char* inputPortName = "input";
+        static constexpr char* outputPortName = "prediction";
+        static constexpr char* weightedElementsPortName = "weightedElements";
+        const model::OutputPort<double>& prediction = _prediction;
+        const model::OutputPort<double>& weightedElements = _weightedElements;
+        /// @}
 
         /// <summary> Constructor </summary>
         ///
@@ -42,18 +48,6 @@ namespace nodes
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
-        /// <summary> Exposes the prediction port as a read-only property </summary>
-        const model::OutputPort<double>& prediction = _prediction;
-        
-        /// <summary> Prediction port name. </summary>
-        static constexpr char* outputPortName = "prediction";
-
-        /// <summary> Exposes the weighted elements port as a read-only property </summary>
-        const model::OutputPort<double>& weightedElements = _weightedElements;
-        
-        /// <summary> Weighted elements port name. </summary>
-        static constexpr char* weightedElementsPortName = "weightedElements";
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;

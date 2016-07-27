@@ -28,11 +28,13 @@ namespace model
     class ElementSelectorNode : public model::Node
     {
     public:
-        /// <summary> Input port name. </summary>
+        /// @name Input and Output Ports
+        /// @{
         static constexpr char* input1PortName = "input";
-
-        /// <summary> Input port name. </summary>
         static constexpr char* selectorPortName = "selector";
+        static constexpr char* outputPortName = "output";
+        const OutputPort<ValueType>& output = _output;
+        /// @}
 
         /// <summary> Constructor </summary>
         ///
@@ -49,12 +51,6 @@ namespace model
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const OutputPort<ValueType>& output = _output;
-        
-        /// <summary> Output port name. </summary>
-        static constexpr char* outputPortName = "output";
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;

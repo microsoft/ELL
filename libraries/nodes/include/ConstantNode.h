@@ -26,6 +26,12 @@ namespace nodes
     class ConstantNode : public model::Node
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr char* outputPortName = "output";
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
+
         /// <summary> Constructor for a scalar constant </summary>
         ///
         /// <param name="value"> The scalar value </param>
@@ -46,19 +52,13 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(model::ModelTransformer& transformer) const override;
+
         /// <summary> Gets the values contained in this node </summary>
         ///
         /// <returns> The values contained in this node </returns>
         const std::vector<ValueType>& GetValues() { return _values; }
-
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<ValueType>& output = _output;
-
-        /// <summary> Output port name. </summary>
-        static constexpr char* outputPortName = "output";
-
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;

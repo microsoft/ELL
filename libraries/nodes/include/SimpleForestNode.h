@@ -28,8 +28,16 @@ namespace nodes
     class SimpleForestNode : public model::Node
     {
     public:
-        /// <summary> Input port name. </summary>
+        /// @name Input and Output Ports
+        /// @{
         static constexpr char* inputPortName = "input";
+        static constexpr char* outputPortName = "prediction";
+        static constexpr char* treeOutputsPortName = "treeOutputs";
+        static constexpr char* edgeIndicatorVectorPortName = "edgeIndicatorVector";
+        const model::OutputPort<double>& output = _prediction;
+        const model::OutputPort<double>& treeOutputs = _treeOutputs;
+        const model::OutputPort<bool>& edgeIndicatorVector = _edgeIndicatorVector;
+        /// @}
 
         /// <summary> Constructor </summary>
         ///
@@ -49,24 +57,6 @@ namespace nodes
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(model::ModelTransformer& transformer) const;
-
-        /// <summary> Exposes the prediction port as a read-only property </summary>
-        const model::OutputPort<double>& output = _prediction;
-
-        /// <summary> Prediction port name. </summary>
-        static constexpr char* outputPortName = "prediction";
-
-        /// <summary> Exposes the individual tree outputs port as a read-only property </summary>
-        const model::OutputPort<double>& treeOutputs = _treeOutputs;
-
-        /// <summary> Tree outputs port name. </summary>
-        static constexpr char* treeOutputsPortName = "treeOutputs";
-
-        /// <summary> Exposes the forest edge indicator vector port as a read-only property </summary>
-        const model::OutputPort<bool>& edgeIndicatorVector = _edgeIndicatorVector;
-
-        /// <summary> Edge indicator vector port name. </summary>
-        static constexpr char* edgeIndicatorVectorPortName = "edgeIndicatorVector";
 
     protected:
         virtual void Compute() const override;

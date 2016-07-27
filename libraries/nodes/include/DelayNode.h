@@ -29,8 +29,12 @@ namespace nodes
     class DelayNode : public model::Node
     {
     public:
-        /// <summary> Input port name. </summary>
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr char* outputPortName = "output";
         static constexpr char* inputPortName = "input";
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
 
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to delay </param>
@@ -46,12 +50,6 @@ namespace nodes
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<ValueType>& output = _output;
-
-        /// <summary> Output port name. </summary>
-        static constexpr char* outputPortName = "output";
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;

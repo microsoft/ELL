@@ -29,10 +29,14 @@ namespace nodes
     class UnaryOperationNode : public model::Node
     {
     public:
-        /// <summary> Input port name. </summary>
+        /// @name Input and Output Ports
+        /// @{
         static constexpr char* inputPortName = "input";
+        static constexpr char* outputPortName = "output";
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
 
-        /// <summary> Types of unary operations supported by this ndoe type. </summary>
+        /// <summary> Types of unary operations supported by this node type. </summary>
         enum class OperationType
         {
             sqrt
@@ -56,12 +60,6 @@ namespace nodes
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
-
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<ValueType>& output = _output;
-
-        /// <summary> Output port name. </summary>
-        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;
