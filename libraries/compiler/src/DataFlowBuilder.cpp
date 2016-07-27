@@ -211,7 +211,7 @@ namespace emll
 			assert(pOutputPort->Size() == 1);
 
 			auto predictor = node.GetPredictor();
-			DotProductNode* pDotProduct = _graph.AddNode<DotProductNode>();
+			DotProductNodeV* pDotProduct = _graph.AddNode<DotProductNodeV>();
 			LiteralNode* pWeights = _graph.AddLiteralV<double>(predictor.GetVector());
 			pWeights->AddDependent(pDotProduct);
 			AddDependencyV(inputPort, pDotProduct);

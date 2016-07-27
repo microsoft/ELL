@@ -54,7 +54,7 @@ namespace emll
 			}
 		}
 
-		void IRCompiler::Compile(DotProductNode& node)
+		void IRCompiler::Compile(DotProductNodeV& node)
 		{
 			llvm::Value* pSrc1 = LoadVar(node.Src1());
 			llvm::Value* pSrc2 = EnsureEmitted(node.Src2());

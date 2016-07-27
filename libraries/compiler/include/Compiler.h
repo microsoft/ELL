@@ -36,7 +36,7 @@ namespace emll
 			virtual void Compile(InputNode& node) = 0;
 			virtual void Compile(OutputNode& node) = 0;
 			virtual void Compile(SumNode& node) = 0;
-			virtual void Compile(DotProductNode& node) = 0;
+			virtual void Compile(DotProductNodeV& node) = 0;
 
 			void BeginFunctionPredict();
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;

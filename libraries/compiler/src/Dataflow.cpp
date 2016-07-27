@@ -157,11 +157,11 @@ namespace emll
 			return _pTotal;
 		}
 
-		DotProductNode::DotProductNode()
+		DotProductNodeV::DotProductNodeV()
 		{
 		}
 
-		void DotProductNode::ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data)
+		void DotProductNodeV::ReceiveData(DataFlowGraph& graph, Compiler& compiler, Variable& data)
 		{
 			if (_pSrc1 == nullptr)
 			{
@@ -174,7 +174,7 @@ namespace emll
 			}
 		}
 
-		Variable* DotProductNode::OnProcess(DataFlowGraph& graph, Compiler& compiler)
+		Variable* DotProductNodeV::OnProcess(DataFlowGraph& graph, Compiler& compiler)
 		{
 			assert(_pSrc1->Type() == _pSrc2->Type() && _pSrc1->Dimension() == _pSrc2->Dimension());
 

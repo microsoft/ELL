@@ -33,6 +33,15 @@ namespace emll
 			std::vector<T> _data;
 		};
 		using LiteralVF = LiteralVarV<double>;
+
+		template<typename T>
+		class ShiftRegisterVar : public VectorVar<T>
+		{
+		public:
+			ShiftRegisterVar(size_t windowSize);
+		private:
+			size_t _windowSize;
+		};
 	}
 }
 

@@ -222,14 +222,15 @@ namespace emll
 			Variable* _pLast = nullptr;
 		};
 
-		class DotProductNode : public DataNode
+		// Takes Vector inputs and generates a for loop or an intrinsic
+		class DotProductNodeV : public DataNode
 		{
 		public:
-			DotProductNode();
+			DotProductNodeV();
 
 			virtual DataNodeType Type() const override
 			{
-				return DataNodeType::BinaryNode;
+				return DataNodeType::DotProductV;
 			}
 			Variable* Var() const { return _pResult; };
 			Variable* Src1() const { return _pSrc1; }

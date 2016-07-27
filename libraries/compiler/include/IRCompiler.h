@@ -19,7 +19,7 @@ namespace emll
 			virtual void Compile(InputNode& node) override;
 			virtual void Compile(OutputNode& node) override;
 			virtual void Compile(SumNode& node) override;
-			virtual void Compile(DotProductNode& node) override;
+			virtual void Compile(DotProductNodeV& node) override;
 
 			llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
 
