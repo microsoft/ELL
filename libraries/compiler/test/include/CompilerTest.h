@@ -45,8 +45,6 @@ private:
 	std::string _name;
 };
 
-void TestDataFlowBuilder();
-void TestDataFlowCompiler();
-
-void TestBinaryVector();
-void TestDotProduct();
+void TestBinaryVector(bool expanded);
+void TestBinaryScalar();
+void TestDotProduct(bool expanded);

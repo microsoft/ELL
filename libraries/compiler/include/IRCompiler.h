@@ -81,7 +81,7 @@ namespace emll
 			llvm::Value* LoadVar(Variable* pVar);
 			llvm::Value* LoadVar(Variable& var);
 			llvm::Value* LoadVar(const model::OutputPortElement elt);
-
+			void SetVar(Variable& var, llvm::Value* pDest, int offset, llvm::Value* pValue);
 			
 			template<typename T>
 			void Compile(const nodes::ConstantNode<T>& node);

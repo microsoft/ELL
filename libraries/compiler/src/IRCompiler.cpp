@@ -477,6 +477,25 @@ namespace emll
 			}
 			return _fn.ValueAt(pVal, _fn.Literal((int) elt.GetIndex()));
 		}
+		
+		void IRCompiler::SetVar(Variable& var, llvm::Value* pDest, int offset, llvm::Value* pValue)
+		{
+			assert(pValue != nullptr);
+			if (var.IsScalar())
+			{
+				if (offset > 0)
+				{
+					throw new CompilerException(CompilerError::indexOutOfRange);
+				}
+				_fn.Store(pDest, pValue);
+				return;
+			}
+			if (offset >= var.Dimension())
+			{
+				throw new CompilerException(CompilerError::indexOutOfRange);
+			}
+			_fn.SetValueAt(pDest, _fn.Literal(offset), pValue);
+		}
 
 		template<>
 		OperatorType IRCompiler::GetOperator<double>(const nodes::BinaryOperationNode<double>& node)

@@ -196,26 +196,7 @@ model::Model InitTestModelSimple()
 	return mb.Model;
 }
 
-void TestDataFlowBuilder()
-{
-	model::Model model = InitTestModelSimple();
-	DataFlowBuilder db;
-	db.Process(model);
-}
-
-void TestDataFlowCompiler()
-{
-	//model::Model model = InitTestModelSimple();
-	model::Model model = InitTestModelBinOp();
-	DataFlowBuilder db;
-	db.Process(model);
-	
-	IRCompiler compiler("EMLL", std::cout);
-	compiler.CompileGraph("Predict", db.Graph());
-	compiler.DebugDump();
-}
-
-void TestBinaryVector()
+void TestBinaryVector(bool expanded)
 {
 	std::vector<double> data = { 5, 10, 15, 20};
 	std::vector<double> data2 = { 4, 4, 4, 4};
@@ -231,11 +212,33 @@ void TestBinaryVector()
 	auto output = mb.Outputs<double>(bop2->output);
 
 	IRCompiler compiler("EMLL", std::cout);
+	compiler.ShouldUnrollLoops() = expanded;
 	compiler.CompileModel("Predict", mb.Model);
 	compiler.DebugDump();
 }
 
-void TestDotProduct()
+void TestBinaryScalar()
+{
+	std::vector<double> data = {5};
+	std::vector<double> data2 = {4};
+
+	ModelBuilder mb;
+
+	auto input1 = mb.Inputs<double>(1);
+	auto c1 = mb.Constant<double>(data);
+	auto c2 = mb.Constant<double>(data2);
+
+	auto bop = mb.Add(c1->output, input1->output);
+	//auto bop2 = mb.Multiply(bop->output, c2->output);
+	auto output = mb.Outputs<double>(bop->output);
+
+	IRCompiler compiler("EMLL", std::cout);
+	compiler.CompileModel("Predict", mb.Model);
+	compiler.DebugDump();
+
+}
+
+void TestDotProduct(bool expanded)
 {
 	std::vector<double> data = { 5, 10, 15, 20 };
 
@@ -246,6 +249,7 @@ void TestDotProduct()
 	auto output = mb.Outputs<double>(dotProduct->output);
 
 	IRCompiler compiler("EMLL", std::cout);
+	compiler.ShouldUnrollLoops() = expanded;
 	compiler.CompileModel("Predict", mb.Model);
 	compiler.DebugDump();
 }

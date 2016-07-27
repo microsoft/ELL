@@ -174,13 +174,15 @@ namespace emll
 		{
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
-			llvm::Value* pResult = EnsureEmitted(node.GetOutputPorts()[0]);
+			auto pOutput = node.GetOutputPorts()[0];
+			llvm::Value* pResult = EnsureEmitted(pOutput);
+			Variable& resultVar = *(GetVariableFor(pOutput));
 			for (size_t i = 0; i < pInput1->Size(); ++i)
 			{
 				llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(i));
 				llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(i));
 				llvm::Value* pOpResult = _fn.Op(GetOperator<T>(node), pLVal, pRVal);
-				_fn.SetValueAt(pResult, _fn.Literal((int)i), pOpResult);
+				SetVar(resultVar, pResult, i, pOpResult);
 			}
 		}
 
@@ -215,15 +217,20 @@ namespace emll
 		{
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
-			llvm::Value* pResult = EnsureEmitted(node.GetOutputPorts()[0]);			
+			auto pOutput = node.GetOutputPorts()[0];
+			llvm::Value* pResult = EnsureEmitted(pOutput);
+			Variable& resultVar = *(GetVariableFor(pOutput));
+
 			_fn.Store(pResult, _fn.Literal(0.0));
+			llvm::Value* pTotal = _fn.Load(pResult);  //pTotal is a register
 			for (size_t i = 0; i < pInput1->Size(); ++i)
 			{
 				llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(i));
 				llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(i));
 				llvm::Value* pMultiplyResult = _fn.Op(GetMultiplyForValueType<T>(), pLVal, pRVal);
-				_fn.OpAndUpdate(pResult, GetAddForValueType<T>(), pMultiplyResult);
+				pTotal = _fn.Op(GetAddForValueType<T>(), pMultiplyResult, pTotal);
 			}
+			_fn.Store(pResult, pTotal);
 		}
 	}
 }
