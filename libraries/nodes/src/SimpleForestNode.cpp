@@ -22,8 +22,13 @@ namespace nodes
         return "SimpleForestNode";
     }
 
-    void SimpleForestNode::Copy(model::ModelTransformer & transformer) const
+    void SimpleForestNode::Copy(model::ModelTransformer& transformer) const
     {
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newNode = transformer.AddNode<SimpleForestNode>(newOutputPortElements, _forest);
+        transformer.MapOutputPort(prediction, newNode->prediction);
+        transformer.MapOutputPort(treeOutputs, newNode->treeOutputs);
+        transformer.MapOutputPort(edgeIndicatorVector, newNode->edgeIndicatorVector);
     }
 
     void SimpleForestNode::Refine(model::ModelTransformer & transformer) const

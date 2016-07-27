@@ -320,12 +320,12 @@ void TestSimpleForestNodeRefine()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputPort = transformer.GetCorrespondingOutputPort(simpleForestNode->output);
+    auto refinedOutputPort = transformer.GetCorrespondingOutputPort(simpleForestNode->prediction);
 
     // check equivalence
     inputNode->SetInput({ 0.2, 0.5, 0.0 });
     refinedInputNode->SetInput({ 0.2, 0.5, 0.0 });
-    auto outputValue = model.ComputeNodeOutput(simpleForestNode->output);
+    auto outputValue = model.ComputeNodeOutput(simpleForestNode->prediction);
     auto refinedOutputValue = refinedModel.ComputeNodeOutput(*refinedOutputPort);
 
     //  expected output is -3.0

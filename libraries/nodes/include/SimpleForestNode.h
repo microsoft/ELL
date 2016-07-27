@@ -10,8 +10,8 @@
 
 // model
 #include "Node.h"
-#include "InputPort.h"
-#include "OutputPort.h"
+#include "ModelGraph.h"
+#include "ModelTransformer.h"
 
 // predictors
 #include "ForestPredictor.h"
@@ -34,7 +34,7 @@ namespace nodes
         static constexpr char* outputPortName = "prediction";
         static constexpr char* treeOutputsPortName = "treeOutputs";
         static constexpr char* edgeIndicatorVectorPortName = "edgeIndicatorVector";
-        const model::OutputPort<double>& output = _prediction;
+        const model::OutputPort<double>& prediction = _prediction;
         const model::OutputPort<double>& treeOutputs = _treeOutputs;
         const model::OutputPort<bool>& edgeIndicatorVector = _edgeIndicatorVector;
         /// @}
