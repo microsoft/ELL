@@ -47,7 +47,7 @@ namespace utilities
     // Serialize
     //
 
-    // TODO: just overload Serialize() on fundamental types instead of creating descriptions for them, etc.
+    // TODO: just overload Serialize() on fundamental types instead of creating descriptions for them, etc. (?)
     template <typename T>
     void Serializer::Serialize(T&& obj)
     {

@@ -19,9 +19,7 @@ namespace utilities
     template <typename ValueType>
     ObjectDescription ObjectDescription::FromType(ValueType&& obj)
     {
-        auto result = ObjectDescription(std::is_fundamental<typename std::decay<ValueType>::type>::value);
-        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
-        return result;
+        return FromType<ValueType>();
     }
 
     template <typename ValueType>

@@ -102,4 +102,8 @@ void TestISerializable()
     std::cout << "\n--Serializing binary operation node--" << std::endl;
     serializer.Serialize(*binaryOpNode);
     std::cout << std::endl;
+
+    std::cout << "\n--Serializing model--" << std::endl;
+    serializer.Serialize(g);
+    std::cout << std::endl;
 }

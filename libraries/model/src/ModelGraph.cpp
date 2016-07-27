@@ -44,8 +44,15 @@ namespace model
         // need a way to have a sequence of un-named items, so we can say:
         // for(auto node: nodes) { desc.AddItem(node); }
 
-        // ???
-        
+        std::vector<const Node*> nodes;
+        auto nodeIter = GetNodeIterator();
+        while(nodeIter.IsValid())
+        {
+            const auto& node = nodeIter.Get();
+            nodes.push_back(node);
+            nodeIter.Next();
+        }
+        result.AddField("nodes", nodes);
         return result;
     }
 
