@@ -33,13 +33,13 @@ namespace nodes
     void SimpleForestNode::Compute() const
     {
         // forest output
-        _output.SetOutput({ _forest.Compute(_input) });
+        _output.SetOutput({ _forest.Predict(_input) });
 
         // individual tree outputs
         std::vector<double> treeOutputs(_forest.NumTrees());
         for(size_t i=0; i<_forest.NumTrees(); ++i)
         {
-            treeOutputs[i] = _forest.Compute(_input, _forest.GetRootIndex(i));
+            treeOutputs[i] = _forest.Predict(_input, _forest.GetRootIndex(i));
         }
         _treeOutputs.SetOutput(std::move(treeOutputs));
 

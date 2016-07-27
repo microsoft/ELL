@@ -129,7 +129,7 @@ namespace trainers
 
             ExampleMetaData metaData;
             metaData.strong = example.GetMetaData();
-            metaData.currentOutput = _forest->Compute(*denseDataVector);
+            metaData.currentOutput = _forest->Predict(*denseDataVector);
 
             _dataset.AddExample(ForestTrainerExample(std::move(denseDataVector), metaData));
 
@@ -173,7 +173,7 @@ namespace trainers
         for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size; ++rowIndex)
         {
             auto& example = _dataset[rowIndex];
-            example.GetMetaData().currentOutput += edgePredictor.Compute(example.GetDataVector());
+            example.GetMetaData().currentOutput += edgePredictor.Predict(example.GetDataVector());
         }
     }
 

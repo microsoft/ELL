@@ -45,22 +45,22 @@ void ForestPredictorTest()
     testing::ProcessTest("Testing NumEdges(tree1)", forest.NumEdges(tree1Root) == 2);
 
     // test Compute 
-    double output = forest.Compute(linear::DoubleVector({0.2, 0.5, 0.0}), tree0Root);
+    double output = forest.Predict(linear::DoubleVector({0.2, 0.5, 0.0}), tree0Root);
     testing::ProcessTest("Testing Compute(tree0)", testing::IsEqual(output, -3.0, 1.0e-8));
 
-    output = forest.Compute(linear::DoubleVector({0.2, 0.7, 0.0}), tree0Root);
+    output = forest.Predict(linear::DoubleVector({0.2, 0.7, 0.0}), tree0Root);
     testing::ProcessTest("Testing Compute(tree0)", testing::IsEqual(output, 1.0, 1.0e-8));
 
-    output = forest.Compute(linear::DoubleVector({0.5, 0.7, 0.7}), tree0Root);
+    output = forest.Predict(linear::DoubleVector({0.5, 0.7, 0.7}), tree0Root);
     testing::ProcessTest("Testing Compute(tree0)", testing::IsEqual(output, -3.0, 1.0e-8));
 
-    output = forest.Compute(linear::DoubleVector({0.5, 0.7, 1.0}), tree0Root);
+    output = forest.Predict(linear::DoubleVector({0.5, 0.7, 1.0}), tree0Root);
     testing::ProcessTest("Testing Compute(tree0)", testing::IsEqual(output, 5.0, 1.0e-8));
 
-    output = forest.Compute(linear::DoubleVector({0.2, 0.5, 0.0}));
+    output = forest.Predict(linear::DoubleVector({0.2, 0.5, 0.0}));
     testing::ProcessTest("Testing Compute()", testing::IsEqual(output, -6.0, 1.0e-8));
 
-    output = forest.Compute(linear::DoubleVector({0.25, 0.7, 0.0}));
+    output = forest.Predict(linear::DoubleVector({0.25, 0.7, 0.0}));
     testing::ProcessTest("Testing Compute()", testing::IsEqual(output, 4.0, 1.0e-8));
 
     // test path generation

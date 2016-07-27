@@ -26,7 +26,7 @@ namespace predictors
         /// 
         /// <returns> A constant value. </returns>
         template<typename AnyType>
-        double Compute(const AnyType&) const { return _value; }
+        double Predict(const AnyType&) const { return _value; }
 
         /// <summary> Gets the constant value. </summary>
         ///

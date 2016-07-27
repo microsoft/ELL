@@ -90,19 +90,19 @@ namespace predictors
 
     template<typename SplitRuleType, typename EdgePredictorType>
     template<typename RandomAccessVectorType>
-    double ForestPredictor<SplitRuleType, EdgePredictorType>::Compute(const RandomAccessVectorType& input) const
+    double ForestPredictor<SplitRuleType, EdgePredictorType>::Predict(const RandomAccessVectorType& input) const
     {
         double output = _bias;
         for (auto treeRootIndex : _treeRootIndices)
         {
-            output += Compute(input, treeRootIndex);
+            output += Predict(input, treeRootIndex);
         }
         return output;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
     template<typename RandomAccessVectorType>
-    double ForestPredictor<SplitRuleType, EdgePredictorType>::Compute(const RandomAccessVectorType& input, size_t interiorNodeIndex) const
+    double ForestPredictor<SplitRuleType, EdgePredictorType>::Predict(const RandomAccessVectorType& input, size_t interiorNodeIndex) const
     {
         if (interiorNodeIndex >= _interiorNodes.size())
         {
@@ -112,7 +112,7 @@ namespace predictors
         size_t nodeIndex = interiorNodeIndex;
         double output = 0.0;
 
-        VisitEdgePathToLeaf(input, interiorNodeIndex, [&](const InteriorNode& interiorNode, size_t edgePosition) { output += interiorNode._outgoingEdges[edgePosition]._predictor.Compute(input); }); 
+        VisitEdgePathToLeaf(input, interiorNodeIndex, [&](const InteriorNode& interiorNode, size_t edgePosition) { output += interiorNode._outgoingEdges[edgePosition]._predictor.Predict(input); }); 
 
         return output;
     }

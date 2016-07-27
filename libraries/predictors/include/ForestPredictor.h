@@ -197,7 +197,7 @@ namespace predictors
         ///
         /// <returns> The prediction. </returns>
         template<typename RandomAccessVectorType>
-        double Compute(const RandomAccessVectorType& input) const;
+        double Predict(const RandomAccessVectorType& input) const;
 
         /// <summary> Returns the output of a given subtree for a given input. </summary>
         ///
@@ -208,7 +208,7 @@ namespace predictors
         ///
         /// <returns> The prediction. </returns>
         template<typename RandomAccessVectorType>
-        double Compute(const RandomAccessVectorType& input, size_t interiorNodeIndex) const;
+        double Predict(const RandomAccessVectorType& input, size_t interiorNodeIndex) const;
 
         /// <summary> Generates the edge path indicator vector of the entire forest. </summary>
         ///
