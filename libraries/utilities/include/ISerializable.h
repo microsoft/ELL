@@ -11,6 +11,7 @@
 #include "ObjectDescription.h"
 #include "Variant_def.h"
 #include "TypeName.h"
+#include "Serialization.h"
 
 // stl
 #include <string>
@@ -27,17 +28,15 @@ namespace utilities
 
         /// <summary> Get an ObjectDescription describing how to serialize this object </summary>
         virtual ObjectDescription GetDescription() const = 0;
+
+        // begin serialize
+        // serialize
+        // end serialize
+
+        // begin deserialize
+        // deserialize
+        // end deserialize
     };
-
-    // TODO: put these someplace that makes sense
-    template <typename ValueType>
-    using IsFundamental = typename std::enable_if_t<std::is_fundamental<typename std::decay<ValueType>::type>::value, int>;
-
-    template <typename ValueType>
-    using IsNotFundamental = typename std::enable_if_t<!std::is_fundamental<typename std::decay<ValueType>::type>::value, int>;
-
-    template <typename ValueType>
-    using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, int>;
 
     template <typename ValueType>
     using IsSerializable = typename std::enable_if_t<std::is_base_of<ISerializable, ValueType>::value, int>;
@@ -81,90 +80,19 @@ namespace utilities
         template <typename T>
         void Serialize(T&& obj);
 
-/*
-        /// <summary> Serialize fundamental types. </summary>
-        ///
-        /// <typeparam name="ValueType"> The type being serialized. </typeparam>
-        /// <param name="name"> Name of the variable being serialized. </param>
-        /// <param name="value"> The variable being serialized. </param>
-        template <typename ValueType, IsFundamental<ValueType> concept = 0>
-        void Serialize(const char* name, const ValueType& value);
-
-        /// <summary> Serialize a unique pointer to a polymorphic class. </summary>
-        ///
-        /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
-        /// <param name="name"> Name of the variable being serialized. </param>
-        /// <param name="value"> The variable being serialized. </param>
-        template<typename ValueType>
-        void Serialize(const char* name, const std::unique_ptr<ValueType>& value);
-
-        /// <summary> Serialize a vector. </summary>
-        ///
-        /// <typeparam name="ElementType"> The type of vector elements being serialized. </typeparam>
-        /// <param name="name"> Name of the variable being serialized. </param>
-        /// <param name="value"> The vector being serialized. </param>
-        template<typename ElementType>
-        void Serialize(const char* name, const std::vector<ElementType>& value);
-
-        /// <summary> Serialize a std::string. </summary>
-        ///
-        /// <param name="name"> Name of the string being serialized. </param>
-        /// <param name="value"> The string being serialized. </param>
-        void Serialize(const char* name, const std::string& value);
-
-        /// <summary> Serialize class types. </summary>
-        ///
-        /// <typeparam name="ValueType"> Type being serialized. </typeparam>
-        /// <param name="name"> Name of the variable being serialized. </param>
-        /// <param name="value"> The variable being serialized. </param>
-        template <typename ValueType, IsClass<ValueType> concept = 0>
-        void Serialize(const char* name, const ValueType& value);
-
-        /// <summary> Serialize unnamed fundamental types. </summary>
-        ///
-        /// <typeparam name="ValueType"> The type being serialized. </typeparam>
-        /// <param name="value"> The variable being serialized. </param>
-        template <typename ValueType, IsFundamental<ValueType> concept = 0>
-        void Serialize(const ValueType& value);
-
-        /// <summary> Serialize an unnamed unique pointer to a polymorphic class. </summary>
-        ///
-        /// <typeparam name="ValueType"> The type pointed to, must be a polymorphic class. </typeparam>
-        /// <param name="value"> The variable being serialized. </param>
-        template<typename ValueType>
-        void Serialize(const std::unique_ptr<ValueType>& value);
-
-        /// <summary> Serialize an unnamed vector. </summary>
-        ///
-        /// <typeparam name="ElementType"> The type of vector elements being serialized. </typeparam>
-        /// <param name="value"> The vector being serialized. </param>
-        template<typename ElementType>
-        void Serialize(const std::vector<ElementType>& value);
-
-        /// <summary> Serialize an unnamed std::string. </summary>
-        ///
-        /// <param name="value"> The string being serialized. </param>
-        void Serialize(const std::string& value);
-
-        /// <summary> Serialize unnamed class types. </summary>
-        ///
-        /// <typeparam name="ValueType"> Type being serialized. </typeparam>
-        /// <param name="value"> The variable being serialized. </param>
-        template <typename ValueType, IsClass<ValueType> concept = 0>
-        void Serialize(const ValueType& value);
-        */
-
     protected:
         virtual void SerializeFundamentalType(const Variant& variant) = 0;
+
         virtual void BeginSerializeType(const ObjectDescription& desc) = 0;
         virtual void SerializeField(std::string name, const Variant& variant) = 0;
         virtual void EndSerializeType(const ObjectDescription& desc) = 0;
     };
 
-    class SimpleSerializer : public Serializer2
+    class SimpleSerializer2 : public Serializer2
     {
     protected:
         virtual void SerializeFundamentalType(const Variant& variant) override;
+
         virtual void BeginSerializeType(const ObjectDescription& desc) override;
         virtual void SerializeField(std::string name, const Variant& variant) override;
         virtual void EndSerializeType(const ObjectDescription& desc) override;

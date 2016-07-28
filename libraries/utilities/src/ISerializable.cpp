@@ -15,9 +15,9 @@
 namespace utilities
 {
     //
-    // SimpleSerializer
+    // SimpleSerializer2
     //
-    void SimpleSerializer::BeginSerializeType(const ObjectDescription& desc)
+    void SimpleSerializer2::BeginSerializeType(const ObjectDescription& desc)
     {
         auto typeName = desc.GetTypeName();
         std::cout << "{" << std::endl;
@@ -27,18 +27,18 @@ namespace utilities
         std::cout << std::endl;
     }
 
-    void SimpleSerializer::EndSerializeType(const ObjectDescription& desc)
+    void SimpleSerializer2::EndSerializeType(const ObjectDescription& desc)
     {
         std::cout << std::string(2*_indent, ' ');
         std::cout << "}";
     }
 
-    void SimpleSerializer::SerializeFundamentalType(const Variant& variant)
+    void SimpleSerializer2::SerializeFundamentalType(const Variant& variant)
     {
         std::cout << to_string(variant);
     }
 
-    void SimpleSerializer::SerializeField(std::string name, const Variant& variant)
+    void SimpleSerializer2::SerializeField(std::string name, const Variant& variant)
     {
         ++_indent;
         std::cout << std::string(2*_indent, ' ');

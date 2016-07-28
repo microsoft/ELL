@@ -10,7 +10,7 @@
 
 #include "Format.h"
 #include "TypeFactory.h"
-#include "ISerializable.h"  // Just to get the IsFundamental and IsClass definitions
+#include "Serialization.h"  // Just to get the IsFundamental and IsClass definitions
 
 // stl
 #include <cstdint>
