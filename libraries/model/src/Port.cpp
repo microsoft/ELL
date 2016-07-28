@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Port.h"
+#include "Node.h"
 
 /// <summary> model namespace </summary>
 namespace model
@@ -40,5 +41,12 @@ namespace model
     //     // ???
     //     return result;
     // }
+    void Port::Serialize(utilities::Serializer& serializer) const
+    {
+        serializer.Serialize("nodeId", _node->GetId());
+//        serializer.Serialize("name", _name);
+        serializer.Serialize("type", (int)_type);
+        serializer.Serialize("size", _size);
+    }
 
 }

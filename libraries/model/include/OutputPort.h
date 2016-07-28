@@ -10,6 +10,9 @@
 
 #include "Port.h"
 
+// utilities
+#include "ISerializable.h"
+
 #include <vector>
 #include <memory>
 
@@ -29,6 +32,20 @@ namespace model
         ///
         /// <returns> Returns true if the port is referenced by another node. </returns>
         bool IsReferenced() { return _isReferenced; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "OutputPortBase"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// Inherited from ISerializable
+        // virtual utilities::ObjectDescription GetDescription() const override;
+        virtual void Serialize(utilities::Serializer& serializer) const override;
 
     protected:
         OutputPortBase(const class Node* node, std::string name, PortType type, size_t size);

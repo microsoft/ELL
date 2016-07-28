@@ -217,7 +217,7 @@ int main()
     // // Variant tests
     // TestVariant();
 
-    // TestISerializable();
+    TestISerializable();
     TestSerializer();
 
     if (testing::DidTestFail())

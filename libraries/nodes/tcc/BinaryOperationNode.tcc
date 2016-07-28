@@ -79,5 +79,7 @@ namespace nodes
         std::cout << "Serializing BinaryOperationNode" << std::endl;
         Node::Serialize(serializer);
         serializer.Serialize("operation", (int)_operation);
+        serializer.Serialize("operation", _input1);
+        serializer.Serialize("operation", _input2);
     }
 }

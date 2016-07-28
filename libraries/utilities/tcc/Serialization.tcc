@@ -51,6 +51,19 @@ namespace utilities
         }
         SerializeArrayValue(name, tmpArray);
     }
+
+    template <typename ValueType, IsSerializable<ValueType> concept>
+    void Serializer::Serialize(const char* name, const std::vector<const ValueType*>& array)
+    {
+        std::cout << "Serialize of vector<serializable*>" << std::endl;
+        std::vector<const utilities::ISerializable*> tmpArray;
+        for (const auto& item : array)
+        {
+            tmpArray.push_back(item);
+        }
+        SerializeArrayValue(name, tmpArray);
+    }
+
 //     template <typename ValueType, IsVector<ValueType> concept=0>
 //     void Serializer::Serialize(const char* name, const std::vector<ValueType&&>& value)
 //     {

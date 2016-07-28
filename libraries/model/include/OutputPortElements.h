@@ -11,6 +11,10 @@
 #include "Port.h"
 #include "OutputPort.h"
 
+// utilities
+#include "ISerializable.h"
+
+// stl
 #include <vector>
 #include <cassert>
 
@@ -50,7 +54,7 @@ namespace model
     };
 
     /// <summary> Represents a contiguous set of values from an output port </summary>
-    class OutputPortRange
+    class OutputPortRange : public utilities::ISerializable
     {
     public:
         /// <summary> Creates an OutputPortRange representing all the values from a given port </summary>
@@ -96,6 +100,20 @@ namespace model
         /// <returns> true if this range spans the port's entire range </returns>
         bool IsFullPortRange() const;
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "OutputPortRange"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
+
+        /// Inherited from ISerializable
+        // virtual utilities::ObjectDescription GetDescription() const override;
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
     private:
         const OutputPortBase* _referencedPort;
         size_t _startIndex;
@@ -104,7 +122,7 @@ namespace model
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>
-    class OutputPortElementsUntyped
+    class OutputPortElementsUntyped : public utilities::ISerializable
     {
     public:
         /// <summary> Creates an OutputPortElementsUntyped representing all the values from a given port </summary>
@@ -155,6 +173,20 @@ namespace model
         ///
         /// <param name="range"> The range of values to add to this list </param>
         void AddRange(const OutputPortRange& range);
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "OutputPortElementsUntyped"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
+
+        /// Inherited from ISerializable
+        // virtual utilities::ObjectDescription GetDescription() const override;
+        virtual void Serialize(utilities::Serializer& serializer) const override;
 
     protected:
         OutputPortElementsUntyped(){};

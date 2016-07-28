@@ -71,7 +71,7 @@ namespace model
             nodeIter.Next();
         }
 
-//        serializer.Serialize("nodes", nodes);
+        serializer.Serialize("nodes", nodes);
     }
 
     //

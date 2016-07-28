@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "OutputPortElements.h"
+#include "Node.h"
 
 namespace model
 {
@@ -42,6 +43,15 @@ namespace model
     bool OutputPortRange::IsFullPortRange() const
     {
         return GetStartIndex() == 0 && Size() == ReferencedPort()->Size();
+    }
+
+    void OutputPortRange::Serialize(utilities::Serializer& serializer) const
+    {
+        serializer.Serialize("startIndex", _startIndex);
+        serializer.Serialize("numValues", _numValues);
+        serializer.Serialize("isFixedSize", _isFixedSize);
+        serializer.Serialize("referencedNodeId", _referencedPort->GetNode()->GetId());
+//        serializer.Serialize("referencedPortName", _referencedPort->GetName());
     }
 
     //
@@ -89,5 +99,10 @@ namespace model
         {
             _size += range.Size();
         }
+    }
+
+    void OutputPortElementsUntyped::Serialize(utilities::Serializer& serializer) const
+    {
+        serializer.Serialize("ranges", _ranges);
     }
 }

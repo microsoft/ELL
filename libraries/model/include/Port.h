@@ -23,7 +23,7 @@ namespace model
     class Node;
 
     /// <summary> Port is the common base class for InputPort and OutputPort. </summary>
-    class Port//: public utilities::ISerializable
+    class Port: public utilities::ISerializable
     {
     public:
         virtual ~Port() = default;
@@ -76,7 +76,8 @@ namespace model
 
         /// Inherited from ISerializable
 //        virtual utilities::ObjectDescription GetDescription() const override;
-
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+        
     protected:
         Port(const class Node* node, std::string name, PortType type, size_t size) : _node(node), _name(name), _type(type), _size(size) {}
         // Port(const Port& other) = delete;

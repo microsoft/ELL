@@ -48,7 +48,7 @@ namespace utilities
     using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, int>;
 
     template <typename ValueType>
-    using IsSerializable = typename std::enable_if_t<std::is_base_of<ISerializable, ValueType>::value, int>;
+    using IsSerializable = typename std::enable_if_t<std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value, int>;
 
     template <typename ValueType>
     using IsNotSerializable = typename std::enable_if_t<(!std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
@@ -73,20 +73,17 @@ namespace utilities
         void Serialize(ValueType&& value);
 
         /// <summary> Serialize named values of any serializable type. </summary>
-
-        // TODO: need to use SFINAE to constrain Serialize() here to not accept vectors!!
         template <typename ValueType, IsNotVector<ValueType> concept = 0>
         void Serialize(const char* name, ValueType&& value);
 
-        // template <typename ValueType, IsVector<ValueType> concept=0>
-        // void Serialize(const char* name, ValueType&& value);
-
-        // this never gets called -- why?
         template <typename ValueType, IsFundamental<ValueType> concept=0>
         void Serialize(const char* name, const std::vector<ValueType>& value);
 
         template <typename ValueType, IsSerializable<ValueType> concept=0>
         void Serialize(const char* name, const std::vector<ValueType>& value);
+
+        template <typename ValueType, IsSerializable<ValueType> concept=0>
+        void Serialize(const char* name, const std::vector<const ValueType*>& value);
 
         // template <typename ValueType>
         // void Serialize(const char* name, const std::vector<ValueType&&>& value);

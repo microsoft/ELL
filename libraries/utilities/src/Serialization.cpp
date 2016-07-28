@@ -53,7 +53,6 @@ namespace utilities
 
     void SimpleSerializer::SerializeArrayValue(const char* name, const std::vector<const ISerializable*>& array)
     {
-        std::cout << "foo" << std::endl;
         std::cout << "[";
         for(const auto& item: array)
         {

@@ -47,6 +47,6 @@ namespace nodes
     {
         std::cout << "Serializing ConstantNode" << std::endl;
         Node::Serialize(serializer);
-//        serializer.Serialize("values", _values);
+        serializer.Serialize("values", _values);
     }
 }

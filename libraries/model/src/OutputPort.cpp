@@ -13,4 +13,10 @@ namespace model
 {
     OutputPortBase::OutputPortBase(const class Node* node, std::string name, PortType type, size_t size) : Port(node, name, type, size), _isReferenced(false) 
     {}
+
+    void OutputPortBase::Serialize(utilities::Serializer& serializer) const
+    {
+        Port::Serialize(serializer);
+        serializer.Serialize("isReferenced", _isReferenced);
+    }
 }
