@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     ElementSelectorNode.tcc (nodes)
-//  Authors:  Chuck Jacobs
+//  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

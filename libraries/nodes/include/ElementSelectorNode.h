@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     ElementSelectorNode.h (node)
-//  Authors:  Chuck Jacobs
+//  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
