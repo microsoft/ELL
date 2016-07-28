@@ -14,14 +14,42 @@ namespace utilities
     // Serializer class
     //
 
+    // TODO: split out scalar vs. array here (or is it fundamental vs. ISerializable?)
+    template <typename ValueType>
+    void Serializer::Serialize(ValueType&& value)
+    {
+        Serialize("", value);
+    }
+
+    template <typename ValueType>
+    void Serializer::Serialize(const char* name, ValueType&& value)
+    {
+        SerializeValue(name, value);
+    }
+
+    template <typename ValueType>
+    void Serializer::Serialize(const char* name, const std::vector<ValueType>& value)
+    {
+        // :(
+        std::cout << "std::vector overload" << std::endl;
+//        SerializeValue(name, value);        
+    }
+    template <typename ValueType>
+    void Serializer::Serialize(const char* name, const std::vector<ValueType&&>& value)
+    {
+        // :(
+        std::cout << "std::vector overload" << std::endl;
+//        SerializeValue(name, value);        
+    }
+
     //
     // SimpleSerializer
     //
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleSerializer::SerializeFundamental(const char* name, const ValueType& value)
+    void SimpleSerializer::SerializeScalar(const char* name, const ValueType& value)
     {
         using std::to_string;
-        if(name == std::string(""))
+        if (name == std::string(""))
         {
             std::cout << to_string(value) << std::endl;
         }
@@ -30,4 +58,31 @@ namespace utilities
             std::cout << name << ": " << to_string(value) << std::endl;
         }
     }
+
+    template <typename ValueType, IsFundamental<ValueType> concept>
+    void SimpleSerializer::SerializeArray(const char* name, const std::vector<ValueType>& array)
+    {
+        std::cout << "[";
+        for (const auto& item : array)
+        {
+            Serialize(item);
+            std::cout << " ";
+        }
+        std::cout << "]" << std::endl;
+    }
+
+    template <typename ValueType, IsSerializable<ValueType> concept>
+    void SimpleSerializer::SerializeArray(const char* name, const std::vector<ValueType>& array)
+    {
+        std::cout << "[";
+        for (const auto& item : array)
+        {
+            Serialize(item);
+            std::cout << " ";
+        }
+        std::cout << "]" << std::endl;
+    }
+
+    // Need a thing for vector<T> where T: fundamental
+    // Need a thing for vector<T> where T: ISerializable*
 }

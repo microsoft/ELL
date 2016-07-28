@@ -24,6 +24,9 @@
 
 namespace utilities
 {
+    struct foo {};
+
+
     class ISerializable;
 
     template <typename ValueType>
@@ -35,52 +38,66 @@ namespace utilities
     template <typename ValueType>
     using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, int>;
 
+    template <typename ValueType>
+    using IsSerializable = typename std::enable_if_t<std::is_base_of<ISerializable, ValueType>::value, int>;
+
+    template <typename ValueType>
+    using IsNotSerializable = typename std::enable_if_t<(!std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
+
+#define DECLARE_FUNDAMENTAL_SERIALIZE_BASE(type)    virtual void SerializeValue(const char* name, type value, IsFundamental<type> dummy=0) = 0;
+#define DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(type)    virtual void SerializeValue(const char* name, type value, IsFundamental<type> dummy=0) override;
+
+#define DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(type)    virtual void SerializeValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy=0) = 0;
+#define DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(type)    virtual void SerializeValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy=0) override;
+
     class Serializer
     {
     public:
         /// <summary> Serialize unnamed values of any serializable type. </summary>
         template <typename ValueType>
-        void Serialize(ValueType&& value)
-        {
-            SerializeValue("", value);
-        }
+        void Serialize(ValueType&& value);
+
+        /// <summary> Serialize named values of any serializable type. </summary>
+
+        // TODO: need to use SFINAE to constrain Serialize() here to not accept vectors!!
+        template <typename ValueType>
+        void Serialize(const char* name, ValueType&& value);
+
+        // this never gets called -- why?
+        template <typename ValueType>
+        void Serialize(const char* name, const std::vector<ValueType>& value);
 
         template <typename ValueType>
-        void Serialize(const char* name, ValueType&& value)
-        {
-            SerializeValue(name, value);
-        }
-
-        // template <typename ValueType>
-        // void Serialize2(const char* name, ValueType&& value)
-        // {
-        //     Variant var = MakeVariant<ValueType>(value);
-        //     SerializeVariant(name, var);
-        // }
+        void Serialize(const char* name, const std::vector<ValueType&&>& value);
 
     protected:
 
-        // #### Instead of having all these different overloads, we could possibly have SerializeVariant(const Variant& value) be the
-        //      virtual interface, and let the subclass deal with extracting the value from the variant
+        // TODO: Instead of having all these different overloads, we could possibly have SerializeVariant(const Variant& value) be the
+        //       virtual interface, and let the subclass deal with extracting the value from the variant
 
         //virtual void SerializeVariant(std::string name, const Variant& variant) = 0;
 
         // fundamental types
-        virtual void SerializeValue(const char* name, bool value) = 0;
+        // TODO: maybe only require bool, char, int, and have rest use those?
+        DECLARE_FUNDAMENTAL_SERIALIZE_BASE(bool);
+        DECLARE_FUNDAMENTAL_SERIALIZE_BASE(char);
+        DECLARE_FUNDAMENTAL_SERIALIZE_BASE(short);
+        DECLARE_FUNDAMENTAL_SERIALIZE_BASE(int);
+        DECLARE_FUNDAMENTAL_SERIALIZE_BASE(size_t);
+        DECLARE_FUNDAMENTAL_SERIALIZE_BASE(float);
+        DECLARE_FUNDAMENTAL_SERIALIZE_BASE(double);
 
-        virtual void SerializeValue(const char* name, char value) = 0;
-        virtual void SerializeValue(const char* name, short value) = 0;
-        virtual void SerializeValue(const char* name, int value) = 0;
-        virtual void SerializeValue(const char* name, size_t value) = 0;
-
-        virtual void SerializeValue(const char* name, float value) = 0;
-        virtual void SerializeValue(const char* name, double value) = 0;
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(bool);
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(char);
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(short);
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(int);
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(size_t);
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(float);
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(double);
 
         virtual void SerializeValue(const char* name, const ISerializable& value) = 0;
     
-        // Repeat above for arrays
-        virtual void SerializeValue(const char* name, const std::vector<int>& array) = 0;
-//        virtual void SerializeValue(const char* name, const std::vector<const ISerializable&>& array) = 0;
+        virtual void SerializeValue(const char* name, const std::vector<const ISerializable*>& array) = 0;
 
         //
         // Deserialization
@@ -128,19 +145,26 @@ namespace utilities
     protected:
         // virtual void SerializeVariant(std::string name, const Variant& variant) override;
 
-        virtual void SerializeValue(const char* name, bool value) override;
-        virtual void SerializeValue(const char* name, char value) override;
-        virtual void SerializeValue(const char* name, short value) override;
-        virtual void SerializeValue(const char* name, int value) override;
-        virtual void SerializeValue(const char* name, size_t value) override;
-        
-        virtual void SerializeValue(const char* name, float value) override;
-        virtual void SerializeValue(const char* name, double value) override;
+        // TODO: make macro for defining these
+        DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(bool);
+        DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(char);
+        DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(short);
+        DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(int);
+        DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(size_t);
+        DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(float);
+        DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(double);
+
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(bool);
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(char);
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(short);
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(int);
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(size_t);
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(float);
+        DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(double);
 
         virtual void SerializeValue(const char* name, const ISerializable& value) override;
 
-        virtual void SerializeValue(const char* name, const std::vector<int>& array) override;
-        //virtual void SerializeValue(const char* name, const std::vector<const ISerializable&>& array) override;
+        virtual void SerializeValue(const char* name, const std::vector<const ISerializable*>& array) override;
 
         // template <typename ValueType, IsClass<ValueType> concept = 0>
         // void Serialize(const char* name, const ValueType& value);
@@ -172,11 +196,14 @@ namespace utilities
 
     private:
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
-        void SerializeFundamental(const char* name, const ValueType& value);
+        void SerializeScalar(const char* name, const ValueType& value);
 
+        template <typename ValueType, IsFundamental<ValueType> concept = 0>
+        void SerializeArray(const char* name, const std::vector<ValueType>& array);
 
+        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        void SerializeArray(const char* name, const std::vector<ValueType>& array);
     };
-
 }
 
 #include "../tcc/Serialization.tcc"

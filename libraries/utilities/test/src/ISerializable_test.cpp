@@ -127,6 +127,17 @@ void TestSerializer()
     std::vector<int> intArray{ 1, 2, 3 };
     serializer.Serialize("intArray", intArray);
 
-    //std::vector<TestStruct> structArray;
-    //serializer.Serialize("structArray", structArray);
+    std::vector<bool> boolArray{ true, false, true };
+    serializer.Serialize("boolArray", boolArray);
+
+    // std::vector<TestStruct> structArray;
+    // structArray.emplace_back(1, 2, 3);
+    // structArray.emplace_back(4, 5, 6);
+    // structArray.emplace_back(7, 8, 9);
+    // serializer.Serialize("structArray", structArray);
+
+    utilities::foo scalarFoo; // weird struct
+    std::vector<utilities::foo> vectorFoo;
+//    serializer.Serialize("scalarFoo", scalarFoo);
+//    serializer.Serialize("vectorFoo", vectorFoo);
 }
