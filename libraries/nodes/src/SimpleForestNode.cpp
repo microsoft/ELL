@@ -11,6 +11,7 @@
 #include "ElementSelectorNode.h"
 #include "BinaryOperationNode.h"
 #include "SumNode.h"
+#include "SubModelBuilders.h"
 
 // stl
 #include <vector>
@@ -62,7 +63,7 @@ namespace nodes
         _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
     }
 
-    SimpleForestSubModelOutputs BuildSubModel(const predictors::SimpleForestPredictor& forest, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
+    SimpleForestSubModelOutputs BuildSubModel(const predictors::SimpleForestPredictor& forest, model::Model& model, const model::OutputPortElements<double>& outputPortElements) // call the last argument "inputs" or something like that
     {
         const auto& interiorNodes = forest.GetInteriorNodes();
         std::vector<model::OutputPortRange> interiorNodeOutputs(interiorNodes.size());
@@ -76,23 +77,25 @@ namespace nodes
             for(size_t j = 0; j < edges.size(); ++j)
             {
                 const auto& edgePredictor = edges[j].GetPredictor();
-                auto edgePredictorNode = model.AddNode<ConstantNode<double>>(13);
+                auto edgePredictorNodeOutputs = BuildSubModel(edgePredictor, model, outputPortElements);
 
                 if(edges[j].IsTargetInterior()) // has subtree
                 {
                     model::OutputPortElements<double> elements;
                     elements.AddRange(interiorNodeOutputs[edges[j].GetTargetNodeIndex()]);
 
-                    auto sumNode = model.AddNode<BinaryOperationNode<double>>(edgePredictorNode->output, elements, BinaryOperationNode<double>::OperationType::add);
+                    auto sumNode = model.AddNode<BinaryOperationNode<double>>(edgePredictorNodeOutputs.output, elements, BinaryOperationNode<double>::OperationType::add);
                     edgeOutputs.AddRange(sumNode->output);
                 }
                 else // leaf
                 {
-                    edgeOutputs.AddRange(edgePredictorNode->output);
+                    edgeOutputs.AddRange(edgePredictorNodeOutputs.output);
                 }
             }
 
             auto splitRuleNode = model.AddNode<ConstantNode<int>>(0);
+
+            const auto& splitRule = node.GetSplitRule(); // TODO
             auto selectorNode = model.AddNode<ElementSelectorNode<double>>(edgeOutputs, splitRuleNode->output);
             interiorNodeOutputs[i-1] = selectorNode->output;
         }
