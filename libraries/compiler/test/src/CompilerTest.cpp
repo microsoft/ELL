@@ -155,6 +155,12 @@ nodes::SumNode<T>* ModelBuilder::Sum(const model::OutputPort<T>& x)
 }
 
 template<typename T>
+nodes::DelayNode<T>* ModelBuilder::Delay(const model::OutputPort<T>& x, size_t windowSize)
+{
+	return _model.AddNode<nodes::DelayNode<T>>(x, windowSize);
+}
+
+template<typename T>
 nodes::AccumulatorNode<T>* ModelBuilder::Accumulate(const model::OutputPort<T>& x)
 {
 	return _model.AddNode<nodes::AccumulatorNode<T>>(x);
@@ -295,6 +301,18 @@ void TestAccumulator(bool expanded)
 
 	IRCompiler compiler("EMLL", std::cout);
 	compiler.ShouldUnrollLoops() = expanded;
+	compiler.CompileModel("Predict", mb.Model);
+	compiler.DebugDump();
+}
+
+void TestDelay()
+{
+	ModelBuilder mb;
+	auto input1 = mb.Inputs<double>(4);
+	auto delay = mb.Delay<double>(input1->output, 4);
+	auto output = mb.Outputs<double>(delay->output);
+
+	IRCompiler compiler("EMLL", std::cout);
 	compiler.CompileModel("Predict", mb.Model);
 	compiler.DebugDump();
 }

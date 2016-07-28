@@ -67,6 +67,7 @@ namespace emll
 			llvm::CallInst* Call(llvm::Function* pfn, llvm::Value* pArg);
 			llvm::CallInst* Call(llvm::Function* pfn, const IRValueList& args);
 			llvm::CallInst* MemMove(llvm::Value* pSrc, llvm::Value* pDest, llvm::Value* pCount);
+			llvm::CallInst* MemCopy(llvm::Value* pSrc, llvm::Value* pDest, llvm::Value* pCount);
 
 			llvm::PHINode* Phi(const ValueType type, llvm::Value* pLVal, llvm::BasicBlock* plBlock, llvm::Value* pRVal, llvm::BasicBlock* prBlock);
 

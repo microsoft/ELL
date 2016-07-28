@@ -107,6 +107,21 @@ namespace emll
 			}
 		}
 
+		void IRCompiler::CompileDelayNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					CompileDelay<double>(static_cast<const nodes::DelayNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					CompileDelay<int>(static_cast<const nodes::DelayNode<int>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
 		void IRCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
 		{			
 			_fn = _module.Function(functionName, ValueType::Void, args, true);
@@ -379,11 +394,18 @@ namespace emll
 			llvm::Value* pVal = nullptr;
 			switch (var.Type())
 			{
-			case ValueType::Double:
-				pVal = EmitGlobalVector<double>(static_cast<VectorVar<double>&>(var));
-				break;
-			default:
-				throw new CompilerException(CompilerError::valueTypeNotSupported);
+				case ValueType::Double:
+					if (var.HasInitValue())
+					{
+						pVal = EmitGlobalVector<double>(static_cast<InitializedVectorVar<double>&>(var));
+					}
+					else
+					{
+						pVal = EmitGlobalVector<double>(static_cast<VectorVar<double>&>(var));
+					}
+					break;
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 			assert(pVal != nullptr);
 			_globals.Set(var.EmittedName(), pVal);

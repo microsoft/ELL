@@ -181,9 +181,12 @@ namespace emll
 			llvm::Value* Printf(std::initializer_list<llvm::Value*> args);
 
 			void MemMove(llvm::Value* pPtr, int fromOffset, int destOffset, int count);
+			void MemCopy(llvm::Value* pPtrSrc, int srcOffset, llvm::Value* pPtrDest, int destOffset, int count);
 
 			llvm::Value* DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal);
 			void DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest);
+
+			void ShiftRegister(llvm::Value* pBuffer, size_t bufferSize, size_t shiftSize, llvm::Value* pNewData = nullptr, llvm::Value* pShiftBuffer = nullptr);
 
 			void Verify()
 			{

@@ -265,10 +265,16 @@ namespace emll
 		void IRFunctionEmitter::MemMove(llvm::Value* pPtr, int fromOffset, int destOffset, int count)
 		{
 			assert(pPtr	!= nullptr);
-
 			auto pSrc = _pEmitter->PtrOffset(pPtr, Literal(fromOffset));
 			auto pDest = _pEmitter->PtrOffset(pPtr, Literal(destOffset));
 			_pEmitter->MemMove(pSrc, pDest, Literal(count));
+		}
+
+		void IRFunctionEmitter::MemCopy(llvm::Value* pPtrSrc, int srcOffset, llvm::Value* pPtrDest, int destOffset, int count)
+		{
+			auto pSrc = _pEmitter->PtrOffset(pPtrSrc, Literal(srcOffset));
+			auto pDest = _pEmitter->PtrOffset(pPtrDest, Literal(destOffset));
+			_pEmitter->MemCopy(pPtrSrc, pPtrDest, Literal(count));
 		}
 
 		llvm::Value* IRFunctionEmitter::DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal)
@@ -284,6 +290,25 @@ namespace emll
 			OpV(OperatorType::MultiplyF, count, pLVal, pRVal, [&pDest, this](llvm::Value* i, llvm::Value* pValue) {
 				OpAndUpdate(pDest, OperatorType::AddF, pValue);
 			});
+		}
+
+		void IRFunctionEmitter::ShiftRegister(llvm::Value* pBuffer, size_t bufferSize, size_t shiftSize, llvm::Value* pNewData, llvm::Value* pShiftBuffer)
+		{
+			assert(pBuffer != nullptr);
+			assert(shiftSize <= bufferSize);
+
+			if (pShiftBuffer != nullptr)
+			{
+				MemCopy(pBuffer, 0, pShiftBuffer, 0, (int) shiftSize);
+			}
+			if (shiftSize < bufferSize)
+			{
+				MemMove(pBuffer, shiftSize, 0, (int) (bufferSize - shiftSize));
+			}
+			if (pNewData != nullptr)
+			{
+				MemCopy(pNewData, 0, pBuffer, shiftSize, shiftSize);
+			}
 		}
 
 		llvm::Function* IRFunctionEmitter::ResolveFunction(const std::string& name)

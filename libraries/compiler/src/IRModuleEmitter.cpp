@@ -42,7 +42,11 @@ namespace emll
 
 			llvm::ArrayType* pArrayType = llvm::ArrayType::get(pType, size);
 			return Global(name, pArrayType, InitializeArray(pArrayType), false);
+		}
 
+		llvm::GlobalVariable* IRModuleEmitter::Global(const std::string&name, const std::vector<double>& value)
+		{
+			return Global(name, _emitter.ArrayType(ValueType::Double, value.size()), _emitter.Literal(value), false);
 		}
 
 		llvm::StructType* IRModuleEmitter::Struct(const std::string& name, std::initializer_list<ValueType> fields)

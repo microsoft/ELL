@@ -21,6 +21,7 @@ namespace emll
 			virtual void CompileDotProductNode(const model::Node& node) override;
 			virtual void CompileSumNode(const model::Node& node) override;
 			virtual void CompileAccumulatorNode(const model::Node& node) override;
+			virtual void CompileDelayNode(const model::Node& node) override;
 
 			void DebugDump();
 
@@ -57,9 +58,11 @@ namespace emll
 			llvm::Value* EmitGlobalVector(Variable& var);
 
 			template<typename T>
-			llvm::Value* EmitLiteralVector(LiteralVarV<T>& var);
-			template<typename T>
 			llvm::Value* EmitGlobalVector(VectorVar<T>& var);
+			template<typename T>
+			llvm::Value* EmitGlobalVector(InitializedVectorVar<T>& var);
+			template<typename T>
+			llvm::Value* EmitLiteralVector(LiteralVarV<T>& var);
 
 			llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
 			llvm::Value* EnsureEmitted(Variable* pVar);
@@ -78,29 +81,36 @@ namespace emll
 			template<typename T>
 			void Compile(const model::OutputNode<T>& node);
 			template<typename T>
+			
 			void Compile(const nodes::BinaryOperationNode<T>& node);
 			template<typename T>
 			void CompileLoop(const nodes::BinaryOperationNode<T>& node);
 			template<typename T>
 			void CompileExpanded(const nodes::BinaryOperationNode<T>& node);
 			template<typename T>
+			
 			void Compile(const nodes::DotProductNode<T>& node);
 			template<typename T>
 			void CompileLoop(const nodes::DotProductNode<T>& node);
 			template<typename T>
 			void CompileExpanded(const nodes::DotProductNode<T>& node);
+			
 			template<typename T>
 			void Compile(const nodes::SumNode<T>& node);
 			template<typename T>
 			void CompileLoop(const nodes::SumNode<T>& node);
 			template<typename T>
 			void CompileExpanded(const nodes::SumNode<T>& node);
+			
 			template<typename T>
 			void Compile(const nodes::AccumulatorNode<T>& node);
 			template<typename T>
 			void CompileLoop(const nodes::AccumulatorNode<T>& node);
 			template<typename T>
 			void CompileExpanded(const nodes::AccumulatorNode<T>& node);
+
+			template<typename T>
+			void CompileDelay(const nodes::DelayNode<T>& node);
 
 			template<typename T>
 			OperatorType GetOperator(const nodes::BinaryOperationNode<T>& node);

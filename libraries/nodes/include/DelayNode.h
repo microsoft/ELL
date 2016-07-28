@@ -50,6 +50,9 @@ namespace nodes
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
+		/// <summary></summary>
+		size_t GetWindowSize() const { return _windowSize; }
+
         static constexpr char* inputPortName = "input";
         static constexpr char* outputPortName = "output";
 

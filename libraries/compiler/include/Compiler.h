@@ -22,6 +22,7 @@
 #include "DotProductNode.h"
 #include "SumNode.h"
 #include "AccumulatorNode.h"
+#include "DelayNode.h"
 
 #include <functional>
 
@@ -49,6 +50,7 @@ namespace emll
 			virtual void CompileDotProductNode(const model::Node& node) = 0;
 			virtual void CompileSumNode(const model::Node& node) = 0;
 			virtual void CompileAccumulatorNode(const model::Node& node) = 0;
+			virtual void CompileDelayNode(const model::Node& node) = 0;
 
 			void BeginFunctionPredict();
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
@@ -67,7 +69,6 @@ namespace emll
 			bool IsNodeType(const std::string& nodeTypeName , const std::string& typeName);
 			ValueType ToValueType(model::Port::PortType type);
 			void CollectInputsAndOutputs(model::Model& model);
-
 
 		private:
 			Variable* AllocArg(const model::OutputPortBase* pPort, bool isInput);

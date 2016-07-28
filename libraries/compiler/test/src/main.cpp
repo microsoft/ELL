@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
 	TestSum(true);
 	TestAccumulator(false);
 	TestAccumulator(true);
+	TestDelay();
 
 	TestLLVM();
 

@@ -33,6 +33,8 @@ public:
 	nodes::AccumulatorNode<T>* Accumulate(const model::OutputPort<T>& x);
 	template<typename T>
 	nodes::SumNode<T>* Sum(const model::OutputPort<T>& x);
+	template<typename T>
+	nodes::DelayNode<T>* Delay(const model::OutputPort<T>& x, size_t windowSize);
 
 	// Expose as a property!
 	model::Model& Model = _model;
@@ -54,3 +56,4 @@ void TestBinaryScalar();
 void TestDotProduct(bool expanded);
 void TestSum(bool expanded);
 void TestAccumulator(bool expanded);
+void TestDelay();

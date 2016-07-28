@@ -23,6 +23,23 @@ namespace emll
 		using VectorI = VectorVar<int>;
 
 		template<typename T>
+		class InitializedVectorVar : public VectorVar<T>
+		{
+		public:
+			InitializedVectorVar(const VariableScope scope, const std::vector<T>& data, int flags = VariableFlags::isMutable);
+
+			std::vector<T>& Data()
+			{
+				return _data;
+			}
+
+		private:
+			std::vector<T> _data;
+		};
+
+		using InitializedVectorF = InitializedVectorVar<double>;
+
+		template<typename T>
 		class LiteralVarV : public VectorVar<T>
 		{
 		public:

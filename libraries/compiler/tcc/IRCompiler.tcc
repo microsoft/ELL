@@ -109,6 +109,12 @@ namespace emll
 		}
 
 		template<typename T>
+		llvm::Value* IRCompiler::EmitGlobalVector(InitializedVectorVar<T>& var)
+		{
+			return _module.Global(var.EmittedName(), var.Data());
+		}
+
+		template<typename T>
 		void IRCompiler::Compile(const nodes::ConstantNode<T>& node)
 		{
 			auto output = node.GetOutputPorts()[0];
@@ -337,6 +343,30 @@ namespace emll
 				llvm::Value* pVal = LoadVar(pInput->GetOutputPortElement(i));
 				_fn.OpAndUpdate(_fn.PtrOffset(pAccumulatorVector, _fn.Literal((int) i)), GetAddForValueType<T>(), pVal);
 			}
+		}
+
+		template<typename T>
+		void IRCompiler::CompileDelay(const nodes::DelayNode<T>& node)
+		{
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			size_t sampleSize = pOutput->Size();
+			size_t windowSize = node.GetWindowSize();
+			size_t bufferSize = sampleSize * windowSize;
+			//
+			// Delay nodes are always long lived - either globals or heap. Currently, we use globals
+			// Each sample chunk is of size == sampleSize. The number of chunks we hold onto == windowSize
+			// We need two buffers - one for the entire lot, one for the "last" chunk forwarded to the next operator
+			// 
+			Variable* pVarAllWindows = Variables().AddVariable<VectorVar<T>>(VariableScope::Global, bufferSize);
+			llvm::Value* pAllWindows = EnsureEmitted(pVarAllWindows);
+
+			Variable* pVarOutputBuffer = Variables().AddVariable<VectorVar<T>>(VariableScope::Global, sampleSize);
+			SetVariableFor(pOutput, pVarOutputBuffer);
+			llvm::Value* pOutputBuffer = EnsureEmitted(pVarOutputBuffer);
+
+			llvm::Value* pInputBuffer = EnsureEmitted(pInput);
+			_fn.ShiftRegister(pAllWindows, bufferSize, sampleSize, pInputBuffer, pOutputBuffer);
 		}
 	}
 }

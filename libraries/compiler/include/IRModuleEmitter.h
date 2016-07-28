@@ -24,6 +24,8 @@ namespace emll
 				return Global(name, pType, nullptr, false);
 			}
 			llvm::GlobalVariable* Global(const std::string& name, llvm::Type* pType, const uint64_t size);
+			llvm::GlobalVariable* Global(const std::string&name, const std::vector<double>& value);
+
 			llvm::StructType* Struct(const std::string& name, std::initializer_list<ValueType> fields);
 			
 			IRFunctionEmitter AddMain();
