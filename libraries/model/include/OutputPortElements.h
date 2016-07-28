@@ -53,6 +53,8 @@ namespace model
     class OutputPortRange
     {
     public:
+        OutputPortRange() = default; // TODO: oferd - I had to add this to get around a problem caused by untyped ports
+
         /// <summary> Creates an OutputPortRange representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>

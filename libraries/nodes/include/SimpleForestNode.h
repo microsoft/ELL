@@ -78,9 +78,9 @@ namespace nodes
     /// <summary> A struct that represents the outputs of a linear predictor node. </summary>
     struct SimpleForestPredictorOutputs
     {
-        model::OutputPort<double> _prediction;
-        //model::OutputPort<double> _treeOutputs;   // TODO: waiting for chuck to decide how we map to multiple ports
-        //model::OutputPort<bool> _edgeIndicatorVector;
+        const model::OutputPort<double>& prediction;
+        //const model::OutputPort<double>& treeOutputs;   // TODO: waiting for chuck to decide how we map to multiple ports
+        //const model::OutputPort<bool>& edgeIndicatorVector;
     };
 
     /// <summary> Builds a part of the model that represents a refined simple forest predictor. </summary>

@@ -132,12 +132,12 @@ namespace predictors
             /// <summary> Gets the vector of outgoing edges. </summary>
             ///
             /// <returns> The outgoing edges. </returns>
-            const std::vector<Edge>& GetOutgoingEdges() { return _outgoingEdges; }
+            const std::vector<Edge>& GetOutgoingEdges() const { return _outgoingEdges; }
 
             /// <summary> Gets the index of the first outgoung edge. </summary>
             ///
             /// <returns> The first edge index. </returns>
-            size_t GetFirstEdgeIndex() { return _firstEdgeIndex; }
+            size_t GetFirstEdgeIndex() const { return _firstEdgeIndex; }
 
             /// <summary> Prints a human readable description of the interior node, indented by a given number of tabs - used for debugging. </summary>
             ///
@@ -269,6 +269,16 @@ namespace predictors
         /// <param name="value"> The value. </param>
         void AddToBias(double value);
 
+        /// <summary> Gets a vector of interior nodes in a topological order. </summary>
+        ///
+        /// <returns> The vector of interior nodes. </returns>
+        const std::vector<InteriorNode>& GetInteriorNodes() const { return _interiorNodes; }
+
+        /// <summary> Gets a vector of tree root indices. </summary>
+        ///
+        /// <returns> The vector of tree root indices. </returns>
+        const std::vector<size_t>& GetTreeRootIndices() const { return _treeRootIndices; }
+
         /// <summary> Prints a representation of the forest to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] The output stream. </param>
@@ -276,7 +286,6 @@ namespace predictors
         void PrintLine(std::ostream& os, size_t tabs=0) const;
 
     protected:
-
         //
         // protected member functions
         // 

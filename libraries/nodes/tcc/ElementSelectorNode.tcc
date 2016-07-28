@@ -10,7 +10,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    ElementSelectorNode<ValueType>::ElementSelectorNode(const model::OutputPortElements<ValueType>& input, const model::OutputPortElements<int>& selector) : Node({ &_input, &_selector }, { &_output }), _input(this, input, inputPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, 1)
+    ElementSelectorNode<ValueType>::ElementSelectorNode(const model::OutputPortElements<ValueType>& input, const model::OutputPortElements<int>& selector) : Node({ &_elements, &_selector }, { &_output }), _elements(this, input, elementsPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, 1)
     {
         if (selector.Size() != 1)
         {
@@ -22,15 +22,15 @@ namespace nodes
     void ElementSelectorNode<ValueType>::Compute() const
     {
         int index = _selector[0];
-        _output.SetOutput(_input1[index]);
+        _output.SetOutput({ _elements[index] });
     }
 
     template <typename ValueType>
     void ElementSelectorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newElements = transformer.TransformOutputPortElements(_elements.GetOutputPortElements());
         auto newSelector = transformer.TransformOutputPortElements(_selector.GetOutputPortElements());
-        auto newNode = transformer.AddNode<ElementSelectorNode<ValueType>>(newInput, newSelector);
+        auto newNode = transformer.AddNode<ElementSelectorNode<ValueType>>(newElements, newSelector);
         transformer.MapOutputPort(output, newNode->output);
     }
 }

@@ -7,6 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SimpleForestNode.h"
+#include "ConstantNode.h"
+#include "ElementSelectorNode.h"
+#include "BinaryOperationNode.h"
+#include "SumNode.h"
 
 // stl
 #include <vector>
@@ -33,6 +37,11 @@ namespace nodes
 
     void SimpleForestNode::Refine(model::ModelTransformer & transformer) const
     {
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newOutputs = BuildSubModel(_forest, transformer.GetModel(), newOutputPortElements);
+        transformer.MapOutputPort(prediction, newOutputs.prediction);
+        //       transformer.MapOutputPort(treeOutputs, newOutputs.treeOutputs);
+        //       transformer.MapOutputPort(edgeIndicatorVector, newOutputs.edgeIndicatorVector);
     }
 
     void SimpleForestNode::Compute() const
@@ -53,9 +62,52 @@ namespace nodes
         _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
     }
 
-    SimpleForestPredictorOutputs BuildSubModel(const predictors::SimpleForestPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
+    SimpleForestPredictorOutputs BuildSubModel(const predictors::SimpleForestPredictor& forest, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
     {
-        auto newNode = model.AddNode<SimpleForestNode>(outputPortElements, predictor);
-        return { newNode->prediction };
+        const auto& interiorNodes = forest.GetInteriorNodes();
+        std::vector<model::OutputPortRange> interiorNodeOutputs(interiorNodes.size());
+
+        for(size_t i = interiorNodes.size(); i > 0; --i)
+        {
+            const auto& node = interiorNodes[i-1];
+            const auto& edges = node.GetOutgoingEdges();
+
+            model::OutputPortElements<double> edgeOutputs;
+            for(size_t j = 0; j < edges.size(); ++j)
+            {
+                //const auto& edgePredictor = edges[j].XXX; 
+                auto edgePredictorNode = model.AddNode<ConstantNode<double>>(13);
+
+                if(edges[j].IsTargetInterior()) // has subtree
+                {
+                    model::OutputPortElements<double> elements;
+                    elements.AddRange(interiorNodeOutputs[edges[j].GetTargetNodeIndex()]);
+
+                    auto sumNode = model.AddNode<BinaryOperationNode<double>>(edgePredictorNode->output, elements, BinaryOperationNode<double>::OperationType::add);
+                    edgeOutputs.AddRange(sumNode->output);
+                }
+                else // leaf
+                {
+                    edgeOutputs.AddRange(edgePredictorNode->output);
+                }
+            }
+
+            auto splitRuleNode = model.AddNode<ConstantNode<int>>(0);
+            auto selectorNode = model.AddNode<ElementSelectorNode<double>>(edgeOutputs, splitRuleNode->output);
+            interiorNodeOutputs[i-1] = selectorNode->output;
+        }
+
+        model::OutputPortElements<double> treeOutputs;
+        for(size_t rootIndex : forest.GetTreeRootIndices()) // TODO: remove the word 'Tree' from this func name, and other members of that class
+        {
+            treeOutputs.AddRange(interiorNodeOutputs[rootIndex]);
+        }
+
+        auto sumNode = model.AddNode<SumNode<double>>(treeOutputs);
+        
+        return { 
+            sumNode->output
+        //,newNode->treeOutputs, newNode->edgeIndicatorVector
+        };
     }
 }

@@ -21,7 +21,7 @@
 #include <exception>
 
 /// <summary> model namespace </summary>
-namespace model
+namespace nodes
 {
     /// <summary> A node that outputs a dynamically specified element from an input array. </summary>
     template <typename ValueType>
@@ -30,17 +30,17 @@ namespace model
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr char* input1PortName = "input";
+        static constexpr char* elementsPortName = "input";
         static constexpr char* selectorPortName = "selector";
         static constexpr char* outputPortName = "output";
-        const OutputPort<ValueType>& output = _output;
+        const model::OutputPort<ValueType>& output = _output;
         /// @}
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="input"> The input aray of values. </param>
+        /// <param name="elements"> The input aray of values. </param>
         /// <param name="selector"> The index of the chosen element </param>
-        ElementSelectorNode(const model::OutputPortElements<ValueType>& input, const model::OutputPortElements<int>& selector);
+        ElementSelectorNode(const model::OutputPortElements<ValueType>& elements, const model::OutputPortElements<int>& selector);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -60,7 +60,7 @@ namespace model
 
     private:
         // Inputs
-        model::InputPort<ValueType> _input;
+        model::InputPort<ValueType> _elements;
         model::InputPort<int> _selector;
 
         // Output

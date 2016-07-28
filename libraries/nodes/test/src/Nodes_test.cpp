@@ -325,8 +325,8 @@ void TestSimpleForestNodeRefine()
     // check equivalence
     inputNode->SetInput({ 0.2, 0.5, 0.0 });
     refinedInputNode->SetInput({ 0.2, 0.5, 0.0 });
-    auto outputValue = model.ComputeNodeOutput(simpleForestNode->prediction);
-    auto refinedOutputValue = refinedModel.ComputeNodeOutput(*refinedOutputPort);
+    auto outputValue = model.ComputeNodeOutput(simpleForestNode->prediction)[0];
+    auto refinedOutputValue = refinedModel.ComputeNodeOutput(*refinedOutputPort)[0];
 
     //  expected output is -3.0
     testing::ProcessTest("Testing SimpleForestNode refine", testing::IsEqual(outputValue, refinedOutputValue));
@@ -360,4 +360,3 @@ void TestLinearPredictorNodeRefine()
 
     testing::ProcessTest("Testing LinearPredictorNode refine", testing::IsEqual(modelOutputValue, newOutputValue));
 }
-
