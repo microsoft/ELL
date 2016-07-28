@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     BinaryOperationNode.h (features)
-//  Authors:  Chuck Jacobs
+//  File:     BinaryPredicateNode.h (features)
+//  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -22,9 +22,9 @@
 
 namespace nodes
 {
-    /// <summary> A node that performs a coordinatewise binary arithmetic operation on its inputs </summary>
+    /// <summary> A node that performs a coordinatewise binary boolean-valued operation on its inputs </summary>
     template <typename ValueType>
-    class BinaryOperationNode : public model::Node
+    class BinaryPredicateNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
@@ -32,29 +32,26 @@ namespace nodes
         static constexpr char* input1PortName = "input1";
         static constexpr char* input2PortName = "input2";
         static constexpr char* outputPortName = "output";
-        const model::OutputPort<ValueType>& output = _output;
+        const model::OutputPort<bool>& output = _output;
         /// @}
 
         /// <summary> Types of coordinatewise operations supported by this node type. </summary>
-        enum class OperationType
+        enum class PredicateType
         {
-            add,
-            subtract,
-            coordinatewiseMultiply, // coordinatewise multiplication
-            divide // coordinatewise division
+            lessThanOrEqual
         };
 
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
         /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
-        /// <param name="operation"> The type of operation to perform. </param>
-        BinaryOperationNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2, OperationType operation);
+        /// <param name="predicate"> The type of predicate to apply. </param>
+        BinaryPredicateNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2, PredicateType predicate);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("BinaryOperationNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("BinaryPredicateNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -76,11 +73,11 @@ namespace nodes
         model::InputPort<ValueType> _input2;
 
         // Output
-        model::OutputPort<ValueType> _output;
+        model::OutputPort<bool> _output;
 
         // Operation
-        OperationType _operation;
+        PredicateType _predicate;
     };
 }
 
-#include "../tcc/BinaryOperationNode.tcc"
+#include "../tcc/BinaryPredicateNode.tcc"

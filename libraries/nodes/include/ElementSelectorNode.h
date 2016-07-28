@@ -24,7 +24,7 @@
 namespace nodes
 {
     /// <summary> A node that outputs a dynamically specified element from an input array. </summary>
-    template <typename ValueType>
+    template <typename ValueType, typename SelectorType>
     class ElementSelectorNode : public model::Node
     {
     public:
@@ -40,7 +40,7 @@ namespace nodes
         ///
         /// <param name="elements"> The input aray of values. </param>
         /// <param name="selector"> The index of the chosen element </param>
-        ElementSelectorNode(const model::OutputPortElements<ValueType>& elements, const model::OutputPortElements<int>& selector);
+        ElementSelectorNode(const model::OutputPortElements<ValueType>& elements, const model::OutputPortElements<SelectorType>& selector);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -61,7 +61,7 @@ namespace nodes
     private:
         // Inputs
         model::InputPort<ValueType> _elements;
-        model::InputPort<int> _selector;
+        model::InputPort<SelectorType> _selector;
 
         // Output
         model::OutputPort<ValueType> _output;
