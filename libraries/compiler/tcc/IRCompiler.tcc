@@ -238,7 +238,8 @@ namespace emll
 		{
 			// SumNode has exactly 1 input and 1 output
 			auto input = node.GetInputPorts()[0];
-			if (ModelEx::IsPureVector(*input))
+			if (ModelEx::IsPureVector(*input) && 
+				!ShouldUnrollLoops())
 			{
 				CompileLoop<T>(node);
 			}
@@ -286,6 +287,56 @@ namespace emll
 				pTotal = _fn.Op(GetAddForValueType<T>(), pVal, pTotal);
 			}
 			_fn.Store(pResult, pTotal);
+		}
+
+		template<typename T>
+		void IRCompiler::Compile(const nodes::AccumulatorNode<T>& node)
+		{
+			// AccumulatorNode has exactly 1 input and 1 output
+			// Accumulators are always long lived - either globals or heap. Currently, we use globals
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			Variable* pVar = Variables().AddVectorVariable(VariableScope::Global, GetValueType<T>(), pOutput->Size());
+			SetVariableFor(pOutput, pVar);
+
+			if (ModelEx::IsPureVector(*pInput) && 
+				!ShouldUnrollLoops())
+			{
+				CompileLoop<T>(node);
+			}
+			else
+			{
+				CompileExpanded<T>(node);
+			}
+		}
+
+		template<typename T>
+		void IRCompiler::CompileLoop(const nodes::AccumulatorNode<T>& node)
+		{
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			llvm::Value* pInputVector = EnsureEmitted(pInput);
+			llvm::Value* pAccumulatorVector = EnsureEmitted(pOutput);
+
+			_fn.OpV(GetAddForValueType<T>(), pOutput->Size(), pAccumulatorVector, pInputVector,
+				[&pAccumulatorVector, this](llvm::Value* i, llvm::Value* pValue) {
+				_fn.SetValueAt(pAccumulatorVector, i, pValue);
+			});
+		}
+
+		template<typename T>
+		void IRCompiler::CompileExpanded(const nodes::AccumulatorNode<T>& node)
+		{
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			llvm::Value* pAccumulatorVector = EnsureEmitted(pOutput);
+			Variable& accumulatorVar = *(GetVariableFor(pOutput));
+
+			for (size_t i = 0; i < pInput->Size(); ++i)
+			{
+				llvm::Value* pVal = LoadVar(pInput->GetOutputPortElement(i));
+				_fn.OpAndUpdate(_fn.PtrOffset(pAccumulatorVector, _fn.Literal((int) i)), GetAddForValueType<T>(), pVal);
+			}
 		}
 	}
 }

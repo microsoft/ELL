@@ -92,6 +92,20 @@ namespace emll
 			}
 		}
 
+		void IRCompiler::CompileAccumulatorNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					Compile<double>(static_cast<const nodes::AccumulatorNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					Compile<int>(static_cast<const nodes::AccumulatorNode<int>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
 
 		void IRCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
 		{			

@@ -21,6 +21,7 @@
 #include "BinaryOperationNode.h"
 #include "DotProductNode.h"
 #include "SumNode.h"
+#include "AccumulatorNode.h"
 
 #include <functional>
 
@@ -47,6 +48,7 @@ namespace emll
 			virtual void CompileBinaryNode(const model::Node& node) = 0;
 			virtual void CompileDotProductNode(const model::Node& node) = 0;
 			virtual void CompileSumNode(const model::Node& node) = 0;
+			virtual void CompileAccumulatorNode(const model::Node& node) = 0;
 
 			void BeginFunctionPredict();
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;

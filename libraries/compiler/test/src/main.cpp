@@ -9,6 +9,9 @@ int main(int argc, char* argv[])
 	TestDotProduct(true);
 	TestSum(false);
 	TestSum(true);
+	TestAccumulator(false);
+	TestAccumulator(true);
+
 	TestLLVM();
 
 	return 0;

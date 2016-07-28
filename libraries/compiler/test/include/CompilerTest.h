@@ -30,6 +30,8 @@ public:
 	template<typename T>
 	nodes::DotProductNode<T>* DotProduct(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 	template<typename T>
+	nodes::AccumulatorNode<T>* Accumulate(const model::OutputPort<T>& x);
+	template<typename T>
 	nodes::SumNode<T>* Sum(const model::OutputPort<T>& x);
 
 	// Expose as a property!
@@ -51,3 +53,4 @@ void TestBinaryVector(bool expanded);
 void TestBinaryScalar();
 void TestDotProduct(bool expanded);
 void TestSum(bool expanded);
+void TestAccumulator(bool expanded);

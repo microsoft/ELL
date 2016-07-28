@@ -155,6 +155,12 @@ nodes::SumNode<T>* ModelBuilder::Sum(const model::OutputPort<T>& x)
 }
 
 template<typename T>
+nodes::AccumulatorNode<T>* ModelBuilder::Accumulate(const model::OutputPort<T>& x)
+{
+	return _model.AddNode<nodes::AccumulatorNode<T>>(x);
+}
+
+template<typename T>
 nodes::ConstantNode<T>* ModelBuilder::Constant(const T value)
 {
 	return _model.AddNode<nodes::ConstantNode<T>>(value);
@@ -276,3 +282,19 @@ void TestSum(bool expanded)
 	compiler.DebugDump();
 }
 
+void TestAccumulator(bool expanded)
+{
+	std::vector<double> data = { 5, 10, 15, 20 };
+
+	ModelBuilder mb;
+	auto c1 = mb.Constant<double>(data);
+	auto input1 = mb.Inputs<double>(4);
+	auto product = mb.Multiply<double>(c1->output, input1->output);
+	auto accumulate = mb.Accumulate<double>(product->output);
+	auto output = mb.Outputs<double>(accumulate->output);
+
+	IRCompiler compiler("EMLL", std::cout);
+	compiler.ShouldUnrollLoops() = expanded;
+	compiler.CompileModel("Predict", mb.Model);
+	compiler.DebugDump();
+}

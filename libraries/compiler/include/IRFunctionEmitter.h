@@ -134,6 +134,7 @@ namespace emll
 			llvm::Value* Store(llvm::Value* pPtr, llvm::Value* pValue);
 			llvm::Value* OpAndUpdate(llvm::Value* pPtr, OperatorType op, llvm::Value* pValue);
 
+			llvm::Value* PtrOffset(llvm::Value* pPtr, llvm::Value* pOffset);
 			llvm::Value* ValueAt(llvm::Value* pPtr, llvm::Value* pOffset);
 			llvm::Value* SetValueAt(llvm::Value* pPtr, llvm::Value* pOffset, llvm::Value* pVal);
 
