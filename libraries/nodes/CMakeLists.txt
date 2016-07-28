@@ -23,11 +23,13 @@ set (INCLUDE include/AccumulatorNode.h
              include/MovingAverageNode.h
              include/MovingVarianceNode.h
              include/SimpleForestNode.h
+             include/SubModelBuilders.h
              include/SumNode.h
              include/UnaryOperationNode.h)
 
 set (SRC src/LinearPredictorNode.cpp
-         src/SimpleForestNode.cpp)
+         src/SimpleForestNode.cpp
+         src/SubModelBuilders.cpp)
 
 set (TCC tcc/AccumulatorNode.tcc
          tcc/BinaryOperationNode.tcc

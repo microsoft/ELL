@@ -102,6 +102,11 @@ namespace predictors
             /// <returns> The target node index. </returns>
             size_t GetTargetNodeIndex() const { return _targetNodeIndex; }
 
+            /// <summary> Gets the predictor associated with this edge. </summary>
+            ///
+            /// <returns> The edge predictor. </returns>
+            const EdgePredictorType& GetPredictor() const { return _predictor; }
+
             /// <summary> Determines if the target of this edge is an interior node. </summary>
             ///
             /// <returns> true if the target is an interior node. </returns>

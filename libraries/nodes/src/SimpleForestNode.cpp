@@ -62,7 +62,7 @@ namespace nodes
         _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
     }
 
-    SimpleForestPredictorOutputs BuildSubModel(const predictors::SimpleForestPredictor& forest, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
+    SimpleForestSubModelOutputs BuildSubModel(const predictors::SimpleForestPredictor& forest, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
     {
         const auto& interiorNodes = forest.GetInteriorNodes();
         std::vector<model::OutputPortRange> interiorNodeOutputs(interiorNodes.size());
@@ -75,7 +75,7 @@ namespace nodes
             model::OutputPortElements<double> edgeOutputs;
             for(size_t j = 0; j < edges.size(); ++j)
             {
-                //const auto& edgePredictor = edges[j].XXX; 
+                const auto& edgePredictor = edges[j].GetPredictor();
                 auto edgePredictorNode = model.AddNode<ConstantNode<double>>(13);
 
                 if(edges[j].IsTargetInterior()) // has subtree

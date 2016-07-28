@@ -70,8 +70,8 @@ namespace nodes
         predictors::LinearPredictor _predictor;
     };
 
-    /// <summary> A struct that represents the outputs of a linear predictor node. </summary>
-    struct LinearPredictorNodeOutputs
+    /// <summary> A struct that represents the outputs of a linear predictor sub-model. </summary>
+    struct LinearPredictorSubModelOutputs
     {
         const model::OutputPort<double>& prediction;
         const model::OutputPort<double>& weightedElements;
@@ -83,6 +83,6 @@ namespace nodes
     /// <param name="outputPortElements"> The output port elements from which the linear predictor takes its inputs. </param>
     /// <param name="predictor"> The linear predictor. </param>
     ///
-    /// <returns> The LinearPredictorNodeOutputs. </returns>
-    LinearPredictorNodeOutputs BuildSubModel(const predictors::LinearPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
+    /// <returns> The LinearPredictorSubModelOutputs. </returns>
+    LinearPredictorSubModelOutputs BuildSubModel(const predictors::LinearPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
 }

@@ -59,7 +59,7 @@ namespace nodes
         _weightedElements.SetOutput(_predictor.GetWeightedElements(dataVector));
     }
 
-    LinearPredictorNodeOutputs BuildSubModel(const predictors::LinearPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
+    LinearPredictorSubModelOutputs BuildSubModel(const predictors::LinearPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
     {
         auto weightsNode = model.AddNode<ConstantNode<double>>(predictor.GetWeights());
         auto dotProductNode = model.AddNode<DotProductNode<double>>(weightsNode->output, outputPortElements);

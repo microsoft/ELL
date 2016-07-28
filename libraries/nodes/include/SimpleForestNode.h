@@ -75,8 +75,8 @@ namespace nodes
     };
 
 
-    /// <summary> A struct that represents the outputs of a linear predictor node. </summary>
-    struct SimpleForestPredictorOutputs
+    /// <summary> A struct that represents the outputs of a linear predictor sub-model. </summary>
+    struct SimpleForestSubModelOutputs
     {
         const model::OutputPort<double>& prediction;
         //const model::OutputPort<double>& treeOutputs;   // TODO: waiting for chuck to decide how we map to multiple ports
@@ -89,6 +89,6 @@ namespace nodes
     /// <param name="outputPortElements"> The output port elements from which the linear predictor takes its inputs. </param>
     /// <param name="predictor"> The simple forest predictor. </param>
     ///
-    /// <returns> The LinearPredictorNodeOutputs. </returns>
-    SimpleForestPredictorOutputs BuildSubModel(const predictors::SimpleForestPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
+    /// <returns> The LinearPredictorSubModelOutputs. </returns>
+    SimpleForestSubModelOutputs BuildSubModel(const predictors::SimpleForestPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
 }
