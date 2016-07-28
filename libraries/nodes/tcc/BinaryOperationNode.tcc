@@ -72,4 +72,12 @@ namespace nodes
         result.AddField("operation", (int)_operation);
         return result;
     }
+
+    template <typename ValueType>
+    void BinaryOperationNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    {
+        std::cout << "Serializing BinaryOperationNode" << std::endl;
+        Node::Serialize(serializer);
+        serializer.Serialize("operation", (int)_operation);
+    }
 }

@@ -48,6 +48,7 @@ namespace utilities
 
         /// Inherited from ISerializable
         virtual ObjectDescription GetDescription() const override;
+        virtual void Serialize(utilities::Serializer& serializer) const override;
         
     private:
         friend std::hash<UniqueId>;

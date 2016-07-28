@@ -13,6 +13,7 @@
 #include "Variant.h"
 #include "ISerializable.h"
 #include "UniqueId.h"
+#include "Serialization.h"
 
 // model
 #include "ModelGraph.h"
@@ -30,13 +31,12 @@
 #include <iostream>
 #include <vector>
 
-
 struct TestStruct : public utilities::ISerializable
 {
-    int a = 1;
-    float b = 2.5;
-    double c = 1.41;
-
+    int a;
+    float b;
+    double c;
+    TestStruct(int a, float b, double c) : a(a), b(b), c(c) {}
     static std::string GetTypeName() { return "TestStruct"; }
     virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
 
@@ -48,21 +48,27 @@ struct TestStruct : public utilities::ISerializable
         result.AddField("c", c);
         return result;
     }
-};
 
+    virtual void Serialize(utilities::Serializer& serializer) const override
+    {
+        serializer.Serialize("a", a);
+        serializer.Serialize("b", b);
+        serializer.Serialize("c", c);
+    }
+};
 
 void TestISerializable()
 {
     int intVal = 1;
     float floatVal = 2.5;
     double doubleVal = 3.14;
-    TestStruct testStruct;
-    
+    TestStruct testStruct{ 1, 2.2, 3.3 };
+
     utilities::UniqueId id;
 
     model::Model g;
     auto in = g.AddNode<model::InputNode<double>>(3);
-    auto constNode = g.AddNode<nodes::ConstantNode<double>>(std::vector<double>{1.0, 2.0, 3.0});
+    auto constNode = g.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
     auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
@@ -106,4 +112,21 @@ void TestISerializable()
     std::cout << "\n--Serializing model--" << std::endl;
     serializer.Serialize(g);
     std::cout << std::endl;
+}
+
+void TestSerializer()
+{
+    utilities::SimpleSerializer serializer;
+
+    serializer.Serialize("five", 5);
+    serializer.Serialize("pi", 3.1415);
+
+    TestStruct testStruct{ 1, 2.2, 3.3 };
+    serializer.Serialize("testStruct", testStruct);
+
+    std::vector<int> intArray{ 1, 2, 3 };
+    serializer.Serialize("intArray", intArray);
+
+    //std::vector<TestStruct> structArray;
+    //serializer.Serialize("structArray", structArray);
 }

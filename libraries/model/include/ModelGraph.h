@@ -150,6 +150,7 @@ namespace model
 
         /// <summary> ISerializable interface </summary>
         virtual utilities::ObjectDescription GetDescription() const override;
+        virtual void Serialize(utilities::Serializer& serializer) const override;
 
     private:
         friend class NodeIterator;

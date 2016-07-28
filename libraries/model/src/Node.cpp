@@ -87,4 +87,21 @@ namespace model
         return result;
     }
 
+    void Node::Serialize(utilities::Serializer& serializer) const
+    {
+        serializer.Serialize("id", _id);
+        if(_inputs.size() > 0)
+        {
+//            result.AddField("inputs", _inputs);
+        }
+        // TODO: do we just add a single field called inputs, and serialize the whole list of inputs?
+        // then we need a way to serialize a vector of arbitrary (serializable) stuff
+        // otherwise, we could add a separate field per input port and require the subclass to serialize its ports
+        // maybe we can just add a helper function here to serialize an input port
+        for (auto inputPort : _inputs)
+        {
+            auto ranges = inputPort->GetInputRanges();
+        }
+    }
+
 }

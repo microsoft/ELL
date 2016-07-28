@@ -39,6 +39,11 @@ namespace utilities
         return result;
     }
 
+    void UniqueId::Serialize(Serializer& serializer) const
+    {
+        serializer.Serialize("id", _id);
+    }
+
     std::string to_string(const UniqueId& id)
     {
         using std::to_string;

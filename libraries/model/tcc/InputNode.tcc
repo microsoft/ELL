@@ -39,4 +39,11 @@ namespace model
         result.AddField("size", _output.Size());
         return result;
     }
+
+    template <typename ValueType>
+    void InputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    {
+        Node::Serialize(serializer);
+        serializer.Serialize("size", _output.Size());
+    }
 }

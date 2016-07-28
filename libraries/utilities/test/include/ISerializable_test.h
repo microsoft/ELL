@@ -10,3 +10,4 @@
 
 void TestISerializable();
 
+void TestSerializer();

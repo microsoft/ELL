@@ -79,6 +79,7 @@ namespace model
 
         /// Inherited from ISerializable
         virtual utilities::ObjectDescription GetDescription() const override;
+        virtual void Serialize(utilities::Serializer& serializer) const override;
 
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);

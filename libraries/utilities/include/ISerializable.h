@@ -29,6 +29,8 @@ namespace utilities
         /// <summary> Get an ObjectDescription describing how to serialize this object </summary>
         virtual ObjectDescription GetDescription() const = 0;
 
+        virtual void Serialize(Serializer& serializer) const = 0;
+
         // begin serialize
         // serialize
         // end serialize
