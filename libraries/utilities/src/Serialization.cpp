@@ -17,7 +17,7 @@
 namespace utilities
 {
 #define IMPLEMENT_FUNDAMENTAL_SERIALIZE(base, type)     void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { SerializeScalar(name,value); }
-#define IMPLEMENT_FUNDAMENTAL_ARRAY_SERIALIZE(base, type)     void base::SerializeValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { SerializeArray(name,value); }
+#define IMPLEMENT_FUNDAMENTAL_ARRAY_SERIALIZE(base, type)     void base::SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { SerializeArray(name,value); }
 
     //
 
@@ -51,8 +51,9 @@ namespace utilities
     IMPLEMENT_FUNDAMENTAL_ARRAY_SERIALIZE(SimpleSerializer, float);
     IMPLEMENT_FUNDAMENTAL_ARRAY_SERIALIZE(SimpleSerializer, double);
 
-    void SimpleSerializer::SerializeValue(const char* name, const std::vector<const ISerializable*>& array)
+    void SimpleSerializer::SerializeArrayValue(const char* name, const std::vector<const ISerializable*>& array)
     {
+        std::cout << "foo" << std::endl;
         std::cout << "[";
         for(const auto& item: array)
         {
