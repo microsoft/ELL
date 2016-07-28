@@ -21,26 +21,35 @@ namespace utilities
         Serialize("", value);
     }
 
-    template <typename ValueType>
+    template <typename ValueType, IsNotVector<ValueType> concept>
     void Serializer::Serialize(const char* name, ValueType&& value)
     {
+        std::cout << "Not Vector" << std::endl;
         SerializeValue(name, value);
     }
 
-    template <typename ValueType>
-    void Serializer::Serialize(const char* name, const std::vector<ValueType>& value)
+    template <typename ValueType, IsVector<ValueType> concept>
+    void Serializer::Serialize(const char* name, ValueType&& value)
     {
-        // :(
-        std::cout << "std::vector overload" << std::endl;
-//        SerializeValue(name, value);        
+        std::cout << "Vector" << std::endl;
+//        SerializeValue(name, value);
     }
-    template <typename ValueType>
-    void Serializer::Serialize(const char* name, const std::vector<ValueType&&>& value)
-    {
-        // :(
-        std::cout << "std::vector overload" << std::endl;
-//        SerializeValue(name, value);        
-    }
+
+//     template <typename ValueType, IsVector<ValueType> concept=0>
+//     void Serializer::Serialize(const char* name, const std::vector<ValueType>& value)
+//     {
+//         // :(
+//         std::cout << "std::vector overload" << std::endl;
+// //        SerializeValue(name, value);        
+//     }
+
+//     template <typename ValueType, IsVector<ValueType> concept=0>
+//     void Serializer::Serialize(const char* name, const std::vector<ValueType&&>& value)
+//     {
+//         // :(
+//         std::cout << "std::vector overload" << std::endl;
+// //        SerializeValue(name, value);        
+//     }
 
     //
     // SimpleSerializer

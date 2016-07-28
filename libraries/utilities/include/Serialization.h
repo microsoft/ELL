@@ -24,8 +24,38 @@
 
 namespace utilities
 {
-    struct foo {};
+    // template <typename ValueType>
+    // class is_vector
+    // {
+    //     typedef char true_t;
+    //     typedef long false_t;
 
+    //     template <typename VectorType>
+    //     static std::true_type is_vector_checker(typename VectorType::value_type*);
+
+    //     template <typename VectorType>
+    //     static std::false_type is_vector_checker(...);
+
+    // public:
+    //     static const bool value = (decltype(is_vector_checker<T>(0)) == std::true_type);
+    // };
+
+    template <typename ValueType>
+    class is_vector
+    {
+        template <typename VectorType>
+        static constexpr bool is_vector_checker(typename VectorType::value_type*) { return true; }
+
+        template <typename VectorType>
+        static constexpr bool is_vector_checker(...) { return false; }
+
+    public:
+        static const bool value = is_vector_checker<ValueType>(0);
+    };
+
+    struct foo
+    {
+    };
 
     class ISerializable;
 
@@ -44,11 +74,17 @@ namespace utilities
     template <typename ValueType>
     using IsNotSerializable = typename std::enable_if_t<(!std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
 
-#define DECLARE_FUNDAMENTAL_SERIALIZE_BASE(type)    virtual void SerializeValue(const char* name, type value, IsFundamental<type> dummy=0) = 0;
-#define DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(type)    virtual void SerializeValue(const char* name, type value, IsFundamental<type> dummy=0) override;
+    template <typename ValueType>
+    using IsVector = typename std::enable_if_t<is_vector<typename std::decay<ValueType>::type>::value, int>;
 
-#define DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(type)    virtual void SerializeValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy=0) = 0;
-#define DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(type)    virtual void SerializeValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy=0) override;
+    template <typename ValueType>
+    using IsNotVector = typename std::enable_if_t<!is_vector<typename std::decay<ValueType>::type>::value, int>;
+
+#define DECLARE_FUNDAMENTAL_SERIALIZE_BASE(type) virtual void SerializeValue(const char* name, type value, IsFundamental<type> dummy = 0) = 0;
+#define DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(type) virtual void SerializeValue(const char* name, type value, IsFundamental<type> dummy = 0) override;
+
+#define DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(type) virtual void SerializeValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) = 0;
+#define DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(type) virtual void SerializeValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) override;
 
     class Serializer
     {
@@ -60,7 +96,10 @@ namespace utilities
         /// <summary> Serialize named values of any serializable type. </summary>
 
         // TODO: need to use SFINAE to constrain Serialize() here to not accept vectors!!
-        template <typename ValueType>
+        template <typename ValueType, IsNotVector<ValueType> concept = 0>
+        void Serialize(const char* name, ValueType&& value);
+
+        template <typename ValueType, IsVector<ValueType> concept=0>
         void Serialize(const char* name, ValueType&& value);
 
         // this never gets called -- why?
@@ -70,12 +109,17 @@ namespace utilities
         template <typename ValueType>
         void Serialize(const char* name, const std::vector<ValueType&&>& value);
 
-    protected:
+        template <typename ValueType, IsVector<ValueType> x = 0>
+        void Foo(const ValueType& arr)
+        {
+            std::cout << "Foo called" << std::endl;
+        }
 
+    protected:
         // TODO: Instead of having all these different overloads, we could possibly have SerializeVariant(const Variant& value) be the
         //       virtual interface, and let the subclass deal with extracting the value from the variant
 
-        //virtual void SerializeVariant(std::string name, const Variant& variant) = 0;
+        // virtual void SerializeVariant(std::string name, const Variant& variant) = 0;
 
         // fundamental types
         // TODO: maybe only require bool, char, int, and have rest use those?
@@ -96,7 +140,7 @@ namespace utilities
         DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(double);
 
         virtual void SerializeValue(const char* name, const ISerializable& value) = 0;
-    
+
         virtual void SerializeValue(const char* name, const std::vector<const ISerializable*>& array) = 0;
 
         //
@@ -106,7 +150,7 @@ namespace utilities
         void Deserialize(const char* name, ValueType& value);
 
         // template<typename BaseType>
-        // void Deserialize(const char* name, std::unique_ptr<BaseType>& value); 
+        // void Deserialize(const char* name, std::unique_ptr<BaseType>& value);
 
         // template<typename BaseType>
         // void Deserialize(const char* name, std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory);
@@ -141,7 +185,6 @@ namespace utilities
     class SimpleSerializer : public Serializer
     {
     public:
-
     protected:
         // virtual void SerializeVariant(std::string name, const Variant& variant) override;
 
@@ -172,10 +215,10 @@ namespace utilities
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void Deserialize(const char* name, ValueType& value);
 
-        virtual void Deserialize(const char* name, ISerializable& value) override; 
+        virtual void Deserialize(const char* name, ISerializable& value) override;
 
         // template<typename BaseType>
-        // void Deserialize(const char* name, std::unique_ptr<BaseType>& value); 
+        // void Deserialize(const char* name, std::unique_ptr<BaseType>& value);
 
         // template<typename BaseType>
         // void Deserialize(const char* name, std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory);
