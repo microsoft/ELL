@@ -57,7 +57,7 @@ namespace model
         /// Inherited from ISerializable
         virtual utilities::ObjectDescription GetDescription() const override;
 
-        static constexpr char* outputPortName = "output";
+        static constexpr const char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

@@ -54,10 +54,10 @@ namespace model
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(ModelTransformer& transformer) const override;
 
-        static constexpr char* conditionPortName = "condition";
-        static constexpr char* input1PortName = "input1";
-        static constexpr char* input2PortName = "input2";
-        static constexpr char* outputPortName = "output";
+        static constexpr const char* conditionPortName = "condition";
+        static constexpr const char* input1PortName = "input1";
+        static constexpr const char* input2PortName = "input2";
+        static constexpr const char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;
@@ -93,11 +93,11 @@ namespace model
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(ModelTransformer& transformer) const override;
 
-        static constexpr char* input1PortName = "input1";
-        static constexpr char* input2PortName = "input2";
-        static constexpr char* value1PortName = "value1";
-        static constexpr char* value2PortName = "value2";
-        static constexpr char* outputPortName = "output";
+        static constexpr const char* input1PortName = "input1";
+        static constexpr const char* input2PortName = "input2";
+        static constexpr const char* value1PortName = "value1";
+        static constexpr const char* value2PortName = "value2";
+        static constexpr const char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;
@@ -130,9 +130,9 @@ namespace model
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(ModelTransformer& transformer) const override;
 
-        static constexpr char* valuePortName = "value";
-        static constexpr char* thresholdPortName = "threshold";
-        static constexpr char* outputPortName = "output";
+        static constexpr const char* valuePortName = "value";
+        static constexpr const char* thresholdPortName = "threshold";
+        static constexpr const char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

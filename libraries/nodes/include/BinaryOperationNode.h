@@ -59,9 +59,9 @@ namespace nodes
         /// Inherited from ISerializable
         virtual utilities::ObjectDescription GetDescription() const override;
 
-        static constexpr char* input1PortName = "input1";
-        static constexpr char* input2PortName = "input2";
-        static constexpr char* outputPortName = "output";
+        static constexpr const char* input1PortName = "input1";
+        static constexpr const char* input2PortName = "input2";
+        static constexpr const char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;
