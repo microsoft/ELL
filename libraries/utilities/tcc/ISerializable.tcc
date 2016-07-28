@@ -29,9 +29,9 @@ namespace utilities
         return description;
     }
 
-    inline ObjectDescription GetDescription(const ISerializable& obj)
+    inline ObjectDescription GetDescription(const IDescribable& obj)
     {
-//        std::cout << "GetDescription(ISerializable)" << std::endl;
+//        std::cout << "GetDescription(IDescribable)" << std::endl;
         auto result = obj.GetDescription();
         return result;
     }

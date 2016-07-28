@@ -78,7 +78,7 @@ namespace model
         virtual void Refine(ModelTransformer& transformer) const;
 
         /// Inherited from ISerializable
-        virtual utilities::ObjectDescription GetDescription() const override;
+        // virtual utilities::ObjectDescription GetDescription() const override;
         virtual void Serialize(utilities::Serializer& serializer) const override;
 
     protected:

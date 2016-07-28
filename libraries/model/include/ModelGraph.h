@@ -149,7 +149,7 @@ namespace model
         virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
 
         /// <summary> ISerializable interface </summary>
-        virtual utilities::ObjectDescription GetDescription() const override;
+        // virtual utilities::ObjectDescription GetDescription() const override;
         virtual void Serialize(utilities::Serializer& serializer) const override;
 
     private:

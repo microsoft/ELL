@@ -32,12 +32,12 @@ namespace utilities
         return stream;
     }
 
-    ObjectDescription UniqueId::GetDescription() const
-    {
-        ObjectDescription result = ObjectDescription::FromType(*this);
-        result.AddField("id", _id);
-        return result;
-    }
+    // ObjectDescription UniqueId::GetDescription() const
+    // {
+    //     ObjectDescription result = ObjectDescription::FromType(*this);
+    //     result.AddField("id", _id);
+    //     return result;
+    // }
 
     void UniqueId::Serialize(Serializer& serializer) const
     {

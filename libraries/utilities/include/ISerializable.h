@@ -26,9 +26,6 @@ namespace utilities
     public:
         virtual ~ISerializable() = default;
 
-        /// <summary> Get an ObjectDescription describing how to serialize this object </summary>
-        virtual ObjectDescription GetDescription() const = 0;
-
         virtual void Serialize(Serializer& serializer) const = 0;
 
         // begin serialize
@@ -40,11 +37,19 @@ namespace utilities
         // end deserialize
     };
 
-    template <typename ValueType>
-    using IsSerializable = typename std::enable_if_t<std::is_base_of<ISerializable, ValueType>::value, int>;
+    //template <typename ValueType>
+    //using IsSerializable = typename std::enable_if_t<std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value, int>;
 
-    template <typename ValueType>
-    using IsNotSerializable = typename std::enable_if_t<(!std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
+    //template <typename ValueType>
+    //using IsNotSerializable = typename std::enable_if_t<(!std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value) && (std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
+
+    class IDescribable
+    {
+    public:
+        virtual ~IDescribable() = default;
+
+        virtual ObjectDescription GetDescription() const = 0;
+    };
 
 
     // // helper function

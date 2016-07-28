@@ -31,7 +31,7 @@
 #include <iostream>
 #include <vector>
 
-struct TestStruct : public utilities::ISerializable
+struct TestStruct : public utilities::ISerializable, public utilities::IDescribable
 {
     int a;
     float b;

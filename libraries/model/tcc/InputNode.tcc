@@ -31,14 +31,14 @@ namespace model
         transformer.MapOutputPort(output, newNode->output);
     }
 
-    /// Inherited from ISerializable
-    template <typename ValueType>
-    utilities::ObjectDescription InputNode<ValueType>::GetDescription() const
-    {
-        auto result = Node::GetDescription();
-        result.AddField("size", _output.Size());
-        return result;
-    }
+    // /// Inherited from ISerializable
+    // template <typename ValueType>
+    // utilities::ObjectDescription InputNode<ValueType>::GetDescription() const
+    // {
+    //     auto result = Node::GetDescription();
+    //     result.AddField("size", _output.Size());
+    //     return result;
+    // }
 
     template <typename ValueType>
     void InputNode<ValueType>::Serialize(utilities::Serializer& serializer) const

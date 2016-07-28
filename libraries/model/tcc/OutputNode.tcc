@@ -27,14 +27,14 @@ namespace model
     }
 
     /// Inherited from ISerializable
-    template <typename ValueType>
-    utilities::ObjectDescription OutputNode<ValueType>::GetDescription() const
-    {
-        std::cout << "Serializing OutputNode" << std::endl;
-        auto result = Node::GetDescription();
-        result.AddField("input", _input);
-        return result;
-    }
+    // template <typename ValueType>
+    // utilities::ObjectDescription OutputNode<ValueType>::GetDescription() const
+    // {
+    //     std::cout << "Serializing OutputNode" << std::endl;
+    //     auto result = Node::GetDescription();
+    //     result.AddField("input", _input);
+    //     return result;
+    // }
 
     template <typename ValueType>
     void OutputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
