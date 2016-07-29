@@ -24,7 +24,17 @@ namespace emll
 		{
 			return ValueType::PInt32;
 		}
-		
+		template<>
+		ValueType GetValueType<int64_t>()
+		{
+			return ValueType::Int64;
+		}
+		template<>
+		ValueType GetValueType<int64_t*>()
+		{
+			return ValueType::PInt64;
+		}
+
 		template<>
 		double GetDefaultForValueType<double>()
 		{

@@ -98,6 +98,16 @@ namespace emll
 			return llvm::ConstantDataArray::get(_context, value);
 		}
 
+		llvm::Constant* IREmitter::Literal(const std::vector<int>& value)
+		{
+			return llvm::ConstantDataArray::get(_context, reinterpret_cast<const std::vector<uint32_t>&>(value));
+		}
+
+		llvm::Constant* IREmitter::Literal(const std::vector<int64_t>& value)
+		{
+			return llvm::ConstantDataArray::get(_context, reinterpret_cast<const std::vector<uint64_t>&>(value));
+		}
+
 		llvm::Value* IREmitter::Literal(const std::string& name, const std::string& value)
 		{
 			return _builder.CreateGlobalStringPtr(value, name);

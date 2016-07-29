@@ -232,122 +232,18 @@ namespace emll
 		llvm::Value* IRCompiler::Emit(Variable& var)
 		{
 			assert(var.HasEmittedName());
-
-			if (var.IsScalar())
-			{
-				return EmitScalar(var);
-			}
-			else if (var.IsVector())
-			{
-				return EmitVector(var);
-			}
-			else
-			{
-				throw new CompilerException(CompilerError::variableTypeNotSupported);
-			}
-		}
-
-		llvm::Value* IRCompiler::EmitScalar(Variable& var)
-		{
-			llvm::Value* pVal = nullptr;	
-			switch (var.Scope())
-			{
-				case VariableScope::Literal:
-					pVal = EmitLiteral(var);
-					break;
-
-				case VariableScope::Local:
-					if (var.IsVectorRef())
-					{
-						pVal = EmitVectorRef(var);
-					}
-					else
-					{
-						pVal = EmitLocalScalar(var);
-					}
-					break;
-
-				case VariableScope::Global:
-					pVal = EmitGlobalScalar(var);
-					break;
-
-				default:
-					throw new CompilerException(CompilerError::variableTypeNotSupported);
-			}
-			return pVal;
-		}
-
-		llvm::Value* IRCompiler::EmitLiteral(Variable& var)
-		{
-			llvm::Value* pVal = nullptr;
 			switch (var.Type())
 			{
 				case ValueType::Double:
-					pVal = EmitLiteral<double>(static_cast<LiteralF&>(var));
-					break;
+					return Emit<double>(var);
+				case ValueType::Int32:
+					return Emit<int>(var);
+				case ValueType::Int64:
+					return Emit<int64_t>(var);
 				default:
-					throw new CompilerException(CompilerError::valueTypeNotSupported);
-			}
-
-			assert(pVal != nullptr);
-			_literals.Set(var.EmittedName(), pVal);
-			return pVal;
-		}
-
-		llvm::Value* IRCompiler::EmitLocalScalar(Variable& var)
-		{
-			llvm::Value* pVal = nullptr;
-			switch (var.Type())
-			{
-				case ValueType::Double:
-					if (var.HasInitValue())
-					{
-						pVal = EmitLocal<double>(static_cast<InitializedScalarF&>(var));
-					}
-					else
-					{
-						pVal = EmitLocal<double>(static_cast<ScalarF&>(var));
-					}
 					break;
-				default:
-					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
-
-			assert(pVal != nullptr);
-			_locals.Set(var.EmittedName(), pVal);
-			return pVal;
-		}
-
-		llvm::Value* IRCompiler::EmitGlobalScalar(Variable& var)
-		{
-			llvm::Value* pVal = nullptr;
-			switch (var.Type())
-			{
-				case ValueType::Double:
-					pVal = EmitGlobal<double>(static_cast<InitializedScalarF&>(var));
-					break;
-				default:
-					throw new CompilerException(CompilerError::valueTypeNotSupported);
-			}
-			assert(pVal != nullptr);
-			_globals.Set(var.EmittedName(), pVal);
-			return pVal;
-		}
-
-		llvm::Value* IRCompiler::EmitVectorRef(Variable& var)
-		{
-			llvm::Value* pVal = nullptr;
-			switch (var.Type())
-			{
-				case ValueType::Double:
-					pVal = EmitRef<double>(static_cast<VectorRefScalarVarF&>(var));
-					break;
-				default:
-					throw new CompilerException(CompilerError::valueTypeNotSupported);
-			}
-			assert(pVal != nullptr);
-			_locals.Set(var.EmittedName(), pVal);
-			return pVal;
+			throw new CompilerException(CompilerError::variableTypeNotSupported);
 		}
 
 		void IRCompiler::ApplyComputed(Variable& var, llvm::Value* pDest)
@@ -361,62 +257,6 @@ namespace emll
 				default:
 					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
-		}
-
-		llvm::Value* IRCompiler::EmitVector(Variable& var)
-		{
-			llvm::Value* pVal = nullptr;
-			switch (var.Scope())
-			{
-				case VariableScope::Literal:
-					pVal = EmitLiteralVector(var);
-					break;
-				case VariableScope::Global:
-					pVal = EmitGlobalVector(var);
-					break;
-				default:
-					throw new CompilerException(CompilerError::variableTypeNotSupported);
-			}
-			return pVal;
-		}
-
-		llvm::Value* IRCompiler::EmitLiteralVector(Variable& var)
-		{
-			llvm::Value* pVal = nullptr;
-			switch (var.Type())
-			{
-				case ValueType::Double:
-					pVal = EmitLiteralVector<double>(static_cast<LiteralVarV<double>&>(var));
-					break;
-				default:
-					throw new CompilerException(CompilerError::valueTypeNotSupported);
-			}
-			assert(pVal != nullptr);
-			_literals.Set(var.EmittedName(), pVal);
-			return pVal;
-		}
-
-		llvm::Value* IRCompiler::EmitGlobalVector(Variable& var)
-		{
-			llvm::Value* pVal = nullptr;
-			switch (var.Type())
-			{
-				case ValueType::Double:
-					if (var.HasInitValue())
-					{
-						pVal = EmitGlobalVector<double>(static_cast<InitializedVectorVar<double>&>(var));
-					}
-					else
-					{
-						pVal = EmitGlobalVector<double>(static_cast<VectorVar<double>&>(var));
-					}
-					break;
-				default:
-					throw new CompilerException(CompilerError::valueTypeNotSupported);
-			}
-			assert(pVal != nullptr);
-			_globals.Set(var.EmittedName(), pVal);
-			return pVal;
 		}
 
 		llvm::Value* IRCompiler::LoadVar(Variable* pVar)

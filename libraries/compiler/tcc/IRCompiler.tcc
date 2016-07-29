@@ -3,6 +3,88 @@ namespace emll
 	namespace compiler
 	{
 		template<typename T>
+		llvm::Value* IRCompiler::Emit(Variable& var)
+		{
+			if (var.IsScalar())
+			{
+				return EmitScalar<T>(var);
+			}
+			else if (var.IsVector())
+			{
+				return EmitVector<T>(var);
+			}
+			else
+			{
+				throw new CompilerException(CompilerError::variableTypeNotSupported);
+			}
+		}
+
+		template<typename T>
+		llvm::Value* IRCompiler::EmitScalar(Variable& var)
+		{
+			llvm::Value* pVal = nullptr;
+			switch (var.Scope())
+			{
+			case VariableScope::Literal:
+				pVal = EmitLiteral<T>(static_cast<LiteralVar<T>&>(var));
+				_literals.Set(var.EmittedName(), pVal);
+				break;
+			case VariableScope::Local:
+				if (var.IsVectorRef())
+				{
+					pVal = EmitRef<T>(static_cast<VectorElementVar<T>&>(var));
+				}
+				else if (var.HasInitValue())
+				{
+					pVal = EmitLocal<T>(static_cast<InitializedScalarVar<T>&>(var));
+				}
+				else
+				{
+					pVal = EmitLocal<T>(static_cast<ScalarVar<T>&>(var));
+				}
+				_locals.Set(var.EmittedName(), pVal);
+				break;
+
+			case VariableScope::Global:
+				pVal = EmitGlobal<T>(static_cast<InitializedScalarVar<T>&>(var));
+				break;
+
+			default:
+				throw new CompilerException(CompilerError::variableTypeNotSupported);
+			}
+			return pVal;
+		}
+
+		template<typename T>
+		llvm::Value* IRCompiler::EmitVector(Variable& var)
+		{
+			llvm::Value* pVal = nullptr;
+			switch (var.Scope())
+			{
+			case VariableScope::Literal:
+				pVal = EmitLiteralVector<T>(static_cast<LiteralVarV<T>&>(var));
+				_literals.Set(var.EmittedName(), pVal);
+				break;
+			case VariableScope::Global:
+				if (var.HasInitValue())
+				{
+					pVal = EmitGlobalVector<T>(static_cast<InitializedVectorVar<T>&>(var));
+				}
+				else
+				{
+					pVal = EmitGlobalVector<T>(static_cast<VectorVar<T>&>(var));
+				}
+				_globals.Set(var.EmittedName(), pVal);
+				break;
+			default:
+				throw new CompilerException(CompilerError::variableTypeNotSupported);
+			}
+			assert(pVal != nullptr);
+			return pVal;
+		}
+
+
+		template<typename T>
 		llvm::Value* IRCompiler::EmitLiteral(LiteralVar<T>& var)
 		{
 			llvm::Value* pVar = _fn.Literal(var.Data());
@@ -45,6 +127,24 @@ namespace emll
 			}
 			return pVal;
 		}
+		template<typename T>
+		llvm::Value* IRCompiler::EmitLiteralVector(LiteralVarV<T>& var)
+		{
+			return _module.Constant(var.EmittedName(), var.Data());
+		}
+
+		template<typename T>
+		llvm::Value* IRCompiler::EmitGlobalVector(VectorVar<T>& var)
+		{
+			return _module.Global(GetValueType<T>(), var.EmittedName(), var.Dimension());
+		}
+
+		template<typename T>
+		llvm::Value* IRCompiler::EmitGlobalVector(InitializedVectorVar<T>& var)
+		{
+			return _module.Global(var.EmittedName(), var.Data());
+		}
+
 
 		template<typename T>
 		void IRCompiler::ApplyComputed(ComputedVar<T>& var, llvm::Value* pDest)
@@ -94,24 +194,6 @@ namespace emll
 					_fn.Store(pDest, pResult);
 				}
 			}
-		}
-
-		template<typename T>
-		llvm::Value* IRCompiler::EmitLiteralVector(LiteralVarV<T>& var)
-		{
-			return _module.Constant(var.EmittedName(), var.Data());
-		}
-
-		template<typename T>
-		llvm::Value* IRCompiler::EmitGlobalVector(VectorVar<T>& var)
-		{
-			return _module.Global(GetValueType<T>(), var.EmittedName(), var.Dimension());
-		}
-
-		template<typename T>
-		llvm::Value* IRCompiler::EmitGlobalVector(InitializedVectorVar<T>& var)
-		{
-			return _module.Global(var.EmittedName(), var.Data());
 		}
 
 		template<typename T>

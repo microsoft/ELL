@@ -17,6 +17,11 @@ namespace emll
 			llvm::GlobalVariable* Constant(const ValueType type, const std::string& name, double value);
 			llvm::GlobalVariable* Constant(const std::string&name, const std::vector<double>& value);
 
+			template<typename T>
+			llvm::GlobalVariable* Constant(const std::string& name, T value);
+			template<typename T>
+			llvm::GlobalVariable* Constant(const std::string&name, const std::vector<T>& value);
+
 			llvm::GlobalVariable* Global(const ValueType type, const std::string& name);
 			llvm::GlobalVariable* Global(const ValueType type, const std::string& name, const uint64_t size);
 			llvm::GlobalVariable* Global(llvm::Type* pType, const std::string& name)
@@ -25,6 +30,9 @@ namespace emll
 			}
 			llvm::GlobalVariable* Global(const std::string& name, llvm::Type* pType, const uint64_t size);
 			llvm::GlobalVariable* Global(const std::string&name, const std::vector<double>& value);
+			
+			template<typename T>
+			llvm::GlobalVariable* Global(const std::string&name, const std::vector<T>& value);
 
 			llvm::StructType* Struct(const std::string& name, std::initializer_list<ValueType> fields);
 			
@@ -114,3 +122,5 @@ namespace emll
 		};
 	}
 }
+
+#include "../tcc/IRModuleEmitter.tcc"

@@ -30,6 +30,9 @@ namespace emll
 			llvm::Constant* Literal(const double value);
 			llvm::Value* Literal(const std::string& value);
 			llvm::Constant* Literal(const std::vector<double>& value);
+			llvm::Constant* Literal(const std::vector<int>& value);
+			llvm::Constant* Literal(const std::vector<int64_t>& value);
+
 			llvm::Value* Literal(const std::string& name, const std::string& value);
 			llvm::Constant* Zero(const ValueType type);
 
@@ -116,4 +119,7 @@ namespace emll
 			llvm::Value* _pZeroLiteral = nullptr;
 		};
 	}
+
 }
+
+#include "../tcc/IREmitter.tcc"
