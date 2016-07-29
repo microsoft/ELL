@@ -63,8 +63,10 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp
-              test/src/Graph_test.cpp)
-set (TEST_INCLUDE test/include/Graph_test.h)
+              test/src/Graph_test.cpp
+              test/src/OutputPortElements_test.cpp)
+set (TEST_INCLUDE test/include/OutputPortElements_test.h
+                  test/include/Graph_test.h)
 
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})

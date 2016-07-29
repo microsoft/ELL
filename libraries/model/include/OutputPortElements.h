@@ -204,7 +204,18 @@ namespace model
         /// <param name="groups"> The list of groups to concantenate together </param>
         OutputPortElements(const std::vector<OutputPortElements<ValueType>>& groups);
     
-        OutputPortElements<ValueType> GetSlice(size_t startIndex, size_t numValues) const;
+        /// <summary> Creates a OutputPortElements representing a single value from a given OutputPortElements </summary>
+        ///
+        /// <param name="elements"> The OutputPortElements to take a value from </param>
+        /// <param name="index"> The index of the value </param>
+        OutputPortElements(const OutputPortElements<ValueType>& elements, size_t startIndex);
+
+        /// <summary> Creates a OutputPortElements representing a single value from a given OutputPortElements </summary>
+        ///
+        /// <param name="elements"> The OutputPortElements to take a value from </param>
+        /// <param name="index"> The index of the value </param>
+        /// <param name="numValues"> The number of values to take </param>
+        OutputPortElements(const OutputPortElements<ValueType>& elements, size_t startIndex, size_t numValues);
     };
 
     //

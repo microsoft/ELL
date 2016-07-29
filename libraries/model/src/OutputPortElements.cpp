@@ -68,7 +68,7 @@ namespace model
     OutputPortElementsUntyped::OutputPortElementsUntyped(const OutputPortRange& range)
     {
         _ranges.push_back(range);
-        ComputeSize();
+        _size += range.Size();
     }
 
     OutputPortElementsUntyped::OutputPortElementsUntyped(const std::vector<OutputPortRange>& ranges)
@@ -80,7 +80,7 @@ namespace model
     void OutputPortElementsUntyped::AddRange(const OutputPortRange& range)
     {
         _ranges.push_back(range);
-        ComputeSize();
+        _size += range.Size();
     }
 
     void OutputPortElementsUntyped::ComputeSize()

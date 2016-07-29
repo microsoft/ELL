@@ -55,34 +55,35 @@ namespace model
     }
 
     template <typename ValueType>
-    OutputPortElements<ValueType> OutputPortElements<ValueType>::GetSlice(size_t startIndex, size_t numValues) const
+    OutputPortElements<ValueType>::OutputPortElements(const OutputPortElements<ValueType>& elements, size_t startIndex) : OutputPortElements(elements, startIndex, 1) {}
+
+    template <typename ValueType>
+    OutputPortElements<ValueType>::OutputPortElements(const OutputPortElements<ValueType>& elements, size_t startIndex, size_t numValues)
     {
-        if(startIndex + numValues > Size())
+        if(startIndex + numValues > elements.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Invalid slice.");
         }
 
-        size_t currentBegin = 0;
-        auto rangeIterator = begin();
+        auto rangeIterator = elements.begin();
         // skip ranges that come before the desired elements
-        while(rangeIterator != end() && currentBegin+rangeIterator->Size() <= startIndex)
+        while(rangeIterator != elements.end() && rangeIterator->Size() <= startIndex)
         {
             startIndex -= rangeIterator->Size();
             ++rangeIterator;
         }
 
-        // now extract stuff from ranges until done
-        OutputPortElements<ValueType> result;
-        while(rangeIterator != end() && numValues > 0)
+        // now extract portions from ranges until done
+        while(rangeIterator != elements.end() && numValues > 0)
         {
-            auto currentRange = *rangeIterator;
-            size_t numRangeValues = std::min(currentRange.Size()-startIndex, numValues);
-            result.AddRange({currentRange->OutputPortBase(), startIndex, numRangeValues});
+            size_t numRangeValues = std::min(rangeIterator->Size()-startIndex, numValues);
+            AddRange({*rangeIterator->ReferencedPort(), startIndex, numRangeValues});
             numValues -= numRangeValues;
+            ++rangeIterator;
+            startIndex = 0; // after the first time through, we'll always take the first part of a range
         }
-        return result;
+        ComputeSize();
     }
-
 
     //
     // Convenience functions

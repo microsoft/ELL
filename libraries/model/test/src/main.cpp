@@ -3,6 +3,7 @@
 // 
 
 #include "Graph_test.h"
+#include "OutputPortElements_test.h"
 
 // testing
 #include "testing.h"
@@ -23,6 +24,9 @@ int main()
 
     TestCopyGraph();
     TestRefineGraph();
+
+    // OutputPortElements tests
+    TestSlice();
 
     if (testing::DidTestFail())
     {
