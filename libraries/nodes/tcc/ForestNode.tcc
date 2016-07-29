@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleForestNode.cpp (nodes)
+//  File:     ForestNode.cpp (nodes)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SimpleForestNode.h"
+#include "ForestNode.h"
 #include "ConstantNode.h"
 #include "ElementSelectorNode.h"
 #include "BinaryOperationNode.h"
@@ -19,24 +19,22 @@
 
 namespace nodes
 {
-    SimpleForestNode::SimpleForestNode(const model::OutputPortElements<double>& input, const predictors::SimpleForestPredictor& forest) : Node({ &_input }, { &_prediction, &_treeOutputs, &_edgeIndicatorVector }), _input(this, input, inputPortName), _prediction(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, forest.NumTrees()), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()), _forest(forest)
+    template<typename SplitRuleType, typename EdgePredictorType>
+    ForestNode<SplitRuleType, EdgePredictorType>::ForestNode(const model::OutputPortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest) : Node({ &_input }, { &_prediction, &_treeOutputs, &_edgeIndicatorVector }), _input(this, input, inputPortName), _prediction(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, forest.NumTrees()), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()), _forest(forest)
     {}
 
-    std::string SimpleForestNode::GetRuntimeTypeName() const
-    {
-        return "SimpleForestNode";
-    }
-
-    void SimpleForestNode::Copy(model::ModelTransformer& transformer) const
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestNode<SplitRuleType, EdgePredictorType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<SimpleForestNode>(newOutputPortElements, _forest);
+        auto newNode = transformer.AddNode<ForestNode<SplitRuleType, EdgePredictorType>>(newOutputPortElements, _forest);
         transformer.MapOutputPort(prediction, newNode->prediction);
         transformer.MapOutputPort(treeOutputs, newNode->treeOutputs);
         transformer.MapOutputPort(edgeIndicatorVector, newNode->edgeIndicatorVector);
     }
 
-    void SimpleForestNode::Refine(model::ModelTransformer & transformer) const
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestNode<SplitRuleType, EdgePredictorType>::Refine(model::ModelTransformer & transformer) const
     {
         auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newOutputs = BuildSubModel(_forest, transformer.GetModel(), newOutputPortElements);
@@ -46,7 +44,8 @@ namespace nodes
         //       transformer.MapOutputPort(edgeIndicatorVector, newOutputs.edgeIndicatorVector);
     }
 
-    void SimpleForestNode::Compute() const
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestNode<SplitRuleType, EdgePredictorType>::Compute() const
     {
         // forest output
         _prediction.SetOutput({ _forest.Predict(_input) });
@@ -64,7 +63,8 @@ namespace nodes
         _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
     }
 
-    SimpleForestSubModelOutputs BuildSubModel(const predictors::SimpleForestPredictor& forest, model::Model& model, const model::OutputPortElements<double>& outputPortElements) // call the last argument "inputs" or something like that
+    template<typename SplitRuleType, typename EdgePredictorType>
+    ForestSubModelOutputs BuildSubModel(const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest, model::Model& model, const model::OutputPortElements<double>& outputPortElements) // call the last argument "inputs" or something like that
     {
         const auto& interiorNodes = forest.GetInteriorNodes();
 

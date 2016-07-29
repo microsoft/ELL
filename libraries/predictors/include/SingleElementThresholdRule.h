@@ -23,6 +23,16 @@ namespace predictors
         /// <param name="threshold"> The threshold. </param>
         SingleElementThresholdRule(size_t index = 0, double threshold = 0.0);
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "SingleElementThresholdRule"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        std::string GetRuntimeTypeName() const { return GetTypeName(); }
+
         /// <summary> Gets the index of the element used to define the rule. </summary>
         ///
         /// <returns> The element index. </returns>

@@ -22,6 +22,16 @@ namespace predictors
         /// <param name="value"> The constant output value. </param>
         ConstantPredictor(double value);
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "ConstantPredictor"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        std::string GetRuntimeTypeName() const { return GetTypeName(); }
+
         /// <summary> A function that ignores its input and returns a constant value. </summary>
         /// 
         /// <returns> A constant value. </returns>

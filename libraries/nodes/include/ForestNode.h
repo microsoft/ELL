@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleForestNode.h (nodes)
+//  File:     ForestNode.h (nodes)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,17 +15,21 @@
 
 // predictors
 #include "ForestPredictor.h"
+#include "SingleElementThresholdRule.h"
+#include "ConstantNode.h"
 
 // stl
 #include <string>
 
 namespace nodes
 {
-    /// <summary>
-    /// Implements a forest node, where each tree in the forest uses single-input threshold split
-    /// rules and constant outputs on all edges.
-    /// </summary>
-    class SimpleForestNode : public model::Node
+    /// <summary> Implements a forest node, where each tree in the forest uses single-input threshold
+    /// split rules and constant outputs on all edges. </summary>
+    ///
+    /// <typeparam name="SplitRuleType"> The split rule type. </typeparam>
+    /// <typeparam name="EdgePredictorType"> The edge predictor type. </typeparam>
+    template<typename SplitRuleType, typename EdgePredictorType>
+    class ForestNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
@@ -42,13 +46,18 @@ namespace nodes
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The predictor's input. </param>
-        /// <param name="forest"> The simple forest predictor. </param>
-        SimpleForestNode(const model::OutputPortElements<double>& input, const predictors::SimpleForestPredictor& forest);
-
-        /// <summary> Gets the name of this type. </summary>
+        /// <param name="forest"> The forest predictor. </param>
+        ForestNode(const model::OutputPortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest);
+        
+        /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override;
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<SplitRuleType, EdgePredictorType>("ForestNode"); }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer. </summary>
         ///
@@ -71,23 +80,30 @@ namespace nodes
         model::OutputPort<bool> _edgeIndicatorVector;
 
         // Forest
-        predictors::SimpleForestPredictor _forest;
+        predictors::ForestPredictor<SplitRuleType, EdgePredictorType> _forest;
     };
 
+    typedef ForestNode<predictors::SingleElementThresholdRule, predictors::ConstantPredictor>  SimpleForestNode;
+
     /// <summary> A struct that represents the outputs of a linear predictor sub-model. </summary>
-    struct SimpleForestSubModelOutputs
+    struct ForestSubModelOutputs
     {
         const model::OutputPort<double>& prediction;
         //const model::OutputPort<double>& treeOutputs;   // TODO: waiting for chuck to decide how we map to multiple ports
         //const model::OutputPort<bool>& edgeIndicatorVector;
     };
 
-    /// <summary> Builds a part of the model that represents a refined simple forest predictor. </summary>
+    /// <summary> Builds a part of the model that represents a refined forest predictor. </summary>
     ///
+    /// <typeparam name="SplitRuleType"> The split rule type. </typeparam>
+    /// <typeparam name="EdgePredictorType"> The edge predictor type. </typeparam>
+    /// <param name="predictor"> The forest predictor. </param>
     /// <param name="model"> [in,out] The model being modified. </param>
     /// <param name="outputPortElements"> The output port elements from which the linear predictor takes its inputs. </param>
-    /// <param name="predictor"> The simple forest predictor. </param>
     ///
-    /// <returns> The LinearPredictorSubModelOutputs. </returns>
-    SimpleForestSubModelOutputs BuildSubModel(const predictors::SimpleForestPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
+    /// <returns> The ForestSubModelOutputs. </returns>
+    template<typename SplitRuleType, typename EdgePredictorType>
+    ForestSubModelOutputs BuildSubModel(const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
 }
+
+#include "../tcc/ForestNode.tcc"

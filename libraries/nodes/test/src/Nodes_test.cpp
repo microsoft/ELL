@@ -15,7 +15,7 @@
 #include "UnaryOperationNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
-#include "SimpleForestNode.h"
+#include "ForestNode.h"
 
 // model
 #include "ModelGraph.h"

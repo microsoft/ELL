@@ -19,17 +19,16 @@ set (INCLUDE include/AccumulatorNode.h
              include/DelayNode.h
              include/DotProductNode.h
              include/ElementSelectorNode.h
+             include/ForestNode.h
              include/LinearPredictorNode.h
              include/L2NormNode.h
              include/MovingAverageNode.h
              include/MovingVarianceNode.h
-             include/SimpleForestNode.h
              include/SubModelBuilders.h
              include/SumNode.h
              include/UnaryOperationNode.h)
 
 set (SRC src/LinearPredictorNode.cpp
-         src/SimpleForestNode.cpp
          src/SubModelBuilders.cpp)
 
 set (TCC tcc/AccumulatorNode.tcc
@@ -39,6 +38,7 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/DelayNode.tcc
          tcc/DotProductNode.tcc
          tcc/ElementSelectorNode.tcc
+         tcc/ForestNode.tcc
          tcc/L2NormNode.tcc
          tcc/MovingAverageNode.tcc
          tcc/MovingVarianceNode.tcc
