@@ -41,6 +41,6 @@ namespace model
     {
         std::cout << "Serializing OutputNode" << std::endl;
         Node::Serialize(serializer);
-//        serializer.Serialize("input", _input);
+        serializer.Serialize("input", _input);
     }
 }

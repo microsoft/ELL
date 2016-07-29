@@ -27,7 +27,7 @@ namespace utilities
     class is_vector
     {
         template <typename VectorType>
-        static constexpr bool is_vector_checker(typename VectorType::value_type*) { return true; }
+        static constexpr bool is_vector_checker(typename VectorType::value_type*, typename std::enable_if<std::is_base_of<VectorType, typename std::vector<typename VectorType::value_type>>::value, int>::type = 0) { return true; }
 
         template <typename VectorType>
         static constexpr bool is_vector_checker(...) { return false; }
@@ -72,6 +72,8 @@ namespace utilities
         template <typename ValueType>
         void Serialize(ValueType&& value);
 
+        // Maybe add SerializeField?
+
         /// <summary> Serialize named values of any serializable type. </summary>
         template <typename ValueType, IsNotVector<ValueType> concept = 0>
         void Serialize(const char* name, ValueType&& value);
@@ -112,6 +114,8 @@ namespace utilities
         DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(size_t);
         DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(float);
         DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(double);
+
+        virtual void SerializeValue(const char* name, std::string value) = 0;
 
         virtual void SerializeValue(const char* name, const ISerializable& value) = 0;
 
@@ -162,7 +166,6 @@ namespace utilities
     protected:
         // virtual void SerializeVariant(std::string name, const Variant& variant) override;
 
-        // TODO: make macro for defining these
         DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(bool);
         DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(char);
         DECLARE_FUNDAMENTAL_SERIALIZE_OVERRIDE(short);
@@ -178,6 +181,8 @@ namespace utilities
         DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(size_t);
         DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(float);
         DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(double);
+
+        virtual void SerializeValue(const char* name, std::string value) override;
 
         virtual void SerializeValue(const char* name, const ISerializable& value) override;
 
@@ -215,10 +220,9 @@ namespace utilities
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void SerializeScalar(const char* name, const ValueType& value);
 
-        template <typename ValueType, IsFundamental<ValueType> concept = 0>
-        void SerializeArray(const char* name, const std::vector<ValueType>& array);
+        void SerializeScalar(const char* name, std::string value);
 
-        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void SerializeArray(const char* name, const std::vector<ValueType>& array);
     };
 }

@@ -112,6 +112,8 @@ void TestISerializable()
     std::cout << "\n--Serializing model--" << std::endl;
     serializer.Serialize(g);
     std::cout << std::endl;
+    std::cout << "------------------------" << std::endl;
+    std::cout << std::endl;
 }
 
 void TestSerializer()

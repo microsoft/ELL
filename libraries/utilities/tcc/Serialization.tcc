@@ -40,6 +40,7 @@ namespace utilities
         SerializeArrayValue(name, array);
     }
 
+    // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Serializer::Serialize(const char* name, const std::vector<ValueType>& array)
     {
@@ -52,6 +53,7 @@ namespace utilities
         SerializeArrayValue(name, tmpArray);
     }
 
+    // Vector of serializable pointers
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Serializer::Serialize(const char* name, const std::vector<const ValueType*>& array)
     {
@@ -81,11 +83,24 @@ namespace utilities
         using std::to_string;
         if (name == std::string(""))
         {
-            std::cout << to_string(value) << std::endl;
+            std::cout << to_string(value);
         }
         else
         {
-            std::cout << name << ": " << to_string(value) << std::endl;
+            std::cout << name << ": " << to_string(value);
+        }
+    }
+
+    inline void SimpleSerializer::SerializeScalar(const char* name, std::string value)
+    {
+        using std::to_string;
+        if (name == std::string(""))
+        {
+            std::cout << "\"" << value << "\"";
+        }
+        else
+        {
+            std::cout << name << ": \"" << value << "\"";
         }
     }
 
@@ -96,24 +111,8 @@ namespace utilities
         for (const auto& item : array)
         {
             Serialize(item);
-            std::cout << " ";
+            std::cout << ", ";
         }
         std::cout << "]" << std::endl;
     }
-
-    template <typename ValueType, IsSerializable<ValueType> concept>
-    void SimpleSerializer::SerializeArray(const char* name, const std::vector<ValueType>& array)
-    {
-        std::cout << "[";
-        for (const auto& item : array)
-        {
-//            Serialize(item);
-            std::cout << " ";
-        }
-        std::cout << "]" << std::endl;
-    }
-
-
-    // Need a thing for vector<T> where T: fundamental
-    // Need a thing for vector<T> where T: ISerializable*
 }

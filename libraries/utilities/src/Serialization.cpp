@@ -33,6 +33,12 @@ namespace utilities
     IMPLEMENT_FUNDAMENTAL_SERIALIZE(SimpleSerializer, float);
     IMPLEMENT_FUNDAMENTAL_SERIALIZE(SimpleSerializer, double);
     
+    // strings
+    void SimpleSerializer::SerializeValue(const char* name, std::string value)
+    {
+        SerializeScalar(name, value);
+    }
+
     // ISerializable
     void SimpleSerializer::SerializeValue(const char* name, const ISerializable& value)
     {
@@ -57,7 +63,7 @@ namespace utilities
         for(const auto& item: array)
         {
             Serialize(*item);
-            std::cout << " ";
+            std::cout << ", ";
         }
         std::cout << "]";
     }
