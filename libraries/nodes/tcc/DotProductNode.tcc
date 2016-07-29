@@ -23,7 +23,7 @@ namespace nodes
         {
             result += _input1[index] * _input2[index];
         }
-        _output.SetOutput({result});
+        _output.SetOutput({ result });
     };
 
     template <typename ValueType>
