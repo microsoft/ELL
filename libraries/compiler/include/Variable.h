@@ -67,9 +67,9 @@ namespace emll
 			}
 			bool IsVector() const
 			{
-				return (Dimension() > 1);
+				return !IsScalar();
 			}
-			bool IsScalar() const
+			virtual bool IsScalar() const
 			{
 				return (Dimension() == 1);
 			}

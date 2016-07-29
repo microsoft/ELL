@@ -16,6 +16,36 @@ void NodePrinter(const model::Node& node)
 	std::cout << "node_" << node.GetId() << " = " << node.GetRuntimeTypeName() << std::endl;
 }
 
+void TestLLVMShiftRegister()
+{
+	IREmitter llvm;
+	IRModuleEmitter module(llvm, llvm.AddModule("Shifter"));
+	module.DeclarePrintf();
+
+	std::vector<double> data({ 1.1, 2.1, 3.1, 4.1, 5.1});
+	std::vector<double> newData1({ 1.2, 2.2 });
+	std::vector<double> newData2({ 3.2, 4.2 });
+
+	auto fn = module.AddMain();
+	llvm::GlobalVariable* pRegister = module.Global("g_shiftRegister", data);
+	llvm::Value* c1= module.Constant("c_1", newData1);
+	llvm::Value* c2 = module.Constant("c_2", newData2);
+
+	fn.Print("Begin\n");
+	fn.PrintForEach("%f\n", pRegister, data.size());
+	fn.Print("Shift 1\n");
+	fn.ShiftAndUpdate<double>(pRegister, data.size(), newData1.size(), c1);
+	fn.PrintForEach("%f\n", pRegister, data.size());
+	fn.Print("Shift 2\n");
+	fn.ShiftAndUpdate<double>(pRegister, data.size(), newData2.size(), c2);
+	fn.PrintForEach("%f\n", pRegister, data.size());
+	fn.Ret();
+	fn.Verify();
+
+	module.Dump();
+	module.WriteBitcodeToFile("C:\\junk\\model\\shift.bc");
+	}
+
 void TestLLVM()
 {
 	IREmitter llvm;
@@ -70,7 +100,6 @@ void TestLLVM()
 	}
 	forLoop.End();
 
-	fnMain.MemMove(pOutput, 2, 0, 3);
 	fnMain.SetValueAt(pOutput, fnMain.Literal(3), fnMain.Literal(10.0));
 	fnMain.SetValueAt(pOutput, fnMain.Literal(4), fnMain.Literal(20.0));
 
@@ -137,9 +166,21 @@ nodes::BinaryOperationNode<T>* ModelBuilder::Add(const model::OutputPort<T>& x, 
 }
 
 template<typename T>
+nodes::BinaryOperationNode<T>* ModelBuilder::Subtract(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
+{
+	return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationNode<T>::OperationType::subtract);
+}
+
+template<typename T>
 nodes::BinaryOperationNode<T>* ModelBuilder::Multiply(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
 {
 	return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationNode<T>::OperationType::coordinatewiseMultiply);
+}
+
+template<typename T>
+nodes::BinaryOperationNode<T>* ModelBuilder::Divide(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
+{
+	return _model.AddNode<nodes::BinaryOperationNode<T>>(x, y, nodes::BinaryOperationNode<T>::OperationType::divide);
 }
 
 template<typename T>
@@ -230,7 +271,7 @@ void TestBinaryVector(bool expanded)
 
 	IRCompiler compiler("EMLL", std::cout);
 	compiler.ShouldUnrollLoops() = expanded;
-	compiler.CompileModel("Predict", mb.Model);
+	compiler.CompileModel("TestBinaryVector", mb.Model);
 	compiler.DebugDump();
 }
 
@@ -250,9 +291,8 @@ void TestBinaryScalar()
 	auto output = mb.Outputs<double>(bop->output);
 
 	IRCompiler compiler("EMLL", std::cout);
-	compiler.CompileModel("Predict", mb.Model);
+	compiler.CompileModel("TestBinaryScalar", mb.Model);
 	compiler.DebugDump();
-
 }
 
 void TestDotProduct(bool expanded)
@@ -267,7 +307,7 @@ void TestDotProduct(bool expanded)
 
 	IRCompiler compiler("EMLL", std::cout);
 	compiler.ShouldUnrollLoops() = expanded;
-	compiler.CompileModel("Predict", mb.Model);
+	compiler.CompileModel("TestDotProduct", mb.Model);
 	compiler.DebugDump();
 }
 
@@ -284,7 +324,7 @@ void TestSum(bool expanded)
 
 	IRCompiler compiler("EMLL", std::cout);
 	compiler.ShouldUnrollLoops() = expanded;
-	compiler.CompileModel("Predict", mb.Model);
+	compiler.CompileModel("TestSum", mb.Model);
 	compiler.DebugDump();
 }
 
@@ -301,7 +341,7 @@ void TestAccumulator(bool expanded)
 
 	IRCompiler compiler("EMLL", std::cout);
 	compiler.ShouldUnrollLoops() = expanded;
-	compiler.CompileModel("Predict", mb.Model);
+	compiler.CompileModel("TestAccumulator", mb.Model);
 	compiler.DebugDump();
 }
 
@@ -309,10 +349,25 @@ void TestDelay()
 {
 	ModelBuilder mb;
 	auto input1 = mb.Inputs<double>(4);
-	auto delay = mb.Delay<double>(input1->output, 4);
+	auto delay = mb.Delay<double>(input1->output, 3);
 	auto output = mb.Outputs<double>(delay->output);
 
 	IRCompiler compiler("EMLL", std::cout);
-	compiler.CompileModel("Predict", mb.Model);
+	compiler.CompileModel("TestDelay", mb.Model);
+	compiler.DebugDump();
+}
+
+void TestSlidingAverage()
+{
+	ModelBuilder mb;
+	auto dim = mb.Constant<double>(4);
+	auto input1 = mb.Inputs<double>(4);
+	auto delay = mb.Delay<double>(input1->output, 2);
+	auto sum = mb.Sum<double>(delay->output);
+	auto avg = mb.Divide<double>(sum->output, dim->output);
+	auto output = mb.Outputs<double>(avg->output);
+
+	IRCompiler compiler("EMLL", std::cout);
+	compiler.CompileModel("TestSlidingAverage", mb.Model);
 	compiler.DebugDump();
 }

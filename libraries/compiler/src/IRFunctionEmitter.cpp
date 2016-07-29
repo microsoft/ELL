@@ -216,6 +216,11 @@ namespace emll
 			return ValueAtA(pPtr, pOffset);
 		}
 
+		llvm::Value* IRFunctionEmitter::ValueAt(llvm::Value* pPtr, int offset)
+		{
+			return ValueAt(pPtr, Literal(offset));
+		}
+
 		llvm::Value* IRFunctionEmitter::SetValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pVal)
 		{
 			return Store(PtrOffset(pGlobal, pOffset), pVal);
@@ -229,6 +234,11 @@ namespace emll
 				return SetValueAt(pGlobal, pOffset, pVal);
 			}
 			return SetValueAtA(pPtr, pOffset, pVal);
+		}
+
+		llvm::Value* IRFunctionEmitter::SetValueAt(llvm::Value* pPtr, int offset, llvm::Value* pVal)
+		{
+			return SetValueAt(pPtr, Literal(offset), pVal);
 		}
 
 		IRForLoopEmitter IRFunctionEmitter::ForLoop()
@@ -262,53 +272,32 @@ namespace emll
 			return Call(PrintfFnName, args);
 		}
 
-		void IRFunctionEmitter::MemMove(llvm::Value* pPtr, int fromOffset, int destOffset, int count)
+		void IRFunctionEmitter::PrintForEach(const std::string& formatString, llvm::Value* pVector, int count)
 		{
-			assert(pPtr	!= nullptr);
-			auto pSrc = _pEmitter->PtrOffset(pPtr, Literal(fromOffset));
-			auto pDest = _pEmitter->PtrOffset(pPtr, Literal(destOffset));
-			_pEmitter->MemMove(pSrc, pDest, Literal(count));
+			llvm::Value* pFormat = Literal(formatString);
+			IRForLoopEmitter forLoop = ForLoop();
+			forLoop.Begin(count);
+			{
+				auto ival = forLoop.LoadIterationVar();
+				auto v = ValueAt(pVector, ival);
+				Printf({ pFormat, v });
+			}
+			forLoop.End();
 		}
 
-		void IRFunctionEmitter::MemCopy(llvm::Value* pPtrSrc, int srcOffset, llvm::Value* pPtrDest, int destOffset, int count)
-		{
-			auto pSrc = _pEmitter->PtrOffset(pPtrSrc, Literal(srcOffset));
-			auto pDest = _pEmitter->PtrOffset(pPtrDest, Literal(destOffset));
-			_pEmitter->MemCopy(pPtrSrc, pPtrDest, Literal(count));
-		}
-
-		llvm::Value* IRFunctionEmitter::DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal)
+		llvm::Value* IRFunctionEmitter::DotProductF(int count, llvm::Value* pLVal, llvm::Value* pRVal)
 		{
 			llvm::Value* pTotal = Var(ValueType::Double);
 			DotProductF(count, pLVal, pRVal, pTotal);
 			return pTotal;
 		}
 
-		void IRFunctionEmitter::DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest)
+		void IRFunctionEmitter::DotProductF(int count, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest)
 		{
 			Store(pDest, Literal(0.0));
 			OpV(OperatorType::MultiplyF, count, pLVal, pRVal, [&pDest, this](llvm::Value* i, llvm::Value* pValue) {
 				OpAndUpdate(pDest, OperatorType::AddF, pValue);
 			});
-		}
-
-		void IRFunctionEmitter::ShiftRegister(llvm::Value* pBuffer, size_t bufferSize, size_t shiftSize, llvm::Value* pNewData, llvm::Value* pShiftBuffer)
-		{
-			assert(pBuffer != nullptr);
-			assert(shiftSize <= bufferSize);
-
-			if (pShiftBuffer != nullptr)
-			{
-				MemCopy(pBuffer, 0, pShiftBuffer, 0, (int) shiftSize);
-			}
-			if (shiftSize < bufferSize)
-			{
-				MemMove(pBuffer, shiftSize, 0, (int) (bufferSize - shiftSize));
-			}
-			if (pNewData != nullptr)
-			{
-				MemCopy(pNewData, 0, pBuffer, shiftSize, shiftSize);
-			}
 		}
 
 		llvm::Function* IRFunctionEmitter::ResolveFunction(const std::string& name)

@@ -5,6 +5,7 @@
 #include "Compiler.h"
 
 void TestLLVM();
+void TestLLVMShiftRegister();
 
 class ModelBuilder
 {
@@ -26,7 +27,11 @@ public:
 	template<typename T>
 	nodes::BinaryOperationNode<T>* Add(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 	template<typename T>
+	nodes::BinaryOperationNode<T>* Subtract(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
+	template<typename T>
 	nodes::BinaryOperationNode<T>* Multiply(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
+	template<typename T>
+	nodes::BinaryOperationNode<T>* Divide(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 	template<typename T>
 	nodes::DotProductNode<T>* DotProduct(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 	template<typename T>
@@ -57,3 +62,4 @@ void TestDotProduct(bool expanded);
 void TestSum(bool expanded);
 void TestAccumulator(bool expanded);
 void TestDelay();
+void TestSlidingAverage();

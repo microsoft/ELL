@@ -12,8 +12,10 @@ int main(int argc, char* argv[])
 	TestAccumulator(false);
 	TestAccumulator(true);
 	TestDelay();
+	TestSlidingAverage();
 
 	TestLLVM();
+	TestLLVMShiftRegister();
 
 	return 0;
 }

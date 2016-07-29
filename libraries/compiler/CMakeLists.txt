@@ -49,6 +49,7 @@ set (TCC tcc/SymbolTable.tcc
 		 tcc/Variable.tcc
 		 tcc/ScalarVar.tcc
 		 tcc/VectorVar.tcc
+		 tcc/IRFunctionEmitter.tcc
 		 tcc/IRCompiler.tcc
 )
 

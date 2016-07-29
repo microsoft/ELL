@@ -118,7 +118,7 @@ namespace emll
 		void IRCompiler::Compile(const nodes::ConstantNode<T>& node)
 		{
 			auto output = node.GetOutputPorts()[0];
-			const std::vector<T>& values = node.output.GetOutput();
+			auto values = node.GetValues();
 			Variable* pVar = nullptr;
 			if (output->Size() == 1)
 			{
@@ -366,7 +366,7 @@ namespace emll
 			llvm::Value* pOutputBuffer = EnsureEmitted(pVarOutputBuffer);
 
 			llvm::Value* pInputBuffer = EnsureEmitted(pInput);
-			_fn.ShiftRegister(pAllWindows, bufferSize, sampleSize, pInputBuffer, pOutputBuffer);
+			_fn.ShiftAndUpdate<T>(pAllWindows, bufferSize, sampleSize, pInputBuffer, pOutputBuffer);
 		}
 	}
 }

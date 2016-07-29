@@ -136,7 +136,9 @@ namespace emll
 
 			llvm::Value* PtrOffset(llvm::Value* pPtr, llvm::Value* pOffset);
 			llvm::Value* ValueAt(llvm::Value* pPtr, llvm::Value* pOffset);
+			llvm::Value* ValueAt(llvm::Value* pPtr, int offset);
 			llvm::Value* SetValueAt(llvm::Value* pPtr, llvm::Value* pOffset, llvm::Value* pVal);
+			llvm::Value* SetValueAt(llvm::Value* pPtr, int offset, llvm::Value* pVal);
 
 			llvm::Value* PtrOffsetA(llvm::Value* pPtr, int offset);
 			llvm::Value* PtrOffsetA(llvm::Value* pPtr, llvm::Value* pOffset, const std::string& name = "");
@@ -170,23 +172,31 @@ namespace emll
 
 			//------------------------------------------
 			//
-			// Standard function calls
+			// Standard useful function calls
 			//
 			//------------------------------------------
-
 			llvm::Value* Malloc(ValueType type, int64_t size);
 			void Free(llvm::Value* pValue);
 
 			llvm::Value* Print(const std::string& text);
 			llvm::Value* Printf(std::initializer_list<llvm::Value*> args);
 
+			template<typename T>
 			void MemMove(llvm::Value* pPtr, int fromOffset, int destOffset, int count);
+			template<typename T>
 			void MemCopy(llvm::Value* pPtrSrc, int srcOffset, llvm::Value* pPtrDest, int destOffset, int count);
 
-			llvm::Value* DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal);
-			void DotProductF(size_t count, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest);
+			//------------------------------------------
+			//
+			// Inline common code generators
+			//
+			//------------------------------------------
+			void PrintForEach(const std::string& formatString, llvm::Value* pVector, int count);
+			llvm::Value* DotProductF(int count, llvm::Value* pLVal, llvm::Value* pRVal);
+			void DotProductF(int count, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest);
 
-			void ShiftRegister(llvm::Value* pBuffer, size_t bufferSize, size_t shiftSize, llvm::Value* pNewData = nullptr, llvm::Value* pShiftBuffer = nullptr);
+			template<typename T>
+			void ShiftAndUpdate(llvm::Value* pBuffer, int bufferCount, int shiftCount, llvm::Value* pNewData, llvm::Value* pShiftedData = nullptr);
 
 			void Verify()
 			{
@@ -212,4 +222,6 @@ namespace emll
 		};
 	}
 }
+
+#include "../tcc/IRFunctionEmitter.tcc"
 

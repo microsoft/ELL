@@ -16,6 +16,11 @@ namespace emll
 			{
 				return _size;
 			}
+			virtual bool IsScalar() const override
+			{
+				return false;
+			}
+
 		private:
 			int _size;
 		};

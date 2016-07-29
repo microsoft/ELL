@@ -49,7 +49,7 @@ namespace nodes
         /// <summary> Gets the values contained in this node </summary>
         ///
         /// <returns> The values contained in this node </returns>
-        const std::vector<ValueType>& GetValues() { return _values; }
+        const std::vector<ValueType>& GetValues() const { return _values; }
 
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<ValueType>& output = _output;

@@ -11,6 +11,12 @@ namespace emll
 		{
 		public:
 			ScalarVar(const VariableScope scope, int flags = VariableFlags::isMutable);
+
+			virtual bool IsScalar() const override
+			{
+				return true;
+			}
+
 		};
 		using ScalarF = ScalarVar<double>;
 		using ScalarI = ScalarVar<int>;
