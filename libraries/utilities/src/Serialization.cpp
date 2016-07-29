@@ -20,7 +20,22 @@ namespace utilities
 #define IMPLEMENT_FUNDAMENTAL_ARRAY_SERIALIZE(base, type)     void base::SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { SerializeArray(name,value); }
 
     //
+    // Serializer base class
+    //
+    void Serializer::SerializeValue(const char* name, const ISerializable& value)
+    {
+        BeginSerializeObject(name, value);
+        SerializeObject(name, value);
+        EndSerializeObject(name, value);
+    }
 
+    void Serializer::BeginSerializeObject(const char* name, const ISerializable& value)
+    {
+    }
+
+    void Serializer::EndSerializeObject(const char* name, const ISerializable& value)
+    {
+    }
 
     //
     // Scalars
@@ -40,7 +55,8 @@ namespace utilities
     }
 
     // ISerializable
-    void SimpleSerializer::SerializeValue(const char* name, const ISerializable& value)
+
+    void SimpleSerializer::SerializeObject(const char* name, const ISerializable& value)
     {
         if (name != std::string(""))
         {

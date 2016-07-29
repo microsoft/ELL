@@ -65,6 +65,7 @@ namespace utilities
 #define DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_BASE(type) virtual void SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) = 0;
 #define DECLARE_FUNDAMENTAL_ARRAY_SERIALIZE_OVERRIDE(type) virtual void SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) override;
 
+    // TODO: replace all these const char* name entries with std::string
     class Serializer
     {
     public:
@@ -117,7 +118,13 @@ namespace utilities
 
         virtual void SerializeValue(const char* name, std::string value) = 0;
 
-        virtual void SerializeValue(const char* name, const ISerializable& value) = 0;
+        virtual void SerializeValue(const char* name, const ISerializable& value);
+
+        // TODO: replace SerializeValue(ISerializable) with SerializeObject
+        virtual void BeginSerializeObject(const char* name, const ISerializable& value);
+        virtual void SerializeObject(const char* name, const ISerializable& value) = 0;
+        virtual void EndSerializeObject(const char* name, const ISerializable& value);
+
 
         virtual void SerializeArrayValue(const char* name, const std::vector<const ISerializable*>& array) = 0;
 
@@ -184,7 +191,7 @@ namespace utilities
 
         virtual void SerializeValue(const char* name, std::string value) override;
 
-        virtual void SerializeValue(const char* name, const ISerializable& value) override;
+        virtual void SerializeObject(const char* name, const ISerializable& value) override;
 
         virtual void SerializeArrayValue(const char* name, const std::vector<const ISerializable*>& array) override;
 

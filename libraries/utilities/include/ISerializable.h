@@ -27,22 +27,12 @@ namespace utilities
         virtual ~ISerializable() = default;
 
         virtual std::string GetRuntimeTypeName() const = 0;
-        virtual void Serialize(Serializer& serializer) const = 0;
+        virtual void Serialize(Serializer& serializer) const = 0;  // TODO: call this SerializeContents?
 
-        // begin serialize
-        // serialize
-        // end serialize
-
-        // begin deserialize
-        // deserialize
-        // end deserialize
+        // Optional:
+        virtual void BeginSerialize(Serializer& serializer) const {};
+        virtual void EndSerialize(Serializer& serializer) const {};
     };
-
-    //template <typename ValueType>
-    //using IsSerializable = typename std::enable_if_t<std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value, int>;
-
-    //template <typename ValueType>
-    //using IsNotSerializable = typename std::enable_if_t<(!std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value) && (std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
 
     class IDescribable
     {
@@ -51,7 +41,6 @@ namespace utilities
 
         virtual ObjectDescription GetDescription() const = 0;
     };
-
 
     // // helper function
     // // See here for advice on overloading with function templates
