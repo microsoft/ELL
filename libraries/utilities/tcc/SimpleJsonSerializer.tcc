@@ -78,6 +78,16 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void SimpleJsonDeserializer::ReadScalar(const char* name, ValueType& value)
     {
+        std::cout << "reading tokens" << std::endl;
+
+        while(true)
+        {
+            auto token = ReadNextToken();
+            if(token=="")
+                break;
+            std::cout << "Token: " << token << std::endl;
+        }
+
         bool hasName = name != std::string("");
         if(hasName)
         {

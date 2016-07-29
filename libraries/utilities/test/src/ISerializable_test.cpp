@@ -31,6 +31,7 @@
 // stl
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 struct TestStruct : public utilities::ISerializable, public utilities::IDescribable
 {
@@ -58,7 +59,7 @@ struct TestStruct : public utilities::ISerializable, public utilities::IDescriba
     }
 };
 
-void TestISerializable()
+void TestSerializer()
 {
     int intVal = 1;
     float floatVal = 2.5;
@@ -115,20 +116,12 @@ void TestISerializable()
     std::cout << std::endl;
     std::cout << "------------------------" << std::endl;
     std::cout << std::endl;
-}
 
-void TestSerializer()
-{
-    utilities::SimpleJsonSerializer serializer;
-
+    // simple stuff
     serializer.Serialize(5);
     std::cout << std::endl;
 
     serializer.Serialize(3.1415);
-    std::cout << std::endl;
-
-    TestStruct testStruct{ 1, 2.2f, 3.3 };
-    serializer.Serialize("testStruct", testStruct);
     std::cout << std::endl;
 
     std::vector<int> intArray{ 1, 2, 3 };
@@ -145,4 +138,21 @@ void TestSerializer()
     structArray.emplace_back(7, 8, 9);
     serializer.Serialize("structArray", structArray);
     std::cout << std::endl;
+}
+
+void TestDeserializer()
+{
+    std::cout << "Deserializer test" << std::endl;
+
+    // create a stream
+    std::stringstream strstream;
+        
+    utilities::SimpleJsonSerializer serializer(strstream);
+    serializer.Serialize("pi", 3.14159);
+    std::cout << "Str value: " << strstream.str();
+
+    utilities::SimpleJsonDeserializer deserializer(strstream);
+    double val = 0;
+    deserializer.Deserialize("pi", val);
+    std::cout << "Result: " << val;
 }

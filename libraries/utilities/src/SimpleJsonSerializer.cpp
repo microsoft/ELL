@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 
 namespace utilities
 {
@@ -102,9 +103,9 @@ namespace utilities
     //
     // Deserialization
     //
-    //
-    // Serialization
-    //
+    SimpleJsonDeserializer::SimpleJsonDeserializer() : _in(std::cin) {}
+    SimpleJsonDeserializer::SimpleJsonDeserializer(std::istream& inStream) : _in(inStream) {}
+
     IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, bool);
     IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, char);
     IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, short);
@@ -144,5 +145,36 @@ namespace utilities
 
     void SimpleJsonDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array)
     {
+    }
+
+    // Tokenizer
+    std::string SimpleJsonDeserializer::ReadNextToken()
+    {
+        std::string tokenStopChars = " \t\r\n:{}[]'\"";
+        std::stringstream tokenStream;
+        // put first char (if it exists)
+        if(_in)
+        {
+            auto ch = _in.get();
+            if(ch == EOF)
+                return "";
+            tokenStream << (char)ch;
+        }
+        while(_in)
+        {
+            auto ch = _in.get();
+            if(ch == EOF)
+            {
+                break;
+            }
+            
+            if(tokenStopChars.find(ch) != std::string::npos)
+            {
+                _in.unget();
+                break;
+            }
+            tokenStream << (char)ch;
+        }
+        return tokenStream.str();
     }
 }

@@ -75,6 +75,9 @@ namespace utilities
     class SimpleJsonDeserializer : public Deserializer
     {
     public:
+        SimpleJsonDeserializer();
+        SimpleJsonDeserializer(std::istream& inputStream);
+
     protected:
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(bool);
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(char);
@@ -99,6 +102,8 @@ namespace utilities
         virtual void EndDeserializeObject(const char* name, ISerializable& value) override;
 
     private:
+        std::string ReadNextToken(); // returns "" at EOF
+
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void ReadScalar(const char* name, ValueType& value);
 
@@ -106,6 +111,8 @@ namespace utilities
 
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void ReadArray(const char* name, std::vector<ValueType>& array);
+
+        std::istream& _in;
     };
 }
 
