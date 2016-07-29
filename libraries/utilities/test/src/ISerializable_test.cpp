@@ -38,7 +38,7 @@ struct TestStruct : public utilities::ISerializable, public utilities::IDescriba
     double c;
     TestStruct(int a, float b, double c) : a(a), b(b), c(c) {}
     static std::string GetTypeName() { return "TestStruct"; }
-    virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     virtual utilities::ObjectDescription GetDescription() const override
     {
@@ -121,20 +121,27 @@ void TestSerializer()
     utilities::SimpleSerializer serializer;
 
     serializer.Serialize(5);
+    std::cout << std::endl;
+
     serializer.Serialize(3.1415);
+    std::cout << std::endl;
 
     TestStruct testStruct{ 1, 2.2f, 3.3 };
     serializer.Serialize("testStruct", testStruct);
+    std::cout << std::endl;
 
     std::vector<int> intArray{ 1, 2, 3 };
     serializer.Serialize("intArray", intArray);
+    std::cout << std::endl;
 
     std::vector<bool> boolArray{ true, false, true };
     serializer.Serialize("boolArray", boolArray);
+    std::cout << std::endl;
 
     std::vector<TestStruct> structArray;
     structArray.emplace_back(1, 2, 3);
     structArray.emplace_back(4, 5, 6);
     structArray.emplace_back(7, 8, 9);
     serializer.Serialize("structArray", structArray);
+    std::cout << std::endl;
 }

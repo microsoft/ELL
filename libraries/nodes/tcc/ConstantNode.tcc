@@ -45,7 +45,6 @@ namespace nodes
     template <typename ValueType>
     void ConstantNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
-        std::cout << "Serializing ConstantNode" << std::endl;
         Node::Serialize(serializer);
         serializer.Serialize("values", _values);
     }

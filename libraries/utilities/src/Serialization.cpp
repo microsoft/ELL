@@ -42,7 +42,14 @@ namespace utilities
     // ISerializable
     void SimpleSerializer::SerializeValue(const char* name, const ISerializable& value)
     {
+        if (name != std::string(""))
+        {
+            std::cout << name << ": ";
+        }
+        std::cout << "{" << std::endl;
+        std::cout << "_type: " << value.GetRuntimeTypeName() << std::endl;
         value.Serialize(*this);
+        std::cout << "}" << std::endl;
     }
 
 
@@ -59,6 +66,11 @@ namespace utilities
 
     void SimpleSerializer::SerializeArrayValue(const char* name, const std::vector<const ISerializable*>& array)
     {
+        if (name != std::string(""))
+        {
+            std::cout << name << ": ";
+        }
+
         std::cout << "[";
         for(const auto& item: array)
         {

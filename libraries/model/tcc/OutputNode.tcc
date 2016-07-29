@@ -39,7 +39,6 @@ namespace model
     template <typename ValueType>
     void OutputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
-        std::cout << "Serializing OutputNode" << std::endl;
         Node::Serialize(serializer);
         serializer.Serialize("input", _input);
     }

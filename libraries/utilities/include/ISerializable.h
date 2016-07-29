@@ -26,6 +26,7 @@ namespace utilities
     public:
         virtual ~ISerializable() = default;
 
+        virtual std::string GetRuntimeTypeName() const = 0;
         virtual void Serialize(Serializer& serializer) const = 0;
 
         // begin serialize

@@ -146,7 +146,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> ISerializable interface </summary>
         // virtual utilities::ObjectDescription GetDescription() const override;

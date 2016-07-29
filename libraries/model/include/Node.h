@@ -59,7 +59,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const = 0;
+//        virtual std::string GetRuntimeTypeName() const = 0;
 
         /// <summary> Get all nodes that this nodes uses for input (and therefore depends on) </summary>
         ///

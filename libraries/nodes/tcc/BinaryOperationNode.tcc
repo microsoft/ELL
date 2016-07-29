@@ -76,10 +76,9 @@ namespace nodes
     template <typename ValueType>
     void BinaryOperationNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
-        std::cout << "Serializing BinaryOperationNode" << std::endl;
         Node::Serialize(serializer);
         serializer.Serialize("operation", (int)_operation);
-        serializer.Serialize("operation", _input1);
-        serializer.Serialize("operation", _input2);
+        serializer.Serialize("input1", _input1);
+        serializer.Serialize("input2", _input2);
     }
 }
