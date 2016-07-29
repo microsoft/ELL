@@ -23,6 +23,15 @@ namespace predictors
         /// <param name="threshold"> The threshold. </param>
         SingleInputThresholdRule(size_t index = 0, double threshold = 0.0);
 
+
+        size_t GetElementIndex() const (return _index;)
+
+        /// <summary> Gets the threshold. </summary>
+        ///
+        /// <returns> The threshold value. </returns>
+        double GetThreshold() const { return _threshold; }
+
+
         /// <summary> Evaluates the split rule. </summary>
         ///
         /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the input. </typeparam>

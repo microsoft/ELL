@@ -8,6 +8,7 @@
 
 #include "SubModelBuilders.h"
 #include "ConstantNode.h"
+#include "BinaryPredicateNode.h"
 
 namespace nodes
 {
@@ -17,10 +18,18 @@ namespace nodes
         return{ constantNode->output };
     }
 
-    //SingleInputThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleInputThresholdRule & rule, model::Model & model, const model::OutputPortElements<double>& outputPortElements)
-    //{
-    //    return SingleInputThresholdRuleSubModelOutputs();
-    //}
+    SingleInputThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleInputThresholdRule& rule, model::Model & model, const model::OutputPortElements<double>& outputPortElements)
+    {
+        // get the single feature
+        
+        // get the threshold
+        rule.
+
+
+
+        auto binaryPredicateNode = model.AddNode<BinaryPredicateNode<double>>
+        return SingleInputThresholdRuleSubModelOutputs();
+    }
 
     // add BinaryPredicateNode with operation less than
     // SingleInput --> SingleElement

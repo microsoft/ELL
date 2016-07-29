@@ -47,5 +47,5 @@ namespace nodes
     /// <param name="outputPortElements"> The output port elements from which the rule takes its inputs. </param>
     ///
     /// <returns> The SingleInputThresholdRuleSubModelOutputs. </returns>
-   // SingleInputThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleInputThresholdRule& rule, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
+    SingleInputThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleInputThresholdRule& rule, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
 }
