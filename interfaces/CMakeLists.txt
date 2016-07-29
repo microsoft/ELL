@@ -20,7 +20,8 @@ set (INTERFACE_MAIN ../common/EMLL.i)
 
 set (INTERFACE_FILES ../common/common.i
                      ../common/callback.i
-                     ../common/LoadModelAsync.i
+                     ../common/loadModelAsync.i
+					 ../common/loadDatasetAsync.i
                      ../common/dataset.i
                      ../common/evaluators.i
                      ../common/features.i

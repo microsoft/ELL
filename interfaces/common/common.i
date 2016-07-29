@@ -28,4 +28,5 @@
 
 #if defined(SWIGJAVASCRIPT)
 %include "loadModelAsync.i"
+%include "loadDatasetAsync.i"
 #endif
