@@ -54,6 +54,36 @@ namespace model
         ComputeSize();
     }
 
+    template <typename ValueType>
+    OutputPortElements<ValueType> OutputPortElements<ValueType>::GetSlice(size_t startIndex, size_t numValues) const
+    {
+        if(startIndex + numValues > Size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Invalid slice.");
+        }
+
+        size_t currentBegin = 0;
+        auto rangeIterator = begin();
+        // skip ranges that come before the desired elements
+        while(rangeIterator != end() && currentBegin+rangeIterator->Size() <= startIndex)
+        {
+            startIndex -= rangeIterator->Size();
+            ++rangeIterator;
+        }
+
+        // now extract stuff from ranges until done
+        OutputPortElements<ValueType> result;
+        while(rangeIterator != end() && numValues > 0)
+        {
+            auto currentRange = *rangeIterator;
+            size_t numRangeValues = std::min(currentRange.Size()-startIndex, numValues);
+            result.AddRange({currentRange->OutputPortBase(), startIndex, numRangeValues});
+            numValues -= numRangeValues;
+        }
+        return result;
+    }
+
+
     //
     // Convenience functions
     //

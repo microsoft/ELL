@@ -11,6 +11,10 @@
 #include "Port.h"
 #include "OutputPort.h"
 
+// utilities
+#include "Exception.h"
+
+// stl
 #include <vector>
 #include <cassert>
 
@@ -199,6 +203,8 @@ namespace model
         ///
         /// <param name="groups"> The list of groups to concantenate together </param>
         OutputPortElements(const std::vector<OutputPortElements<ValueType>>& groups);
+    
+        OutputPortElements<ValueType> GetSlice(size_t startIndex, size_t numValues) const;
     };
 
     //
