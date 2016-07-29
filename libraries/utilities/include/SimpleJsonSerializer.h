@@ -16,7 +16,7 @@
 #include <cstdint>
 #include <string>
 #include <sstream>
-#include <iostream>
+#include <ostream>
 #include <vector>
 #include <type_traits>
 #include <memory>
@@ -26,6 +26,9 @@ namespace utilities
     class SimpleJsonSerializer : public Serializer
     {
     public:
+        SimpleJsonSerializer();
+        SimpleJsonSerializer(std::ostream& outputStream);
+
     protected:
         // virtual void SerializeVariant(std::string name, const Variant& variant) override;
 
@@ -64,6 +67,7 @@ namespace utilities
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
+        std::ostream& _out;
         int _indent = 0;
         std::string GetCurrentIndent() { return std::string(2 * _indent, ' '); }
     };

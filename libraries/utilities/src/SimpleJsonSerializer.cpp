@@ -17,15 +17,21 @@
 
 namespace utilities
 {
-#define IMPLEMENT_SERIALIZE_VALUE(base, type)     void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name,value); }
-#define IMPLEMENT_SERIALIZE_ARRAY_VALUE(base, type)     void base::SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name,value); }
+#define IMPLEMENT_SERIALIZE_VALUE(base, type)        void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name,value); }
+#define IMPLEMENT_SERIALIZE_ARRAY_VALUE(base, type)  void base::SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name,value); }
 
-#define IMPLEMENT_DESERIALIZE_VALUE(base, type)     void base::DeserializeValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name,value); }
-#define IMPLEMENT_DESERIALIZE_ARRAY_VALUE(base, type)     void base::DeserializeArrayValue(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name,value); }
+#define IMPLEMENT_DESERIALIZE_VALUE(base, type)        void base::DeserializeValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name,value); }
+#define IMPLEMENT_DESERIALIZE_ARRAY_VALUE(base, type)  void base::DeserializeArrayValue(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name,value); }
 
     //
     // Serialization
     //
+    SimpleJsonSerializer::SimpleJsonSerializer() : _out(std::cout) 
+    {}
+
+    SimpleJsonSerializer::SimpleJsonSerializer(std::ostream& outputStream) : _out(outputStream) 
+    {}
+
     IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, bool);
     IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, char);
     IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, short);
@@ -46,10 +52,10 @@ namespace utilities
         auto indent = GetCurrentIndent();
         if (name != std::string(""))
         {
-            std::cout << indent << name << ": ";
+            _out << indent << name << ": ";
         }
-        std::cout << "{" << std::endl;
-        std::cout << indent << "_type: " << value.GetRuntimeTypeName() << std::endl;
+        _out << "{" << std::endl;
+        _out << indent << "_type: " << value.GetRuntimeTypeName() << std::endl;
     }
 
     void SimpleJsonSerializer::SerializeObject(const char* name, const ISerializable& value)
@@ -62,7 +68,7 @@ namespace utilities
     void SimpleJsonSerializer::EndSerializeObject(const char* name, const ISerializable& value)
     {
         auto indent = GetCurrentIndent();
-        std::cout << indent << "}" << std::endl;
+        _out << indent << "}" << std::endl;
     }
 
     //
@@ -81,16 +87,16 @@ namespace utilities
         auto indent = GetCurrentIndent();
         if (name != std::string(""))
         {
-            std::cout << name << ": ";
+            _out << name << ": ";
         }
 
-        std::cout << "[";
+        _out << "[";
         for(const auto& item: array)
         {
             Serialize(*item);
-            std::cout << ", ";
+            _out << ", ";
         }
-        std::cout << "]";
+        _out << "]";
     }
 
     //

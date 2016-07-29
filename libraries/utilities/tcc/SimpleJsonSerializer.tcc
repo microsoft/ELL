@@ -21,12 +21,12 @@ namespace utilities
         bool hasName = name != std::string("");
         auto endOfLine = hasName ? "\n" : "";
 
-        std::cout << indent;
+        _out << indent;
         if (hasName)
         {
-            std::cout << name << ": ";
+            _out << name << ": ";
         }
-        std::cout << to_string(value) << endOfLine;
+        _out << to_string(value) << endOfLine;
     }
 
     // This function is inline just so it appears next to the other Write* functions
@@ -36,12 +36,12 @@ namespace utilities
         bool hasName = name != std::string("");
         auto endOfLine = hasName ? "\n" : "";
 
-        std::cout << indent;
+        _out << indent;
         if (hasName)
         {
-            std::cout << name << ": ";
+            _out << name << ": ";
         }
-        std::cout << "\"" << value << "\"" << endOfLine;
+        _out << "\"" << value << "\"" << endOfLine;
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
@@ -51,21 +51,21 @@ namespace utilities
         auto indent = GetCurrentIndent();
         auto endOfLine = "\n";
 
-        std::cout << indent;
+        _out << indent;
         if (hasName)
         {
-            std::cout << name << ": ";
+            _out << name << ": ";
         }
 
-        std::cout << "[";
+        _out << "[";
         // reset indent
         for (const auto& item : array)
         {
             Serialize(item);
-            std::cout << ", ";
+            _out << ", ";
         }
         // reset indent
-        std::cout << "]" << endOfLine;
+        _out << "]" << endOfLine;
     }
 
     //
