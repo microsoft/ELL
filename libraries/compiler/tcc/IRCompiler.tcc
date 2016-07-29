@@ -228,15 +228,13 @@ namespace emll
 			Variable& resultVar = *(GetVariableFor(pOutput));
 
 			_fn.Store(pResult, _fn.Literal(0.0));
-			llvm::Value* pTotal = _fn.Load(pResult);  //pTotal is a register
 			for (size_t i = 0; i < pInput1->Size(); ++i)
 			{
 				llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(i));
 				llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(i));
 				llvm::Value* pMultiplyResult = _fn.Op(GetMultiplyForValueType<T>(), pLVal, pRVal);
-				pTotal = _fn.Op(GetAddForValueType<T>(), pMultiplyResult, pTotal);
+				_fn.OpAndUpdate(pResult, GetAddForValueType<T>(), pMultiplyResult);
 			}
-			_fn.Store(pResult, pTotal);
 		}
 
 		template<typename T>
@@ -265,16 +263,14 @@ namespace emll
 			Variable& resultVar = *(GetVariableFor(pOutput));
 
 			_fn.Store(pResult, _fn.Literal(0.0));
-			llvm::Value* pTotal = _fn.Load(pResult);  //pTotal is a register
 			auto forLoop = _fn.ForLoop();
 			auto pBodyBlock = forLoop.Begin(pInput->Size());
 			{
 				auto i = forLoop.LoadIterationVar();
-				llvm::Value* pValue  = _fn.ValueAt(pSrcVector, i);
-				pTotal = _fn.Op(GetAddForValueType<T>(), pValue, pTotal);
+				llvm::Value* pValue = _fn.ValueAt(pSrcVector, i);
+				_fn.OpAndUpdate(pResult, GetAddForValueType<T>(), pValue);
 			}
 			forLoop.End();
-			_fn.Store(pResult, pTotal);
 		}
 
 		template<typename T>
@@ -286,13 +282,11 @@ namespace emll
 			Variable& resultVar = *(GetVariableFor(pOutput));
 
 			_fn.Store(pResult, _fn.Literal(0.0));
-			llvm::Value* pTotal = _fn.Load(pResult);  //pTotal is a register
 			for (size_t i = 0; i < pInput->Size(); ++i)
 			{
-				llvm::Value* pVal = LoadVar(pInput->GetOutputPortElement(i));
-				pTotal = _fn.Op(GetAddForValueType<T>(), pVal, pTotal);
+				llvm::Value* pValue = LoadVar(pInput->GetOutputPortElement(i));
+				_fn.OpAndUpdate(pResult, GetAddForValueType<T>(), pValue);
 			}
-			_fn.Store(pResult, pTotal);
 		}
 
 		template<typename T>

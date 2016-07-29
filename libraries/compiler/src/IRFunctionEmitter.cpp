@@ -206,6 +206,11 @@ namespace emll
 			return PtrOffsetA(pPtr, pOffset);
 		}
 
+		llvm::Value* IRFunctionEmitter::PtrOffset(llvm::Value* pPtr, int offset)
+		{
+			return PtrOffset(pPtr, Literal(offset));
+		}
+
 		llvm::Value* IRFunctionEmitter::ValueAt(llvm::Value* pPtr, llvm::Value* pOffset)
 		{
 			llvm::GlobalVariable* pGlobal = llvm::dyn_cast<llvm::GlobalVariable>(pPtr);

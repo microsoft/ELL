@@ -369,5 +369,22 @@ void TestSlidingAverage()
 
 	IRCompiler compiler("EMLL", std::cout);
 	compiler.CompileModel("TestSlidingAverage", mb.Model);
+
+	auto& module = compiler.Module();
+	module.DeclarePrintf();
+	auto fnMain = module.AddMain();
+	std::vector<double> data = { 5, 10, 15, 20 };
+	llvm::Value* pData = module.Constant("c_data", data);
+	llvm::Value* pResult = fnMain.Var(ValueType::Double, 1);
+	fnMain.Call("TestSlidingAverage", {fnMain.PtrOffset(pData, 0), fnMain.PtrOffset(pResult, 0)});
+	fnMain.PrintForEach("%f\n", pResult, 1);
+	fnMain.Call("TestSlidingAverage", { fnMain.PtrOffset(pData, 0), fnMain.PtrOffset(pResult, 0) });
+	fnMain.PrintForEach("%f\n", pResult, 1);
+	fnMain.Call("TestSlidingAverage", { fnMain.PtrOffset(pData, 0), fnMain.PtrOffset(pResult, 0) });
+	fnMain.PrintForEach("%f\n", pResult, 1);
+	fnMain.Ret();
+	fnMain.Verify();
+
 	compiler.DebugDump();
+	module.WriteBitcodeToFile("C:\\junk\\model\\avg.bc");
 }

@@ -122,7 +122,6 @@ namespace emll
 			{
 				return _pEmitter->StackAlloc(type, count);
 			}
-
 			llvm::Value* Load(llvm::Value* pPtr)
 			{
 				return _pEmitter->Load(pPtr);
@@ -135,6 +134,7 @@ namespace emll
 			llvm::Value* OpAndUpdate(llvm::Value* pPtr, OperatorType op, llvm::Value* pValue);
 
 			llvm::Value* PtrOffset(llvm::Value* pPtr, llvm::Value* pOffset);
+			llvm::Value* PtrOffset(llvm::Value* pPtr, int offset);
 			llvm::Value* ValueAt(llvm::Value* pPtr, llvm::Value* pOffset);
 			llvm::Value* ValueAt(llvm::Value* pPtr, int offset);
 			llvm::Value* SetValueAt(llvm::Value* pPtr, llvm::Value* pOffset, llvm::Value* pVal);

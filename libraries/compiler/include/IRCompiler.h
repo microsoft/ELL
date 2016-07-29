@@ -25,9 +25,11 @@ namespace emll
 
 			void DebugDump();
 
+			IRModuleEmitter& Module() { return _module; }
+
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) override;
 			virtual void EndFunction() override;
-		
+			
 		private:
 			void RegisterFunctionArgs(NamedValueTypeList& args);
 
