@@ -23,15 +23,16 @@ namespace nodes
 
     SingleElementThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleElementThresholdRule& rule, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
     {
-        // get the element index
-        size_t elementIndex = rule.GetElementIndex();
-        //model::OutputPortElements<double> element = { outputPortElements, elementIndex };
+        // get the element used in the split rule // TODO - this is a broken way to get the element. 
+        auto elementAsRange = outputPortElements.GetElement(rule.GetElementIndex());
         model::OutputPortElements<double> element;
+        element.AddRange(elementAsRange);
 
-        // get the threshold .
+        // get the threshold.
         auto thresholdNode = model.AddNode<ConstantNode<double>>(rule.GetThreshold());
-        auto binaryPredicateNode = model.AddNode<BinaryPredicateNode<double>>(element, thresholdNode->output, BinaryPredicateNode<double>::PredicateType::lessThanOrEqual);
 
+        // create a lessThanOrEqual predicate that implements the split rule
+        auto binaryPredicateNode = model.AddNode<BinaryPredicateNode<double>>(element, thresholdNode->output, BinaryPredicateNode<double>::PredicateType::lessThanOrEqual);
         return{ binaryPredicateNode->output };
     }
 }

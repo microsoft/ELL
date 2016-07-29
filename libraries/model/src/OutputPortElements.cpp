@@ -8,6 +8,9 @@
 
 #include "OutputPortElements.h"
 
+// utilities
+#include "Exception.h"
+
 namespace model
 {
     //
@@ -81,6 +84,20 @@ namespace model
     {
         _ranges.push_back(range);
         _size += range.Size();
+    }
+
+    OutputPortRange OutputPortElementsUntyped::GetElement(size_t index) const
+    {
+        size_t rangeFirstIndex = 0;
+        for (const auto& range : _ranges)
+        {
+            if (index < rangeFirstIndex + range.Size())
+            {
+                return OutputPortRange(*range.ReferencedPort(), index - rangeFirstIndex, 1);
+            }
+            rangeFirstIndex += range.Size();
+        }
+        throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds OutputPortElements range");
     }
 
     void OutputPortElementsUntyped::ComputeSize()
