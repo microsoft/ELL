@@ -115,7 +115,7 @@ namespace emll
 		}
 
 		template<typename T>
-		void IRCompiler::Compile(const nodes::ConstantNode<T>& node)
+		void IRCompiler::CompileConstant(const nodes::ConstantNode<T>& node)
 		{
 			auto output = node.GetOutputPorts()[0];
 			auto values = node.GetValues();
@@ -133,7 +133,7 @@ namespace emll
 		}
 
 		template<typename T>
-		void IRCompiler::Compile(const model::OutputNode<T>& node)
+		void IRCompiler::CompileOutput(const model::OutputNode<T>& node)
 		{
 			// Output ports have exactly 1 input, output
 			auto pInput = node.GetInputPorts()[0];
@@ -146,23 +146,23 @@ namespace emll
 		}
 
 		template<typename T>
-		void IRCompiler::Compile(const nodes::BinaryOperationNode<T>& node)
+		void IRCompiler::CompileBinary(const nodes::BinaryOperationNode<T>& node)
 		{
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
 			if ((ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2)) &&
 				!ShouldUnrollLoops())
 			{
-				CompileLoop<T>(node);
+				CompileBinaryLoop<T>(node);
 			}
 			else
 			{
-				CompileExpanded<T>(node);
+				CompileBinaryExpanded<T>(node);
 			}
 		}
 
 		template<typename T>
-		void IRCompiler::CompileLoop(const nodes::BinaryOperationNode<T>& node)
+		void IRCompiler::CompileBinaryLoop(const nodes::BinaryOperationNode<T>& node)
 		{
 			llvm::Value* pLVector = EnsureEmitted(node.GetInputPorts()[0]);
 			llvm::Value* pRVector = EnsureEmitted(node.GetInputPorts()[1]);
@@ -176,7 +176,7 @@ namespace emll
 		}
 
 		template<typename T>
-		void IRCompiler::CompileExpanded(const nodes::BinaryOperationNode<T>& node)
+		void IRCompiler::CompileBinaryExpanded(const nodes::BinaryOperationNode<T>& node)
 		{
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
@@ -193,23 +193,23 @@ namespace emll
 		}
 
 		template<typename T>
-		void IRCompiler::Compile(const nodes::DotProductNode<T>& node)
+		void IRCompiler::CompileDotProduct(const nodes::DotProductNode<T>& node)
 		{
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
 			if ((ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2)) &&
 				!ShouldUnrollLoops())
 			{
-				CompileLoop<T>(node);
+				CompileDotProductLoop<T>(node);
 			}
 			else
 			{
-				CompileExpanded<T>(node);
+				CompileDotProductExpanded<T>(node);
 			}
 		}
 
 		template<typename T>
-		void IRCompiler::CompileLoop(const nodes::DotProductNode<T>& node)
+		void IRCompiler::CompileDotProductLoop(const nodes::DotProductNode<T>& node)
 		{
 			llvm::Value* pLVector = EnsureEmitted(node.GetInputPorts()[0]);
 			llvm::Value* pRVector = EnsureEmitted(node.GetInputPorts()[1]);
@@ -219,7 +219,7 @@ namespace emll
 		}
 
 		template<typename T>
-		void IRCompiler::CompileExpanded(const nodes::DotProductNode<T>& node)
+		void IRCompiler::CompileDotProductExpanded(const nodes::DotProductNode<T>& node)
 		{
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
@@ -238,23 +238,23 @@ namespace emll
 		}
 
 		template<typename T>
-		void IRCompiler::Compile(const nodes::SumNode<T>& node)
+		void IRCompiler::CompileSum(const nodes::SumNode<T>& node)
 		{
 			// SumNode has exactly 1 input and 1 output
 			auto input = node.GetInputPorts()[0];
 			if (ModelEx::IsPureVector(*input) && 
 				!ShouldUnrollLoops())
 			{
-				CompileLoop<T>(node);
+				CompileSumLoop<T>(node);
 			}
 			else
 			{
-				CompileExpanded<T>(node);
+				CompileSumExpanded<T>(node);
 			}
 		}
 
 		template<typename T>
-		void IRCompiler::CompileLoop(const nodes::SumNode<T>& node)
+		void IRCompiler::CompileSumLoop(const nodes::SumNode<T>& node)
 		{
 			auto pInput = node.GetInputPorts()[0];
 			auto pOutput = node.GetOutputPorts()[0];
@@ -274,7 +274,7 @@ namespace emll
 		}
 
 		template<typename T>
-		void IRCompiler::CompileExpanded(const nodes::SumNode<T>& node)
+		void IRCompiler::CompileSumExpanded(const nodes::SumNode<T>& node)
 		{
 			auto pInput = node.GetInputPorts()[0];
 			auto pOutput = node.GetOutputPorts()[0];
@@ -290,7 +290,7 @@ namespace emll
 		}
 
 		template<typename T>
-		void IRCompiler::Compile(const nodes::AccumulatorNode<T>& node)
+		void IRCompiler::CompileAccumulator(const nodes::AccumulatorNode<T>& node)
 		{
 			// AccumulatorNode has exactly 1 input and 1 output
 			// Accumulators are always long lived - either globals or heap. Currently, we use globals
@@ -302,16 +302,16 @@ namespace emll
 			if (ModelEx::IsPureVector(*pInput) && 
 				!ShouldUnrollLoops())
 			{
-				CompileLoop<T>(node);
+				CompileAccumulatorLoop<T>(node);
 			}
 			else
 			{
-				CompileExpanded<T>(node);
+				CompileAccumulatorExpanded<T>(node);
 			}
 		}
 
 		template<typename T>
-		void IRCompiler::CompileLoop(const nodes::AccumulatorNode<T>& node)
+		void IRCompiler::CompileAccumulatorLoop(const nodes::AccumulatorNode<T>& node)
 		{
 			auto pInput = node.GetInputPorts()[0];
 			auto pOutput = node.GetOutputPorts()[0];
@@ -325,7 +325,7 @@ namespace emll
 		}
 
 		template<typename T>
-		void IRCompiler::CompileExpanded(const nodes::AccumulatorNode<T>& node)
+		void IRCompiler::CompileAccumulatorExpanded(const nodes::AccumulatorNode<T>& node)
 		{
 			auto pInput = node.GetInputPorts()[0];
 			auto pOutput = node.GetOutputPorts()[0];
@@ -358,7 +358,9 @@ namespace emll
 			Variable* pVarOutputBuffer = Variables().AddVariable<VectorVar<T>>(VariableScope::Global, sampleSize);
 			SetVariableFor(pOutput, pVarOutputBuffer);
 			llvm::Value* pOutputBuffer = EnsureEmitted(pVarOutputBuffer);
-
+			//
+			// We implement a delay not as a Shift Register
+			//
 			llvm::Value* pInputBuffer = EnsureEmitted(pInput);
 			_fn.ShiftAndUpdate<T>(pAllWindows, bufferSize, sampleSize, pInputBuffer, pOutputBuffer);
 		}

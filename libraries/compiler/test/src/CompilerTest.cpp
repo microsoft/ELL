@@ -269,7 +269,7 @@ void TestBinaryVector(bool expanded)
 	auto bop2 = mb.Multiply(bop->output, c2->output);
 	auto output = mb.Outputs<double>(bop2->output);
 
-	IRCompiler compiler("EMLL", std::cout);
+	IRCompiler compiler("EMLL");
 	compiler.ShouldUnrollLoops() = expanded;
 	compiler.CompileModel("TestBinaryVector", mb.Model);
 	compiler.DebugDump();
@@ -290,7 +290,7 @@ void TestBinaryScalar()
 	//auto bop2 = mb.Multiply(bop->output, c2->output);
 	auto output = mb.Outputs<double>(bop->output);
 
-	IRCompiler compiler("EMLL", std::cout);
+	IRCompiler compiler("EMLL");
 	compiler.CompileModel("TestBinaryScalar", mb.Model);
 	compiler.DebugDump();
 }
@@ -305,7 +305,7 @@ void TestDotProduct(bool expanded)
 	auto dotProduct = mb.DotProduct<double>(c1->output, input1->output);
 	auto output = mb.Outputs<double>(dotProduct->output);
 
-	IRCompiler compiler("EMLL", std::cout);
+	IRCompiler compiler("EMLL");
 	compiler.ShouldUnrollLoops() = expanded;
 	compiler.CompileModel("TestDotProduct", mb.Model);
 	compiler.DebugDump();
@@ -322,7 +322,7 @@ void TestSum(bool expanded)
 	auto sum = mb.Sum<double>(product->output);
 	auto output = mb.Outputs<double>(sum->output);
 
-	IRCompiler compiler("EMLL", std::cout);
+	IRCompiler compiler("EMLL");
 	compiler.ShouldUnrollLoops() = expanded;
 	compiler.CompileModel("TestSum", mb.Model);
 	compiler.DebugDump();
@@ -339,7 +339,7 @@ void TestAccumulator(bool expanded)
 	auto accumulate = mb.Accumulate<double>(product->output);
 	auto output = mb.Outputs<double>(accumulate->output);
 
-	IRCompiler compiler("EMLL", std::cout);
+	IRCompiler compiler("EMLL");
 	compiler.ShouldUnrollLoops() = expanded;
 	compiler.CompileModel("TestAccumulator", mb.Model);
 	compiler.DebugDump();
@@ -352,7 +352,7 @@ void TestDelay()
 	auto delay = mb.Delay<double>(input1->output, 3);
 	auto output = mb.Outputs<double>(delay->output);
 
-	IRCompiler compiler("EMLL", std::cout);
+	IRCompiler compiler("EMLL");
 	compiler.CompileModel("TestDelay", mb.Model);
 	compiler.DebugDump();
 }
@@ -367,7 +367,7 @@ void TestSlidingAverage()
 	auto avg = mb.Divide<double>(sum->output, dim->output);
 	auto output = mb.Outputs<double>(avg->output);
 
-	IRCompiler compiler("EMLL", std::cout);
+	IRCompiler compiler("EMLL");
 	compiler.CompileModel("TestSlidingAverage", mb.Model);
 
 	auto& module = compiler.Module();

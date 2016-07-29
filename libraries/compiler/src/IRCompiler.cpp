@@ -7,8 +7,8 @@ namespace emll
 {
 	namespace compiler
 	{
-		IRCompiler::IRCompiler(const std::string& moduleName, std::ostream& os)
-			:  _module(_emitter, moduleName), _os(os)
+		IRCompiler::IRCompiler(const std::string& moduleName)
+			:  _module(_emitter, moduleName)
 		{
 		}
 
@@ -17,10 +17,10 @@ namespace emll
 			switch (ModelEx::GetNodeDataType(node))
 			{
 				case model::Port::PortType::Real:
-					Compile<double>(static_cast<const nodes::ConstantNode<double>&>(node));
+					CompileConstant<double>(static_cast<const nodes::ConstantNode<double>&>(node));
 					break;
 				case model::Port::PortType::Integer:
-					Compile<int>(static_cast<const nodes::ConstantNode<int>&>(node));
+					CompileConstant<int>(static_cast<const nodes::ConstantNode<int>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -37,10 +37,10 @@ namespace emll
 			switch (ModelEx::GetNodeDataType(node))
 			{
 				case model::Port::PortType::Real:
-					Compile<double>(static_cast<const model::OutputNode<double>&>(node));
+					CompileOutput<double>(static_cast<const model::OutputNode<double>&>(node));
 					break;
 				case model::Port::PortType::Integer:
-					Compile<int>(static_cast<const model::OutputNode<int>&>(node));
+					CompileOutput<int>(static_cast<const model::OutputNode<int>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -52,10 +52,10 @@ namespace emll
 			switch (ModelEx::GetNodeDataType(node))
 			{
 				case model::Port::PortType::Real:
-					Compile<double>(static_cast<const nodes::BinaryOperationNode<double>&>(node));
+					CompileBinary<double>(static_cast<const nodes::BinaryOperationNode<double>&>(node));
 					break;
 				case model::Port::PortType::Integer:
-					Compile<int>(static_cast<const nodes::BinaryOperationNode<int>&>(node));
+					CompileBinary<int>(static_cast<const nodes::BinaryOperationNode<int>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -67,10 +67,10 @@ namespace emll
 			switch (ModelEx::GetNodeDataType(node))
 			{
 				case model::Port::PortType::Real:
-					Compile<double>(static_cast<const nodes::DotProductNode<double>&>(node));
+					CompileDotProduct<double>(static_cast<const nodes::DotProductNode<double>&>(node));
 					break;
 				case model::Port::PortType::Integer:
-					Compile<int>(static_cast<const nodes::DotProductNode<int>&>(node));
+					CompileDotProduct<int>(static_cast<const nodes::DotProductNode<int>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -82,10 +82,10 @@ namespace emll
 			switch (ModelEx::GetNodeDataType(node))
 			{
 				case model::Port::PortType::Real:
-					Compile<double>(static_cast<const nodes::SumNode<double>&>(node));
+					CompileSum<double>(static_cast<const nodes::SumNode<double>&>(node));
 					break;
 				case model::Port::PortType::Integer:
-					Compile<int>(static_cast<const nodes::SumNode<int>&>(node));
+					CompileSum<int>(static_cast<const nodes::SumNode<int>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -97,10 +97,10 @@ namespace emll
 			switch (ModelEx::GetNodeDataType(node))
 			{
 				case model::Port::PortType::Real:
-					Compile<double>(static_cast<const nodes::AccumulatorNode<double>&>(node));
+					CompileAccumulator<double>(static_cast<const nodes::AccumulatorNode<double>&>(node));
 					break;
 				case model::Port::PortType::Integer:
-					Compile<int>(static_cast<const nodes::AccumulatorNode<int>&>(node));
+					CompileAccumulator<int>(static_cast<const nodes::AccumulatorNode<int>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -124,14 +124,21 @@ namespace emll
 
 		void IRCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
 		{			
+			EndFunction();
+			
+			_locals.Clear();  // Only locals can be reused. 
+
 			_fn = _module.Function(functionName, ValueType::Void, args, true);
 			RegisterFunctionArgs(args);
 		}
 
 		void IRCompiler::EndFunction()
 		{
-			_fn.Ret();
-			_fn.Verify();
+			if (_fn.Function() != nullptr)
+			{
+				_fn.Ret();
+				_fn.Verify();
+			}
 		}
 
 		llvm::Value* IRCompiler::GetEmittedVariable(const VariableScope scope, const std::string& name)
@@ -476,7 +483,7 @@ namespace emll
 		}
 
 		template<>
-		OperatorType IRCompiler::GetOperator<double>(const nodes::BinaryOperationNode<double>& node)
+		OperatorType IRCompiler::GetOperator<double>(const nodes::BinaryOperationNode<double>& node) const
 		{
 			using Bop = nodes::BinaryOperationNode<double>;
 			switch (node.GetOperation())
@@ -495,21 +502,21 @@ namespace emll
 		}
 
 		template<>
-		OperatorType IRCompiler::GetOperator<int>(const nodes::BinaryOperationNode<int>& node)
+		OperatorType IRCompiler::GetOperator<int>(const nodes::BinaryOperationNode<int>& node) const
 		{
 			using Bop = nodes::BinaryOperationNode<int>;
 			switch (node.GetOperation())
 			{
-			case Bop::OperationType::add:
-				return OperatorType::Add;
-			case Bop::OperationType::subtract:
-				return OperatorType::Subtract;
-			case Bop::OperationType::coordinatewiseMultiply:
-				return OperatorType::Multiply;
-			case Bop::OperationType::divide:
-				return OperatorType::DivideS;
-			default:
-				throw new CompilerException(CompilerError::operationTypeNotSupported);
+				case Bop::OperationType::add:
+					return OperatorType::Add;
+				case Bop::OperationType::subtract:
+					return OperatorType::Subtract;
+				case Bop::OperationType::coordinatewiseMultiply:
+					return OperatorType::Multiply;
+				case Bop::OperationType::divide:
+					return OperatorType::DivideS;
+				default:
+					throw new CompilerException(CompilerError::operationTypeNotSupported);
 			}
 		}
 
@@ -517,5 +524,15 @@ namespace emll
 		{
 			_module.Dump();
 		}
+
+		void IRCompiler::WriteAsmToFile(const std::string& name)
+		{
+			_module.WriteAsmToFile(name);
+		}
+		void IRCompiler::WriteBitcodeToFile(const std::string& name)
+		{
+			_module.WriteBitcodeToFile(name);
+		}
+
 	}
 }
