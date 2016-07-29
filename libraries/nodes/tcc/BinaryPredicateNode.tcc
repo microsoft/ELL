@@ -36,8 +36,14 @@ namespace nodes
         std::vector<bool> output;
         switch (_predicate)
         {
-            case PredicateType::lessThanOrEqual:
-                output = ComputeOutput([](ValueType x, ValueType y) { return x <= y; });
+            case PredicateType::equal:
+                output = ComputeOutput([](ValueType x, ValueType y) { return x == y; });
+                break;
+            case PredicateType::less:
+                output = ComputeOutput([](ValueType x, ValueType y) { return x < y; });
+                break;
+            case PredicateType::greater:
+                output = ComputeOutput([](ValueType x, ValueType y) { return x > y; });
                 break;
             default:
                 throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown predicate type");

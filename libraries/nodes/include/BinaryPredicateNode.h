@@ -38,7 +38,9 @@ namespace nodes
         /// <summary> Types of coordinatewise operations supported by this node type. </summary>
         enum class PredicateType
         {
-            lessThanOrEqual
+            equal,
+            less,
+            greater
         };
 
         /// <summary> Constructor. </summary>

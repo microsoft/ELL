@@ -32,7 +32,7 @@ namespace nodes
         auto thresholdNode = model.AddNode<ConstantNode<double>>(rule.GetThreshold());
 
         // create a lessThanOrEqual predicate that implements the split rule
-        auto binaryPredicateNode = model.AddNode<BinaryPredicateNode<double>>(element, thresholdNode->output, BinaryPredicateNode<double>::PredicateType::lessThanOrEqual);
+        auto binaryPredicateNode = model.AddNode<BinaryPredicateNode<double>>(element, thresholdNode->output, BinaryPredicateNode<double>::PredicateType::greater);
         return{ binaryPredicateNode->output };
     }
 }
