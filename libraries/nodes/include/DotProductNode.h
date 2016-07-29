@@ -54,8 +54,8 @@ namespace nodes
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(model::ModelTransformer& transformer) const override;
 
-        static constexpr char* inputPortName = "input";
-        static constexpr char* outputPortName = "output";
+        static constexpr const char* inputPortName = "input";
+        static constexpr const char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

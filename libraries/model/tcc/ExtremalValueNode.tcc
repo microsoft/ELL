@@ -39,19 +39,19 @@ namespace model
     template <typename ValueType>
     void ArgMinNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newOutputPortElements = transformer.TransformOutputPortElements(this->_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<ArgMinNode<ValueType>>(newOutputPortElements);
-        transformer.MapOutputPort(val, newNode->val);
-        transformer.MapOutputPort(argVal, newNode->argVal);
+        transformer.MapOutputPort(this->val, newNode->val);
+        transformer.MapOutputPort(this->argVal, newNode->argVal);
     }
 
     template <typename ValueType>
     void ArgMaxNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newOutputPortElements = transformer.TransformOutputPortElements(this->_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<ArgMaxNode<ValueType>>(newOutputPortElements);
-        transformer.MapOutputPort(val, newNode->val);
-        transformer.MapOutputPort(argVal, newNode->argVal);
+        transformer.MapOutputPort(this->val, newNode->val);
+        transformer.MapOutputPort(this->argVal, newNode->argVal);
     }
 
 }
