@@ -88,14 +88,14 @@ namespace model
 
     OutputPortRange OutputPortElementsUntyped::GetElement(size_t index) const
     {
-        size_t rangeFirstIndex = 0;
+        size_t sumRangeSizesSoFar = 0;
         for (const auto& range : _ranges)
         {
-            if (index < rangeFirstIndex + range.Size())
+            if (index < sumRangeSizesSoFar + range.Size())
             {
-                return OutputPortRange(*range.ReferencedPort(), index - rangeFirstIndex, 1);
+                return OutputPortRange(*range.ReferencedPort(), range.GetStartIndex() + index - sumRangeSizesSoFar, 1);
             }
-            rangeFirstIndex += range.Size();
+            sumRangeSizesSoFar += range.Size();
         }
         throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds OutputPortElements range");
     }
