@@ -11,49 +11,78 @@
 namespace utilities
 {
     //
-    // SimpleJsonSerializer
+    // Serialization
     //
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleJsonSerializer::SerializeScalar(const char* name, const ValueType& value)
+    void SimpleJsonSerializer::WriteScalar(const char* name, const ValueType& value)
     {
         using std::to_string;
-        if (name == std::string(""))
+        auto indent = GetCurrentIndent();
+        bool hasName = name != std::string("");
+        auto endOfLine = hasName ? "\n" : "";
+
+        std::cout << indent;
+        if (hasName)
         {
-            std::cout << to_string(value);
+            std::cout << name << ": ";
         }
-        else
-        {
-            std::cout << name << ": " << to_string(value) << std::endl;
-        }
+        std::cout << to_string(value) << endOfLine;
     }
 
-    inline void SimpleJsonSerializer::SerializeScalar(const char* name, std::string value)
+    // This function is inline just so it appears next to the other Write* functions
+    inline void SimpleJsonSerializer::WriteScalar(const char* name, const std::string& value)
     {
-        using std::to_string;
-        if (name == std::string(""))
+        auto indent = GetCurrentIndent();
+        bool hasName = name != std::string("");
+        auto endOfLine = hasName ? "\n" : "";
+
+        std::cout << indent;
+        if (hasName)
         {
-            std::cout << "\"" << value << "\"";
+            std::cout << name << ": ";
         }
-        else
-        {
-            std::cout << name << ": \"" << value << "\"" << std::endl;
-        }
+        std::cout << "\"" << value << "\"" << endOfLine;
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleJsonSerializer::SerializeArray(const char* name, const std::vector<ValueType>& array)
+    void SimpleJsonSerializer::WriteArray(const char* name, const std::vector<ValueType>& array)
     {
-        if (name != std::string(""))
+        bool hasName = name != std::string("");
+        auto indent = GetCurrentIndent();
+        auto endOfLine = "\n";
+
+        std::cout << indent;
+        if (hasName)
         {
             std::cout << name << ": ";
         }
 
         std::cout << "[";
+        // reset indent
         for (const auto& item : array)
         {
             Serialize(item);
             std::cout << ", ";
         }
-        std::cout << "]" << std::endl;
+        // reset indent
+        std::cout << "]" << endOfLine;
+    }
+
+    //
+    // Deserialization
+    //
+    template <typename ValueType, IsFundamental<ValueType> concept>
+    void SimpleJsonSerializer::ReadScalar(const char* name, ValueType& value)
+    {
+    }
+
+    // This function is inline just so it appears next to the other Read* functions
+    inline void SimpleJsonSerializer::ReadScalar(const char* name, std::string& value) 
+    {        
+    }
+
+    template <typename ValueType, IsFundamental<ValueType> concept>
+    void SimpleJsonSerializer::ReadArray(const char* name, std::vector<ValueType>& array)
+    {
     }
 }

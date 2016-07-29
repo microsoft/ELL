@@ -32,7 +32,7 @@ namespace utilities
     // {
     //     std::cout << "Vector" << std::endl;
     //     SerializeValue(name, value);
-    // 
+    //
 
     template <typename ValueType, IsFundamental<ValueType> concept>
     void Serializer::Serialize(const char* name, const std::vector<ValueType>& array)
@@ -45,7 +45,7 @@ namespace utilities
     void Serializer::Serialize(const char* name, const std::vector<ValueType>& array)
     {
         std::vector<const utilities::ISerializable*> tmpArray;
-        for(const auto& item: array)
+        for (const auto& item : array)
         {
             tmpArray.push_back(&item);
         }
@@ -62,5 +62,15 @@ namespace utilities
             tmpArray.push_back(item);
         }
         SerializeArrayValue(name, tmpArray);
+    }
+
+    //
+    // Deserialization
+    //
+
+    template <typename ValueType>
+    void Serializer::Deserialize(ValueType&& value)
+    {
+        Deserialize("", value);
     }
 }

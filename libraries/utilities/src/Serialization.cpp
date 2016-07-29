@@ -16,11 +16,8 @@
 
 namespace utilities
 {
-#define IMPLEMENT_FUNDAMENTAL_SERIALIZE(base, type)     void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { SerializeScalar(name,value); }
-#define IMPLEMENT_FUNDAMENTAL_ARRAY_SERIALIZE(base, type)     void base::SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { SerializeArray(name,value); }
-
     //
-    // Serializer base class
+    // Serialization
     //
     void Serializer::SerializeValue(const char* name, const ISerializable& value)
     {
@@ -31,9 +28,32 @@ namespace utilities
 
     void Serializer::BeginSerializeObject(const char* name, const ISerializable& value)
     {
+        // nothing
     }
 
     void Serializer::EndSerializeObject(const char* name, const ISerializable& value)
     {
+        // nothing
+    }
+
+
+    //
+    // Deserialization
+    //
+    void Serializer::DeserializeValue(const char* name, const ISerializable& value)
+    {
+        BeginDeserializeObject(name, value);
+        DeserializeObject(name, value);
+        EndDeserializeObject(name, value);
+    }
+
+    void Serializer::BeginDeserializeObject(const char* name, const ISerializable& value)
+    {
+        // nothing
+    }
+
+    void Serializer::EndDeserializeObject(const char* name, const ISerializable& value)
+    {
+        // nothing
     }
 }
