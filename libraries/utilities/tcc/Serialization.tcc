@@ -69,7 +69,7 @@ namespace utilities
     //
 
     template <typename ValueType>
-    void Serializer::Deserialize(ValueType&& value)
+    void Deserializer::Deserialize(ValueType&& value)
     {
         Deserialize("", value);
     }

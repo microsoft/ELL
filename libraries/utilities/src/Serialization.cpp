@@ -40,19 +40,19 @@ namespace utilities
     //
     // Deserialization
     //
-    void Serializer::DeserializeValue(const char* name, const ISerializable& value)
+    void Deserializer::DeserializeValue(const char* name, ISerializable& value)
     {
         BeginDeserializeObject(name, value);
         DeserializeObject(name, value);
         EndDeserializeObject(name, value);
     }
 
-    void Serializer::BeginDeserializeObject(const char* name, const ISerializable& value)
+    void Deserializer::BeginDeserializeObject(const char* name, ISerializable& value)
     {
         // nothing
     }
 
-    void Serializer::EndDeserializeObject(const char* name, const ISerializable& value)
+    void Deserializer::EndDeserializeObject(const char* name, ISerializable& value)
     {
         // nothing
     }

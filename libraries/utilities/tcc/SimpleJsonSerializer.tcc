@@ -76,7 +76,7 @@ namespace utilities
     // split on: whitepace, comma, colon, square brackets, curly brackets, quotes
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleJsonSerializer::ReadScalar(const char* name, ValueType& value)
+    void SimpleJsonDeserializer::ReadScalar(const char* name, ValueType& value)
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -89,7 +89,7 @@ namespace utilities
     }
 
     // This function is inline just so it appears next to the other Read* functions
-    inline void SimpleJsonSerializer::ReadScalar(const char* name, std::string& value) 
+    inline void SimpleJsonDeserializer::ReadScalar(const char* name, std::string& value) 
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -104,7 +104,7 @@ namespace utilities
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleJsonSerializer::ReadArray(const char* name, std::vector<ValueType>& array)
+    void SimpleJsonDeserializer::ReadArray(const char* name, std::vector<ValueType>& array)
     {
         bool hasName = name != std::string("");
         if(hasName)

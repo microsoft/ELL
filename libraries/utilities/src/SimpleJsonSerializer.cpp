@@ -19,8 +19,9 @@ namespace utilities
 {
 #define IMPLEMENT_SERIALIZE_VALUE(base, type)     void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name,value); }
 #define IMPLEMENT_SERIALIZE_ARRAY_VALUE(base, type)     void base::SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name,value); }
-#define IMPLEMENT_DESERIALIZE_VALUE(base, type)     void base::DeserializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name,value); }
-#define IMPLEMENT_DESERIALIZE_ARRAY_VALUE(base, type)     void base::DeserializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name,value); }
+
+#define IMPLEMENT_DESERIALIZE_VALUE(base, type)     void base::DeserializeValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name,value); }
+#define IMPLEMENT_DESERIALIZE_ARRAY_VALUE(base, type)     void base::DeserializeArrayValue(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name,value); }
 
     //
     // Serialization
@@ -98,44 +99,44 @@ namespace utilities
     //
     // Serialization
     //
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonSerializer, bool);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonSerializer, char);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonSerializer, short);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonSerializer, int);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonSerializer, size_t);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonSerializer, float);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonSerializer, double);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, bool);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, char);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, short);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, int);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, size_t);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, float);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, double);
     
     // strings
-    void SimpleJsonSerializer::DeserializeValue(const char* name, std::string value)
+    void SimpleJsonDeserializer::DeserializeValue(const char* name, std::string& value)
     {
     }
 
     // ISerializable
-    void SimpleJsonSerializer::BeginDeserializeObject(const char* name, const ISerializable& value)
+    void SimpleJsonDeserializer::BeginDeserializeObject(const char* name, ISerializable& value)
     {
     }
 
-    void SimpleJsonSerializer::DeserializeObject(const char* name, const ISerializable& value)
+    void SimpleJsonDeserializer::DeserializeObject(const char* name, ISerializable& value)
     {
     }
 
-    void SimpleJsonSerializer::EndDeserializeObject(const char* name, const ISerializable& value)
+    void SimpleJsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value)
     {
     }
 
     //
     // Arrays
     //
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, bool);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, char);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, short);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, int);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, size_t);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, float);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, double);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, bool);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, char);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, short);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, int);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, size_t);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, float);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, double);
 
-    void SimpleJsonSerializer::DeserializeArrayValue(const char* name, const std::vector<const ISerializable*>& array)
+    void SimpleJsonDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array)
     {
     }
 }
