@@ -74,7 +74,6 @@ namespace nodes
         predictors::SimpleForestPredictor _forest;
     };
 
-
     /// <summary> A struct that represents the outputs of a linear predictor sub-model. </summary>
     struct SimpleForestSubModelOutputs
     {

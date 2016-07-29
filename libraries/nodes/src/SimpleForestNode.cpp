@@ -41,6 +41,7 @@ namespace nodes
         auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newOutputs = BuildSubModel(_forest, transformer.GetModel(), newOutputPortElements);
         transformer.MapOutputPort(prediction, newOutputs.prediction);
+        // TODO: we need the transformer to support OutputPortElements
         //       transformer.MapOutputPort(treeOutputs, newOutputs.treeOutputs);
         //       transformer.MapOutputPort(edgeIndicatorVector, newOutputs.edgeIndicatorVector);
     }
@@ -66,45 +67,60 @@ namespace nodes
     SimpleForestSubModelOutputs BuildSubModel(const predictors::SimpleForestPredictor& forest, model::Model& model, const model::OutputPortElements<double>& outputPortElements) // call the last argument "inputs" or something like that
     {
         const auto& interiorNodes = forest.GetInteriorNodes();
-        std::vector<model::OutputPortRange> interiorNodeOutputs(interiorNodes.size());
 
+        // create a place to store references to the output ports of the sub-models at each interior node
+        // TODO: this should be a vector of OutputPortElements and not OutputPortRange -it is currently a vector of Ranges because I need to AddRange them
+        std::vector<model::OutputPortRange> interiorNodeSubModels(interiorNodes.size());
+
+        // visit interior nodes bottom-up (in reverse topological order)
         for(size_t i = interiorNodes.size(); i > 0; --i)
         {
-            const auto& node = interiorNodes[i-1];
-            const auto& edges = node.GetOutgoingEdges();
+            const auto& edges = interiorNodes[i - 1].GetOutgoingEdges();
 
+            // get the sub-model that represents each outgoing edge
+            // TODO: why is this an OutputPortElements, while interiorNodeSubModels is a vector?
             model::OutputPortElements<double> edgeOutputs;
             for(size_t j = 0; j < edges.size(); ++j)
             {
                 const auto& edgePredictor = edges[j].GetPredictor();
-                auto edgePredictorNodeOutputs = BuildSubModel(edgePredictor, model, outputPortElements);
+                auto edgePredictorSubModel = BuildSubModel(edgePredictor, model, outputPortElements);
 
-                if(edges[j].IsTargetInterior()) // has subtree
+                if(edges[j].IsTargetInterior()) // target node is itself an interior node: reverse topological order guarantees that it's already visited
                 {
+                    // TODO: the following 3 lines should be one clean line - there are currently 3 because interiorNodeSubModels had to be an array of Ranges
                     model::OutputPortElements<double> elements;
-                    elements.AddRange(interiorNodeOutputs[edges[j].GetTargetNodeIndex()]);
+                    auto targetNodeSubModelOutputs = interiorNodeSubModels[edges[j].GetTargetNodeIndex()];
+                    elements.AddRange(targetNodeSubModelOutputs);
 
-                    auto sumNode = model.AddNode<BinaryOperationNode<double>>(edgePredictorNodeOutputs.output, elements, BinaryOperationNode<double>::OperationType::add);
+                    auto sumNode = model.AddNode<BinaryOperationNode<double>>(edgePredictorSubModel.output, elements, BinaryOperationNode<double>::OperationType::add);
                     edgeOutputs.AddRange(sumNode->output);
                 }
-                else // leaf
+                else // target node is a leaf
                 {
-                    edgeOutputs.AddRange(edgePredictorNodeOutputs.output);
+                    edgeOutputs.AddRange(edgePredictorSubModel.output);
                 }
             }
 
-            auto splitRuleSubModelOutputs = BuildSubModel(node.GetSplitRule(), model, outputPortElements);
-            auto selectorNode = model.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleSubModelOutputs.output);
-            interiorNodeOutputs[i-1] = selectorNode->output;
+            // add the sub-model that computes the split rule
+            auto splitRuleSubModel = BuildSubModel(interiorNodes[i - 1].GetSplitRule(), model, outputPortElements);
+            auto selectorNode = model.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleSubModel.output);
+            interiorNodeSubModels[i-1] = selectorNode->output;
         }
 
-        model::OutputPortElements<double> treeOutputs;
+        // collect the sub-models that represent the trees of the forest
+        // TODO: why is this an OutputPortElements, while interiorNodeSubModels is a vector?
+        model::OutputPortElements<double> treeSubModels;
         for(size_t rootIndex : forest.GetRootIndices())
         {
-            treeOutputs.AddRange(interiorNodeOutputs[rootIndex]);
+            treeSubModels.AddRange(interiorNodeSubModels[rootIndex]);
         }
 
-        auto sumNode = model.AddNode<SumNode<double>>(treeOutputs);
+        // add the bias term
+        auto biasNode = model.AddNode<ConstantNode<double>>(forest.GetBias());
+        treeSubModels.AddRange(biasNode->output);
+
+        // sum all of the trees
+        auto sumNode = model.AddNode<SumNode<double>>(treeSubModels);
         
         return { 
             sumNode->output
