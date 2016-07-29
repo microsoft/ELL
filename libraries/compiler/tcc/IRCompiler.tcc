@@ -50,7 +50,7 @@ namespace emll
 				break;
 
 			default:
-				throw new CompilerException(CompilerError::variableTypeNotSupported);
+				throw new CompilerException(CompilerError::variableScopeNotSupported);
 			}
 			return pVal;
 		}
@@ -77,7 +77,7 @@ namespace emll
 				_globals.Set(var.EmittedName(), pVal);
 				break;
 			default:
-				throw new CompilerException(CompilerError::variableTypeNotSupported);
+				throw new CompilerException(CompilerError::variableScopeNotSupported);
 			}
 			assert(pVal != nullptr);
 			return pVal;

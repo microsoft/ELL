@@ -310,7 +310,7 @@ namespace emll
 			llvm::Function* pfn = Module()->getFunction(name);
 			if (pfn == nullptr)
 			{
-				throw new CompilerException(CompilerError::FunctionNotFound);
+				throw new CompilerException(CompilerError::functionNotFound);
 			}
 			return pfn;
 		}

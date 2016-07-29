@@ -82,7 +82,7 @@ namespace emll
 				}
 				else
 				{
-					throw new CompilerException(CompilerError::nodeTypeNotSupported);
+					throw new CompilerException(CompilerError::modelNodeTypeNotSupported);
 				}
 
 			});

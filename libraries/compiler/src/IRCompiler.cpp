@@ -287,7 +287,7 @@ namespace emll
 			{
 				if (elt.GetIndex() > 0)
 				{
-					throw new CompilerException(CompilerError::variableIsNotVector);
+					throw new CompilerException(CompilerError::vectorVariableExpected);
 				}
 				if (pVar->IsLiteral())
 				{
@@ -337,7 +337,7 @@ namespace emll
 				case Bop::OperationType::divide:
 					return OperatorType::DivideF;
 				default:
-					throw new CompilerException(CompilerError::operationTypeNotSupported);
+					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
 			}
 		}
 
@@ -356,7 +356,7 @@ namespace emll
 				case Bop::OperationType::divide:
 					return OperatorType::DivideS;
 				default:
-					throw new CompilerException(CompilerError::operationTypeNotSupported);
+					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
 			}
 		}
 

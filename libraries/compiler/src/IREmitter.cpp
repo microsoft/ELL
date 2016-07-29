@@ -43,7 +43,7 @@ namespace emll
 			case ValueType::PChar8:
 				return GetValueType(ValueType::Char8)->getPointerTo();
 			default:
-				throw new CompilerException(CompilerError::InvalidValueType);
+				throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 		}
 
@@ -192,7 +192,7 @@ namespace emll
 				case OperatorType::DivideF:
 					return _builder.CreateFDiv(pLVal, pRVal, varName);
 				default:
-					throw new CompilerException(CompilerError::InvalidOperatorType);
+					throw new CompilerException(CompilerError::operatorTypeNotSupported);
 			}
 		}
 
@@ -226,7 +226,7 @@ namespace emll
 				case ComparisonType::GteF:
 					return _builder.CreateFCmpOGE(pLVal, pRVal);
 				default:
-					throw new CompilerException(CompilerError::InvalidComparisonType);
+					throw new CompilerException(CompilerError::comparisonTypeNotSupported);
 			}
 		}
 
@@ -463,22 +463,22 @@ namespace emll
 		{
 			switch (type)
 			{
-			case ValueType::Void:
-				return _builder.getVoidTy();
-			case ValueType::Byte:
-				return _builder.getInt8Ty();
-			case ValueType::Short:
-				return _builder.getInt16Ty();
-			case ValueType::Int32:
-				return _builder.getInt32Ty();
-			case ValueType::Int64:
-				return _builder.getInt64Ty();
-			case ValueType::Double:
-				return _builder.getDoubleTy();
-			case ValueType::Char8:
-				return _builder.getInt8Ty();
-			default:
-				throw new CompilerException(CompilerError::InvalidValueType);
+				case ValueType::Void:
+					return _builder.getVoidTy();
+				case ValueType::Byte:
+					return _builder.getInt8Ty();
+				case ValueType::Short:
+					return _builder.getInt16Ty();
+				case ValueType::Int32:
+					return _builder.getInt32Ty();
+				case ValueType::Int64:
+					return _builder.getInt64Ty();
+				case ValueType::Double:
+					return _builder.getDoubleTy();
+				case ValueType::Char8:
+					return _builder.getInt8Ty();
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 		}
 
@@ -499,7 +499,7 @@ namespace emll
 			case ValueType::Char8:
 				return 8;
 			default:
-				throw new CompilerException(CompilerError::InvalidValueType);
+				throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 		}
 
@@ -540,7 +540,7 @@ namespace emll
 			llvm::Function* pfn = llvm::Function::Create(pTypeDef, linkage, name, pModule);
 			if (pfn == nullptr)
 			{
-				throw new CompilerException(CompilerError::InvalidFunction);
+				throw new CompilerException(CompilerError::functionNotFound);
 			}
 			return pfn;
 		}

@@ -65,7 +65,7 @@ namespace emll
 			llvm::Function* pfn = _emitter.Function(Module(), name, returnType, Linkage(isPublic), args);
 			if (pfn == nullptr)
 			{
-				throw new CompilerException(CompilerError::InvalidFunction);
+				throw new CompilerException(CompilerError::functionNotFound);
 			}
 			BeginFunction(pfn);
 			return IRFunctionEmitter(&_emitter, pfn);
@@ -93,7 +93,7 @@ namespace emll
 			llvm::Function* pfn = _emitter.Function(Module(), name, returnType, Linkage(isPublic), pArgs);
 			if (pfn == nullptr)
 			{
-				throw new CompilerException(CompilerError::InvalidFunction);
+				throw new CompilerException(CompilerError::functionNotFound);
 			}
 			BeginFunction(pfn);
 			return IRFunctionEmitter(&_emitter, pfn);
@@ -143,7 +143,7 @@ namespace emll
 				Module()->print(out.os(), nullptr);
 			}
 			if (out.os().has_error()) {
-				throw new CompilerException(CompilerError::WriteStreamFailed);
+				throw new CompilerException(CompilerError::writeStreamFailed);
 			}
 			out.keep();
 		}
