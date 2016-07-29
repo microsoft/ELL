@@ -71,18 +71,50 @@ namespace utilities
     //
     // Deserialization
     //
+
+    // TODO: make simple simple tokenizer that splits based on simple patterns
+    // split on: whitepace, comma, colon, square brackets, curly brackets, quotes
+
     template <typename ValueType, IsFundamental<ValueType> concept>
     void SimpleJsonSerializer::ReadScalar(const char* name, ValueType& value)
     {
+        bool hasName = name != std::string("");
+        if(hasName)
+        {
+            // match name
+            // match ':'
+        }
+
+        // read string
     }
 
     // This function is inline just so it appears next to the other Read* functions
     inline void SimpleJsonSerializer::ReadScalar(const char* name, std::string& value) 
-    {        
+    {
+        bool hasName = name != std::string("");
+        if(hasName)
+        {
+            // match name
+            // match ':'
+        }
+
+        // match "
+        // read string
+        // match "
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
     void SimpleJsonSerializer::ReadArray(const char* name, std::vector<ValueType>& array)
     {
+        bool hasName = name != std::string("");
+        if(hasName)
+        {
+            // match name
+            // match ':'
+        }
+
+        // match [
+        // read contents
+        // match ]
     }
 }

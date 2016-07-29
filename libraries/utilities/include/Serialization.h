@@ -29,15 +29,21 @@ namespace utilities
         virtual ~SerializationContext() = default;
     };
 
-
+    // TODO: put all this stuff somewhere else
     template <typename ValueType>
     class is_vector
     {
         template <typename VectorType>
-        static constexpr bool is_vector_checker(typename VectorType::value_type*, typename std::enable_if_t<std::is_base_of<VectorType, typename std::vector<typename VectorType::value_type>>::value, int> = 0) { return true; }
+        static constexpr bool is_vector_checker(typename VectorType::value_type*, typename std::enable_if_t<std::is_base_of<VectorType, typename std::vector<typename VectorType::value_type>>::value, int> = 0)
+        {
+            return true;
+        }
 
         template <typename VectorType>
-        static constexpr bool is_vector_checker(...) { return false; }
+        static constexpr bool is_vector_checker(...)
+        {
+            return false;
+        }
 
     public:
         static const bool value = is_vector_checker<ValueType>(0);
@@ -71,7 +77,6 @@ namespace utilities
 #define DECLARE_DESERIALIZE_VALUE_BASE(type) virtual void DeserializeValue(const char* name, type value, IsFundamental<type> dummy = 0) = 0;
 #define DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(type) virtual void DeserializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) = 0;
 
-
 #define DECLARE_SERIALIZE_VALUE_OVERRIDE(type) virtual void SerializeValue(const char* name, type value, IsFundamental<type> dummy = 0) override;
 #define DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(type) virtual void SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) override;
 #define DECLARE_DESERIALIZE_VALUE_OVERRIDE(type) virtual void DeserializeValue(const char* name, type value, IsFundamental<type> dummy = 0) override;
@@ -92,17 +97,14 @@ namespace utilities
         template <typename ValueType, IsNotVector<ValueType> concept = 0>
         void Serialize(const char* name, ValueType&& value);
 
-        template <typename ValueType, IsFundamental<ValueType> concept=0>
+        template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void Serialize(const char* name, const std::vector<ValueType>& value);
 
-        template <typename ValueType, IsSerializable<ValueType> concept=0>
+        template <typename ValueType, IsSerializable<ValueType> concept = 0>
         void Serialize(const char* name, const std::vector<ValueType>& value);
 
-        template <typename ValueType, IsSerializable<ValueType> concept=0>
+        template <typename ValueType, IsSerializable<ValueType> concept = 0>
         void Serialize(const char* name, const std::vector<const ValueType*>& value);
-
-        // template <typename ValueType>
-        // void Serialize(const char* name, const std::vector<ValueType&&>& value);
 
         //
         // Deserialization
@@ -114,15 +116,14 @@ namespace utilities
         template <typename ValueType, IsNotVector<ValueType> concept = 0>
         void Deserialize(const char* name, ValueType&& value);
 
-        template <typename ValueType, IsFundamental<ValueType> concept=0>
+        template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void Deserialize(const char* name, const std::vector<ValueType>& value);
 
-        template <typename ValueType, IsSerializable<ValueType> concept=0>
+        template <typename ValueType, IsSerializable<ValueType> concept = 0>
         void Deserialize(const char* name, const std::vector<ValueType>& value);
 
-        template <typename ValueType, IsSerializable<ValueType> concept=0>
+        template <typename ValueType, IsSerializable<ValueType> concept = 0>
         void Deserialize(const char* name, const std::vector<const ValueType*>& value);
-
 
     protected:
         // TODO: Instead of having all these different overloads, we could possibly have SerializeVariant(const Variant& value) be the
@@ -185,27 +186,6 @@ namespace utilities
         virtual void BeginDeserializeObject(const char* name, const ISerializable& value);
         virtual void DeserializeObject(const char* name, const ISerializable& value) = 0;
         virtual void EndDeserializeObject(const char* name, const ISerializable& value);
-        // template<typename BaseType>
-        // void Deserialize(const char* name, std::unique_ptr<BaseType>& value);
-
-        // template<typename BaseType>
-        // void Deserialize(const char* name, std::unique_ptr<BaseType>& value, const TypeFactory<BaseType>& factory);
-
-
-        // template<typename BaseType>
-        // void Deserialize(const char* name, std::vector<std::unique_ptr<BaseType>>& value);
-
-        // template<typename BaseType>
-        // void Deserialize(const char* name, std::vector<std::unique_ptr<BaseType>>& value, const TypeFactory<BaseType>& factory);
-
-        // template<typename ElementType>
-        // void Deserialize(const char* name, std::vector<ElementType>& value);
-
-        // void Deserialize(const char* name, std::string& value);
-
-        // template <typename ValueType, IsClass<ValueType> concept = 0>
-        // void Deserialize(const char* name, ValueType& value);
-
     };
 }
 
