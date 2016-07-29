@@ -20,7 +20,7 @@ namespace nodes
 
     template <typename ValueType>
     template <typename Operation>
-    std::vector<ValueType> BinaryPredicateNode<ValueType>::ComputeOutput(Operation&& fn) const
+    std::vector<bool> BinaryPredicateNode<ValueType>::ComputeOutput(Operation&& fn) const
     {
         auto output = std::vector<bool>(_input1.Size());
         for (size_t index = 0; index < _input1.Size(); index++)
@@ -33,8 +33,8 @@ namespace nodes
     template <typename ValueType>
     void BinaryPredicateNode<ValueType>::Compute() const
     {
-        std::vector<ValueType> output;
-        switch (_operation)
+        std::vector<bool> output;
+        switch (_predicate)
         {
             case PredicateType::lessThanOrEqual:
                 output = ComputeOutput([](ValueType x, ValueType y) { return x <= y; });

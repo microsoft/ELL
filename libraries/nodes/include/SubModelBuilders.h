@@ -37,7 +37,7 @@ namespace nodes
     /// <summary> A struct that represents the outputs of a constant predictor sub-model. </summary>
     struct SingleInputThresholdRuleSubModelOutputs
     {
-        const model::OutputPort<int>& output;
+        const model::OutputPort<bool>& output;
     };
 
     /// <summary> Builds a part of the model that represents a single-element treshold rule. </summary>

@@ -10,6 +10,9 @@
 #include "ConstantNode.h"
 #include "BinaryPredicateNode.h"
 
+// model
+#include "OutputPortElements.h"
+
 namespace nodes
 {
     ConstantPredictorSubModelOutputs BuildSubModel(const predictors::ConstantPredictor& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
@@ -18,17 +21,18 @@ namespace nodes
         return{ constantNode->output };
     }
 
-    SingleInputThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleInputThresholdRule& rule, model::Model & model, const model::OutputPortElements<double>& outputPortElements)
+    SingleInputThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleInputThresholdRule& rule, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
     {
-        // get the single feature
-        
-        // get the threshold
-        rule.
+        // get the element index
+        size_t elementIndex = rule.GetElementIndex();
+        //model::OutputPortElements<double> element = { outputPortElements, elementIndex };
+        model::OutputPortElements<double> element;
 
+        // get the threshold .
+        auto thresholdNode = model.AddNode<ConstantNode<double>>(rule.GetThreshold());
+        auto binaryPredicateNode = model.AddNode<BinaryPredicateNode<double>>(element, thresholdNode->output, BinaryPredicateNode<double>::PredicateType::lessThanOrEqual);
 
-
-        auto binaryPredicateNode = model.AddNode<BinaryPredicateNode<double>>
-        return SingleInputThresholdRuleSubModelOutputs();
+        return{ binaryPredicateNode->output };
     }
 
     // add BinaryPredicateNode with operation less than

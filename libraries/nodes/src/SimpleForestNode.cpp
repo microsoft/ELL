@@ -93,10 +93,8 @@ namespace nodes
                 }
             }
 
-            auto splitRuleNode = model.AddNode<ConstantNode<bool>>(false);
-
-            const auto& splitRule = node.GetSplitRule(); // TODO
-            auto selectorNode = model.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleNode->output);
+            auto splitRuleSubModelOutputs = BuildSubModel(node.GetSplitRule(), model, outputPortElements);
+            auto selectorNode = model.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleSubModelOutputs.output);
             interiorNodeOutputs[i-1] = selectorNode->output;
         }
 

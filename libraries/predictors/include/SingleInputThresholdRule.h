@@ -23,8 +23,10 @@ namespace predictors
         /// <param name="threshold"> The threshold. </param>
         SingleInputThresholdRule(size_t index = 0, double threshold = 0.0);
 
-
-        size_t GetElementIndex() const (return _index;)
+        /// <summary> Gets element index. </summary>
+        ///
+        /// <returns> The element index. </returns>
+        size_t GetElementIndex() const { return _index; }
 
         /// <summary> Gets the threshold. </summary>
         ///

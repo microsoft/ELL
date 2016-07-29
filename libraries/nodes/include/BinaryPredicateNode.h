@@ -66,7 +66,7 @@ namespace nodes
 
     private:
         template <typename Operation>
-        std::vector<ValueType> ComputeOutput(Operation&& fn) const;
+        std::vector<bool> ComputeOutput(Operation&& fn) const;
 
         // Inputs
         model::InputPort<ValueType> _input1;
