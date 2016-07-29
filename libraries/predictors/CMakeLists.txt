@@ -15,17 +15,17 @@ endif()
 set (SRC src/ConstantPredictor.cpp
          src/DecisionTreePredictor.cpp
          src/LinearPredictor.cpp
-         src/SingleInputThresholdRule.cpp)
+         src/SingleElementThresholdRule.cpp)
 
 set (INCLUDE include/ConstantPredictor.h
              include/DecisionTreePredictor.h
              include/EnsemblePredictor.h
              include/LinearPredictor.h
-             include/SingleInputThresholdRule.h
+             include/SingleElementThresholdRule.h
              include/ForestPredictor.h)
 
 set (TCC tcc/EnsemblePredictor.tcc
-         tcc/SingleInputThresholdRule.tcc
+         tcc/SingleElementThresholdRule.tcc
          tcc/ForestPredictor.tcc)
 
 source_group("src" FILES ${SRC})

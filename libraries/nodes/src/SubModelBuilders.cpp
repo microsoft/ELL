@@ -21,7 +21,7 @@ namespace nodes
         return{ constantNode->output };
     }
 
-    SingleInputThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleInputThresholdRule& rule, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
+    SingleElementThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleElementThresholdRule& rule, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
     {
         // get the element index
         size_t elementIndex = rule.GetElementIndex();
@@ -34,8 +34,4 @@ namespace nodes
 
         return{ binaryPredicateNode->output };
     }
-
-    // add BinaryPredicateNode with operation less than
-    // SingleInput --> SingleElement
-    // TreeRoot ---> Root
 }

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "SingleInputThresholdRule.h"
+#include "SingleElementThresholdRule.h"
 #include "ConstantPredictor.h"
 
 // dataset
@@ -166,14 +166,14 @@ namespace predictors
         /// <summary> Gets the number of trees in the forest. </summary>
         ///
         /// <returns> The number of tress. </returns>
-        size_t NumTrees() const { return _treeRootIndices.size(); }
+        size_t NumTrees() const { return _rootIndices.size(); }
 
         /// <summary> Gets the index of the root node of a given tree. </summary>
         ///
         /// <param name="treeIndex"> The tree index. </param>
         ///
         /// <returns> The root index. </returns>
-        size_t GetRootIndex(size_t treeIndex) const { return _treeRootIndices[treeIndex]; }
+        size_t GetRootIndex(size_t treeIndex) const { return _rootIndices[treeIndex]; }
 
         /// <summary> Gets the total number of interior nodes in the entire forest. </summary>
         ///
@@ -282,7 +282,7 @@ namespace predictors
         /// <summary> Gets a vector of tree root indices. </summary>
         ///
         /// <returns> The vector of tree root indices. </returns>
-        const std::vector<size_t>& GetTreeRootIndices() const { return _treeRootIndices; }
+        const std::vector<size_t>& GetRootIndices() const { return _rootIndices; }
 
         /// <summary> Prints a representation of the forest to an output stream. </summary>
         ///
@@ -306,13 +306,13 @@ namespace predictors
         //  member variables
         //
         std::vector<InteriorNode> _interiorNodes;
-        std::vector<size_t> _treeRootIndices;
+        std::vector<size_t> _rootIndices;
         double _bias = 0.0;
         size_t _numEdges = 0; 
     };
 
     /// <summary> A simple binary tree with single-input threshold rules and constant predictors in its edges. </summary>
-    typedef ForestPredictor<SingleInputThresholdRule, ConstantPredictor> SimpleForestPredictor;
+    typedef ForestPredictor<SingleElementThresholdRule, ConstantPredictor> SimpleForestPredictor;
 }
 
 #include "../tcc/ForestPredictor.tcc"

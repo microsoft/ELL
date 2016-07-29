@@ -12,13 +12,13 @@
 #include "LogitBooster.h"
 
 // predictors
-#include "SingleInputThresholdRule.h"
+#include "SingleElementThresholdRule.h"
 #include "ConstantPredictor.h"
 
 namespace trainers
 {
     template <typename LossFunctionType, typename BoosterType> 
-    class SimpleForestTrainer : public ForestTrainer<predictors::SingleInputThresholdRule, predictors::ConstantPredictor, BoosterType>
+    class SimpleForestTrainer : public ForestTrainer<predictors::SingleElementThresholdRule, predictors::ConstantPredictor, BoosterType>
     {
     public:
         /// <summary> Constructs an instance of SimpleForestTrainer. </summary>
@@ -28,7 +28,7 @@ namespace trainers
         /// <param name="parameters"> Training Parameters. </param>
         SimpleForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters);
 
-        using SplitRuleType = predictors::SingleInputThresholdRule;
+        using SplitRuleType = predictors::SingleElementThresholdRule;
         using EdgePredictorType = predictors::ConstantPredictor;
         using SplitCandidate = ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate;
 

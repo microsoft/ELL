@@ -299,7 +299,7 @@ void TestSimpleForestNodeRefine()
 {
     // define some abbreviations
     using SplitAction = predictors::SimpleForestPredictor::SplitAction;
-    using SplitRule = predictors::SingleInputThresholdRule;
+    using SplitRule = predictors::SingleElementThresholdRule;
     using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
     using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 

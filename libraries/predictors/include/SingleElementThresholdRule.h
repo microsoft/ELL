@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SingleInputThresholdRule.h (predictors)
+//  File:     SingleElementThresholdRule.h (predictors)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,16 +14,16 @@
 namespace predictors
 {
     /// <summary> A split rule that compares a single feature to a threshold. </summary>
-    class SingleInputThresholdRule
+    class SingleElementThresholdRule
     {
     public:
-        /// <summary> Constructs a single-input threshold rule. </summary>
+        /// <summary> Constructs a single-element threshold rule. </summary>
         ///
-        /// <param name="index"> Zero-based index of the input coordinate. </param>
+        /// <param name="index"> Zero-based index of the element. </param>
         /// <param name="threshold"> The threshold. </param>
-        SingleInputThresholdRule(size_t index = 0, double threshold = 0.0);
+        SingleElementThresholdRule(size_t index = 0, double threshold = 0.0);
 
-        /// <summary> Gets element index. </summary>
+        /// <summary> Gets the index of the element used to define the rule. </summary>
         ///
         /// <returns> The element index. </returns>
         size_t GetElementIndex() const { return _index; }
@@ -32,7 +32,6 @@ namespace predictors
         ///
         /// <returns> The threshold value. </returns>
         double GetThreshold() const { return _threshold; }
-
 
         /// <summary> Evaluates the split rule. </summary>
         ///
@@ -60,4 +59,4 @@ namespace predictors
     };
 }
 
-#include "../tcc/SingleInputThresholdRule.tcc"
+#include "../tcc/SingleElementThresholdRule.tcc"

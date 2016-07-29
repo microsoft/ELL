@@ -99,7 +99,7 @@ namespace nodes
         }
 
         model::OutputPortElements<double> treeOutputs;
-        for(size_t rootIndex : forest.GetTreeRootIndices()) // TODO: remove the word 'Tree' from this func name, and other members of that class
+        for(size_t rootIndex : forest.GetRootIndices()) // TODO: remove the word 'Tree' from this func name, and other members of that class
         {
             treeOutputs.AddRange(interiorNodeOutputs[rootIndex]);
         }

@@ -34,7 +34,7 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     bool ForestPredictor<SplitRuleType, EdgePredictorType>::IsTrivial() const
     {
-        if(_treeRootIndices.size() == 0 && _bias == 0.0)
+        if(_rootIndices.size() == 0 && _bias == 0.0)
         {
             return true;
         }
@@ -93,7 +93,7 @@ namespace predictors
     double ForestPredictor<SplitRuleType, EdgePredictorType>::Predict(const RandomAccessVectorType& input) const
     {
         double output = _bias;
-        for (auto treeRootIndex : _treeRootIndices)
+        for (auto treeRootIndex : _rootIndices)
         {
             output += Predict(input, treeRootIndex);
         }
@@ -122,7 +122,7 @@ namespace predictors
     std::vector<bool> ForestPredictor<SplitRuleType, EdgePredictorType>::GetEdgeIndicatorVector(const RandomAccessVectorType& input) const
     {
         std::vector<bool> edgeIndicator(_numEdges);
-        for (auto treeRootIndex : _treeRootIndices)
+        for (auto treeRootIndex : _rootIndices)
         {
             SetEdgeIndicatorVector(input, edgeIndicator, treeRootIndex);
         }
@@ -175,7 +175,7 @@ namespace predictors
             size_t interiorNodeIndex = AddInteriorNode(splitAction);
 
             // add new tree
-            _treeRootIndices.push_back(interiorNodeIndex);
+            _rootIndices.push_back(interiorNodeIndex);
 
             // return ID of new root
             return interiorNodeIndex;
@@ -322,7 +322,7 @@ namespace predictors
         {
             interiorNode.PrintLine(os, tabs + 1);
         }
-        for (auto treeRootIndex : _treeRootIndices)
+        for (auto treeRootIndex : _rootIndices)
         {
             os << std::string(tabs * 4, ' ') << "Tree: root index = " << treeRootIndex << "\n";
         }
