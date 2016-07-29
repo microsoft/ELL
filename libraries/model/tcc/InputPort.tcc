@@ -61,7 +61,7 @@ namespace model
     inline void InputPortBase::Serialize(utilities::Serializer& serializer) const
     {
         Port::Serialize(serializer); // call this SerializeContents
-        serializer.Serialize("inputs", _inputRanges);
+        serializer.Serialize("inputElements", _inputRanges);
     }
 
     //
