@@ -14,6 +14,7 @@
 #include "ISerializable.h"
 #include "UniqueId.h"
 #include "Serialization.h"
+#include "SimpleJsonSerializer.h"
 
 // model
 #include "ModelGraph.h"
@@ -72,7 +73,7 @@ void TestISerializable()
     auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
     auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
-    utilities::SimpleSerializer serializer;
+    utilities::SimpleJsonSerializer serializer;
     std::cout << "--Serializing int--" << std::endl;
     serializer.Serialize(intVal);
     std::cout << std::endl;
@@ -118,7 +119,7 @@ void TestISerializable()
 
 void TestSerializer()
 {
-    utilities::SimpleSerializer serializer;
+    utilities::SimpleJsonSerializer serializer;
 
     serializer.Serialize(5);
     std::cout << std::endl;
