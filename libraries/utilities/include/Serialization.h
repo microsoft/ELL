@@ -23,6 +23,13 @@
 
 namespace utilities
 {
+    class SerializationContext
+    {
+    public:
+        virtual ~SerializationContext() = default;
+    };
+
+
     template <typename ValueType>
     class is_vector
     {
