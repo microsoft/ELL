@@ -53,6 +53,8 @@ namespace model
     class OutputPortRange
     {
     public:
+        OutputPortRange() = default; // TODO: oferd - I had to add this to get around a problem caused by untyped ports
+
         /// <summary> Creates an OutputPortRange representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
@@ -155,6 +157,13 @@ namespace model
         ///
         /// <param name="range"> The range of values to add to this list </param>
         void AddRange(const OutputPortRange& range);
+
+        /// <summary> Gets an element in the elements. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the element. </param>
+        ///
+        /// <returns> The specified element. </returns>
+        OutputPortRange GetElement(size_t index) const;
 
     protected:
         OutputPortElementsUntyped(){};

@@ -14,28 +14,36 @@ endif()
 
 set (INCLUDE include/AccumulatorNode.h
              include/BinaryOperationNode.h
+             include/BinaryPredicateNode.h
              include/ConstantNode.h
              include/DelayNode.h
              include/DotProductNode.h
+             include/ElementSelectorNode.h
+             include/ForestNode.h
              include/LinearPredictorNode.h
              include/L2NormNode.h
              include/MovingAverageNode.h
+             include/MovingVarianceNode.h
+             include/SubModelBuilders.h
              include/SumNode.h
-             include/UnaryOperationNode.h
-             include/MovingVarianceNode.h)
+             include/UnaryOperationNode.h)
 
-set (SRC src/LinearPredictorNode.cpp)
+set (SRC src/LinearPredictorNode.cpp
+         src/SubModelBuilders.cpp)
 
 set (TCC tcc/AccumulatorNode.tcc
          tcc/BinaryOperationNode.tcc
+         tcc/BinaryPredicateNode.tcc
          tcc/ConstantNode.tcc
          tcc/DelayNode.tcc
          tcc/DotProductNode.tcc
+         tcc/ElementSelectorNode.tcc
+         tcc/ForestNode.tcc
          tcc/L2NormNode.tcc
          tcc/MovingAverageNode.tcc
+         tcc/MovingVarianceNode.tcc
          tcc/SumNode.tcc
-         tcc/UnaryOperationNode.tcc
-         tcc/MovingVarianceNode.tcc)
+         tcc/UnaryOperationNode.tcc)
 
 source_group("include" FILES ${INCLUDE})
 source_group("src" FILES ${SRC})

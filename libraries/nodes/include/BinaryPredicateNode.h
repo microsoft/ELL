@@ -1,33 +1,30 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     DotProductNode.h (features)
-//  Authors:  Chuck Jacobs
+//  File:     BinaryPredicateNode.h (features)
+//  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include "SumNode.h"
-
-// model
 #include "Node.h"
+#include "ModelGraph.h"
 #include "ModelTransformer.h"
-#include "OutputPortElements.h"
-#include "InputPort.h"
-#include "OutputPort.h"
 
 // utilities
+#include "Exception.h"
 #include "TypeName.h"
 
 // stl
 #include <string>
+#include <vector>
 
 namespace nodes
 {
-    /// <summary> A feature that takes two vector inputs and returns their dot product </summary>
+    /// <summary> A node that performs a coordinatewise binary boolean-valued operation on its inputs </summary>
     template <typename ValueType>
-    class DotProductNode : public model::Node
+    class BinaryPredicateNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
@@ -35,18 +32,28 @@ namespace nodes
         static constexpr char* input1PortName = "input1";
         static constexpr char* input2PortName = "input2";
         static constexpr char* outputPortName = "output";
-        const model::OutputPort<ValueType>& output = _output;
+        const model::OutputPort<bool>& output = _output;
         /// @}
 
-        /// <summary> Constructor </summary>
-        /// <param name="input1"> One of the signals to take the dot product of </param>
-        /// <param name="input2"> The other signal to take the dot product of </param>
-        DotProductNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2);
-        
+        /// <summary> Types of coordinatewise operations supported by this node type. </summary>
+        enum class PredicateType
+        {
+            equal,
+            less,
+            greater
+        };
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
+        /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
+        /// <param name="predicate"> The type of predicate to apply. </param>
+        BinaryPredicateNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2, PredicateType predicate);
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("DotProductNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("BinaryPredicateNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -56,20 +63,23 @@ namespace nodes
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(model::ModelTransformer& transformer) const override;
-
     protected:
         virtual void Compute() const override;
 
     private:
+        template <typename Operation>
+        std::vector<bool> ComputeOutput(Operation&& fn) const;
+
         // Inputs
         model::InputPort<ValueType> _input1;
         model::InputPort<ValueType> _input2;
 
         // Output
-        model::OutputPort<ValueType> _output;
+        model::OutputPort<bool> _output;
+
+        // Operation
+        PredicateType _predicate;
     };
 }
 
-#include "../tcc/DotProductNode.tcc"
+#include "../tcc/BinaryPredicateNode.tcc"

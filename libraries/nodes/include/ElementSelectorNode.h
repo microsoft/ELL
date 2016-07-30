@@ -1,17 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     DelayNode.h (features)
-//  Authors:  Chuck Jacobs
+//  File:     ElementSelectorNode.h (node)
+//  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-// model
 #include "Node.h"
-#include "ModelTransformer.h"
-#include "OutputPortElements.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
@@ -19,32 +16,36 @@
 #include "TypeName.h"
 
 // stl
-#include <string>
 #include <vector>
+#include <memory>
+#include <exception>
 
+/// <summary> model namespace </summary>
 namespace nodes
 {
-    /// <summary> A feature that takes a signal and returns a delayed sample of the signal </summary>
-    template <typename ValueType>
-    class DelayNode : public model::Node
+    /// <summary> A node that outputs a dynamically specified element from an input array. </summary>
+    template <typename ValueType, typename SelectorType>
+    class ElementSelectorNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
         /// @{
+        static constexpr char* elementsPortName = "input";
+        static constexpr char* selectorPortName = "selector";
         static constexpr char* outputPortName = "output";
-        static constexpr char* inputPortName = "input";
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
         /// <summary> Constructor </summary>
-        /// <param name="input"> The signal to delay </param>
-        /// <param name="windowSize"> The number of samples to delay the signal </param>
-        DelayNode(const model::OutputPortElements<ValueType>& input, size_t windowSize);
-        
+        ///
+        /// <param name="elements"> The input aray of values. </param>
+        /// <param name="selector"> The index of the chosen element </param>
+        ElementSelectorNode(const model::OutputPortElements<ValueType>& elements, const model::OutputPortElements<SelectorType>& selector);
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("DelayNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("ElementSelectorNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -59,15 +60,12 @@ namespace nodes
 
     private:
         // Inputs
-        model::InputPort<ValueType> _input;
+        model::InputPort<ValueType> _elements;
+        model::InputPort<SelectorType> _selector;
 
         // Output
         model::OutputPort<ValueType> _output;
-
-        // Buffer
-        mutable std::vector<std::vector<ValueType>> _samples;
-        size_t _windowSize;
     };
 }
 
-#include "../tcc/DelayNode.tcc"
+#include "../tcc/ElementSelectorNode.tcc"

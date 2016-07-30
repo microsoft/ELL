@@ -35,7 +35,8 @@ namespace model
     template <typename ValueType>
     const OutputPort<ValueType>* ModelTransformer::GetCorrespondingOutputPort(const OutputPort<ValueType>& port)
     {
-        auto result = dynamic_cast<const model::OutputPort<double>*>(GetCorrespondingPort(port));
+        auto correspondingPort = GetCorrespondingPort(port);
+        auto result = dynamic_cast<const model::OutputPort<ValueType>*>(correspondingPort);
         assert(result != nullptr);
         return result;
     }

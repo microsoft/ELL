@@ -34,6 +34,13 @@ namespace nodes
     class MovingAverageNode : public model::Node
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr char* inputPortName = "input";
+        static constexpr char* outputPortName = "output";
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
+
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the mean of </param>
         /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
@@ -49,17 +56,11 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<ValueType>& output = _output;
-
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(model::ModelTransformer& transformer) const override;
-
-        static constexpr char* inputPortName = "input";
-        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;
