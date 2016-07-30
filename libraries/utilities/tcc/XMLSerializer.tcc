@@ -18,13 +18,12 @@ namespace utilities
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
         auto endOfLine = hasName ? "\n" : "";
-
         auto typeName = TypeName<ValueType>::GetName();
 
         _out << indent;
         _out << "<" << typeName;
 
-        if (name != std::string(""))
+        if (hasName)
         {
             _out << " name='" << name << "'";
         }
@@ -48,7 +47,7 @@ namespace utilities
         _out << indent;
         _out << "<" << typeName;
 
-        if (name != std::string(""))
+        if (hasName)
         {
             _out << " name='" << name << "'";
         }
@@ -65,7 +64,7 @@ namespace utilities
         _out << indent;
         _out << "<" << typeName;
 
-        if (name != std::string(""))
+        if (hasName)
         {
             _out << " name='" << name << "'";
         }
@@ -88,13 +87,23 @@ namespace utilities
             _out << " name='" << name << "'";
         }
         _out << " type='" << typeName <<  "'>" << std::endl;
+
+        // Indent the next line (the line with the array elements), and then 
+        // set the indent to 0 (so there isn't indentation going on inside the line)
+        // TODO: find a more principled way to do this
+        // TODO: find a way to encode the values that doesn't require putting each one in a tag
+        // (say, by having them be a comma-separated list)
         ++_indent;
+        _out << GetCurrentIndent();
+
+        auto oldIndent = _indent-1;
+        _indent = 0;
         for (const auto& item : array)
         {
             Serialize(item);
-            _out << " "; // ???
+            _out << " ";
         }
-        --_indent;
+        _indent = oldIndent;
         _out << std::endl;
         _out << indent;
         _out << "</Array>" << std::endl;
@@ -110,33 +119,60 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void SimpleXmlDeserializer::ReadScalar(const char* name, ValueType& value)
     {
+        auto typeName = TypeName<ValueType>::GetName();
         bool hasName = name != std::string("");
+
+        MatchNextToken("<");
+        MatchNextToken(typeName);
         if(hasName)
         {
+            MatchNextToken("name");
+            MatchNextToken("=");
+            MatchNextToken("'");
             MatchNextToken(name);
-            MatchNextToken(":");
+            MatchNextToken("'");
         }
+        MatchNextToken("value");
+        MatchNextToken("=");
+        MatchNextToken("'");
 
-        // read string
+        // read value
         auto valueToken = ReadNextToken();
         std::stringstream valueStream(valueToken);
         valueStream >> value;
+
+        MatchNextToken("'");
+        MatchNextToken("/");
+        MatchNextToken(">");
     }
 
     // This function is inline just so it appears next to the other Read* functions
     inline void SimpleXmlDeserializer::ReadScalar(const char* name, std::string& value) 
     {
+        auto typeName = "string";
         bool hasName = name != std::string("");
+
+        MatchNextToken("<");
+        MatchNextToken(typeName);
         if(hasName)
         {
+            MatchNextToken("name");
+            MatchNextToken("=");
+            MatchNextToken("'");
             MatchNextToken(name);
-            MatchNextToken(":");
+            MatchNextToken("'");
         }
+        MatchNextToken("value");
+        MatchNextToken("=");
+        MatchNextToken("'");
 
-        MatchNextToken("\"");
+        // read value
         auto valueToken = ReadNextToken();
         value = valueToken;
-        MatchNextToken("\"");
+
+        MatchNextToken("'");
+        MatchNextToken("/");
+        MatchNextToken(">");
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
