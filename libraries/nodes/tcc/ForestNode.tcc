@@ -39,7 +39,7 @@ namespace nodes
         auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newOutputs = BuildSubModel(_forest, transformer.GetModel(), newOutputPortElements);
         transformer.MapOutputPort(prediction, newOutputs.prediction);
-        // TODO: we need the transformer to support OutputPortElements
+        // TODO: waiting for OutputPortElements changes:
         //       transformer.MapOutputPort(treeOutputs, newOutputs.treeOutputs);
         //       transformer.MapOutputPort(edgeIndicatorVector, newOutputs.edgeIndicatorVector);
     }
@@ -69,7 +69,7 @@ namespace nodes
         const auto& interiorNodes = forest.GetInteriorNodes();
 
         // create a place to store references to the output ports of the sub-models at each interior node
-        // TODO: this should be a vector of OutputPortElements and not OutputPortRange -it is currently a vector of Ranges because I need to AddRange them
+        // TODO: waiting for OutputPortElements changes: this should be a vector of OutputPortElements and not OutputPortRange -it is currently a vector of Ranges because I need to AddRange them
         std::vector<model::OutputPortRange> interiorNodeSubModels(interiorNodes.size());
 
         // visit interior nodes bottom-up (in reverse topological order)
@@ -78,7 +78,7 @@ namespace nodes
             const auto& edges = interiorNodes[i - 1].GetOutgoingEdges();
 
             // get the sub-model that represents each outgoing edge
-            // TODO: why is this an OutputPortElements, while interiorNodeSubModels is a vector?
+            // TODO: waiting for OutputPortElements changes: why is this an OutputPortElements, while interiorNodeSubModels is a vector?
             model::OutputPortElements<double> edgeOutputs;
             for(size_t j = 0; j < edges.size(); ++j)
             {
@@ -87,7 +87,7 @@ namespace nodes
 
                 if(edges[j].IsTargetInterior()) // target node is itself an interior node: reverse topological order guarantees that it's already visited
                 {
-                    // TODO: the following 3 lines should be one clean line - there are currently 3 because interiorNodeSubModels had to be an array of Ranges
+                    // TODO: waiting for OutputPortElements changes: the following 3 lines should be one clean line - there are currently 3 because interiorNodeSubModels had to be an array of Ranges
                     model::OutputPortElements<double> elements;
                     auto targetNodeSubModelOutputs = interiorNodeSubModels[edges[j].GetTargetNodeIndex()];
                     elements.AddRange(targetNodeSubModelOutputs);
@@ -108,7 +108,7 @@ namespace nodes
         }
 
         // collect the sub-models that represent the trees of the forest
-        // TODO: why is this an OutputPortElements, while interiorNodeSubModels is a vector?
+        // TODO: waiting for OutputPortElements changes: why is this an OutputPortElements, while interiorNodeSubModels is a vector?
         model::OutputPortElements<double> treeSubModels;
         for(size_t rootIndex : forest.GetRootIndices())
         {

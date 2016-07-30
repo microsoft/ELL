@@ -63,7 +63,7 @@ namespace nodes
     {
         auto weightsNode = model.AddNode<ConstantNode<double>>(predictor.GetWeights());
         auto dotProductNode = model.AddNode<DotProductNode<double>>(weightsNode->output, outputPortElements);
-        auto coordinatewiseMultiplyNode = model.AddNode<BinaryOperationNode<double>>(weightsNode->output, outputPortElements, BinaryOperationNode<double>::OperationType::coordinatewiseMultiply); // TODO: do I really need both a Dot and then a separate CoordinatewiseMultiply?
+        auto coordinatewiseMultiplyNode = model.AddNode<BinaryOperationNode<double>>(weightsNode->output, outputPortElements, BinaryOperationNode<double>::OperationType::coordinatewiseMultiply);
         auto biasNode = model.AddNode<ConstantNode<double>>(predictor.GetBias());
         auto addNode = model.AddNode<BinaryOperationNode<double>>(dotProductNode->output, biasNode->output, BinaryOperationNode<double>::OperationType::add);
         return { addNode->output, coordinatewiseMultiplyNode->output };

@@ -89,7 +89,7 @@ namespace nodes
     struct ForestSubModelOutputs
     {
         const model::OutputPort<double>& prediction;
-        //const model::OutputPort<double>& treeOutputs;   // TODO: waiting for chuck to decide how we map to multiple ports
+        //const model::OutputPort<double>& treeOutputs;   // TODO: waiting for OutputPortElements changes
         //const model::OutputPort<bool>& edgeIndicatorVector;
     };
 
