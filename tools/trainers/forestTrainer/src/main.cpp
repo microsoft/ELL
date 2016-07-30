@@ -1,11 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     main.cpp (baggedTreeTrainer)
+//  File:     main.cpp (forestTrainer)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 // utilities
 #include "Files.h"
@@ -20,26 +19,21 @@
 #include "CoordinateListTools.h"
 
 // dataset
-#include "SupervisedExample.h"
+#include "Example.h"
 
 // common
-#include "SortingTreeTrainerArguments.h"
-#include "BaggingIncrementalTrainerArguments.h"
+#include "ForestTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
 #include "MapSaveArguments.h" 
-#include "DataLoadArguments.h" 
-#include "EvaluatorArguments.h"
+#include "DataLoadArguments.h"
 #include "DataLoaders.h"
 #include "LoadModel.h"
 #include "MakeTrainer.h"
 #include "MakeEvaluator.h"
 
 // trainers
-#include "SortingTreeTrainer.h"
-
-// evaluators
-#include "IncrementalEvaluator.h"
+#include "ForestTrainer.h"
 
 // lossFunctions
 #include "SquaredLoss.h"
@@ -61,29 +55,25 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
-        common::ParsedSortingTreeTrainerArguments sortingTreeTrainerArguments;
-        common::ParsedBaggingIncrementalTrainerArguments baggingIncrementalTrainerArguments;
-        common::ParsedEvaluatorArguments evaluatorArguments;
+        common::ParsedForestTrainerArguments sortingTreeTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(sortingTreeTrainerArguments);
-        commandLineParser.AddOptionSet(baggingIncrementalTrainerArguments);
-        commandLineParser.AddOptionSet(evaluatorArguments);
-
+        
         // parse command line
         commandLineParser.Parse();
-
+                
         if(trainerArguments.verbose)
         {
-            std::cout << "Bagged Tree Trainer" << std::endl;
+            std::cout << "Sorting Tree Trainer" << std::endl;
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
         // if output file specified, replace stdout with it 
-        utilities::OutputStreamImpostor outStream(mapSaveArguments.outputModelFilename);
+        auto& outStream = mapSaveArguments.outputModelStream;
 
         // load a model
         auto model = common::LoadModel(mapLoadArguments.modelLoadArguments);
@@ -96,41 +86,37 @@ int main(int argc, char* argv[])
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
-        // predictor type
-        using PredictorType = predictors::DecisionTreePredictor;
-
-        // create evaluator
-        std::shared_ptr<evaluators::IIncrementalEvaluator<PredictorType>> evaluator = nullptr;
-        if(trainerArguments.verbose)
-        {
-            evaluator = common::MakeIncrementalEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
-        }
-
         // create trainer
-        auto baseTrainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
-        auto trainer = trainers::MakeBaggingIncrementalTrainer(std::move(baseTrainer), baggingIncrementalTrainerArguments, evaluator);
-        
+        auto trainer = common::MakeSimpleForestTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
+
+        // create random number generator
+        auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
+
+        // randomly permute the data
+        rowDataset.RandomPermute(rng);
+
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        auto trainSetIterator = rowDataset.GetIterator();
-        trainer->Update(trainSetIterator);
-        auto ensemble = trainer->GetPredictor();
+        auto dataIterator = rowDataset.GetIterator(0, 1000);
+        trainer->Update(dataIterator);
 
         // print loss and errors
         if(trainerArguments.verbose)
         {
-            std::cout << "Finished training.\n";
+            //std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
 
-            // print evaluation
-            std::cout << "Training error\n";
-            evaluator->Print(std::cout);
-            std::cout << std::endl;
+            // evaluate
+            //auto evaluator = common::MakeEvaluator<predictors::DecisionTreePredictor>(rowDataset.GetIterator(), evaluators::EvaluatorParameters{1, false}, trainerArguments.lossArguments);
+            //evaluator->Evaluate(tree);
+            //std::cout << "Training error\n";
+            //evaluator->Print(std::cout);
+            //std::cout << std::endl;
         }
 
-        // add predictor to the model
-        ensemble->AddToModel(model, outputCoordinateList);
+        // add tree to model
+      //  tree.AddToModel(model, outputCoordinateList);
 
-        // save the model
+        // output map
         model.Save(outStream);
 
     }
