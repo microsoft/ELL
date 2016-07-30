@@ -19,7 +19,7 @@
 #include "CoordinateListTools.h"
 
 // dataset
-#include "Example.h"
+#include "SupervisedExample.h"
 
 // common
 #include "SGDIncrementalTrainerArguments.h"
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
         }
 
         // if output file specified, replace stdout with it 
-        auto& outStream = mapSaveArguments.outputModelStream;
+        utilities::OutputStreamImpostor outStream(mapSaveArguments.outputModelFilename);
 
         // load a model
         auto model = common::LoadModel(mapLoadArguments.modelLoadArguments);

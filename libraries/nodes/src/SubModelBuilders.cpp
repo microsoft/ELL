@@ -24,7 +24,7 @@ namespace nodes
     SingleElementThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleElementThresholdRule& rule, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
     {
         // get the element used in the split rule 
-        // TODO - the following 3 lines should be one line. 
+        // TODO - waiting for OutputPortElements changes: the following 3 lines should be one line. 
         auto elementAsRange = outputPortElements.GetElement(rule.GetElementIndex());
         model::OutputPortElements<double> element;
         element.AddRange(elementAsRange);
