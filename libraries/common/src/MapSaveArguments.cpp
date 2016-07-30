@@ -13,10 +13,29 @@ namespace common
     void ParsedMapSaveArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
-            outputModelFile,
-            "outputModelFile",
+            outputModelFilename,
+            "outputModelFilename",
             "omf",
             "Path to the output model file",
-            "");
+            "null");
+    }
+
+    utilities::CommandLineParseResult ParsedMapSaveArguments::PostProcess(const utilities::CommandLineParser& parser)
+    {
+        if(outputModelFilename == "null")
+        {
+            outputModelStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
+        }
+        else if(outputModelFilename == "cout")
+        {
+            outputModelStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
+        }
+        else // treat argument as filename
+        {
+            outputModelStream = utilities::OutputStreamImpostor(outputModelFilename);
+        }
+
+        std::vector<std::string> parseErrorMessages;
+        return parseErrorMessages;
     }
 }

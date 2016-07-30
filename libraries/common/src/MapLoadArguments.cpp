@@ -22,7 +22,7 @@ namespace common
             "e");
     }
 
-    utilities::CommandLineParseResult ParsedMapLoadArguments::PostProcess(const utilities::CommandLineParser & parser)
+    utilities::CommandLineParseResult ParsedMapLoadArguments::PostProcess(const utilities::CommandLineParser& parser)
     {
         return modelLoadArguments.PostProcess(parser);
     }

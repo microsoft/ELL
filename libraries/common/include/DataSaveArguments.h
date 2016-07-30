@@ -10,6 +10,7 @@
 
 // utilities
 #include "CommandLineParser.h"
+#include "OutputStreamImpostor.h"
 
 // stl
 #include <string>
@@ -20,7 +21,9 @@ namespace common
     struct DataSaveArguments
     {
         /// <summary> The filename for the output data file. </summary>
-        std::string outputDataFile = "";
+        std::string outputDataFilename = "";
+
+        utilities::OutputStreamImpostor outputDataStream;
     };
 
     /// <summary> A version of DataSaveArguments that can add its members to the command line parser and post process their values. </summary>
