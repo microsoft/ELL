@@ -20,10 +20,10 @@
 #include "CoordinateListTools.h"
 
 // dataset
-#include "SupervisedExample.h"
+#include "Example.h"
 
 // common
-#include "SortingTreeTrainerArguments.h"
+#include "ForestTrainerArguments.h"
 #include "BaggingIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "MapLoadArguments.h" 
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
-        common::ParsedSortingTreeTrainerArguments sortingTreeTrainerArguments;
+        common::ParsedForestTrainerArguments forestTrainerArguments;
         common::ParsedBaggingIncrementalTrainerArguments baggingIncrementalTrainerArguments;
         common::ParsedEvaluatorArguments evaluatorArguments;
 
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
-        commandLineParser.AddOptionSet(sortingTreeTrainerArguments);
+        commandLineParser.AddOptionSet(forestTrainerArguments);
         commandLineParser.AddOptionSet(baggingIncrementalTrainerArguments);
         commandLineParser.AddOptionSet(evaluatorArguments);
 
@@ -107,8 +107,8 @@ int main(int argc, char* argv[])
         }
 
         // create trainer
-        auto baseTrainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
-        auto trainer = trainers::MakeBaggingIncrementalTrainer(std::move(baseTrainer), baggingIncrementalTrainerArguments, evaluator);
+        auto trainer = common::MakeSimpleForestTrainer(trainerArguments.lossArguments, forestTrainerArguments);
+//        auto trainer = trainers::MakeBaggingIncrementalTrainer(std::move(baseTrainer), baggingIncrementalTrainerArguments, evaluator);
         
         // train
         if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
         }
 
         // add predictor to the model
-        ensemble->AddToModel(model, outputCoordinateList);
+//        ensemble->AddToModel(model, outputCoordinateList);
 
         // save the model
         model.Save(outStream);
