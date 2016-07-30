@@ -22,7 +22,7 @@ namespace trainers
     {
     public:
         SGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
-        virtual void Update(dataset::GenericRowIterator& exampleIterator) override;
+        virtual void Update(dataset::GenericRowDataset::Iterator& exampleIterator) override;
         virtual const std::shared_ptr<const predictors::LinearPredictor> GetPredictor() const override;
     };
 }

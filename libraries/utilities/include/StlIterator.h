@@ -20,8 +20,9 @@ namespace utilities
     {
     public:
 
-        StlIterator() = default;
-        
+		StlIterator() = default;
+		StlIterator(const StlIterator& other) = default;
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="begin"> The STL iterator pointing to the beginning of the range to iterate over. </param>

@@ -122,8 +122,8 @@ namespace dataset
         uint64_t _maxExampleSize = 0;
     };
 
-    typedef RowDataset<IDataVector> GenericRowDataset;
-    
+	typedef RowDataset<IDataVector> GenericRowDataset;
+
     template<typename DataVectorType>
     std::ostream& operator<<(std::ostream& os, RowDataset<DataVectorType>& dataset);
 }

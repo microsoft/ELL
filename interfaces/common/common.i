@@ -25,6 +25,10 @@
 
 // Modified versions of interfaces
 %include "DataLoadersInterface.h"
+
+
+%template (GenericSupervisedExampleIterator) utilities::AnyIterator<dataset::GenericSupervisedExample>;
+
 %include "LoadModelInterface.h" 
 
 #if defined(SWIGJAVASCRIPT)

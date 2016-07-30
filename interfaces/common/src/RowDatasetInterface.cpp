@@ -45,8 +45,8 @@ namespace interfaces
         auto result = static_cast<dataset::GenericSupervisedExample>(_dataset.GetExample(index));
         result.Print(std::cout);
         std::cout << std::endl;
-        return static_cast<dataset::GenericSupervisedExample>(_dataset.GetExample(index));
-    }
+		return result;
+	}
 
     dataset::SupervisedExample<dataset::DoubleDataVector> GenericRowDataset::GetDenseSupervisedExample(uint64_t index) const
     {
@@ -63,9 +63,9 @@ namespace interfaces
         return result;
     }
 
-    dataset::GenericRowIterator GenericRowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
+    GenericRowIterator GenericRowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
     {
-        return _dataset.GetIterator(firstExample, numExamples);
+        return GenericRowIterator(_dataset.GetIterator(firstExample, numExamples));
     }
 
     void GenericRowDataset::AddExample(dataset::GenericSupervisedExample&& example)

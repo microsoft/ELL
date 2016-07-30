@@ -91,35 +91,36 @@ namespace predictors {};
 namespace dataset {};
 
 %ignore dataset::RowDataset::operator[];
-%import "RowDataset.h"
+%{
+#include "StlIterator.h"
+#include "IDataVector.h"
+#include "RowDataset.h"
+#include "IIterator.h"
+%}
+
+// %import "StlIterator.h"
 %import "IDataVector.h"
+%import "RowDataset.h"
+%include "IIterator.h"
 
 #ifndef SWIGXML
 %template () std::vector<dataset::IDataVector>;
 #endif
 
-namespace dataset
-{
-    class GenericRowIterator {}; // This is necessary to prevent memory leak of datasets::GenericRowIterator
-}
-
-typedef dataset::RowDataset<IDataVector> dataset::GenericRowDataset;
-typedef dataset::GenericRowDataset::Iterator dataset::GenericRowIterator;
-
 namespace utilities
 {
-    template <typename ValueType>
-    class IIterator {}; 
+//    template <typename ValueType>
+//    class IIterator {}; 
     
-    template <typename IteratorType, typename ValueType> class StlIterator {};
-    %template () StlIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
+//    template <typename IteratorType, typename ValueType> class StlIterator {};
+//    %template () StlIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
 
     template <typename IteratorType, typename ValueType> class StlIndexValueIterator {};
     %template () StlIndexValueIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
 }
 
-%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>,std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
-typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> dataset::GenericRowIterator;
+//%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>,std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
+//typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> dataset::GenericRowIterator;
 
 // Interface includes for lossFunctions library
 %include lossFunctions.i
@@ -157,8 +158,8 @@ wrap_unique_ptr(LayerPtr, layers::Layer)
 
 #ifndef SWIGXML
 %template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
-%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
-%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>, std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
+//%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
+//%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>, std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 
 %template () dataset::RowDataset<dataset::IDataVector>;
 %template () trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
