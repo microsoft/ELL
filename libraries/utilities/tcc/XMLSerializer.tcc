@@ -19,12 +19,22 @@ namespace utilities
         bool hasName = name != std::string("");
         auto endOfLine = hasName ? "\n" : "";
 
+        auto typeName = TypeName<ValueType>::GetName();
+
         _out << indent;
-        if (hasName)
+        _out << "<" << typeName;
+
+        if (name != std::string(""))
         {
-            _out << name << ": ";
+            _out << " name='" << name << "'";
         }
-        _out << to_string(value) << endOfLine;
+
+        _out << " value='" << to_string(value) << "'/>" << endOfLine;
+    }
+
+    inline std::string XmlEncodeString(std::string s)
+    {
+        return s;
     }
 
     // This function is inline just so it appears next to the other Write* functions
@@ -33,13 +43,16 @@ namespace utilities
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
         auto endOfLine = hasName ? "\n" : "";
+        auto typeName = "string";
 
         _out << indent;
-        if (hasName)
+        _out << "<" << typeName;
+
+        if (name != std::string(""))
         {
-            _out << name << ": ";
+            _out << " name='" << name << "'";
         }
-        _out << "\"" << value << "\"" << endOfLine;
+        _out << " value='" << XmlEncodeString(value) << "'/>" << endOfLine;
     }
 
     inline void SimpleXmlSerializer::WriteScalar(const char* name, const std::string& value)
@@ -47,13 +60,16 @@ namespace utilities
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
         auto endOfLine = hasName ? "\n" : "";
+        auto typeName = "string";
 
         _out << indent;
-        if (hasName)
+        _out << "<" << typeName;
+
+        if (name != std::string(""))
         {
-            _out << name << ": ";
+            _out << " name='" << name << "'";
         }
-        _out << "\"" << value << "\"" << endOfLine;
+        _out << " value='" << XmlEncodeString(value) << "'/>" << endOfLine;
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
@@ -62,22 +78,26 @@ namespace utilities
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
         auto endOfLine = "\n";
+        auto size = array.size();
+        auto typeName = TypeName<ValueType>::GetName();
 
         _out << indent;
+        _out << "<Array";
         if (hasName)
         {
-            _out << name << ": ";
+            _out << " name='" << name << "'";
         }
-
-        _out << "[";
-        // reset indent
+        _out << " type='" << typeName <<  "'>" << std::endl;
+        ++_indent;
         for (const auto& item : array)
         {
             Serialize(item);
-            _out << ", ";
+            _out << " "; // ???
         }
-        // reset indent
-        _out << "]" << endOfLine;
+        --_indent;
+        _out << std::endl;
+        _out << indent;
+        _out << "</Array>" << std::endl;
     }
 
     //

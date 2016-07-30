@@ -84,6 +84,18 @@ namespace utilities
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
+    struct TypeName<char>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "char"; }
+    };
+
+    /// <summary> Class used to get information about the 8-bit integer type. </summary>
+    ///
+    /// <typeparam name="T"> Generic type parameter. </typeparam>
+    template <>
     struct TypeName<int8_t>
     {
         /// <summary> Gets the serialization name of the type. </summary>

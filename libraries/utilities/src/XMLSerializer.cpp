@@ -44,6 +44,7 @@ namespace utilities
         auto indent = GetCurrentIndent();
         auto typeName = value.GetRuntimeTypeName();
 
+        _out << indent;
         _out << "<" << typeName;
 
         if (name != std::string(""))
@@ -64,7 +65,8 @@ namespace utilities
     {
         auto indent = GetCurrentIndent();
         auto typeName = value.GetRuntimeTypeName();
-        _out << indent << "</" << typeName << ">" << std::endl;
+        _out << indent;
+        _out << "</" << typeName << ">" << std::endl;
     }
 
     //
@@ -78,22 +80,31 @@ namespace utilities
     IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleXmlSerializer, float);
     IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleXmlSerializer, double);
 
-    // ???
+    // Array of ISerializable
+    // TOOD: pass in compile-time type name
     void SimpleXmlSerializer::SerializeArrayValue(const char* name, const std::vector<const ISerializable*>& array)
     {
+        bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
-        if (name != std::string(""))
-        {
-            _out << name << ": ";
-        }
+        auto endOfLine = "\n";
+        auto size = array.size();
+        auto typeName = "ISerializable";
 
-        _out << "[";
+        _out << indent;
+        _out << "<Array";
+        if (hasName)
+        {
+            _out << " name='" << name << "'";
+        }
+        _out << " type='" << typeName <<  "'>" << std::endl;
+        ++_indent;
         for (const auto& item : array)
         {
             Serialize(*item);
-            _out << ", ";
         }
-        _out << "]";
+        --_indent;
+        _out << indent;
+        _out << "</Array>" << endOfLine;
     }
 
     //
@@ -141,7 +152,8 @@ namespace utilities
 
     void SimpleXmlDeserializer::EndDeserializeObject(const char* name, ISerializable& value) 
     {
-        MatchNextToken("}");
+        MatchNextToken("/");
+        MatchNextToken(">");
     }
 
     //
@@ -167,8 +179,8 @@ namespace utilities
             return temp;
         }
 
-        std::string whitespace = " \r\t\n";
-        std::string tokenStopChars = " \t\r\n,:{}[]'\"";
+        const std::string whitespace = " \r\t\n";
+        const std::string tokenStopChars = " \t\r\n<>/'\"";
         std::stringstream tokenStream;
 
         // eat whitespace and add first char
