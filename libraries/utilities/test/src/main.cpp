@@ -219,8 +219,9 @@ int main()
         // // Variant tests
         // TestVariant();
 
-        TestSerializer();
-        TestDeserializer();
+        TestJsonSerializer();
+        TestJsonDeserializer();
+        TestXmlSerializer();
     }
     catch(utilities::Exception& exception)
     {

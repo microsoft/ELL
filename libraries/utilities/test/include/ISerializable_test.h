@@ -8,6 +8,8 @@
 
 #pragma once
 
-void TestSerializer();
+void TestJsonSerializer();
 
-void TestDeserializer();
+void TestJsonDeserializer();
+
+void TestXmlSerializer();

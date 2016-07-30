@@ -15,6 +15,7 @@
 #include "UniqueId.h"
 #include "Serialization.h"
 #include "SimpleJsonSerializer.h"
+#include "XMLSerializer.h"
 
 // model
 #include "ModelGraph.h"
@@ -67,7 +68,7 @@ struct TestStruct : public utilities::ISerializable, public utilities::IDescriba
     }
 };
 
-void TestSerializer()
+void TestJsonSerializer()
 {
     int intVal = 1;
     float floatVal = 2.5;
@@ -148,7 +149,7 @@ void TestSerializer()
     std::cout << std::endl;
 }
 
-void TestDeserializer()
+void TestJsonDeserializer()
 {
     std::cout << "Deserializer test 1" << std::endl;
     {
@@ -215,5 +216,86 @@ void TestDeserializer()
         testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);
         
     }
+    std::cout << std::endl;
+}
+
+void TestXmlSerializer()
+{
+    int intVal = 1;
+    float floatVal = 2.5;
+    double doubleVal = 3.14;
+    TestStruct testStruct{ 1, 2.2f, 3.3 };
+
+    utilities::UniqueId id;
+
+    model::Model g;
+    auto in = g.AddNode<model::InputNode<double>>(3);
+    auto constNode = g.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
+    auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
+    auto out = g.AddNode<model::OutputNode<double>>(in->output);
+
+    utilities::SimpleXmlSerializer serializer;
+    std::cout << "--Serializing int--" << std::endl;
+    serializer.Serialize(intVal);
+    std::cout << std::endl;
+
+    std::cout << "--Serializing float--" << std::endl;
+    serializer.Serialize(floatVal);
+    std::cout << std::endl;
+
+    std::cout << "--Serializing double--" << std::endl;
+    serializer.Serialize(doubleVal);
+    std::cout << std::endl;
+
+    std::cout << "--Serializing TestStruct--" << std::endl;
+    serializer.Serialize(testStruct);
+    std::cout << std::endl;
+
+    std::cout << "--Serializing UniqueId--" << std::endl;
+    serializer.Serialize(id);
+    std::cout << std::endl;
+
+    std::cout << "--Serializing input node--" << std::endl;
+    serializer.Serialize(*in);
+    std::cout << std::endl;
+
+    std::cout << "\n--Serializing output node--" << std::endl;
+    serializer.Serialize(*out);
+    std::cout << std::endl;
+
+    std::cout << "\n--Serializing constant node--" << std::endl;
+    serializer.Serialize(*constNode);
+    std::cout << std::endl;
+
+    std::cout << "\n--Serializing binary operation node--" << std::endl;
+    serializer.Serialize(*binaryOpNode);
+    std::cout << std::endl;
+
+    std::cout << "\n--Serializing model--" << std::endl;
+    serializer.Serialize(g);
+    std::cout << std::endl;
+    std::cout << "------------------------" << std::endl;
+    std::cout << std::endl;
+
+    // simple stuff
+    serializer.Serialize(5);
+    std::cout << std::endl;
+
+    serializer.Serialize(3.1415);
+    std::cout << std::endl;
+
+    std::vector<int> intArray{ 1, 2, 3 };
+    serializer.Serialize("intArray", intArray);
+    std::cout << std::endl;
+
+    std::vector<bool> boolArray{ true, false, true };
+    serializer.Serialize("boolArray", boolArray);
+    std::cout << std::endl;
+
+    std::vector<TestStruct> structArray;
+    structArray.emplace_back(1, 2, 3);
+    structArray.emplace_back(4, 5, 6);
+    structArray.emplace_back(7, 8, 9);
+    serializer.Serialize("structArray", structArray);
     std::cout << std::endl;
 }

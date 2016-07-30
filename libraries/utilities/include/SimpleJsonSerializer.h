@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "Serialization.h"
 #include "TypeFactory.h"
 #include "TypeName.h"
 #include "Exception.h"
