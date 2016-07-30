@@ -22,7 +22,7 @@ namespace nodes
             auto v = _input[index];
             result += v;
         }
-        _output.SetOutput({result});
+        _output.SetOutput({ result });
     };
 
     template <typename ValueType>

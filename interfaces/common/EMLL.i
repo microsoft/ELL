@@ -81,6 +81,10 @@ namespace std
 // Useful macros
 %include "macros.i"
 
+// Interface for NaN callbacks
+%include callback.i
+
+
 // Define some namespaces so we can refer to them later
 namespace lossFunctions {};
 namespace predictors {};
