@@ -99,7 +99,7 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_VALUE_OVERRIDE(double);
         virtual void DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array) override;
 
-        virtual void BeginDeserializeObject(const char* name, ISerializable& value) override;
+        virtual std::string BeginDeserializeObject(const char* name, ISerializable& value) override;
         virtual void DeserializeObject(const char* name, ISerializable& value) override;
         virtual void EndDeserializeObject(const char* name, ISerializable& value) override;
 

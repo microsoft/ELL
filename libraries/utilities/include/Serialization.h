@@ -181,7 +181,7 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(double);
         virtual void DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array) = 0;
 
-        virtual void BeginDeserializeObject(const char* name, ISerializable& value);
+        virtual std::string BeginDeserializeObject(const char* name, ISerializable& value); // returns typename
         virtual void DeserializeObject(const char* name, ISerializable& value) = 0;
         virtual void EndDeserializeObject(const char* name, ISerializable& value);
     };

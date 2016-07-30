@@ -35,9 +35,10 @@
 
 struct TestStruct : public utilities::ISerializable, public utilities::IDescribable
 {
-    int a;
-    float b;
-    double c;
+    int a=0;
+    float b=0;
+    double c=0;
+    TestStruct() = default;
     TestStruct(int a, float b, double c) : a(a), b(b), c(c) {}
     static std::string GetTypeName() { return "TestStruct"; }
     virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
@@ -56,6 +57,13 @@ struct TestStruct : public utilities::ISerializable, public utilities::IDescriba
         serializer.Serialize("a", a);
         serializer.Serialize("b", b);
         serializer.Serialize("c", c);
+    }
+
+    virtual void Deserialize(utilities::Deserializer& serializer) override
+    {
+        serializer.Deserialize("a", a);
+        serializer.Deserialize("b", b);
+        serializer.Deserialize("c", c);
     }
 };
 
@@ -153,6 +161,7 @@ void TestDeserializer()
         double val = 0;
         deserializer.Deserialize("pi", val);
         std::cout << "Result: " << val << std::endl;
+        testing::ProcessTest("Deserialize float check", val == 3.14159);
     }
     std::cout << std::endl;
 
@@ -167,6 +176,7 @@ void TestDeserializer()
         std::string val;
         deserializer.Deserialize("pie", val);
         std::cout << "Result: " << val << std::endl;
+        testing::ProcessTest("Deserialize string check", val == "cherry");
     }
     std::cout << std::endl;
 
@@ -185,6 +195,25 @@ void TestDeserializer()
         for(auto element: val)
             std::cout << element << ", ";
          std::cout << std::endl;
+        testing::ProcessTest("Deserialize vector<int> check", val[0] == 1 && val[1] == 2 && val[2] == 3);
+    }
+    std::cout << std::endl;
+
+    std::cout << "Deserializer test 4" << std::endl;
+    {
+        std::stringstream strstream;
+        utilities::SimpleJsonSerializer serializer(strstream);
+        TestStruct testStruct{ 1, 2.2f, 3.3 };
+        serializer.Serialize("s", testStruct);
+        std::cout << "Str value: " << strstream.str() << std::endl;
+
+        utilities::SimpleJsonDeserializer deserializer(strstream);
+        TestStruct val;
+        deserializer.Deserialize("s", val);
+        std::cout << "Result: ";
+        std::cout << "a: " << val.a << ", b: " << val.b << ", c: " << val.c << std::endl;
+        testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);
+        
     }
     std::cout << std::endl;
 }

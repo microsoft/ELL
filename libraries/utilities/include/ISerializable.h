@@ -27,11 +27,19 @@ namespace utilities
         virtual ~ISerializable() = default;
 
         virtual std::string GetRuntimeTypeName() const = 0;
+
         virtual void Serialize(Serializer& serializer) const = 0;  // TODO: call this SerializeContents?
 
         // Optional:
         virtual void BeginSerialize(Serializer& serializer) const {};
         virtual void EndSerialize(Serializer& serializer) const {};
+
+
+        virtual void Deserialize(Deserializer& serializer) {} // = 0;  // TODO: call this SerializeContents?
+
+        // Optional:
+        virtual void BeginDeserialize(Deserializer& serializer) {};
+        virtual void EndDeserialize(Deserializer& serializer) {};
     };
 
     class IDescribable

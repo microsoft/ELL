@@ -90,6 +90,7 @@ namespace utilities
         //     tmpArray.push_back(&item);
         // }
         DeserializeArrayValue(name, tmpArray);
+        // TODO: copy
     }
 
     // Vector of serializable pointers

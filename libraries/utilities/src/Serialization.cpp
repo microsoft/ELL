@@ -42,14 +42,14 @@ namespace utilities
     //
     void Deserializer::DeserializeValue(const char* name, ISerializable& value)
     {
-        BeginDeserializeObject(name, value);
+        auto typeName = BeginDeserializeObject(name, value);
         DeserializeObject(name, value);
         EndDeserializeObject(name, value);
     }
 
-    void Deserializer::BeginDeserializeObject(const char* name, ISerializable& value)
+    std::string Deserializer::BeginDeserializeObject(const char* name, ISerializable& value)
     {
-        // nothing
+        return "";
     }
 
     void Deserializer::EndDeserializeObject(const char* name, ISerializable& value)
