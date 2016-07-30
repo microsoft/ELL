@@ -142,17 +142,49 @@ void TestSerializer()
 
 void TestDeserializer()
 {
-    std::cout << "Deserializer test" << std::endl;
+    std::cout << "Deserializer test 1" << std::endl;
+    {
+        std::stringstream strstream;
+        utilities::SimpleJsonSerializer serializer(strstream);
+        serializer.Serialize("pi", 3.14159);
+        std::cout << "Str value: " << strstream.str() << std::endl;;
 
-    // create a stream
-    std::stringstream strstream;
-        
-    utilities::SimpleJsonSerializer serializer(strstream);
-    serializer.Serialize("pi", 3.14159);
-    std::cout << "Str value: " << strstream.str();
+        utilities::SimpleJsonDeserializer deserializer(strstream);
+        double val = 0;
+        deserializer.Deserialize("pi", val);
+        std::cout << "Result: " << val << std::endl;
+    }
+    std::cout << std::endl;
 
-    utilities::SimpleJsonDeserializer deserializer(strstream);
-    double val = 0;
-    deserializer.Deserialize("pi", val);
-    std::cout << "Result: " << val;
+    std::cout << "Deserializer test 2" << std::endl;
+    {
+        std::stringstream strstream;
+        utilities::SimpleJsonSerializer serializer(strstream);
+        serializer.Serialize("pie", std::string{ "cherry" });
+        std::cout << "Str value: " << strstream.str() << std::endl;
+
+        utilities::SimpleJsonDeserializer deserializer(strstream);
+        std::string val;
+        deserializer.Deserialize("pie", val);
+        std::cout << "Result: " << val << std::endl;
+    }
+    std::cout << std::endl;
+
+    std::cout << "Deserializer test 3" << std::endl;
+    {
+        std::stringstream strstream;
+        utilities::SimpleJsonSerializer serializer(strstream);
+        std::vector<int> arr {1,2,3};
+        serializer.Serialize("arr", arr);
+        std::cout << "Str value: " << strstream.str() << std::endl;
+
+        utilities::SimpleJsonDeserializer deserializer(strstream);
+        std::vector<int> val;
+        deserializer.Deserialize("arr", val);
+        std::cout << "Result: ";
+        for(auto element: val)
+            std::cout << element << ", ";
+         std::cout << std::endl;
+    }
+    std::cout << std::endl;
 }

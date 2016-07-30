@@ -120,7 +120,8 @@ namespace utilities
         DECLARE_SERIALIZE_VALUE_BASE(size_t);
         DECLARE_SERIALIZE_VALUE_BASE(float);
         DECLARE_SERIALIZE_VALUE_BASE(double);
-        virtual void SerializeValue(const char* name, std::string value) = 0;
+        virtual void SerializeValue(const char* name, const char* value) = 0;
+        virtual void SerializeValue(const char* name, const std::string& value) = 0;
         virtual void SerializeValue(const char* name, const ISerializable& value);
 
         DECLARE_SERIALIZE_ARRAY_VALUE_BASE(bool);

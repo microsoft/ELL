@@ -30,6 +30,20 @@ namespace utilities
     }
 
     // This function is inline just so it appears next to the other Write* functions
+    inline void SimpleJsonSerializer::WriteScalar(const char* name, const char* value)
+    {
+        auto indent = GetCurrentIndent();
+        bool hasName = name != std::string("");
+        auto endOfLine = hasName ? "\n" : "";
+
+        _out << indent;
+        if (hasName)
+        {
+            _out << name << ": ";
+        }
+        _out << "\"" << value << "\"" << endOfLine;
+    }
+
     inline void SimpleJsonSerializer::WriteScalar(const char* name, const std::string& value)
     {
         auto indent = GetCurrentIndent();
@@ -78,24 +92,17 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void SimpleJsonDeserializer::ReadScalar(const char* name, ValueType& value)
     {
-        std::cout << "reading tokens" << std::endl;
-
-        while(true)
-        {
-            auto token = ReadNextToken();
-            if(token=="")
-                break;
-            std::cout << "Token: " << token << std::endl;
-        }
-
         bool hasName = name != std::string("");
         if(hasName)
         {
-            // match name
-            // match ':'
+            MatchNextToken(name);
+            MatchNextToken(":");
         }
 
         // read string
+        auto valueToken = ReadNextToken();
+        std::stringstream valueStream(valueToken);
+        valueStream >> value;
     }
 
     // This function is inline just so it appears next to the other Read* functions
@@ -104,13 +111,14 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            // match name
-            // match ':'
+            MatchNextToken(name);
+            MatchNextToken(":");
         }
 
-        // match "
-        // read string
-        // match "
+        MatchNextToken("\"");
+        auto valueToken = ReadNextToken();
+        value = valueToken;
+        MatchNextToken("\"");
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
@@ -119,12 +127,23 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            // match name
-            // match ':'
+            MatchNextToken(name);
+            MatchNextToken(":");
         }
+                
+        MatchNextToken("[");
+        std::string nextToken = "";
+        while(nextToken != "]")
+        {
+            ValueType obj;
+            Deserialize(obj);
+            array.push_back(obj);
 
-        // match [
-        // read contents
-        // match ]
+            MatchNextToken(",");
+
+            // Want to peek at the next token here to see if it's a ']'
+            nextToken = PeekNextToken();
+        }
+        MatchNextToken("]");
     }
 }

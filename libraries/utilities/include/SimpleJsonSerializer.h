@@ -39,7 +39,8 @@ namespace utilities
         DECLARE_SERIALIZE_VALUE_OVERRIDE(size_t);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(float);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(double);
-        virtual void SerializeValue(const char* name, std::string value) override;
+        virtual void SerializeValue(const char* name, const char* value) override;
+        virtual void SerializeValue(const char* name, const std::string& value) override;
 
         DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(bool);
         DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(char);
@@ -62,6 +63,7 @@ namespace utilities
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void WriteScalar(const char* name, const ValueType& value);
 
+        void WriteScalar(const char* name, const char* value);
         void WriteScalar(const char* name, const std::string& value);
 
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
@@ -102,7 +104,12 @@ namespace utilities
         virtual void EndDeserializeObject(const char* name, ISerializable& value) override;
 
     private:
+        void PrintTokens();
+
+        std::string _peekedToken = "";
         std::string ReadNextToken(); // returns "" at EOF
+        std::string PeekNextToken(); // returns "" at EOF
+        void MatchNextToken(std::string readString); // throws an exception if it doesn't match
 
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void ReadScalar(const char* name, ValueType& value);

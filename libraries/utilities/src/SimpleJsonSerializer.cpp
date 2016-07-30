@@ -15,23 +15,26 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <cctype>
 
 namespace utilities
 {
-#define IMPLEMENT_SERIALIZE_VALUE(base, type)        void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name,value); }
-#define IMPLEMENT_SERIALIZE_ARRAY_VALUE(base, type)  void base::SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name,value); }
+#define IMPLEMENT_SERIALIZE_VALUE(base, type)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \
+    void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
+#define IMPLEMENT_SERIALIZE_ARRAY_VALUE(base, type)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            \
+    void base::SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
 
-#define IMPLEMENT_DESERIALIZE_VALUE(base, type)        void base::DeserializeValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name,value); }
-#define IMPLEMENT_DESERIALIZE_ARRAY_VALUE(base, type)  void base::DeserializeArrayValue(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name,value); }
+#define IMPLEMENT_DESERIALIZE_VALUE(base, type)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \
+    void base::DeserializeValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name, value); }
+#define IMPLEMENT_DESERIALIZE_ARRAY_VALUE(base, type)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
+    void base::DeserializeArrayValue(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name, value); }
 
     //
     // Serialization
     //
-    SimpleJsonSerializer::SimpleJsonSerializer() : _out(std::cout) 
-    {}
+    SimpleJsonSerializer::SimpleJsonSerializer() : _out(std::cout) {}
 
-    SimpleJsonSerializer::SimpleJsonSerializer(std::ostream& outputStream) : _out(outputStream) 
-    {}
+    SimpleJsonSerializer::SimpleJsonSerializer(std::ostream& outputStream) : _out(outputStream) {}
 
     IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, bool);
     IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, char);
@@ -40,12 +43,11 @@ namespace utilities
     IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, size_t);
     IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, float);
     IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, double);
-    
+
     // strings
-    void SimpleJsonSerializer::SerializeValue(const char* name, std::string value)
-    {
-        WriteScalar(name, value);
-    }
+    void SimpleJsonSerializer::SerializeValue(const char* name, const char* value) { WriteScalar(name, value); }
+
+    void SimpleJsonSerializer::SerializeValue(const char* name, const std::string& value) { WriteScalar(name, value); }
 
     // ISerializable
     void SimpleJsonSerializer::BeginSerializeObject(const char* name, const ISerializable& value)
@@ -92,7 +94,7 @@ namespace utilities
         }
 
         _out << "[";
-        for(const auto& item: array)
+        for (const auto& item : array)
         {
             Serialize(*item);
             _out << ", ";
@@ -113,24 +115,16 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, size_t);
     IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, float);
     IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, double);
-    
+
     // strings
-    void SimpleJsonDeserializer::DeserializeValue(const char* name, std::string& value)
-    {
-    }
+    void SimpleJsonDeserializer::DeserializeValue(const char* name, std::string& value) { ReadScalar(name, value); }
 
     // ISerializable
-    void SimpleJsonDeserializer::BeginDeserializeObject(const char* name, ISerializable& value)
-    {
-    }
+    void SimpleJsonDeserializer::BeginDeserializeObject(const char* name, ISerializable& value) {}
 
-    void SimpleJsonDeserializer::DeserializeObject(const char* name, ISerializable& value)
-    {
-    }
+    void SimpleJsonDeserializer::DeserializeObject(const char* name, ISerializable& value) {}
 
-    void SimpleJsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value)
-    {
-    }
+    void SimpleJsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value) {}
 
     //
     // Arrays
@@ -143,38 +137,83 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, float);
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, double);
 
-    void SimpleJsonDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array)
-    {
-    }
+    void SimpleJsonDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array) {}
 
     // Tokenizer
     std::string SimpleJsonDeserializer::ReadNextToken()
     {
-        std::string tokenStopChars = " \t\r\n:{}[]'\"";
-        std::stringstream tokenStream;
-        // put first char (if it exists)
-        if(_in)
+        if (_peekedToken != "")
         {
-            auto ch = _in.get();
-            if(ch == EOF)
-                return "";
-            tokenStream << (char)ch;
+            auto temp = _peekedToken;
+            _peekedToken = "";
+            return temp;
         }
-        while(_in)
+
+        std::string whitespace = " \r\t\n";
+        std::string tokenStopChars = " \t\r\n,:{}[]'\"";
+        std::stringstream tokenStream;
+
+        // eat whitespace and add first char
+        while (_in)
         {
             auto ch = _in.get();
-            if(ch == EOF)
+            if (ch == EOF)
+                return "";
+            if (!std::isspace(ch))
+            {
+                tokenStream << (char)ch;
+                if (tokenStopChars.find(ch) == std::string::npos)
+                    break;
+                else
+                    return tokenStream.str();
+            }
+        }
+
+        while (_in)
+        {
+            auto ch = _in.get();
+            if (ch == EOF)
             {
                 break;
             }
-            
-            if(tokenStopChars.find(ch) != std::string::npos)
+
+            if (tokenStopChars.find(ch) != std::string::npos)
             {
                 _in.unget();
                 break;
             }
             tokenStream << (char)ch;
         }
+
         return tokenStream.str();
+    }
+
+    std::string SimpleJsonDeserializer::PeekNextToken()
+    {
+        if (_peekedToken == "")
+        {
+            _peekedToken = ReadNextToken();
+        }
+        return _peekedToken;
+    }
+
+    void SimpleJsonDeserializer::PrintTokens()
+    {
+        while (true)
+        {
+            auto token = ReadNextToken();
+            if (token == "")
+                break;
+            std::cout << "Token: " << token << std::endl;
+        }
+    }
+
+    void SimpleJsonDeserializer::MatchNextToken(std::string value)
+    {
+        auto token = ReadNextToken();
+        if (token != value)
+        {
+            throw InputException(InputExceptionErrors::badStringFormat);
+        }
     }
 }
