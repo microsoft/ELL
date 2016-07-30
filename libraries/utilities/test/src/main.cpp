@@ -221,7 +221,9 @@ int main()
 
         TestJsonSerializer();
         TestJsonDeserializer();
+
         TestXmlSerializer();
+        TestXmlDeserializer();
     }
     catch(utilities::Exception& exception)
     {

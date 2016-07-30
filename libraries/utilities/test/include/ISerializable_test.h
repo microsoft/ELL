@@ -9,7 +9,7 @@
 #pragma once
 
 void TestJsonSerializer();
-
 void TestJsonDeserializer();
 
 void TestXmlSerializer();
+void TestXmlDeserializer();

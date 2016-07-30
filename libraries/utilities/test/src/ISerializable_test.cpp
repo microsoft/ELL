@@ -299,3 +299,73 @@ void TestXmlSerializer()
     serializer.Serialize("structArray", structArray);
     std::cout << std::endl;
 }
+
+void TestXmlDeserializer()
+{
+    std::cout << "Deserializer test 1" << std::endl;
+    {
+        std::stringstream strstream;
+        utilities::SimpleXmlSerializer serializer(strstream);
+        serializer.Serialize("pi", 3.14159);
+        std::cout << "Str value: " << strstream.str() << std::endl;;
+
+        utilities::SimpleXmlDeserializer deserializer(strstream);
+        double val = 0;
+        deserializer.Deserialize("pi", val);
+        std::cout << "Result: " << val << std::endl;
+        testing::ProcessTest("Deserialize float check", val == 3.14159);
+    }
+    std::cout << std::endl;
+
+    std::cout << "Deserializer test 2" << std::endl;
+    {
+        std::stringstream strstream;
+        utilities::SimpleXmlSerializer serializer(strstream);
+        serializer.Serialize("pie", std::string{ "cherry" });
+        std::cout << "Str value: " << strstream.str() << std::endl;
+
+        utilities::SimpleXmlDeserializer deserializer(strstream);
+        std::string val;
+        deserializer.Deserialize("pie", val);
+        std::cout << "Result: " << val << std::endl;
+        testing::ProcessTest("Deserialize string check", val == "cherry");
+    }
+    std::cout << std::endl;
+
+    std::cout << "Deserializer test 3" << std::endl;
+    {
+        std::stringstream strstream;
+        utilities::SimpleXmlSerializer serializer(strstream);
+        std::vector<int> arr {1,2,3};
+        serializer.Serialize("arr", arr);
+        std::cout << "Str value: " << strstream.str() << std::endl;
+
+        utilities::SimpleXmlDeserializer deserializer(strstream);
+        std::vector<int> val;
+        deserializer.Deserialize("arr", val);
+        std::cout << "Result: ";
+        for(auto element: val)
+            std::cout << element << ", ";
+         std::cout << std::endl;
+        testing::ProcessTest("Deserialize vector<int> check", val[0] == 1 && val[1] == 2 && val[2] == 3);
+    }
+    std::cout << std::endl;
+
+    std::cout << "Deserializer test 4" << std::endl;
+    {
+        std::stringstream strstream;
+        utilities::SimpleXmlSerializer serializer(strstream);
+        TestStruct testStruct{ 1, 2.2f, 3.3 };
+        serializer.Serialize("s", testStruct);
+        std::cout << "Str value: " << strstream.str() << std::endl;
+
+        utilities::SimpleXmlDeserializer deserializer(strstream);
+        TestStruct val;
+        deserializer.Deserialize("s", val);
+        std::cout << "Result: ";
+        std::cout << "a: " << val.a << ", b: " << val.b << ", c: " << val.c << std::endl;
+        testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);
+        
+    }
+    std::cout << std::endl;
+}

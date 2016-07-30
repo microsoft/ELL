@@ -167,6 +167,7 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, float);
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, double);
 
+    // ???
     void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array) {}
 
     // Tokenizer
@@ -180,7 +181,7 @@ namespace utilities
         }
 
         const std::string whitespace = " \r\t\n";
-        const std::string tokenStopChars = " \t\r\n<>/'\"";
+        const std::string tokenStopChars = " \t\r\n<>=/'\"";
         std::stringstream tokenStream;
 
         // eat whitespace and add first char
@@ -243,7 +244,7 @@ namespace utilities
         auto token = ReadNextToken();
         if (token != value)
         {
-            throw InputException(InputExceptionErrors::badStringFormat, std::string{"Failed to match token "} + value);
+            throw InputException(InputExceptionErrors::badStringFormat, std::string{"Failed to match token "} + value + ", got: " + token);
         }
     }
 }

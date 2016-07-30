@@ -178,26 +178,38 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<ValueType>& array)
     {
+        auto typeName = TypeName<ValueType>::GetName();
         bool hasName = name != std::string("");
+
+        MatchNextToken("<");
+        MatchNextToken("Array");
         if(hasName)
         {
+            MatchNextToken("name");
+            MatchNextToken("=");
+            MatchNextToken("'");
             MatchNextToken(name);
-            MatchNextToken(":");
+            MatchNextToken("'");
         }
                 
-        MatchNextToken("[");
+        MatchNextToken("name");
+        MatchNextToken("=");
+        MatchNextToken("'");
+        MatchNextToken(typeName);
+        MatchNextToken("'");
+        MatchNextToken(">");
+
         std::string nextToken = "";
-        while(nextToken != "]")
+        // Ugh... need to look ahead to find '</', not just '<'
+        // Maybe we need a stack of peeked tokens
+        while(nextToken != "<")
         {
             ValueType obj;
             Deserialize(obj);
-            array.push_back(obj);
-
-            MatchNextToken(",");
-
-            // Want to peek at the next token here to see if it's a ']'
-            nextToken = PeekNextToken();
         }
-        MatchNextToken("]");
+
+        MatchNextToken("<");
+        MatchNextToken("/");
+        MatchNextToken("Array");
     }
 }
