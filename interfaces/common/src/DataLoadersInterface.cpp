@@ -134,9 +134,7 @@ namespace interfaces
 
         // Create iterator
         auto parsingIterator = MakeParsingIterator(std::move(lineIterator), std::move(sparseEntryParser));
-        // return utilities::MakeAnyIterator(parsingIterator); // Why does this work?
-		utilities::AnyIterator<dataset::GenericSupervisedExample> result;
-		return result;
+        return utilities::MakeAnyIterator(parsingIterator); // Why does this work?
     }
 
     utilities::AnyIterator<dataset::GenericSupervisedExample> GetDataIterator(const std::string& dataFilename, int dimension, const std::string coordinateListString, const std::string& modelFilename)
