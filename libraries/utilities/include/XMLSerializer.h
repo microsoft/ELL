@@ -107,8 +107,9 @@ namespace utilities
     private:
         void PrintTokens();
 
-        std::string _peekedToken = "";
+        std::vector<std::string> _peekedTokens;
         std::string ReadNextToken(); // returns "" at EOF
+        void PutBackToken(std::string token);
         std::string PeekNextToken(); // returns "" at EOF
         void MatchNextToken(std::string readString); // throws an exception if it doesn't match
 

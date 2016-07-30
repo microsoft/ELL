@@ -167,16 +167,18 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, float);
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, double);
 
-    // ???
+    // TODO: Why does this not do anything???
     void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array) {}
+
+    // TODO: allow multi-char tokens
 
     // Tokenizer
     std::string SimpleXmlDeserializer::ReadNextToken()
     {
-        if (_peekedToken != "")
+        if (_peekedTokens.size() > 0)
         {
-            auto temp = _peekedToken;
-            _peekedToken = "";
+            auto temp = _peekedTokens.back();
+            _peekedTokens.pop_back();
             return temp;
         }
 
@@ -221,11 +223,14 @@ namespace utilities
 
     std::string SimpleXmlDeserializer::PeekNextToken()
     {
-        if (_peekedToken == "")
-        {
-            _peekedToken = ReadNextToken();
-        }
-        return _peekedToken;
+        auto token = ReadNextToken();
+        PutBackToken(token);
+        return token;
+    }
+
+    void SimpleXmlDeserializer::PutBackToken(std::string token)
+    {
+        _peekedTokens.push_back(token);
     }
 
     void SimpleXmlDeserializer::PrintTokens()

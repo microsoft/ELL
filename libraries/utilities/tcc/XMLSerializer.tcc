@@ -192,7 +192,7 @@ namespace utilities
             MatchNextToken("'");
         }
                 
-        MatchNextToken("name");
+        MatchNextToken("type");
         MatchNextToken("=");
         MatchNextToken("'");
         MatchNextToken(typeName);
@@ -200,12 +200,22 @@ namespace utilities
         MatchNextToken(">");
 
         std::string nextToken = "";
-        // Ugh... need to look ahead to find '</', not just '<'
-        // Maybe we need a stack of peeked tokens
-        while(nextToken != "<")
+        while(true)
         {
+            std::cout << "Deserializing element of type " << typeName << std::endl;
             ValueType obj;
             Deserialize(obj);
+            array.push_back(obj);
+            
+            // check for '</'
+            auto token1 = ReadNextToken();
+            auto token2 = ReadNextToken();
+            PutBackToken(token2);
+            PutBackToken(token1);
+            if(token1+token2 == "</")
+            {
+                break;
+            }
         }
 
         MatchNextToken("<");
