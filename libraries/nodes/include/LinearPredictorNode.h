@@ -26,9 +26,9 @@ namespace nodes
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr char* inputPortName = "input";
-        static constexpr char* outputPortName = "prediction";
-        static constexpr char* weightedElementsPortName = "weightedElements";
+        static constexpr const char* inputPortName = "input";
+        static constexpr const char* outputPortName = "prediction";
+        static constexpr const char* weightedElementsPortName = "weightedElements";
         const model::OutputPort<double>& prediction = _prediction;
         const model::OutputPort<double>& weightedElements = _weightedElements;
         /// @}

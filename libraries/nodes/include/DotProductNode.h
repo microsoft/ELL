@@ -32,9 +32,9 @@ namespace nodes
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr char* input1PortName = "input1";
-        static constexpr char* input2PortName = "input2";
-        static constexpr char* outputPortName = "output";
+        static constexpr const char* input1PortName = "input1";
+        static constexpr const char* input2PortName = "input2";
+        static constexpr const char* outputPortName = "output";
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
