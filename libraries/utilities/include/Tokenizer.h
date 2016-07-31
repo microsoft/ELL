@@ -29,7 +29,10 @@ namespace utilities
     private:
         std::istream& _in;
         std::string _tokenStopChars;
+        std::string _stringDelimiters = "'\"";
 
         std::vector<std::string> _peekedTokens;
+
+        char _currentStringDelimiter = '\0'; // '\0' if we're not currently parsing a string
     };
 }

@@ -170,14 +170,14 @@ void TestJsonDeserializer()
     {
         std::stringstream strstream;
         utilities::SimpleJsonSerializer serializer(strstream);
-        serializer.Serialize("pie", std::string{ "cherry" });
+        serializer.Serialize("pie", std::string{ "cherry pie" });
         std::cout << "Str value: " << strstream.str() << std::endl;
 
         utilities::SimpleJsonDeserializer deserializer(strstream);
         std::string val;
         deserializer.Deserialize("pie", val);
         std::cout << "Result: " << val << std::endl;
-        testing::ProcessTest("Deserialize string check", val == "cherry");
+        testing::ProcessTest("Deserialize string check", val == "cherry pie");
     }
     std::cout << std::endl;
 
@@ -321,14 +321,14 @@ void TestXmlDeserializer()
     {
         std::stringstream strstream;
         utilities::SimpleXmlSerializer serializer(strstream);
-        serializer.Serialize("pie", std::string{ "cherry" });
+        serializer.Serialize("pie", std::string{ "cherry pie" });
         std::cout << "Str value: " << strstream.str() << std::endl;
 
         utilities::SimpleXmlDeserializer deserializer(strstream);
         std::string val;
         deserializer.Deserialize("pie", val);
         std::cout << "Result: " << val << std::endl;
-        testing::ProcessTest("Deserialize string check", val == "cherry");
+        testing::ProcessTest("Deserialize string check", val == "cherry pie");
     }
     std::cout << std::endl;
 
