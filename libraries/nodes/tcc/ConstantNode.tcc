@@ -13,7 +13,10 @@ namespace nodes
 
     // superclass (Node) constructor takes two array arguments: inputs and outputs. These are pointers to our local InputPort and OutputPort storage.
     template <typename ValueType>
-    ConstantNode<ValueType>::ConstantNode(ValueType value) : Node({}, { &_output }), _output(this, outputPortName, 1), _values({ value }){};
+    ConstantNode<ValueType>::ConstantNode(ValueType value) : Node({}, { &_output }), _output(this, outputPortName, 1), _values({ value }) {};
+
+    template <typename ValueType>
+    ConstantNode<ValueType>::ConstantNode() : Node({}, { &_output }), _output(this, outputPortName, 1) {};
 
     // Constructor for a vector constant
     template <typename ValueType>
@@ -47,5 +50,12 @@ namespace nodes
     {
         Node::Serialize(serializer);
         serializer.Serialize("values", _values);
+    }
+
+    template <typename ValueType>
+    void ConstantNode<ValueType>::Deserialize(utilities::Deserializer& serializer)
+    {
+        Node::Deserialize(serializer);
+        serializer.Deserialize("values", _values);
     }
 }

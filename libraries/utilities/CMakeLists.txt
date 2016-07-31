@@ -25,6 +25,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/RandomEngines.cpp
          src/Serialization.cpp
          src/SimpleJsonSerializer.cpp
+         src/Tokenizer.cpp
          src/XMLSerializer.cpp
          src/TypeName.cpp
          src/UniqueId.cpp
@@ -47,6 +48,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/RandomEngines.h
              include/Serialization.h
              include/SimpleJsonSerializer.h
+             include/Tokenizer.h
              include/XMLSerializer.h
              include/StlIndexValueIterator.h
              include/StlIterator.h

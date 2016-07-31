@@ -364,8 +364,26 @@ void TestXmlDeserializer()
         deserializer.Deserialize("s", val);
         std::cout << "Result: ";
         std::cout << "a: " << val.a << ", b: " << val.b << ", c: " << val.c << std::endl;
-        testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);
-        
+        testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);        
     }
     std::cout << std::endl;
+
+    std::cout << "Deserializer test 5" << std::endl;
+    {
+        model::Model g;
+        std::stringstream strstream;
+        utilities::SimpleXmlSerializer serializer(strstream);
+        auto in = g.AddNode<model::InputNode<double>>(3);
+        auto constNode = g.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
+        auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
+        auto out = g.AddNode<model::OutputNode<double>>(in->output);
+
+        serializer.Serialize("node", *constNode);
+        std::cout << "Str value: " << strstream.str() << std::endl;
+
+        utilities::SimpleXmlDeserializer deserializer(strstream);
+        nodes::ConstantNode<double> val;
+        deserializer.Deserialize("node", val);
+//        testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);
+    }
 }

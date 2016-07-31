@@ -12,6 +12,7 @@
 #include "Variant_def.h"
 #include "TypeName.h"
 #include "Serialization.h"
+#include "Exception.h"
 
 // stl
 #include <string>
@@ -35,7 +36,7 @@ namespace utilities
         virtual void EndSerialize(Serializer& serializer) const {};
 
 
-        virtual void Deserialize(Deserializer& serializer) {} // = 0;  // TODO: call this SerializeContents?
+        virtual void Deserialize(Deserializer& serializer) { throw LogicException(LogicExceptionErrors::notImplemented); }
 
         // Optional:
         virtual void BeginDeserialize(Deserializer& serializer) {};

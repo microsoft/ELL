@@ -104,4 +104,8 @@ namespace model
         }
     }
 
+    void Node::Deserialize(utilities::Deserializer& serializer)
+    {
+        serializer.Deserialize("id", _id);
+    }
 }

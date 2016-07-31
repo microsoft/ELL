@@ -15,6 +15,7 @@
 #include <string>
 #include <sstream>
 #include <cctype>
+#include <algorithm>
 
 namespace utilities
 {
@@ -42,7 +43,7 @@ namespace utilities
     void SimpleXmlSerializer::BeginSerializeObject(const char* name, const ISerializable& value)
     {
         auto indent = GetCurrentIndent();
-        auto typeName = value.GetRuntimeTypeName();
+        auto typeName = SanitizeTypeName(value.GetRuntimeTypeName());
 
         _out << indent;
         _out << "<" << typeName;
@@ -64,7 +65,7 @@ namespace utilities
     void SimpleXmlSerializer::EndSerializeObject(const char* name, const ISerializable& value)
     {
         auto indent = GetCurrentIndent();
-        auto typeName = value.GetRuntimeTypeName();
+        auto typeName = SanitizeTypeName(value.GetRuntimeTypeName());
         _out << indent;
         _out << "</" << typeName << ">" << std::endl;
     }
@@ -88,7 +89,7 @@ namespace utilities
         auto indent = GetCurrentIndent();
         auto endOfLine = "\n";
         auto size = array.size();
-        auto typeName = "ISerializable";
+        auto typeName = "ISerializable"; //?
 
         _out << indent;
         _out << "<Array";
@@ -110,8 +111,8 @@ namespace utilities
     //
     // Deserialization
     //
-    SimpleXmlDeserializer::SimpleXmlDeserializer() : _in(std::cin) {}
-    SimpleXmlDeserializer::SimpleXmlDeserializer(std::istream& inStream) : _in(inStream) {}
+    SimpleXmlDeserializer::SimpleXmlDeserializer() : _in(std::cin), _tokenizer(std::cin) {}
+    SimpleXmlDeserializer::SimpleXmlDeserializer(std::istream& inputStream) : _in(inputStream), _tokenizer(inputStream) {}
 
     IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, bool);
     IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, char);
@@ -128,37 +129,36 @@ namespace utilities
     std::string SimpleXmlDeserializer::BeginDeserializeObject(const char* name, ISerializable& value) 
     {
         bool hasName = name != std::string("");
-        auto typeName = value.GetRuntimeTypeName();
+        auto typeName = SanitizeTypeName(value.GetRuntimeTypeName());
 
-        MatchNextToken("<");
-        MatchNextToken(typeName);
+        _tokenizer.MatchNextToken("<");
+        _tokenizer.MatchNextToken(typeName);
         if(hasName)
         {
-            MatchNextToken("name");
-            MatchNextToken("=");
-            MatchNextToken("'");
-            MatchNextToken(name);
-            MatchNextToken("'");
+            _tokenizer.MatchNextToken("name");
+            _tokenizer.MatchNextToken("=");
+            _tokenizer.MatchNextToken("'");
+            _tokenizer.MatchNextToken(name);
+            _tokenizer.MatchNextToken("'");
         }
-        MatchNextToken(">");
+        _tokenizer.MatchNextToken(">");
         return typeName;
     }
 
     void SimpleXmlDeserializer::DeserializeObject(const char* name, ISerializable& value) 
     {
-        std::cout << "Deserializing an object" << std::endl;
         // somehow we need to have created the right object type
         value.Deserialize(*this);
-        std::cout << "Done" << std::endl;
     }
 
     void SimpleXmlDeserializer::EndDeserializeObject(const char* name, ISerializable& value) 
     {
-        auto typeName = value.GetRuntimeTypeName();
-        MatchNextToken("<");
-        MatchNextToken("/");
-        MatchNextToken(typeName);
-        MatchNextToken(">");
+        auto typeName = SanitizeTypeName(value.GetRuntimeTypeName());
+        std::cout << "Begin deserialization for type " << typeName << std::endl;
+        _tokenizer.MatchNextToken("<");
+        _tokenizer.MatchNextToken("/");
+        _tokenizer.MatchNextToken(typeName);
+        _tokenizer.MatchNextToken(">");
     }
 
     //
@@ -173,88 +173,46 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, double);
 
     // TODO: Why does this not do anything???
-    void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array) {}
+    void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array) 
+    {
+        throw "DeserializeArrayValue called";
+    }
 
     // TODO: allow multi-char tokens
 
-    // Tokenizer
-    std::string SimpleXmlDeserializer::ReadNextToken()
+    std::string SimpleXmlDeserializer::SanitizeString(const std::string& str)
     {
-        if (_peekedTokens.size() > 0)
-        {
-            auto temp = _peekedTokens.back();
-            _peekedTokens.pop_back();
-            return temp;
-        }
-
-        const std::string whitespace = " \r\t\n";
-        const std::string tokenStopChars = " \t\r\n<>=/'\"";
-        std::stringstream tokenStream;
-
-        // eat whitespace and add first char
-        while (_in)
-        {
-            auto ch = _in.get();
-            if (ch == EOF)
-                return "";
-            if (!std::isspace(ch))
-            {
-                tokenStream << (char)ch;
-                if (tokenStopChars.find(ch) == std::string::npos)
-                    break;
-                else
-                    return tokenStream.str();
-            }
-        }
-
-        while (_in)
-        {
-            auto ch = _in.get();
-            if (ch == EOF)
-            {
-                break;
-            }
-
-            if (tokenStopChars.find(ch) != std::string::npos)
-            {
-                _in.unget();
-                break;
-            }
-            tokenStream << (char)ch;
-        }
-
-        return tokenStream.str();
+        return str;
     }
 
-    std::string SimpleXmlDeserializer::PeekNextToken()
+    std::string SimpleXmlDeserializer::UnsanitizeString(const std::string& str)
     {
-        auto token = ReadNextToken();
-        PutBackToken(token);
-        return token;
+        return str;
     }
 
-    void SimpleXmlDeserializer::PutBackToken(std::string token)
+    std::string SimpleXmlSerializer::SanitizeTypeName(const std::string& str)
     {
-        _peekedTokens.push_back(token);
+        // convert '<'->'(' etc.
+        auto result = str;
+        std::replace(result.begin(), result.end(), '<', '(');
+        std::replace(result.begin(), result.end(), '>', ')');
+        return result;
     }
 
-    void SimpleXmlDeserializer::PrintTokens()
+    std::string SimpleXmlDeserializer::SanitizeTypeName(const std::string& str)
     {
-        while (true)
-        {
-            auto token = ReadNextToken();
-            if (token == "")
-                break;
-            std::cout << "Token: " << token << std::endl;
-        }
+        // convert '<'->'(' etc.
+        auto result = str;
+        std::replace(result.begin(), result.end(), '<', '(');
+        std::replace(result.begin(), result.end(), '>', ')');
+        return result;
     }
 
-    void SimpleXmlDeserializer::MatchNextToken(std::string value)
+    std::string SimpleXmlDeserializer::UnsanitizeTypeName(const std::string& str)
     {
-        auto token = ReadNextToken();
-        if (token != value)
-        {
-            throw InputException(InputExceptionErrors::badStringFormat, std::string{"Failed to match token "} + value + ", got: " + token);
-        }
+        auto result = str;
+        std::replace(result.begin(), result.end(), '(', ')');
+        std::replace(result.begin(), result.end(), ')', '>');
+        return result;
     }
 }

@@ -26,6 +26,9 @@ namespace nodes
     class ConstantNode : public model::Node
     {
     public:
+        /// <summary> Default constructor (used only for deserialization) </summary>
+        ConstantNode();
+
         /// <summary> Constructor for a scalar constant </summary>
         ///
         /// <param name="value"> The scalar value </param>
@@ -60,6 +63,7 @@ namespace nodes
         /// Inherited from ISerializable
         // virtual utilities::ObjectDescription GetDescription() const override;
         virtual void Serialize(utilities::Serializer& serializer) const override;
+        virtual void Deserialize(utilities::Deserializer& serializer) override;
 
         static constexpr const char* outputPortName = "output";
 

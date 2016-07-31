@@ -18,7 +18,7 @@ namespace utilities
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
         auto endOfLine = hasName ? "\n" : "";
-        auto typeName = TypeName<ValueType>::GetName();
+        auto typeName = SanitizeTypeName(TypeName<ValueType>::GetName());
 
         _out << indent;
         _out << "<" << typeName;
@@ -78,7 +78,7 @@ namespace utilities
         auto indent = GetCurrentIndent();
         auto endOfLine = "\n";
         auto size = array.size();
-        auto typeName = TypeName<ValueType>::GetName();
+        auto typeName = SanitizeTypeName(TypeName<ValueType>::GetName());
 
         _out << indent;
         _out << "<Array";
@@ -119,31 +119,31 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void SimpleXmlDeserializer::ReadScalar(const char* name, ValueType& value)
     {
-        auto typeName = TypeName<ValueType>::GetName();
+        auto typeName = SanitizeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
 
-        MatchNextToken("<");
-        MatchNextToken(typeName);
+        _tokenizer.MatchNextToken("<");
+        _tokenizer.MatchNextToken(typeName);
         if(hasName)
         {
-            MatchNextToken("name");
-            MatchNextToken("=");
-            MatchNextToken("'");
-            MatchNextToken(name);
-            MatchNextToken("'");
+            _tokenizer.MatchNextToken("name");
+            _tokenizer.MatchNextToken("=");
+            _tokenizer.MatchNextToken("'");
+            _tokenizer.MatchNextToken(name);
+            _tokenizer.MatchNextToken("'");
         }
-        MatchNextToken("value");
-        MatchNextToken("=");
-        MatchNextToken("'");
+        _tokenizer.MatchNextToken("value");
+        _tokenizer.MatchNextToken("=");
+        _tokenizer.MatchNextToken("'");
 
         // read value
-        auto valueToken = ReadNextToken();
+        auto valueToken = _tokenizer.ReadNextToken();
         std::stringstream valueStream(valueToken);
         valueStream >> value;
 
-        MatchNextToken("'");
-        MatchNextToken("/");
-        MatchNextToken(">");
+        _tokenizer.MatchNextToken("'");
+        _tokenizer.MatchNextToken("/");
+        _tokenizer.MatchNextToken(">");
     }
 
     // This function is inline just so it appears next to the other Read* functions
@@ -152,74 +152,74 @@ namespace utilities
         auto typeName = "string";
         bool hasName = name != std::string("");
 
-        MatchNextToken("<");
-        MatchNextToken(typeName);
+        _tokenizer.MatchNextToken("<");
+        _tokenizer.MatchNextToken(typeName);
         if(hasName)
         {
-            MatchNextToken("name");
-            MatchNextToken("=");
-            MatchNextToken("'");
-            MatchNextToken(name);
-            MatchNextToken("'");
+            _tokenizer.MatchNextToken("name");
+            _tokenizer.MatchNextToken("=");
+            _tokenizer.MatchNextToken("'");
+            _tokenizer.MatchNextToken(name);
+            _tokenizer.MatchNextToken("'");
         }
-        MatchNextToken("value");
-        MatchNextToken("=");
-        MatchNextToken("'");
+        _tokenizer.MatchNextToken("value");
+        _tokenizer.MatchNextToken("=");
+        _tokenizer.MatchNextToken("'");
 
         // read value
-        auto valueToken = ReadNextToken();
+        auto valueToken = _tokenizer.ReadNextToken();
         value = valueToken;
 
-        MatchNextToken("'");
-        MatchNextToken("/");
-        MatchNextToken(">");
+        _tokenizer.MatchNextToken("'");
+        _tokenizer.MatchNextToken("/");
+        _tokenizer.MatchNextToken(">");
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
     void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<ValueType>& array)
     {
-        auto typeName = TypeName<ValueType>::GetName();
+        auto typeName = SanitizeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
 
-        MatchNextToken("<");
-        MatchNextToken("Array");
+        _tokenizer.MatchNextToken("<");
+        _tokenizer.MatchNextToken("Array");
         if(hasName)
         {
-            MatchNextToken("name");
-            MatchNextToken("=");
-            MatchNextToken("'");
-            MatchNextToken(name);
-            MatchNextToken("'");
+            _tokenizer.MatchNextToken("name");
+            _tokenizer.MatchNextToken("=");
+            _tokenizer.MatchNextToken("'");
+            _tokenizer.MatchNextToken(name);
+            _tokenizer.MatchNextToken("'");
         }
                 
-        MatchNextToken("type");
-        MatchNextToken("=");
-        MatchNextToken("'");
-        MatchNextToken(typeName);
-        MatchNextToken("'");
-        MatchNextToken(">");
+        _tokenizer.MatchNextToken("type");
+        _tokenizer.MatchNextToken("=");
+        _tokenizer.MatchNextToken("'");
+        _tokenizer.MatchNextToken(typeName);
+        _tokenizer.MatchNextToken("'");
+        _tokenizer.MatchNextToken(">");
 
         std::string nextToken = "";
         while(true)
         {
-            std::cout << "Deserializing element of type " << typeName << std::endl;
             ValueType obj;
             Deserialize(obj);
             array.push_back(obj);
             
             // check for '</'
-            auto token1 = ReadNextToken();
-            auto token2 = ReadNextToken();
-            PutBackToken(token2);
-            PutBackToken(token1);
+            auto token1 = _tokenizer.ReadNextToken();
+            auto token2 = _tokenizer.ReadNextToken();
+            _tokenizer.PutBackToken(token2);
+            _tokenizer.PutBackToken(token1);
             if(token1+token2 == "</")
             {
                 break;
             }
         }
 
-        MatchNextToken("<");
-        MatchNextToken("/");
-        MatchNextToken("Array");
+        _tokenizer.MatchNextToken("<");
+        _tokenizer.MatchNextToken("/");
+        _tokenizer.MatchNextToken("Array");
+        _tokenizer.MatchNextToken(">");
     }
 }

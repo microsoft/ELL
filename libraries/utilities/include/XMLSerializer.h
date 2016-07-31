@@ -12,6 +12,7 @@
 #include "TypeFactory.h"
 #include "TypeName.h"
 #include "Exception.h"
+#include "Tokenizer.h"
 
 // stl
 #include <cstdint>
@@ -73,6 +74,8 @@ namespace utilities
         std::ostream& _out;
         int _indent = 0;
         std::string GetCurrentIndent() { return std::string(2 * _indent, ' '); }
+
+        static std::string SanitizeTypeName(const std::string& str);
     };
 
     class SimpleXmlDeserializer : public Deserializer
@@ -105,23 +108,20 @@ namespace utilities
         virtual void EndDeserializeObject(const char* name, ISerializable& value) override;
 
     private:
-        void PrintTokens();
-
-        std::vector<std::string> _peekedTokens;
-        std::string ReadNextToken(); // returns "" at EOF
-        void PutBackToken(std::string token);
-        std::string PeekNextToken(); // returns "" at EOF
-        void MatchNextToken(std::string readString); // throws an exception if it doesn't match
+        // utilitiy functinos
+        static std::string SanitizeString(const std::string& str);
+        static std::string UnsanitizeString(const std::string& str);
+        static std::string SanitizeTypeName(const std::string& str);
+        static std::string UnsanitizeTypeName(const std::string& str);
 
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void ReadScalar(const char* name, ValueType& value);
-
         void ReadScalar(const char* name, std::string& value);
-
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void ReadArray(const char* name, std::vector<ValueType>& array);
 
         std::istream& _in;
+        Tokenizer _tokenizer;
     };
 }
 
