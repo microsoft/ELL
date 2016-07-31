@@ -128,17 +128,19 @@ namespace utilities
     std::string SimpleXmlDeserializer::BeginDeserializeObject(const char* name, ISerializable& value) 
     {
         bool hasName = name != std::string("");
+        auto typeName = value.GetRuntimeTypeName();
+
+        MatchNextToken("<");
+        MatchNextToken(typeName);
         if(hasName)
         {
+            MatchNextToken("name");
+            MatchNextToken("=");
+            MatchNextToken("'");
             MatchNextToken(name);
-            MatchNextToken(":");
+            MatchNextToken("'");
         }
-        MatchNextToken("{");
-        
-        MatchNextToken("_type");
-        MatchNextToken(":");
-        auto typeName = ReadNextToken();
-        std::cout << "Read type: " << typeName << std::endl;    
+        MatchNextToken(">");
         return typeName;
     }
 
@@ -152,7 +154,10 @@ namespace utilities
 
     void SimpleXmlDeserializer::EndDeserializeObject(const char* name, ISerializable& value) 
     {
+        auto typeName = value.GetRuntimeTypeName();
+        MatchNextToken("<");
         MatchNextToken("/");
+        MatchNextToken(typeName);
         MatchNextToken(">");
     }
 
