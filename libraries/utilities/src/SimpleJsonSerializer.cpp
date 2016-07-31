@@ -93,8 +93,8 @@ namespace utilities
     //
     // Deserialization
     //
-    SimpleJsonDeserializer::SimpleJsonDeserializer() : _in(std::cin) {}
-    SimpleJsonDeserializer::SimpleJsonDeserializer(std::istream& inStream) : _in(inStream) {}
+    SimpleJsonDeserializer::SimpleJsonDeserializer() : _in(std::cin), _tokenizer(std::cin, ",:{}[]'\"") {}
+    SimpleJsonDeserializer::SimpleJsonDeserializer(std::istream& inputStream) : _in(inputStream), _tokenizer(inputStream, ",:{}[]'\"") {}
 
     IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, bool);
     IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, char);
@@ -113,14 +113,14 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            MatchNextToken(name);
-            MatchNextToken(":");
+            _tokenizer.MatchNextToken(name);
+            _tokenizer.MatchNextToken(":");
         }
-        MatchNextToken("{");
+        _tokenizer.MatchNextToken("{");
         
-        MatchNextToken("_type");
-        MatchNextToken(":");
-        auto typeName = ReadNextToken();
+        _tokenizer.MatchNextToken("_type");
+        _tokenizer.MatchNextToken(":");
+        auto typeName = _tokenizer.ReadNextToken();
         std::cout << "Read type: " << typeName << std::endl;    
         return typeName;
     }
@@ -135,7 +135,7 @@ namespace utilities
 
     void SimpleJsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value) 
     {
-        MatchNextToken("}");
+        _tokenizer.MatchNextToken("}");
     }
 
     //
@@ -150,82 +150,4 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, double);
 
     void SimpleJsonDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array) {}
-
-    // Tokenizer
-    std::string SimpleJsonDeserializer::ReadNextToken()
-    {
-        if (_peekedToken != "")
-        {
-            auto temp = _peekedToken;
-            _peekedToken = "";
-            return temp;
-        }
-
-        std::string whitespace = " \r\t\n";
-        std::string tokenStopChars = " \t\r\n,:{}[]'\"";
-        std::stringstream tokenStream;
-
-        // eat whitespace and add first char
-        while (_in)
-        {
-            auto ch = _in.get();
-            if (ch == EOF)
-                return "";
-            if (!std::isspace(ch))
-            {
-                tokenStream << (char)ch;
-                if (tokenStopChars.find(ch) == std::string::npos)
-                    break;
-                else
-                    return tokenStream.str();
-            }
-        }
-
-        while (_in)
-        {
-            auto ch = _in.get();
-            if (ch == EOF)
-            {
-                break;
-            }
-
-            if (tokenStopChars.find(ch) != std::string::npos)
-            {
-                _in.unget();
-                break;
-            }
-            tokenStream << (char)ch;
-        }
-
-        return tokenStream.str();
-    }
-
-    std::string SimpleJsonDeserializer::PeekNextToken()
-    {
-        if (_peekedToken == "")
-        {
-            _peekedToken = ReadNextToken();
-        }
-        return _peekedToken;
-    }
-
-    void SimpleJsonDeserializer::PrintTokens()
-    {
-        while (true)
-        {
-            auto token = ReadNextToken();
-            if (token == "")
-                break;
-            std::cout << "Token: " << token << std::endl;
-        }
-    }
-
-    void SimpleJsonDeserializer::MatchNextToken(std::string value)
-    {
-        auto token = ReadNextToken();
-        if (token != value)
-        {
-            throw InputException(InputExceptionErrors::badStringFormat, std::string{"Failed to match token "} + value);
-        }
-    }
 }

@@ -111,8 +111,8 @@ namespace utilities
     //
     // Deserialization
     //
-    SimpleXmlDeserializer::SimpleXmlDeserializer() : _in(std::cin), _tokenizer(std::cin) {}
-    SimpleXmlDeserializer::SimpleXmlDeserializer(std::istream& inputStream) : _in(inputStream), _tokenizer(inputStream) {}
+    SimpleXmlDeserializer::SimpleXmlDeserializer() : _in(std::cin), _tokenizer(std::cin, "<>=/'\"") {}
+    SimpleXmlDeserializer::SimpleXmlDeserializer(std::istream& inputStream) : _in(inputStream), _tokenizer(inputStream, "<>=/'\"") {}
 
     IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, bool);
     IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, char);

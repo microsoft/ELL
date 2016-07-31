@@ -93,12 +93,12 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            MatchNextToken(name);
-            MatchNextToken(":");
+            _tokenizer.MatchNextToken(name);
+            _tokenizer.MatchNextToken(":");
         }
 
         // read string
-        auto valueToken = ReadNextToken();
+        auto valueToken = _tokenizer.ReadNextToken();
         std::stringstream valueStream(valueToken);
         valueStream >> value;
     }
@@ -109,14 +109,14 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            MatchNextToken(name);
-            MatchNextToken(":");
+            _tokenizer.MatchNextToken(name);
+            _tokenizer.MatchNextToken(":");
         }
 
-        MatchNextToken("\"");
-        auto valueToken = ReadNextToken();
+        _tokenizer.MatchNextToken("\"");
+        auto valueToken = _tokenizer.ReadNextToken();
         value = valueToken;
-        MatchNextToken("\"");
+        _tokenizer.MatchNextToken("\"");
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
@@ -125,11 +125,11 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            MatchNextToken(name);
-            MatchNextToken(":");
+            _tokenizer.MatchNextToken(name);
+            _tokenizer.MatchNextToken(":");
         }
                 
-        MatchNextToken("[");
+        _tokenizer.MatchNextToken("[");
         std::string nextToken = "";
         while(nextToken != "]")
         {
@@ -137,11 +137,11 @@ namespace utilities
             Deserialize(obj);
             array.push_back(obj);
 
-            MatchNextToken(",");
+            _tokenizer.MatchNextToken(",");
 
             // Want to peek at the next token here to see if it's a ']'
-            nextToken = PeekNextToken();
+            nextToken = _tokenizer.PeekNextToken();
         }
-        MatchNextToken("]");
+        _tokenizer.MatchNextToken("]");
     }
 }

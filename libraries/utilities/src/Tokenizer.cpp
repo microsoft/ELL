@@ -27,9 +27,6 @@ namespace utilities
             _peekedTokens.pop_back();
             return temp;
         }
-
-        const std::string whitespace = " \r\t\n";
-        const std::string tokenStopChars = " \t\r\n<>=/'\"";
         std::stringstream tokenStream;
 
         // eat whitespace and add first char
@@ -41,7 +38,7 @@ namespace utilities
             if (!std::isspace(ch))
             {
                 tokenStream << (char)ch;
-                if (tokenStopChars.find(ch) == std::string::npos)
+                if (_tokenStopChars.find(ch) == std::string::npos)
                     break;
                 else
                     return tokenStream.str();
@@ -56,7 +53,7 @@ namespace utilities
                 break;
             }
 
-            if (tokenStopChars.find(ch) != std::string::npos)
+            if (std::isspace(ch) || _tokenStopChars.find(ch) != std::string::npos)
             {
                 _in.unget();
                 break;

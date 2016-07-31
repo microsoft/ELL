@@ -12,6 +12,7 @@
 #include "TypeFactory.h"
 #include "TypeName.h"
 #include "Exception.h"
+#include "Tokenizer.h"
 
 // stl
 #include <cstdint>
@@ -105,13 +106,6 @@ namespace utilities
         virtual void EndDeserializeObject(const char* name, ISerializable& value) override;
 
     private:
-        void PrintTokens();
-
-        std::string _peekedToken = "";
-        std::string ReadNextToken(); // returns "" at EOF
-        std::string PeekNextToken(); // returns "" at EOF
-        void MatchNextToken(std::string readString); // throws an exception if it doesn't match
-
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void ReadScalar(const char* name, ValueType& value);
 
@@ -121,6 +115,7 @@ namespace utilities
         void ReadArray(const char* name, std::vector<ValueType>& array);
 
         std::istream& _in;
+        Tokenizer _tokenizer;
     };
 }
 
