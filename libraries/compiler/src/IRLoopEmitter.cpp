@@ -44,6 +44,17 @@ namespace emll
 			return PrepareBody();
 		}
 
+		llvm::BasicBlock* IRForLoopEmitter::Begin(llvm::Value* pRepeatCount)
+		{
+			assert(pRepeatCount != nullptr);
+
+			CreateBlocks();
+			EmitIterationVar(ValueType::Int32, _fn.Literal(0));
+			EmitCondition(ComparisonType::Lt, pRepeatCount);
+			EmitIncrement(ValueType::Int32, _fn.Literal(1));
+			return PrepareBody();
+		}
+
 		void IRForLoopEmitter::CreateBlocks()
 		{
 			_pInitBlock = _fn.Block(ForInitBlockName);

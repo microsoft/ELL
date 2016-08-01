@@ -270,7 +270,7 @@ void TestBinaryVector(bool expanded)
 	auto output = mb.Outputs<double>(bop2->output);
 
 	IRCompiler compiler("EMLL");
-	compiler.ShouldUnrollLoops() = expanded;
+	compiler.Settings().ShouldUnrollLoops() = expanded;
 	compiler.CompileModel("TestBinaryVector", mb.Model);
 	compiler.DebugDump();
 }
@@ -295,7 +295,7 @@ void TestBinaryScalar()
 	compiler.DebugDump();
 }
 
-void TestDotProduct(bool expanded)
+void TestDotProduct(CompilerSettings& settings)
 {
 	std::vector<double> data = { 5, 10, 15, 20 };
 
@@ -306,9 +306,26 @@ void TestDotProduct(bool expanded)
 	auto output = mb.Outputs<double>(dotProduct->output);
 
 	IRCompiler compiler("EMLL");
-	compiler.ShouldUnrollLoops() = expanded;
+	compiler.Settings() = settings;
 	compiler.CompileModel("TestDotProduct", mb.Model);
 	compiler.DebugDump();
+}
+
+void TestDotProduct()
+{
+	CompilerSettings settings;
+	
+	settings.ShouldUnrollLoops() = false;
+	settings.ShouldInlineOperators() = true;
+	TestDotProduct(settings);
+
+	settings.ShouldUnrollLoops() = true;
+	settings.ShouldInlineOperators() = true;
+	TestDotProduct(settings);
+
+	settings.ShouldUnrollLoops() = false;
+	settings.ShouldInlineOperators() = false;
+	TestDotProduct(settings);
 }
 
 void TestSum(bool expanded)
@@ -323,7 +340,7 @@ void TestSum(bool expanded)
 	auto output = mb.Outputs<double>(sum->output);
 
 	IRCompiler compiler("EMLL");
-	compiler.ShouldUnrollLoops() = expanded;
+	compiler.Settings().ShouldUnrollLoops() = expanded;
 	compiler.CompileModel("TestSum", mb.Model);
 	compiler.DebugDump();
 }
@@ -340,7 +357,7 @@ void TestAccumulator(bool expanded)
 	auto output = mb.Outputs<double>(accumulate->output);
 
 	IRCompiler compiler("EMLL");
-	compiler.ShouldUnrollLoops() = expanded;
+	compiler.Settings().ShouldUnrollLoops() = expanded;
 	compiler.CompileModel("TestAccumulator", mb.Model);
 	compiler.DebugDump();
 }
@@ -388,3 +405,33 @@ void TestSlidingAverage()
 	compiler.DebugDump();
 	module.WriteBitcodeToFile("C:\\junk\\model\\avg.bc");
 }
+
+void TestDotProductOutput()
+{
+	CompilerSettings settings;
+	std::vector<double> data = { 5, 10, 15, 20 };
+
+	ModelBuilder mb;
+	auto c1 = mb.Constant<double>(data);
+	auto input1 = mb.Inputs<double>(4);
+	auto dotProduct = mb.DotProduct<double>(c1->output, input1->output);
+	auto output = mb.Outputs<double>(dotProduct->output);
+
+	IRCompiler compiler("EMLL");
+	compiler.Settings().ShouldInlineOperators() = false;
+	compiler.CompileModel("TestDotProduct", mb.Model);
+
+	auto& module = compiler.Module();
+	module.DeclarePrintf();
+	auto fnMain = module.AddMain();
+	llvm::Value* pData = module.Constant("c_data", data);
+	llvm::Value* pResult = fnMain.Var(ValueType::Double, 1);
+	fnMain.Call("TestDotProduct", { fnMain.PtrOffset(pData, 0), fnMain.PtrOffset(pResult, 0) });
+	fnMain.PrintForEach("%f\n", pResult, 1);
+	fnMain.Ret();
+	fnMain.Verify();
+
+	compiler.DebugDump();
+	module.WriteBitcodeToFile("C:\\junk\\model\\dot.bc");
+}
+

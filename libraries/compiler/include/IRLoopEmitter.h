@@ -23,11 +23,16 @@ namespace emll
 				return _pIterationVar;
 			}
 			llvm::Value* LoadIterationVar();
+
+			///<summary>Begin a for loop that repeats the given number of times</summary>
 			llvm::BasicBlock* Begin(const int repeatCount)
 			{
 				return Begin(0, repeatCount, 1);
 			}
 			llvm::BasicBlock* Begin(const int iStartAt, const int iMaxValue, const int stepSize);
+
+			///<summary>Begin a for loop that repeats the given number of times</summary>
+			llvm::BasicBlock* Begin(llvm::Value* pRepeatCount);
 
 			void End();
 			void Clear();

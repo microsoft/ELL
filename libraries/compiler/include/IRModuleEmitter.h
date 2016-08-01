@@ -102,6 +102,11 @@ namespace emll
 			}
 
 			///<summary>For direct access to LLVM APIs</summary>
+			IREmitter& Emitter()
+			{
+				return _emitter;
+			}
+			///<summary>For direct access to LLVM APIs</summary>
 			llvm::Module* Module() const
 			{
 				return _pModule.get();

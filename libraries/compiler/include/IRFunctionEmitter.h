@@ -74,6 +74,9 @@ namespace emll
 			llvm::Value* Call(const std::string& name, IRValueList& args);
 			///<summary>Emit a call to a function with arguments</summary>
 			llvm::Value* Call(const std::string& name, std::initializer_list<llvm::Value*> args);
+			///<summary>Emit a call to a function with arguments</summary>
+			llvm::Value* Call(llvm::Function* pfn, std::initializer_list<llvm::Value*> args);
+
 			///<summary>Emit a return - the function returns void</summary>
 			void Ret()
 			{
@@ -94,6 +97,8 @@ namespace emll
 			
 			///<summary>Emit binary operator over 2 equal sized vector args - the operator is applied to each pair of scalars. Also supply an aggregator function</summary>
 			void OpV(OperatorType type, size_t count, llvm::Value* pLVal, llvm::Value* pRVal, std::function<void(llvm::Value*, llvm::Value*)> aggregator);
+			///<summary>Emit binary operator over 2 equal sized vector args - the operator is applied to each pair of scalars. Also supply an aggregator function</summary>
+			void OpV(OperatorType type, llvm::Value* pCount, llvm::Value* pLVal, llvm::Value* pRVal, std::function<void(llvm::Value*, llvm::Value*)> aggregator);
 			///<summary>Emit binary operator over 2 equal sized vector args - the operator is applied to each pair of scalars. Also supply an aggregator function</summary>
 			void OpV(OperatorType type, size_t count, llvm::Value* pLVal, int startAtL, llvm::Value* pRVal, int startAtR, std::function<void(llvm::Value*, llvm::Value*)> aggregator);
 
@@ -218,10 +223,17 @@ namespace emll
 			// Inline common code generators
 			//
 			//------------------------------------------
+			///<summary>Emit IR to printf each item in the given vector</summary>
 			void PrintForEach(const std::string& formatString, llvm::Value* pVector, int count);
-			llvm::Value* DotProductF(int count, llvm::Value* pLVal, llvm::Value* pRVal);
-			void DotProductF(int count, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest);
 
+			///<summary>Emit IR to compute a DOT product</summary>
+			llvm::Value* DotProductF(int count, llvm::Value* pLVal, llvm::Value* pRVal);
+			///<summary>Emit IR to compute a DOT product</summary>
+			void DotProductF(int count, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest);
+			///<summary>Emit IR to compute a DOT product</summary>
+			void DotProductF(llvm::Value* pCount, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest);
+
+			///<summary>Implements the mechanics of a shift register</summary>
 			template<typename T>
 			void ShiftAndUpdate(llvm::Value* pBuffer, int bufferCount, int shiftCount, llvm::Value* pNewData, llvm::Value* pShiftedData = nullptr);
 

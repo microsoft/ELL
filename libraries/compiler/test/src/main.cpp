@@ -1,12 +1,15 @@
 #include "CompilerTest.h"
 
+using namespace emll::compiler;
+
 int main(int argc, char* argv[])
 {
+	TestDotProductOutput();
+
 	TestBinaryVector(false);
 	TestBinaryVector(true);
 	TestBinaryScalar();
-	TestDotProduct(false);
-	TestDotProduct(true);
+	TestDotProduct();
 	TestSum(false);
 	TestSum(true);
 	TestAccumulator(false);

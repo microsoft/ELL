@@ -233,7 +233,7 @@ namespace emll
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
 			if ((ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2)) &&
-				!ShouldUnrollLoops())
+				!Settings().ShouldUnrollLoops())
 			{
 				CompileBinaryLoop<T>(node);
 			}
@@ -280,7 +280,7 @@ namespace emll
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
 			if ((ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2)) &&
-				!ShouldUnrollLoops())
+				!Settings().ShouldUnrollLoops())
 			{
 				CompileDotProductLoop<T>(node);
 			}
@@ -296,8 +296,16 @@ namespace emll
 			llvm::Value* pLVector = EnsureEmitted(node.GetInputPorts()[0]);
 			llvm::Value* pRVector = EnsureEmitted(node.GetInputPorts()[1]);
 			auto pOutput = node.GetOutputPorts()[0];
+			int count = (int)(node.GetInputPorts()[0])->Size();
 			llvm::Value* pResult = EnsureEmitted(pOutput);
-			_fn.DotProductF(pOutput->Size(), pLVector, pRVector, pResult);
+			if (Settings().ShouldInlineOperators())
+			{
+				_fn.DotProductF(count, pLVector, pRVector, pResult);
+			}
+			else
+			{
+				_fn.Call(_runtime.DotProductF(), { _fn.Literal(count), _fn.PtrOffset(pLVector, 0), _fn.PtrOffset(pRVector, 0), _fn.PtrOffset(pResult, 0) });
+			}
 		}
 
 		template<typename T>
@@ -325,7 +333,7 @@ namespace emll
 			// SumNode has exactly 1 input and 1 output
 			auto input = node.GetInputPorts()[0];
 			if (ModelEx::IsPureVector(*input) && 
-				!ShouldUnrollLoops())
+				!Settings().ShouldUnrollLoops())
 			{
 				CompileSumLoop<T>(node);
 			}
@@ -382,7 +390,7 @@ namespace emll
 			SetVariableFor(pOutput, pVar);
 
 			if (ModelEx::IsPureVector(*pInput) && 
-				!ShouldUnrollLoops())
+				!Settings().ShouldUnrollLoops())
 			{
 				CompileAccumulatorLoop<T>(node);
 			}

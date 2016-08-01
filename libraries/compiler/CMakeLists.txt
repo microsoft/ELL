@@ -24,6 +24,7 @@ set (SRC src/Types.cpp
 		 src/ModelEx.cpp
 		 src/Variable.cpp
 		 src/Compiler.cpp
+		 src/IRRuntime.cpp
 		 src/IRCompiler.cpp
 )
 
@@ -42,6 +43,7 @@ set (INCLUDE include/LLVMInclude.h
 		include/ScalarVar.h
 		include/VectorVar.h
 		include/Compiler.h
+		include/IRRuntime.h
 		include/IRCompiler.h
 )
 

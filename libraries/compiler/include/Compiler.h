@@ -30,7 +30,22 @@ namespace emll
 {
 	namespace compiler
 	{
-		/// <summary>Base class for EMLL compilers</summary>
+		///<summary>Standard compiler switches. These will evolve as we do deeper compiler work</summary>
+		class CompilerSettings
+		{
+		public:
+			CompilerSettings() = default;
+			CompilerSettings(const CompilerSettings& src);
+
+			bool& ShouldUnrollLoops() { return _unrollLoops; }
+			bool& ShouldInlineOperators() { return _inlineOperators; }
+
+		private:
+			bool _unrollLoops = false;
+			bool _inlineOperators = true;
+		};
+
+		/// <summary>Abstract base class for EMLL compilers</summary>
 		class Compiler
 		{
 		public:
@@ -39,7 +54,8 @@ namespace emll
 			Compiler();
 			virtual ~Compiler() = default;
 
-			bool& ShouldUnrollLoops() { return _unrollLoops; }
+			///<summary>Return the base compiler settings</summary>
+			CompilerSettings& Settings() { return _settings; }
 
 			///<summary>Compile the model into a function with the given name</summary>
 			void CompileModel(const std::string& functionName, model::Model& model);
@@ -95,10 +111,8 @@ namespace emll
 			NamedValueTypeList _args;				// function arguments
 			// Maps output ports to runtime variables
 			std::unordered_map<const model::OutputPortBase*, Variable*> _portToVarMap;
-			//
-			// Compiler settings
-			//
-			bool _unrollLoops = false;
+
+			CompilerSettings _settings;
 		};
 	}
 }

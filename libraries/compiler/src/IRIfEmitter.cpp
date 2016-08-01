@@ -28,7 +28,7 @@ namespace emll
 
 		llvm::BasicBlock* IRIfEmitter::Else()
 		{
-			assert(_pEndBlock != nullptr);
+			assert(_pEndBlock != nullptr);  // Else was called twice, OR without a preceding If
 
 			EndPrev();
 			_pThenBlock = _pEndBlock;

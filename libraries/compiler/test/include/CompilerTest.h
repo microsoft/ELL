@@ -58,8 +58,10 @@ private:
 
 void TestBinaryVector(bool expanded);
 void TestBinaryScalar();
-void TestDotProduct(bool expanded);
+void TestDotProduct();
+
 void TestSum(bool expanded);
 void TestAccumulator(bool expanded);
 void TestDelay();
 void TestSlidingAverage();
+void TestDotProductOutput();

@@ -3,6 +3,7 @@
 #include "IRInclude.h"
 #include "ScalarVar.h"
 #include "VectorVar.h"
+#include "IRRuntime.h"
 #include <stdio.h>
 
 namespace emll
@@ -174,11 +175,12 @@ namespace emll
 
 		private:
 			IREmitter _emitter;			// Object that makes lower level LLVM calls
-			IRModuleEmitter _module;		// The emitted IR module
+			IRModuleEmitter _module;	// The emitted IR module
 			IRFunctionEmitter _fn;		// The main function for the module we are writing into.  
 			IRVariableTable _literals;	// Symbol table - name to literals
-			IRVariableTable _locals;		// Symbol table - name to stack variables
+			IRVariableTable _locals;	// Symbol table - name to stack variables
 			IRVariableTable _globals;	// Symbol table - name to global variables
+			IRRuntime _runtime;			// Manages emission of runtime functions	
 		};
 	}
 }

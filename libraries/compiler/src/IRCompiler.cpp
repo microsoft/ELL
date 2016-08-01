@@ -8,7 +8,7 @@ namespace emll
 	namespace compiler
 	{
 		IRCompiler::IRCompiler(const std::string& moduleName)
-			:  _module(_emitter, moduleName)
+			:  _module(_emitter, moduleName), _runtime(_module)
 		{
 		}
 

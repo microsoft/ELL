@@ -13,6 +13,13 @@ namespace emll
 {
 	namespace compiler
 	{
+		CompilerSettings::CompilerSettings(const CompilerSettings& src)
+			: _unrollLoops(src._unrollLoops),
+			  _inlineOperators(src._inlineOperators)
+		{
+
+		}
+
 		static const std::string c_InputVariableName = "input";
 		static const std::string c_OutputVariableName = "output";
 		static const std::string c_literalVar = "c_";

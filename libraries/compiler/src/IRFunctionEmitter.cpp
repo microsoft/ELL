@@ -63,6 +63,13 @@ namespace emll
 			return _pEmitter->Call(ResolveFunction(name), _values);
 		}
 
+		llvm::Value* IRFunctionEmitter::Call(llvm::Function* pfn, std::initializer_list<llvm::Value*> args)
+		{
+			assert(pfn != nullptr);
+			_values.init(args);
+			return _pEmitter->Call(pfn, _values);
+		}
+
 		llvm::Value* IRFunctionEmitter::Op(OperatorType  type, llvm::iterator_range<llvm::Function::arg_iterator>& args)
 		{
 			auto values = args.begin();
@@ -83,6 +90,24 @@ namespace emll
 				auto i = forLoop.LoadIterationVar();
 				llvm::Value* pLItem = ValueAt(pLVal, i);
 				llvm::Value* pRItem =  ValueAt(pRVal, i);
+				llvm::Value* pTemp = Op(type, pLItem, pRItem);
+				aggregator(i, pTemp);
+			}
+			forLoop.End();
+		}
+
+		void IRFunctionEmitter::OpV(OperatorType type, llvm::Value* pCount, llvm::Value* pLVal, llvm::Value* pRVal, std::function<void(llvm::Value*, llvm::Value*)> aggregator)
+		{
+			assert(pCount != nullptr);
+			assert(pLVal != nullptr);
+			assert(pRVal != nullptr);
+
+			auto forLoop = ForLoop();
+			auto pBodyBlock = forLoop.Begin(pCount);
+			{
+				auto i = forLoop.LoadIterationVar();
+				llvm::Value* pLItem = ValueAt(pLVal, i);
+				llvm::Value* pRItem = ValueAt(pRVal, i);
 				llvm::Value* pTemp = Op(type, pLItem, pRItem);
 				aggregator(i, pTemp);
 			}
@@ -308,6 +333,14 @@ namespace emll
 		{
 			Store(pDest, Literal(0.0));
 			OpV(OperatorType::MultiplyF, count, pLVal, pRVal, [&pDest, this](llvm::Value* i, llvm::Value* pValue) {
+				OpAndUpdate(pDest, OperatorType::AddF, pValue);
+			});
+		}
+
+		void IRFunctionEmitter::DotProductF(llvm::Value* pCount, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest)
+		{
+			Store(pDest, Literal(0.0));
+			OpV(OperatorType::MultiplyF, pCount, pLVal, pRVal, [&pDest, this](llvm::Value* i, llvm::Value* pValue) {
 				OpAndUpdate(pDest, OperatorType::AddF, pValue);
 			});
 		}
