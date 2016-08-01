@@ -9,8 +9,6 @@
 // TODO - second call to Update should run data through the forest and update the "currentOutput"
 // 
 // TODO - bucket sort
-// TODO - add a Template booster that sets weak labels and weights
-// TODO - add parameters to set epoch sizes, how often to reboost
 
 #pragma once
 

@@ -23,6 +23,7 @@ set (INCLUDE include/BaggingIncrementalTrainer.h
              include/LogitBooster.h
              include/MultiEpochIncrementalTrainer.h
              include/SimpleForestTrainer.h
+             include/SortingForestTrainer.h
              include/SortingTreeTrainer.h
              include/SweepingIncrementalTrainer.h
              include/SGDIncrementalTrainer.h)
@@ -32,6 +33,7 @@ set (TCC tcc/BaggingIncrementalTrainer.tcc
          tcc/ForestTrainer.tcc
          tcc/SimpleForestTrainer.tcc
          tcc/MultiEpochIncrementalTrainer.tcc
+         tcc/SortingForestTrainer.tcc
          tcc/SortingTreeTrainer.tcc
          tcc/SweepingIncrementalTrainer.tcc
          tcc/SGDIncrementalTrainer.tcc)
