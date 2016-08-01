@@ -98,7 +98,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType, typename BoosterType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> XXXMakeSortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters)
+    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters)
     {
         return std::make_unique<SortingForestTrainer<LossFunctionType, BoosterType>>(lossFunction, booster, parameters);
     }

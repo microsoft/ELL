@@ -34,6 +34,14 @@ namespace common
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
     std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& sgdArguments);
 
+    /// <summary> Makes a sorting forest trainerr. </summary>
+    ///
+    /// <param name="parameters"> Trainer parameters. </param>
+    /// <param name="trainerArguments"> Trainer command line arguments. </param>
+    ///
+    /// <returns> A unique_ptr to a forest trainer. </returns>
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& sortingTreeArguments);
+
     /// <summary> Makes a simple forest trainerr. </summary>
     ///
     /// <param name="parameters"> Trainer parameters. </param>
@@ -41,7 +49,4 @@ namespace common
     ///
     /// <returns> A unique_ptr to a forest trainer. </returns>
     std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSimpleForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& sortingTreeArguments);
-
-
-
 }
