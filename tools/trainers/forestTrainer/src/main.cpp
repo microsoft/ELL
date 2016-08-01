@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
         // create trainer
-        auto trainer = common::MakeSimpleForestTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
+        auto trainer = common::MakeHistogramForestTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
 
         // create random number generator
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);

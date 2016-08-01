@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
         }
 
         // create trainer
-        auto trainer = common::MakeSimpleForestTrainer(trainerArguments.lossArguments, forestTrainerArguments);
+        auto trainer = common::MakeHistogramForestTrainer(trainerArguments.lossArguments, forestTrainerArguments);
 //        auto trainer = trainers::MakeBaggingIncrementalTrainer(std::move(baseTrainer), baggingIncrementalTrainerArguments, evaluator);
         
         // train

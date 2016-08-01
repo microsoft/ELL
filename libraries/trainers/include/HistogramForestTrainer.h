@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleForestTrainer.h (trainers)
+//  File:     HistogramForestTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,15 +18,15 @@
 namespace trainers
 {
     template <typename LossFunctionType, typename BoosterType> 
-    class SimpleForestTrainer : public ForestTrainer<predictors::SingleElementThresholdRule, predictors::ConstantPredictor, BoosterType>
+    class HistogramForestTrainer : public ForestTrainer<predictors::SingleElementThresholdRule, predictors::ConstantPredictor, BoosterType>
     {
     public:
-        /// <summary> Constructs an instance of SimpleForestTrainer. </summary>
+        /// <summary> Constructs an instance of HistogramForestTrainer. </summary>
         ///
         /// <param name="lossFunction"> The loss function. </param>
         /// <param name="booster"> The booster. </param>
         /// <param name="parameters"> Training Parameters. </param>
-        SimpleForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters);
+        HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters);
 
         using SplitRuleType = predictors::SingleElementThresholdRule;
         using EdgePredictorType = predictors::ConstantPredictor;
@@ -53,7 +53,7 @@ namespace trainers
     ///
     /// <returns> A unique_ptr to a simple forest trainer. </returns>
     template<typename LossFunctionType, typename BoosterType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSimpleForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters);
+    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters);
 }
 
-#include "../tcc/SimpleForestTrainer.tcc"
+#include "../tcc/HistogramForestTrainer.tcc"

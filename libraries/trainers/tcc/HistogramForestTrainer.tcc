@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleForestTrainer.tcc (trainers)
+//  File:     HistogramForestTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,11 +9,11 @@
 namespace trainers
 {
     template<typename LossFunctionType, typename BoosterType>
-    SimpleForestTrainer<LossFunctionType, BoosterType>::SimpleForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters) : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction)
+    HistogramForestTrainer<LossFunctionType, BoosterType>::HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters) : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction)
     {}
 
     template<typename LossFunctionType, typename BoosterType>
-    typename SimpleForestTrainer<LossFunctionType, BoosterType>::SplitCandidate SimpleForestTrainer<LossFunctionType, BoosterType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums)
+    typename HistogramForestTrainer<LossFunctionType, BoosterType>::SplitCandidate HistogramForestTrainer<LossFunctionType, BoosterType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums)
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 
@@ -62,7 +62,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType, typename BoosterType>
-    std::vector<typename SimpleForestTrainer<LossFunctionType, BoosterType>::EdgePredictorType> SimpleForestTrainer<LossFunctionType, BoosterType>::GetEdgePredictors(const NodeStats& nodeStats)
+    std::vector<typename HistogramForestTrainer<LossFunctionType, BoosterType>::EdgePredictorType> HistogramForestTrainer<LossFunctionType, BoosterType>::GetEdgePredictors(const NodeStats& nodeStats)
     {
         double output = GetOutputValue(nodeStats.GetTotalSums());
         double output0 = GetOutputValue(nodeStats.GetChildSums(0)) - output;
@@ -71,7 +71,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType, typename BoosterType>
-    void SimpleForestTrainer<LossFunctionType, BoosterType>::SortNodeDataset(Range range, size_t inputIndex)
+    void HistogramForestTrainer<LossFunctionType, BoosterType>::SortNodeDataset(Range range, size_t inputIndex)
     {
         _dataset.Sort([inputIndex](const ForestTrainerExample& example) { return example.GetDataVector()[inputIndex]; },
                       range.firstIndex,
@@ -79,7 +79,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType, typename BoosterType>
-    double SimpleForestTrainer<LossFunctionType, BoosterType>::CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const
+    double HistogramForestTrainer<LossFunctionType, BoosterType>::CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const
     {
         if(sums0.sumWeights == 0 || sums1.sumWeights == 0)
         {
@@ -92,14 +92,14 @@ namespace trainers
     }
 
     template<typename LossFunctionType, typename BoosterType>
-    double SimpleForestTrainer<LossFunctionType, BoosterType>::GetOutputValue(const Sums& sums) const
+    double HistogramForestTrainer<LossFunctionType, BoosterType>::GetOutputValue(const Sums& sums) const
     {
         return sums.sumWeightedLabels / sums.sumWeights;
     }
 
     template<typename LossFunctionType, typename BoosterType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSimpleForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters)
+    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters)
     {
-        return std::make_unique<SimpleForestTrainer<LossFunctionType, BoosterType>>(lossFunction, booster, parameters);
+        return std::make_unique<HistogramForestTrainer<LossFunctionType, BoosterType>>(lossFunction, booster, parameters);
     }
 }
