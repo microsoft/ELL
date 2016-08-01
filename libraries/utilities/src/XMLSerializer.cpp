@@ -131,17 +131,12 @@ namespace utilities
         bool hasName = name != std::string("");
         auto typeName = SanitizeTypeName(value.GetRuntimeTypeName());
 
-        _tokenizer.MatchNextToken("<");
-        _tokenizer.MatchNextToken(typeName);
+        _tokenizer.MatchTokens({"<", typeName});
         if(hasName)
         {
-            _tokenizer.MatchNextToken("name");
-            _tokenizer.MatchNextToken("=");
-            _tokenizer.MatchNextToken("'");
-            _tokenizer.MatchNextToken(name);
-            _tokenizer.MatchNextToken("'");
+            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
         }
-        _tokenizer.MatchNextToken(">");
+        _tokenizer.MatchToken(">");
         return typeName;
     }
 
@@ -154,11 +149,7 @@ namespace utilities
     void SimpleXmlDeserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
         auto typeName = SanitizeTypeName(value.GetRuntimeTypeName());
-        std::cout << "Begin deserialization for type " << typeName << std::endl;
-        _tokenizer.MatchNextToken("<");
-        _tokenizer.MatchNextToken("/");
-        _tokenizer.MatchNextToken(typeName);
-        _tokenizer.MatchNextToken(">");
+        _tokenizer.MatchTokens({"<", "/", typeName, ">"});
     }
 
     //

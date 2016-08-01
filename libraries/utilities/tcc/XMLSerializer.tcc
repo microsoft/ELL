@@ -122,28 +122,19 @@ namespace utilities
         auto typeName = SanitizeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
 
-        _tokenizer.MatchNextToken("<");
-        _tokenizer.MatchNextToken(typeName);
+        _tokenizer.MatchTokens({"<", typeName});
         if(hasName)
         {
-            _tokenizer.MatchNextToken("name");
-            _tokenizer.MatchNextToken("=");
-            _tokenizer.MatchNextToken("'");
-            _tokenizer.MatchNextToken(name);
-            _tokenizer.MatchNextToken("'");
+            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
         }
-        _tokenizer.MatchNextToken("value");
-        _tokenizer.MatchNextToken("=");
-        _tokenizer.MatchNextToken("'");
+        _tokenizer.MatchTokens({"value", "=", "'"});
 
         // read value
         auto valueToken = _tokenizer.ReadNextToken();
         std::stringstream valueStream(valueToken);
         valueStream >> value;
 
-        _tokenizer.MatchNextToken("'");
-        _tokenizer.MatchNextToken("/");
-        _tokenizer.MatchNextToken(">");
+        _tokenizer.MatchTokens({"'", "/", ">"});
     }
 
     // This function is inline just so it appears next to the other Read* functions
@@ -152,27 +143,18 @@ namespace utilities
         auto typeName = "string";
         bool hasName = name != std::string("");
 
-        _tokenizer.MatchNextToken("<");
-        _tokenizer.MatchNextToken(typeName);
+        _tokenizer.MatchTokens({"<", typeName});
         if(hasName)
         {
-            _tokenizer.MatchNextToken("name");
-            _tokenizer.MatchNextToken("=");
-            _tokenizer.MatchNextToken("'");
-            _tokenizer.MatchNextToken(name);
-            _tokenizer.MatchNextToken("'");
+            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
         }
-        _tokenizer.MatchNextToken("value");
-        _tokenizer.MatchNextToken("=");
-        _tokenizer.MatchNextToken("'");
+        _tokenizer.MatchTokens({"value", "=", "'"});
 
         // read value
         auto valueToken = _tokenizer.ReadNextToken();
         value = valueToken;
 
-        _tokenizer.MatchNextToken("'");
-        _tokenizer.MatchNextToken("/");
-        _tokenizer.MatchNextToken(">");
+        _tokenizer.MatchTokens({"'", "/", ">"});
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
@@ -181,23 +163,13 @@ namespace utilities
         auto typeName = SanitizeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
 
-        _tokenizer.MatchNextToken("<");
-        _tokenizer.MatchNextToken("Array");
+        _tokenizer.MatchTokens({"<", "Array"});
         if(hasName)
         {
-            _tokenizer.MatchNextToken("name");
-            _tokenizer.MatchNextToken("=");
-            _tokenizer.MatchNextToken("'");
-            _tokenizer.MatchNextToken(name);
-            _tokenizer.MatchNextToken("'");
+            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
         }
                 
-        _tokenizer.MatchNextToken("type");
-        _tokenizer.MatchNextToken("=");
-        _tokenizer.MatchNextToken("'");
-        _tokenizer.MatchNextToken(typeName);
-        _tokenizer.MatchNextToken("'");
-        _tokenizer.MatchNextToken(">");
+        _tokenizer.MatchTokens({"type", "=", "'", typeName, "'", ">"});
 
         std::string nextToken = "";
         while(true)
@@ -217,9 +189,6 @@ namespace utilities
             }
         }
 
-        _tokenizer.MatchNextToken("<");
-        _tokenizer.MatchNextToken("/");
-        _tokenizer.MatchNextToken("Array");
-        _tokenizer.MatchNextToken(">");
+        _tokenizer.MatchTokens({"<", "/", "Array", ">"});
     }
 }

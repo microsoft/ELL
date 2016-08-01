@@ -113,13 +113,10 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            _tokenizer.MatchNextToken(name);
-            _tokenizer.MatchNextToken(":");
+            _tokenizer.MatchTokens( {name, ":"} );
         }
-        _tokenizer.MatchNextToken("{");
-        
-        _tokenizer.MatchNextToken("_type");
-        _tokenizer.MatchNextToken(":");
+        _tokenizer.MatchToken("{");        
+        _tokenizer.MatchTokens({"_type", ":"});
         auto typeName = _tokenizer.ReadNextToken();
         std::cout << "Read type: " << typeName << std::endl;    
         return typeName;
@@ -135,7 +132,7 @@ namespace utilities
 
     void SimpleJsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
-        _tokenizer.MatchNextToken("}");
+        _tokenizer.MatchToken("}");
     }
 
     //

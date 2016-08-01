@@ -12,6 +12,7 @@
 #include <istream>
 #include <string>
 #include <vector>
+#include <initializer_list>
 
 namespace utilities
 {
@@ -41,10 +42,15 @@ namespace utilities
         /// <param name="token"> The token to return to the stream. </param>
         void PutBackToken(std::string token);
 
-        /// <summary> Returns the next token from the input stream. </summary>
+        /// <summary> Matches the next token from the input stream. Throws an exception if token doesn't match. </summary>
         ///
-        /// <returns> The next token, or the empty string if the end of file is reached. </returns>
-        void MatchNextToken(std::string readString); // throws an exception if it doesn't match
+        /// <param name="token"> The token to match. </param>
+        void MatchToken(std::string token);
+
+        /// <summary> Matches the next token from the input stream. Throws an exception if token doesn't match. </summary>
+        ///
+        /// <param name="token"> The token to match. </param>
+        void MatchTokens(const std::initializer_list<std::string>& tokens);
 
         /// <summary> Gets the next token from the input stream without consuming it. </summary>
         ///

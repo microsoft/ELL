@@ -93,8 +93,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            _tokenizer.MatchNextToken(name);
-            _tokenizer.MatchNextToken(":");
+            _tokenizer.MatchTokens({name, ":"});
         }
 
         // read string
@@ -109,14 +108,13 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            _tokenizer.MatchNextToken(name);
-            _tokenizer.MatchNextToken(":");
+            _tokenizer.MatchTokens({name, ":"});
         }
 
-        _tokenizer.MatchNextToken("\"");
+        _tokenizer.MatchToken("\"");
         auto valueToken = _tokenizer.ReadNextToken();
         value = valueToken;
-        _tokenizer.MatchNextToken("\"");
+        _tokenizer.MatchToken("\"");
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
@@ -125,11 +123,10 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            _tokenizer.MatchNextToken(name);
-            _tokenizer.MatchNextToken(":");
+            _tokenizer.MatchTokens({name, ":"});
         }
                 
-        _tokenizer.MatchNextToken("[");
+        _tokenizer.MatchToken("[");
         std::string nextToken = "";
         while(nextToken != "]")
         {
@@ -137,11 +134,11 @@ namespace utilities
             Deserialize(obj, context);
             array.push_back(obj);
 
-            _tokenizer.MatchNextToken(",");
+            _tokenizer.MatchToken(",");
 
             // Want to peek at the next token here to see if it's a ']'
             nextToken = _tokenizer.PeekNextToken();
         }
-        _tokenizer.MatchNextToken("]");
+        _tokenizer.MatchToken("]");
     }
 }
