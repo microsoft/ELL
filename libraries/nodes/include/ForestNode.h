@@ -23,8 +23,7 @@
 
 namespace nodes
 {
-    /// <summary> Implements a forest node, where each tree in the forest uses single-input threshold
-    /// split rules and constant outputs on all edges. </summary>
+    /// <summary> Implements a forest node, which wraps the forest predictor. </summary>
     ///
     /// <typeparam name="SplitRuleType"> The split rule type. </typeparam>
     /// <typeparam name="EdgePredictorType"> The edge predictor type. </typeparam>
