@@ -30,7 +30,7 @@ namespace emll
 {
 	namespace compiler
 	{
-		/// <summary>The EMLL compiler</summary>
+		/// <summary>Base class for EMLL compilers</summary>
 		class Compiler
 		{
 		public:
@@ -41,6 +41,7 @@ namespace emll
 
 			bool& ShouldUnrollLoops() { return _unrollLoops; }
 
+			///<summary>Compile the model into a function with the given name</summary>
 			void CompileModel(const std::string& functionName, model::Model& model);
 
 			virtual void CompileConstantNode(const model::Node& node) = 0;
@@ -52,22 +53,31 @@ namespace emll
 			virtual void CompileAccumulatorNode(const model::Node& node) = 0;
 			virtual void CompileDelayNode(const model::Node& node) = 0;
 
-			void BeginFunctionPredict();
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
 			virtual void EndFunction() = 0;
-
-			void AllocVar(Variable& var);
-			void FreeVar(Variable& var);
-
+			
+			///<summary>Variable allocator</summary>
 			VariableAllocator& Variables() { return _variables; }
+			///<summary>Create a variable to store computed output for the given output port. The variable
+			/// will be emitted lazily. </summary>
 			Variable* AllocVar(model::OutputPortBase* pPort);
+			///<summary>Get the variable for output port</summary>
 			Variable* GetVariableFor(const model::OutputPortBase* pPort);
+			///<summary>Get the variable for output port element</summary>
 			Variable* GetVariableFor(const model::OutputPortElement elt);
+			///<summary>Associate the given variable with the output port</summary>
 			void SetVariableFor(const model::OutputPortBase* pPort, Variable* pVar);
 
 		protected:
+			///<summary>Allocate a *runtime* variable..</summary>
+			void AllocVar(Variable& var);
+			///<summary>Free a *runtime* variable..</summary>
+			void FreeVar(Variable& var);
+
 			bool IsNodeType(const std::string& nodeTypeName , const std::string& typeName);
+			///<summary>Convert a port type to a compiler specific value type</summary>
 			ValueType ToValueType(model::Port::PortType type);
+			///<summary>Models get turned into functions. To declare the function, we need to know inputs and outputs.</summary>
 			void CollectInputsAndOutputs(model::Model& model);
 
 		private:
@@ -75,16 +85,16 @@ namespace emll
 			void Reset();
 			
 		private:
-			EmittedVarAllocator _inputVars;
-			EmittedVarAllocator _outputVars;
-			EmittedVarAllocator _literalVars;
-			EmittedVarAllocator _localVars;
-			EmittedVarAllocator _globalVars;
+			EmittedVarAllocator _inputVars;			// Runtime variable table
+			EmittedVarAllocator _outputVars;			// Runtime variable table
+			EmittedVarAllocator _literalVars;		// Runtime variable table
+			EmittedVarAllocator _localVars;			// Runtime variable table
+			EmittedVarAllocator _globalVars;			// Runtime variable table
 
-			VariableAllocator _variables;
-			NamedValueTypeList _args;
+			VariableAllocator _variables;			// variable allocator
+			NamedValueTypeList _args;				// function arguments
+			// Maps output ports to runtime variables
 			std::unordered_map<const model::OutputPortBase*, Variable*> _portToVarMap;
-
 			//
 			// Compiler settings
 			//

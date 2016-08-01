@@ -15,7 +15,6 @@ namespace emll
 	{
 		static const std::string c_InputVariableName = "input";
 		static const std::string c_OutputVariableName = "output";
-		static const std::string c_PredictFunctionName = "Predict";
 		static const std::string c_literalVar = "c_";
 		static const std::string c_globalVar = "g_";
 		static const std::string c_localVar = "t_";
@@ -202,13 +201,6 @@ namespace emll
 		void Compiler::SetVariableFor(const model::OutputPortBase* pPort, Variable* pVar)
 		{
 			_portToVarMap[pPort] = pVar;
-		}
-
-		void Compiler::BeginFunctionPredict()
-		{
-			NamedValueTypeList fnArgs;
-			fnArgs.init({ {c_InputVariableName, ValueType::PDouble },{ c_OutputVariableName, ValueType::PDouble } });
-			BeginFunction(c_PredictFunctionName, fnArgs);
 		}
 
 		bool Compiler::IsNodeType(const std::string& nodeTypeName, const std::string& typeName)

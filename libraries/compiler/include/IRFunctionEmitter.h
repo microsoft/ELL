@@ -8,116 +8,140 @@ namespace emll
 {
 	namespace compiler
 	{
+		///<summary>Used to emit code INTO an existing LLVM IR Function</summary>
 		class IRFunctionEmitter
 		{
 		public:
+			///<summary>Create a new empty function emitter.</summary>
 			IRFunctionEmitter(void) {}
-			IRFunctionEmitter(IREmitter* pEmitter, llvm::Function* pfn);
+			///<summary>Copy constructor for the emitter</summary>
 			IRFunctionEmitter(const IRFunctionEmitter& src);
+			///<summary>Create a new emitter to emit code INTO the given function, using the given IR emitter</summary>
+			IRFunctionEmitter(IREmitter* pEmitter, llvm::Function* pfn);
+			
+			///<summary>Initialize the emitter</summary>
+			void Init(IREmitter* pEmitter, llvm::Function* pfn);
 
-			llvm::Value* Literal(int value)
-			{
-				return _pEmitter->Literal(value);
-			}
-			llvm::Value* Literal(int64_t value)
-			{
-				return _pEmitter->Literal(value);
-			}
-			llvm::Value* Literal(double value)
-			{
-				return _pEmitter->Literal(value);
-			}
-			llvm::Value* Literal(const std::string& value)
-			{
-				return _pEmitter->Literal(value);
-			}
-			llvm::Value* Arg(llvm::ilist_iterator<llvm::Argument>& arg)
+			///<summary>Emit a literal into the function</summary>
+			template<typename T>
+			llvm::Value* Literal(T value);
+
+			///<summary>Emit a load for the function argument</summary>
+			llvm::Value* LoadArg(llvm::ilist_iterator<llvm::Argument>& arg)
 			{
 				return _pEmitter->Load(&(*arg));
 			}
+
+			///<summary>Emit a typecast to the given ValueType</summary>
 			llvm::Value* Cast(llvm::Value* pValue, ValueType destType)
 			{
 				return _pEmitter->Cast(pValue, destType);
 			}
+			///<summary>Explict typecast from integer to float</summary>
 			llvm::Value* CastFloatToInt(llvm::Value* pValue)
 			{
 				return _pEmitter->CastFloat(pValue, ValueType::Int32);
 			}
-			llvm::BasicBlock* Block(const std::string& label)
-			{
-				return _pEmitter->Block(_pfn, label);
-			}
-			llvm::BasicBlock* BlockAfter(llvm::BasicBlock* pPrevBlock, const std::string& label)
-			{
-				return _pEmitter->BlockAfter(_pfn, pPrevBlock, label);
-			}
-			void AddBlock(llvm::BasicBlock* pBlock);
-
+			///<summary>Emit a typecast to template type</summary>
+			template<typename T>
+			llvm::Value* Cast(llvm::Value* pValue);
+			
+			///<summary>The current code block that code is being emitted into</summary>
 			llvm::BasicBlock* CurrentBlock()
 			{
 				return _pEmitter->CurrentBlock();
 			}
-				
-			// Set the block that subsequent code will go into. 
-			// Returns the previous block
+			/// <summary>Set the block that subsequent code will go into.</summary> 
+			/// <returns>The previous block</returns>
 			llvm::BasicBlock* CurrentBlock(llvm::BasicBlock* pBlock);
+			
+			///<summary>Emit a new labelled code block. The "current" block does not change</summary>
+			llvm::BasicBlock* Block(const std::string& label)
+			{
+				return _pEmitter->Block(_pfn, label);
+			}
+			///<summary>Emit a new labelled code block. The block is inserted after the given previous block</summary>
+			llvm::BasicBlock* BlockAfter(llvm::BasicBlock* pPrevBlock, const std::string& label)
+			{
+				return _pEmitter->BlockAfter(_pfn, pPrevBlock, label);
+			}
+			///<summary>The given block is added to the end of the function's block list</summary>
+			void AddBlock(llvm::BasicBlock* pBlock);
+				
+			///<summary>Emit a call to a function with a single optional argument</summary>
 			llvm::Value* Call(const std::string& name, llvm::Value* pArg = nullptr);
+			///<summary>Emit a call to a function with arguments</summary>
 			llvm::Value* Call(const std::string& name, IRValueList& args);
+			///<summary>Emit a call to a function with arguments</summary>
 			llvm::Value* Call(const std::string& name, std::initializer_list<llvm::Value*> args);
+			///<summary>Emit a return - the function returns void</summary>
 			void Ret()
 			{
 				_pEmitter->ReturnVoid();
 			}
+			///<summary>Emit a return - the function returns the given value</summary>
 			llvm::Value* Ret(llvm::Value* value)
 			{
 				return _pEmitter->Return(value);
 			}
-
+			///<summary>Emit a binary operator with 2 scalar args</summary>
 			llvm::Value* Op(OperatorType type, llvm::Value* pLVal, llvm::Value* pRVal)
 			{
 				return _pEmitter->BinaryOp(type, pLVal, pRVal);
 			}
+			///<summary>Emit a binary operator with 2 scalar args</summary>
 			llvm::Value* Op(OperatorType type, llvm::iterator_range<llvm::Function::arg_iterator>& args);
 			
+			///<summary>Emit binary operator over 2 equal sized vector args - the operator is applied to each pair of scalars. Also supply an aggregator function</summary>
 			void OpV(OperatorType type, size_t count, llvm::Value* pLVal, llvm::Value* pRVal, std::function<void(llvm::Value*, llvm::Value*)> aggregator);
+			///<summary>Emit binary operator over 2 equal sized vector args - the operator is applied to each pair of scalars. Also supply an aggregator function</summary>
 			void OpV(OperatorType type, size_t count, llvm::Value* pLVal, int startAtL, llvm::Value* pRVal, int startAtR, std::function<void(llvm::Value*, llvm::Value*)> aggregator);
 
+			///<summary>Emit a branch to the given block</summary>
 			void Branch(llvm::BasicBlock* pDestBlock)
 			{
 				_pEmitter->Branch(pDestBlock);
 			}
+			///<summary>Emit a conditional branch</summary>
 			void Branch(llvm::Value* pCondVal, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
 			{
 				_pEmitter->Branch(pCondVal, pThenBlock, pElseBlock);
 			}
+			///<summary>Emit a conditional branch</summary>
 			void Branch(ComparisonType comparision, llvm::Value* pValue, llvm::Value* pTestValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
-
+			///<summary>Emit a comparison</summary>
 			llvm::Value* Cmp(ComparisonType type, llvm::Value* pValue, llvm::Value* pTestValue)
 			{
 				return _pEmitter->Cmp(type, pValue, pTestValue);
 			}
+
 			//------------------------------------------
 			//
 			// Variables
 			//
 			//------------------------------------------
 
+			///<summary>Iterate over this function's arguments</summary>
 			llvm::iterator_range<llvm::Function::arg_iterator> Args()
 			{
 				return _pfn->args();
 			}
+			///<summary>Get the first function argument</summary>
 			llvm::Argument& FirstArg()
 			{
 				return *(Args().begin());
 			}
+			///<summary>Emit a stack scalar</summary>
 			llvm::Value* Var(ValueType type)
 			{
 				return _pEmitter->Variable(type);
 			}
+			///<summary>Emit a named stack scalar </summary>
 			llvm::Value* Var(ValueType type, const std::string& name)
 			{
 				return _pEmitter->Variable(type, name);
 			}
+			///<summary>Emit a stack vector of the given size</summary>
 			llvm::Value* Var(ValueType type, int count)
 			{
 				return _pEmitter->StackAlloc(type, count);
@@ -176,6 +200,9 @@ namespace emll
 			//
 			//------------------------------------------
 			llvm::Value* Malloc(ValueType type, int64_t size);
+			template<typename T>
+			llvm::Value* Malloc(int64_t count);
+
 			void Free(llvm::Value* pValue);
 
 			llvm::Value* Print(const std::string& text);

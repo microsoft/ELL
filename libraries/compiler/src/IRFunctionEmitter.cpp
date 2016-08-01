@@ -11,15 +11,22 @@ namespace emll
 		const std::string FreeFnName = "free";
 
 		IRFunctionEmitter::IRFunctionEmitter(IREmitter* pEmitter, llvm::Function* pfn)
-			: _pEmitter(pEmitter),
-			_pfn(pfn)
 		{
+			Init(pEmitter, pfn);
 		}
 
 		IRFunctionEmitter::IRFunctionEmitter(const IRFunctionEmitter& src)
 			: _pEmitter(src._pEmitter),
 			_pfn(src._pfn)
 		{
+		}
+
+		void IRFunctionEmitter::Init(IREmitter* pEmitter, llvm::Function* pfn)
+		{
+			assert(pEmitter != nullptr);
+			assert(pfn != nullptr);
+			_pEmitter = pEmitter;
+			_pfn = pfn;
 		}
 
 		void IRFunctionEmitter::AddBlock(llvm::BasicBlock* pBlock)

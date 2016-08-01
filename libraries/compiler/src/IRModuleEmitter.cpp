@@ -11,7 +11,8 @@ namespace emll
 		}
 
 		IRModuleEmitter::IRModuleEmitter(IREmitter& emitter, std::unique_ptr<llvm::Module> pModule)
-			: _emitter(emitter), _pModule(std::move(pModule))
+			: _emitter(emitter), 
+			_pModule(std::move(pModule))
 		{
 		}
 
@@ -82,10 +83,24 @@ namespace emll
 			return new llvm::GlobalVariable(*_pModule, pType, isConst, llvm::GlobalValue::InternalLinkage, pInitial, name);
 		}
 
-
 		llvm::Function* IRModuleEmitter::GetFunction(const std::string& name)
 		{
 			return _pModule->getFunction(name);
+		}
+
+		llvm::FunctionPassManager* IRModuleEmitter::FunctionOptimizer()
+		{
+			if (_pOptimizer == nullptr)
+			{
+				_pOptimizer = std::make_unique<llvm::FunctionPassManager>(_pModule.get());
+				/*
+				_pOptimizer->addPass(llvm::createInstructionCombiningPass());
+				_pOptimizer->addPass(llvm::createReassociatePass());
+				_pOptimizer->addPass(llvm::createGVNPass());  // Common sub-expression elimination
+				_pOptimizer->addPass(llvm::createCFGSimplificationPass());
+				*/
+			}
+			return _pOptimizer.get();
 		}
 
 		IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, const ValueType returnType, const ValueTypeList* pArgs, bool isPublic)

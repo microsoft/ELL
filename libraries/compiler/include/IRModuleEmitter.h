@@ -67,6 +67,8 @@ namespace emll
 
 			llvm::Function* GetFunction(const std::string& name);
 
+			///<summary>Return the current optimizer pipeline. It is preconfigured with some standard passes.</summary>
+			llvm::FunctionPassManager* FunctionOptimizer();
 			//
 			// Serialization
 			//
@@ -92,19 +94,20 @@ namespace emll
 			void DeclarePrintf();
 			void DeclareMalloc();
 			void DeclareFree();
-			//
-			// Debugging
-			//
+			
+			///<summary>Output code to std::cout for debugging</summary>
 			void Dump()
 			{
 				_pModule->dump();
 			}
 
-		private:
+			///<summary>For direct access to LLVM APIs</summary>
 			llvm::Module* Module() const
 			{
 				return _pModule.get();
 			}
+
+		private:
 
 			llvm::GlobalVariable* Global(const std::string& name, llvm::Type *pType, llvm::Constant* pInitial, bool isConst);
 			IRFunctionEmitter Function(const std::string& name, const ValueType returnType, const ValueTypeList* pArgs, bool isPublic);
@@ -116,6 +119,7 @@ namespace emll
 
 		private:
 			std::unique_ptr<llvm::Module> _pModule;
+			std::unique_ptr<llvm::FunctionPassManager> _pOptimizer;
 			IREmitter& _emitter;
 			// Reusable buffers
 			ValueTypeList _valueTypeList;

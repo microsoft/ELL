@@ -3,6 +3,24 @@ namespace emll
 	namespace compiler
 	{
 		template<typename T>
+		llvm::Value* IRFunctionEmitter::Literal(T value)
+		{
+			return _pEmitter->Literal(value);
+		}
+
+		template<typename T>
+		llvm::Value* IRFunctionEmitter::Cast(llvm::Value* pValue)
+		{
+			return Cast(pValue, GetValueType<T>());
+		}
+
+		template<typename T>
+		llvm::Value* IRFunctionEmitter::Malloc(int64_t count)
+		{
+			return Malloc(GetValueType<T>(), count);
+		}
+
+		template<typename T>
 		void IRFunctionEmitter::MemMove(llvm::Value* pPtr, int fromOffset, int destOffset, int count)
 		{
 			assert(pPtr != nullptr);

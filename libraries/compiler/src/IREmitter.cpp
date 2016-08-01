@@ -133,7 +133,6 @@ namespace emll
 		llvm::Value* IREmitter::Cast(llvm::Value* pValue, const ValueType destType)
 		{
 			assert(pValue != nullptr);
-
 			return _builder.CreateBitCast(pValue, Type(destType));
 		}
 

@@ -5,14 +5,34 @@ namespace emll
 	namespace compiler
 	{
 		template<>
-		ValueType GetValueType<double>()
+		ValueType GetValueType<char>()
 		{
-			return ValueType::Double;
+			return ValueType::Char8;
 		}
 		template<>
-		ValueType GetValueType<double*>()
+		ValueType GetValueType<char*>()
 		{
-			return ValueType::PDouble;
+			return ValueType::PChar8;
+		}
+		template<>
+		ValueType GetValueType<unsigned char>()
+		{
+			return ValueType::Byte;
+		}
+		template<>
+		ValueType GetValueType<unsigned char*>()
+		{
+			return ValueType::PByte;
+		}
+		template<>
+		ValueType GetValueType<short>()
+		{
+			return ValueType::Short;
+		}
+		template<>
+		ValueType GetValueType<short*>()
+		{
+			return ValueType::PShort;
 		}
 		template<>
 		ValueType GetValueType<int>()
@@ -33,6 +53,16 @@ namespace emll
 		ValueType GetValueType<int64_t*>()
 		{
 			return ValueType::PInt64;
+		}
+		template<>
+		ValueType GetValueType<double>()
+		{
+			return ValueType::Double;
+		}
+		template<>
+		ValueType GetValueType<double*>()
+		{
+			return ValueType::PDouble;
 		}
 
 		template<>
