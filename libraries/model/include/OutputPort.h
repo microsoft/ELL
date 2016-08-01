@@ -13,6 +13,7 @@
 // utilities
 #include "ISerializable.h"
 
+// stl
 #include <vector>
 #include <memory>
 
@@ -44,8 +45,8 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// Inherited from ISerializable
-        // virtual utilities::ObjectDescription GetDescription() const override;
         virtual void Serialize(utilities::Serializer& serializer) const override;
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     protected:
         OutputPortBase(const class Node* node, std::string name, PortType type, size_t size);

@@ -78,9 +78,8 @@ namespace model
         virtual void Refine(ModelTransformer& transformer) const;
 
         /// Inherited from ISerializable
-        // virtual utilities::ObjectDescription GetDescription() const override;
         virtual void Serialize(utilities::Serializer& serializer) const override;
-        virtual void Deserialize(utilities::Deserializer& serializer) override;
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);

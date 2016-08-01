@@ -31,19 +31,16 @@ namespace model
         transformer.MapOutputPort(output, newNode->output);
     }
 
-    // /// Inherited from ISerializable
-    // template <typename ValueType>
-    // utilities::ObjectDescription InputNode<ValueType>::GetDescription() const
-    // {
-    //     auto result = Node::GetDescription();
-    //     result.AddField("size", _output.Size());
-    //     return result;
-    // }
-
     template <typename ValueType>
     void InputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);
         serializer.Serialize("size", _output.Size());
+    }
+
+    template <typename ValueType>
+    void InputNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        throw "Not implemented";
     }
 }

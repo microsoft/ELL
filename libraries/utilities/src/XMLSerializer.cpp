@@ -123,10 +123,10 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, double);
 
     // strings
-    void SimpleXmlDeserializer::DeserializeValue(const char* name, std::string& value) { ReadScalar(name, value); }
+    void SimpleXmlDeserializer::DeserializeValue(const char* name, std::string& value, SerializationContext& context) { ReadScalar(name, value); }
 
     // ISerializable
-    std::string SimpleXmlDeserializer::BeginDeserializeObject(const char* name, ISerializable& value) 
+    std::string SimpleXmlDeserializer::BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
         bool hasName = name != std::string("");
         auto typeName = SanitizeTypeName(value.GetRuntimeTypeName());
@@ -145,13 +145,13 @@ namespace utilities
         return typeName;
     }
 
-    void SimpleXmlDeserializer::DeserializeObject(const char* name, ISerializable& value) 
+    void SimpleXmlDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
         // somehow we need to have created the right object type
-        value.Deserialize(*this);
+        value.Deserialize(*this, context);
     }
 
-    void SimpleXmlDeserializer::EndDeserializeObject(const char* name, ISerializable& value) 
+    void SimpleXmlDeserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
         auto typeName = SanitizeTypeName(value.GetRuntimeTypeName());
         std::cout << "Begin deserialization for type " << typeName << std::endl;
@@ -173,7 +173,7 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, double);
 
     // TODO: Why does this not do anything???
-    void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array) 
+    void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array, SerializationContext& context) 
     {
         throw "DeserializeArrayValue called";
     }

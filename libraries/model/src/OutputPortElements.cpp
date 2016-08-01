@@ -54,6 +54,11 @@ namespace model
 //        serializer.Serialize("referencedPortName", _referencedPort->GetName());
     }
 
+    void OutputPortRange::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        throw "Not implemented";
+    }
+
     //
     // OutputPortElementsUntyped
     //
@@ -104,5 +109,10 @@ namespace model
     void OutputPortElementsUntyped::Serialize(utilities::Serializer& serializer) const
     {
         serializer.Serialize("ranges", _ranges);
+    }
+
+    void OutputPortElementsUntyped::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        throw "Not implemented";
     }
 }

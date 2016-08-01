@@ -57,11 +57,16 @@ namespace model
         return typedOutput->GetOutput(element.GetIndex());
     }
 
-// TODO: put this in cpp file
+// TODO: put these in cpp file
     inline void InputPortBase::Serialize(utilities::Serializer& serializer) const
     {
         Port::Serialize(serializer); // call this SerializeContents
         serializer.Serialize("inputElements", _inputRanges);
+    }
+
+    inline void InputPortBase::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        throw "Not implemented";
     }
 
     //

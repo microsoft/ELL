@@ -105,10 +105,10 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, double);
 
     // strings
-    void SimpleJsonDeserializer::DeserializeValue(const char* name, std::string& value) { ReadScalar(name, value); }
+    void SimpleJsonDeserializer::DeserializeValue(const char* name, std::string& value, SerializationContext& context) { ReadScalar(name, value); }
 
     // ISerializable
-    std::string SimpleJsonDeserializer::BeginDeserializeObject(const char* name, ISerializable& value) 
+    std::string SimpleJsonDeserializer::BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -125,15 +125,15 @@ namespace utilities
         return typeName;
     }
 
-    void SimpleJsonDeserializer::DeserializeObject(const char* name, ISerializable& value) 
+    void SimpleJsonDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
         std::cout << "Deserializing an object" << std::endl;
         // somehow we need to have created the right object type
-        value.Deserialize(*this);
+        value.Deserialize(*this, context);
         std::cout << "Done" << std::endl;
     }
 
-    void SimpleJsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value) 
+    void SimpleJsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
         _tokenizer.MatchNextToken("}");
     }
@@ -149,5 +149,5 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, float);
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, double);
 
-    void SimpleJsonDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array) {}
+    void SimpleJsonDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array, SerializationContext& context) {}
 }

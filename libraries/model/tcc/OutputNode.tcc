@@ -27,20 +27,16 @@ namespace model
         transformer.MapOutputPort(output, newNode->output);
     }
 
-    /// Inherited from ISerializable
-    // template <typename ValueType>
-    // utilities::ObjectDescription OutputNode<ValueType>::GetDescription() const
-    // {
-    //     std::cout << "Serializing OutputNode" << std::endl;
-    //     auto result = Node::GetDescription();
-    //     result.AddField("input", _input);
-    //     return result;
-    // }
-
     template <typename ValueType>
     void OutputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);
         serializer.Serialize("input", _input);
+    }
+
+    template <typename ValueType>
+    void OutputNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        throw "Not implemented";
     }
 }

@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "UniqueId.h"
-#include "Variant.h"
 
 #include <string>
 
@@ -32,21 +31,14 @@ namespace utilities
         return stream;
     }
 
-    // ObjectDescription UniqueId::GetDescription() const
-    // {
-    //     ObjectDescription result = ObjectDescription::FromType(*this);
-    //     result.AddField("id", _id);
-    //     return result;
-    // }
-
     void UniqueId::Serialize(Serializer& serializer) const
     {
         serializer.Serialize("id", _id);
     }
 
-    void UniqueId::Deserialize(Deserializer& serializer) 
+    void UniqueId::Deserialize(Deserializer& serializer, SerializationContext& context) 
     {
-        serializer.Deserialize("id", _id);
+        serializer.Deserialize("id", _id, context);
     }
 
     std::string to_string(const UniqueId& id)

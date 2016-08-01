@@ -62,26 +62,26 @@ namespace utilities
     //
 
     template <typename ValueType>
-    void Deserializer::Deserialize(ValueType&& value)
+    void Deserializer::Deserialize(ValueType&& value, SerializationContext& context)
     {
-        Deserialize("", value);
+        Deserialize("", value, context);
     }
 
     template <typename ValueType, IsNotVector<ValueType> concept>
-    void Deserializer::Deserialize(const char* name, ValueType&& value)
+    void Deserializer::Deserialize(const char* name, ValueType&& value, SerializationContext& context)
     {
-        DeserializeValue(name, value);
+        DeserializeValue(name, value, context);
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void Deserializer::Deserialize(const char* name, std::vector<ValueType>& array)
+    void Deserializer::Deserialize(const char* name, std::vector<ValueType>& array, SerializationContext& context)
     {
-        DeserializeArrayValue(name, array);
+        DeserializeArrayValue(name, array, context);
     }
 
     // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::Deserialize(const char* name, std::vector<ValueType>& array)
+    void Deserializer::Deserialize(const char* name, std::vector<ValueType>& array, SerializationContext& context)
     {
         // ???
         std::vector<const utilities::ISerializable*> tmpArray;
@@ -89,18 +89,18 @@ namespace utilities
         // {
         //     tmpArray.push_back(&item);
         // }
-        DeserializeArrayValue(name, tmpArray);
+        DeserializeArrayValue(name, tmpArray, context);
         // TODO: copy
     }
 
     // Vector of serializable pointers
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::Deserialize(const char* name, std::vector<const ValueType*>& array)
+    void Deserializer::Deserialize(const char* name, std::vector<const ValueType*>& array, SerializationContext& context)
     {
         std::vector<const utilities::ISerializable*> tmpArray;
         for (const auto& item : array)
         {
             tmpArray.push_back(item);
         }
-        DeserializeArrayValue(name, tmpArray);
+        DeserializeArrayValue(name, tmpArray, context);
     }}

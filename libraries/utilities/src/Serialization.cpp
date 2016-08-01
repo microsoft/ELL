@@ -9,7 +9,6 @@
 #include "Serialization.h"
 #include "Format.h"
 #include "ISerializable.h"
-#include "Variant.h"
 
 #include <iostream>
 #include <string>
@@ -40,19 +39,19 @@ namespace utilities
     //
     // Deserialization
     //
-    void Deserializer::DeserializeValue(const char* name, ISerializable& value)
+    void Deserializer::DeserializeValue(const char* name, ISerializable& value, SerializationContext& context)
     {
-        auto typeName = BeginDeserializeObject(name, value);
-        DeserializeObject(name, value);
-        EndDeserializeObject(name, value);
+        auto typeName = BeginDeserializeObject(name, value, context);
+        DeserializeObject(name, value, context);
+        EndDeserializeObject(name, value, context);
     }
 
-    std::string Deserializer::BeginDeserializeObject(const char* name, ISerializable& value)
+    std::string Deserializer::BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context)
     {
         return "";
     }
 
-    void Deserializer::EndDeserializeObject(const char* name, ISerializable& value)
+    void Deserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context)
     {
         // nothing
     }

@@ -10,7 +10,7 @@
 
 // utilities
 #include "UniqueId.h"
-// #include "ISerializable.h"
+#include "ISerializable.h"
 
 // stl
 #include <vector>
@@ -75,8 +75,8 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// Inherited from ISerializable
-//        virtual utilities::ObjectDescription GetDescription() const override;
         virtual void Serialize(utilities::Serializer& serializer) const override;
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
         
     protected:
         Port(const class Node* node, std::string name, PortType type, size_t size) : _node(node), _name(name), _type(type), _size(size) {}

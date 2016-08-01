@@ -111,8 +111,8 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// Inherited from ISerializable
-        // virtual utilities::ObjectDescription GetDescription() const override;
         virtual void Serialize(utilities::Serializer& serializer) const override;
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     private:
         const OutputPortBase* _referencedPort;
@@ -185,8 +185,8 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// Inherited from ISerializable
-        // virtual utilities::ObjectDescription GetDescription() const override;
         virtual void Serialize(utilities::Serializer& serializer) const override;
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     protected:
         OutputPortElementsUntyped(){};

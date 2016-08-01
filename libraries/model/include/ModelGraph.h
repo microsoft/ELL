@@ -15,7 +15,6 @@
 // utilities
 #include "IIterator.h"
 #include "ISerializable.h"
-#include "ObjectDescription.h"
 
 #include <unordered_set>
 #include <vector>
@@ -149,8 +148,8 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> ISerializable interface </summary>
-        // virtual utilities::ObjectDescription GetDescription() const override;
         virtual void Serialize(utilities::Serializer& serializer) const override;
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     private:
         friend class NodeIterator;

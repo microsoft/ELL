@@ -35,16 +35,6 @@ namespace nodes
          transformer.MapOutputPort(output, newNode->output);
     }
 
-    /// Inherited from ISerializable
-    // template <typename ValueType>
-    // utilities::ObjectDescription ConstantNode<ValueType>::GetDescription() const
-    // {
-    //     std::cout << "Serializing ConstantNode" << std::endl;
-    //     auto result = Node::GetDescription();
-    //     result.AddField("values", _values);
-    //     return result;
-    // }
-
     template <typename ValueType>
     void ConstantNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
@@ -53,9 +43,9 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void ConstantNode<ValueType>::Deserialize(utilities::Deserializer& serializer)
+    void ConstantNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
-        Node::Deserialize(serializer);
-        serializer.Deserialize("values", _values);
+        Node::Deserialize(serializer, context);
+        serializer.Deserialize("values", _values, context);
     }
 }

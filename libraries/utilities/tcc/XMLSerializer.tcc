@@ -176,7 +176,7 @@ namespace utilities
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<ValueType>& array)
+    void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<ValueType>& array, SerializationContext& context)
     {
         auto typeName = SanitizeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
@@ -203,7 +203,7 @@ namespace utilities
         while(true)
         {
             ValueType obj;
-            Deserialize(obj);
+            Deserialize(obj, context);
             array.push_back(obj);
             
             // check for '</'

@@ -61,9 +61,8 @@ namespace nodes
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// Inherited from ISerializable
-        // virtual utilities::ObjectDescription GetDescription() const override;
         virtual void Serialize(utilities::Serializer& serializer) const override;
-        virtual void Deserialize(utilities::Deserializer& serializer) override;
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
         static constexpr const char* outputPortName = "output";
 

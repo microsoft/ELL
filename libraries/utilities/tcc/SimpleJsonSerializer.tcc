@@ -120,7 +120,7 @@ namespace utilities
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleJsonDeserializer::ReadArray(const char* name, std::vector<ValueType>& array)
+    void SimpleJsonDeserializer::ReadArray(const char* name, std::vector<ValueType>& array, SerializationContext& context)
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -134,7 +134,7 @@ namespace utilities
         while(nextToken != "]")
         {
             ValueType obj;
-            Deserialize(obj);
+            Deserialize(obj, context);
             array.push_back(obj);
 
             _tokenizer.MatchNextToken(",");

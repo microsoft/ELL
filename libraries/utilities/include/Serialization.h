@@ -138,28 +138,28 @@ namespace utilities
         virtual void EndSerializeObject(const char* name, const ISerializable& value);
     };
 
-#define DECLARE_DESERIALIZE_VALUE_BASE(type) virtual void DeserializeValue(const char* name, type& value, IsFundamental<type> dummy = 0) = 0;
-#define DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(type) virtual void DeserializeArrayValue(const char* name, std::vector<type>& value, IsFundamental<type> dummy = 0) = 0;
-#define DECLARE_DESERIALIZE_VALUE_OVERRIDE(type) virtual void DeserializeValue(const char* name, type& value, IsFundamental<type> dummy = 0) override;
-#define DECLARE_DESERIALIZE_ARRAY_VALUE_OVERRIDE(type) virtual void DeserializeArrayValue(const char* name, std::vector<type>& value, IsFundamental<type> dummy = 0) override;
+#define DECLARE_DESERIALIZE_VALUE_BASE(type) virtual void DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy = 0) = 0;
+#define DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(type) virtual void DeserializeArrayValue(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy = 0) = 0;
+#define DECLARE_DESERIALIZE_VALUE_OVERRIDE(type) virtual void DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy = 0) override;
+#define DECLARE_DESERIALIZE_ARRAY_VALUE_OVERRIDE(type) virtual void DeserializeArrayValue(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy = 0) override;
     class Deserializer
     {
     public:
         // TODO: add context
         template <typename ValueType>
-        void Deserialize(ValueType&& value);
+        void Deserialize(ValueType&& value, SerializationContext& context);
 
         template <typename ValueType, IsNotVector<ValueType> concept = 0>
-        void Deserialize(const char* name, ValueType&& value);
+        void Deserialize(const char* name, ValueType&& value, SerializationContext& context);
 
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
-        void Deserialize(const char* name, std::vector<ValueType>& value);
+        void Deserialize(const char* name, std::vector<ValueType>& value, SerializationContext& context);
 
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
-        void Deserialize(const char* name, std::vector<ValueType>& value);
+        void Deserialize(const char* name, std::vector<ValueType>& value, SerializationContext& context);
 
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
-        void Deserialize(const char* name, std::vector<const ValueType*>& value);
+        void Deserialize(const char* name, std::vector<const ValueType*>& value, SerializationContext& context);
 
     protected:
         DECLARE_DESERIALIZE_VALUE_BASE(bool);
@@ -169,8 +169,8 @@ namespace utilities
         DECLARE_DESERIALIZE_VALUE_BASE(size_t);
         DECLARE_DESERIALIZE_VALUE_BASE(float);
         DECLARE_DESERIALIZE_VALUE_BASE(double);
-        virtual void DeserializeValue(const char* name, std::string& value) = 0;
-        virtual void DeserializeValue(const char* name, ISerializable& value);
+        virtual void DeserializeValue(const char* name, std::string& value, SerializationContext& context) = 0;
+        virtual void DeserializeValue(const char* name, ISerializable& value, SerializationContext& context);
 
         DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(bool);
         DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(char);
@@ -179,18 +179,18 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(size_t);
         DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(float);
         DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(double);
-        virtual void DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array) = 0;
+        virtual void DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array, SerializationContext& context) = 0;
 
-        virtual std::string BeginDeserializeObject(const char* name, ISerializable& value); // returns typename
-        virtual void DeserializeObject(const char* name, ISerializable& value) = 0;
-        virtual void EndDeserializeObject(const char* name, ISerializable& value);
+        virtual std::string BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context); // returns typename
+        virtual void DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) = 0;
+        virtual void EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context);
     };
 }
 
 #define IMPLEMENT_SERIALIZE_VALUE(base, type)          void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
 #define IMPLEMENT_SERIALIZE_ARRAY_VALUE(base, type)    void base::SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
 
-#define IMPLEMENT_DESERIALIZE_VALUE(base, type)        void base::DeserializeValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name, value); }
-#define IMPLEMENT_DESERIALIZE_ARRAY_VALUE(base, type)  void base::DeserializeArrayValue(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name, value); }
+#define IMPLEMENT_DESERIALIZE_VALUE(base, type)        void base::DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy) { ReadScalar(name, value); }
+#define IMPLEMENT_DESERIALIZE_ARRAY_VALUE(base, type)  void base::DeserializeArrayValue(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy) { ReadArray(name, value, context); }
 
 #include "../tcc/Serialization.tcc"

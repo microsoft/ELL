@@ -10,9 +10,8 @@
 #include "ISerializable_test.h"
 
 // utilities
-#include "Variant.h"
-#include "ISerializable.h"
 #include "UniqueId.h"
+#include "ISerializable.h"
 #include "Serialization.h"
 #include "SimpleJsonSerializer.h"
 #include "XMLSerializer.h"
@@ -34,7 +33,7 @@
 #include <vector>
 #include <sstream>
 
-struct TestStruct : public utilities::ISerializable, public utilities::IDescribable
+struct TestStruct : public utilities::ISerializable
 {
     int a=0;
     float b=0;
@@ -44,15 +43,6 @@ struct TestStruct : public utilities::ISerializable, public utilities::IDescriba
     static std::string GetTypeName() { return "TestStruct"; }
     virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-    virtual utilities::ObjectDescription GetDescription() const override
-    {
-        auto result = utilities::ObjectDescription::FromType(*this);
-        result.AddField("a", a);
-        result.AddField("b", b);
-        result.AddField("c", c);
-        return result;
-    }
-
     virtual void Serialize(utilities::Serializer& serializer) const override
     {
         serializer.Serialize("a", a);
@@ -60,11 +50,11 @@ struct TestStruct : public utilities::ISerializable, public utilities::IDescriba
         serializer.Serialize("c", c);
     }
 
-    virtual void Deserialize(utilities::Deserializer& serializer) override
+    virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override
     {
-        serializer.Deserialize("a", a);
-        serializer.Deserialize("b", b);
-        serializer.Deserialize("c", c);
+        serializer.Deserialize("a", a, context);
+        serializer.Deserialize("b", b, context);
+        serializer.Deserialize("c", c, context);
     }
 };
 
@@ -151,6 +141,8 @@ void TestJsonSerializer()
 
 void TestJsonDeserializer()
 {
+    utilities::SerializationContext context;
+
     std::cout << "Deserializer test 1" << std::endl;
     {
         std::stringstream strstream;
@@ -160,7 +152,7 @@ void TestJsonDeserializer()
 
         utilities::SimpleJsonDeserializer deserializer(strstream);
         double val = 0;
-        deserializer.Deserialize("pi", val);
+        deserializer.Deserialize("pi", val, context);
         std::cout << "Result: " << val << std::endl;
         testing::ProcessTest("Deserialize float check", val == 3.14159);
     }
@@ -175,7 +167,7 @@ void TestJsonDeserializer()
 
         utilities::SimpleJsonDeserializer deserializer(strstream);
         std::string val;
-        deserializer.Deserialize("pie", val);
+        deserializer.Deserialize("pie", val, context);
         std::cout << "Result: " << val << std::endl;
         testing::ProcessTest("Deserialize string check", val == "cherry pie");
     }
@@ -191,7 +183,7 @@ void TestJsonDeserializer()
 
         utilities::SimpleJsonDeserializer deserializer(strstream);
         std::vector<int> val;
-        deserializer.Deserialize("arr", val);
+        deserializer.Deserialize("arr", val, context);
         std::cout << "Result: ";
         for(auto element: val)
             std::cout << element << ", ";
@@ -210,7 +202,7 @@ void TestJsonDeserializer()
 
         utilities::SimpleJsonDeserializer deserializer(strstream);
         TestStruct val;
-        deserializer.Deserialize("s", val);
+        deserializer.Deserialize("s", val, context);
         std::cout << "Result: ";
         std::cout << "a: " << val.a << ", b: " << val.b << ", c: " << val.c << std::endl;
         testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);
@@ -302,6 +294,8 @@ void TestXmlSerializer()
 
 void TestXmlDeserializer()
 {
+    utilities::SerializationContext context;
+
     std::cout << "Deserializer test 1" << std::endl;
     {
         std::stringstream strstream;
@@ -311,7 +305,7 @@ void TestXmlDeserializer()
 
         utilities::SimpleXmlDeserializer deserializer(strstream);
         double val = 0;
-        deserializer.Deserialize("pi", val);
+        deserializer.Deserialize("pi", val, context);
         std::cout << "Result: " << val << std::endl;
         testing::ProcessTest("Deserialize float check", val == 3.14159);
     }
@@ -326,7 +320,7 @@ void TestXmlDeserializer()
 
         utilities::SimpleXmlDeserializer deserializer(strstream);
         std::string val;
-        deserializer.Deserialize("pie", val);
+        deserializer.Deserialize("pie", val, context);
         std::cout << "Result: " << val << std::endl;
         testing::ProcessTest("Deserialize string check", val == "cherry pie");
     }
@@ -342,7 +336,7 @@ void TestXmlDeserializer()
 
         utilities::SimpleXmlDeserializer deserializer(strstream);
         std::vector<int> val;
-        deserializer.Deserialize("arr", val);
+        deserializer.Deserialize("arr", val, context);
         std::cout << "Result: ";
         for(auto element: val)
             std::cout << element << ", ";
@@ -361,7 +355,7 @@ void TestXmlDeserializer()
 
         utilities::SimpleXmlDeserializer deserializer(strstream);
         TestStruct val;
-        deserializer.Deserialize("s", val);
+        deserializer.Deserialize("s", val, context);
         std::cout << "Result: ";
         std::cout << "a: " << val.a << ", b: " << val.b << ", c: " << val.c << std::endl;
         testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);        
@@ -383,7 +377,7 @@ void TestXmlDeserializer()
 
         utilities::SimpleXmlDeserializer deserializer(strstream);
         nodes::ConstantNode<double> val;
-        deserializer.Deserialize("node", val);
+        deserializer.Deserialize("node", val, context);
 //        testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);
     }
 }

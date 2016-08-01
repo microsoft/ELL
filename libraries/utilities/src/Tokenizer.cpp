@@ -63,7 +63,7 @@ namespace utilities
                     }
                 }
 
-                if (_tokenStopChars.find(ch) == std::string::npos) // if we didn't hit a token-stop char, break out of this loop and keep reading 
+                if (_tokenStartChars.find(ch) == std::string::npos) // if we didn't hit a token-stop char, break out of this loop and keep reading 
                 {
                     break;
                 }
@@ -94,7 +94,7 @@ namespace utilities
                     break;
                 }
             }
-            else if (std::isspace(ch) || _tokenStopChars.find(ch) != std::string::npos)
+            else if (std::isspace(ch) || _tokenStartChars.find(ch) != std::string::npos)
             {
                 _in.unget();
                 break;

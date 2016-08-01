@@ -19,4 +19,9 @@ namespace model
         Port::Serialize(serializer);
         serializer.Serialize("isReferenced", _isReferenced);
     }
+
+    void OutputPortBase::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        throw "Not implemented";
+    }
 }

@@ -46,8 +46,8 @@ namespace model
         virtual void Copy(ModelTransformer& transformer) const override;
 
         /// Inherited from ISerializable
-        // virtual utilities::ObjectDescription GetDescription() const override;
         virtual void Serialize(utilities::Serializer& serializer) const override;
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";

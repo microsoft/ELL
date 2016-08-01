@@ -33,14 +33,6 @@ namespace model
         return Port::PortType::Boolean;
     }
 
-    // /// Inherited from ISerializable
-    // utilities::ObjectDescription Port::GetDescription() const
-    // {
-    //     auto result = utilities::ObjectDescription::FromType(*this);
-    //     result.AddField("dummy", 0);
-    //     // ???
-    //     return result;
-    // }
     void Port::Serialize(utilities::Serializer& serializer) const
     {
         serializer.Serialize("nodeId", _node->GetId());
@@ -48,5 +40,11 @@ namespace model
         serializer.Serialize("type", (int)_type);
         serializer.Serialize("size", _size);
     }
+
+    void Port::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        throw "Not implemented";
+    }
+
 
 }

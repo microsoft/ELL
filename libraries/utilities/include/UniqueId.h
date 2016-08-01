@@ -47,9 +47,8 @@ namespace utilities
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// Inherited from ISerializable
-        // virtual ObjectDescription GetDescription() const override;
         virtual void Serialize(utilities::Serializer& serializer) const override;
-        virtual void Deserialize(utilities::Deserializer& serializer) override;
+        virtual void Deserialize(utilities::Deserializer& serializer, SerializationContext& context) override;
         
     private:
         friend std::hash<UniqueId>;

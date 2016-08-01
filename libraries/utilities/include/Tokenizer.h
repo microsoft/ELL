@@ -15,20 +15,48 @@
 
 namespace utilities
 {
+    /// <summary> A very simple tokenizer suitable for XML and JSON deserialization </summary>
     class Tokenizer
     {
     public:
-        Tokenizer(std::istream& in, const std::string tokenStopChars): _in(in), _tokenStopChars(tokenStopChars) {}
+        /// <summary> Constructor </summary>
+        /// 
+        /// <param name=inputStream> Stream to read from </param>
+        /// <param name=tokenStartChars> Set of characters that indicate the beginning of a new token. </param> 
+        Tokenizer(std::istream& inputStream, const std::string tokenStartChars): _in(inputStream), _tokenStartChars(tokenStartChars) {}
 
-        std::string ReadNextToken(); // returns "" at EOF
+        /// <summary> Constructor </summary>
+        /// 
+        /// <param name=filename> Filename to read from </param>
+        /// <param name=tokenStartChars> Set of characters that indicate the beginning of a new token. </param> 
+        Tokenizer(std::string filename, const std::string tokenStartChars);
+
+        /// <summary> Gets the next token from the input stream. </summary>
+        ///
+        /// <returns> The next token, or the empty string if the end of file is reached. </returns>
+        std::string ReadNextToken();
+
+        /// <summary> Returns a token back to the input stream. </summary>
+        ///
+        /// <param name="token"> The token to return to the stream. </param>
         void PutBackToken(std::string token);
-        std::string PeekNextToken(); // returns "" at EOF
+
+        /// <summary> Returns the next token from the input stream. </summary>
+        ///
+        /// <returns> The next token, or the empty string if the end of file is reached. </returns>
         void MatchNextToken(std::string readString); // throws an exception if it doesn't match
+
+        /// <summary> Gets the next token from the input stream without consuming it. </summary>
+        ///
+        /// <returns> The next token, or the empty string if the end of file is reached. </returns>
+        std::string PeekNextToken();
+
+        /// <summary> Consumes entire stream, printing tokens as they're read. For debugging. </summary>
         void PrintTokens();
 
     private:
         std::istream& _in;
-        std::string _tokenStopChars;
+        std::string _tokenStartChars;
         std::string _stringDelimiters = "'\"";
 
         std::vector<std::string> _peekedTokens;
