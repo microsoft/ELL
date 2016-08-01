@@ -183,7 +183,7 @@ namespace utilities
 
     std::string SimpleXmlSerializer::SanitizeTypeName(const std::string& str)
     {
-        // convert '<'->'(' etc.
+        // convert '<' into '(' etc.
         auto result = str;
         std::replace(result.begin(), result.end(), '<', '(');
         std::replace(result.begin(), result.end(), '>', ')');
@@ -192,7 +192,7 @@ namespace utilities
 
     std::string SimpleXmlDeserializer::SanitizeTypeName(const std::string& str)
     {
-        // convert '<'->'(' etc.
+        // convert '<' into '(' etc.
         auto result = str;
         std::replace(result.begin(), result.end(), '<', '(');
         std::replace(result.begin(), result.end(), '>', ')');

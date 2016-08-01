@@ -40,17 +40,19 @@ namespace utilities
     // ISerializable
     void SimpleJsonSerializer::BeginSerializeObject(const char* name, const ISerializable& value)
     {
+        FinishPreviousLine();
         auto indent = GetCurrentIndent();
         if (name != std::string(""))
         {
             _out << indent << name << ": ";
         }
         _out << "{" << std::endl;
-        _out << indent << "_type: " << value.GetRuntimeTypeName() << std::endl;
+        _out << indent << "_type: " << value.GetRuntimeTypeName() << "\n";
     }
 
     void SimpleJsonSerializer::SerializeObject(const char* name, const ISerializable& value)
     {
+        FinishPreviousLine();
         ++_indent;
         value.Serialize(*this); // TODO: need to somehow know if we're in an indenting context or not for the subsequent calls to WriteScalar
         --_indent;
@@ -58,6 +60,9 @@ namespace utilities
 
     void SimpleJsonSerializer::EndSerializeObject(const char* name, const ISerializable& value)
     {
+//        FinishPreviousLine();
+        _out << "\n";
+        // TODO: need to skip writing a comma here
         auto indent = GetCurrentIndent();
         _out << indent << "}" << std::endl;
     }
@@ -75,6 +80,7 @@ namespace utilities
 
     void SimpleJsonSerializer::SerializeArrayValue(const char* name, const std::vector<const ISerializable*>& array)
     {
+        FinishPreviousLine();
         auto indent = GetCurrentIndent();
         if (name != std::string(""))
         {
@@ -82,12 +88,29 @@ namespace utilities
         }
 
         _out << "[";
-        for (const auto& item : array)
+
+
+        auto numItems = array.size();
+        for(size_t index = 0; index < numItems; ++index)
         {
-            Serialize(*item);
-            _out << ", ";
+            Serialize(*array[index]);
+            if(index != numItems-1)
+            {
+                _out << ", ";
+            }
         }
         _out << "]";
+    }
+
+    void SimpleJsonSerializer::Indent()
+    {
+        _out << GetCurrentIndent();
+    }
+
+    void SimpleJsonSerializer::FinishPreviousLine()
+    {
+        _out << _endOfPreviousLine;
+        _endOfPreviousLine = "";
     }
 
     //
@@ -125,7 +148,6 @@ namespace utilities
     void SimpleJsonDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
         std::cout << "Deserializing an object" << std::endl;
-        // somehow we need to have created the right object type
         value.Deserialize(*this, context);
         std::cout << "Done" << std::endl;
     }

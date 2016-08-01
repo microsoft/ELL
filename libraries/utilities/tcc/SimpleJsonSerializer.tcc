@@ -70,14 +70,20 @@ namespace utilities
         }
 
         _out << "[";
+
         // reset indent
-        for (const auto& item : array)
+        auto numItems = array.size();
+        for(size_t index = 0; index < numItems; ++index)
         {
-            Serialize(item);
-            _out << ", ";
+            Serialize(array[index]);
+            if(index != numItems-1)
+            {
+                _out << ", ";
+            }
         }
         // reset indent
-        _out << "]" << endOfLine;
+        _out << "]";
+        _endOfPreviousLine = endOfLine;
     }
 
     //
@@ -127,17 +133,21 @@ namespace utilities
         }
                 
         _tokenizer.MatchToken("[");
-        std::string nextToken = "";
-        while(nextToken != "]")
+        while(true)
         {
             ValueType obj;
             Deserialize(obj, context);
             array.push_back(obj);
 
-            _tokenizer.MatchToken(",");
-
-            // Want to peek at the next token here to see if it's a ']'
-            nextToken = _tokenizer.PeekNextToken();
+            auto maybeComma = _tokenizer.PeekNextToken();
+            if(maybeComma != ",")
+            {
+                break;
+            }
+            else
+            {
+                _tokenizer.ReadNextToken();
+            }
         }
         _tokenizer.MatchToken("]");
     }

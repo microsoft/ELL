@@ -73,7 +73,11 @@ namespace utilities
 
         std::ostream& _out;
         int _indent = 0;
+        std::string _endOfPreviousLine;
         std::string GetCurrentIndent() { return std::string(2 * _indent, ' '); }
+        void Indent();
+        void FinishPreviousLine();
+        void SetEndOfLine(std::string endOfLine);
     };
 
     class SimpleJsonDeserializer : public Deserializer
