@@ -82,12 +82,13 @@ namespace dataset
     }
 
     template<typename ExampleType>
-    void RowDataset<ExampleType>::RandomPermute(std::default_random_engine& rng, uint64_t count)
+    void RowDataset<ExampleType>::RandomPermute(std::default_random_engine& rng, uint64_t prefixSize, uint64_t rangeFirstIndex, uint64_t rangeSize)
     {
         using std::swap;
-        uint64_t lastIndex = NumExamples() - 1;
+        if(rangeSize == 0) rangeSize = NumExamples();
+        uint64_t lastIndex = rangeFirstIndex + rangeSize - 1;
 
-        for (uint64_t i = 0; i < count; ++i)
+        for (uint64_t i = rangeFirstIndex; i < rangeFirstIndex + prefixSize; ++i)
         {
             std::uniform_int_distribution<uint64_t> dist(i, lastIndex);
             uint64_t j = dist(rng);

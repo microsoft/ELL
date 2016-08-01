@@ -1,3 +1,4 @@
+#include "..\include\HistogramForestTrainer.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
@@ -15,6 +16,10 @@ namespace trainers
     template<typename LossFunctionType, typename BoosterType>
     typename HistogramForestTrainer<LossFunctionType, BoosterType>::SplitCandidate HistogramForestTrainer<LossFunctionType, BoosterType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums)
     {
+        auto edgePredictorCandidates = GetEdgePredictorCandidatesAtNode(range);
+
+
+
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 
         SplitCandidate bestSplitCandidate(nodeId, range, sums);
@@ -95,6 +100,13 @@ namespace trainers
     double HistogramForestTrainer<LossFunctionType, BoosterType>::GetOutputValue(const Sums& sums) const
     {
         return sums.sumWeightedLabels / sums.sumWeights;
+    }
+
+    template<typename LossFunctionType, typename BoosterType>
+    std::vector<typename HistogramForestTrainer<LossFunctionType, BoosterType>::EdgePredictorType> HistogramForestTrainer<LossFunctionType, BoosterType>::GetEdgePredictorCandidatesAtNode(Range range) const
+    {
+        //_dataset.RandomPermute(range.firstIndex, range.size);
+        return std::vector<EdgePredictorType>();
     }
 
     template<typename LossFunctionType, typename BoosterType>

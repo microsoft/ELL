@@ -41,6 +41,9 @@ namespace trainers
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
         double GetOutputValue(const Sums& sums) const;
 
+        // new functions for the HistogramForestTrainer
+        std::vector<EdgePredictorType> GetEdgePredictorCandidatesAtNode(Range range) const;
+
         // member variables
         LossFunctionType _lossFunction;
     };

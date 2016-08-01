@@ -104,13 +104,17 @@ namespace dataset
         /// <param name="rng"> [in,out] The random number generator. </param>
         void RandomPermute(std::default_random_engine& rng);
 
-        /// <summary>
-        /// Permutes the dataset so that the first count examples are chosen uniformly, and the rest are arbitrary.
-        /// </summary>
+        /// <summary> Permutes a range of the dataset so that a prefix of the examples in the range are
+        /// chosen uniformly from that range (the rest of the examples in the range are ordered
+        /// arbitrarily. Namely, RandomPermute(rng, 7, 4, 2) will rearrange the order of examples 7,8,9,
+        /// 10 such that examples positions 7,8 are chosen uniformly without replacement from 7,8,9,10
+        /// and positions 9,10 are in some arbitrary order. </summary>
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
-        /// <param name="count"> Number of examples to permute. </param>
-        void RandomPermute(std::default_random_engine& rng, uint64_t count);
+        /// <param name="rangeFirstIndex"> Index of the first example in the range being permuted. </param>
+        /// <param name="rangeSize"> Number of examples in the range being permuted. </param>
+        /// <param name="prefixSize"> The number of examples at the top of the range (at most rangeSize) that will be uniformly distributed after the permutation. </param>
+        void RandomPermute(std::default_random_engine& rng, uint64_t prefixSize, uint64_t rangeFirstIndex = 0, uint64_t rangeSize = 0);
 
         /// <summary> Sorts an interval of examples by a certain key. </summary>
         ///

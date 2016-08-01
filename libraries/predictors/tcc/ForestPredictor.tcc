@@ -264,7 +264,7 @@ namespace predictors
             operation(interiorNode, edgePosition);
             
             //follow the edge to the next node
-            auto edge = interiorNode._outgoingEdges[edgePosition];
+            const auto& edge = interiorNode._outgoingEdges[edgePosition];
             nodeIndex = edge.GetTargetNodeIndex();
         }
         while (nodeIndex != 0);
