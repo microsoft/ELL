@@ -82,6 +82,10 @@ namespace model
         /// <param name=values> The values this port should output </param>
         void SetOutput(std::vector<ValueType> values) const;
 
+        /// Inherited from ISerializable
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
     private:
         mutable std::vector<ValueType> _cachedOutput;
     };

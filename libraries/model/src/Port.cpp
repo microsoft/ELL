@@ -37,13 +37,19 @@ namespace model
     {
         serializer.Serialize("nodeId", _node->GetId());
         serializer.Serialize("name", _name);
-        serializer.Serialize("type", (int)_type);
+        serializer.Serialize("type", static_cast<int>(_type));
         serializer.Serialize("size", _size);
     }
 
     void Port::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::Port deserialization not implemented");
+        Node::NodeId id;
+        serializer.Deserialize("nodeId", id, context);
+        serializer.Deserialize("name", _name, context);
+        int typeCode = 0;
+        serializer.Deserialize("type", typeCode, context);
+        _type = static_cast<PortType>(typeCode);
+        serializer.Deserialize("size", _size, context);
     }
 
     void Port::SetSize(size_t size)

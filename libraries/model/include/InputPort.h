@@ -79,10 +79,6 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// Inherited from ISerializable
-        virtual void Serialize(utilities::Serializer& serializer) const override;
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
-
     private:
         const OutputPortElementsUntyped& _inputRanges; // Just a reference to the typed elements in concrete subclass
 
@@ -121,6 +117,10 @@ namespace model
         /// <param name="index"> The index of the element to return </param>
         /// <returns> The output value at the corresponding index </returns>
         ValueType operator[](size_t index) const;
+
+        /// Inherited from ISerializable
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     private:
         OutputPortElements<ValueType> _input;

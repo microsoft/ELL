@@ -9,6 +9,11 @@
 namespace nodes
 {
     template <typename ValueType>
+    BinaryOperationNode<ValueType>::BinaryOperationNode() : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(OperationType::none)
+    {
+    }
+
+    template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2, OperationType operation) : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
     {
         if (input1.Size() != input2.Size())
@@ -67,8 +72,20 @@ namespace nodes
     void BinaryOperationNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);
-        serializer.Serialize("operation", (int)_operation);
+        serializer.Serialize("operation", static_cast<int>(_operation));
         serializer.Serialize("input1", _input1);
         serializer.Serialize("input2", _input2);
+    }
+
+    template <typename ValueType>
+    void BinaryOperationNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        Node::Deserialize(serializer, context);
+        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
+        int op = 0;
+        serializer.Deserialize("operation", op, context);
+        _operation = static_cast<OperationType>(op);
+        serializer.Deserialize("input1", _input1, context);
+        serializer.Deserialize("input2", _input2, context);
     }
 }

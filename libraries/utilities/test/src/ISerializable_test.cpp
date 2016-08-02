@@ -215,24 +215,33 @@ void TestDeserializer()
     {
         model::Model g;
         std::stringstream strstream;
+        auto constVector = std::vector<double>{ 1.0, 2.0, 3.0 };
+
         SerializerType serializer(strstream);
         auto in = g.AddNode<model::InputNode<double>>(3);
-        auto constNode = g.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
+        auto constNode = g.AddNode<nodes::ConstantNode<double>>(constVector);
         auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
         auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
-        serializer.Serialize("node", *constNode);
-        serializer.Serialize("node", *in);
+        serializer.Serialize("node1", *constNode);
+        serializer.Serialize("node2", *in);
+        serializer.Serialize("node3", constNode);
+        serializer.Serialize("node4", binaryOpNode);
         std::cout << "Str value: " << strstream.str() << std::endl;
 
         model::ModelSerializationContext modelContext(nullptr);
         DeserializerType deserializer(strstream);
         nodes::ConstantNode<double> newConstNode;
         model::InputNode<double> newIn;
-        deserializer.Deserialize("node", newConstNode, modelContext);
-        deserializer.Deserialize("node", newIn, modelContext);
+        std::unique_ptr<nodes::ConstantNode<double>> newConstNode2 = nullptr;
+        std::unique_ptr<nodes::BinaryOperationNode<double>> newBinaryOpNode = nullptr;
+        deserializer.Deserialize("node1", newConstNode, modelContext);
+        deserializer.Deserialize("node2", newIn, modelContext);
+        deserializer.Deserialize("node3", newConstNode2, modelContext);
+ //       deserializer.Deserialize("node4", newBinaryOpNode, modelContext);
 
-//        testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);
+        testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNode.GetValues()));
+        testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNode2->GetValues()));
     }
     std::cout << std::endl;
 }

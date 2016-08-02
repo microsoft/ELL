@@ -66,7 +66,8 @@ namespace model
         serializer.Deserialize("referencedPortName", portName, newContext);
         
         Node* newNode = newContext.GetNodeFromId(newId);
-        // TODO: get port from node and name
+
+        // TODO: Add a way to look up a port by name
         auto ports = newNode->GetOutputPorts();
         OutputPortBase* newPort = nullptr;
         for(auto port: ports)
@@ -140,9 +141,8 @@ namespace model
     {
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         std::vector<OutputPortRange> ranges;
-        serializer.Deserialize("ranges", ranges, newContext);
+//        serializer.Deserialize("ranges", ranges, newContext);
         _ranges = ranges;
         ComputeSize();
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::OutputPortElementsUntyped not implemented");
     }
 }

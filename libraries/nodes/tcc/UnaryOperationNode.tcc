@@ -37,6 +37,7 @@ namespace nodes
                 output = ComputeOutput(sqrtOp);
             }
             break;
+            
             default:
                 throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
         }

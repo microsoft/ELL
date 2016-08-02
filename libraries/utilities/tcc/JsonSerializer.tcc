@@ -61,7 +61,7 @@ namespace utilities
         SetEndOfLine(endOfLine);
     }
 
-    template <typename ValueType, IsFundamental<ValueType> concept>
+    template <typename ValueType>
     void JsonSerializer::WriteArray(const char* name, const std::vector<ValueType>& array)
     {
         bool hasName = name != std::string("");

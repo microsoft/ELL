@@ -62,7 +62,7 @@ namespace utilities
         void WriteScalar(const char* name, const char* value);
         void WriteScalar(const char* name, const std::string& value);
 
-        template <typename ValueType, IsFundamental<ValueType> concept = 0>
+        template <typename ValueType>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
         std::ostream& _out;
@@ -95,7 +95,7 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_VALUE_OVERRIDE(size_t);
         DECLARE_DESERIALIZE_ARRAY_VALUE_OVERRIDE(float);
         DECLARE_DESERIALIZE_ARRAY_VALUE_OVERRIDE(double);
-        virtual void DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array, SerializationContext& context) override;
+        virtual void DeserializeArrayValue(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) override;
 
         virtual std::string BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) override;
         virtual void DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) override;

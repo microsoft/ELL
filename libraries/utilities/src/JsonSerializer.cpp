@@ -195,5 +195,5 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, float);
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, double);
 
-    void JsonDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array, SerializationContext& context) {}
+    void JsonDeserializer::DeserializeArrayValue(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) {}
 }

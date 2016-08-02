@@ -57,18 +57,6 @@ namespace model
         return typedOutput->GetOutput(element.GetIndex());
     }
 
-// TODO: put these in cpp file
-    inline void InputPortBase::Serialize(utilities::Serializer& serializer) const
-    {
-        Port::Serialize(serializer); // call this SerializeContents
-        serializer.Serialize("inputElements", _inputRanges);
-    }
-
-    inline void InputPortBase::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::InputPortBase deserialization not implemented");
-    }
-
     //
     // InputPort
     //
@@ -93,5 +81,20 @@ namespace model
     OutputPortElements<ValueType> InputPort<ValueType>::GetOutputPortElements() const
     {
         return _input;
+    }
+
+    template <typename ValueType>
+    void InputPort<ValueType>::Serialize(utilities::Serializer& serializer) const
+    {
+        InputPortBase::Serialize(serializer); // call this SerializeContents
+        serializer.Serialize("inputElements", _input);
+    }
+
+    template <typename ValueType>
+    void InputPort<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+         InputPortBase::Deserialize(serializer, context);
+
+        serializer.Deserialize("inputElements", _input, context);
     }
 }

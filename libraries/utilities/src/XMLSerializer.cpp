@@ -162,7 +162,7 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, double);
 
     // TODO: Why does this not do anything???
-    void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array, SerializationContext& context) 
+    void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) 
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::SimpleXmlDeserializer deserialization not implemented");
     }

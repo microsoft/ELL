@@ -22,6 +22,7 @@ namespace model
 
     void OutputPortBase::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::OutputPortBase not implemented");
+        Port::Deserialize(serializer, context);
+        serializer.Deserialize("isReferenced", _isReferenced, context);
     }
 }

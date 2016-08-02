@@ -29,11 +29,14 @@ namespace nodes
     public:
         enum class OperationType
         {
+            none,
             add,
             subtract,
             coordinatewiseMultiply, // coordinatewise multiplication
             divide // coordinatewise division
         };
+
+        BinaryOperationNode();
 
         /// <summary> Constructor </summary>
         /// <param name="input1"> The left-hand input of the arithmetic expression </param>
@@ -58,6 +61,7 @@ namespace nodes
 
         /// Inherited from ISerializable
         virtual void Serialize(utilities::Serializer& serializer) const override;
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
         static constexpr const char* input1PortName = "input1";
         static constexpr const char* input2PortName = "input2";

@@ -71,7 +71,7 @@ namespace utilities
         _out << " value='" << XmlEncodeString(value) << "'/>" << endOfLine;
     }
 
-    template <typename ValueType, IsFundamental<ValueType> concept>
+    template <typename ValueType>
     void SimpleXmlSerializer::WriteArray(const char* name, const std::vector<ValueType>& array)
     {
         bool hasName = name != std::string("");

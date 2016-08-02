@@ -158,6 +158,9 @@ namespace utilities
         template <typename ValueType, IsNotVector<ValueType> concept = 0>
         void Serialize(const char* name, ValueType&& value);
 
+        template <typename ValueType>
+        void Serialize(const char* name, ValueType* value);
+
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void Serialize(const char* name, const std::vector<ValueType>& value);
 
@@ -176,7 +179,6 @@ namespace utilities
         DECLARE_SERIALIZE_VALUE_BASE(size_t);
         DECLARE_SERIALIZE_VALUE_BASE(float);
         DECLARE_SERIALIZE_VALUE_BASE(double);
-//        virtual void SerializeValue(const char* name, const char* value) = 0;
         virtual void SerializeValue(const char* name, const std::string& value) = 0;
         virtual void SerializeValue(const char* name, const ISerializable& value);
 
@@ -200,22 +202,33 @@ namespace utilities
 #define DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(type) virtual void DeserializeArrayValue(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy = 0) = 0;
 #define DECLARE_DESERIALIZE_VALUE_OVERRIDE(type) virtual void DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy = 0) override;
 #define DECLARE_DESERIALIZE_ARRAY_VALUE_OVERRIDE(type) virtual void DeserializeArrayValue(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy = 0) override;
+
     class Deserializer
     {
     public:
-        // TODO: add context
+        /// <summary> Serialize unnamed values of any serializable type. </summary>
         template <typename ValueType>
         void Deserialize(ValueType&& value, SerializationContext& context);
 
+        /// <summary> Serialize named values of various serializable types. </summary>
         template <typename ValueType, IsNotVector<ValueType> concept = 0>
         void Deserialize(const char* name, ValueType&& value, SerializationContext& context);
 
+        template <typename ValueType, IsNotSerializable<ValueType> concept = 0>
+        void Deserialize(const char* name, std::unique_ptr<ValueType>& value, SerializationContext& context);
+
+        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        void Deserialize(const char* name, std::unique_ptr<ValueType>& value, SerializationContext& context);
+
+        // vector of fundamental values
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void Deserialize(const char* name, std::vector<ValueType>& value, SerializationContext& context);
 
+        // vector of ISerializable values
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
         void Deserialize(const char* name, std::vector<ValueType>& value, SerializationContext& context);
 
+        // Vector of pointers to serializable things
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
         void Deserialize(const char* name, std::vector<const ValueType*>& value, SerializationContext& context);
 
@@ -237,7 +250,7 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(size_t);
         DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(float);
         DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(double);
-        virtual void DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array, SerializationContext& context) = 0;
+        virtual void DeserializeArrayValue(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) = 0;
 
         virtual std::string BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context); // returns typename
         virtual void DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) = 0;
