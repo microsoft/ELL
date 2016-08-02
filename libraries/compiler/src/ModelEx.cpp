@@ -20,6 +20,12 @@ namespace emll
 			return (inputs.NumRanges() == 1 && (inputs.begin()->Size() > 1));
 		}
 
+		bool ModelEx::IsPureBinary(const model::Node& node)
+		{
+			const std::vector<model::InputPortBase*>& inputs = node.GetInputPorts();
+			return (inputs.size() == 2);
+		}
+
 		bool ModelEx::IsScalar(const model::InputPortBase& port)
 		{
 			return (port.Size() == 1);

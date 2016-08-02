@@ -73,6 +73,7 @@ namespace emll
 			virtual void CompileDelayNode(const model::Node& node) = 0;
 			virtual void CompileUnaryNode(const model::Node& node) = 0;
 			virtual void CompileBinaryPredicateNode(const model::Node& node) = 0;
+			virtual void CompileElementSelectorNode(const model::Node& node) = 0;
 
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
 			virtual void EndFunction() = 0;

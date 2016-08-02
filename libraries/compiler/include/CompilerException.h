@@ -22,10 +22,14 @@ namespace emll
 			unaryOperationNotSupported,
 			/// Binary predicates - operation not supported
 			binaryPredicateTypeNotSupported,
+			/// Element selector not supported
+			elementSelectorNotSupported,
 			/// Expected a scalar inputs, but a vector was encountered
 			scalarInputsExpected,
 			/// Expected a scalar inputs, but a vector was encountered
 			scalarOutputsExpected,
+			/// Expected a scalar inputs, but a vector was encountered
+			binaryInputsExpected,
 			/// Unknown VariableScope
 			variableScopeNotSupported,
 			/// Unknown Variable type

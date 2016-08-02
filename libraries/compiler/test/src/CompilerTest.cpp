@@ -9,6 +9,8 @@
 #include "VectorVar.h"
 #include "testing.h"
 
+#include "ForestNode.h"
+
 using namespace emll::compiler;
 
 void NodePrinter(const model::Node& node)
@@ -125,6 +127,7 @@ void TestLLVM()
 	module.WriteBitcodeToFile("C:\\junk\\model\\loop.bc");
 }
 
+
 ModelBuilder::ModelBuilder()
 {
 }
@@ -196,6 +199,25 @@ nodes::BinaryPredicateNode<T>* ModelBuilder::Equals(const model::OutputPort<T>& 
 }
 
 template<typename T>
+nodes::BinaryPredicateNode<T>* ModelBuilder::Lt(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
+{
+	return _model.AddNode<nodes::BinaryPredicateNode<T>>(x, y, nodes::BinaryPredicateNode<T>::PredicateType::less);
+}
+
+template<typename T>
+nodes::BinaryPredicateNode<T>* ModelBuilder::Gt(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
+{
+	return _model.AddNode<nodes::BinaryPredicateNode<T>>(x, y, nodes::BinaryPredicateNode<T>::PredicateType::greater);
+}
+
+template<typename T, typename S>
+nodes::ElementSelectorNode<T, S>* ModelBuilder::Select(const model::OutputPort<T>& elts, const model::OutputPort<S>& selector)
+{
+	auto node = _model.AddNode<nodes::ElementSelectorNode<T, S>>(elts, selector);
+	return node;
+}
+
+template<typename T>
 nodes::UnaryOperationNode<T>* ModelBuilder::Sqrt(const model::OutputPort<T>& x)
 {
 	return _model.AddNode<nodes::UnaryOperationNode<T>>(x, nodes::UnaryOperationNode<T>::OperationType::sqrt);
@@ -232,6 +254,13 @@ nodes::ConstantNode<T>* ModelBuilder::Constant(const std::vector<T>& values)
 	// Work around a bug. Make sure literal values are propagated to outputs
 	_model.ComputeNodeOutput<T>(pNode->output);
 	return pNode;
+}
+
+template<typename T>
+model::OutputPort<T>* ModelBuilder::GetOutputPort(model::Node* pNode, size_t portIndex)
+{
+	auto pPort = pNode->GetOutputPorts()[portIndex];
+	return static_cast<model::OutputPort<T>*>(pPort);
 }
 
 model::Model InitTestModelBinOp()
@@ -413,6 +442,22 @@ void TestBinaryPredicate(bool expanded)
 	compiler.DebugDump();
 }
 
+void TestElementSelector()
+{
+	ModelBuilder mb;
+
+	std::vector<double> data = { 5, 10 };
+	auto c1 = mb.Constant<bool>(true);
+	auto input1 = mb.Inputs<double>(data.size());
+	auto selector = mb.Select<double, bool>(input1->output, c1->output);
+	//selector->output.SetOutput(0);
+	auto output = mb.Outputs<double>(*mb.GetOutputPort<double>(selector, 0));
+
+	IRCompiler compiler("EMLL");
+	compiler.CompileModel("TestElementSelector", mb.Model);
+	compiler.DebugDump();
+}
+
 void TestSlidingAverage()
 {
 	ModelBuilder mb;
@@ -472,5 +517,54 @@ void TestDotProductOutput()
 
 	compiler.DebugDump();
 	module.WriteBitcodeToFile("C:\\junk\\model\\dot.bc");
+}
+
+model::Model MakeForest()
+{
+	// define some abbreviations
+	using SplitAction = predictors::SimpleForestPredictor::SplitAction;
+	using SplitRule = predictors::SingleElementThresholdRule;
+	using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
+	using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
+
+	// build a forest
+	predictors::SimpleForestPredictor forest;
+	auto root = forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.3 }, EdgePredictorVector{ -1.0, 1.0 } });
+	forest.Split(SplitAction{ forest.GetChildId(root, 0), SplitRule{ 1, 0.6 }, EdgePredictorVector{ -2.0, 2.0 } });
+	forest.Split(SplitAction{ forest.GetChildId(root, 1), SplitRule{ 2, 0.9 }, EdgePredictorVector{ -4.0, 4.0 } });
+	forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.2 }, EdgePredictorVector{ -3.0, 3.0 } });
+
+	// build the model
+	model::Model model;
+	auto inputNode = model.AddNode<model::InputNode<double>>(3);
+	auto simpleForestNode = model.AddNode<nodes::SimpleForestNode>(inputNode->output, forest);
+
+	// refine
+	model::TransformContext context;
+	model::ModelTransformer transformer;
+	auto refinedModel = transformer.RefineModel(model, context);
+	/*
+	// check equivalence
+	auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
+	auto refinedOutputPort = transformer.GetCorrespondingOutputPort(simpleForestNode->prediction);
+
+	inputNode->SetInput({ 0.2, 0.5, 0.0 });
+	refinedInputNode->SetInput({ 0.2, 0.5, 0.0 });
+	auto outputValue = model.ComputeNodeOutput(simpleForestNode->prediction)[0];
+	auto refinedOutputValue = refinedModel.ComputeNodeOutput(*refinedOutputPort)[0];
+
+	//  expected output is -3.0
+	testing::ProcessTest("Testing SimpleForestNode refine", testing::IsEqual(outputValue, refinedOutputValue));
+	*/
+	return refinedModel;
+}
+
+void TestForest()
+{
+	model::Model model = MakeForest();
+
+	IRCompiler compiler;
+	compiler.CompileModel("TestForest", model);
+	compiler.DebugDump();
 }
 

@@ -15,6 +15,11 @@ namespace emll
 {
 	namespace compiler
 	{
+		IRCompiler::IRCompiler()
+			: IRCompiler("EMLL")
+		{
+		}
+
 		IRCompiler::IRCompiler(const std::string& moduleName)
 			:  _module(_emitter, moduleName), _runtime(_module)
 		{
@@ -30,9 +35,26 @@ namespace emll
 				case model::Port::PortType::Integer:
 					CompileConstant<int>(static_cast<const nodes::ConstantNode<int>&>(node));
 					break;
+				case model::Port::PortType::Boolean:
+					CompileConstantBool(static_cast<const nodes::ConstantNode<bool>&>(node));
+					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
+		}
+
+		void IRCompiler::CompileConstantBool(const nodes::ConstantNode<bool>& node)
+		{
+			auto output = node.GetOutputPorts()[0];
+			if (!ModelEx::IsScalar(*output))
+			{
+				throw new CompilerException(CompilerError::scalarInputsExpected);
+			}
+			auto values = node.GetValues();
+			// We always convert booleans as integers
+			Variable* pVar = Variables().AddVariable<LiteralVar<int>>(values[0]);
+			SetVariableFor(output, pVar);
+			EnsureEmitted(pVar);
 		}
 
 		void IRCompiler::CompileInputNode(const model::Node& node)
@@ -152,6 +174,18 @@ namespace emll
 			{
 				case model::Port::PortType::Real:
 					CompileBinaryPredicate<double>(static_cast<const nodes::BinaryPredicateNode<double>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void IRCompiler::CompileElementSelectorNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					CompileElementSelectorNode<double>(node);
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);

@@ -43,9 +43,9 @@ namespace emll
 				return _pEmitter->CastFloat(pValue, ValueType::Int32);
 			}
 			///<summary>Explict downcast from integer to byte</summary>
-			llvm::Value* CastToByte(llvm::Value* pValue)
+			llvm::Value* CastBoolToInt(llvm::Value* pValue)
 			{
-				return _pEmitter->CastInt(pValue, ValueType::Byte);
+				return _pEmitter->CastInt(pValue, ValueType::Int32);
 			}
 
 			///<summary>Emit a typecast to template type</summary>

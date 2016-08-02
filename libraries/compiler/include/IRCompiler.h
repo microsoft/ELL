@@ -22,6 +22,8 @@ namespace emll
 		class IRCompiler : public Compiler
 		{
 		public:
+			///<summary>Create a compiler to produce an LLVM module with the default name</summary>
+			IRCompiler();
 			///<summary>Create a compiler to produce an LLVM module with the given name</summary>
 			IRCompiler(const std::string& moduleName);
 
@@ -45,6 +47,8 @@ namespace emll
 			virtual void CompileUnaryNode(const model::Node& node) override;
 			///<summary>Compile a binary predicate</summary>
 			virtual void CompileBinaryPredicateNode(const model::Node& node) override;
+			///<summary>Compile an elementselectorNode</summary>
+			virtual void CompileElementSelectorNode(const model::Node& node) override;
 
 			///<summary>Emit LLVM IR to std::out for debugging</summary>
 			void DebugDump();
@@ -135,6 +139,8 @@ namespace emll
 			///<summary>Compile a ConstantNode</summary>
 			template<typename T>
 			void CompileConstant(const nodes::ConstantNode<T>& node);
+			///<summary>Compile a boolean ConstantNode, which we have to handle in a special way</summary>
+			void CompileConstantBool(const nodes::ConstantNode<bool>& node);
 			///<summary>Compile an OutputNode</summary>
 			template<typename T>
 			void CompileOutput(const model::OutputNode<T>& node);
@@ -190,6 +196,16 @@ namespace emll
 			///<summary>Compile a BinarPredicate</summary>
 			template<typename T>
 			void CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node);
+
+			///<summary>Compile an element selector node</summary>
+			template<typename T>
+			void CompileElementSelectorNode(const model::Node& node);
+			///<summary>Compile an element selector node</summary>
+			template<typename T, typename SelectorType>
+			void CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node);
+			///<summary>Compile an element selector node</summary>
+			template<typename T, typename SelectorType>
+			void CompileElementSelectorBinary(const nodes::ElementSelectorNode<T, SelectorType>& node);
 
 			///<summary>Translate the binary operation operator into a strongly typed operator for LLVM</summary>
 			template<typename T>

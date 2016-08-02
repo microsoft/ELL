@@ -478,6 +478,7 @@ namespace emll
 		template<typename T>
 		void IRCompiler::CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node)
 		{
+			// Binary predicate has 2 inputs and 1 output
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
 			auto pOutput = node.GetOutputPorts()[0];
@@ -496,8 +497,70 @@ namespace emll
 			llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(0));
 			llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(0));
 			llvm::Value* pOpResult = _fn.Cmp(cmp, pLVal, pRVal);
-			// LLVM internally uses 1 bit for boolean. We use bytes to store boolean results. That requires a typecast in LLVM
-			_fn.Store(pResult, _fn.CastToByte(pOpResult));
+			// LLVM internally uses 1 bit for boolean. We use integers to store boolean results (see CompileElementSelector). That requires a typecast in LLVM
+			_fn.Store(pResult, _fn.CastBoolToInt(pOpResult));
+		}
+
+		template<typename T>
+		void IRCompiler::CompileElementSelectorNode(const model::Node& node)
+		{
+			auto selectorPort = node.GetInputPorts()[1];
+			switch (selectorPort->GetType())
+			{
+				case model::Port::PortType::Boolean:
+					return CompileElementSelector<T, bool>(static_cast<const nodes::ElementSelectorNode<T, bool>&>(node));
+	
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		template<typename T, typename SelectorType>
+		void IRCompiler::CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node)
+		{
+			auto pElements = node.GetInputPorts()[0];
+			if (!ModelEx::IsPureBinary(node))
+			{
+				// Only support binary right now
+				throw new CompilerException(CompilerError::binaryInputsExpected);
+			}
+			CompileElementSelectorBinary<T, SelectorType>(node);
+		}
+
+		///<summary>Compile an element selector node</summary>
+		template<typename T, typename SelectorType>
+		void IRCompiler::CompileElementSelectorBinary(const nodes::ElementSelectorNode<T, SelectorType>& node)
+		{
+			auto pElements = node.GetInputPorts()[0];
+			auto lInput = pElements->GetOutputPortElement(0);
+			auto rInput = pElements->GetOutputPortElement(1);
+
+			auto pSelector = node.GetInputPorts()[1];
+			if (!ModelEx::IsScalar(*pSelector))
+			{
+				throw new CompilerException(CompilerError::scalarInputsExpected);
+			}
+			auto pOutput = node.GetOutputPorts()[0];
+			if (!ModelEx::IsScalar(*pOutput))
+			{
+				throw new CompilerException(CompilerError::scalarOutputsExpected);
+			}
+
+			llvm::Value* pLVal = LoadVar(lInput);
+			llvm::Value* pRVal = LoadVar(rInput);
+			llvm::Value* pSelectorVal = LoadVar(pSelector);
+			llvm::Value* pResult = EnsureEmitted(pOutput);
+
+			IRIfEmitter ife = _fn.If();
+			ife.If(ComparisonType::Eq, pSelectorVal, _fn.Literal(0));
+			{
+				_fn.Store(pResult, pLVal);
+			}
+			ife.Else();
+			{
+				_fn.Store(pResult, pRVal);
+			}
+			ife.End();
 		}
 	}
 }

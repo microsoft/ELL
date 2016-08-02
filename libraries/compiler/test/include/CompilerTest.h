@@ -35,6 +35,12 @@ public:
 	template<typename T>
 	nodes::BinaryPredicateNode<T>* Equals(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 	template<typename T>
+	nodes::BinaryPredicateNode<T>* Lt(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
+	template<typename T>
+	nodes::BinaryPredicateNode<T>* Gt(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
+	template<typename T, typename S>
+	nodes::ElementSelectorNode<T, S>* Select(const model::OutputPort<T>& elts, const model::OutputPort<S>& selector);
+	template<typename T>
 	nodes::AccumulatorNode<T>* Accumulate(const model::OutputPort<T>& x);
 	template<typename T>
 	nodes::SumNode<T>* Sum(const model::OutputPort<T>& x);
@@ -44,6 +50,9 @@ public:
 	nodes::DotProductNode<T>* DotProduct(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 	template<typename T>
 	nodes::UnaryOperationNode<T>* Sqrt(const model::OutputPort<T>& x);
+
+	template<typename T>
+	model::OutputPort<T>* GetOutputPort(model::Node* pNode, size_t portIndex);
 
 	// Expose as a property!
 	model::Model& Model = _model;
@@ -68,5 +77,7 @@ void TestAccumulator(bool expanded);
 void TestDelay();
 void TestSqrt();
 void TestBinaryPredicate(bool expanded);
+void TestElementSelector();
 void TestSlidingAverage();
 void TestDotProductOutput();
+void TestForest();
