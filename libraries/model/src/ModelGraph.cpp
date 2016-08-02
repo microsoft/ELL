@@ -57,6 +57,10 @@ namespace model
 
     void Model::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) 
     {
+        ModelSerializationContext graphContext(this);
+        
+        // deserialize nodes
+
         throw "Not implemented";
     }
 
@@ -157,5 +161,26 @@ namespace model
                 }
             }
         }
+    }
+
+    //
+    // ModelSerializationContext
+    //
+    ModelSerializationContext::ModelSerializationContext(Model* model) : _model(model) 
+    {
+    }
+    
+    Node* ModelSerializationContext::GetNodeFromId(const Node::NodeId& id)
+    {
+        std::cout << "Looking up new node for ID " << id << std::endl;
+        // TODO: error checking
+        return _oldToNewNodeMap[id];
+    }
+
+    void ModelSerializationContext::MapNode(const Node::NodeId& id, Node* node)
+    {
+        std::cout << "Adding map for node ID " << id << std::endl;
+        // TODO: error checking
+        _oldToNewNodeMap[id] = node;
     }
 }

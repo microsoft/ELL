@@ -84,6 +84,9 @@ namespace model
 
     void Node::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
-        serializer.Deserialize("id", _id, context);
+        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
+        NodeId oldId;
+        serializer.Deserialize("id", oldId, context);
+        newContext.MapNode(oldId, this);
     }
 }

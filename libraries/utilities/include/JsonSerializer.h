@@ -77,11 +77,11 @@ namespace utilities
         void SetEndOfLine(std::string endOfLine);
     };
 
-    class SimpleJsonDeserializer : public Deserializer
+    class JsonDeserializer : public Deserializer
     {
     public:
-        SimpleJsonDeserializer();
-        SimpleJsonDeserializer(std::istream& inputStream);
+        JsonDeserializer();
+        JsonDeserializer(std::istream& inputStream);
 
     protected:
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(bool);

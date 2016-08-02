@@ -45,6 +45,7 @@ namespace nodes
     template <typename ValueType>
     void ConstantNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
+        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         Node::Deserialize(serializer, context);
         serializer.Deserialize("values", _values, context);
     }

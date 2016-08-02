@@ -131,22 +131,22 @@ namespace utilities
     //
     // Deserialization
     //
-    SimpleJsonDeserializer::SimpleJsonDeserializer() : _in(std::cin), _tokenizer(std::cin, ",:{}[]'\"") {}
-    SimpleJsonDeserializer::SimpleJsonDeserializer(std::istream& inputStream) : _in(inputStream), _tokenizer(inputStream, ",:{}[]'\"") {}
+    JsonDeserializer::JsonDeserializer() : _in(std::cin), _tokenizer(std::cin, ",:{}[]'\"") {}
+    JsonDeserializer::JsonDeserializer(std::istream& inputStream) : _in(inputStream), _tokenizer(inputStream, ",:{}[]'\"") {}
 
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, bool);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, char);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, short);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, int);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, size_t);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, float);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleJsonDeserializer, double);
+    IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, bool);
+    IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, char);
+    IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, short);
+    IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, int);
+    IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, size_t);
+    IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, float);
+    IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, double);
 
     // strings
-    void SimpleJsonDeserializer::DeserializeValue(const char* name, std::string& value, SerializationContext& context) { ReadScalar(name, value); }
+    void JsonDeserializer::DeserializeValue(const char* name, std::string& value, SerializationContext& context) { ReadScalar(name, value); }
 
     // ISerializable
-    std::string SimpleJsonDeserializer::BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
+    std::string JsonDeserializer::BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -168,12 +168,12 @@ namespace utilities
         return typeName;
     }
 
-    void SimpleJsonDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
+    void JsonDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
         value.Deserialize(*this, context);
     }
 
-    void SimpleJsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
+    void JsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
         _tokenizer.MatchToken("}");
 
@@ -187,13 +187,13 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, bool);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, char);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, short);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, int);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, size_t);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, float);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleJsonDeserializer, double);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, bool);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, char);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, short);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, int);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, size_t);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, float);
+    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, double);
 
-    void SimpleJsonDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array, SerializationContext& context) {}
+    void JsonDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array, SerializationContext& context) {}
 }

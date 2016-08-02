@@ -37,5 +37,3 @@ namespace utilities
         virtual void EndDeserialize(Deserializer& serializer, SerializationContext& context) {};
     };
 }
-
-#include "../tcc/ISerializable.tcc"

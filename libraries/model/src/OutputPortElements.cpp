@@ -8,13 +8,13 @@
 
 #include "OutputPortElements.h"
 #include "Node.h"
+#include "ModelGraph.h"
 
 namespace model
 {
     //
     // OutputPortElement
     //
-
     OutputPortElement::OutputPortElement(const OutputPortBase& port, size_t index) : _referencedPort(&port), _index(index) {}
 
     //
@@ -56,6 +56,7 @@ namespace model
 
     void OutputPortRange::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
+        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         throw "Not implemented";
     }
 
@@ -113,6 +114,7 @@ namespace model
 
     void OutputPortElementsUntyped::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
+        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         throw "Not implemented";
     }
 }

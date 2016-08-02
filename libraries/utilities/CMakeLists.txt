@@ -19,8 +19,6 @@ set (SRC src/CompressedIntegerList.cpp
          src/Format.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
-         src/IDescribable.cpp
-         src/ISerializable.cpp
          src/ObjectDescription.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
@@ -69,7 +67,6 @@ set (TCC tcc/AnyIterator.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
          tcc/IDescribable.tcc
-         tcc/ISerializable.tcc
          tcc/ObjectDescription.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc

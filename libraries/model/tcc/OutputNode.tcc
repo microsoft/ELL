@@ -37,6 +37,8 @@ namespace model
     template <typename ValueType>
     void OutputNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
+        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
+        Node::Deserialize(serializer, newContext);
         throw "Not implemented";
     }
 }

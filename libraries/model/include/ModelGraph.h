@@ -16,6 +16,7 @@
 #include "IIterator.h"
 #include "ISerializable.h"
 
+// stl
 #include <unordered_set>
 #include <vector>
 #include <memory>
@@ -156,6 +157,18 @@ namespace model
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
         // to look nodes up by id.
         std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _idToNodeMap;
+    };
+
+    class ModelSerializationContext: public utilities::SerializationContext
+    {
+    public:
+        ModelSerializationContext(Model* model);
+        Model* GetModel() { return _model; }
+        Node* GetNodeFromId(const Node::NodeId& id);
+        void MapNode(const Node::NodeId& id, Node* node);
+
+        Model* _model;
+        std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;
     };
 }
 
