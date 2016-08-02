@@ -26,6 +26,7 @@ int main()
     
     TestMovingAverageNodeRefine();
     TestLinearPredictorNodeRefine();
+    TestSimpleForestNodeRefine();
 
     if (testing::DidTestFail())
     {

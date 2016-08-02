@@ -13,7 +13,8 @@ namespace nodes
 
     // superclass (Node) constructor takes two array arguments: inputs and outputs. These are pointers to our local InputPort and OutputPort storage.
     template <typename ValueType>
-    ConstantNode<ValueType>::ConstantNode(ValueType value) : Node({}, { &_output }), _output(this, outputPortName, 1), _values({ value }){};
+    ConstantNode<ValueType>::ConstantNode(ValueType value) : Node({}, { &_output }), _output(this, outputPortName, 1), _values({ value })
+    {};
 
     // Constructor for a vector constant
     template <typename ValueType>

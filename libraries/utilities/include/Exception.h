@@ -77,6 +77,7 @@ namespace utilities
     enum class InputExceptionErrors
     {
         badStringFormat,
+        badData,
         indexOutOfRange,
         invalidArgument,
         nullReference,

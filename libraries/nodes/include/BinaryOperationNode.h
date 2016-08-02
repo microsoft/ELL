@@ -27,6 +27,15 @@ namespace nodes
     class BinaryOperationNode : public model::Node
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr const char* input1PortName = "input1";
+        static constexpr const char* input2PortName = "input2";
+        static constexpr const char* outputPortName = "output";
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
+
+        /// <summary> Types of coordinatewise operations supported by this node type. </summary>
         enum class OperationType
         {
             add,
@@ -35,9 +44,11 @@ namespace nodes
             divide // coordinatewise division
         };
 
-        /// <summary> Constructor </summary>
-        /// <param name="input1"> The left-hand input of the arithmetic expression </param>
-        /// <param name="input2"> The right-hand input of the arithmetic expression </param>
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
+        /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
+        /// <param name="operation"> The type of operation to perform. </param>
         BinaryOperationNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2, OperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -50,15 +61,8 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<ValueType>& output = _output;
-
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
-
-        static constexpr char* input1PortName = "input1";
-        static constexpr char* input2PortName = "input2";
-        static constexpr char* outputPortName = "output";
 
 		/// <summary>Return the operation performed by this node</summary>
 		OperationType GetOperation() const { return _operation;}
@@ -70,14 +74,15 @@ namespace nodes
         template <typename Operation>
         std::vector<ValueType> ComputeOutput(Operation&& fn) const;
 
-        OperationType _operation;
-
         // Inputs
         model::InputPort<ValueType> _input1;
         model::InputPort<ValueType> _input2;
 
         // Output
         model::OutputPort<ValueType> _output;
+
+        // Operation
+        OperationType _operation;
     };
 }
 

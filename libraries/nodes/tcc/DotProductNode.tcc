@@ -11,7 +11,7 @@
 namespace nodes
 {
     template <typename ValueType>
-    DotProductNode<ValueType>::DotProductNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2) : Node({&_input1, &_input2}, {&_output}), _input1(this, input1, "input1"), _input2(this, input2, "input2"), _output(this, outputPortName, 1)
+    DotProductNode<ValueType>::DotProductNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2) : Node({&_input1, &_input2}, {&_output}), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, 1)
     {
     }
 
@@ -23,7 +23,7 @@ namespace nodes
         {
             result += _input1[index] * _input2[index];
         }
-        _output.SetOutput({result});
+        _output.SetOutput({ result });
     };
 
     template <typename ValueType>

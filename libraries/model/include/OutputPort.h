@@ -41,6 +41,8 @@ namespace model
     class OutputPort : public OutputPortBase
     {
     public:
+        OutputPort(const OutputPort&) = delete;
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="node"> The node this output port is part of </param>

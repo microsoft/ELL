@@ -29,6 +29,14 @@ namespace nodes
     class UnaryOperationNode : public model::Node
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr const char* inputPortName = "input";
+        static constexpr const char* outputPortName = "output";
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
+
+        /// <summary> Types of unary operations supported by this node type. </summary>
         enum class OperationType
         {
             sqrt
@@ -50,17 +58,11 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<ValueType>& output = _output;
-
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
 		/// <summary>Gets the operation type</summary>
 		OperationType GetOperationType() const { return _operation; }
-
-        static constexpr char* inputPortName = "input";
-        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;
@@ -68,15 +70,16 @@ namespace nodes
     private:
         template <typename Operation>
         std::vector<ValueType> ComputeOutput(Operation&& fn) const;
-
-        // Operation
-        OperationType _operation;
-
+ 
         // Inputs
         model::InputPort<ValueType> _input;
 
         // Output
         model::OutputPort<ValueType> _output;
+
+        // Operation
+        OperationType _operation;
+
     };
 }
 

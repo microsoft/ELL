@@ -63,7 +63,9 @@ namespace model
         /// <returns> a vector of all the nodes that depend on this node </summary>
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer. </summary>
+        ///
+        /// <param name="transformer"> [in,out] The transformer. </param>
         virtual void Copy(ModelTransformer& transformer) const = 0;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
