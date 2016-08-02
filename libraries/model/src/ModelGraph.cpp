@@ -60,8 +60,12 @@ namespace model
         ModelSerializationContext graphContext(this);
         
         // deserialize nodes
+        std::vector<const Node*> nodes;
+        serializer.Deserialize("nodes", nodes, graphContext);
 
-        throw "Not implemented";
+        // TODO: fix up everything
+
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::Deserialize not implemented");
     }
 
     //

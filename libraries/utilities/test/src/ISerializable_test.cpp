@@ -222,12 +222,16 @@ void TestDeserializer()
         auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
         serializer.Serialize("node", *constNode);
+        serializer.Serialize("node", *in);
         std::cout << "Str value: " << strstream.str() << std::endl;
 
         model::ModelSerializationContext modelContext(nullptr);
         DeserializerType deserializer(strstream);
-        nodes::ConstantNode<double> val;
-        deserializer.Deserialize("node", val, modelContext);
+        nodes::ConstantNode<double> newConstNode;
+        model::InputNode<double> newIn;
+        deserializer.Deserialize("node", newConstNode, modelContext);
+        deserializer.Deserialize("node", newIn, modelContext);
+
 //        testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);
     }
     std::cout << std::endl;

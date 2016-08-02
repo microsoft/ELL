@@ -39,6 +39,7 @@ namespace model
     {
         ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         Node::Deserialize(serializer, newContext);
-        throw "Not implemented";
+        
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::OutputNode deserialization not implemented");
     }
 }

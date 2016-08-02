@@ -164,7 +164,7 @@ namespace utilities
     // TODO: Why does this not do anything???
     void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<const ISerializable*>& array, SerializationContext& context) 
     {
-        throw "DeserializeArrayValue called";
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::SimpleXmlDeserializer deserialization not implemented");
     }
 
     // TODO: allow multi-char tokens

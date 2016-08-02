@@ -52,6 +52,8 @@ namespace model
         /// <returns> The dimensionality of the output </returns>
         size_t Size() const { return _size; } // dimension
 
+        void SetSize(size_t size);
+
         /// <summary> Returns the name of this port </summary>
         ///
         /// <returns> The name of this port </returns>

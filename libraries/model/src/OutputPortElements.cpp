@@ -51,13 +51,37 @@ namespace model
         serializer.Serialize("numValues", _numValues);
         serializer.Serialize("isFixedSize", _isFixedSize);
         serializer.Serialize("referencedNodeId", _referencedPort->GetNode()->GetId());
-//        serializer.Serialize("referencedPortName", _referencedPort->GetName());
+        serializer.Serialize("referencedPortName", _referencedPort->GetName());
     }
 
     void OutputPortRange::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
-        throw "Not implemented";
+        serializer.Deserialize("startIndex", _startIndex, newContext);
+        serializer.Deserialize("numValues", _numValues, newContext);
+        serializer.Deserialize("isFixedSize", _isFixedSize, newContext);
+        Node::NodeId newId;
+        serializer.Deserialize("referencedNodeId", newId, newContext);
+        std::string portName;
+        serializer.Deserialize("referencedPortName", portName, newContext);
+        
+        Node* newNode = newContext.GetNodeFromId(newId);
+        // TODO: get port from node and name
+        auto ports = newNode->GetOutputPorts();
+        OutputPortBase* newPort = nullptr;
+        for(auto port: ports)
+        {
+            if(port->GetName() == portName)
+            {
+                newPort = port;
+                break;
+            }
+        }
+        _referencedPort = newPort;
+        if(newPort == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't deserialize model::OutputPortRange port");
+        }
     }
 
     //
@@ -115,6 +139,10 @@ namespace model
     void OutputPortElementsUntyped::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
-        throw "Not implemented";
+        std::vector<OutputPortRange> ranges;
+        serializer.Deserialize("ranges", ranges, newContext);
+        _ranges = ranges;
+        ComputeSize();
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::OutputPortElementsUntyped not implemented");
     }
 }

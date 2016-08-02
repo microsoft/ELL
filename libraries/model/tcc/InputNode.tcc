@@ -10,6 +10,10 @@
 namespace model
 {
     template <typename ValueType>
+    InputNode<ValueType>::InputNode() : Node({}, { &_output }), _output(this, outputPortName, 0)
+    {};
+
+    template <typename ValueType>
     InputNode<ValueType>::InputNode(size_t dimension) : Node({}, { &_output }), _output(this, outputPortName, dimension){};
 
     template <typename ValueType>
@@ -43,6 +47,8 @@ namespace model
     {
         ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         Node::Deserialize(serializer, newContext);
-        throw "Not implemented";
+        size_t newSize = 0;
+        serializer.Deserialize("size", newSize, newContext);
+        _output.SetSize(newSize);
     }
 }

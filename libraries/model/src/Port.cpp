@@ -43,8 +43,11 @@ namespace model
 
     void Port::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
-        throw "Not implemented";
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::Port deserialization not implemented");
     }
 
-
+    void Port::SetSize(size_t size)
+    {
+        _size = size;
+    }
 }

@@ -66,7 +66,7 @@ namespace model
 
     inline void InputPortBase::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
-        throw "Not implemented";
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::InputPortBase deserialization not implemented");
     }
 
     //

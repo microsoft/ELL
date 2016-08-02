@@ -28,6 +28,9 @@ namespace model
     class InputNode : public Node
     {
     public:
+        /// <summary> Default constructor (used only for deserialization) </summary>
+        InputNode();
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="dimension"> The input dimension </param>
