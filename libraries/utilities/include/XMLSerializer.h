@@ -32,8 +32,6 @@ namespace utilities
         SimpleXmlSerializer(std::ostream& outputStream);
 
     protected:
-        // virtual void SerializeVariant(std::string name, const Variant& variant) override;
-
         DECLARE_SERIALIZE_VALUE_OVERRIDE(bool);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(char);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(short);
@@ -41,7 +39,6 @@ namespace utilities
         DECLARE_SERIALIZE_VALUE_OVERRIDE(size_t);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(float);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(double);
-        virtual void SerializeValue(const char* name, const char* value) override;
         virtual void SerializeValue(const char* name, const std::string& value) override;
 
         DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(bool);
@@ -56,9 +53,6 @@ namespace utilities
         virtual void BeginSerializeObject(const char* name, const ISerializable& value) override;
         virtual void SerializeObject(const char* name, const ISerializable& value) override;
         virtual void EndSerializeObject(const char* name, const ISerializable& value) override;
-
-        // template <typename ValueType, IsClass<ValueType> concept = 0>
-        // void Serialize(const char* name, const ValueType& value);
 
     private:
         // Serialization

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleJsonSerializer.h (utilities)
+//  File:     JsonSerializer.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,15 +25,13 @@
 
 namespace utilities
 {
-    class SimpleJsonSerializer : public Serializer
+    class JsonSerializer : public Serializer
     {
     public:
-        SimpleJsonSerializer();
-        SimpleJsonSerializer(std::ostream& outputStream);
+        JsonSerializer();
+        JsonSerializer(std::ostream& outputStream);
 
     protected:
-        // virtual void SerializeVariant(std::string name, const Variant& variant) override;
-
         DECLARE_SERIALIZE_VALUE_OVERRIDE(bool);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(char);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(short);
@@ -41,7 +39,6 @@ namespace utilities
         DECLARE_SERIALIZE_VALUE_OVERRIDE(size_t);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(float);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(double);
-        virtual void SerializeValue(const char* name, const char* value) override;
         virtual void SerializeValue(const char* name, const std::string& value) override;
 
         DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(bool);
@@ -57,8 +54,7 @@ namespace utilities
         virtual void SerializeObject(const char* name, const ISerializable& value) override;
         virtual void EndSerializeObject(const char* name, const ISerializable& value) override;
 
-        // template <typename ValueType, IsClass<ValueType> concept = 0>
-        // void Serialize(const char* name, const ValueType& value);
+        virtual void EndSerialization() override;
 
     private:
         // Serialization
@@ -73,6 +69,7 @@ namespace utilities
 
         std::ostream& _out;
         int _indent = 0;
+        int _nestedObjectCount = 0;
         std::string _endOfPreviousLine;
         std::string GetCurrentIndent() { return std::string(2 * _indent, ' '); }
         void Indent();
@@ -119,8 +116,9 @@ namespace utilities
         void ReadArray(const char* name, std::vector<ValueType>& array, SerializationContext& context);
 
         std::istream& _in;
+        std::string _endOfPreviousLine;
         Tokenizer _tokenizer;
     };
 }
 
-#include "../tcc/SimpleJsonSerializer.tcc"
+#include "../tcc/JsonSerializer.tcc"

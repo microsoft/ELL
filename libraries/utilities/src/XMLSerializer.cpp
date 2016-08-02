@@ -35,8 +35,6 @@ namespace utilities
     IMPLEMENT_SERIALIZE_VALUE(SimpleXmlSerializer, double);
 
     // strings
-    void SimpleXmlSerializer::SerializeValue(const char* name, const char* value) { WriteScalar(name, value); }
-
     void SimpleXmlSerializer::SerializeValue(const char* name, const std::string& value) { WriteScalar(name, value); }
 
     // ISerializable

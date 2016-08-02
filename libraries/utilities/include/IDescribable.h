@@ -72,7 +72,7 @@ namespace utilities
         virtual void EndSerializeType(const ObjectDescription& desc) = 0;
     };
 
-    class SimpleJsonSerializer2 : public Serializer2
+    class JsonSerializer2 : public Serializer2
     {
     protected:
         virtual void SerializeFundamentalType(const Variant& variant) override;

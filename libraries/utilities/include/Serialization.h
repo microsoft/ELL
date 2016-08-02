@@ -77,15 +77,81 @@ namespace utilities
 #define DECLARE_SERIALIZE_VALUE_OVERRIDE(type) virtual void SerializeValue(const char* name, type value, IsFundamental<type> dummy = 0) override;
 #define DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(type) virtual void SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) override;
 
-    // TODO: replace all these const char* name entries with std::string
+    /// <summary>
+    /// The Serializer and Deserializer abstract base classes facilitate serialization and
+    /// deserialization of some fundamental types, `std::string`s, `std::vector`s, and
+    /// classes that implement the required functions. Serializing a couple of variables to a
+    /// string stream is as simple as
+    /// 
+    ///     double x = 5.3;
+    ///     uint64_t y = 12;
+    ///     std::stringstream stream;
+    ///     SerializerType serializer(stream);
+    ///     serializer.Serialize(x);
+    ///     serializer.Serialize(y);
+    /// 
+    /// Note: Deserialization must occur in the same order.
+    /// 
+    ///     DeserializerType deserializer(stream);
+    ///     double xx;
+    ///     uint64_t yy;
+    ///     deserializer.deserialize(xx);
+    ///     deserializer.deserialize(yy);
+    ///     assert(x == xx &amp;&amp; y == yy);
+    /// 
+    /// The Serializer subclasses also support serialization of named variables, in which case the
+    /// deserialization must specify the correct variable name.
+    /// 
+    ///     x = 0.4;
+    ///     serializer.Serialize("x", x);
+    ///     deserializer.deserialize("x", xx);
+    ///     assert(x == xx);
+    /// 
+    /// Serialization of `std::strings` and `std::vectors` of fundamental types is similar.
+    /// 
+    /// To make a class serializable, the following public members are required:
+    /// 
+    ///     class Bar
+    ///     {
+    ///     public: 
+    ///         Bar();
+    ///         void Read(utilities::Deserializer&amp; deserializer, utilities::SerializationContext& context);
+    ///         void Write(utilities::Serializer&amp; serializer) const;
+    ///     }
+    /// 
+    /// A typical implementation of Read() will include a sequence of calls to
+    /// deserializer.Deserialize(). A typical implementation of Write will include a sequence of
+    /// calls to serializer.Serialize(), in the same order. To serialize the class, call:
+    /// 
+    ///     Bar z;
+    ///     serializer.Serialize("z", z);
+    /// 
+    /// This class also supports serializing and deserialization of std::unique_pointers to a
+    /// polymorphic base class. For this, say that we have a base class named Base. The base class is
+    /// required to have the following two public static members, and there pure virtual functions:
+    /// 
+    ///     class Base
+    ///     {
+    ///     public: 
+    ///         static std::string GetTypeName();
+    ///         static const utilities::TypeFactory&lt;Layer&gt; GetTypeFactory();
+    ///         virtual std::string GetRuntimeTypeName() const = 0;
+    ///         virtual void Read(utilities::XMLDeserializer&amp; deserializer) = 0;
+    ///         virtual void Write(utilities::XMLSerializer&amp; serializer) const = 0;
+    ///     };
+    /// 
+    /// `GetTypeFactory()` constructs a factory that maps the names (strings) of classes that derive
+    /// from Base to their default constructors. The deserializer relies on this factory to construct
+    /// the correct derived type. Now, classes derived from Base must implement the pure virtual
+    /// functions defined in Base.
+    /// 
+    /// </summary>
     class Serializer
     {
     public:
         /// <summary> Serialize unnamed values of any serializable type. </summary>
         template <typename ValueType>
         void Serialize(ValueType&& value);
-
-        // Maybe add SerializeField?
 
         // TODO: call these something else, and just call them from the generic Serialize(name, ValueType&& value)
         /// <summary> Serialize named values of any serializable type. </summary>
@@ -102,17 +168,7 @@ namespace utilities
         void Serialize(const char* name, const std::vector<const ValueType*>& value);
 
     protected:
-        // TODO: Instead of having all these different overloads, we could possibly have SerializeVariant(const Variant& value) be the
-        //       virtual interface, and let the subclass deal with extracting the value from the variant
-
-        // virtual void SerializeVariant(std::string name, const Variant& variant) = 0;
-
-        // fundamental types
-        // TODO: maybe only require bool, char, int, and have rest use those?
-        // Generates "SerializeValue" function definitions
-
         // These are all the virtual function that need to be implemented by serializers
-
         DECLARE_SERIALIZE_VALUE_BASE(bool);
         DECLARE_SERIALIZE_VALUE_BASE(char);
         DECLARE_SERIALIZE_VALUE_BASE(short);
@@ -120,7 +176,7 @@ namespace utilities
         DECLARE_SERIALIZE_VALUE_BASE(size_t);
         DECLARE_SERIALIZE_VALUE_BASE(float);
         DECLARE_SERIALIZE_VALUE_BASE(double);
-        virtual void SerializeValue(const char* name, const char* value) = 0;
+//        virtual void SerializeValue(const char* name, const char* value) = 0;
         virtual void SerializeValue(const char* name, const std::string& value) = 0;
         virtual void SerializeValue(const char* name, const ISerializable& value);
 
@@ -136,6 +192,8 @@ namespace utilities
         virtual void BeginSerializeObject(const char* name, const ISerializable& value);
         virtual void SerializeObject(const char* name, const ISerializable& value) = 0;
         virtual void EndSerializeObject(const char* name, const ISerializable& value);
+
+        virtual void EndSerialization() {}
     };
 
 #define DECLARE_DESERIALIZE_VALUE_BASE(type) virtual void DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy = 0) = 0;

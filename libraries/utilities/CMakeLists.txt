@@ -25,7 +25,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
          src/Serialization.cpp
-         src/SimpleJsonSerializer.cpp
+         src/JsonSerializer.cpp
          src/Tokenizer.cpp
          src/XMLSerializer.cpp
          src/TypeName.cpp
@@ -49,7 +49,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/Parser.h
              include/RandomEngines.h
              include/Serialization.h
-             include/SimpleJsonSerializer.h
+             include/JsonSerializer.h
              include/Tokenizer.h
              include/XMLSerializer.h
              include/StlIndexValueIterator.h
@@ -74,7 +74,7 @@ set (TCC tcc/AnyIterator.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
          tcc/Serialization.tcc
-         tcc/SimpleJsonSerializer.tcc
+         tcc/JsonSerializer.tcc
          tcc/XMLSerializer.tcc
          tcc/StlIndexValueIterator.tcc
          tcc/StlIterator.tcc

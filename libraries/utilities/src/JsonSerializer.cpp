@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleJsonSerializer.cpp (utilities)
+//  File:     JsonSerializer.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SimpleJsonSerializer.h"
+#include "JsonSerializer.h"
 #include "Serialization.h"
 #include "ISerializable.h"
 
@@ -20,25 +20,23 @@ namespace utilities
     //
     // Serialization
     //
-    SimpleJsonSerializer::SimpleJsonSerializer() : _out(std::cout) {}
+    JsonSerializer::JsonSerializer() : _out(std::cout) {}
 
-    SimpleJsonSerializer::SimpleJsonSerializer(std::ostream& outputStream) : _out(outputStream) {}
+    JsonSerializer::JsonSerializer(std::ostream& outputStream) : _out(outputStream) {}
 
-    IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, bool);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, char);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, short);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, int);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, size_t);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, float);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleJsonSerializer, double);
+    IMPLEMENT_SERIALIZE_VALUE(JsonSerializer, bool);
+    IMPLEMENT_SERIALIZE_VALUE(JsonSerializer, char);
+    IMPLEMENT_SERIALIZE_VALUE(JsonSerializer, short);
+    IMPLEMENT_SERIALIZE_VALUE(JsonSerializer, int);
+    IMPLEMENT_SERIALIZE_VALUE(JsonSerializer, size_t);
+    IMPLEMENT_SERIALIZE_VALUE(JsonSerializer, float);
+    IMPLEMENT_SERIALIZE_VALUE(JsonSerializer, double);
 
     // strings
-    void SimpleJsonSerializer::SerializeValue(const char* name, const char* value) { WriteScalar(name, value); }
-
-    void SimpleJsonSerializer::SerializeValue(const char* name, const std::string& value) { WriteScalar(name, value); }
+    void JsonSerializer::SerializeValue(const char* name, const std::string& value) { WriteScalar(name, value); }
 
     // ISerializable
-    void SimpleJsonSerializer::BeginSerializeObject(const char* name, const ISerializable& value)
+    void JsonSerializer::BeginSerializeObject(const char* name, const ISerializable& value)
     {
         FinishPreviousLine();
         auto indent = GetCurrentIndent();
@@ -46,11 +44,13 @@ namespace utilities
         {
             _out << indent << name << ": ";
         }
-        _out << "{" << std::endl;
-        _out << indent << "_type: " << value.GetRuntimeTypeName() << "\n";
+        _out << "{\n";
+        _out << indent << "_type: " << value.GetRuntimeTypeName();
+        SetEndOfLine(",\n");
+        ++_nestedObjectCount;
     }
 
-    void SimpleJsonSerializer::SerializeObject(const char* name, const ISerializable& value)
+    void JsonSerializer::SerializeObject(const char* name, const ISerializable& value)
     {
         FinishPreviousLine();
         ++_indent;
@@ -58,31 +58,41 @@ namespace utilities
         --_indent;
     }
 
-    void SimpleJsonSerializer::EndSerializeObject(const char* name, const ISerializable& value)
+    void JsonSerializer::EndSerializeObject(const char* name, const ISerializable& value)
     {
 //        FinishPreviousLine();
         _out << "\n";
-        // TODO: need to skip writing a comma here
         auto indent = GetCurrentIndent();
-        _out << indent << "}" << std::endl;
+        _out << indent << "}";
+        // need to output a comma if we're serializing a field. How?
+        --_nestedObjectCount;
+        SetEndOfLine(_nestedObjectCount > 0 ? ",\n" : "\n");
+    }
+
+    void JsonSerializer::EndSerialization()
+    {
+        FinishPreviousLine();
     }
 
     //
     // Arrays
     //
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, bool);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, char);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, short);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, int);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, size_t);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, float);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleJsonSerializer, double);
+    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, bool);
+    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, char);
+    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, short);
+    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, int);
+    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, size_t);
+    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, float);
+    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, double);
 
-    void SimpleJsonSerializer::SerializeArrayValue(const char* name, const std::vector<const ISerializable*>& array)
+    void JsonSerializer::SerializeArrayValue(const char* name, const std::vector<const ISerializable*>& array)
     {
         FinishPreviousLine();
         auto indent = GetCurrentIndent();
-        if (name != std::string(""))
+        bool hasName = name != std::string("");
+
+        _out << indent;
+        if (hasName)
         {
             _out << name << ": ";
         }
@@ -102,15 +112,20 @@ namespace utilities
         _out << "]";
     }
 
-    void SimpleJsonSerializer::Indent()
+    void JsonSerializer::Indent()
     {
         _out << GetCurrentIndent();
     }
 
-    void SimpleJsonSerializer::FinishPreviousLine()
+    void JsonSerializer::FinishPreviousLine()
     {
         _out << _endOfPreviousLine;
         _endOfPreviousLine = "";
+    }
+
+    void JsonSerializer::SetEndOfLine(std::string endOfLine)
+    {
+        _endOfPreviousLine = endOfLine;
     }
 
     //
@@ -141,20 +156,32 @@ namespace utilities
         _tokenizer.MatchToken("{");        
         _tokenizer.MatchTokens({"_type", ":"});
         auto typeName = _tokenizer.ReadNextToken();
-        std::cout << "Read type: " << typeName << std::endl;    
+
+        // eat a comma if it exists
+        if(hasName)
+        {
+            if(_tokenizer.PeekNextToken() == ",")
+            {
+                _tokenizer.ReadNextToken();
+            }
+        }
         return typeName;
     }
 
     void SimpleJsonDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
-        std::cout << "Deserializing an object" << std::endl;
         value.Deserialize(*this, context);
-        std::cout << "Done" << std::endl;
     }
 
     void SimpleJsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
         _tokenizer.MatchToken("}");
+
+        // eat a comma if it exists
+        if(_tokenizer.PeekNextToken() == ",")
+        {
+            _tokenizer.ReadNextToken();
+        }
     }
 
     //

@@ -13,7 +13,7 @@
 #include "UniqueId.h"
 #include "ISerializable.h"
 #include "Serialization.h"
-#include "SimpleJsonSerializer.h"
+#include "JsonSerializer.h"
 #include "XMLSerializer.h"
 
 // model
@@ -73,7 +73,7 @@ void TestJsonSerializer()
     auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
     auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
-    utilities::SimpleJsonSerializer serializer;
+    utilities::JsonSerializer serializer;
     std::cout << "--Serializing int--" << std::endl;
     serializer.Serialize(intVal);
     std::cout << std::endl;
@@ -146,7 +146,7 @@ void TestJsonDeserializer()
     std::cout << "Deserializer test 1" << std::endl;
     {
         std::stringstream strstream;
-        utilities::SimpleJsonSerializer serializer(strstream);
+        utilities::JsonSerializer serializer(strstream);
         serializer.Serialize("pi", 3.14159);
         std::cout << "Str value: " << strstream.str() << std::endl;;
 
@@ -161,7 +161,7 @@ void TestJsonDeserializer()
     std::cout << "Deserializer test 2" << std::endl;
     {
         std::stringstream strstream;
-        utilities::SimpleJsonSerializer serializer(strstream);
+        utilities::JsonSerializer serializer(strstream);
         serializer.Serialize("pie", std::string{ "cherry pie" });
         std::cout << "Str value: " << strstream.str() << std::endl;
 
@@ -176,7 +176,7 @@ void TestJsonDeserializer()
     std::cout << "Deserializer test 3" << std::endl;
     {
         std::stringstream strstream;
-        utilities::SimpleJsonSerializer serializer(strstream);
+        utilities::JsonSerializer serializer(strstream);
         std::vector<int> arr {1,2,3};
         serializer.Serialize("arr", arr);
         std::cout << "Str value: " << strstream.str() << std::endl;
@@ -195,7 +195,7 @@ void TestJsonDeserializer()
     std::cout << "Deserializer test 4" << std::endl;
     {
         std::stringstream strstream;
-        utilities::SimpleJsonSerializer serializer(strstream);
+        utilities::JsonSerializer serializer(strstream);
         TestStruct testStruct{ 1, 2.2f, 3.3 };
         serializer.Serialize("s", testStruct);
         std::cout << "Str value: " << strstream.str() << std::endl;

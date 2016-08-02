@@ -207,17 +207,17 @@ int main()
     try
     {
         // misc tests
-        // testIteratorAdapter();
-        // testTransformIterator();
-        // testParallelTransformIterator();
-        // testMatchFormat();
+        testIteratorAdapter();
+        testTransformIterator();
+        testParallelTransformIterator();
+        testMatchFormat();
 
-        // // XMLSerialization tests
-        // XMLSerializationTest();
-        // TypeFactoryTest();
+        // XMLSerialization tests
+        XMLSerializationTest();
+        TypeFactoryTest();
 
-        // // Variant tests
-        // TestVariant();
+        // Variant tests
+        TestVariant();
 
         TestJsonSerializer();
         TestJsonDeserializer();

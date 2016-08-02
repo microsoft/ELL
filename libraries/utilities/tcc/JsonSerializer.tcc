@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleJsonSerializer.tcc (utilities)
+//  File:     JsonSerializer.tcc (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,57 +12,63 @@ namespace utilities
     // Serialization
     //
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleJsonSerializer::WriteScalar(const char* name, const ValueType& value)
+    void JsonSerializer::WriteScalar(const char* name, const ValueType& value)
     {
-        using std::to_string;
         auto indent = GetCurrentIndent();
-        bool hasName = name != std::string("");
-        auto endOfLine = hasName ? "\n" : "";
+        bool hasName = name != std::string("");        
+        auto endOfLine = hasName ? ",\n" : "";
 
+        FinishPreviousLine();
         _out << indent;
         if (hasName)
         {
             _out << name << ": ";
         }
-        _out << to_string(value) << endOfLine;
+        _out << value;
+        SetEndOfLine(endOfLine);
     }
 
     // This function is inline just so it appears next to the other Write* functions
-    inline void SimpleJsonSerializer::WriteScalar(const char* name, const char* value)
+    inline void JsonSerializer::WriteScalar(const char* name, const char* value)
     {
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
-        auto endOfLine = hasName ? "\n" : "";
+        auto endOfLine = hasName ? ",\n" : "";
 
+        FinishPreviousLine();
         _out << indent;
         if (hasName)
         {
             _out << name << ": ";
         }
-        _out << "\"" << value << "\"" << endOfLine;
+        _out << "\"" << value << "\"";
+        SetEndOfLine(endOfLine);
     }
 
-    inline void SimpleJsonSerializer::WriteScalar(const char* name, const std::string& value)
+    inline void JsonSerializer::WriteScalar(const char* name, const std::string& value)
     {
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
-        auto endOfLine = hasName ? "\n" : "";
+        auto endOfLine = hasName ? ",\n" : "";
 
+        FinishPreviousLine();
         _out << indent;
         if (hasName)
         {
             _out << name << ": ";
         }
-        _out << "\"" << value << "\"" << endOfLine;
+        _out << "\"" << value << "\"";
+        SetEndOfLine(endOfLine);
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleJsonSerializer::WriteArray(const char* name, const std::vector<ValueType>& array)
+    void JsonSerializer::WriteArray(const char* name, const std::vector<ValueType>& array)
     {
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
         auto endOfLine = "\n";
 
+        FinishPreviousLine();
         _out << indent;
         if (hasName)
         {
@@ -83,7 +89,7 @@ namespace utilities
         }
         // reset indent
         _out << "]";
-        _endOfPreviousLine = endOfLine;
+        SetEndOfLine(endOfLine);
     }
 
     //
@@ -106,6 +112,15 @@ namespace utilities
         auto valueToken = _tokenizer.ReadNextToken();
         std::stringstream valueStream(valueToken);
         valueStream >> value;
+
+        // eat a comma if it exists
+        if(hasName)
+        {
+            if(_tokenizer.PeekNextToken() == ",")
+            {
+                _tokenizer.ReadNextToken();
+            }
+        }
     }
 
     // This function is inline just so it appears next to the other Read* functions
@@ -121,6 +136,15 @@ namespace utilities
         auto valueToken = _tokenizer.ReadNextToken();
         value = valueToken;
         _tokenizer.MatchToken("\"");
+
+        // eat a comma if it exists
+        if(hasName)
+        {
+            if(_tokenizer.PeekNextToken() == ",")
+            {
+                _tokenizer.ReadNextToken();
+            }
+        }
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
