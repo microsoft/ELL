@@ -1,3 +1,11 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     IRCompiler.h (compiler)
+//  Authors:  Umesh Madan
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 #include "Compiler.h"
 #include "IRInclude.h"
@@ -33,6 +41,8 @@ namespace emll
 			virtual void CompileAccumulatorNode(const model::Node& node) override;
 			///<summary>Compile a Delay node</summary>
 			virtual void CompileDelayNode(const model::Node& node) override;
+			///<summary>Compile a Unary node</summary>
+			virtual void CompileUnaryNode(const model::Node& node) override;
 
 			///<summary>Emit LLVM IR to std::out for debugging</summary>
 			void DebugDump();
@@ -115,6 +125,8 @@ namespace emll
 			///<summary>Ensure that the variable for this outport port element is loaded into a register. SThis will automatically
 			/// dereference any pointers it needs to.</summary>
 			llvm::Value* LoadVar(const model::OutputPortElement elt);
+			///<summary>Load the variable for the outport port referenced by this input port</summary>
+			llvm::Value* LoadVar(model::InputPortBase* pPort);
 			///<summary>Updates the value at a given offset of the given variable. Checks for index out of range etc.</summary>
 			void SetVar(Variable& var, llvm::Value* pDest, int offset, llvm::Value* pValue);
 			
@@ -169,6 +181,10 @@ namespace emll
 			template<typename T>
 			void CompileDelay(const nodes::DelayNode<T>& node);
 			
+			///<summary>Compile a UnaryNode</summary>
+			template<typename T>
+			void CompileUnary(const nodes::UnaryOperationNode<T>& node);
+
 			///<summary>Translate the binary operation operator into a more strongly typed operator for</summary>
 			template<typename T>
 			OperatorType GetOperator(const nodes::BinaryOperationNode<T>& node) const;

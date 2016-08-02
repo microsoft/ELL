@@ -88,6 +88,12 @@ namespace emll
 			return _pModule->getFunction(name);
 		}
 
+		llvm::Function* IRModuleEmitter::GetIntrinsic(llvm::Intrinsic::ID id, std::initializer_list<ValueType> args)
+		{
+			_valueTypeList.init(args);
+			return _emitter.GetIntrinsic(_pModule.get(), id, _valueTypeList);
+		}
+
 		llvm::FunctionPassManager* IRModuleEmitter::FunctionOptimizer()
 		{
 			if (_pOptimizer == nullptr)

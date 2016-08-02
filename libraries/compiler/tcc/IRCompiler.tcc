@@ -454,5 +454,24 @@ namespace emll
 			llvm::Value* pInputBuffer = EnsureEmitted(pInput);
 			_fn.ShiftAndUpdate<T>(pAllWindows, bufferSize, sampleSize, pInputBuffer, pOutputBuffer);
 		}
+
+		template<typename T>
+		void IRCompiler::CompileUnary(const nodes::UnaryOperationNode<T>& node)
+		{
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			using Uop = nodes::UnaryOperationNode<T>;
+			switch (node.GetOperationType())
+			{
+				case Uop::OperationType::sqrt:
+					{
+						llvm::Value* pSqrtOut = EnsureEmitted(pOutput);
+						_fn.Store(pSqrtOut, _fn.Call(_runtime.Sqrt<T>(), { LoadVar(pInput) }));
+					}
+					break;
+				default:
+					throw new CompilerException(CompilerError::unaryOperationNotSupported);
+			}
+		}
 	}
 }

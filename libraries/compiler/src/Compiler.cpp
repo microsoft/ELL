@@ -37,6 +37,7 @@ namespace emll
 		static const std::string c_SumNodeType = "SumNode";
 		static const std::string c_AccumulatorNodeType = "AccumulatorNode";
 		static const std::string c_DelayNodeType = "DelayNode";
+		static const std::string c_UnaryNodeType = "UnaryOperationNode";
 
 
 		/// <summary>Base class for ML Compiler.</summary>
@@ -85,6 +86,10 @@ namespace emll
 				else if (IsNodeType(typeName, c_DelayNodeType))
 				{
 					CompileDelayNode(node);
+				}
+				else if (IsNodeType(typeName, c_UnaryNodeType))
+				{
+					CompileUnaryNode(node);
 				}
 				else
 				{

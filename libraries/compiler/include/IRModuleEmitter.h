@@ -66,6 +66,7 @@ namespace emll
 			IRFunctionEmitter Function(const std::string& name, const ValueType returnType, std::initializer_list<ValueType> args, bool isPublic = false);
 
 			llvm::Function* GetFunction(const std::string& name);
+			llvm::Function* GetIntrinsic(llvm::Intrinsic::ID id, std::initializer_list<ValueType> args);
 
 			///<summary>Return the current optimizer pipeline. It is preconfigured with some standard passes.</summary>
 			llvm::FunctionPassManager* FunctionOptimizer();

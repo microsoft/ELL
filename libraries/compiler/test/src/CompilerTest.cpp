@@ -190,6 +190,12 @@ nodes::DotProductNode<T>* ModelBuilder::DotProduct(const model::OutputPort<T>& x
 }
 
 template<typename T>
+nodes::UnaryOperationNode<T>* ModelBuilder::Sqrt(const model::OutputPort<T>& x)
+{
+	return _model.AddNode<nodes::UnaryOperationNode<T>>(x, nodes::UnaryOperationNode<T>::OperationType::sqrt);
+}
+
+template<typename T>
 nodes::SumNode<T>* ModelBuilder::Sum(const model::OutputPort<T>& x)
 {
 	return _model.AddNode<nodes::SumNode<T>>(x);
@@ -371,6 +377,18 @@ void TestDelay()
 
 	IRCompiler compiler("EMLL");
 	compiler.CompileModel("TestDelay", mb.Model);
+	compiler.DebugDump();
+}
+
+void TestSqrt()
+{
+	ModelBuilder mb;
+	auto input1 = mb.Inputs<double>(1);
+	auto sqrt = mb.Sqrt<double>(input1->output);
+	auto output = mb.Outputs<double>(sqrt->output);
+
+	IRCompiler compiler("EMLL");
+	compiler.CompileModel("TestSqrt", mb.Model);
 	compiler.DebugDump();
 }
 

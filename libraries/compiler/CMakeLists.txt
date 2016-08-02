@@ -54,6 +54,7 @@ set (TCC tcc/SymbolTable.tcc
 		 tcc/IREmitter.tcc
 		 tcc/IRModuleEmitter.tcc
 		 tcc/IRFunctionEmitter.tcc
+		 tcc/IRRuntime.tcc
 		 tcc/IRCompiler.tcc
 )
 

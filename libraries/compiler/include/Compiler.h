@@ -23,6 +23,7 @@
 #include "SumNode.h"
 #include "AccumulatorNode.h"
 #include "DelayNode.h"
+#include "UnaryOperationNode.h"
 
 #include <functional>
 
@@ -68,6 +69,7 @@ namespace emll
 			virtual void CompileSumNode(const model::Node& node) = 0;
 			virtual void CompileAccumulatorNode(const model::Node& node) = 0;
 			virtual void CompileDelayNode(const model::Node& node) = 0;
+			virtual void CompileUnaryNode(const model::Node& node) = 0;
 
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
 			virtual void EndFunction() = 0;

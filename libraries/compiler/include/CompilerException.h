@@ -18,6 +18,8 @@ namespace emll
 			portTypeNotSupported,
 			/// Binary Operators - operation not supported
 			binaryOperationTypeNotSupported,
+			/// Unary Operators - operation not supported
+			unaryOperationNotSupported,
 			/// Unknown VariableScope
 			variableScopeNotSupported,
 			/// Unknown Variable type

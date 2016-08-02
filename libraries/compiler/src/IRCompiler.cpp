@@ -1,3 +1,11 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     IRCompiler.cpp (compiler)
+//  Authors:  Umesh Madan
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "IRCompiler.h"
 #include "ScalarVar.h"
 #include "VectorVar.h"
@@ -69,9 +77,6 @@ namespace emll
 				case model::Port::PortType::Real:
 					CompileDotProduct<double>(static_cast<const nodes::DotProductNode<double>&>(node));
 					break;
-				case model::Port::PortType::Integer:
-					CompileDotProduct<int>(static_cast<const nodes::DotProductNode<int>&>(node));
-					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
@@ -116,6 +121,21 @@ namespace emll
 					break;
 				case model::Port::PortType::Integer:
 					CompileDelay<int>(static_cast<const nodes::DelayNode<int>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void IRCompiler::CompileUnaryNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					CompileUnary<double>(static_cast<const nodes::UnaryOperationNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					CompileUnary<int>(static_cast<const nodes::UnaryOperationNode<int>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -303,6 +323,12 @@ namespace emll
 			return _fn.ValueAt(pVal, _fn.Literal((int) elt.GetIndex()));
 		}
 		
+		llvm::Value* IRCompiler::LoadVar(model::InputPortBase* pPort)
+		{
+			assert(pPort != nullptr);
+			return LoadVar(pPort->GetOutputPortElement(0));
+		}
+
 		void IRCompiler::SetVar(Variable& var, llvm::Value* pDest, int offset, llvm::Value* pValue)
 		{
 			assert(pValue != nullptr);

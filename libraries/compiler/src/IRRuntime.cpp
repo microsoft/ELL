@@ -9,6 +9,8 @@ namespace emll
 		static const std::string& c_RVectorName = "pRVector";
 		static const std::string& c_ResultName = "pResult";
 
+		static const std::string& c_DotProductFnName = "Emll_DotProductF";
+
 		IRRuntime::IRRuntime(IRModuleEmitter& module)
 			: _module(module)
 		{
@@ -33,7 +35,7 @@ namespace emll
 				{c_RVectorName, ValueType::PDouble},
 				{c_ResultName, ValueType::PDouble}
 			});
-			auto fn = _module.Function("Emll_DotProductF", ValueType::Void, _args);
+			auto fn = _module.Function(c_DotProductFnName, ValueType::Void, _args);
 			auto args = fn.Args().begin();
 			llvm::Argument& count = *args++;
 			llvm::Argument& lVal = *args++;

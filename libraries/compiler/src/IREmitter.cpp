@@ -340,6 +340,13 @@ namespace emll
 			return _builder.CreateMemCpy(pDest, pSrc, pCount, 8);
 		}
 
+		llvm::Function* IREmitter::GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const ValueTypeList& args)
+		{
+			assert(pModule != nullptr);
+			BindTypes(args);
+			return llvm::Intrinsic::getDeclaration(pModule, id, _types);
+		}
+
 		llvm::PHINode* IREmitter::Phi(const ValueType type, llvm::Value* pLVal, llvm::BasicBlock* pLBlock, llvm::Value* pRVal, llvm::BasicBlock* pRBlock)
 		{
 			assert(pLBlock != nullptr);

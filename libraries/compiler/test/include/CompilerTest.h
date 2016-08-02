@@ -33,13 +33,15 @@ public:
 	template<typename T>
 	nodes::BinaryOperationNode<T>* Divide(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 	template<typename T>
-	nodes::DotProductNode<T>* DotProduct(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
-	template<typename T>
 	nodes::AccumulatorNode<T>* Accumulate(const model::OutputPort<T>& x);
 	template<typename T>
 	nodes::SumNode<T>* Sum(const model::OutputPort<T>& x);
 	template<typename T>
 	nodes::DelayNode<T>* Delay(const model::OutputPort<T>& x, size_t windowSize);
+	template<typename T>
+	nodes::DotProductNode<T>* DotProduct(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
+	template<typename T>
+	nodes::UnaryOperationNode<T>* Sqrt(const model::OutputPort<T>& x);
 
 	// Expose as a property!
 	model::Model& Model = _model;
@@ -59,9 +61,9 @@ private:
 void TestBinaryVector(bool expanded);
 void TestBinaryScalar();
 void TestDotProduct();
-
 void TestSum(bool expanded);
 void TestAccumulator(bool expanded);
 void TestDelay();
+void TestSqrt();
 void TestSlidingAverage();
 void TestDotProductOutput();

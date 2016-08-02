@@ -15,6 +15,7 @@ int main(int argc, char* argv[])
 	TestAccumulator(false);
 	TestAccumulator(true);
 	TestDelay();
+	TestSqrt();
 	TestSlidingAverage();
 
 	TestLLVM();
