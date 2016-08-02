@@ -15,12 +15,17 @@ namespace emll
 			return ValueType::PChar8;
 		}
 		template<>
-		ValueType GetValueType<unsigned char>()
+		ValueType GetValueType<bool>()
 		{
 			return ValueType::Byte;
 		}
 		template<>
-		ValueType GetValueType<unsigned char*>()
+		ValueType GetValueType<uint8_t>()
+		{
+			return ValueType::Byte;
+		}
+		template<>
+		ValueType GetValueType<uint8_t*>()
 		{
 			return ValueType::PByte;
 		}

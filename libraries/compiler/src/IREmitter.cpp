@@ -57,7 +57,12 @@ namespace emll
 			return llvm::VectorType::get(Type(type), size);
 		}
 
-		llvm::Constant* IREmitter::Literal(const unsigned char value)
+		llvm::Constant* IREmitter::Literal(const bool value)
+		{
+			return value ? _builder.getTrue() : _builder.getFalse();
+		}
+
+		llvm::Constant* IREmitter::Literal(const uint8_t value)
 		{
 			return Integer(ValueType::Byte, value);
 		}
@@ -91,6 +96,16 @@ namespace emll
 				_stringLiterals.Set(value, literal);
 			}
 			return literal;
+		}
+
+		llvm::Constant* IREmitter::Literal(const std::vector<bool>& value)
+		{
+			std::vector<uint8_t> bools;
+			for (size_t i = 0; i < value.size(); ++i)
+			{
+				bools.push_back(value[i] ? 1 : 0);
+			}
+			return llvm::ConstantDataArray::get(_context, bools);
 		}
 
 		llvm::Constant* IREmitter::Literal(const std::vector<double>& value)

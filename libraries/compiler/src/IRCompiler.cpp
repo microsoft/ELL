@@ -30,6 +30,9 @@ namespace emll
 				case model::Port::PortType::Integer:
 					CompileConstant<int>(static_cast<const nodes::ConstantNode<int>&>(node));
 					break;
+				case model::Port::PortType::Boolean:
+					CompileConstant<bool>(static_cast<const nodes::ConstantNode<bool>&>(node));
+					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
@@ -49,6 +52,9 @@ namespace emll
 					break;
 				case model::Port::PortType::Integer:
 					CompileOutput<int>(static_cast<const model::OutputNode<int>&>(node));
+					break;
+				case model::Port::PortType::Boolean:
+					CompileOutput<bool>(static_cast<const model::OutputNode<bool>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -136,6 +142,21 @@ namespace emll
 					break;
 				case model::Port::PortType::Integer:
 					CompileUnary<int>(static_cast<const nodes::UnaryOperationNode<int>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void IRCompiler::CompileBinaryPredicateNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					CompileBinaryPredicate<double>(static_cast<const nodes::BinaryPredicateNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					CompileBinaryPredicate<int>(static_cast<const nodes::BinaryPredicateNode<int>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -383,6 +404,40 @@ namespace emll
 					return OperatorType::DivideS;
 				default:
 					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
+			}
+		}
+
+		template<>
+		ComparisonType IRCompiler::GetOperator<double>(const nodes::BinaryPredicateNode<double>& node) const
+		{
+			using Bop = nodes::BinaryPredicateNode<double>;
+			switch (node.GetPredicateType())
+			{
+				case Bop::PredicateType::equal:
+					return ComparisonType::EqF;
+				case Bop::PredicateType::greater:
+					return ComparisonType::GtF;
+				case Bop::PredicateType::less:
+					return ComparisonType::LtF;
+				default:
+					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
+			}
+		}
+
+		template<>
+		ComparisonType IRCompiler::GetOperator<int>(const nodes::BinaryPredicateNode<int>& node) const
+		{
+			using Bop = nodes::BinaryPredicateNode<int>;
+			switch (node.GetPredicateType())
+			{
+			case Bop::PredicateType::equal:
+				return ComparisonType::Eq;
+			case Bop::PredicateType::greater:
+				return ComparisonType::Gt;
+			case Bop::PredicateType::less:
+				return ComparisonType::Lt;
+			default:
+				throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
 			}
 		}
 

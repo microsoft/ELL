@@ -20,6 +20,8 @@ namespace emll
 			binaryOperationTypeNotSupported,
 			/// Unary Operators - operation not supported
 			unaryOperationNotSupported,
+			/// Binary predicates - operation not supported
+			binaryPredicateTypeNotSupported,
 			/// Unknown VariableScope
 			variableScopeNotSupported,
 			/// Unknown Variable type

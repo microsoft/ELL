@@ -23,12 +23,15 @@ namespace emll
 			llvm::ArrayType* ArrayType(const ValueType type, uint64_t size);
 			llvm::VectorType* VectorType(const ValueType type, uint64_t size);
 
-			llvm::Constant* Literal(const unsigned char value);
+			llvm::Constant* Literal(const bool value);
+			llvm::Constant* Literal(const uint8_t value);
 			llvm::Constant* Literal(const short value);
 			llvm::Constant* Literal(const int value);
 			llvm::Constant* Literal(const int64_t value);
 			llvm::Constant* Literal(const double value);
 			llvm::Value* Literal(const std::string& value);
+
+			llvm::Constant* Literal(const std::vector<bool>& value);
 			llvm::Constant* Literal(const std::vector<double>& value);
 			llvm::Constant* Literal(const std::vector<int>& value);
 			llvm::Constant* Literal(const std::vector<int64_t>& value);

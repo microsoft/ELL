@@ -127,6 +127,7 @@ namespace emll
 			}
 			return pVal;
 		}
+
 		template<typename T>
 		llvm::Value* IRCompiler::EmitLiteralVector(LiteralVarV<T>& var)
 		{
@@ -471,6 +472,62 @@ namespace emll
 					break;
 				default:
 					throw new CompilerException(CompilerError::unaryOperationNotSupported);
+			}
+		}
+
+		template<typename T>
+		void IRCompiler::CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node)
+		{
+			auto pInput1 = node.GetInputPorts()[0];
+			auto pInput2 = node.GetInputPorts()[1];
+			if ((ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2)) &&
+				!Settings().ShouldUnrollLoops())
+			{
+				CompilePredicateLoop<T>(node);
+			}
+			else
+			{
+				CompilePredicateExpanded<T>(node);
+			}
+		}
+
+		template<typename T>
+		void IRCompiler::CompilePredicateLoop(const nodes::BinaryPredicateNode<T>& node)
+		{
+			llvm::Value* pLVector = EnsureEmitted(node.GetInputPorts()[0]);
+			llvm::Value* pRVector = EnsureEmitted(node.GetInputPorts()[1]);
+			auto pOutput = node.GetOutputPorts()[0];
+			llvm::Value* pResultVector = EnsureEmitted(pOutput);
+
+			ComparisonType cmp = GetOperator<T>(node);
+			auto forLoop = _fn.ForLoop();
+			auto pBodyBlock = forLoop.Begin(pOutput->Size());
+			{
+				auto i = forLoop.LoadIterationVar();
+				llvm::Value* pLItem = _fn.ValueAt(pLVector, i);
+				llvm::Value* pRItem = _fn.ValueAt(pRVector, i);
+				llvm::Value* pTemp = _fn.Cmp(cmp, pLItem, pRItem);
+				_fn.SetValueAt(pResultVector, i, pTemp);
+			}
+			forLoop.End();
+		}
+
+		template<typename T>
+		void IRCompiler::CompilePredicateExpanded(const nodes::BinaryPredicateNode<T>& node)
+		{
+			auto pInput1 = node.GetInputPorts()[0];
+			auto pInput2 = node.GetInputPorts()[1];
+			auto pOutput = node.GetOutputPorts()[0];
+			llvm::Value* pResult = EnsureEmitted(pOutput);
+			Variable& resultVar = *(GetVariableFor(pOutput));
+
+			ComparisonType cmp = GetOperator<T>(node);
+			for (size_t i = 0; i < pInput1->Size(); ++i)
+			{
+				llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(i));
+				llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(i));
+				llvm::Value* pOpResult = _fn.Cmp(cmp, pLVal, pRVal);
+				SetVar(resultVar, pResult, i, pOpResult);
 			}
 		}
 	}

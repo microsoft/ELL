@@ -228,6 +228,8 @@ namespace emll
 					return ValueType::Double;
 				case model::Port::PortType::Integer:
 					return ValueType::Int32;
+				case model::Port::PortType::Boolean:
+					return ValueType::Byte;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}

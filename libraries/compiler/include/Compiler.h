@@ -24,6 +24,8 @@
 #include "AccumulatorNode.h"
 #include "DelayNode.h"
 #include "UnaryOperationNode.h"
+#include "ElementSelectorNode.h"
+#include "BinaryPredicateNode.h"
 
 #include <functional>
 
@@ -70,6 +72,7 @@ namespace emll
 			virtual void CompileAccumulatorNode(const model::Node& node) = 0;
 			virtual void CompileDelayNode(const model::Node& node) = 0;
 			virtual void CompileUnaryNode(const model::Node& node) = 0;
+			virtual void CompileBinaryPredicateNode(const model::Node& node) = 0;
 
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
 			virtual void EndFunction() = 0;

@@ -43,6 +43,8 @@ namespace emll
 			virtual void CompileDelayNode(const model::Node& node) override;
 			///<summary>Compile a Unary node</summary>
 			virtual void CompileUnaryNode(const model::Node& node) override;
+			///<summary>Compile a binary predicate</summary>
+			virtual void CompileBinaryPredicateNode(const model::Node& node) override;
 
 			///<summary>Emit LLVM IR to std::out for debugging</summary>
 			void DebugDump();
@@ -185,9 +187,21 @@ namespace emll
 			template<typename T>
 			void CompileUnary(const nodes::UnaryOperationNode<T>& node);
 
-			///<summary>Translate the binary operation operator into a more strongly typed operator for</summary>
+			///<summary>Compile a BinarPredicate</summary>
+			template<typename T>
+			void CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node);
+			template<typename T>
+			void CompilePredicateLoop(const nodes::BinaryPredicateNode<T>& node);
+			template<typename T>
+			void CompilePredicateExpanded(const nodes::BinaryPredicateNode<T>& node);
+
+			///<summary>Translate the binary operation operator into a strongly typed operator for LLVM</summary>
 			template<typename T>
 			OperatorType GetOperator(const nodes::BinaryOperationNode<T>& node) const;
+
+			///<summary>Translate the binary predicate operator into a more strongly typed operator for LLVM</summary>
+			template<typename T>
+			ComparisonType GetOperator(const nodes::BinaryPredicateNode<T>& node) const;
 
 		private:
 			IREmitter _emitter;			// Object that makes lower level LLVM calls
