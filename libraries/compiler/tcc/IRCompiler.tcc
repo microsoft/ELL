@@ -25,32 +25,32 @@ namespace emll
 			llvm::Value* pVal = nullptr;
 			switch (var.Scope())
 			{
-			case VariableScope::Literal:
-				pVal = EmitLiteral<T>(static_cast<LiteralVar<T>&>(var));
-				_literals.Set(var.EmittedName(), pVal);
-				break;
-			case VariableScope::Local:
-				if (var.IsVectorRef())
-				{
-					pVal = EmitRef<T>(static_cast<VectorElementVar<T>&>(var));
-				}
-				else if (var.HasInitValue())
-				{
-					pVal = EmitLocal<T>(static_cast<InitializedScalarVar<T>&>(var));
-				}
-				else
-				{
-					pVal = EmitLocal<T>(static_cast<ScalarVar<T>&>(var));
-				}
-				_locals.Set(var.EmittedName(), pVal);
-				break;
+				case VariableScope::Literal:
+					pVal = EmitLiteral<T>(static_cast<LiteralVar<T>&>(var));
+					_literals.Set(var.EmittedName(), pVal);
+					break;
+				case VariableScope::Local:
+					if (var.IsVectorRef())
+					{
+						pVal = EmitRef<T>(static_cast<VectorElementVar<T>&>(var));
+					}
+					else if (var.HasInitValue())
+					{
+						pVal = EmitLocal<T>(static_cast<InitializedScalarVar<T>&>(var));
+					}
+					else
+					{
+						pVal = EmitLocal<T>(static_cast<ScalarVar<T>&>(var));
+					}
+					_locals.Set(var.EmittedName(), pVal);
+					break;
 
-			case VariableScope::Global:
-				pVal = EmitGlobal<T>(static_cast<InitializedScalarVar<T>&>(var));
-				break;
+				case VariableScope::Global:
+					pVal = EmitGlobal<T>(static_cast<InitializedScalarVar<T>&>(var));
+					break;
 
-			default:
-				throw new CompilerException(CompilerError::variableScopeNotSupported);
+				default:
+					throw new CompilerException(CompilerError::variableScopeNotSupported);
 			}
 			return pVal;
 		}
@@ -61,23 +61,23 @@ namespace emll
 			llvm::Value* pVal = nullptr;
 			switch (var.Scope())
 			{
-			case VariableScope::Literal:
-				pVal = EmitLiteralVector<T>(static_cast<LiteralVarV<T>&>(var));
-				_literals.Set(var.EmittedName(), pVal);
-				break;
-			case VariableScope::Global:
-				if (var.HasInitValue())
-				{
-					pVal = EmitGlobalVector<T>(static_cast<InitializedVectorVar<T>&>(var));
-				}
-				else
-				{
-					pVal = EmitGlobalVector<T>(static_cast<VectorVar<T>&>(var));
-				}
-				_globals.Set(var.EmittedName(), pVal);
-				break;
-			default:
-				throw new CompilerException(CompilerError::variableScopeNotSupported);
+				case VariableScope::Literal:
+					pVal = EmitLiteralVector<T>(static_cast<LiteralVarV<T>&>(var));
+					_literals.Set(var.EmittedName(), pVal);
+					break;
+				case VariableScope::Global:
+					if (var.HasInitValue())
+					{
+						pVal = EmitGlobalVector<T>(static_cast<InitializedVectorVar<T>&>(var));
+					}
+					else
+					{
+						pVal = EmitGlobalVector<T>(static_cast<VectorVar<T>&>(var));
+					}
+					_globals.Set(var.EmittedName(), pVal);
+					break;
+				default:
+					throw new CompilerException(CompilerError::variableScopeNotSupported);
 			}
 			assert(pVal != nullptr);
 			return pVal;
@@ -480,55 +480,24 @@ namespace emll
 		{
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
-			if ((ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2)) &&
-				!Settings().ShouldUnrollLoops())
-			{
-				CompilePredicateLoop<T>(node);
-			}
-			else
-			{
-				CompilePredicateExpanded<T>(node);
-			}
-		}
-
-		template<typename T>
-		void IRCompiler::CompilePredicateLoop(const nodes::BinaryPredicateNode<T>& node)
-		{
-			llvm::Value* pLVector = EnsureEmitted(node.GetInputPorts()[0]);
-			llvm::Value* pRVector = EnsureEmitted(node.GetInputPorts()[1]);
 			auto pOutput = node.GetOutputPorts()[0];
-			llvm::Value* pResultVector = EnsureEmitted(pOutput);
-
-			ComparisonType cmp = GetOperator<T>(node);
-			auto forLoop = _fn.ForLoop();
-			auto pBodyBlock = forLoop.Begin(pOutput->Size());
+			if (!(ModelEx::IsScalar(*pInput1) && ModelEx::IsScalar(*pInput2)))
 			{
-				auto i = forLoop.LoadIterationVar();
-				llvm::Value* pLItem = _fn.ValueAt(pLVector, i);
-				llvm::Value* pRItem = _fn.ValueAt(pRVector, i);
-				llvm::Value* pTemp = _fn.Cmp(cmp, pLItem, pRItem);
-				_fn.SetValueAt(pResultVector, i, pTemp);
+				throw new CompilerException(CompilerError::scalarInputsExpected);
+			}		
+			if (!ModelEx::IsScalar(*pOutput))
+			{
+				throw new CompilerException(CompilerError::scalarOutputsExpected);
 			}
-			forLoop.End();
-		}
-
-		template<typename T>
-		void IRCompiler::CompilePredicateExpanded(const nodes::BinaryPredicateNode<T>& node)
-		{
-			auto pInput1 = node.GetInputPorts()[0];
-			auto pInput2 = node.GetInputPorts()[1];
-			auto pOutput = node.GetOutputPorts()[0];
+			
 			llvm::Value* pResult = EnsureEmitted(pOutput);
 			Variable& resultVar = *(GetVariableFor(pOutput));
-
 			ComparisonType cmp = GetOperator<T>(node);
-			for (size_t i = 0; i < pInput1->Size(); ++i)
-			{
-				llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(i));
-				llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(i));
-				llvm::Value* pOpResult = _fn.Cmp(cmp, pLVal, pRVal);
-				SetVar(resultVar, pResult, i, pOpResult);
-			}
+			llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(0));
+			llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(0));
+			llvm::Value* pOpResult = _fn.Cmp(cmp, pLVal, pRVal);
+			// LLVM internally uses 1 bit for boolean. We use bytes to store boolean results. That requires a typecast in LLVM
+			_fn.Store(pResult, _fn.CastToByte(pOpResult));
 		}
 	}
 }

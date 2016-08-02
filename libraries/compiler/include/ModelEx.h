@@ -21,7 +21,14 @@ namespace emll
 			/// <summary>Returns true if a node is a leaf node</summary>
 			static bool IsLeafNode(const model::Node& node);
 			
+			/// <summary>Returns true if this input has dimension greater than 1 and it references exactly one output port</summary>
 			static bool IsPureVector(const model::InputPortBase& port);
+
+			/// <summary>Returns true if this port is scalar</summary>
+			static bool IsScalar(const model::InputPortBase& port);
+
+			/// <summary>Returns true if this port is scalar</summary>
+			static bool IsScalar(const model::OutputPortBase& port);
 		};
 	}
 }

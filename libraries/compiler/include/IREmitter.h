@@ -29,9 +29,10 @@ namespace emll
 			llvm::Constant* Literal(const int value);
 			llvm::Constant* Literal(const int64_t value);
 			llvm::Constant* Literal(const double value);
+			llvm::Value* Literal(const char* pValue);
 			llvm::Value* Literal(const std::string& value);
 
-			llvm::Constant* Literal(const std::vector<bool>& value);
+			llvm::Constant* Literal(const std::vector<uint8_t>& value);
 			llvm::Constant* Literal(const std::vector<double>& value);
 			llvm::Constant* Literal(const std::vector<int>& value);
 			llvm::Constant* Literal(const std::vector<int64_t>& value);
@@ -41,6 +42,7 @@ namespace emll
 
 			llvm::Value* Cast(llvm::Value* pValue, const ValueType destType);
 			llvm::Value* CastFloat(llvm::Value* pValue, const ValueType destType);
+			llvm::Value* CastInt(llvm::Value* pValue, const ValueType destType);
 
 			llvm::ReturnInst* ReturnVoid();
 			llvm::ReturnInst* Return(llvm::Value* pValue);

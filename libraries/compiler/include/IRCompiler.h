@@ -190,10 +190,6 @@ namespace emll
 			///<summary>Compile a BinarPredicate</summary>
 			template<typename T>
 			void CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node);
-			template<typename T>
-			void CompilePredicateLoop(const nodes::BinaryPredicateNode<T>& node);
-			template<typename T>
-			void CompilePredicateExpanded(const nodes::BinaryPredicateNode<T>& node);
 
 			///<summary>Translate the binary operation operator into a strongly typed operator for LLVM</summary>
 			template<typename T>

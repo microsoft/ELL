@@ -190,6 +190,12 @@ nodes::DotProductNode<T>* ModelBuilder::DotProduct(const model::OutputPort<T>& x
 }
 
 template<typename T>
+nodes::BinaryPredicateNode<T>* ModelBuilder::Equals(const model::OutputPort<T>& x, const model::OutputPort<T>& y)
+{
+	return _model.AddNode<nodes::BinaryPredicateNode<T>>(x, y, nodes::BinaryPredicateNode<T>::PredicateType::equal);
+}
+
+template<typename T>
 nodes::UnaryOperationNode<T>* ModelBuilder::Sqrt(const model::OutputPort<T>& x)
 {
 	return _model.AddNode<nodes::UnaryOperationNode<T>>(x, nodes::UnaryOperationNode<T>::OperationType::sqrt);
@@ -389,6 +395,21 @@ void TestSqrt()
 
 	IRCompiler compiler("EMLL");
 	compiler.CompileModel("TestSqrt", mb.Model);
+	compiler.DebugDump();
+}
+
+void TestBinaryPredicate(bool expanded)
+{
+	std::vector<double> data = { 5 };
+
+	ModelBuilder mb;
+	auto input1 = mb.Inputs<double>(data.size());
+	auto c1 = mb.Constant<double>(data);
+	auto eq = mb.Equals(input1->output, c1->output);
+	auto output = mb.Outputs<bool>(eq->output);
+
+	IRCompiler compiler("EMLL");
+	compiler.CompileModel("TestPredicate", mb.Model);
 	compiler.DebugDump();
 }
 

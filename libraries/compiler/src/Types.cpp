@@ -20,6 +20,11 @@ namespace emll
 			return ValueType::Byte;
 		}
 		template<>
+		ValueType GetValueType<bool*>()
+		{
+			return ValueType::PByte;
+		}
+		template<>
 		ValueType GetValueType<uint8_t>()
 		{
 			return ValueType::Byte;
@@ -126,5 +131,19 @@ namespace emll
 			return OperatorType::Multiply;
 		}
 
+		bool IsSigned(ValueType type)
+		{
+			switch (type)
+			{
+				case ValueType::Short:
+				case ValueType::Int32:
+				case ValueType::Int64:
+				case ValueType::Double:
+					return true;
+
+				default:
+					return false;
+			}
+		}
 	}
 }

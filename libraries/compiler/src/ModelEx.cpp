@@ -19,5 +19,15 @@ namespace emll
 			auto inputs = port.GetInputRanges();
 			return (inputs.NumRanges() == 1 && (inputs.begin()->Size() > 1));
 		}
+
+		bool ModelEx::IsScalar(const model::InputPortBase& port)
+		{
+			return (port.Size() == 1);
+		}
+
+		bool ModelEx::IsScalar(const model::OutputPortBase& port)
+		{
+			return (port.Size() == 1);
+		}
 	}
 }

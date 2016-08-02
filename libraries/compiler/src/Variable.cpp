@@ -50,9 +50,11 @@ namespace emll
 			switch (type)
 			{
 				case ValueType::Double:
-					return AddVariable<ScalarF>(scope);
+					return AddVariable<ScalarVar<double>>(scope);
 				case ValueType::Int32:
-					return AddVariable<ScalarI>(scope);
+					return AddVariable<ScalarVar<int>>(scope);
+				case ValueType::Byte:
+					return AddVariable<ScalarVar<uint8_t>>(scope);
 				default:
 					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
@@ -63,9 +65,11 @@ namespace emll
 			switch (type)
 			{
 				case ValueType::Double:
-					return AddVariable<VectorF>(scope, size);
+					return AddVariable<VectorVar<double>>(scope, size);
 				case ValueType::Int32:
-					return AddVariable<VectorI>(scope, size);
+					return AddVariable<VectorVar<int>>(scope, size);
+				case ValueType::Byte:
+					return AddVariable<VectorVar<uint8_t>>(scope, size);
 				default:
 					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
@@ -76,10 +80,14 @@ namespace emll
 		{
 			switch (type)
 			{
-			case ValueType::Double:
-				return AddVariable<VectorElementVar<double>>(src, offset);
-			default:
-				throw new CompilerException(CompilerError::valueTypeNotSupported);
+				case ValueType::Double:
+					return AddVariable<VectorElementVar<double>>(src, offset);
+				case ValueType::Int32:
+					return AddVariable<VectorElementVar<int>>(src, offset);
+				case ValueType::Byte:
+					return AddVariable<VectorElementVar<uint8_t>>(src, offset);
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 		}
 	}

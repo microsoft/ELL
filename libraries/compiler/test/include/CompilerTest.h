@@ -33,6 +33,8 @@ public:
 	template<typename T>
 	nodes::BinaryOperationNode<T>* Divide(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 	template<typename T>
+	nodes::BinaryPredicateNode<T>* Equals(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
+	template<typename T>
 	nodes::AccumulatorNode<T>* Accumulate(const model::OutputPort<T>& x);
 	template<typename T>
 	nodes::SumNode<T>* Sum(const model::OutputPort<T>& x);
@@ -65,5 +67,6 @@ void TestSum(bool expanded);
 void TestAccumulator(bool expanded);
 void TestDelay();
 void TestSqrt();
+void TestBinaryPredicate(bool expanded);
 void TestSlidingAverage();
 void TestDotProductOutput();

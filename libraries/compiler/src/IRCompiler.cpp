@@ -30,9 +30,6 @@ namespace emll
 				case model::Port::PortType::Integer:
 					CompileConstant<int>(static_cast<const nodes::ConstantNode<int>&>(node));
 					break;
-				case model::Port::PortType::Boolean:
-					CompileConstant<bool>(static_cast<const nodes::ConstantNode<bool>&>(node));
-					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
@@ -150,13 +147,11 @@ namespace emll
 
 		void IRCompiler::CompileBinaryPredicateNode(const model::Node& node)
 		{
-			switch (ModelEx::GetNodeDataType(node))
+			auto input = node.GetInputPorts()[0];
+			switch (input->GetType())
 			{
 				case model::Port::PortType::Real:
 					CompileBinaryPredicate<double>(static_cast<const nodes::BinaryPredicateNode<double>&>(node));
-					break;
-				case model::Port::PortType::Integer:
-					CompileBinaryPredicate<int>(static_cast<const nodes::BinaryPredicateNode<int>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -277,6 +272,8 @@ namespace emll
 			{
 				case ValueType::Double:
 					return Emit<double>(var);
+				case ValueType::Byte:
+					return Emit<uint8_t>(var);
 				case ValueType::Int32:
 					return Emit<int>(var);
 				case ValueType::Int64:

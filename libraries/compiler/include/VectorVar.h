@@ -24,8 +24,6 @@ namespace emll
 		private:
 			int _size;
 		};
-		using VectorF = VectorVar<double>;
-		using VectorI = VectorVar<int>;
 
 		template<typename T>
 		class InitializedVectorVar : public VectorVar<T>

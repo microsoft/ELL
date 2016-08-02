@@ -18,8 +18,6 @@ namespace emll
 			}
 
 		};
-		using ScalarF = ScalarVar<double>;
-		using ScalarI = ScalarVar<int>;
 
 		template<typename T>
 		class LiteralVar : public ScalarVar<T>

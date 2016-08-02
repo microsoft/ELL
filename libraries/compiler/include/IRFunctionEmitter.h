@@ -37,11 +37,17 @@ namespace emll
 			{
 				return _pEmitter->Cast(pValue, destType);
 			}
-			///<summary>Explict typecast from integer to float</summary>
+			///<summary>Explict typecast from float to integer</summary>
 			llvm::Value* CastFloatToInt(llvm::Value* pValue)
 			{
 				return _pEmitter->CastFloat(pValue, ValueType::Int32);
 			}
+			///<summary>Explict downcast from integer to byte</summary>
+			llvm::Value* CastToByte(llvm::Value* pValue)
+			{
+				return _pEmitter->CastInt(pValue, ValueType::Byte);
+			}
+
 			///<summary>Emit a typecast to template type</summary>
 			template<typename T>
 			llvm::Value* Cast(llvm::Value* pValue);

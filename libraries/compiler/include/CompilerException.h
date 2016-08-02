@@ -22,6 +22,10 @@ namespace emll
 			unaryOperationNotSupported,
 			/// Binary predicates - operation not supported
 			binaryPredicateTypeNotSupported,
+			/// Expected a scalar inputs, but a vector was encountered
+			scalarInputsExpected,
+			/// Expected a scalar inputs, but a vector was encountered
+			scalarOutputsExpected,
 			/// Unknown VariableScope
 			variableScopeNotSupported,
 			/// Unknown Variable type

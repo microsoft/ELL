@@ -59,7 +59,7 @@ namespace emll
 
 		llvm::Constant* IREmitter::Literal(const bool value)
 		{
-			return value ? _builder.getTrue() : _builder.getFalse();
+			return Integer(ValueType::Byte, value ? 1 : 0);
 		}
 
 		llvm::Constant* IREmitter::Literal(const uint8_t value)
@@ -87,6 +87,13 @@ namespace emll
 			return llvm::ConstantFP::get(_context, llvm::APFloat(value));
 		}
 
+		llvm::Value* IREmitter::Literal(const char* pValue)
+		{
+			assert(pValue != nullptr);
+			std::string str(pValue);
+			return Literal(str);
+		}
+
 		llvm::Value* IREmitter::Literal(const std::string& value)
 		{
 			llvm::Value* literal = _stringLiterals.Get(value);
@@ -98,14 +105,9 @@ namespace emll
 			return literal;
 		}
 
-		llvm::Constant* IREmitter::Literal(const std::vector<bool>& value)
+		llvm::Constant* IREmitter::Literal(const std::vector<uint8_t>& value)
 		{
-			std::vector<uint8_t> bools;
-			for (size_t i = 0; i < value.size(); ++i)
-			{
-				bools.push_back(value[i] ? 1 : 0);
-			}
-			return llvm::ConstantDataArray::get(_context, bools);
+			return llvm::ConstantDataArray::get(_context, value);
 		}
 
 		llvm::Constant* IREmitter::Literal(const std::vector<double>& value)
@@ -169,6 +171,13 @@ namespace emll
 				default:
 					throw new CompilerException(CompilerError::notSupported);
 			}
+		}
+
+		llvm::Value* IREmitter::CastInt(llvm::Value* pValue, const ValueType destType)
+		{
+			assert(pValue != nullptr);
+			auto type = Type(destType);
+			return _builder.CreateIntCast(pValue, type, IsSigned(destType));
 		}
 
 		llvm::ReturnInst* IREmitter::ReturnVoid()
@@ -507,20 +516,20 @@ namespace emll
 		{
 			switch (type)
 			{
-			case ValueType::Byte:
-				return 8;
-			case ValueType::Short:
-				return 16;
-			case ValueType::Int32:
-				return 32;
-			case ValueType::Int64:
-				return 64;
-			case ValueType::Double:
-				return 8;
-			case ValueType::Char8:
-				return 8;
-			default:
-				throw new CompilerException(CompilerError::valueTypeNotSupported);
+				case ValueType::Byte:
+					return 8;
+				case ValueType::Short:
+					return 16;
+				case ValueType::Int32:
+					return 32;
+				case ValueType::Int64:
+					return 64;
+				case ValueType::Double:
+					return 8;
+				case ValueType::Char8:
+					return 8;
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 		}
 
