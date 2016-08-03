@@ -80,23 +80,31 @@ namespace utilities
         DeserializeValue(name, value, context);
     }
 
+    // pointer to non-serializable type
     template <typename ValueType, IsNotSerializable<ValueType> concept>
     void Deserializer::Deserialize(const char* name, std::unique_ptr<ValueType>& value, SerializationContext& context)
     {
-        std::cout << "Deserializing non-serializable thing" << std::endl;
+        std::cout << "Deserializing non-serializable pointer" << std::endl;
         auto ptr = std::make_unique<ValueType>();
         DeserializeValue(name, *ptr, context);
         value = std::move(ptr);
     }
 
+    // pointer to serializable type
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Deserializer::Deserialize(const char* name, std::unique_ptr<ValueType>& value, SerializationContext& context)
     {
-        std::unique_ptr<ISerializable> ptr = nullptr;
-        std::cout << "Deserializing serializable thing" << std::endl;
-        DeserializePointerValue(name, ptr, context);
-        std::cout << "Done deserializing" << std::endl;
-        // now cast the pointer or whatever
+        std::cout << "Deserializing serializable pointer" << std::endl;
+        ValueType dummy; // TODO: find a way to get rid of this
+
+        auto typeName = BeginDeserializeObject(name, dummy, context);
+
+        // TODO: create new typeName thing
+        auto newPtr = std::make_unique<ValueType>();
+
+        DeserializeObject(name, *newPtr, context);
+        EndDeserializeObject(name, *newPtr, context);
+        value = std::move(newPtr);
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
@@ -116,6 +124,7 @@ namespace utilities
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Deserializer::Deserialize(const char* name, std::vector<const ValueType*>& array, SerializationContext& context)
     {
+        std::cout << "Deserializing array of pointers";
         std::vector<const utilities::ISerializable*> tmpArray;
 //        DeserializeArrayValue(name, tmpArray, context);
         // TODO: copy

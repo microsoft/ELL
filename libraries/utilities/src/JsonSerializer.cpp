@@ -145,22 +145,6 @@ namespace utilities
     // strings
     void JsonDeserializer::DeserializeValue(const char* name, std::string& value, SerializationContext& context) { ReadScalar(name, value); }
 
-    // pointers to serializable values
-    void JsonDeserializer::DeserializePointerValue(const char* name, std::unique_ptr<ISerializable>& ptr, SerializationContext& context)
-    {
-        auto typeName = BeginDeserializeObject(name, *ptr, context);
-        std::cout << "DeserializePointerValue" << std::endl;
-        // TODO: create thing of this type
-
-        // ####
-        // TODO: create new object of type TypeName os create object iwth that type
-        // then call Deseriable on it
-
-
-        utilities::Serializable& newPtr;
-        auto thing = static_cast<ISerializable>(ptr);
-    }
-
     // ISerializable
     std::string JsonDeserializer::BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
