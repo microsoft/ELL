@@ -123,6 +123,12 @@ namespace utilities
     // strings
     void SimpleXmlDeserializer::DeserializeValue(const char* name, std::string& value, SerializationContext& context) { ReadScalar(name, value); }
 
+    // pointers to serializable values
+    void SimpleXmlDeserializer::DeserializePointerValue(const char* name, std::unique_ptr<ISerializable>& array, SerializationContext& context)
+    {
+
+    }
+
     // ISerializable
     std::string SimpleXmlDeserializer::BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {

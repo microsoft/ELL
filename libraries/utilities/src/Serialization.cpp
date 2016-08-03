@@ -35,7 +35,6 @@ namespace utilities
         // nothing
     }
 
-
     //
     // Deserialization
     //

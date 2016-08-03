@@ -92,11 +92,11 @@ namespace utilities
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Deserializer::Deserialize(const char* name, std::unique_ptr<ValueType>& value, SerializationContext& context)
     {
+        std::unique_ptr<ISerializable> ptr = nullptr;
         std::cout << "Deserializing serializable thing" << std::endl;
-        // !!!! need to create the correct type of thing
-        auto ptr = std::make_unique<ValueType>();
-        DeserializeValue(name, *ptr, context);
-        value = std::move(ptr);
+        DeserializePointerValue(name, ptr, context);
+        std::cout << "Done deserializing" << std::endl;
+        // now cast the pointer or whatever
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>

@@ -227,21 +227,23 @@ void TestDeserializer()
         serializer.Serialize("node2", *in);
         serializer.Serialize("node3", constNode);
         serializer.Serialize("node4", binaryOpNode);
-        std::cout << "Str value: " << strstream.str() << std::endl;
+        std::cout << "Str value: " << "\n" << strstream.str() << std::endl;
 
         model::ModelSerializationContext modelContext(nullptr);
         DeserializerType deserializer(strstream);
         nodes::ConstantNode<double> newConstNode;
         model::InputNode<double> newIn;
-        std::unique_ptr<nodes::ConstantNode<double>> newConstNode2 = nullptr;
-        std::unique_ptr<nodes::BinaryOperationNode<double>> newBinaryOpNode = nullptr;
+        nodes::BinaryOperationNode<double> newBinaryOpNode;
+        std::unique_ptr<nodes::ConstantNode<double>> newConstNodePtr = nullptr;
+        std::unique_ptr<nodes::BinaryOperationNode<double>> newBinaryOpNodePtr = nullptr;
         deserializer.Deserialize("node1", newConstNode, modelContext);
         deserializer.Deserialize("node2", newIn, modelContext);
-        deserializer.Deserialize("node3", newConstNode2, modelContext);
- //       deserializer.Deserialize("node4", newBinaryOpNode, modelContext);
+        deserializer.Deserialize("node3", newConstNodePtr, modelContext);
+
+//        deserializer.Deserialize("node4", newBinaryOpNode, modelContext);
 
         testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNode.GetValues()));
-        testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNode2->GetValues()));
+        testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNodePtr->GetValues()));
     }
     std::cout << std::endl;
 }

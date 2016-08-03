@@ -134,7 +134,7 @@ namespace model
 
     void OutputPortElementsUntyped::Serialize(utilities::Serializer& serializer) const
     {
-        serializer.Serialize("ranges", _ranges);
+//        serializer.Serialize("ranges", _ranges);
     }
 
     void OutputPortElementsUntyped::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
