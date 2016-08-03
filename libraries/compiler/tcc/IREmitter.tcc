@@ -1,6 +1,0 @@
-namespace emll
-{
-	namespace compiler
-	{
-	}
-}

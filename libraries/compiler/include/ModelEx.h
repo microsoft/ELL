@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     ModelEx.h (compiler)
+//  Authors:  Umesh Madan
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
 #include "ModelGraph.h"
@@ -11,6 +18,7 @@ namespace emll
 {
 	namespace compiler
 	{
+		///<summary>model extension methods used by the compiler</summary>
 		class ModelEx
 		{
 		public:

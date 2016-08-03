@@ -1,3 +1,11 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     IREmitter.cpp (compiler)
+//  Authors:  Umesh Madan
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "IREmitter.h"
 #include "CompilerException.h"
 
@@ -348,20 +356,20 @@ namespace emll
 			return _builder.CreateCall(pfn, args);
 		}
 
-		llvm::CallInst* IREmitter::MemMove(llvm::Value* pSrc, llvm::Value* pDest, llvm::Value* pCount)
+		llvm::CallInst* IREmitter::MemMove(llvm::Value* pSrc, llvm::Value* pDest, llvm::Value* pCountBytes)
 		{
 			assert(pSrc != nullptr);
 			assert(pDest != nullptr);
-			assert(pCount != nullptr);
-			return _builder.CreateMemMove(pDest, pSrc, pCount, 8);
+			assert(pCountBytes != nullptr);
+			return _builder.CreateMemMove(pDest, pSrc, pCountBytes, 8);
 		}
 
-		llvm::CallInst* IREmitter::MemCopy(llvm::Value* pSrc, llvm::Value* pDest, llvm::Value* pCount)
+		llvm::CallInst* IREmitter::MemCopy(llvm::Value* pSrc, llvm::Value* pDest, llvm::Value* pCountBytes)
 		{
 			assert(pSrc != nullptr);
 			assert(pDest != nullptr);
-			assert(pCount != nullptr);
-			return _builder.CreateMemCpy(pDest, pSrc, pCount, 8);
+			assert(pCountBytes != nullptr);
+			return _builder.CreateMemCpy(pDest, pSrc, pCountBytes, 8);
 		}
 
 		llvm::Function* IREmitter::GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const ValueTypeList& args)

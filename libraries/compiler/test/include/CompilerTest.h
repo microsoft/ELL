@@ -80,4 +80,5 @@ void TestBinaryPredicate(bool expanded);
 void TestElementSelector();
 void TestSlidingAverage();
 void TestDotProductOutput();
+void TestLinearPredictor();
 void TestForest();

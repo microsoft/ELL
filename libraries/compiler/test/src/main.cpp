@@ -4,10 +4,7 @@ using namespace emll::compiler;
 
 int main(int argc, char* argv[])
 {
-	TestElementSelector();
-	TestForest();
 
-	TestBinaryPredicate(false);
 	TestBinaryVector(false);
 	TestBinaryVector(true);
 	TestBinaryScalar();
@@ -18,8 +15,13 @@ int main(int argc, char* argv[])
 	TestAccumulator(true);
 	TestDelay();
 	TestSqrt();
+	TestBinaryPredicate(false);
+	TestElementSelector();
 	TestSlidingAverage();
 	TestDotProductOutput();
+
+	TestLinearPredictor();
+	TestForest();
 
 	TestLLVM();
 	TestLLVMShiftRegister();

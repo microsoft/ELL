@@ -8,6 +8,8 @@
 #include "ScalarVar.h"
 #include "VectorVar.h"
 #include "testing.h"
+#include "LinearPredictor.h"
+#include "LinearPredictorNode.h"
 
 #include "ForestNode.h"
 
@@ -519,6 +521,65 @@ void TestDotProductOutput()
 	module.WriteBitcodeToFile("C:\\junk\\model\\dot.bc");
 }
 
+model::Model MakeLinearPredictor()
+{
+	// make a linear predictor
+	size_t dim = 3;
+	predictors::LinearPredictor predictor(dim);
+	predictor.GetBias() = 2.0;
+	predictor.GetWeights() = std::vector<double>{ 3.0, 4.0, 5.0 };
+
+	// make a model
+	model::Model model;
+	auto inputNode = model.AddNode<model::InputNode<double>>(3);
+	auto linearPredictorNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
+
+	// refine the model
+	model::TransformContext context;
+	model::ModelTransformer transformer;
+	auto newModel = transformer.RefineModel(model, context);
+
+	// check for equality
+	auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
+	auto newOutputPort = transformer.GetCorrespondingOutputPort(linearPredictorNode->prediction);
+	inputNode->SetInput({ 1.0, 1.0, 1.0 });
+	newInputNode->SetInput({ 1.0, 1.0, 1.0 });
+	auto modelOutputValue = model.ComputeNodeOutput(linearPredictorNode->prediction)[0];
+	auto newOutputValue = newModel.ComputeNodeOutput(*newOutputPort)[0];
+
+	testing::ProcessTest("Testing LinearPredictorNode refine", testing::IsEqual(modelOutputValue, newOutputValue));
+	return newModel;
+}
+
+void TestLinearPredictor()
+{
+	model::Model model = MakeLinearPredictor();
+
+	std::vector<double> data = { 1.0, 1.0, 1.0 };
+
+	IRCompiler compiler;
+	compiler.CompileModel("TestLinear", model);
+
+	auto& module = compiler.Module();
+	module.DeclarePrintf();
+
+	auto fnMain = module.AddMain();
+	llvm::Value* pData = module.Constant("c_data", data);
+
+	llvm::Value* pResult1 = fnMain.Var(ValueType::Double, 1);
+	llvm::Value* pResult2 = fnMain.Var(ValueType::Double, 1);
+	fnMain.Call("TestLinear", { fnMain.PtrOffset(pData, 0), fnMain.PtrOffset(pResult1, 0), fnMain.PtrOffset(pResult2, 0) });
+
+	fnMain.PrintForEach("%f\n", pResult1, 1);
+	fnMain.PrintForEach("%f\n", pResult2, 1);
+	fnMain.Ret();
+	fnMain.Verify();
+
+	compiler.DebugDump();
+	module.WriteBitcodeToFile("C:\\junk\\model\\linear.bc");
+
+}
+
 model::Model MakeForest()
 {
 	// define some abbreviations
@@ -570,10 +631,13 @@ void TestForest()
 
 	auto& module = compiler.Module();
 	module.DeclarePrintf();
+
 	auto fnMain = module.AddMain();
 	llvm::Value* pData = module.Constant("c_data", data);
+
 	llvm::Value* pResult = fnMain.Var(ValueType::Double, 1);
 	fnMain.Call("TestForest", { fnMain.PtrOffset(pData, 0), fnMain.PtrOffset(pResult, 0) });
+
 	fnMain.PrintForEach("%f\n", pResult, 1);
 	fnMain.Ret();
 	fnMain.Verify();

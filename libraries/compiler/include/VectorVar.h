@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     VectorVar.h (compiler)
+//  Authors:  Umesh Madan
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
 #include "Variable.h"
@@ -6,12 +13,14 @@ namespace emll
 {
 	namespace compiler
 	{
+		///<summary>A vector variable</summary>
 		template<typename T>
 		class VectorVar : public Variable
 		{
 		public:
 			VectorVar(const VariableScope scope, const size_t size, int flags = VariableFlags::isMutable);
 
+			///<summary>The size of the vector</summary>
 			virtual size_t Dimension() const override
 			{
 				return _size;
@@ -25,6 +34,7 @@ namespace emll
 			int _size;
 		};
 
+		///<summary>A vector that has initial values</summary>
 		template<typename T>
 		class InitializedVectorVar : public VectorVar<T>
 		{
@@ -40,8 +50,7 @@ namespace emll
 			std::vector<T> _data;
 		};
 
-		using InitializedVectorF = InitializedVectorVar<double>;
-
+		///<summary>A constant vector</summary>
 		template<typename T>
 		class LiteralVarV : public VectorVar<T>
 		{
@@ -53,8 +62,6 @@ namespace emll
 		private:
 			std::vector<T> _data;
 		};
-		using LiteralVF = LiteralVarV<double>;
-		using LiteralVI = LiteralVarV<int>;
 	}
 }
 

@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     IRCompiler.tcc (compiler)
+//  Authors:  Umesh Madan
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 namespace emll
 {
 	namespace compiler
@@ -494,6 +501,7 @@ namespace emll
 			llvm::Value* pResult = EnsureEmitted(pOutput);
 			Variable& resultVar = *(GetVariableFor(pOutput));
 			ComparisonType cmp = GetOperator<T>(node);
+
 			llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(0));
 			llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(0));
 			llvm::Value* pOpResult = _fn.Cmp(cmp, pLVal, pRVal);

@@ -1,3 +1,11 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     IRModuleEmitter.cpp (compiler)
+//  Authors:  Umesh Madan
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "CompilerException.h"
 #include "IRModuleEmitter.h"
 
@@ -5,8 +13,8 @@ namespace emll
 {
 	namespace compiler
 	{
-		IRModuleEmitter::IRModuleEmitter(IREmitter& emitter, const std::string& name)
-			: IRModuleEmitter(emitter, emitter.AddModule(name))
+		IRModuleEmitter::IRModuleEmitter(IREmitter& emitter, const std::string& moduleName)
+			: IRModuleEmitter(emitter, emitter.AddModule(moduleName))
 		{
 		}
 
