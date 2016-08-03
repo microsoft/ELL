@@ -532,9 +532,6 @@ namespace emll
 		void IRCompiler::CompileElementSelectorBinary(const nodes::ElementSelectorNode<T, SelectorType>& node)
 		{
 			auto pElements = node.GetInputPorts()[0];
-			auto lInput = pElements->GetOutputPortElement(0);
-			auto rInput = pElements->GetOutputPortElement(1);
-
 			auto pSelector = node.GetInputPorts()[1];
 			if (!ModelEx::IsScalar(*pSelector))
 			{
@@ -545,22 +542,30 @@ namespace emll
 			{
 				throw new CompilerException(CompilerError::scalarOutputsExpected);
 			}
-
-			llvm::Value* pLVal = LoadVar(lInput);
-			llvm::Value* pRVal = LoadVar(rInput);
 			llvm::Value* pSelectorVal = LoadVar(pSelector);
 			llvm::Value* pResult = EnsureEmitted(pOutput);
-
-			IRIfEmitter ife = _fn.If();
-			ife.If(ComparisonType::Eq, pSelectorVal, _fn.Literal(0));
+			//
+			// If inputs are pure vectors - i.e. all from the same input port, then we can optimize the If, then away into a vector dereference
+			//
+			if (ModelEx::IsPureVector(*pElements))
 			{
-				_fn.Store(pResult, pLVal);
+				_fn.Store(pResult, _fn.ValueAt(EnsureEmitted(pElements), pSelectorVal));
 			}
-			ife.Else();
+			else
 			{
-				_fn.Store(pResult, pRVal);
+				llvm::Value* pLVal = LoadVar(pElements->GetOutputPortElement(0));
+				llvm::Value* pRVal = LoadVar(pElements->GetOutputPortElement(1));
+				IRIfEmitter ife = _fn.If();
+				ife.If(ComparisonType::Eq, pSelectorVal, _fn.Literal(0));
+				{
+					_fn.Store(pResult, pLVal);
+				}
+				ife.Else();
+				{
+					_fn.Store(pResult, pRVal);
+				}
+				ife.End();
 			}
-			ife.End();
 		}
 	}
 }
