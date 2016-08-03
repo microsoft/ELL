@@ -29,4 +29,29 @@ namespace common
                          "The number of boosting rounds to perform",
                          "10");
     }
+
+    void ParsedHistogramForestTrainerArguments::AddArgs(utilities::CommandLineParser& parser) 
+    {
+        parser.AddOption(minSplitGain,
+                         "minSplitGain",
+                         "msg",
+                         "The minimal gain required to split a leaf node",
+                         0.0);
+
+        parser.AddOption(maxSplitsPerRound,
+                         "maxSplitsPerRound",
+                         "ms",
+                         "The number of split operations to perform on each boosting round",
+                         "1");
+        parser.AddOption(numRounds,
+                         "numRounds",
+                         "nr",
+                         "The number of boosting rounds to perform",
+                         "10");
+        parser.AddOption(randomSeed,
+                         "randomSeed",
+                         "rs",
+                         "Random seed used to choose random split threshold candidates",
+                         "123456");
+    }
 }

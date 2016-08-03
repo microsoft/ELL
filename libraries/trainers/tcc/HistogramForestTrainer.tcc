@@ -1,4 +1,3 @@
-#include "..\include\HistogramForestTrainer.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
@@ -7,10 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "RandomEngines.h"
+
 namespace trainers
 {
     template<typename LossFunctionType, typename BoosterType>
-    HistogramForestTrainer<LossFunctionType, BoosterType>::HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters) : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction)
+    HistogramForestTrainer<LossFunctionType, BoosterType>::HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const HistogramForestTrainerParameters& parameters) : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction), _random(utilities::GetRandomEngine(parameters.randomSeed))
     {}
 
     template<typename LossFunctionType, typename BoosterType>
@@ -110,7 +112,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType, typename BoosterType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters)
+    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const HistogramForestTrainerParameters& parameters)
     {
         return std::make_unique<HistogramForestTrainer<LossFunctionType, BoosterType>>(lossFunction, booster, parameters);
     }

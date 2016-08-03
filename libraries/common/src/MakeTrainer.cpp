@@ -57,7 +57,7 @@ namespace common
         }
     }
 
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& forestTrainerArguments)
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossArguments& lossArguments, const HistogramForestTrainerArguments& forestTrainerArguments)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
