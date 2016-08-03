@@ -85,7 +85,12 @@ namespace dataset
     void RowDataset<ExampleType>::RandomPermute(std::default_random_engine& rng, uint64_t prefixSize, uint64_t rangeFirstIndex, uint64_t rangeSize)
     {
         using std::swap;
-        if(rangeSize == 0) rangeSize = NumExamples();
+        rangeSize = CorrectRangeSize(rangeFirstIndex, rangeSize);
+        if(prefixSize > rangeSize)
+        {
+            prefixSize = rangeSize;
+        }
+
         uint64_t lastIndex = rangeFirstIndex + rangeSize - 1;
 
         for (uint64_t i = rangeFirstIndex; i < rangeFirstIndex + prefixSize; ++i)
