@@ -256,6 +256,10 @@ namespace emll
 				{
 					AllocArg(node.GetOutputPorts()[0], false);
 				}
+				else if (ModelEx::IsLeafNode(node))
+				{
+					AllocArg(node.GetOutputPorts()[0], false);
+				}
 			});
 		}
 

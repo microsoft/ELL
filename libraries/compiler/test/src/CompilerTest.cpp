@@ -543,7 +543,7 @@ model::Model MakeForest()
 	model::TransformContext context;
 	model::ModelTransformer transformer;
 	auto refinedModel = transformer.RefineModel(model, context);
-	/*
+
 	// check equivalence
 	auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
 	auto refinedOutputPort = transformer.GetCorrespondingOutputPort(simpleForestNode->prediction);
@@ -555,7 +555,7 @@ model::Model MakeForest()
 
 	//  expected output is -3.0
 	testing::ProcessTest("Testing SimpleForestNode refine", testing::IsEqual(outputValue, refinedOutputValue));
-	*/
+
 	return refinedModel;
 }
 
@@ -563,8 +563,21 @@ void TestForest()
 {
 	model::Model model = MakeForest();
 
+	std::vector<double> data = { 0.2, 0.5, 0.0 };
+
 	IRCompiler compiler;
 	compiler.CompileModel("TestForest", model);
+
+	auto& module = compiler.Module();
+	module.DeclarePrintf();
+	auto fnMain = module.AddMain();
+	llvm::Value* pData = module.Constant("c_data", data);
+	llvm::Value* pResult = fnMain.Var(ValueType::Double, 1);
+	fnMain.Call("TestForest", { fnMain.PtrOffset(pData, 0), fnMain.PtrOffset(pResult, 0) });
+	fnMain.PrintForEach("%f\n", pResult, 1);
+	fnMain.Ret();
+	fnMain.Verify();
 	compiler.DebugDump();
+	module.WriteBitcodeToFile("C:\\junk\\model\\forest.bc");
 }
 
