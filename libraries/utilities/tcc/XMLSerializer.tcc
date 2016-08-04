@@ -166,8 +166,6 @@ namespace utilities
         }
                 
         _tokenizer.MatchTokens({"type", "=", "'", typeName, "'", ">"});
-
-        std::string nextToken = "";
         while(true)
         {
             ValueType obj;

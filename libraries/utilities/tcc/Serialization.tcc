@@ -94,15 +94,22 @@ namespace utilities
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Deserializer::Deserialize(const char* name, std::unique_ptr<ValueType>& value, SerializationContext& context)
     {
-        std::cout << "Deserializing serializable pointer" << std::endl;
-        ValueType dummy; // TODO: find a way to get rid of this
-
-        auto typeName = BeginDeserializeObject(name, dummy, context);
+        auto baseTypeName = ValueType::GetTypeName();
+        auto encodedTypeName = BeginDeserializeObject(name, baseTypeName, context);
+        std::cout << "Deserializing serializable pointer to type " << baseTypeName << ", encoded type: " << encodedTypeName << std::endl;
 
         // TODO: create new typeName thing
-        auto newPtr = std::make_unique<ValueType>(); // ####
-        // Somehow we need to get a TypeFactory<ValueType>
-        // auto newPtr = factory.Construct(typeName);
+        std::unique_ptr<ValueType> newPtr;
+
+        // Need to do some SFINAE thing to ensure ValueType isn't an abstract base class 
+        if(false) // baseTypeName == encodedTypeName
+        {
+//            newPtr = std::make_unique<ValueType>();
+        }
+        else
+        {
+            newPtr = context.GetTypeFactory().Construct<ValueType>(encodedTypeName);
+        }
 
         DeserializeObject(name, *newPtr, context);
         EndDeserializeObject(name, *newPtr, context);
@@ -121,18 +128,4 @@ namespace utilities
     {
         DeserializeArray(name, array, context);
     }
-
-    // Vector of serializable pointers
-    template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::Deserialize(const char* name, std::vector<const ValueType*>& array, SerializationContext& context)
-    {
-        std::cout << "Deserializing array of pointers";
-        throw LogicException(LogicExceptionErrors::notImplemented, "Deserialize vector<ValueType*> not implemented."); 
-        std::vector<const utilities::ISerializable*> tmpArray;
-//        DeserializeArray(name, tmpArray, context);
-        // TODO: copy
-        for(const auto& item: tmpArray)
-        {
-
-        }
-    }}
+}

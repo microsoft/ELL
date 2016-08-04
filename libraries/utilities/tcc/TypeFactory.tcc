@@ -6,8 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// utilities
-#include "Exception.h"
+#include <iostream>
 
 namespace utilities
 {
@@ -50,7 +49,7 @@ namespace utilities
         virtual ~TypeCreatorBase() {}
 
         template <typename BaseType>
-        std::unique_ptr<BaseType> Create();
+        std::unique_ptr<BaseType> Create() const;
     };
 
     template <typename BaseType>
@@ -70,7 +69,7 @@ namespace utilities
             return result;
         }
 
-        std::unique_ptr<BaseType> Create()
+        std::unique_ptr<BaseType> Create() const
         {
             return _createFn();
         }
@@ -83,17 +82,16 @@ namespace utilities
     // TypeCreatorBase implementation
     //
     template <typename BaseType>
-    std::unique_ptr<BaseType> TypeCreatorBase::Create()
+    std::unique_ptr<BaseType> TypeCreatorBase::Create() const
     {
         auto thisPtr = dynamic_cast<const TypeCreatorDerived<BaseType>*>(this);
         if (thisPtr == nullptr)
         {
-            throw InputException(InputExceptionErrors::typeMismatch, "TypeCreatorBase::Create called with wrong type.");
+            throw InputException(InputExceptionErrors::typeMismatch, std::string{"TypeCreatorBase::Create called with wrong type. BaseType: "} + BaseType::GetTypeName());
         }
 
         return thisPtr->Create();
     }
-
 
     //
     // GenericTypeFactory implementation
@@ -101,12 +99,15 @@ namespace utilities
     template <typename BaseType>
     std::unique_ptr<BaseType> GenericTypeFactory::Construct(const std::string& typeName) const
     {
-        auto entry = _typeCreatorMap.find(typeName);
+        auto baseTypeName = std::string{BaseType::GetTypeName()};
+        auto key = baseTypeName + "__" + typeName;
+        auto entry = _typeCreatorMap.find(key);
         if (entry == _typeCreatorMap.end())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "type " + typeName + " not registered in TypeFactory<" + BaseType::GetTypeName() + ">");
         }
 
+        std::cout << "Found type creator for type " << typeName << std::endl;
         return entry->second->Create<BaseType>();        
     }
 
@@ -120,7 +121,11 @@ namespace utilities
     template<typename BaseType, typename RuntimeType>
     void GenericTypeFactory::AddType(const std::string& typeName)
     {
+        auto baseTypeName = std::string{BaseType::GetTypeName()};
+        auto key = baseTypeName + "__" + typeName;
+
+        std::cout << "Adding type creator for base type " << BaseType::GetTypeName() << ", runtime type: " << RuntimeType::GetTypeName() << " arg type: " << typeName << std::endl;
         auto derivedCreator = TypeCreatorDerived<BaseType>::template NewTypeCreator<RuntimeType>().release();
-        _typeCreatorMap[typeName] = std::unique_ptr<TypeCreatorBase>(derivedCreator);
+        _typeCreatorMap[key] = std::unique_ptr<TypeCreatorBase>(derivedCreator);
     }
 }

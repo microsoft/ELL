@@ -8,11 +8,14 @@
 
 #pragma once
 
+#include "Exception.h"
+
 // stl
 #include <unordered_map>
 #include <functional>
 #include <string>
 #include <memory>
+#include <utility>
 
 namespace utilities
 {

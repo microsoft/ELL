@@ -124,18 +124,19 @@ namespace utilities
     void SimpleXmlDeserializer::DeserializeValue(const char* name, std::string& value, SerializationContext& context) { ReadScalar(name, value); }
 
     // ISerializable
-    std::string SimpleXmlDeserializer::BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
+    std::string SimpleXmlDeserializer::BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) 
     {
         bool hasName = name != std::string("");
-        auto typeName = SanitizeTypeName(value.GetRuntimeTypeName());
+        auto rawTypeName = typeName;
 
-        _tokenizer.MatchTokens({"<", typeName});
+        _tokenizer.MatchToken("<");
+        auto readTypeName = UnsanitizeTypeName(_tokenizer.ReadNextToken());
         if(hasName)
         {
             _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
         }
         _tokenizer.MatchToken(">");
-        return typeName;
+        return readTypeName;
     }
 
     void SimpleXmlDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
@@ -165,14 +166,45 @@ namespace utilities
     {
         ReadArray(name, array, context);
     }
-    // TODO: Why does this not do anything???
-    void SimpleXmlDeserializer::DeserializeArray(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) 
+
+    void SimpleXmlDeserializer::BeginDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
     {
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::SimpleXmlDeserializer deserialization not implemented");
+        bool hasName = name != std::string("");
+
+        _tokenizer.MatchTokens({"<", "Array"});
+        if(hasName)
+        {
+            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
+        }
+                
+        _tokenizer.MatchTokens({"type", "=", "'", typeName, "'", ">"});
+    }
+
+    bool SimpleXmlDeserializer::DeserializeArrayItem(const char* name, ISerializable& value, SerializationContext& context)
+    {
+        Deserialize(value, context);
+        
+        // check for '</'
+        auto token1 = _tokenizer.ReadNextToken();
+        auto token2 = _tokenizer.ReadNextToken();
+        _tokenizer.PutBackToken(token2);
+        _tokenizer.PutBackToken(token1);
+        if(token1+token2 == "</")
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    void SimpleXmlDeserializer::EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
+    {
+        _tokenizer.MatchTokens({"<", "/", "Array", ">"});
     }
 
     // TODO: allow multi-char tokens
-
     std::string SimpleXmlDeserializer::SanitizeString(const std::string& str)
     {
         return str;
@@ -203,8 +235,9 @@ namespace utilities
 
     std::string SimpleXmlDeserializer::UnsanitizeTypeName(const std::string& str)
     {
+        // convert '(' into '<' etc.
         auto result = str;
-        std::replace(result.begin(), result.end(), '(', ')');
+        std::replace(result.begin(), result.end(), '(', '<');
         std::replace(result.begin(), result.end(), ')', '>');
         return result;
     }

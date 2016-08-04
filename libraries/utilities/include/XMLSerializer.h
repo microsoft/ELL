@@ -96,9 +96,11 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_OVERRIDE(float);
         DECLARE_DESERIALIZE_ARRAY_OVERRIDE(double);
         virtual void DeserializeArray(const char* name, std::vector<std::string>& array, SerializationContext& context) override;
-        virtual void DeserializeArray(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) override;
+        virtual void BeginDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context) override;
+        virtual bool DeserializeArrayItem(const char* name, ISerializable& value, SerializationContext& context) override;
+        virtual void EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context) override;
 
-        virtual std::string BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) override;
+        virtual std::string BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) override;
         virtual void DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) override;
         virtual void EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) override;
 

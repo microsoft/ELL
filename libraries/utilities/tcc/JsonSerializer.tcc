@@ -187,7 +187,7 @@ namespace utilities
         _tokenizer.MatchToken("[");
         while(true)
         {
-            std::string  obj;
+            std::string obj;
             Deserialize(obj, context);
             array.push_back(obj);
 

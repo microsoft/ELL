@@ -62,7 +62,7 @@ namespace model
         
         // deserialize nodes
         std::vector<const Node*> nodes;
-        serializer.Deserialize("nodes", nodes, graphContext);
+//        serializer.Deserialize("nodes", nodes, graphContext);
 
         // TODO: fix up everything
 

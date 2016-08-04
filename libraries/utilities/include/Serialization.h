@@ -27,6 +27,10 @@ namespace utilities
     {
     public:
         virtual ~SerializationContext() = default;
+        GenericTypeFactory& GetTypeFactory() { return _typeFactory; }
+    
+    private:
+        GenericTypeFactory _typeFactory;
     };
 
     // TODO: put all this stuff somewhere else
@@ -230,10 +234,6 @@ namespace utilities
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
         void Deserialize(const char* name, std::vector<ValueType>& value, SerializationContext& context);
 
-        // Vector of pointers to serializable things
-        template <typename ValueType, IsSerializable<ValueType> concept = 0>
-        void Deserialize(const char* name, std::vector<const ValueType*>& value, SerializationContext& context);
-
     protected:
         DECLARE_DESERIALIZE_VALUE_BASE(bool);
         DECLARE_DESERIALIZE_VALUE_BASE(char);
@@ -253,12 +253,11 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_BASE(float);
         DECLARE_DESERIALIZE_ARRAY_BASE(double);
         virtual void DeserializeArray(const char* name, std::vector<std::string>& array, SerializationContext& context) = 0;
-        virtual void DeserializeArray(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) = 0;
-        // virtual void BeginDeserializeArray(const char* name, ISerializable& value, SerializationContext& context);
-        // virtual void DeserializeArrayItem(const char* name, ISerializable& value, SerializationContext& context) = 0;
-        // virtual void EndDeserializeArray(const char* name, ISerializable& value, SerializationContext& context);
+        virtual void BeginDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context);
+        virtual bool DeserializeArrayItem(const char* name, ISerializable& value, SerializationContext& context) = 0;
+        virtual void EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context);
 
-        virtual std::string BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context); // returns typename
+        virtual std::string BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context); // returns typename
         virtual void DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) = 0;
         virtual void EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context);
     };
