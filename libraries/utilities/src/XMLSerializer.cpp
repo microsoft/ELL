@@ -153,20 +153,20 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, bool);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, char);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, short);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, int);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, size_t);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, float);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, double);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, bool);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, char);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, short);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, int);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, size_t);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, float);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, double);
 
-    void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<std::string>& array, SerializationContext& context)
+    void SimpleXmlDeserializer::DeserializeArray(const char* name, std::vector<std::string>& array, SerializationContext& context)
     {
         ReadArray(name, array, context);
     }
     // TODO: Why does this not do anything???
-    void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) 
+    void SimpleXmlDeserializer::DeserializeArray(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) 
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::SimpleXmlDeserializer deserialization not implemented");
     }

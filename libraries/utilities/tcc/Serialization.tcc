@@ -112,14 +112,14 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void Deserializer::Deserialize(const char* name, std::vector<ValueType>& array, SerializationContext& context)
     {
-        DeserializeArrayValue(name, array, context);
+        DeserializeArray(name, array, context);
     }
 
     // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Deserializer::Deserialize(const char* name, std::vector<ValueType>& array, SerializationContext& context)
     {
-        DeserializeArrayValue(name, array, context);
+        DeserializeArray(name, array, context);
     }
 
     // Vector of serializable pointers
@@ -129,7 +129,7 @@ namespace utilities
         std::cout << "Deserializing array of pointers";
         throw LogicException(LogicExceptionErrors::notImplemented, "Deserialize vector<ValueType*> not implemented."); 
         std::vector<const utilities::ISerializable*> tmpArray;
-//        DeserializeArrayValue(name, tmpArray, context);
+//        DeserializeArray(name, tmpArray, context);
         // TODO: copy
         for(const auto& item: tmpArray)
         {

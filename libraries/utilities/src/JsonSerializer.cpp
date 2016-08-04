@@ -190,19 +190,19 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, bool);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, char);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, short);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, int);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, size_t);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, float);
-    IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, double);
+    IMPLEMENT_DESERIALIZE_ARRAY(JsonDeserializer, bool);
+    IMPLEMENT_DESERIALIZE_ARRAY(JsonDeserializer, char);
+    IMPLEMENT_DESERIALIZE_ARRAY(JsonDeserializer, short);
+    IMPLEMENT_DESERIALIZE_ARRAY(JsonDeserializer, int);
+    IMPLEMENT_DESERIALIZE_ARRAY(JsonDeserializer, size_t);
+    IMPLEMENT_DESERIALIZE_ARRAY(JsonDeserializer, float);
+    IMPLEMENT_DESERIALIZE_ARRAY(JsonDeserializer, double);
 
-    void JsonDeserializer::DeserializeArrayValue(const char* name, std::vector<std::string>& array, SerializationContext& context)
+    void JsonDeserializer::DeserializeArray(const char* name, std::vector<std::string>& array, SerializationContext& context)
     {
         ReadArray(name, array, context);
     }
 
-    void JsonDeserializer::DeserializeArrayValue(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) 
+    void JsonDeserializer::DeserializeArray(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) 
     {}
 }
