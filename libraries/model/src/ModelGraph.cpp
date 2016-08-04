@@ -8,6 +8,7 @@
 
 #include "ModelGraph.h"
 #include "Port.h"
+#include "Node.h"
 
 // stl
 #include <unordered_map>

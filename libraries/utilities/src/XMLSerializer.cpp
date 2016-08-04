@@ -161,6 +161,10 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, float);
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(SimpleXmlDeserializer, double);
 
+    void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<std::string>& array, SerializationContext& context)
+    {
+        ReadArray(name, array, context);
+    }
     // TODO: Why does this not do anything???
     void SimpleXmlDeserializer::DeserializeArrayValue(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) 
     {

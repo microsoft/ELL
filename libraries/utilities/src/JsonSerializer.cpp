@@ -143,7 +143,10 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, double);
 
     // strings
-    void JsonDeserializer::DeserializeValue(const char* name, std::string& value, SerializationContext& context) { ReadScalar(name, value); }
+    void JsonDeserializer::DeserializeValue(const char* name, std::string& value, SerializationContext& context) 
+    { 
+        ReadScalar(name, value); 
+    }
 
     // ISerializable
     std::string JsonDeserializer::BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
@@ -195,5 +198,11 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, float);
     IMPLEMENT_DESERIALIZE_ARRAY_VALUE(JsonDeserializer, double);
 
-    void JsonDeserializer::DeserializeArrayValue(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) {}
+    void JsonDeserializer::DeserializeArrayValue(const char* name, std::vector<std::string>& array, SerializationContext& context)
+    {
+        ReadArray(name, array, context);
+    }
+
+    void JsonDeserializer::DeserializeArrayValue(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) 
+    {}
 }

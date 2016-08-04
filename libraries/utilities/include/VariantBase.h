@@ -64,4 +64,40 @@ namespace utilities
     private:
         std::type_index _type; // redundant with type in Variant class.
     };
+
+    //
+    // VariantDerived<T>
+    //
+    /// <summary>
+    template <typename ValueType>
+    class VariantDerived : public VariantBase
+    {
+    public:
+        VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) {}
+
+        const ValueType& GetValue() const { return _value; }
+
+        virtual std::unique_ptr<VariantBase> Clone() const override
+        {
+            auto ptr = static_cast<VariantBase*>(new VariantDerived<ValueType>(_value));
+            return std::unique_ptr<VariantBase>(ptr);
+        }
+
+        virtual std::string ToString() const override;
+
+        virtual std::string GetStoredTypeName() const override;
+
+        virtual bool IsPrimitiveType() const override { return std::is_fundamental<ValueType>::value; }
+
+        virtual bool IsSerializable() const override { return !IsPrimitiveType(); }
+
+        virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
+
+        virtual ObjectDescription GetObjectDescription() const override;
+
+    private:
+        ValueType _value;
+    };
 }
+
+#include "../tcc/VariantDerived.tcc"

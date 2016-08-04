@@ -214,6 +214,12 @@ void TestDeserializer()
     std::cout << "Deserializer test 5" << std::endl;
     {
         model::Model g;
+        utilities::GenericTypeFactory typeFactory;
+        typeFactory.AddType<model::Node, model::InputNode<double>>();
+        typeFactory.AddType<model::Node, model::OutputNode<double>>();
+        typeFactory.AddType<model::Node, nodes::ConstantNode<double>>();
+        typeFactory.AddType<model::Node, nodes::BinaryOperationNode<double>>();
+
         std::stringstream strstream;
         auto constVector = std::vector<double>{ 1.0, 2.0, 3.0 };
 

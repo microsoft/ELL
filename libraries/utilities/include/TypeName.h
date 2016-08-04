@@ -236,6 +236,18 @@ namespace utilities
         static std::string GetName() { return "double"; }
     };
 
+    /// <summary> Class used to get information about the double type. </summary>
+    ///
+    /// <typeparam name="T"> Generic type parameter. </typeparam>
+    template <>
+    struct TypeName<std::string>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "std::string"; }
+    };
+
     /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
     ///
     /// <param name="baseType"> The base type (e.g., 'Vector') </param>

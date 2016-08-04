@@ -24,6 +24,8 @@ namespace model
     class OutputNode : public Node
     {
     public:
+        OutputNode(); // for serialization
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
@@ -51,6 +53,8 @@ namespace model
 
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";
+
+        void SetInput(const model::OutputPortElements<ValueType>& input);
 
     protected:
         virtual void Compute() const override;

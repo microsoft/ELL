@@ -71,6 +71,36 @@ namespace utilities
     private:
         std::unordered_map<std::string, std::function<std::unique_ptr<BaseType>()>> _typeMap;
     };
+
+    class TypeCreatorBase;
+    class GenericTypeFactory
+    {
+    public:
+        /// <summary> Invokes the default constructor of the named type. </summary>
+        ///
+        /// <typeparam name="BaseeType"> The base type to return. </typeparam>
+        /// <param name="typeName"> Name of the type to construct. </param>
+        ///
+        /// <returns> A std::unique_ptr to the base type, which points to the newly constructed object </returns>
+        template <typename BaseType>
+        std::unique_ptr<BaseType> Construct(const std::string& typeName) const;
+
+        /// <summary> Adds a type to the factory, with its default name. </summary>
+        ///
+        /// <typeparam name="RuntimeType"> Type being added. </typeparam>
+        template<typename BaseType, typename RuntimeType>
+        void AddType();
+
+        /// <summary> Adds a type to the factory, with its default name. </summary>
+        ///
+        /// <typeparam name="RuntimeType"> Type being added. </typeparam>
+        /// <param name="typeName"> Name of the type being added. </param>
+        template<typename BaseType, typename RuntimeType>
+        void AddType(const std::string& typeName);
+
+    private:
+        std::unordered_map<std::string, std::unique_ptr<TypeCreatorBase>> _typeCreatorMap;        
+    };
 }
 
 #include "../tcc/TypeFactory.tcc"

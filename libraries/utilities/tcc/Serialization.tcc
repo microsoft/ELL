@@ -100,7 +100,9 @@ namespace utilities
         auto typeName = BeginDeserializeObject(name, dummy, context);
 
         // TODO: create new typeName thing
-        auto newPtr = std::make_unique<ValueType>();
+        auto newPtr = std::make_unique<ValueType>(); // ####
+        // Somehow we need to get a TypeFactory<ValueType>
+        // auto newPtr = factory.Construct(typeName);
 
         DeserializeObject(name, *newPtr, context);
         EndDeserializeObject(name, *newPtr, context);
@@ -125,6 +127,7 @@ namespace utilities
     void Deserializer::Deserialize(const char* name, std::vector<const ValueType*>& array, SerializationContext& context)
     {
         std::cout << "Deserializing array of pointers";
+        throw LogicException(LogicExceptionErrors::notImplemented, "Deserialize vector<ValueType*> not implemented."); 
         std::vector<const utilities::ISerializable*> tmpArray;
 //        DeserializeArrayValue(name, tmpArray, context);
         // TODO: copy

@@ -175,4 +175,33 @@ namespace utilities
         }
         _tokenizer.MatchToken("]");
     }
+
+    inline void JsonDeserializer::ReadArray(const char* name, std::vector<std::string>& array, SerializationContext& context)
+    {
+        bool hasName = name != std::string("");
+        if(hasName)
+        {
+            _tokenizer.MatchTokens({name, ":"});
+        }
+                
+        _tokenizer.MatchToken("[");
+        while(true)
+        {
+            std::string  obj;
+            Deserialize(obj, context);
+            array.push_back(obj);
+
+            auto maybeComma = _tokenizer.PeekNextToken();
+            if(maybeComma != ",")
+            {
+                break;
+            }
+            else
+            {
+                _tokenizer.ReadNextToken();
+            }
+        }
+        _tokenizer.MatchToken("]");
+    }
+
 }

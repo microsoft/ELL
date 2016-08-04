@@ -59,7 +59,6 @@ set (INCLUDE include/CompressedIntegerList.h
              include/Variant.h
              include/Variant_def.h
              include/VariantBase.h
-             include/VariantDerived.h
              include/XMLSerialization.h)
 
 set (TCC tcc/AnyIterator.tcc

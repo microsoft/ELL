@@ -103,6 +103,7 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_VALUE_OVERRIDE(size_t);
         DECLARE_DESERIALIZE_ARRAY_VALUE_OVERRIDE(float);
         DECLARE_DESERIALIZE_ARRAY_VALUE_OVERRIDE(double);
+        virtual void DeserializeArrayValue(const char* name, std::vector<std::string>& array, SerializationContext& context) override;
         virtual void DeserializeArrayValue(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) override;
 
         virtual std::string BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) override;
@@ -117,6 +118,8 @@ namespace utilities
 
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void ReadArray(const char* name, std::vector<ValueType>& array, SerializationContext& context);
+
+        void ReadArray(const char* name, std::vector<std::string>& array, SerializationContext& context);
 
         std::istream& _in;
         std::string _endOfPreviousLine;

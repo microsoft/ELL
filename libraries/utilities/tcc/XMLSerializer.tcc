@@ -187,4 +187,38 @@ namespace utilities
 
         _tokenizer.MatchTokens({"<", "/", "Array", ">"});
     }
+
+    inline void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<std::string>& array, SerializationContext& context)
+    {
+        auto typeName = SanitizeTypeName(TypeName<std::string>::GetName());
+        bool hasName = name != std::string("");
+
+        _tokenizer.MatchTokens({"<", "Array"});
+        if(hasName)
+        {
+            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
+        }
+                
+        _tokenizer.MatchTokens({"type", "=", "'", typeName, "'", ">"});
+
+        std::string nextToken = "";
+        while(true)
+        {
+            std::string obj;
+            Deserialize(obj, context);
+            array.push_back(obj);
+            
+            // check for '</'
+            auto token1 = _tokenizer.ReadNextToken();
+            auto token2 = _tokenizer.ReadNextToken();
+            _tokenizer.PutBackToken(token2);
+            _tokenizer.PutBackToken(token1);
+            if(token1+token2 == "</")
+            {
+                break;
+            }
+        }
+
+        _tokenizer.MatchTokens({"<", "/", "Array", ">"});
+    }
 }

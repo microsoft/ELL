@@ -10,6 +10,10 @@
 namespace model
 {
     template <typename ValueType>
+    OutputNode<ValueType>::OutputNode() : Node({&_input}, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
+    {};
+
+    template <typename ValueType>
     OutputNode<ValueType>::OutputNode(const model::OutputPortElements<ValueType>& input) : Node({&_input}, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size())
     {};
 
@@ -17,6 +21,12 @@ namespace model
     void OutputNode<ValueType>::Compute() const
     {
         _output.SetOutput(_input.GetValue());
+    }
+
+    template <typename ValueType>
+    void OutputNode<ValueType>::SetInput(const model::OutputPortElements<ValueType>& input)
+    {
+        _input.SetOutputPortElements(input);
     }
 
     template <typename ValueType>

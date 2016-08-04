@@ -97,4 +97,10 @@ namespace model
 
         serializer.Deserialize("inputElements", _input, context);
     }
+
+    template <typename ValueType>
+    void InputPort<ValueType>::SetOutputPortElements(const OutputPortElements<ValueType>& elements)
+    {
+        _input = elements;
+    }
 }

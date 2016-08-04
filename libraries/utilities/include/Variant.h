@@ -9,6 +9,6 @@
 #pragma once
 
 #include "Variant_def.h"
+#include "ObjectDescription.h"
 #include "VariantBase.h"
-#include "VariantDerived.h"
 #include "../tcc/Variant.tcc"

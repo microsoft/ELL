@@ -252,6 +252,7 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(size_t);
         DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(float);
         DECLARE_DESERIALIZE_ARRAY_VALUE_BASE(double);
+        virtual void DeserializeArrayValue(const char* name, std::vector<std::string>& array, SerializationContext& context) = 0;
         virtual void DeserializeArrayValue(const char* name, std::vector<ISerializable*>& array, SerializationContext& context) = 0;
 
         virtual std::string BeginDeserializeObject(const char* name, ISerializable& value, SerializationContext& context); // returns typename
