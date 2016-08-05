@@ -45,24 +45,26 @@ namespace utilities
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Serializer::Serialize(const char* name, const std::vector<ValueType>& array)
     {
+        auto baseTypeName = ValueType::GetTypeName();
         std::vector<const utilities::ISerializable*> tmpArray;
         for (const auto& item : array)
         {
             tmpArray.push_back(&item);
         }
-        SerializeArrayValue(name, tmpArray);
+        SerializeArrayValue(name, baseTypeName, tmpArray);
     }
 
     // Vector of serializable pointers
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Serializer::Serialize(const char* name, const std::vector<const ValueType*>& array)
     {
+        auto baseTypeName = ValueType::GetTypeName();
         std::vector<const utilities::ISerializable*> tmpArray;
         for (const auto& item : array)
         {
             tmpArray.push_back(item);
         }
-        SerializeArrayValue(name, tmpArray);
+        SerializeArrayValue(name, baseTypeName, tmpArray);
     }
 
     //
@@ -126,6 +128,19 @@ namespace utilities
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Deserializer::Deserialize(const char* name, std::vector<ValueType>& array, SerializationContext& context)
     {
-        DeserializeArray(name, array, context);
+        array.clear();
+        auto typeName = ValueType::GetTypeName();
+        BeginDeserializeArray(name, typeName, context);
+        while(true)
+        {
+            ValueType value;
+            auto good = DeserializeArrayItem(value, context);
+            if(!good)
+            {
+                break;
+            }
+            array.push_back(value);
+        }
+        EndDeserializeArray(name, typeName, context);
     }
 }

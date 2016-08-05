@@ -52,6 +52,7 @@ struct TestStruct : public utilities::ISerializable
 
     virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override
     {
+        // what about _type?
         serializer.Deserialize("a", a, context);
         serializer.Deserialize("b", b, context);
         serializer.Deserialize("c", c, context);
@@ -250,10 +251,37 @@ void TestDeserializer()
         deserializer.Deserialize("node3", newConstNodePtr, modelContext);
         deserializer.Deserialize("node4", newNodePtr, modelContext);
 
-//        deserializer.Deserialize("node5", newBinaryOpNode, modelContext);
+        deserializer.Deserialize("node5", newBinaryOpNode, modelContext);
 
         testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNode.GetValues()));
         testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNodePtr->GetValues()));
+    }
+    std::cout << std::endl;
+
+    std::cout << "Deserializer test 6" << std::endl;
+    {
+        // arrays of stuff
+        std::stringstream strstream;
+        auto doubleVector = std::vector<double>{ 1.0, 2.0, 3.0 };
+        std::vector<TestStruct> structVector;
+        structVector.push_back(TestStruct{ 1, 2.2f, 3.3 });
+        structVector.push_back(TestStruct{ 4, 5.5f, 6.6 });
+
+        SerializerType serializer(strstream);
+        serializer.Serialize("vec1", doubleVector);
+        serializer.Serialize("vec2", structVector);
+        std::cout << "Str value: " << "\n" << strstream.str() << std::endl;
+
+        DeserializerType deserializer(strstream);
+        std::vector<double> newDoubleVector;
+        std::vector<TestStruct> newStructVector;
+        deserializer.Deserialize("vec1", newDoubleVector, context);
+        deserializer.Deserialize("vec2", newStructVector, context);
+
+        testing::ProcessTest("Deserialize array check",  testing::IsEqual(doubleVector, newDoubleVector));
+        testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].a, newStructVector[0].a));
+        testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].b, newStructVector[0].b));
+        testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].c, newStructVector[0].c));
     }
     std::cout << std::endl;
 }

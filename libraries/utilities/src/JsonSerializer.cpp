@@ -45,7 +45,7 @@ namespace utilities
             _out << indent << name << ": ";
         }
         _out << "{\n";
-        _out << indent << "_type: " << value.GetRuntimeTypeName();
+        _out << indent << "  _type: " << value.GetRuntimeTypeName();
         SetEndOfLine(",\n");
         ++_nestedObjectCount;
     }
@@ -85,7 +85,7 @@ namespace utilities
     IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, float);
     IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, double);
 
-    void JsonSerializer::SerializeArrayValue(const char* name, const std::vector<const ISerializable*>& array)
+    void JsonSerializer::SerializeArrayValue(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
     {
         FinishPreviousLine();
         auto indent = GetCurrentIndent();
@@ -151,6 +151,8 @@ namespace utilities
     // ISerializable
     std::string JsonDeserializer::BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) 
     {
+        std::cout << "BeginDeserializeObject of type: " << typeName << std::endl;
+
         bool hasName = name != std::string("");
         if(hasName)
         {
@@ -159,7 +161,27 @@ namespace utilities
         _tokenizer.MatchToken("{");        
         _tokenizer.MatchTokens({"_type", ":"});
         auto encodedTypeName = _tokenizer.ReadNextToken();
-        // ensure they match, I suppose
+
+        if(_tokenizer.PeekNextToken() == ",")
+        {
+            _tokenizer.ReadNextToken();
+        }
+        std::cout << "  -- encoded typename: " << encodedTypeName << std::endl;
+        return encodedTypeName;
+    }
+
+    void JsonDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
+    {
+        std::cout << "Deserializing object of type: " << value.GetRuntimeTypeName() << std::endl;
+        value.Deserialize(*this, context);
+    }
+
+    void JsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
+    {
+        bool hasName = name != std::string("");
+        std::cout << "End deserialize object of type " << value.GetRuntimeTypeName() << std::endl;
+        _tokenizer.MatchToken("}");
+
         // eat a comma if it exists
         if(hasName)
         {
@@ -167,23 +189,6 @@ namespace utilities
             {
                 _tokenizer.ReadNextToken();
             }
-        }
-        return encodedTypeName;
-    }
-
-    void JsonDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
-    {
-        value.Deserialize(*this, context);
-    }
-
-    void JsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
-    {
-        _tokenizer.MatchToken("}");
-
-        // eat a comma if it exists
-        if(_tokenizer.PeekNextToken() == ",")
-        {
-            _tokenizer.ReadNextToken();
         }
     }
 
@@ -214,10 +219,11 @@ namespace utilities
         _tokenizer.MatchToken("[");
     }
 
-    bool JsonDeserializer::DeserializeArrayItem(const char* name, ISerializable& value, SerializationContext& context)
+    bool JsonDeserializer::DeserializeArrayItem(ISerializable& value, SerializationContext& context)
     {
+        std::cout << "DeserializeArrayItem for type " << value.GetRuntimeTypeName() << std::endl;
         Deserialize(value, context);
-
+        std::cout << "Done deserializing an item" << std::endl;
         auto maybeComma = _tokenizer.PeekNextToken();
         if(maybeComma != ",")
         {

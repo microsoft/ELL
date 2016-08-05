@@ -79,9 +79,9 @@ namespace utilities
     IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleXmlSerializer, float);
     IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleXmlSerializer, double);
 
-    // Array of ISerializable
+    // Array of pointers-to-ISerializable
     // TOOD: pass in compile-time type name
-    void SimpleXmlSerializer::SerializeArrayValue(const char* name, const std::vector<const ISerializable*>& array)
+    void SimpleXmlSerializer::SerializeArrayValue(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
     {
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
@@ -95,7 +95,7 @@ namespace utilities
         {
             _out << " name='" << name << "'";
         }
-        _out << " type='" << typeName <<  "'>" << std::endl;
+        _out << " type='" << baseTypeName <<  "'>" << std::endl;
         ++_indent;
         for (const auto& item : array)
         {
@@ -176,11 +176,11 @@ namespace utilities
         {
             _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
         }
-                
+
         _tokenizer.MatchTokens({"type", "=", "'", typeName, "'", ">"});
     }
 
-    bool SimpleXmlDeserializer::DeserializeArrayItem(const char* name, ISerializable& value, SerializationContext& context)
+    bool SimpleXmlDeserializer::DeserializeArrayItem(ISerializable& value, SerializationContext& context)
     {
         Deserialize(value, context);
         
