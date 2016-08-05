@@ -282,6 +282,16 @@ void TestDeserializer()
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].a, newStructVector[0].a));
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].b, newStructVector[0].b));
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].c, newStructVector[0].c));
+        testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[1].a, newStructVector[1].a));
+        testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[1].b, newStructVector[1].b));
+        testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[1].c, newStructVector[1].c));
+
+
+        std::cout << "-------------" << std::endl;
+        std::stringstream strstream2;
+        SerializerType serializer2(strstream2);
+        serializer2.Serialize("vec2", newStructVector);
+        std::cout << "Reserialized str value: " << "\n" << strstream2.str() << std::endl;
     }
     std::cout << std::endl;
 }

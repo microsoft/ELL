@@ -221,19 +221,21 @@ namespace utilities
 
     bool JsonDeserializer::DeserializeArrayItem(ISerializable& value, SerializationContext& context)
     {
+        auto maybeEndArray = _tokenizer.PeekNextToken();
+        if(maybeEndArray == "]")
+        {
+            return false;
+        }
+
         std::cout << "DeserializeArrayItem for type " << value.GetRuntimeTypeName() << std::endl;
         Deserialize(value, context);
         std::cout << "Done deserializing an item" << std::endl;
         auto maybeComma = _tokenizer.PeekNextToken();
-        if(maybeComma != ",")
-        {
-            return false;
-        }
-        else
+        if(maybeComma == ",")
         {
             _tokenizer.ReadNextToken();
-            return true;
         }
+        return true;
     }
 
     void JsonDeserializer::EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)

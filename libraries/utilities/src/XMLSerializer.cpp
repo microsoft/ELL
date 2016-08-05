@@ -182,8 +182,6 @@ namespace utilities
 
     bool SimpleXmlDeserializer::DeserializeArrayItem(ISerializable& value, SerializationContext& context)
     {
-        Deserialize(value, context);
-        
         // check for '</'
         auto token1 = _tokenizer.ReadNextToken();
         auto token2 = _tokenizer.ReadNextToken();
@@ -193,10 +191,9 @@ namespace utilities
         {
             return false;
         }
-        else
-        {
-            return true;
-        }
+        
+        Deserialize(value, context);
+        return true;
     }
 
     void SimpleXmlDeserializer::EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
