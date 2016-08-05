@@ -27,7 +27,7 @@ namespace utilities
     {
     public:
         virtual ~SerializationContext() = default;
-        GenericTypeFactory& GetTypeFactory() { return _typeFactory; }
+        virtual GenericTypeFactory& GetTypeFactory() { return _typeFactory; }
     
     private:
         GenericTypeFactory _typeFactory;

@@ -163,10 +163,15 @@ namespace model
     {
     public:
         ModelSerializationContext(Model* model);
+        ModelSerializationContext(utilities::SerializationContext& otherContext, Model* model);
+
+        virtual utilities::GenericTypeFactory& GetTypeFactory() override { return _originalContext.GetTypeFactory(); }
         Model* GetModel() { return _model; }
         Node* GetNodeFromId(const Node::NodeId& id);
         void MapNode(const Node::NodeId& id, Node* node);
 
+        utilities::SerializationContext _dummyContext;
+        utilities::SerializationContext& _originalContext;
         Model* _model;
         std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;
     };

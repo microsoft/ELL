@@ -59,13 +59,18 @@ namespace model
 
     void Model::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) 
     {
-        ModelSerializationContext graphContext(this);
+        ModelSerializationContext graphContext(context, this);
         
         // deserialize nodes
         std::vector<std::unique_ptr<Node>> nodes;
         serializer.Deserialize("nodes", nodes, graphContext);
 
-        // TODO: fix up everything
+        for(auto& node: nodes)
+        {
+            std::shared_ptr<Node> sharedNode = std::shared_ptr<Node>(node.release());
+            node->RegisterDependencies();
+            _idToNodeMap[node->GetId()] = sharedNode;
+        }
 
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::Deserialize not implemented");
     }
@@ -172,7 +177,11 @@ namespace model
     //
     // ModelSerializationContext
     //
-    ModelSerializationContext::ModelSerializationContext(Model* model) : _model(model) 
+    ModelSerializationContext::ModelSerializationContext(Model* model) : _originalContext(_dummyContext), _model(model) 
+    {
+    }
+    
+    ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& otherContext, Model* model) : _originalContext(otherContext), _model(model) 
     {
     }
     
