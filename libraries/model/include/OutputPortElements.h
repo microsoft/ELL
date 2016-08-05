@@ -57,6 +57,8 @@ namespace model
     class OutputPortRange : public utilities::ISerializable
     {
     public:
+        OutputPortRange() {}
+
         /// <summary> Creates an OutputPortRange representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
@@ -115,10 +117,10 @@ namespace model
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     private:
-        const OutputPortBase* _referencedPort;
-        size_t _startIndex;
-        size_t _numValues;
-        bool _isFixedSize;
+        const OutputPortBase* _referencedPort = nullptr;
+        size_t _startIndex = 0;
+        size_t _numValues = 0;
+        bool _isFixedSize = true;
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>

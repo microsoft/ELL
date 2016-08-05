@@ -49,6 +49,7 @@ namespace model
         while(nodeIter.IsValid())
         {
             const auto& node = nodeIter.Get();
+            std::cout << "Serializing node of type " << node->GetRuntimeTypeName() << std::endl;
             nodes.push_back(node);
             nodeIter.Next();
         }
@@ -61,8 +62,8 @@ namespace model
         ModelSerializationContext graphContext(this);
         
         // deserialize nodes
-        std::vector<const Node*> nodes;
-//        serializer.Deserialize("nodes", nodes, graphContext);
+        std::vector<std::unique_ptr<Node>> nodes;
+        serializer.Deserialize("nodes", nodes, graphContext);
 
         // TODO: fix up everything
 

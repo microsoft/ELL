@@ -234,6 +234,10 @@ namespace utilities
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
         void Deserialize(const char* name, std::vector<ValueType>& value, SerializationContext& context);
 
+        // vector of pointers to ISerializable
+        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        void Deserialize(const char* name, std::vector<std::unique_ptr<ValueType>>& value, SerializationContext& context);
+
     protected:
         DECLARE_DESERIALIZE_VALUE_BASE(bool);
         DECLARE_DESERIALIZE_VALUE_BASE(char);
@@ -263,10 +267,10 @@ namespace utilities
     };
 }
 
-#define IMPLEMENT_SERIALIZE_VALUE(base, type)          void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
-#define IMPLEMENT_SERIALIZE_ARRAY_VALUE(base, type)    void base::SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
+#define IMPLEMENT_SERIALIZE_VALUE(base, type)        void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
+#define IMPLEMENT_SERIALIZE_ARRAY_VALUE(base, type)  void base::SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
 
-#define IMPLEMENT_DESERIALIZE_VALUE(base, type)        void base::DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy) { ReadScalar(name, value); }
-#define IMPLEMENT_DESERIALIZE_ARRAY(base, type)  void base::DeserializeArray(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy) { ReadArray(name, value, context); }
+#define IMPLEMENT_DESERIALIZE_VALUE(base, type)      void base::DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy) { ReadScalar(name, value); }
+#define IMPLEMENT_DESERIALIZE_ARRAY(base, type)      void base::DeserializeArray(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy) { ReadArray(name, value, context); }
 
 #include "../tcc/Serialization.tcc"

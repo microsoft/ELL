@@ -107,7 +107,6 @@ namespace utilities
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "type " + typeName + " not registered in TypeFactory<" + BaseType::GetTypeName() + ">");
         }
 
-        std::cout << "Found type creator for type " << typeName << std::endl;
         return entry->second->Create<BaseType>();        
     }
 
@@ -124,7 +123,6 @@ namespace utilities
         auto baseTypeName = std::string{BaseType::GetTypeName()};
         auto key = baseTypeName + "__" + typeName;
 
-        std::cout << "Adding type creator for base type " << BaseType::GetTypeName() << ", runtime type: " << RuntimeType::GetTypeName() << " arg type: " << typeName << std::endl;
         auto derivedCreator = TypeCreatorDerived<BaseType>::template NewTypeCreator<RuntimeType>().release();
         _typeCreatorMap[key] = std::unique_ptr<TypeCreatorBase>(derivedCreator);
     }

@@ -146,73 +146,52 @@ void TestDeserializer()
 {
     utilities::SerializationContext context;
 
-    std::cout << "Deserializer test 1" << std::endl;
     {
         std::stringstream strstream;
         SerializerType serializer(strstream);
         serializer.Serialize("pi", 3.14159);
-        std::cout << "Str value: " << strstream.str() << std::endl;;
 
         DeserializerType deserializer(strstream);
         double val = 0;
         deserializer.Deserialize("pi", val, context);
-        std::cout << "Result: " << val << std::endl;
         testing::ProcessTest("Deserialize float check", val == 3.14159);
     }
-    std::cout << std::endl;
 
-    std::cout << "Deserializer test 2" << std::endl;
     {
         std::stringstream strstream;
         SerializerType serializer(strstream);
         serializer.Serialize("pie", std::string{ "cherry pie" });
-        std::cout << "Str value: " << strstream.str() << std::endl;
 
         DeserializerType deserializer(strstream);
         std::string val;
         deserializer.Deserialize("pie", val, context);
-        std::cout << "Result: " << val << std::endl;
         testing::ProcessTest("Deserialize string check", val == "cherry pie");
     }
-    std::cout << std::endl;
 
-    std::cout << "Deserializer test 3" << std::endl;
     {
         std::stringstream strstream;
         SerializerType serializer(strstream);
         std::vector<int> arr {1,2,3};
         serializer.Serialize("arr", arr);
-        std::cout << "Str value: " << strstream.str() << std::endl;
 
         DeserializerType deserializer(strstream);
         std::vector<int> val;
         deserializer.Deserialize("arr", val, context);
-        std::cout << "Result: ";
-        for(auto element: val)
-            std::cout << element << ", ";
-         std::cout << std::endl;
         testing::ProcessTest("Deserialize vector<int> check", val[0] == 1 && val[1] == 2 && val[2] == 3);
     }
-    std::cout << std::endl;
 
-    std::cout << "Deserializer test 4" << std::endl;
     {
         std::stringstream strstream;
         SerializerType serializer(strstream);
         TestStruct testStruct{ 1, 2.2f, 3.3 };
         serializer.Serialize("s", testStruct);
-        std::cout << "Str value: " << strstream.str() << std::endl;
 
         DeserializerType deserializer(strstream);
         TestStruct val;
         deserializer.Deserialize("s", val, context);
-        std::cout << "Result: ";
-        std::cout << "a: " << val.a << ", b: " << val.b << ", c: " << val.c << std::endl;
-        testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);
-        
+        testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);        
     }
 
-    std::cout << "Deserializer test 5" << std::endl;
     {
         model::Model g;
         model::ModelSerializationContext modelContext(&g);
@@ -220,7 +199,6 @@ void TestDeserializer()
         modelContext.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
         modelContext.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
         modelContext.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<double>>();
-
         modelContext.GetTypeFactory().AddType<nodes::ConstantNode<double>, nodes::ConstantNode<double>>();
 
         std::stringstream strstream;
@@ -237,7 +215,6 @@ void TestDeserializer()
         serializer.Serialize("node3", constNode);
         serializer.Serialize("node4", constNode);
         serializer.Serialize("node5", binaryOpNode);
-        std::cout << "Str value: " << "\n" << strstream.str() << std::endl;
 
         DeserializerType deserializer(strstream);
         nodes::ConstantNode<double> newConstNode;
@@ -250,15 +227,12 @@ void TestDeserializer()
         deserializer.Deserialize("node2", newIn, modelContext);
         deserializer.Deserialize("node3", newConstNodePtr, modelContext);
         deserializer.Deserialize("node4", newNodePtr, modelContext);
-
         deserializer.Deserialize("node5", newBinaryOpNode, modelContext);
 
         testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNode.GetValues()));
         testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNodePtr->GetValues()));
     }
-    std::cout << std::endl;
 
-    std::cout << "Deserializer test 6" << std::endl;
     {
         // arrays of stuff
         std::stringstream strstream;
@@ -270,7 +244,6 @@ void TestDeserializer()
         SerializerType serializer(strstream);
         serializer.Serialize("vec1", doubleVector);
         serializer.Serialize("vec2", structVector);
-        std::cout << "Str value: " << "\n" << strstream.str() << std::endl;
 
         DeserializerType deserializer(strstream);
         std::vector<double> newDoubleVector;
@@ -285,15 +258,33 @@ void TestDeserializer()
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[1].a, newStructVector[1].a));
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[1].b, newStructVector[1].b));
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[1].c, newStructVector[1].c));
-
-
-        std::cout << "-------------" << std::endl;
-        std::stringstream strstream2;
-        SerializerType serializer2(strstream2);
-        serializer2.Serialize("vec2", newStructVector);
-        std::cout << "Reserialized str value: " << "\n" << strstream2.str() << std::endl;
     }
-    std::cout << std::endl;
+
+    {
+        model::Model g;
+        model::ModelSerializationContext modelContext(&g);
+        modelContext.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
+        modelContext.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
+        modelContext.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
+        modelContext.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<double>>();
+        modelContext.GetTypeFactory().AddType<nodes::ConstantNode<double>, nodes::ConstantNode<double>>();
+        auto in = g.AddNode<model::InputNode<double>>(3);
+        auto doubleVector = std::vector<double>{ 1.0, 2.0, 3.0 };
+        auto constNode = g.AddNode<nodes::ConstantNode<double>>(doubleVector);
+        // auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
+        // auto out = g.AddNode<model::OutputNode<double>>(in->output);
+
+        std::stringstream strstream;
+        SerializerType serializer(strstream);
+
+        serializer.Serialize(g);
+        std::cout << "Graph output:" << std::endl;
+        std::cout << strstream.str() << std::endl;
+
+        DeserializerType deserializer(strstream);
+        model::Model newGraph;
+//        deserializer.Deserialize(newGraph, modelContext);
+    }
 }
 
 void TestJsonSerializer()

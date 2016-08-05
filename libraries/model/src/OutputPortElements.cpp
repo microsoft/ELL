@@ -134,14 +134,14 @@ namespace model
 
     void OutputPortElementsUntyped::Serialize(utilities::Serializer& serializer) const
     {
-//        serializer.Serialize("ranges", _ranges);
+        serializer.Serialize("ranges", _ranges);
     }
 
     void OutputPortElementsUntyped::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         std::vector<OutputPortRange> ranges;
-//        serializer.Deserialize("ranges", ranges, newContext);
+        serializer.Deserialize("ranges", ranges, newContext);
         _ranges = ranges;
         ComputeSize();
     }

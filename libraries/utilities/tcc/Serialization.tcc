@@ -143,4 +143,25 @@ namespace utilities
         }
         EndDeserializeArray(name, typeName, context);
     }
+
+    // Vector of serializable objects
+    template <typename ValueType, IsSerializable<ValueType> concept>
+    void Deserializer::Deserialize(const char* name, std::vector<std::unique_ptr<ValueType>>& array, SerializationContext& context)
+    {
+        array.clear();
+        auto typeName = ValueType::GetTypeName();
+        BeginDeserializeArray(name, typeName, context);
+        while(true)
+        {
+            auto newPtr = context.GetTypeFactory().Construct<ValueType>(typeName);
+            auto good = DeserializeArrayItem(*newPtr, context);
+            if(!good)
+            {
+                break;
+            }
+            array.push_back(std::move(newPtr));
+        }
+        EndDeserializeArray(name, typeName, context);
+    }
+
 }
