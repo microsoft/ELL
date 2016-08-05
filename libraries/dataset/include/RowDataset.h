@@ -102,19 +102,16 @@ namespace dataset
         /// <summary> Randomly permutes the rows of the dataset. </summary>
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
-        void RandomPermute(std::default_random_engine& rng);
+        /// <param name="prefixSize"> Size of the prefix to permute, zero to permute the entire dataset. </param>
+        void RandomPermute(std::default_random_engine& rng, size_t prefixSize=0);
 
-        /// <summary> Permutes a range of the dataset so that a prefix of the examples in the range are
-        /// chosen uniformly from that range (the rest of the examples in the range are ordered
-        /// arbitrarily. Namely, RandomPermute(rng, 7, 4, 2) will rearrange the order of examples 7,8,9,
-        /// 10 such that examples positions 7,8 are chosen uniformly without replacement from 7,8,9,10
-        /// and positions 9,10 are in some arbitrary order. </summary>
+        /// <summary> Choses an example uniformly from a given range and swaps it with a given example (which can either be insode or outside of the range).
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
-        /// <param name="rangeFirstIndex"> Index of the first example in the range being permuted. </param>
-        /// <param name="rangeSize"> Number of examples in the range being permuted. </param>
-        /// <param name="prefixSize"> The number of examples at the top of the range (at most rangeSize) that will be uniformly distributed after the permutation. </param>
-        void RandomPermute(std::default_random_engine& rng, uint64_t prefixSize, uint64_t rangeFirstIndex = 0, uint64_t rangeSize = 0);
+        /// <param name="targetExampleIndex"> Zero-based index of the target example. </param>
+        /// <param name="rangeFirstIndex"> Index of the first example in the range from which the example is chosen. </param>
+        /// <param name="rangeSize"> Number of examples in the range from which the example is chosen. </param>
+        void RandomSwap(std::default_random_engine& rng, uint64_t targetExampleIndex, uint64_t rangeFirstIndex, uint64_t rangeSize);
 
         /// <summary> Sorts an interval of examples by a certain key. </summary>
         ///

@@ -23,7 +23,8 @@ namespace trainers
     /// <summary> Parameters for the forest trainer. </summary>
     struct HistogramForestTrainerParameters : public ForestTrainerParameters
     {
-        std::string randomSeed = "";
+        std::string randomSeed;
+        size_t candidatesPerInput;
     };
 
     /// <summary> A histogram forest trainer. </summary>
@@ -55,11 +56,13 @@ namespace trainers
         double GetOutputValue(const Sums& sums) const;
 
         // new functions for the HistogramForestTrainer
-        std::vector<EdgePredictorType> GetEdgePredictorCandidatesAtNode(Range range) const;
+        std::vector<SplitRuleType> GetSplitCandidatesAtNode(Range range);
+        void AddSplitCandidatesAtNode(std::vector<SplitRuleType>& splitRuleCandidates, Range range, size_t index);
 
         // member variables
         LossFunctionType _lossFunction;
         std::default_random_engine _random;
+        size_t _candidatesPerInput;
     };
 
     /// <summary> Makes a simple forest trainer. </summary>

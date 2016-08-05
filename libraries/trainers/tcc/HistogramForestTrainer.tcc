@@ -8,17 +8,19 @@
 
 // utilities
 #include "RandomEngines.h"
+#include "..\include\HistogramForestTrainer.h"
 
 namespace trainers
 {
     template<typename LossFunctionType, typename BoosterType>
-    HistogramForestTrainer<LossFunctionType, BoosterType>::HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const HistogramForestTrainerParameters& parameters) : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction), _random(utilities::GetRandomEngine(parameters.randomSeed))
+    HistogramForestTrainer<LossFunctionType, BoosterType>::HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const HistogramForestTrainerParameters& parameters) 
+        : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction), _random(utilities::GetRandomEngine(parameters.randomSeed)), _candidatesPerInput(parameters.candidatesPerInput)
     {}
 
     template<typename LossFunctionType, typename BoosterType>
     typename HistogramForestTrainer<LossFunctionType, BoosterType>::SplitCandidate HistogramForestTrainer<LossFunctionType, BoosterType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums)
     {
-        auto edgePredictorCandidates = GetEdgePredictorCandidatesAtNode(range);
+        auto splitRuleCandidates = GetSplitCandidatesAtNode(range);
 
 
 
@@ -105,10 +107,28 @@ namespace trainers
     }
 
     template<typename LossFunctionType, typename BoosterType>
-    std::vector<typename HistogramForestTrainer<LossFunctionType, BoosterType>::EdgePredictorType> HistogramForestTrainer<LossFunctionType, BoosterType>::GetEdgePredictorCandidatesAtNode(Range range) const
+    std::vector<typename HistogramForestTrainer<LossFunctionType, BoosterType>::SplitRuleType> HistogramForestTrainer<LossFunctionType, BoosterType>::GetSplitCandidatesAtNode(Range range)
     {
-        //_dataset.RandomPermute(range.firstIndex, range.size);
-        return std::vector<EdgePredictorType>();
+        auto numInputElements = _dataset.GetMaxDataVectorSize();
+        std::vector<SplitRuleType> splitRuleCandidates;
+        splitRuleCandidates.reserve(_candidatesPerInput * numInputElements);
+        
+        for(size_t j = 0; j<numInputElements; ++j)
+        {
+            AddSplitCandidatesAtNode(splitRuleCandidates, range, j);
+        }
+        return splitRuleCandidates;
+    }
+
+    template<typename LossFunctionType, typename BoosterType>
+    void HistogramForestTrainer<LossFunctionType, BoosterType>::AddSplitCandidatesAtNode(std::vector<SplitRuleType>& splitRuleCandidates, Range range, size_t index)
+    {
+
+        const double epsilon = 1.0e-8;
+
+        // uniformly choose _candidatesPerInput from the range, without replacement
+        _dataset.RandomSwap(_random, range.firstIndex, range.firstIndex, range.size);      
+
     }
 
     template<typename LossFunctionType, typename BoosterType>

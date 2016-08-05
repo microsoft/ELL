@@ -53,5 +53,10 @@ namespace common
                          "rs",
                          "Random seed used to choose random split threshold candidates",
                          "123456");
+        parser.AddOption(candidatesPerInput,
+                         "candidatesPerInput",
+                         "cpi",
+                         "The number of split candidates to create per input element",
+                         8);
     }
 }
