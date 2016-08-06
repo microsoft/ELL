@@ -63,16 +63,18 @@ namespace model
         
         // deserialize nodes
         std::vector<std::unique_ptr<Node>> nodes;
+        std::cout << "Deserializing nodes" << std::endl;
         serializer.Deserialize("nodes", nodes, graphContext);
+        std::cout << "Done deserializing nodes" << std::endl;
 
         for(auto& node: nodes)
         {
             std::shared_ptr<Node> sharedNode = std::shared_ptr<Node>(node.release());
-            node->RegisterDependencies();
-            _idToNodeMap[node->GetId()] = sharedNode;
+            std::cout << "Fixing up node " << sharedNode->GetRuntimeTypeName() << std::endl;
+            sharedNode->RegisterDependencies();
+            std::cout << "Done registering dependencies" << std::endl;
+            _idToNodeMap[sharedNode->GetId()] = sharedNode;
         }
-
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "model::Deserialize not implemented");
     }
 
     //

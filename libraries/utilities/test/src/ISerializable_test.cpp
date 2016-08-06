@@ -244,12 +244,17 @@ void TestDeserializer()
         SerializerType serializer(strstream);
         serializer.Serialize("vec1", doubleVector);
         serializer.Serialize("vec2", structVector);
+        std::cout << "Serialized string:" << std::endl;
+        std::cout << strstream.str() << std::endl;
+
 
         DeserializerType deserializer(strstream);
         std::vector<double> newDoubleVector;
         std::vector<TestStruct> newStructVector;
         deserializer.Deserialize("vec1", newDoubleVector, context);
+        std::cout << "Done with vec1" << std::endl;
         deserializer.Deserialize("vec2", newStructVector, context);
+        std::cout << "Done with vec2" << std::endl;
 
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(doubleVector, newDoubleVector));
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].a, newStructVector[0].a));
@@ -283,7 +288,7 @@ void TestDeserializer()
 
         DeserializerType deserializer(strstream);
         model::Model newGraph;
-//        deserializer.Deserialize(newGraph, modelContext);
+        deserializer.Deserialize(newGraph, modelContext);
     }
 }
 

@@ -133,13 +133,15 @@ namespace utilities
         BeginDeserializeArray(name, typeName, context);
         while(true)
         {
-            ValueType value;
-            auto good = DeserializeArrayItem(value, context);
+            auto good = BeginDeserializeArrayItem(typeName, context);
             if(!good)
             {
                 break;
             }
+            ValueType value;
+            Deserialize(value, context);
             array.push_back(value);
+            EndDeserializeArrayItem(typeName, context);            
         }
         EndDeserializeArray(name, typeName, context);
     }
@@ -148,18 +150,21 @@ namespace utilities
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Deserializer::Deserialize(const char* name, std::vector<std::unique_ptr<ValueType>>& array, SerializationContext& context)
     {
+        std::cout << "Deserializing array of pointers to " << ValueType::GetTypeName() << std::endl;
         array.clear();
         auto typeName = ValueType::GetTypeName();
         BeginDeserializeArray(name, typeName, context);
         while(true)
         {
-            auto newPtr = context.GetTypeFactory().Construct<ValueType>(typeName);
-            auto good = DeserializeArrayItem(*newPtr, context);
+            auto good = BeginDeserializeArrayItem(typeName, context);            
             if(!good)
             {
                 break;
             }
+            std::unique_ptr<ValueType> newPtr;
+            Deserialize(newPtr, context);
             array.push_back(std::move(newPtr));
+            EndDeserializeArrayItem(typeName, context);            
         }
         EndDeserializeArray(name, typeName, context);
     }

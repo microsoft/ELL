@@ -10,6 +10,8 @@
 #include "Node.h"
 #include "ModelGraph.h"
 
+#include <cassert>
+
 namespace model
 {
     //
@@ -56,6 +58,7 @@ namespace model
 
     void OutputPortRange::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
+        std::cout << "Deserializing OutputPortRange" << std::endl;
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         serializer.Deserialize("startIndex", _startIndex, newContext);
         serializer.Deserialize("numValues", _numValues, newContext);
@@ -78,6 +81,7 @@ namespace model
                 break;
             }
         }
+        assert(_referencedPort != newPort);
         _referencedPort = newPort;
         if(newPort == nullptr)
         {
@@ -139,6 +143,7 @@ namespace model
 
     void OutputPortElementsUntyped::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
+        std::cout << "Deserializing OutputPortElementsUntyped" << std::endl;
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         std::vector<OutputPortRange> ranges;
         serializer.Deserialize("ranges", ranges, newContext);

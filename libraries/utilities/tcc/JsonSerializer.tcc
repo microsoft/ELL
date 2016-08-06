@@ -159,16 +159,17 @@ namespace utilities
         _tokenizer.MatchToken("[");
         while(true)
         {
+            auto maybeEndArray = _tokenizer.PeekNextToken();
+            if(maybeEndArray == "]")
+            {
+                break;
+            }
+
             ValueType obj;
             Deserialize(obj, context);
             array.push_back(obj);
 
-            auto maybeComma = _tokenizer.PeekNextToken();
-            if(maybeComma != ",")
-            {
-                break;
-            }
-            else
+            if(_tokenizer.PeekNextToken() == ",")
             {
                 _tokenizer.ReadNextToken();
             }
@@ -187,16 +188,17 @@ namespace utilities
         _tokenizer.MatchToken("[");
         while(true)
         {
+            auto maybeEndArray = _tokenizer.PeekNextToken();
+            if(maybeEndArray == "]")
+            {
+                break;
+            }
+
             std::string obj;
             Deserialize(obj, context);
             array.push_back(obj);
 
-            auto maybeComma = _tokenizer.PeekNextToken();
-            if(maybeComma != ",")
-            {
-                break;
-            }
-            else
+            if(_tokenizer.PeekNextToken() == ",")
             {
                 _tokenizer.ReadNextToken();
             }

@@ -180,7 +180,7 @@ namespace utilities
         _tokenizer.MatchTokens({"type", "=", "'", typeName, "'", ">"});
     }
 
-    bool SimpleXmlDeserializer::DeserializeArrayItem(ISerializable& value, SerializationContext& context)
+    bool SimpleXmlDeserializer::BeginDeserializeArrayItem(const std::string& typeName, SerializationContext& context)
     {
         // check for '</'
         auto token1 = _tokenizer.ReadNextToken();
@@ -191,10 +191,47 @@ namespace utilities
         {
             return false;
         }
-        
-        Deserialize(value, context);
-        return true;
+        else
+        {
+            return true;
+        }
     }
+
+    void SimpleXmlDeserializer::EndDeserializeArrayItem(const std::string& typeName, SerializationContext& context)
+    {
+    }
+    
+    // bool SimpleXmlDeserializer::DeserializeArrayItem(ISerializable& value, SerializationContext& context)
+    // {
+    //     // check for '</'
+    //     auto token1 = _tokenizer.ReadNextToken();
+    //     auto token2 = _tokenizer.ReadNextToken();
+    //     _tokenizer.PutBackToken(token2);
+    //     _tokenizer.PutBackToken(token1);
+    //     if(token1+token2 == "</")
+    //     {
+    //         return false;
+    //     }
+        
+    //     Deserialize(value, context);
+    //     return true;
+    // }
+
+    // bool SimpleXmlDeserializer::DeserializeArrayItem(std::unique_ptr<ISerializable>& value, SerializationContext& context)
+    // {
+    //     // check for '</'
+    //     auto token1 = _tokenizer.ReadNextToken();
+    //     auto token2 = _tokenizer.ReadNextToken();
+    //     _tokenizer.PutBackToken(token2);
+    //     _tokenizer.PutBackToken(token1);
+    //     if(token1+token2 == "</")
+    //     {
+    //         return false;
+    //     }
+        
+    //     Deserialize(value, context);
+    //     return true;
+    // }
 
     void SimpleXmlDeserializer::EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
     {

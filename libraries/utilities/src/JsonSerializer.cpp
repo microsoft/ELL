@@ -219,24 +219,64 @@ namespace utilities
         _tokenizer.MatchToken("[");
     }
 
-    bool JsonDeserializer::DeserializeArrayItem(ISerializable& value, SerializationContext& context)
+    bool JsonDeserializer::BeginDeserializeArrayItem(const std::string& typeName, SerializationContext& context)
     {
         auto maybeEndArray = _tokenizer.PeekNextToken();
         if(maybeEndArray == "]")
         {
             return false;
         }
+        else
+        {
+            return true;
+        }
+    }
 
-        std::cout << "DeserializeArrayItem for type " << value.GetRuntimeTypeName() << std::endl;
-        Deserialize(value, context);
-        std::cout << "Done deserializing an item" << std::endl;
-        auto maybeComma = _tokenizer.PeekNextToken();
-        if(maybeComma == ",")
+    void JsonDeserializer::EndDeserializeArrayItem(const std::string& typeName, SerializationContext& context)
+    {
+        if(_tokenizer.PeekNextToken() == ",")
         {
             _tokenizer.ReadNextToken();
         }
-        return true;
     }
+    
+    // bool JsonDeserializer::DeserializeArrayItem(ISerializable& value, SerializationContext& context)
+    // {
+    //     auto maybeEndArray = _tokenizer.PeekNextToken();
+    //     if(maybeEndArray == "]")
+    //     {
+    //         return false;
+    //     }
+
+    //     std::cout << "DeserializeArrayItem for type " << value.GetRuntimeTypeName() << std::endl;
+    //     Deserialize(value, context);
+    //     std::cout << "Done deserializing an item" << std::endl;
+    //     auto maybeComma = _tokenizer.PeekNextToken();
+    //     if(maybeComma == ",")
+    //     {
+    //         _tokenizer.ReadNextToken();
+    //     }
+    //     return true;
+    // }
+
+    // bool JsonDeserializer::DeserializeArrayItem(std::unique_ptr<ISerializable>& value, SerializationContext& context)
+    // {
+    //     auto maybeEndArray = _tokenizer.PeekNextToken();
+    //     if(maybeEndArray == "]")
+    //     {
+    //         return false;
+    //     }
+
+    //     std::cout << "DeserializeArrayItem for pointer-to-serializable " << std::endl;
+    //     Deserialize(value, context);
+    //     std::cout << "Done deserializing an item" << std::endl;
+    //     auto maybeComma = _tokenizer.PeekNextToken();
+    //     if(maybeComma == ",")
+    //     {
+    //         _tokenizer.ReadNextToken();
+    //     }
+    //     return true;
+    // }
 
     void JsonDeserializer::EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
     {
