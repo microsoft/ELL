@@ -71,17 +71,17 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleXmlSerializer, bool);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleXmlSerializer, char);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleXmlSerializer, short);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleXmlSerializer, int);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleXmlSerializer, size_t);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleXmlSerializer, float);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(SimpleXmlSerializer, double);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, bool);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, char);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, short);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, int);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, size_t);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, float);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, double);
 
     // Array of pointers-to-ISerializable
     // TOOD: pass in compile-time type name
-    void SimpleXmlSerializer::SerializeArrayValue(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
+    void SimpleXmlSerializer::SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
     {
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
@@ -200,7 +200,7 @@ namespace utilities
     void SimpleXmlDeserializer::EndDeserializeArrayItem(const std::string& typeName, SerializationContext& context)
     {
     }
-    
+
     // bool SimpleXmlDeserializer::DeserializeArrayItem(ISerializable& value, SerializationContext& context)
     // {
     //     // check for '</'

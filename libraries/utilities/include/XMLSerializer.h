@@ -41,14 +41,14 @@ namespace utilities
         DECLARE_SERIALIZE_VALUE_OVERRIDE(double);
         virtual void SerializeValue(const char* name, const std::string& value) override;
 
-        DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(bool);
-        DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(char);
-        DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(short);
-        DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(int);
-        DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(size_t);
-        DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(float);
-        DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(double);
-        virtual void SerializeArrayValue(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array) override;
+        DECLARE_SERIALIZE_ARRAY_OVERRIDE(bool);
+        DECLARE_SERIALIZE_ARRAY_OVERRIDE(char);
+        DECLARE_SERIALIZE_ARRAY_OVERRIDE(short);
+        DECLARE_SERIALIZE_ARRAY_OVERRIDE(int);
+        DECLARE_SERIALIZE_ARRAY_OVERRIDE(size_t);
+        DECLARE_SERIALIZE_ARRAY_OVERRIDE(float);
+        DECLARE_SERIALIZE_ARRAY_OVERRIDE(double);
+        virtual void SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array) override;
 
         virtual void BeginSerializeObject(const char* name, const ISerializable& value) override;
         virtual void SerializeObject(const char* name, const ISerializable& value) override;

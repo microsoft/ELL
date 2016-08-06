@@ -77,15 +77,15 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, bool);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, char);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, short);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, int);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, size_t);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, float);
-    IMPLEMENT_SERIALIZE_ARRAY_VALUE(JsonSerializer, double);
+    IMPLEMENT_SERIALIZE_ARRAY(JsonSerializer, bool);
+    IMPLEMENT_SERIALIZE_ARRAY(JsonSerializer, char);
+    IMPLEMENT_SERIALIZE_ARRAY(JsonSerializer, short);
+    IMPLEMENT_SERIALIZE_ARRAY(JsonSerializer, int);
+    IMPLEMENT_SERIALIZE_ARRAY(JsonSerializer, size_t);
+    IMPLEMENT_SERIALIZE_ARRAY(JsonSerializer, float);
+    IMPLEMENT_SERIALIZE_ARRAY(JsonSerializer, double);
 
-    void JsonSerializer::SerializeArrayValue(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
+    void JsonSerializer::SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
     {
         FinishPreviousLine();
         auto indent = GetCurrentIndent();

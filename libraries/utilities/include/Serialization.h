@@ -77,9 +77,9 @@ namespace utilities
     using IsNotVector = typename std::enable_if_t<!is_vector<typename std::decay<ValueType>::type>::value, int>;
 
 #define DECLARE_SERIALIZE_VALUE_BASE(type) virtual void SerializeValue(const char* name, type value, IsFundamental<type> dummy = 0) = 0;
-#define DECLARE_SERIALIZE_ARRAY_VALUE_BASE(type) virtual void SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) = 0;
+#define DECLARE_SERIALIZE_ARRAY_BASE(type) virtual void SerializeArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) = 0;
 #define DECLARE_SERIALIZE_VALUE_OVERRIDE(type) virtual void SerializeValue(const char* name, type value, IsFundamental<type> dummy = 0) override;
-#define DECLARE_SERIALIZE_ARRAY_VALUE_OVERRIDE(type) virtual void SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) override;
+#define DECLARE_SERIALIZE_ARRAY_OVERRIDE(type) virtual void SerializeArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) override;
 
     /// <summary>
     /// The Serializer and Deserializer abstract base classes facilitate serialization and
@@ -186,14 +186,14 @@ namespace utilities
         virtual void SerializeValue(const char* name, const std::string& value) = 0;
         virtual void SerializeValue(const char* name, const ISerializable& value);
 
-        DECLARE_SERIALIZE_ARRAY_VALUE_BASE(bool);
-        DECLARE_SERIALIZE_ARRAY_VALUE_BASE(char);
-        DECLARE_SERIALIZE_ARRAY_VALUE_BASE(short);
-        DECLARE_SERIALIZE_ARRAY_VALUE_BASE(int);
-        DECLARE_SERIALIZE_ARRAY_VALUE_BASE(size_t);
-        DECLARE_SERIALIZE_ARRAY_VALUE_BASE(float);
-        DECLARE_SERIALIZE_ARRAY_VALUE_BASE(double);
-        virtual void SerializeArrayValue(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array) = 0;
+        DECLARE_SERIALIZE_ARRAY_BASE(bool);
+        DECLARE_SERIALIZE_ARRAY_BASE(char);
+        DECLARE_SERIALIZE_ARRAY_BASE(short);
+        DECLARE_SERIALIZE_ARRAY_BASE(int);
+        DECLARE_SERIALIZE_ARRAY_BASE(size_t);
+        DECLARE_SERIALIZE_ARRAY_BASE(float);
+        DECLARE_SERIALIZE_ARRAY_BASE(double);
+        virtual void SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array) = 0;
 
         virtual void BeginSerializeObject(const char* name, const ISerializable& value);
         virtual void SerializeObject(const char* name, const ISerializable& value) = 0;
@@ -271,7 +271,7 @@ namespace utilities
 }
 
 #define IMPLEMENT_SERIALIZE_VALUE(base, type)        void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
-#define IMPLEMENT_SERIALIZE_ARRAY_VALUE(base, type)  void base::SerializeArrayValue(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
+#define IMPLEMENT_SERIALIZE_ARRAY(base, type)  void base::SerializeArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
 
 #define IMPLEMENT_DESERIALIZE_VALUE(base, type)      void base::DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy) { ReadScalar(name, value); }
 #define IMPLEMENT_DESERIALIZE_ARRAY(base, type)      void base::DeserializeArray(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy) { ReadArray(name, value, context); }

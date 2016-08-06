@@ -38,7 +38,7 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void Serializer::Serialize(const char* name, const std::vector<ValueType>& array)
     {
-        SerializeArrayValue(name, array);
+        SerializeArray(name, array);
     }
 
     // Vector of serializable objects
@@ -51,7 +51,7 @@ namespace utilities
         {
             tmpArray.push_back(&item);
         }
-        SerializeArrayValue(name, baseTypeName, tmpArray);
+        SerializeArray(name, baseTypeName, tmpArray);
     }
 
     // Vector of serializable pointers
@@ -64,7 +64,7 @@ namespace utilities
         {
             tmpArray.push_back(item);
         }
-        SerializeArrayValue(name, baseTypeName, tmpArray);
+        SerializeArray(name, baseTypeName, tmpArray);
     }
 
     //
