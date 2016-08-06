@@ -276,7 +276,7 @@ void TestDeserializer()
         auto doubleVector = std::vector<double>{ 1.0, 2.0, 3.0 };
         auto constNode = g.AddNode<nodes::ConstantNode<double>>(doubleVector);
         auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
-        // auto out = g.AddNode<model::OutputNode<double>>(in->output);
+        auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
         std::stringstream strstream;
         SerializerType serializer(strstream);
@@ -288,6 +288,13 @@ void TestDeserializer()
         DeserializerType deserializer(strstream);
         model::Model newGraph;
         deserializer.Deserialize(newGraph, modelContext);
+
+        std::stringstream strstream2;
+        SerializerType serializer2(strstream2);
+
+        serializer2.Serialize(newGraph);
+        std::cout << "New graph output:" << std::endl;
+        std::cout << strstream2.str() << std::endl;
     }
 }
 

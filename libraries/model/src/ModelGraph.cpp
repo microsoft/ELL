@@ -40,10 +40,7 @@ namespace model
 
     void Model::Serialize(utilities::Serializer& serializer) const
     {
-        // need to add a field with vector of nodes (or something)
-        // need a way to have a sequence of un-named items, so we can say:
-        // for(auto node: nodes) { desc.AddItem(node); }
-
+        std::cout << "Serializing " << _idToNodeMap.size() << " nodes" << std::endl;
         std::vector<const Node*> nodes;
         auto nodeIter = GetNodeIterator();
         while(nodeIter.IsValid())
@@ -65,12 +62,12 @@ namespace model
         std::vector<std::unique_ptr<Node>> nodes;
         std::cout << "Deserializing nodes" << std::endl;
         serializer.Deserialize("nodes", nodes, graphContext);
-        std::cout << "Done deserializing nodes" << std::endl;
+        std::cout << "Done deserializing " << nodes.size() << " nodes" << std::endl;
 
         for(auto& node: nodes)
         {
             std::shared_ptr<Node> sharedNode = std::shared_ptr<Node>(node.release());
-            std::cout << "Fixing up node " << sharedNode->GetRuntimeTypeName() << std::endl;
+            std::cout << "Fixing up node " << sharedNode->GetRuntimeTypeName() << ", Id: " << sharedNode->GetId() << std::endl;
             sharedNode->RegisterDependencies();
             std::cout << "Done registering dependencies" << std::endl;
             _idToNodeMap[sharedNode->GetId()] = sharedNode;
