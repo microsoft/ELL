@@ -66,7 +66,7 @@ namespace utilities
         _out << indent << "}";
         // need to output a comma if we're serializing a field. How?
         --_nestedObjectCount;
-        SetEndOfLine(_nestedObjectCount > 0 ? ",\n" : "\n");
+        SetEndOfLine(_nestedObjectCount > 0 ? ",\n" : "\n"); // Ugh --- we're outputting too many commas when serializing arrays within objects
     }
 
     void JsonSerializer::EndSerialization()

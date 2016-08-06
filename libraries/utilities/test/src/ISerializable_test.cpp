@@ -247,7 +247,6 @@ void TestDeserializer()
         std::cout << "Serialized string:" << std::endl;
         std::cout << strstream.str() << std::endl;
 
-
         DeserializerType deserializer(strstream);
         std::vector<double> newDoubleVector;
         std::vector<TestStruct> newStructVector;
@@ -276,7 +275,7 @@ void TestDeserializer()
         auto in = g.AddNode<model::InputNode<double>>(3);
         auto doubleVector = std::vector<double>{ 1.0, 2.0, 3.0 };
         auto constNode = g.AddNode<nodes::ConstantNode<double>>(doubleVector);
-        // auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
+        auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
         // auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
         std::stringstream strstream;
