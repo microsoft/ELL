@@ -25,15 +25,20 @@ namespace utilities
     public:
         virtual ~ISerializable() = default;
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const = 0;
 
-        virtual void Serialize(Serializer& serializer) const = 0;  // TODO: call this SerializeContents?
-        virtual void BeginSerialize(Serializer& serializer) const {};
-        virtual void EndSerialize(Serializer& serializer) const {};
-
+        /// <summary> Serializes the object. </summary>
         ///
+        /// <param name="serializer">  The serializer. </param>
+        virtual void Serialize(Serializer& serializer) const = 0;
+
+        /// <summary> Deserializes the object. </summary>
+        ///
+        /// <param name="serializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(Deserializer& serializer, SerializationContext& context) { throw LogicException(LogicExceptionErrors::notImplemented); }
-        virtual void BeginDeserialize(Deserializer& serializer, SerializationContext& context) {};
-        virtual void EndDeserialize(Deserializer& serializer, SerializationContext& context) {};
     };
 }

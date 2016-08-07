@@ -31,9 +31,9 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="owningNode"> The node that contains this port </param>
-        /// <param name="input"> The input group to fetch input values from </param>
-        /// <param name="dimension"> The dimension of the port </param>
+        /// <param name="inputRef"> The input group to fetch input values from </param>
         /// <param name="name"> The name of this port </param>
+        /// <param name="dimension"> The dimension of the port </param>
         template <typename ValueType>
         InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputRef, std::string name, size_t dimension);
 
