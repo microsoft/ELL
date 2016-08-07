@@ -13,21 +13,8 @@ namespace model
     // InputPortBase
     //
     template <typename ValueType>
-    InputPortBase::InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputRef, const OutputPortElements<ValueType>& inputValues, std::string name) : Port(owningNode, name, Port::GetPortType<ValueType>(), inputValues.Size()), _inputRanges(inputRef)
+    InputPortBase::InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputRef, std::string name, size_t dimension) : Port(owningNode, name, Port::GetPortType<ValueType>(), dimension), _inputRanges(inputRef)
     {
-        assert(owningNode != nullptr);
-        for (const auto& range : inputValues)
-        {
-            auto port = range.ReferencedPort();
-            auto node = port->GetNode();
-            auto start = range.GetStartIndex();
-            auto numElements = range.Size();
-            for (size_t index = 0; index < numElements; ++index)
-            {
-                _individualElements.emplace_back(*port, index + start);
-            }
-            _parentNodes.push_back(node);
-        }
     }
 
     template <typename ValueType>
@@ -57,7 +44,6 @@ namespace model
         return typedOutput->GetOutput(element.GetIndex());
     }
 
-
     inline void InputPortBase::ComputeParentsAndElements()
     {
         for (const auto& range : _inputRanges)
@@ -78,8 +64,9 @@ namespace model
     // InputPort
     //
     template <typename ValueType>
-    InputPort<ValueType>::InputPort(const class Node* owningNode, const OutputPortElements<ValueType>& input, std::string name) : InputPortBase(owningNode, _input, input, name), _input(input)
+    InputPort<ValueType>::InputPort(const class Node* owningNode, const OutputPortElements<ValueType>& input, std::string name) : InputPortBase(owningNode, _input, name, input.Size()), _input(input)
     {
+        ComputeParentsAndElements();
     }
 
     template <typename ValueType>
@@ -103,7 +90,7 @@ namespace model
     template <typename ValueType>
     void InputPort<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
-        InputPortBase::Serialize(serializer); // call this SerializeContents
+        InputPortBase::Serialize(serializer);
         serializer.Serialize("inputElements", _input);
     }
 
@@ -113,7 +100,6 @@ namespace model
         InputPortBase::Deserialize(serializer, context);
         serializer.Deserialize("inputElements", _input, context);
 
-        // Need to recompute parent nodes and individual elements
         ComputeParentsAndElements();
     }
 

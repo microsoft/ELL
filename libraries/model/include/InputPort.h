@@ -15,6 +15,7 @@
 // utilities
 #include "Exception.h"
 
+// stl
 #include <vector>
 #include <cassert>
 
@@ -31,9 +32,10 @@ namespace model
         ///
         /// <param name="owningNode"> The node that contains this port </param>
         /// <param name="input"> The input group to fetch input values from </param>
+        /// <param name="dimension"> The dimension of the port </param>
         /// <param name="name"> The name of this port </param>
         template <typename ValueType>
-        InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputRef, const OutputPortElements<ValueType>& inputValues, std::string name);
+        InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputRef, std::string name, size_t dimension);
 
         /// <summary> Returns an OutputPortElement containing the referenced location to get the value for a specific input element from </summary>
         ///
@@ -80,6 +82,7 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
+        /// Subclasses _must_ call this method in their constructor
         void ComputeParentsAndElements();
 
     private:
