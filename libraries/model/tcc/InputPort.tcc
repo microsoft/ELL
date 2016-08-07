@@ -42,7 +42,7 @@ namespace model
             result.push_back(temp);
         }
 
-        if(Size() != result.size())
+        if (Size() != result.size())
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
         }
@@ -55,6 +55,23 @@ namespace model
         const auto& element = _individualElements[index];
         auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
         return typedOutput->GetOutput(element.GetIndex());
+    }
+
+
+    inline void InputPortBase::ComputeParentsAndElements()
+    {
+        for (const auto& range : _inputRanges)
+        {
+            auto port = range.ReferencedPort();
+            auto node = port->GetNode();
+            auto start = range.GetStartIndex();
+            auto numElements = range.Size();
+            for (size_t index = 0; index < numElements; ++index)
+            {
+                _individualElements.emplace_back(*port, index + start);
+            }
+            _parentNodes.push_back(node);
+        }
     }
 
     //
@@ -93,9 +110,11 @@ namespace model
     template <typename ValueType>
     void InputPort<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
-         InputPortBase::Deserialize(serializer, context);
-
+        InputPortBase::Deserialize(serializer, context);
         serializer.Deserialize("inputElements", _input, context);
+
+        // Need to recompute parent nodes and individual elements
+        ComputeParentsAndElements();
     }
 
     template <typename ValueType>

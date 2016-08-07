@@ -48,7 +48,6 @@ namespace utilities
         _out << "{\n";
         _out << indent << "  _type: " << value.GetRuntimeTypeName();
         SetEndOfLine(",\n");
-        ++_nestedObjectCount;
     }
 
     void JsonSerializer::SerializeObject(const char* name, const ISerializable& value)
@@ -62,13 +61,10 @@ namespace utilities
     void JsonSerializer::EndSerializeObject(const char* name, const ISerializable& value)
     {
         bool hasName = name != std::string("");
-//        FinishPreviousLine();
-        _out << "\n";
+        _out << "\n"; // Output newline instead of calling "FinishPreviousLine"
         auto indent = GetCurrentIndent();
         _out << indent << "}";
         // need to output a comma if we're serializing a field. How? -- if name !- ""
-        --_nestedObjectCount;
-//        SetEndOfLine(_nestedObjectCount > 0 ? ",\n" : "\n"); // Ugh --- we're outputting too many commas when serializing arrays within objects
         SetEndOfLine(hasName > 0 ? ",\n" : "\n"); // Ugh --- we're outputting too many commas when serializing arrays within objects
     }
 

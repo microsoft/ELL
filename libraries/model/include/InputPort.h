@@ -79,6 +79,9 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+    protected:
+        void ComputeParentsAndElements();
+
     private:
         const OutputPortElementsUntyped& _inputRanges; // Just a reference to the typed elements in concrete subclass
 

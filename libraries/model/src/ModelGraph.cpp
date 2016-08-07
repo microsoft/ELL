@@ -58,18 +58,16 @@ namespace model
     {
         ModelSerializationContext graphContext(context, this);
         
-        // deserialize nodes
+        // Deserialize nodes into big array
         std::vector<std::unique_ptr<Node>> nodes;
-        std::cout << "Deserializing nodes" << std::endl;
         serializer.Deserialize("nodes", nodes, graphContext);
-        std::cout << "Done deserializing " << nodes.size() << " nodes" << std::endl;
 
+        // Now add them to the model graph
         for(auto& node: nodes)
         {
             std::shared_ptr<Node> sharedNode = std::shared_ptr<Node>(node.release());
             std::cout << "Fixing up node " << sharedNode->GetRuntimeTypeName() << ", Id: " << sharedNode->GetId() << std::endl;
             sharedNode->RegisterDependencies();
-            std::cout << "Done registering dependencies" << std::endl;
             _idToNodeMap[sharedNode->GetId()] = sharedNode;
         }
     }
@@ -128,10 +126,13 @@ namespace model
             // we can visit this node only if all its inputs have been visited already
             bool canVisit = true;
             const auto& nodeInputs = node->GetInputPorts();
+            std::cout << "# input ports for node " << node->GetId() << ": " << nodeInputs.size() << std::endl;
             for (auto input : nodeInputs)
             {
+                std::cout << "Checking input port " << input->GetName() << " with "<< input->GetParentNodes().size() << " parent nodes" << std::endl;
                 for (const auto& inputNode : input->GetParentNodes())
                 {
+                    std::cout << "Checking if we visited node " << inputNode->GetId() << std::endl;
                     canVisit = canVisit && _visitedNodes.find(inputNode) != _visitedNodes.end();
                 }
             }
@@ -186,14 +187,12 @@ namespace model
     
     Node* ModelSerializationContext::GetNodeFromId(const Node::NodeId& id)
     {
-        std::cout << "Looking up new node for ID " << id << std::endl;
         // TODO: error checking
         return _oldToNewNodeMap[id];
     }
 
     void ModelSerializationContext::MapNode(const Node::NodeId& id, Node* node)
     {
-        std::cout << "Adding map for node ID " << id << std::endl;
         // TODO: error checking
         _oldToNewNodeMap[id] = node;
     }
