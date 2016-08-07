@@ -219,8 +219,8 @@ int main()
         // Variant tests
         TestVariant();
 
-        // TestJsonSerializer();
-        // TestJsonDeserializer();
+        TestJsonSerializer();
+        TestJsonDeserializer();
 
         TestXmlSerializer();
         TestXmlDeserializer();
