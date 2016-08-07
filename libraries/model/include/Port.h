@@ -76,8 +76,15 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// Inherited from ISerializable
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
         virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
         
     protected:

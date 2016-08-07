@@ -39,6 +39,14 @@ namespace nodes
         /// <param name="value"> The vector value </param>
         ConstantNode(const std::vector<ValueType>& values);
 
+        /// <summary> Gets the values contained in this node </summary>
+        ///
+        /// <returns> The values contained in this node </returns>
+        const std::vector<ValueType>& GetValues() { return _values; }
+
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(model::ModelTransformer& transformer) const override;
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -49,20 +57,19 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Gets the values contained in this node </summary>
+        /// <summary> Writes to a Serializer. </summary>
         ///
-        /// <returns> The values contained in this node </returns>
-        const std::vector<ValueType>& GetValues() { return _values; }
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<ValueType>& output = _output;
-
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(model::ModelTransformer& transformer) const override;
-
-        /// Inherited from ISerializable
-        virtual void Serialize(utilities::Serializer& serializer) const override;
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
         static constexpr const char* outputPortName = "output";
 

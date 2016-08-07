@@ -43,6 +43,9 @@ namespace nodes
         /// <param name="input2"> The right-hand input of the arithmetic expression </param>
         BinaryOperationNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2, OperationType operation);
 
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(model::ModelTransformer& transformer) const override;
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -53,15 +56,19 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<ValueType>& output = _output;
-
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(model::ModelTransformer& transformer) const override;
-
-        /// Inherited from ISerializable
-        virtual void Serialize(utilities::Serializer& serializer) const override;
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
         static constexpr const char* input1PortName = "input1";
         static constexpr const char* input2PortName = "input2";

@@ -76,6 +76,9 @@ namespace utilities
     };
 
     class TypeCreatorBase;
+    /// <summary>
+    /// A factory object that can create new objects given their type name and a base type to derive from.
+    /// </summary>
     class GenericTypeFactory
     {
     public:

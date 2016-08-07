@@ -19,7 +19,7 @@
 
 namespace utilities
 {
-    /// <summary> ISerializable interface --- provides one function, GetDescription </summary>
+    /// <summary> ISerializable interface </summary>
     class ISerializable
     {
     public:
