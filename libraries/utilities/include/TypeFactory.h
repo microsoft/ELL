@@ -105,7 +105,7 @@ namespace utilities
         void AddType(const std::string& typeName);
 
     private:
-        std::unordered_map<std::string, std::unique_ptr<TypeCreatorBase>> _typeCreatorMap;        
+        std::unordered_map<std::string, std::shared_ptr<TypeCreatorBase>> _typeCreatorMap;        
     };
 }
 

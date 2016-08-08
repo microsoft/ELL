@@ -124,6 +124,6 @@ namespace utilities
         auto key = baseTypeName + "__" + typeName;
 
         auto derivedCreator = TypeCreatorDerived<BaseType>::template NewTypeCreator<RuntimeType>().release();
-        _typeCreatorMap[key] = std::unique_ptr<TypeCreatorBase>(derivedCreator);
+        _typeCreatorMap[key] = std::shared_ptr<TypeCreatorBase>(derivedCreator);
     }
 }
