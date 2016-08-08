@@ -8,8 +8,80 @@
 
 namespace utilities
 {
+    // Forward declaration of derived class
+    template <typename ValueType>
+    class VariantDerived;
+
     //
-    // Variant
+    // VariantBase declaration
+    //
+    class VariantBase
+    {
+    public:
+        VariantBase(std::type_index type) : _type(type){};
+        virtual ~VariantBase() = default;
+
+        template <typename ValueType>
+        ValueType GetValue() const
+        {
+            auto thisPtr = dynamic_cast<const VariantDerived<ValueType>*>(this);
+            if (thisPtr == nullptr)
+            {
+                throw InputException(InputExceptionErrors::typeMismatch, "Variant::GetValue called with wrong type.");
+            }
+
+            return thisPtr->GetValue();
+        }
+
+        virtual std::unique_ptr<VariantBase> Clone() const = 0;
+
+        virtual std::string ToString() const = 0;
+
+        virtual std::string GetStoredTypeName() const = 0;
+
+        virtual bool IsPrimitiveType() const = 0;
+
+        virtual bool IsSerializable() const = 0;
+
+        virtual bool IsPointer() const = 0;
+
+    private:
+        std::type_index _type; // redundant with type in Variant class.
+    };
+
+    //
+    // VariantDerived declaration
+    //
+    template <typename ValueType>
+    class VariantDerived : public VariantBase
+    {
+    public:
+        VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) {}
+
+        const ValueType& GetValue() const { return _value; }
+
+        virtual std::unique_ptr<VariantBase> Clone() const override
+        {
+            auto ptr = static_cast<VariantBase*>(new VariantDerived<ValueType>(_value));
+            return std::unique_ptr<VariantBase>(ptr);
+        }
+
+        virtual std::string ToString() const override;
+
+        virtual std::string GetStoredTypeName() const override;
+
+        virtual bool IsPrimitiveType() const override { return std::is_fundamental<ValueType>::value; }
+
+        virtual bool IsSerializable() const override { return !IsPrimitiveType(); }
+
+        virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
+
+    private:
+        ValueType _value;
+    };
+    
+    //
+    // Variant implementation
     //
 
     template <typename ValueType>
@@ -45,5 +117,40 @@ namespace utilities
         auto derivedPtr = new VariantDerived<ValueType>(std::forward<Args>(args)...);
         auto basePtr = static_cast<VariantBase*>(derivedPtr);
         return Variant(std::type_index(typeid(ValueType)), std::unique_ptr<VariantBase>(basePtr));
+    }
+
+    //
+    // Private code we'd like to hide:
+    //
+    namespace VariantNamespace
+    {
+        template <typename ValueType>
+        auto GetValueString(const ValueType& value, double) -> std::string
+        {
+            return std::string("[No to_string for type ") + typeid(ValueType).name() + "]";
+        }
+
+        using std::to_string;
+        using utilities::to_string;
+        inline std::string to_string(const std::string& str) { return str; }
+        
+        template <typename ValueType>
+        auto GetValueString(const ValueType& value, int) -> decltype(to_string(value), std::string())
+        {
+            return to_string(value);
+        }
+    }
+
+    template <typename ValueType>
+    inline std::string VariantDerived<ValueType>::ToString() const
+    {
+        return VariantNamespace::GetValueString(_value, (int)0);
+    }
+
+    template <typename ValueType>
+    inline std::string VariantDerived<ValueType>::GetStoredTypeName() const
+    {
+        // TODO: call GetRuntimeTypeName if we can
+        return TypeName<ValueType>::GetName();
     }
 }

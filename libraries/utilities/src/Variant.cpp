@@ -6,7 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ObjectDescription.h"
 #include "Variant.h"
 
 namespace utilities
@@ -54,10 +53,5 @@ namespace utilities
     bool Variant::IsPointer() const
     {
         return _value->IsPointer();
-    }
-
-    ObjectDescription Variant::GetObjectDescription() const
-    {
-        return _value->GetObjectDescription();
     }
 }

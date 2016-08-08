@@ -19,7 +19,6 @@ set (SRC src/CompressedIntegerList.cpp
          src/Format.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
-         src/ObjectDescription.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
          src/Serialization.cpp
@@ -39,9 +38,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/IIterator.h
              include/IntegerList.h
              include/IntegerStack.h
-             include/IDescribable.h
              include/ISerializable.h
-             include/ObjectDescription.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
              include/Parser.h
@@ -58,16 +55,12 @@ set (INCLUDE include/CompressedIntegerList.h
              include/TypeTraits.h
              include/UniqueId.h
              include/Variant.h
-             include/Variant_def.h
-             include/VariantBase.h
              include/XMLSerialization.h)
 
 set (TCC tcc/AnyIterator.tcc
          tcc/CommandLineParser.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
-         tcc/IDescribable.tcc
-         tcc/ObjectDescription.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
          tcc/Serialization.tcc
@@ -79,7 +72,6 @@ set (TCC tcc/AnyIterator.tcc
          tcc/TypeFactory.tcc
          tcc/TypeName.tcc
          tcc/Variant.tcc
-         tcc/VariantDerived.tcc
          tcc/XMLSerialization.tcc)
 
 source_group("src" FILES ${SRC})

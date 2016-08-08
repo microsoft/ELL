@@ -21,7 +21,6 @@
 #include "Serialization.h"
 #include "UniqueId.h"
 #include "Variant.h"
-#include "ObjectDescription.h"
 
 #include "LogLoss.h"
 #include "HingeLoss.h"
@@ -29,8 +28,6 @@
 #include "LinearPredictor.h"
 #include "SGDIncrementalTrainer.h"
 %}
-
-%nodefaultctor utilities::ObjectDescription;
 
 template <typename IteratorType, typename ValueType> class StlIterator {};
 
@@ -40,12 +37,10 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 
 %include "SGDIncrementalTrainer_wrap.h"
 
-%import "ObjectDescription.h" // I'm not sure why, but this %import is necessary
 %import "Serialization.h"
 %include "ISerializable.h"
 %include "UniqueId.h"
 %include "Variant.h"
-%include "ObjectDescription.h"
 
 WRAP_OSTREAM_OUT_TO_STR(utilities::UniqueId)
 
