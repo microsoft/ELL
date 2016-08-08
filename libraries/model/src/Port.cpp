@@ -51,9 +51,4 @@ namespace model
         _type = static_cast<PortType>(typeCode);
         serializer.Deserialize("size", _size, context);
     }
-
-    void Port::SetSize(size_t size)
-    {
-        _size = size;
-    }
 }

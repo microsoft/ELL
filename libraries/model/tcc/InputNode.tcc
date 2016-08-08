@@ -39,7 +39,7 @@ namespace model
     void InputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);
-        serializer.Serialize("size", _output.Size());
+        serializer.Serialize("output", _output);
     }
 
     template <typename ValueType>
@@ -47,8 +47,6 @@ namespace model
     {
         ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         Node::Deserialize(serializer, newContext);
-        size_t newSize = 0;
-        serializer.Deserialize("size", newSize, newContext);
-        _output.SetSize(newSize);
+        serializer.Deserialize("output", _output, context);
     }
 }
