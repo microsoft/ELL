@@ -172,21 +172,26 @@ namespace model
 
         /// <summary> Creates a OutputPortElements by concatenating a set of them together </summary>
         ///
-        /// <param name="groups"> The list of groups to concantenate together </param>
+        /// <param name="groups"> The vector of groups to concantenate together </param>
         OutputPortElements(const std::vector<OutputPortElements<ValueType>>& groups);
     
         /// <summary> Creates a OutputPortElements representing a single value from a given OutputPortElements </summary>
         ///
         /// <param name="elements"> The OutputPortElements to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        OutputPortElements(const OutputPortElements<ValueType>& elements, size_t startIndex);
+        OutputPortElements(const OutputPortElements<ValueType>& elements, size_t index);
 
         /// <summary> Creates a OutputPortElements representing a single value from a given OutputPortElements </summary>
         ///
         /// <param name="elements"> The OutputPortElements to take a value from </param>
-        /// <param name="index"> The index of the value </param>
+        /// <param name="startIndex"> The index of the first value to use </param>
         /// <param name="numValues"> The number of values to take </param>
         OutputPortElements(const OutputPortElements<ValueType>& elements, size_t startIndex, size_t numValues);
+
+        /// <summary> Appends a set of elements to this set of elements. </summary>
+        ///
+        /// <param name="other"> The OutputPortElements to append to this one. </param>
+        void Append(const OutputPortElements<ValueType>& other);
     };
 
     //

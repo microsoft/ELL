@@ -55,7 +55,7 @@ namespace model
     }
 
     template <typename ValueType>
-    OutputPortElements<ValueType>::OutputPortElements(const OutputPortElements<ValueType>& elements, size_t startIndex) : OutputPortElements(elements, startIndex, 1) {}
+    OutputPortElements<ValueType>::OutputPortElements(const OutputPortElements<ValueType>& elements, size_t index) : OutputPortElements(elements, index, 1) {}
 
     template <typename ValueType>
     OutputPortElements<ValueType>::OutputPortElements(const OutputPortElements<ValueType>& elements, size_t startIndex, size_t numValues)
@@ -84,6 +84,16 @@ namespace model
         }
         ComputeSize();
     }
+
+    template <typename ValueType>
+    void OutputPortElements<ValueType>::Append(const OutputPortElements<ValueType>& other)
+    {
+        for(const auto& range: other)
+        {
+            AddRange(range);
+        }
+    }
+
 
     //
     // Convenience functions
