@@ -4,3 +4,4 @@
 // 
 
 void TestSlice();
+void TestAppend();

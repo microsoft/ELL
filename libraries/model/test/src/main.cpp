@@ -27,6 +27,7 @@ int main()
 
     // OutputPortElements tests
     TestSlice();
+    TestAppend();
 
     if (testing::DidTestFail())
     {
