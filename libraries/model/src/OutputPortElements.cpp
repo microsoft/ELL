@@ -125,6 +125,7 @@ namespace model
     void OutputPortElementsUntyped::AddRange(const OutputPortRange& range)
     {
         _ranges.push_back(range);
+        _size += range.Size();
     }
 
     void OutputPortElementsUntyped::ComputeSize()

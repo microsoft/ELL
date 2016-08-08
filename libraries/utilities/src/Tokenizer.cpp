@@ -13,6 +13,7 @@
 #include <cassert>
 #include <sstream>
 #include <iostream>
+#include <cctype>
 
 namespace utilities
 {

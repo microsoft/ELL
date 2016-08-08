@@ -57,7 +57,7 @@ namespace model
     class OutputPortRange : public utilities::ISerializable
     {
     public:
-        OutputPortRange() {}
+        OutputPortRange() = default;
 
         /// <summary> Creates an OutputPortRange representing all the values from a given port </summary>
         ///

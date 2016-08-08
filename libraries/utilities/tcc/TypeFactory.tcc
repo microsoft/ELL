@@ -46,7 +46,7 @@ namespace utilities
     class TypeCreatorBase
     {
     public:
-        virtual ~TypeCreatorBase() {}
+        virtual ~TypeCreatorBase() = default;
 
         template <typename BaseType>
         std::unique_ptr<BaseType> Create() const;
