@@ -48,11 +48,7 @@ namespace nodes
     void LinearPredictorNode::Compute() const
     {
         // create an IDataVector
-        dataset::DoubleDataVector dataVector; 
-        for (size_t i = 0; i < _input.Size(); ++i)
-        {
-            dataVector.AppendEntry(i, _input[i]);
-        }
+        dataset::DoubleDataVector dataVector(_input.GetValue());
 
         // predict
         _prediction.SetOutput({ _predictor.Predict(dataVector) });
