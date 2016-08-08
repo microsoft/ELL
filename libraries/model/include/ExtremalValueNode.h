@@ -73,6 +73,9 @@ namespace model
         /// <param name="input"> The node to get the input data from </param>
         ArgMinNode(const OutputPortElements<ValueType>& input) : ExtremalValueNode<ValueType, false>(input) {}
 
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(ModelTransformer& transformer) const override;
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -82,9 +85,6 @@ namespace model
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(ModelTransformer& transformer) const override;
     };
 
     /// <summary> ArgMax node subclass </summary>
@@ -97,6 +97,9 @@ namespace model
         /// <param name="input"> The node to get the input data from </param>
         ArgMaxNode(const OutputPortElements<ValueType>& input) : ExtremalValueNode<ValueType, true>(input) {}
 
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(ModelTransformer& transformer) const override;
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -107,8 +110,6 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(ModelTransformer& transformer) const override;
     };
 }
 

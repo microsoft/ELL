@@ -59,4 +59,25 @@ namespace nodes
         auto addNode = model.AddNode<BinaryOperationNode<double>>(dotProductNode->output, biasNode->output, BinaryOperationNode<double>::OperationType::add);
         return { addNode->output };
     }
+
+    void LinearPredictorNode::Serialize(utilities::Serializer& serializer) const
+    {
+        Node::Serialize(serializer);
+        serializer.Serialize("input", _input);
+        serializer.Serialize("output", _output);
+        // TODO: weights and bias
+        // serializer.Serialize("weights", _predictor.GetWeights);
+        // serializer.Serialize("bias", _predictor.GetBias());
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+    }
+
+    void LinearPredictorNode::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        Node::Deserialize(serializer, context);
+        serializer.Deserialize("input", _input, context);
+        serializer.Deserialize("output", _output, context);
+        // TODO: weights and bias
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+    }
+
 }

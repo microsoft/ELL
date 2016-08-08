@@ -42,6 +42,7 @@ namespace model
     {
         Node::Serialize(serializer);
         serializer.Serialize("input", _input);
+        serializer.Serialize("output", _output);
     }
 
     template <typename ValueType>
@@ -49,5 +50,6 @@ namespace model
     {
         Node::Deserialize(serializer, context);
         serializer.Deserialize("input", _input, context);
+        serializer.Deserialize("output", _output, context);
     }
 }
