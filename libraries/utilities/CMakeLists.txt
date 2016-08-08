@@ -55,6 +55,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/TransformIterator.h
              include/TypeFactory.h
              include/TypeName.h
+             include/TypeTraits.h
              include/UniqueId.h
              include/Variant.h
              include/Variant_def.h

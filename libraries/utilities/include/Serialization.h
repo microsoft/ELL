@@ -11,14 +11,12 @@
 #include "TypeFactory.h"
 #include "TypeName.h"
 #include "Exception.h"
+#include "TypeTraits.h"
 
 // stl
 #include <cstdint>
 #include <string>
-#include <sstream>
-#include <iostream>
 #include <vector>
-#include <type_traits>
 #include <memory>
 
 namespace utilities
@@ -38,51 +36,9 @@ namespace utilities
         GenericTypeFactory _typeFactory;
     };
 
-    // TODO: put all this stuff somewhere else
-    template <typename ValueType>
-    class is_vector
-    {
-        template <typename VectorType>
-        static constexpr bool is_vector_checker(typename VectorType::value_type*, typename std::enable_if_t<std::is_base_of<VectorType, typename std::vector<typename VectorType::value_type>>::value, int> = 0)
-        {
-            return true;
-        }
-
-        template <typename VectorType>
-        static constexpr bool is_vector_checker(...)
-        {
-            return false;
-        }
-
-    public:
-        static const bool value = is_vector_checker<ValueType>(0);
-    };
-
-    class ISerializable;
-
-    template <typename ValueType>
-    using IsFundamental = typename std::enable_if_t<std::is_fundamental<typename std::decay<ValueType>::type>::value, int>;
-
-    template <typename ValueType>
-    using IsNotFundamental = typename std::enable_if_t<!std::is_fundamental<typename std::decay<ValueType>::type>::value, int>;
-
-    template <typename ValueType>
-    using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, int>;
-
-    template <typename ValueType>
-    using IsSerializable = typename std::enable_if_t<std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value, int>;
-
-    template <typename ValueType>
-    using IsNotSerializable = typename std::enable_if_t<(!std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
-
-    template <typename ValueType>
-    using IsVector = typename std::enable_if_t<is_vector<typename std::decay<ValueType>::type>::value, int>;
-
-    template <typename ValueType>
-    using IsNotVector = typename std::enable_if_t<!is_vector<typename std::decay<ValueType>::type>::value, int>;
-
 #define DECLARE_SERIALIZE_VALUE_BASE(type) virtual void SerializeValue(const char* name, type value, IsFundamental<type> dummy = 0) = 0;
 #define DECLARE_SERIALIZE_ARRAY_BASE(type) virtual void SerializeArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) = 0;
+
 #define DECLARE_SERIALIZE_VALUE_OVERRIDE(type) virtual void SerializeValue(const char* name, type value, IsFundamental<type> dummy = 0) override;
 #define DECLARE_SERIALIZE_ARRAY_OVERRIDE(type) virtual void SerializeArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) override;
 
