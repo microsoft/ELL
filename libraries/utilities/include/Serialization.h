@@ -66,8 +66,9 @@ namespace utilities
     ///     deserializer.deserialize(yy);
     ///     assert(x == xx &amp;&amp; y == yy);
     /// 
-    /// The Serializer subclasses also support serialization of named variables, in which case the
-    /// deserialization must specify the correct variable name.
+    /// The Serializer subclasses support serialization of named variables, in which case the
+    /// deserialization must specify the correct variable name. This is most often used when 
+    /// serializing named fields in objects.
     /// 
     ///     x = 0.4;
     ///     serializer.Serialize("x", x);
@@ -99,10 +100,9 @@ namespace utilities
     /// A typical implementation of Deserialize() will include a similar sequence of calls to
     /// deserializer.Deserialize(). 
     /// 
-    /// 
-    /// This class also supports serializing and deserialization of std::unique_pointers to serializable
-    /// classes (that is, classes that derive from ISerializable, have a default constructor, and implement
-    /// the static `GetTypeName` function).
+    /// Serialization and deserialization of std::unique_pointers to serializable objects
+    /// (that is, classes that derive from ISerializable, have a default constructor, and implement
+    /// the static `GetTypeName` function) is supported as well.
     /// 
     /// </summary>
     class Serializer
@@ -160,11 +160,13 @@ namespace utilities
         void SerializeItem(const char* name, const std::vector<const ValueType*>& value);    
     };
 
+/// <summary> Macros to make repetitive boilerplate code in deserializer implementations easier to implement. </summary>
 #define DECLARE_DESERIALIZE_VALUE_BASE(type) virtual void DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy = 0) = 0;
 #define DECLARE_DESERIALIZE_ARRAY_BASE(type) virtual void DeserializeArray(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy = 0) = 0;
 #define DECLARE_DESERIALIZE_VALUE_OVERRIDE(type) virtual void DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy = 0) override;
 #define DECLARE_DESERIALIZE_ARRAY_OVERRIDE(type) virtual void DeserializeArray(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy = 0) override;
 
+    /// <summary> Deserializer class </summary>
     class Deserializer
     {
     public:
@@ -195,13 +197,15 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_BASE(float);
         DECLARE_DESERIALIZE_ARRAY_BASE(double);
 
+        /// <summary> Extra functions needed for deserializing arrays. </summary>
         virtual void DeserializeArray(const char* name, std::vector<std::string>& array, SerializationContext& context) = 0;
         virtual void BeginDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context);
         virtual bool BeginDeserializeArrayItem(const std::string& typeName, SerializationContext& context) = 0;
         virtual void EndDeserializeArrayItem(const std::string& typeName, SerializationContext& context) = 0;
         virtual void EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context);
 
-        virtual std::string BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context); // returns typename
+        /// <summary> Extra functions needed for deserializing ISerializable objects. </summary>
+        virtual std::string BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context);
         virtual void DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) = 0;
         virtual void EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context);
 
@@ -232,10 +236,12 @@ namespace utilities
     };
 }
 
-#define IMPLEMENT_SERIALIZE_VALUE(base, type)        void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
+/// <summary> Macros to make repetitive boilerplate code in serializer implementations easier to implement. </summary>
+#define IMPLEMENT_SERIALIZE_VALUE(base, type)  void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
 #define IMPLEMENT_SERIALIZE_ARRAY(base, type)  void base::SerializeArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
 
-#define IMPLEMENT_DESERIALIZE_VALUE(base, type)      void base::DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy) { ReadScalar(name, value); }
-#define IMPLEMENT_DESERIALIZE_ARRAY(base, type)      void base::DeserializeArray(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy) { ReadArray(name, value, context); }
+/// <summary> Macros to make repetitive boilerplate code in deserializer implementations easier to implement. </summary>
+#define IMPLEMENT_DESERIALIZE_VALUE(base, type)  void base::DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy) { ReadScalar(name, value); }
+#define IMPLEMENT_DESERIALIZE_ARRAY(base, type)  void base::DeserializeArray(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy) { ReadArray(name, value, context); }
 
 #include "../tcc/Serialization.tcc"
