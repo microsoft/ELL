@@ -11,12 +11,6 @@
 namespace model
 {
     //
-    // OutputPortElement
-    //
-
-    OutputPortElement::OutputPortElement(const OutputPortBase& port, size_t index) : _referencedPort(&port), _index(index) {}
-
-    //
     // OutputPortRange
     //
     OutputPortRange::OutputPortRange(const OutputPortBase& port) : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}

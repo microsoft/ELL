@@ -38,7 +38,7 @@ namespace model
         for (const auto& element : _individualElements)
         {
             auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
-            auto temp = typedOutput->GetOutput(element.GetIndex());
+            auto temp = typedOutput->GetOutput(element.GetStartIndex());
             result.push_back(temp);
         }
 
@@ -54,7 +54,7 @@ namespace model
     {
         const auto& element = _individualElements[index];
         auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
-        return typedOutput->GetOutput(element.GetIndex());
+        return typedOutput->GetOutput(element.GetStartIndex());
     }
 
     //

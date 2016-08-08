@@ -35,12 +35,6 @@ namespace model
         template <typename ValueType>
         InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputRef, const OutputPortElements<ValueType>& inputValues, std::string name);
 
-        /// <summary> Returns an OutputPortElement containing the referenced location to get the value for a specific input element from </summary>
-        ///
-        /// <param name="index"> The index of the element </param>
-        /// <returns> The OutputPortElement containing the referenced location to get the value from </returns>
-        const OutputPortElement& GetOutputPortElement(size_t index) const { return _individualElements[index]; }
-
         /// <summary> Returns the list nodes this input port gets values from </summary>
         ///
         /// <returns> The list nodes this input port gets values from </returns>
@@ -54,7 +48,7 @@ namespace model
         /// <summary> The dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
-        size_t Size() const { return _individualElements.size(); }
+        size_t Size() const { return _inputRanges.Size(); }
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         ///
@@ -72,7 +66,7 @@ namespace model
     private:
         const OutputPortElementsUntyped& _inputRanges; // Just a reference to the typed elements in concrete subclass
 
-        std::vector<OutputPortElement> _individualElements; // individual elements
+        std::vector<OutputPortRange> _individualElements; // individual elements
         std::vector<const Node*> _parentNodes;
     };
 

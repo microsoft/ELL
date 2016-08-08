@@ -17,41 +17,12 @@
 // stl
 #include <vector>
 #include <cassert>
+#include <algorithm>
 
 /// <summary> model namespace </summary>
 namespace model
 {
     class Node;
-
-    /// <summary> Represents a reference to a single element in another node's output </summary>
-    class OutputPortElement
-    {
-    public:
-        /// <summary> Creates an OutputPortElement representing a single value from a given port </summary>
-        ///
-        /// <param name="port"> The port to take a value from </param>
-        /// <param name="index"> The index of the value </param>
-        OutputPortElement(const OutputPortBase& port, size_t index);
-
-        /// <summary> Returns the type of the values referenced </summary>
-        ///
-        /// <returns> The type of the values referenced </returns>
-        Port::PortType GetType() const { return _referencedPort->GetType(); }
-
-        /// <summary> The index of the element this range refers to </summary>
-        ///
-        /// <returns> The index of the element this range refers to </returns>
-        size_t GetIndex() const { return _index; }
-
-        /// <summary> The port this range refers to </summary>
-        ///
-        /// <returns> The port this range refers to </returns>
-        const OutputPortBase* ReferencedPort() const { return _referencedPort; }
-
-    private:
-        const OutputPortBase* _referencedPort;
-        size_t _index;
-    };
 
     /// <summary> Represents a contiguous set of values from an output port </summary>
     class OutputPortRange
