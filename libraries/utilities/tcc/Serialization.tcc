@@ -114,7 +114,7 @@ namespace utilities
         }
 
         DeserializeObject(name, *newPtr, context);
-        EndDeserializeObject(name, *newPtr, context);
+        EndDeserializeObject(name, encodedTypeName, context);
         value = std::move(newPtr);
     }
 

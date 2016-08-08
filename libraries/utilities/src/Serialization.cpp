@@ -43,7 +43,7 @@ namespace utilities
         auto typeName = value.GetRuntimeTypeName();
         typeName = BeginDeserializeObject(name, "", context);
         DeserializeObject(name, value, context);
-        EndDeserializeObject(name, value, context);
+        EndDeserializeObject(name, typeName, context);
     }
 
     std::string Deserializer::BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context)
@@ -51,7 +51,7 @@ namespace utilities
         return "";
     }
 
-    void Deserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context)
+    void Deserializer::EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context)
     {
         // nothing
     }

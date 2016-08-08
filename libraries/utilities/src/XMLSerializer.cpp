@@ -141,14 +141,13 @@ namespace utilities
 
     void SimpleXmlDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
-        // somehow we need to have created the right object type
         value.Deserialize(*this, context);
     }
 
-    void SimpleXmlDeserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
+    void SimpleXmlDeserializer::EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) 
     {
-        auto typeName = SanitizeTypeName(value.GetRuntimeTypeName());
-        _tokenizer.MatchTokens({"<", "/", typeName, ">"});
+        auto sanitizedTypeName = SanitizeTypeName(typeName);
+        _tokenizer.MatchTokens({"<", "/", sanitizedTypeName, ">"});
     }
 
     //

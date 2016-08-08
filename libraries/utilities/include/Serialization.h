@@ -210,17 +210,16 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_BASE(size_t);
         DECLARE_DESERIALIZE_ARRAY_BASE(float);
         DECLARE_DESERIALIZE_ARRAY_BASE(double);
+
         virtual void DeserializeArray(const char* name, std::vector<std::string>& array, SerializationContext& context) = 0;
         virtual void BeginDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context);
         virtual bool BeginDeserializeArrayItem(const std::string& typeName, SerializationContext& context) = 0;
         virtual void EndDeserializeArrayItem(const std::string& typeName, SerializationContext& context) = 0;
-        // virtual bool DeserializeArrayItem(ISerializable& value, SerializationContext& context) = 0;
-        // virtual bool DeserializeArrayItem(std::unique_ptr<ISerializable>& value, SerializationContext& context) = 0;
         virtual void EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context);
 
         virtual std::string BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context); // returns typename
         virtual void DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) = 0;
-        virtual void EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context);
+        virtual void EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context);
     };
 }
 

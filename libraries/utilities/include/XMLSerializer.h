@@ -99,13 +99,11 @@ namespace utilities
         virtual void BeginDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context) override;
         virtual bool BeginDeserializeArrayItem(const std::string& typeName, SerializationContext& context) override;
         virtual void EndDeserializeArrayItem(const std::string& typeName, SerializationContext& context) override;
-        // virtual bool DeserializeArrayItem(ISerializable& value, SerializationContext& context) override;
-        // virtual bool DeserializeArrayItem(std::unique_ptr<ISerializable>& value, SerializationContext& context) override;
         virtual void EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context) override;
 
         virtual std::string BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) override;
         virtual void DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) override;
-        virtual void EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) override;
+        virtual void EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) override;
 
     private:
         // utilitiy functinos

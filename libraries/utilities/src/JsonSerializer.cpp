@@ -175,10 +175,9 @@ namespace utilities
         value.Deserialize(*this, context);
     }
 
-    void JsonDeserializer::EndDeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
+    void JsonDeserializer::EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) 
     {
         bool hasName = name != std::string("");
-        std::cout << "End deserialize object of type " << value.GetRuntimeTypeName() << std::endl;
         _tokenizer.MatchToken("}");
 
         // eat a comma if it exists
