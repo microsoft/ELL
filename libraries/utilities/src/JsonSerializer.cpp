@@ -320,6 +320,7 @@ namespace utilities
                 {
                     s.put(encoding);
                 }
+                prevWasBackslash = false;
             }
             else
             {

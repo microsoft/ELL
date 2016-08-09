@@ -51,7 +51,7 @@ namespace utilities
         {
             _out << " name='" << name << "'";
         }
-        _out << " value='" << XmlEncodeString(value) << "'/>" << endOfLine;
+        _out << " value='" << XmlUtilities::EncodeAttributeString(value) << "'/>" << endOfLine;
     }
 
     inline void SimpleXmlSerializer::WriteScalar(const char* name, const std::string& value)
@@ -68,7 +68,7 @@ namespace utilities
         {
             _out << " name='" << name << "'";
         }
-        _out << " value='" << XmlEncodeString(value) << "'/>" << endOfLine;
+        _out << " value='" << XmlUtilities::EncodeAttributeString(value) << "'/>" << endOfLine;
     }
 
     template <typename ValueType>
@@ -148,7 +148,7 @@ namespace utilities
 
         // read value
         auto valueToken = _tokenizer.ReadNextToken();
-        value = valueToken;
+        value = XmlUtilities::DecodeAttributeString(valueToken);
 
         _tokenizer.MatchTokens({"'", "/", ">"});
     }

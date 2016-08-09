@@ -134,7 +134,7 @@ namespace utilities
 
         _tokenizer.MatchToken("\"");
         auto valueToken = _tokenizer.ReadNextToken();
-        value = valueToken;
+        value = JsonUtilities::DecodeString(valueToken);
         _tokenizer.MatchToken("\"");
 
         // eat a comma if it exists

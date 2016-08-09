@@ -208,17 +208,87 @@ namespace utilities
     //
     // XmlUtilities
     //
-    std::string XmlUtilities::EncodeString(const std::string& str)
+    std::string XmlUtilities::EncodeAttributeString(const std::string& str)
     {
-        return str;
+        std::vector<char> charCodes(127, '\0');
+        charCodes['\''] = '\'';
+        charCodes['\"'] = '\"';
+        charCodes['\\'] = '\\';
+        charCodes['\n'] = 'n';
+        charCodes['\r'] = 'r';
+        charCodes['\t'] = 't';
+        charCodes['\b'] = 'b';
+        charCodes['\f'] = 'f';
+
+        // copy characters from str until we hit an escaped character, then prepend it with a backslash
+        std::stringstream s;
+        for(auto ch: str)
+        {
+            auto encoding = charCodes[ch];
+            if(encoding == '\0') // no encoding
+            {
+                s.put(ch);
+            }
+            else
+            {
+                s.put('\\');
+                s.put(encoding);
+            }
+        }
+        return s.str();
     }
 
-    std::string XmlUtilities::DecodeString(const std::string& str)
+    std::string XmlUtilities::DecodeAttributeString(const std::string& str)
     {
-        return str;
-    }
+        std::vector<char> charCodes(127, '\0');
+        charCodes['\''] = '\'';
+        charCodes['\"'] = '\"';
+        charCodes['\\'] = '\\';
+        charCodes['n'] = '\n';
+        charCodes['r'] = '\r';
+        charCodes['t'] = '\t';
+        charCodes['b'] = '\b';
+        charCodes['f'] = '\f';
 
-    std::string XmlUtilities::EncodeTypeName(const std::string& str)
+        std::stringstream s;
+        bool prevWasBackslash = false;
+        for(auto ch: str)
+        {
+            if(prevWasBackslash)
+            {
+                auto encoding = charCodes[ch];
+                if(encoding == '\0') // nothing special
+                {
+                    s.put('\\'); // emit previous backslash
+                    s.put(ch); // emit character
+                }
+                else
+                {
+                    s.put(encoding);
+                }
+                prevWasBackslash = false;
+            }
+            else
+            {
+                if(ch == '\\')
+                {
+                    prevWasBackslash = true;
+                }
+                else
+                {
+                    prevWasBackslash = false;
+                    s.put(ch);
+                }
+            }
+        }
+
+        if(prevWasBackslash)
+        {
+            s.put('\\');
+        }
+        return s.str();
+    }
+        std::string XmlUtilities::EncodeTypeName(const std::string& str)
     {
         // convert '<' into '(' etc.
         auto result = str;

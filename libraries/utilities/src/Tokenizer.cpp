@@ -17,13 +17,13 @@
 
 namespace utilities
 {
-    // 
-
     //
     // Tokenizer
     //
     std::string Tokenizer::ReadNextToken()
     {
+        const char escapeChar = '\\';
+
         if (_peekedTokens.size() > 0)
         {
             auto temp = _peekedTokens.back();
@@ -86,27 +86,26 @@ namespace utilities
                 break;
             }
 
-            if(!prevEscaped && _currentStringDelimiter != '\0')
-            {         
-                // only break if we're done reading a string
-                if(ch == _currentStringDelimiter)
+            if (_currentStringDelimiter != '\0') // we're in read-string mode
+            {
+                if (!prevEscaped)
                 {
-                    _in.unget();
-                    break;
+                    // only break if we're done reading a string
+                    if (ch == _currentStringDelimiter)
+                    {
+                        _in.unget();
+                        break;
+                    }
                 }
             }
-            else if (std::isspace(ch) || _tokenStartChars.find(ch) != std::string::npos)
+            else if (std::isspace(ch) || _tokenStartChars.find(ch) != std::string::npos) // not in read-string mode, break on token or space
             {
                 _in.unget();
                 break;
             }
 
-            if(!prevEscaped)
-            {
-                tokenStream << (char)ch;
-            }
-
-            prevEscaped = !prevEscaped && ch == '\\';
+            tokenStream << (char)ch;
+            prevEscaped = !prevEscaped && ch == escapeChar;
         }
 
         return tokenStream.str();
