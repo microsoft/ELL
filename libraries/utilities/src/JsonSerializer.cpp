@@ -150,8 +150,6 @@ namespace utilities
     // ISerializable
     std::string JsonDeserializer::BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) 
     {
-        std::cout << "BeginDeserializeObject of type: " << typeName << std::endl;
-
         bool hasName = name != std::string("");
         if(hasName)
         {
@@ -165,13 +163,11 @@ namespace utilities
         {
             _tokenizer.ReadNextToken();
         }
-        std::cout << "  -- encoded typename: " << encodedTypeName << std::endl;
         return encodedTypeName;
     }
 
     void JsonDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
-        std::cout << "Deserializing object of type: " << value.GetRuntimeTypeName() << std::endl;
         value.Deserialize(*this, context);
     }
 
@@ -238,46 +234,121 @@ namespace utilities
         }
     }
     
-    // bool JsonDeserializer::DeserializeArrayItem(ISerializable& value, SerializationContext& context)
-    // {
-    //     auto maybeEndArray = _tokenizer.PeekNextToken();
-    //     if(maybeEndArray == "]")
-    //     {
-    //         return false;
-    //     }
-
-    //     std::cout << "DeserializeArrayItem for type " << value.GetRuntimeTypeName() << std::endl;
-    //     Deserialize(value, context);
-    //     std::cout << "Done deserializing an item" << std::endl;
-    //     auto maybeComma = _tokenizer.PeekNextToken();
-    //     if(maybeComma == ",")
-    //     {
-    //         _tokenizer.ReadNextToken();
-    //     }
-    //     return true;
-    // }
-
-    // bool JsonDeserializer::DeserializeArrayItem(std::unique_ptr<ISerializable>& value, SerializationContext& context)
-    // {
-    //     auto maybeEndArray = _tokenizer.PeekNextToken();
-    //     if(maybeEndArray == "]")
-    //     {
-    //         return false;
-    //     }
-
-    //     std::cout << "DeserializeArrayItem for pointer-to-serializable " << std::endl;
-    //     Deserialize(value, context);
-    //     std::cout << "Done deserializing an item" << std::endl;
-    //     auto maybeComma = _tokenizer.PeekNextToken();
-    //     if(maybeComma == ",")
-    //     {
-    //         _tokenizer.ReadNextToken();
-    //     }
-    //     return true;
-    // }
-
     void JsonDeserializer::EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
     {
         _tokenizer.MatchToken("]");
+    }
+
+    //
+    // JsonUtilities
+    //
+
+
+    /*
+        From Wikipedia, the list of characters that can (must?) be escaped:
+
+        JavaScript uses the \ (backslash) as an escape character for:
+
+        \' single quote
+        \" double quote
+        \\ backslash
+        \n new line
+        \r carriage return
+        \t tab
+        \b backspace
+        \f form feed
+        \v vertical tab (IE < 9 treats '\v' as 'v' instead of a vertical tab ('\x0B'). If cross-browser compatibility is a concern, use \x0B instead of \v.)
+        \0 null character (U+0000 NULL) (only if the next character is not a decimal digit; else it is an octal escape sequence)
+        Note that the \v and \0 escapes are not allowed in JSON strings.
+    */
+
+    std::string JsonUtilities::EncodeString(const std::string& str)
+    {
+        std::vector<char> charCodes(127, '\0');
+        charCodes['\''] = '\'';
+        charCodes['\"'] = '\"';
+        charCodes['\\'] = '\\';
+        charCodes['\n'] = 'n';
+        charCodes['\r'] = 'r';
+        charCodes['\t'] = 't';
+        charCodes['\b'] = 'b';
+        charCodes['\f'] = 'f';
+
+        // copy characters from str until we hit an escaped character, then prepend it with a backslash
+        std::stringstream s;
+        for(auto ch: str)
+        {
+            auto encoding = charCodes[ch];
+            if(encoding == '\0') // no encoding
+            {
+                s.put(ch);
+            }
+            else
+            {
+                s.put('\\');
+                s.put(encoding);
+            }
+        }
+        return s.str();
+    }
+
+    std::string JsonUtilities::DecodeString(const std::string& str)
+    {
+        std::vector<char> charCodes(127, '\0');
+        charCodes['\''] = '\'';
+        charCodes['\"'] = '\"';
+        charCodes['\\'] = '\\';
+        charCodes['n'] = '\n';
+        charCodes['r'] = '\r';
+        charCodes['t'] = '\t';
+        charCodes['b'] = '\b';
+        charCodes['f'] = '\f';
+
+        std::stringstream s;
+        bool prevWasBackslash = false;
+        for(auto ch: str)
+        {
+            if(prevWasBackslash)
+            {
+                auto encoding = charCodes[ch];
+                if(encoding == '\0') // nothing special
+                {
+                    s.put('\\'); // emit previous backslash
+                    s.put(ch); // emit character
+                }
+                else
+                {
+                    s.put(encoding);
+                }
+            }
+            else
+            {
+                if(ch == '\\')
+                {
+                    prevWasBackslash = true;
+                }
+                else
+                {
+                    prevWasBackslash = false;
+                    s.put(ch);
+                }
+            }
+        }
+
+        if(prevWasBackslash)
+        {
+            s.put('\\');
+        }
+        return s.str();
+    }
+
+    std::string JsonUtilities::EncodeTypeName(const std::string& str)
+    {
+        return str;
+    }
+
+    std::string JsonUtilities::DecodeTypeName(const std::string& str)
+    {
+        return str;
     }
 }

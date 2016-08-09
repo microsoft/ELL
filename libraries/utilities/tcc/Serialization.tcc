@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-
 namespace utilities
 {
     //
@@ -99,7 +97,6 @@ namespace utilities
     template <typename ValueType, IsNotSerializable<ValueType> concept>
     void Deserializer::DeserializeItem(const char* name, std::unique_ptr<ValueType>& value, SerializationContext& context)
     {
-        std::cout << "Deserializing non-serializable pointer" << std::endl;
         auto ptr = std::make_unique<ValueType>();
         DeserializeValue(name, *ptr, context);
         value = std::move(ptr);
@@ -111,7 +108,6 @@ namespace utilities
     {
         auto baseTypeName = ValueType::GetTypeName();
         auto encodedTypeName = BeginDeserializeObject(name, baseTypeName, context);
-        std::cout << "Deserializing serializable pointer to type " << baseTypeName << ", encoded type: " << encodedTypeName << std::endl;
 
         // TODO: create new typeName thing
         std::unique_ptr<ValueType> newPtr;
@@ -163,7 +159,6 @@ namespace utilities
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Deserializer::DeserializeItem(const char* name, std::vector<std::unique_ptr<ValueType>>& array, SerializationContext& context)
     {
-        std::cout << "Deserializing array of pointers to " << ValueType::GetTypeName() << std::endl;
         array.clear();
         auto typeName = ValueType::GetTypeName();
         BeginDeserializeArray(name, typeName, context);

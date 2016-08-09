@@ -41,7 +41,7 @@ namespace utilities
         {
             _out << name << ": ";
         }
-        _out << "\"" << value << "\"";
+        _out << "\"" << JsonUtilities::EncodeString(value) << "\"";
         SetEndOfLine(endOfLine);
     }
 
@@ -57,7 +57,7 @@ namespace utilities
         {
             _out << name << ": ";
         }
-        _out << "\"" << value << "\"";
+        _out << "\"" << JsonUtilities::EncodeString(value) << "\"";
         SetEndOfLine(endOfLine);
     }
 

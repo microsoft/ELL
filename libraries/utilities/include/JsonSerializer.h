@@ -128,6 +128,16 @@ namespace utilities
         std::string _endOfPreviousLine;
         Tokenizer _tokenizer;
     };
+
+    // Json utility functions
+    class JsonUtilities
+    {
+    public:
+        static std::string EncodeString(const std::string& str);
+        static std::string DecodeString(const std::string& str);
+        static std::string EncodeTypeName(const std::string& str);
+        static std::string DecodeTypeName(const std::string& str);
+    };
 }
 
 #include "../tcc/JsonSerializer.tcc"

@@ -205,7 +205,6 @@ namespace utilities
         _tokenizer.MatchTokens({"<", "/", "Array", ">"});
     }
 
-
     //
     // XmlUtilities
     //

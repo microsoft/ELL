@@ -146,6 +146,19 @@ void TestDeserializer()
 {
     utilities::SerializationContext context;
 
+    // {
+    //     std::stringstream strstream;
+    //     SerializerType serializer(strstream);
+    //     auto stringVal = std::string{"Hi there! Here's a tab character: \t, as well as some 'quoted' text."};
+    //     serializer.Serialize("str", stringVal);
+    //     std::cout << strstream.str() << std::endl;
+
+    //     DeserializerType deserializer(strstream);
+    //     std::string val;
+    //     deserializer.Deserialize("str", val, context);
+    //     testing::ProcessTest("Deserialize float check", val == stringVal);
+    // }
+
     {
         std::stringstream strstream;
         SerializerType serializer(strstream);

@@ -12,7 +12,6 @@
 
 // stl
 #include <unordered_map>
-#include <iostream>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -40,13 +39,11 @@ namespace model
 
     void Model::Serialize(utilities::Serializer& serializer) const
     {
-        std::cout << "Serializing " << _idToNodeMap.size() << " nodes" << std::endl;
         std::vector<const Node*> nodes;
         auto nodeIter = GetNodeIterator();
         while(nodeIter.IsValid())
         {
             const auto& node = nodeIter.Get();
-            std::cout << "Serializing node of type " << node->GetRuntimeTypeName() << std::endl;
             nodes.push_back(node);
             nodeIter.Next();
         }
@@ -66,7 +63,6 @@ namespace model
         for(auto& node: nodes)
         {
             std::shared_ptr<Node> sharedNode = std::shared_ptr<Node>(node.release());
-            std::cout << "Fixing up node " << sharedNode->GetRuntimeTypeName() << ", Id: " << sharedNode->GetId() << std::endl;
             sharedNode->RegisterDependencies();
             _idToNodeMap[sharedNode->GetId()] = sharedNode;
         }
@@ -126,13 +122,10 @@ namespace model
             // we can visit this node only if all its inputs have been visited already
             bool canVisit = true;
             const auto& nodeInputs = node->GetInputPorts();
-            std::cout << "# input ports for node " << node->GetId() << ": " << nodeInputs.size() << std::endl;
             for (auto input : nodeInputs)
             {
-                std::cout << "Checking input port " << input->GetName() << " with "<< input->GetParentNodes().size() << " parent nodes" << std::endl;
                 for (const auto& inputNode : input->GetParentNodes())
                 {
-                    std::cout << "Checking if we visited node " << inputNode->GetId() << std::endl;
                     canVisit = canVisit && _visitedNodes.find(inputNode) != _visitedNodes.end();
                 }
             }
