@@ -22,66 +22,71 @@ namespace emll
 
 		CppEmitter::CppEmitter()	
 		{
-			_buffer.precision(17);
 		}
 		
 		CppEmitter& CppEmitter::Space()
 		{
-			_buffer << " ";
+			_writer.Write(" ");
 			return *this;
 		}
 
 		CppEmitter& CppEmitter::NewLine()
 		{
-			_buffer << std::endl;
+			_writer.WriteNewLine();
 			return *this;
 		}
 
 		CppEmitter& CppEmitter::Semicolon()
 		{
-			_buffer << ";";
+			_writer.Write(';');
 			return *this;
 		}
 
 		CppEmitter& CppEmitter::Comma()
 		{
-			_buffer << ",";
+			_writer.Write(',');
 			return *this;
 		}
 
 		CppEmitter& CppEmitter::OpenBrace()
 		{
-			_buffer << "{";
+			_writer.Write('{');
 			return *this;
 		}
 		
 		CppEmitter& CppEmitter::CloseBrace()
 		{
-			_buffer << "}";
+			_writer.Write('}');
 			return *this;
 		}
 
 		CppEmitter& CppEmitter::OpenParan()
 		{
-			_buffer << "(";
+			_writer.Write('(');
 			return *this;
 		}
 
 		CppEmitter& CppEmitter::CloseParan()
 		{
-			_buffer << ")";
+			_writer.Write(')');
 			return *this;
 		}
 
 		CppEmitter& CppEmitter::Quote()
 		{
-			_buffer << '"';
+			_writer.Write('"');
 			return *this;
 		}
 		
 		CppEmitter& CppEmitter::Assign()
 		{
-			_buffer << '=';
+			_writer.Write('=');
+			return *this;
+		}
+
+		CppEmitter& CppEmitter::Asterisk()
+		{
+			_writer.Write('*');
 			return *this;
 		}
 
@@ -91,23 +96,24 @@ namespace emll
 			{
 				case OperatorType::Add:
 				case OperatorType::AddF:
-					_buffer << '+';
+					_writer.Write('+');
 					break;
 				case OperatorType::Subtract:
 				case OperatorType::SubtractF:
-					_buffer << '-';
+					_writer.Write('-');
 					break;
 				case OperatorType::Multiply:
 				case OperatorType::MultiplyF:
-					_buffer << '*';
+					_writer.Write('*');
 					break;
 				case emll::compiler::OperatorType::DivideS:
 				case emll::compiler::OperatorType::DivideF:
-					_buffer << '/';
+					_writer.Write('/');
 					break;
 				default:
 					throw new CompilerException(CompilerError::operatorTypeNotSupported);
 			}
+			return *this;
 		}
 
 		CppEmitter& CppEmitter::Cmp(ComparisonType cmp)
@@ -116,27 +122,27 @@ namespace emll
 			{
 				case ComparisonType::Eq:
 				case ComparisonType::EqF:
-					_buffer << "==";
+					_writer.Write("==");
 					break;
 				case ComparisonType::Lt:
 				case ComparisonType::LtF:
-					_buffer << '<';
+					_writer.Write('<');
 					break;
 				case ComparisonType::Lte:
 				case ComparisonType::LteF:
-					_buffer << "<=";
+					_writer.Write("<=");
 					break;
 				case ComparisonType::Gt:
 				case ComparisonType::GtF:
-					_buffer << '>';
+					_writer.Write('>');
 					break;
 				case ComparisonType::Gte:
 				case ComparisonType::GteF:
-					_buffer << ">=";
+					_writer.Write(">=");
 					break;
 				case ComparisonType::Neq:
 				case ComparisonType::NeqF:
-					_buffer << "!=";
+					_writer.Write("!=");
 					break;
 				default:
 					throw new CompilerException(CompilerError::comparisonTypeNotSupported);
@@ -156,7 +162,7 @@ namespace emll
 
 		CppEmitter& CppEmitter::Token(const std::string& token)
 		{
-			_buffer << token;
+			_writer.Write(token);
 			return *this;
 		}
 
@@ -176,6 +182,18 @@ namespace emll
 				case ValueType::Double:
 					Token(c_DoubleType);
 					break;
+				case ValueType::PVoid:
+					Token(c_VoidType).Asterisk();
+					break;
+				case ValueType::PByte:
+					Token(c_ByteType).Asterisk();
+					break;
+				case ValueType::PInt32:
+					Token(c_IntType).Asterisk();
+					break;
+				case ValueType::PDouble:
+					Token(c_DoubleType).Asterisk();
+					break;
 				default:
 					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
@@ -185,22 +203,8 @@ namespace emll
 		CppEmitter& CppEmitter::Literal(const std::string& value)
 		{
 			Quote();
-			_buffer << value;
+			_writer.Write(value);
 			Quote();
-			return *this;
-		}
-		
-		template<>
-		CppEmitter& CppEmitter::Literal<double>(double value)
-		{
-			_buffer << value;
-			return *this;
-		}
-
-		template<>
-		CppEmitter& CppEmitter::Literal<int>(int value)
-		{
-			_buffer << value;
 			return *this;
 		}
 
@@ -209,18 +213,6 @@ namespace emll
 			return Type(type)
 				.Space()
 				.Identifier(name);
-		}
-
-		template<>
-		CppEmitter& CppEmitter::Var<double>(const std::string& name)
-		{
-			return Var(ValueType::Double, name);
-		}
-
-		template<>
-		CppEmitter& CppEmitter::Var<int>(const std::string& name)
-		{
-			return Var(ValueType::Int32, name);
 		}
 
 		CppEmitter& CppEmitter::Var(const NamedValueType& var)
@@ -234,7 +226,7 @@ namespace emll
 			{
 				if (i > 0)
 				{
-					Comma();
+					Comma().Space();
 				}
 				Var(args[i]);
 			}
@@ -253,13 +245,25 @@ namespace emll
 
 		CppEmitter& CppEmitter::Clear()
 		{
-			_buffer.clear();
+			_writer.Clear();
 			return *this;
 		}
 
 		CppEmitter& CppEmitter::AppendRaw(const std::string& code)
 		{
-			_buffer << code;
+			_writer.Write(code);
+			return *this;
+		}
+
+		CppEmitter& CppEmitter::IncreaseIndent()
+		{
+			_writer.IncreaseIndent();
+			return *this;
+		}
+
+		CppEmitter& CppEmitter::DecreaseIndent()
+		{
+			_writer.DecreaseIndent();
 			return *this;
 		}
 	}

@@ -8,9 +8,7 @@
 #pragma once
 
 #include "Types.h"
-
-#include <string>
-#include <sstream>
+#include "IndentedTextWriter.h"
 
 namespace emll
 {
@@ -31,6 +29,7 @@ namespace emll
 			CppEmitter& CloseParan();
 			CppEmitter& Quote();
 			CppEmitter& Assign();
+			CppEmitter& Asterisk();
 			CppEmitter& Operator(OperatorType op);
 			CppEmitter& Cmp(ComparisonType cmp);
 
@@ -57,10 +56,17 @@ namespace emll
 			CppEmitter& AppendRaw(const std::string& code);
 			CppEmitter& Clear();
 
-			std::string Code() { return _buffer.str(); }
+			///<summary>Increase the indent</summary>
+			CppEmitter& IncreaseIndent();
+			///<summary>Decrease the indent</summary>
+			CppEmitter& DecreaseIndent();
+
+			std::string Code() { return _writer.ToString(); }
 
 		private:
-			std::stringstream _buffer;
+			IndentedTextWriter _writer;
 		};
 	}
 }
+
+#include "../tcc/CppEmitter.tcc"

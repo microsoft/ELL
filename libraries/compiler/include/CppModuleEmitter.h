@@ -6,6 +6,8 @@ namespace emll
 {
 	namespace compiler
 	{
+		class CppFunctionEmitter;
+
 		class CppModuleEmitter
 		{
 		public:
@@ -15,6 +17,8 @@ namespace emll
 			CppModuleEmitter& Global(const std::string& name, T value);
 
 			CppModuleEmitter& Constant(const ValueType type, const std::string& name);
+
+			void AddFunction(CppFunctionEmitter& fn);
 
 			void Dump();
 

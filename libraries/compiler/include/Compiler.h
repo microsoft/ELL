@@ -63,24 +63,38 @@ namespace emll
 			///<summary>Compile the model into a function with the given name</summary>
 			void CompileModel(const std::string& functionName, model::Model& model);
 
+			///<summary>Compile a ConstantNode</summary>
 			virtual void CompileConstantNode(const model::Node& node) = 0;
+			///<summary>Compile an InputNode</summary>
 			virtual void CompileInputNode(const model::Node& node) = 0;
+			///<summary>Compile an OutputNode</summary>
 			virtual void CompileOutputNode(const model::Node& node) = 0;
+			///<summary>Compile a BinaryNode</summary>
 			virtual void CompileBinaryNode(const model::Node& node) = 0;
+			///<summary>Compile a DotProductNode</summary>
 			virtual void CompileDotProductNode(const model::Node& node) = 0;
+			///<summary>Compile a SumNode</summary>
 			virtual void CompileSumNode(const model::Node& node) = 0;
+			///<summary>Compile a AccumulatorNode</summary>
 			virtual void CompileAccumulatorNode(const model::Node& node) = 0;
+			///<summary>Compile a DelayNode</summary>
 			virtual void CompileDelayNode(const model::Node& node) = 0;
+			///<summary>Compile a UnaryNode</summary>
 			virtual void CompileUnaryNode(const model::Node& node) = 0;
+			///<summary>Compile a BinaryPredicateNode</summary>
 			virtual void CompileBinaryPredicateNode(const model::Node& node) = 0;
+			///<summary>Compile an ElementSelectorNode</summary>
 			virtual void CompileElementSelectorNode(const model::Node& node) = 0;
 
+			///<summary>Edit the prediction function declaration</summary>
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
+			///<summary>End the function</summary>
 			virtual void EndFunction() = 0;
-			
-		protected:
+
 			///<summary>Variable allocator</summary>
 			VariableAllocator& Variables() { return _variables; }
+
+		protected:
 			///<summary>Create a variable to store computed output for the given output port. The variable
 			/// will be emitted lazily. </summary>
 			Variable* AllocVar(model::OutputPortBase* pPort);

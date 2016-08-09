@@ -265,38 +265,6 @@ model::OutputPort<T>* ModelBuilder::GetOutputPort(model::Node* pNode, size_t por
 	return static_cast<model::OutputPort<T>*>(pPort);
 }
 
-model::Model InitTestModelBinOp()
-{
-	ModelBuilder builder;
-	std::vector<double> data = { 10, 100, 1000, 10000 };
-
-	auto input = builder.Inputs<double>(data);
-	auto c = builder.Constant<double>({ 5, 50, 500, 5000 });
-
-	nodes::BinaryOperationNode<double>* multNode = builder.Multiply<double>(input->output, c->output);
-	multNode = builder.Multiply<double>(multNode->output, c->output);	
-	multNode = builder.Multiply<double>(multNode->output, c->output);
-	auto addNode = builder.Add<double>(input->output, multNode->output);
-	addNode = builder.Add<double>(c->output, addNode->output);
-	multNode = builder.Multiply<double>(addNode->output, c->output);
-	multNode = builder.Multiply<double>(multNode->output, c->output);
-	addNode = builder.Add<double>(c->output, multNode->output);
-
-	return builder.Model;
-}
-
-model::Model InitTestModelSimple()
-{
-	ModelBuilder mb;
-	auto input = mb.Inputs<double>(2);
-	auto c = mb.Constant<double>({ 5, 3});
-
-	nodes::BinaryOperationNode<double>* multNode = mb.Multiply<double>(input->output, c->output);
-	auto addNode = mb.Add<double>(c->output, multNode->output);
-	addNode = mb.Add<double>(c->output, addNode->output);
-	return mb.Model;
-}
-
 void TestBinaryVector(bool expanded)
 {
 	std::vector<double> data = { 5, 10, 15, 20};

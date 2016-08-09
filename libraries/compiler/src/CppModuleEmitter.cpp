@@ -1,4 +1,5 @@
 #include "CppModuleEmitter.h"
+#include "CppFunctionEmitter.h"
 #include <iostream>
 
 namespace emll
@@ -14,6 +15,11 @@ namespace emll
 				.Semicolon();
 
 			return *this;
+		}
+
+		void CppModuleEmitter::AddFunction(CppFunctionEmitter& fn)
+		{
+			_functions.AppendRaw(fn.Code());
 		}
 
 		void CppModuleEmitter::Dump()

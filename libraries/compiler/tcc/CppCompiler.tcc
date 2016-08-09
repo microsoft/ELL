@@ -22,7 +22,6 @@ namespace emll
 		template<typename T>
 		void CppCompiler::EmitScalar(Variable& var)
 		{
-			/*
 			switch (var.Scope())
 			{
 				case VariableScope::Literal:
@@ -31,7 +30,7 @@ namespace emll
 				case VariableScope::Local:
 					if (var.IsVectorRef())
 					{
-						EmitRef<T>(static_cast<VectorElementVar<T>&>(var));
+						//EmitRef<T>(static_cast<VectorElementVar<T>&>(var));
 					}
 					else if (var.HasInitValue())
 					{
@@ -44,13 +43,12 @@ namespace emll
 					break;
 
 				case VariableScope::Global:
-					EmitGlobal<T>(static_cast<InitializedScalarVar<T>&>(var));
+					//EmitGlobal<T>(static_cast<InitializedScalarVar<T>&>(var));
 					break;
 
 				default:
 					throw new CompilerException(CompilerError::variableScopeNotSupported);
 			}
-			*/
 		}
 
 		template<typename T>
@@ -78,6 +76,23 @@ namespace emll
 			*/
 		}
 
+		template<typename T>
+		void CppCompiler::EmitLocal(ScalarVar<T>& var)
+		{
+			_fn.Var(var.Type(), var.EmittedName());
+		}
+
+		template<typename T>
+		void CppCompiler::EmitLocal(InitializedScalarVar<T>& var)
+		{
+			_fn.Var<T>(var.EmittedName(), var.Data());
+		}
+
+		template<typename T>
+		void CppCompiler::EmitLiteral(LiteralVar<T>& var)
+		{			
+			_fn.Literal(var.Data());
+		}
 
 		template<typename T>
 		void CppCompiler::EmitGlobal(InitializedScalarVar<T>& var)

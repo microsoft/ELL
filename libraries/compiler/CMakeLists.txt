@@ -26,6 +26,7 @@ set (SRC src/Types.cpp
 		 src/Compiler.cpp
 		 src/IRRuntime.cpp
 		 src/IRCompiler.cpp
+		 src/IndentedTextWriter.cpp
 		 src/CppEmitter.cpp
 		 src/CppModuleEmitter.cpp
 		 src/CppFunctionEmitter.cpp
@@ -49,6 +50,7 @@ set (INCLUDE include/LLVMInclude.h
 		include/Compiler.h
 		include/IRRuntime.h
 		include/IRCompiler.h
+		include/IndentedTextWriter.h
 		include/CppEmitter.h
 		include/CppModuleEmitter.h
 		include/CppFunctionEmitter.h
@@ -63,8 +65,10 @@ set (TCC tcc/SymbolTable.tcc
 		 tcc/IRFunctionEmitter.tcc
 		 tcc/IRRuntime.tcc
 		 tcc/IRCompiler.tcc
-		 tcc/CppCompiler.tcc
+		 tcc/CppEmitter.tcc
 		 tcc/CppModuleEmitter.tcc
+		 tcc/CppFunctionEmitter.tcc
+		 tcc/CppCompiler.tcc
 )
 
 source_group("src" FILES ${SRC})

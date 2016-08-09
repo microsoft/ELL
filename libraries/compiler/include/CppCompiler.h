@@ -10,6 +10,7 @@
 
 #include "Compiler.h"
 #include "CppModuleEmitter.h"
+#include "CppFunctionEmitter.h"
 
 namespace emll
 {
@@ -36,6 +37,7 @@ namespace emll
 			virtual void EndFunction() override;
 
 			CppModuleEmitter& Module() { return _module; }
+			CppFunctionEmitter& Function() { return _fn; }
 
 		public:
 
@@ -51,6 +53,16 @@ namespace emll
 			///<summary>Emit a scalar variable</summary>
 			template<typename T>
 			void EmitScalar(Variable& var);
+			///<summary>Emit a literal veriable</summary>
+			template<typename T>
+			void EmitLiteral(LiteralVar<T>& var);
+			///<summary>Emit a stack scalar variable</summary>
+			template<typename T>
+			void EmitLocal(ScalarVar<T>& var);
+			///<summary>Emit a stack scalar variable with an initial value</summary>
+			template<typename T>
+			void EmitLocal(InitializedScalarVar<T>& var);
+
 			///<summary>Emit a Global Scalar with an initial value</summary>
 			template<typename T>
 			void EmitGlobal(InitializedScalarVar<T>& var);
@@ -62,6 +74,7 @@ namespace emll
 
 		private:
 			CppModuleEmitter _module;
+			CppFunctionEmitter _fn;
 		};
 	}
 }
