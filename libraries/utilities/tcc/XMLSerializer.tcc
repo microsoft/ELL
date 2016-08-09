@@ -18,7 +18,7 @@ namespace utilities
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
         auto endOfLine = hasName ? "\n" : "";
-        auto typeName = SanitizeTypeName(TypeName<ValueType>::GetName());
+        auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
 
         _out << indent;
         _out << "<" << typeName;
@@ -78,7 +78,7 @@ namespace utilities
         auto indent = GetCurrentIndent();
         auto endOfLine = "\n";
         auto size = array.size();
-        auto typeName = SanitizeTypeName(TypeName<ValueType>::GetName());
+        auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
 
         _out << indent;
         _out << "<Array";
@@ -115,7 +115,7 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void SimpleXmlDeserializer::ReadScalar(const char* name, ValueType& value)
     {
-        auto typeName = SanitizeTypeName(TypeName<ValueType>::GetName());
+        auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
 
         _tokenizer.MatchTokens({"<", typeName});
@@ -156,7 +156,7 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<ValueType>& array, SerializationContext& context)
     {
-        auto typeName = SanitizeTypeName(TypeName<ValueType>::GetName());
+        auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
 
         _tokenizer.MatchTokens({"<", "Array"});
@@ -188,7 +188,7 @@ namespace utilities
 
     inline void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<std::string>& array, SerializationContext& context)
     {
-        auto typeName = SanitizeTypeName(TypeName<std::string>::GetName());
+        auto typeName = XmlUtilities::EncodeTypeName(TypeName<std::string>::GetName());
         bool hasName = name != std::string("");
 
         _tokenizer.MatchTokens({"<", "Array"});

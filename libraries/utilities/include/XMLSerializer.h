@@ -68,8 +68,6 @@ namespace utilities
         std::ostream& _out;
         int _indent = 0;
         std::string GetCurrentIndent() { return std::string(2 * _indent, ' '); }
-
-        static std::string SanitizeTypeName(const std::string& str);
     };
 
     class SimpleXmlDeserializer : public Deserializer
@@ -106,12 +104,6 @@ namespace utilities
         virtual void EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) override;
 
     private:
-        // utilitiy functinos
-        static std::string SanitizeString(const std::string& str);
-        static std::string UnsanitizeString(const std::string& str);
-        static std::string SanitizeTypeName(const std::string& str);
-        static std::string UnsanitizeTypeName(const std::string& str);
-
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void ReadScalar(const char* name, ValueType& value);
         void ReadScalar(const char* name, std::string& value);
@@ -121,6 +113,16 @@ namespace utilities
 
         std::istream& _in;
         Tokenizer _tokenizer;
+    };
+
+    // XML utility functions
+    class XmlUtilities
+    {
+    public:
+        static std::string EncodeString(const std::string& str);
+        static std::string DecodeString(const std::string& str);
+        static std::string EncodeTypeName(const std::string& str);
+        static std::string DecodeTypeName(const std::string& str);
     };
 }
 
