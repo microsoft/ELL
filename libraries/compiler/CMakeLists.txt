@@ -26,6 +26,10 @@ set (SRC src/Types.cpp
 		 src/Compiler.cpp
 		 src/IRRuntime.cpp
 		 src/IRCompiler.cpp
+		 src/CppEmitter.cpp
+		 src/CppModuleEmitter.cpp
+		 src/CppFunctionEmitter.cpp
+		 src/CppCompiler.cpp
 )
 
 set (INCLUDE include/LLVMInclude.h
@@ -45,6 +49,10 @@ set (INCLUDE include/LLVMInclude.h
 		include/Compiler.h
 		include/IRRuntime.h
 		include/IRCompiler.h
+		include/CppEmitter.h
+		include/CppModuleEmitter.h
+		include/CppFunctionEmitter.h
+		include/CppCompiler.h
 )
 
 set (TCC tcc/SymbolTable.tcc
@@ -55,6 +63,8 @@ set (TCC tcc/SymbolTable.tcc
 		 tcc/IRFunctionEmitter.tcc
 		 tcc/IRRuntime.tcc
 		 tcc/IRCompiler.tcc
+		 tcc/CppCompiler.tcc
+		 tcc/CppModuleEmitter.tcc
 )
 
 source_group("src" FILES ${SRC})
@@ -87,8 +97,11 @@ if(MSVC)
 endif()
 
 set (TEST_SRC test/src/main.cpp
-              test/src/CompilerTest.cpp)
-set (TEST_INCLUDE test/include/CompilerTest.h)
+              test/src/CompilerTest.cpp
+			  test/src/CppCompilerTest.cpp)
+
+set (TEST_INCLUDE test/include/CompilerTest.h
+				  test/include/CppCompilerTest.h)
 
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})

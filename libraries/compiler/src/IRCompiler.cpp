@@ -9,6 +9,9 @@
 #include "IRCompiler.h"
 #include "ScalarVar.h"
 #include "VectorVar.h"
+
+#include "Files.h"
+
 #include <stdio.h>
 
 namespace emll
@@ -481,10 +484,10 @@ namespace emll
 		{
 			_module.WriteAsmToFile(name);
 		}
+
 		void IRCompiler::WriteBitcodeToFile(const std::string& name)
 		{
 			_module.WriteBitcodeToFile(name);
 		}
-
 	}
 }

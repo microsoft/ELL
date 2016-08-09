@@ -90,7 +90,6 @@ namespace emll
 			return pVal;
 		}
 
-
 		template<typename T>
 		llvm::Value* IRCompiler::EmitLiteral(LiteralVar<T>& var)
 		{

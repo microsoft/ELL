@@ -1,9 +1,11 @@
 #include "CompilerTest.h"
+#include "CppCompilerTest.h"
 
 using namespace emll::compiler;
 
 int main(int argc, char* argv[])
 {
+	TestCppCompiler();
 
 	TestBinaryVector(false);
 	TestBinaryVector(true);

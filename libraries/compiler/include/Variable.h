@@ -156,6 +156,10 @@ namespace emll
 			{
 				return TestFlags(VariableFlags::isComputed);
 			}
+			bool IsNew() const
+			{
+				return _emittedVar.isNew;
+			}
 			bool TestFlags(int flags) const
 			{
 				return ((_flags & flags) != 0);

@@ -78,6 +78,7 @@ namespace emll
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
 			virtual void EndFunction() = 0;
 			
+		protected:
 			///<summary>Variable allocator</summary>
 			VariableAllocator& Variables() { return _variables; }
 			///<summary>Create a variable to store computed output for the given output port. The variable
@@ -90,7 +91,6 @@ namespace emll
 			///<summary>Associate the given variable with the output port</summary>
 			void SetVariableFor(const model::OutputPortBase* pPort, Variable* pVar);
 
-		protected:
 			///<summary>Allocate a *runtime* variable..</summary>
 			void AllocVar(Variable& var);
 			///<summary>Free a *runtime* variable..</summary>

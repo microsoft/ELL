@@ -48,7 +48,7 @@ void TestLLVMShiftRegister()
 
 	module.Dump();
 	module.WriteBitcodeToFile("C:\\junk\\model\\shift.bc");
-	}
+}
 
 void TestLLVM()
 {
