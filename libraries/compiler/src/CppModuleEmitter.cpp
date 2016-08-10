@@ -6,20 +6,13 @@ namespace emll
 {
 	namespace compiler
 	{
-		CppModuleEmitter& CppModuleEmitter::Constant(const ValueType type, const std::string& name)
-		{			
-			_globals.NewLine()
-				.Const()
-				.Space()
-				.Var(type, name)
-				.Semicolon();
-
-			return *this;
-		}
-
-		void CppModuleEmitter::AddFunction(CppFunctionEmitter& fn)
+		CppFunctionEmitter* CppModuleEmitter::Function(const std::string& name, const ValueType returnType, const NamedValueTypeList& args, bool isPublic)
 		{
-			_functions.AppendRaw(fn.Code());
+			auto fn = std::make_shared<CppFunctionEmitter>();
+			fn->Begin(name, returnType, args);
+			CppFunctionEmitter* pfn = fn.get();			
+			_functions.push_back(fn);
+			return pfn;
 		}
 
 		void CppModuleEmitter::Dump()
@@ -29,8 +22,12 @@ namespace emll
 
 		void CppModuleEmitter::Write(std::ostream& os)
 		{
+			os << _constants.Code() << std::endl;
 			os << _globals.Code() << std::endl;
-			os << _functions.Code() << std::endl;
+			for (auto fn : _functions)
+			{
+				os << fn->Code();
+			}
 		}
 	}
 }

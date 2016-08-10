@@ -34,5 +34,12 @@ namespace emll
 					.NewLine();
 			return *this;
 		}
+
+		CppFunctionEmitter& CppFunctionEmitter::PtrOffset(const std::string& name, int offset)
+		{
+			_emitter.Identifier(name)
+					.Offset(offset);
+			return *this;
+		}
 	}
 }

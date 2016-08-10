@@ -37,7 +37,6 @@ namespace emll
 			virtual void EndFunction() override;
 
 			CppModuleEmitter& Module() { return _module; }
-			CppFunctionEmitter& Function() { return _fn; }
 
 		public:
 
@@ -62,7 +61,9 @@ namespace emll
 			///<summary>Emit a stack scalar variable with an initial value</summary>
 			template<typename T>
 			void EmitLocal(InitializedScalarVar<T>& var);
-
+			///<summary>Emit IR for a reference to an element in a vector</summary>
+			template<typename T>
+			void EmitRef(VectorElementVar<T>& var);
 			///<summary>Emit a Global Scalar with an initial value</summary>
 			template<typename T>
 			void EmitGlobal(InitializedScalarVar<T>& var);
@@ -70,11 +71,20 @@ namespace emll
 			///<summary>Emit a vector variable</summary>
 			template<typename T>
 			void EmitVector(Variable& var);
+			///<summary>Emit a Global Vector. Global is initialized to zero</summary>
+			template<typename T>
+			void EmitGlobalVector(VectorVar<T>& var);
+			///<summary>Emit a Global Vector with initial values</summary>
+			template<typename T>
+			void EmitGlobalVector(InitializedVectorVar<T>& var);
+			///<summary>Emit a Constant Vector</summary>
+			template<typename T>
+			void EmitLiteralVector(LiteralVarV<T>& var);
 
 
 		private:
 			CppModuleEmitter _module;
-			CppFunctionEmitter _fn;
+			CppFunctionEmitter* _pfn;
 		};
 	}
 }

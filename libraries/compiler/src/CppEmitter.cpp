@@ -72,6 +72,18 @@ namespace emll
 			return *this;
 		}
 
+		CppEmitter& CppEmitter::OpenBracket()
+		{
+			_writer.Write('[');
+			return *this;
+		}
+
+		CppEmitter& CppEmitter::CloseBracket()
+		{
+			_writer.Write(']');
+			return *this;
+		}
+
 		CppEmitter& CppEmitter::Quote()
 		{
 			_writer.Write('"');
@@ -160,6 +172,23 @@ namespace emll
 			return Token(c_Static);
 		}
 
+		CppEmitter& CppEmitter::Offset(int offset)
+		{
+			return OpenBracket()
+				.Literal(offset)
+				.CloseBracket();
+		}
+
+		CppEmitter& CppEmitter::Dimension(int size)
+		{
+			OpenBracket();
+			if (size > 0)
+			{
+				Literal(size);
+			}
+			return CloseBracket();
+		}
+
 		CppEmitter& CppEmitter::Token(const std::string& token)
 		{
 			_writer.Write(token);
@@ -235,8 +264,7 @@ namespace emll
 
 		CppEmitter& CppEmitter::DeclareFunction(const std::string& name, const ValueType returnType, const NamedValueTypeList& args)
 		{
-			return Type(returnType)
-					.Space()
+			return Type(returnType).Space()
 					.Token(name)
 					.OpenParan()
 					.Vars(args)

@@ -21,6 +21,8 @@ namespace emll
 		public:
 			///<summary>Construct a default writer</summary>
 			IndentedTextWriter();
+			///<summary>Construct a writer with the indent settings of src</summary>
+			IndentedTextWriter(const IndentedTextWriter& src);
 
 			///<summary>Configure the string used for indentation - the default is 4 spaces</summary>
 			std::string& TabString() { return _tabString; }

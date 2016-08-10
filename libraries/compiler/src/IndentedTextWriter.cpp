@@ -19,6 +19,13 @@ namespace emll
 			_buffer.precision(17);
 		}
 
+		IndentedTextWriter::IndentedTextWriter(const IndentedTextWriter& src)
+			: _tabString(src._tabString),
+			  _indentCount(src._indentCount)
+		{
+			_buffer.precision(_buffer.precision());
+		}
+
 		IndentedTextWriter& IndentedTextWriter::WriteNewLine()
 		{
 			_buffer << std::endl;

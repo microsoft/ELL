@@ -27,6 +27,9 @@ namespace emll
 			template<typename T>
 			CppFunctionEmitter& Var(const std::string& name, T data);
 
+			///<summary>Emit a offset into a pointer</summary>
+			CppFunctionEmitter& PtrOffset(const std::string& name, int offset);
+
 			std::string Code() { return _emitter.Code(); }
 
 		private:

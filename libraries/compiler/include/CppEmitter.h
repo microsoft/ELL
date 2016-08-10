@@ -27,27 +27,35 @@ namespace emll
 			CppEmitter& CloseBrace();
 			CppEmitter& OpenParan();
 			CppEmitter& CloseParan();
+			CppEmitter& OpenBracket();
+			CppEmitter& CloseBracket();
 			CppEmitter& Quote();
 			CppEmitter& Assign();
 			CppEmitter& Asterisk();
 			CppEmitter& Operator(OperatorType op);
 			CppEmitter& Cmp(ComparisonType cmp);
 
-			CppEmitter& Token(const std::string& token);
 			CppEmitter& Const();
 			CppEmitter& Static();
-
+			CppEmitter& Token(const std::string& token);
 			CppEmitter& Type(const ValueType type);
 			CppEmitter& Identifier(const std::string& id) { return Token(id); }
+
+			CppEmitter& Offset(int offset);
+			CppEmitter& Dimension(int size);
 
 			CppEmitter& Literal(const std::string& value);
 
 			template<typename T>
 			CppEmitter& Literal(T value);
+			template<typename T>
+			CppEmitter& Literal(const std::vector<T>& value);
 
 			CppEmitter& Var(const ValueType type, const std::string& name);
 			template<typename T>
 			CppEmitter& Var(const std::string& name);
+			template<typename T>
+			CppEmitter& Var(const std::string& name, int size);
 
 			CppEmitter& Var(const NamedValueType& var);
 			CppEmitter& Vars(const NamedValueTypeList& vars);

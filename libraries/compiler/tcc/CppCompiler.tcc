@@ -30,7 +30,7 @@ namespace emll
 				case VariableScope::Local:
 					if (var.IsVectorRef())
 					{
-						//EmitRef<T>(static_cast<VectorElementVar<T>&>(var));
+						EmitRef<T>(static_cast<VectorElementVar<T>&>(var));
 					}
 					else if (var.HasInitValue())
 					{
@@ -43,7 +43,7 @@ namespace emll
 					break;
 
 				case VariableScope::Global:
-					//EmitGlobal<T>(static_cast<InitializedScalarVar<T>&>(var));
+					EmitGlobal<T>(static_cast<InitializedScalarVar<T>&>(var));
 					break;
 
 				default:
@@ -54,7 +54,6 @@ namespace emll
 		template<typename T>
 		void CppCompiler::EmitVector(Variable& var)
 		{
-			/*
 			switch (var.Scope())
 			{
 				case VariableScope::Literal:
@@ -73,25 +72,31 @@ namespace emll
 				default:
 					throw new CompilerException(CompilerError::variableScopeNotSupported);
 			}
-			*/
 		}
 
 		template<typename T>
 		void CppCompiler::EmitLocal(ScalarVar<T>& var)
 		{
-			_fn.Var(var.Type(), var.EmittedName());
+			_pfn->Var(var.Type(), var.EmittedName());
 		}
 
 		template<typename T>
 		void CppCompiler::EmitLocal(InitializedScalarVar<T>& var)
 		{
-			_fn.Var<T>(var.EmittedName(), var.Data());
+			_pfn->Var<T>(var.EmittedName(), var.Data());
 		}
 
 		template<typename T>
 		void CppCompiler::EmitLiteral(LiteralVar<T>& var)
 		{			
-			_fn.Literal(var.Data());
+			_pfn->Literal(var.Data());
+		}
+
+		template<typename T>
+		void CppCompiler::EmitRef(VectorElementVar<T>& var)
+		{
+			EnsureEmitted(var.Src());
+			_pfn->PtrOffset(var.Src().EmittedName(), var.Offset());
 		}
 
 		template<typename T>
@@ -99,12 +104,31 @@ namespace emll
 		{
 			if (var.IsMutable())
 			{
-				_module.Global(var.Type(), var.EmittedName());
+				_module.Global<T>(var.EmittedName(), var.Data());
 			}
 			else
 			{
-				_module.Constant(var.Type(), var.EmittedName());
+				_module.Constant<T>(var.EmittedName(), var.Data());
 			}
 		}
+
+		template<typename T>
+		void CppCompiler::EmitLiteralVector(LiteralVarV<T>& var)
+		{
+			_module.ConstantV<T>(var.EmittedName(), var.Data());
+		}
+
+		template<typename T>
+		void CppCompiler::EmitGlobalVector(VectorVar<T>& var)
+		{
+			_module.GlobalV<T>(var.EmittedName(), var.Dimension());
+		}
+
+		template<typename T>
+		void CppCompiler::EmitGlobalVector(InitializedVectorVar<T>& var)
+		{
+			_module.GlobalV<T>(var.EmittedName(), var.Data());
+		}
+
 	}
 }

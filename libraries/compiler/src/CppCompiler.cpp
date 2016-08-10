@@ -63,11 +63,14 @@ namespace emll
 		}
 		void CppCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
 		{
-			throw new CompilerException(CompilerError::notSupported);
+			_pfn = _module.Function(functionName, ValueType::Void, args);
 		}
 		void CppCompiler::EndFunction()
 		{
-			throw new CompilerException(CompilerError::notSupported);
+			if (_pfn != nullptr)
+			{
+				_pfn->End();
+			}
 		}
 
 		void CppCompiler::EnsureEmitted(Variable& var)

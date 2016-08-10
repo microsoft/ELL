@@ -11,18 +11,17 @@ void TestCppCompiler()
 	CppCompiler compiler;
 
 	CppModuleEmitter& module = compiler.Module();
+	std::vector<double> data({8.3, 4.33, 7.11});
 
-	module.Global<double>("g_1", 33.3);
-	module.Global<int>("g_2", 44);
-
-	CppFunctionEmitter& fn = compiler.Function();
 	NamedValueTypeList args({ {"input", ValueType::PDouble }, {"output", ValueType::PDouble} });
-	fn.Begin("Predict", ValueType::Void, args);
+	compiler.BeginFunction("Predict", args);
 	auto var = compiler.Variables().AddLocalScalarVariable(ValueType::Double);
+	auto varV = compiler.Variables().AddVectorVariable(VariableScope::Global, ValueType::Double, 9);
+	auto varV2 = compiler.Variables().AddVariable<InitializedVectorVar<double>>(VariableScope::Global, data);
 	compiler.EnsureEmitted(*var);
-	fn.End();
-	module.AddFunction(fn);
+	compiler.EnsureEmitted(*varV);
+	compiler.EnsureEmitted(*varV2);
+	compiler.EndFunction();
 
-	
 	module.Dump();
 }

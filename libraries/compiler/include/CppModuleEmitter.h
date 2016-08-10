@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CppEmitter.h"
+#include <memory>
 
 namespace emll
 {
@@ -8,6 +9,7 @@ namespace emll
 	{
 		class CppFunctionEmitter;
 
+		///<summary>Class to emit cpp code</summary>
 		class CppModuleEmitter
 		{
 		public:
@@ -15,19 +17,25 @@ namespace emll
 			CppModuleEmitter& Global(const std::string& name, bool needsInit = false);
 			template<typename T>
 			CppModuleEmitter& Global(const std::string& name, T value);
+			template<typename T>
+			CppModuleEmitter& GlobalV(const std::string& name, const int size);
+			template<typename T>
+			CppModuleEmitter& GlobalV(const std::string& name, const std::vector<T>& value);
+			template<typename T>
+			CppModuleEmitter& Constant(const std::string& name, T value);
+			template<typename T>
+			CppModuleEmitter& ConstantV(const std::string& name, const std::vector<T>& value);
 
-			CppModuleEmitter& Constant(const ValueType type, const std::string& name);
-
-			void AddFunction(CppFunctionEmitter& fn);
+			CppFunctionEmitter* Function(const std::string& name, const ValueType returnType, const NamedValueTypeList& args, bool isPublic = false);
 
 			void Dump();
 
 			void Write(std::ostream& os);
 
 		private:
+			CppEmitter _constants;
 			CppEmitter _globals;
-			CppEmitter _functionDeclarations;
-			CppEmitter _functions;
+			std::vector<std::shared_ptr<CppFunctionEmitter>> _functions;
 		};
 	}
 }

@@ -152,7 +152,6 @@ namespace emll
 			return _module.Global(var.EmittedName(), var.Data());
 		}
 
-
 		template<typename T>
 		void IRCompiler::ApplyComputed(ComputedVar<T>& var, llvm::Value* pDest)
 		{
