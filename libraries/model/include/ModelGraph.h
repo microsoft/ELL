@@ -166,18 +166,34 @@ namespace model
         std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _idToNodeMap;
     };
 
+    /// <summary> A serialization context used during Model deserialization </summary>
     class ModelSerializationContext: public utilities::SerializationContext
     {
     public:
-        ModelSerializationContext(Model* model);
         ModelSerializationContext(utilities::SerializationContext& otherContext, Model* model);
 
+        /// <summary> Gets the type factory associated with this context. </summary>
+        ///
+        /// <returns> The type factory associated with this context. </returns>
         virtual utilities::GenericTypeFactory& GetTypeFactory() override { return _originalContext.GetTypeFactory(); }
-        Model* GetModel() { return _model; }
-        Node* GetNodeFromId(const Node::NodeId& id);
-        void MapNode(const Node::NodeId& id, Node* node);
 
-        utilities::SerializationContext _dummyContext;
+        /// <summary> Returns the Model currently being deserialized. </summary>
+        ///
+        /// <returns> The Model currently being deserialized. </returns>
+        Model* GetModel() { return _model; }
+
+        /// <summary> Returns a pointer to an already-deserialized node, given its serialized ID </summary>
+        ///
+        /// <returns> A pointer to an already-deserialized node. </returns>
+        Node* GetNodeFromId(const Node::NodeId& id);
+
+        /// <summary> Associate a newly-deserialized node with its serialized ID </summary>
+        ///
+        /// <param name="id"> The serialized ID of the node. </param>
+        /// <param name="node"> A pointer to the serialized node. </param>
+        void MapNode(const Node::NodeId& id, Node* node);
+    
+    private:
         utilities::SerializationContext& _originalContext;
         Model* _model;
         std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;

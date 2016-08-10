@@ -169,24 +169,18 @@ namespace model
 
     //
     // ModelSerializationContext
-    //
-    ModelSerializationContext::ModelSerializationContext(Model* model) : _originalContext(_dummyContext), _model(model) 
-    {
-    }
-    
+    //    
     ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& otherContext, Model* model) : _originalContext(otherContext), _model(model) 
     {
     }
     
     Node* ModelSerializationContext::GetNodeFromId(const Node::NodeId& id)
     {
-        // TODO: error checking
         return _oldToNewNodeMap[id];
     }
 
     void ModelSerializationContext::MapNode(const Node::NodeId& id, Node* node)
     {
-        // TODO: error checking
         _oldToNewNodeMap[id] = node;
     }
 }

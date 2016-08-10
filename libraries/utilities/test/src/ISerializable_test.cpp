@@ -210,7 +210,8 @@ void TestDeserializer()
 
     {
         model::Model g;
-        model::ModelSerializationContext modelContext(&g);
+        utilities::SerializationContext context;
+        model::ModelSerializationContext modelContext(context, &g);
         modelContext.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
         modelContext.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
         modelContext.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
@@ -282,7 +283,8 @@ void TestDeserializer()
 
     {
         model::Model g;
-        model::ModelSerializationContext modelContext(&g);
+        utilities::SerializationContext context;
+        model::ModelSerializationContext modelContext(context, &g);
         modelContext.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
         modelContext.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
         modelContext.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
