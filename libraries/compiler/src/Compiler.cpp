@@ -352,5 +352,77 @@ namespace emll
 			}
 		}
 
+		template<>
+		OperatorType Compiler::GetOperator<double>(const nodes::BinaryOperationNode<double>& node) const
+		{
+			using Bop = nodes::BinaryOperationNode<double>;
+			switch (node.GetOperation())
+			{
+				case Bop::OperationType::add:
+					return OperatorType::AddF;
+				case Bop::OperationType::subtract:
+					return OperatorType::SubtractF;
+				case Bop::OperationType::coordinatewiseMultiply:
+					return OperatorType::MultiplyF;
+				case Bop::OperationType::divide:
+					return OperatorType::DivideF;
+				default:
+					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
+			}
+		}
+
+		template<>
+		OperatorType Compiler::GetOperator<int>(const nodes::BinaryOperationNode<int>& node) const
+		{
+			using Bop = nodes::BinaryOperationNode<int>;
+			switch (node.GetOperation())
+			{
+				case Bop::OperationType::add:
+					return OperatorType::Add;
+				case Bop::OperationType::subtract:
+					return OperatorType::Subtract;
+				case Bop::OperationType::coordinatewiseMultiply:
+					return OperatorType::Multiply;
+				case Bop::OperationType::divide:
+					return OperatorType::DivideS;
+				default:
+					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
+			}
+		}
+
+		template<>
+		ComparisonType Compiler::GetComparison<double>(const nodes::BinaryPredicateNode<double>& node) const
+		{
+			using Bop = nodes::BinaryPredicateNode<double>;
+			switch (node.GetPredicateType())
+			{
+				case Bop::PredicateType::equal:
+					return ComparisonType::EqF;
+				case Bop::PredicateType::greater:
+					return ComparisonType::GtF;
+				case Bop::PredicateType::less:
+					return ComparisonType::LtF;
+				default:
+					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
+			}
+		}
+
+		template<>
+		ComparisonType Compiler::GetComparison<int>(const nodes::BinaryPredicateNode<int>& node) const
+		{
+			using Bop = nodes::BinaryPredicateNode<int>;
+			switch (node.GetPredicateType())
+			{
+				case Bop::PredicateType::equal:
+					return ComparisonType::Eq;
+				case Bop::PredicateType::greater:
+					return ComparisonType::Gt;
+				case Bop::PredicateType::less:
+					return ComparisonType::Lt;
+				default:
+					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
+			}
+		}
+
 	}
 }

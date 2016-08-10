@@ -172,7 +172,7 @@ namespace emll
 				auto pLOutput = pInput1->GetOutputPortElement(i);
 				auto pROutput = pInput2->GetOutputPortElement(i);
 				SetVar(resultVar, i);
-				_pfn->Op(OperatorType::Add, 
+				_pfn->Op(GetOperator<T>(node), 
 					[&pLOutput, this](CppFunctionEmitter& fn) {LoadVar(pLOutput); },
 					[&pROutput, this](CppFunctionEmitter& fn) {LoadVar(pROutput); });
 				_pfn->EndStatement();

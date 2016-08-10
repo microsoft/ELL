@@ -217,14 +217,6 @@ namespace emll
 			template<typename T, typename SelectorType>
 			void CompileElementSelectorBinary(const nodes::ElementSelectorNode<T, SelectorType>& node);
 
-			///<summary>Translate the binary operation operator into a strongly typed operator for LLVM</summary>
-			template<typename T>
-			OperatorType GetOperator(const nodes::BinaryOperationNode<T>& node) const;
-
-			///<summary>Translate the binary predicate operator into a more strongly typed operator for LLVM</summary>
-			template<typename T>
-			ComparisonType GetOperator(const nodes::BinaryPredicateNode<T>& node) const;
-
 		private:
 			IREmitter _emitter;			// Object that makes lower level LLVM calls
 			IRModuleEmitter _module;	// The emitted IR module

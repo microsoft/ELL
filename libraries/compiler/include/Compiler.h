@@ -150,6 +150,14 @@ namespace emll
 			///<summary>Compile a boolean ConstantNode, which we have to handle in a special way</summary>
 			void CompileConstantBool(const nodes::ConstantNode<bool>& node);
 
+			///<summary>Translate the binary operation operator into a strongly typed operator for LLVM</summary>
+			template<typename T>
+			OperatorType GetOperator(const nodes::BinaryOperationNode<T>& node) const;
+
+			///<summary>Translate the binary predicate operator into a more strongly typed operator for LLVM</summary>
+			template<typename T>
+			ComparisonType GetComparison(const nodes::BinaryPredicateNode<T>& node) const;
+
 		private:
 			Variable* AllocArg(const model::OutputPortBase* pPort, bool isInput);
 			void Reset();

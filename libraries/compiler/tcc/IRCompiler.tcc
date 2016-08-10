@@ -480,7 +480,7 @@ namespace emll
 			
 			llvm::Value* pResult = EnsureEmitted(pOutput);
 			Variable& resultVar = *(GetVariableFor(pOutput));
-			ComparisonType cmp = GetOperator<T>(node);
+			ComparisonType cmp = GetComparison<T>(node);
 
 			llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(0));
 			llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(0));
