@@ -21,10 +21,33 @@ namespace emll
 		public:
 			CppCompiler();
 
+			CppModuleEmitter& Module() { return _module; }
+			CppFunctionEmitter& Function() { return *_pfn; }
+
+			void DebugDump() { _module.Dump(); }
+
+			///<summary>Output the compiled model to the given file</summary>
+			virtual void WriteToFile(const std::string& filePath) override;
+				
+		public:
+			///<summary>Begins the function that will contain our compiled model</summary>
+			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) override;
+			///<summary>Ends the function that will contain our compiled model</summary>
+			virtual void EndFunction() override;
+
+		protected:
 			///<summary>Compile an OutputNode</summary>
-			virtual void CompileOutputNode(const model::Node& node) override;
-			///<summary>Compile a BinaryOperationNode</summary>
-			virtual void CompileBinaryNode(const model::Node& node) override;
+			virtual void CompileOutputNode(const model::OutputNode<double>& node) override { CompileOutput<double>(node); }
+			///<summary>Compile an OutputNode</summary>
+			virtual void CompileOutputNode(const model::OutputNode<int>& node) override { CompileOutput<int>(node); }
+			///<summary>Compile an OutputNode</summary>
+			virtual void CompileOutputNode(const model::OutputNode<bool>& node) override { CompileOutput<bool>(node); }
+
+			///<summary>Compile a BinaryNode</summary>
+			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<double>& node) override { CompileBinary<double>(node); }
+			///<summary>Compile a BinaryNode</summary>
+			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<int>& node) override { CompileBinary<int>(node); }
+
 			///<summary>Compile a DotProductNode</summary>
 			virtual void CompileDotProductNode(const model::Node& node) override;
 			///<summary>Compile a SumNode</summary>
@@ -40,25 +63,16 @@ namespace emll
 			///<summary>Compile an elementselectorNode</summary>
 			virtual void CompileElementSelectorNode(const model::Node& node) override;
 
-			CppModuleEmitter& Module() { return _module; }
-			CppFunctionEmitter& Function() { return *_pfn; }
-
-			void DebugDump() { _module.Dump(); }
-
-			///<summary>Output the compiled model to the given file</summary>
-			virtual void WriteToFile(const std::string& filePath) override;
-
-		public:
-			///<summary>Begins the function that will contain our compiled model</summary>
-			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) override;
-			///<summary>Ends the function that will contain our compiled model</summary>
-			virtual void EndFunction() override;
 
 			///<summary>Ensure a variable is emitted</summary>
 			virtual void EnsureVarEmitted(Variable* pVar) override
 			{
 				EnsureEmitted(*pVar);
 			}
+
+			///<summary>Compile a BinaryOperationNode</summary>
+			template<typename T>
+			void CompileBinary(const nodes::BinaryOperationNode<T>& node);
 
 		public:
 

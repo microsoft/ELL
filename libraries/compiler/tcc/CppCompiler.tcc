@@ -142,5 +142,21 @@ namespace emll
 				_pfn->AssignValueAt(pOutputVar->EmittedName(), i, [&outputElt, this](CppFunctionEmitter& fn) {LoadVar(outputElt); });
 			}
 		}
+
+		template<typename T>
+		void CppCompiler::CompileBinary(const nodes::BinaryOperationNode<T>& node)
+		{
+			auto pInput1 = node.GetInputPorts()[0];
+			auto pInput2 = node.GetInputPorts()[1];
+			if ((ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2)) &&
+				!Settings().ShouldUnrollLoops())
+			{
+				//CompileBinaryLoop<T>(node);
+			}
+			else
+			{
+				//CompileBinaryExpanded<T>(node);
+			}
+		}
 	}
 }

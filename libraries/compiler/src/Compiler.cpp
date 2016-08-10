@@ -287,21 +287,39 @@ namespace emll
 			// Input node is typically set up during pass1. By default, no further work needed
 		}
 
+		void Compiler::CompileOutputNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					CompileOutputNode(static_cast<const model::OutputNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					CompileOutputNode(static_cast<const model::OutputNode<int>&>(node));
+					break;
+				case model::Port::PortType::Boolean:
+					CompileOutputNode(static_cast<const model::OutputNode<bool>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
 		void Compiler::CompileConstantNode(const model::Node& node)
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-			case model::Port::PortType::Real:
-				CompileConstant<double>(static_cast<const nodes::ConstantNode<double>&>(node));
-				break;
-			case model::Port::PortType::Integer:
-				CompileConstant<int>(static_cast<const nodes::ConstantNode<int>&>(node));
-				break;
-			case model::Port::PortType::Boolean:
-				CompileConstantBool(static_cast<const nodes::ConstantNode<bool>&>(node));
-				break;
-			default:
-				throw new CompilerException(CompilerError::portTypeNotSupported);
+				case model::Port::PortType::Real:
+					CompileConstant<double>(static_cast<const nodes::ConstantNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					CompileConstant<int>(static_cast<const nodes::ConstantNode<int>&>(node));
+					break;
+				case model::Port::PortType::Boolean:
+					CompileConstantBool(static_cast<const nodes::ConstantNode<bool>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
 		}
 
@@ -318,5 +336,21 @@ namespace emll
 			SetVariableFor(output, pVar);
 			EnsureVarEmitted(pVar);
 		}
+
+		void Compiler::CompileBinaryNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					CompileBinaryNode(static_cast<const nodes::BinaryOperationNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					CompileBinaryNode(static_cast<const nodes::BinaryOperationNode<int>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
 	}
 }

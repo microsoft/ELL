@@ -63,14 +63,44 @@ namespace emll
 			///<summary>Compile the model into a function with the given name</summary>
 			void CompileModel(const std::string& functionName, model::Model& model);
 
+			///<summary>Edit the prediction function declaration</summary>
+			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
+			///<summary>End the function</summary>
+			virtual void EndFunction() = 0;
+
+			///<summary>Variable allocator</summary>
+			VariableAllocator& Variables() { return _variables; }
+
+			///<summary>Output the compiled model to the given file</summary>
+			virtual void WriteToFile(const std::string& filePath) = 0;
+		
+		protected:
 			///<summary>Compile a ConstantNode</summary>
 			virtual void CompileConstantNode(const model::Node& node);
 			///<summary>Compile an InputNode</summary>
 			virtual void CompileInputNode(const model::Node& node);
 			///<summary>Compile an OutputNode</summary>
-			virtual void CompileOutputNode(const model::Node& node) = 0;
+			virtual void CompileOutputNode(const model::Node& node);
 			///<summary>Compile a BinaryNode</summary>
-			virtual void CompileBinaryNode(const model::Node& node) = 0;
+			virtual void CompileBinaryNode(const model::Node& node);
+
+			//---------------------------------------------------
+			//
+			// These methods may be implemented by specific compilers
+			//
+			//---------------------------------------------------
+			///<summary>Compile an OutputNode</summary>
+			virtual void CompileOutputNode(const model::OutputNode<double>& node) = 0;
+			///<summary>Compile an OutputNode</summary>
+			virtual void CompileOutputNode(const model::OutputNode<int>& node) = 0;
+			///<summary>Compile an OutputNode</summary>
+			virtual void CompileOutputNode(const model::OutputNode<bool>& node) = 0;
+
+			///<summary>Compile a BinaryNode</summary>
+			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<double>& node) = 0;
+			///<summary>Compile a BinaryNode</summary>
+			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<int>& node) = 0;
+
 			///<summary>Compile a DotProductNode</summary>
 			virtual void CompileDotProductNode(const model::Node& node) = 0;
 			///<summary>Compile a SumNode</summary>
@@ -85,17 +115,8 @@ namespace emll
 			virtual void CompileBinaryPredicateNode(const model::Node& node) = 0;
 			///<summary>Compile an ElementSelectorNode</summary>
 			virtual void CompileElementSelectorNode(const model::Node& node) = 0;
-
-			///<summary>Edit the prediction function declaration</summary>
-			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) = 0;
-			///<summary>End the function</summary>
-			virtual void EndFunction() = 0;
-
-			///<summary>Variable allocator</summary>
-			VariableAllocator& Variables() { return _variables; }
-
-			///<summary>Output the compiled model to the given file</summary>
-			virtual void WriteToFile(const std::string& filePath) = 0;
+			///<summary>Ensure a variable is emitted</summary>
+			virtual void EnsureVarEmitted(Variable* pVar) = 0;
 
 		protected:
 			///<summary>Create a variable to store computed output for the given output port. The variable
@@ -122,11 +143,6 @@ namespace emll
 			ValueType ToValueType(model::Port::PortType type);
 			///<summary>Models get turned into functions. To declare the function, we need to know inputs and outputs.</summary>
 			void CollectInputsAndOutputs(model::Model& model);
-
-		protected:
-
-			///<summary>Ensure a variable is emitted</summary>
-			virtual void EnsureVarEmitted(Variable* pVar) = 0;
 
 			///<summary>Compile a ConstantNode</summary>
 			template<typename T>

@@ -28,39 +28,6 @@ namespace emll
 		{
 		}
 		
-		void IRCompiler::CompileOutputNode(const model::Node& node)
-		{
-			switch (ModelEx::GetNodeDataType(node))
-			{
-				case model::Port::PortType::Real:
-					CompileOutput<double>(static_cast<const model::OutputNode<double>&>(node));
-					break;
-				case model::Port::PortType::Integer:
-					CompileOutput<int>(static_cast<const model::OutputNode<int>&>(node));
-					break;
-				case model::Port::PortType::Boolean:
-					CompileOutput<bool>(static_cast<const model::OutputNode<bool>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
-		void IRCompiler::CompileBinaryNode(const model::Node& node)
-		{
-			switch (ModelEx::GetNodeDataType(node))
-			{
-				case model::Port::PortType::Real:
-					CompileBinary<double>(static_cast<const nodes::BinaryOperationNode<double>&>(node));
-					break;
-				case model::Port::PortType::Integer:
-					CompileBinary<int>(static_cast<const nodes::BinaryOperationNode<int>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
 		void IRCompiler::CompileDotProductNode(const model::Node& node)
 		{
 			switch (ModelEx::GetNodeDataType(node))

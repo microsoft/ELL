@@ -27,25 +27,6 @@ namespace emll
 			///<summary>Create a compiler to produce an LLVM module with the given name</summary>
 			IRCompiler(const std::string& moduleName);
 
-			///<summary>Compile an OutputNode</summary>
-			virtual void CompileOutputNode(const model::Node& node) override;
-			///<summary>Compile a BinaryOperationNode</summary>
-			virtual void CompileBinaryNode(const model::Node& node) override;
-			///<summary>Compile a DotProductNode</summary>
-			virtual void CompileDotProductNode(const model::Node& node) override;
-			///<summary>Compile a SumNode</summary>
-			virtual void CompileSumNode(const model::Node& node) override;
-			///<summary>Compile a AccmulatorNode</summary>
-			virtual void CompileAccumulatorNode(const model::Node& node) override;
-			///<summary>Compile a Delay node</summary>
-			virtual void CompileDelayNode(const model::Node& node) override;
-			///<summary>Compile a Unary node</summary>
-			virtual void CompileUnaryNode(const model::Node& node) override;
-			///<summary>Compile a binary predicate</summary>
-			virtual void CompileBinaryPredicateNode(const model::Node& node) override;
-			///<summary>Compile an elementselectorNode</summary>
-			virtual void CompileElementSelectorNode(const model::Node& node) override;
-
 			///<summary>Emit LLVM IR to std::out for debugging</summary>
 			void DebugDump();
 			///<summary>Output the compiled model to the given file</summary>
@@ -61,6 +42,34 @@ namespace emll
 			IRModuleEmitter& Module() { return _module; }
 
 		protected:
+			///<summary>Compile an OutputNode</summary>
+			virtual void CompileOutputNode(const model::OutputNode<double>& node) override { CompileOutput<double>(node);}
+			///<summary>Compile an OutputNode</summary>
+			virtual void CompileOutputNode(const model::OutputNode<int>& node) override { CompileOutput<int>(node);}
+			///<summary>Compile an OutputNode</summary>
+			virtual void CompileOutputNode(const model::OutputNode<bool>& node) override { CompileOutput<bool>(node);}
+
+			///<summary>Compile a BinaryNode</summary>
+			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<double>& node) override { CompileBinary<double>(node);}
+			///<summary>Compile a BinaryNode</summary>
+			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<int>& node) override { CompileBinary<int>(node); }
+
+			///<summary>Compile a DotProductNode</summary>
+			virtual void CompileDotProductNode(const model::Node& node) override;
+			///<summary>Compile a SumNode</summary>
+			virtual void CompileSumNode(const model::Node& node) override;
+			///<summary>Compile a AccmulatorNode</summary>
+			virtual void CompileAccumulatorNode(const model::Node& node) override;
+			///<summary>Compile a Delay node</summary>
+			virtual void CompileDelayNode(const model::Node& node) override;
+			///<summary>Compile a Unary node</summary>
+			virtual void CompileUnaryNode(const model::Node& node) override;
+			///<summary>Compile a binary predicate</summary>
+			virtual void CompileBinaryPredicateNode(const model::Node& node) override;
+			///<summary>Compile an elementselectorNode</summary>
+			virtual void CompileElementSelectorNode(const model::Node& node) override;
+
+
 			///<summary>Begins the IR function that will contain our compiled model</summary>
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) override;
 			///<summary>Ends the IR function that will contain our compiled model</summary>
