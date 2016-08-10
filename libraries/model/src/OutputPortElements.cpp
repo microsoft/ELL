@@ -58,7 +58,6 @@ namespace model
 
     void OutputPortRange::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
-        std::cout << "Deserializing OutputPortRange" << std::endl;
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         serializer.Deserialize("startIndex", _startIndex, newContext);
         serializer.Deserialize("numValues", _numValues, newContext);
@@ -70,7 +69,6 @@ namespace model
         
         Node* newNode = newContext.GetNodeFromId(newId);
 
-        // TODO: Add a way to look up a port by name
         auto ports = newNode->GetOutputPorts();
         OutputPortBase* newPort = nullptr;
         for(auto port: ports)
@@ -144,7 +142,6 @@ namespace model
 
     void OutputPortElementsUntyped::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
-        std::cout << "Deserializing OutputPortElementsUntyped" << std::endl;
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         std::vector<OutputPortRange> ranges;
         serializer.Deserialize("ranges", ranges, newContext);
