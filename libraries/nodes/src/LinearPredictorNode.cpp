@@ -69,10 +69,7 @@ namespace nodes
         Node::Serialize(serializer);
         serializer.Serialize("input", _input);
         serializer.Serialize("output", _output);
-        // TODO: weights and bias
-        // serializer.Serialize("weights", _predictor.GetWeights);
-        // serializer.Serialize("bias", _predictor.GetBias());
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+        serializer.Serialize("predictor", _predictor);
     }
 
     void LinearPredictorNode::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
@@ -80,8 +77,6 @@ namespace nodes
         Node::Deserialize(serializer, context);
         serializer.Deserialize("input", _input, context);
         serializer.Deserialize("output", _output, context);
-        // TODO: weights and bias
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+        serializer.Deserialize("predictor", _predictor, context);
     }
-
 }

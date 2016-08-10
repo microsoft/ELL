@@ -55,4 +55,18 @@ namespace predictors
 
         return biasLayerCoordinates;
     }
-}
+
+    void LinearPredictor::Serialize(utilities::Serializer& serializer) const
+    {
+        std::vector<double> weights = _w;
+        serializer.Serialize("w", weights);
+        serializer.Serialize("b", _b);
+    }
+
+    void LinearPredictor::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        std::vector<double> weights;
+        serializer.Deserialize("w", weights, context);
+        _w = weights;
+        serializer.Deserialize("b", _b, context);
+    }}
