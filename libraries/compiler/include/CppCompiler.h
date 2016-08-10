@@ -37,6 +37,7 @@ namespace emll
 			virtual void EndFunction() override;
 
 			CppModuleEmitter& Module() { return _module; }
+			CppFunctionEmitter& Function() { return *_pfn; }
 
 		public:
 

@@ -32,6 +32,7 @@ namespace emll
 			CppEmitter& Quote();
 			CppEmitter& Assign();
 			CppEmitter& Asterisk();
+			CppEmitter& Increment();
 			CppEmitter& Operator(OperatorType op);
 			CppEmitter& Cmp(ComparisonType cmp);
 
@@ -60,6 +61,18 @@ namespace emll
 			CppEmitter& Var(const NamedValueType& var);
 			CppEmitter& Vars(const NamedValueTypeList& vars);
 			CppEmitter& DeclareFunction(const std::string& name, const ValueType returnType, const NamedValueTypeList& args);
+
+			template<typename T>
+			CppEmitter& Cmp(const std::string& varName, ComparisonType cmp, T value);
+			template<typename T>
+			CppEmitter& SetVar(T value);
+
+			CppEmitter& For();
+			CppEmitter& If();
+			CppEmitter& Else();
+
+			CppEmitter& BeginBlock();
+			CppEmitter& EndBlock();
 
 			CppEmitter& AppendRaw(const std::string& code);
 			CppEmitter& Clear();

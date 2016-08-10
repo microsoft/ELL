@@ -20,15 +20,21 @@ namespace emll
 			///<summary>Emit a literal</summary>
 			template<typename T>
 			CppFunctionEmitter& Literal(T value);
-
 			///<summary>Emit a named stack scalar </summary>
 			CppFunctionEmitter& Var(ValueType type, const std::string& name);
 			///<summary>Emit a named stack scalar with the given initial value</summary>
 			template<typename T>
 			CppFunctionEmitter& Var(const std::string& name, T data);
-
 			///<summary>Emit a offset into a pointer</summary>
 			CppFunctionEmitter& PtrOffset(const std::string& name, int offset);
+
+			CppFunctionEmitter& BeginFor(const std::string& iVarName, int count);
+			CppFunctionEmitter& EndFor();
+			
+			template<typename T>
+			CppFunctionEmitter& BeginIf(const std::string&varName, ComparisonType cmp, T value);
+			CppFunctionEmitter& BeginElse();
+			CppFunctionEmitter& EndIf();
 
 			std::string Code() { return _emitter.Code(); }
 

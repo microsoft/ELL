@@ -13,24 +13,19 @@ namespace emll
 			_emitter.Clear()
 				.DeclareFunction(name, returnType, args)
 				.NewLine()
-				.OpenBrace()
-				.NewLine()
-				.IncreaseIndent();
+				.BeginBlock();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::End()
 		{
-			_emitter.DecreaseIndent()
-					.CloseBrace()
-					.NewLine();
+			_emitter.EndBlock();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::Var(ValueType type, const std::string& name)
 		{
-			_emitter.Var(type, name)
-					.Semicolon()
+			_emitter.Var(type, name).Semicolon()
 					.NewLine();
 			return *this;
 		}
@@ -41,5 +36,37 @@ namespace emll
 					.Offset(offset);
 			return *this;
 		}
+
+		CppFunctionEmitter& CppFunctionEmitter::BeginFor(const std::string& iVarName, int count)
+		{
+			_emitter.For()
+				.OpenParan()
+				.Identifier(iVarName).SetVar<int>(0).Semicolon().Space()
+				.Cmp<int>(iVarName, ComparisonType::Lt, count).Semicolon().Space()
+				.Identifier(iVarName).Increment()
+				.CloseParan().NewLine()
+				.BeginBlock();
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::EndFor()
+		{
+			_emitter.EndBlock();
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::BeginElse()
+		{
+			_emitter.Else().NewLine()
+				.BeginBlock();
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::EndIf()
+		{
+			_emitter.EndBlock();
+			return *this;
+		}
+
 	}
 }

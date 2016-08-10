@@ -3,18 +3,6 @@ namespace emll
 	namespace compiler
 	{
 		template<typename T>
-		CppEmitter& CppEmitter::Var(const std::string& name)
-		{
-			return Var(GetValueType<T>(), name);
-		}
-
-		template<typename T>
-		CppEmitter& CppEmitter::Var(const std::string& name, int size)
-		{
-			return Var<T>(name).Dimension(size);
-		}
-
-		template<typename T>
 		CppEmitter& CppEmitter::Literal(T value)
 		{
 			_writer.Write<T>(value);
@@ -34,6 +22,33 @@ namespace emll
 				Literal<T>(value[i]);
 			}
 			return CloseBrace();
+		}
+		
+		template<typename T>
+		CppEmitter& CppEmitter::Var(const std::string& name)
+		{
+			return Var(GetValueType<T>(), name);
+		}
+
+		template<typename T>
+		CppEmitter& CppEmitter::Var(const std::string& name, int size)
+		{
+			return Var<T>(name).Dimension(size);
+		}
+		
+		template<typename T>
+		CppEmitter& CppEmitter::Cmp(const std::string& varName, ComparisonType cmp, T value)
+		{
+			return Identifier(varName).Space()
+					.Cmp(cmp).Space()
+					.Literal<T>(value);
+		}
+
+		template<typename T>
+		CppEmitter& CppEmitter::SetVar(T value)
+		{
+			return Assign().Space().
+					Literal<T>(value);
 		}
 	}
 }

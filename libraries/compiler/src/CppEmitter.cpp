@@ -19,6 +19,9 @@ namespace emll
 		static const std::string c_ByteType = "uint8_t";
 		static const std::string c_IntType = "int";
 		static const std::string c_DoubleType = "double";
+		static const std::string c_ForKeyword = "for";
+		static const std::string c_IfKeyword = "if";
+		static const std::string c_ElseKeyword = "else";
 
 		CppEmitter::CppEmitter()	
 		{
@@ -99,6 +102,12 @@ namespace emll
 		CppEmitter& CppEmitter::Asterisk()
 		{
 			_writer.Write('*');
+			return *this;
+		}
+
+		CppEmitter& CppEmitter::Increment()
+		{
+			_writer.Write("++");
 			return *this;
 		}
 
@@ -271,10 +280,37 @@ namespace emll
 					.CloseParan();
 		}
 
+		CppEmitter& CppEmitter::For()
+		{
+			return Token(c_ForKeyword);
+		}
+
+		CppEmitter& CppEmitter::If()
+		{
+			return Token(c_IfKeyword);
+		}
+
+		CppEmitter& CppEmitter::Else()
+		{
+			return Token(c_ElseKeyword);
+		}
+
 		CppEmitter& CppEmitter::Clear()
 		{
 			_writer.Clear();
 			return *this;
+		}
+
+		CppEmitter& CppEmitter::BeginBlock()
+		{
+			return OpenBrace().NewLine()
+				  .IncreaseIndent();
+		}
+
+		CppEmitter& CppEmitter::EndBlock()
+		{
+			return DecreaseIndent()
+				.CloseBrace().NewLine();
 		}
 
 		CppEmitter& CppEmitter::AppendRaw(const std::string& code)

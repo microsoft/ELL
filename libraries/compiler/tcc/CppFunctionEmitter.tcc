@@ -14,9 +14,20 @@ namespace emll
 		{
 			_emitter.Var<T>(name)
 				.Assign()
-				.Literal<T>(data)
-				.Semicolon();
+				.Literal<T>(data).Semicolon();
 			return *this;					
 		}
+
+		template<typename T>
+		CppFunctionEmitter& CppFunctionEmitter::BeginIf(const std::string&varName, ComparisonType cmp, T value)
+		{
+			_emitter.If()
+				.OpenParan()
+				.Cmp<T>(varName, cmp, value)
+				.CloseParan().NewLine()
+				.BeginBlock();
+			return *this;
+		}
+
 	}
 }
