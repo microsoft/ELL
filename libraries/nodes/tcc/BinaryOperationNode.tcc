@@ -81,7 +81,6 @@ namespace nodes
     void BinaryOperationNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
         Node::Deserialize(serializer, context);
-        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         int op = 0;
         serializer.Deserialize("operation", op, context);
         _operation = static_cast<OperationType>(op);
