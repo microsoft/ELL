@@ -96,7 +96,7 @@ namespace emll
 		void CppCompiler::EmitRef(VectorElementVar<T>& var)
 		{
 			EnsureEmitted(var.Src());
-			_pfn->PtrOffset(var.Src().EmittedName(), var.Offset());
+			_pfn->ValueAt(var.Src().EmittedName(), var.Offset());
 		}
 
 		template<typename T>
@@ -130,5 +130,17 @@ namespace emll
 			_module.GlobalV<T>(var.EmittedName(), var.Data());
 		}
 
+		template<typename T>
+		void CppCompiler::CompileOutput(const model::OutputNode<T>& node)
+		{
+			// Output ports have exactly 1 input, output
+			auto pInput = node.GetInputPorts()[0];
+			Variable* pOutputVar = EnsureVariableFor(node.GetOutputPorts()[0]);
+			for (size_t i = 0; i < pInput->Size(); ++i)
+			{
+				auto outputElt = pInput->GetOutputPortElement(i);
+				_pfn->AssignValueAt(pOutputVar->EmittedName(), i, [&outputElt, this](CppFunctionEmitter& fn) {LoadVar(outputElt); });
+			}
+		}
 	}
 }

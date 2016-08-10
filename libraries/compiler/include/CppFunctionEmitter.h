@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CppEmitter.h"
+#include <functional>
 
 namespace emll
 {
@@ -25,8 +26,12 @@ namespace emll
 			///<summary>Emit a named stack scalar with the given initial value</summary>
 			template<typename T>
 			CppFunctionEmitter& Var(const std::string& name, T data);
+
 			///<summary>Emit a offset into a pointer</summary>
-			CppFunctionEmitter& PtrOffset(const std::string& name, int offset);
+			CppFunctionEmitter& Value(const std::string& varName);
+			CppFunctionEmitter& ValueAt(const std::string& name, int offset);
+			CppFunctionEmitter& AssignValue(const std::string& varName, std::function<void(CppFunctionEmitter& fn)> value);
+			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, int offset, std::function<void(CppFunctionEmitter& fn)> value);
 
 			CppFunctionEmitter& BeginFor(const std::string& iVarName, int count);
 			CppFunctionEmitter& EndFor();

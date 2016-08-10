@@ -27,43 +27,6 @@ namespace emll
 			:  _module(_emitter, moduleName), _runtime(_module)
 		{
 		}
-
-		void IRCompiler::CompileConstantNode(const model::Node& node)
-		{
-			switch (ModelEx::GetNodeDataType(node))
-			{
-				case model::Port::PortType::Real:
-					CompileConstant<double>(static_cast<const nodes::ConstantNode<double>&>(node));
-					break;
-				case model::Port::PortType::Integer:
-					CompileConstant<int>(static_cast<const nodes::ConstantNode<int>&>(node));
-					break;
-				case model::Port::PortType::Boolean:
-					CompileConstantBool(static_cast<const nodes::ConstantNode<bool>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
-		void IRCompiler::CompileConstantBool(const nodes::ConstantNode<bool>& node)
-		{
-			auto output = node.GetOutputPorts()[0];
-			if (!ModelEx::IsScalar(*output))
-			{
-				throw new CompilerException(CompilerError::scalarInputsExpected);
-			}
-			auto values = node.GetValues();
-			// We always convert booleans as integers
-			Variable* pVar = Variables().AddVariable<LiteralVar<int>>(values[0]);
-			SetVariableFor(output, pVar);
-			EnsureEmitted(pVar);
-		}
-
-		void IRCompiler::CompileInputNode(const model::Node& node)
-		{
-			// Input node is already set up during pass1. No further work needed here
-		}
 		
 		void IRCompiler::CompileOutputNode(const model::Node& node)
 		{
@@ -276,12 +239,7 @@ namespace emll
 
 		llvm::Value* IRCompiler::EnsureEmitted(model::OutputPortElement elt)
 		{
-			Variable* pVar = GetVariableFor(elt);
-			if (pVar == nullptr)
-			{
-				throw new CompilerException(CompilerError::variableForOutputNotFound);
-			}
-			return EnsureEmitted(pVar);
+			return EnsureEmitted(EnsureVariableFor(elt));
 		}
 
 		llvm::Value* IRCompiler::EnsureEmitted(model::OutputPortBase* pPort)
@@ -352,11 +310,7 @@ namespace emll
 
 		llvm::Value* IRCompiler::LoadVar(const model::OutputPortElement elt)
 		{
-			Variable* pVar = GetVariableFor(elt);
-			if (pVar == nullptr)
-			{
-				throw new CompilerException(CompilerError::variableForOutputNotFound);
-			}
+			Variable* pVar = EnsureVariableFor(elt);
 			llvm::Value* pVal = EnsureEmitted(pVar);
 			if (pVar->IsScalar())
 			{
@@ -480,14 +434,14 @@ namespace emll
 			_module.Dump();
 		}
 
-		void IRCompiler::WriteAsmToFile(const std::string& name)
+		void IRCompiler::WriteAsmToFile(const std::string& filePath)
 		{
-			_module.WriteAsmToFile(name);
+			_module.WriteAsmToFile(filePath);
 		}
 
-		void IRCompiler::WriteBitcodeToFile(const std::string& name)
+		void IRCompiler::WriteBitcodeToFile(const std::string& filePath)
 		{
-			_module.WriteBitcodeToFile(name);
+			_module.WriteBitcodeToFile(filePath);
 		}
 	}
 }

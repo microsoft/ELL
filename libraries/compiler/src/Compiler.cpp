@@ -214,9 +214,24 @@ namespace emll
 			return nullptr;
 		}
 
+		Variable* Compiler::EnsureVariableFor(const model::OutputPortBase* pPort)
+		{
+			Variable* pVar = GetVariableFor(pPort);
+			if (pVar == nullptr)
+			{
+				throw new CompilerException(CompilerError::variableForOutputNotFound);
+			}
+			return pVar;
+		}
+
 		Variable* Compiler::GetVariableFor(const model::OutputPortElement elt)
 		{
 			return GetVariableFor(elt.ReferencedPort());
+		}
+
+		Variable* Compiler::EnsureVariableFor(const model::OutputPortElement elt)
+		{
+			return EnsureVariableFor(elt.ReferencedPort());
 		}
 
 		void Compiler::SetVariableFor(const model::OutputPortBase* pPort, Variable* pVar)
@@ -265,6 +280,43 @@ namespace emll
 
 		void Compiler::Reset()
 		{
+		}
+
+		void Compiler::CompileInputNode(const model::Node& node)
+		{
+			// Input node is typically set up during pass1. By default, no further work needed
+		}
+
+		void Compiler::CompileConstantNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+			case model::Port::PortType::Real:
+				CompileConstant<double>(static_cast<const nodes::ConstantNode<double>&>(node));
+				break;
+			case model::Port::PortType::Integer:
+				CompileConstant<int>(static_cast<const nodes::ConstantNode<int>&>(node));
+				break;
+			case model::Port::PortType::Boolean:
+				CompileConstantBool(static_cast<const nodes::ConstantNode<bool>&>(node));
+				break;
+			default:
+				throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void Compiler::CompileConstantBool(const nodes::ConstantNode<bool>& node)
+		{
+			auto output = node.GetOutputPorts()[0];
+			if (!ModelEx::IsScalar(*output))
+			{
+				throw new CompilerException(CompilerError::scalarInputsExpected);
+			}
+			auto values = node.GetValues();
+			// We always convert booleans as integers
+			Variable* pVar = Variables().AddVariable<LiteralVar<int>>(values[0]);
+			SetVariableFor(output, pVar);
+			EnsureVarEmitted(pVar);
 		}
 	}
 }

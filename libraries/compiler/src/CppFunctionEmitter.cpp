@@ -30,10 +30,32 @@ namespace emll
 			return *this;
 		}
 
-		CppFunctionEmitter& CppFunctionEmitter::PtrOffset(const std::string& name, int offset)
+		CppFunctionEmitter& CppFunctionEmitter::Value(const std::string& varName)
+		{
+			_emitter.Identifier(varName);
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::ValueAt(const std::string& name, int offset)
 		{
 			_emitter.Identifier(name)
-					.Offset(offset);
+				.Offset(offset);
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::AssignValue(const std::string& varName, std::function<void(CppFunctionEmitter& fn)> value)
+		{
+			_emitter.Assign(varName).Space();
+			value(*this);
+			_emitter.Semicolon().NewLine();
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::AssignValueAt(const std::string& destVarName, int offset, std::function<void(CppFunctionEmitter& fn)> value)
+		{
+			_emitter.AssignValueAt(destVarName, offset).Space();
+			value(*this);
+			_emitter.Semicolon().NewLine();
 			return *this;
 		}
 

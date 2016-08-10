@@ -64,9 +64,9 @@ namespace emll
 			void CompileModel(const std::string& functionName, model::Model& model);
 
 			///<summary>Compile a ConstantNode</summary>
-			virtual void CompileConstantNode(const model::Node& node) = 0;
+			virtual void CompileConstantNode(const model::Node& node);
 			///<summary>Compile an InputNode</summary>
-			virtual void CompileInputNode(const model::Node& node) = 0;
+			virtual void CompileInputNode(const model::Node& node);
 			///<summary>Compile an OutputNode</summary>
 			virtual void CompileOutputNode(const model::Node& node) = 0;
 			///<summary>Compile a BinaryNode</summary>
@@ -94,14 +94,21 @@ namespace emll
 			///<summary>Variable allocator</summary>
 			VariableAllocator& Variables() { return _variables; }
 
+			///<summary>Output the compiled model to the given file</summary>
+			virtual void WriteToFile(const std::string& filePath) = 0;
+
 		protected:
 			///<summary>Create a variable to store computed output for the given output port. The variable
 			/// will be emitted lazily. </summary>
 			Variable* AllocVar(model::OutputPortBase* pPort);
 			///<summary>Get the variable for output port</summary>
 			Variable* GetVariableFor(const model::OutputPortBase* pPort);
+			///<summary>Ensure the variable for output port element exists</summary>
+			Variable* EnsureVariableFor(const model::OutputPortBase* pPort);
 			///<summary>Get the variable for output port element</summary>
 			Variable* GetVariableFor(const model::OutputPortElement elt);
+			///<summary>Ensure the variable for output port element exists</summary>
+			Variable* EnsureVariableFor(const model::OutputPortElement elt);
 			///<summary>Associate the given variable with the output port</summary>
 			void SetVariableFor(const model::OutputPortBase* pPort, Variable* pVar);
 
@@ -115,6 +122,17 @@ namespace emll
 			ValueType ToValueType(model::Port::PortType type);
 			///<summary>Models get turned into functions. To declare the function, we need to know inputs and outputs.</summary>
 			void CollectInputsAndOutputs(model::Model& model);
+
+		protected:
+
+			///<summary>Ensure a variable is emitted</summary>
+			virtual void EnsureVarEmitted(Variable* pVar) = 0;
+
+			///<summary>Compile a ConstantNode</summary>
+			template<typename T>
+			void CompileConstant(const nodes::ConstantNode<T>& node);
+			///<summary>Compile a boolean ConstantNode, which we have to handle in a special way</summary>
+			void CompileConstantBool(const nodes::ConstantNode<bool>& node);
 
 		private:
 			Variable* AllocArg(const model::OutputPortBase* pPort, bool isInput);
@@ -136,3 +154,5 @@ namespace emll
 		};
 	}
 }
+
+#include "../tcc/Compiler.tcc"

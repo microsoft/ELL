@@ -46,7 +46,6 @@ namespace emll
 			CppEmitter& Dimension(int size);
 
 			CppEmitter& Literal(const std::string& value);
-
 			template<typename T>
 			CppEmitter& Literal(T value);
 			template<typename T>

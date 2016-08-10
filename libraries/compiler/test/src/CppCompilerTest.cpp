@@ -3,10 +3,11 @@
 #include <ostream>
 #include "IndentedTextWriter.h"
 #include "CppCompiler.h"
+#include "CompilerTest.h"
 
 using namespace emll::compiler;
 
-void TestCppCompiler()
+void TestCppCompilerGeneral()
 {
 	CppCompiler compiler;
 
@@ -27,5 +28,17 @@ void TestCppCompiler()
 	compiler.Function().EndFor();
 	compiler.EndFunction();
 
-	module.Dump();
+	compiler.DebugDump();
+}
+
+void TestEmptyModelCpp()
+{
+	ModelBuilder mb;
+	auto input1 = mb.Inputs<double>(4);
+	mb.Outputs(input1->output);
+
+	CppCompiler compiler;
+	compiler.CompileModel("TestEmpty", mb.Model);
+	compiler.DebugDump();
+	compiler.WriteToFile("C:\\junk\\model\\TestEmpty.cpp");
 }

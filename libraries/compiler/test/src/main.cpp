@@ -3,10 +3,8 @@
 
 using namespace emll::compiler;
 
-int main(int argc, char* argv[])
+void TestIRCompiler()
 {
-	TestCppCompiler();
-
 	TestBinaryVector(false);
 	TestBinaryVector(true);
 	TestBinaryScalar();
@@ -27,6 +25,19 @@ int main(int argc, char* argv[])
 
 	TestLLVM();
 	TestLLVMShiftRegister();
+}
+
+
+void TestCppCompiler()
+{
+	TestEmptyModelCpp();
+	TestCppCompilerGeneral();
+}
+
+int main(int argc, char* argv[])
+{
+	TestCppCompiler();
+	TestIRCompiler();
 
 	return 0;
 }

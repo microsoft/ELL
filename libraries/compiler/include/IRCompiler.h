@@ -27,10 +27,6 @@ namespace emll
 			///<summary>Create a compiler to produce an LLVM module with the given name</summary>
 			IRCompiler(const std::string& moduleName);
 
-			///<summary>Compile a ConstantNode</summary>
-			virtual void CompileConstantNode(const model::Node& node) override;
-			///<summary>Compile a InputNode</summary>
-			virtual void CompileInputNode(const model::Node& node) override;
 			///<summary>Compile an OutputNode</summary>
 			virtual void CompileOutputNode(const model::Node& node) override;
 			///<summary>Compile a BinaryOperationNode</summary>
@@ -52,18 +48,28 @@ namespace emll
 
 			///<summary>Emit LLVM IR to std::out for debugging</summary>
 			void DebugDump();
+			///<summary>Output the compiled model to the given file</summary>
+			virtual void WriteToFile(const std::string& filePath) override
+			{
+				WriteAsmToFile(filePath);
+			}
 			///<summary>Emit LLVM IR assembly to a file</summary>
-			void WriteAsmToFile(const std::string& name);
+			void WriteAsmToFile(const std::string& filePath);
 			///<summary>Emit LLVM IR bitcode to a file</summary>
-			void WriteBitcodeToFile(const std::string& name);
+			void WriteBitcodeToFile(const std::string& filePath);
 		
 			IRModuleEmitter& Module() { return _module; }
 
-		private:
-			///<summary>Begins the base IR function that will contain our compiled model</summary>
+		protected:
+			///<summary>Begins the IR function that will contain our compiled model</summary>
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) override;
-			///<summary>Ends the base IR function that will contain our compiled model</summary>
+			///<summary>Ends the IR function that will contain our compiled model</summary>
 			virtual void EndFunction() override;
+			///<summary>Ensure a variable is emitted</summary>
+			virtual void EnsureVarEmitted(Variable* pVar)
+			{
+				EnsureEmitted(pVar);
+			}
 
 		private:
 			void RegisterFunctionArgs(NamedValueTypeList& args);
@@ -136,11 +142,6 @@ namespace emll
 			///<summary>Updates the value at a given offset of the given variable. Checks for index out of range etc.</summary>
 			void SetVar(Variable& var, llvm::Value* pDest, int offset, llvm::Value* pValue);
 			
-			///<summary>Compile a ConstantNode</summary>
-			template<typename T>
-			void CompileConstant(const nodes::ConstantNode<T>& node);
-			///<summary>Compile a boolean ConstantNode, which we have to handle in a special way</summary>
-			void CompileConstantBool(const nodes::ConstantNode<bool>& node);
 			///<summary>Compile an OutputNode</summary>
 			template<typename T>
 			void CompileOutput(const model::OutputNode<T>& node);

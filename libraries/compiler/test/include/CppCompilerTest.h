@@ -1,4 +1,6 @@
 #pragma once
 
-void TestCppCompiler();
+void TestEmptyModelCpp();
+void TestCppCompilerGeneral();
+
 
