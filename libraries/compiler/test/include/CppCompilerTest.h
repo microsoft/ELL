@@ -2,5 +2,6 @@
 
 void TestEmptyModelCpp();
 void TestCppCompilerGeneral();
+void TestBinaryVectorCpp(bool expanded);
 
 

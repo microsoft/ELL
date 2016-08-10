@@ -76,6 +76,19 @@ namespace emll
 			}
 		}
 
+		Variable* CppCompiler::EnsureEmitted(model::OutputPortBase* pPort)
+		{
+			assert(pPort != nullptr);
+			Variable* pVar = GetVariableFor(pPort);
+			if (pVar == nullptr)
+			{
+				pVar = AllocVar(pPort);
+			}
+			assert(pVar != nullptr);
+			EnsureEmitted(pVar);
+			return pVar;
+		}
+
 		void CppCompiler::Emit(Variable& var)
 		{
 			assert(var.HasEmittedName());
@@ -117,6 +130,24 @@ namespace emll
 				throw new CompilerException(CompilerError::indexOutOfRange);
 			}
 			_pfn->ValueAt(pVar->EmittedName(), (int)elt.GetIndex());
+		}
+
+		void CppCompiler::SetVar(Variable& var, int offset)
+		{
+			if (var.IsScalar())
+			{
+				if (offset > 0)
+				{
+					throw new CompilerException(CompilerError::indexOutOfRange);
+				}
+				_pfn->AssignValue(var.EmittedName());
+				return;
+			}
+			if (offset >= var.Dimension())
+			{
+				throw new CompilerException(CompilerError::indexOutOfRange);
+			}
+			_pfn->AssignValueAt(var.EmittedName(), offset);
 		}
 	}
 }

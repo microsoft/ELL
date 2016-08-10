@@ -30,6 +30,8 @@ void TestIRCompiler()
 
 void TestCppCompiler()
 {
+	TestBinaryVectorCpp(true);
+	TestBinaryVectorCpp(false);
 	TestEmptyModelCpp();
 	TestCppCompilerGeneral();
 }

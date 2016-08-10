@@ -152,11 +152,32 @@ namespace emll
 				!Settings().ShouldUnrollLoops())
 			{
 				//CompileBinaryLoop<T>(node);
+				CompileBinaryExpanded<T>(node);
 			}
 			else
 			{
-				//CompileBinaryExpanded<T>(node);
+				CompileBinaryExpanded<T>(node);
 			}
 		}
+
+		template<typename T>
+		void CppCompiler::CompileBinaryExpanded(const nodes::BinaryOperationNode<T>& node)
+		{
+			auto pInput1 = node.GetInputPorts()[0];
+			auto pInput2 = node.GetInputPorts()[1];
+			auto pOutput = node.GetOutputPorts()[0];
+			Variable& resultVar = *(EnsureEmitted(pOutput));
+			for (size_t i = 0; i < pInput1->Size(); ++i)
+			{
+				auto pLOutput = pInput1->GetOutputPortElement(i);
+				auto pROutput = pInput2->GetOutputPortElement(i);
+				SetVar(resultVar, i);
+				_pfn->Op(OperatorType::Add, 
+					[&pLOutput, this](CppFunctionEmitter& fn) {LoadVar(pLOutput); },
+					[&pROutput, this](CppFunctionEmitter& fn) {LoadVar(pROutput); });
+				_pfn->EndStatement();
+			}
+		}
+
 	}
 }

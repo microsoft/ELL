@@ -35,6 +35,10 @@ namespace emll
 			///<summary>Ends the function that will contain our compiled model</summary>
 			virtual void EndFunction() override;
 
+			///<summary>Ensure a variable is emitted</summary>
+			void EnsureEmitted(Variable* pVar) { EnsureEmitted(*pVar); }
+			void EnsureEmitted(Variable& var);
+
 		protected:
 			///<summary>Compile an OutputNode</summary>
 			virtual void CompileOutputNode(const model::OutputNode<double>& node) override { CompileOutput<double>(node); }
@@ -70,16 +74,9 @@ namespace emll
 				EnsureEmitted(*pVar);
 			}
 
-			///<summary>Compile a BinaryOperationNode</summary>
-			template<typename T>
-			void CompileBinary(const nodes::BinaryOperationNode<T>& node);
+		private:
 
-		public:
-
-			///<summary>Ensure a variable is emitted</summary>
-			void EnsureEmitted(Variable* pVar) { EnsureEmitted(*pVar); }
-			void EnsureEmitted(Variable& var);
-
+			Variable* EnsureEmitted(model::OutputPortBase* pPort);
 
 			///<summary>Emit a variable</summary>
 			void Emit(Variable& var);
@@ -122,10 +119,19 @@ namespace emll
 			///<summary>Ensure that the variable for this outport port element is loaded into a register. SThis will automatically
 			/// dereference any pointers it needs to.</summary>
 			void LoadVar(const model::OutputPortElement elt);
+			///<summary>Updates the value at a given offset of the given variable. Checks for index out of range etc.</summary>
+			void SetVar(Variable& var, int offset);
 
 			///<summary>Compile an OutputNode</summary>
 			template<typename T>
 			void CompileOutput(const model::OutputNode<T>& node);
+
+			///<summary>Compile a BinaryOperationNode</summary>
+			template<typename T>
+			void CompileBinary(const nodes::BinaryOperationNode<T>& node);
+			///<summary>Compile a BinaryOperationNode as a sequence of scalar operations</summary>
+			template<typename T>
+			void CompileBinaryExpanded(const nodes::BinaryOperationNode<T>& node);
 
 		private:
 			CppModuleEmitter _module;

@@ -23,10 +23,16 @@ namespace emll
 			return *this;
 		}
 
+		CppFunctionEmitter& CppFunctionEmitter::EndStatement()
+		{
+			_emitter.Semicolon().NewLine();
+			return *this;
+		}
+
 		CppFunctionEmitter& CppFunctionEmitter::Var(ValueType type, const std::string& name)
 		{
-			_emitter.Var(type, name).Semicolon()
-					.NewLine();
+			_emitter.Var(type, name);
+			EndStatement();
 			return *this;
 		}
 
@@ -43,11 +49,23 @@ namespace emll
 			return *this;
 		}
 
+		CppFunctionEmitter& CppFunctionEmitter::AssignValue(const std::string& varName)
+		{
+			_emitter.Assign(varName).Space();
+			return *this;
+		}
+
 		CppFunctionEmitter& CppFunctionEmitter::AssignValue(const std::string& varName, std::function<void(CppFunctionEmitter& fn)> value)
 		{
 			_emitter.Assign(varName).Space();
 			value(*this);
-			_emitter.Semicolon().NewLine();
+			EndStatement();
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::AssignValueAt(const std::string& destVarName, int offset)
+		{
+			_emitter.AssignValueAt(destVarName, offset).Space();
 			return *this;
 		}
 
@@ -55,7 +73,17 @@ namespace emll
 		{
 			_emitter.AssignValueAt(destVarName, offset).Space();
 			value(*this);
-			_emitter.Semicolon().NewLine();
+			EndStatement();
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::Op(OperatorType op, std::function<void(CppFunctionEmitter& fn)> lValue, std::function<void(CppFunctionEmitter& fn)> rValue)
+		{
+			lValue(*this);
+			_emitter.Space();
+			_emitter.Operator(op).Space();
+			rValue(*this);
+
 			return *this;
 		}
 

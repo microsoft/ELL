@@ -42,3 +42,25 @@ void TestEmptyModelCpp()
 	compiler.DebugDump();
 	compiler.WriteToFile("C:\\junk\\model\\TestEmpty.cpp");
 }
+
+void TestBinaryVectorCpp(bool expanded)
+{
+	std::vector<double> data = { 5, 10, 15, 20 };
+	std::vector<double> data2 = { 4, 4, 4, 4 };
+
+	ModelBuilder mb;
+
+	auto input1 = mb.Inputs<double>(4);
+	auto c1 = mb.Constant<double>(data);
+	auto c2 = mb.Constant<double>(data2);
+
+	auto bop = mb.Add(c1->output, input1->output);
+	auto bop2 = mb.Multiply(bop->output, c2->output);
+	auto output = mb.Outputs<double>(bop2->output);
+
+	CppCompiler compiler;
+	compiler.Settings().ShouldUnrollLoops() = expanded;
+	compiler.CompileModel("TestBinaryVector", mb.Model);
+	compiler.DebugDump();
+	compiler.WriteToFile("C:\\junk\\model\\TestBinary.cpp");
+}

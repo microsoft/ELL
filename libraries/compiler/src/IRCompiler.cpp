@@ -385,14 +385,14 @@ namespace emll
 			using Bop = nodes::BinaryPredicateNode<int>;
 			switch (node.GetPredicateType())
 			{
-			case Bop::PredicateType::equal:
-				return ComparisonType::Eq;
-			case Bop::PredicateType::greater:
-				return ComparisonType::Gt;
-			case Bop::PredicateType::less:
-				return ComparisonType::Lt;
-			default:
-				throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
+				case Bop::PredicateType::equal:
+					return ComparisonType::Eq;
+				case Bop::PredicateType::greater:
+					return ComparisonType::Gt;
+				case Bop::PredicateType::less:
+					return ComparisonType::Lt;
+				default:
+					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
 			}
 		}
 

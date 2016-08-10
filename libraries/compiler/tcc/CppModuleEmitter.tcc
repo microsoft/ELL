@@ -30,7 +30,7 @@ namespace emll
 		template<typename T>
 		CppModuleEmitter& CppModuleEmitter::GlobalV(const std::string& name, const int size)
 		{
-			_globals.NewLine()
+			_globals
 				.Var<T>(name, size)
 				.Semicolon().NewLine();
 			return *this;
@@ -39,7 +39,7 @@ namespace emll
 		template<typename T>
 		CppModuleEmitter& CppModuleEmitter::GlobalV(const std::string& name, const std::vector<T>& value)
 		{
-			_globals.NewLine()
+			_globals
 				.Var<T>(name, value.size()).Space()
 				.Assign().Space()
 				.Literal<T>(value)
@@ -50,7 +50,7 @@ namespace emll
 		template<typename T>
 		CppModuleEmitter& CppModuleEmitter::Constant(const std::string& name, T value)
 		{
-			_constants.NewLine()
+			_constants
 				.Static().Space()
 				.Const().Space()
 				.Var<T>(name).Space()
@@ -63,9 +63,10 @@ namespace emll
 		template<typename T>
 		CppModuleEmitter& CppModuleEmitter::ConstantV(const std::string& name, const std::vector<T>& value)
 		{
-			_constants.NewLine()
+			_constants
 				.Static().Space()
 				.Const().Space()
+				.Var<T>(name).Dimension(value.size()).Space()
 				.Assign().Space()
 				.Literal<T>(value)
 				.Semicolon().NewLine();
