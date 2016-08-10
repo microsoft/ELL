@@ -31,6 +31,7 @@ namespace model
         _context = context;
         _model = Model();
         _portToPortMap.clear();
+        _isModelCompilable = true;
         oldModel.Visit([this](const Node& node) { node.Refine(*this); });
         _context = TransformContext();
 

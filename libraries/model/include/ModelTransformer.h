@@ -24,6 +24,7 @@
 #include <vector>
 #include <unordered_map>
 #include <exception>
+#include <functional>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -31,8 +32,9 @@ namespace model
     template <typename ValueType>
     class InputNode;
 
-    class TransformContext
+    struct TransformContext
     {
+        std::function<bool(Node*)> IsNodeCompilable;
     };
 
     // TODO: template transformer on the context type
@@ -102,6 +104,7 @@ namespace model
         Model _model;
         TransformContext _context;
         std::unordered_map<const Port*, Port*> _portToPortMap;
+        bool _isModelCompilable;
     };
 }
 
