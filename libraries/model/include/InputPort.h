@@ -35,7 +35,7 @@ namespace model
         /// <param name="name"> The name of this port </param>
         /// <param name="dimension"> The dimension of the port </param>
         template <typename ValueType>
-        InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputRef, std::string name, size_t dimension);
+        InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputs, std::string name, size_t dimension);
 
         /// <summary> Returns an OutputPortElement containing the referenced location to get the value for a specific input element from </summary>
         ///
