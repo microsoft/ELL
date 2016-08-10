@@ -31,6 +31,7 @@ namespace nodes
     class DotProductNode : public model::Node
     {
     public:
+        /// <summary> Default Constructor </summary>
         DotProductNode();
 
         /// <summary> Constructor </summary>

@@ -27,6 +27,9 @@ namespace model
     class ExtremalValueNode : public Node
     {
     public:
+        /// <summary> Default Constructor </summary>    
+        ExtremalValueNode();
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
@@ -68,6 +71,9 @@ namespace model
     class ArgMinNode : public ExtremalValueNode<ValueType, false>
     {
     public:
+        /// <summary> Default Constructor </summary>    
+        ArgMinNode() : ExtremalValueNode<ValueType, false>() {}
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
@@ -92,6 +98,9 @@ namespace model
     class ArgMaxNode : public ExtremalValueNode<ValueType, true>
     {
     public:
+        /// <summary> Default Constructor </summary>    
+        ArgMaxNode() : ExtremalValueNode<ValueType, true>(input) {}
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>

@@ -27,6 +27,7 @@ namespace nodes
     class SumNode : public model::Node
     {
     public:
+        /// <summary> Default Constructor </summary>
         SumNode();
 
         /// <summary> Constructor </summary>

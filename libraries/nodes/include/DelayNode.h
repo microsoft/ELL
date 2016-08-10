@@ -29,6 +29,7 @@ namespace nodes
     class DelayNode : public model::Node
     {
     public:
+        /// <summary> Default Constructor </summary>
         DelayNode();
 
         /// <summary> Constructor </summary>

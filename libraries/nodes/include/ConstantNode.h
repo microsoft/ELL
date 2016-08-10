@@ -26,7 +26,7 @@ namespace nodes
     class ConstantNode : public model::Node
     {
     public:
-        /// <summary> Default constructor (used only for deserialization) </summary>
+        /// <summary> Default Constructor </summary>
         ConstantNode();
 
         /// <summary> Constructor for a scalar constant </summary>

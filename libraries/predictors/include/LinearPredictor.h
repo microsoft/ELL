@@ -28,6 +28,9 @@ namespace predictors
     class LinearPredictor
     {
     public:
+        /// <summary> Default Constructor. </summary>
+        LinearPredictor();
+
         /// <summary> Constructs an instance of Linear. </summary>
         ///
         /// <param name="dim"> The dimension. </param>

@@ -28,6 +28,7 @@ namespace nodes
     class MovingVarianceNode : public model::Node
     {
     public:
+        /// <summary> Default Constructor </summary>
         MovingVarianceNode();
         
         /// <summary> Constructor </summary>

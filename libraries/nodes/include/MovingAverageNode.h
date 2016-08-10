@@ -34,6 +34,7 @@ namespace nodes
     class MovingAverageNode : public model::Node
     {
     public:
+        /// <summary> Default Constructor </summary>
         MovingAverageNode();
 
         /// <summary> Constructor </summary>

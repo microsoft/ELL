@@ -36,6 +36,7 @@ namespace nodes
             divide // coordinatewise division
         };
 
+        /// <summary> Default Constructor </summary>
         BinaryOperationNode();
 
         /// <summary> Constructor </summary>

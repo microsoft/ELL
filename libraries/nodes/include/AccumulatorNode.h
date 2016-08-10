@@ -27,6 +27,7 @@ namespace nodes
     class AccumulatorNode : public model::Node
     {
     public:
+        /// <summary> Default Constructor </summary>
         AccumulatorNode();
 
         /// <summary> Constructor </summary>

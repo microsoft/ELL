@@ -28,6 +28,7 @@ namespace nodes
     class L2NormNode : public model::Node
     {
     public:
+        /// <summary> Default Constructor </summary>
         L2NormNode();
         
         /// <summary> Constructor </summary>

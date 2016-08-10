@@ -24,7 +24,8 @@ namespace model
     class OutputNode : public Node
     {
     public:
-        OutputNode(); // for serialization
+        /// <summary> Default Constructor </summary>
+        OutputNode();
 
         /// <summary> Constructor </summary>
         ///

@@ -19,6 +19,9 @@
 
 namespace predictors
 {
+    LinearPredictor::LinearPredictor() : _b(0)
+    {}
+
     LinearPredictor::LinearPredictor(uint64_t dim) : _w(dim), _b(0)
     {}
 

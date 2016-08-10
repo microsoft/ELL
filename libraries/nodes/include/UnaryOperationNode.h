@@ -35,6 +35,7 @@ namespace nodes
             sqrt
         };
 
+        /// <summary> Default Constructor </summary>
         UnaryOperationNode();
 
         /// <summary> Constructor </summary>

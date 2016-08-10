@@ -24,6 +24,9 @@ namespace nodes
     class LinearPredictorNode : public model::Node
     {
     public:
+        /// <summary> Default Constructor </summary>
+        LinearPredictorNode();
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The signal to predict from </param>
