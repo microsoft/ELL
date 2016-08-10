@@ -64,8 +64,8 @@ namespace utilities
         _out << "\n"; // Output newline instead of calling "FinishPreviousLine"
         auto indent = GetCurrentIndent();
         _out << indent << "}";
-        // need to output a comma if we're serializing a field. How? -- if name !- ""
-        SetEndOfLine(hasName > 0 ? ",\n" : "\n"); // Ugh --- we're outputting too many commas when serializing arrays within objects
+        // need to output a comma if we're serializing a field (that is, if name != "")
+        SetEndOfLine(hasName ? ",\n" : "\n");
     }
 
     void JsonSerializer::EndSerialization()

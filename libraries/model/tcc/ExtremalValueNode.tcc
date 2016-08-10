@@ -15,6 +15,19 @@ namespace model
     }
 
     template <typename ValueType, bool max>
+    std::string ExtremalValueNode<ValueType, max>::GetTypeName() 
+    {
+        if(max)
+        {
+            return utilities::GetCompositeTypeName<ValueType, std::true_type>("ExtremalValueNode"); 
+        } 
+        else
+        {
+            return utilities::GetCompositeTypeName<ValueType, std::false_type>("ExtremalValueNode"); 
+        } 
+    }
+
+    template <typename ValueType, bool max>
     void ExtremalValueNode<ValueType, max>::Compute() const
     {
         auto inputValues = _input.GetValue();

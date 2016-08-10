@@ -248,6 +248,30 @@ namespace utilities
         static std::string GetName() { return "std::string"; }
     };
 
+    /// <summary> Class used to get information about the std::true_type type. </summary>
+    ///
+    /// <typeparam name="T"> Generic type parameter. </typeparam>
+    template <>
+    struct TypeName<std::true_type>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "std::true_type"; }
+    };
+
+    /// <summary> Class used to get information about the std::false_type type. </summary>
+    ///
+    /// <typeparam name="T"> Generic type parameter. </typeparam>
+    template <>
+    struct TypeName<std::false_type>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "std::false_type"; }
+    };
+
     /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
     ///
     /// <param name="baseType"> The base type (e.g., 'Vector') </param>

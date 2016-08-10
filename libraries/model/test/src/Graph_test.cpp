@@ -326,20 +326,3 @@ void TestRefineGraph()
     }
 }
 
-void TestSerialization()
-{
-    // std::cout << "Serialization" << std::endl;
-    // model::Model g;
-    // auto in = g.AddNode<model::InputNode<double>>(3);
-    // auto out = g.AddNode<model::OutputNode<double>>(in->output);
-
-    // auto nodeIter = g.GetNodeIterator();
-    // while(nodeIter.IsValid())
-    // {
-    //     auto node = nodeIter.Get();
-    //     auto description = node->GetDescription();
-    //     description.Print(std::cout);
-    //     nodeIter.Next();
-    // }
-}
-

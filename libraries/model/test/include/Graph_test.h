@@ -13,5 +13,3 @@ void TestInputRouting2();
 
 void TestCopyGraph();
 void TestRefineGraph();
-
-void TestSerialization();
