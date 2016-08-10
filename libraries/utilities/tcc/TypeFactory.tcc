@@ -43,15 +43,6 @@ namespace utilities
     //
     // GenericTypeFactory
     //
-    class TypeCreatorBase
-    {
-    public:
-        virtual ~TypeCreatorBase() = default;
-
-        template <typename BaseType>
-        std::unique_ptr<BaseType> Create() const;
-    };
-
     template <typename BaseType>
     class TypeCreatorDerived : public TypeCreatorBase
     {

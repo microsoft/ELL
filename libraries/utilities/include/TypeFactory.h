@@ -75,7 +75,22 @@ namespace utilities
         std::unordered_map<std::string, std::function<std::unique_ptr<BaseType>()>> _typeMap;
     };
 
-    class TypeCreatorBase;
+    /// <summary>
+    /// An internal class used by GenericTypeFactory
+    /// </summary>
+    class TypeCreatorBase
+    {
+    public:
+        virtual ~TypeCreatorBase() = default;
+    
+    private:
+        friend class GenericTypeFactory;
+        template <typename BaseType>
+        friend class TypeCreator;
+        template <typename BaseType>
+        std::unique_ptr<BaseType> Create() const;
+    };
+
     /// <summary>
     /// A factory object that can create new objects given their type name and a base type to derive from.
     /// </summary>
