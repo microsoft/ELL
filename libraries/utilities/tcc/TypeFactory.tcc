@@ -51,7 +51,7 @@ namespace utilities
         static std::unique_ptr<TypeCreatorDerived<BaseType>> NewTypeCreator()
         {
             auto result = std::make_unique<TypeCreatorDerived<BaseType>>();            
-            result->_createFn = []()
+            result->_createFunction = []()
             {
                 auto runtimePtr = new RuntimeType();
                 auto basePtr = dynamic_cast<BaseType*>(runtimePtr);
@@ -62,11 +62,11 @@ namespace utilities
 
         std::unique_ptr<BaseType> Create() const
         {
-            return _createFn();
+            return _createFunction();
         }
 
     private:
-        std::function<std::unique_ptr<BaseType>()> _createFn;
+        std::function<std::unique_ptr<BaseType>()> _createFunction;
     };
 
     //
