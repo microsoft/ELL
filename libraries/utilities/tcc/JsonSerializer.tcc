@@ -28,6 +28,24 @@ namespace utilities
         SetEndOfLine(endOfLine);
     }
 
+    // Specialization for bool (though perhaps this should be an overload, not a specialization)
+    template <>
+    inline void JsonSerializer::WriteScalar(const char* name, const bool& value)
+    {
+        auto indent = GetCurrentIndent();
+        bool hasName = name != std::string("");        
+        auto endOfLine = hasName ? ",\n" : "";
+
+        FinishPreviousLine();
+        _out << indent;
+        if (hasName)
+        {
+            _out << name << ": ";
+        }
+        _out << (value ? "true" : "false");
+        SetEndOfLine(endOfLine);
+    }
+
     // This function is inline just so it appears next to the other Write* functions
     inline void JsonSerializer::WriteScalar(const char* name, const char* value)
     {
@@ -112,6 +130,29 @@ namespace utilities
         auto valueToken = _tokenizer.ReadNextToken();
         std::stringstream valueStream(valueToken);
         valueStream >> value;
+
+        // eat a comma if it exists
+        if(hasName)
+        {
+            if(_tokenizer.PeekNextToken() == ",")
+            {
+                _tokenizer.ReadNextToken();
+            }
+        }
+    }
+
+    template <>
+    inline void JsonDeserializer::ReadScalar(const char* name, bool& value)
+    {
+        bool hasName = name != std::string("");
+        if(hasName)
+        {
+            _tokenizer.MatchTokens({name, ":"});
+        }
+
+        // read string
+        auto valueToken = _tokenizer.ReadNextToken();
+        value = valueToken == "true";
 
         // eat a comma if it exists
         if(hasName)

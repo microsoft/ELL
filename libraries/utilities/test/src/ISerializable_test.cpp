@@ -62,6 +62,7 @@ struct TestStruct : public utilities::ISerializable
 template <typename SerializerType>
 void TestSerializer()
 {
+    bool boolVal = true;
     int intVal = 1;
     float floatVal = 2.5;
     double doubleVal = 3.14;
@@ -76,6 +77,10 @@ void TestSerializer()
     auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
     SerializerType serializer;
+    std::cout << "--Serializing bool--" << std::endl;
+    serializer.Serialize(boolVal);
+    std::cout << std::endl;
+
     std::cout << "--Serializing int--" << std::endl;
     serializer.Serialize(intVal);
     std::cout << std::endl;
@@ -145,6 +150,17 @@ template <typename SerializerType, typename DeserializerType>
 void TestDeserializer()
 {
     utilities::SerializationContext context;
+
+    {
+        std::stringstream strstream;
+        SerializerType serializer(strstream);
+        serializer.Serialize("true", true);
+
+        DeserializerType deserializer(strstream);
+        bool val = false;
+        deserializer.Deserialize("true", val, context);
+        testing::ProcessTest("Deserialize bool check", val == true);
+    }
 
     {
         std::stringstream strstream;
@@ -282,8 +298,8 @@ void TestDeserializer()
         SerializerType serializer(strstream);
 
         serializer.Serialize(g);
-        std::cout << "Graph output:" << std::endl;
-        std::cout << strstream.str() << std::endl;
+        // std::cout << "Graph output:" << std::endl;
+        // std::cout << strstream.str() << std::endl;
 
         DeserializerType deserializer(strstream);
         model::Model newGraph;
@@ -293,8 +309,8 @@ void TestDeserializer()
         SerializerType serializer2(strstream2);
 
         serializer2.Serialize(newGraph);
-        std::cout << "New graph output:" << std::endl;
-        std::cout << strstream2.str() << std::endl;
+        // std::cout << "New graph output:" << std::endl;
+        // std::cout << strstream2.str() << std::endl;
     }
 
     {
