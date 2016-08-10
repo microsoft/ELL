@@ -41,11 +41,14 @@ namespace emll
 		{
 			_emitter.For()
 				.OpenParan()
-				.Identifier(iVarName).SetVar<int>(0).Semicolon().Space()
+				.Var<int>(iVarName).Space()
+				.Assign().Space()
+				.Literal(0).Semicolon().Space()
 				.Cmp<int>(iVarName, ComparisonType::Lt, count).Semicolon().Space()
 				.Identifier(iVarName).Increment()
 				.CloseParan().NewLine()
 				.BeginBlock();
+
 			return *this;
 		}
 

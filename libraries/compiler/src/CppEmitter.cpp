@@ -295,6 +295,19 @@ namespace emll
 			return Token(c_ElseKeyword);
 		}
 
+		CppEmitter& CppEmitter::Assign(const std::string& varName)
+		{
+			return Identifier(varName).Space()
+					.Assign();
+		}
+
+		CppEmitter& CppEmitter::AssignValueAt(const std::string& varName, const int offset)
+		{
+			return Identifier(varName)
+				.Offset(offset).Space()
+				.Assign();
+		}
+
 		CppEmitter& CppEmitter::Clear()
 		{
 			_writer.Clear();

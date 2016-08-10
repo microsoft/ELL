@@ -43,12 +43,5 @@ namespace emll
 					.Cmp(cmp).Space()
 					.Literal<T>(value);
 		}
-
-		template<typename T>
-		CppEmitter& CppEmitter::SetVar(T value)
-		{
-			return Assign().Space().
-					Literal<T>(value);
-		}
 	}
 }

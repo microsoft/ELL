@@ -64,8 +64,9 @@ namespace emll
 
 			template<typename T>
 			CppEmitter& Cmp(const std::string& varName, ComparisonType cmp, T value);
-			template<typename T>
-			CppEmitter& SetVar(T value);
+
+			CppEmitter& Assign(const std::string& varName);
+			CppEmitter& AssignValueAt(const std::string& varName, const int offset);
 
 			CppEmitter& For();
 			CppEmitter& If();
