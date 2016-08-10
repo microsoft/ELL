@@ -117,7 +117,6 @@ namespace model
         ///
         /// <returns> The OutputPortElements containing the referenced locations to get values from </returns>
         OutputPortElements<ValueType> GetOutputPortElements() const;
-        void SetOutputPortElements(const OutputPortElements<ValueType>& elements);
 
         /// <summary> Returns an element from the (already-computed) output value corresponding to this input </summary>
         ///

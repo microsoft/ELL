@@ -102,10 +102,4 @@ namespace model
 
         ComputeParentsAndElements();
     }
-
-    template <typename ValueType>
-    void InputPort<ValueType>::SetOutputPortElements(const OutputPortElements<ValueType>& elements)
-    {
-        _input = elements;
-    }
 }

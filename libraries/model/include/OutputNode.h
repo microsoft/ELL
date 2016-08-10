@@ -61,8 +61,6 @@ namespace model
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";
 
-        void SetInput(const model::OutputPortElements<ValueType>& input);
-
     protected:
         virtual void Compute() const override;
 

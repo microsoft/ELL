@@ -24,12 +24,6 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputNode<ValueType>::SetInput(const model::OutputPortElements<ValueType>& input)
-    {
-        _input.SetOutputPortElements(input);
-    }
-
-    template <typename ValueType>
     void OutputNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
         auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
