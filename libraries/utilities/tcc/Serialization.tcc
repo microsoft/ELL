@@ -128,16 +128,17 @@ namespace utilities
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::vector<ValueType>& array, SerializationContext& context)
+    void Deserializer::DeserializeItem(const char* name, std::vector<ValueType>& arr, SerializationContext& context)
     {
-        DeserializeArray(name, array, context);
+        arr.clear();
+        DeserializeArray(name, arr, context);
     }
 
     // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::vector<ValueType>& array, SerializationContext& context)
+    void Deserializer::DeserializeItem(const char* name, std::vector<ValueType>& arr, SerializationContext& context)
     {
-        array.clear();
+        arr.clear();
         auto typeName = ValueType::GetTypeName();
         BeginDeserializeArray(name, typeName, context);
         while(true)
@@ -149,7 +150,7 @@ namespace utilities
             }
             ValueType value;
             Deserialize(value, context);
-            array.push_back(value);
+            arr.push_back(value);
             EndDeserializeArrayItem(typeName, context);            
         }
         EndDeserializeArray(name, typeName, context);
@@ -157,9 +158,9 @@ namespace utilities
 
     // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::vector<std::unique_ptr<ValueType>>& array, SerializationContext& context)
+    void Deserializer::DeserializeItem(const char* name, std::vector<std::unique_ptr<ValueType>>& arr, SerializationContext& context)
     {
-        array.clear();
+        arr.clear();
         auto typeName = ValueType::GetTypeName();
         BeginDeserializeArray(name, typeName, context);
         while(true)
@@ -171,10 +172,9 @@ namespace utilities
             }
             std::unique_ptr<ValueType> newPtr;
             Deserialize(newPtr, context);
-            array.push_back(std::move(newPtr));
+            arr.push_back(std::move(newPtr));
             EndDeserializeArrayItem(typeName, context);            
         }
         EndDeserializeArray(name, typeName, context);
     }
-
 }

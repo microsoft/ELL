@@ -80,6 +80,8 @@ namespace nodes
         serializer.Deserialize("windowSize", _windowSize, context);
 
         auto dimension = _input.Size();
+        _samples.clear();
+        _samples.reserve(_windowSize);
         for(size_t index = 0; index < _windowSize; ++index)
         {
             _samples.push_back(std::vector<ValueType>(dimension));
