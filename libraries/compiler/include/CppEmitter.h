@@ -43,6 +43,7 @@ namespace emll
 			CppEmitter& Identifier(const std::string& id) { return Token(id); }
 
 			CppEmitter& Offset(int offset);
+			CppEmitter& Offset(const std::string& offsetVarName);
 			CppEmitter& Dimension(int size);
 
 			CppEmitter& Literal(const std::string& value);
@@ -66,6 +67,7 @@ namespace emll
 
 			CppEmitter& Assign(const std::string& varName);
 			CppEmitter& AssignValueAt(const std::string& varName, const int offset);
+			CppEmitter& AssignValueAt(const std::string& varName, const std::string& offsetVarName);
 
 			CppEmitter& For();
 			CppEmitter& If();

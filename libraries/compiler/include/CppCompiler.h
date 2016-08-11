@@ -77,6 +77,8 @@ namespace emll
 		private:
 
 			Variable* EnsureEmitted(model::OutputPortBase* pPort);
+			Variable* EnsureEmitted(model::OutputPortElement elt);
+			Variable* EnsureEmitted(model::InputPortBase* pPort);
 
 			///<summary>Emit a variable</summary>
 			void Emit(Variable& var);
@@ -129,6 +131,9 @@ namespace emll
 			///<summary>Compile a BinaryOperationNode</summary>
 			template<typename T>
 			void CompileBinary(const nodes::BinaryOperationNode<T>& node);
+			///<summary>Compile a BinaryOperationNode with pure vector inputs as a loop</summary>
+			template<typename T>
+			void CompileBinaryLoop(const nodes::BinaryOperationNode<T>& node);
 			///<summary>Compile a BinaryOperationNode as a sequence of scalar operations</summary>
 			template<typename T>
 			void CompileBinaryExpanded(const nodes::BinaryOperationNode<T>& node);

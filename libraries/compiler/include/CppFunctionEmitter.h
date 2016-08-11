@@ -31,10 +31,14 @@ namespace emll
 			///<summary>Emit a offset into a pointer</summary>
 			CppFunctionEmitter& Value(const std::string& varName);
 			CppFunctionEmitter& ValueAt(const std::string& name, int offset);
+			CppFunctionEmitter& ValueAt(const std::string& name, const std::string& offsetVarName);
+
 			CppFunctionEmitter& AssignValue(const std::string& varName);
 			CppFunctionEmitter& AssignValue(const std::string& varName, std::function<void(CppFunctionEmitter& fn)> value);
 			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, int offset);
+			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, const std::string& offsetVarName);
 			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, int offset, std::function<void(CppFunctionEmitter& fn)> value);
+
 			CppFunctionEmitter& Op(OperatorType op, std::function<void(CppFunctionEmitter& fn)> lValue, std::function<void(CppFunctionEmitter& fn)> rValue);
 
 			CppFunctionEmitter& BeginFor(const std::string& iVarName, int count);

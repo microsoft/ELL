@@ -89,6 +89,19 @@ namespace emll
 			return pVar;
 		}
 
+		Variable* CppCompiler::EnsureEmitted(model::OutputPortElement elt)
+		{
+			Variable* pVar = EnsureVariableFor(elt);
+			EnsureEmitted(pVar);
+			return pVar;
+		}
+
+		Variable* CppCompiler::EnsureEmitted(model::InputPortBase* pPort)
+		{
+			assert(pPort != nullptr);
+			return EnsureEmitted(pPort->GetOutputPortElement(0));
+		}
+
 		void CppCompiler::Emit(Variable& var)
 		{
 			assert(var.HasEmittedName());

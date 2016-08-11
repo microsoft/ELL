@@ -49,6 +49,13 @@ namespace emll
 			return *this;
 		}
 
+		CppFunctionEmitter& CppFunctionEmitter::ValueAt(const std::string& name, const std::string& offsetVarName)
+		{
+			_emitter.Identifier(name)
+				.Offset(offsetVarName);
+			return *this;
+		}
+
 		CppFunctionEmitter& CppFunctionEmitter::AssignValue(const std::string& varName)
 		{
 			_emitter.Assign(varName).Space();
@@ -66,6 +73,12 @@ namespace emll
 		CppFunctionEmitter& CppFunctionEmitter::AssignValueAt(const std::string& destVarName, int offset)
 		{
 			_emitter.AssignValueAt(destVarName, offset).Space();
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::AssignValueAt(const std::string& destVarName, const std::string& offsetVarName)
+		{
+			_emitter.AssignValueAt(destVarName, offsetVarName).Space();
 			return *this;
 		}
 

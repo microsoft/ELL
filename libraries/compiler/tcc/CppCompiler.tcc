@@ -151,13 +151,32 @@ namespace emll
 			if ((ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2)) &&
 				!Settings().ShouldUnrollLoops())
 			{
-				//CompileBinaryLoop<T>(node);
-				CompileBinaryExpanded<T>(node);
+				CompileBinaryLoop<T>(node);
 			}
 			else
 			{
 				CompileBinaryExpanded<T>(node);
 			}
+		}
+
+		template<typename T>
+		void CppCompiler::CompileBinaryLoop(const nodes::BinaryOperationNode<T>& node)
+		{
+			const std::string iVarName = "i";
+			Variable* pLVector = EnsureEmitted(node.GetInputPorts()[0]);
+			Variable* pRVector = EnsureEmitted(node.GetInputPorts()[1]);
+			auto pOutput = node.GetOutputPorts()[0];
+			Variable* pResultVector = EnsureEmitted(pOutput);
+
+			_pfn->BeginFor(iVarName, pOutput->Size());
+			{
+				_pfn->AssignValueAt(pResultVector->EmittedName(), iVarName);
+				_pfn->Op(GetOperator<T>(node),
+					[&pLVector, &iVarName, this](CppFunctionEmitter& fn) {_pfn->ValueAt(pLVector->EmittedName(), iVarName); },
+					[&pRVector, &iVarName, this](CppFunctionEmitter& fn) {_pfn->ValueAt(pRVector->EmittedName(), iVarName); });
+				_pfn->EndStatement();
+			}
+			_pfn->EndFor();
 		}
 
 		template<typename T>

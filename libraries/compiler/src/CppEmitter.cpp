@@ -188,6 +188,13 @@ namespace emll
 				.CloseBracket();
 		}
 
+		CppEmitter& CppEmitter::Offset(const std::string& offsetVarName)
+		{
+			return OpenBracket()
+				.Identifier(offsetVarName)
+				.CloseBracket();
+		}
+
 		CppEmitter& CppEmitter::Dimension(int size)
 		{
 			OpenBracket();
@@ -305,6 +312,13 @@ namespace emll
 		{
 			return Identifier(varName)
 				.Offset(offset).Space()
+				.Assign();
+		}
+
+		CppEmitter& CppEmitter::AssignValueAt(const std::string& varName, const std::string& offsetVarName)
+		{
+			return Identifier(varName)
+				.Offset(offsetVarName).Space()
 				.Assign();
 		}
 
