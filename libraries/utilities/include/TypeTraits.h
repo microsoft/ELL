@@ -18,6 +18,10 @@ namespace utilities
     template <typename ValueType>
     class IsVectorType
     {
+    public:
+        static const bool value = IsVectorChecker<ValueType>(0);
+
+    private:
         template <typename VectorType>
         static constexpr bool IsVectorChecker(typename VectorType::value_type*, typename std::enable_if_t<std::is_base_of<VectorType, typename std::vector<typename VectorType::value_type>>::value, int> = 0)
         {
@@ -29,9 +33,6 @@ namespace utilities
         {
             return false;
         }
-
-    public:
-        static const bool value = IsVectorChecker<ValueType>(0);
     };
 
     /// <summary> Enabled if ValueType is a fundamental value. </summary>

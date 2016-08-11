@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Serialization.h (utilities)
+//  File:     Serializer.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,12 +109,17 @@ namespace utilities
     {
     public:
         /// <summary> Serialize unnamed values of any serializable type. </summary>
+        ///
+        /// <param name="value"> The value to serialize. </param>
         template <typename ValueType>
         void Serialize(ValueType&& value);
 
         /// <summary> Serialize named values of any serializable type. </summary>
         template <typename ValueType>
         void Serialize(const char* name, ValueType&& value);
+        ///
+        /// <param name="name"> The name to serialize the value under. </param>
+        /// <param name="value"> The value to serialize. </param>
 
     protected:
         // These are all the virtual function that need to be implemented by serializers
@@ -171,10 +176,15 @@ namespace utilities
     {
     public:
         /// <summary> Serialize unnamed values of any serializable type. </summary>
+        ///
+        /// <param name="value"> The value to deserialize. </param>
         template <typename ValueType>
         void Deserialize(ValueType&& value, SerializationContext& context);
 
         /// <summary> Serialize named values of various serializable types. </summary>
+        ///
+        /// <param name="name"> The name of the value to deserialize. </param>
+        /// <param name="value"> The value to deserialize. </param>
         template <typename ValueType>
         void Deserialize(const char* name, ValueType&& value, SerializationContext& context);
 
@@ -197,14 +207,14 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_BASE(float);
         DECLARE_DESERIALIZE_ARRAY_BASE(double);
 
-        /// <summary> Extra functions needed for deserializing arrays. </summary>
+        // Extra functions needed for deserializing arrays.
         virtual void DeserializeArray(const char* name, std::vector<std::string>& array, SerializationContext& context) = 0;
         virtual void BeginDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context);
         virtual bool BeginDeserializeArrayItem(const std::string& typeName, SerializationContext& context) = 0;
         virtual void EndDeserializeArrayItem(const std::string& typeName, SerializationContext& context) = 0;
         virtual void EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context);
 
-        /// <summary> Extra functions needed for deserializing ISerializable objects. </summary>
+        // Extra functions needed for deserializing ISerializable objects. 
         virtual std::string BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context);
         virtual void DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) = 0;
         virtual void EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context);
@@ -244,4 +254,4 @@ namespace utilities
 #define IMPLEMENT_DESERIALIZE_VALUE(base, type)  void base::DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy) { ReadScalar(name, value); }
 #define IMPLEMENT_DESERIALIZE_ARRAY(base, type)  void base::DeserializeArray(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy) { ReadArray(name, value, context); }
 
-#include "../tcc/Serialization.tcc"
+#include "../tcc/Serializer.tcc"

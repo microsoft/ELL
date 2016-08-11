@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     TypeFactory.tcc (utilities)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -44,13 +44,13 @@ namespace utilities
     // GenericTypeFactory
     //
     template <typename BaseType>
-    class TypeCreatorDerived : public TypeCreatorBase
+    class TypeConstructorDerived : public TypeConstructorBase
     {
     public:
         template <typename RuntimeType>
-        static std::unique_ptr<TypeCreatorDerived<BaseType>> NewTypeCreator()
+        static std::unique_ptr<TypeConstructorDerived<BaseType>> NewTypeConstructor()
         {
-            auto result = std::make_unique<TypeCreatorDerived<BaseType>>();            
+            auto result = std::make_unique<TypeConstructorDerived<BaseType>>();            
             result->_createFunction = []()
             {
                 auto runtimePtr = new RuntimeType();
@@ -60,7 +60,7 @@ namespace utilities
             return result;
         }
 
-        std::unique_ptr<BaseType> Create() const
+        std::unique_ptr<BaseType> Construct() const
         {
             return _createFunction();
         }
@@ -70,18 +70,18 @@ namespace utilities
     };
 
     //
-    // TypeCreatorBase implementation
+    // TypeConstructorBase implementation
     //
     template <typename BaseType>
-    std::unique_ptr<BaseType> TypeCreatorBase::Create() const
+    std::unique_ptr<BaseType> TypeConstructorBase::Construct() const
     {
-        auto thisPtr = dynamic_cast<const TypeCreatorDerived<BaseType>*>(this);
+        auto thisPtr = dynamic_cast<const TypeConstructorDerived<BaseType>*>(this);
         if (thisPtr == nullptr)
         {
-            throw InputException(InputExceptionErrors::typeMismatch, std::string{"TypeCreatorBase::Create called with wrong type. BaseType: "} + BaseType::GetTypeName());
+            throw InputException(InputExceptionErrors::typeMismatch, std::string{"TypeConstructorBase::Construct called with wrong type. BaseType: "} + BaseType::GetTypeName());
         }
 
-        return thisPtr->Create();
+        return thisPtr->Construct();
     }
 
     //
@@ -92,13 +92,13 @@ namespace utilities
     {
         auto baseTypeName = std::string{BaseType::GetTypeName()};
         auto key = baseTypeName + "__" + typeName;
-        auto entry = _typeCreatorMap.find(key);
-        if (entry == _typeCreatorMap.end())
+        auto entry = _typeConstructorMap.find(key);
+        if (entry == _typeConstructorMap.end())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "type " + typeName + " not registered in TypeFactory<" + BaseType::GetTypeName() + ">");
         }
 
-        return entry->second->Create<BaseType>();        
+        return entry->second->Construct<BaseType>();        
     }
 
     template<typename BaseType, typename RuntimeType>
@@ -114,7 +114,7 @@ namespace utilities
         auto baseTypeName = std::string{BaseType::GetTypeName()};
         auto key = baseTypeName + "__" + typeName;
 
-        auto derivedCreator = TypeCreatorDerived<BaseType>::template NewTypeCreator<RuntimeType>().release();
-        _typeCreatorMap[key] = std::shared_ptr<TypeCreatorBase>(derivedCreator);
+        auto derivedCreator = TypeConstructorDerived<BaseType>::template NewTypeConstructor<RuntimeType>().release();
+        _typeConstructorMap[key] = std::shared_ptr<TypeConstructorBase>(derivedCreator);
     }
 }

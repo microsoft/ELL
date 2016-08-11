@@ -18,7 +18,7 @@
 #include "RandomEngines.h"
 #include "StlIterator.h"
 #include "ISerializable.h"
-#include "Serialization.h"
+#include "Serializer.h"
 #include "UniqueId.h"
 #include "Variant.h"
 
@@ -37,7 +37,7 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 
 %include "SGDIncrementalTrainer_wrap.h"
 
-%import "Serialization.h"
+%import "Serializer.h"
 %include "ISerializable.h"
 %include "UniqueId.h"
 %include "Variant.h"

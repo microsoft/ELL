@@ -12,7 +12,7 @@
 // utilities
 #include "UniqueId.h"
 #include "ISerializable.h"
-#include "Serialization.h"
+#include "Serializer.h"
 #include "JsonSerializer.h"
 #include "XMLSerializer.h"
 

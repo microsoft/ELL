@@ -78,17 +78,17 @@ namespace utilities
     /// <summary>
     /// An internal class used by GenericTypeFactory
     /// </summary>
-    class TypeCreatorBase
+    class TypeConstructorBase
     {
     public:
-        virtual ~TypeCreatorBase() = default;
+        virtual ~TypeConstructorBase() = default;
     
     private:
         friend class GenericTypeFactory;
         template <typename BaseType>
-        friend class TypeCreator;
+        friend class TypeConstructor;
         template <typename BaseType>
-        std::unique_ptr<BaseType> Create() const;
+        std::unique_ptr<BaseType> Construct() const;
     };
 
     /// <summary>
@@ -120,7 +120,7 @@ namespace utilities
         void AddType(const std::string& typeName);
 
     private:
-        std::unordered_map<std::string, std::shared_ptr<TypeCreatorBase>> _typeCreatorMap;        
+        std::unordered_map<std::string, std::shared_ptr<TypeConstructorBase>> _typeConstructorMap;        
     };
 }
 

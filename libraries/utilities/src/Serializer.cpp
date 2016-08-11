@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Serialization.cpp (utilities)
+//  File:     Serializer.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Serialization.h"
+#include "Serializer.h"
 #include "Format.h"
 #include "ISerializable.h"
 
@@ -15,7 +15,7 @@
 namespace utilities
 {
     //
-    // Serialization
+    // Serializer
     //
     void Serializer::SerializeValue(const char* name, const ISerializable& value)
     {
@@ -35,7 +35,7 @@ namespace utilities
     }
 
     //
-    // Deserialization
+    // Deserializer
     //
     void Deserializer::DeserializeValue(const char* name, ISerializable& value, SerializationContext& context)
     {

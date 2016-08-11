@@ -9,13 +9,12 @@
 #pragma once
 
 #include "TypeName.h"
-#include "Serialization.h"
+#include "Serializer.h"
 #include "Exception.h"
 
 // stl
 #include <string>
 #include <ostream>
-#include <type_traits>
 
 namespace utilities
 {
