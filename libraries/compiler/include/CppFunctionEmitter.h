@@ -33,8 +33,11 @@ namespace emll
 			CppFunctionEmitter& ValueAt(const std::string& name, int offset);
 			CppFunctionEmitter& ValueAt(const std::string& name, const std::string& offsetVarName);
 
-			CppFunctionEmitter& AssignValue(const std::string& varName);
+			CppFunctionEmitter& Assign(const std::string& varName);
+			template<typename T>
+			CppFunctionEmitter& Assign(const std::string& varName, T value);
 			CppFunctionEmitter& AssignValue(const std::string& varName, std::function<void(CppFunctionEmitter& fn)> value);
+
 			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, int offset);
 			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, const std::string& offsetVarName);
 			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, int offset, std::function<void(CppFunctionEmitter& fn)> value);

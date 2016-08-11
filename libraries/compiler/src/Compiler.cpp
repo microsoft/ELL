@@ -352,6 +352,21 @@ namespace emll
 			}
 		}
 
+		void Compiler::CompileSumNode(const model::Node& node)
+		{
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					CompileSumNode(static_cast<const nodes::SumNode<double>&>(node));
+					break;
+				case model::Port::PortType::Integer:
+					CompileSumNode(static_cast<const nodes::SumNode<int>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
 		template<>
 		OperatorType Compiler::GetOperator<double>(const nodes::BinaryOperationNode<double>& node) const
 		{

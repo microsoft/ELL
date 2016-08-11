@@ -19,10 +19,14 @@ namespace emll
 		public:
 			CppEmitter();
 
+			CppEmitter& Comment(const std::string& text);
+
 			CppEmitter& Space();
 			CppEmitter& NewLine();
 			CppEmitter& Semicolon();
 			CppEmitter& Comma();
+			CppEmitter& OpenComment();
+			CppEmitter& CloseComment();
 			CppEmitter& OpenBrace();
 			CppEmitter& CloseBrace();
 			CppEmitter& OpenParan();

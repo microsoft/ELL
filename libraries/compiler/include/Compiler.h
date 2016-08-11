@@ -83,6 +83,8 @@ namespace emll
 			virtual void CompileOutputNode(const model::Node& node);
 			///<summary>Compile a BinaryNode</summary>
 			virtual void CompileBinaryNode(const model::Node& node);
+			///<summary>Compile a SumNode</summary>
+			virtual void CompileSumNode(const model::Node& node);
 
 			//---------------------------------------------------
 			//
@@ -101,10 +103,13 @@ namespace emll
 			///<summary>Compile a BinaryNode</summary>
 			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<int>& node) = 0;
 
+			///<summary>Compile a SumNode</summary>
+			virtual void CompileSumNode(const nodes::SumNode<double>& node) = 0;
+			///<summary>Compile a SumNode</summary>
+			virtual void CompileSumNode(const nodes::SumNode<int>& node) = 0;
+
 			///<summary>Compile a DotProductNode</summary>
 			virtual void CompileDotProductNode(const model::Node& node) = 0;
-			///<summary>Compile a SumNode</summary>
-			virtual void CompileSumNode(const model::Node& node) = 0;
 			///<summary>Compile a AccumulatorNode</summary>
 			virtual void CompileAccumulatorNode(const model::Node& node) = 0;
 			///<summary>Compile a DelayNode</summary>

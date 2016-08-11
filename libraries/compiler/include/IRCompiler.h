@@ -53,11 +53,13 @@ namespace emll
 			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<double>& node) override { CompileBinary<double>(node);}
 			///<summary>Compile a BinaryNode</summary>
 			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<int>& node) override { CompileBinary<int>(node); }
+			///<summary>Compile a SumNode</summary>
+			virtual void CompileSumNode(const nodes::SumNode<double>& node) override { CompileSum<double>(node); }
+			///<summary>Compile a SumNode</summary>
+			virtual void CompileSumNode(const nodes::SumNode<int>& node) override { CompileSum<int>(node);}
 
 			///<summary>Compile a DotProductNode</summary>
 			virtual void CompileDotProductNode(const model::Node& node) override;
-			///<summary>Compile a SumNode</summary>
-			virtual void CompileSumNode(const model::Node& node) override;
 			///<summary>Compile a AccmulatorNode</summary>
 			virtual void CompileAccumulatorNode(const model::Node& node) override;
 			///<summary>Compile a Delay node</summary>

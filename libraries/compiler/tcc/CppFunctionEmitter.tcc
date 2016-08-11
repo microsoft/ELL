@@ -19,6 +19,15 @@ namespace emll
 		}
 
 		template<typename T>
+		CppFunctionEmitter& CppFunctionEmitter::Assign(const std::string& varName, T value)
+		{
+			_emitter.Assign(varName).Space();
+			_emitter.Literal(value);
+			EndStatement();
+			return *this;
+		}
+
+		template<typename T>
 		CppFunctionEmitter& CppFunctionEmitter::BeginIf(const std::string&varName, ComparisonType cmp, T value)
 		{
 			_emitter.If()

@@ -162,12 +162,11 @@ namespace emll
 		template<typename T>
 		void CppCompiler::CompileBinaryLoop(const nodes::BinaryOperationNode<T>& node)
 		{
-			const std::string iVarName = "i";
 			Variable* pLVector = EnsureEmitted(node.GetInputPorts()[0]);
 			Variable* pRVector = EnsureEmitted(node.GetInputPorts()[1]);
 			auto pOutput = node.GetOutputPorts()[0];
 			Variable* pResultVector = EnsureEmitted(pOutput);
-
+			auto iVarName = LoopVarName();
 			_pfn->BeginFor(iVarName, pOutput->Size());
 			{
 				_pfn->AssignValueAt(pResultVector->EmittedName(), iVarName);
@@ -188,15 +187,68 @@ namespace emll
 			Variable& resultVar = *(EnsureEmitted(pOutput));
 			for (size_t i = 0; i < pInput1->Size(); ++i)
 			{
-				auto pLOutput = pInput1->GetOutputPortElement(i);
-				auto pROutput = pInput2->GetOutputPortElement(i);
+				auto pLInput = pInput1->GetOutputPortElement(i);
+				auto pRInput = pInput2->GetOutputPortElement(i);
 				SetVar(resultVar, i);
 				_pfn->Op(GetOperator<T>(node), 
-					[&pLOutput, this](CppFunctionEmitter& fn) {LoadVar(pLOutput); },
-					[&pROutput, this](CppFunctionEmitter& fn) {LoadVar(pROutput); });
+					[&pLInput, this](CppFunctionEmitter& fn) {LoadVar(pLInput); },
+					[&pRInput, this](CppFunctionEmitter& fn) {LoadVar(pRInput); });
 				_pfn->EndStatement();
 			}
 		}
 
+		template<typename T>
+		void CppCompiler::CompileSum(const nodes::SumNode<T>& node)
+		{
+			// SumNode has exactly 1 input and 1 output
+			auto input = node.GetInputPorts()[0];
+			if (ModelEx::IsPureVector(*input) &&
+				!Settings().ShouldUnrollLoops())
+			{
+				CompileSumLoop<T>(node);
+			}
+			else
+			{
+				CompileSumExpanded<T>(node);
+			}
+		}
+		template<typename T>
+		void CppCompiler::CompileSumLoop(const nodes::SumNode<T>& node)
+		{
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			Variable* pSrcVector = EnsureEmitted(pInput);
+			Variable& resultVar = *(EnsureEmitted(pOutput));
+			auto iVarName = LoopVarName();
+			_pfn->Assign(resultVar.EmittedName(), GetDefaultForValueType<T>());
+			_pfn->BeginFor(LoopVarName(), pSrcVector->Dimension());
+			{
+				_pfn->Assign(resultVar.EmittedName());
+				_pfn->Op(GetAddForValueType<T>(),
+					[&resultVar, this](CppFunctionEmitter& fn) {_pfn->Value(resultVar.EmittedName()); },
+					[&pSrcVector, &iVarName, this](CppFunctionEmitter& fn) {_pfn->ValueAt(pSrcVector->EmittedName(), iVarName); });
+				_pfn->EndStatement();
+			}
+			_pfn->EndFor();
+		}
+
+		template<typename T>
+		void CppCompiler::CompileSumExpanded(const nodes::SumNode<T>& node)
+		{
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			Variable& resultVar = *(EnsureEmitted(pOutput));
+
+			_pfn->Assign(resultVar.EmittedName(), GetDefaultForValueType<T>());
+			for (size_t i = 0; i < pInput->Size(); ++i)
+			{
+				auto pRInput = pInput->GetOutputPortElement(i);
+				_pfn->Assign(resultVar.EmittedName());
+				_pfn->Op(OperatorType::Add,
+					[&resultVar, this](CppFunctionEmitter& fn) { _pfn->Value(resultVar.EmittedName()); },
+					[&pRInput, this](CppFunctionEmitter& fn) {LoadVar(pRInput); });
+				_pfn->EndStatement();
+			}
+		}
 	}
 }

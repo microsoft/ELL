@@ -27,6 +27,14 @@ namespace emll
 		{
 		}
 		
+		CppEmitter& CppEmitter::Comment(const std::string& text)
+		{
+			OpenComment()
+				.AppendRaw(text)
+			.CloseComment();
+			return *this;
+		}
+
 		CppEmitter& CppEmitter::Space()
 		{
 			_writer.Write(" ");
@@ -48,6 +56,18 @@ namespace emll
 		CppEmitter& CppEmitter::Comma()
 		{
 			_writer.Write(',');
+			return *this;
+		}
+
+		CppEmitter& CppEmitter::OpenComment()
+		{
+			_writer.Write("/*");
+			return *this;
+		}
+
+		CppEmitter& CppEmitter::CloseComment()
+		{
+			_writer.Write("*/");
 			return *this;
 		}
 

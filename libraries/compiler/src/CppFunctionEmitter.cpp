@@ -56,7 +56,7 @@ namespace emll
 			return *this;
 		}
 
-		CppFunctionEmitter& CppFunctionEmitter::AssignValue(const std::string& varName)
+		CppFunctionEmitter& CppFunctionEmitter::Assign(const std::string& varName)
 		{
 			_emitter.Assign(varName).Space();
 			return *this;

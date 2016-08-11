@@ -64,3 +64,22 @@ void TestBinaryVectorCpp(bool expanded)
 	compiler.DebugDump();
 	compiler.WriteToFile("C:\\junk\\model\\TestBinary.cpp");
 }
+
+void TestSumCpp(bool expanded)
+{
+	std::vector<double> data = { 5, 10, 15, 20 };
+
+	ModelBuilder mb;
+	auto c1 = mb.Constant<double>(data);
+	auto input1 = mb.Inputs<double>(4);
+	auto product = mb.Multiply<double>(c1->output, input1->output);
+	auto sum = mb.Sum<double>(product->output);
+	auto output = mb.Outputs<double>(sum->output);
+
+	CppCompiler compiler;
+	compiler.Settings().ShouldUnrollLoops() = expanded;
+	compiler.CompileModel("TestSum", mb.Model);
+	compiler.DebugDump();
+	compiler.WriteToFile("C:\\junk\\model\\TestSum.cpp");
+}
+

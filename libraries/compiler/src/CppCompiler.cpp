@@ -13,6 +13,8 @@ namespace emll
 {
 	namespace compiler
 	{
+		static const std::string c_LoopVarName = "i";
+
 		CppCompiler::CppCompiler()
 		{
 		}
@@ -24,10 +26,6 @@ namespace emll
 		}
 
 		void CppCompiler::CompileDotProductNode(const model::Node& node)
-		{
-			throw new CompilerException(CompilerError::notSupported);
-		}
-		void CppCompiler::CompileSumNode(const model::Node& node)
 		{
 			throw new CompilerException(CompilerError::notSupported);
 		}
@@ -153,7 +151,7 @@ namespace emll
 				{
 					throw new CompilerException(CompilerError::indexOutOfRange);
 				}
-				_pfn->AssignValue(var.EmittedName());
+				_pfn->Assign(var.EmittedName());
 				return;
 			}
 			if (offset >= var.Dimension())
@@ -161,6 +159,11 @@ namespace emll
 				throw new CompilerException(CompilerError::indexOutOfRange);
 			}
 			_pfn->AssignValueAt(var.EmittedName(), offset);
+		}
+
+		const std::string& CppCompiler::LoopVarName()
+		{
+			return c_LoopVarName;
 		}
 	}
 }
