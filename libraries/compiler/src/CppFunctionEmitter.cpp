@@ -56,6 +56,30 @@ namespace emll
 			return *this;
 		}
 
+		CppFunctionEmitter& CppFunctionEmitter::Value(Variable& var, int index)
+		{
+			if (var.IsScalar())
+			{
+				if (index > 0)
+				{
+					throw new CompilerException(CompilerError::vectorVariableExpected);
+				}
+				if (!var.IsLiteral())
+				{
+					Value(var.EmittedName());
+				}
+			}
+			else
+			{
+				if (index >= var.Dimension())
+				{
+					throw new CompilerException(CompilerError::indexOutOfRange);
+				}
+				ValueAt(var.EmittedName(), index);
+			}
+			return *this;
+		}
+
 		CppFunctionEmitter& CppFunctionEmitter::Assign(const std::string& varName)
 		{
 			_emitter.Assign(varName).Space();
@@ -87,6 +111,40 @@ namespace emll
 			_emitter.AssignValueAt(destVarName, offset).Space();
 			value();
 			EndStatement();
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::AssignValue(Variable& var)
+		{
+			if (var.IsScalar())
+			{
+				Assign(var.EmittedName());
+			}
+			else
+			{
+				AssignValueAt(var.EmittedName(), 0);
+			}
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::AssignValue(Variable& var, int offset)
+		{
+			if (var.IsScalar())
+			{
+				if (offset > 0)
+				{
+					throw new CompilerException(CompilerError::indexOutOfRange);
+				}
+				Assign(var.EmittedName());
+			}
+			else
+			{
+				if (offset >= var.Dimension())
+				{
+					throw new CompilerException(CompilerError::indexOutOfRange);
+				}
+				AssignValueAt(var.EmittedName(), offset);
+			}
 			return *this;
 		}
 

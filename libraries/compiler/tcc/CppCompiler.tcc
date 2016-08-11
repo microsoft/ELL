@@ -196,8 +196,10 @@ namespace emll
 			{
 				auto lInput = pInput1->GetOutputPortElement(i);
 				auto rInput = pInput2->GetOutputPortElement(i);
-				SetVar(resultVar, i);
-				_pfn->Op(GetOperator<T>(node), [&lInput, this]() {LoadVar(lInput); },[&rInput, this]() {LoadVar(rInput); });
+				_pfn->AssignValue(resultVar, i);
+				{
+					_pfn->Op(GetOperator<T>(node), [&lInput, this]() {LoadVar(lInput); },[&rInput, this]() {LoadVar(rInput); });
+				}
 				_pfn->EndStatement();
 			}
 		}

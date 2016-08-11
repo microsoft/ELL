@@ -127,13 +127,9 @@ namespace emll
 
 			///<summary>Ensure that the variable for this outport port element is loaded into a register. SThis will automatically
 			/// dereference any pointers it needs to.</summary>
-			void LoadVar(const model::OutputPortElement elt);
+			Variable* LoadVar(const model::OutputPortElement elt);
 			///<summary>Load the variable for the outport port referenced by this input port</summary>
-			void LoadVar(model::InputPortBase* pPort);
-			///<summary>Updates the value at a given offset of the given variable. Checks for index out of range etc.</summary>
-			void SetVar(Variable& var, int offset);
-			///<summary>Updates the value at a given offset of the given variable. Checks for index out of range etc.</summary>
-			void SetVar(Variable& var);
+			Variable* LoadVar(model::InputPortBase* pPort);
 
 			const std::string& LoopVarName();
 

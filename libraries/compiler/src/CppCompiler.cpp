@@ -125,66 +125,19 @@ namespace emll
 			throw new CompilerException(CompilerError::variableTypeNotSupported);
 		}
 
-		void CppCompiler::LoadVar(const model::OutputPortElement elt)
+		Variable* CppCompiler::LoadVar(const model::OutputPortElement elt)
 		{
 			Variable* pVar = EnsureVariableFor(elt);
 			EnsureEmitted(pVar);
-			if (pVar->IsScalar())
-			{
-				if (elt.GetIndex() > 0)
-				{
-					throw new CompilerException(CompilerError::vectorVariableExpected);
-				}
-				if (!pVar->IsLiteral())
-				{
-					_pfn->Value(pVar->EmittedName());
-				}
-				return;
-			}
-
-			if (elt.GetIndex() >= pVar->Dimension())
-			{
-				throw new CompilerException(CompilerError::indexOutOfRange);
-			}
-			_pfn->ValueAt(pVar->EmittedName(), (int)elt.GetIndex());
+			_pfn->Value(*pVar, elt.GetIndex());
+			return pVar;
 		}
 
-		void CppCompiler::LoadVar(model::InputPortBase* pPort)
+		Variable* CppCompiler::LoadVar(model::InputPortBase* pPort)
 		{
 			assert(pPort != nullptr);
 			return LoadVar(pPort->GetOutputPortElement(0));
 		}
-
-		void CppCompiler::SetVar(Variable& var, int offset)
-		{
-			if (var.IsScalar())
-			{
-				if (offset > 0)
-				{
-					throw new CompilerException(CompilerError::indexOutOfRange);
-				}
-				_pfn->Assign(var.EmittedName());
-				return;
-			}
-			if (offset >= var.Dimension())
-			{
-				throw new CompilerException(CompilerError::indexOutOfRange);
-			}
-			_pfn->AssignValueAt(var.EmittedName(), offset);
-		}
-
-		void CppCompiler::SetVar(Variable& var)
-		{
-			if (var.IsScalar())
-			{
-				_pfn->Assign(var.EmittedName());
-			}
-			else
-			{
-				_pfn->AssignValueAt(var.EmittedName(), 0);
-			}
-		}
-
 
 		const std::string& CppCompiler::LoopVarName()
 		{

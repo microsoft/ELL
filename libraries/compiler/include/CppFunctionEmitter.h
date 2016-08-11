@@ -2,6 +2,7 @@
 
 #include "CppEmitter.h"
 #include <functional>
+#include "Variable.h"
 
 namespace emll
 {
@@ -34,6 +35,8 @@ namespace emll
 			CppFunctionEmitter& ValueAt(const std::string& name, int offset);
 			///<summary>Emit a offset into a pointer</summary>
 			CppFunctionEmitter& ValueAt(const std::string& name, const std::string& offsetVarName);
+			
+			CppFunctionEmitter& Value(Variable& var, int index);
 
 			///<summary>Emit an Assign</summary>
 			CppFunctionEmitter& Assign(const std::string& varName);
@@ -49,6 +52,9 @@ namespace emll
 			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, const std::string& offsetVarName);
 			///<summary>Emit an Assign</summary>
 			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, int offset, std::function<void()> value);
+			
+			CppFunctionEmitter& AssignValue(Variable& var);
+			CppFunctionEmitter& AssignValue(Variable& var, int offset);
 
 			///<summary>Emit a math operator</summary>
 			CppFunctionEmitter& Op(OperatorType op, std::function<void()> lValue, std::function<void()> rValue);
