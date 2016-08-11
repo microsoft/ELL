@@ -15,18 +15,18 @@
 ///
 int main()
 {
-    TestL2NormNodeCompute();
-    TestAccumulatorNodeCompute();
-    TestDelayNodeCompute();
-    TestMovingAverageNodeCompute();
-    TestMovingVarianceNodeCompute(); 
-    TestUnaryOperationNodeCompute();
-    TestBinaryOperationNodeCompute();
-    TestLinearPredictorNodeCompute();
-    
-    TestMovingAverageNodeRefine();
+    //TestL2NormNodeCompute();
+    //TestAccumulatorNodeCompute();
+    //TestDelayNodeCompute();
+    //TestMovingAverageNodeCompute();
+    //TestMovingVarianceNodeCompute(); 
+    //TestUnaryOperationNodeCompute();
+    //TestBinaryOperationNodeCompute();
+    //TestLinearPredictorNodeCompute();
+    //
+    //TestMovingAverageNodeRefine();
     TestLinearPredictorNodeRefine();
-    TestSimpleForestNodeRefine();
+//    TestSimpleForestNodeRefine();
 
     if (testing::DidTestFail())
     {

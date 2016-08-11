@@ -25,6 +25,9 @@
 // predictors
 #include "LinearPredictor.h"
 
+// common
+#include "IsNodeCompilable.h"
+
 // testing
 #include "testing.h"
 
@@ -347,6 +350,7 @@ void TestLinearPredictorNodeRefine()
 
     // refine the model
     model::TransformContext context;
+    context.IsNodeCompilable = common::IsNodeCompilable();
     model::ModelTransformer transformer;
     auto newModel = transformer.RefineModel(model, context);
 

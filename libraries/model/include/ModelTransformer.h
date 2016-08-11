@@ -37,7 +37,6 @@ namespace model
         std::function<bool(Node*)> IsNodeCompilable;
     };
 
-    // TODO: template transformer on the context type
     class ModelTransformer
     {
     public:

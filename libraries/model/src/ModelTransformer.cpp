@@ -29,12 +29,36 @@ namespace model
     Model ModelTransformer::RefineModel(const Model& oldModel, const TransformContext& context)
     {
         _context = context;
-        _model = Model();
-        _portToPortMap.clear();
-        _isModelCompilable = true;
-        oldModel.Visit([this](const Node& node) { node.Refine(*this); });
-        _context = TransformContext();
+        _model = oldModel;
 
+        do
+        {
+            Model currentModel = std::move(_model);
+            _model = Model();
+
+            std::unordered_map<const Port*, Port*> currentPortToPortMap = std::move(_portToPortMap);
+            _portToPortMap = std::unordered_map<const Port*, Port*>();
+
+            _isModelCompilable = true;
+
+            currentModel.Visit([this](const Node& node) 
+            { 
+                node.Refine(*this); 
+            });
+
+            if(currentPortToPortMap.size() > 0)
+            {
+                std::unordered_map<const Port*, Port*> newPortToPortMap;
+                for(const auto& entry : currentPortToPortMap)
+                {
+                    newPortToPortMap[entry.first] = _portToPortMap[entry.second];
+                }
+                _portToPortMap = newPortToPortMap;
+            }
+        }
+        while(!_isModelCompilable);
+
+        _context = TransformContext();
         return _model;
     }
 
