@@ -30,6 +30,7 @@ void TestIRCompiler()
 
 void TestCppCompiler()
 {
+	TestElementSelectorCpp();
 	TestBinaryPredicateCpp();
 	TestSumCpp(true);
 	TestSumCpp(false);

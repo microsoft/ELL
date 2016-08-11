@@ -133,6 +133,15 @@ namespace emll
 			return *this;
 		}
 
+		CppFunctionEmitter& CppFunctionEmitter::BeginIf(std::function<void(CppFunctionEmitter& fn)> value)
+		{
+			_emitter.If().OpenParan();
+			value(*this);
+			_emitter.CloseParan().NewLine()
+					.BeginBlock();
+			return *this;
+		}
+
 		CppFunctionEmitter& CppFunctionEmitter::BeginElse()
 		{
 			_emitter.Else().NewLine()

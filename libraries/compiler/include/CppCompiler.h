@@ -127,6 +127,8 @@ namespace emll
 			///<summary>Ensure that the variable for this outport port element is loaded into a register. SThis will automatically
 			/// dereference any pointers it needs to.</summary>
 			void LoadVar(const model::OutputPortElement elt);
+			///<summary>Load the variable for the outport port referenced by this input port</summary>
+			void LoadVar(model::InputPortBase* pPort);
 			///<summary>Updates the value at a given offset of the given variable. Checks for index out of range etc.</summary>
 			void SetVar(Variable& var, int offset);
 
@@ -159,6 +161,16 @@ namespace emll
 			///<summary>Compile a BinarPredicate</summary>
 			template<typename T>
 			void CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node);
+
+			///<summary>Compile an element selector node</summary>
+			template<typename T>
+			void CompileElementSelectorNode(const model::Node& node);
+			///<summary>Compile an element selector node</summary>
+			template<typename T, typename SelectorType>
+			void CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node);
+			///<summary>Compile an element selector node</summary>
+			template<typename T, typename SelectorType>
+			void CompileElementSelectorBinary(const nodes::ElementSelectorNode<T, SelectorType>& node);
 
 		private:
 			CppModuleEmitter _module;

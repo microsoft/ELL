@@ -37,14 +37,24 @@ namespace emll
 		{
 			throw new CompilerException(CompilerError::notSupported);
 		}
+
 		void CppCompiler::CompileUnaryNode(const model::Node& node)
 		{
 			throw new CompilerException(CompilerError::notSupported);
 		}
+
 		void CppCompiler::CompileElementSelectorNode(const model::Node& node)
 		{
-			throw new CompilerException(CompilerError::notSupported);
+			switch (ModelEx::GetNodeDataType(node))
+			{
+				case model::Port::PortType::Real:
+					CompileElementSelectorNode<double>(node);
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
 		}
+
 		void CppCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
 		{
 			_pfn = _module.Function(functionName, ValueType::Void, args);
@@ -137,6 +147,12 @@ namespace emll
 				throw new CompilerException(CompilerError::indexOutOfRange);
 			}
 			_pfn->ValueAt(pVar->EmittedName(), (int)elt.GetIndex());
+		}
+
+		void CppCompiler::LoadVar(model::InputPortBase* pPort)
+		{
+			assert(pPort != nullptr);
+			return LoadVar(pPort->GetOutputPortElement(0));
 		}
 
 		void CppCompiler::SetVar(Variable& var, int offset)

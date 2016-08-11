@@ -99,4 +99,22 @@ void TestBinaryPredicateCpp()
 	compiler.WriteToFile("C:\\junk\\model\\TestPredicate.cpp");
 }
 
+void TestElementSelectorCpp()
+{
+	ModelBuilder mb;
+
+	std::vector<double> data = { 5, 10 };
+	auto c1 = mb.Constant<bool>(true);
+	auto input1 = mb.Inputs<double>(data.size());
+	auto selector = mb.Select<double, bool>(input1->output, c1->output);
+	//selector->output.SetOutput(0);
+	auto output = mb.Outputs<double>(*mb.GetOutputPort<double>(selector, 0));
+
+	CppCompiler compiler;
+	compiler.CompileModel("TestElementSelector", mb.Model);
+	compiler.DebugDump();
+	compiler.WriteToFile("C:\\junk\\model\\TestElementSelector.cpp");
+}
+
+
 

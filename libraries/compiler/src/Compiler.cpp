@@ -334,7 +334,6 @@ namespace emll
 			// We always convert booleans as integers
 			Variable* pVar = Variables().AddVariable<LiteralVar<int>>(values[0]);
 			SetVariableFor(output, pVar);
-			EnsureVarEmitted(pVar);
 		}
 
 		void Compiler::CompileBinaryNode(const model::Node& node)

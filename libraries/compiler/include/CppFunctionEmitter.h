@@ -50,6 +50,7 @@ namespace emll
 			
 			template<typename T>
 			CppFunctionEmitter& BeginIf(const std::string&varName, ComparisonType cmp, T value);
+			CppFunctionEmitter& BeginIf(std::function<void(CppFunctionEmitter& fn)> value);
 			CppFunctionEmitter& BeginElse();
 			CppFunctionEmitter& EndIf();
 

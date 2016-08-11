@@ -277,5 +277,71 @@ namespace emll
 				[&rInput, this](CppFunctionEmitter& fn) {LoadVar(rInput); });
 			_pfn->EndStatement();
 		}
+
+		template<typename T>
+		void CppCompiler::CompileElementSelectorNode(const model::Node& node)
+		{
+			auto selectorPort = node.GetInputPorts()[1];
+			switch (selectorPort->GetType())
+			{
+				case model::Port::PortType::Boolean:
+					return CompileElementSelector<T, bool>(static_cast<const nodes::ElementSelectorNode<T, bool>&>(node));
+
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		template<typename T, typename SelectorType>
+		void CppCompiler::CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node)
+		{
+			auto pElements = node.GetInputPorts()[0];
+			if (!ModelEx::IsPureBinary(node))
+			{
+				// Only support binary right now
+				throw new CompilerException(CompilerError::binaryInputsExpected);
+			}
+			CompileElementSelectorBinary<T, SelectorType>(node);
+		}
+
+		///<summary>Compile an element selector node</summary>
+		template<typename T, typename SelectorType>
+		void CppCompiler::CompileElementSelectorBinary(const nodes::ElementSelectorNode<T, SelectorType>& node)
+		{
+			auto pElements = node.GetInputPorts()[0];
+			auto pSelector = node.GetInputPorts()[1];
+			if (!ModelEx::IsScalar(*pSelector))
+			{
+				throw new CompilerException(CompilerError::scalarInputsExpected);
+			}
+			auto pOutput = node.GetOutputPorts()[0];
+			if (!ModelEx::IsScalar(*pOutput))
+			{
+				throw new CompilerException(CompilerError::scalarOutputsExpected);
+			}
+			Variable* pResult = EnsureEmitted(pOutput);
+			//
+			// If inputs are pure vectors - i.e. all from the same input port, then we can optimize the If, then away into a vector dereference
+			//
+			//if (ModelEx::IsPureVector(*pElements))
+			//{
+			//	_fn.Store(pResult, _fn.ValueAt(EnsureEmitted(pElements), pSelectorVal));
+			//}
+			//else
+			{
+				auto lVal = pElements->GetOutputPortElement(0);
+				auto rVal = pElements->GetOutputPortElement(1);
+				_pfn->BeginIf([&pSelector, this](CppFunctionEmitter& fn) { LoadVar(pSelector); });
+				{
+					_pfn->AssignValue(pResult->EmittedName(), [&lVal, this](CppFunctionEmitter& fn) { LoadVar(lVal); });
+				}
+				_pfn->EndIf();
+				_pfn->BeginElse();
+				{
+					_pfn->AssignValue(pResult->EmittedName(), [&rVal, this](CppFunctionEmitter& fn) { LoadVar(rVal); });
+				}
+				_pfn->EndIf();
+			}
+		}
 	}
 }
