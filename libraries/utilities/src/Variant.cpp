@@ -28,11 +28,11 @@ namespace utilities
         return *this;
     }
 
-    std::string to_string(const Variant& variant)
+    std::string Variant::ToString() const
     {
         using std::to_string;
         using utilities::to_string;
-        return variant._value->ToString();
+        return _value->ToString();
     }
 
     std::string Variant::GetStoredTypeName() const
@@ -53,5 +53,10 @@ namespace utilities
     bool Variant::IsPointer() const
     {
         return _value->IsPointer();
+    }
+
+    std::string to_string(const Variant& variant)
+    {
+        return variant.ToString();
     }
 }

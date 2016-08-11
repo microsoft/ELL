@@ -67,12 +67,17 @@ namespace utilities
 // custom specialization of std::hash so we can keep UniqueIds in containers that require hashable types
 namespace std
 {
+    /// <summary> Implements a hash function for the UniqueId class, so that it can be used with associative containers (maps, sets, and the like). </summary>
     template <>
     class hash<utilities::UniqueId>
     {
     public:
         typedef utilities::UniqueId argument_type;
         typedef std::size_t result_type;
+
+        /// <summary> Computes a hash of the input value. </summary>
+        ///
+        /// <returns> A hash value for the given input. </returns>
         result_type operator()(argument_type const& id) const;
     };
 }

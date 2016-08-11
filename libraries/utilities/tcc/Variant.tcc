@@ -18,21 +18,9 @@ namespace utilities
     class VariantBase
     {
     public:
-        VariantBase(std::type_index type) : _type(type){};
         virtual ~VariantBase() = default;
 
-        template <typename ValueType>
-        ValueType GetValue() const
-        {
-            auto thisPtr = dynamic_cast<const VariantDerived<ValueType>*>(this);
-            if (thisPtr == nullptr)
-            {
-                throw InputException(InputExceptionErrors::typeMismatch, "Variant::GetValue called with wrong type.");
-            }
-
-            return thisPtr->GetValue();
-        }
-
+    protected:
         virtual std::unique_ptr<VariantBase> Clone() const = 0;
 
         virtual std::string ToString() const = 0;
@@ -46,6 +34,22 @@ namespace utilities
         virtual bool IsPointer() const = 0;
 
     private:
+        friend class Variant;
+
+        VariantBase(std::type_index type) : _type(type){};
+
+        template <typename ValueType>
+        ValueType GetValue() const
+        {
+            auto thisPtr = dynamic_cast<const VariantDerived<ValueType>*>(this);
+            if (thisPtr == nullptr)
+            {
+                throw InputException(InputExceptionErrors::typeMismatch, "Variant::GetValue called with wrong type.");
+            }
+
+            return thisPtr->GetValue();
+        }
+
         std::type_index _type; // redundant with type in Variant class.
     };
 
@@ -55,9 +59,7 @@ namespace utilities
     template <typename ValueType>
     class VariantDerived : public VariantBase
     {
-    public:
-        VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) {}
-
+    protected:
         const ValueType& GetValue() const { return _value; }
 
         virtual std::unique_ptr<VariantBase> Clone() const override
@@ -77,6 +79,10 @@ namespace utilities
         virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
 
     private:
+        friend class Variant;
+
+        VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) {}
+
         ValueType _value;
     };
     

@@ -29,36 +29,53 @@ namespace utilities
     class Variant
     {
     public:
-        /// <summary> Copy constructor </summary>
+        /// <summary> Copy constructor. </summary>
         Variant(const Variant& other);
         Variant(Variant&& other) = default;
 
-        /// <summary> Copy assignment operator </summary>
+        /// <summary> Copy assignment operator. </summary>
         Variant& operator=(const Variant& other);
         Variant& operator=(Variant&& other) = default;
 
-        /// <summary> Assignment operator from basic (non-variant) types </summary>
+        /// <summary> Assignment operator from basic (non-variant) types. </summary>
         template <typename ValueType>
         Variant& operator=(ValueType&& value);
 
         /// <summary> Get a type-safe value from the variant. </summary>
         ///
-        /// <returns> The variant's current value
+        /// <returns> The variant's current value. </returns>
         template <typename ValueType>
         ValueType GetValue() const;
     
-        /// <summary> Checks the current type of the variant </summary>
+        /// <summary> Checks the current type of the variant. </summary>
         ///
-        /// <returns> True if the variant currently holds a value of type `ValueType` </returns>
+        /// <returns> True if the variant currently holds a value of type `ValueType`. </returns>
         template <typename ValueType>
         bool IsType() const;
 
+        /// <summary> Checks if the variant is holding a primitive value. </summary>
+        ///
+        /// <returns> True if the variant currently holds a primitive value. </returns>
         bool IsPrimitiveType() const;
 
+        /// <summary> Checks if the variant is holding a serializable object. </summary>
+        ///
+        /// <returns> True if the variant currently holds a serializable object. </returns>
         bool IsSerializable() const;
 
+        /// <summary> Checks if the variant is holding a pointer. </summary>
+        ///
+        /// <returns> True if the variant currently holds a pointer. </returns>
         bool IsPointer() const;
 
+        /// <summary> Gets a string representation of the value. </summary>
+        ///
+        /// <returns> A string representation of the value. </summary>
+        std::string ToString() const;
+
+        /// <summary> Gets the type name of the value stored in the variant. </summary>
+        ///
+        /// <returns> The type name of the value stored in the variant. </returns>
         std::string GetStoredTypeName() const;
 
     private:
@@ -81,5 +98,4 @@ namespace utilities
     std::string to_string(const Variant& variant);
 }
 
-//#include "VariantBase.h"
 #include "../tcc/Variant.tcc"
