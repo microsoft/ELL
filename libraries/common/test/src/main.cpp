@@ -2,17 +2,16 @@
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     main.cpp (common_test)
-//  Authors:  Ofer Dekel
+//  Authors:  Ofer Dekel, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "LoadModelGraph_test.h"
 
 /// Runs all tests
 ///
 int main()
 {
-    return 0;
+    TestLoadSampleModels();
+    TestLoadTreeModels();
 }
-
-
-
-

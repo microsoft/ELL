@@ -11,7 +11,7 @@
 // model
 #include "ModelGraph.h"
 #include "InputNode.h"
-// #include "OutputNode.h"
+#include "OutputNode.h"
 #include "ExtremalValueNode.h"
 
 // nodes
@@ -51,7 +51,7 @@ namespace common
             predictor.GetWeights()[index] = (double)(index % 5);
         }
         auto classifierNode = model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
-        //auto outputNode = model.AddNode<model::OutputNode<double>>(classifierNode->prediction);
+        // auto outputNode = model.AddNode<model::OutputNode<double>>(classifierNode->prediction);
         return model;
     }
 
@@ -61,7 +61,7 @@ namespace common
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
 
-        // one "leg"        
+        // one "leg"
         auto mean1 = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 8);
         auto mag1 = model.AddNode<nodes::L2NormNode<double>>(mean1->output);
 
@@ -72,7 +72,7 @@ namespace common
         // combine them
         auto diff = model.AddNode<nodes::BinaryOperationNode<double>>(mag1->output, mean2->output, nodes::BinaryOperationNode<double>::OperationType::subtract);
 
-//        auto output = model.AddNode<model::OutputNode<double>>(maxVal->val);
+        //        auto output = model.AddNode<model::OutputNode<double>>(maxVal->val);
         return model;
     }
 
@@ -92,12 +92,72 @@ namespace common
 
         auto dotDifference = model.AddNode<nodes::BinaryOperationNode<double>>(dot1->output, dot2->output, nodes::BinaryOperationNode<double>::OperationType::subtract);
 
-//        auto output = model.AddNode<model::OutputNode<double>>(classifierNode->output);
+        //        auto output = model.AddNode<model::OutputNode<double>>(classifierNode->output);
         return model;
+    }
+
+    predictors::SimpleForestPredictor CreateForest(int numSplits)
+    {
+        // define some abbreviations
+        using SplitAction = predictors::SimpleForestPredictor::SplitAction;
+        using SplitRule = predictors::SingleElementThresholdRule;
+        using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
+        using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
+
+        // build a forest
+        predictors::SimpleForestPredictor forest;
+        SplitRule dummyRule{ 0, 0.0 };
+        EdgePredictorVector dummyEdgePredictor{ -1.0, 1.0 };
+        auto root = forest.Split(SplitAction{ forest.GetNewRootId(), dummyRule, dummyEdgePredictor });
+        std::vector<size_t> interiorNodeVector;
+        interiorNodeVector.push_back(root);
+
+        /*
+            auto root = forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.3 }, EdgePredictorVector{ -1.0, 1.0 } });
+            forest.Split(SplitAction{ forest.GetChildId(root, 0), SplitRule{ 1, 0.6 }, EdgePredictorVector{ -2.0, 2.0 } });
+            forest.Split(SplitAction{ forest.GetChildId(root, 1), SplitRule{ 2, 0.9 }, EdgePredictorVector{ -4.0, 4.0 } });
+            forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.2 }, EdgePredictorVector{ -3.0, 3.0 } });
+        */
+
+        for (int index = 0; index < numSplits; ++index)
+        {
+            auto node = interiorNodeVector.back();
+            std::cout << "Splitting node " << node << std::endl;
+            interiorNodeVector.pop_back();
+            interiorNodeVector.push_back(forest.Split(SplitAction{ forest.GetChildId(node, 0), dummyRule, dummyEdgePredictor }));
+            interiorNodeVector.push_back(forest.Split(SplitAction{ forest.GetChildId(node, 1), dummyRule, dummyEdgePredictor }));
+        }
+        return forest;
+    }
+
+    model::Model GetTreeModel(int numSplits)
+    {
+        auto forest = CreateForest(numSplits);
+        std::cout << "Num edges in forest: " << forest.NumEdges() << std::endl;
+        model::Model model;
+        auto inputNode = model.AddNode<model::InputNode<double>>(3);
+        auto simpleForestNode = model.AddNode<nodes::SimpleForestNode>(inputNode->output, forest);
+        auto outputNode = model.AddNode<model::OutputNode<double>>(simpleForestNode->prediction);
+        return model;
+    }
+
+    model::Model GetRefinedTreeModel(int numSplits)
+    {
+        auto model = GetTreeModel(numSplits);
+        std::cout << "Refining" << std::endl;
+        model::TransformContext context;
+        model::ModelTransformer transformer;
+        auto refinedModel = transformer.RefineModel(model, context);
+        return refinedModel;
     }
 
     model::Model LoadModelGraph(const std::string& filename)
     {
+        std::string treePrefix = "tree_";
+        if (filename == "1")
+        {
+            return GetModel1();
+        }
         if (filename == "2")
         {
             return GetModel2();
@@ -105,6 +165,13 @@ namespace common
         else if (filename == "3")
         {
             return GetModel3();
+        }
+        else if (filename.find(treePrefix) == 0)
+        {
+            auto pos = filename.find(treePrefix);
+            auto suffix = filename.substr(pos + treePrefix.size());
+            auto numSplits = std::stoi(suffix);
+            return GetRefinedTreeModel(numSplits);
         }
         else
         {
