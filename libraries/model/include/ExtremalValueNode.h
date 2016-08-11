@@ -99,7 +99,7 @@ namespace model
     {
     public:
         /// <summary> Default Constructor </summary>    
-        ArgMaxNode() : ExtremalValueNode<ValueType, true>(input) {}
+        ArgMaxNode() : ExtremalValueNode<ValueType, true>() {}
 
         /// <summary> Constructor </summary>
         ///
