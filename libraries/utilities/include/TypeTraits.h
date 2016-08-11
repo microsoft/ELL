@@ -18,21 +18,15 @@ namespace utilities
     template <typename ValueType>
     class IsVectorType
     {
-    public:
-        static const bool value = IsVectorChecker<ValueType>(0);
-
     private:
         template <typename VectorType>
-        static constexpr bool IsVectorChecker(typename VectorType::value_type*, typename std::enable_if_t<std::is_base_of<VectorType, typename std::vector<typename VectorType::value_type>>::value, int> = 0)
-        {
-            return true;
-        }
+        static constexpr bool IsVectorChecker(typename VectorType::value_type*, typename std::enable_if_t<std::is_base_of<VectorType, typename std::vector<typename VectorType::value_type>>::value, int> = 0);
 
         template <typename VectorType>
-        static constexpr bool IsVectorChecker(...)
-        {
-            return false;
-        }
+        static constexpr bool IsVectorChecker(...);
+
+    public:
+        static const bool value = IsVectorChecker<ValueType>(0);
     };
 
     /// <summary> Enabled if ValueType is a fundamental value. </summary>
@@ -63,3 +57,5 @@ namespace utilities
     template <typename ValueType>
     using IsNotVector = typename std::enable_if_t<!IsVectorType<typename std::decay<ValueType>::type>::value, int>;
 }
+
+#include "../tcc/TypeTraits.tcc"

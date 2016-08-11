@@ -71,6 +71,7 @@ set (TCC tcc/AnyIterator.tcc
          tcc/TransformIterator.tcc
          tcc/TypeFactory.tcc
          tcc/TypeName.tcc
+         tcc/TypeTraits.tcc
          tcc/Variant.tcc
          tcc/XMLSerialization.tcc)
 
