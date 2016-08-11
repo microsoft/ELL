@@ -31,6 +31,8 @@ namespace model
         _context = context;
         _model = oldModel;
 
+        int iterationCount = 0;
+
         do
         {
             Model currentModel = std::move(_model);
@@ -54,6 +56,11 @@ namespace model
                     newPortToPortMap[entry.first] = _portToPortMap[entry.second];
                 }
                 _portToPortMap = newPortToPortMap;
+            }
+
+            if(++iterationCount >= 10)
+            {
+                throw new utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than 10 refinement iterations");
             }
         }
         while(!_isModelCompilable);

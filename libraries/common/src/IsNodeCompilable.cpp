@@ -18,7 +18,7 @@ namespace common
         _nodeNames.insert("SumNode<double>");
     }
 
-    bool IsNodeCompilable::operator()(model::Node * node)
+    bool IsNodeCompilable::operator()(const model::Node * node)
     {
         const auto& nodeName = node->GetRuntimeTypeName();
         if(_nodeNames.find(nodeName) != _nodeNames.end())
