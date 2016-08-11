@@ -113,10 +113,6 @@ namespace utilities
     //
     // Deserialization
     //
-
-    // TODO: make simple simple tokenizer that splits based on simple patterns
-    // split on: whitepace, comma, colon, square brackets, curly brackets, quotes
-
     template <typename ValueType, IsFundamental<ValueType> concept>
     void JsonDeserializer::ReadScalar(const char* name, ValueType& value)
     {
@@ -246,5 +242,4 @@ namespace utilities
         }
         _tokenizer.MatchToken("]");
     }
-
 }

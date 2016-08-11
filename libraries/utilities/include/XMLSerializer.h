@@ -25,10 +25,16 @@
 
 namespace utilities
 {
+    /// <summary> A serializer that encodes data in an XML format. </summary>
     class SimpleXmlSerializer : public Serializer
     {
     public:
+        /// <summary> Default Constructor --- writes to standard output. </summary>
         SimpleXmlSerializer();
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="outputStream"> The stream to serialize data to. </summary>
         SimpleXmlSerializer(std::ostream& outputStream);
 
     protected:
@@ -70,10 +76,16 @@ namespace utilities
         std::string GetCurrentIndent() { return std::string(2 * _indent, ' '); }
     };
 
+    /// <summary> A deserializer that reads data encoded in an XML format. </summary>
     class SimpleXmlDeserializer : public Deserializer
     {
     public:
+        /// <summary> Default Constructor --- reads from standard input. </summary>
         SimpleXmlDeserializer();
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="inputStream"> The stream to deserialize data from. </summary>
         SimpleXmlDeserializer(std::istream& inputStream);
 
     protected:

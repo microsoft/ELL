@@ -25,7 +25,6 @@ namespace utilities
         SerializeItem(name, value);
     }
 
-
     template <typename ValueType, IsNotVector<ValueType> concept>
     void Serializer::SerializeItem(const char* name, ValueType&& value)
     {
@@ -109,19 +108,7 @@ namespace utilities
         auto baseTypeName = ValueType::GetTypeName();
         auto encodedTypeName = BeginDeserializeObject(name, baseTypeName, context);
 
-        // TODO: create new typeName thing
-        std::unique_ptr<ValueType> newPtr;
-
-        // Need to do some SFINAE thing to ensure ValueType isn't an abstract base class 
-        if(false) // baseTypeName == encodedTypeName
-        {
-//            newPtr = std::make_unique<ValueType>();
-        }
-        else
-        {
-            newPtr = context.GetTypeFactory().Construct<ValueType>(encodedTypeName);
-        }
-
+        std::unique_ptr<ValueType> newPtr = context.GetTypeFactory().Construct<ValueType>(encodedTypeName);
         DeserializeObject(name, *newPtr, context);
         EndDeserializeObject(name, encodedTypeName, context);
         value = std::move(newPtr);

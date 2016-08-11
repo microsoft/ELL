@@ -21,6 +21,8 @@ namespace utilities
         virtual ~VariantBase() = default;
 
     protected:
+        VariantBase(std::type_index type) : _type(type){};
+
         virtual std::unique_ptr<VariantBase> Clone() const = 0;
 
         virtual std::string ToString() const = 0;
@@ -35,8 +37,6 @@ namespace utilities
 
     private:
         friend class Variant;
-
-        VariantBase(std::type_index type) : _type(type){};
 
         template <typename ValueType>
         ValueType GetValue() const
@@ -59,6 +59,9 @@ namespace utilities
     template <typename ValueType>
     class VariantDerived : public VariantBase
     {
+    public:
+        VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) {}
+
     protected:
         const ValueType& GetValue() const { return _value; }
 
@@ -80,8 +83,7 @@ namespace utilities
 
     private:
         friend class Variant;
-
-        VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) {}
+        friend class VariantBase;
 
         ValueType _value;
     };
@@ -128,7 +130,7 @@ namespace utilities
     //
     // Private code we'd like to hide:
     //
-    namespace VariantNamespace
+    namespace variantNamespace
     {
         template <typename ValueType>
         auto GetValueString(const ValueType& value, double) -> std::string
@@ -150,13 +152,12 @@ namespace utilities
     template <typename ValueType>
     inline std::string VariantDerived<ValueType>::ToString() const
     {
-        return VariantNamespace::GetValueString(_value, (int)0);
+        return variantNamespace::GetValueString(_value, (int)0);
     }
 
     template <typename ValueType>
     inline std::string VariantDerived<ValueType>::GetStoredTypeName() const
     {
-        // TODO: call GetRuntimeTypeName if we can
         return TypeName<ValueType>::GetName();
     }
 }

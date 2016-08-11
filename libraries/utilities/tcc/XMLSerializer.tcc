@@ -89,10 +89,7 @@ namespace utilities
         _out << " type='" << typeName <<  "'>" << std::endl;
 
         // Indent the next line (the line with the array elements), and then 
-        // set the indent to 0 (so there isn't indentation going on inside the line)
-        // TODO: find a more principled way to do this
-        // TODO: find a way to encode the values that doesn't require putting each one in a tag
-        // (say, by having them be a comma-separated list)
+        // set the indent to 0 (so there isn't indentation inside the line)
         ++_indent;
         _out << GetCurrentIndent();
 

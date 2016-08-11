@@ -32,9 +32,6 @@ namespace utilities
         }
         std::stringstream tokenStream;
 
-        // Problem: we won't have any way to distinguish between a string with a single quote in it and a string delimiter token.
-        // need a token class with a token_type field that is either "identifier" or "string"
-
         // eat whitespace and add first char
         while (_in)
         {

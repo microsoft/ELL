@@ -25,10 +25,16 @@
 
 namespace utilities
 {
+    /// <summary> A serializer that encodes data as JSON-formatted text </summary>
     class JsonSerializer : public Serializer
     {
     public:
+        /// <summary> Default Constructor --- writes to standard output. </summary>
         JsonSerializer();
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="outputStream"> The stream to serialize data to. </summary>
         JsonSerializer(std::ostream& outputStream);
 
     protected:
@@ -79,10 +85,16 @@ namespace utilities
         void SetEndOfLine(std::string endOfLine);
     };
 
+    /// <summary> A deserializer that reads data encoded in JSON-formatted text. </summary>
     class JsonDeserializer : public Deserializer
     {
     public:
+        /// <summary> Default Constructor --- reads from standard input. </summary>
         JsonDeserializer();
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="inputStream"> The stream to deserialize data from. </summary>
         JsonDeserializer(std::istream& inputStream);
 
     protected:

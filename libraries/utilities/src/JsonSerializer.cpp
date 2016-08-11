@@ -98,7 +98,6 @@ namespace utilities
 
         _out << "[";
 
-
         auto numItems = array.size();
         for(size_t index = 0; index < numItems; ++index)
         {
@@ -243,25 +242,7 @@ namespace utilities
     // JsonUtilities
     //
 
-
-    /*
-        From Wikipedia, the list of characters that can (must?) be escaped:
-
-        JavaScript uses the \ (backslash) as an escape character for:
-
-        \' single quote
-        \" double quote
-        \\ backslash
-        \n new line
-        \r carriage return
-        \t tab
-        \b backspace
-        \f form feed
-        \v vertical tab (IE < 9 treats '\v' as 'v' instead of a vertical tab ('\x0B'). If cross-browser compatibility is a concern, use \x0B instead of \v.)
-        \0 null character (U+0000 NULL) (only if the next character is not a decimal digit; else it is an octal escape sequence)
-        Note that the \v and \0 escapes are not allowed in JSON strings.
-    */
-
+    // Characters that must be escaped in JSON strings: ', ", \, newline (\n), carriage return (\r), tab (\t), backspace (\b), form feed (\f)
     std::string JsonUtilities::EncodeString(const std::string& str)
     {
         std::vector<char> charCodes(127, '\0');
