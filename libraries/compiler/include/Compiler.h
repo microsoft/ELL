@@ -129,6 +129,9 @@ namespace emll
 			///<summary>The model has unexpected leaf nodes</summary>
 			virtual void HandleLeafNode(const model::Node& node);
 
+			virtual void VerifyIsScalar(const model::InputPortBase& port);
+			virtual void VerifyIsScalar(const model::OutputPortBase& port);
+
 		protected:
 			///<summary>Create a variable to store computed output for the given output port. The variable
 			/// will be emitted lazily. </summary>

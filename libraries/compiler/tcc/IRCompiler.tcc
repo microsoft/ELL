@@ -469,14 +469,9 @@ namespace emll
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
 			auto pOutput = node.GetOutputPorts()[0];
-			if (!(ModelEx::IsScalar(*pInput1) && ModelEx::IsScalar(*pInput2)))
-			{
-				throw new CompilerException(CompilerError::scalarInputsExpected);
-			}		
-			if (!ModelEx::IsScalar(*pOutput))
-			{
-				throw new CompilerException(CompilerError::scalarOutputsExpected);
-			}
+			VerifyIsScalar(*pInput1);
+			VerifyIsScalar(*pInput2);
+			VerifyIsScalar(*pOutput);
 			
 			llvm::Value* pResult = EnsureEmitted(pOutput);
 			Variable& resultVar = *(GetVariableFor(pOutput));
@@ -521,15 +516,10 @@ namespace emll
 		{
 			auto pElements = node.GetInputPorts()[0];
 			auto pSelector = node.GetInputPorts()[1];
-			if (!ModelEx::IsScalar(*pSelector))
-			{
-				throw new CompilerException(CompilerError::scalarInputsExpected);
-			}
+			VerifyIsScalar(*pSelector);
 			auto pOutput = node.GetOutputPorts()[0];
-			if (!ModelEx::IsScalar(*pOutput))
-			{
-				throw new CompilerException(CompilerError::scalarOutputsExpected);
-			}
+			VerifyIsScalar(*pOutput);
+
 			llvm::Value* pSelectorVal = LoadVar(pSelector);
 			llvm::Value* pResult = EnsureEmitted(pOutput);
 			//

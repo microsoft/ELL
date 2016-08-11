@@ -283,6 +283,22 @@ namespace emll
 			AllocArg(node.GetOutputPorts()[0], false);
 		}
 
+		void Compiler::VerifyIsScalar(const model::InputPortBase& port)
+		{
+			if (!ModelEx::IsScalar(port))
+			{
+				throw new CompilerException(CompilerError::scalarInputsExpected);
+			}
+		}
+
+		void Compiler::VerifyIsScalar(const model::OutputPortBase& port)
+		{
+			if (!ModelEx::IsScalar(port))
+			{
+				throw new CompilerException(CompilerError::scalarOutputsExpected);
+			}
+		}
+
 		void Compiler::Reset()
 		{
 		}

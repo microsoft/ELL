@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     CppCompiler.tcc (compiler)
+//  Authors:  Umesh Madan
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 namespace emll
 {
 	namespace compiler
@@ -259,14 +266,9 @@ namespace emll
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
 			auto pOutput = node.GetOutputPorts()[0];
-			if (!(ModelEx::IsScalar(*pInput1) && ModelEx::IsScalar(*pInput2)))
-			{
-				throw new CompilerException(CompilerError::scalarInputsExpected);
-			}
-			if (!ModelEx::IsScalar(*pOutput))
-			{
-				throw new CompilerException(CompilerError::scalarOutputsExpected);
-			}
+			VerifyIsScalar(*pInput1);
+			VerifyIsScalar(*pInput2);
+			VerifyIsScalar(*pOutput);
 
 			Variable& resultVar = *(EnsureEmitted(pOutput));
 			auto lInput = pInput1->GetOutputPortElement(0);
@@ -310,10 +312,8 @@ namespace emll
 		{
 			auto pElements = node.GetInputPorts()[0];
 			auto pSelector = node.GetInputPorts()[1];
-			if (!ModelEx::IsScalar(*pSelector))
-			{
-				throw new CompilerException(CompilerError::scalarInputsExpected);
-			}
+			VerifyIsScalar(*pSelector);
+
 			auto pOutput = node.GetOutputPorts()[0];
 			if (!ModelEx::IsScalar(*pOutput))
 			{
