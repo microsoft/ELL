@@ -116,5 +116,18 @@ void TestElementSelectorCpp()
 	compiler.WriteToFile("C:\\junk\\model\\TestElementSelector.cpp");
 }
 
+void TestForestCpp()
+{
+	model::Model model = MakeForest();
+
+	std::vector<double> data = { 0.2, 0.5, 0.0 };
+
+	CppCompiler compiler;
+	compiler.CompileModel("TestForest", model);
+	compiler.DebugDump();
+	compiler.WriteToFile("C:\\junk\\model\\forest.cpp");
+}
+
+
 
 

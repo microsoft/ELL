@@ -131,6 +131,8 @@ namespace emll
 			void LoadVar(model::InputPortBase* pPort);
 			///<summary>Updates the value at a given offset of the given variable. Checks for index out of range etc.</summary>
 			void SetVar(Variable& var, int offset);
+			///<summary>Updates the value at a given offset of the given variable. Checks for index out of range etc.</summary>
+			void SetVar(Variable& var);
 
 			const std::string& LoopVarName();
 

@@ -69,6 +69,8 @@ private:
 	std::string _name;
 };
 
+model::Model MakeForest();
+
 void TestBinaryVector(bool expanded);
 void TestBinaryScalar();
 void TestDotProduct();

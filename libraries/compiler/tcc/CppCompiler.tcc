@@ -320,28 +320,18 @@ namespace emll
 				throw new CompilerException(CompilerError::scalarOutputsExpected);
 			}
 			Variable* pResult = EnsureEmitted(pOutput);
-			//
-			// If inputs are pure vectors - i.e. all from the same input port, then we can optimize the If, then away into a vector dereference
-			//
-			//if (ModelEx::IsPureVector(*pElements))
-			//{
-			//	_fn.Store(pResult, _fn.ValueAt(EnsureEmitted(pElements), pSelectorVal));
-			//}
-			//else
+			auto lVal = pElements->GetOutputPortElement(0);
+			auto rVal = pElements->GetOutputPortElement(1);
+			_pfn->BeginIf([&pSelector, this](CppFunctionEmitter& fn) { LoadVar(pSelector); });
 			{
-				auto lVal = pElements->GetOutputPortElement(0);
-				auto rVal = pElements->GetOutputPortElement(1);
-				_pfn->BeginIf([&pSelector, this](CppFunctionEmitter& fn) { LoadVar(pSelector); });
-				{
-					_pfn->AssignValue(pResult->EmittedName(), [&lVal, this](CppFunctionEmitter& fn) { LoadVar(lVal); });
-				}
-				_pfn->EndIf();
-				_pfn->BeginElse();
-				{
-					_pfn->AssignValue(pResult->EmittedName(), [&rVal, this](CppFunctionEmitter& fn) { LoadVar(rVal); });
-				}
-				_pfn->EndIf();
+				_pfn->AssignValue(pResult->EmittedName(), [&lVal, this](CppFunctionEmitter& fn) { LoadVar(lVal); });
 			}
+			_pfn->EndIf();
+			_pfn->BeginElse();
+			{
+				_pfn->AssignValue(pResult->EmittedName(), [&rVal, this](CppFunctionEmitter& fn) { LoadVar(rVal); });
+			}
+			_pfn->EndIf();
 		}
 	}
 }

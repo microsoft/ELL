@@ -6,3 +6,4 @@ void TestBinaryVectorCpp(bool expanded);
 void TestSumCpp(bool expanded);
 void TestBinaryPredicateCpp();
 void TestElementSelectorCpp();
+void TestForestCpp();

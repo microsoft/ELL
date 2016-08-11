@@ -173,6 +173,19 @@ namespace emll
 			_pfn->AssignValueAt(var.EmittedName(), offset);
 		}
 
+		void CppCompiler::SetVar(Variable& var)
+		{
+			if (var.IsScalar())
+			{
+				_pfn->Assign(var.EmittedName());
+			}
+			else
+			{
+				_pfn->AssignValueAt(var.EmittedName(), 0);
+			}
+		}
+
+
 		const std::string& CppCompiler::LoopVarName()
 		{
 			return c_LoopVarName;
