@@ -273,9 +273,14 @@ namespace emll
 				}
 				else if (ModelEx::IsLeafNode(node))
 				{
-					AllocArg(node.GetOutputPorts()[0], false);
+					HandleLeafNode(node);
 				}
 			});
+		}
+
+		void Compiler::HandleLeafNode(const model::Node& node)
+		{
+			AllocArg(node.GetOutputPorts()[0], false);
 		}
 
 		void Compiler::Reset()

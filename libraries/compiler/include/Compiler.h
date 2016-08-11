@@ -123,8 +123,11 @@ namespace emll
 			virtual void CompileUnaryNode(const model::Node& node) = 0;
 			///<summary>Compile an ElementSelectorNode</summary>
 			virtual void CompileElementSelectorNode(const model::Node& node) = 0;
+
 			///<summary>Ensure a variable is emitted</summary>
 			virtual void EnsureVarEmitted(Variable* pVar) = 0;
+			///<summary>The model has unexpected leaf nodes</summary>
+			virtual void HandleLeafNode(const model::Node& node);
 
 		protected:
 			///<summary>Create a variable to store computed output for the given output port. The variable

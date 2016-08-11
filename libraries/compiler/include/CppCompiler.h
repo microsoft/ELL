@@ -79,6 +79,7 @@ namespace emll
 			{
 				EnsureEmitted(*pVar);
 			}
+			virtual void HandleLeafNode(const model::Node& node) override {}
 
 		private:
 

@@ -30,9 +30,9 @@ void TestIRCompiler()
 
 void TestCppCompiler()
 {
+	TestForestCpp();
 	TestSumCpp(true);
 	TestSumCpp(false);
-	TestForestCpp();
 	TestElementSelectorCpp();
 	TestBinaryPredicateCpp();
 	TestBinaryVectorCpp(true);
