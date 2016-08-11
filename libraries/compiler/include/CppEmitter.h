@@ -34,6 +34,8 @@ namespace emll
 			CppEmitter& OpenBracket();
 			CppEmitter& CloseBracket();
 			CppEmitter& Quote();
+			CppEmitter& Question();
+			CppEmitter& Colon();
 			CppEmitter& Assign();
 			CppEmitter& Asterisk();
 			CppEmitter& Increment();

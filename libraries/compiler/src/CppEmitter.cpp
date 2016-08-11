@@ -113,6 +113,18 @@ namespace emll
 			return *this;
 		}
 		
+		CppEmitter& CppEmitter::Question()
+		{
+			_writer.Write('?');
+			return *this;
+		}
+
+		CppEmitter& CppEmitter::Colon()
+		{
+			_writer.Write(':');
+			return *this;
+		}
+
 		CppEmitter& CppEmitter::Assign()
 		{
 			_writer.Write('=');

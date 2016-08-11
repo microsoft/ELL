@@ -131,6 +131,7 @@ namespace emll
 
 			virtual void VerifyIsScalar(const model::InputPortBase& port);
 			virtual void VerifyIsScalar(const model::OutputPortBase& port);
+			virtual void VerifyIsPureBinary(const model::Node& node);
 
 		protected:
 			///<summary>Create a variable to store computed output for the given output port. The variable

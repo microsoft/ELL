@@ -28,32 +28,51 @@ namespace emll
 			template<typename T>
 			CppFunctionEmitter& Var(const std::string& name, T data);
 
-			///<summary>Emit a offset into a pointer</summary>
+			///<summary>Emit a value</summary>
 			CppFunctionEmitter& Value(const std::string& varName);
+			///<summary>Emit a offset into a pointer</summary>
 			CppFunctionEmitter& ValueAt(const std::string& name, int offset);
+			///<summary>Emit a offset into a pointer</summary>
 			CppFunctionEmitter& ValueAt(const std::string& name, const std::string& offsetVarName);
 
+			///<summary>Emit an Assign</summary>
 			CppFunctionEmitter& Assign(const std::string& varName);
 			template<typename T>
+			///<summary>Emit an Assign</summary>
 			CppFunctionEmitter& Assign(const std::string& varName, T value);
-			CppFunctionEmitter& AssignValue(const std::string& varName, std::function<void(CppFunctionEmitter& fn)> value);
+			///<summary>Emit an Assign</summary>
+			CppFunctionEmitter& AssignValue(const std::string& varName, std::function<void()> value);
 
+			///<summary>Emit an Assign</summary>
 			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, int offset);
+			///<summary>Emit an Assign</summary>
 			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, const std::string& offsetVarName);
-			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, int offset, std::function<void(CppFunctionEmitter& fn)> value);
+			///<summary>Emit an Assign</summary>
+			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, int offset, std::function<void()> value);
 
-			CppFunctionEmitter& Op(OperatorType op, std::function<void(CppFunctionEmitter& fn)> lValue, std::function<void(CppFunctionEmitter& fn)> rValue);
-			CppFunctionEmitter& Cmp(ComparisonType cmp, std::function<void(CppFunctionEmitter& fn)> lValue, std::function<void(CppFunctionEmitter& fn)> rValue);
+			///<summary>Emit a math operator</summary>
+			CppFunctionEmitter& Op(OperatorType op, std::function<void()> lValue, std::function<void()> rValue);
+			///<summary>Emit a comparison</summary>
+			CppFunctionEmitter& Cmp(ComparisonType cmp, std::function<void()> lValue, std::function<void()> rValue);
 
+			///<summary>Begin a for loop</summary>
 			CppFunctionEmitter& BeginFor(const std::string& iVarName, int count);
+			///<summary>End a for loop</summary>
 			CppFunctionEmitter& EndFor();
 			
+			///<summary>Begin a conditional block</summary>
 			template<typename T>
 			CppFunctionEmitter& BeginIf(const std::string&varName, ComparisonType cmp, T value);
-			CppFunctionEmitter& BeginIf(std::function<void(CppFunctionEmitter& fn)> value);
+			///<summary>Begin a conditional</summary>
+			CppFunctionEmitter& BeginIf(std::function<void()> value);
+			///<summary>Begin a conditional</summary>
 			CppFunctionEmitter& BeginElse();
+			///<summary>End a conditional</summary>
 			CppFunctionEmitter& EndIf();
+			///<summary>Begin a conditional</summary>
+			CppFunctionEmitter& IfInline(std::function<void()> value, std::function<void()> lVal, std::function<void()> rVal);
 
+			///<summary>Return generated code</summary>
 			std::string Code() { return _emitter.Code(); }
 
 		private:

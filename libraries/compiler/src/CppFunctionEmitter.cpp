@@ -62,10 +62,10 @@ namespace emll
 			return *this;
 		}
 
-		CppFunctionEmitter& CppFunctionEmitter::AssignValue(const std::string& varName, std::function<void(CppFunctionEmitter& fn)> value)
+		CppFunctionEmitter& CppFunctionEmitter::AssignValue(const std::string& varName, std::function<void()> value)
 		{
 			_emitter.Assign(varName).Space();
-			value(*this);
+			value();
 			EndStatement();
 			return *this;
 		}
@@ -82,31 +82,31 @@ namespace emll
 			return *this;
 		}
 
-		CppFunctionEmitter& CppFunctionEmitter::AssignValueAt(const std::string& destVarName, int offset, std::function<void(CppFunctionEmitter& fn)> value)
+		CppFunctionEmitter& CppFunctionEmitter::AssignValueAt(const std::string& destVarName, int offset, std::function<void()> value)
 		{
 			_emitter.AssignValueAt(destVarName, offset).Space();
-			value(*this);
+			value();
 			EndStatement();
 			return *this;
 		}
 
-		CppFunctionEmitter& CppFunctionEmitter::Op(OperatorType op, std::function<void(CppFunctionEmitter& fn)> lValue, std::function<void(CppFunctionEmitter& fn)> rValue)
+		CppFunctionEmitter& CppFunctionEmitter::Op(OperatorType op, std::function<void()> lValue, std::function<void()> rValue)
 		{
-			lValue(*this);
+			lValue();
 			_emitter.Space();
 			_emitter.Operator(op).Space();
-			rValue(*this);
+			rValue();
 
 			return *this;
 		}
 
-		CppFunctionEmitter& CppFunctionEmitter::Cmp(ComparisonType cmp, std::function<void(CppFunctionEmitter& fn)> lValue, std::function<void(CppFunctionEmitter& fn)> rValue)
+		CppFunctionEmitter& CppFunctionEmitter::Cmp(ComparisonType cmp, std::function<void()> lValue, std::function<void()> rValue)
 		{
 			_emitter.OpenParan();
-			lValue(*this);
+			lValue();
 			_emitter.Space();
 			_emitter.Cmp(cmp).Space();
-			rValue(*this);
+			rValue();
 			_emitter.CloseParan();
 
 			return *this;
@@ -133,10 +133,10 @@ namespace emll
 			return *this;
 		}
 
-		CppFunctionEmitter& CppFunctionEmitter::BeginIf(std::function<void(CppFunctionEmitter& fn)> value)
+		CppFunctionEmitter& CppFunctionEmitter::BeginIf(std::function<void()> value)
 		{
 			_emitter.If().OpenParan();
-			value(*this);
+			value();
 			_emitter.CloseParan().NewLine()
 					.BeginBlock();
 			return *this;
@@ -155,5 +155,18 @@ namespace emll
 			return *this;
 		}
 
+		CppFunctionEmitter& CppFunctionEmitter::IfInline(std::function<void()> value, std::function<void()> lVal, std::function<void()> rVal)
+		{
+			_emitter.OpenParan();
+			value();
+			_emitter.CloseParan().Space()
+					.Question().Space();
+			lVal();
+			_emitter.Space()
+					.Colon().Space();
+			rVal();
+			EndStatement();
+			return *this;
+		}
 	}
 }

@@ -299,6 +299,15 @@ namespace emll
 			}
 		}
 
+		void Compiler::VerifyIsPureBinary(const model::Node& node)
+		{
+			if (!ModelEx::IsPureBinary(node))
+			{
+				// Only support binary right now
+				throw new CompilerException(CompilerError::binaryInputsExpected);
+			}
+		}
+
 		void Compiler::Reset()
 		{
 		}

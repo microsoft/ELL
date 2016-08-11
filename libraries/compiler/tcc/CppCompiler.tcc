@@ -146,7 +146,7 @@ namespace emll
 			for (size_t i = 0; i < pInput->Size(); ++i)
 			{
 				auto outputElt = pInput->GetOutputPortElement(i);
-				_pfn->AssignValueAt(pOutputVar->EmittedName(), i, [&outputElt, this](CppFunctionEmitter& fn) {LoadVar(outputElt); });
+				_pfn->AssignValueAt(pOutputVar->EmittedName(), i, [&outputElt, this]() {LoadVar(outputElt); });
 			}
 		}
 
@@ -178,8 +178,8 @@ namespace emll
 			{
 				_pfn->AssignValueAt(pResultVector->EmittedName(), iVarName);
 				_pfn->Op(GetOperator<T>(node),
-					[&pLVector, &iVarName, this](CppFunctionEmitter& fn) {_pfn->ValueAt(pLVector->EmittedName(), iVarName); },
-					[&pRVector, &iVarName, this](CppFunctionEmitter& fn) {_pfn->ValueAt(pRVector->EmittedName(), iVarName); });
+					[&pLVector, &iVarName, this]() {_pfn->ValueAt(pLVector->EmittedName(), iVarName); },
+					[&pRVector, &iVarName, this]() {_pfn->ValueAt(pRVector->EmittedName(), iVarName); });
 				_pfn->EndStatement();
 			}
 			_pfn->EndFor();
@@ -197,9 +197,7 @@ namespace emll
 				auto lInput = pInput1->GetOutputPortElement(i);
 				auto rInput = pInput2->GetOutputPortElement(i);
 				SetVar(resultVar, i);
-				_pfn->Op(GetOperator<T>(node), 
-					[&lInput, this](CppFunctionEmitter& fn) {LoadVar(lInput); },
-					[&rInput, this](CppFunctionEmitter& fn) {LoadVar(rInput); });
+				_pfn->Op(GetOperator<T>(node), [&lInput, this]() {LoadVar(lInput); },[&rInput, this]() {LoadVar(rInput); });
 				_pfn->EndStatement();
 			}
 		}
@@ -232,8 +230,8 @@ namespace emll
 			{
 				_pfn->Assign(resultVar.EmittedName());
 				_pfn->Op(GetAddForValueType<T>(),
-					[&resultVar, this](CppFunctionEmitter& fn) {_pfn->Value(resultVar.EmittedName()); },
-					[&pSrcVector, &iVarName, this](CppFunctionEmitter& fn) {_pfn->ValueAt(pSrcVector->EmittedName(), iVarName); });
+					[&resultVar, this]() {_pfn->Value(resultVar.EmittedName()); },
+					[&pSrcVector, &iVarName, this]() {_pfn->ValueAt(pSrcVector->EmittedName(), iVarName); });
 				_pfn->EndStatement();
 			}
 			_pfn->EndFor();
@@ -252,8 +250,8 @@ namespace emll
 				auto pRInput = pInput->GetOutputPortElement(i);
 				_pfn->Assign(resultVar.EmittedName());
 				_pfn->Op(OperatorType::Add,
-					[&resultVar, this](CppFunctionEmitter& fn) { _pfn->Value(resultVar.EmittedName()); },
-					[&pRInput, this](CppFunctionEmitter& fn) {LoadVar(pRInput); }
+					[&resultVar, this]() { _pfn->Value(resultVar.EmittedName()); },
+					[&pRInput, this]() {LoadVar(pRInput); }
 				);
 				_pfn->EndStatement();
 			}
@@ -274,9 +272,7 @@ namespace emll
 			auto lInput = pInput1->GetOutputPortElement(0);
 			auto rInput = pInput2->GetOutputPortElement(0);
 			_pfn->Assign(resultVar.EmittedName());
-			_pfn->Cmp(GetComparison<T>(node),
-				[&lInput, this](CppFunctionEmitter& fn) {LoadVar(lInput); },
-				[&rInput, this](CppFunctionEmitter& fn) {LoadVar(rInput); });
+			_pfn->Cmp(GetComparison<T>(node), [&lInput, this](){LoadVar(lInput); }, [&rInput, this](){LoadVar(rInput); });
 			_pfn->EndStatement();
 		}
 
@@ -297,12 +293,9 @@ namespace emll
 		template<typename T, typename SelectorType>
 		void CppCompiler::CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node)
 		{
+			// Only support binary right now
+			VerifyIsPureBinary(node);
 			auto pElements = node.GetInputPorts()[0];
-			if (!ModelEx::IsPureBinary(node))
-			{
-				// Only support binary right now
-				throw new CompilerException(CompilerError::binaryInputsExpected);
-			}
 			CompileElementSelectorBinary<T, SelectorType>(node);
 		}
 
@@ -315,23 +308,13 @@ namespace emll
 			VerifyIsScalar(*pSelector);
 
 			auto pOutput = node.GetOutputPorts()[0];
-			if (!ModelEx::IsScalar(*pOutput))
-			{
-				throw new CompilerException(CompilerError::scalarOutputsExpected);
-			}
+			VerifyIsScalar(*pOutput);
+
 			Variable* pResult = EnsureEmitted(pOutput);
 			auto lVal = pElements->GetOutputPortElement(0);
 			auto rVal = pElements->GetOutputPortElement(1);
-			_pfn->BeginIf([&pSelector, this](CppFunctionEmitter& fn) { LoadVar(pSelector); });
-			{
-				_pfn->AssignValue(pResult->EmittedName(), [&lVal, this](CppFunctionEmitter& fn) { LoadVar(lVal); });
-			}
-			_pfn->EndIf();
-			_pfn->BeginElse();
-			{
-				_pfn->AssignValue(pResult->EmittedName(), [&rVal, this](CppFunctionEmitter& fn) { LoadVar(rVal); });
-			}
-			_pfn->EndIf();
+			_pfn->Assign(pResult->EmittedName());
+			_pfn->IfInline([&pSelector, this]() { LoadVar(pSelector); }, [&lVal, this]() { LoadVar(lVal); }, [&rVal, this]() { LoadVar(rVal); });
 		}
 	}
 }
