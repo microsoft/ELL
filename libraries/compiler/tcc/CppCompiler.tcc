@@ -187,12 +187,12 @@ namespace emll
 			Variable& resultVar = *(EnsureEmitted(pOutput));
 			for (size_t i = 0; i < pInput1->Size(); ++i)
 			{
-				auto pLInput = pInput1->GetOutputPortElement(i);
-				auto pRInput = pInput2->GetOutputPortElement(i);
+				auto lInput = pInput1->GetOutputPortElement(i);
+				auto rInput = pInput2->GetOutputPortElement(i);
 				SetVar(resultVar, i);
 				_pfn->Op(GetOperator<T>(node), 
-					[&pLInput, this](CppFunctionEmitter& fn) {LoadVar(pLInput); },
-					[&pRInput, this](CppFunctionEmitter& fn) {LoadVar(pRInput); });
+					[&lInput, this](CppFunctionEmitter& fn) {LoadVar(lInput); },
+					[&rInput, this](CppFunctionEmitter& fn) {LoadVar(rInput); });
 				_pfn->EndStatement();
 			}
 		}
@@ -246,9 +246,36 @@ namespace emll
 				_pfn->Assign(resultVar.EmittedName());
 				_pfn->Op(OperatorType::Add,
 					[&resultVar, this](CppFunctionEmitter& fn) { _pfn->Value(resultVar.EmittedName()); },
-					[&pRInput, this](CppFunctionEmitter& fn) {LoadVar(pRInput); });
+					[&pRInput, this](CppFunctionEmitter& fn) {LoadVar(pRInput); }
+				);
 				_pfn->EndStatement();
 			}
+		}
+
+		template<typename T>
+		void CppCompiler::CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node)
+		{
+			// Binary predicate has 2 inputs and 1 output
+			auto pInput1 = node.GetInputPorts()[0];
+			auto pInput2 = node.GetInputPorts()[1];
+			auto pOutput = node.GetOutputPorts()[0];
+			if (!(ModelEx::IsScalar(*pInput1) && ModelEx::IsScalar(*pInput2)))
+			{
+				throw new CompilerException(CompilerError::scalarInputsExpected);
+			}
+			if (!ModelEx::IsScalar(*pOutput))
+			{
+				throw new CompilerException(CompilerError::scalarOutputsExpected);
+			}
+
+			Variable& resultVar = *(EnsureEmitted(pOutput));
+			auto lInput = pInput1->GetOutputPortElement(0);
+			auto rInput = pInput2->GetOutputPortElement(0);
+			_pfn->Assign(resultVar.EmittedName());
+			_pfn->Cmp(GetComparison<T>(node),
+				[&lInput, this](CppFunctionEmitter& fn) {LoadVar(lInput); },
+				[&rInput, this](CppFunctionEmitter& fn) {LoadVar(rInput); });
+			_pfn->EndStatement();
 		}
 	}
 }

@@ -52,6 +52,11 @@ namespace emll
 			///<summary>Compile a BinaryNode</summary>
 			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<int>& node) override { CompileBinary<int>(node); }
 
+			///<summary>Compile a SumNode</summary>
+			virtual void CompileSumNode(const nodes::SumNode<double>& node) { CompileSum<double>(node); };
+			///<summary>Compile a SumNode</summary>
+			virtual void CompileSumNode(const nodes::SumNode<int>& node) { CompileSum<int>(node); };
+
 			///<summary>Compile a DotProductNode</summary>
 			virtual void CompileDotProductNode(const model::Node& node) override;
 			///<summary>Compile a AccmulatorNode</summary>
@@ -60,11 +65,14 @@ namespace emll
 			virtual void CompileDelayNode(const model::Node& node) override;
 			///<summary>Compile a Unary node</summary>
 			virtual void CompileUnaryNode(const model::Node& node) override;
-			///<summary>Compile a binary predicate</summary>
-			virtual void CompileBinaryPredicateNode(const model::Node& node) override;
 			///<summary>Compile an elementselectorNode</summary>
 			virtual void CompileElementSelectorNode(const model::Node& node) override;
 
+			///<summary>Compile a binary predicate</summary>
+			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) override 
+			{ 
+				CompileBinaryPredicate<double>(node); 
+			}
 
 			///<summary>Ensure a variable is emitted</summary>
 			virtual void EnsureVarEmitted(Variable* pVar) override
@@ -137,18 +145,20 @@ namespace emll
 			///<summary>Compile a BinaryOperationNode as a sequence of scalar operations</summary>
 			template<typename T>
 			void CompileBinaryExpanded(const nodes::BinaryOperationNode<T>& node);
-
-			///<summary>Compile a SumNode</summary>
-			virtual void CompileSumNode(const nodes::SumNode<double>& node) { CompileSum<double>(node); };
-			///<summary>Compile a SumNode</summary>
-			virtual void CompileSumNode(const nodes::SumNode<int>& node) { CompileSum<int>(node); };
+			
 			///<summary>Compile a SumNode</summary>
 			template<typename T>
 			void CompileSum(const nodes::SumNode<T>& node);
+			///<summary>Compile a SumNode</summary>
 			template<typename T>
 			void CompileSumLoop(const nodes::SumNode<T>& node);
+			///<summary>Compile a SumNode</summary>
 			template<typename T>
 			void CompileSumExpanded(const nodes::SumNode<T>& node);
+
+			///<summary>Compile a BinarPredicate</summary>
+			template<typename T>
+			void CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node);
 
 		private:
 			CppModuleEmitter _module;

@@ -100,6 +100,18 @@ namespace emll
 			return *this;
 		}
 
+		CppFunctionEmitter& CppFunctionEmitter::Cmp(ComparisonType cmp, std::function<void(CppFunctionEmitter& fn)> lValue, std::function<void(CppFunctionEmitter& fn)> rValue)
+		{
+			_emitter.OpenParan();
+			lValue(*this);
+			_emitter.Space();
+			_emitter.Cmp(cmp).Space();
+			rValue(*this);
+			_emitter.CloseParan();
+
+			return *this;
+		}
+
 		CppFunctionEmitter& CppFunctionEmitter::BeginFor(const std::string& iVarName, int count)
 		{
 			_emitter.For()

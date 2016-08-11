@@ -367,6 +367,19 @@ namespace emll
 			}
 		}
 
+		void Compiler::CompileBinaryPredicateNode(const model::Node& node)
+		{
+			auto input = node.GetInputPorts()[0];
+			switch (input->GetType())
+			{
+				case model::Port::PortType::Real:
+					CompileBinaryPredicateNode(static_cast<const nodes::BinaryPredicateNode<double>&>(node));
+					break;
+				default:
+					throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
 		template<>
 		OperatorType Compiler::GetOperator<double>(const nodes::BinaryOperationNode<double>& node) const
 		{

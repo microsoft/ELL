@@ -37,6 +37,5 @@ namespace emll
 				.BeginBlock();
 			return *this;
 		}
-
 	}
 }

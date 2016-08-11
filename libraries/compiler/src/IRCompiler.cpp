@@ -85,19 +85,6 @@ namespace emll
 			}
 		}
 
-		void IRCompiler::CompileBinaryPredicateNode(const model::Node& node)
-		{
-			auto input = node.GetInputPorts()[0];
-			switch (input->GetType())
-			{
-				case model::Port::PortType::Real:
-					CompileBinaryPredicate<double>(static_cast<const nodes::BinaryPredicateNode<double>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
 		void IRCompiler::CompileElementSelectorNode(const model::Node& node)
 		{
 			switch (ModelEx::GetNodeDataType(node))

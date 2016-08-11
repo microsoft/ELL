@@ -41,10 +41,6 @@ namespace emll
 		{
 			throw new CompilerException(CompilerError::notSupported);
 		}
-		void CppCompiler::CompileBinaryPredicateNode(const model::Node& node)
-		{
-			throw new CompilerException(CompilerError::notSupported);
-		}
 		void CppCompiler::CompileElementSelectorNode(const model::Node& node)
 		{
 			throw new CompilerException(CompilerError::notSupported);

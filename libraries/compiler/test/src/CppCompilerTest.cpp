@@ -83,3 +83,20 @@ void TestSumCpp(bool expanded)
 	compiler.WriteToFile("C:\\junk\\model\\TestSum.cpp");
 }
 
+void TestBinaryPredicateCpp()
+{
+	std::vector<double> data = { 5 };
+
+	ModelBuilder mb;
+	auto input1 = mb.Inputs<double>(data.size());
+	auto c1 = mb.Constant<double>(data);
+	auto eq = mb.Equals(input1->output, c1->output);
+	auto output = mb.Outputs<bool>(eq->output);
+
+	CppCompiler compiler;
+	compiler.CompileModel("TestPredicate", mb.Model);
+	compiler.DebugDump();
+	compiler.WriteToFile("C:\\junk\\model\\TestPredicate.cpp");
+}
+
+

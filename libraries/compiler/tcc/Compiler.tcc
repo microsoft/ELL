@@ -25,7 +25,6 @@ namespace emll
 				pVar = Variables().AddVariable<LiteralVarV<T>>(values);
 			}
 			SetVariableFor(output, pVar);
-			EnsureVarEmitted(pVar);
 		}
 	}
 }

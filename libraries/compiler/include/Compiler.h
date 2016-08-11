@@ -85,6 +85,8 @@ namespace emll
 			virtual void CompileBinaryNode(const model::Node& node);
 			///<summary>Compile a SumNode</summary>
 			virtual void CompileSumNode(const model::Node& node);
+			///<summary>Compile a BinaryPredicateNode</summary>
+			virtual void CompileBinaryPredicateNode(const model::Node& node);
 
 			//---------------------------------------------------
 			//
@@ -108,6 +110,9 @@ namespace emll
 			///<summary>Compile a SumNode</summary>
 			virtual void CompileSumNode(const nodes::SumNode<int>& node) = 0;
 
+			///<summary>Compile a binary predicate</summary>
+			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) = 0;
+
 			///<summary>Compile a DotProductNode</summary>
 			virtual void CompileDotProductNode(const model::Node& node) = 0;
 			///<summary>Compile a AccumulatorNode</summary>
@@ -116,8 +121,6 @@ namespace emll
 			virtual void CompileDelayNode(const model::Node& node) = 0;
 			///<summary>Compile a UnaryNode</summary>
 			virtual void CompileUnaryNode(const model::Node& node) = 0;
-			///<summary>Compile a BinaryPredicateNode</summary>
-			virtual void CompileBinaryPredicateNode(const model::Node& node) = 0;
 			///<summary>Compile an ElementSelectorNode</summary>
 			virtual void CompileElementSelectorNode(const model::Node& node) = 0;
 			///<summary>Ensure a variable is emitted</summary>

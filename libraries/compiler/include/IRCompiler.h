@@ -66,8 +66,10 @@ namespace emll
 			virtual void CompileDelayNode(const model::Node& node) override;
 			///<summary>Compile a Unary node</summary>
 			virtual void CompileUnaryNode(const model::Node& node) override;
+
 			///<summary>Compile a binary predicate</summary>
-			virtual void CompileBinaryPredicateNode(const model::Node& node) override;
+			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) { CompileBinaryPredicate<double>(node); };
+
 			///<summary>Compile an elementselectorNode</summary>
 			virtual void CompileElementSelectorNode(const model::Node& node) override;
 
