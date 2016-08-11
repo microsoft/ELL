@@ -437,7 +437,7 @@ namespace emll
 			SetVariableFor(pOutput, pVarOutputBuffer);
 			llvm::Value* pOutputBuffer = EnsureEmitted(pVarOutputBuffer);
 			//
-			// We implement a delay not as a Shift Register
+			// We implement a delay as a Shift Register
 			//
 			llvm::Value* pInputBuffer = EnsureEmitted(pInput);
 			_fn.ShiftAndUpdate<T>(pAllWindows, bufferSize, sampleSize, pInputBuffer, pOutputBuffer);
