@@ -124,6 +124,9 @@ namespace emll
 			///<summary>Emit a Constant Vector</summary>
 			template<typename T>
 			void EmitLiteralVector(LiteralVarV<T>& var);
+			
+			template<typename T>
+			void EmitRValue(Variable& var);
 
 			///<summary>Ensure that the variable for this outport port element is loaded into a register. SThis will automatically
 			/// dereference any pointers it needs to.</summary>

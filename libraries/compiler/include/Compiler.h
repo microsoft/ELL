@@ -173,19 +173,23 @@ namespace emll
 			template<typename T>
 			ComparisonType GetComparison(const nodes::BinaryPredicateNode<T>& node) const;
 
+			const NamedValueTypeList& InputArgs() const { return _inputArgs; }
+
 		private:
 			Variable* AllocArg(const model::OutputPortBase* pPort, bool isInput);
 			void Reset();
 			
 		private:
-			EmittedVarAllocator _inputVars;			// Runtime variable table
-			EmittedVarAllocator _outputVars;			// Runtime variable table
-			EmittedVarAllocator _literalVars;		// Runtime variable table
-			EmittedVarAllocator _localVars;			// Runtime variable table
-			EmittedVarAllocator _globalVars;			// Runtime variable table
+			EmittedVarAllocator _inputVars;			// Runtime input variable table
+			EmittedVarAllocator _outputVars;			// Runtime output variable table
+			EmittedVarAllocator _literalVars;		// Runtime literal variable table
+			EmittedVarAllocator _localVars;			// Runtime local variable table
+			EmittedVarAllocator _globalVars;			// Runtime global variable table
+			EmittedVarAllocator _rValueVars;			// Runtime RValues variable table
 
-			VariableAllocator _variables;			// variable allocator
+			VariableAllocator _variables;			// variable object manager
 			NamedValueTypeList _args;				// function arguments
+			NamedValueTypeList _inputArgs;			// Track inputs separately
 			// Maps output ports to runtime variables
 			std::unordered_map<const model::OutputPortBase*, Variable*> _portToVarMap;
 

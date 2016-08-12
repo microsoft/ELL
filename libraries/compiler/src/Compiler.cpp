@@ -25,6 +25,8 @@ namespace emll
 		static const std::string c_literalVar = "c_";
 		static const std::string c_globalVar = "g_";
 		static const std::string c_localVar = "t_";
+		static const std::string c_fnVar = "Fn";
+		static const std::string c_nodeVar = "Node";
 		static const std::string c_inputVar = "input";
 		static const std::string c_outputVar = "output";
 
@@ -132,6 +134,10 @@ namespace emll
 					emittedVar = _globalVars.Alloc();
 					pPrefix = &c_globalVar;
 					break;
+				case VariableScope::RValue:
+					emittedVar = _rValueVars.Alloc();
+					pPrefix = (var.IsTreeNode()) ? &c_nodeVar : &c_fnVar;
+					break;
 				case VariableScope::Input:
 					emittedVar = _inputVars.Alloc();
 					pPrefix = &c_inputVar;
@@ -199,6 +205,10 @@ namespace emll
 			SetVariableFor(pPort, pVar);
 
 			_args.push_back({pVar->EmittedName(), GetPtrType(varType)});
+			if (isInput)
+			{
+				_inputArgs.push_back({ pVar->EmittedName(), GetPtrType(varType) });
+			}
 			
 			return pVar;
 		}

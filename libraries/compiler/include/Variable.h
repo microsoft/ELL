@@ -53,6 +53,8 @@ namespace emll
 			Global,
 			///<summary>Heap allocated variable</summary>
 			Heap,
+			///<summary>Variable returned by a helper function</summary>
+			RValue,
 			///<summary>Input function argument</summary>
 			Input,
 			///<summary>Output function argument</summary>
@@ -79,7 +81,8 @@ namespace emll
 				hasInitValue		= 0x00000002,
 				///<summary>Is this a offset into a vector or array</summary>
 				isVectorRef		= 0x00000004,
-				isComputed		= 0x00000008
+				///<summary>Is this a helper for a tree node</summary>
+				isTreeNode		= 0x00000008
 			};
 
 		public:
@@ -132,6 +135,10 @@ namespace emll
 			{
 				return (_scope == VariableScope::Global);
 			}
+			bool IsRValue() const
+			{
+				return (_scope == VariableScope::RValue);
+			}
 			///<summary>Is this a variable mutable?</summary>
 			bool IsMutable() const
 			{
@@ -147,14 +154,15 @@ namespace emll
 			{
 				return TestFlags(VariableFlags::isVectorRef);
 			}
+			///<summary>Does this variable reference a tree node?</summary>
+			bool IsTreeNode() const
+			{
+				return TestFlags(VariableFlags::isTreeNode);
+			}
 			///<summary>Does the variable need to be initialized?</summary>
 			bool HasInitValue() const
 			{
 				return TestFlags(VariableFlags::hasInitValue);
-			}
-			bool IsComputed() const
-			{
-				return TestFlags(VariableFlags::isComputed);
 			}
 			bool IsNew() const
 			{

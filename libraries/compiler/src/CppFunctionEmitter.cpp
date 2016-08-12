@@ -216,13 +216,19 @@ namespace emll
 		CppFunctionEmitter& CppFunctionEmitter::IfInline(std::function<void()> value, std::function<void()> lVal, std::function<void()> rVal)
 		{
 			_emitter.OpenParan();
-			value();
-			_emitter.CloseParan().Space()
-					.Question().Space();
-			lVal();
-			_emitter.Space()
-					.Colon().Space();
-			rVal();
+			{
+				value();
+			}
+			_emitter.CloseParan().Space();
+			_emitter.Question().Space();
+			{
+				lVal();
+				_emitter.Space();
+			}
+			_emitter.Colon().Space();
+			{
+				rVal();
+			}
 			EndStatement();
 			return *this;
 		}

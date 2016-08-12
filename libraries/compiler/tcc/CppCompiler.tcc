@@ -51,6 +51,10 @@ namespace emll
 
 				case VariableScope::Global:
 					EmitGlobal<T>(static_cast<InitializedScalarVar<T>&>(var));
+					break;	
+
+				case VariableScope::RValue:
+					EmitRValue<T>(var);
 					break;
 
 				default:
@@ -135,6 +139,12 @@ namespace emll
 		void CppCompiler::EmitGlobalVector(InitializedVectorVar<T>& var)
 		{
 			_module.GlobalV<T>(var.EmittedName(), var.Data());
+		}
+
+		template<typename T>
+		void CppCompiler::EmitRValue(Variable& var)
+		{
+			//_pfn->Call(var.EmittedName(), InputArgs());
 		}
 
 		template<typename T>
