@@ -24,15 +24,6 @@ namespace emll
 			_emittedName = std::move(name);
 		}
 
-		Variable* Variable::Combine(VariableAllocator& vAlloc, Variable& other, OperatorType op)
-		{
-			if (other.IsLiteral())
-			{
-				return other.Combine(vAlloc, *this, op);
-			}
-			return nullptr;
-		}
-
 		void EmittedVar::Clear()
 		{
 			isNew = false;

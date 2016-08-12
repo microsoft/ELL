@@ -169,10 +169,6 @@ namespace emll
 					pVal = Emit(var);
 				}
 			}
-			if (var.IsComputed())
-			{
-				ApplyComputed(var, pVal);
-			}
 			return pVal;
 		}
 
@@ -216,19 +212,6 @@ namespace emll
 					break;
 			}
 			throw new CompilerException(CompilerError::variableTypeNotSupported);
-		}
-
-		void IRCompiler::ApplyComputed(Variable& var, llvm::Value* pDest)
-		{
-			llvm::Value* pVal = nullptr;
-			switch (var.Type())
-			{
-				case ValueType::Double:
-					ApplyComputed<double>(static_cast<ComputedVar<double>&>(var), pDest);
-					break;
-				default:
-					throw new CompilerException(CompilerError::valueTypeNotSupported);
-			}
 		}
 
 		llvm::Value* IRCompiler::LoadVar(Variable* pVar)

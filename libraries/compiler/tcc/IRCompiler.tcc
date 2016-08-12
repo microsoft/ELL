@@ -153,56 +153,6 @@ namespace emll
 		}
 
 		template<typename T>
-		void IRCompiler::ApplyComputed(ComputedVar<T>& var, llvm::Value* pDest)
-		{
-			assert(var.LastOp() != OperatorType::None);
-
-			llvm::Value* pSrc = LoadVar(var.Src());
-			T increment = var.IncrementBy();
-			T multiplyBy = var.MultiplyBy();
-
-			llvm::Value* pResult;
-			if (increment == 0.0)
-			{
-				if (multiplyBy != 1.0)
-				{
-					pResult = _fn.Op(GetMultiplyForValueType<T>(), pSrc, _fn.Literal(multiplyBy));
-					_fn.Store(pDest, pResult);
-				}
-				else
-				{
-					_fn.Store(pDest, pSrc);
-				}
-			}
-			else
-			{
-				if (multiplyBy == 0.0)
-				{
-					_fn.Store(pDest, _fn.Literal(multiplyBy));
-				}
-				else if (multiplyBy == 1.0)
-				{
-					pResult = _fn.Op(GetAddForValueType<T>(), pSrc, _fn.Literal(increment));
-					_fn.Store(pDest, pResult);
-				}
-				else if (var.LastOp() == OperatorType::Add)
-				{
-					pResult = _fn.Op(GetAddForValueType<T>(),
-						_fn.Op(GetMultiplyForValueType<T>(), _fn.Literal(multiplyBy), pSrc),
-						_fn.Literal(increment));
-					_fn.Store(pDest, pResult);
-				}
-				else if (var.LastOp() == OperatorType::Multiply)
-				{
-					pResult = _fn.Op(GetMultiplyForValueType<T>(),
-						_fn.Op(GetAddForValueType<T>(), _fn.Literal(increment), pSrc),
-						_fn.Literal(multiplyBy));
-					_fn.Store(pDest, pResult);
-				}
-			}
-		}
-
-		template<typename T>
 		void IRCompiler::CompileOutput(const model::OutputNode<T>& node)
 		{
 			// Output ports have exactly 1 input, output

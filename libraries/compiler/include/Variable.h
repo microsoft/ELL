@@ -174,9 +174,6 @@ namespace emll
 			{
 				return _emittedVar;
 			}
-
-			///<summary>For variable folding and delayed operation</summary>
-			virtual Variable* Combine(VariableAllocator& vAlloc, Variable& other, OperatorType op);
 		
 		protected:
 

@@ -39,8 +39,6 @@ namespace emll
 				return _data;
 			}
 
-			virtual Variable* Combine(VariableAllocator& vAlloc, Variable& other,  OperatorType op) override;
-
 		private:
 			T _data;
 		};
@@ -83,49 +81,6 @@ namespace emll
 			Variable& _src;
 			int _offset;
 		};
-
-		///<summary>A computed variable</summary>
-		template<typename T>
-		class ComputedVar : public ScalarVar<T>
-		{
-		public:
-			ComputedVar(Variable& src);
-			ComputedVar(ComputedVar<T>& src);
-
-			Variable& Src() const
-			{
-				return _src;
-			}
-			T IncrementBy() const
-			{
-				return _add;
-			}
-			T MultiplyBy() const
-			{
-				return _multiply;
-			}
-			bool HasSameSource(ComputedVar<T>& other);
-
-			bool Append(T data, OperatorType op);
-
-			virtual Variable* Combine(VariableAllocator& vAlloc, Variable& other, OperatorType op) override;
-
-			OperatorType LastOp() const
-			{
-				return _lastOp;
-			}
-		private:
-			void Append(ComputedVar<T>& other);
-			bool PrepareAppend(OperatorType op);
-			
-		private:
-			Variable& _src;
-			T _add;
-			T _multiply;
-			OperatorType _lastOp = OperatorType::None;
-			int _opCount = 0;
-		};
-		using ComputedVarF = ComputedVar<double>;
 	}
 }
 

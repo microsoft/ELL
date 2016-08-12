@@ -126,10 +126,6 @@ namespace emll
 			template<typename T>
 			llvm::Value* EmitLiteralVector(LiteralVarV<T>& var);
 
-			void ApplyComputed(Variable& var, llvm::Value* pDest);
-			template<typename T>
-			void ApplyComputed(ComputedVar<T>& var, llvm::Value* pDest);
-
 			///<summary>Gets an emitted variable with the given name and scope</summary>
 			llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
 			///<summary>Ensure that the given variable has been declared in IR</summary>
