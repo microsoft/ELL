@@ -41,9 +41,6 @@ namespace model
         /// <param name="inputValues"> The values for this node to output </param>
         void SetInput(std::vector<ValueType> inputValues);
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(ModelTransformer& transformer) const override;
-
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -64,6 +61,9 @@ namespace model
         /// <param name="deserializer"> The deserializer. </param>
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(ModelTransformer& transformer) const override;
 
         /// <summary> Exposes the output port as a read-only property </summary>
         const OutputPort<ValueType>& output = _output;

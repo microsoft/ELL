@@ -12,6 +12,9 @@
 
 #include <cassert>
 
+// utilities
+#include "Exception.h"
+
 namespace model
 {
     //
@@ -124,6 +127,20 @@ namespace model
     {
         _ranges.push_back(range);
         _size += range.Size();
+    }
+
+    OutputPortRange OutputPortElementsUntyped::GetElement(size_t index) const
+    {
+        size_t sumRangeSizesSoFar = 0;
+        for (const auto& range : _ranges)
+        {
+            if (index < sumRangeSizesSoFar + range.Size())
+            {
+                return OutputPortRange(*range.ReferencedPort(), range.GetStartIndex() + index - sumRangeSizesSoFar, 1);
+            }
+            sumRangeSizesSoFar += range.Size();
+        }
+        throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds OutputPortElements range");
     }
 
     void OutputPortElementsUntyped::ComputeSize()

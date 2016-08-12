@@ -69,8 +69,15 @@ namespace predictors
         ///
         /// <param name="example"> The data vector. </param>
         ///
-        /// <returns> A double. </returns>
+        /// <returns> The prediction. </returns>
         double Predict(const dataset::IDataVector& dataVector) const;
+
+        /// <summary> Returns a vector of dataVector elements weighted by the predictor weights. </summary>
+        ///
+        /// <param name="example"> The data vector. </param>
+        ///
+        /// <returns> The weighted elements vector. </returns>
+        std::vector<double> GetWeightedElements(const dataset::IDataVector& dataVector) const;
 
         /// <summary> Scales the linear predictor by a scalar </summary>
         ///

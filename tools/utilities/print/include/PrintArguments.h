@@ -10,6 +10,7 @@
 
 // utilities
 #include "CommandLineParser.h"
+#include "OutputStreamImpostor.h"
 
 // stl
 #include <cstdint>
@@ -65,7 +66,8 @@ struct LayerStyleArguments
 /// <summary> Arguments for print. </summary>
 struct PrintArguments
 {
-    std::string outputSvgFile;
+    std::string outputSvgFilename;
+    utilities::OutputStreamImpostor outputSvgStream;
 
     ElementLayoutArguments valueElementLayout;
     ElementLayoutArguments emptyElementLayout;
@@ -83,4 +85,11 @@ struct ParsedPrintArguments : public PrintArguments, public utilities::ParsedArg
     ///
     /// <param name="parser"> [in,out] The parser. </param>
     virtual void AddArgs(utilities::CommandLineParser& parser);
+
+    /// <summary> Check arguments. </summary>
+    ///
+    /// <param name="parser"> The parser. </param>
+    ///
+    /// <returns> An utilities::CommandLineParseResult. </returns>
+    virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
 };

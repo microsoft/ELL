@@ -13,7 +13,7 @@
 
 void ParsedPrintArguments::AddArgs(utilities::CommandLineParser & parser)
 {
-    parser.AddOption(outputSvgFile, "outputSvgFile", "osvg", "Path to the output Svg file", "");
+    parser.AddOption(outputSvgFilename, "outputSvgFilename", "osvg", "Path to the output Svg file", "");
 
     parser.AddOption(valueElementLayout.width, "valueElementWidth", "vew", "Width of each element in a layer that shows values", 55);
     parser.AddOption(valueElementLayout.height, "valueElementHeight", "veh", "Height of each element in a layer that shows values", 40);
@@ -47,5 +47,24 @@ void ParsedPrintArguments::AddArgs(utilities::CommandLineParser & parser)
 
     parser.AddOption(edgeStyle.flattness, "edgeFlattness", "ef", "Flatness of edges: between 0 and 1", 0.65);
     parser.AddOption(edgeStyle.dashStyle, "edgeDashStyle", "eds", "The dash style of the edges", "5,2");
+}
+
+utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilities::CommandLineParser & parser)
+{
+    if(outputSvgFilename == "null")
+    {
+        outputSvgStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
+    }
+    else if(outputSvgFilename == "cout")
+    {
+        outputSvgStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
+    }
+    else // treat argument as filename
+    {
+        outputSvgStream = utilities::OutputStreamImpostor(outputSvgFilename);
+    }
+
+    std::vector<std::string> parseErrorMessages;
+    return parseErrorMessages;
 }
 

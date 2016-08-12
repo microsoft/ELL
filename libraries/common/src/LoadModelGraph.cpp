@@ -51,7 +51,7 @@ namespace common
             predictor.GetWeights()[index] = (double)(index % 5);
         }
         auto classifierNode = model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
-//        auto outputNode = model.AddNode<model::OutputNode<double>>(classifierNode->output);
+        //auto outputNode = model.AddNode<model::OutputNode<double>>(classifierNode->prediction);
         return model;
     }
 

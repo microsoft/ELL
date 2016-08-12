@@ -33,7 +33,7 @@ namespace
         dataset::MappedParser<dataset::SparseEntryParser> mappedParser(dataset::SparseEntryParser(), std::move(map));
 
         // create line iterator - read line by line sequentially
-        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
+        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFilename);
 
         // Create iterator
         return dataset::GetParsingIterator(std::move(lineIterator), std::move(mappedParser));
@@ -51,7 +51,7 @@ namespace common
         dataset::SparseEntryParser sparseEntryParser;
 
         // create line iterator - read line by line sequentially
-        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFile);
+        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFilename);
 
         // Create iterator
         return dataset::GetParsingIterator(std::move(lineIterator), std::move(sparseEntryParser));

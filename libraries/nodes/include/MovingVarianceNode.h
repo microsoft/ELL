@@ -28,17 +28,21 @@ namespace nodes
     class MovingVarianceNode : public model::Node
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr const char* inputPortName = "input";
+        static constexpr const char* outputPortName = "output";
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
+
         /// <summary> Default Constructor </summary>
         MovingVarianceNode();
-        
+
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the variance of </param>
         /// <param name="windowSize"> The number of samples of history to use in computing the variance </param>
         MovingVarianceNode(const model::OutputPortElements<ValueType>& input, size_t windowSize);
         
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(model::ModelTransformer& transformer) const override;
-
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -60,11 +64,8 @@ namespace nodes
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<ValueType>& output = _output;
-
-        static constexpr const char* inputPortName = "input";
-        static constexpr const char* outputPortName = "output";
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;

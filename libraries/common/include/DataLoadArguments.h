@@ -21,8 +21,8 @@ namespace common
     struct DataLoadArguments
     {
         /// <summary> The filename for the input data file. </summary>
-        std::string inputDataFile = "";
-        
+        std::string inputDataFilename = "";
+
         /// <summary> The number of elements in an input data vector. </summary>
         std::string dataDimension = "";
 

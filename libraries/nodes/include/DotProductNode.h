@@ -31,6 +31,14 @@ namespace nodes
     class DotProductNode : public model::Node
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr const char* input1PortName = "input1";
+        static constexpr const char* input2PortName = "input2";
+        static constexpr const char* outputPortName = "output";
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
+
         /// <summary> Default Constructor </summary>
         DotProductNode();
 
@@ -38,12 +46,6 @@ namespace nodes
         /// <param name="input1"> One of the signals to take the dot product of </param>
         /// <param name="input2"> The other signal to take the dot product of </param>
         DotProductNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2);
-        
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(model::ModelTransformer& transformer) const override;
-
-        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(model::ModelTransformer& transformer) const override;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -66,12 +68,11 @@ namespace nodes
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<ValueType>& output = _output;
-
-        static constexpr const char* input1PortName = "input1";
-        static constexpr const char* input2PortName = "input2";
-        static constexpr const char* outputPortName = "output";
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(model::ModelTransformer& transformer) const override;
+        
+        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
+        virtual void Refine(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;

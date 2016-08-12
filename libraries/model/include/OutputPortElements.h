@@ -183,6 +183,13 @@ namespace model
         /// <param name="range"> The range of values to add to this list </param>
         void AddRange(const OutputPortRange& range);
 
+        /// <summary> Gets an element in the elements. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the element. </param>
+        ///
+        /// <returns> The specified element. </returns>
+        OutputPortRange GetElement(size_t index) const;
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>

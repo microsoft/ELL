@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        auto outStream = utilities::GetOutputStreamImpostor(dataSaveArguments.outputDataFile);
+        auto& outStream = dataSaveArguments.outputDataStream;
 
         // create mapped data iterator based on the command line params
         auto dataIterator = GetDataIterator(dataLoadArguments, mapLoadArguments);

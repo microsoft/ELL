@@ -32,9 +32,6 @@ namespace model
         /// <param name="input"> The node to get the input data from </param>
         OutputNode(const model::OutputPortElements<ValueType>& input);
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(ModelTransformer& transformer) const override;
-
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -58,6 +55,9 @@ namespace model
 
         /// <summary> Exposes the output port as a read-only property </summary>
         const OutputPort<ValueType>& output = _output;
+
+        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        virtual void Copy(ModelTransformer& transformer) const override;
 
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";

@@ -121,12 +121,12 @@ namespace model
 
             // we can visit this node only if all its inputs have been visited already
             bool canVisit = true;
-            const auto& nodeInputs = node->GetInputPorts();
-            for (auto input : nodeInputs)
+            const auto& inputPorts = node->GetInputPorts();
+            for (auto inputPort : inputPorts)
             {
-                for (const auto& inputNode : input->GetParentNodes())
+                for (const auto& parentNode : inputPort->GetParentNodes())
                 {
-                    canVisit = canVisit && _visitedNodes.find(inputNode) != _visitedNodes.end();
+                    canVisit = canVisit && _visitedNodes.find(parentNode) != _visitedNodes.end();
                 }
             }
 
@@ -155,12 +155,12 @@ namespace model
             }
             else // visit node's inputs
             {
-                const auto& nodeInputs = node->GetInputPorts();
-                for (auto input : ModelImpl::Reverse(nodeInputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
+                const auto& inputPorts = node->GetInputPorts();
+                for (auto input : ModelImpl::Reverse(inputPorts)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
                 {
-                    for (const auto& inputNode : input->GetParentNodes())
+                    for (const auto& parentNode : input->GetParentNodes())
                     {
-                        _stack.push_back(inputNode);
+                        _stack.push_back(parentNode);
                     }
                 }
             }

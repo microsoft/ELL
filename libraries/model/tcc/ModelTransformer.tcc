@@ -35,7 +35,8 @@ namespace model
     template <typename ValueType>
     const OutputPort<ValueType>* ModelTransformer::GetCorrespondingOutputPort(const OutputPort<ValueType>& port)
     {
-        auto result = dynamic_cast<const model::OutputPort<double>*>(GetCorrespondingPort(port));
+        auto correspondingPort = GetCorrespondingPort(port);
+        auto result = dynamic_cast<const model::OutputPort<ValueType>*>(correspondingPort);
         assert(result != nullptr);
         return result;
     }
@@ -61,6 +62,11 @@ namespace model
     template <typename NodeType, typename... Args>
     NodeType* ModelTransformer::AddNode(Args&&... args)
     {
-        return _model.AddNode<NodeType>(std::forward<Args>(args)...);
+        auto newNode = _model.AddNode<NodeType>(std::forward<Args>(args)...);
+        if (_context.IsNodeCompilable)
+        {
+            _isModelCompilable &= _context.IsNodeCompilable(*newNode);
+        }
+        return newNode;
     }
 }

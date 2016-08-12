@@ -36,6 +36,17 @@ namespace predictors
         return dataVector.Dot(_w) + _b;
     }
 
+    std::vector<double> LinearPredictor::GetWeightedElements(const dataset::IDataVector& dataVector) const
+    {
+        std::vector<double> weightedElements(_w.Size());
+        dataVector.AddTo(weightedElements);
+        for (size_t i = 0; i < _w.Size(); ++i)
+        {
+            weightedElements[i] *= _w[i];
+        }
+        return weightedElements;
+    }
+
     void LinearPredictor::Scale(double scalar)
     {
         _w.Scale(scalar);
