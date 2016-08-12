@@ -92,7 +92,7 @@ namespace model
         
         model.Visit([&](const Node& node) 
         { 
-            if(!context.IsNodeCompilable(&node))
+            if(!context.IsNodeCompilable(node))
             {
                 uncompilableNodeName = node.GetRuntimeTypeName();
             };

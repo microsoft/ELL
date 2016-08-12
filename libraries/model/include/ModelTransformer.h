@@ -34,7 +34,7 @@ namespace model
 
     struct TransformContext
     {
-        std::function<bool(const Node*)> IsNodeCompilable;
+        std::function<bool(const Node&)> IsNodeCompilable;
     };
 
     class ModelTransformer

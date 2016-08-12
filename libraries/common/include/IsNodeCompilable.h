@@ -27,10 +27,10 @@ namespace common
 
         /// <summary> Determines if a node is compilable or not </summary>
         ///
-        /// <param name="node"> A pointer to the node. </param>
+        /// <param name="node"> A node. </param>
         ///
         /// <returns> True if the node is compilable. </returns>
-        bool operator()(const model::Node* node);
+        bool operator()(const model::Node& node);
 
     protected:
         std::unordered_set<std::string> _nodeNames;
