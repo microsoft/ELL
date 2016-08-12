@@ -34,7 +34,7 @@ namespace model
 
     struct TransformContext
     {
-        std::function<bool(Node*)> IsNodeCompilable;
+        std::function<bool(const Node*)> IsNodeCompilable;
     };
 
     class ModelTransformer
@@ -99,6 +99,7 @@ namespace model
 
         /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
         void MapPort(const Port& oldPort, const Port& newPort);
+        std::string GetUncompilableNodeName(const Model& model, const TransformContext& context) const;
 
         Model _model;
         TransformContext _context;

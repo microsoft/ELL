@@ -8,25 +8,31 @@
 
 #include "Nodes_test.h"
 
+// utilities
+#include "Exception.h"
+
 // testing
 #include "testing.h"
+
+// stl
+#include <iostream>
 
 /// Runs all tests
 ///
 int main()
 {
-    //TestL2NormNodeCompute();
-    //TestAccumulatorNodeCompute();
-    //TestDelayNodeCompute();
-    //TestMovingAverageNodeCompute();
-    //TestMovingVarianceNodeCompute(); 
-    //TestUnaryOperationNodeCompute();
-    //TestBinaryOperationNodeCompute();
-    //TestLinearPredictorNodeCompute();
-    //
-    //TestMovingAverageNodeRefine();
+    TestL2NormNodeCompute();
+    TestAccumulatorNodeCompute();
+    TestDelayNodeCompute();
+    TestMovingAverageNodeCompute();
+    TestMovingVarianceNodeCompute(); 
+    TestUnaryOperationNodeCompute();
+    TestBinaryOperationNodeCompute();
+    TestLinearPredictorNodeCompute();
+    
+    TestMovingAverageNodeRefine();
     TestLinearPredictorNodeRefine();
-//    TestSimpleForestNodeRefine();
+    TestSimpleForestNodeRefine();
 
     if (testing::DidTestFail())
     {

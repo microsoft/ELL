@@ -25,14 +25,12 @@ set (INCLUDE include/AccumulatorNode.h
              include/MovingAverageNode.h
              include/MovingVarianceNode.h
              include/SingleElementThresholdNode.h
-             include/SubModelBuilders.h
              include/SumNode.h
              include/UnaryOperationNode.h)
 
 set (SRC src/ConstantNode.cpp
          src/LinearPredictorNode.cpp
-         src/SingleElementThresholdNode.cpp
-         src/SubModelBuilders.cpp)
+         src/SingleElementThresholdNode.cpp)
 
 set (TCC tcc/AccumulatorNode.tcc
          tcc/BinaryOperationNode.tcc

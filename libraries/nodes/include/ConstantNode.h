@@ -74,6 +74,13 @@ namespace nodes
         std::vector<ValueType> _values;
     };
 
+    /// <summary> Adds a constant node (which represents a constant predictor) to a model transformer. </summary>
+    ///
+    /// <param name="input"> The input to the predictor, which is ignored. </param>
+    /// <param name="predictor"> The constant predictor. </param>
+    /// <param name="transformer"> [in,out] The model transformer. </param>
+    ///
+    /// <returns> The node added to the model. </returns>
     ConstantNode<double>* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::ConstantPredictor& predictor, model::ModelTransformer& transformer);
 }
 

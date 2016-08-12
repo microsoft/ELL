@@ -60,7 +60,8 @@ namespace model
 
             if(++iterationCount >= 10)
             {
-                throw new utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than 10 refinement iterations");
+                auto uncompilableNodeName = GetUncompilableNodeName(currentModel, context);
+                throw new utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than 10 refinement iterations, uncompilable node: " + uncompilableNodeName);
             }
         }
         while(!_isModelCompilable);
@@ -83,5 +84,20 @@ namespace model
         // this is hideous
         auto nonconstPort = const_cast<Port*>(&newPort);
         _portToPortMap[&oldPort] = nonconstPort;
+    }
+
+    std::string ModelTransformer::GetUncompilableNodeName(const Model& model, const TransformContext& context) const
+    {
+        std::string uncompilableNodeName;
+        
+        model.Visit([&](const Node& node) 
+        { 
+            if(!context.IsNodeCompilable(&node))
+            {
+                uncompilableNodeName = node.GetRuntimeTypeName();
+            };
+        });
+
+        return uncompilableNodeName;
     }
 }

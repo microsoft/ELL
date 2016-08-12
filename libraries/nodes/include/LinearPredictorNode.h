@@ -71,22 +71,12 @@ namespace nodes
         predictors::LinearPredictor _predictor;
     };
 
-    /// <summary> A struct that represents the outputs of a linear predictor sub-model. </summary>
-    struct LinearPredictorSubModelOutputs
-    {
-        const model::OutputPort<double>& output;
-        const model::OutputPort<double>& weightedElements;
-    };
-
-
-    LinearPredictorNode* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer);
-
-    /// <summary> Builds a part of the model that represents a refined linear predictor. </summary>
+    /// <summary> Adds a linear predictor node to a model transformer. </summary>
     ///
-    /// <param name="transformer"> [in,out] The model transformer. </param>
-    /// <param name="outputPortElements"> The output port elements from which the linear predictor takes its inputs. </param>
+    /// <param name="input"> The input to the predictor. </param>
     /// <param name="predictor"> The linear predictor. </param>
+    /// <param name="transformer"> [in,out] The model transformer. </param>
     ///
-    /// <returns> The LinearPredictorSubModelOutputs. </returns>
-    LinearPredictorSubModelOutputs BuildSubModel(const predictors::LinearPredictor& predictor,  model::ModelTransformer& transformer, const model::OutputPortElements<double>& outputPortElements);
+    /// <returns> The node added to the model. </returns>
+    LinearPredictorNode* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer);
 }

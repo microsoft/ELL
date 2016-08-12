@@ -82,27 +82,8 @@ namespace nodes
         predictors::ForestPredictor<SplitRuleType, EdgePredictorType> _forest;
     };
 
+    /// <summary> Defines an alias representing a simple forest node, which holds a forest with a SingleElementThresholdPredictor as the split rule and ConstantPredictors on the edges. </summary>
     typedef ForestNode<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor>  SimpleForestNode;
-
-    /// <summary> A struct that represents the outputs of a linear predictor sub-model. </summary>
-    struct ForestSubModelOutputs
-    {
-        const model::OutputPort<double>& output;
-        //const model::OutputPort<double>& treeOutputs;   // TODO: waiting for OutputPortElements changes
-        //const model::OutputPort<bool>& edgeIndicatorVector;
-    };
-
-    /// <summary> Builds a part of the model that represents a refined forest predictor. </summary>
-    ///
-    /// <typeparam name="SplitRuleType"> The split rule type. </typeparam>
-    /// <typeparam name="EdgePredictorType"> The edge predictor type. </typeparam>
-    /// <param name="predictor"> The forest predictor. </param>
-    /// <param name="model"> [in,out] The model being modified. </param>
-    /// <param name="outputPortElements"> The output port elements from which the linear predictor takes its inputs. </param>
-    ///
-    /// <returns> The ForestSubModelOutputs. </returns>
-    template<typename SplitRuleType, typename EdgePredictorType>
-    ForestSubModelOutputs BuildSubModel(const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& predictor, model::ModelTransformer& transformer, const model::OutputPortElements<double>& outputPortElements);
 }
 
 #include "../tcc/ForestNode.tcc"

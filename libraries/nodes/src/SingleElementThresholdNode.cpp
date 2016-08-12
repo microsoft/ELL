@@ -29,9 +29,11 @@ namespace nodes
 
     void SingleElementThresholdNode::Refine(model::ModelTransformer& transformer) const
     {
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+
         // get the element used in the split rule 
         // TODO - waiting for OutputPortElements changes: the following 3 lines should be one line. 
-        auto elementAsRange = _input.GetOutputPortElements().GetElement(_predictor.GetElementIndex());
+        auto elementAsRange = newOutputPortElements.GetElement(_predictor.GetElementIndex());
         model::OutputPortElements<double> element;
         element.AddRange(elementAsRange);
 

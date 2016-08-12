@@ -320,6 +320,7 @@ void TestSimpleForestNodeRefine()
 
     // refine
     model::TransformContext context;
+    context.IsNodeCompilable = common::IsNodeCompilable();
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);

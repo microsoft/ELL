@@ -40,9 +40,15 @@ namespace nodes
     void LinearPredictorNode::Refine(model::ModelTransformer& transformer) const
     {
         auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newOutputs = BuildSubModel(_predictor, transformer, newOutputPortElements);
-        transformer.MapOutputPort(output, newOutputs.output);
-        transformer.MapOutputPort(weightedElements, newOutputs.weightedElements);
+    
+        auto weightsNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetWeights());
+        auto dotProductNode = transformer.AddNode<DotProductNode<double>>(weightsNode->output, newOutputPortElements);
+        auto coordinatewiseMultiplyNode = transformer.AddNode<BinaryOperationNode<double>>(weightsNode->output, newOutputPortElements, BinaryOperationNode<double>::OperationType::coordinatewiseMultiply);
+        auto biasNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetBias());
+        auto addNode = transformer.AddNode<BinaryOperationNode<double>>(dotProductNode->output, biasNode->output, BinaryOperationNode<double>::OperationType::add);
+        
+        transformer.MapOutputPort(output, addNode->output);
+        transformer.MapOutputPort(weightedElements, coordinatewiseMultiplyNode->output);
     }
 
     void LinearPredictorNode::Compute() const
@@ -58,15 +64,5 @@ namespace nodes
     LinearPredictorNode* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer)
     {
         return transformer.AddNode<LinearPredictorNode>(input, predictor);
-    }
-
-    LinearPredictorSubModelOutputs BuildSubModel(const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer, const model::OutputPortElements<double>& outputPortElements)
-    {
-        auto weightsNode = transformer.AddNode<ConstantNode<double>>(predictor.GetWeights());
-        auto dotProductNode = transformer.AddNode<DotProductNode<double>>(weightsNode->output, outputPortElements);
-        auto coordinatewiseMultiplyNode = transformer.AddNode<BinaryOperationNode<double>>(weightsNode->output, outputPortElements, BinaryOperationNode<double>::OperationType::coordinatewiseMultiply);
-        auto biasNode = transformer.AddNode<ConstantNode<double>>(predictor.GetBias());
-        auto addNode = transformer.AddNode<BinaryOperationNode<double>>(dotProductNode->output, biasNode->output, BinaryOperationNode<double>::OperationType::add);
-        return { addNode->output, coordinatewiseMultiplyNode->output };
     }
 }

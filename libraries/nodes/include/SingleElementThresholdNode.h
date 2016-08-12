@@ -65,5 +65,12 @@ namespace nodes
         predictors::SingleElementThresholdPredictor _predictor;
     };
 
+    /// <summary> Adds a SingleElementThreshold predictor node to a model transformer. </summary>
+    ///
+    /// <param name="input"> The input to the predictor. </param>
+    /// <param name="predictor"> The SingleElementThreshold predictor. </param>
+    /// <param name="transformer"> [in,out] The model transformer. </param>
+    ///
+    /// <returns> The node added to the model. </returns>
     SingleElementThresholdNode* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor, model::ModelTransformer& transformer);
 }

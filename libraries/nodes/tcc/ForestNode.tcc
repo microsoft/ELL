@@ -12,7 +12,6 @@
 #include "BinaryOperationNode.h"
 #include "SingleElementThresholdNode.h"
 #include "SumNode.h"
-#include "SubModelBuilders.h"
 
 // stl
 #include <vector>
@@ -37,37 +36,8 @@ namespace nodes
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestNode<SplitRuleType, EdgePredictorType>::Refine(model::ModelTransformer & transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newOutputs = BuildSubModel(_forest, transformer, newOutputPortElements);
-        transformer.MapOutputPort(output, newOutputs.output);
-        // TODO: waiting for OutputPortElements changes:
-        //       transformer.MapOutputPort(treeOutputs, newOutputs.treeOutputs);
-        //       transformer.MapOutputPort(edgeIndicatorVector, newOutputs.edgeIndicatorVector);
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::Compute() const
-    {
-        // forest output
-        _output.SetOutput({ _forest.Predict(_input) });
-
-        // individual tree outputs
-        std::vector<double> treeOutputs(_forest.NumTrees());
-        for(size_t i=0; i<_forest.NumTrees(); ++i)
-        {
-            treeOutputs[i] = _forest.Predict(_input, _forest.GetRootIndex(i));
-        }
-        _treeOutputs.SetOutput(std::move(treeOutputs));
-
-        // path indicator
-        auto edgeIndicator = _forest.GetEdgeIndicatorVector(_input);
-        _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType>
-    ForestSubModelOutputs BuildSubModel(const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest, model::ModelTransformer& transformer, const model::OutputPortElements<double>& outputPortElements) // call the last argument "inputs" or something like that
-    {
-        const auto& interiorNodes = forest.GetInteriorNodes();
+        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());      
+        const auto& interiorNodes = _forest.GetInteriorNodes();
 
         // create a place to store references to the output ports of the sub-models at each interior node
         // TODO: waiting for OutputPortElements changes: this should be a vector of OutputPortElements and not OutputPortRange -it is currently a vector of Ranges because I need to AddRange them
@@ -85,7 +55,7 @@ namespace nodes
             {
                 const auto& edgePredictor = edges[j].GetPredictor();
                 //auto edgePredictorSubModel = BuildSubModel(edgePredictor, model, outputPortElements);
-                auto edgePredictorNode = AddNodeToModelTransformer(outputPortElements, edgePredictor, transformer);
+                auto edgePredictorNode = AddNodeToModelTransformer(newOutputPortElements, edgePredictor, transformer);
 
                 if(edges[j].IsTargetInterior()) // target node is itself an interior node: reverse topological order guarantees that it's already visited
                 {
@@ -105,7 +75,7 @@ namespace nodes
 
             // add the sub-model that computes the split rule
             //auto splitRuleSubModel = BuildSubModel(interiorNodes[i - 1].GetSplitRule(), model, outputPortElements);
-            auto splitRuleNode = AddNodeToModelTransformer(outputPortElements, interiorNodes[i - 1].GetSplitRule(), transformer);
+            auto splitRuleNode = AddNodeToModelTransformer(newOutputPortElements, interiorNodes[i - 1].GetSplitRule(), transformer);
 
             auto selectorNode = transformer.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleNode->output);
             interiorNodeSubModels[i-1] = selectorNode->output;
@@ -114,21 +84,40 @@ namespace nodes
         // collect the sub-models that represent the trees of the forest
         // TODO: waiting for OutputPortElements changes: why is this an OutputPortElements, while interiorNodeSubModels is a vector?
         model::OutputPortElements<double> treeSubModels;
-        for(size_t rootIndex : forest.GetRootIndices())
+        for(size_t rootIndex : _forest.GetRootIndices())
         {
             treeSubModels.AddRange(interiorNodeSubModels[rootIndex]);
         }
 
         // add the bias term
-        auto biasNode = transformer.AddNode<ConstantNode<double>>(forest.GetBias());
+        auto biasNode = transformer.AddNode<ConstantNode<double>>(_forest.GetBias());
         treeSubModels.AddRange(biasNode->output);
 
         // sum all of the trees
         auto sumNode = transformer.AddNode<SumNode<double>>(treeSubModels);
         
-        return { 
-            sumNode->output
-        //,newNode->treeOutputs, newNode->edgeIndicatorVector
-        };
+        transformer.MapOutputPort(output, sumNode->output);
+        // TODO: waiting for OutputPortElements changes:
+        //       transformer.MapOutputPort(treeOutputs, ...);
+        //       transformer.MapOutputPort(edgeIndicatorVector, ...);
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestNode<SplitRuleType, EdgePredictorType>::Compute() const
+    {
+        // forest output
+        _output.SetOutput({ _forest.Predict(_input) });
+
+        // individual tree outputs
+        std::vector<double> treeOutputs(_forest.NumTrees());
+        for(size_t i=0; i<_forest.NumTrees(); ++i)
+        {
+            treeOutputs[i] = _forest.Predict(_input, _forest.GetRootIndex(i));
+        }
+        _treeOutputs.SetOutput(std::move(treeOutputs));
+
+        // path indicator
+        auto edgeIndicator = _forest.GetEdgeIndicatorVector(_input);
+        _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
     }
 }
