@@ -8,9 +8,6 @@
 
 #include "Nodes_test.h"
 
-// utilities
-#include "Exception.h"
-
 // testing
 #include "testing.h"
 
