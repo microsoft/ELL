@@ -17,6 +17,7 @@ set (SRC src/BaggingIncrementalTrainerArguments.cpp
          src/DataSaveArguments.cpp
          src/DataLoaders.cpp
          src/EvaluatorArguments.cpp
+         src/IsNodeCompilable.cpp
          src/LoadModel.cpp
          src/LoadModelGraph.cpp
          src/MakeTrainer.cpp
@@ -34,6 +35,7 @@ set (INCLUDE include/BaggingIncrementalTrainerArguments.h
              include/DataSaveArguments.h
              include/DataLoaders.h
              include/EvaluatorArguments.h
+             include/IsNodeCompilable.h
              include/LoadModel.h
              include/LoadModelGraph.h
              include/MakeEvaluator.h

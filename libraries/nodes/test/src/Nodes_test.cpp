@@ -25,6 +25,9 @@
 // predictors
 #include "LinearPredictor.h"
 
+// common
+#include "IsNodeCompilable.h"
+
 // testing
 #include "testing.h"
 
@@ -299,7 +302,7 @@ void TestSimpleForestNodeRefine()
 {
     // define some abbreviations
     using SplitAction = predictors::SimpleForestPredictor::SplitAction;
-    using SplitRule = predictors::SingleElementThresholdRule;
+    using SplitRule = predictors::SingleElementThresholdPredictor;
     using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
     using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
@@ -317,15 +320,16 @@ void TestSimpleForestNodeRefine()
 
     // refine
     model::TransformContext context;
+    context.IsNodeCompilable = common::IsNodeCompilable();
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputPort = transformer.GetCorrespondingOutputPort(simpleForestNode->prediction);
+    auto refinedOutputPort = transformer.GetCorrespondingOutputPort(simpleForestNode->output);
 
     // check equivalence
     inputNode->SetInput({ 0.2, 0.5, 0.0 });
     refinedInputNode->SetInput({ 0.2, 0.5, 0.0 });
-    auto outputValue = model.ComputeNodeOutput(simpleForestNode->prediction)[0];
+    auto outputValue = model.ComputeNodeOutput(simpleForestNode->output)[0];
     auto refinedOutputValue = refinedModel.ComputeNodeOutput(*refinedOutputPort)[0];
 
     //  expected output is -3.0
@@ -347,15 +351,16 @@ void TestLinearPredictorNodeRefine()
 
     // refine the model
     model::TransformContext context;
+    context.IsNodeCompilable = common::IsNodeCompilable();
     model::ModelTransformer transformer;
     auto newModel = transformer.RefineModel(model, context);
 
     // check for equality
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputPort = transformer.GetCorrespondingOutputPort(linearPredictorNode->prediction);
+    auto newOutputPort = transformer.GetCorrespondingOutputPort(linearPredictorNode->output);
     inputNode->SetInput({1.0, 1.0, 1.0});
     newInputNode->SetInput({1.0, 1.0, 1.0});
-    auto modelOutputValue = model.ComputeNodeOutput(linearPredictorNode->prediction)[0];
+    auto modelOutputValue = model.ComputeNodeOutput(linearPredictorNode->output)[0];
     auto newOutputValue = newModel.ComputeNodeOutput(*newOutputPort)[0];
 
     testing::ProcessTest("Testing LinearPredictorNode refine", testing::IsEqual(modelOutputValue, newOutputValue));

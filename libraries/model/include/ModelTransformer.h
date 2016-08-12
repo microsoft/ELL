@@ -24,6 +24,7 @@
 #include <vector>
 #include <unordered_map>
 #include <exception>
+#include <functional>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -31,18 +32,26 @@ namespace model
     template <typename ValueType>
     class InputNode;
 
-    class TransformContext
+    struct TransformContext
     {
+        std::function<bool(const Node&)> IsNodeCompilable;
     };
 
-    // TODO: template transformer on the context type
     class ModelTransformer
     {
     public:
         /// <summary> Returns a copy of the input model, by calling Copy() on each of the model's nodes </summary>
         Model CopyModel(const Model& model, const TransformContext& context);
 
-        /// <summary> Returns a refined version of the input model, by calling Refine() on each of the model's nodes </summary>
+        /// <summary> Performs one or more refinement iterations on a given model and returns the result.
+        /// If context.IsNodeCompilable is not set, this call performs one refinement iteration. If
+        /// context.IsNodeCompilable is set, this call refines the model until all its nodes are
+        /// compilable. </summary>
+        ///
+        /// <param name="model"> The model. </param>
+        /// <param name="context"> The context. </param>
+        ///
+        /// <returns> The refined Model. </returns>
         Model RefineModel(const Model& model, const TransformContext& context);
 
         /// <summary> Returns the  OutputPort from new new model corresponding to the given port on the input model </summary>
@@ -96,12 +105,19 @@ namespace model
     private:
         friend class Node;
 
-        /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
+        // Sets up a port-port mapping. Called by node implementors
         void MapPort(const Port& oldPort, const Port& newPort);
+
+        // Find the name of a node that isn't compilable (if there are several, it just finds one)
+        std::string GetUncompilableNodeName(const Model& model, const TransformContext& context) const;
 
         Model _model;
         TransformContext _context;
         std::unordered_map<const Port*, Port*> _portToPortMap;
+        bool _isModelCompilable;
+
+        // the maximal number of refinement iterations to allow
+        const int maxRefinementIterations = 10;
     };
 }
 

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "SingleElementThresholdRule.h"
+#include "SingleElementThresholdPredictor.h"
 #include "ConstantPredictor.h"
 
 // dataset
@@ -312,7 +312,7 @@ namespace predictors
     };
 
     /// <summary> A simple binary tree with single-input threshold rules and constant predictors in its edges. </summary>
-    typedef ForestPredictor<SingleElementThresholdRule, ConstantPredictor> SimpleForestPredictor;
+    typedef ForestPredictor<SingleElementThresholdPredictor, ConstantPredictor> SimpleForestPredictor;
 }
 
 #include "../tcc/ForestPredictor.tcc"
