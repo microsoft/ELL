@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SingleElementThresholdRule.h (predictors)
+//  File:     SingleElementThresholdPredictor.h (predictors)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,19 +14,19 @@
 namespace predictors
 {
     /// <summary> A split rule that compares a single feature to a threshold. </summary>
-    class SingleElementThresholdRule
+    class SingleElementThresholdPredictor
     {
     public:
         /// <summary> Constructs a single-element threshold rule. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
         /// <param name="threshold"> The threshold. </param>
-        SingleElementThresholdRule(size_t index = 0, double threshold = 0.0);
+        SingleElementThresholdPredictor(size_t index = 0, double threshold = 0.0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "SingleElementThresholdRule"; }
+        static std::string GetTypeName() { return "SingleElementThresholdPredictor"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -50,7 +50,7 @@ namespace predictors
         ///
         /// <returns> The result of the split rule. </returns>
         template<typename RandomAccessVectorType>
-        int Compute(const RandomAccessVectorType& inputVector) const;
+        int Predict(const RandomAccessVectorType& inputVector) const;
 
         /// <summary> Returns the number of outputs (the max output value plus one). </summary>
         ///
@@ -69,4 +69,4 @@ namespace predictors
     };
 }
 
-#include "../tcc/SingleElementThresholdRule.tcc"
+#include "../tcc/SingleElementThresholdPredictor.tcc"

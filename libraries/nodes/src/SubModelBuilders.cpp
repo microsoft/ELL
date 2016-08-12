@@ -21,7 +21,7 @@ namespace nodes
         return{ constantNode->output };
     }
 
-    SingleElementThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleElementThresholdRule& rule, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
+    SingleElementThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleElementThresholdPredictor& rule, model::Model& model, const model::OutputPortElements<double>& outputPortElements)
     {
         // get the element used in the split rule 
         // TODO - waiting for OutputPortElements changes: the following 3 lines should be one line. 

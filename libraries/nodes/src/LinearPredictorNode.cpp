@@ -24,7 +24,7 @@
 
 namespace nodes
 {
-    LinearPredictorNode::LinearPredictorNode(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor) : Node({ &_input }, { &_prediction, &_weightedElements }), _input(this, input, inputPortName), _prediction(this, outputPortName, 1), _weightedElements(this, weightedElementsPortName, input.Size()), _predictor(predictor)
+    LinearPredictorNode::LinearPredictorNode(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor) : Node({ &_input }, { &_output, &_weightedElements }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _weightedElements(this, weightedElementsPortName, input.Size()), _predictor(predictor)
     {
         assert(input.Size() == predictor.GetDimension());
     }
@@ -33,7 +33,7 @@ namespace nodes
     {
         auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<LinearPredictorNode>(newOutputPortElements, _predictor);
-        transformer.MapOutputPort(prediction, newNode->prediction);
+        transformer.MapOutputPort(output, newNode->output);
         transformer.MapOutputPort(weightedElements, newNode->weightedElements);
     }
 
@@ -41,7 +41,7 @@ namespace nodes
     {
         auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newOutputs = BuildSubModel(_predictor, transformer, newOutputPortElements);
-        transformer.MapOutputPort(prediction, newOutputs.prediction);
+        transformer.MapOutputPort(output, newOutputs.output);
         transformer.MapOutputPort(weightedElements, newOutputs.weightedElements);
     }
 
@@ -51,8 +51,13 @@ namespace nodes
         dataset::DoubleDataVector dataVector(_input.GetValue());
 
         // predict
-        _prediction.SetOutput({ _predictor.Predict(dataVector) });
+        _output.SetOutput({ _predictor.Predict(dataVector) });
         _weightedElements.SetOutput(_predictor.GetWeightedElements(dataVector));
+    }
+
+    LinearPredictorNode* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer)
+    {
+        return transformer.AddNode<LinearPredictorNode>(input, predictor);
     }
 
     LinearPredictorSubModelOutputs BuildSubModel(const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer, const model::OutputPortElements<double>& outputPortElements)

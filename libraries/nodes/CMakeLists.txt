@@ -24,11 +24,14 @@ set (INCLUDE include/AccumulatorNode.h
              include/L2NormNode.h
              include/MovingAverageNode.h
              include/MovingVarianceNode.h
+             include/SingleElementThresholdNode.h
              include/SubModelBuilders.h
              include/SumNode.h
              include/UnaryOperationNode.h)
 
-set (SRC src/LinearPredictorNode.cpp
+set (SRC src/ConstantNode.cpp
+         src/LinearPredictorNode.cpp
+         src/SingleElementThresholdNode.cpp
          src/SubModelBuilders.cpp)
 
 set (TCC tcc/AccumulatorNode.tcc

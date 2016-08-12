@@ -10,7 +10,7 @@
 
 // predictors
 #include "ConstantPredictor.h"
-#include "SingleElementThresholdRule.h"
+#include "SingleElementThresholdPredictor.h"
 
 // model
 #include "ModelGraph.h"
@@ -47,5 +47,5 @@ namespace nodes
     /// <param name="outputPortElements"> The output port elements from which the rule takes its inputs. </param>
     ///
     /// <returns> The SingleElementThresholdRuleSubModelOutputs. </returns>
-    SingleElementThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleElementThresholdRule& rule, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
+    SingleElementThresholdRuleSubModelOutputs BuildSubModel(const predictors::SingleElementThresholdPredictor& rule, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
 }

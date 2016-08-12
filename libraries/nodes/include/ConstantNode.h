@@ -12,6 +12,9 @@
 #include "OutputPort.h"
 #include "ModelTransformer.h"
 
+// predictors
+#include "ConstantPredictor.h"
+
 // utilities
 #include "TypeName.h"
 
@@ -70,6 +73,8 @@ namespace nodes
         // Constant value
         std::vector<ValueType> _values;
     };
+
+    ConstantNode<double>* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::ConstantPredictor& predictor, model::ModelTransformer& transformer);
 }
 
 #include "../tcc/ConstantNode.tcc"
