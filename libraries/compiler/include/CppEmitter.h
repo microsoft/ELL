@@ -39,6 +39,8 @@ namespace emll
 			CppEmitter& Assign();
 			CppEmitter& Asterisk();
 			CppEmitter& Increment();
+			CppEmitter& EndStatement();
+
 			CppEmitter& Operator(OperatorType op);
 			CppEmitter& Cmp(ComparisonType cmp);
 
@@ -83,6 +85,7 @@ namespace emll
 			CppEmitter& EndBlock();
 
 			CppEmitter& AppendRaw(const std::string& code);
+			CppEmitter& Append(CppEmitter& emitter);
 			CppEmitter& Clear();
 
 			///<summary>Increase the indent</summary>

@@ -79,10 +79,14 @@ namespace emll
 			CppFunctionEmitter& IfInline(std::function<void()> value, std::function<void()> lVal, std::function<void()> rVal);
 
 			///<summary>Return generated code</summary>
-			std::string Code() { return _emitter.Code(); }
+			std::string Code() { return _root.Code(); }
+
+			CppFunctionEmitter& Clear();
 
 		private:
-			CppEmitter _emitter;
+			CppEmitter _root;
+			CppEmitter _variables;
+			CppEmitter _code;
 		};
 	}
 }

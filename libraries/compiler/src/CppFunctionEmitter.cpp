@@ -6,52 +6,67 @@ namespace emll
 	{
 		CppFunctionEmitter::CppFunctionEmitter()
 		{
+			_variables.IncreaseIndent();
+			_code.IncreaseIndent();
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::Clear()
+		{
+			_root.Clear();
+			_variables.Clear();
+			_code.Clear();
+			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::Begin(const std::string& name, const ValueType returnType, const NamedValueTypeList& args)
 		{
-			_emitter.Clear()
-				.DeclareFunction(name, returnType, args)
-				.NewLine()
+			Clear();
+			_root.DeclareFunction(name, returnType, args).NewLine()
 				.BeginBlock();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::End()
 		{
-			_emitter.EndBlock();
+			_root.Append(_variables);
+			_root.NewLine();
+			_root.Append(_code);
+			_root.EndBlock();
+
+			_variables.Clear();
+			_code.Clear();
+
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::EndStatement()
 		{
-			_emitter.Semicolon().NewLine();
+			_code.EndStatement();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::Var(ValueType type, const std::string& name)
 		{
-			_emitter.Var(type, name);
-			EndStatement();
+			_variables.Var(type, name).EndStatement();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::Value(const std::string& varName)
 		{
-			_emitter.Identifier(varName);
+			_code.Identifier(varName);
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::ValueAt(const std::string& name, int offset)
 		{
-			_emitter.Identifier(name)
+			_code.Identifier(name)
 				.Offset(offset);
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::ValueAt(const std::string& name, const std::string& offsetVarName)
 		{
-			_emitter.Identifier(name)
+			_code.Identifier(name)
 				.Offset(offsetVarName);
 			return *this;
 		}
@@ -82,13 +97,13 @@ namespace emll
 
 		CppFunctionEmitter& CppFunctionEmitter::Assign(const std::string& varName)
 		{
-			_emitter.Assign(varName).Space();
+			_code.Assign(varName).Space();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::AssignValue(const std::string& varName, std::function<void()> value)
 		{
-			_emitter.Assign(varName).Space();
+			_code.Assign(varName).Space();
 			value();
 			EndStatement();
 			return *this;
@@ -96,19 +111,19 @@ namespace emll
 
 		CppFunctionEmitter& CppFunctionEmitter::AssignValueAt(const std::string& destVarName, int offset)
 		{
-			_emitter.AssignValueAt(destVarName, offset).Space();
+			_code.AssignValueAt(destVarName, offset).Space();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::AssignValueAt(const std::string& destVarName, const std::string& offsetVarName)
 		{
-			_emitter.AssignValueAt(destVarName, offsetVarName).Space();
+			_code.AssignValueAt(destVarName, offsetVarName).Space();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::AssignValueAt(const std::string& destVarName, int offset, std::function<void()> value)
 		{
-			_emitter.AssignValueAt(destVarName, offset).Space();
+			_code.AssignValueAt(destVarName, offset).Space();
 			value();
 			EndStatement();
 			return *this;
@@ -151,8 +166,8 @@ namespace emll
 		CppFunctionEmitter& CppFunctionEmitter::Op(OperatorType op, std::function<void()> lValue, std::function<void()> rValue)
 		{
 			lValue();
-			_emitter.Space();
-			_emitter.Operator(op).Space();
+			_code.Space();
+			_code.Operator(op).Space();
 			rValue();
 
 			return *this;
@@ -160,19 +175,19 @@ namespace emll
 
 		CppFunctionEmitter& CppFunctionEmitter::Cmp(ComparisonType cmp, std::function<void()> lValue, std::function<void()> rValue)
 		{
-			_emitter.OpenParan();
+			_code.OpenParan();
 			lValue();
-			_emitter.Space();
-			_emitter.Cmp(cmp).Space();
+			_code.Space();
+			_code.Cmp(cmp).Space();
 			rValue();
-			_emitter.CloseParan();
+			_code.CloseParan();
 
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::BeginFor(const std::string& iVarName, int count)
 		{
-			_emitter.For()
+			_code.For()
 				.OpenParan()
 				.Var<int>(iVarName).Space()
 				.Assign().Space()
@@ -187,45 +202,45 @@ namespace emll
 
 		CppFunctionEmitter& CppFunctionEmitter::EndFor()
 		{
-			_emitter.EndBlock();
+			_code.EndBlock();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::BeginIf(std::function<void()> value)
 		{
-			_emitter.If().OpenParan();
+			_code.If().OpenParan();
 			value();
-			_emitter.CloseParan().NewLine()
+			_code.CloseParan().NewLine()
 					.BeginBlock();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::BeginElse()
 		{
-			_emitter.Else().NewLine()
+			_code.Else().NewLine()
 				.BeginBlock();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::EndIf()
 		{
-			_emitter.EndBlock();
+			_code.EndBlock();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::IfInline(std::function<void()> value, std::function<void()> lVal, std::function<void()> rVal)
 		{
-			_emitter.OpenParan();
+			_code.OpenParan();
 			{
 				value();
 			}
-			_emitter.CloseParan().Space();
-			_emitter.Question().Space();
+			_code.CloseParan().Space();
+			_code.Question().Space();
 			{
 				lVal();
-				_emitter.Space();
+				_code.Space();
 			}
-			_emitter.Colon().Space();
+			_code.Colon().Space();
 			{
 				rVal();
 			}

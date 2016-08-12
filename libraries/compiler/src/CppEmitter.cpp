@@ -143,6 +143,11 @@ namespace emll
 			return *this;
 		}
 
+		CppEmitter& CppEmitter::EndStatement()
+		{
+			return Semicolon().NewLine();
+		}
+
 		CppEmitter& CppEmitter::Operator(OperatorType op)
 		{
 			switch (op)
@@ -375,6 +380,12 @@ namespace emll
 		CppEmitter& CppEmitter::AppendRaw(const std::string& code)
 		{
 			_writer.Write(code);
+			return *this;
+		}
+
+		CppEmitter& CppEmitter::Append(CppEmitter& emitter)
+		{
+			_writer.Write(emitter.Code());
 			return *this;
 		}
 
