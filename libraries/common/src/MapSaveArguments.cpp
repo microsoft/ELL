@@ -17,7 +17,7 @@ namespace common
             "outputModelFilename",
             "omf",
             "Path to the output model file",
-            "null");
+            "");
     }
 
     utilities::CommandLineParseResult ParsedMapSaveArguments::PostProcess(const utilities::CommandLineParser& parser)
@@ -26,7 +26,7 @@ namespace common
         {
             outputModelStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
         }
-        else if(outputModelFilename == "cout")
+        else if(outputModelFilename == "")
         {
             outputModelStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
         }
