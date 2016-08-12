@@ -54,7 +54,6 @@ namespace nodes
             for(size_t j = 0; j < edges.size(); ++j)
             {
                 const auto& edgePredictor = edges[j].GetPredictor();
-                //auto edgePredictorSubModel = BuildSubModel(edgePredictor, model, outputPortElements);
                 auto edgePredictorNode = AddNodeToModelTransformer(newOutputPortElements, edgePredictor, transformer);
 
                 if(edges[j].IsTargetInterior()) // target node is itself an interior node: reverse topological order guarantees that it's already visited
@@ -74,7 +73,6 @@ namespace nodes
             }
 
             // add the sub-model that computes the split rule
-            //auto splitRuleSubModel = BuildSubModel(interiorNodes[i - 1].GetSplitRule(), model, outputPortElements);
             auto splitRuleNode = AddNodeToModelTransformer(newOutputPortElements, interiorNodes[i - 1].GetSplitRule(), transformer);
 
             auto selectorNode = transformer.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleNode->output);

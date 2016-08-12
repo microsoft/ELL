@@ -33,6 +33,7 @@ namespace model
 
         int iterationCount = 0;
 
+        // refine until all nodes are compilable according to context.IsNodeCompilable()
         do
         {
             Model currentModel = std::move(_model);
@@ -43,11 +44,13 @@ namespace model
 
             _isModelCompilable = true;
 
+            // one refinement pass
             currentModel.Visit([this](const Node& node) 
             { 
                 node.Refine(*this); 
             });
 
+            // concatenate new port map onto existing port map
             if(currentPortToPortMap.size() > 0)
             {
                 std::unordered_map<const Port*, Port*> newPortToPortMap;
@@ -58,7 +61,8 @@ namespace model
                 _portToPortMap = newPortToPortMap;
             }
 
-            if(++iterationCount >= 10)
+            // die after too many iterations
+            if(++iterationCount >= maxRefinementIterations)
             {
                 auto uncompilableNodeName = GetUncompilableNodeName(currentModel, context);
                 throw new utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than 10 refinement iterations, uncompilable node: " + uncompilableNodeName);
