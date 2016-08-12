@@ -40,7 +40,10 @@ namespace nodes
         {
             equal,
             less,
-            greater
+            greater,
+            notEqual,
+            lessOrEqual,
+            greaterOrEqual
         };
 
         /// <summary> Constructor. </summary>
