@@ -14,9 +14,6 @@
 // testing
 #include "testing.h"
 
-// stl
-#include <iostream>
-
 /// Runs all tests
 ///
 int main()
