@@ -28,6 +28,7 @@ set (SRC src/Types.cpp
 		 src/IRCompiler.cpp
 		 src/IndentedTextWriter.cpp
 		 src/CppEmitter.cpp
+		 src/CppBlock.cpp
 		 src/CppModuleEmitter.cpp
 		 src/CppFunctionEmitter.cpp
 		 src/CppCompiler.cpp
@@ -52,6 +53,7 @@ set (INCLUDE include/LLVMInclude.h
 		include/IRCompiler.h
 		include/IndentedTextWriter.h
 		include/CppEmitter.h
+		include/CppBlock.h
 		include/CppModuleEmitter.h
 		include/CppFunctionEmitter.h
 		include/CppCompiler.h

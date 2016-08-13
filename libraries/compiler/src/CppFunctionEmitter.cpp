@@ -6,67 +6,73 @@ namespace emll
 	{
 		CppFunctionEmitter::CppFunctionEmitter()
 		{
-			_variables.IncreaseIndent();
-			_code.IncreaseIndent();
+		}
+
+		CppBlock* CppFunctionEmitter::AppendBlock()
+		{
+			auto pNewBlock = _blockAllocator.Alloc();
+			_blocks.Push(pNewBlock);
+			if (_pCurBlock != nullptr)
+			{
+				pNewBlock->Indent() = _pCurBlock->Indent();
+			}
+			_pCurBlock = pNewBlock;
+			return pNewBlock;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::Clear()
 		{
-			_root.Clear();
-			_variables.Clear();
-			_code.Clear();
+			_blockAllocator.Clear();
+			_blocks.Clear();
+			_pCurBlock = nullptr;
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::Begin(const std::string& name, const ValueType returnType, const NamedValueTypeList& args)
 		{
 			Clear();
-			_root.DeclareFunction(name, returnType, args).NewLine()
-				.BeginBlock();
+			DeclareFunction(name, returnType, args);
+			_pVariables = AppendBlock();
+			_pCurBlock = AppendBlock();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::End()
 		{
-			_root.Append(_variables);
-			_root.NewLine();
-			_root.Append(_code);
-			_root.EndBlock();
-
-			_variables.Clear();
-			_code.Clear();
-
+			_pCurBlock->EndBlock();
+			_pVariables->NewLine();
+			MergeBlocks();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::EndStatement()
 		{
-			_code.EndStatement();
+			_pCurBlock->EndStatement();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::Var(ValueType type, const std::string& name)
 		{
-			_variables.Var(type, name).EndStatement();
+			_pVariables->Var(type, name).EndStatement();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::Value(const std::string& varName)
 		{
-			_code.Identifier(varName);
+			_pCurBlock->Identifier(varName);
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::ValueAt(const std::string& name, int offset)
 		{
-			_code.Identifier(name)
+			_pCurBlock->Identifier(name)
 				.Offset(offset);
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::ValueAt(const std::string& name, const std::string& offsetVarName)
 		{
-			_code.Identifier(name)
+			_pCurBlock->Identifier(name)
 				.Offset(offsetVarName);
 			return *this;
 		}
@@ -97,13 +103,13 @@ namespace emll
 
 		CppFunctionEmitter& CppFunctionEmitter::Assign(const std::string& varName)
 		{
-			_code.Assign(varName).Space();
+			_pCurBlock->Assign(varName).Space();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::AssignValue(const std::string& varName, std::function<void()> value)
 		{
-			_code.Assign(varName).Space();
+			_pCurBlock->Assign(varName).Space();
 			value();
 			EndStatement();
 			return *this;
@@ -111,19 +117,19 @@ namespace emll
 
 		CppFunctionEmitter& CppFunctionEmitter::AssignValueAt(const std::string& destVarName, int offset)
 		{
-			_code.AssignValueAt(destVarName, offset).Space();
+			_pCurBlock->AssignValueAt(destVarName, offset).Space();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::AssignValueAt(const std::string& destVarName, const std::string& offsetVarName)
 		{
-			_code.AssignValueAt(destVarName, offsetVarName).Space();
+			_pCurBlock->AssignValueAt(destVarName, offsetVarName).Space();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::AssignValueAt(const std::string& destVarName, int offset, std::function<void()> value)
 		{
-			_code.AssignValueAt(destVarName, offset).Space();
+			_pCurBlock->AssignValueAt(destVarName, offset).Space();
 			value();
 			EndStatement();
 			return *this;
@@ -166,8 +172,8 @@ namespace emll
 		CppFunctionEmitter& CppFunctionEmitter::Op(OperatorType op, std::function<void()> lValue, std::function<void()> rValue)
 		{
 			lValue();
-			_code.Space();
-			_code.Operator(op).Space();
+			_pCurBlock->Space();
+			_pCurBlock->Operator(op).Space();
 			rValue();
 
 			return *this;
@@ -175,77 +181,99 @@ namespace emll
 
 		CppFunctionEmitter& CppFunctionEmitter::Cmp(ComparisonType cmp, std::function<void()> lValue, std::function<void()> rValue)
 		{
-			_code.OpenParan();
-			lValue();
-			_code.Space();
-			_code.Cmp(cmp).Space();
-			rValue();
-			_code.CloseParan();
+			_pCurBlock->OpenParan();
+			{
+				lValue();
+				_pCurBlock->Space().Cmp(cmp).Space();
+				rValue();
+			}
+			_pCurBlock->CloseParan();
 
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::BeginFor(const std::string& iVarName, int count)
 		{
-			_code.For()
-				.OpenParan()
-				.Var<int>(iVarName).Space()
-				.Assign().Space()
-				.Literal(0).Semicolon().Space()
-				.Cmp<int>(iVarName, ComparisonType::Lt, count).Semicolon().Space()
-				.Identifier(iVarName).Increment()
-				.CloseParan().NewLine()
-				.BeginBlock();
+			_pCurBlock->For();
+			_pCurBlock->OpenParan();
+			{
+				_pCurBlock->Var<int>(iVarName).Space()
+					.Assign().Space()
+					.Literal(0).Semicolon().Space()
+					.Cmp<int>(iVarName, ComparisonType::Lt, count).Semicolon().Space()
+					.Identifier(iVarName).Increment();
+			}
+			_pCurBlock->CloseParan().NewLine();
+			_pCurBlock->BeginBlock();
 
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::EndFor()
 		{
-			_code.EndBlock();
+			_pCurBlock->EndBlock();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::BeginIf(std::function<void()> value)
 		{
-			_code.If().OpenParan();
+			_pCurBlock->If().OpenParan();
 			value();
-			_code.CloseParan().NewLine()
+			_pCurBlock->CloseParan().NewLine()
 					.BeginBlock();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::BeginElse()
 		{
-			_code.Else().NewLine()
+			_pCurBlock->Else().NewLine()
 				.BeginBlock();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::EndIf()
 		{
-			_code.EndBlock();
+			_pCurBlock->EndBlock();
 			return *this;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::IfInline(std::function<void()> value, std::function<void()> lVal, std::function<void()> rVal)
 		{
-			_code.OpenParan();
+			_pCurBlock->OpenParan();
 			{
 				value();
 			}
-			_code.CloseParan().Space();
-			_code.Question().Space();
+			_pCurBlock->CloseParan().Space();
+			_pCurBlock->Question().Space();
 			{
 				lVal();
-				_code.Space();
+				_pCurBlock->Space();
 			}
-			_code.Colon().Space();
+			_pCurBlock->Colon().Space();
 			{
 				rVal();
 			}
 			EndStatement();
 			return *this;
+		}
+
+		std::string CppFunctionEmitter::Code()
+		{
+			return _pCurBlock->Code();
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::DeclareFunction(const std::string& name, const ValueType returnType, const NamedValueTypeList& args)
+		{
+			CppBlock* pDeclaration = AppendBlock();
+			pDeclaration->DeclareFunction(name, returnType, args).NewLine()
+						  .BeginBlock();
+			return *this;
+		}
+
+		void CppFunctionEmitter::MergeBlocks()
+		{
+			_blocks.Merge();
+			_pCurBlock = _blocks.First();
 		}
 	}
 }

@@ -86,18 +86,20 @@ namespace emll
 
 			CppEmitter& AppendRaw(const std::string& code);
 			CppEmitter& Append(CppEmitter& emitter);
+			CppEmitter& Append(CppEmitter* pEmitter);
 			CppEmitter& Clear();
 
 			///<summary>Increase the indent</summary>
 			CppEmitter& IncreaseIndent();
 			///<summary>Decrease the indent</summary>
 			CppEmitter& DecreaseIndent();
+			uint32_t& Indent() { return _writer.IndentCount(); }
 
 			std::string Code() { return _writer.ToString(); }
 
 		private:
 			IndentedTextWriter _writer;
-		};
+		};	
 	}
 }
 

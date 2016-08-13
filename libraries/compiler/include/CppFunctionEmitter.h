@@ -3,6 +3,7 @@
 #include "CppEmitter.h"
 #include <functional>
 #include "Variable.h"
+#include "CppBlock.h"
 
 namespace emll
 {
@@ -13,6 +14,9 @@ namespace emll
 		{
 		public:
 			CppFunctionEmitter();
+
+			CppBlock* AppendBlock();
+			CppBlock* CurrentBlock() const { return _pCurBlock; };
 
 			///<summary>Begin a new function with the given return type and args</summary>
 			CppFunctionEmitter& Begin(const std::string& name, const ValueType returnType, const NamedValueTypeList& args);
@@ -79,14 +83,19 @@ namespace emll
 			CppFunctionEmitter& IfInline(std::function<void()> value, std::function<void()> lVal, std::function<void()> rVal);
 
 			///<summary>Return generated code</summary>
-			std::string Code() { return _root.Code(); }
+			std::string Code();
 
 			CppFunctionEmitter& Clear();
 
+		protected:
+			CppFunctionEmitter& DeclareFunction(const std::string& name, const ValueType returnType, const NamedValueTypeList& args);
+			void MergeBlocks();
+
 		private:
-			CppEmitter _root;
-			CppEmitter _variables;
-			CppEmitter _code;
+			CppBlockAllocator _blockAllocator;
+			CppBlockList _blocks;
+			CppBlock* _pVariables;
+			CppBlock* _pCurBlock = nullptr;
 		};
 	}
 }

@@ -9,6 +9,8 @@
 #include "CppEmitter.h"
 #include "CompilerException.h"
 
+#include <cassert>
+
 namespace emll
 {
 	namespace compiler
@@ -379,13 +381,19 @@ namespace emll
 
 		CppEmitter& CppEmitter::AppendRaw(const std::string& code)
 		{
-			_writer.Write(code);
+			_writer.WriteRaw(code);
 			return *this;
 		}
 
 		CppEmitter& CppEmitter::Append(CppEmitter& emitter)
 		{
-			_writer.Write(emitter.Code());
+			return AppendRaw(emitter.Code());
+		}
+
+		CppEmitter& CppEmitter::Append(CppEmitter* pEmitter)
+		{
+			assert(pEmitter != nullptr);
+			Append(*pEmitter);
 			return *this;
 		}
 

@@ -87,6 +87,12 @@ namespace emll
 			return *this;
 		}
 
+		IndentedTextWriter& IndentedTextWriter::WriteRaw(const std::string& value)
+		{
+			_buffer << value;
+			return *this;
+		}
+
 		IndentedTextWriter& IndentedTextWriter::IncreaseIndent()
 		{
 			++_indentCount;
