@@ -50,7 +50,7 @@ struct ParsedCompileArguments : public CompileArguments, public utilities::Parse
         {
             outputCodeStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
         }
-        else if(outputCodeFilename == "cout")
+        else if(outputCodeFilename == "")
         {
             outputCodeStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
         }
