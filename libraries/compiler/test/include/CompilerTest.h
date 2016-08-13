@@ -70,6 +70,7 @@ private:
 };
 
 model::Model MakeForest();
+model::Model MakeForestDeep();
 
 void TestBinaryVector(bool expanded);
 void TestBinaryScalar();

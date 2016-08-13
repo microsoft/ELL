@@ -42,7 +42,7 @@ namespace emll
 		protected:
 			const model::Node* CppCompiler::GetUniqueParent(const model::Node& node);
 			void NewCodeBlock(const model::Node& node);
-			void EndCodeBlock(const model::Node& node);
+			bool TryMergeCodeBlock(const model::Node& node);
 			void MergeNodeBlocks(const model::Node& dest, const model::Node& src);
 			void MergeNodeIntoBlock(CppBlock* pDestBlock, const model::Node& src);
 

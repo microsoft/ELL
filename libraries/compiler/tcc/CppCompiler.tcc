@@ -177,7 +177,7 @@ namespace emll
 				CompileBinaryExpanded<T>(node);
 			}
 
-			EndCodeBlock(node);
+			TryMergeCodeBlock(node);
 		}
 
 		template<typename T>
@@ -235,7 +235,7 @@ namespace emll
 				CompileSumExpanded<T>(node);
 			}
 
-			EndCodeBlock(node);
+			TryMergeCodeBlock(node);
 		}
 
 		template<typename T>
@@ -298,7 +298,7 @@ namespace emll
 			_pfn->Cmp(GetComparison<T>(node), [&lInput, this](){LoadVar(lInput); }, [&rInput, this](){LoadVar(rInput); });
 			_pfn->EndStatement();
 
-			EndCodeBlock(node);
+			TryMergeCodeBlock(node);
 		}
 
 		template<typename T>
@@ -316,8 +316,6 @@ namespace emll
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
-
-			EndCodeBlock(node);
 		}
 
 		template<typename T, typename SelectorType>
@@ -374,6 +372,12 @@ namespace emll
 					_pfn->EndStatement();
 				}
 				_pfn->EndIf();
+			}
+
+			auto pSelectorNode = pSelector->GetParentNodes()[0];
+			if (ModelEx::HasSingleDescendant(*pSelectorNode))
+			{
+				MergeNodeBlocks(*pSelectorNode, node);
 			}
 		}
 	}

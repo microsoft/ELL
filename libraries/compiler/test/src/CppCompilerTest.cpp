@@ -120,7 +120,7 @@ void TestElementSelectorCpp()
 
 void TestForestCpp()
 {
-	model::Model model = MakeForest();
+	model::Model model = MakeForestDeep();//MakeForest();
 
 	std::vector<double> data = { 0.2, 0.5, 0.0 };
 

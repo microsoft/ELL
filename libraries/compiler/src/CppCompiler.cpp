@@ -60,7 +60,7 @@ namespace emll
 			_nodeBlocks[node.GetId()] = pBlock;
 		}
 
-		void CppCompiler::EndCodeBlock(const model::Node& node)
+		bool CppCompiler::TryMergeCodeBlock(const model::Node& node)
 		{
 			auto pBlock = _nodeBlocks.at(node.GetId());
 			assert(pBlock != nullptr);
@@ -69,11 +69,10 @@ namespace emll
 			if (pParentNode == nullptr)
 			{
 				_pfn->Comment(_pfn->CurrentBlock()->IdString());
+				return false;
 			}
-			else
-			{
-				MergeNodeBlocks(*pParentNode, node);
-			}
+			MergeNodeBlocks(*pParentNode, node);
+			return true;
 		}
 
 		void CppCompiler::MergeNodeBlocks(const model::Node& dest, const model::Node& src)
@@ -89,6 +88,7 @@ namespace emll
 			{
 				return;
 			}
+			assert(pDestBlock->Id() != result->second->Id());
 			_pfn->MergeBlocks(pDestBlock, result->second);
 			_nodeBlocks[src.GetId()] = pDestBlock;
 		}

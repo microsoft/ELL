@@ -588,6 +588,34 @@ model::Model MakeForest()
 	return refinedModel;
 }
 
+model::Model MakeForestDeep()
+{
+	// define some abbreviations
+	using SplitAction = predictors::SimpleForestPredictor::SplitAction;
+	using SplitRule = predictors::SingleElementThresholdRule;
+	using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
+	using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
+
+	// build a forest
+	predictors::SimpleForestPredictor forest;
+	auto root = forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.3 }, EdgePredictorVector{ -1.0, 1.0 } });
+	auto child1 = forest.Split(SplitAction{ forest.GetChildId(root, 0), SplitRule{ 1, 0.6 }, EdgePredictorVector{ -2.0, 2.0 } });
+	forest.Split(SplitAction{ forest.GetChildId(child1, 0), SplitRule{ 1, 0.4 }, EdgePredictorVector{ -2.1, 2.1 } });
+	forest.Split(SplitAction{ forest.GetChildId(child1, 1), SplitRule{ 1, 0.7 }, EdgePredictorVector{ -2.2, 2.2 } });
+	forest.Split(SplitAction{ forest.GetChildId(root, 1), SplitRule{ 2, 0.9 }, EdgePredictorVector{ -4.0, 4.0 } });
+	forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.2 }, EdgePredictorVector{ -3.0, 3.0 } });
+
+	// build the model
+	model::Model model;
+	auto inputNode = model.AddNode<model::InputNode<double>>(3);
+	auto simpleForestNode = model.AddNode<nodes::SimpleForestNode>(inputNode->output, forest);
+
+	// refine
+	model::TransformContext context;
+	model::ModelTransformer transformer;
+	return transformer.RefineModel(model, context);
+}
+
 void TestForest()
 {
 	model::Model model = MakeForest();
