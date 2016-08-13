@@ -14,7 +14,9 @@
 
 // utilities
 #include "IIterator.h"
+#include "ISerializable.h"
 
+// stl
 #include <unordered_set>
 #include <vector>
 #include <memory>
@@ -54,7 +56,7 @@ namespace model
     };
 
     /// <summary> Model class. Represents a graph of computation </summary>
-    class Model
+    class Model : public utilities::ISerializable
     {
     public:
         /// <summary> Factory method used to create nodes and add them to the graph. </summary>
@@ -136,11 +138,65 @@ namespace model
         /// <param name="outputNodes"> The output nodes to use for deciding which nodes to visit </param>
         NodeIterator GetNodeIterator(const std::vector<const Node*>& outputNodes) const;
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "ModelGraph"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
     private:
         friend class NodeIterator;
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
         // to look nodes up by id.
         std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _idToNodeMap;
+    };
+
+    /// <summary> A serialization context used during Model deserialization </summary>
+    class ModelSerializationContext: public utilities::SerializationContext
+    {
+    public:
+        ModelSerializationContext(utilities::SerializationContext& otherContext, Model* model);
+
+        /// <summary> Gets the type factory associated with this context. </summary>
+        ///
+        /// <returns> The type factory associated with this context. </returns>
+        virtual utilities::GenericTypeFactory& GetTypeFactory() override { return _originalContext.GetTypeFactory(); }
+
+        /// <summary> Returns the Model currently being deserialized. </summary>
+        ///
+        /// <returns> The Model currently being deserialized. </returns>
+        Model* GetModel() { return _model; }
+
+        /// <summary> Returns a pointer to an already-deserialized node, given its serialized ID </summary>
+        ///
+        /// <returns> A pointer to an already-deserialized node. </returns>
+        Node* GetNodeFromId(const Node::NodeId& id);
+
+        /// <summary> Associate a newly-deserialized node with its serialized ID </summary>
+        ///
+        /// <param name="id"> The serialized ID of the node. </param>
+        /// <param name="node"> A pointer to the serialized node. </param>
+        void MapNode(const Node::NodeId& id, Node* node);
+    
+    private:
+        utilities::SerializationContext& _originalContext;
+        Model* _model;
+        std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;
     };
 }
 

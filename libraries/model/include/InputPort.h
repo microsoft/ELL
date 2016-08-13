@@ -15,6 +15,7 @@
 // utilities
 #include "Exception.h"
 
+// stl
 #include <vector>
 #include <cassert>
 
@@ -30,10 +31,11 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="owningNode"> The node that contains this port </param>
-        /// <param name="input"> The input group to fetch input values from </param>
+        /// <param name="inputRef"> The input group to fetch input values from </param>
         /// <param name="name"> The name of this port </param>
+        /// <param name="dimension"> The dimension of the port </param>
         template <typename ValueType>
-        InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputRef, const OutputPortElements<ValueType>& inputValues, std::string name);
+        InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputs, std::string name, size_t dimension);
 
         /// <summary> Returns an OutputPortElement containing the referenced location to get the value for a specific input element from </summary>
         ///
@@ -41,14 +43,14 @@ namespace model
         /// <returns> The OutputPortElement containing the referenced location to get the value from </returns>
         const OutputPortElement& GetOutputPortElement(size_t index) const { return _individualElements[index]; }
 
-        /// <summary> Returns the list nodes this input port gets values from </summary>
+        /// <summary> Returns the list of nodes this input port gets values from </summary>
         ///
         /// <returns> The list nodes this input port gets values from </returns>
         const std::vector<const Node*>& GetParentNodes() const { return _parentNodes; }
 
-        /// <summary> Returns a list nodes ranges this input port gets values from </summary>
+        /// <summary> Returns the list of port ranges this input port gets values from </summary>
         ///
-        /// <returns> A list node ranges this input port gets values from </returns>
+        /// <returns> The list nodes this input port gets values from </returns>
         const OutputPortElementsUntyped& GetInputRanges() const { return _inputRanges; }
 
         /// <summary> The dimensionality of the output </summary>
@@ -68,6 +70,20 @@ namespace model
         /// <returns> The output value at the corresponding index </returns>
         template <typename ValueType>
         ValueType GetTypedValue(size_t index) const;
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "InputPortBase"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+    protected:
+        /// Subclasses _must_ call this method in their constructor
+        void ComputeParentsAndElements();
 
     private:
         const OutputPortElementsUntyped& _inputRanges; // Just a reference to the typed elements in concrete subclass
@@ -107,6 +123,27 @@ namespace model
         /// <param name="index"> The index of the element to return </param>
         /// <returns> The output value at the corresponding index </returns>
         ValueType operator[](size_t index) const;
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("InputPort"); }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     private:
         OutputPortElements<ValueType> _input;

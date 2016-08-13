@@ -8,14 +8,17 @@
 
 #include "ModelGraph.h"
 #include "Port.h"
+#include "Node.h"
 
 // stl
 #include <unordered_map>
-#include <iostream>
 
 /// <summary> model namespace </summary>
 namespace model
 {
+    //
+    // Model
+    //
     Node* Model::GetNode(Node::NodeId id)
     {
         auto it = _idToNodeMap.find(id);
@@ -32,6 +35,37 @@ namespace model
     NodeIterator Model::GetNodeIterator(const std::vector<const Node*>& outputNodes) const
     {
         return NodeIterator(this, outputNodes);
+    }
+
+    void Model::Serialize(utilities::Serializer& serializer) const
+    {
+        std::vector<const Node*> nodes;
+        auto nodeIter = GetNodeIterator();
+        while(nodeIter.IsValid())
+        {
+            const auto& node = nodeIter.Get();
+            nodes.push_back(node);
+            nodeIter.Next();
+        }
+
+        serializer.Serialize("nodes", nodes);
+    }
+
+    void Model::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) 
+    {
+        ModelSerializationContext graphContext(context, this);
+        
+        // Deserialize nodes into big array
+        std::vector<std::unique_ptr<Node>> nodes;
+        serializer.Deserialize("nodes", nodes, graphContext);
+
+        // Now add them to the model graph
+        for(auto& node: nodes)
+        {
+            std::shared_ptr<Node> sharedNode = std::shared_ptr<Node>(node.release());
+            sharedNode->RegisterDependencies();
+            _idToNodeMap[sharedNode->GetId()] = sharedNode;
+        }
     }
 
     //
@@ -87,12 +121,12 @@ namespace model
 
             // we can visit this node only if all its inputs have been visited already
             bool canVisit = true;
-            const auto& nodeInputs = node->GetInputPorts();
-            for (auto input : nodeInputs)
+            const auto& inputPorts = node->GetInputPorts();
+            for (auto inputPort : inputPorts)
             {
-                for (const auto& inputNode : input->GetParentNodes())
+                for (const auto& parentNode : inputPort->GetParentNodes())
                 {
-                    canVisit = canVisit && _visitedNodes.find(inputNode) != _visitedNodes.end();
+                    canVisit = canVisit && _visitedNodes.find(parentNode) != _visitedNodes.end();
                 }
             }
 
@@ -121,15 +155,32 @@ namespace model
             }
             else // visit node's inputs
             {
-                const auto& nodeInputs = node->GetInputPorts();
-                for (auto input : ModelImpl::Reverse(nodeInputs)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
+                const auto& inputPorts = node->GetInputPorts();
+                for (auto input : ModelImpl::Reverse(inputPorts)) // Visiting the inputs in reverse order more closely retains the order the features were originally created
                 {
-                    for (const auto& inputNode : input->GetParentNodes())
+                    for (const auto& parentNode : input->GetParentNodes())
                     {
-                        _stack.push_back(inputNode);
+                        _stack.push_back(parentNode);
                     }
                 }
             }
         }
+    }
+
+    //
+    // ModelSerializationContext
+    //    
+    ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& otherContext, Model* model) : _originalContext(otherContext), _model(model) 
+    {
+    }
+    
+    Node* ModelSerializationContext::GetNodeFromId(const Node::NodeId& id)
+    {
+        return _oldToNewNodeMap[id];
+    }
+
+    void ModelSerializationContext::MapNode(const Node::NodeId& id, Node* node)
+    {
+        _oldToNewNodeMap[id] = node;
     }
 }

@@ -32,7 +32,7 @@ namespace features
     class Feature
     {
     public:
-        virtual ~Feature() {};
+        virtual ~Feature() = default;
 
         /// <summary> The unique ID of this feature. </summary>
         std::string Id() const { return _id; }

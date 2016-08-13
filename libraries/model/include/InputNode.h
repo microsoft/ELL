@@ -14,6 +14,7 @@
 
 // utilities
 #include "TypeName.h"
+#include "ISerializable.h"
 
 #include <vector>
 #include <memory>
@@ -27,6 +28,9 @@ namespace model
     class InputNode : public Node
     {
     public:
+        /// <summary> Default Constructor </summary>
+        InputNode();
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="dimension"> The input dimension </param>
@@ -47,16 +51,24 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const OutputPort<ValueType>& output = _output;
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(ModelTransformer& transformer) const override;
 
-        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(ModelTransformer& transformer) const override;
+        /// <summary> Exposes the output port as a read-only property </summary>
+        const OutputPort<ValueType>& output = _output;
 
-        static constexpr char* outputPortName = "output";
+        static constexpr const char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

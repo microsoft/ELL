@@ -10,8 +10,26 @@
 namespace model
 {
     template <typename ValueType, bool max>
+    ExtremalValueNode<ValueType, max>::ExtremalValueNode() : Node({ &_input }, { &_val, &_argVal }), _input(this, {}, inputPortName), _val(this, valPortName, 1), _argVal(this, argValPortName, 1)
+    {
+    }
+
+    template <typename ValueType, bool max>
     ExtremalValueNode<ValueType, max>::ExtremalValueNode(const OutputPortElements<ValueType>& input) : Node({ &_input }, { &_val, &_argVal }), _input(this, input, inputPortName), _val(this, valPortName, 1), _argVal(this, argValPortName, 1)
     {
+    }
+
+    template <typename ValueType, bool max>
+    std::string ExtremalValueNode<ValueType, max>::GetTypeName() 
+    {
+        if(max)
+        {
+            return utilities::GetCompositeTypeName<ValueType, std::true_type>("ExtremalValueNode"); 
+        } 
+        else
+        {
+            return utilities::GetCompositeTypeName<ValueType, std::false_type>("ExtremalValueNode"); 
+        } 
     }
 
     template <typename ValueType, bool max>
@@ -39,19 +57,18 @@ namespace model
     template <typename ValueType>
     void ArgMinNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newOutputPortElements = transformer.TransformOutputPortElements(this->_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<ArgMinNode<ValueType>>(newOutputPortElements);
-        transformer.MapOutputPort(val, newNode->val);
-        transformer.MapOutputPort(argVal, newNode->argVal);
+        transformer.MapOutputPort(this->val, newNode->val);
+        transformer.MapOutputPort(this->argVal, newNode->argVal);
     }
 
     template <typename ValueType>
     void ArgMaxNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newOutputPortElements = transformer.TransformOutputPortElements(this->_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<ArgMaxNode<ValueType>>(newOutputPortElements);
-        transformer.MapOutputPort(val, newNode->val);
-        transformer.MapOutputPort(argVal, newNode->argVal);
+        transformer.MapOutputPort(this->val, newNode->val);
+        transformer.MapOutputPort(this->argVal, newNode->argVal);
     }
-
 }

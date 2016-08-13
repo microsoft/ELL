@@ -24,6 +24,9 @@ namespace model
     class OutputNode : public Node
     {
     public:
+        /// <summary> Default Constructor </summary>
+        OutputNode();
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
@@ -39,14 +42,25 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
         /// <summary> Exposes the output port as a read-only property </summary>
         const OutputPort<ValueType>& output = _output;
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(ModelTransformer& transformer) const override;
 
-        static constexpr char* inputPortName = "input";
-        static constexpr char* outputPortName = "output";
+        static constexpr const char* inputPortName = "input";
+        static constexpr const char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

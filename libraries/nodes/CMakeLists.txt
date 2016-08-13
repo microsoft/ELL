@@ -14,28 +14,37 @@ endif()
 
 set (INCLUDE include/AccumulatorNode.h
              include/BinaryOperationNode.h
+             include/BinaryPredicateNode.h
              include/ConstantNode.h
              include/DelayNode.h
              include/DotProductNode.h
+             include/ElementSelectorNode.h
+             include/ForestNode.h
              include/LinearPredictorNode.h
              include/L2NormNode.h
              include/MovingAverageNode.h
+             include/MovingVarianceNode.h
+             include/SingleElementThresholdNode.h
              include/SumNode.h
-             include/UnaryOperationNode.h
-             include/MovingVarianceNode.h)
+             include/UnaryOperationNode.h)
 
-set (SRC src/LinearPredictorNode.cpp)
+set (SRC src/ConstantNode.cpp
+         src/LinearPredictorNode.cpp
+         src/SingleElementThresholdNode.cpp)
 
 set (TCC tcc/AccumulatorNode.tcc
          tcc/BinaryOperationNode.tcc
+         tcc/BinaryPredicateNode.tcc
          tcc/ConstantNode.tcc
          tcc/DelayNode.tcc
          tcc/DotProductNode.tcc
+         tcc/ElementSelectorNode.tcc
+         tcc/ForestNode.tcc
          tcc/L2NormNode.tcc
          tcc/MovingAverageNode.tcc
+         tcc/MovingVarianceNode.tcc
          tcc/SumNode.tcc
-         tcc/UnaryOperationNode.tcc
-         tcc/MovingVarianceNode.tcc)
+         tcc/UnaryOperationNode.tcc)
 
 source_group("include" FILES ${INCLUDE})
 source_group("src" FILES ${SRC})
@@ -64,7 +73,7 @@ source_group("include" FILES ${TEST_INCLUDE})
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} testing linear model nodes predictors utilities)
+target_link_libraries(${TEST_NAME} testing linear model nodes predictors utilities common)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

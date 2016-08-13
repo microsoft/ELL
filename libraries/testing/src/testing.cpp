@@ -63,6 +63,18 @@ namespace testing
         return true;
     }
 
+    bool IsEqual(const std::vector<bool>& a, const std::vector<bool>& b)
+    {
+        for (uint64_t i = 0; i < a.size(); ++i)
+        {
+            if (a[i] != b[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     bool testFailedFlag = false;
 
     void ProcessTest(const std::string& testDescription, bool success)

@@ -7,13 +7,19 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "OutputPortElements.h"
+#include "Node.h"
+#include "ModelGraph.h"
+
+#include <cassert>
+
+// utilities
+#include "Exception.h"
 
 namespace model
 {
     //
     // OutputPortElement
     //
-
     OutputPortElement::OutputPortElement(const OutputPortBase& port, size_t index) : _referencedPort(&port), _index(index) {}
 
     //
@@ -42,6 +48,46 @@ namespace model
     bool OutputPortRange::IsFullPortRange() const
     {
         return GetStartIndex() == 0 && Size() == ReferencedPort()->Size();
+    }
+
+    void OutputPortRange::Serialize(utilities::Serializer& serializer) const
+    {
+        serializer.Serialize("startIndex", _startIndex);
+        serializer.Serialize("numValues", _numValues);
+        serializer.Serialize("isFixedSize", _isFixedSize);
+        serializer.Serialize("referencedNodeId", _referencedPort->GetNode()->GetId());
+        serializer.Serialize("referencedPortName", _referencedPort->GetName());
+    }
+
+    void OutputPortRange::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
+        serializer.Deserialize("startIndex", _startIndex, newContext);
+        serializer.Deserialize("numValues", _numValues, newContext);
+        serializer.Deserialize("isFixedSize", _isFixedSize, newContext);
+        Node::NodeId newId;
+        serializer.Deserialize("referencedNodeId", newId, newContext);
+        std::string portName;
+        serializer.Deserialize("referencedPortName", portName, newContext);
+        
+        Node* newNode = newContext.GetNodeFromId(newId);
+
+        auto ports = newNode->GetOutputPorts();
+        OutputPortBase* newPort = nullptr;
+        for(auto port: ports)
+        {
+            if(port->GetName() == portName)
+            {
+                newPort = port;
+                break;
+            }
+        }
+        assert(_referencedPort != newPort);
+        _referencedPort = newPort;
+        if(newPort == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't deserialize model::OutputPortRange port");
+        }
     }
 
     //
@@ -80,6 +126,21 @@ namespace model
     void OutputPortElementsUntyped::AddRange(const OutputPortRange& range)
     {
         _ranges.push_back(range);
+        _size += range.Size();
+    }
+
+    OutputPortRange OutputPortElementsUntyped::GetElement(size_t index) const
+    {
+        size_t sumRangeSizesSoFar = 0;
+        for (const auto& range : _ranges)
+        {
+            if (index < sumRangeSizesSoFar + range.Size())
+            {
+                return OutputPortRange(*range.ReferencedPort(), range.GetStartIndex() + index - sumRangeSizesSoFar, 1);
+            }
+            sumRangeSizesSoFar += range.Size();
+        }
+        throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds OutputPortElements range");
     }
 
     void OutputPortElementsUntyped::ComputeSize()
@@ -89,5 +150,19 @@ namespace model
         {
             _size += range.Size();
         }
+    }
+
+    void OutputPortElementsUntyped::Serialize(utilities::Serializer& serializer) const
+    {
+        serializer.Serialize("ranges", _ranges);
+    }
+
+    void OutputPortElementsUntyped::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
+        std::vector<OutputPortRange> ranges;
+        serializer.Deserialize("ranges", ranges, newContext);
+        _ranges = ranges;
+        ComputeSize();
     }
 }

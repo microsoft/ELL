@@ -21,7 +21,7 @@
 #include "MovingVarianceNode.h"
 %}
 
-%ignore nodes::LinearPredictorNodeOutputs;
+%ignore nodes::LinearPredictorSubModelOutputs;
 %ignore nodes::BuildSubModel;
 
 %rename (ModelGraph) model::Model;

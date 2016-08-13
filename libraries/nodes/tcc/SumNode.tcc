@@ -9,6 +9,11 @@
 namespace nodes
 {
     template <typename ValueType>
+    SumNode<ValueType>::SumNode() : Node({&_input}, {&_output}), _input(this, {}, inputPortName), _output(this, outputPortName, 1)
+    {
+    }
+
+    template <typename ValueType>
     SumNode<ValueType>::SumNode(const model::OutputPortElements<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, 1)
     {
     }
@@ -31,5 +36,21 @@ namespace nodes
         auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
         auto newNode = transformer.AddNode<SumNode<ValueType>>(newOutputPortElements);
         transformer.MapOutputPort(output, newNode->output);
+    }
+
+    template <typename ValueType>
+    void SumNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    {
+        Node::Serialize(serializer);
+        serializer.Serialize("input", _input);
+        serializer.Serialize("output", _output);
+    }
+
+    template <typename ValueType>
+    void SumNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        Node::Deserialize(serializer, context);
+        serializer.Deserialize("input", _input, context);
+        serializer.Deserialize("output", _output, context);
     }
 }

@@ -10,6 +10,7 @@
 #include "ValueSelectorNode.h"
 #include "ExtremalValueNode.h"
 #include "InputNode.h"
+#include "OutputNode.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
@@ -170,8 +171,8 @@ void TestNodeIterator()
         ++size2;
         iter.Next();
     }
-    testing::ProcessTest("Testing Size() and iterator count", testing::IsEqual(size1, size2));
-    testing::ProcessTest("Testing Size() and known node count", testing::IsEqual(size1, 5));
+    testing::ProcessTest("Testing Size() and iterator count", size1 == size2);
+    testing::ProcessTest("Testing Size() and known node count", size1 == 5);
 
     std::cout << std::endl << std::endl;
 }
@@ -324,3 +325,4 @@ void TestRefineGraph()
         testing::ProcessTest("testing refined graph", testing::IsEqual(output[2], newOutput[2]));
     }
 }
+

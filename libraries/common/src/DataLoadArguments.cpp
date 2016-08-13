@@ -22,8 +22,8 @@ namespace common
     void ParsedDataLoadArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
-            inputDataFile,
-            "inputDataFile", 
+            inputDataFilename,
+            "inputDataFilename", 
             "idf",
             "Path to the input data file",
             "");
@@ -40,16 +40,16 @@ namespace common
     {
         std::vector<std::string> parseErrorMessages;
         
-        // inputDataFile
-        if(inputDataFile == "")
+        // inputDataFilename
+        if(inputDataFilename == "")
         {
-            parseErrorMessages.push_back("-inputDataFile (or -idf) is required");
+            parseErrorMessages.push_back("-inputDataFilename (or -idf) is required");
         }
         else
         {
-            if(!utilities::IsFileReadable(inputDataFile))
+            if(!utilities::IsFileReadable(inputDataFilename))
             {
-                parseErrorMessages.push_back("cannot read from specified input data file: " + inputDataFile);
+                parseErrorMessages.push_back("cannot read from specified input data file: " + inputDataFilename);
             }
         }
 

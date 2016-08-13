@@ -15,6 +15,7 @@
 #include "UnaryOperationNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
+#include "ForestNode.h"
 
 // model
 #include "ModelGraph.h"
@@ -23,6 +24,9 @@
 
 // predictors
 #include "LinearPredictor.h"
+
+// common
+#include "IsNodeCompilable.h"
 
 // testing
 #include "testing.h"
@@ -103,7 +107,7 @@ void TestL2NormNodeCompute()
         inputNode->SetInput(inputValue);
         std::vector<double> outputVec = model.ComputeNodeOutput(outputNode->output);
 
-        testing::ProcessTest("Testing L2NormNode output size", testing::IsEqual(outputVec.size(), 1));
+        testing::ProcessTest("Testing L2NormNode output size", outputVec.size() == 1);
         testing::ProcessTest("Testing L2NormNode compute", testing::IsEqual(outputVec[0], expectedOutput));
     }
 }
@@ -274,7 +278,7 @@ void TestMovingAverageNodeRefine()
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
     auto meanNode = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, windowSize);
 
-    std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
+    std::vector<std::vector<double>> data = { { 1 },{ 2 },{ 3 },{ 4 },{ 5 },{ 6 },{ 7 },{ 8 },{ 9 },{ 10 } };
     double expectedOutput = VectorMean({ 7.0, 8.0, 9.0, 10.0 });
 
     model::TransformContext context;
@@ -294,6 +298,44 @@ void TestMovingAverageNodeRefine()
     }
 }
 
+void TestSimpleForestNodeRefine()
+{
+    // define some abbreviations
+    using SplitAction = predictors::SimpleForestPredictor::SplitAction;
+    using SplitRule = predictors::SingleElementThresholdPredictor;
+    using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
+    using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
+
+    // build a forest
+    predictors::SimpleForestPredictor forest;
+    auto root = forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.3 }, EdgePredictorVector{ -1.0, 1.0 } });
+    forest.Split(SplitAction{ forest.GetChildId(root, 0), SplitRule{ 1, 0.6 }, EdgePredictorVector{ -2.0, 2.0 } });
+    forest.Split(SplitAction{ forest.GetChildId(root, 1), SplitRule{ 2, 0.9 }, EdgePredictorVector{ -4.0, 4.0 } });
+    forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.2 }, EdgePredictorVector{ -3.0, 3.0 } });
+
+    // build the model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(3);
+    auto simpleForestNode = model.AddNode<nodes::SimpleForestNode>(inputNode->output, forest);
+
+    // refine
+    model::TransformContext context;
+    context.IsNodeCompilable = common::IsNodeCompilable();
+    model::ModelTransformer transformer;
+    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
+    auto refinedOutputPort = transformer.GetCorrespondingOutputPort(simpleForestNode->output);
+
+    // check equivalence
+    inputNode->SetInput({ 0.2, 0.5, 0.0 });
+    refinedInputNode->SetInput({ 0.2, 0.5, 0.0 });
+    auto outputValue = model.ComputeNodeOutput(simpleForestNode->output)[0];
+    auto refinedOutputValue = refinedModel.ComputeNodeOutput(*refinedOutputPort)[0];
+
+    //  expected output is -3.0
+    testing::ProcessTest("Testing SimpleForestNode refine", testing::IsEqual(outputValue, refinedOutputValue));
+}
+
 void TestLinearPredictorNodeRefine()
 {
     // make a linear predictor
@@ -309,6 +351,7 @@ void TestLinearPredictorNodeRefine()
 
     // refine the model
     model::TransformContext context;
+    context.IsNodeCompilable = common::IsNodeCompilable();
     model::ModelTransformer transformer;
     auto newModel = transformer.RefineModel(model, context);
 
@@ -317,9 +360,8 @@ void TestLinearPredictorNodeRefine()
     auto newOutputPort = transformer.GetCorrespondingOutputPort(linearPredictorNode->output);
     inputNode->SetInput({1.0, 1.0, 1.0});
     newInputNode->SetInput({1.0, 1.0, 1.0});
-    auto modelOutputValue = model.ComputeNodeOutput(linearPredictorNode->output);
-    auto newOutputValue = newModel.ComputeNodeOutput(*newOutputPort);
+    auto modelOutputValue = model.ComputeNodeOutput(linearPredictorNode->output)[0];
+    auto newOutputValue = newModel.ComputeNodeOutput(*newOutputPort)[0];
 
     testing::ProcessTest("Testing LinearPredictorNode refine", testing::IsEqual(modelOutputValue, newOutputValue));
 }
-

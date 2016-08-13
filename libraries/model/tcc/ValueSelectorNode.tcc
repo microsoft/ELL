@@ -10,6 +10,11 @@
 namespace model
 {
     template <typename ValueType>
+    ValueSelectorNode<ValueType>::ValueSelectorNode() : Node({ &_condition, &_input1, &_input2 }, { &_output }), _condition(this, {}, conditionPortName), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0)
+    {
+    }
+
+    template <typename ValueType>
     ValueSelectorNode<ValueType>::ValueSelectorNode(const OutputPortElements<bool>& condition, const OutputPortElements<ValueType>& input1, const OutputPortElements<ValueType>& input2) : Node({ &_condition, &_input1, &_input2 }, { &_output }), _condition(this, condition, conditionPortName), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, input1.Size())
     {
         if (condition.Size() != 1)

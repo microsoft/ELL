@@ -27,4 +27,16 @@ namespace model
     {
         _cachedOutput = values;
     }
+
+    template <typename ValueType>
+    void OutputPort<ValueType>::Serialize(utilities::Serializer& serializer) const
+    {
+        OutputPortBase::Serialize(serializer);
+    }
+
+    template <typename ValueType>
+    void OutputPort<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        OutputPortBase::Deserialize(serializer, context);
+    }
 }
