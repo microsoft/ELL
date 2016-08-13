@@ -8,13 +8,15 @@
 
 #pragma once
 
+#include "IPredictor.h"
+
 //stl
 #include <iostream>
 
 namespace predictors
 {
     /// <summary> A predictor that ignores its input and outputs a constant number. This class is used to define decision trees. </summary>
-    class ConstantPredictor
+    class ConstantPredictor : public IPredictor<double>
     {
     public:
         /// <summary> Constructs an instance of ConstantPredictor. </summary>

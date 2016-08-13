@@ -17,6 +17,7 @@ set (SRC src/ConstantPredictor.cpp
          src/SingleElementThresholdPredictor.cpp)
 
 set (INCLUDE include/ConstantPredictor.h
+             include/IPredictor.h
              include/LinearPredictor.h
              include/SingleElementThresholdPredictor.h
              include/ForestPredictor.h)

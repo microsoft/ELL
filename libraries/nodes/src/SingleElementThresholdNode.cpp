@@ -52,7 +52,7 @@ namespace nodes
         dataset::DoubleDataVector dataVector(_input.GetValue());
 
         // predict
-        _output.SetOutput({ _predictor.Predict(dataVector) == 1 ? true : false });
+        _output.SetOutput({ _predictor.Predict(dataVector) });
     }
 
     SingleElementThresholdNode* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor, model::ModelTransformer& transformer)

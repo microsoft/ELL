@@ -8,13 +8,15 @@
 
 #pragma once
 
+#include "IPredictor.h"
+
 // stl
 #include <iostream>
 
 namespace predictors
 {
     /// <summary> A split rule that compares a single feature to a threshold. </summary>
-    class SingleElementThresholdPredictor
+    class SingleElementThresholdPredictor : public IPredictor<bool>
     {
     public:
         /// <summary> Constructs a single-element threshold rule. </summary>
@@ -50,7 +52,7 @@ namespace predictors
         ///
         /// <returns> The result of the split rule. </returns>
         template<typename RandomAccessVectorType>
-        int Predict(const RandomAccessVectorType& inputVector) const;
+        bool Predict(const RandomAccessVectorType& inputVector) const;
 
         /// <summary> Returns the number of outputs (the max output value plus one). </summary>
         ///

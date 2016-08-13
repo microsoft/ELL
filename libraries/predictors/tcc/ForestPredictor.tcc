@@ -252,7 +252,7 @@ namespace predictors
             const auto& interiorNode = _interiorNodes[nodeIndex];
 
             // which way do we go?
-            int edgePosition = interiorNode._splitRule.Predict(input);
+            int edgePosition = static_cast<int>(interiorNode._splitRule.Predict(input));
 
             // check for early eject
             if (edgePosition < 0)

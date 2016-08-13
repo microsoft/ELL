@@ -11,13 +11,13 @@
 namespace predictors
 {
     template<typename RandomAccessVectorType>
-    int predictors::SingleElementThresholdPredictor::Predict(const RandomAccessVectorType& inputVector) const
+    bool predictors::SingleElementThresholdPredictor::Predict(const RandomAccessVectorType& inputVector) const
     {
         if (inputVector.Size() <= _index)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
         }
 
-        return inputVector[_index] > _threshold ? 1 : 0;
+        return inputVector[_index] > _threshold ? true : false;
     }
 }

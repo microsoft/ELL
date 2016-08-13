@@ -75,7 +75,7 @@ namespace nodes
             // add the sub-model that computes the split rule
             auto splitRuleNode = AddNodeToModelTransformer(newOutputPortElements, interiorNodes[i - 1].GetSplitRule(), transformer);
 
-            auto selectorNode = transformer.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleNode->output);
+            auto selectorNode = transformer.AddNode<ElementSelectorNode<double, SplitRuleType::PredictionType>>(edgeOutputs, splitRuleNode->output);
             interiorNodeSubModels[i-1] = selectorNode->output;
         }
 
