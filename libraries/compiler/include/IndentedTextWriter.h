@@ -43,7 +43,7 @@ namespace emll
 			template<typename T>
 			IndentedTextWriter& Write(T value);
 
-			IndentedTextWriter& WriteRaw(const std::string& value);
+			IndentedTextWriter& WriteRaw(const std::string& value, int indentCount = 0);
 			///<summary>Output the current buffer into a string</summary>
 			std::string ToString() { return _buffer.str(); }
 			
@@ -53,6 +53,7 @@ namespace emll
 		private:
 			///<summary>Emit the tab indent</summary>
 			void WriteIndent();
+			void WriteIndent(int count);
 
 		private:
 			std::stringstream _buffer;

@@ -67,17 +67,14 @@ namespace emll
 
 		void CppBlockList::Merge()
 		{
-			CppBlock* pFirst = First();
+			CppBlock* pMergedBlock = _allocator.Alloc();
 			for (auto pBlock = _blocks.begin(); pBlock != _blocks.end(); ++pBlock)
 			{
-				if (*pBlock != pFirst)
-				{
-					pFirst->Append(*pBlock);
-					_allocator.Free(*pBlock);
-				}
+				pMergedBlock->Append(*pBlock);
+				_allocator.Free(*pBlock);
 			}
 			_blocks.clear();
-			_blocks.push_back(pFirst);
+			_blocks.push_back(pMergedBlock);
 		}
 	}
 }

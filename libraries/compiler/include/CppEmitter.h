@@ -98,6 +98,9 @@ namespace emll
 			std::string Code() { return _writer.ToString(); }
 
 		private:
+			CppEmitter& AppendReindent(std::string& code, int indentDelta);
+
+		private:
 			IndentedTextWriter _writer;
 		};	
 	}

@@ -8,8 +8,9 @@
 
 #include "CppEmitter.h"
 #include "CompilerException.h"
-
 #include <cassert>
+#include <iostream>
+#include <sstream>
 
 namespace emll
 {
@@ -389,7 +390,16 @@ namespace emll
 
 		CppEmitter& CppEmitter::Append(CppEmitter& emitter)
 		{
-			return AppendRaw(emitter.Code());
+			std::string code = emitter.Code();
+			int indentDelta = Indent() - emitter.Indent();
+			if (indentDelta <= 0)
+			{ 
+				return AppendRaw(code);
+			}
+			else
+			{
+				return AppendReindent(code, indentDelta);
+			}
 		}
 
 		CppEmitter& CppEmitter::Append(CppEmitter* pEmitter)
@@ -408,6 +418,17 @@ namespace emll
 		CppEmitter& CppEmitter::DecreaseIndent()
 		{
 			_writer.DecreaseIndent();
+			return *this;
+		}
+
+		CppEmitter& CppEmitter::AppendReindent(std::string& code, int indentDelta)
+		{
+			std::istringstream lines(code);
+			std::string line;
+			while (std::getline(lines, line))
+			{
+				_writer.WriteRaw(line, indentDelta).WriteNewLine();
+			}
 			return *this;
 		}
 	}

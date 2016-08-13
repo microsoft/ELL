@@ -87,8 +87,12 @@ namespace emll
 			return *this;
 		}
 
-		IndentedTextWriter& IndentedTextWriter::WriteRaw(const std::string& value)
+		IndentedTextWriter& IndentedTextWriter::WriteRaw(const std::string& value, int indentCount)
 		{
+			if (indentCount > 0)
+			{
+				WriteIndent(indentCount);
+			}
 			_buffer << value;
 			return *this;
 		}
@@ -112,11 +116,16 @@ namespace emll
 		{
 			if (_needsIndent)
 			{
-				for (uint32_t i = 0; i < _indentCount; ++i)
-				{
-					_buffer << _tabString;
-				}
+				WriteIndent(_indentCount);
 				_needsIndent = false;
+			}
+		}
+
+		void IndentedTextWriter::WriteIndent(int count)
+		{
+			for (uint32_t i = 0; i < count; ++i)
+			{
+				_buffer << _tabString;
 			}
 		}
 	}
