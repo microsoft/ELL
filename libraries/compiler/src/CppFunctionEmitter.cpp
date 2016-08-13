@@ -10,8 +10,7 @@ namespace emll
 
 		CppBlock* CppFunctionEmitter::AppendBlock()
 		{
-			auto pNewBlock = _blockAllocator.Alloc();
-			_blocks.Push(pNewBlock);
+			auto pNewBlock = _blocks.AddBlock();
 			if (_pCurBlock != nullptr)
 			{
 				pNewBlock->Indent() = _pCurBlock->Indent();
@@ -28,13 +27,11 @@ namespace emll
 				_pCurBlock = pTarget;
 			}
 			_blocks.Remove(pSrc);
-			_blockAllocator.Free(pSrc);
 			return pTarget;
 		}
 
 		CppFunctionEmitter& CppFunctionEmitter::Clear()
 		{
-			_blockAllocator.Clear();
 			_blocks.Clear();
 			_pCurBlock = nullptr;
 			return *this;
@@ -43,6 +40,24 @@ namespace emll
 		CppFunctionEmitter& CppFunctionEmitter::Comment(const std::string& comment)
 		{
 			_pCurBlock->Comment(comment);
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::Comment()
+		{
+			_pCurBlock->OpenComment();
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::CommentText(const std::string& text)
+		{
+			_pCurBlock->AppendRaw(text);
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::EndComment()
+		{
+			_pCurBlock->CloseComment().NewLine();
 			return *this;
 		}
 
@@ -210,7 +225,7 @@ namespace emll
 			return *this;
 		}
 
-		CppFunctionEmitter& CppFunctionEmitter::BeginFor(const std::string& iVarName, int count)
+		CppFunctionEmitter& CppFunctionEmitter::For(const std::string& iVarName, int count)
 		{
 			_pCurBlock->For();
 			_pCurBlock->OpenParan();
@@ -233,7 +248,7 @@ namespace emll
 			return *this;
 		}
 
-		CppFunctionEmitter& CppFunctionEmitter::BeginIf(std::function<void()> value)
+		CppFunctionEmitter& CppFunctionEmitter::If(std::function<void()> value)
 		{
 			_pCurBlock->If().OpenParan();
 			value();
@@ -242,7 +257,7 @@ namespace emll
 			return *this;
 		}
 
-		CppFunctionEmitter& CppFunctionEmitter::BeginElse()
+		CppFunctionEmitter& CppFunctionEmitter::Else()
 		{
 			_pCurBlock->Else().NewLine()
 				.BeginBlock();

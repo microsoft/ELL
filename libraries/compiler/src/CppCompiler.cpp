@@ -54,10 +54,9 @@ namespace emll
 			return pParentNode;
 		}
 
-		void CppCompiler::BeginCodeBlock(const model::Node& node) 
+		void CppCompiler::NewCodeBlock(const model::Node& node) 
 		{
 			CppBlock* pBlock = _pfn->AppendBlock();
-			pBlock->Comment(node.GetRuntimeTypeName());
 			_nodeBlocks[node.GetId()] = pBlock;
 		}
 
@@ -69,14 +68,43 @@ namespace emll
 			const model::Node* pParentNode = GetUniqueParent(node);
 			if (pParentNode == nullptr)
 			{
-				std::string comment = "Block" + std::to_string(pBlock->Id());
-				_pfn->Comment(comment);
+				_pfn->Comment(_pfn->CurrentBlock()->IdString());
+			}
+			else
+			{
+				MergeNodeBlocks(*pParentNode, node);
+			}
+		}
+
+		void CppCompiler::MergeNodeBlocks(const model::Node& dest, const model::Node& src)
+		{
+			CppBlock* pDestBlock = _nodeBlocks.at(dest.GetId());
+			MergeNodeIntoBlock(pDestBlock, src);
+		}
+
+		void CppCompiler::MergeNodeIntoBlock(CppBlock* pDestBlock, const model::Node& src)
+		{
+			auto result = _nodeBlocks.find(src.GetId());
+			if (result == _nodeBlocks.end())
+			{
 				return;
 			}
-			auto pParentBlock = _nodeBlocks.at(pParentNode->GetId());
-			assert(pParentBlock != nullptr);
-			_pfn->MergeBlocks(pParentBlock, pBlock);
-			_nodeBlocks[node.GetId()] = pParentBlock;
+			_pfn->MergeBlocks(pDestBlock, result->second);
+			_nodeBlocks[src.GetId()] = pDestBlock;
+		}
+
+		const model::Node* CppCompiler::GetMergeableNode(const model::OutputPortElement& elt)
+		{
+			if (ModelEx::HasSingleDescendant(elt))
+			{
+				Variable* pVar = GetVariableFor(elt);
+				if (pVar != nullptr && !pVar->IsLiteral())
+				{
+					return ModelEx::GetSourceNode(elt);
+				}
+			}
+
+			return nullptr;
 		}
 
 		void CppCompiler::CompileDotProductNode(const model::Node& node)

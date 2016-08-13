@@ -18,6 +18,11 @@ namespace emll
 			return node.GetOutputPorts()[0]->GetType();
 		}
 
+		const model::Node* ModelEx::GetSourceNode(const model::OutputPortElement& elt)
+		{
+			return elt.ReferencedPort()->GetNode();
+		}
+
 		bool ModelEx::IsLeafNode(const model::Node& node)
 		{
 			return (node.GetDependentNodes().size() == 0);
@@ -43,6 +48,16 @@ namespace emll
 		bool ModelEx::IsScalar(const model::OutputPortBase& port)
 		{
 			return (port.Size() == 1);
+		}
+
+		bool ModelEx::HasSingleDescendant(const model::Node& node)
+		{
+			return (node.GetDependentNodes().size() == 1);
+		}
+
+		bool ModelEx::HasSingleDescendant(const model::OutputPortElement& elt)
+		{
+			return HasSingleDescendant(*GetSourceNode(elt));
 		}
 	}
 }

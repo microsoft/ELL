@@ -10,6 +10,11 @@ namespace emll
 		{
 		}
 
+		std::string CppBlock::IdString()
+		{
+			return "Block" + std::to_string(_id);
+		}
+
 		CppBlock* CppBlockAllocator::Alloc()
 		{
 			auto block = std::make_shared<CppBlock>(NextId());
@@ -40,21 +45,24 @@ namespace emll
 			return _blocks.back();
 		}
 
-		void CppBlockList::Push(CppBlock* pBlock)
+		CppBlock* CppBlockList::AddBlock()
 		{
-			assert(pBlock != nullptr);
+			CppBlock* pBlock = _allocator.Alloc();
 			_blocks.push_back(pBlock);
+			return pBlock;
 		}
 		
 		void CppBlockList::Remove(CppBlock* pBlock)
 		{
 			assert(pBlock != nullptr);
 			_blocks.remove(pBlock);
+			_allocator.Free(pBlock);
 		}
 
 		void CppBlockList::Clear()
 		{
 			_blocks.clear();
+			_allocator.Clear();
 		}
 
 		void CppBlockList::Merge()
@@ -65,6 +73,7 @@ namespace emll
 				if (*pBlock != pFirst)
 				{
 					pFirst->Append(*pBlock);
+					_allocator.Free(*pBlock);
 				}
 			}
 			_blocks.clear();

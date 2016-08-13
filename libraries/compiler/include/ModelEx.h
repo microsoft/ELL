@@ -26,6 +26,9 @@ namespace emll
 			/// <summary>Return the data type of the given node</summary>
 			static model::Port::PortType GetNodeDataType(const model::Node& node);
 
+			/// <summary>Return the source node</summary>
+			static const model::Node* GetSourceNode(const model::OutputPortElement& elt);
+
 			/// <summary>Returns true if a node is a leaf node</summary>
 			static bool IsLeafNode(const model::Node& node);
 			
@@ -40,6 +43,12 @@ namespace emll
 
 			/// <summary>Returns true if this port is scalar</summary>
 			static bool IsScalar(const model::OutputPortBase& port);
+
+			/// <summary>Does this node have a single descendant?</summary>
+			static bool HasSingleDescendant(const model::Node& node);
+
+			/// <summary>Does this node have a single descendant?</summary>
+			static bool HasSingleDescendant(const model::OutputPortElement& elt);
 		};
 	}
 }

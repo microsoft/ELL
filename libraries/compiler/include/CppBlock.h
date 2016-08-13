@@ -16,6 +16,7 @@ namespace emll
 			CppBlock(int blockId);
 
 			const int Id() const { return _id; }
+			std::string IdString();
 
 		private:
 			int _id;
@@ -41,15 +42,18 @@ namespace emll
 		class CppBlockList
 		{
 		public:
+			CppBlock* AddBlock();
+
 			CppBlock* First();
 			CppBlock* Last();
-			void Push(CppBlock* pBlock);
+
 			void Remove(CppBlock* pBlock);
 			void Clear();
 			void Merge();
 
 		private:
 			std::list<CppBlock*> _blocks;
+			CppBlockAllocator _allocator;
 		};
 	}
 }

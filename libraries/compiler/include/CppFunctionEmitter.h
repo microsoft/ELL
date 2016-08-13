@@ -20,6 +20,9 @@ namespace emll
 			CppBlock* MergeBlocks(CppBlock* pTarget, CppBlock* pSrc);
 
 			CppFunctionEmitter& Comment(const std::string& comment);
+			CppFunctionEmitter& Comment();
+			CppFunctionEmitter& CommentText(const std::string& text);
+			CppFunctionEmitter& EndComment();
 
 			///<summary>Begin a new function with the given return type and args</summary>
 			CppFunctionEmitter& Begin(const std::string& name, const ValueType returnType, const NamedValueTypeList& args);
@@ -69,17 +72,17 @@ namespace emll
 			CppFunctionEmitter& Cmp(ComparisonType cmp, std::function<void()> lValue, std::function<void()> rValue);
 
 			///<summary>Begin a for loop</summary>
-			CppFunctionEmitter& BeginFor(const std::string& iVarName, int count);
+			CppFunctionEmitter& For(const std::string& iVarName, int count);
 			///<summary>End a for loop</summary>
 			CppFunctionEmitter& EndFor();
 			
 			///<summary>Begin a conditional block</summary>
 			template<typename T>
-			CppFunctionEmitter& BeginIf(const std::string&varName, ComparisonType cmp, T value);
+			CppFunctionEmitter& If(const std::string&varName, ComparisonType cmp, T value);
 			///<summary>Begin a conditional</summary>
-			CppFunctionEmitter& BeginIf(std::function<void()> value);
+			CppFunctionEmitter& If(std::function<void()> value);
 			///<summary>Begin a conditional</summary>
-			CppFunctionEmitter& BeginElse();
+			CppFunctionEmitter& Else();
 			///<summary>End a conditional</summary>
 			CppFunctionEmitter& EndIf();
 			///<summary>Begin a conditional</summary>
@@ -95,7 +98,6 @@ namespace emll
 			void MergeBlocks();
 
 		private:
-			CppBlockAllocator _blockAllocator;
 			CppBlockList _blocks;
 			CppBlock* _pVariables;
 			CppBlock* _pCurBlock = nullptr;

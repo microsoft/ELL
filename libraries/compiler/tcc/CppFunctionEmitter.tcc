@@ -28,7 +28,7 @@ namespace emll
 		}
 
 		template<typename T>
-		CppFunctionEmitter& CppFunctionEmitter::BeginIf(const std::string&varName, ComparisonType cmp, T value)
+		CppFunctionEmitter& CppFunctionEmitter::If(const std::string&varName, ComparisonType cmp, T value)
 		{
 			_pCurBlock->If()
 				.OpenParan()

@@ -41,8 +41,10 @@ namespace emll
 
 		protected:
 			const model::Node* CppCompiler::GetUniqueParent(const model::Node& node);
-			void BeginCodeBlock(const model::Node& node);
+			void NewCodeBlock(const model::Node& node);
 			void EndCodeBlock(const model::Node& node);
+			void MergeNodeBlocks(const model::Node& dest, const model::Node& src);
+			void MergeNodeIntoBlock(CppBlock* pDestBlock, const model::Node& src);
 
 			///<summary>Compile an OutputNode</summary>
 			virtual void CompileOutputNode(const model::OutputNode<double>& node) override { CompileOutput<double>(node); }
@@ -177,6 +179,7 @@ namespace emll
 			///<summary>Compile an element selector node</summary>
 			template<typename T, typename SelectorType>
 			void CompileElementSelectorBinary(const nodes::ElementSelectorNode<T, SelectorType>& node);
+			const model::Node* GetMergeableNode(const model::OutputPortElement& elt);
 
 		private:
 			CppModuleEmitter _module;

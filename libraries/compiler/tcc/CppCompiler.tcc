@@ -163,7 +163,7 @@ namespace emll
 		template<typename T>
 		void CppCompiler::CompileBinary(const nodes::BinaryOperationNode<T>& node)
 		{
-			BeginCodeBlock(node);
+			NewCodeBlock(node);
 
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
@@ -188,7 +188,7 @@ namespace emll
 			auto pOutput = node.GetOutputPorts()[0];
 			Variable* pResultVector = EnsureEmitted(pOutput);
 			auto iVarName = LoopVarName();
-			_pfn->BeginFor(iVarName, pOutput->Size());
+			_pfn->For(iVarName, pOutput->Size());
 			{
 				_pfn->AssignValueAt(pResultVector->EmittedName(), iVarName);
 				_pfn->Op(GetOperator<T>(node),
@@ -221,7 +221,7 @@ namespace emll
 		template<typename T>
 		void CppCompiler::CompileSum(const nodes::SumNode<T>& node)
 		{
-			BeginCodeBlock(node);
+			NewCodeBlock(node);
 
 			// SumNode has exactly 1 input and 1 output
 			auto input = node.GetInputPorts()[0];
@@ -247,7 +247,7 @@ namespace emll
 			Variable& resultVar = *(EnsureEmitted(pOutput));
 			auto iVarName = LoopVarName();
 			_pfn->Assign(resultVar.EmittedName(), GetDefaultForValueType<T>());
-			_pfn->BeginFor(LoopVarName(), pSrcVector->Dimension());
+			_pfn->For(LoopVarName(), pSrcVector->Dimension());
 			{
 				_pfn->Assign(resultVar.EmittedName());
 				_pfn->Op(GetAddForValueType<T>(),
@@ -281,7 +281,7 @@ namespace emll
 		template<typename T>
 		void CppCompiler::CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node)
 		{
-			BeginCodeBlock(node);
+			NewCodeBlock(node);
 
 			// Binary predicate has 2 inputs and 1 output
 			auto pInput1 = node.GetInputPorts()[0];
@@ -304,7 +304,7 @@ namespace emll
 		template<typename T>
 		void CppCompiler::CompileElementSelectorNode(const model::Node& node)
 		{
-			BeginCodeBlock(node);
+			NewCodeBlock(node);
 
 			auto selectorPort = node.GetInputPorts()[1];
 			switch (selectorPort->GetType())
@@ -343,8 +343,38 @@ namespace emll
 			Variable* pResult = EnsureEmitted(pOutput);
 			auto lVal = pElements->GetOutputPortElement(0);
 			auto rVal = pElements->GetOutputPortElement(1);
-			_pfn->Assign(pResult->EmittedName());
-			_pfn->IfInline([&pSelector, this]() { LoadVar(pSelector); }, [&lVal, this]() { LoadVar(lVal); }, [&rVal, this]() { LoadVar(rVal); });
+			auto lMergeableSrc = GetMergeableNode(lVal);
+			auto rMergeableSrc = GetMergeableNode(rVal);
+			if (lMergeableSrc == nullptr && rMergeableSrc == nullptr)
+			{
+				_pfn->Assign(pResult->EmittedName());
+				_pfn->IfInline([&pSelector, this]() { LoadVar(pSelector); }, [&lVal, this]() { LoadVar(lVal); }, [&rVal, this]() { LoadVar(rVal); });
+			}
+			else
+			{
+				_pfn->If([&pSelector, this]() { LoadVar(pSelector); });
+				{
+					if (lMergeableSrc != nullptr)
+					{
+						MergeNodeIntoBlock(_pfn->CurrentBlock(), *lMergeableSrc);
+					}
+					_pfn->Assign(pResult->EmittedName());
+					LoadVar(lVal);
+					_pfn->EndStatement();
+				}
+				_pfn->EndIf();
+				_pfn->Else();
+				{
+					if (rMergeableSrc != nullptr)
+					{
+						MergeNodeIntoBlock(_pfn->CurrentBlock(), *rMergeableSrc);
+					}
+					_pfn->Assign(pResult->EmittedName());
+					LoadVar(rVal);
+					_pfn->EndStatement();
+				}
+				_pfn->EndIf();
+			}
 		}
 	}
 }
