@@ -17,6 +17,9 @@ namespace emll
 
 			CppBlock* AppendBlock();
 			CppBlock* CurrentBlock() const { return _pCurBlock; };
+			CppBlock* MergeBlocks(CppBlock* pTarget, CppBlock* pSrc);
+
+			CppFunctionEmitter& Comment(const std::string& comment);
 
 			///<summary>Begin a new function with the given return type and args</summary>
 			CppFunctionEmitter& Begin(const std::string& name, const ValueType returnType, const NamedValueTypeList& args);

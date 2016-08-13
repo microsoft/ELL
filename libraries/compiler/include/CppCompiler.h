@@ -40,7 +40,9 @@ namespace emll
 			void EnsureEmitted(Variable& var);
 
 		protected:
-			void PreprocessNode(const model::Node& node);
+			const model::Node* CppCompiler::GetUniqueParent(const model::Node& node);
+			void BeginCodeBlock(const model::Node& node);
+			void EndCodeBlock(const model::Node& node);
 
 			///<summary>Compile an OutputNode</summary>
 			virtual void CompileOutputNode(const model::OutputNode<double>& node) override { CompileOutput<double>(node); }

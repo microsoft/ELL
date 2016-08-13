@@ -20,11 +20,29 @@ namespace emll
 			return pNewBlock;
 		}
 
+		CppBlock* CppFunctionEmitter::MergeBlocks(CppBlock* pTarget, CppBlock* pSrc)
+		{
+			pTarget->Append(pSrc);
+			if (pSrc == _pCurBlock)
+			{
+				_pCurBlock = pTarget;
+			}
+			_blocks.Remove(pSrc);
+			_blockAllocator.Free(pSrc);
+			return pTarget;
+		}
+
 		CppFunctionEmitter& CppFunctionEmitter::Clear()
 		{
 			_blockAllocator.Clear();
 			_blocks.Clear();
 			_pCurBlock = nullptr;
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::Comment(const std::string& comment)
+		{
+			_pCurBlock->Comment(comment);
 			return *this;
 		}
 

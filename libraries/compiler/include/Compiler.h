@@ -60,7 +60,7 @@ namespace emll
 			///<summary>Return the base compiler settings</summary>
 			CompilerSettings& Settings() { return _settings; }
 
-			///<summary>Compile the model into a function with the given name</summary>
+			/// <summary>Compile the model into a function with the given name</summary>
 			void CompileModel(const std::string& functionName, model::Model& model);
 
 			///<summary>Edit the prediction function declaration</summary>

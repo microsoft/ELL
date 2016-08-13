@@ -54,8 +54,7 @@ namespace emll
 			CollectInputsAndOutputs(model);
 			BeginFunction(functionName, _args);
 			model.Visit([this](const model::Node& node) {
-				std::string typeName = node.GetRuntimeTypeName();	
-				
+				std::string typeName = node.GetRuntimeTypeName();					
 				//
 				// TODO: Make this a lookup table
 				//

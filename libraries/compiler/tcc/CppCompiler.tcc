@@ -163,7 +163,7 @@ namespace emll
 		template<typename T>
 		void CppCompiler::CompileBinary(const nodes::BinaryOperationNode<T>& node)
 		{
-			PreprocessNode(node);
+			BeginCodeBlock(node);
 
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
@@ -176,6 +176,8 @@ namespace emll
 			{
 				CompileBinaryExpanded<T>(node);
 			}
+
+			EndCodeBlock(node);
 		}
 
 		template<typename T>
@@ -219,8 +221,8 @@ namespace emll
 		template<typename T>
 		void CppCompiler::CompileSum(const nodes::SumNode<T>& node)
 		{
-			PreprocessNode(node);
-			
+			BeginCodeBlock(node);
+
 			// SumNode has exactly 1 input and 1 output
 			auto input = node.GetInputPorts()[0];
 			if (ModelEx::IsPureVector(*input) &&
@@ -232,7 +234,10 @@ namespace emll
 			{
 				CompileSumExpanded<T>(node);
 			}
+
+			EndCodeBlock(node);
 		}
+
 		template<typename T>
 		void CppCompiler::CompileSumLoop(const nodes::SumNode<T>& node)
 		{
@@ -276,7 +281,7 @@ namespace emll
 		template<typename T>
 		void CppCompiler::CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node)
 		{
-			PreprocessNode(node);
+			BeginCodeBlock(node);
 
 			// Binary predicate has 2 inputs and 1 output
 			auto pInput1 = node.GetInputPorts()[0];
@@ -292,22 +297,27 @@ namespace emll
 			_pfn->Assign(resultVar.EmittedName());
 			_pfn->Cmp(GetComparison<T>(node), [&lInput, this](){LoadVar(lInput); }, [&rInput, this](){LoadVar(rInput); });
 			_pfn->EndStatement();
+
+			EndCodeBlock(node);
 		}
 
 		template<typename T>
 		void CppCompiler::CompileElementSelectorNode(const model::Node& node)
 		{
-			PreprocessNode(node);
+			BeginCodeBlock(node);
 
 			auto selectorPort = node.GetInputPorts()[1];
 			switch (selectorPort->GetType())
 			{
 				case model::Port::PortType::Boolean:
-					return CompileElementSelector<T, bool>(static_cast<const nodes::ElementSelectorNode<T, bool>&>(node));
+					CompileElementSelector<T, bool>(static_cast<const nodes::ElementSelectorNode<T, bool>&>(node));
+					break;
 
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
 			}
+
+			EndCodeBlock(node);
 		}
 
 		template<typename T, typename SelectorType>

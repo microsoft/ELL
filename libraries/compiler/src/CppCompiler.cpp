@@ -25,11 +25,58 @@ namespace emll
 			_module.Write(fileStream);
 		}
 
-		void CppCompiler::PreprocessNode(const model::Node& node) 
+		const model::Node* CppCompiler::GetUniqueParent(const model::Node& node)
+		{
+			auto inputs = node.GetInputPorts();
+			const model::Node* pParentNode = nullptr;
+			CppBlock* pParentBlock = nullptr;
+			for (auto input : inputs)
+			{
+				for (auto parentNode : input->GetParentNodes())
+				{
+					CppBlock* pNodeBlock = nullptr;
+					auto result = _nodeBlocks.find(parentNode->GetId());
+					if (result != _nodeBlocks.end())
+					{
+						pNodeBlock = result->second;
+					}
+					if (pNodeBlock != nullptr)
+					{
+						if (pParentBlock != nullptr && pParentBlock != pNodeBlock)
+						{
+							return nullptr;
+						}
+						pParentBlock = pNodeBlock;
+						pParentNode = parentNode;
+					}
+				}
+			}
+			return pParentNode;
+		}
+
+		void CppCompiler::BeginCodeBlock(const model::Node& node) 
 		{
 			CppBlock* pBlock = _pfn->AppendBlock();
 			pBlock->Comment(node.GetRuntimeTypeName());
 			_nodeBlocks[node.GetId()] = pBlock;
+		}
+
+		void CppCompiler::EndCodeBlock(const model::Node& node)
+		{
+			auto pBlock = _nodeBlocks.at(node.GetId());
+			assert(pBlock != nullptr);
+
+			const model::Node* pParentNode = GetUniqueParent(node);
+			if (pParentNode == nullptr)
+			{
+				std::string comment = "Block" + std::to_string(pBlock->Id());
+				_pfn->Comment(comment);
+				return;
+			}
+			auto pParentBlock = _nodeBlocks.at(pParentNode->GetId());
+			assert(pParentBlock != nullptr);
+			_pfn->MergeBlocks(pParentBlock, pBlock);
+			_nodeBlocks[node.GetId()] = pParentBlock;
 		}
 
 		void CppCompiler::CompileDotProductNode(const model::Node& node)
