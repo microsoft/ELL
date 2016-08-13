@@ -43,8 +43,8 @@ namespace emll
 			const model::Node* CppCompiler::GetUniqueParent(const model::Node& node);
 			void NewCodeBlock(const model::Node& node);
 			bool TryMergeCodeBlock(const model::Node& node);
-			void MergeNodeBlocks(const model::Node& dest, const model::Node& src);
-			void MergeNodeIntoBlock(CppBlock* pDestBlock, const model::Node& src);
+			bool TryMergeNodeBlocks(const model::Node& dest, const model::Node& src);
+			bool TryMergeNodeIntoBlock(CppBlock* pDestBlock, const model::Node& src);
 
 			///<summary>Compile an OutputNode</summary>
 			virtual void CompileOutputNode(const model::OutputNode<double>& node) override { CompileOutput<double>(node); }
@@ -184,7 +184,7 @@ namespace emll
 		private:
 			CppModuleEmitter _module;
 			CppFunctionEmitter* _pfn;
-			std::unordered_map<model::Node::NodeId, CppBlock*> _nodeBlocks;
+			NodeMap<CppBlock*, nullptr> _nodeBlocks;
 		};
 	}
 }

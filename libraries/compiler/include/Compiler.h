@@ -28,6 +28,7 @@
 #include "BinaryPredicateNode.h"
 
 #include <functional>
+#include <unordered_map>
 
 namespace emll
 {
@@ -194,6 +195,23 @@ namespace emll
 			std::unordered_map<const model::OutputPortBase*, Variable*> _portToVarMap;
 
 			CompilerSettings _settings;
+		};
+
+		template<typename T, T Default>
+		class NodeMap
+		{
+		public:
+
+			T Get(const model::Node& node) const;
+			T Get(const model::Node* pNode) const;
+			void Set(const model::Node& node, T value);
+			bool Contains(const model::Node& node) const;
+			void Remove(const model::Node& node);
+
+			void Clear();
+
+		private:
+			std::unordered_map<model::Node::NodeId, T> _map;
 		};
 	}
 }

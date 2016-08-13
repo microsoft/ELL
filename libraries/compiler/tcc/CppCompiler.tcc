@@ -354,7 +354,7 @@ namespace emll
 				{
 					if (lMergeableSrc != nullptr)
 					{
-						MergeNodeIntoBlock(_pfn->CurrentBlock(), *lMergeableSrc);
+						TryMergeNodeIntoBlock(_pfn->CurrentBlock(), *lMergeableSrc);
 					}
 					_pfn->Assign(pResult->EmittedName());
 					LoadVar(lVal);
@@ -365,7 +365,7 @@ namespace emll
 				{
 					if (rMergeableSrc != nullptr)
 					{
-						MergeNodeIntoBlock(_pfn->CurrentBlock(), *rMergeableSrc);
+						TryMergeNodeIntoBlock(_pfn->CurrentBlock(), *rMergeableSrc);
 					}
 					_pfn->Assign(pResult->EmittedName());
 					LoadVar(rVal);
@@ -377,7 +377,7 @@ namespace emll
 			auto pSelectorNode = pSelector->GetParentNodes()[0];
 			if (ModelEx::HasSingleDescendant(*pSelectorNode))
 			{
-				MergeNodeBlocks(*pSelectorNode, node);
+				TryMergeNodeBlocks(*pSelectorNode, node);
 			}
 		}
 	}

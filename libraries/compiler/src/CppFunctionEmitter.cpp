@@ -1,4 +1,5 @@
 #include "CppFunctionEmitter.h"
+#include <cassert>
 
 namespace emll
 {
@@ -21,6 +22,7 @@ namespace emll
 
 		CppBlock* CppFunctionEmitter::MergeBlocks(CppBlock* pTarget, CppBlock* pSrc)
 		{
+			assert(pTarget != nullptr);
 			pTarget->Append(pSrc);
 			if (pSrc == _pCurBlock)
 			{
@@ -305,8 +307,7 @@ namespace emll
 
 		void CppFunctionEmitter::MergeBlocks()
 		{
-			_blocks.Merge();
-			_pCurBlock = _blocks.First();
+			_pCurBlock = _blocks.Merge();
 		}
 	}
 }

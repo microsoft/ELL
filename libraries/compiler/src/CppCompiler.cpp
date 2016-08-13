@@ -34,12 +34,7 @@ namespace emll
 			{
 				for (auto parentNode : input->GetParentNodes())
 				{
-					CppBlock* pNodeBlock = nullptr;
-					auto result = _nodeBlocks.find(parentNode->GetId());
-					if (result != _nodeBlocks.end())
-					{
-						pNodeBlock = result->second;
-					}
+					CppBlock* pNodeBlock = _nodeBlocks.Get(parentNode);
 					if (pNodeBlock != nullptr)
 					{
 						if (pParentBlock != nullptr && pParentBlock != pNodeBlock)
@@ -57,13 +52,16 @@ namespace emll
 		void CppCompiler::NewCodeBlock(const model::Node& node) 
 		{
 			CppBlock* pBlock = _pfn->AppendBlock();
-			_nodeBlocks[node.GetId()] = pBlock;
+			_nodeBlocks.Set(node, pBlock);
 		}
 
 		bool CppCompiler::TryMergeCodeBlock(const model::Node& node)
 		{
-			auto pBlock = _nodeBlocks.at(node.GetId());
-			assert(pBlock != nullptr);
+			auto pBlock = _nodeBlocks.Get(node);
+			if (pBlock == nullptr)
+			{
+				return false;
+			}
 
 			const model::Node* pParentNode = GetUniqueParent(node);
 			if (pParentNode == nullptr)
@@ -71,26 +69,30 @@ namespace emll
 				_pfn->Comment(_pfn->CurrentBlock()->IdString());
 				return false;
 			}
-			MergeNodeBlocks(*pParentNode, node);
-			return true;
+
+			return TryMergeNodeBlocks(*pParentNode, node);
 		}
 
-		void CppCompiler::MergeNodeBlocks(const model::Node& dest, const model::Node& src)
+		bool CppCompiler::TryMergeNodeBlocks(const model::Node& dest, const model::Node& src)
 		{
-			CppBlock* pDestBlock = _nodeBlocks.at(dest.GetId());
-			MergeNodeIntoBlock(pDestBlock, src);
-		}
-
-		void CppCompiler::MergeNodeIntoBlock(CppBlock* pDestBlock, const model::Node& src)
-		{
-			auto result = _nodeBlocks.find(src.GetId());
-			if (result == _nodeBlocks.end())
+			CppBlock* pDestBlock = _nodeBlocks.Get(dest);
+			if (pDestBlock == nullptr)
 			{
-				return;
+				return false;
 			}
-			assert(pDestBlock->Id() != result->second->Id());
-			_pfn->MergeBlocks(pDestBlock, result->second);
-			_nodeBlocks[src.GetId()] = pDestBlock;
+			return TryMergeNodeIntoBlock(pDestBlock, src);
+		}
+
+		bool CppCompiler::TryMergeNodeIntoBlock(CppBlock* pDestBlock, const model::Node& src)
+		{
+			CppBlock* pSrcBlock = _nodeBlocks.Get(src);
+			if (pSrcBlock == nullptr || pSrcBlock->Id() == pDestBlock->Id())
+			{
+				return false;
+			}
+			_pfn->MergeBlocks(pDestBlock, pSrcBlock);
+			_nodeBlocks.Set(src, pDestBlock);
+			return true;
 		}
 
 		const model::Node* CppCompiler::GetMergeableNode(const model::OutputPortElement& elt)
@@ -146,7 +148,7 @@ namespace emll
 			if (_pfn != nullptr)
 			{
 				_pfn->End();
-				_nodeBlocks.clear();
+				_nodeBlocks.Clear();
 			}
 		}
 

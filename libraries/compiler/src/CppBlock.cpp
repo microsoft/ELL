@@ -65,7 +65,7 @@ namespace emll
 			_allocator.Clear();
 		}
 
-		void CppBlockList::Merge()
+		CppBlock* CppBlockList::Merge()
 		{
 			CppBlock* pMergedBlock = _allocator.Alloc();
 			for (auto pBlock = _blocks.begin(); pBlock != _blocks.end(); ++pBlock)
@@ -75,6 +75,7 @@ namespace emll
 			}
 			_blocks.clear();
 			_blocks.push_back(pMergedBlock);
+			return pMergedBlock;
 		}
 	}
 }

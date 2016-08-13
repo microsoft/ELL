@@ -49,7 +49,7 @@ namespace emll
 
 			void Remove(CppBlock* pBlock);
 			void Clear();
-			void Merge();
+			CppBlock* Merge();
 
 		private:
 			std::list<CppBlock*> _blocks;
