@@ -15,8 +15,7 @@ endif()
 set (SRC src/ForestTrainer.cpp
          src/LogitBooster.cpp)
 
-set (INCLUDE include/BaggingIncrementalTrainer.h
-             include/EvaluatingIncrementalTrainer.h
+set (INCLUDE include/EvaluatingIncrementalTrainer.h
              include/ForestTrainer.h
              include/IIncrementalTrainer.h
              include/IBlackBoxTrainer.h
@@ -24,17 +23,14 @@ set (INCLUDE include/BaggingIncrementalTrainer.h
              include/MultiEpochIncrementalTrainer.h
              include/HistogramForestTrainer.h
              include/SortingForestTrainer.h
-             include/SortingTreeTrainer.h
              include/SweepingIncrementalTrainer.h
              include/SGDIncrementalTrainer.h)
 
-set (TCC tcc/BaggingIncrementalTrainer.tcc
-         tcc/EvaluatingIncrementalTrainer.tcc
+set (TCC tcc/EvaluatingIncrementalTrainer.tcc
          tcc/ForestTrainer.tcc
          tcc/HistogramForestTrainer.tcc
          tcc/MultiEpochIncrementalTrainer.tcc
          tcc/SortingForestTrainer.tcc
-         tcc/SortingTreeTrainer.tcc
          tcc/SweepingIncrementalTrainer.tcc
          tcc/SGDIncrementalTrainer.tcc)
 

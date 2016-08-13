@@ -237,13 +237,13 @@ namespace trainers
     {
         if(splitRule.NumOutputs() == 2)
         {
-            _dataset.Partition([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()) == 0 ? true : false; },
+            _dataset.Partition([splitRule](const ForestTrainerExample& example) { return splitRule.Predict(example.GetDataVector()) == 0 ? true : false; },
                                range.firstIndex,
                                range.size);
         }
         else
         {
-            _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Compute(example.GetDataVector()); },
+            _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Predict(example.GetDataVector()); },
                           range.firstIndex,
                           range.size);
         }

@@ -12,13 +12,13 @@
 #include "LogitBooster.h"
 
 // predictors
-#include "SingleElementThresholdRule.h"
+#include "SingleElementThresholdPredictor.h"
 #include "ConstantPredictor.h"
 
 namespace trainers
 {
     template <typename LossFunctionType, typename BoosterType> 
-    class HistogramForestTrainer : public ForestTrainer<predictors::SingleElementThresholdRule, predictors::ConstantPredictor, BoosterType>
+    class HistogramForestTrainer : public ForestTrainer<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor, BoosterType>
     {
     public:
         /// <summary> Constructs an instance of HistogramForestTrainer. </summary>
@@ -28,7 +28,7 @@ namespace trainers
         /// <param name="parameters"> Training Parameters. </param>
         HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters);
 
-        using SplitRuleType = predictors::SingleElementThresholdRule;
+        using SplitRuleType = predictors::SingleElementThresholdPredictor;
         using EdgePredictorType = predictors::ConstantPredictor;
         using SplitCandidate = ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate;
 

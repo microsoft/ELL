@@ -9,13 +9,10 @@
 %ignore predictors::LinearPredictor::AddToModel(layers::Model&, const layers::CoordinateList& ) const;
 %ignore predictors::LinearPredictor::GetWeights() const;
 %ignore predictors::LinearPredictor::GetBias() const;
-//%ignore predictors::DecisionTreePredictor;
-%ignore predictors::DecisionTreePredictor::InteriorNode;
 
 %{
 #define SWIG_FILE_WITH_INIT
 #include "LinearPredictor.h"
-#include "DecisionTreePredictor.h"
 #include "Coordinatewise.h"
 #include "Sum.h"
 #include "Model.h"
@@ -27,7 +24,6 @@
 #endif
 
 %include "LinearPredictor.h"
-%include "DecisionTreePredictor.h"
 
 %extend predictors::LinearPredictor
 {
