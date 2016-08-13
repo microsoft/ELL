@@ -21,6 +21,16 @@
 
 namespace utilities
 {
+    class ISerializable;
+
+    /// <summary> Enabled if ValueType inherits from ISerializable. </summary>
+    template <typename ValueType>
+    using IsSerializable = typename std::enable_if_t<std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value, int>;
+
+    /// <summary> Enabled if ValueType does not inherit from ISerializable. </summary>
+    template <typename ValueType>
+    using IsNotSerializable = typename std::enable_if_t<(!std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
+
     /// <summary> A context object used during deserialization. Contains a GenericTypeFactory. </summary>
     class SerializationContext
     {
