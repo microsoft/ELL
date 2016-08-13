@@ -75,6 +75,7 @@ namespace emll
 			virtual void WriteToFile(const std::string& filePath) = 0;
 		
 		protected:
+
 			///<summary>Compile a ConstantNode</summary>
 			virtual void CompileConstantNode(const model::Node& node);
 			///<summary>Compile an InputNode</summary>
@@ -87,7 +88,6 @@ namespace emll
 			virtual void CompileSumNode(const model::Node& node);
 			///<summary>Compile a BinaryPredicateNode</summary>
 			virtual void CompileBinaryPredicateNode(const model::Node& node);
-
 			//---------------------------------------------------
 			//
 			// These methods may be implemented by specific compilers

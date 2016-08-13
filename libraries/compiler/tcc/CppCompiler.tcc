@@ -163,6 +163,8 @@ namespace emll
 		template<typename T>
 		void CppCompiler::CompileBinary(const nodes::BinaryOperationNode<T>& node)
 		{
+			PreprocessNode(node);
+
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
 			if ((ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2)) &&
@@ -217,6 +219,8 @@ namespace emll
 		template<typename T>
 		void CppCompiler::CompileSum(const nodes::SumNode<T>& node)
 		{
+			PreprocessNode(node);
+			
 			// SumNode has exactly 1 input and 1 output
 			auto input = node.GetInputPorts()[0];
 			if (ModelEx::IsPureVector(*input) &&
@@ -272,6 +276,8 @@ namespace emll
 		template<typename T>
 		void CppCompiler::CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node)
 		{
+			PreprocessNode(node);
+
 			// Binary predicate has 2 inputs and 1 output
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
@@ -291,6 +297,8 @@ namespace emll
 		template<typename T>
 		void CppCompiler::CompileElementSelectorNode(const model::Node& node)
 		{
+			PreprocessNode(node);
+
 			auto selectorPort = node.GetInputPorts()[1];
 			switch (selectorPort->GetType())
 			{

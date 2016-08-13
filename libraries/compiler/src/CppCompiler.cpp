@@ -25,6 +25,13 @@ namespace emll
 			_module.Write(fileStream);
 		}
 
+		void CppCompiler::PreprocessNode(const model::Node& node) 
+		{
+			CppBlock* pBlock = _pfn->AppendBlock();
+			pBlock->Comment(node.GetRuntimeTypeName());
+			_nodeBlocks[node.GetId()] = pBlock;
+		}
+
 		void CppCompiler::CompileDotProductNode(const model::Node& node)
 		{
 			throw new CompilerException(CompilerError::notSupported);
@@ -64,6 +71,7 @@ namespace emll
 			if (_pfn != nullptr)
 			{
 				_pfn->End();
+				_nodeBlocks.clear();
 			}
 		}
 

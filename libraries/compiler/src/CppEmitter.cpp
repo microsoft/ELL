@@ -31,9 +31,11 @@ namespace emll
 		
 		CppEmitter& CppEmitter::Comment(const std::string& text)
 		{
-			OpenComment()
-				.AppendRaw(text)
-			.CloseComment();
+			OpenComment().Space();
+			{
+				AppendRaw(text).Space();
+			}
+			CloseComment().NewLine();
 			return *this;
 		}
 

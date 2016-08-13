@@ -55,6 +55,7 @@ namespace emll
 			BeginFunction(functionName, _args);
 			model.Visit([this](const model::Node& node) {
 				std::string typeName = node.GetRuntimeTypeName();	
+				
 				//
 				// TODO: Make this a lookup table
 				//
@@ -106,7 +107,6 @@ namespace emll
 				{
 					throw new CompilerException(CompilerError::modelNodeTypeNotSupported);
 				}
-
 			});
 			EndFunction();
 		}

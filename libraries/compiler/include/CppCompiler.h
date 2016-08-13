@@ -40,6 +40,8 @@ namespace emll
 			void EnsureEmitted(Variable& var);
 
 		protected:
+			void PreprocessNode(const model::Node& node);
+
 			///<summary>Compile an OutputNode</summary>
 			virtual void CompileOutputNode(const model::OutputNode<double>& node) override { CompileOutput<double>(node); }
 			///<summary>Compile an OutputNode</summary>
@@ -177,6 +179,7 @@ namespace emll
 		private:
 			CppModuleEmitter _module;
 			CppFunctionEmitter* _pfn;
+			std::unordered_map<model::Node::NodeId, CppBlock*> _nodeBlocks;
 		};
 	}
 }
