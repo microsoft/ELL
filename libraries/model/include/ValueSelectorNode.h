@@ -28,6 +28,9 @@ namespace model
     class ValueSelectorNode : public Node
     {
     public:
+        /// <summary> Default Constructor </summary>
+        ValueSelectorNode();
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="condition"> An input that returns a single boolean value that selects which input to use as output </param>

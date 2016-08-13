@@ -15,7 +15,7 @@
 
 // predictors
 #include "ForestPredictor.h"
-#include "SingleElementThresholdRule.h"
+#include "SingleElementThresholdPredictor.h"
 #include "ConstantNode.h"
 
 // stl
@@ -23,8 +23,7 @@
 
 namespace nodes
 {
-    /// <summary> Implements a forest node, where each tree in the forest uses single-input threshold
-    /// split rules and constant outputs on all edges. </summary>
+    /// <summary> Implements a forest node, which wraps the forest predictor. </summary>
     ///
     /// <typeparam name="SplitRuleType"> The split rule type. </typeparam>
     /// <typeparam name="EdgePredictorType"> The edge predictor type. </typeparam>
@@ -35,10 +34,10 @@ namespace nodes
         /// @name Input and Output Ports
         /// @{
         static constexpr const char* inputPortName = "input";
-        static constexpr const char* outputPortName = "prediction";
+        static constexpr const char* outputPortName = "output";
         static constexpr const char* treeOutputsPortName = "treeOutputs";
         static constexpr const char* edgeIndicatorVectorPortName = "edgeIndicatorVector";
-        const model::OutputPort<double>& prediction = _prediction;
+        const model::OutputPort<double>& output = _output;
         const model::OutputPort<double>& treeOutputs = _treeOutputs;
         const model::OutputPort<bool>& edgeIndicatorVector = _edgeIndicatorVector;
         /// @}
@@ -65,7 +64,7 @@ namespace nodes
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(model::ModelTransformer& transformer) const;
+        virtual void Refine(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;
@@ -75,7 +74,7 @@ namespace nodes
         model::InputPort<double> _input;
 
         // Outputs
-        model::OutputPort<double> _prediction;
+        model::OutputPort<double> _output;
         model::OutputPort<double> _treeOutputs;
         model::OutputPort<bool> _edgeIndicatorVector;
 
@@ -83,27 +82,8 @@ namespace nodes
         predictors::ForestPredictor<SplitRuleType, EdgePredictorType> _forest;
     };
 
-    typedef ForestNode<predictors::SingleElementThresholdRule, predictors::ConstantPredictor>  SimpleForestNode;
-
-    /// <summary> A struct that represents the outputs of a linear predictor sub-model. </summary>
-    struct ForestSubModelOutputs
-    {
-        const model::OutputPort<double>& prediction;
-        //const model::OutputPort<double>& treeOutputs;   // TODO: waiting for OutputPortElements changes
-        //const model::OutputPort<bool>& edgeIndicatorVector;
-    };
-
-    /// <summary> Builds a part of the model that represents a refined forest predictor. </summary>
-    ///
-    /// <typeparam name="SplitRuleType"> The split rule type. </typeparam>
-    /// <typeparam name="EdgePredictorType"> The edge predictor type. </typeparam>
-    /// <param name="predictor"> The forest predictor. </param>
-    /// <param name="model"> [in,out] The model being modified. </param>
-    /// <param name="outputPortElements"> The output port elements from which the linear predictor takes its inputs. </param>
-    ///
-    /// <returns> The ForestSubModelOutputs. </returns>
-    template<typename SplitRuleType, typename EdgePredictorType>
-    ForestSubModelOutputs BuildSubModel(const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& predictor, model::Model& model, const model::OutputPortElements<double>& outputPortElements);
+    /// <summary> Defines an alias representing a simple forest node, which holds a forest with a SingleElementThresholdPredictor as the split rule and ConstantPredictors on the edges. </summary>
+    typedef ForestNode<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor>  SimpleForestNode;
 }
 
 #include "../tcc/ForestNode.tcc"

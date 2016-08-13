@@ -55,7 +55,7 @@ utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilit
     {
         outputSvgStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
     }
-    else if(outputSvgFilename == "cout")
+    else if(outputSvgFilename == "")
     {
         outputSvgStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
     }

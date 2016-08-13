@@ -10,6 +10,7 @@
 #include "ValueSelectorNode.h"
 #include "ExtremalValueNode.h"
 #include "InputNode.h"
+#include "OutputNode.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
@@ -324,3 +325,4 @@ void TestRefineGraph()
         testing::ProcessTest("testing refined graph", testing::IsEqual(output[2], newOutput[2]));
     }
 }
+

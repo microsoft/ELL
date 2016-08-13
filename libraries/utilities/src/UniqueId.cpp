@@ -8,6 +8,8 @@
 
 #include "UniqueId.h"
 
+#include <string>
+
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
@@ -22,6 +24,28 @@ namespace utilities
     bool UniqueId::operator==(const UniqueId& other) const { return _id == other._id; }
 
     bool UniqueId::operator!=(const UniqueId& other) const { return !(other == *this); }
+
+    std::ostream& operator<<(std::ostream& stream, const UniqueId& id)
+    {
+        stream << id._id;
+        return stream;
+    }
+
+    void UniqueId::Serialize(Serializer& serializer) const
+    {
+        serializer.Serialize("id", _id);
+    }
+
+    void UniqueId::Deserialize(Deserializer& serializer, SerializationContext& context) 
+    {
+        serializer.Deserialize("id", _id, context);
+    }
+
+    std::string to_string(const UniqueId& id)
+    {
+        using std::to_string;
+        return to_string(id._id);
+    }
 }
 
 std::hash<utilities::UniqueId>::result_type std::hash<utilities::UniqueId>::operator()(argument_type const& id) const

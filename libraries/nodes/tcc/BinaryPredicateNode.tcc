@@ -45,6 +45,15 @@ namespace nodes
             case PredicateType::greater:
                 output = ComputeOutput([](ValueType x, ValueType y) { return x > y; });
                 break;
+            case PredicateType::notEqual:
+                output = ComputeOutput([](ValueType x, ValueType y) { return x != y; });
+                break;
+            case PredicateType::lessOrEqual:
+                output = ComputeOutput([](ValueType x, ValueType y) { return x <= y; });
+                break;
+            case PredicateType::greaterOrEqual:
+                output = ComputeOutput([](ValueType x, ValueType y) { return x >= y; });
+                break;
             default:
                 throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown predicate type");
         }

@@ -24,12 +24,13 @@ set (INCLUDE include/AccumulatorNode.h
              include/L2NormNode.h
              include/MovingAverageNode.h
              include/MovingVarianceNode.h
-             include/SubModelBuilders.h
+             include/SingleElementThresholdNode.h
              include/SumNode.h
              include/UnaryOperationNode.h)
 
-set (SRC src/LinearPredictorNode.cpp
-         src/SubModelBuilders.cpp)
+set (SRC src/ConstantNode.cpp
+         src/LinearPredictorNode.cpp
+         src/SingleElementThresholdNode.cpp)
 
 set (TCC tcc/AccumulatorNode.tcc
          tcc/BinaryOperationNode.tcc
@@ -72,7 +73,7 @@ source_group("include" FILES ${TEST_INCLUDE})
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} testing linear model nodes predictors utilities)
+target_link_libraries(${TEST_NAME} testing linear model nodes predictors utilities common)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

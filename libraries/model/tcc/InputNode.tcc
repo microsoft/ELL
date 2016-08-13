@@ -10,6 +10,10 @@
 namespace model
 {
     template <typename ValueType>
+    InputNode<ValueType>::InputNode() : Node({}, { &_output }), _output(this, outputPortName, 0)
+    {};
+
+    template <typename ValueType>
     InputNode<ValueType>::InputNode(size_t dimension) : Node({}, { &_output }), _output(this, outputPortName, dimension){};
 
     template <typename ValueType>
@@ -32,9 +36,17 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputNode<ValueType>::Refine(ModelTransformer& transformer) const
+    void InputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
-        auto newNode = transformer.AddNode<InputNode<ValueType>>(_output.Size());
-         transformer.MapOutputPort(output, newNode->output);
+        Node::Serialize(serializer);
+        serializer.Serialize("output", _output);
+    }
+
+    template <typename ValueType>
+    void InputNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
+        Node::Deserialize(serializer, newContext);
+        serializer.Deserialize("output", _output, context);
     }
 }

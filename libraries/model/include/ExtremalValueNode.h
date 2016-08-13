@@ -27,10 +27,23 @@ namespace model
     class ExtremalValueNode : public Node
     {
     public:
+        /// <summary> Default Constructor </summary>    
+        ExtremalValueNode();
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
         ExtremalValueNode(const OutputPortElements<ValueType>& input);
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName();
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Exposes the extremal value port as a read-only property </summary>
         const OutputPort<ValueType>& val = _val;
@@ -58,6 +71,9 @@ namespace model
     class ArgMinNode : public ExtremalValueNode<ValueType, false>
     {
     public:
+        /// <summary> Default Constructor </summary>    
+        ArgMinNode() : ExtremalValueNode<ValueType, false>() {}
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
@@ -82,6 +98,9 @@ namespace model
     class ArgMaxNode : public ExtremalValueNode<ValueType, true>
     {
     public:
+        /// <summary> Default Constructor </summary>    
+        ArgMaxNode() : ExtremalValueNode<ValueType, true>() {}
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
@@ -99,6 +118,7 @@ namespace model
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(ModelTransformer& transformer) const override;
+
     };
 }
 

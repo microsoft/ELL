@@ -6,10 +6,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "BinaryOperationNode.h"
-
 namespace nodes
 {
+    template <typename ValueType>
+    DotProductNode<ValueType>::DotProductNode() : Node({&_input1, &_input2}, {&_output}), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 1)
+    {
+    }
+
     template <typename ValueType>
     DotProductNode<ValueType>::DotProductNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2) : Node({&_input1, &_input2}, {&_output}), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, 1)
     {
@@ -45,5 +48,23 @@ namespace nodes
         auto sumNode = transformer.AddNode<SumNode<ValueType>>(multNode->output);
 
         transformer.MapOutputPort(output, sumNode->output);
+    }
+
+    template <typename ValueType>
+    void DotProductNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    {
+        Node::Serialize(serializer);
+        serializer.Serialize("input1", _input1);
+        serializer.Serialize("input2", _input2);
+        serializer.Serialize("output", _output);
+    }
+
+    template <typename ValueType>
+    void DotProductNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        Node::Deserialize(serializer, context);
+        serializer.Deserialize("input1", _input1, context);
+        serializer.Deserialize("input2", _input2, context);
+        serializer.Deserialize("output", _output, context);
     }
 }

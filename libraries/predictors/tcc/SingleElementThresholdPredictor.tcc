@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SingleElementThresholdRule.tcc (predictors)
+//  File:     SingleElementThresholdPredictor.tcc (predictors)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,7 +11,7 @@
 namespace predictors
 {
     template<typename RandomAccessVectorType>
-    int predictors::SingleElementThresholdRule::Compute(const RandomAccessVectorType& inputVector) const
+    int predictors::SingleElementThresholdPredictor::Predict(const RandomAccessVectorType& inputVector) const
     {
         if (inputVector.Size() <= _index)
         {

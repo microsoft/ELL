@@ -18,6 +18,10 @@
 // datasets
 #include "IDataVector.h"
 
+// utilities
+#include "ISerializable.h"
+#include "Serializer.h"
+
 // stl
 #include <cstdint>
 #include <memory>
@@ -25,9 +29,12 @@
 namespace predictors
 {
     /// <summary> A linear binary predictor. </summary>
-    class LinearPredictor
+    class LinearPredictor : public utilities::ISerializable
     {
     public:
+        /// <summary> Default Constructor. </summary>
+        LinearPredictor();
+
         /// <summary> Constructs an instance of Linear. </summary>
         ///
         /// <param name="dim"> The dimension. </param>
@@ -87,6 +94,27 @@ namespace predictors
         ///
         /// <returns> The predictor's output coordinates in the model. </returns>
         layers::CoordinateList AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "Node"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     private:
         linear::DoubleVector _w;

@@ -11,7 +11,13 @@
 namespace utilities
 {
     //
-    // Variant
+    // VariantBase implementation
+    //
+    VariantBase::VariantBase(std::type_index type) : _type(type)
+    {};
+
+    //
+    // Variant implementation
     //
 
     Variant::Variant(const Variant& other) : _type(other._type) { _value = other._value->Clone(); }
@@ -26,5 +32,37 @@ namespace utilities
             _value = other._value->Clone();
         }
         return *this;
+    }
+
+    std::string Variant::ToString() const
+    {
+        using std::to_string;
+        using utilities::to_string;
+        return _value->ToString();
+    }
+
+    std::string Variant::GetStoredTypeName() const
+    {
+        return _value->GetStoredTypeName();
+    }
+
+    bool Variant::IsPrimitiveType() const
+    {
+        return _value->IsPrimitiveType();
+    }
+
+    bool Variant::IsSerializable() const
+    {
+        return _value->IsSerializable();
+    }
+
+    bool Variant::IsPointer() const
+    {
+        return _value->IsPointer();
+    }
+
+    std::string to_string(const Variant& variant)
+    {
+        return variant.ToString();
     }
 }
