@@ -11,7 +11,13 @@
 namespace utilities
 {
     //
-    // Variant
+    // VariantBase implementation
+    //
+    VariantBase::VariantBase(std::type_index type) : _type(type)
+    {};
+
+    //
+    // Variant implementation
     //
 
     Variant::Variant(const Variant& other) : _type(other._type) { _value = other._value->Clone(); }

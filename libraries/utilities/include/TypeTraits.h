@@ -12,8 +12,6 @@
 
 namespace utilities
 {
-    class ISerializable;
-
     /// <summary> Utility class to test if a type is a specialization of std::vector. Used by IsVector/IsNotVector, below. </summary>
     template <typename ValueType>
     class IsVectorType
@@ -40,14 +38,6 @@ namespace utilities
     /// <summary> Enabled if ValueType is a class. </summary>
     template <typename ValueType>
     using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, int>;
-
-    /// <summary> Enabled if ValueType inherits from ISerializable. </summary>
-    template <typename ValueType>
-    using IsSerializable = typename std::enable_if_t<std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value, int>;
-
-    /// <summary> Enabled if ValueType does not inherit from ISerializable. </summary>
-    template <typename ValueType>
-    using IsNotSerializable = typename std::enable_if_t<(!std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
 
     /// <summary> Enabled if ValueType is a specialization of std::vector. </summary>
     template <typename ValueType>

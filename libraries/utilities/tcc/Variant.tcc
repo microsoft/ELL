@@ -8,86 +8,36 @@
 
 namespace utilities
 {
-    // Forward declaration of derived class
-    template <typename ValueType>
-    class VariantDerived;
-
     //
-    // VariantBase declaration
-    //
-    class VariantBase
-    {
-    public:
-        virtual ~VariantBase() = default;
-
-    protected:
-        VariantBase(std::type_index type) : _type(type){};
-
-        virtual std::unique_ptr<VariantBase> Clone() const = 0;
-
-        virtual std::string ToString() const = 0;
-
-        virtual std::string GetStoredTypeName() const = 0;
-
-        virtual bool IsPrimitiveType() const = 0;
-
-        virtual bool IsSerializable() const = 0;
-
-        virtual bool IsPointer() const = 0;
-
-    private:
-        friend class Variant;
-
-        template <typename ValueType>
-        ValueType GetValue() const
-        {
-            auto thisPtr = dynamic_cast<const VariantDerived<ValueType>*>(this);
-            if (thisPtr == nullptr)
-            {
-                throw InputException(InputExceptionErrors::typeMismatch, "Variant::GetValue called with wrong type.");
-            }
-
-            return thisPtr->GetValue();
-        }
-
-        std::type_index _type; // redundant with type in Variant class.
-    };
-
-    //
-    // VariantDerived declaration
+    // VariantBase implementation
     //
     template <typename ValueType>
-    class VariantDerived : public VariantBase
+    ValueType VariantBase::GetValue() const
     {
-    public:
-        VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) {}
-
-    protected:
-        const ValueType& GetValue() const { return _value; }
-
-        virtual std::unique_ptr<VariantBase> Clone() const override
+        auto thisPtr = dynamic_cast<const VariantDerived<ValueType>*>(this);
+        if (thisPtr == nullptr)
         {
-            auto ptr = static_cast<VariantBase*>(new VariantDerived<ValueType>(_value));
-            return std::unique_ptr<VariantBase>(ptr);
+            throw InputException(InputExceptionErrors::typeMismatch, "Variant::GetValue called with wrong type.");
         }
 
-        virtual std::string ToString() const override;
+        return thisPtr->GetValue();
+    }
 
-        virtual std::string GetStoredTypeName() const override;
+    //
+    // VariantDerived implementation
+    //
 
-        virtual bool IsPrimitiveType() const override { return std::is_fundamental<ValueType>::value; }
+    template <typename ValueType>
+    VariantDerived<ValueType>::VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) 
+    {}
 
-        virtual bool IsSerializable() const override { return !IsPrimitiveType(); }
+    template <typename ValueType>
+    std::unique_ptr<VariantBase> VariantDerived<ValueType>::Clone() const
+    {
+        auto ptr = static_cast<VariantBase*>(new VariantDerived<ValueType>(_value));
+        return std::unique_ptr<VariantBase>(ptr);
+    }
 
-        virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
-
-    private:
-        friend class Variant;
-        friend class VariantBase;
-
-        ValueType _value;
-    };
-    
     //
     // Variant implementation
     //
