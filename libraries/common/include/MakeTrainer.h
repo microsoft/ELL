@@ -17,7 +17,6 @@
 #include "LinearPredictor.h"
 
 // trainers
-#include "IBlackBoxTrainer.h"
 #include "IIncrementalTrainer.h"
 
 // stl

@@ -18,7 +18,6 @@ set (SRC src/ForestTrainer.cpp
 set (INCLUDE include/EvaluatingIncrementalTrainer.h
              include/ForestTrainer.h
              include/IIncrementalTrainer.h
-             include/IBlackBoxTrainer.h
              include/LogitBooster.h
              include/MultiEpochIncrementalTrainer.h
              include/HistogramForestTrainer.h
