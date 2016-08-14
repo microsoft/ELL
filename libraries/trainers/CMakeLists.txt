@@ -13,17 +13,19 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/ForestTrainer.cpp
-         src/LogitBooster.cpp)
+         src/LogitBooster.cpp
+         src/ThresholdFinder.cpp)
 
 set (INCLUDE include/EvaluatingIncrementalTrainer.h
              include/ForestTrainer.h
+             include/HistogramForestTrainer.h
              include/IIncrementalTrainer.h
              include/LogitBooster.h
              include/MultiEpochIncrementalTrainer.h
-             include/HistogramForestTrainer.h
              include/SortingForestTrainer.h
              include/SweepingIncrementalTrainer.h
-             include/SGDIncrementalTrainer.h)
+             include/SGDIncrementalTrainer.h
+             include/ThresholdFinder.h)
 
 set (TCC tcc/EvaluatingIncrementalTrainer.tcc
          tcc/ForestTrainer.tcc

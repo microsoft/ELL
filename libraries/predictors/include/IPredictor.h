@@ -17,7 +17,6 @@ namespace predictors
     class IPredictor
     {
     public:
-
         /// <summary> The prediction type. </summary>
         using PredictionType = T;
     };
