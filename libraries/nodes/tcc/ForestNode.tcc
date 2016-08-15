@@ -40,8 +40,7 @@ namespace nodes
         const auto& interiorNodes = _forest.GetInteriorNodes();
 
         // create a place to store references to the output ports of the sub-models at each interior node
-        // TODO: waiting for PortElements changes: this should be a vector of PortElements and not PortRange -it is currently a vector of Ranges because I need to AddRange them
-        std::vector<model::PortRange> interiorNodeSubModels(interiorNodes.size());
+        std::vector<model::PortElements<double>> interiorNodeSubModels(interiorNodes.size());
 
         // visit interior nodes bottom-up (in reverse topological order)
         for(size_t i = interiorNodes.size(); i > 0; --i)
@@ -49,7 +48,6 @@ namespace nodes
             const auto& edges = interiorNodes[i - 1].GetOutgoingEdges();
 
             // get the sub-model that represents each outgoing edge
-            // TODO: waiting for PortElements changes: why is this an PortElements, while interiorNodeSubModels is a vector?
             model::PortElements<double> edgeOutputs;
             for(size_t j = 0; j < edges.size(); ++j)
             {
@@ -58,17 +56,14 @@ namespace nodes
 
                 if(edges[j].IsTargetInterior()) // target node is itself an interior node: reverse topological order guarantees that it's already visited
                 {
-                    // TODO: waiting for PortElements changes: the following 3 lines should be one clean line - there are currently 3 because interiorNodeSubModels had to be an array of Ranges
-                    model::PortElements<double> elements;
-                    auto targetNodeSubModelOutputs = interiorNodeSubModels[edges[j].GetTargetNodeIndex()];
-                    elements.AddRange(targetNodeSubModelOutputs);
+                    model::PortElements<double> elements = interiorNodeSubModels[edges[j].GetTargetNodeIndex()];
 
                     auto sumNode = transformer.AddNode<BinaryOperationNode<double>>(edgePredictorNode->output, elements, BinaryOperationNode<double>::OperationType::add);
-                    edgeOutputs.AddRange(sumNode->output);
+                    edgeOutputs.Append(sumNode->output);
                 }
                 else // target node is a leaf
                 {
-                    edgeOutputs.AddRange(edgePredictorNode->output);
+                    edgeOutputs.Append(edgePredictorNode->output);
                 }
             }
 
@@ -76,20 +71,19 @@ namespace nodes
             auto splitRuleNode = AddNodeToModelTransformer(newPortElements, interiorNodes[i - 1].GetSplitRule(), transformer);
 
             auto selectorNode = transformer.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleNode->output);
-            interiorNodeSubModels[i-1] = selectorNode->output;
+            interiorNodeSubModels[i-1] = {selectorNode->output};
         }
 
         // collect the sub-models that represent the trees of the forest
-        // TODO: waiting for PortElements changes: why is this an PortElements, while interiorNodeSubModels is a vector?
         model::PortElements<double> treeSubModels;
         for(size_t rootIndex : _forest.GetRootIndices())
         {
-            treeSubModels.AddRange(interiorNodeSubModels[rootIndex]);
+            treeSubModels.Append(interiorNodeSubModels[rootIndex]);
         }
 
         // add the bias term
         auto biasNode = transformer.AddNode<ConstantNode<double>>(_forest.GetBias());
-        treeSubModels.AddRange(biasNode->output);
+        treeSubModels.Append(biasNode->output);
 
         // sum all of the trees
         auto sumNode = transformer.AddNode<SumNode<double>>(treeSubModels);
