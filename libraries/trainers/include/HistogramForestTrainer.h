@@ -10,6 +10,7 @@
 
 #include "ForestTrainer.h"
 #include "LogitBooster.h"
+#include "ThresholdFinder.h"
 
 // predictors
 #include "SingleElementThresholdPredictor.h"
@@ -46,6 +47,7 @@ namespace trainers
 
         // member variables
         LossFunctionType _lossFunction;
+        ThresholdFinder _thresholdFinder;
     };
 
     /// <summary> Makes a simple forest trainer. </summary>
