@@ -22,6 +22,7 @@ namespace trainers
         {
             const auto& example = exampleIterator.Get();
             auto denseDataVector = example.GetDataVector().ToArray();
+            double weight = example.GetMetaData().weight;
 
             if (result.size() < denseDataVector.size())
             {
@@ -30,7 +31,7 @@ namespace trainers
 
             for (size_t j = 0; j < denseDataVector.size(); ++j)
             {
-                result[j].push_back({ denseDataVector[j], 1 });
+                result[j].push_back({ denseDataVector[j], weight });
             }
 
             exampleIterator.Next();
@@ -59,7 +60,7 @@ namespace trainers
         {
             if (iter->value == current->value)
             {
-                current->count += iter->count;
+                current->weight += iter->weight;
             }
             else
             {

@@ -22,7 +22,7 @@ namespace trainers
         struct ValueCount
         {
             double value;
-            size_t count;
+            double weight;
 
             operator double() { return value; }
         };
