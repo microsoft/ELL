@@ -14,6 +14,7 @@ namespace emll
 {
 	namespace compiler
 	{
+		/// <summary>Helper class for emitting properly INDENTED TEXT C++ code</summary>
 		class CppEmitter
 		{
 		public:

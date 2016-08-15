@@ -10,6 +10,7 @@ namespace emll
 {
 	namespace compiler
 	{
+		///<summary> A block of Cpp code </summary>
 		class CppBlock : public CppEmitter
 		{
 		public:
@@ -22,6 +23,7 @@ namespace emll
 			int _id;
 		};
 
+		///<summary>Cpp code block allocation</summary>
 		class CppBlockAllocator
 		{
 		public:
@@ -39,6 +41,7 @@ namespace emll
 			int _nextId = 0;
 		};
 
+		///<sumary>List of Cpp code blocks. Used by functions </summary>
 		class CppBlockList
 		{
 		public:

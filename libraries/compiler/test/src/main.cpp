@@ -1,10 +1,14 @@
 #include "CompilerTest.h"
 #include "CppCompilerTest.h"
+#include <direct.h>
 
 using namespace emll::compiler;
 
 void TestIRCompiler()
 {
+	_mkdir("C:/junk");
+	_mkdir("C:/junk/model");
+
 	TestBinaryVector(false);
 	TestBinaryVector(true);
 	TestBinaryScalar();
@@ -43,6 +47,7 @@ void TestCppCompiler()
 
 int main(int argc, char* argv[])
 {
+	TestLLVMBlocks();
 	TestCppCompiler();
 	TestIRCompiler();
 

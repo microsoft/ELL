@@ -6,6 +6,7 @@
 
 void TestLLVM();
 void TestLLVMShiftRegister();
+void TestLLVMBlocks();
 
 class ModelBuilder
 {
