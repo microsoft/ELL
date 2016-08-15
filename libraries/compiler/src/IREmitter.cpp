@@ -22,36 +22,36 @@ namespace emll
 		{
 			switch (type)
 			{
-			case ValueType::Void:
-				return GetValueType(type);
-			case ValueType::PVoid:
-				return GetValueType(ValueType::Void)->getPointerTo();
-			case ValueType::Byte:
-				return GetValueType(type);
-			case ValueType::PByte:
-				return GetValueType(ValueType::Byte)->getPointerTo();
-			case ValueType::Short:
-				return GetValueType(type);
-			case ValueType::PShort:
-				return GetValueType(ValueType::Short)->getPointerTo();
-			case ValueType::Int32:
-				return GetValueType(type);
-			case ValueType::PInt32:
-				return GetValueType(ValueType::Int32)->getPointerTo();
-			case ValueType::Int64:
-				return GetValueType(type);
-			case ValueType::PInt64:
-				return GetValueType(ValueType::Int64)->getPointerTo();
-			case ValueType::Double:
-				return GetValueType(type);
-			case ValueType::PDouble:
-				return GetValueType(ValueType::Double)->getPointerTo();
-			case ValueType::Char8:
-				return GetValueType(type);
-			case ValueType::PChar8:
-				return GetValueType(ValueType::Char8)->getPointerTo();
-			default:
-				throw new CompilerException(CompilerError::valueTypeNotSupported);
+				case ValueType::Void:
+					return GetValueType(type);
+				case ValueType::PVoid:
+					return GetValueType(ValueType::Void)->getPointerTo();
+				case ValueType::Byte:
+					return GetValueType(type);
+				case ValueType::PByte:
+					return GetValueType(ValueType::Byte)->getPointerTo();
+				case ValueType::Short:
+					return GetValueType(type);
+				case ValueType::PShort:
+					return GetValueType(ValueType::Short)->getPointerTo();
+				case ValueType::Int32:
+					return GetValueType(type);
+				case ValueType::PInt32:
+					return GetValueType(ValueType::Int32)->getPointerTo();
+				case ValueType::Int64:
+					return GetValueType(type);
+				case ValueType::PInt64:
+					return GetValueType(ValueType::Int64)->getPointerTo();
+				case ValueType::Double:
+					return GetValueType(type);
+				case ValueType::PDouble:
+					return GetValueType(ValueType::Double)->getPointerTo();
+				case ValueType::Char8:
+					return GetValueType(type);
+				case ValueType::PChar8:
+					return GetValueType(ValueType::Char8)->getPointerTo();
+				default:
+					throw new CompilerException(CompilerError::valueTypeNotSupported);
 			}
 		}
 

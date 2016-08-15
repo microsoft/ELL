@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "CodeGen.h"
+#include "Tests.h"
 
 using namespace emll;
 
@@ -223,6 +224,10 @@ void generateHelloWorld()
 
 int main()
 {
+	double treeInput[3] = { 0.2, 0.5, 0.0 };
+	double dtree = TestForest(treeInput);
+
+
 	generateHelloWorld();
     return 0;
 }

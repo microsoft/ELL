@@ -339,8 +339,8 @@ namespace emll
 			VerifyIsScalar(*pOutput);
 
 			Variable* pResult = EnsureEmitted(pOutput);
-			auto lVal = pElements->GetOutputPortElement(0);
-			auto rVal = pElements->GetOutputPortElement(1);
+			auto lVal = pElements->GetOutputPortElement(1);  // lval is selected if the result of the "if" comparison is NON-zero
+			auto rVal = pElements->GetOutputPortElement(0);
 			auto lMergeableSrc = GetMergeableNode(lVal);
 			auto rMergeableSrc = GetMergeableNode(rVal);
 			if (lMergeableSrc == nullptr && rMergeableSrc == nullptr)

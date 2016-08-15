@@ -639,5 +639,6 @@ void TestForest()
 	fnMain.Verify();
 	compiler.DebugDump();
 	module.WriteBitcodeToFile("C:\\junk\\model\\forest.bc");
+	module.WriteAsmToFile("C:\\junk\\model\\forest.asm");
 }
 
