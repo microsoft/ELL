@@ -20,14 +20,14 @@
 namespace nodes
 {
     template<typename SplitRuleType, typename EdgePredictorType>
-    ForestNode<SplitRuleType, EdgePredictorType>::ForestNode(const model::OutputPortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest) : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, forest.NumTrees()), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()), _forest(forest)
+    ForestNode<SplitRuleType, EdgePredictorType>::ForestNode(const model::PortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest) : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, forest.NumTrees()), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()), _forest(forest)
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestNode<SplitRuleType, EdgePredictorType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<ForestNode<SplitRuleType, EdgePredictorType>>(newOutputPortElements, _forest);
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        auto newNode = transformer.AddNode<ForestNode<SplitRuleType, EdgePredictorType>>(newPortElements, _forest);
         transformer.MapOutputPort(output, newNode->output);
         transformer.MapOutputPort(treeOutputs, newNode->treeOutputs);
         transformer.MapOutputPort(edgeIndicatorVector, newNode->edgeIndicatorVector);
@@ -36,12 +36,12 @@ namespace nodes
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestNode<SplitRuleType, EdgePredictorType>::Refine(model::ModelTransformer & transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());      
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());      
         const auto& interiorNodes = _forest.GetInteriorNodes();
 
         // create a place to store references to the output ports of the sub-models at each interior node
-        // TODO: waiting for OutputPortElements changes: this should be a vector of OutputPortElements and not OutputPortRange -it is currently a vector of Ranges because I need to AddRange them
-        std::vector<model::OutputPortRange> interiorNodeSubModels(interiorNodes.size());
+        // TODO: waiting for PortElements changes: this should be a vector of PortElements and not PortRange -it is currently a vector of Ranges because I need to AddRange them
+        std::vector<model::PortRange> interiorNodeSubModels(interiorNodes.size());
 
         // visit interior nodes bottom-up (in reverse topological order)
         for(size_t i = interiorNodes.size(); i > 0; --i)
@@ -49,17 +49,17 @@ namespace nodes
             const auto& edges = interiorNodes[i - 1].GetOutgoingEdges();
 
             // get the sub-model that represents each outgoing edge
-            // TODO: waiting for OutputPortElements changes: why is this an OutputPortElements, while interiorNodeSubModels is a vector?
-            model::OutputPortElements<double> edgeOutputs;
+            // TODO: waiting for PortElements changes: why is this an PortElements, while interiorNodeSubModels is a vector?
+            model::PortElements<double> edgeOutputs;
             for(size_t j = 0; j < edges.size(); ++j)
             {
                 const auto& edgePredictor = edges[j].GetPredictor();
-                auto edgePredictorNode = AddNodeToModelTransformer(newOutputPortElements, edgePredictor, transformer);
+                auto edgePredictorNode = AddNodeToModelTransformer(newPortElements, edgePredictor, transformer);
 
                 if(edges[j].IsTargetInterior()) // target node is itself an interior node: reverse topological order guarantees that it's already visited
                 {
-                    // TODO: waiting for OutputPortElements changes: the following 3 lines should be one clean line - there are currently 3 because interiorNodeSubModels had to be an array of Ranges
-                    model::OutputPortElements<double> elements;
+                    // TODO: waiting for PortElements changes: the following 3 lines should be one clean line - there are currently 3 because interiorNodeSubModels had to be an array of Ranges
+                    model::PortElements<double> elements;
                     auto targetNodeSubModelOutputs = interiorNodeSubModels[edges[j].GetTargetNodeIndex()];
                     elements.AddRange(targetNodeSubModelOutputs);
 
@@ -73,15 +73,15 @@ namespace nodes
             }
 
             // add the sub-model that computes the split rule
-            auto splitRuleNode = AddNodeToModelTransformer(newOutputPortElements, interiorNodes[i - 1].GetSplitRule(), transformer);
+            auto splitRuleNode = AddNodeToModelTransformer(newPortElements, interiorNodes[i - 1].GetSplitRule(), transformer);
 
             auto selectorNode = transformer.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleNode->output);
             interiorNodeSubModels[i-1] = selectorNode->output;
         }
 
         // collect the sub-models that represent the trees of the forest
-        // TODO: waiting for OutputPortElements changes: why is this an OutputPortElements, while interiorNodeSubModels is a vector?
-        model::OutputPortElements<double> treeSubModels;
+        // TODO: waiting for PortElements changes: why is this an PortElements, while interiorNodeSubModels is a vector?
+        model::PortElements<double> treeSubModels;
         for(size_t rootIndex : _forest.GetRootIndices())
         {
             treeSubModels.AddRange(interiorNodeSubModels[rootIndex]);
@@ -95,7 +95,7 @@ namespace nodes
         auto sumNode = transformer.AddNode<SumNode<double>>(treeSubModels);
         
         transformer.MapOutputPort(output, sumNode->output);
-        // TODO: waiting for OutputPortElements changes:
+        // TODO: waiting for PortElements changes:
         //       transformer.MapOutputPort(treeOutputs, ...);
         //       transformer.MapOutputPort(edgeIndicatorVector, ...);
     }

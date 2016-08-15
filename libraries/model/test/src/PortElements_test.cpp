@@ -1,13 +1,13 @@
 //
-// OutputPortElements tests
+// PortElements tests
 //
 
-#include "OutputPortElements_test.h"
+#include "PortElements_test.h"
 
 // model
 #include "ModelGraph.h"
 #include "InputNode.h"
-#include "OutputPortElements.h"
+#include "PortElements.h"
 
 // testing
 #include "testing.h"
@@ -15,13 +15,13 @@
 // stl
 #include <iostream>
 
-void PrintRange(const model::OutputPortRange& range)
+void PrintRange(const model::PortRange& range)
 {
     std::cout << "[" << range.ReferencedPort()->GetNode()->GetId() << ", " << range.GetStartIndex() << "--" << (range.GetStartIndex() + range.Size() - 1) << "]";
 }
 
 template <typename T>
-void PrintElements(const model::OutputPortElements<T>& elements)
+void PrintElements(const model::PortElements<T>& elements)
 {
     for (const auto& range : elements)
     {
@@ -38,11 +38,11 @@ void TestSlice()
     auto in2 = g.AddNode<model::InputNode<double>>(2);
     auto in3 = g.AddNode<model::InputNode<double>>(4);
 
-    auto allElements = model::OutputPortElements<double>(std::vector<model::OutputPortElements<double>>{ model::OutputPortElements<double>{ in1->output }, model::OutputPortElements<double>{ in2->output }, model::OutputPortElements<double>{ in3->output } });
-    auto element0 = model::OutputPortElements<double>(allElements, 0);
-    auto element4 = model::OutputPortElements<double>(allElements, 4);
-    auto element2_6 = model::OutputPortElements<double>(allElements, 2, 5);
-    model::OutputPortElements<double> element2_6_prime = { allElements, 2, 5 };
+    auto allElements = model::PortElements<double>(std::vector<model::PortElements<double>>{ model::PortElements<double>{ in1->output }, model::PortElements<double>{ in2->output }, model::PortElements<double>{ in3->output } });
+    auto element0 = model::PortElements<double>(allElements, 0);
+    auto element4 = model::PortElements<double>(allElements, 4);
+    auto element2_6 = model::PortElements<double>(allElements, 2, 5);
+    model::PortElements<double> element2_6_prime = { allElements, 2, 5 };
 
     testing::ProcessTest("Testing slice and append", testing::IsEqual(allElements.Size(), 9));
     testing::ProcessTest("Testing slice and append", testing::IsEqual(element0.Size(), 1));
@@ -56,10 +56,10 @@ void TestAppend()
     auto in2 = g.AddNode<model::InputNode<double>>(2);
     auto in3 = g.AddNode<model::InputNode<double>>(4);
 
-    model::OutputPortElements<double> elements1 = { in1->output };
+    model::PortElements<double> elements1 = { in1->output };
     elements1.Append({ in2->output });
 
-    model::OutputPortElements<double> elements2;
+    model::PortElements<double> elements2;
     elements2.Append({ in3->output, 1, 2 });
     elements2.Append({ elements1 });
 

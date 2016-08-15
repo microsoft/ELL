@@ -46,7 +46,7 @@ namespace nodes
         ///
         /// <param name="input"> The predictor's input. </param>
         /// <param name="forest"> The forest predictor. </param>
-        ForestNode(const model::OutputPortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest);
+        ForestNode(const model::PortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest);
         
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -13,7 +13,7 @@
 // model
 #include "Node.h"
 #include "ModelTransformer.h"
-#include "OutputPortElements.h"
+#include "PortElements.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 #include "BinaryOperationNode.h"
@@ -45,7 +45,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         /// <param name="input1"> One of the signals to take the dot product of </param>
         /// <param name="input2"> The other signal to take the dot product of </param>
-        DotProductNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2);
+        DotProductNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

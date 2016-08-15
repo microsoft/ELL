@@ -11,7 +11,7 @@
 // model
 #include "Node.h"
 #include "ModelTransformer.h"
-#include "OutputPortElements.h"
+#include "PortElements.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
@@ -42,7 +42,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to delay </param>
         /// <param name="windowSize"> The number of samples to delay the signal </param>
-        DelayNode(const model::OutputPortElements<ValueType>& input, size_t windowSize);
+        DelayNode(const model::PortElements<ValueType>& input, size_t windowSize);
         
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

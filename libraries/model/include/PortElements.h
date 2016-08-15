@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     OutputPortElements.h (model)
+//  File:     PortElements.h (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,28 +26,28 @@ namespace model
     class Node;
 
     /// <summary> Represents a contiguous set of values from an output port </summary>
-    class OutputPortRange : public utilities::ISerializable
+    class PortRange : public utilities::ISerializable
     {
     public:
-        OutputPortRange() = default;
+        PortRange() = default;
 
-        /// <summary> Creates an OutputPortRange representing all the values from a given port </summary>
+        /// <summary> Creates a PortRange representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
-        OutputPortRange(const OutputPortBase& port);
+        PortRange(const OutputPortBase& port);
 
-        /// <summary> Creates an OutputPortRange representing a single value from a given port </summary>
+        /// <summary> Creates a PortRange representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        OutputPortRange(const OutputPortBase& port, size_t index);
+        PortRange(const OutputPortBase& port, size_t index);
 
-        /// <summary> Creates an OutputPortRange representing a range of values from a given port </summary>
+        /// <summary> Creates a PortRange representing a range of values from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="startIndex"> The index of the first value to take </param>
         /// <param name="numValues"> The number of values to take </param>
-        OutputPortRange(const OutputPortBase& port, size_t startIndex, size_t numValues);
+        PortRange(const OutputPortBase& port, size_t startIndex, size_t numValues);
 
         /// <summary> Returns the type of the values referenced </summary>
         ///
@@ -77,7 +77,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "OutputPortRange"; }
+        static std::string GetTypeName() { return "PortRange"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -103,36 +103,36 @@ namespace model
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>
-    class OutputPortElementsUntyped : public utilities::ISerializable
+    class PortElementsUntyped : public utilities::ISerializable
     {
     public:
-        /// <summary> Creates an OutputPortElementsUntyped representing all the values from a given port </summary>
+        /// <summary> Creates an PortElementsUntyped representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
-        OutputPortElementsUntyped(const OutputPortBase& port);
+        PortElementsUntyped(const OutputPortBase& port);
 
-        /// <summary> Creates an OutputPortElementsUntyped representing a single value from a given port </summary>
+        /// <summary> Creates an PortElementsUntyped representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        OutputPortElementsUntyped(const OutputPortBase& port, size_t startIndex);
+        PortElementsUntyped(const OutputPortBase& port, size_t startIndex);
 
-        /// <summary> Creates an OutputPortElementsUntyped representing a range of values from a given port </summary>
+        /// <summary> Creates an PortElementsUntyped representing a range of values from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="startIndex"> The index of the first value to take </param>
         /// <param name="numValues"> The number of values to take </param>
-        OutputPortElementsUntyped(const OutputPortBase& port, size_t startIndex, size_t numValues);
+        PortElementsUntyped(const OutputPortBase& port, size_t startIndex, size_t numValues);
 
-        /// <summary> Creates an OutputPortElementsUntyped from an OutputPortRange </summary>
+        /// <summary> Creates an PortElementsUntyped from a PortRange </summary>
         ///
         /// <param name="range"> The range to get values from </param>
-        OutputPortElementsUntyped(const OutputPortRange& range);
+        PortElementsUntyped(const PortRange& range);
 
-        /// <summary> Creates an OutputPortElementsUntyped from a set of OutputPortRange </summary>
+        /// <summary> Creates an PortElementsUntyped from a set of PortRange </summary>
         ///
         /// <param name="range"> The ranges to get values from </param>
-        OutputPortElementsUntyped(const std::vector<OutputPortRange>& ranges);
+        PortElementsUntyped(const std::vector<PortRange>& ranges);
 
         /// <summary> The dimensionality of the output </summary>
         ///
@@ -145,27 +145,27 @@ namespace model
         size_t NumRanges() const { return _ranges.size(); }
 
         /// <summary> An STL-type iterator pointing to the beginning of the list of ranges </summary>
-        std::vector<OutputPortRange>::const_iterator begin() const { return _ranges.cbegin(); }
+        std::vector<PortRange>::const_iterator begin() const { return _ranges.cbegin(); }
 
         /// <summary> An STL-type iterator pointing to the end of the list of ranges </summary>
-        std::vector<OutputPortRange>::const_iterator end() const { return _ranges.cend(); }
+        std::vector<PortRange>::const_iterator end() const { return _ranges.cend(); }
 
         /// <summary> Adds a range of values to this list </summary>
         ///
         /// <param name="range"> The range of values to add to this list </param>
-        void AddRange(const OutputPortRange& range);
+        void AddRange(const PortRange& range);
 
         /// <summary> Gets an element in the elements. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
         ///
         /// <returns> The specified element. </returns>
-        OutputPortRange GetElement(size_t index) const;
+        PortRange GetElement(size_t index) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "OutputPortElementsUntyped"; }
+        static std::string GetTypeName() { return "PortElementsUntyped"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -184,102 +184,102 @@ namespace model
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     protected:
-        OutputPortElementsUntyped(){};
+        PortElementsUntyped(){};
         void ComputeSize();
 
     private:
-        std::vector<OutputPortRange> _ranges;
+        std::vector<PortRange> _ranges;
         size_t _size = 0;
     };
 
     /// <summary> Represents a statically-typed set of values from one or more output ports </summary>
     template <typename ValueType>
-    class OutputPortElements : public OutputPortElementsUntyped
+    class PortElements : public PortElementsUntyped
     {
     public:
-        OutputPortElements() = default;
+        PortElements() = default;
 
-        /// <summary> Creates a OutputPortElements representing all the values from a given port </summary>
+        /// <summary> Creates a PortElements representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
-        OutputPortElements(const OutputPort<ValueType>& port);
+        PortElements(const OutputPort<ValueType>& port);
 
-        /// <summary> Creates a OutputPortElements representing a single value from a given port </summary>
+        /// <summary> Creates a PortElements representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        OutputPortElements(const OutputPort<ValueType>& port, size_t startIndex);
+        PortElements(const OutputPort<ValueType>& port, size_t startIndex);
 
-        /// <summary> Creates a OutputPortElements representing a range of values from a given port </summary>
+        /// <summary> Creates a PortElements representing a range of values from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="startIndex"> The index of the first value to take </param>
         /// <param name="numValues"> The number of values to take </param>
-        OutputPortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
+        PortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
 
-        /// <summary> Creates a OutputPortElements by concatenating a set of them together </summary>
+        /// <summary> Creates a PortElements by concatenating a set of them together </summary>
         ///
         /// <param name="groups"> The list of groups to concantenate together </param>
-        OutputPortElements(const std::initializer_list<OutputPortElements<ValueType>>& groups);
+        PortElements(const std::initializer_list<PortElements<ValueType>>& groups);
 
-        /// <summary> Creates a OutputPortElements by concatenating a set of them together </summary>
+        /// <summary> Creates a PortElements by concatenating a set of them together </summary>
         ///
         /// <param name="groups"> The vector of groups to concantenate together </param>
-        OutputPortElements(const std::vector<OutputPortElements<ValueType>>& groups);
+        PortElements(const std::vector<PortElements<ValueType>>& groups);
     
-        /// <summary> Creates a OutputPortElements representing a single value from a given OutputPortElements </summary>
+        /// <summary> Creates a PortElements representing a single value from a given PortElements </summary>
         ///
-        /// <param name="elements"> The OutputPortElements to take a value from </param>
+        /// <param name="elements"> The PortElements to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        OutputPortElements(const OutputPortElements<ValueType>& elements, size_t index);
+        PortElements(const PortElements<ValueType>& elements, size_t index);
 
-        /// <summary> Creates a OutputPortElements representing a single value from a given OutputPortElements </summary>
+        /// <summary> Creates a PortElements representing a single value from a given PortElements </summary>
         ///
-        /// <param name="elements"> The OutputPortElements to take a value from </param>
+        /// <param name="elements"> The PortElements to take a value from </param>
         /// <param name="startIndex"> The index of the first value to use </param>
         /// <param name="numValues"> The number of values to take </param>
-        OutputPortElements(const OutputPortElements<ValueType>& elements, size_t startIndex, size_t numValues);
+        PortElements(const PortElements<ValueType>& elements, size_t startIndex, size_t numValues);
 
         /// <summary> Appends a set of elements to this set of elements. </summary>
         ///
-        /// <param name="other"> The OutputPortElements to append to this one. </param>
-        void Append(const OutputPortElements<ValueType>& other);
+        /// <param name="other"> The PortElements to append to this one. </param>
+        void Append(const PortElements<ValueType>& other);
     };
 
     //
     // Helper functions
     //
 
-    /// <summary> Creates a OutputPortElements representing all the values from a given port </summary>
+    /// <summary> Creates a PortElements representing all the values from a given port </summary>
     ///
     /// <param name="port"> The port to take values from </param>
-    /// <returns> The composite OutputPortElements </returns>
+    /// <returns> The composite PortElements </returns>
     template <typename ValueType>
-    OutputPortElements<ValueType> MakeOutputPortElements(const OutputPort<ValueType>& port);
+    PortElements<ValueType> MakePortElements(const OutputPort<ValueType>& port);
 
-    /// <summary> Creates a OutputPortElements representing a single value from a given port </summary>
+    /// <summary> Creates a PortElements representing a single value from a given port </summary>
     ///
     /// <param name="port"> The port to take a value from </param>
     /// <param name="index"> The index of the value </param>
-    /// <returns> The composite OutputPortElements </returns>
+    /// <returns> The composite PortElements </returns>
     template <typename ValueType>
-    OutputPortElements<ValueType> MakeOutputPortElements(const OutputPort<ValueType>& port, size_t startIndex);
+    PortElements<ValueType> MakePortElements(const OutputPort<ValueType>& port, size_t startIndex);
 
-    /// <summary> Creates a OutputPortElements representing a range of values from a given port </summary>
+    /// <summary> Creates a PortElements representing a range of values from a given port </summary>
     ///
     /// <param name="port"> The port to take a value from </param>
     /// <param name="startIndex"> The index of the first value to take </param>
     /// <param name="numValues"> The number of values to take </param>
-    /// <returns> The composite OutputPortElements </returns>
+    /// <returns> The composite PortElements </returns>
     template <typename ValueType>
-    OutputPortElements<ValueType> MakeOutputPortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
+    PortElements<ValueType> MakePortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
 
-    /// <summary> Creates a OutputPortElements by concatenating together one or more OutputPortElementss
+    /// <summary> Creates a PortElements by concatenating together one or more PortElementss
     ///
-    /// <param name="ref"> The OutputPortElementss to concatenate together </param>
-    /// <returns> The composite OutputPortElements </returns>
+    /// <param name="ref"> The PortElementss to concatenate together </param>
+    /// <returns> The composite PortElements </returns>
     template <typename RefType, typename... Refs>
     RefType Concat(const RefType& ref1, Refs&&... refs);
 }
 
-#include "../tcc/OutputPortElements.tcc"
+#include "../tcc/PortElements.tcc"

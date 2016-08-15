@@ -10,7 +10,7 @@
 
 #include "Node.h"
 #include "ModelTransformer.h"
-#include "OutputPortElements.h"
+#include "PortElements.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
@@ -39,7 +39,7 @@ namespace nodes
 
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the sum of </param>
-        SumNode(const model::OutputPortElements<ValueType>& input);
+        SumNode(const model::PortElements<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

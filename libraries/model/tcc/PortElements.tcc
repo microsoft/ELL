@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     OutputPortElements.tcc (model)
+//  File:     PortElements.tcc (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,39 +10,26 @@
 namespace model
 {
     //
-    // OutputPortElements
+    // PortElements
     //
 
     template <typename ValueType>
-    OutputPortElements<ValueType>::OutputPortElements(const OutputPort<ValueType>& port) : OutputPortElementsUntyped(port)
+    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port) : PortElementsUntyped(port)
     {
     }
 
     template <typename ValueType>
-    OutputPortElements<ValueType>::OutputPortElements(const OutputPort<ValueType>& port, size_t startIndex) : OutputPortElementsUntyped(OutputPortRange(port, startIndex))
+    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex) : PortElementsUntyped(PortRange(port, startIndex))
     {
     }
 
     template <typename ValueType>
-    OutputPortElements<ValueType>::OutputPortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : OutputPortElementsUntyped(OutputPortRange(port, startIndex, numValues))
+    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : PortElementsUntyped(PortRange(port, startIndex, numValues))
     {
     }
 
     template <typename ValueType>
-    OutputPortElements<ValueType>::OutputPortElements(const std::initializer_list<OutputPortElements<ValueType>>& groups)
-    {
-        for (const auto& group : groups)
-        {
-            for (const auto& range : group)
-            {
-                AddRange(range);
-            }
-        }
-        ComputeSize();
-    }
-
-    template <typename ValueType>
-    OutputPortElements<ValueType>::OutputPortElements(const std::vector<OutputPortElements<ValueType>>& groups)
+    PortElements<ValueType>::PortElements(const std::initializer_list<PortElements<ValueType>>& groups)
     {
         for (const auto& group : groups)
         {
@@ -55,10 +42,23 @@ namespace model
     }
 
     template <typename ValueType>
-    OutputPortElements<ValueType>::OutputPortElements(const OutputPortElements<ValueType>& elements, size_t index) : OutputPortElements(elements, index, 1) {}
+    PortElements<ValueType>::PortElements(const std::vector<PortElements<ValueType>>& groups)
+    {
+        for (const auto& group : groups)
+        {
+            for (const auto& range : group)
+            {
+                AddRange(range);
+            }
+        }
+        ComputeSize();
+    }
 
     template <typename ValueType>
-    OutputPortElements<ValueType>::OutputPortElements(const OutputPortElements<ValueType>& elements, size_t startIndex, size_t numValues)
+    PortElements<ValueType>::PortElements(const PortElements<ValueType>& elements, size_t index) : PortElements(elements, index, 1) {}
+
+    template <typename ValueType>
+    PortElements<ValueType>::PortElements(const PortElements<ValueType>& elements, size_t startIndex, size_t numValues)
     {
         if(startIndex + numValues > elements.Size())
         {
@@ -86,7 +86,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputPortElements<ValueType>::Append(const OutputPortElements<ValueType>& other)
+    void PortElements<ValueType>::Append(const PortElements<ValueType>& other)
     {
         for(const auto& range: other)
         {
@@ -99,23 +99,23 @@ namespace model
     // Convenience functions
     //
 
-    // MakeOutputPortElements
+    // MakePortElements
     template <typename ValueType>
-    OutputPortElements<ValueType> MakeOutputPortElements(const OutputPort<ValueType>& port)
+    PortElements<ValueType> MakePortElements(const OutputPort<ValueType>& port)
     {
-        return OutputPortElements<ValueType>(port);
+        return PortElements<ValueType>(port);
     }
 
     template <typename ValueType>
-    OutputPortElements<ValueType> MakeOutputPortElements(const OutputPort<ValueType>& port, size_t startIndex)
+    PortElements<ValueType> MakePortElements(const OutputPort<ValueType>& port, size_t startIndex)
     {
-        return OutputPortElements<ValueType>(port, startIndex);
+        return PortElements<ValueType>(port, startIndex);
     }
 
     template <typename ValueType>
-    OutputPortElements<ValueType> MakeOutputPortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues)
+    PortElements<ValueType> MakePortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues)
     {
-        return OutputPortElements<ValueType>(port, startIndex, numValues);
+        return PortElements<ValueType>(port, startIndex, numValues);
     }
 
     // Concat

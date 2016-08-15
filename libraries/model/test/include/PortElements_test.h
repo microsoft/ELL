@@ -1,6 +1,6 @@
 #pragma once
 //
-// OutputPortElements tests
+// PortElements tests
 // 
 
 void TestSlice();

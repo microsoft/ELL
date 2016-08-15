@@ -16,7 +16,7 @@
 // model
 #include "Node.h"
 #include "ModelTransformer.h"
-#include "OutputPortElements.h"
+#include "PortElements.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
@@ -47,7 +47,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to take the mean of </param>
         /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
-        MovingAverageNode(const model::OutputPortElements<ValueType>& input, size_t windowSize);
+        MovingAverageNode(const model::PortElements<ValueType>& input, size_t windowSize);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

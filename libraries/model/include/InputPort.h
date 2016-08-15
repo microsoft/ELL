@@ -10,7 +10,7 @@
 
 #include "Port.h"
 #include "OutputPort.h"
-#include "OutputPortElements.h"
+#include "PortElements.h"
 
 // utilities
 #include "Exception.h"
@@ -35,7 +35,7 @@ namespace model
         /// <param name="name"> The name of this port </param>
         /// <param name="dimension"> The dimension of the port </param>
         template <typename ValueType>
-        InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputs, std::string name, size_t dimension);
+        InputPortBase(const class Node* owningNode, const PortElements<ValueType>& inputs, std::string name, size_t dimension);
 
         /// <summary> Returns the list of nodes this input port gets values from </summary>
         ///
@@ -45,7 +45,7 @@ namespace model
         /// <summary> Returns the list of port ranges this input port gets values from </summary>
         ///
         /// <returns> The list nodes this input port gets values from </returns>
-        const OutputPortElementsUntyped& GetInputRanges() const { return _inputRanges; }
+        const PortElementsUntyped& GetInputRanges() const { return _inputRanges; }
 
         /// <summary> The dimensionality of the output </summary>
         ///
@@ -80,9 +80,9 @@ namespace model
         void ComputeParentsAndElements();
 
     private:
-        const OutputPortElementsUntyped& _inputRanges; // Just a reference to the typed elements in concrete subclass
+        const PortElementsUntyped& _inputRanges; // Just a reference to the typed elements in concrete subclass
 
-        std::vector<OutputPortRange> _individualElements; // individual elements
+        std::vector<PortRange> _individualElements; // individual elements
         std::vector<const Node*> _parentNodes;
     };
 
@@ -94,7 +94,7 @@ namespace model
         ///
         /// <param name="owningNode"> The node this port belongs to </param>
         /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
-        InputPort(const class Node* owningNode, const OutputPortElements<ValueType>& input, std::string name);
+        InputPort(const class Node* owningNode, const PortElements<ValueType>& input, std::string name);
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         ///
@@ -107,10 +107,10 @@ namespace model
         /// <returns> The output value at the corresponding index </returns>
         ValueType GetValue(size_t index) const;
 
-        /// <summary> Returns the OutputPortElements containing the referenced locations this port gets its values from </summary>
+        /// <summary> Returns the PortElements containing the referenced locations this port gets its values from </summary>
         ///
-        /// <returns> The OutputPortElements containing the referenced locations to get values from </returns>
-        OutputPortElements<ValueType> GetOutputPortElements() const;
+        /// <returns> The PortElements containing the referenced locations to get values from </returns>
+        PortElements<ValueType> GetPortElements() const;
 
         /// <summary> Returns an element from the (already-computed) output value corresponding to this input </summary>
         ///
@@ -140,7 +140,7 @@ namespace model
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     private:
-        OutputPortElements<ValueType> _input;
+        PortElements<ValueType> _input;
     };
 }
 

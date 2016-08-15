@@ -3,7 +3,7 @@
 // 
 
 #include "Graph_test.h"
-#include "OutputPortElements_test.h"
+#include "PortElements_test.h"
 
 // testing
 #include "testing.h"
@@ -25,7 +25,7 @@ int main()
     TestCopyGraph();
     TestRefineGraph();
 
-    // OutputPortElements tests
+    // PortElements tests
     TestSlice();
     TestAppend();
 

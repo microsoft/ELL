@@ -195,8 +195,8 @@ void TestInputRouting1()
 
     // auto minAndArgMin = model.AddNode<model::ArgMinNode<double>>(in->output);
     // auto maxAndArgMax = model.AddNode<model::ArgMaxNode<double>>(in->output);
-    // model::OutputPortRangeList ranges = { { minAndArgMin->val, 0}, {maxAndArgMax->val, 0} };
-    // model::OutputPortRangeList ranges2 = { { minAndArgMin->val, 0}, {in->output, 1, 2} };
+    // model::PortRangeList ranges = { { minAndArgMin->val, 0}, {maxAndArgMax->val, 0} };
+    // model::PortRangeList ranges2 = { { minAndArgMin->val, 0}, {in->output, 1, 2} };
 
     // auto minAndMax = model.AddNode<model::CombinerNode<double>>(ranges);
     // auto minAndTail = model.AddNode<model::CombinerNode<double>>(ranges2);
@@ -221,16 +221,16 @@ void TestInputRouting2()
     model::Model model;
 
     auto in = model.AddNode<model::InputNode<double>>(3);
-    model::OutputPortElements<double> range = { in->output, 0, 2 };
-    model::OutputPortElements<double> ranges = { { in->output, 0 }, { in->output, 2 } };
+    model::PortElements<double> range = { in->output, 0, 2 };
+    model::PortElements<double> ranges = { { in->output, 0 }, { in->output, 2 } };
 
     auto minAndArgMin1 = model.AddNode<model::ArgMinNode<double>>(in->output); // a "standard" node that takes its input from an output port
     auto minAndArgMin2 = model.AddNode<model::ArgMinNode<double>>(range);      // a node that takes its input from a range --- a subset of outputs from a port
     auto minAndArgMin3 = model.AddNode<model::ArgMinNode<double>>(ranges);     // a node that takes its input from a "group" --- an arbitrary set of outputs from other ports
 
-    auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::MakeOutputPortElements(in->output, 0, 2));
-    auto minAndArgMin5 = model.AddNode<model::ArgMinNode<double>>(model::OutputPortElements<double>{ { in->output, 0 }, { in->output, 0, 2 } });
-    auto minAndArgMin6 = model.AddNode<model::ArgMinNode<double>>(model::Concat(model::MakeOutputPortElements(in->output, 0), model::MakeOutputPortElements(in->output, 0, 2), model::MakeOutputPortElements(minAndArgMin1->val, 0, 1)));
+    auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::MakePortElements(in->output, 0, 2));
+    auto minAndArgMin5 = model.AddNode<model::ArgMinNode<double>>(model::PortElements<double>{ { in->output, 0 }, { in->output, 0, 2 } });
+    auto minAndArgMin6 = model.AddNode<model::ArgMinNode<double>>(model::Concat(model::MakePortElements(in->output, 0), model::MakePortElements(in->output, 0, 2), model::MakePortElements(minAndArgMin1->val, 0, 1)));
 
     //// set some example input and read the output
     std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
@@ -286,8 +286,8 @@ void TestRefineGraph()
     model::Model model;
 
     auto inputNode = model.AddNode<model::InputNode<double>>(2);
-    model::OutputPortElements<double> inputValue = { inputNode->output, 0 };
-    model::OutputPortElements<double> inputThresh = { inputNode->output, 1 };
+    model::PortElements<double> inputValue = { inputNode->output, 0 };
+    model::PortElements<double> inputThresh = { inputNode->output, 1 };
 
     auto value1 = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto value2 = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 100.0, 200.0, 300.0 });

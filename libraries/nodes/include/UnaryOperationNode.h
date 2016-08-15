@@ -10,7 +10,7 @@
 
 #include "Node.h"
 #include "ModelTransformer.h"
-#include "OutputPortElements.h"
+#include "PortElements.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
@@ -50,7 +50,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to process. </param>
         /// <param name="operation"> The function to use to process the signal. </param>
-        UnaryOperationNode(const model::OutputPortElements<ValueType>& input, OperationType operation);
+        UnaryOperationNode(const model::PortElements<ValueType>& input, OperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -13,7 +13,7 @@ namespace model
     // InputPortBase
     //
     template <typename ValueType>
-    InputPortBase::InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputs, std::string name, size_t dimension) : Port(owningNode, name, Port::GetPortType<ValueType>(), dimension), _inputRanges(inputs)
+    InputPortBase::InputPortBase(const class Node* owningNode, const PortElements<ValueType>& inputs, std::string name, size_t dimension) : Port(owningNode, name, Port::GetPortType<ValueType>(), dimension), _inputRanges(inputs)
     {
     }
 
@@ -64,7 +64,7 @@ namespace model
     // InputPort
     //
     template <typename ValueType>
-    InputPort<ValueType>::InputPort(const class Node* owningNode, const OutputPortElements<ValueType>& input, std::string name) : InputPortBase(owningNode, _input, name, input.Size()), _input(input)
+    InputPort<ValueType>::InputPort(const class Node* owningNode, const PortElements<ValueType>& input, std::string name) : InputPortBase(owningNode, _input, name, input.Size()), _input(input)
     {
         ComputeParentsAndElements();
     }
@@ -82,7 +82,7 @@ namespace model
     }
 
     template <typename ValueType>
-    OutputPortElements<ValueType> InputPort<ValueType>::GetOutputPortElements() const
+    PortElements<ValueType> InputPort<ValueType>::GetPortElements() const
     {
         return _input;
     }

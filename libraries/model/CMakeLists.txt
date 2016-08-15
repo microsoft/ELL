@@ -16,7 +16,7 @@ set (SRC src/ModelGraph.cpp
          src/ModelTransformer.cpp
          src/Node.cpp
          src/OutputPort.cpp
-         src/OutputPortElements.cpp
+         src/PortElements.cpp
          src/Port.cpp
 )
 
@@ -28,7 +28,7 @@ set (INCLUDE include/ExtremalValueNode.h
              include/Node.h
              include/OutputNode.h
              include/OutputPort.h
-             include/OutputPortElements.h
+             include/PortElements.h
              include/Port.h
              include/ValueSelectorNode.h
 )
@@ -40,7 +40,7 @@ set (TCC tcc/ExtremalValueNode.tcc
          tcc/ModelTransformer.tcc
          tcc/OutputNode.tcc
          tcc/OutputPort.tcc
-         tcc/OutputPortElements.tcc
+         tcc/PortElements.tcc
          tcc/ValueSelectorNode.tcc
 )
 
@@ -64,8 +64,8 @@ PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp
               test/src/Graph_test.cpp
-              test/src/OutputPortElements_test.cpp)
-set (TEST_INCLUDE test/include/OutputPortElements_test.h
+              test/src/PortElements_test.cpp)
+set (TEST_INCLUDE test/include/PortElements_test.h
                   test/include/Graph_test.h)
 
 source_group("src" FILES ${TEST_SRC})
