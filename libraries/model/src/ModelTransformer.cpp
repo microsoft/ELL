@@ -15,6 +15,25 @@
 /// <summary> model namespace </summary>
 namespace model
 {
+    //
+    // TransformContext implementation
+    //
+    TransformContext::TransformContext()
+    {
+        _isNodeCompilableFunction = [](const Node& node) { return false; };
+    }
+
+    TransformContext::TransformContext(const std::function<bool(const Node&)>& isNodeCompilable) : _isNodeCompilableFunction(isNodeCompilable)
+    {}
+
+    bool TransformContext::IsNodeCompilable(const Node& node) const
+    {
+        return _isNodeCompilableFunction(node);
+    }
+
+    //
+    // ModelTransformer implementation
+    //
     Model ModelTransformer::CopyModel(const Model& oldModel, const TransformContext& context)
     {
         _context = context;
@@ -67,11 +86,12 @@ namespace model
                 std::string uncompilableNodeName;
                 auto uncompilableNode = GetUncompilableNode(currentModel, context);
                 uncompilableNodeName = uncompilableNode->GetRuntimeTypeName();
-                throw new utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than 10 refinement iterations, uncompilable node: " + uncompilableNodeName);
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than " + std::to_string(maxRefinementIterations) + " refinement iterations, uncompilable node: " + uncompilableNodeName);
             }
         }
         while(!_isModelCompilable);
 
+        // clear out the context
         _context = TransformContext();
         return _model;
     }

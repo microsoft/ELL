@@ -63,10 +63,7 @@ namespace model
     NodeType* ModelTransformer::AddNode(Args&&... args)
     {
         auto newNode = _model.AddNode<NodeType>(std::forward<Args>(args)...);
-        if (_context.IsNodeCompilable)
-        {
-            _isModelCompilable &= _context.IsNodeCompilable(*newNode);
-        }
+        _isModelCompilable &= _context.IsNodeCompilable(*newNode);
         return newNode;
     }
 }

@@ -32,9 +32,15 @@ namespace model
     template <typename ValueType>
     class InputNode;
 
-    struct TransformContext
+    class TransformContext
     {
-        std::function<bool(const Node&)> IsNodeCompilable;
+    public:
+        TransformContext();
+        TransformContext(const std::function<bool(const Node&)>& isNodeCompilable);
+        bool IsNodeCompilable(const Node& node) const;
+
+    private:
+        std::function<bool(const Node&)> _isNodeCompilableFunction;
     };
 
     class ModelTransformer

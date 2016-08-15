@@ -281,7 +281,7 @@ void TestMovingAverageNodeRefine()
     std::vector<std::vector<double>> data = { { 1 },{ 2 },{ 3 },{ 4 },{ 5 },{ 6 },{ 7 },{ 8 },{ 9 },{ 10 } };
     double expectedOutput = VectorMean({ 7.0, 8.0, 9.0, 10.0 });
 
-    model::TransformContext context;
+    model::TransformContext context{ common::IsNodeCompilable() };
     model::ModelTransformer transformer;
     auto newModel = transformer.RefineModel(model, context);
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
@@ -319,8 +319,7 @@ void TestSimpleForestNodeRefine()
     auto simpleForestNode = model.AddNode<nodes::SimpleForestNode>(inputNode->output, forest);
 
     // refine
-    model::TransformContext context;
-    context.IsNodeCompilable = common::IsNodeCompilable();
+    model::TransformContext context{ common::IsNodeCompilable() };
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
@@ -350,8 +349,7 @@ void TestLinearPredictorNodeRefine()
     auto linearPredictorNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
 
     // refine the model
-    model::TransformContext context;
-    context.IsNodeCompilable = common::IsNodeCompilable();
+    model::TransformContext context{ common::IsNodeCompilable() };
     model::ModelTransformer transformer;
     auto newModel = transformer.RefineModel(model, context);
 
