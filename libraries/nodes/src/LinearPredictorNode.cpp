@@ -41,7 +41,7 @@ namespace nodes
         transformer.MapOutputPort(weightedElements, newNode->weightedElements);
     }
 
-    void LinearPredictorNode::Refine(model::ModelTransformer& transformer) const
+    void LinearPredictorNode::RefineNode(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
     

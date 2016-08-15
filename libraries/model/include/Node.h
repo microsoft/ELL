@@ -61,7 +61,6 @@ namespace model
         /// <returns> a vector of all the nodes that depend on this node </summary>
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
-
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -84,9 +83,13 @@ namespace model
         virtual void Copy(ModelTransformer& transformer) const = 0;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(ModelTransformer& transformer) const;
+        bool Refine(ModelTransformer& transformer) const;
+        
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
+
+        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
+        virtual void RefineNode(ModelTransformer& transformer) const;
 
         /// <summary> Computes the output of this node and stores it in the output ports </summary>
         virtual void Compute() const = 0;
@@ -103,5 +106,9 @@ namespace model
         std::vector<OutputPortBase*> _outputs;
 
         mutable std::vector<const Node*> _dependentNodes;
+
+        // After Refine() is called, this is set to false if the default base class implementation 
+        // (which copies the node) is called, otherwise true.
+        mutable bool _didRefine;
     };
 }

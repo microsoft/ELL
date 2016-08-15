@@ -34,7 +34,7 @@ namespace nodes
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::Refine(model::ModelTransformer & transformer) const
+    void ForestNode<SplitRuleType, EdgePredictorType>::RefineNode(model::ModelTransformer & transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());      
         const auto& interiorNodes = _forest.GetInteriorNodes();

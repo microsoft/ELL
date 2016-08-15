@@ -39,7 +39,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void L2NormNode<ValueType>::Refine(model::ModelTransformer& transformer) const
+    void L2NormNode<ValueType>::RefineNode(model::ModelTransformer& transformer) const
     {
         // TODO: elementwise x^2, sum, div by D
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());

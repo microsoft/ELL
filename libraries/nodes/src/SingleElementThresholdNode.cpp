@@ -27,7 +27,7 @@ namespace nodes
         transformer.MapOutputPort(output, newNode->output);
     }
 
-    void SingleElementThresholdNode::Refine(model::ModelTransformer& transformer) const
+    void SingleElementThresholdNode::RefineNode(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
 

@@ -60,8 +60,16 @@ namespace model
         }
     }
 
-    void Node::Refine(ModelTransformer& transformer) const
+    bool Node::Refine(ModelTransformer& transformer) const
     {
+        _didRefine = true;
+        RefineNode(transformer);
+        return _didRefine;
+    }
+
+    void Node::RefineNode(ModelTransformer& transformer) const
+    {
+        _didRefine = false;
         Copy(transformer);
     }
 

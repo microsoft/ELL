@@ -74,7 +74,7 @@ namespace nodes
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(model::ModelTransformer& transformer) const override;
+        virtual void RefineNode(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;

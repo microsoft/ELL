@@ -48,7 +48,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::Refine(ModelTransformer& transformer) const
+    void ValueSelectorNode<ValueType>::RefineNode(ModelTransformer& transformer) const
     {
         auto newCondition = transformer.TransformPortElements(_condition.GetPortElements());
         auto newPortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
@@ -99,7 +99,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void SelectIfLessNode<ValueType>::Refine(ModelTransformer& transformer) const
+    void SelectIfLessNode<ValueType>::RefineNode(ModelTransformer& transformer) const
     {
         auto newPortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
         auto newPortElements2 = transformer.TransformPortElements(_input2.GetPortElements());
@@ -144,7 +144,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void IfLessNode<ValueType>::Refine(ModelTransformer& transformer) const
+    void IfLessNode<ValueType>::RefineNode(ModelTransformer& transformer) const
     {
         auto newValue = transformer.TransformPortElements(_value.GetPortElements());
         auto newThreshold = transformer.TransformPortElements(_threshold.GetPortElements());

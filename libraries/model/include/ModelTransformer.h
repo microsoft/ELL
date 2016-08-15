@@ -52,13 +52,19 @@ namespace model
         /// <summary> Performs one or more refinement iterations on a given model and returns the result.
         /// If context.IsNodeCompilable is not set, this call performs one refinement iteration. If
         /// context.IsNodeCompilable is set, this call refines the model until all its nodes are
-        /// compilable. </summary>
+        /// compilable or until none of the nodes refine themselves. </summary>
         ///
         /// <param name="model"> The model. </param>
         /// <param name="context"> The context. </param>
         ///
         /// <returns> The refined Model. </returns>
         Model RefineModel(const Model& model, const TransformContext& context);
+
+        /// <summary> Indicates if the last call to RefineModel produced a model that is compilable. </summary>
+        ///
+        /// <returns> true if the model returned by RefineModel is compilable. </returns>
+        /// <remarks> Only available after calling CopyModel or RefineModel. </remarks>
+        bool IsModelCompilable() const { return _isModelCompilable; }
 
         /// <summary> Returns the  OutputPort from new new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>

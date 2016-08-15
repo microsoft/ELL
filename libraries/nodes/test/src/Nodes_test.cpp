@@ -287,6 +287,9 @@ void TestMovingAverageNodeRefine()
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newOutputPort = transformer.GetCorrespondingOutputPort(meanNode->output);
 
+    std::cout << "MovingAverage model compilable: " << (transformer.IsModelCompilable() ? "yes" : "no") << std::endl;
+    std::cout << "Original nodes: " << model.Size() << ", refined: " << newModel.Size() << std::endl;
+
     for (const auto& inputValue : data)
     {
         inputNode->SetInput(inputValue);
@@ -324,6 +327,7 @@ void TestSimpleForestNodeRefine()
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto refinedOutputPort = transformer.GetCorrespondingOutputPort(simpleForestNode->output);
+    testing::ProcessTest("Testing SimpleForestNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
     // check equivalence
     inputNode->SetInput({ 0.2, 0.5, 0.0 });
@@ -352,6 +356,7 @@ void TestLinearPredictorNodeRefine()
     model::TransformContext context{ common::IsNodeCompilable() };
     model::ModelTransformer transformer;
     auto newModel = transformer.RefineModel(model, context);
+    testing::ProcessTest("Testing LinearPredictorNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
     // check for equality
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);

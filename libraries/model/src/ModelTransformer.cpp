@@ -64,9 +64,11 @@ namespace model
             _isModelCompilable = true;
 
             // one refinement pass
-            currentModel.Visit([this](const Node& node) 
+            bool didRefineAny = false;
+            currentModel.Visit([this, &didRefineAny](const Node& node) 
             { 
-                node.Refine(*this); 
+                bool didRefineNode = node.Refine(*this); 
+                didRefineAny |= didRefineNode;
             });
 
             // concatenate new port map onto existing port map
@@ -78,6 +80,12 @@ namespace model
                     newPortToPortMap[entry.first] = _portToPortMap[entry.second];
                 }
                 _portToPortMap = newPortToPortMap;
+            }
+
+            // return if we didn't make any progress 
+            if(!didRefineAny)
+            {
+                break;
             }
 
             // die after too many iterations
