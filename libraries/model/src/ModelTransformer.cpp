@@ -64,7 +64,9 @@ namespace model
             // die after too many iterations
             if(++iterationCount >= maxRefinementIterations)
             {
-                auto uncompilableNodeName = GetUncompilableNodeName(currentModel, context);
+                std::string uncompilableNodeName;
+                auto uncompilableNode = GetUncompilableNode(currentModel, context);
+                uncompilableNodeName = uncompilableNode->GetRuntimeTypeName();
                 throw new utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than 10 refinement iterations, uncompilable node: " + uncompilableNodeName);
             }
         }
@@ -90,18 +92,18 @@ namespace model
         _portToPortMap[&oldPort] = nonconstPort;
     }
 
-    std::string ModelTransformer::GetUncompilableNodeName(const Model& model, const TransformContext& context) const
+    const Node* ModelTransformer::GetUncompilableNode(const Model& model, const TransformContext& context) const
     {
-        std::string uncompilableNodeName;
-        
-        model.Visit([&](const Node& node) 
-        { 
-            if(!context.IsNodeCompilable(node))
+        auto iter = model.GetNodeIterator();
+        while(iter.IsValid())
+        {
+            auto node = iter.Get();
+            if(!context.IsNodeCompilable(*node))
             {
-                uncompilableNodeName = node.GetRuntimeTypeName();
-            };
-        });
-
-        return uncompilableNodeName;
+                return node;
+            }
+            iter.Next();
+        }
+        return nullptr;
     }
 }
