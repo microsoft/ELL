@@ -6,12 +6,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <stdexcept>
 #include <random>
 #include <cassert>
 #include <algorithm>
-#include "..\include\RowDataset.h"
 
 namespace dataset
 {
@@ -76,24 +78,28 @@ namespace dataset
     }
 
     template<typename ExampleType>
-    void RowDataset<ExampleType>::RandomPermute(std::default_random_engine& rng)
+    void RowDataset<ExampleType>::RandomPermute(std::default_random_engine& rng, size_t prefixSize)
     {
-        RandomPermute(rng, NumExamples());
+        prefixSize = CorrectRangeSize(0, prefixSize);
+        for(size_t i = 0; i < prefixSize; ++i)
+        {
+            RandomSwap(rng, i, i, _examples.size()-i);
+        }
     }
 
     template<typename ExampleType>
-    void RowDataset<ExampleType>::RandomPermute(std::default_random_engine& rng, uint64_t prefixSize, uint64_t rangeFirstIndex, uint64_t rangeSize)
+    void RowDataset<ExampleType>::RandomSwap(std::default_random_engine& rng, uint64_t targetExampleIndex, uint64_t rangeFirstIndex, uint64_t rangeSize)
     {
         using std::swap;
-        if(rangeSize == 0) rangeSize = NumExamples();
-        uint64_t lastIndex = rangeFirstIndex + rangeSize - 1;
-
-        for (uint64_t i = rangeFirstIndex; i < rangeFirstIndex + prefixSize; ++i)
+        rangeSize = CorrectRangeSize(rangeFirstIndex, rangeSize);
+        if(targetExampleIndex > _examples.size())
         {
-            std::uniform_int_distribution<uint64_t> dist(i, lastIndex);
-            uint64_t j = dist(rng);
-            swap(_examples[i], _examples[j]);
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
         }
+
+        std::uniform_int_distribution<size_t> dist(rangeFirstIndex, rangeFirstIndex + rangeSize - 1);
+        size_t j = dist(rng);
+        swap(_examples[targetExampleIndex], _examples[j]);
     }
 
     template<typename ExampleType>

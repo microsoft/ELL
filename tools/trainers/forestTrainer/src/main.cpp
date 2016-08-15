@@ -55,13 +55,13 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapSaveArguments mapSaveArguments;
-        common::ParsedForestTrainerArguments sortingTreeTrainerArguments;
+        common::ParsedHistogramForestTrainerArguments histogramForestTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapSaveArguments);
-        commandLineParser.AddOptionSet(sortingTreeTrainerArguments);
+        commandLineParser.AddOptionSet(histogramForestTrainerArguments);
         
         // parse command line
         commandLineParser.Parse();
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
         auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
 
         // create trainer
-        auto trainer = common::MakeHistogramForestTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
+        auto trainer = common::MakeHistogramForestTrainer(trainerArguments.lossArguments, histogramForestTrainerArguments);
 
         // create random number generator
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);

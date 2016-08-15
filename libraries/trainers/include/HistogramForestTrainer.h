@@ -16,8 +16,22 @@
 #include "SingleElementThresholdPredictor.h"
 #include "ConstantPredictor.h"
 
+// stl
+#include <random>
+
 namespace trainers
 {
+    /// <summary> Parameters for the forest trainer. </summary>
+    struct HistogramForestTrainerParameters : public ForestTrainerParameters
+    {
+        std::string randomSeed;
+        size_t candidatesPerInput;
+    };
+
+    /// <summary> A histogram forest trainer. </summary>
+    ///
+    /// <typeparam name="LossFunctionType"> The loss function type. </typeparam>
+    /// <typeparam name="BoosterType"> The booster type. </typeparam>
     template <typename LossFunctionType, typename BoosterType> 
     class HistogramForestTrainer : public ForestTrainer<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor, BoosterType>
     {
@@ -27,7 +41,7 @@ namespace trainers
         /// <param name="lossFunction"> The loss function. </param>
         /// <param name="booster"> The booster. </param>
         /// <param name="parameters"> Training Parameters. </param>
-        HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters);
+        HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const HistogramForestTrainerParameters& parameters);
 
         using SplitRuleType = predictors::SingleElementThresholdPredictor;
         using EdgePredictorType = predictors::ConstantPredictor;
@@ -43,10 +57,13 @@ namespace trainers
         double GetOutputValue(const Sums& sums) const;
 
         // new functions for the HistogramForestTrainer
-        std::vector<EdgePredictorType> GetEdgePredictorCandidatesAtNode(Range range) const;
+        std::vector<SplitRuleType> GetSplitCandidatesAtNode(Range range);
+        void AddSplitCandidatesAtNode(std::vector<SplitRuleType>& splitRuleCandidates, Range range, size_t index);
 
         // member variables
         LossFunctionType _lossFunction;
+        std::default_random_engine _random;
+        size_t _candidatesPerInput;
         ThresholdFinder _thresholdFinder;
     };
 
@@ -58,7 +75,7 @@ namespace trainers
     ///
     /// <returns> A unique_ptr to a simple forest trainer. </returns>
     template<typename LossFunctionType, typename BoosterType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters);
+    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const HistogramForestTrainerParameters& parameters);
 }
 
 #include "../tcc/HistogramForestTrainer.tcc"
