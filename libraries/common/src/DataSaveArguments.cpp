@@ -16,8 +16,8 @@ namespace common
     void ParsedDataSaveArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
-            outputDataFile,
-            "outputDataFile", 
+            outputDataFilename,
+            "outputDataFilename", 
             "odf",
             "Path to the output data file",
             "");
@@ -25,8 +25,20 @@ namespace common
 
     utilities::CommandLineParseResult ParsedDataSaveArguments::PostProcess(const utilities::CommandLineParser & parser)
     {
-        std::vector<std::string> parseErrorMessages;
+        if(outputDataFilename == "null")
+        {
+            outputDataStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
+        }
+        else if(outputDataFilename == "")
+        {
+            outputDataStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
+        }
+        else // treat argument as filename
+        {
+            outputDataStream = utilities::OutputStreamImpostor(outputDataFilename);
+        }
 
+        std::vector<std::string> parseErrorMessages;
         return parseErrorMessages;
     }
 }

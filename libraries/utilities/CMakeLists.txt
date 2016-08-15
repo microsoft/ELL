@@ -21,6 +21,10 @@ set (SRC src/CompressedIntegerList.cpp
          src/IntegerStack.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
+         src/Serializer.cpp
+         src/JsonSerializer.cpp
+         src/Tokenizer.cpp
+         src/XMLSerializer.cpp
          src/TypeName.cpp
          src/UniqueId.cpp
          src/Variant.cpp
@@ -34,29 +38,40 @@ set (INCLUDE include/CompressedIntegerList.h
              include/IIterator.h
              include/IntegerList.h
              include/IntegerStack.h
+             include/ISerializable.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
              include/Parser.h
              include/RandomEngines.h
+             include/Serializer.h
+             include/JsonSerializer.h
+             include/Tokenizer.h
+             include/XMLSerializer.h
              include/StlIndexValueIterator.h
              include/StlIterator.h
              include/TransformIterator.h
              include/TypeFactory.h
              include/TypeName.h
+             include/TypeTraits.h
              include/UniqueId.h
              include/Variant.h
              include/XMLSerialization.h)
 
-set (TCC tcc/CommandLineParser.tcc
+set (TCC tcc/AnyIterator.tcc
+         tcc/CommandLineParser.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
+         tcc/Serializer.tcc
+         tcc/JsonSerializer.tcc
+         tcc/XMLSerializer.tcc
          tcc/StlIndexValueIterator.tcc
          tcc/StlIterator.tcc
          tcc/TransformIterator.tcc
          tcc/TypeFactory.tcc
          tcc/TypeName.tcc
+         tcc/TypeTraits.tcc
          tcc/Variant.tcc
          tcc/XMLSerialization.tcc)
 
@@ -84,10 +99,12 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp 
+              test/src/ISerializable_test.cpp
               test/src/Variant_test.cpp
               test/src/XMLSerialization_test.cpp)
 
-set (TEST_INCLUDE test/include/Variant_test.h
+set (TEST_INCLUDE test/include/ISerializable_test.h
+                  test/include/Variant_test.h
                   test/include/XMLSerialization_test.h)
                   
 source_group("src" FILES ${TEST_SRC})
@@ -97,9 +114,9 @@ add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-target_link_libraries(utilities_test utilities dataset linear layers testing -pthread)
+target_link_libraries(utilities_test utilities dataset linear layers model nodes testing -pthread)
 else()
-target_link_libraries(utilities_test utilities dataset linear layers testing)
+target_link_libraries(utilities_test utilities dataset linear layers model nodes testing)
 endif()
 set_property(TARGET utilities_test PROPERTY FOLDER "tests")
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})

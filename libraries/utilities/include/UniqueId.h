@@ -8,14 +8,17 @@
 
 #pragma once
 
+#include "ISerializable.h"
+
 #include <functional>
 #include <ostream>
+#include <string>
 
 /// <summary> model namespace </summary>
 namespace utilities
 {
     /// <summary> UniqueId: A placeholder for a real GUID-type class </summary>
-    class UniqueId
+    class UniqueId : public ISerializable
     {
     public:
         /// <summary> Constructor </summary>
@@ -30,12 +33,30 @@ namespace utilities
         bool operator!=(const UniqueId& other) const;
 
         /// <summary> Stream output </summary>
-        friend std::ostream& operator<<(std::ostream& stream, const UniqueId& id)
-        {
-            stream << id._id;
-            return stream;
-        }
+        friend std::ostream& operator<<(std::ostream& stream, const UniqueId& id);
+        friend std::string to_string(const UniqueId& id);
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "UniqueId"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, SerializationContext& context) override;
+        
     private:
         friend std::hash<UniqueId>;
         size_t _id;
@@ -46,12 +67,17 @@ namespace utilities
 // custom specialization of std::hash so we can keep UniqueIds in containers that require hashable types
 namespace std
 {
+    /// <summary> Implements a hash function for the UniqueId class, so that it can be used with associative containers (maps, sets, and the like). </summary>
     template <>
     class hash<utilities::UniqueId>
     {
     public:
         typedef utilities::UniqueId argument_type;
         typedef std::size_t result_type;
+
+        /// <summary> Computes a hash of the input value. </summary>
+        ///
+        /// <returns> A hash value for the given input. </returns>
         result_type operator()(argument_type const& id) const;
     };
 }

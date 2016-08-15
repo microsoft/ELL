@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, replace stdout with it 
-        auto outStream = utilities::GetOutputStreamImpostor(compileArguments.outputCodeFile);
+        auto& outStream = compileArguments.outputCodeStream;
 
         // load the model, coordinates, and map
         auto model = common::LoadModel(mapLoadArguments.modelLoadArguments);

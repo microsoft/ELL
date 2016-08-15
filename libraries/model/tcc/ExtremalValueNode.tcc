@@ -10,8 +10,26 @@
 namespace model
 {
     template <typename ValueType, bool max>
+    ExtremalValueNode<ValueType, max>::ExtremalValueNode() : Node({ &_input }, { &_val, &_argVal }), _input(this, {}, inputPortName), _val(this, valPortName, 1), _argVal(this, argValPortName, 1)
+    {
+    }
+
+    template <typename ValueType, bool max>
     ExtremalValueNode<ValueType, max>::ExtremalValueNode(const OutputPortElements<ValueType>& input) : Node({ &_input }, { &_val, &_argVal }), _input(this, input, inputPortName), _val(this, valPortName, 1), _argVal(this, argValPortName, 1)
     {
+    }
+
+    template <typename ValueType, bool max>
+    std::string ExtremalValueNode<ValueType, max>::GetTypeName() 
+    {
+        if(max)
+        {
+            return utilities::GetCompositeTypeName<ValueType, std::true_type>("ExtremalValueNode"); 
+        } 
+        else
+        {
+            return utilities::GetCompositeTypeName<ValueType, std::false_type>("ExtremalValueNode"); 
+        } 
     }
 
     template <typename ValueType, bool max>
@@ -53,5 +71,4 @@ namespace model
         transformer.MapOutputPort(this->val, newNode->val);
         transformer.MapOutputPort(this->argVal, newNode->argVal);
     }
-
 }

@@ -9,10 +9,15 @@
 namespace nodes
 {
     template <typename ValueType>
+    MovingAverageNode<ValueType>::MovingAverageNode() : Node({&_input}, {&_output}), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _windowSize(0)
+    {        
+    }
+
+    template <typename ValueType>
     MovingAverageNode<ValueType>::MovingAverageNode(const model::OutputPortElements<ValueType>& input, size_t windowSize) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _windowSize(windowSize)
     {
-        auto dimension = input.Size();
-        for(size_t index = 0; index < windowSize; ++index)
+        auto dimension = _input.Size();
+        for(size_t index = 0; index < _windowSize; ++index)
         {
             _samples.push_back(std::vector<ValueType>(dimension));
         }
@@ -55,5 +60,32 @@ namespace nodes
         auto constNode = transformer.AddNode<ConstantNode<ValueType>>(literalN);
         auto divideNode = transformer.AddNode<BinaryOperationNode<ValueType>>(accumNode->output, constNode->output, BinaryOperationNode<ValueType>::OperationType::divide);
         transformer.MapOutputPort(output, divideNode->output);
+    }
+
+    template <typename ValueType>
+    void MovingAverageNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    {
+        Node::Serialize(serializer);
+        serializer.Serialize("input", _input);
+        serializer.Serialize("output", _output);
+        serializer.Serialize("windowSize", _windowSize);
+    }
+
+    template <typename ValueType>
+    void MovingAverageNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        Node::Deserialize(serializer, context);
+        serializer.Deserialize("input", _input, context);
+        serializer.Deserialize("output", _output, context);
+        serializer.Deserialize("windowSize", _windowSize, context);
+
+        auto dimension = _input.Size();
+        _samples.clear();
+        _samples.reserve(_windowSize);
+        for(size_t index = 0; index < _windowSize; ++index)
+        {
+            _samples.push_back(std::vector<ValueType>(dimension));
+        }
+        _runningSum = std::vector<ValueType>(dimension);
     }
 }

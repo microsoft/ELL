@@ -13,21 +13,8 @@ namespace model
     // InputPortBase
     //
     template <typename ValueType>
-    InputPortBase::InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputRef, const OutputPortElements<ValueType>& inputValues, std::string name) : Port(owningNode, name, Port::GetPortType<ValueType>(), inputValues.Size()), _inputRanges(inputRef)
+    InputPortBase::InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputs, std::string name, size_t dimension) : Port(owningNode, name, Port::GetPortType<ValueType>(), dimension), _inputRanges(inputs)
     {
-        assert(owningNode != nullptr);
-        for (const auto& range : inputValues)
-        {
-            auto port = range.ReferencedPort();
-            auto node = port->GetNode();
-            auto start = range.GetStartIndex();
-            auto numElements = range.Size();
-            for (size_t index = 0; index < numElements; ++index)
-            {
-                _individualElements.emplace_back(*port, index + start);
-            }
-            _parentNodes.push_back(node);
-        }
     }
 
     template <typename ValueType>
@@ -42,7 +29,7 @@ namespace model
             result.push_back(temp);
         }
 
-        if(Size() != result.size())
+        if (Size() != result.size())
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
         }
@@ -57,12 +44,29 @@ namespace model
         return typedOutput->GetOutput(element.GetStartIndex());
     }
 
+    inline void InputPortBase::ComputeParentsAndElements()
+    {
+        for (const auto& range : _inputRanges)
+        {
+            auto port = range.ReferencedPort();
+            auto node = port->GetNode();
+            auto start = range.GetStartIndex();
+            auto numElements = range.Size();
+            for (size_t index = 0; index < numElements; ++index)
+            {
+                _individualElements.emplace_back(*port, index + start);
+            }
+            _parentNodes.push_back(node);
+        }
+    }
+
     //
     // InputPort
     //
     template <typename ValueType>
-    InputPort<ValueType>::InputPort(const class Node* owningNode, const OutputPortElements<ValueType>& input, std::string name) : InputPortBase(owningNode, _input, input, name), _input(input)
+    InputPort<ValueType>::InputPort(const class Node* owningNode, const OutputPortElements<ValueType>& input, std::string name) : InputPortBase(owningNode, _input, name, input.Size()), _input(input)
     {
+        ComputeParentsAndElements();
     }
 
     template <typename ValueType>
@@ -81,5 +85,21 @@ namespace model
     OutputPortElements<ValueType> InputPort<ValueType>::GetOutputPortElements() const
     {
         return _input;
+    }
+
+    template <typename ValueType>
+    void InputPort<ValueType>::Serialize(utilities::Serializer& serializer) const
+    {
+        InputPortBase::Serialize(serializer);
+        serializer.Serialize("inputElements", _input);
+    }
+
+    template <typename ValueType>
+    void InputPort<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        InputPortBase::Deserialize(serializer, context);
+        serializer.Deserialize("inputElements", _input, context);
+
+        ComputeParentsAndElements();
     }
 }

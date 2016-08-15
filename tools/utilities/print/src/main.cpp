@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // if output file specified, use it, otherwise use std::cout
-        auto outStream = utilities::GetOutputStreamImpostor(printArguments.outputSvgFile);
+        utilities::OutputStreamImpostor outStream(printArguments.outputSvgFilename);
 
         // open model file
         auto model = common::LoadModel(modelLoadArguments);

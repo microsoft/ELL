@@ -13,6 +13,7 @@
 
 // utilities
 #include "Exception.h"
+#include "ISerializable.h"
 
 // stl
 #include <vector>
@@ -25,9 +26,11 @@ namespace model
     class Node;
 
     /// <summary> Represents a contiguous set of values from an output port </summary>
-    class OutputPortRange
+    class OutputPortRange : public utilities::ISerializable
     {
     public:
+        OutputPortRange() = default;
+
         /// <summary> Creates an OutputPortRange representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
@@ -71,15 +74,36 @@ namespace model
         /// <returns> true if this range spans the port's entire range </returns>
         bool IsFullPortRange() const;
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "OutputPortRange"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
     private:
-        const OutputPortBase* _referencedPort;
-        size_t _startIndex;
-        size_t _numValues;
-        bool _isFixedSize;
+        const OutputPortBase* _referencedPort = nullptr;
+        size_t _startIndex = 0;
+        size_t _numValues = 0;
+        bool _isFixedSize = true;
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>
-    class OutputPortElementsUntyped
+    class OutputPortElementsUntyped : public utilities::ISerializable
     {
     public:
         /// <summary> Creates an OutputPortElementsUntyped representing all the values from a given port </summary>
@@ -130,6 +154,34 @@ namespace model
         ///
         /// <param name="range"> The range of values to add to this list </param>
         void AddRange(const OutputPortRange& range);
+
+        /// <summary> Gets an element in the elements. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the element. </param>
+        ///
+        /// <returns> The specified element. </returns>
+        OutputPortRange GetElement(size_t index) const;
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "OutputPortElementsUntyped"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     protected:
         OutputPortElementsUntyped(){};
