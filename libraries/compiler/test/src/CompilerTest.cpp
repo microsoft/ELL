@@ -651,12 +651,20 @@ model::Model MakeForestDeep()
 	// refine
 	model::TransformContext context;
 	model::ModelTransformer transformer;
-	return transformer.RefineModel(model, context);
+	auto refinedModel =  transformer.RefineModel(model, context);
+	auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
+	auto refinedOutputPort = transformer.GetCorrespondingOutputPort(simpleForestNode->prediction);
+
+	refinedInputNode->SetInput({ 0.2, 0.5, 0.0 });
+	auto refinedOutputValue = refinedModel.ComputeNodeOutput(*refinedOutputPort)[0];
+
+	return refinedModel;
 }
 
 void TestForest()
 {
-	model::Model model = MakeForest();
+	//model::Model model = MakeForest();
+	model::Model model = MakeForestDeep();
 
 	std::vector<double> data = { 0.2, 0.5, 0.0 };
 

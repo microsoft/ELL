@@ -434,20 +434,6 @@ namespace emll
 			_fn.Store(pResult, _fn.CastBoolToInt(pOpResult));
 		}
 
-		template<typename T>
-		void IRCompiler::CompileElementSelectorNode(const model::Node& node)
-		{
-			auto selectorPort = node.GetInputPorts()[1];
-			switch (selectorPort->GetType())
-			{
-				case model::Port::PortType::Boolean:
-					return CompileElementSelector<T, bool>(static_cast<const nodes::ElementSelectorNode<T, bool>&>(node));
-	
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
 		template<typename T, typename SelectorType>
 		void IRCompiler::CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node)
 		{

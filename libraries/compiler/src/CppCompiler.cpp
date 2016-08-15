@@ -127,18 +127,6 @@ namespace emll
 			throw new CompilerException(CompilerError::notSupported);
 		}
 
-		void CppCompiler::CompileElementSelectorNode(const model::Node& node)
-		{
-			switch (ModelEx::GetNodeDataType(node))
-			{
-				case model::Port::PortType::Real:
-					CompileElementSelectorNode<double>(node);
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
 		void CppCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
 		{
 			_pfn = _module.Function(functionName, ValueType::Void, args);

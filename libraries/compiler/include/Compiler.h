@@ -14,7 +14,8 @@
 #include "Variable.h"
 #include "ScalarVar.h"
 #include "VectorVar.h"
-#
+#include "NodeMap.h"
+
 #include "ConstantNode.h"
 #include "InputNode.h"
 #include "OutputNode.h"
@@ -89,6 +90,7 @@ namespace emll
 			virtual void CompileSumNode(const model::Node& node);
 			///<summary>Compile a BinaryPredicateNode</summary>
 			virtual void CompileBinaryPredicateNode(const model::Node& node);
+
 			//---------------------------------------------------
 			//
 			// These methods may be implemented by specific compilers
@@ -122,8 +124,10 @@ namespace emll
 			virtual void CompileDelayNode(const model::Node& node) = 0;
 			///<summary>Compile a UnaryNode</summary>
 			virtual void CompileUnaryNode(const model::Node& node) = 0;
+
 			///<summary>Compile an ElementSelectorNode</summary>
-			virtual void CompileElementSelectorNode(const model::Node& node) = 0;
+			virtual void CompileElementSelectorNode(const model::Node& node);
+			virtual void CompileElementSelectorNode(const nodes::ElementSelectorNode<double, bool>& node) = 0;
 
 			///<summary>Ensure a variable is emitted</summary>
 			virtual void EnsureVarEmitted(Variable* pVar) = 0;
@@ -195,23 +199,6 @@ namespace emll
 			std::unordered_map<const model::OutputPortBase*, Variable*> _portToVarMap;
 
 			CompilerSettings _settings;
-		};
-
-		template<typename T, T Default>
-		class NodeMap
-		{
-		public:
-
-			T Get(const model::Node& node) const;
-			T Get(const model::Node* pNode) const;
-			void Set(const model::Node& node, T value);
-			bool Contains(const model::Node& node) const;
-			void Remove(const model::Node& node);
-
-			void Clear();
-
-		private:
-			std::unordered_map<model::Node::NodeId, T> _map;
 		};
 	}
 }

@@ -48,6 +48,7 @@ set (INCLUDE include/LLVMInclude.h
 		include/Variable.h
 		include/ScalarVar.h
 		include/VectorVar.h
+		include/NodeMap.h
 		include/Compiler.h
 		include/IRRuntime.h
 		include/IRCompiler.h
@@ -63,6 +64,7 @@ set (TCC tcc/SymbolTable.tcc
 		 tcc/Variable.tcc
 		 tcc/ScalarVar.tcc
 		 tcc/VectorVar.tcc
+		 tcc/NodeMap.tcc
 		 tcc/IRModuleEmitter.tcc
 		 tcc/IRFunctionEmitter.tcc
 		 tcc/IRRuntime.tcc

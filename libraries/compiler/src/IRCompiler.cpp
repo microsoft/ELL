@@ -85,18 +85,6 @@ namespace emll
 			}
 		}
 
-		void IRCompiler::CompileElementSelectorNode(const model::Node& node)
-		{
-			switch (ModelEx::GetNodeDataType(node))
-			{
-				case model::Port::PortType::Real:
-					CompileElementSelectorNode<double>(node);
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
 		void IRCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
 		{			
 			EndFunction();

@@ -225,8 +225,8 @@ void generateHelloWorld()
 int main()
 {
 	double treeInput[3] = { 0.2, 0.5, 0.0 };
-	double dtree = TestForest(treeInput);
-
+	double forestResult = TestForest(treeInput);
+	printf("Forest = %f", forestResult);
 
 	generateHelloWorld();
     return 0;

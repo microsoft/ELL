@@ -70,9 +70,6 @@ namespace emll
 			///<summary>Compile a binary predicate</summary>
 			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) { CompileBinaryPredicate<double>(node); };
 
-			///<summary>Compile an elementselectorNode</summary>
-			virtual void CompileElementSelectorNode(const model::Node& node) override;
-
 
 			///<summary>Begins the IR function that will contain our compiled model</summary>
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) override;
@@ -207,9 +204,11 @@ namespace emll
 			template<typename T>
 			void CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node);
 
-			///<summary>Compile an element selector node</summary>
-			template<typename T>
-			void CompileElementSelectorNode(const model::Node& node);
+			///<summary>Compile an elementselectorNode</summary>
+			virtual void CompileElementSelectorNode(const nodes::ElementSelectorNode<double, bool>& node) override
+			{
+				CompileElementSelector<double, bool>(node);
+			}
 			///<summary>Compile an element selector node</summary>
 			template<typename T, typename SelectorType>
 			void CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node);

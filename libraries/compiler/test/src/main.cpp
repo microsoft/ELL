@@ -29,6 +29,7 @@ void TestIRCompiler()
 
 	TestLLVM();
 	TestLLVMShiftRegister();
+	TestLLVMBlocks();
 }
 
 
@@ -47,7 +48,6 @@ void TestCppCompiler()
 
 int main(int argc, char* argv[])
 {
-	TestLLVMBlocks();
 	TestCppCompiler();
 	TestIRCompiler();
 

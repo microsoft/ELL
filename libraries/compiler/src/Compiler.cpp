@@ -418,6 +418,21 @@ namespace emll
 			}
 		}
 
+		void Compiler::CompileElementSelectorNode(const model::Node& node)
+		{
+			auto value = node.GetInputPorts()[0];
+			auto selector = node.GetInputPorts()[1];
+			if (value->GetType() == model::Port::PortType::Real &&
+				selector->GetType() == model::Port::PortType::Boolean)
+			{
+				CompileElementSelectorNode(static_cast<const nodes::ElementSelectorNode<double, bool>&>(node));
+			}
+			else
+			{
+				throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
 		template<>
 		OperatorType Compiler::GetOperator<double>(const nodes::BinaryOperationNode<double>& node) const
 		{

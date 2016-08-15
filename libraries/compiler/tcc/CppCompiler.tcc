@@ -301,28 +301,14 @@ namespace emll
 			TryMergeCodeBlock(node);
 		}
 
-		template<typename T>
-		void CppCompiler::CompileElementSelectorNode(const model::Node& node)
-		{
-			NewCodeBlock(node);
-
-			auto selectorPort = node.GetInputPorts()[1];
-			switch (selectorPort->GetType())
-			{
-				case model::Port::PortType::Boolean:
-					CompileElementSelector<T, bool>(static_cast<const nodes::ElementSelectorNode<T, bool>&>(node));
-					break;
-
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
 		template<typename T, typename SelectorType>
 		void CppCompiler::CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node)
 		{
 			// Only support binary right now
 			VerifyIsPureBinary(node);
+
+			NewCodeBlock(node);
+
 			auto pElements = node.GetInputPorts()[0];
 			CompileElementSelectorBinary<T, SelectorType>(node);
 		}
