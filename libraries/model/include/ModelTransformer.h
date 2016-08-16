@@ -32,17 +32,29 @@ namespace model
     template <typename ValueType>
     class InputNode;
 
+    /// <summary> A context object that carries information about the compiler or other process driving the transformation. </summary>
     class TransformContext
     {
     public:
+        /// <summary> Default Constructor. </summary>
         TransformContext();
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name='IsNodeCompilable'> A function that indicates which nodes are compilable </param>
         TransformContext(const std::function<bool(const Node&)>& isNodeCompilable);
+
+        /// <summary> Indicates if a node is compilable. </summary>
+        ///
+        /// <param name="node"> A node. </param>
+        /// <returns> Returns true if the node is compilable. </returns>
         bool IsNodeCompilable(const Node& node) const;
 
     private:
         std::function<bool(const Node&)> _isNodeCompilableFunction;
     };
 
+    /// <summary> A class that refines or copies models </summary>
     class ModelTransformer
     {
     public:
