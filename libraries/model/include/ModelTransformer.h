@@ -35,8 +35,18 @@ namespace model
     class TransformContext
     {
     public:
+        /// <summary> Default Constructor. </summary>
         TransformContext();
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name='IsNodeCompilable'> A function that indicates which nodes are compilable </param>
         TransformContext(const std::function<bool(const Node&)>& isNodeCompilable);
+
+        /// <summary> Indicates if a node is compilable. </summary>
+        ///
+        /// <param name="node"> A node. </param>
+        /// <returns> Returns true if the node is compilable. </returns>
         bool IsNodeCompilable(const Node& node) const;
 
     private:
