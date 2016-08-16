@@ -52,7 +52,8 @@ namespace model
 
         int iterationCount = 0;
 
-        // refine until all nodes are compilable according to context.IsNodeCompilable()
+        // refine until all nodes are compilable according to context.IsNodeCompilable(), until
+        // the model is fully refined, or until the maximum number of iterations is reached.
         do
         {
             Model currentModel = std::move(_model);

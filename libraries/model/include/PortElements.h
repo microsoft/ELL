@@ -31,7 +31,7 @@ namespace model
     public:
         PortElementBase() = default;
         virtual ~PortElementBase() = default;
-        
+
         /// <summary> Creates a PortElementBase representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
@@ -58,7 +58,7 @@ namespace model
         /// <returns> true if this element is equivalent to other. </returns>
         bool operator==(const PortElementBase& other) const;
 
-    private:
+    protected:
         const OutputPortBase* _referencedPort = nullptr;
         size_t _index = 0;
     };
@@ -76,7 +76,7 @@ namespace model
         /// <summary> The port this range refers to </summary>
         ///
         /// <returns> The port this range refers to </returns>
-        const OutputPort<ValueType>* ReferencedPort() const { return static_cast<const OutputPort<ValueType>*>(PortElementBase::ReferencedPort()); }
+        const OutputPort<ValueType>* ReferencedPort() const { return static_cast<const OutputPort<ValueType>*>(_referencedPort); }
     };
 
     /// <summary> Represents a contiguous set of values from an output port </summary>

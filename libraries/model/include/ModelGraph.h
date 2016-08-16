@@ -171,7 +171,8 @@ namespace model
         std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _idToNodeMap;
     };
 
-    /// <summary> A serialization context used during Model deserialization </summary>
+    /// <summary> A serialization context used during Model deserialization. Created by the
+    /// model during serialization --- clients shouldn't have to interact directly with this class. </summary>
     class ModelSerializationContext: public utilities::SerializationContext
     {
     public:
