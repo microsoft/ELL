@@ -104,14 +104,25 @@ namespace model
         return _model;
     }
 
-    const OutputPortBase* ModelTransformer::GetCorrespondingPort(const OutputPortBase& port)
+    // const OutputPortBase* ModelTransformer::GetCorrespondingPort(const OutputPortBase& port)
+    // {
+    //     auto portRange = PortRange{port};
+    //     if (_elementToElementMap.find(portRange) == _elementToElementMap.end())
+    //     {
+    //         throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find port in new model.");
+    //     }
+    //     return _elementToElementMap[portRange].ReferencedPort();
+    // }
+
+    PortElementsUntyped ModelTransformer::GetCorrespondingElements(const PortElementsUntyped& elements)
     {
-        auto portRange = PortRange{port};
+        assert(elements.NumRanges() == 1);
+        auto portRange = elements.GetRange(0);
         if (_elementToElementMap.find(portRange) == _elementToElementMap.end())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find port in new model.");
         }
-        return _elementToElementMap[portRange].ReferencedPort();
+        return _elementToElementMap[portRange];
     }
 
     void ModelTransformer::MapPort(const OutputPortBase& oldPort, const OutputPortBase& newPort)

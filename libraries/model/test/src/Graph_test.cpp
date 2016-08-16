@@ -309,7 +309,7 @@ void TestRefineGraph()
 
     // Now run data through the graphs and make sure they agree
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputPort = transformer.GetCorrespondingOutputPort(outputNode->output);
+    auto newOutputs = transformer.GetCorrespondingOutputs(model::PortElements<double>{outputNode->output});
 
     std::vector<std::vector<double>> inputValues = { { 1.0, 2.0 }, { 1.0, 0.5 }, { 2.0, 4.0 } };
     for (const auto& inputValue : inputValues)
@@ -318,6 +318,7 @@ void TestRefineGraph()
         auto output = model.ComputeNodeOutput(outputNode->output);
 
         newInputNode->SetInput(inputValue);
+        auto newOutputPort = newOutputs.GetElement(0).ReferencedPort();
         auto newOutput = newModel.ComputeNodeOutput(*newOutputPort);
 
         testing::ProcessTest("testing refined graph", testing::IsEqual(output[0], newOutput[0]));

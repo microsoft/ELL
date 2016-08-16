@@ -155,6 +155,8 @@ namespace model
         /// <summary> An STL-type iterator pointing to the end of the list of ranges </summary>
         std::vector<PortRange>::const_iterator end() const { return _ranges.cend(); }
 
+        PortRange GetRange(size_t index) const { return _ranges[index]; }
+
         /// <summary> Adds a range of values to this list </summary>
         ///
         /// <param name="range"> The range of values to add to this list </param>

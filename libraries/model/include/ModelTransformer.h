@@ -85,8 +85,11 @@ namespace model
 
         /// <summary> Returns the OutputPort from new new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
+        // template <typename ValueType>
+        // const OutputPort<ValueType>* GetCorrespondingOutputPort(const OutputPort<ValueType>& port);
+
         template <typename ValueType>
-        const OutputPort<ValueType>* GetCorrespondingOutputPort(const OutputPort<ValueType>& port);
+        const PortElements<ValueType> GetCorrespondingOutputs(const PortElements<ValueType>& elements);
 
         /// <summary> Returns the input node from new new model corresponding to the given input node on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
@@ -132,7 +135,11 @@ namespace model
 
         /// <summary> Returns the (untyped) Port from new new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        const OutputPortBase* GetCorrespondingPort(const OutputPortBase& port);
+//        const OutputPortBase* GetCorrespondingPort(const OutputPortBase& port);
+
+        /// <summary> Returns the (untyped) Port from new new model corresponding to the given port on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
+        PortElementsUntyped GetCorrespondingElements(const PortElementsUntyped& elements);
 
         // Sets up a port-port mapping. Called by node implementors
         void MapPort(const OutputPortBase& oldPort, const OutputPortBase& newPort);

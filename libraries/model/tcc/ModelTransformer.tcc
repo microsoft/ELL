@@ -33,14 +33,24 @@ namespace model
         return PortElements<ValueType>(newRanges);
     }
 
+    // template <typename ValueType>
+    // const OutputPort<ValueType>* ModelTransformer::GetCorrespondingOutputPort(const OutputPort<ValueType>& port)
+    // {
+    //     auto correspondingPort = GetCorrespondingPort(port);
+    //     auto result = dynamic_cast<const model::OutputPort<ValueType>*>(correspondingPort);
+    //     assert(result != nullptr);
+    //     return result;
+    // }
+
     template <typename ValueType>
-    const OutputPort<ValueType>* ModelTransformer::GetCorrespondingOutputPort(const OutputPort<ValueType>& port)
+    const PortElements<ValueType> ModelTransformer::GetCorrespondingOutputs(const PortElements<ValueType>& elements)
     {
-        auto correspondingPort = GetCorrespondingPort(port);
+        auto correspondingPort = GetCorrespondingPort(elements);
         auto result = dynamic_cast<const model::OutputPort<ValueType>*>(correspondingPort);
         assert(result != nullptr);
         return result;
     }
+
 
     template <typename ValueType>
     InputNode<ValueType>* ModelTransformer::GetCorrespondingInputNode(const InputNode<ValueType>* inputNode)
