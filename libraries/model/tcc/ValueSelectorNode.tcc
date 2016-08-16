@@ -44,7 +44,7 @@ namespace model
 
         auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newPortElements1, newPortElements2);
 
-         transformer.MapOutputPort(output, newNode->output);
+         transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>
@@ -56,7 +56,7 @@ namespace model
 
         auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newPortElements1, newPortElements2);
 
-         transformer.MapOutputPort(output, newNode->output);
+         transformer.MapNodeOutput(output, newNode->output);
     }
 
     //
@@ -95,7 +95,7 @@ namespace model
         auto newValue2 = transformer.TransformPortElements(_value2.GetPortElements());
 
         auto newNode = transformer.AddNode<SelectIfLessNode<ValueType>>(newPortElements1, newPortElements2, newValue1, newValue2);
-        transformer.MapOutputPort(_output, newNode->output);
+        transformer.MapNodeOutput(_output, newNode->output);
     }
 
     template <typename ValueType>
@@ -109,7 +109,7 @@ namespace model
         auto ifLessNode = transformer.AddNode<IfLessNode<ValueType>>(newPortElements1, newPortElements2);
         auto selectNode = transformer.AddNode<ValueSelectorNode<ValueType>>(ifLessNode->output, newValue1, newValue2);
 
-        transformer.MapOutputPort(_output, selectNode->output);
+        transformer.MapNodeOutput(_output, selectNode->output);
     }
 
     //
@@ -140,7 +140,7 @@ namespace model
 
         auto newNode = transformer.AddNode<IfLessNode<ValueType>>(newValue, newThreshold);
 
-        transformer.MapOutputPort(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>
@@ -151,6 +151,6 @@ namespace model
 
         auto newNode = transformer.AddNode<IfLessNode<ValueType>>(newValue, newThreshold);
 
-         transformer.MapOutputPort(output, newNode->output);
+         transformer.MapNodeOutput(output, newNode->output);
     }
 }

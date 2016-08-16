@@ -14,17 +14,17 @@ namespace model
     //
 
     template <typename ValueType>
-    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port) : PortElementsUntyped(port)
+    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port) : PortElementsBase(port)
     {
     }
 
     template <typename ValueType>
-    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex) : PortElementsUntyped(PortRange(port, startIndex))
+    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex) : PortElementsBase(PortRange(port, startIndex))
     {
     }
 
     template <typename ValueType>
-    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : PortElementsUntyped(PortRange(port, startIndex, numValues))
+    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : PortElementsBase(PortRange(port, startIndex, numValues))
     {
     }
 
@@ -83,6 +83,13 @@ namespace model
             startIndex = 0; // after the first time through, we'll always take the first part of a range
         }
         ComputeSize();
+    }
+
+    template <typename ValueType>
+    PortElement<ValueType> PortElements<ValueType>::GetElement(size_t index) const
+    {
+        auto element = static_cast<PortElement<ValueType>&>(PortElementsBase::GetElement(index));
+        return element;
     }
 
     template <typename ValueType>

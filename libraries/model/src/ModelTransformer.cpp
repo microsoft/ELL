@@ -58,7 +58,7 @@ namespace model
             Model currentModel = std::move(_model);
             _model = Model();
 
-            std::unordered_map<PortRange, PortRange> currentElementToElementMap = std::move(_elementToElementMap);
+            auto currentElementToElementMap = std::move(_elementToElementMap);
             _elementToElementMap.clear();
 
             _isModelCompilable = true;
@@ -74,7 +74,7 @@ namespace model
             // concatenate new port map onto existing port map
             if(currentElementToElementMap.size() > 0)
             {
-                std::unordered_map<PortRange, PortRange> newElementToElementMap;
+                std::unordered_map<PortElementBase, PortElementBase> newElementToElementMap;
                 for(const auto& entry : currentElementToElementMap)
                 {
                     newElementToElementMap[entry.first] = _elementToElementMap[entry.second];
@@ -104,33 +104,14 @@ namespace model
         return _model;
     }
 
-    // const OutputPortBase* ModelTransformer::GetCorrespondingPort(const OutputPortBase& port)
-    // {
-    //     auto portRange = PortRange{port};
-    //     if (_elementToElementMap.find(portRange) == _elementToElementMap.end())
-    //     {
-    //         throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find port in new model.");
-    //     }
-    //     return _elementToElementMap[portRange].ReferencedPort();
-    // }
-
-    // PortElementsUntyped ModelTransformer::GetCorrespondingElements(const PortElementsUntyped& elements)
-    // {
-    //     // TODO: fix this
-    //     assert(elements.NumRanges() == 1);
-    //     auto portRange = elements.GetRange(0);
-    //     if (_elementToElementMap.find(portRange) == _elementToElementMap.end())
-    //     {
-    //         throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find port in new model.");
-    //     }
-    //     return _elementToElementMap[portRange];
-    // }
-
     void ModelTransformer::MapPort(const OutputPortBase& oldPort, const OutputPortBase& newPort)
     {
-        PortRange oldRange(oldPort);
-        PortRange newRange(newPort);
-        _elementToElementMap[oldRange] = newRange;
+        auto portSize = oldPort.Size(); 
+        assert(newPort.Size() == portSize);
+        for(size_t index = 0; index < portSize; ++index)
+        {
+            _elementToElementMap[{oldPort, index}] = {newPort, index};
+        }
     }
 
     const Node* ModelTransformer::FindFirstUncompilableNode(const Model& model, const TransformContext& context) const

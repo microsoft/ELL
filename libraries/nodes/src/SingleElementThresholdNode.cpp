@@ -24,7 +24,7 @@ namespace nodes
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto newNode = transformer.AddNode<SingleElementThresholdNode>(newPortElements, _predictor);
-        transformer.MapOutputPort(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 
     void SingleElementThresholdNode::RefineNode(model::ModelTransformer& transformer) const
@@ -40,7 +40,7 @@ namespace nodes
         // create a predicate that implements the split rule
         auto binaryPredicateNode = transformer.AddNode<BinaryPredicateNode<double>>(element, thresholdNode->output, BinaryPredicateNode<double>::PredicateType::greater);
 
-        transformer.MapOutputPort(output, binaryPredicateNode->output);
+        transformer.MapNodeOutput(output, binaryPredicateNode->output);
     }
 
     void SingleElementThresholdNode::Compute() const

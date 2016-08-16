@@ -12,25 +12,20 @@ namespace model
     template <typename ValueType>
     PortElements<ValueType> ModelTransformer::TransformPortElements(const PortElements<ValueType>& elements)
     {
-        std::vector<PortElements<ValueType>> newRanges;
-        for (const auto& range : elements)
+        auto size = elements.Size();
+        PortElements<ValueType> result;
+        // result.Reserve(size);
+        for (size_t index = 0; index < size; ++index)
         {
-            auto oldPort = range.ReferencedPort();
-            auto oldPortRange = PortRange{*oldPort};
-            assert(_elementToElementMap.find(oldPortRange) != _elementToElementMap.end());
-            if(_elementToElementMap.find(oldPortRange) == _elementToElementMap.end())
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
-            }
-            auto newPortRange = _elementToElementMap[oldPortRange];
-            auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPortRange.ReferencedPort());
-            assert(outputPort != nullptr);
-
-            auto start = range.GetStartIndex();
-            auto size = range.Size();
-            newRanges.emplace_back(*outputPort, start, size);
+            auto oldElement = elements.GetElement(index);
+            assert(_elementToElementMap.find(oldElement) != _elementToElementMap.end());
+            auto newElement = _elementToElementMap[oldElement];
+            auto newPort = static_cast<const OutputPort<ValueType>*>(newElement.ReferencedPort());
+            //PortElements<ValueType> newElements(newPort, newElement.GetIndex());
+            result.Append({ *newPort, newElement.GetIndex() });
         }
-        return PortElements<ValueType>(newRanges);
+        // result.Consolidate();
+        return result;
     }
 
     template <typename ValueType>
@@ -44,23 +39,25 @@ namespace model
     PortElements<ValueType> ModelTransformer::GetCorrespondingOutputs(const PortElements<ValueType>& elements)
     {
         // TODO: fix this --- it only returns a port
+        // TODO: iterate over each element
         assert(elements.NumRanges() == 1);
-        auto portRange = elements.GetRange(0);
-        if (_elementToElementMap.find(portRange) == _elementToElementMap.end())
+        auto firstElement = elements.GetElement(0);
+        if (_elementToElementMap.find(firstElement) == _elementToElementMap.end())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find port in new model.");
         }
 
-        auto range = _elementToElementMap[portRange];
+        auto range = _elementToElementMap[firstElement];
         auto untypedPort = range.ReferencedPort();
         auto port = dynamic_cast<const OutputPort<ValueType>*>(untypedPort);
+        assert(port != nullptr);
         return *port;
     }
 
     template <typename ValueType>
     InputNode<ValueType>* ModelTransformer::GetCorrespondingInputNode(const InputNode<ValueType>* inputNode)
     {
-        // #### FIX THIS
+        // #### FIX THIS --- maybe we should just keep track of nodes separately somehow
         // This sucks:
         auto inputNodeOutputPortElements = PortElements<ValueType>(inputNode->output);
         auto newInputNodeOutputs = GetCorrespondingOutputs(inputNodeOutputPortElements);
@@ -72,7 +69,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void ModelTransformer::MapOutputPort(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort)
+    void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort)
     {
         MapPort(oldPort, newPort);
     }

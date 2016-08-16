@@ -35,7 +35,7 @@ namespace nodes
         auto newInput1 = transformer.TransformPortElements(_input1.GetPortElements());
         auto newInput2 = transformer.TransformPortElements(_input2.GetPortElements());
         auto newNode = transformer.AddNode<DotProductNode<ValueType>>(newInput1, newInput2);
-        transformer.MapOutputPort(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>
@@ -47,7 +47,7 @@ namespace nodes
         auto multNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput1, newInput2, BinaryOperationNode<ValueType>::OperationType::coordinatewiseMultiply);
         auto sumNode = transformer.AddNode<SumNode<ValueType>>(multNode->output);
 
-        transformer.MapOutputPort(output, sumNode->output);
+        transformer.MapNodeOutput(output, sumNode->output);
     }
 
     template <typename ValueType>

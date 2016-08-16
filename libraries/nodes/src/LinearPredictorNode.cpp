@@ -37,8 +37,8 @@ namespace nodes
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto newNode = transformer.AddNode<LinearPredictorNode>(newPortElements, _predictor);
-        transformer.MapOutputPort(output, newNode->output);
-        transformer.MapOutputPort(weightedElements, newNode->weightedElements);
+        transformer.MapNodeOutput(output, newNode->output);
+        transformer.MapNodeOutput(weightedElements, newNode->weightedElements);
     }
 
     void LinearPredictorNode::RefineNode(model::ModelTransformer& transformer) const
@@ -51,8 +51,8 @@ namespace nodes
         auto biasNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetBias());
         auto addNode = transformer.AddNode<BinaryOperationNode<double>>(dotProductNode->output, biasNode->output, BinaryOperationNode<double>::OperationType::add);
         
-        transformer.MapOutputPort(output, addNode->output);
-        transformer.MapOutputPort(weightedElements, coordinatewiseMultiplyNode->output);
+        transformer.MapNodeOutput(output, addNode->output);
+        transformer.MapNodeOutput(weightedElements, coordinatewiseMultiplyNode->output);
     }
 
     void LinearPredictorNode::Compute() const

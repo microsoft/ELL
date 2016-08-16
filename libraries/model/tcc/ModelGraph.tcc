@@ -82,7 +82,7 @@ namespace model
             auto element = elements.GetElement(index);
             auto port = dynamic_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
             auto portOutput = port->GetOutput(); // TODO: fix this, it's very inefficient
-            result[index] = portOutput[element.GetStartIndex()];
+            result[index] = portOutput[element.GetIndex()];
         }
         return result;
     }

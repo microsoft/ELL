@@ -18,6 +18,16 @@
 namespace model
 {
     //
+    // PortElementBase
+    //
+    PortElementBase::PortElementBase(const OutputPortBase& port, size_t index) : _referencedPort(&port), _index(index) {}
+
+    bool PortElementBase::operator==(const PortElementBase& other) const
+    {
+        return (_referencedPort == other._referencedPort) && (_index == other._index);
+    }
+
+    //
     // PortRange
     //
     PortRange::PortRange(const OutputPortBase& port) : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}
@@ -37,8 +47,6 @@ namespace model
             return _referencedPort->Size();
         }
     }
-
-    size_t PortRange::GetStartIndex() const { return _startIndex; }
 
     bool PortRange::IsFullPortRange() const
     {
@@ -91,59 +99,59 @@ namespace model
     }
 
     //
-    // PortElementsUntyped
+    // PortElementsBase
     //
-    PortElementsUntyped::PortElementsUntyped(const OutputPortBase& port)
+    PortElementsBase::PortElementsBase(const OutputPortBase& port)
     {
         _ranges.emplace_back(port);
         ComputeSize();
     }
 
-    PortElementsUntyped::PortElementsUntyped(const OutputPortBase& port, size_t startIndex)
+    PortElementsBase::PortElementsBase(const OutputPortBase& port, size_t startIndex)
     {
         _ranges.emplace_back(port, startIndex);
         ComputeSize();
     }
 
-    PortElementsUntyped::PortElementsUntyped(const OutputPortBase& port, size_t startIndex, size_t numValues)
+    PortElementsBase::PortElementsBase(const OutputPortBase& port, size_t startIndex, size_t numValues)
     {
         _ranges.emplace_back(port, startIndex, numValues);
         ComputeSize();
     }
 
-    PortElementsUntyped::PortElementsUntyped(const PortRange& range)
+    PortElementsBase::PortElementsBase(const PortRange& range)
     {
         _ranges.push_back(range);
         _size += range.Size();
     }
 
-    PortElementsUntyped::PortElementsUntyped(const std::vector<PortRange>& ranges)
+    PortElementsBase::PortElementsBase(const std::vector<PortRange>& ranges)
     {
         _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
         ComputeSize();
     }
     
-    void PortElementsUntyped::AddRange(const PortRange& range)
+    void PortElementsBase::AddRange(const PortRange& range)
     {
         _ranges.push_back(range);
         _size += range.Size();
     }
 
-    PortRange PortElementsUntyped::GetElement(size_t index) const
+    PortElementBase PortElementsBase::GetElement(size_t index) const
     {
         size_t sumRangeSizesSoFar = 0;
         for (const auto& range : _ranges)
         {
             if (index < sumRangeSizesSoFar + range.Size())
             {
-                return PortRange(*range.ReferencedPort(), range.GetStartIndex() + index - sumRangeSizesSoFar, 1);
+                return PortElementBase(*range.ReferencedPort(), range.GetStartIndex() + index - sumRangeSizesSoFar);
             }
             sumRangeSizesSoFar += range.Size();
         }
         throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds PortElements range");
     }
 
-    void PortElementsUntyped::ComputeSize()
+    void PortElementsBase::ComputeSize()
     {
         _size = 0;
         for (const auto& range : _ranges)
@@ -152,12 +160,12 @@ namespace model
         }
     }
 
-    void PortElementsUntyped::Serialize(utilities::Serializer& serializer) const
+    void PortElementsBase::Serialize(utilities::Serializer& serializer) const
     {
         serializer.Serialize("ranges", _ranges);
     }
 
-    void PortElementsUntyped::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void PortElementsBase::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         std::vector<PortRange> ranges;
@@ -168,8 +176,15 @@ namespace model
 }
 
 //
-// hash function for PortRange
+// hash functions for PortElementUntyped and PortRange
 //
+std::hash<model::PortElementBase>::result_type std::hash<model::PortElementBase>::operator()(argument_type const& element) const
+{
+    auto hash1 = std::hash<const model::OutputPortBase*>()(element.ReferencedPort());
+    auto hash2 = std::hash<size_t>()(element.GetIndex());
+    return hash1 ^ (hash2 << 1);
+}
+
 std::hash<model::PortRange>::result_type std::hash<model::PortRange>::operator()(argument_type const& range) const
 {
     auto hash1 = std::hash<const model::OutputPortBase*>()(range.ReferencedPort());
