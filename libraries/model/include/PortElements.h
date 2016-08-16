@@ -177,14 +177,10 @@ namespace model
         /// <returns> The number of ranges in this list </returns>
         size_t NumRanges() const { return _ranges.size(); }
 
-        /// <summary> An STL-type iterator pointing to the beginning of the list of ranges </summary>
-        std::vector<PortRange>::const_iterator begin() const { return _ranges.cbegin(); }
-
-        /// <summary> An STL-type iterator pointing to the end of the list of ranges </summary>
-        std::vector<PortRange>::const_iterator end() const { return _ranges.cend(); }
-
-        /// <summary> Gets a range </summary>
-        PortRange GetRange(size_t index) const { return _ranges[index]; }
+        /// <summary> Gets a vector of range objects </summary>
+        ///
+        /// <returns> A std::vector of PortRange objects </returns>
+        const std::vector<PortRange>& GetRanges() const { return _ranges; }
 
         /// <summary> Gets an element in the elements. </summary>
         ///

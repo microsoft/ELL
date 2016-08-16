@@ -46,7 +46,7 @@ namespace model
 
     inline void InputPortBase::ComputeParentsAndElements()
     {
-        for (const auto& range : _inputElements)
+        for (const auto& range : _inputElements.GetRanges())
         {
             auto port = range.ReferencedPort();
             auto node = port->GetNode();

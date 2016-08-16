@@ -65,7 +65,7 @@ namespace model
     {
         // get set of nodes to make sure we visit
         std::unordered_set<const Node*> usedNodes;
-        for(const auto& range: elements)
+        for(const auto& range: elements.GetRanges())
         {
             usedNodes.insert(range.ReferencedPort()->GetNode());
         }

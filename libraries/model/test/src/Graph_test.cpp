@@ -44,7 +44,7 @@ void NodePrinter(const model::Node& node)
         }
 
         bool isFirstRange = true;
-        for (const auto& range : elements)
+        for (const auto& range : elements.GetRanges())
         {
             std::cout << (isFirstRange ? "" : ", ");
             isFirstRange = false;

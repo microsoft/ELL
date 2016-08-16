@@ -40,7 +40,7 @@ namespace model
     {
         for (const auto& group : groups)
         {
-            for (const auto& range : group)
+            for (const auto& range : group.GetRanges())
             {
                 AddRange(range);
             }
@@ -53,7 +53,7 @@ namespace model
     {
         for (const auto& group : groups)
         {
-            for (const auto& range : group)
+            for (const auto& range : group.GetRanges())
             {
                 AddRange(range);
             }
@@ -72,16 +72,17 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Invalid slice.");
         }
 
-        auto rangeIterator = elements.begin();
+        auto rangeIterator = elements.GetRanges().begin();
+        auto endIterator = elements.GetRanges().end();
         // skip ranges that come before the desired elements
-        while(rangeIterator != elements.end() && rangeIterator->Size() <= startIndex)
+        while(rangeIterator != endIterator && rangeIterator->Size() <= startIndex)
         {
             startIndex -= rangeIterator->Size();
             ++rangeIterator;
         }
 
         // now extract portions from ranges until done
-        while(rangeIterator != elements.end() && numValues > 0)
+        while(rangeIterator != endIterator && numValues > 0)
         {
             size_t numRangeValues = std::min(rangeIterator->Size()-startIndex, numValues);
             AddRange({*rangeIterator->ReferencedPort(), startIndex, numRangeValues});
@@ -102,7 +103,7 @@ namespace model
     template <typename ValueType>
     void PortElements<ValueType>::Append(const PortElements<ValueType>& other)
     {
-        for(const auto& range: other)
+        for(const auto& range: other.GetRanges())
         {
             AddRange(range);
         }
