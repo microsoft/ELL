@@ -37,19 +37,6 @@ namespace emll
 			_pfn = pfn;
 		}
 
-		void IRFunctionEmitter::AddBlock(llvm::BasicBlock* pBlock)
-		{
-			assert(pBlock != nullptr);
-			_pfn->getBasicBlockList().push_back(pBlock);
-		}
-
-		llvm::BasicBlock* IRFunctionEmitter::CurrentBlock(llvm::BasicBlock* pBlock)
-		{
-			llvm::BasicBlock* pCurrentBlock = CurrentBlock();
-			_pEmitter->SetCurrentBlock(pBlock);
-			return pCurrentBlock;
-		}
-
 		llvm::Value* IRFunctionEmitter::Call(const std::string& name, llvm::Value* pArg)
 		{
 			llvm::Function* fn = ResolveFunction(name);
@@ -146,6 +133,19 @@ namespace emll
 		{
 			llvm::Value* pResult = Cmp(comparision, pValue, pTestValue);
 			Branch(pResult, pThenBlock, pElseBlock);
+		}
+
+		void IRFunctionEmitter::AppendBlock(llvm::BasicBlock* pBlock)
+		{
+			assert(pBlock != nullptr);
+			_pfn->getBasicBlockList().push_back(pBlock);
+		}
+
+		llvm::BasicBlock* IRFunctionEmitter::CurrentBlock(llvm::BasicBlock* pBlock)
+		{
+			llvm::BasicBlock* pCurrentBlock = CurrentBlock();
+			_pEmitter->SetCurrentBlock(pBlock);
+			return pCurrentBlock;
 		}
 
 		llvm::Value* IRFunctionEmitter::Store(llvm::Value* pPtr, llvm::Value* pVal)

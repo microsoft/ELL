@@ -29,7 +29,6 @@ void TestIRCompiler()
 
 	TestLLVM();
 	TestLLVMShiftRegister();
-	TestLLVMBlocks();
 }
 
 

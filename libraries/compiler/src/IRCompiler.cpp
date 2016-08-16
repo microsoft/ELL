@@ -13,76 +13,54 @@
 #include "Files.h"
 
 #include <stdio.h>
+#include <sstream>
 
 namespace emll
 {
 	namespace compiler
 	{
+		IRBlockRegionList::IRBlockRegionList(IRFunctionEmitter& fn)
+			: _fn(fn)
+		{
+		}
+
+		IRBlockRegion* IRBlockRegionList::Add()
+		{
+			auto pRegion = std::make_shared<IRBlockRegion>();
+			_regions.push_back(pRegion);
+			return pRegion.get();
+		}
+
+		void IRBlockRegionList::Merge()
+		{
+			llvm::BasicBlock* pCurBlock = _fn.CurrentBlock();
+			IRBlockRegion* pPrevRegion = nullptr;
+			for (size_t i = 0; i < _regions.size(); ++i)
+			{
+				IRBlockRegion* pRegion = _regions[i].get();
+				if (pRegion->IsTopLevel())
+				{
+					if (pPrevRegion != nullptr)
+					{
+						_fn.CurrentBlock(pPrevRegion->End());
+						_fn.Branch(pRegion->Start());
+					}
+					pPrevRegion = pRegion;
+				}
+			}
+			_fn.CurrentBlock(pCurBlock);
+		}
+
 		IRCompiler::IRCompiler()
 			: IRCompiler("EMLL")
 		{
 		}
 
 		IRCompiler::IRCompiler(const std::string& moduleName)
-			:  _module(_emitter, moduleName), _runtime(_module)
+			:  _module(_emitter, moduleName), 
+			   _runtime(_module),
+			   _regions(_fn)
 		{
-		}
-		
-		void IRCompiler::CompileDotProductNode(const model::Node& node)
-		{
-			switch (ModelEx::GetNodeDataType(node))
-			{
-				case model::Port::PortType::Real:
-					CompileDotProduct<double>(static_cast<const nodes::DotProductNode<double>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
-		void IRCompiler::CompileAccumulatorNode(const model::Node& node)
-		{
-			switch (ModelEx::GetNodeDataType(node))
-			{
-				case model::Port::PortType::Real:
-					CompileAccumulator<double>(static_cast<const nodes::AccumulatorNode<double>&>(node));
-					break;
-				case model::Port::PortType::Integer:
-					CompileAccumulator<int>(static_cast<const nodes::AccumulatorNode<int>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
-		void IRCompiler::CompileDelayNode(const model::Node& node)
-		{
-			switch (ModelEx::GetNodeDataType(node))
-			{
-				case model::Port::PortType::Real:
-					CompileDelay<double>(static_cast<const nodes::DelayNode<double>&>(node));
-					break;
-				case model::Port::PortType::Integer:
-					CompileDelay<int>(static_cast<const nodes::DelayNode<int>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
-		}
-
-		void IRCompiler::CompileUnaryNode(const model::Node& node)
-		{
-			switch (ModelEx::GetNodeDataType(node))
-			{
-				case model::Port::PortType::Real:
-					CompileUnary<double>(static_cast<const nodes::UnaryOperationNode<double>&>(node));
-					break;
-				case model::Port::PortType::Integer:
-					CompileUnary<int>(static_cast<const nodes::UnaryOperationNode<int>&>(node));
-					break;
-				default:
-					throw new CompilerException(CompilerError::portTypeNotSupported);
-			}
 		}
 
 		void IRCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
@@ -200,6 +178,17 @@ namespace emll
 					break;
 			}
 			throw new CompilerException(CompilerError::variableTypeNotSupported);
+		}
+
+		void IRCompiler::NewBlockRegion(const model::Node& node)
+		{
+			/*
+			std::stringstream id;
+			id << "Node_" << node.GetId();
+			auto pBlock = _fn.BlockRegion(id.str());
+			_nodeBlocks.Set(node, pBlock);
+			_fn.CurrentBlock(pBlock);
+			*/
 		}
 
 		llvm::Value* IRCompiler::LoadVar(Variable* pVar)

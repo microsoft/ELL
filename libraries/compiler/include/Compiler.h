@@ -90,6 +90,14 @@ namespace emll
 			virtual void CompileSumNode(const model::Node& node);
 			///<summary>Compile a BinaryPredicateNode</summary>
 			virtual void CompileBinaryPredicateNode(const model::Node& node);
+			///<summary>Compile a DotProductNode</summary>
+			virtual void CompileDotProductNode(const model::Node& node);
+			///<summary>Compile a AccumulatorNode</summary>
+			virtual void CompileAccumulatorNode(const model::Node& node);
+			///<summary>Compile a DelayNode</summary>
+			virtual void CompileDelayNode(const model::Node& node);
+			///<summary>Compile a UnaryNode</summary>
+			virtual void CompileUnaryNode(const model::Node& node);
 
 			//---------------------------------------------------
 			//
@@ -97,33 +105,35 @@ namespace emll
 			//
 			//---------------------------------------------------
 			///<summary>Compile an OutputNode</summary>
-			virtual void CompileOutputNode(const model::OutputNode<double>& node) = 0;
+			virtual void CompileOutputNode(const model::OutputNode<double>& node)  { NotSupported(); }
 			///<summary>Compile an OutputNode</summary>
-			virtual void CompileOutputNode(const model::OutputNode<int>& node) = 0;
+			virtual void CompileOutputNode(const model::OutputNode<int>& node) { NotSupported(); }
 			///<summary>Compile an OutputNode</summary>
-			virtual void CompileOutputNode(const model::OutputNode<bool>& node) = 0;
-
+			virtual void CompileOutputNode(const model::OutputNode<bool>& node) { NotSupported(); }
 			///<summary>Compile a BinaryNode</summary>
-			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<double>& node) = 0;
+			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<double>& node) { NotSupported(); }
 			///<summary>Compile a BinaryNode</summary>
-			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<int>& node) = 0;
-
+			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<int>& node) { NotSupported(); }
 			///<summary>Compile a SumNode</summary>
-			virtual void CompileSumNode(const nodes::SumNode<double>& node) = 0;
+			virtual void CompileSumNode(const nodes::SumNode<double>& node) { NotSupported(); }
 			///<summary>Compile a SumNode</summary>
-			virtual void CompileSumNode(const nodes::SumNode<int>& node) = 0;
-
+			virtual void CompileSumNode(const nodes::SumNode<int>& node) { NotSupported(); }
 			///<summary>Compile a binary predicate</summary>
-			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) = 0;
-
+			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) { NotSupported(); }
 			///<summary>Compile a DotProductNode</summary>
-			virtual void CompileDotProductNode(const model::Node& node) = 0;
+			virtual void CompileDotProductNode(const nodes::DotProductNode<double>& node) { NotSupported(); }
 			///<summary>Compile a AccumulatorNode</summary>
-			virtual void CompileAccumulatorNode(const model::Node& node) = 0;
+			virtual void CompileAccumulatorNode(const nodes::AccumulatorNode<double>& node) { NotSupported(); }
+			///<summary>Compile a AccumulatorNode</summary>
+			virtual void CompileAccumulatorNode(const nodes::AccumulatorNode<int>& node) { NotSupported(); }
 			///<summary>Compile a DelayNode</summary>
-			virtual void CompileDelayNode(const model::Node& node) = 0;
+			virtual void CompileDelayNode(const nodes::DelayNode<double>& node) { NotSupported();}
+			///<summary>Compile a DelayNode</summary>
+			virtual void CompileDelayNode(const nodes::DelayNode<int>& node) { NotSupported(); }
 			///<summary>Compile a UnaryNode</summary>
-			virtual void CompileUnaryNode(const model::Node& node) = 0;
+			virtual void CompileUnaryNode(const nodes::UnaryOperationNode<double>& node) { NotSupported(); }
+			///<summary>Compile a UnaryNode</summary>
+			virtual void CompileUnaryNode(const nodes::UnaryOperationNode<int>& node) { NotSupported(); }
 
 			///<summary>Compile an ElementSelectorNode</summary>
 			virtual void CompileElementSelectorNode(const model::Node& node);
@@ -179,6 +189,8 @@ namespace emll
 			ComparisonType GetComparison(const nodes::BinaryPredicateNode<T>& node) const;
 
 			const NamedValueTypeList& InputArgs() const { return _inputArgs; }
+
+			void NotSupported();
 
 		private:
 			Variable* AllocArg(const model::OutputPortBase* pPort, bool isInput);

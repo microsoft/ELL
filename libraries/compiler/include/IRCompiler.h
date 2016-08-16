@@ -12,12 +12,40 @@
 #include "ScalarVar.h"
 #include "VectorVar.h"
 #include "IRRuntime.h"
+
 #include <stdio.h>
+#include <memory>
 
 namespace emll
 {
 	namespace compiler
 	{
+		class IRBlockRegion
+		{
+		public:
+			llvm::BasicBlock*& Start() { return _pStart; }
+			llvm::BasicBlock*& End() { return _pEnd; }
+			bool& IsTopLevel() { return _isTopLevel;}
+
+		private:
+			llvm::BasicBlock* _pStart = nullptr;
+			llvm::BasicBlock* _pEnd = nullptr;
+			bool _isTopLevel = true;
+		};
+
+		class IRBlockRegionList
+		{
+		public:
+			IRBlockRegionList(IRFunctionEmitter& fn);
+
+			IRBlockRegion* Add();
+			void Merge();
+
+		private:
+			IRFunctionEmitter& _fn;
+			std::vector<std::shared_ptr<IRBlockRegion>> _regions;
+		};
+
 		///<summary>Compiles EMLL Models to LLVM IR</summary>
 		class IRCompiler : public Compiler
 		{
@@ -53,23 +81,28 @@ namespace emll
 			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<double>& node) override { CompileBinary<double>(node);}
 			///<summary>Compile a BinaryNode</summary>
 			virtual void CompileBinaryNode(const nodes::BinaryOperationNode<int>& node) override { CompileBinary<int>(node); }
+
 			///<summary>Compile a SumNode</summary>
 			virtual void CompileSumNode(const nodes::SumNode<double>& node) override { CompileSum<double>(node); }
 			///<summary>Compile a SumNode</summary>
 			virtual void CompileSumNode(const nodes::SumNode<int>& node) override { CompileSum<int>(node);}
 
 			///<summary>Compile a DotProductNode</summary>
-			virtual void CompileDotProductNode(const model::Node& node) override;
-			///<summary>Compile a AccmulatorNode</summary>
-			virtual void CompileAccumulatorNode(const model::Node& node) override;
-			///<summary>Compile a Delay node</summary>
-			virtual void CompileDelayNode(const model::Node& node) override;
-			///<summary>Compile a Unary node</summary>
-			virtual void CompileUnaryNode(const model::Node& node) override;
-
+			virtual void CompileDotProductNode(const nodes::DotProductNode<double>& node) override { CompileDotProduct<double>(node); }
+			///<summary>Compile a AccumulatorNode</summary>
+			virtual void CompileAccumulatorNode(const nodes::AccumulatorNode<double>& node) override { CompileAccumulator<double>(node); }
+			///<summary>Compile a AccumulatorNode</summary>
+			virtual void CompileAccumulatorNode(const nodes::AccumulatorNode<int>& node) override { CompileAccumulator<int>(node); }
 			///<summary>Compile a binary predicate</summary>
-			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) { CompileBinaryPredicate<double>(node); };
-
+			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) override { CompileBinaryPredicate<double>(node); };
+			///<summary>Compile a DelayNode</summary>
+			virtual void CompileDelayNode(const nodes::DelayNode<double>& node) override { CompileDelay<double>(node); }
+			///<summary>Compile a DelayNode</summary>
+			virtual void CompileDelayNode(const nodes::DelayNode<int>& node) override { CompileDelay<int>(node); }
+			///<summary>Compile a UnaryNode</summary>
+			virtual void CompileUnaryNode(const nodes::UnaryOperationNode<double>& node) { CompileUnary<double>(node); }
+			///<summary>Compile a UnaryNode</summary>
+			virtual void CompileUnaryNode(const nodes::UnaryOperationNode<int>& node) { CompileUnary<int>(node); }
 
 			///<summary>Begins the IR function that will contain our compiled model</summary>
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) override;
@@ -148,6 +181,8 @@ namespace emll
 			///<summary>Updates the value at a given offset of the given variable. Checks for index out of range etc.</summary>
 			void SetVar(Variable& var, llvm::Value* pDest, int offset, llvm::Value* pValue);
 			
+			void NewBlockRegion(const model::Node& node);
+
 			///<summary>Compile an OutputNode</summary>
 			template<typename T>
 			void CompileOutput(const model::OutputNode<T>& node);
@@ -224,6 +259,9 @@ namespace emll
 			IRVariableTable _locals;	// Symbol table - name to stack variables
 			IRVariableTable _globals;	// Symbol table - name to global variables
 			IRRuntime _runtime;			// Manages emission of runtime functions	
+
+			IRBlockRegionList _regions;
+			NodeMap<IRBlockRegion*, nullptr> _nodeRegions;
 		};
 	}
 }

@@ -60,27 +60,6 @@ namespace emll
 			template<typename T>
 			llvm::Value* Cast(llvm::Value* pValue);
 			
-			///<summary>The current code block that code is being emitted into</summary>
-			llvm::BasicBlock* CurrentBlock()
-			{
-				return _pEmitter->CurrentBlock();
-			}
-			/// <summary>Set the block that subsequent code will go into.</summary> 
-			/// <returns>The previous block</returns>
-			llvm::BasicBlock* CurrentBlock(llvm::BasicBlock* pBlock);
-			
-			///<summary>Emit a new labelled code block. The "current" block does not change</summary>
-			llvm::BasicBlock* Block(const std::string& label)
-			{
-				return _pEmitter->Block(_pfn, label);
-			}
-			///<summary>Emit a new labelled code block. The block is inserted after the given previous block</summary>
-			llvm::BasicBlock* BlockAfter(llvm::BasicBlock* pPrevBlock, const std::string& label)
-			{
-				return _pEmitter->BlockAfter(_pfn, pPrevBlock, label);
-			}
-			///<summary>The given block is added to the end of the function's block list</summary>
-			void AddBlock(llvm::BasicBlock* pBlock);
 				
 			///<summary>Emit a call to a function with a single optional argument</summary>
 			llvm::Value* Call(const std::string& name, llvm::Value* pArg = nullptr);
@@ -134,6 +113,34 @@ namespace emll
 				return _pEmitter->Cmp(type, pValue, pTestValue);
 			}
 
+			//-----------------------------------
+			//
+			// Block management
+			//
+			//-----------------------------------
+
+			///<summary>The current code block that code is being emitted into</summary>
+			llvm::BasicBlock* CurrentBlock()
+			{
+				return _pEmitter->CurrentBlock();
+			}
+			/// <summary>Set the block that subsequent code will go into.</summary> 
+			/// <returns>The previous block</returns>
+			llvm::BasicBlock* CurrentBlock(llvm::BasicBlock* pBlock);
+
+			///<summary>Emit a new labelled code block. The "current" block does not change</summary>
+			llvm::BasicBlock* Block(const std::string& label)
+			{
+				return _pEmitter->Block(_pfn, label);
+			}
+			///<summary>Emit a new labelled code block. The block is inserted after the given previous block</summary>
+			llvm::BasicBlock* BlockAfter(llvm::BasicBlock* pPrevBlock, const std::string& label)
+			{
+				return _pEmitter->BlockAfter(_pfn, pPrevBlock, label);
+			}
+			///<summary>The given block is added to the end of the function's block list</summary>
+			void AppendBlock(llvm::BasicBlock* pBlock);
+
 			//------------------------------------------
 			//
 			// Variables
@@ -165,6 +172,12 @@ namespace emll
 			{
 				return _pEmitter->StackAlloc(type, count);
 			}
+
+			//------------------------------------------
+			//
+			// Load and tore
+			//
+			//------------------------------------------
 			llvm::Value* Load(llvm::Value* pPtr)
 			{
 				return _pEmitter->Load(pPtr);
@@ -173,6 +186,7 @@ namespace emll
 			{
 				return _pEmitter->Load(pPtr, name);
 			}
+
 			llvm::Value* Store(llvm::Value* pPtr, llvm::Value* pValue);
 			llvm::Value* OpAndUpdate(llvm::Value* pPtr, OperatorType op, llvm::Value* pValue);
 
@@ -203,7 +217,6 @@ namespace emll
 
 			llvm::Value* ValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset);
 			llvm::Value* SetValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pVal);
-
 
 			//------------------------------------------
 			//

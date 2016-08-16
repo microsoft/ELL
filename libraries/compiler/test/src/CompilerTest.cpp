@@ -129,44 +129,6 @@ void TestLLVM()
 	module.WriteBitcodeToFile("C:\\junk\\model\\loop.bc");
 }
 
-void TestLLVMBlocks()
-{
-	IREmitter llvm;
-	IRModuleEmitter module(llvm, llvm.AddModule("Blocks"));
-	module.DeclarePrintf();
-
-	auto fn = module.Function("MergeBlocks", ValueType::Void);
-	
-	std::vector<llvm::BasicBlock*> blocks;
-	blocks.push_back(fn.CurrentBlock());
-	for (int i = 0; i < 5; ++i)
-	{
-		auto block = fn.Block("block_" + std::to_string(i));
-		blocks.push_back(block);
-	}
-
-	for (size_t i = 0; i < blocks.size(); ++i)
-	{
-		auto curBlock = blocks[i];
-		if (i > 0)
-		{
-			auto prevBlock = blocks[i - 1];
-			fn.CurrentBlock(prevBlock);
-			fn.Branch(curBlock);
-		}
-		fn.CurrentBlock(curBlock);
-		fn.Printf({ fn.Literal("%s\n"), fn.Literal(curBlock->getName())});
-	}
-
-	fn.Ret();
-	
-	auto fnMain = module.AddMain();
-	fnMain.Call("MergeBlocks");
-	fnMain.Ret();
-
-	module.Dump();
-	module.WriteAsmToFile("C:\\junk\\model\\MergeBlocks.asm");
-}
 
 ModelBuilder::ModelBuilder()
 {

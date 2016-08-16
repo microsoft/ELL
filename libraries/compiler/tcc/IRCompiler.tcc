@@ -268,6 +268,8 @@ namespace emll
 		template<typename T>
 		void IRCompiler::CompileSum(const nodes::SumNode<T>& node)
 		{
+			NewBlockRegion(node);
+
 			// SumNode has exactly 1 input and 1 output
 			auto input = node.GetInputPorts()[0];
 			if (ModelEx::IsPureVector(*input) && 
@@ -415,6 +417,8 @@ namespace emll
 		template<typename T>
 		void IRCompiler::CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node)
 		{
+			NewBlockRegion(node);
+
 			// Binary predicate has 2 inputs and 1 output
 			auto pInput1 = node.GetInputPorts()[0];
 			auto pInput2 = node.GetInputPorts()[1];
@@ -437,6 +441,8 @@ namespace emll
 		template<typename T, typename SelectorType>
 		void IRCompiler::CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node)
 		{
+			NewBlockRegion(node);
+
 			auto pElements = node.GetInputPorts()[0];
 			if (!ModelEx::IsPureBinary(node))
 			{
@@ -467,16 +473,14 @@ namespace emll
 			}
 			else
 			{
-				llvm::Value* pLVal = LoadVar(pElements->GetOutputPortElement(0));
-				llvm::Value* pRVal = LoadVar(pElements->GetOutputPortElement(1));
 				IRIfEmitter ife = _fn.If();
 				ife.If(ComparisonType::Eq, pSelectorVal, _fn.Literal(0));
 				{
-					_fn.Store(pResult, pLVal);
+					_fn.Store(pResult, LoadVar(pElements->GetOutputPortElement(0)));
 				}
 				ife.Else();
 				{
-					_fn.Store(pResult, pRVal);
+					_fn.Store(pResult, LoadVar(pElements->GetOutputPortElement(1)));
 				}
 				ife.End();
 			}

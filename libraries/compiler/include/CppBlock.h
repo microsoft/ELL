@@ -52,6 +52,7 @@ namespace emll
 
 			void Remove(CppBlock* pBlock);
 			void Clear();
+			///<summary>Combine all blocks into one.. </summary>
 			CppBlock* Merge();
 
 		private:
