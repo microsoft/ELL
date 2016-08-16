@@ -118,31 +118,31 @@ void TestStaticGraph()
     in->SetInput(inputValues);
 
     std::cout << "\nComputing output of Input node" << std::endl;
-    auto output1 = g.ComputeNodeOutput(in->output);
+    auto output1 = g.ComputeOutput(in->output);
     for (auto x : output1)
         std::cout << x << "  ";
     std::cout << std::endl;
 
     std::cout << "\nComputing output of condition node" << std::endl;
-    auto conditionOutput = g.ComputeNodeOutput(condition->output);
+    auto conditionOutput = g.ComputeOutput(condition->output);
     for (auto x : conditionOutput)
         std::cout << x << "  ";
     std::cout << std::endl;
 
     // std::cout << "\nComputing output of ArgMax node" << std::endl;
-    // auto maxOutput = g.ComputeNodeOutput(maxAndArgMax->val);
+    // auto maxOutput = g.ComputeOutput(maxAndArgMax->val);
     // for(auto x: maxOutput) std::cout << x << "  ";
     // std::cout << std::endl;
 
     std::cout << "\nComputing output of valSelector node" << std::endl;
-    auto output3 = g.ComputeNodeOutput(valSelector->output);
+    auto output3 = g.ComputeOutput(valSelector->output);
     for (auto x : output3)
         std::cout << x << "  ";
     std::cout << std::endl;
     testing::ProcessTest("Testing min value", testing::IsEqual(output3[0], 0.75));
 
     std::cout << "\nComputing output of indexSelector node" << std::endl;
-    auto output4 = g.ComputeNodeOutput(indexSelector->output);
+    auto output4 = g.ComputeOutput(indexSelector->output);
     for (auto x : output4)
         std::cout << x << "  ";
     std::cout << std::endl;
@@ -204,12 +204,12 @@ void TestInputRouting1()
     // set some example input and read the output
     // std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
     // in->SetInput(inputValues);
-    // auto output = model.ComputeNodeOutput(minAndMax->output);
+    // auto output = model.ComputeOutput(minAndMax->output);
 
     // testing::ProcessTest("Testing combine node", testing::IsEqual(output[0], 0.25));
     // testing::ProcessTest("Testing combine node", testing::IsEqual(output[1], 0.75));
 
-    // auto output2 = model.ComputeNodeOutput(minAndTail->output);
+    // auto output2 = model.ComputeOutput(minAndTail->output);
     // std::cout << "size: " << output2.size() << std::endl;
     // for (auto val : output2) std::cout << val << "  ";
     // std::cout << std::endl;
@@ -236,11 +236,11 @@ void TestInputRouting2()
     std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
     in->SetInput(inputValues);
 
-    auto output1 = model.ComputeNodeOutput(minAndArgMin1->val);
-    auto output2 = model.ComputeNodeOutput(minAndArgMin2->val);
-    auto output3 = model.ComputeNodeOutput(minAndArgMin3->val);
-    auto output4 = model.ComputeNodeOutput(minAndArgMin4->val);
-    //    auto output5 = model.ComputeNodeOutput(minAndArgMin5->val);
+    auto output1 = model.ComputeOutput(minAndArgMin1->val);
+    auto output2 = model.ComputeOutput(minAndArgMin2->val);
+    auto output3 = model.ComputeOutput(minAndArgMin3->val);
+    auto output4 = model.ComputeOutput(minAndArgMin4->val);
+    //    auto output5 = model.ComputeOutput(minAndArgMin5->val);
 
     std::cout << "output1: " << output1[0] << ", output2: " << output2[0] << ", output3: " << output3[0] << ", output4: " << output4[0] << std::endl; // ", output5: " << output5[0] << std::endl;
 
@@ -315,11 +315,11 @@ void TestRefineGraph()
     for (const auto& inputValue : inputValues)
     {
         inputNode->SetInput(inputValue);
-        auto output = model.ComputeNodeOutput(outputNode->output);
+        auto output = model.ComputeOutput(outputNode->output);
 
         newInputNode->SetInput(inputValue);
         auto newOutputPort = newOutputs.GetElement(0).ReferencedPort();
-        auto newOutput = newModel.ComputeNodeOutput(*newOutputPort);
+        auto newOutput = newModel.ComputeOutput(*newOutputPort);
 
         testing::ProcessTest("testing refined graph", testing::IsEqual(output[0], newOutput[0]));
         testing::ProcessTest("testing refined graph", testing::IsEqual(output[1], newOutput[1]));

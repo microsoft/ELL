@@ -105,7 +105,7 @@ void TestL2NormNodeCompute()
         double expectedOutput = VectorMagnitude(inputValue);
 
         inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.ComputeNodeOutput(outputNode->output);
+        std::vector<double> outputVec = model.ComputeOutput(outputNode->output);
 
         testing::ProcessTest("Testing L2NormNode output size", outputVec.size() == 1);
         testing::ProcessTest("Testing L2NormNode compute", testing::IsEqual(outputVec[0], expectedOutput));
@@ -131,7 +131,7 @@ void TestAccumulatorNodeCompute()
             accumOutput[d] += inputValue[d];
         }
         inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.ComputeNodeOutput(outputNode->output);
+        std::vector<double> outputVec = model.ComputeOutput(outputNode->output);
 
         testing::ProcessTest("Testing AccumulatorNode compute", testing::IsEqual(outputVec, accumOutput));
     }
@@ -154,7 +154,7 @@ void TestDelayNodeCompute()
     {
         auto inputValue = data[index];
         inputNode->SetInput(inputValue);
-        outputVec = model.ComputeNodeOutput(outputNode->output);
+        outputVec = model.ComputeOutput(outputNode->output);
         if (index >= delay)
         {
             testing::ProcessTest("Testing DelayNode compute", testing::IsEqual(outputVec, data[index - delay]));
@@ -178,7 +178,7 @@ void TestMovingAverageNodeCompute()
     for (const auto& inputValue : data)
     {
         inputNode->SetInput(inputValue);
-        outputVec = model.ComputeNodeOutput(outputNode->output);
+        outputVec = model.ComputeOutput(outputNode->output);
     }
     testing::ProcessTest("Testing MovingAverageNode compute", testing::IsEqual(outputVec[0], expectedOutput));
 }
@@ -200,7 +200,7 @@ void TestMovingVarianceNodeCompute()
     for (const auto& inputValue : data)
     {
         inputNode->SetInput(inputValue);
-        outputVec = model.ComputeNodeOutput(outputNode->output);
+        outputVec = model.ComputeOutput(outputNode->output);
     }
     testing::ProcessTest("Testing MovingVarianceNode compute", testing::IsEqual(outputVec[0], expectedOutput));
 }
@@ -218,7 +218,7 @@ void TestUnaryOperationNodeCompute()
         auto inputValue = data[index];
 
         inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.ComputeNodeOutput(outputNode->output);
+        std::vector<double> outputVec = model.ComputeOutput(outputNode->output);
 
         for (int d = 0; d < inputValue.size(); ++d)
         {
@@ -241,7 +241,7 @@ void TestBinaryOperationNodeCompute()
         auto inputValue = data[index];
 
         inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.ComputeNodeOutput(outputNode->output);
+        std::vector<double> outputVec = model.ComputeOutput(outputNode->output);
 
         for (int d = 0; d < inputValue.size(); ++d)
         {
@@ -293,9 +293,9 @@ void TestMovingAverageNodeRefine()
     for (const auto& inputValue : data)
     {
         inputNode->SetInput(inputValue);
-        auto outputVec1 = model.ComputeNodeOutput(meanNode->output);
+        auto outputVec1 = model.ComputeOutput(meanNode->output);
         newInputNode->SetInput(inputValue);
-        auto outputVec2 = newModel.ComputeNodeOutput(*newOutputPort);
+        auto outputVec2 = newModel.ComputeOutput(*newOutputPort);
 
         testing::ProcessTest("Testing MovingAverageNode refine", testing::IsEqual(outputVec1, outputVec2));
     }
@@ -332,8 +332,8 @@ void TestSimpleForestNodeRefine()
     // check equivalence
     inputNode->SetInput({ 0.2, 0.5, 0.0 });
     refinedInputNode->SetInput({ 0.2, 0.5, 0.0 });
-    auto outputValue = model.ComputeNodeOutput(simpleForestNode->output)[0];
-    auto refinedOutputValue = refinedModel.ComputeNodeOutput(*refinedOutputPort)[0];
+    auto outputValue = model.ComputeOutput(simpleForestNode->output)[0];
+    auto refinedOutputValue = refinedModel.ComputeOutput(*refinedOutputPort)[0];
 
     //  expected output is -3.0
     testing::ProcessTest("Testing SimpleForestNode refine", testing::IsEqual(outputValue, refinedOutputValue));
@@ -363,8 +363,8 @@ void TestLinearPredictorNodeRefine()
     auto newOutputPort = transformer.GetCorrespondingOutputPort(linearPredictorNode->output);
     inputNode->SetInput({1.0, 1.0, 1.0});
     newInputNode->SetInput({1.0, 1.0, 1.0});
-    auto modelOutputValue = model.ComputeNodeOutput(linearPredictorNode->output)[0];
-    auto newOutputValue = newModel.ComputeNodeOutput(*newOutputPort)[0];
+    auto modelOutputValue = model.ComputeOutput(linearPredictorNode->output)[0];
+    auto newOutputValue = newModel.ComputeOutput(*newOutputPort)[0];
 
     testing::ProcessTest("Testing LinearPredictorNode refine", testing::IsEqual(modelOutputValue, newOutputValue));
 }

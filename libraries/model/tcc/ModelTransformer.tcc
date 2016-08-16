@@ -55,9 +55,11 @@ namespace model
     template <typename ValueType>
     InputNode<ValueType>* ModelTransformer::GetCorrespondingInputNode(const InputNode<ValueType>* inputNode)
     {
+        // #### FIX THIS
         // This sucks:
         const auto inputNodeOutputPort = inputNode->GetOutputPorts()[0];
-        auto newInputNodeOutputPort = GetCorrespondingPort(*inputNodeOutputPort);
+        auto inputNodeOutputPortElements = PortElements<ValueType>(inputNodeOutputPort);
+        auto newInputNodeOutputPort = GetCorrespondingOutputs(inputNodeOutputPortElements);
         auto newInputNodeConst = dynamic_cast<const model::InputNode<ValueType>*>(newInputNodeOutputPort->GetNode());
         assert(newInputNodeConst != nullptr);
         auto newInputNode = const_cast<model::InputNode<ValueType>*>(newInputNodeConst);

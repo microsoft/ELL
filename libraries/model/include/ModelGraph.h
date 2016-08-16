@@ -85,9 +85,8 @@ namespace model
         ///
         /// <param name="outputPort"> The output port to get the computed value form </param>
         template <typename ValueType>
-        std::vector<ValueType> ComputeNodeOutput(const OutputPort<ValueType>& outputPort) const;
-
-        // TODO: Need (?) a function to compute output from a PortElements thing
+        std::vector<ValueType> ComputeOutput(const OutputPort<ValueType>& outputPort) const;
+        // #### TODO: add version that takes a PortElements
 
 
         /// <summary>

@@ -51,7 +51,7 @@ namespace model
     // Compute output value
     //
     template <typename ValueType>
-    std::vector<ValueType> Model::ComputeNodeOutput(const OutputPort<ValueType>& outputPort) const
+    std::vector<ValueType> Model::ComputeOutput(const OutputPort<ValueType>& outputPort) const
     {
         auto compute = [](const Node& node) { node.Compute(); };
 
