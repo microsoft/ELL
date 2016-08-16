@@ -138,7 +138,7 @@ namespace model
         void MapPort(const OutputPortBase& oldPort, const OutputPortBase& newPort);
 
         // Find the name of a node that isn't compilable (if there are several, it just finds one)
-        const Node* GetUncompilableNode(const Model& model, const TransformContext& context) const;
+        const Node* FindFirstUncompilableNode(const Model& model, const TransformContext& context) const;
 
         Model _model;
         TransformContext _context;

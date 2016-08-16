@@ -92,7 +92,7 @@ namespace model
             if(++iterationCount >= maxRefinementIterations)
             {
                 std::string uncompilableNodeName;
-                auto uncompilableNode = GetUncompilableNode(currentModel, context);
+                auto uncompilableNode = FindFirstUncompilableNode(currentModel, context);
                 uncompilableNodeName = uncompilableNode->GetRuntimeTypeName();
                 throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than " + std::to_string(maxRefinementIterations) + " refinement iterations, uncompilable node: " + uncompilableNodeName);
             }
@@ -118,13 +118,10 @@ namespace model
     {
         PortRange oldRange(oldPort);
         PortRange newRange(newPort);
-        // // this is hideous
-        // auto nonconstPort = const_cast<OutputPortBase*>(&newPort);
-        // auto portRange = PortRange{nonconstPort};
         _elementToElementMap[oldRange] = newRange;
     }
 
-    const Node* ModelTransformer::GetUncompilableNode(const Model& model, const TransformContext& context) const
+    const Node* ModelTransformer::FindFirstUncompilableNode(const Model& model, const TransformContext& context) const
     {
         auto iter = model.GetNodeIterator();
         while(iter.IsValid())
