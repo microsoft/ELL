@@ -81,10 +81,6 @@ namespace model
         template <typename ValueType>
         InputNode<ValueType>* GetCorrespondingInputNode(const InputNode<ValueType>* node);
 
-        /// <summary> Returns the (untyped) Port from new new model corresponding to the given port on the input model </summary>
-        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        const Port* GetCorrespondingPort(const Port& port);
-
         ///
         /// Functions used by node implementors
         ///
@@ -122,16 +118,21 @@ namespace model
     private:
         friend class Node;
 
+        /// <summary> Returns the (untyped) Port from new new model corresponding to the given port on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
+        const OutputPortBase* GetCorrespondingPort(const OutputPortBase& port);
+
         // Sets up a port-port mapping. Called by node implementors
-        void MapPort(const Port& oldPort, const Port& newPort);
+        void MapPort(const OutputPortBase& oldPort, const OutputPortBase& newPort);
 
         // Find the name of a node that isn't compilable (if there are several, it just finds one)
         const Node* GetUncompilableNode(const Model& model, const TransformContext& context) const;
 
         Model _model;
         TransformContext _context;
-        std::unordered_map<const Port*, Port*> _portToPortMap;
+        std::unordered_map<PortRange, PortRange> _elementToElementMap;
         bool _isModelCompilable;
+
 
         // the maximal number of refinement iterations to allow
         const int maxRefinementIterations = 10;

@@ -16,13 +16,14 @@ namespace model
         for (const auto& range : elements)
         {
             auto oldPort = range.ReferencedPort();
-            assert(_portToPortMap.find(oldPort) != _portToPortMap.end());
-            if(_portToPortMap.find(oldPort) == _portToPortMap.end())
+            auto oldPortRange = PortRange{*oldPort};
+            assert(_elementToElementMap.find(oldPortRange) != _elementToElementMap.end());
+            if(_elementToElementMap.find(oldPortRange) == _elementToElementMap.end())
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
             }
-            auto newPort = _portToPortMap[oldPort];
-            auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPort);
+            auto newPortRange = _elementToElementMap[oldPortRange];
+            auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPortRange.ReferencedPort());
             assert(outputPort != nullptr);
 
             auto start = range.GetStartIndex();

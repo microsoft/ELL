@@ -85,6 +85,11 @@ namespace model
         }
     }
 
+    bool PortRange::operator==(const PortRange& other) const
+    {
+        return (_referencedPort == other._referencedPort) && (_startIndex == other._startIndex) && (_numValues == other._numValues);
+    }
+
     //
     // PortElementsUntyped
     //

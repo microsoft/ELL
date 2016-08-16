@@ -95,6 +95,11 @@ namespace model
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
+        /// <summary> Equality operatior. </summary>
+        ///
+        /// <returns> true if this range is equivalent to other. </returns>
+        bool operator==(const PortRange& other) const;
+
     private:
         const OutputPortBase* _referencedPort = nullptr;
         size_t _startIndex = 0;
