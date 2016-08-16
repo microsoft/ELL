@@ -79,9 +79,9 @@ double TestForest(double* input0)
 		t_21 = t_19;
 	}
 	t_22 = 0;
-	t_22 = t_22 + t_21;
-	t_22 = t_22 + t_7;
-	t_22 = t_22 + 0;
-	/* Block26 */	
+	t_22 += t_21;
+	t_22 += t_7;
+	t_22 += 0;
+	/* Block26 */
 	return t_22;
 }

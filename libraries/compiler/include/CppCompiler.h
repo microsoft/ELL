@@ -66,6 +66,11 @@ namespace emll
 			///<summary>Compile a DotProductNode</summary>
 			virtual void CompileDotProductNode(const nodes::DotProductNode<double>& node) { CompileDotProduct<double>(node); }
 
+			///<summary>Compile a AccumulatorNode</summary>
+			virtual void CompileAccumulatorNode(const nodes::AccumulatorNode<double>& node) { CompileAccumulator<double>(node); }
+			///<summary>Compile a AccumulatorNode</summary>
+			virtual void CompileAccumulatorNode(const nodes::AccumulatorNode<int>& node) { CompileAccumulator<int>(node); }
+
 			///<summary>Compile a binary predicate</summary>
 			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) override 
 			{ 
@@ -164,6 +169,16 @@ namespace emll
 			void CompileDotProductLoop(const nodes::DotProductNode<T>& node);
 			template<typename T>
 			void CompileDotProductExpanded(const nodes::DotProductNode<T>& node);
+
+			///<summary>Compile an Accumulator node</summary>
+			template<typename T>
+			void CompileAccumulator(const nodes::AccumulatorNode<T>& node);
+			///<summary>Compile an Accumulator with pure vector inputs as a loop</summary>
+			template<typename T>
+			void CompileAccumulatorLoop(const nodes::AccumulatorNode<T>& node);
+			///<summary>Compile an Accumulator into a sequence of scalar operations</summary>
+			template<typename T>
+			void CompileAccumulatorExpanded(const nodes::AccumulatorNode<T>& node);
 
 			///<summary>Compile a BinarPredicate</summary>
 			template<typename T>

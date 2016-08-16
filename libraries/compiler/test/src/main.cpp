@@ -34,7 +34,8 @@ void TestIRCompiler()
 
 void TestCppCompiler()
 {
-	TestDotProductCpp();
+	TestAccumulatorCpp(true);
+	TestAccumulatorCpp(false);
 	TestForestCpp();
 	TestSumCpp(true);
 	TestSumCpp(false);
@@ -42,6 +43,7 @@ void TestCppCompiler()
 	TestBinaryPredicateCpp();
 	TestBinaryVectorCpp(true);
 	TestBinaryVectorCpp(false);
+	TestDotProductCpp();
 	TestEmptyModelCpp();
 	TestCppCompilerGeneral();
 }

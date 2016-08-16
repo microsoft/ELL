@@ -63,9 +63,11 @@ namespace emll
 			///<summary>Emit an Assign</summary>
 			CppFunctionEmitter& AssignValueAt(const std::string& destVarName, int offset, std::function<void()> value);
 
-			///<summary>Emit an Assign</summary>
+			///<summary>Emit an Assign and increment</summary>
 			CppFunctionEmitter& IncrementUpdate(const std::string& varName);
-			///<summary>Emit an Assign</summary>
+			///<summary>Emit an Assign and increment</summary>
+			CppFunctionEmitter& IncrementValueAt(const std::string& destVarName, int offset);
+			///<summary>Emit an Assign and increment</summary>
 			CppFunctionEmitter& IncrementValueAt(const std::string& destVarName, const std::string& offsetVarName);
 
 			CppFunctionEmitter& AssignValue(Variable& var);

@@ -66,7 +66,7 @@ namespace emll
 			const model::Node* pParentNode = GetUniqueParent(node);
 			if (pParentNode == nullptr)
 			{
-				_pfn->Comment(_pfn->CurrentBlock()->IdString());
+				//_pfn->Comment(_pfn->CurrentBlock()->IdString());
 				return false;
 			}
 

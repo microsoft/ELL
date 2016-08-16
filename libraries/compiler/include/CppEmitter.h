@@ -79,6 +79,7 @@ namespace emll
 			CppEmitter& IncrementUpdate(const std::string& varName);
 			CppEmitter& AssignValueAt(const std::string& varName, const int offset);
 			CppEmitter& AssignValueAt(const std::string& varName, const std::string& offsetVarName);
+			CppEmitter& IncrementValueAt(const std::string& varName, const int offset);
 			CppEmitter& IncrementValueAt(const std::string& varName, const std::string& offsetVarName);
 
 			CppEmitter& For();

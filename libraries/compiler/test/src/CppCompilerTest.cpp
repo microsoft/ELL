@@ -151,6 +151,23 @@ void TestDotProductCpp()
 	TestDotProductCpp(settings);
 }
 
+void TestAccumulatorCpp(bool expanded)
+{
+	std::vector<double> data = { 5, 10, 15, 20 };
+
+	ModelBuilder mb;
+	auto c1 = mb.Constant<double>(data);
+	auto input1 = mb.Inputs<double>(4);
+	auto product = mb.Multiply<double>(c1->output, input1->output);
+	auto accumulate = mb.Accumulate<double>(product->output);
+	auto output = mb.Outputs<double>(accumulate->output);
+
+	CppCompiler compiler;
+	compiler.Settings().ShouldUnrollLoops() = expanded;
+	compiler.CompileModel("TestAccumulator", mb.Model);
+	compiler.DebugDump();
+}
+
 void TestForestCpp()
 {
 	model::Model model = MakeForestDeep();

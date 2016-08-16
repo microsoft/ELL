@@ -8,3 +8,4 @@ void TestBinaryPredicateCpp();
 void TestElementSelectorCpp();
 void TestForestCpp();
 void TestDotProductCpp();
+void TestAccumulatorCpp(bool expanded);

@@ -376,6 +376,13 @@ namespace emll
 				.Assign();
 		}
 
+		CppEmitter& CppEmitter::IncrementValueAt(const std::string& varName, const int offset)
+		{
+			return Identifier(varName)
+				.Offset(offset).Space()
+				.IncrementUpdate();
+		}
+
 		CppEmitter& CppEmitter::IncrementValueAt(const std::string& varName, const std::string& offsetVarName)
 		{
 			return Identifier(varName)

@@ -249,10 +249,10 @@ namespace emll
 			_pfn->Assign(resultVar.EmittedName(), GetDefaultForValueType<T>());
 			_pfn->For(LoopVarName(), pSrcVector->Dimension());
 			{
-				_pfn->Assign(resultVar.EmittedName());
-				_pfn->Op(GetAddForValueType<T>(),
-					[&resultVar, this]() {_pfn->Value(resultVar.EmittedName()); },
-					[&pSrcVector, &iVarName, this]() {_pfn->ValueAt(pSrcVector->EmittedName(), iVarName); });
+				_pfn->IncrementUpdate(resultVar.EmittedName());
+				{
+					_pfn->ValueAt(pSrcVector->EmittedName(), iVarName);
+				}
 				_pfn->EndStatement();
 			}
 			_pfn->EndFor();
@@ -269,11 +269,10 @@ namespace emll
 			for (size_t i = 0; i < pInput->Size(); ++i)
 			{
 				auto pRInput = pInput->GetOutputPortElement(i);
-				_pfn->Assign(resultVar.EmittedName());
-				_pfn->Op(OperatorType::Add,
-					[&resultVar, this]() { _pfn->Value(resultVar.EmittedName()); },
-					[&pRInput, this]() {LoadVar(pRInput); }
-				);
+				_pfn->IncrementUpdate(resultVar.EmittedName());
+				{
+					LoadVar(pRInput);
+				}
 				_pfn->EndStatement();
 			}
 		}
@@ -310,13 +309,11 @@ namespace emll
 			auto iVarName = LoopVarName();
 			_pfn->For(iVarName, pOutput->Size());
 			{
-				_pfn->IncrementUpdate(pResult->EmittedName());
-				{
-					_pfn->Op(OperatorType::MultiplyF,
+				_pfn->IncrementUpdate(pResult->EmittedName()).
+					Op(GetMultiplyForValueType<T>(),
 						[&pLVector, &iVarName, this]() {_pfn->ValueAt(pLVector->EmittedName(), iVarName); },
-						[&pRVector, &iVarName, this]() {_pfn->ValueAt(pRVector->EmittedName(), iVarName); });
-				}
-				_pfn->EndStatement();
+						[&pRVector, &iVarName, this]() {_pfn->ValueAt(pRVector->EmittedName(), iVarName); })
+					.EndStatement();
 			}
 			_pfn->EndFor();
 		}
@@ -333,9 +330,63 @@ namespace emll
 			{
 				auto lInput = pInput1->GetOutputPortElement(i);
 				auto rInput = pInput2->GetOutputPortElement(i);
-				_pfn->IncrementUpdate(resultVar.EmittedName());
+				_pfn->IncrementUpdate(resultVar.EmittedName())
+					 .Op(GetMultiplyForValueType<T>(), [&lInput, this]() {LoadVar(lInput); }, [&rInput, this]() {LoadVar(rInput); })
+					 .EndStatement();
+			}
+		}
+
+		template<typename T>
+		void CppCompiler::CompileAccumulator(const nodes::AccumulatorNode<T>& node)
+		{
+			// AccumulatorNode has exactly 1 input and 1 output
+			// Accumulators are always long lived - either globals or heap. Currently, we use globals
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			Variable* pVar = Variables().AddVectorVariable(VariableScope::Global, GetValueType<T>(), pOutput->Size());
+			SetVariableFor(pOutput, pVar);
+
+			if (ModelEx::IsPureVector(*pInput) &&
+				!Settings().ShouldUnrollLoops())
+			{
+				CompileAccumulatorLoop<T>(node);
+			}
+			else
+			{
+				CompileAccumulatorExpanded<T>(node);
+			}
+		}
+
+		template<typename T>
+		void CppCompiler::CompileAccumulatorLoop(const nodes::AccumulatorNode<T>& node)
+		{
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			Variable* pInputVector = EnsureEmitted(pInput);
+			Variable* pAccumulatorVector = EnsureEmitted(pOutput);
+
+			auto iVarName = LoopVarName();
+			_pfn->For(iVarName, pOutput->Size());
+			{
+				_pfn->IncrementValueAt(pAccumulatorVector->EmittedName(), iVarName)
+					 .ValueAt(pInputVector->EmittedName(), iVarName)
+					 .EndStatement();
+			}
+			_pfn->EndFor();
+		}
+
+		template<typename T>
+		void CppCompiler::CompileAccumulatorExpanded(const nodes::AccumulatorNode<T>& node)
+		{
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			Variable* pAccumulatorVector = EnsureEmitted(pOutput);
+
+			for (size_t i = 0; i < pInput->Size(); ++i)
+			{
+				_pfn->IncrementValueAt(pAccumulatorVector->EmittedName(), i);
 				{
-					_pfn->Op(OperatorType::MultiplyF, [&lInput, this]() {LoadVar(lInput); }, [&rInput, this]() {LoadVar(rInput); });
+					LoadVar(pInput->GetOutputPortElement(i));
 				}
 				_pfn->EndStatement();
 			}
