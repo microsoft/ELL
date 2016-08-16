@@ -19,6 +19,10 @@ namespace model
         {
             auto oldElement = elements.GetElement(index);
             assert(_elementToElementMap.find(oldElement) != _elementToElementMap.end());
+            if (_elementToElementMap.find(oldElement) == _elementToElementMap.end())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element in new model.");
+            }
             auto newElement = _elementToElementMap[oldElement];
             auto newPort = static_cast<const OutputPort<ValueType>*>(newElement.ReferencedPort());
             result.Append({ *newPort, newElement.GetIndex() });
@@ -37,23 +41,7 @@ namespace model
     template <typename ValueType>
     PortElements<ValueType> ModelTransformer::GetCorrespondingOutputs(const PortElements<ValueType>& elements)
     {
-        auto size = elements.Size();
-        PortElements<ValueType> result;
-        result.Reserve(size);
-        for(size_t index = 0; index < size; ++index)
-        {
-            auto oldElement = elements.GetElement(index);
-            if (_elementToElementMap.find(oldElement) == _elementToElementMap.end())
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element in new model.");
-            }
-
-            auto newElementUntyped = _elementToElementMap[oldElement]; // base
-            auto newPort = static_cast<const OutputPort<ValueType>*>(newElementUntyped.ReferencedPort());
-            PortElement<ValueType> newElement(*newPort, newElementUntyped.GetIndex());
-            result.Append({ *newPort, newElementUntyped.GetIndex() });
-        }
-        return result;
+        return TransformPortElements(elements);
     }
 
     template <typename ValueType>
