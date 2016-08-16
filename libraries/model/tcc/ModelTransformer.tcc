@@ -47,12 +47,9 @@ namespace model
     template <typename ValueType>
     InputNode<ValueType>* ModelTransformer::GetCorrespondingInputNode(const InputNode<ValueType>* inputNode)
     {
-        // #### FIX THIS --- maybe we should just keep track of nodes separately somehow
-        // This sucks:
-        auto inputNodeOutputPortElements = PortElements<ValueType>(inputNode->output);
-        auto newInputNodeOutputs = GetCorrespondingOutputs(inputNodeOutputPortElements);
-        auto newInputNodeOutputPort = newInputNodeOutputs.GetElement(0).ReferencedPort();
-        auto newInputNodeConst = dynamic_cast<const model::InputNode<ValueType>*>(newInputNodeOutputPort->GetNode());
+        auto newNodeOutputs = GetCorrespondingOutputs(inputNode->output);
+        auto newNodeConst = newNodeOutputs.GetElement(0).ReferencedPort()->GetNode();
+        auto newInputNodeConst = dynamic_cast<const model::InputNode<ValueType>*>(newNodeConst);
         assert(newInputNodeConst != nullptr);
         auto newInputNode = const_cast<model::InputNode<ValueType>*>(newInputNodeConst);
         return newInputNode;

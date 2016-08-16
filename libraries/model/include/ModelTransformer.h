@@ -141,14 +141,13 @@ namespace model
     private:
         friend class Node;
 
-        // Find the name of a node that isn't compilable (if there are several, it just finds one)
+        // Find a node that isn't compilable (if there are several, it just finds one)
         const Node* FindFirstUncompilableNode(const Model& model, const TransformContext& context) const;
 
         Model _model;
         TransformContext _context;
         std::unordered_map<PortElementBase, PortElementBase> _elementToElementMap;
         bool _isModelCompilable;
-
 
         // the maximal number of refinement iterations to allow
         const int maxRefinementIterations = 10;

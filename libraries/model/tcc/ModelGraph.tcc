@@ -54,9 +54,7 @@ namespace model
     std::vector<ValueType> Model::ComputeOutput(const OutputPort<ValueType>& outputPort) const
     {
         auto compute = [](const Node& node) { node.Compute(); };
-
         Visit(compute, { outputPort.GetNode() });
-
         return outputPort.GetOutput();
     }
 
@@ -69,9 +67,9 @@ namespace model
         {
             usedNodes.insert(range.ReferencedPort()->GetNode());
         }
-        auto nodes = std::vector<const Node*>(usedNodes.begin(), usedNodes.end());
-        auto compute = [](const Node& node) { node.Compute(); };
 
+        auto compute = [](const Node& node) { node.Compute(); };
+        auto nodes = std::vector<const Node*>(usedNodes.begin(), usedNodes.end());
         Visit(compute, nodes);
 
         // Now construct the output
@@ -80,9 +78,9 @@ namespace model
         for(size_t index = 0; index < numElements; ++index)
         {
             auto element = elements.GetElement(index);
-            auto port = dynamic_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
-            auto portOutput = port->GetOutput(); // TODO: fix this, it's very inefficient
-            result[index] = portOutput[element.GetIndex()];
+            auto port = element.ReferencedPort();
+            auto portOutput = port->GetOutput()[element.GetIndex()];
+            result[index] = portOutput;
         }
         return result;
     }
