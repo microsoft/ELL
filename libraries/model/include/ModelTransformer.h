@@ -47,6 +47,11 @@ namespace model
     {
     public:
         /// <summary> Returns a copy of the input model, by calling Copy() on each of the model's nodes </summary>
+        ///
+        /// <param name="model"> The model. </param>
+        /// <param name="context"> The context. </param>
+        ///
+        /// <returns> The copied Model. </returns>
         Model CopyModel(const Model& model, const TransformContext& context);
 
         /// <summary> Performs one or more refinement iterations on a given model and returns the result.
@@ -66,7 +71,7 @@ namespace model
         /// <remarks> Only available after calling CopyModel or RefineModel. </remarks>
         bool IsModelCompilable() const { return _isModelCompilable; }
 
-        /// <summary> Returns the  OutputPort from new new model corresponding to the given port on the input model </summary>
+        /// <summary> Returns the OutputPort from new new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
         const OutputPort<ValueType>* GetCorrespondingOutputPort(const OutputPort<ValueType>& port);

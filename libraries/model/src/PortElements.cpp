@@ -161,3 +161,14 @@ namespace model
         ComputeSize();
     }
 }
+
+//
+// hash function for PortRange
+//
+std::hash<model::PortRange>::result_type std::hash<model::PortRange>::operator()(argument_type const& range) const
+{
+    auto hash1 = std::hash<const model::OutputPortBase*>()(range.ReferencedPort());
+    auto hash2 = std::hash<size_t>()(range.Size());
+    auto hash3 = std::hash<size_t>()(range.GetStartIndex());
+    return hash1 ^ ((hash2 ^ (hash3 << 1)) << 1);
+}
