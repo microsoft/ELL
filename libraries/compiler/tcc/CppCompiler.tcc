@@ -279,6 +279,69 @@ namespace emll
 		}
 
 		template<typename T>
+		void CppCompiler::CompileDotProduct(const nodes::DotProductNode<T>& node)
+		{
+			NewCodeBlock(node);
+
+			auto pInput1 = node.GetInputPorts()[0];
+			auto pInput2 = node.GetInputPorts()[1];
+			if ((ModelEx::IsPureVector(*pInput1) && ModelEx::IsPureVector(*pInput2)) &&
+				!Settings().ShouldUnrollLoops())
+			{
+				CompileDotProductLoop<T>(node);
+			}
+			else
+			{
+				CompileDotProductExpanded<T>(node);
+			}
+
+			TryMergeCodeBlock(node);
+		}
+
+		template<typename T>
+		void CppCompiler::CompileDotProductLoop(const nodes::DotProductNode<T>& node)
+		{
+			Variable* pLVector = EnsureEmitted(node.GetInputPorts()[0]);
+			Variable* pRVector = EnsureEmitted(node.GetInputPorts()[1]);
+			auto pOutput = node.GetOutputPorts()[0];
+			Variable* pResult = EnsureEmitted(pOutput);
+			_pfn->Assign(pResult->EmittedName(), 0);
+
+			auto iVarName = LoopVarName();
+			_pfn->For(iVarName, pOutput->Size());
+			{
+				_pfn->IncrementUpdate(pResult->EmittedName());
+				{
+					_pfn->Op(OperatorType::MultiplyF,
+						[&pLVector, &iVarName, this]() {_pfn->ValueAt(pLVector->EmittedName(), iVarName); },
+						[&pRVector, &iVarName, this]() {_pfn->ValueAt(pRVector->EmittedName(), iVarName); });
+				}
+				_pfn->EndStatement();
+			}
+			_pfn->EndFor();
+		}
+
+		template<typename T>
+		void CppCompiler::CompileDotProductExpanded(const nodes::DotProductNode<T>& node)
+		{
+			auto pInput1 = node.GetInputPorts()[0];
+			auto pInput2 = node.GetInputPorts()[1];
+			auto pOutput = node.GetOutputPorts()[0];
+			Variable& resultVar = *(EnsureEmitted(pOutput));
+			_pfn->Assign(resultVar.EmittedName(), 0);
+			for (size_t i = 0; i < pInput1->Size(); ++i)
+			{
+				auto lInput = pInput1->GetOutputPortElement(i);
+				auto rInput = pInput2->GetOutputPortElement(i);
+				_pfn->IncrementUpdate(resultVar.EmittedName());
+				{
+					_pfn->Op(OperatorType::MultiplyF, [&lInput, this]() {LoadVar(lInput); }, [&rInput, this]() {LoadVar(rInput); });
+				}
+				_pfn->EndStatement();
+			}
+		}
+
+		template<typename T>
 		void CppCompiler::CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node)
 		{
 			NewCodeBlock(node);

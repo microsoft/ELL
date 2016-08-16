@@ -118,6 +118,39 @@ void TestElementSelectorCpp()
 	compiler.WriteToFile("C:\\junk\\model\\TestElementSelector.cpp");
 }
 
+void TestDotProductCpp(CompilerSettings& settings)
+{
+	std::vector<double> data = { 5, 10, 15, 20 };
+
+	ModelBuilder mb;
+	auto c1 = mb.Constant<double>(data);
+	auto input1 = mb.Inputs<double>(4);
+	auto dotProduct = mb.DotProduct<double>(c1->output, input1->output);
+	auto output = mb.Outputs<double>(dotProduct->output);
+
+	CppCompiler compiler;
+	compiler.Settings() = settings;
+	compiler.CompileModel("TestDotProduct", mb.Model);
+	compiler.DebugDump();
+}
+
+void TestDotProductCpp()
+{
+	CompilerSettings settings;
+
+	settings.ShouldUnrollLoops() = false;
+	settings.ShouldInlineOperators() = true;
+	TestDotProductCpp(settings);
+
+	settings.ShouldUnrollLoops() = true;
+	settings.ShouldInlineOperators() = true;
+	TestDotProductCpp(settings);
+
+	settings.ShouldUnrollLoops() = false;
+	settings.ShouldInlineOperators() = false;
+	TestDotProductCpp(settings);
+}
+
 void TestForestCpp()
 {
 	model::Model model = MakeForestDeep();

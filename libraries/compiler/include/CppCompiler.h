@@ -64,13 +64,7 @@ namespace emll
 			virtual void CompileSumNode(const nodes::SumNode<int>& node) { CompileSum<int>(node); };
 
 			///<summary>Compile a DotProductNode</summary>
-			virtual void CompileDotProductNode(const model::Node& node) override;
-			///<summary>Compile a AccmulatorNode</summary>
-			virtual void CompileAccumulatorNode(const model::Node& node) override;
-			///<summary>Compile a Delay node</summary>
-			virtual void CompileDelayNode(const model::Node& node) override;
-			///<summary>Compile a Unary node</summary>
-			virtual void CompileUnaryNode(const model::Node& node) override;
+			virtual void CompileDotProductNode(const nodes::DotProductNode<double>& node) { CompileDotProduct<double>(node); }
 
 			///<summary>Compile a binary predicate</summary>
 			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) override 
@@ -163,6 +157,13 @@ namespace emll
 			///<summary>Compile a SumNode</summary>
 			template<typename T>
 			void CompileSumExpanded(const nodes::SumNode<T>& node);
+
+			template<typename T>
+			void CompileDotProduct(const nodes::DotProductNode<T>& node);
+			template<typename T>
+			void CompileDotProductLoop(const nodes::DotProductNode<T>& node);
+			template<typename T>
+			void CompileDotProductExpanded(const nodes::DotProductNode<T>& node);
 
 			///<summary>Compile a BinarPredicate</summary>
 			template<typename T>

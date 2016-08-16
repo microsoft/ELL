@@ -148,6 +148,12 @@ namespace emll
 			return *this;
 		}
 
+		CppEmitter& CppEmitter::IncrementUpdate()
+		{
+			_writer.Write("+=");
+			return *this;
+		}
+
 		CppEmitter& CppEmitter::EndStatement()
 		{
 			return Semicolon().NewLine();
@@ -350,6 +356,12 @@ namespace emll
 					.Assign();
 		}
 
+		CppEmitter& CppEmitter::IncrementUpdate(const std::string& varName)
+		{
+			return Identifier(varName).Space()
+				.IncrementUpdate();
+		}
+
 		CppEmitter& CppEmitter::AssignValueAt(const std::string& varName, const int offset)
 		{
 			return Identifier(varName)
@@ -362,6 +374,13 @@ namespace emll
 			return Identifier(varName)
 				.Offset(offsetVarName).Space()
 				.Assign();
+		}
+
+		CppEmitter& CppEmitter::IncrementValueAt(const std::string& varName, const std::string& offsetVarName)
+		{
+			return Identifier(varName)
+				.Offset(offsetVarName).Space()
+				.IncrementUpdate();
 		}
 
 		CppEmitter& CppEmitter::Clear()

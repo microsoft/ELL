@@ -109,24 +109,6 @@ namespace emll
 			return nullptr;
 		}
 
-		void CppCompiler::CompileDotProductNode(const model::Node& node)
-		{
-			throw new CompilerException(CompilerError::notSupported);
-		}
-		void CppCompiler::CompileAccumulatorNode(const model::Node& node)
-		{
-			throw new CompilerException(CompilerError::notSupported);
-		}
-		void CppCompiler::CompileDelayNode(const model::Node& node)
-		{
-			throw new CompilerException(CompilerError::notSupported);
-		}
-
-		void CppCompiler::CompileUnaryNode(const model::Node& node)
-		{
-			throw new CompilerException(CompilerError::notSupported);
-		}
-
 		void CppCompiler::BeginFunction(const std::string& functionName, NamedValueTypeList& args)
 		{
 			_pfn = _module.Function(functionName, ValueType::Void, args);

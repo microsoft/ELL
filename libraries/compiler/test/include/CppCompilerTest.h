@@ -7,3 +7,4 @@ void TestSumCpp(bool expanded);
 void TestBinaryPredicateCpp();
 void TestElementSelectorCpp();
 void TestForestCpp();
+void TestDotProductCpp();

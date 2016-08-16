@@ -204,6 +204,18 @@ namespace emll
 			return *this;
 		}
 
+		CppFunctionEmitter& CppFunctionEmitter::IncrementUpdate(const std::string& varName)
+		{
+			_pCurBlock->IncrementUpdate(varName).Space();
+			return *this;
+		}
+
+		CppFunctionEmitter& CppFunctionEmitter::IncrementValueAt(const std::string& destVarName, const std::string& offsetVarName)
+		{
+			_pCurBlock->IncrementValueAt(destVarName, offsetVarName).Space();
+			return *this;
+		}
+
 		CppFunctionEmitter& CppFunctionEmitter::Op(OperatorType op, std::function<void()> lValue, std::function<void()> rValue)
 		{
 			lValue();

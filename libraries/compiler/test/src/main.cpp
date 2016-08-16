@@ -34,6 +34,7 @@ void TestIRCompiler()
 
 void TestCppCompiler()
 {
+	TestDotProductCpp();
 	TestForestCpp();
 	TestSumCpp(true);
 	TestSumCpp(false);

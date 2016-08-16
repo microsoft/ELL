@@ -40,6 +40,7 @@ namespace emll
 			CppEmitter& Assign();
 			CppEmitter& Asterisk();
 			CppEmitter& Increment();
+			CppEmitter& IncrementUpdate();
 			CppEmitter& EndStatement();
 
 			CppEmitter& Operator(OperatorType op);
@@ -75,8 +76,10 @@ namespace emll
 			CppEmitter& Cmp(const std::string& varName, ComparisonType cmp, T value);
 
 			CppEmitter& Assign(const std::string& varName);
+			CppEmitter& IncrementUpdate(const std::string& varName);
 			CppEmitter& AssignValueAt(const std::string& varName, const int offset);
 			CppEmitter& AssignValueAt(const std::string& varName, const std::string& offsetVarName);
+			CppEmitter& IncrementValueAt(const std::string& varName, const std::string& offsetVarName);
 
 			CppEmitter& For();
 			CppEmitter& If();
