@@ -40,21 +40,21 @@ namespace model
         // TODO: fix this --- it only returns a port
         // TODO: iterate over each element
         assert(elements.NumRanges() == 1);
-
-
-
-
-        auto firstElement = elements.GetElement(0);
-        if (_elementToElementMap.find(firstElement) == _elementToElementMap.end())
+        auto size = elements.Size();
+        PortElements<ValueType> result;
+        for(size_t index = 0; index < size; ++index)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find port in new model.");
-        }
+            auto element = elements.GetElement(index);
+            if (_elementToElementMap.find(element) == _elementToElementMap.end())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element in new model.");
+            }
 
-        auto range = _elementToElementMap[firstElement];
-        auto untypedPort = range.ReferencedPort();
-        auto port = dynamic_cast<const OutputPort<ValueType>*>(untypedPort);
-        assert(port != nullptr);
-        return *port;
+            auto newElementUntyped = _elementToElementMap[element]; // base
+            PortElement<ValueType> newElement(*dynamic_cast<const OutputPort<ValueType>*>(newElementUntyped.ReferencedPort()), newElementUntyped.GetIndex());;
+            result.Append(newElement);
+        }
+        return result;
     }
 
     template <typename ValueType>
@@ -85,13 +85,12 @@ namespace model
     template <typename ValueType>
     void ModelTransformer::MapNodeOutput(const PortElements<ValueType>& oldElements, const PortElements<ValueType>& newElements)
     {
-        // auto portSize = oldPort.Size(); 
-        // assert(newPort.Size() == portSize);
-        // for(size_t index = 0; index < portSize; ++index)
-        // {
-        //     _elementToElementMap[{oldPort, index}] = {newPort, index};
-        // }
-
+         auto size = oldElements.Size();
+         assert(oldElements.Size() == size);
+         for(size_t index = 0; index < size; ++index)
+         {
+             _elementToElementMap[oldElements.GetElement(index)] = newElements.GetElement(index);
+         }
     }
 
     template <typename NodeType, typename... Args>

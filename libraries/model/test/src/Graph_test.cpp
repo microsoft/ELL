@@ -368,7 +368,7 @@ public:
         model::PortElements<ValueType> elem1(newNode1->output);
         model::PortElements<ValueType> elem2(newNode2->output);
         model::PortElements<ValueType> newOutput({ elem1, elem2 });
-
+        
         transformer.MapNodeOutput({ output }, newOutput);
     }
 
@@ -393,7 +393,7 @@ void TestRefineSplitOutputs()
 
     model::TransformContext context;
     model::ModelTransformer transformer;
-    auto newModel = transformer.CopyModel(model, context);
+    auto newModel = transformer.RefineModel(model, context);
 
     // Now run data through the graphs and make sure they agree
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
@@ -406,12 +406,9 @@ void TestRefineSplitOutputs()
         auto output = model.ComputeOutput(outputNode->output);
 
         newInputNode->SetInput(inputValue);
-        auto newOutputPortUntyped = newOutputs.GetElement(0).ReferencedPort(); // need typed port
-        auto newOutputPort = dynamic_cast<const model::OutputPort<double>*>(newOutputPortUntyped);
-        assert(newOutputPort != nullptr);
-        auto newOutput = newModel.ComputeOutput(*newOutputPort);
+        auto newOutput = newModel.ComputeOutput(newOutputs);
 
-        testing::ProcessTest("testing refined graph", testing::IsEqual(output[0], newOutput[0]));
-        testing::ProcessTest("testing refined graph", testing::IsEqual(output[1], newOutput[1]));
+        testing::ProcessTest("testing refined splitting graph", testing::IsEqual(output[0], newOutput[0]));
+        testing::ProcessTest("testing refined splitting graph", testing::IsEqual(output[1], newOutput[1]));
     }
 }

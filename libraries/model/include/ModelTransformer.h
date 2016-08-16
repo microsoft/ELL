@@ -114,13 +114,17 @@ namespace model
         template <typename NodeType, typename... Args>
         NodeType* AddNode(Args&&... args);
 
-        /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
+        /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
         ///
         /// <param name="oldPort"> The port in the old model to map to the new model. </param>
         /// <param name="newPort"> The port in the new model to be mapped from the old model. </param>
         template <typename ValueType>
         void MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort);
 
+        /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
+        ///
+        /// <param name="oldElements"> The elements in the old model to map to the new model. </param>
+        /// <param name="newElements"> The elements in the new model to be mapped from the old model. </param>
         template <typename ValueType>
         void MapNodeOutput(const PortElements<ValueType>& oldElements, const PortElements<ValueType>& newElements);
 

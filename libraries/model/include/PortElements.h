@@ -30,7 +30,8 @@ namespace model
     {
     public:
         PortElementBase() = default;
-
+        virtual ~PortElementBase() = default;
+        
         /// <summary> Creates a PortElementBase representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
