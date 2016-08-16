@@ -318,7 +318,9 @@ void TestRefineGraph()
         auto output = model.ComputeOutput(outputNode->output);
 
         newInputNode->SetInput(inputValue);
-        auto newOutputPort = newOutputs.GetElement(0).ReferencedPort();
+        auto newOutputPortUntyped = newOutputs.GetElement(0).ReferencedPort(); // need typed port
+        auto newOutputPort = dynamic_cast<const model::OutputPort<double>*>(newOutputPortUntyped);
+        assert(newOutputPort != nullptr);
         auto newOutput = newModel.ComputeOutput(*newOutputPort);
 
         testing::ProcessTest("testing refined graph", testing::IsEqual(output[0], newOutput[0]));

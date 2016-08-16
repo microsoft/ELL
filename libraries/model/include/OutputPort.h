@@ -86,6 +86,8 @@ namespace model
         /// <returns> The cached output for the element </returns>
         ValueType GetOutput(size_t index) const;
 
+        // #### TODO: add operator[] or something
+
         /// <summary> Sets the cached output from this port </summary>
         ///
         /// <param name=values> The values this port should output </param>

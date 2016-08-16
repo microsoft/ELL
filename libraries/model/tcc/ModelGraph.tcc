@@ -60,6 +60,33 @@ namespace model
         return outputPort.GetOutput();
     }
 
+    template <typename ValueType>
+    std::vector<ValueType> Model::ComputeOutput(const PortElements<ValueType>& elements) const
+    {
+        // get set of nodes to make sure we visit
+        std::unordered_set<const Node*> usedNodes;
+        for(const auto& range: elements)
+        {
+            usedNodes.insert(range.ReferencedPort()->GetNode());
+        }
+        auto nodes = std::vector<const Node*>(usedNodes.begin(), usedNodes.end());
+        auto compute = [](const Node& node) { node.Compute(); };
+
+        Visit(compute, nodes);
+
+        // Now construct the output
+        auto numElements = elements.Size();
+        std::vector<ValueType> result(numElements);
+        for(size_t index = 0; index < numElements; ++index)
+        {
+            auto element = elements.GetElement(index);
+            auto port = dynamic_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
+            auto portOutput = port->GetOutput(); // TODO: fix this, it's very inefficient
+            result[index] = portOutput[element.GetStartIndex()];
+        }
+        return result;
+    }
+
     //
     // Get nodes by type
     //

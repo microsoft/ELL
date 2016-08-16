@@ -14,7 +14,6 @@
 #include "OutputPort.h"
 #include "PortElements.h"
 #include "Node.h"
-#include "OutputPort.h"
 
 // utilities
 #include "Exception.h"
@@ -83,13 +82,15 @@ namespace model
         /// <remarks> Only available after calling CopyModel or RefineModel. </remarks>
         bool IsModelCompilable() const { return _isModelCompilable; }
 
-        /// <summary> Returns the OutputPort from new new model corresponding to the given port on the input model </summary>
+        /// <summary> Returns the port elements from the new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        // template <typename ValueType>
-        // const OutputPort<ValueType>* GetCorrespondingOutputPort(const OutputPort<ValueType>& port);
-
         template <typename ValueType>
-        const PortElements<ValueType> GetCorrespondingOutputs(const PortElements<ValueType>& elements);
+        PortElements<ValueType> GetCorrespondingOutputs(const OutputPort<ValueType>& port);
+
+        /// <summary> Returns the port elements from the new model corresponding to the given elements on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
+        template <typename ValueType>
+        PortElements<ValueType> GetCorrespondingOutputs(const PortElements<ValueType>& elements);
 
         /// <summary> Returns the input node from new new model corresponding to the given input node on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
@@ -139,7 +140,7 @@ namespace model
 
         /// <summary> Returns the (untyped) Port from new new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        PortElementsUntyped GetCorrespondingElements(const PortElementsUntyped& elements);
+//        PortElementsUntyped GetCorrespondingElements(const PortElementsUntyped& elements);
 
         // Sets up a port-port mapping. Called by node implementors
         void MapPort(const OutputPortBase& oldPort, const OutputPortBase& newPort);

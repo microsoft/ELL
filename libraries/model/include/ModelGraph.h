@@ -17,11 +17,10 @@
 #include "ISerializable.h"
 
 // stl
-#include <unordered_set>
 #include <vector>
 #include <memory>
 #include <unordered_map>
-#include <exception>
+#include <unordered_set>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -81,13 +80,17 @@ namespace model
         template <typename NodeType>
         std::vector<const NodeType*> GetNodesByType();
 
-        /// <summary> Returns part of the output computed by a node </summary>
+        /// <summary> Returns part of the output computed by the model </summary>
         ///
         /// <param name="outputPort"> The output port to get the computed value form </param>
         template <typename ValueType>
         std::vector<ValueType> ComputeOutput(const OutputPort<ValueType>& outputPort) const;
-        // #### TODO: add version that takes a PortElements
 
+        /// <summary> Returns part of the output computed by the model </summary>
+        ///
+        /// <param name="elements"> The output port elements to get the computed value form </param>
+        template <typename ValueType>
+        std::vector<ValueType> ComputeOutput(const PortElements<ValueType>& elements) const;
 
         /// <summary>
         /// Visits all the nodes in the graph in dependency order. No nodes will be visited until all

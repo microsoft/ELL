@@ -139,6 +139,8 @@ namespace model
         /// <param name="range"> The ranges to get values from </param>
         PortElementsUntyped(const std::vector<PortRange>& ranges);
 
+        virtual ~PortElementsUntyped() = default;
+
         /// <summary> The dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
@@ -157,10 +159,13 @@ namespace model
 
         PortRange GetRange(size_t index) const { return _ranges[index]; }
 
-        /// <summary> Adds a range of values to this list </summary>
-        ///
-        /// <param name="range"> The range of values to add to this list </param>
-        void AddRange(const PortRange& range);
+        // std::unordered_set<Node*> usedNodes;
+        // for(const auto& range: elements)
+        // {
+        //     usedNodes.insert(range.ReferencedPort()->GetNode());
+        // }
+        // auto nodes = std::vector<Node*>(usedNodes.begin(), usedNodes.end());
+
 
         /// <summary> Gets an element in the elements. </summary>
         ///
@@ -193,9 +198,11 @@ namespace model
     protected:
         PortElementsUntyped(){};
         void ComputeSize();
+        void AddRange(const PortRange& range);
 
     private:
         std::vector<PortRange> _ranges;
+        // TODO: keep set of nodes (?)
         size_t _size = 0;
     };
 
