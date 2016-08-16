@@ -287,10 +287,10 @@ namespace model
     RefType Concat(const RefType& ref1, Refs&&... refs);
 }
 
-// custom specialization of std::hash so we can keep UniqueIds in containers that require hashable types
+// custom specialization of std::hash so we can keep PortRanges in containers that require hashable types
 namespace std
 {
-    /// <summary> Implements a hash function for the UniqueId class, so that it can be used with associative containers (maps, sets, and the like). </summary>
+    /// <summary> Implements a hash function for the PortRange class, so that it can be used with associative containers (maps, sets, and the like). </summary>
     template <>
     class hash<model::PortRange>
     {
