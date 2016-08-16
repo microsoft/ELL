@@ -37,14 +37,14 @@ void NodePrinter(const model::Node& node)
         std::cout << (isFirstInputPort ? "" : ", ");
         isFirstInputPort = false;
 
-        auto ranges = inputPort->GetInputRanges();
-        if (ranges.NumRanges() > 1)
+        auto elements = inputPort->GetInputElements();
+        if (elements.NumRanges() > 1)
         {
             std::cout << "{";
         }
 
         bool isFirstRange = true;
-        for (const auto& range : ranges)
+        for (const auto& range : elements)
         {
             std::cout << (isFirstRange ? "" : ", ");
             isFirstRange = false;
@@ -59,7 +59,7 @@ void NodePrinter(const model::Node& node)
             }
         }
 
-        if (ranges.NumRanges() > 1)
+        if (elements.NumRanges() > 1)
         {
             std::cout << "}";
         }

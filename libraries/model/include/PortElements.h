@@ -214,35 +214,13 @@ namespace model
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     protected:
-        /// <summary> Creates an PortElementsBase representing all the values from a given port </summary>
-        ///
-        /// <param name="port"> The port to take values from </param>
         PortElementsBase(const OutputPortBase& port);
-
-        /// <summary> Creates an PortElementsBase representing a single value from a given port </summary>
-        ///
-        /// <param name="port"> The port to take a value from </param>
-        /// <param name="index"> The index of the value </param>
         PortElementsBase(const OutputPortBase& port, size_t startIndex);
-
-        /// <summary> Creates an PortElementsBase representing a range of values from a given port </summary>
-        ///
-        /// <param name="port"> The port to take a value from </param>
-        /// <param name="startIndex"> The index of the first value to take </param>
-        /// <param name="numValues"> The number of values to take </param>
         PortElementsBase(const OutputPortBase& port, size_t startIndex, size_t numValues);
-
-        /// <summary> Creates an PortElementsBase from a PortRange </summary>
-        ///
-        /// <param name="range"> The range to get values from </param>
         PortElementsBase(const PortRange& range);
-
-        /// <summary> Creates an PortElementsBase from a set of PortRange </summary>
-        ///
-        /// <param name="range"> The ranges to get values from </param>
         PortElementsBase(const std::vector<PortRange>& ranges);
-
         PortElementsBase(){};
+        
         void ComputeSize();
         void AddRange(const PortRange& range);
 

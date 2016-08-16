@@ -53,7 +53,7 @@ namespace model
             {
                 node->AddDependent(this);
             }
-            for (const auto& range : input->GetInputRanges())
+            for (const auto& range : input->GetInputElements())
             {
                 range.ReferencedPort()->ReferencePort();
             }
