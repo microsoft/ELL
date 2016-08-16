@@ -182,13 +182,13 @@ namespace emll
 
 		void IRCompiler::NewBlockRegion(const model::Node& node)
 		{
-			/*
 			std::stringstream id;
 			id << "Node_" << node.GetId();
-			auto pBlock = _fn.BlockRegion(id.str());
-			_nodeBlocks.Set(node, pBlock);
+			auto pBlock = _fn.Block(id.str());
+			auto pRegion = _regions.Add();
+			pRegion->Start() = pBlock;
+			pRegion->End() = nullptr;
 			_fn.CurrentBlock(pBlock);
-			*/
 		}
 
 		llvm::Value* IRCompiler::LoadVar(Variable* pVar)
