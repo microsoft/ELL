@@ -25,7 +25,7 @@ namespace model
 {
     class Node;
 
-    /// <summary> Represents a contiguous set of values from an output port </summary>
+    /// <summary> Represents a single value from an output port </summary>
     class PortElementBase
     {
     public:
@@ -38,22 +38,22 @@ namespace model
         /// <param name="index"> The index of the value </param>
         PortElementBase(const OutputPortBase& port, size_t index);
 
-        /// <summary> Returns the type of the values referenced </summary>
+        /// <summary> Returns the type of the value referenced </summary>
         ///
-        /// <returns> The type of the values referenced </returns>
+        /// <returns> The type of the value referenced </returns>
         Port::PortType GetType() const { return _referencedPort->GetType(); }
 
-        /// <summary> The index of the element this range refers to </summary>
+        /// <summary> The index within the port of the element this refers to </summary>
         ///
-        /// <returns> The index of the element this range refers to </returns>
+        /// <returns> The index of the element this refers to </returns>
         size_t GetIndex() const { return _index; }
 
-        /// <summary> The port this range refers to </summary>
+        /// <summary> The port this element refers to </summary>
         ///
-        /// <returns> The port this range refers to </returns>
+        /// <returns> The port this element refers to </returns>
         const OutputPortBase* ReferencedPort() const { return _referencedPort; }
 
-        /// <summary> Equality operatior. </summary>
+        /// <summary> Equality operator. </summary>
         ///
         /// <returns> true if this element is equivalent to other. </returns>
         bool operator==(const PortElementBase& other) const;
@@ -63,19 +63,20 @@ namespace model
         size_t _index = 0;
     };
 
+    /// <summary> Represents a single value from an output port </summary>
     template <typename ValueType>
     class PortElement : public PortElementBase
     {
     public:
-        /// <summary> Creates a PortElementBase representing a single value from a given port </summary>
+        /// <summary> Creates a PortElement representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
         PortElement(const OutputPortBase& port, size_t index) : PortElementBase(port, index) {}
 
-        /// <summary> The port this range refers to </summary>
+        /// <summary> The port this element refers to </summary>
         ///
-        /// <returns> The port this range refers to </returns>
+        /// <returns> The port this element refers to </returns>
         const OutputPort<ValueType>* ReferencedPort() const { return static_cast<const OutputPort<ValueType>*>(_referencedPort); }
     };
 
@@ -149,7 +150,7 @@ namespace model
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
-        /// <summary> Equality operatior. </summary>
+        /// <summary> Equality operator. </summary>
         ///
         /// <returns> true if this range is equivalent to other. </returns>
         bool operator==(const PortRange& other) const;
@@ -182,6 +183,11 @@ namespace model
         /// <returns> A std::vector of PortRange objects </returns>
         const std::vector<PortRange>& GetRanges() const { return _ranges; }
 
+        /// <summary> Reserves space for the given number of ranges </summary>
+        ///
+        /// <param name="numRanges"> The number of ranges to reserve space for </param>
+        void Reserve(size_t numRanges);
+                
         /// <summary> Gets an element in the elements. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>

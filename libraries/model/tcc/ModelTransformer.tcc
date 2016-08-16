@@ -14,7 +14,7 @@ namespace model
     {
         auto size = elements.Size();
         PortElements<ValueType> result;
-        // result.Reserve(size);
+        result.Reserve(size);
         for (size_t index = 0; index < size; ++index)
         {
             auto oldElement = elements.GetElement(index);
@@ -37,22 +37,21 @@ namespace model
     template <typename ValueType>
     PortElements<ValueType> ModelTransformer::GetCorrespondingOutputs(const PortElements<ValueType>& elements)
     {
-        // TODO: fix this --- it only returns a port
-        // TODO: iterate over each element
-        assert(elements.NumRanges() == 1);
         auto size = elements.Size();
         PortElements<ValueType> result;
+        result.Reserve(size);
         for(size_t index = 0; index < size; ++index)
         {
-            auto element = elements.GetElement(index);
-            if (_elementToElementMap.find(element) == _elementToElementMap.end())
+            auto oldElement = elements.GetElement(index);
+            if (_elementToElementMap.find(oldElement) == _elementToElementMap.end())
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element in new model.");
             }
 
-            auto newElementUntyped = _elementToElementMap[element]; // base
-            PortElement<ValueType> newElement(*dynamic_cast<const OutputPort<ValueType>*>(newElementUntyped.ReferencedPort()), newElementUntyped.GetIndex());;
-            result.Append(newElement);
+            auto newElementUntyped = _elementToElementMap[oldElement]; // base
+            auto newPort = static_cast<const OutputPort<ValueType>*>(newElementUntyped.ReferencedPort());
+            PortElement<ValueType> newElement(*newPort, newElementUntyped.GetIndex());
+            result.Append({ *newPort, newElementUntyped.GetIndex() });
         }
         return result;
     }

@@ -131,6 +131,11 @@ namespace model
         ComputeSize();
     }
     
+    void PortElementsBase::Reserve(size_t numRanges)
+    {
+        _ranges.reserve(numRanges);
+    }
+
     void PortElementsBase::AddRange(const PortRange& range)
     {
         _ranges.push_back(range);
