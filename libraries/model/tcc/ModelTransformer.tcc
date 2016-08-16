@@ -21,7 +21,6 @@ namespace model
             assert(_elementToElementMap.find(oldElement) != _elementToElementMap.end());
             auto newElement = _elementToElementMap[oldElement];
             auto newPort = static_cast<const OutputPort<ValueType>*>(newElement.ReferencedPort());
-            //PortElements<ValueType> newElements(newPort, newElement.GetIndex());
             result.Append({ *newPort, newElement.GetIndex() });
         }
         // result.Consolidate();
@@ -41,6 +40,10 @@ namespace model
         // TODO: fix this --- it only returns a port
         // TODO: iterate over each element
         assert(elements.NumRanges() == 1);
+
+
+
+
         auto firstElement = elements.GetElement(0);
         if (_elementToElementMap.find(firstElement) == _elementToElementMap.end())
         {
@@ -71,7 +74,24 @@ namespace model
     template <typename ValueType>
     void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort)
     {
-        MapPort(oldPort, newPort);
+        auto portSize = oldPort.Size(); 
+        assert(newPort.Size() == portSize);
+        for(size_t index = 0; index < portSize; ++index)
+        {
+            _elementToElementMap[{oldPort, index}] = {newPort, index};
+        }
+    }
+
+    template <typename ValueType>
+    void ModelTransformer::MapNodeOutput(const PortElements<ValueType>& oldElements, const PortElements<ValueType>& newElements)
+    {
+        // auto portSize = oldPort.Size(); 
+        // assert(newPort.Size() == portSize);
+        // for(size_t index = 0; index < portSize; ++index)
+        // {
+        //     _elementToElementMap[{oldPort, index}] = {newPort, index};
+        // }
+
     }
 
     template <typename NodeType, typename... Args>

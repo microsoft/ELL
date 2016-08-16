@@ -104,16 +104,6 @@ namespace model
         return _model;
     }
 
-    void ModelTransformer::MapPort(const OutputPortBase& oldPort, const OutputPortBase& newPort)
-    {
-        auto portSize = oldPort.Size(); 
-        assert(newPort.Size() == portSize);
-        for(size_t index = 0; index < portSize; ++index)
-        {
-            _elementToElementMap[{oldPort, index}] = {newPort, index};
-        }
-    }
-
     const Node* ModelTransformer::FindFirstUncompilableNode(const Model& model, const TransformContext& context) const
     {
         auto iter = model.GetNodeIterator();

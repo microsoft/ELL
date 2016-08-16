@@ -276,6 +276,11 @@ namespace model
         /// <param name="numValues"> The number of values to take </param>
         PortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
 
+        /// <summary> Creates a PortElements representing a single element from a given port </summary>
+        ///
+        /// <param name="element"> The element </param>
+        PortElements(const PortElement<ValueType>& element);
+
         /// <summary> Creates a PortElements by concatenating a set of them together </summary>
         ///
         /// <param name="groups"> The list of groups to concantenate together </param>

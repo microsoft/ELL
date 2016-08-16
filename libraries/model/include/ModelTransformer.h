@@ -119,10 +119,10 @@ namespace model
         /// <param name="oldPort"> The port in the old model to map to the new model. </param>
         /// <param name="newPort"> The port in the new model to be mapped from the old model. </param>
         template <typename ValueType>
-        void MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort); // TODO: need to have MapOutput(elements->elements)
+        void MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort);
 
-        // template <typename ValueType>
-        // void MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort); // TODO: need to have MapOutput(elements->elements)
+        template <typename ValueType>
+        void MapNodeOutput(const PortElements<ValueType>& oldElements, const PortElements<ValueType>& newElements);
 
         /// <summary> Get the context used by the transformer. Called by node implementors </summary>
         ///
@@ -136,9 +136,6 @@ namespace model
 
     private:
         friend class Node;
-
-        // Sets up a port-port mapping. Called by node implementors
-        void MapPort(const OutputPortBase& oldPort, const OutputPortBase& newPort);
 
         // Find the name of a node that isn't compilable (if there are several, it just finds one)
         const Node* FindFirstUncompilableNode(const Model& model, const TransformContext& context) const;

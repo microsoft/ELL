@@ -38,28 +38,28 @@ void NodePrinter(const model::Node& node)
         isFirstInputPort = false;
 
         auto ranges = inputPort->GetInputRanges();
-        if(ranges.NumRanges() > 1)
+        if (ranges.NumRanges() > 1)
         {
             std::cout << "{";
         }
 
         bool isFirstRange = true;
-        for(const auto& range: ranges)
+        for (const auto& range : ranges)
         {
             std::cout << (isFirstRange ? "" : ", ");
             isFirstRange = false;
 
             auto port = range.ReferencedPort();
             std::cout << "node_" << port->GetNode()->GetId() << "." << port->GetName();
-            if(!range.IsFullPortRange())
+            if (!range.IsFullPortRange())
             {
                 auto start = range.GetStartIndex();
                 auto size = range.Size();
-                std::cout << "[" << start << ":" << (start+size) << "]";
+                std::cout << "[" << start << ":" << (start + size) << "]";
             }
         }
 
-        if(ranges.NumRanges() > 1)
+        if (ranges.NumRanges() > 1)
         {
             std::cout << "}";
         }
@@ -75,7 +75,7 @@ void PrintGraph(const model::Model& graph)
 void PrintGraphIterator(const model::Model& graph)
 {
     auto iter = graph.GetNodeIterator();
-    while(iter.IsValid())
+    while (iter.IsValid())
     {
         NodePrinter(*iter.Get());
         iter.Next();
@@ -166,7 +166,7 @@ void TestNodeIterator()
     auto size1 = model.Size();
     auto size2 = 0;
     auto iter = model.GetNodeIterator();
-    while(iter.IsValid())
+    while (iter.IsValid())
     {
         ++size2;
         iter.Next();
@@ -228,9 +228,9 @@ void TestInputRouting2()
     auto minAndArgMin2 = model.AddNode<model::ArgMinNode<double>>(range);      // a node that takes its input from a range --- a subset of outputs from a port
     auto minAndArgMin3 = model.AddNode<model::ArgMinNode<double>>(ranges);     // a node that takes its input from a "group" --- an arbitrary set of outputs from other ports
 
-    auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::MakePortElements(in->output, 0, 2));
+    auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::PortElements<double>(in->output, 0, 2));
     auto minAndArgMin5 = model.AddNode<model::ArgMinNode<double>>(model::PortElements<double>{ { in->output, 0 }, { in->output, 0, 2 } });
-    auto minAndArgMin6 = model.AddNode<model::ArgMinNode<double>>(model::Concat(model::MakePortElements(in->output, 0), model::MakePortElements(in->output, 0, 2), model::MakePortElements(minAndArgMin1->val, 0, 1)));
+    auto minAndArgMin6 = model.AddNode<model::ArgMinNode<double>>(model::PortElements<double>{ { in->output, 0 }, { in->output, 0, 2 }, { minAndArgMin1->val, 0, 1 } });
 
     //// set some example input and read the output
     std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
@@ -309,7 +309,7 @@ void TestRefineGraph()
 
     // Now run data through the graphs and make sure they agree
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputs = transformer.GetCorrespondingOutputs(model::PortElements<double>{outputNode->output});
+    auto newOutputs = transformer.GetCorrespondingOutputs(model::PortElements<double>{ outputNode->output });
 
     std::vector<std::vector<double>> inputValues = { { 1.0, 2.0 }, { 1.0, 0.5 }, { 2.0, 4.0 } };
     for (const auto& inputValue : inputValues)
@@ -329,3 +329,89 @@ void TestRefineGraph()
     }
 }
 
+// Define new node that splits its outputs when refined
+template <typename ValueType>
+class SplittingNode : public model::Node
+{
+public:
+    SplittingNode() : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
+    SplittingNode(const model::PortElements<ValueType>& input) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
+
+    static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SplittingNode"); }
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+    virtual void Copy(model::ModelTransformer& transformer) const override
+    {
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        auto newNode = transformer.AddNode<SplittingNode<ValueType>>(newPortElements);
+        transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    virtual void RefineNode(model::ModelTransformer& transformer) const override
+    {
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        model::PortElements<ValueType> in1;
+        model::PortElements<ValueType> in2;
+        auto size = _input.Size();
+        auto halfSize = size / 2;
+        // split into two nodes, one which returns the first half, and one which returns the second half
+        for (size_t index = 0; index < halfSize; ++index)
+        {
+            in1.Append(model::PortElements<ValueType>(newPortElements.GetElement(index)));
+        }
+        for (size_t index = halfSize; index < size; ++index)
+        {
+            in2.Append(model::PortElements<ValueType>(newPortElements.GetElement(index)));
+        }
+        auto newNode1 = transformer.AddNode<model::OutputNode<ValueType>>(in1);
+        auto newNode2 = transformer.AddNode<model::OutputNode<ValueType>>(in2);
+        model::PortElements<ValueType> elem1(newNode1->output);
+        model::PortElements<ValueType> elem2(newNode2->output);
+        model::PortElements<ValueType> newOutput({ elem1, elem2 });
+
+        transformer.MapNodeOutput({ output }, newOutput);
+    }
+
+    const model::OutputPort<ValueType>& output = _output;
+    static constexpr const char* inputPortName = "input";
+    static constexpr const char* outputPortName = "output";
+
+protected:
+    virtual void Compute() const override { _output.SetOutput(_input.GetValue()); }
+
+private:
+    model::InputPort<ValueType> _input;
+    model::OutputPort<ValueType> _output;
+};
+
+void TestRefineSplitOutputs()
+{
+    // Create a simple computation graph
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(2);
+    auto outputNode = model.AddNode<SplittingNode<double>>(inputNode->output);
+
+    model::TransformContext context;
+    model::ModelTransformer transformer;
+    auto newModel = transformer.CopyModel(model, context);
+
+    // Now run data through the graphs and make sure they agree
+    auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
+    auto newOutputs = transformer.GetCorrespondingOutputs(model::PortElements<double>{ outputNode->output });
+
+    std::vector<std::vector<double>> inputValues = { { 1.0, 2.0 }, { 1.0, 0.5 }, { 2.0, 4.0 } };
+    for (const auto& inputValue : inputValues)
+    {
+        inputNode->SetInput(inputValue);
+        auto output = model.ComputeOutput(outputNode->output);
+
+        newInputNode->SetInput(inputValue);
+        auto newOutputPortUntyped = newOutputs.GetElement(0).ReferencedPort(); // need typed port
+        auto newOutputPort = dynamic_cast<const model::OutputPort<double>*>(newOutputPortUntyped);
+        assert(newOutputPort != nullptr);
+        auto newOutput = newModel.ComputeOutput(*newOutputPort);
+
+        testing::ProcessTest("testing refined graph", testing::IsEqual(output[0], newOutput[0]));
+        testing::ProcessTest("testing refined graph", testing::IsEqual(output[1], newOutput[1]));
+    }
+}

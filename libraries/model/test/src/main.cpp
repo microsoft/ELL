@@ -24,6 +24,7 @@ int main()
 
     TestCopyGraph();
     TestRefineGraph();
+    TestRefineSplitOutputs();
 
     // PortElements tests
     TestSlice();
