@@ -12,6 +12,7 @@ namespace model
     template <typename ValueType>
     PortElements<ValueType> ModelTransformer::TransformPortElements(const PortElements<ValueType>& elements)
     {
+        // TODO: verify elements in `elements` param are from input model, and result elements are from output model
         auto size = elements.Size();
         PortElements<ValueType> result;
         result.Reserve(size);
@@ -34,6 +35,7 @@ namespace model
     template <typename ValueType>
     PortElements<ValueType> ModelTransformer::GetCorrespondingOutputs(const OutputPort<ValueType>& port)
     {
+        // TODO: verify `port` is from old model and result is from new model
         PortElements<ValueType> elements(port);
         return GetCorrespondingOutputs(elements);
     }
@@ -47,6 +49,7 @@ namespace model
     template <typename ValueType>
     InputNode<ValueType>* ModelTransformer::GetCorrespondingInputNode(const InputNode<ValueType>* inputNode)
     {
+        // TODO: verify `inputNode` is from old model and result is from new model
         auto newNodeOutputs = GetCorrespondingOutputs(inputNode->output);
         auto newNodeConst = newNodeOutputs.GetElement(0).ReferencedPort()->GetNode();
         auto newInputNodeConst = dynamic_cast<const model::InputNode<ValueType>*>(newNodeConst);
@@ -58,6 +61,7 @@ namespace model
     template <typename ValueType>
     void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort)
     {
+        // TODO: verify `oldPort` is from old model and `newPort` is from new model
         auto portSize = oldPort.Size(); 
         assert(newPort.Size() == portSize);
         for(size_t index = 0; index < portSize; ++index)
@@ -69,6 +73,7 @@ namespace model
     template <typename ValueType>
     void ModelTransformer::MapNodeOutput(const PortElements<ValueType>& oldElements, const PortElements<ValueType>& newElements)
     {
+        // TODO: verify `oldElements` are from old model and `newElements` are from new model
          auto size = oldElements.Size();
          assert(oldElements.Size() == size);
          for(size_t index = 0; index < size; ++index)
