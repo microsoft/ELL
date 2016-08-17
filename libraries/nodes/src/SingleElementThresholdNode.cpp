@@ -31,8 +31,8 @@ namespace nodes
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
 
-        // get the element used in the split rule 
-        model::PortElements<double> element {newPortElements, _predictor.GetElementIndex()};
+        // get the element used in the split rule
+        model::PortElements<double> element{ newPortElements, _predictor.GetElementIndex() };
 
         // get the threshold.
         auto thresholdNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetThreshold());
@@ -56,6 +56,4 @@ namespace nodes
     {
         return transformer.AddNode<SingleElementThresholdNode>(input, predictor);
     }
-
-
 }

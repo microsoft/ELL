@@ -81,7 +81,8 @@ namespace nodes
             treeSubModels.Append(interiorNodeSubModels[rootIndex]);
         }
 
-        // add the bias term
+        // add the bias term, but first make a copy for individual tree outputs
+        auto individualTreeOutputs = treeSubModels;
         auto biasNode = transformer.AddNode<ConstantNode<double>>(_forest.GetBias());
         treeSubModels.Append(biasNode->output);
 
@@ -89,8 +90,9 @@ namespace nodes
         auto sumNode = transformer.AddNode<SumNode<double>>(treeSubModels);
         
         transformer.MapNodeOutput(output, sumNode->output);
+
         // TODO: waiting for PortElements changes:
-        //       transformer.MapNodeOutput(treeOutputs, ...);
+        transformer.MapNodeOutput(treeOutputs, individualTreeOutputs); 
         //       transformer.MapNodeOutput(edgeIndicatorVector, ...);
     }
 

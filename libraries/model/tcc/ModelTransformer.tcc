@@ -62,11 +62,23 @@ namespace model
     void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort)
     {
         // TODO: verify `oldPort` is from old model and `newPort` is from new model
-        auto portSize = oldPort.Size(); 
-        assert(newPort.Size() == portSize);
-        for(size_t index = 0; index < portSize; ++index)
+        auto size = oldPort.Size();
+        assert(newPort.Size() == size);
+        for(size_t index = 0; index < size; ++index)
         {
             _elementToElementMap[{oldPort, index}] = {newPort, index};
+        }
+    }
+
+    template <typename ValueType>
+    void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElements<ValueType>& newElements)
+    {
+        // TODO: verify `oldPort` is from old model and `newElements` are from new model
+        auto size = oldPort.Size(); 
+        assert(newElements.Size() == size);
+        for(size_t index = 0; index < size; ++index)
+        {
+            _elementToElementMap[{oldPort, index}] = newElements.GetElement(index);
         }
     }
 

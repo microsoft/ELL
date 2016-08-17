@@ -123,6 +123,13 @@ namespace model
 
         /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
         ///
+        /// <param name="oldPort"> The port in the old model to map to the new model. </param>
+        /// <param name="newPort"> The port in the new model to be mapped from the old model. </param>
+        template <typename ValueType>
+        void MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElements<ValueType>& newElements);
+
+        /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
+        ///
         /// <param name="oldElements"> The elements in the old model to map to the new model. </param>
         /// <param name="newElements"> The elements in the new model to be mapped from the old model. </param>
         template <typename ValueType>
