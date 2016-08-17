@@ -33,9 +33,8 @@ namespace model
         /// <param name="owningNode"> The node that contains this port </param>
         /// <param name="inputRef"> The input group to fetch input values from </param>
         /// <param name="name"> The name of this port </param>
-        /// <param name="dimension"> The dimension of the port </param>
         template <typename ValueType>
-        InputPortBase(const class Node* owningNode, const PortElements<ValueType>& inputs, std::string name, size_t dimension);
+        InputPortBase(const class Node* owningNode, const PortElements<ValueType>& inputs, std::string name);
 
         /// <summary> Returns the list of nodes this input port gets values from </summary>
         ///
@@ -50,20 +49,7 @@ namespace model
         /// <summary> The dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
-        size_t Size() const { return _inputElements.Size(); }
-
-        /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
-        ///
-        /// <returns> The (already-computed) output value corresponding to this input </returns>
-        template <typename ValueType>
-        std::vector<ValueType> GetTypedValue() const;
-
-        /// <summary> Returns an element from the (already-computed) output value corresponding to this input </summary>
-        ///
-        /// <param name="index"> The index of the element to return </param>
-        /// <returns> The output value at the corresponding index </returns>
-        template <typename ValueType>
-        ValueType GetTypedValue(size_t index) const;
+        virtual size_t Size() const override { return _inputElements.Size(); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -77,7 +63,7 @@ namespace model
 
     protected:
         /// Subclasses _must_ call this method in their constructor
-        void ComputeParentsAndElements();
+        void ComputeParents();
 
     private:
         const PortElementsBase& _inputElements; // Just a reference to the typed elements in concrete subclass
@@ -97,7 +83,7 @@ namespace model
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         ///
         /// <returns> The (already-computed) output value corresponding to this input </returns>
-        std::vector<ValueType> GetValue() const { return GetTypedValue<ValueType>(); }
+        std::vector<ValueType> GetValue() const;
 
         /// <summary> Returns an element from the (already-computed) output value corresponding to this input </summary>
         ///

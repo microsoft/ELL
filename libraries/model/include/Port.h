@@ -50,7 +50,7 @@ namespace model
         /// <summary> Returns the dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
-        size_t Size() const { return _size; } // dimension
+        virtual size_t Size() const = 0;
 
         /// <summary> Returns the name of this port </summary>
         ///
@@ -86,7 +86,7 @@ namespace model
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
         
     protected:
-        Port(const class Node* node, std::string name, PortType type, size_t size) : _node(node), _name(name), _type(type), _size(size) {}
+        Port(const class Node* node, std::string name, PortType type) : _node(node), _name(name), _type(type) {}
         Port(const Port& other) = delete;
 
     private:
@@ -94,6 +94,5 @@ namespace model
         const class Node* _node = nullptr;
         std::string _name;
         PortType _type = PortType::None;
-        size_t _size = 0;
     };
 }
