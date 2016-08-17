@@ -148,7 +148,7 @@ namespace utilities
 
         // read string
         auto valueToken = _tokenizer.ReadNextToken();
-        value = valueToken == "true";
+        value = (valueToken == "true");
 
         // eat a comma if it exists
         if(hasName)
