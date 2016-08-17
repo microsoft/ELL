@@ -96,7 +96,8 @@ namespace model
     template <typename ValueType>
     PortElement<ValueType> PortElements<ValueType>::GetElement(size_t index) const
     {
-        auto element = static_cast<PortElement<ValueType>&>(PortElementsBase::GetElement(index));
+        auto baseElement = PortElementsBase::GetElement(index);
+        auto element = static_cast<PortElement<ValueType>&>(baseElement);
         return element;
     }
 

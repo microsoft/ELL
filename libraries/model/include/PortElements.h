@@ -294,7 +294,7 @@ namespace model
         /// <summary> The port this element refers to </summary>
         ///
         /// <returns> The port this element refers to </returns>
-        const OutputPort<ValueType>* ReferencedPort() const { return static_cast<const OutputPort<ValueType>*>(PortElementBase::ReferencedPort()); }
+        const OutputPort<ValueType>* ReferencedPort() const { return static_cast<const OutputPort<ValueType>*>(this->PortElementBase::ReferencedPort()); }
 
         /// <summary> Appends a set of elements to this set of elements. </summary>
         ///
