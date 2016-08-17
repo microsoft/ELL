@@ -287,8 +287,6 @@ void TestMovingAverageNodeRefine()
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ meanNode->output }); // TODO: cleanup
 
-    auto newOutputPort = dynamic_cast<const model::OutputPort<double>*>(newOutputElements.GetElement(0).ReferencedPort());
-
     std::cout << "MovingAverage model compilable: " << (transformer.IsModelCompilable() ? "yes" : "no") << std::endl;
     std::cout << "Original nodes: " << model.Size() << ", refined: " << newModel.Size() << std::endl;
 
@@ -297,8 +295,7 @@ void TestMovingAverageNodeRefine()
         inputNode->SetInput(inputValue);
         auto outputVec1 = model.ComputeOutput(meanNode->output);
         newInputNode->SetInput(inputValue);
-        auto outputVec2 = newModel.ComputeOutput(*newOutputPort); // #### change back to newOutputElements
-        // auto outputVec2 = newModel.ComputeOutput(newOutputElements); // #### change back to newOutputElements
+        auto outputVec2 = newModel.ComputeOutput(newOutputElements);
 
         testing::ProcessTest("Testing MovingAverageNode refine", testing::IsEqual(outputVec1, outputVec2));
     }

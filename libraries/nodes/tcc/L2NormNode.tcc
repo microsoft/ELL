@@ -37,15 +37,6 @@ namespace nodes
         auto newNode = transformer.AddNode<L2NormNode<ValueType>>(newPortElements);
         transformer.MapNodeOutput(output, newNode->output);
     }
-
-    template <typename ValueType>
-    void L2NormNode<ValueType>::RefineNode(model::ModelTransformer& transformer) const
-    {
-        // TODO: elementwise x^2, sum, div by D
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<L2NormNode<ValueType>>(newPortElements);
-        transformer.MapNodeOutput(output, newNode->output);
-    }
     
     template <typename ValueType>
     void L2NormNode<ValueType>::Serialize(utilities::Serializer& serializer) const
