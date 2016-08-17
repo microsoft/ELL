@@ -83,14 +83,14 @@ namespace model
     void InputPort<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         InputPortBase::Serialize(serializer);
-        serializer.Serialize("inputElements", _input);
+        serializer.Serialize("input", _input);
     }
 
     template <typename ValueType>
     void InputPort<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
         InputPortBase::Deserialize(serializer, context);
-        serializer.Deserialize("inputElements", _input, context);
+        serializer.Deserialize("input", _input, context);
 
         ComputeParents();
     }
