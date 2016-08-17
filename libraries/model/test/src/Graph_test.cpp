@@ -37,29 +37,29 @@ void NodePrinter(const model::Node& node)
         std::cout << (isFirstInputPort ? "" : ", ");
         isFirstInputPort = false;
 
-        auto ranges = inputPort->GetInputRanges();
-        if(ranges.NumRanges() > 1)
+        auto elements = inputPort->GetInputElements();
+        if (elements.NumRanges() > 1)
         {
             std::cout << "{";
         }
 
         bool isFirstRange = true;
-        for(const auto& range: ranges)
+        for (const auto& range : elements.GetRanges())
         {
             std::cout << (isFirstRange ? "" : ", ");
             isFirstRange = false;
 
             auto port = range.ReferencedPort();
             std::cout << "node_" << port->GetNode()->GetId() << "." << port->GetName();
-            if(!range.IsFullPortRange())
+            if (!range.IsFullPortRange())
             {
                 auto start = range.GetStartIndex();
                 auto size = range.Size();
-                std::cout << "[" << start << ":" << (start+size) << "]";
+                std::cout << "[" << start << ":" << (start + size) << "]";
             }
         }
 
-        if(ranges.NumRanges() > 1)
+        if (elements.NumRanges() > 1)
         {
             std::cout << "}";
         }
@@ -75,7 +75,7 @@ void PrintGraph(const model::Model& graph)
 void PrintGraphIterator(const model::Model& graph)
 {
     auto iter = graph.GetNodeIterator();
-    while(iter.IsValid())
+    while (iter.IsValid())
     {
         NodePrinter(*iter.Get());
         iter.Next();
@@ -118,31 +118,31 @@ void TestStaticGraph()
     in->SetInput(inputValues);
 
     std::cout << "\nComputing output of Input node" << std::endl;
-    auto output1 = g.ComputeNodeOutput(in->output);
+    auto output1 = g.ComputeOutput(in->output);
     for (auto x : output1)
         std::cout << x << "  ";
     std::cout << std::endl;
 
     std::cout << "\nComputing output of condition node" << std::endl;
-    auto conditionOutput = g.ComputeNodeOutput(condition->output);
+    auto conditionOutput = g.ComputeOutput(condition->output);
     for (auto x : conditionOutput)
         std::cout << x << "  ";
     std::cout << std::endl;
 
     // std::cout << "\nComputing output of ArgMax node" << std::endl;
-    // auto maxOutput = g.ComputeNodeOutput(maxAndArgMax->val);
+    // auto maxOutput = g.ComputeOutput(maxAndArgMax->val);
     // for(auto x: maxOutput) std::cout << x << "  ";
     // std::cout << std::endl;
 
     std::cout << "\nComputing output of valSelector node" << std::endl;
-    auto output3 = g.ComputeNodeOutput(valSelector->output);
+    auto output3 = g.ComputeOutput(valSelector->output);
     for (auto x : output3)
         std::cout << x << "  ";
     std::cout << std::endl;
     testing::ProcessTest("Testing min value", testing::IsEqual(output3[0], 0.75));
 
     std::cout << "\nComputing output of indexSelector node" << std::endl;
-    auto output4 = g.ComputeNodeOutput(indexSelector->output);
+    auto output4 = g.ComputeOutput(indexSelector->output);
     for (auto x : output4)
         std::cout << x << "  ";
     std::cout << std::endl;
@@ -166,7 +166,7 @@ void TestNodeIterator()
     auto size1 = model.Size();
     auto size2 = 0;
     auto iter = model.GetNodeIterator();
-    while(iter.IsValid())
+    while (iter.IsValid())
     {
         ++size2;
         iter.Next();
@@ -204,12 +204,12 @@ void TestInputRouting1()
     // set some example input and read the output
     // std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
     // in->SetInput(inputValues);
-    // auto output = model.ComputeNodeOutput(minAndMax->output);
+    // auto output = model.ComputeOutput(minAndMax->output);
 
     // testing::ProcessTest("Testing combine node", testing::IsEqual(output[0], 0.25));
     // testing::ProcessTest("Testing combine node", testing::IsEqual(output[1], 0.75));
 
-    // auto output2 = model.ComputeNodeOutput(minAndTail->output);
+    // auto output2 = model.ComputeOutput(minAndTail->output);
     // std::cout << "size: " << output2.size() << std::endl;
     // for (auto val : output2) std::cout << val << "  ";
     // std::cout << std::endl;
@@ -228,19 +228,19 @@ void TestInputRouting2()
     auto minAndArgMin2 = model.AddNode<model::ArgMinNode<double>>(range);      // a node that takes its input from a range --- a subset of outputs from a port
     auto minAndArgMin3 = model.AddNode<model::ArgMinNode<double>>(ranges);     // a node that takes its input from a "group" --- an arbitrary set of outputs from other ports
 
-    auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::MakePortElements(in->output, 0, 2));
+    auto minAndArgMin4 = model.AddNode<model::ArgMinNode<double>>(model::PortElements<double>(in->output, 0, 2));
     auto minAndArgMin5 = model.AddNode<model::ArgMinNode<double>>(model::PortElements<double>{ { in->output, 0 }, { in->output, 0, 2 } });
-    auto minAndArgMin6 = model.AddNode<model::ArgMinNode<double>>(model::Concat(model::MakePortElements(in->output, 0), model::MakePortElements(in->output, 0, 2), model::MakePortElements(minAndArgMin1->val, 0, 1)));
+    auto minAndArgMin6 = model.AddNode<model::ArgMinNode<double>>(model::PortElements<double>{ { in->output, 0 }, { in->output, 0, 2 }, { minAndArgMin1->val, 0, 1 } });
 
     //// set some example input and read the output
     std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
     in->SetInput(inputValues);
 
-    auto output1 = model.ComputeNodeOutput(minAndArgMin1->val);
-    auto output2 = model.ComputeNodeOutput(minAndArgMin2->val);
-    auto output3 = model.ComputeNodeOutput(minAndArgMin3->val);
-    auto output4 = model.ComputeNodeOutput(minAndArgMin4->val);
-    //    auto output5 = model.ComputeNodeOutput(minAndArgMin5->val);
+    auto output1 = model.ComputeOutput(minAndArgMin1->val);
+    auto output2 = model.ComputeOutput(minAndArgMin2->val);
+    auto output3 = model.ComputeOutput(minAndArgMin3->val);
+    auto output4 = model.ComputeOutput(minAndArgMin4->val);
+    //    auto output5 = model.ComputeOutput(minAndArgMin5->val);
 
     std::cout << "output1: " << output1[0] << ", output2: " << output2[0] << ", output3: " << output3[0] << ", output4: " << output4[0] << std::endl; // ", output5: " << output5[0] << std::endl;
 
@@ -309,16 +309,19 @@ void TestRefineGraph()
 
     // Now run data through the graphs and make sure they agree
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputPort = transformer.GetCorrespondingOutputPort(outputNode->output);
+    auto newOutputs = transformer.GetCorrespondingOutputs(model::PortElements<double>{ outputNode->output });
 
     std::vector<std::vector<double>> inputValues = { { 1.0, 2.0 }, { 1.0, 0.5 }, { 2.0, 4.0 } };
     for (const auto& inputValue : inputValues)
     {
         inputNode->SetInput(inputValue);
-        auto output = model.ComputeNodeOutput(outputNode->output);
+        auto output = model.ComputeOutput(outputNode->output);
 
         newInputNode->SetInput(inputValue);
-        auto newOutput = newModel.ComputeNodeOutput(*newOutputPort);
+        auto newOutputPortUntyped = newOutputs.GetElement(0).ReferencedPort(); // need typed port
+        auto newOutputPort = dynamic_cast<const model::OutputPort<double>*>(newOutputPortUntyped);
+        assert(newOutputPort != nullptr);
+        auto newOutput = newModel.ComputeOutput(*newOutputPort);
 
         testing::ProcessTest("testing refined graph", testing::IsEqual(output[0], newOutput[0]));
         testing::ProcessTest("testing refined graph", testing::IsEqual(output[1], newOutput[1]));
@@ -326,3 +329,86 @@ void TestRefineGraph()
     }
 }
 
+// Define new node that splits its outputs when refined
+template <typename ValueType>
+class SplittingNode : public model::Node
+{
+public:
+    SplittingNode() : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
+    SplittingNode(const model::PortElements<ValueType>& input) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
+
+    static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SplittingNode"); }
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+    virtual void Copy(model::ModelTransformer& transformer) const override
+    {
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        auto newNode = transformer.AddNode<SplittingNode<ValueType>>(newPortElements);
+        transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    virtual void RefineNode(model::ModelTransformer& transformer) const override
+    {
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        model::PortElements<ValueType> in1;
+        model::PortElements<ValueType> in2;
+        auto size = _input.Size();
+        auto halfSize = size / 2;
+        // split into two nodes, one which returns the first half, and one which returns the second half
+        for (size_t index = 0; index < halfSize; ++index)
+        {
+            in1.Append(model::PortElements<ValueType>(newPortElements.GetElement(index)));
+        }
+        for (size_t index = halfSize; index < size; ++index)
+        {
+            in2.Append(model::PortElements<ValueType>(newPortElements.GetElement(index)));
+        }
+        auto newNode1 = transformer.AddNode<model::OutputNode<ValueType>>(in1);
+        auto newNode2 = transformer.AddNode<model::OutputNode<ValueType>>(in2);
+        model::PortElements<ValueType> elem1(newNode1->output);
+        model::PortElements<ValueType> elem2(newNode2->output);
+        model::PortElements<ValueType> newOutput({ elem1, elem2 });
+        
+        transformer.MapNodeOutput({ output }, newOutput);
+    }
+
+    const model::OutputPort<ValueType>& output = _output;
+    static constexpr const char* inputPortName = "input";
+    static constexpr const char* outputPortName = "output";
+
+protected:
+    virtual void Compute() const override { _output.SetOutput(_input.GetValue()); }
+
+private:
+    model::InputPort<ValueType> _input;
+    model::OutputPort<ValueType> _output;
+};
+
+void TestRefineSplitOutputs()
+{
+    // Create a simple computation graph
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(2);
+    auto outputNode = model.AddNode<SplittingNode<double>>(inputNode->output);
+
+    model::TransformContext context;
+    model::ModelTransformer transformer;
+    auto newModel = transformer.RefineModel(model, context);
+
+    // Now run data through the graphs and make sure they agree
+    auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
+    auto newOutputs = transformer.GetCorrespondingOutputs(model::PortElements<double>{ outputNode->output });
+
+    std::vector<std::vector<double>> inputValues = { { 1.0, 2.0 }, { 1.0, 0.5 }, { 2.0, 4.0 } };
+    for (const auto& inputValue : inputValues)
+    {
+        inputNode->SetInput(inputValue);
+        auto output = model.ComputeOutput(outputNode->output);
+
+        newInputNode->SetInput(inputValue);
+        auto newOutput = newModel.ComputeOutput(newOutputs);
+
+        testing::ProcessTest("testing refined splitting graph", testing::IsEqual(output[0], newOutput[0]));
+        testing::ProcessTest("testing refined splitting graph", testing::IsEqual(output[1], newOutput[1]));
+    }
+}

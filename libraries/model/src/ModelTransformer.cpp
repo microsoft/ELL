@@ -52,13 +52,14 @@ namespace model
 
         int iterationCount = 0;
 
-        // refine until all nodes are compilable according to context.IsNodeCompilable()
+        // refine until all nodes are compilable according to context.IsNodeCompilable(), until
+        // the model is fully refined, or until the maximum number of iterations is reached.
         do
         {
             Model currentModel = std::move(_model);
             _model = Model();
 
-            std::unordered_map<PortRange, PortRange> currentElementToElementMap = std::move(_elementToElementMap);
+            auto currentElementToElementMap = std::move(_elementToElementMap);
             _elementToElementMap.clear();
 
             _isModelCompilable = true;
@@ -74,7 +75,7 @@ namespace model
             // concatenate new port map onto existing port map
             if(currentElementToElementMap.size() > 0)
             {
-                std::unordered_map<PortRange, PortRange> newElementToElementMap;
+                std::unordered_map<PortElementBase, PortElementBase> newElementToElementMap;
                 for(const auto& entry : currentElementToElementMap)
                 {
                     newElementToElementMap[entry.first] = _elementToElementMap[entry.second];
@@ -92,7 +93,7 @@ namespace model
             if(++iterationCount >= maxRefinementIterations)
             {
                 std::string uncompilableNodeName;
-                auto uncompilableNode = GetUncompilableNode(currentModel, context);
+                auto uncompilableNode = FindFirstUncompilableNode(currentModel, context);
                 uncompilableNodeName = uncompilableNode->GetRuntimeTypeName();
                 throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than " + std::to_string(maxRefinementIterations) + " refinement iterations, uncompilable node: " + uncompilableNodeName);
             }
@@ -104,27 +105,7 @@ namespace model
         return _model;
     }
 
-    const OutputPortBase* ModelTransformer::GetCorrespondingPort(const OutputPortBase& port)
-    {
-        auto portRange = PortRange{port};
-        if (_elementToElementMap.find(portRange) == _elementToElementMap.end())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find port in new model.");
-        }
-        return _elementToElementMap[portRange].ReferencedPort();
-    }
-
-    void ModelTransformer::MapPort(const OutputPortBase& oldPort, const OutputPortBase& newPort)
-    {
-        PortRange oldRange(oldPort);
-        PortRange newRange(newPort);
-        // // this is hideous
-        // auto nonconstPort = const_cast<OutputPortBase*>(&newPort);
-        // auto portRange = PortRange{nonconstPort};
-        _elementToElementMap[oldRange] = newRange;
-    }
-
-    const Node* ModelTransformer::GetUncompilableNode(const Model& model, const TransformContext& context) const
+    const Node* ModelTransformer::FindFirstUncompilableNode(const Model& model, const TransformContext& context) const
     {
         auto iter = model.GetNodeIterator();
         while(iter.IsValid())

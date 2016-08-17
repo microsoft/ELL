@@ -51,13 +51,38 @@ namespace model
     // Compute output value
     //
     template <typename ValueType>
-    std::vector<ValueType> Model::ComputeNodeOutput(const OutputPort<ValueType>& outputPort) const
+    std::vector<ValueType> Model::ComputeOutput(const OutputPort<ValueType>& outputPort) const
     {
         auto compute = [](const Node& node) { node.Compute(); };
-
         Visit(compute, { outputPort.GetNode() });
-
         return outputPort.GetOutput();
+    }
+
+    template <typename ValueType>
+    std::vector<ValueType> Model::ComputeOutput(const PortElements<ValueType>& elements) const
+    {
+        // get set of nodes to make sure we visit
+        std::unordered_set<const Node*> usedNodes;
+        for(const auto& range: elements.GetRanges())
+        {
+            usedNodes.insert(range.ReferencedPort()->GetNode());
+        }
+
+        auto compute = [](const Node& node) { node.Compute(); };
+        auto nodes = std::vector<const Node*>(usedNodes.begin(), usedNodes.end());
+        Visit(compute, nodes);
+
+        // Now construct the output
+        auto numElements = elements.Size();
+        std::vector<ValueType> result(numElements);
+        for(size_t index = 0; index < numElements; ++index)
+        {
+            auto element = elements.GetElement(index);
+            auto port = element.ReferencedPort();
+            auto portOutput = port->GetOutput()[element.GetIndex()];
+            result[index] = portOutput;
+        }
+        return result;
     }
 
     //

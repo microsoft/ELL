@@ -14,7 +14,6 @@
 #include "OutputPort.h"
 #include "PortElements.h"
 #include "Node.h"
-#include "OutputPort.h"
 
 // utilities
 #include "Exception.h"
@@ -32,6 +31,7 @@ namespace model
     template <typename ValueType>
     class InputNode;
 
+    /// <summary> A context object that carries information about the compiler or other process driving the transformation. </summary>
     class TransformContext
     {
     public:
@@ -53,6 +53,7 @@ namespace model
         std::function<bool(const Node&)> _isNodeCompilableFunction;
     };
 
+    /// <summary> A class that refines or copies models </summary>
     class ModelTransformer
     {
     public:
@@ -81,10 +82,15 @@ namespace model
         /// <remarks> Only available after calling CopyModel or RefineModel. </remarks>
         bool IsModelCompilable() const { return _isModelCompilable; }
 
-        /// <summary> Returns the OutputPort from new new model corresponding to the given port on the input model </summary>
+        /// <summary> Returns the port elements from the new model corresponding to the given port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
-        const OutputPort<ValueType>* GetCorrespondingOutputPort(const OutputPort<ValueType>& port);
+        PortElements<ValueType> GetCorrespondingOutputs(const OutputPort<ValueType>& port);
+
+        /// <summary> Returns the port elements from the new model corresponding to the given elements on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
+        template <typename ValueType>
+        PortElements<ValueType> GetCorrespondingOutputs(const PortElements<ValueType>& elements);
 
         /// <summary> Returns the input node from new new model corresponding to the given input node on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
@@ -108,12 +114,19 @@ namespace model
         template <typename NodeType, typename... Args>
         NodeType* AddNode(Args&&... args);
 
-        /// <summary> Sets up a port-port mapping. Called by node implementors </summary>
+        /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
         ///
         /// <param name="oldPort"> The port in the old model to map to the new model. </param>
         /// <param name="newPort"> The port in the new model to be mapped from the old model. </param>
         template <typename ValueType>
-        void MapOutputPort(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort);
+        void MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort);
+
+        /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
+        ///
+        /// <param name="oldElements"> The elements in the old model to map to the new model. </param>
+        /// <param name="newElements"> The elements in the new model to be mapped from the old model. </param>
+        template <typename ValueType>
+        void MapNodeOutput(const PortElements<ValueType>& oldElements, const PortElements<ValueType>& newElements);
 
         /// <summary> Get the context used by the transformer. Called by node implementors </summary>
         ///
@@ -128,21 +141,13 @@ namespace model
     private:
         friend class Node;
 
-        /// <summary> Returns the (untyped) Port from new new model corresponding to the given port on the input model </summary>
-        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
-        const OutputPortBase* GetCorrespondingPort(const OutputPortBase& port);
-
-        // Sets up a port-port mapping. Called by node implementors
-        void MapPort(const OutputPortBase& oldPort, const OutputPortBase& newPort);
-
-        // Find the name of a node that isn't compilable (if there are several, it just finds one)
-        const Node* GetUncompilableNode(const Model& model, const TransformContext& context) const;
+        // Find a node that isn't compilable (if there are several, it just finds one)
+        const Node* FindFirstUncompilableNode(const Model& model, const TransformContext& context) const;
 
         Model _model;
         TransformContext _context;
-        std::unordered_map<PortRange, PortRange> _elementToElementMap;
+        std::unordered_map<PortElementBase, PortElementBase> _elementToElementMap;
         bool _isModelCompilable;
-
 
         // the maximal number of refinement iterations to allow
         const int maxRefinementIterations = 10;

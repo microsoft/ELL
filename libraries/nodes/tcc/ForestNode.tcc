@@ -28,9 +28,9 @@ namespace nodes
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto newNode = transformer.AddNode<ForestNode<SplitRuleType, EdgePredictorType>>(newPortElements, _forest);
-        transformer.MapOutputPort(output, newNode->output);
-        transformer.MapOutputPort(treeOutputs, newNode->treeOutputs);
-        transformer.MapOutputPort(edgeIndicatorVector, newNode->edgeIndicatorVector);
+        transformer.MapNodeOutput(output, newNode->output);
+        transformer.MapNodeOutput(treeOutputs, newNode->treeOutputs);
+        transformer.MapNodeOutput(edgeIndicatorVector, newNode->edgeIndicatorVector);
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
@@ -88,10 +88,10 @@ namespace nodes
         // sum all of the trees
         auto sumNode = transformer.AddNode<SumNode<double>>(treeSubModels);
         
-        transformer.MapOutputPort(output, sumNode->output);
+        transformer.MapNodeOutput(output, sumNode->output);
         // TODO: waiting for PortElements changes:
-        //       transformer.MapOutputPort(treeOutputs, ...);
-        //       transformer.MapOutputPort(edgeIndicatorVector, ...);
+        //       transformer.MapNodeOutput(treeOutputs, ...);
+        //       transformer.MapNodeOutput(edgeIndicatorVector, ...);
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>

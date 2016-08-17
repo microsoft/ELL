@@ -65,7 +65,7 @@ namespace nodes
         auto PortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
         auto PortElements2 = transformer.TransformPortElements(_input2.GetPortElements());
         auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(PortElements1, PortElements2, _operation);
-        transformer.MapOutputPort(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>

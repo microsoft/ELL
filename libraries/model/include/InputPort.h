@@ -45,12 +45,12 @@ namespace model
         /// <summary> Returns the list of port ranges this input port gets values from </summary>
         ///
         /// <returns> The list nodes this input port gets values from </returns>
-        const PortElementsUntyped& GetInputRanges() const { return _inputRanges; }
+        const PortElementsBase& GetInputElements() const { return _inputElements; }
 
         /// <summary> The dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
-        size_t Size() const { return _inputRanges.Size(); }
+        size_t Size() const { return _inputElements.Size(); }
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         ///
@@ -80,9 +80,9 @@ namespace model
         void ComputeParentsAndElements();
 
     private:
-        const PortElementsUntyped& _inputRanges; // Just a reference to the typed elements in concrete subclass
+        const PortElementsBase& _inputElements; // Just a reference to the typed elements in concrete subclass
 
-        std::vector<PortRange> _individualElements; // individual elements
+        std::vector<PortRange> _individualElements; // individual elements // unnecessary now
         std::vector<const Node*> _parentNodes;
     };
 

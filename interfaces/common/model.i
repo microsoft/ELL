@@ -56,7 +56,7 @@
 
 #endif
 
-%ignore model::Model::ComputeNodeOutput;
+%ignore model::Model::ComputeOutput;
 
 %extend model::Model 
 {
@@ -75,6 +75,6 @@
     // compute output
     std::vector<double> ComputeDoubleOutput(const OutputPort<double>& outputPort) const
     {
-        return $self->ComputeNodeOutput(outputPort);
+        return $self->ComputeOutput(outputPort);
     }
 }

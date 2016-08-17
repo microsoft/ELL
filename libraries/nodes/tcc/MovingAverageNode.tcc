@@ -46,7 +46,7 @@ namespace nodes
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto newNode = transformer.AddNode<MovingAverageNode<ValueType>>(newPortElements, _windowSize);
-        transformer.MapOutputPort(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>
@@ -59,7 +59,7 @@ namespace nodes
         std::vector<ValueType> literalN(newPortElements.Size(), (ValueType)_windowSize);
         auto constNode = transformer.AddNode<ConstantNode<ValueType>>(literalN);
         auto divideNode = transformer.AddNode<BinaryOperationNode<ValueType>>(accumNode->output, constNode->output, BinaryOperationNode<ValueType>::OperationType::divide);
-        transformer.MapOutputPort(output, divideNode->output);
+        transformer.MapNodeOutput(output, divideNode->output);
     }
 
     template <typename ValueType>

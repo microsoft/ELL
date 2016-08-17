@@ -32,7 +32,7 @@ namespace model
     void InputNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<InputNode<ValueType>>(_output.Size());
-        transformer.MapOutputPort(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>

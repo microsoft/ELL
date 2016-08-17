@@ -59,8 +59,8 @@ namespace model
     {
         auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
         auto newNode = transformer.AddNode<ArgMinNode<ValueType>>(newPortElements);
-        transformer.MapOutputPort(this->val, newNode->val);
-        transformer.MapOutputPort(this->argVal, newNode->argVal);
+        transformer.MapNodeOutput(this->val, newNode->val);
+        transformer.MapNodeOutput(this->argVal, newNode->argVal);
     }
 
     template <typename ValueType>
@@ -68,7 +68,7 @@ namespace model
     {
         auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
         auto newNode = transformer.AddNode<ArgMaxNode<ValueType>>(newPortElements);
-        transformer.MapOutputPort(this->val, newNode->val);
-        transformer.MapOutputPort(this->argVal, newNode->argVal);
+        transformer.MapNodeOutput(this->val, newNode->val);
+        transformer.MapNodeOutput(this->argVal, newNode->argVal);
     }
 }

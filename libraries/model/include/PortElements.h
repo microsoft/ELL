@@ -25,6 +25,61 @@ namespace model
 {
     class Node;
 
+    /// <summary> Represents a single value from an output port </summary>
+    class PortElementBase
+    {
+    public:
+        PortElementBase() = default;
+        virtual ~PortElementBase() = default;
+
+        /// <summary> Creates a PortElementBase representing a single value from a given port </summary>
+        ///
+        /// <param name="port"> The port to take a value from </param>
+        /// <param name="index"> The index of the value </param>
+        PortElementBase(const OutputPortBase& port, size_t index);
+
+        /// <summary> Returns the type of the value referenced </summary>
+        ///
+        /// <returns> The type of the value referenced </returns>
+        Port::PortType GetType() const { return _referencedPort->GetType(); }
+
+        /// <summary> The index within the port of the element this refers to </summary>
+        ///
+        /// <returns> The index of the element this refers to </returns>
+        size_t GetIndex() const { return _index; }
+
+        /// <summary> The port this element refers to </summary>
+        ///
+        /// <returns> The port this element refers to </returns>
+        const OutputPortBase* ReferencedPort() const { return _referencedPort; }
+
+        /// <summary> Equality operator. </summary>
+        ///
+        /// <returns> true if this element is equivalent to other. </returns>
+        bool operator==(const PortElementBase& other) const;
+
+    protected:
+        const OutputPortBase* _referencedPort = nullptr;
+        size_t _index = 0;
+    };
+
+    /// <summary> Represents a single value from an output port </summary>
+    template <typename ValueType>
+    class PortElement : public PortElementBase
+    {
+    public:
+        /// <summary> Creates a PortElement representing a single value from a given port </summary>
+        ///
+        /// <param name="port"> The port to take a value from </param>
+        /// <param name="index"> The index of the value </param>
+        PortElement(const OutputPortBase& port, size_t index) : PortElementBase(port, index) {}
+
+        /// <summary> The port this element refers to </summary>
+        ///
+        /// <returns> The port this element refers to </returns>
+        const OutputPort<ValueType>* ReferencedPort() const { return static_cast<const OutputPort<ValueType>*>(_referencedPort); }
+    };
+
     /// <summary> Represents a contiguous set of values from an output port </summary>
     class PortRange : public utilities::ISerializable
     {
@@ -62,7 +117,7 @@ namespace model
         /// <summary> The index of the first element this range refers to </summary>
         ///
         /// <returns> The index of the first element this range refers to </returns>
-        size_t GetStartIndex() const;
+        size_t GetStartIndex() const { return _startIndex; }
 
         /// <summary> The port this range refers to </summary>
         ///
@@ -95,7 +150,7 @@ namespace model
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
-        /// <summary> Equality operatior. </summary>
+        /// <summary> Equality operator. </summary>
         ///
         /// <returns> true if this range is equivalent to other. </returns>
         bool operator==(const PortRange& other) const;
@@ -108,36 +163,10 @@ namespace model
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>
-    class PortElementsUntyped : public utilities::ISerializable
+    class PortElementsBase : public utilities::ISerializable
     {
     public:
-        /// <summary> Creates an PortElementsUntyped representing all the values from a given port </summary>
-        ///
-        /// <param name="port"> The port to take values from </param>
-        PortElementsUntyped(const OutputPortBase& port);
-
-        /// <summary> Creates an PortElementsUntyped representing a single value from a given port </summary>
-        ///
-        /// <param name="port"> The port to take a value from </param>
-        /// <param name="index"> The index of the value </param>
-        PortElementsUntyped(const OutputPortBase& port, size_t startIndex);
-
-        /// <summary> Creates an PortElementsUntyped representing a range of values from a given port </summary>
-        ///
-        /// <param name="port"> The port to take a value from </param>
-        /// <param name="startIndex"> The index of the first value to take </param>
-        /// <param name="numValues"> The number of values to take </param>
-        PortElementsUntyped(const OutputPortBase& port, size_t startIndex, size_t numValues);
-
-        /// <summary> Creates an PortElementsUntyped from a PortRange </summary>
-        ///
-        /// <param name="range"> The range to get values from </param>
-        PortElementsUntyped(const PortRange& range);
-
-        /// <summary> Creates an PortElementsUntyped from a set of PortRange </summary>
-        ///
-        /// <param name="range"> The ranges to get values from </param>
-        PortElementsUntyped(const std::vector<PortRange>& ranges);
+        virtual ~PortElementsBase() = default;
 
         /// <summary> The dimensionality of the output </summary>
         ///
@@ -149,28 +178,26 @@ namespace model
         /// <returns> The number of ranges in this list </returns>
         size_t NumRanges() const { return _ranges.size(); }
 
-        /// <summary> An STL-type iterator pointing to the beginning of the list of ranges </summary>
-        std::vector<PortRange>::const_iterator begin() const { return _ranges.cbegin(); }
-
-        /// <summary> An STL-type iterator pointing to the end of the list of ranges </summary>
-        std::vector<PortRange>::const_iterator end() const { return _ranges.cend(); }
-
-        /// <summary> Adds a range of values to this list </summary>
+        /// <summary> Gets a vector of range objects </summary>
         ///
-        /// <param name="range"> The range of values to add to this list </param>
-        void AddRange(const PortRange& range);
+        /// <returns> A std::vector of PortRange objects </returns>
+        const std::vector<PortRange>& GetRanges() const { return _ranges; }
 
+        /// <summary> Reserves space for the given number of ranges </summary>
+        ///
+        /// <param name="numRanges"> The number of ranges to reserve space for </param>
+        void Reserve(size_t numRanges);
+                
         /// <summary> Gets an element in the elements. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
-        ///
         /// <returns> The specified element. </returns>
-        PortRange GetElement(size_t index) const;
+        PortElementBase GetElement(size_t index) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "PortElementsUntyped"; }
+        static std::string GetTypeName() { return "PortElementsBase"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -189,17 +216,25 @@ namespace model
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     protected:
-        PortElementsUntyped(){};
+        PortElementsBase(const OutputPortBase& port);
+        PortElementsBase(const OutputPortBase& port, size_t startIndex);
+        PortElementsBase(const OutputPortBase& port, size_t startIndex, size_t numValues);
+        PortElementsBase(const PortRange& range);
+        PortElementsBase(const std::vector<PortRange>& ranges);
+        PortElementsBase(){};
+        
         void ComputeSize();
+        void AddRange(const PortRange& range);
 
     private:
         std::vector<PortRange> _ranges;
+        // TODO: keep set of nodes (?)
         size_t _size = 0;
     };
 
     /// <summary> Represents a statically-typed set of values from one or more output ports </summary>
     template <typename ValueType>
-    class PortElements : public PortElementsUntyped
+    class PortElements : public PortElementsBase
     {
     public:
         PortElements() = default;
@@ -213,7 +248,7 @@ namespace model
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        PortElements(const OutputPort<ValueType>& port, size_t startIndex);
+        PortElements(const OutputPort<ValueType>& port, size_t index);
 
         /// <summary> Creates a PortElements representing a range of values from a given port </summary>
         ///
@@ -221,6 +256,11 @@ namespace model
         /// <param name="startIndex"> The index of the first value to take </param>
         /// <param name="numValues"> The number of values to take </param>
         PortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
+
+        /// <summary> Creates a PortElements representing a single element from a given port </summary>
+        ///
+        /// <param name="element"> The element </param>
+        PortElements(const PortElement<ValueType>& element);
 
         /// <summary> Creates a PortElements by concatenating a set of them together </summary>
         ///
@@ -245,6 +285,17 @@ namespace model
         /// <param name="numValues"> The number of values to take </param>
         PortElements(const PortElements<ValueType>& elements, size_t startIndex, size_t numValues);
 
+        /// <summary> Gets an element in the elements. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the element. </param>
+        /// <returns> The specified element. </returns>
+        PortElement<ValueType> GetElement(size_t index) const;
+
+        /// <summary> The port this element refers to </summary>
+        ///
+        /// <returns> The port this element refers to </returns>
+        const OutputPort<ValueType>* ReferencedPort() const { return static_cast<const OutputPort<ValueType>*>(PortElementBase::ReferencedPort()); }
+
         /// <summary> Appends a set of elements to this set of elements. </summary>
         ///
         /// <param name="other"> The PortElements to append to this one. </param>
@@ -268,7 +319,7 @@ namespace model
     /// <param name="index"> The index of the value </param>
     /// <returns> The composite PortElements </returns>
     template <typename ValueType>
-    PortElements<ValueType> MakePortElements(const OutputPort<ValueType>& port, size_t startIndex);
+    PortElements<ValueType> MakePortElements(const OutputPort<ValueType>& port, size_t index);
 
     /// <summary> Creates a PortElements representing a range of values from a given port </summary>
     ///
@@ -287,10 +338,23 @@ namespace model
     RefType Concat(const RefType& ref1, Refs&&... refs);
 }
 
-// custom specialization of std::hash so we can keep UniqueIds in containers that require hashable types
+// custom specialization of std::hash so we can keep PortRanges in containers that require hashable types
 namespace std
 {
-    /// <summary> Implements a hash function for the UniqueId class, so that it can be used with associative containers (maps, sets, and the like). </summary>
+    /// <summary> Implements a hash function for the PortRange class, so that it can be used with associative containers (maps, sets, and the like). </summary>
+    template <>
+    class hash<model::PortElementBase>
+    {
+    public:
+        typedef model::PortElementBase argument_type;
+        typedef std::size_t result_type;
+
+        /// <summary> Computes a hash of the input value. </summary>
+        ///
+        /// <returns> A hash value for the given input. </returns>
+        result_type operator()(argument_type const& id) const;
+    };
+
     template <>
     class hash<model::PortRange>
     {

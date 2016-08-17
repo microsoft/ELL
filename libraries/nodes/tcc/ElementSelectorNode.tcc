@@ -31,6 +31,6 @@ namespace nodes
         auto newElements = transformer.TransformPortElements(_elements.GetPortElements());
         auto newSelector = transformer.TransformPortElements(_selector.GetPortElements());
         auto newNode = transformer.AddNode<ElementSelectorNode<ValueType, SelectorType>>(newElements, newSelector);
-        transformer.MapOutputPort(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 }
