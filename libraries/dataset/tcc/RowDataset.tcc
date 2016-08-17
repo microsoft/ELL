@@ -81,9 +81,25 @@ namespace dataset
     void RowDataset<ExampleType>::RandomPermute(std::default_random_engine& rng, size_t prefixSize)
     {
         prefixSize = CorrectRangeSize(0, prefixSize);
-        for(size_t i = 0; i < prefixSize; ++i)
+        for (size_t i = 0; i < prefixSize; ++i)
         {
-            RandomSwap(rng, i, i, _examples.size()-i);
+            RandomSwap(rng, i, i, _examples.size() - i);
+        }
+    }
+
+    template<typename ExampleType>
+    void RowDataset<ExampleType>::RandomPermute(std::default_random_engine& rng, size_t rangeFirstIndex, size_t rangeSize, size_t prefixSize)
+    {
+        rangeSize = CorrectRangeSize(rangeFirstIndex, rangeSize);
+
+        if (prefixSize > rangeSize || prefixSize == 0)
+        {
+            prefixSize = rangeSize;
+        }
+
+        for (size_t i = rangeFirstIndex; i < rangeFirstIndex + prefixSize; ++i)
+        {
+            RandomSwap(rng, i, i, _examples.size() - i);
         }
     }
 

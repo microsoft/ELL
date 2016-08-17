@@ -105,6 +105,14 @@ namespace dataset
         /// <param name="prefixSize"> Size of the prefix to permute, zero to permute the entire dataset. </param>
         void RandomPermute(std::default_random_engine& rng, size_t prefixSize=0);
 
+        /// <summary> Randomly permutes a range of rows in the dataset. </summary>
+        ///
+        /// <param name="rng"> [in,out] The random number generator. </param>
+        /// <param name="rangeFirstIndex"> Zero-based index of the firest example in the range. </param>
+        /// <param name="rangeSize"> Size of the range. </param>
+        /// <param name="prefixSize"> Size of the prefix to permute, zero to permute the entire range. </param>
+        void RandomPermute(std::default_random_engine& rng, size_t rangeFirstIndex, size_t rangeSize, size_t prefixSize=0);
+
         /// <summary> Choses an example uniformly from a given range and swaps it with a given example (which can either be insode or outside of the range).
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>

@@ -25,6 +25,7 @@ namespace trainers
     struct HistogramForestTrainerParameters : public ForestTrainerParameters
     {
         std::string randomSeed;
+        size_t thresholdFinderSampleSize;
         size_t candidatesPerInput;
     };
 
@@ -63,6 +64,7 @@ namespace trainers
         // member variables
         LossFunctionType _lossFunction;
         std::default_random_engine _random;
+        size_t _thresholdFinderSampleSize;
         size_t _candidatesPerInput;
         ThresholdFinder _thresholdFinder;
     };

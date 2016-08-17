@@ -8,13 +8,12 @@
 
 // utilities
 #include "RandomEngines.h"
-#include "..\include\HistogramForestTrainer.h"
 
 namespace trainers
 {
     template<typename LossFunctionType, typename BoosterType>
     HistogramForestTrainer<LossFunctionType, BoosterType>::HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const HistogramForestTrainerParameters& parameters) 
-        : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction), _random(utilities::GetRandomEngine(parameters.randomSeed)), _candidatesPerInput(parameters.candidatesPerInput)
+        : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction), _random(utilities::GetRandomEngine(parameters.randomSeed)), _candidatesPerInput(parameters.candidatesPerInput), _thresholdFinderSampleSize(parameters.thresholdFinderSampleSize)
     {}
 
     template<typename LossFunctionType, typename BoosterType>
@@ -127,7 +126,7 @@ namespace trainers
         const double epsilon = 1.0e-8;
 
         // uniformly choose _candidatesPerInput from the range, without replacement
-        _dataset.RandomSwap(_random, range.firstIndex, range.firstIndex, range.size);      
+        _dataset.RandomPermute(_random, range.firstIndex, range.size, _thresholdFinderSampleSize);
 
     }
 
