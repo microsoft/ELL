@@ -8,45 +8,8 @@
 
 #include "ThresholdFinder.h"
 
-// stl
-#include <algorithm>
-
 namespace trainers
 {
-    std::vector<std::vector<ThresholdFinder::ValueCount>> ThresholdFinder::UniqueValues(dataset::GenericRowDataset::Iterator exampleIterator) const
-    {
-        std::vector<std::vector<ValueCount>> result;
-
-        // invert and densify result
-        while (exampleIterator.IsValid())
-        {
-            const auto& example = exampleIterator.Get();
-            auto denseDataVector = example.GetDataVector().ToArray();
-            double weight = example.GetMetaData().weight;
-
-            if (result.size() < denseDataVector.size())
-            {
-                result.resize(denseDataVector.size());
-            }
-
-            for (size_t j = 0; j < denseDataVector.size(); ++j)
-            {
-                result[j].push_back({ denseDataVector[j], weight });
-            }
-
-            exampleIterator.Next();
-        }
-
-        // sort and unique each feature
-        for (size_t j = 0; j < result.size(); ++j)
-        {
-            auto newSize = SortReduceDuplicates(result[j].begin(), result[j].end());
-            result[j].resize(newSize);
-        }
-
-        return result;
-    }
-
     size_t ThresholdFinder::SortReduceDuplicates(std::vector<ValueCount>::iterator begin, const std::vector<ValueCount>::iterator end) const
     {
         // sort the values

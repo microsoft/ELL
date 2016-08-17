@@ -128,6 +128,9 @@ namespace trainers
         // uniformly choose _candidatesPerInput from the range, without replacement
         _dataset.RandomPermute(_random, range.firstIndex, range.size, _thresholdFinderSampleSize);
 
+        auto exampleIterator = _dataset.GetIterator(range.firstIndex, _thresholdFinderSampleSize);
+        auto uniqueValues = _thresholdFinder.UniqueValues(exampleIterator);
+
     }
 
     template<typename LossFunctionType, typename BoosterType>

@@ -66,7 +66,6 @@ namespace trainers
         virtual const std::shared_ptr<const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> GetPredictor() const { return _forest; };
 
     protected:       
-
         //
         // Private internal structs 
         //

@@ -33,7 +33,8 @@ set (TCC tcc/EvaluatingIncrementalTrainer.tcc
          tcc/MultiEpochIncrementalTrainer.tcc
          tcc/SortingForestTrainer.tcc
          tcc/SweepingIncrementalTrainer.tcc
-         tcc/SGDIncrementalTrainer.tcc)
+         tcc/SGDIncrementalTrainer.tcc
+         tcc/ThresholdFinder.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

@@ -32,9 +32,12 @@ namespace trainers
         /// <param name="exampleIterator"> An example iterator. </param>
         ///
         /// <returns> For each feature, a vector of sorted unique values with counts. </returns>
-        std::vector<std::vector<ValueCount>> UniqueValues(dataset::GenericRowDataset::Iterator exampleIterator) const;
+        template<typename ExampleIteratorType>
+        std::vector<std::vector<ValueCount>> UniqueValues(ExampleIteratorType exampleIterator) const;
 
     private:
-       size_t SortReduceDuplicates(std::vector<ValueCount>::iterator begin, std::vector<ValueCount>::iterator end) const;
+       size_t SortReduceDuplicates(std::vector<ValueCount>::iterator begin, const std::vector<ValueCount>::iterator end) const;
     };
 }
+
+#include "../tcc/ThresholdFinder.tcc"
