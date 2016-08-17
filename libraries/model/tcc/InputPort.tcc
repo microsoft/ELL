@@ -21,11 +21,13 @@ namespace model
     std::vector<ValueType> InputPortBase::GetTypedValue() const
     {
         std::vector<ValueType> result;
-        result.reserve(Size());
-        for (const auto& element : _individualElements)
+        size_t size = Size();
+        result.reserve(size);
+        for(size_t index = 0; index < size; ++index)
         {
+            auto element = _inputElements.GetElement(index);
             auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
-            auto temp = typedOutput->GetOutput(element.GetStartIndex());
+            auto temp = typedOutput->GetOutput(element.GetIndex());
             result.push_back(temp);
         }
 
@@ -38,10 +40,10 @@ namespace model
 
     template <typename ValueType>
     ValueType InputPortBase::GetTypedValue(size_t index) const
-    {
-        const auto& element = _individualElements[index];
+    {        
+        const auto& element = _inputElements.GetElement(index);
         auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
-        return typedOutput->GetOutput(element.GetStartIndex());
+        return typedOutput->GetOutput(element.GetIndex());
     }
 
     inline void InputPortBase::ComputeParentsAndElements()
@@ -50,12 +52,6 @@ namespace model
         {
             auto port = range.ReferencedPort();
             auto node = port->GetNode();
-            auto start = range.GetStartIndex();
-            auto numElements = range.Size();
-            for (size_t index = 0; index < numElements; ++index)
-            {
-                _individualElements.emplace_back(*port, index + start);
-            }
             _parentNodes.push_back(node);
         }
     }

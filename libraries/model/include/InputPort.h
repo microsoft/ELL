@@ -81,8 +81,6 @@ namespace model
 
     private:
         const PortElementsBase& _inputElements; // Just a reference to the typed elements in concrete subclass
-
-        std::vector<PortRange> _individualElements; // individual elements // unnecessary now
         std::vector<const Node*> _parentNodes;
     };
 
