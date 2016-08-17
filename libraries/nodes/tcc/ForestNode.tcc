@@ -41,7 +41,7 @@ namespace nodes
 
         // create a place to store references to the output ports of the sub-models at each interior node
         std::vector<model::PortElements<double>> interiorNodeSubModels(interiorNodes.size());
-
+        
         // visit interior nodes bottom-up (in reverse topological order)
         for(size_t i = interiorNodes.size(); i > 0; --i)
         {
@@ -88,11 +88,11 @@ namespace nodes
 
         // sum all of the trees
         auto sumNode = transformer.AddNode<SumNode<double>>(treeSubModels);
-        
-        transformer.MapNodeOutput(output, sumNode->output);
 
-        // TODO: waiting for PortElements changes:
+        // Map all the outputs from the original node to the refined graph outputs         
+        transformer.MapNodeOutput(output, sumNode->output);
         transformer.MapNodeOutput(treeOutputs, individualTreeOutputs); 
+        // TODO: waiting for PortElements changes:
         //       transformer.MapNodeOutput(edgeIndicatorVector, ...);
     }
 
