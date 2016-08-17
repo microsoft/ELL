@@ -108,29 +108,12 @@ namespace trainers
     template<typename LossFunctionType, typename BoosterType>
     std::vector<typename HistogramForestTrainer<LossFunctionType, BoosterType>::SplitRuleType> HistogramForestTrainer<LossFunctionType, BoosterType>::GetSplitCandidatesAtNode(Range range)
     {
-        auto numInputElements = _dataset.GetMaxDataVectorSize();
-        std::vector<SplitRuleType> splitRuleCandidates;
-        splitRuleCandidates.reserve(_candidatesPerInput * numInputElements);
-        
-        for(size_t j = 0; j<numInputElements; ++j)
-        {
-            AddSplitCandidatesAtNode(splitRuleCandidates, range, j);
-        }
-        return splitRuleCandidates;
-    }
-
-    template<typename LossFunctionType, typename BoosterType>
-    void HistogramForestTrainer<LossFunctionType, BoosterType>::AddSplitCandidatesAtNode(std::vector<SplitRuleType>& splitRuleCandidates, Range range, size_t index)
-    {
-
-        const double epsilon = 1.0e-8;
-
         // uniformly choose _candidatesPerInput from the range, without replacement
         _dataset.RandomPermute(_random, range.firstIndex, range.size, _thresholdFinderSampleSize);
 
         auto exampleIterator = _dataset.GetIterator(range.firstIndex, _thresholdFinderSampleSize);
-        auto uniqueValues = _thresholdFinder.UniqueValues(exampleIterator);
-
+        auto thresholds = _thresholdFinder.GetThresholds(exampleIterator);
+        return thresholds;
     }
 
     template<typename LossFunctionType, typename BoosterType>

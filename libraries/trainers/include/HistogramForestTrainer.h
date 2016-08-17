@@ -59,14 +59,13 @@ namespace trainers
 
         // new functions for the HistogramForestTrainer
         std::vector<SplitRuleType> GetSplitCandidatesAtNode(Range range);
-        void AddSplitCandidatesAtNode(std::vector<SplitRuleType>& splitRuleCandidates, Range range, size_t index);
 
         // member variables
         LossFunctionType _lossFunction;
         std::default_random_engine _random;
         size_t _thresholdFinderSampleSize;
         size_t _candidatesPerInput;
-        ThresholdFinder _thresholdFinder;
+        ExhaustiveThresholdFinder _thresholdFinder;
     };
 
     /// <summary> Makes a simple forest trainer. </summary>

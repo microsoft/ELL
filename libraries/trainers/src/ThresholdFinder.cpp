@@ -10,7 +10,7 @@
 
 namespace trainers
 {
-    size_t ThresholdFinder::SortReduceDuplicates(std::vector<ValueCount>::iterator begin, const std::vector<ValueCount>::iterator end) const
+    size_t ThresholdFinder::SortReduceDuplicates(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const
     {
         // sort the values
         std::sort(begin, end);
@@ -33,7 +33,6 @@ namespace trainers
                 }
             }
         }
-
         return current - begin + 1;
     }
 }

@@ -14,9 +14,10 @@
 namespace trainers
 {
     template<typename ExampleIteratorType>
-    std::vector<std::vector<ThresholdFinder::ValueCount>> ThresholdFinder::UniqueValues(ExampleIteratorType exampleIterator) const
+    ThresholdFinder::UniqueValuesResult ThresholdFinder::UniqueValues(ExampleIteratorType exampleIterator) const
     {
-        std::vector<std::vector<ValueCount>> result;
+        std::vector<std::vector<ValueWeight>> result;
+        double totalWeight = 0.0;
 
         // invert and densify result
         while (exampleIterator.IsValid())
@@ -24,6 +25,8 @@ namespace trainers
             const auto& example = exampleIterator.Get();
             const auto& denseDataVector = example.GetDataVector();
             double weight = example.GetMetaData().weak.weight;
+
+            totalWeight += weight;
 
             if (result.size() < denseDataVector.Size())
             {
@@ -45,6 +48,24 @@ namespace trainers
             result[j].resize(newSize);
         }
 
-        return result;
+        return { result, totalWeight };
+    }
+
+    template<typename ExampleIteratorType>
+    std::vector<predictors::SingleElementThresholdPredictor> trainers::ExhaustiveThresholdFinder::GetThresholds(ExampleIteratorType exampleIterator) const
+    {
+        auto uniqueValuesResult = UniqueValues(exampleIterator);
+        std::vector<predictors::SingleElementThresholdPredictor> thresholdPredictors;
+
+        for(size_t j = 0; j < uniqueValuesResult.weightedValues.size(); ++j)
+        {
+            const auto& featureValues = uniqueValuesResult.weightedValues[j];
+            for(size_t i = 0; i<featureValues.size()-1; ++i)
+            {
+                thresholdPredictors.push_back({ j, 0.5 * (featureValues[i].value + featureValues[i+1].value) });
+            }
+        }
+
+        return thresholdPredictors;
     }
 }
