@@ -153,8 +153,10 @@ void TestDeserializer()
 
     {
         std::stringstream strstream;
-        SerializerType serializer(strstream);
-        serializer.Serialize("true", true);
+        {
+            SerializerType serializer(strstream);
+            serializer.Serialize("true", true);
+        }
 
         DeserializerType deserializer(strstream);
         bool val = false;
@@ -164,8 +166,10 @@ void TestDeserializer()
 
     {
         std::stringstream strstream;
-        SerializerType serializer(strstream);
-        serializer.Serialize("pi", 3.14159);
+        {
+            SerializerType serializer(strstream);
+            serializer.Serialize("pi", 3.14159);
+        }
 
         DeserializerType deserializer(strstream);
         double val = 0;
@@ -175,8 +179,10 @@ void TestDeserializer()
 
     {
         std::stringstream strstream;
-        SerializerType serializer(strstream);
-        serializer.Serialize("pie", std::string{ "cherry pie" });
+        {
+            SerializerType serializer(strstream);
+            serializer.Serialize("pie", std::string{ "cherry pie" });
+        }
 
         DeserializerType deserializer(strstream);
         std::string val;
@@ -186,9 +192,11 @@ void TestDeserializer()
 
     {
         std::stringstream strstream;
-        SerializerType serializer(strstream);
-        std::vector<int> arr {1,2,3};
-        serializer.Serialize("arr", arr);
+        {
+            SerializerType serializer(strstream);
+            std::vector<int> arr{ 1,2,3 };
+            serializer.Serialize("arr", arr);
+        }
 
         DeserializerType deserializer(strstream);
         std::vector<int> val;
@@ -198,9 +206,11 @@ void TestDeserializer()
 
     {
         std::stringstream strstream;
-        SerializerType serializer(strstream);
-        TestStruct testStruct{ 1, 2.2f, 3.3 };
-        serializer.Serialize("s", testStruct);
+        {
+            SerializerType serializer(strstream);
+            TestStruct testStruct{ 1, 2.2f, 3.3 };
+            serializer.Serialize("s", testStruct);
+        }
 
         DeserializerType deserializer(strstream);
         TestStruct val;
@@ -221,17 +231,19 @@ void TestDeserializer()
         std::stringstream strstream;
         auto constVector = std::vector<double>{ 1.0, 2.0, 3.0 };
 
-        SerializerType serializer(strstream);
-        auto in = g.AddNode<model::InputNode<double>>(3);
-        auto constNode = g.AddNode<nodes::ConstantNode<double>>(constVector);
-        auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
-        auto out = g.AddNode<model::OutputNode<double>>(in->output);
+        {
+            SerializerType serializer(strstream);
+            auto in = g.AddNode<model::InputNode<double>>(3);
+            auto constNode = g.AddNode<nodes::ConstantNode<double>>(constVector);
+            auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
+            auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
-        serializer.Serialize("node1", *constNode);
-        serializer.Serialize("node2", *in);
-        serializer.Serialize("node3", constNode);
-        serializer.Serialize("node4", constNode);
-        serializer.Serialize("node5", binaryOpNode);
+            serializer.Serialize("node1", *constNode);
+            serializer.Serialize("node2", *in);
+            serializer.Serialize("node3", constNode);
+            serializer.Serialize("node4", constNode);
+            serializer.Serialize("node5", binaryOpNode);
+        }
 
         DeserializerType deserializer(strstream);
         nodes::ConstantNode<double> newConstNode;
@@ -258,9 +270,11 @@ void TestDeserializer()
         structVector.push_back(TestStruct{ 1, 2.2f, 3.3 });
         structVector.push_back(TestStruct{ 4, 5.5f, 6.6 });
 
-        SerializerType serializer(strstream);
-        serializer.Serialize("vec1", doubleVector);
-        serializer.Serialize("vec2", structVector);
+        {
+            SerializerType serializer(strstream);
+            serializer.Serialize("vec1", doubleVector);
+            serializer.Serialize("vec2", structVector);
+        }
         std::cout << "Serialized string:" << std::endl;
         std::cout << strstream.str() << std::endl;
 
@@ -297,11 +311,13 @@ void TestDeserializer()
         auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
         std::stringstream strstream;
-        SerializerType serializer(strstream);
+        {
+            SerializerType serializer(strstream);
 
-        serializer.Serialize(g);
-        // std::cout << "Graph output:" << std::endl;
-        // std::cout << strstream.str() << std::endl;
+            serializer.Serialize(g);
+            // std::cout << "Graph output:" << std::endl;
+            // std::cout << strstream.str() << std::endl;
+        }
 
         DeserializerType deserializer(strstream);
         model::Model newGraph;
@@ -316,10 +332,12 @@ void TestDeserializer()
     }
 
     {
+        auto stringVal = std::string{ "Hi there! Here's a tab character: \t, as well as some 'quoted' text." };
         std::stringstream strstream;
-        SerializerType serializer(strstream);
-        auto stringVal = std::string{"Hi there! Here's a tab character: \t, as well as some 'quoted' text."};
-        serializer.Serialize("str", stringVal);
+        {
+            SerializerType serializer(strstream);
+            serializer.Serialize("str", stringVal);
+        }
         
         DeserializerType deserializer(strstream);
         std::string val;

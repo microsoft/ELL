@@ -37,6 +37,9 @@ namespace utilities
         /// <param name="outputStream"> The stream to serialize data to. </summary>
         SimpleXmlSerializer(std::ostream& outputStream);
 
+        /// <summary> Default Destructor </summary>
+        ~SimpleXmlSerializer();
+
     protected:
         DECLARE_SERIALIZE_VALUE_OVERRIDE(bool);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(char);
@@ -62,6 +65,9 @@ namespace utilities
 
     private:
         // Serialization
+        void WriteFileHeader();
+        void WriteFileFooter();
+
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void WriteScalar(const char* name, const ValueType& value);
 
@@ -87,6 +93,9 @@ namespace utilities
         ///
         /// <param name="inputStream"> The stream to deserialize data from. </summary>
         SimpleXmlDeserializer(std::istream& inputStream);
+
+        /// <summary> Default Destructor </summary>
+        ~SimpleXmlDeserializer();
 
     protected:
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(bool);
@@ -116,6 +125,10 @@ namespace utilities
         virtual void EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) override;
 
     private:
+        // Deserialization
+        void ReadFileHeader();
+        void ReadFileFooter();
+
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void ReadScalar(const char* name, ValueType& value);
         void ReadScalar(const char* name, std::string& value);
