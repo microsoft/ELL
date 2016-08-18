@@ -22,9 +22,12 @@
 #include "DelayNode.h"
 #include "BinaryOperationNode.h"
 #include "DotProductNode.h"
+#include "ForestNode.h"
 
 // predictors
 #include "LinearPredictor.h"
+#include "ForestPredictor.h"
+#include "SingleElementThresholdPredictor.h"
 
 // utilities
 #include "Files.h"
@@ -100,7 +103,7 @@ namespace common
     {
         // define some abbreviations
         using SplitAction = predictors::SimpleForestPredictor::SplitAction;
-        using SplitRule = predictors::SingleElementThresholdRule;
+        using SplitRule = predictors::SingleElementThresholdPredictor;
         using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
         using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
@@ -137,7 +140,7 @@ namespace common
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(3);
         auto simpleForestNode = model.AddNode<nodes::SimpleForestNode>(inputNode->output, forest);
-        auto outputNode = model.AddNode<model::OutputNode<double>>(simpleForestNode->prediction);
+        auto outputNode = model.AddNode<model::OutputNode<double>>(simpleForestNode->output);
         return model;
     }
 
