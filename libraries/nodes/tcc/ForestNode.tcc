@@ -80,7 +80,7 @@ namespace nodes
         // Now compute the edge indicator vector
         std::vector<model::PortElements<bool>> edgeIndicatorSubModels(_forest.NumEdges());
 
-        // Vector with index of the incoming edge for each internal node (-1 for tree roots)
+        // Vector with index of the incoming edge for each internal node (with sentinel value of -1 for tree roots)
         std::vector<int> incomingEdgeIndices(interiorNodes.size(), -1);
         for(size_t nodeIndex = 0; nodeIndex < interiorNodes.size(); ++nodeIndex)
         {
@@ -107,13 +107,11 @@ namespace nodes
                 auto edgeIndex = node.GetFirstEdgeIndex() + edgePosition;
                 if(parentEdgeIndex == -1) // this node is a root
                 {
-                    assert(thisEdgeIndicator.Size() == 1);
                     edgeIndicatorSubModels[edgeIndex] = thisEdgeIndicator;
                 }
                 else
                 {
                     auto parentIndicator = edgeIndicatorSubModels[parentEdgeIndex];
-                    assert(parentIndicator.Size() == 1);
                     auto andNode = transformer.AddNode<BinaryOperationNode<bool>>(parentIndicator, thisEdgeIndicator, BinaryOperationNode<bool>::OperationType::logicalAnd);
                     edgeIndicatorSubModels[edgeIndex] = {andNode->output};
                 }
