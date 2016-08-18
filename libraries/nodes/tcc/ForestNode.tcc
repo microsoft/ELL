@@ -45,7 +45,7 @@ namespace nodes
         std::vector<model::PortElements<double>> interiorNodeSubModels(interiorNodes.size());
         
         // visit interior nodes bottom-up (in reverse topological order)
-        for(int nodeIndex = (int)interiorNodes.size()-1; nodeIndex >= 0; --nodeIndex) // Note: index var must be signed or else end condition is never met
+        for(int nodeIndex = static_cast<int>(interiorNodes.size())-1; nodeIndex >= 0; --nodeIndex) // Note: index var must be signed or else end condition is never met
         {            
             const auto& edges = interiorNodes[nodeIndex].GetOutgoingEdges();
 
@@ -79,6 +79,7 @@ namespace nodes
         }
 
         // Now compute the edge indicator vector
+        auto trueNode = transformer.AddNode<ConstantNode<bool>>(true); // the constant 'true'
         std::vector<model::PortElements<bool>> edgeIndicatorSubModels(_forest.NumEdges());
 
         // Vector with index of the incoming edge for each internal node (with sentinel value of -1 for tree roots)
@@ -87,43 +88,30 @@ namespace nodes
         {
             auto parentEdgeIndex = incomingEdgeIndices[nodeIndex];
             auto isRoot = parentEdgeIndex == -1;
-            const auto& node = interiorNodes[nodeIndex];
             const auto& edgeSelector = interiorNodeSplitIndicators[nodeIndex];
-
-            model::PortElements<bool> child1Out;
-            model::PortElements<bool> child2Out;
-            
-            // multiplexor
-            if(isRoot)
-            {
-                auto notNode = transformer.AddNode<UnaryOperationNode<bool>>(edgeSelector, UnaryOperationNode<bool>::OperationType::logicalNot);
-                child1Out = {notNode->output};
-                child2Out = {edgeSelector};
-            }
-            else
-            {
-               auto parentIndicator = edgeIndicatorSubModels[parentEdgeIndex];
-               auto muxNode = transformer.AddNode<MultiplexorNode<bool, bool>>(parentIndicator, edgeSelector, 2);                
-               child1Out = {muxNode->output, 0};
-               child2Out = {muxNode->output, 1};
-            }
-
-            auto firstEdgeIndex = node.GetFirstEdgeIndex();
-            edgeIndicatorSubModels[firstEdgeIndex] = child1Out;
-            edgeIndicatorSubModels[firstEdgeIndex+1] = child2Out;
-
+            const auto& node = interiorNodes[nodeIndex];
             const auto& childEdges = node.GetOutgoingEdges();
-            for(size_t edgePosition = 0; edgePosition < childEdges.size(); ++edgePosition)
+            auto numChildren = childEdges.size();
+            model::PortElements<bool> parentIndicator = isRoot ? trueNode->output : edgeIndicatorSubModels[parentEdgeIndex];
+
+            // The multiplexor node computes the indicator value for all the children at once, by copying its input value (a '1' if it's the root)
+            // to the selected child.
+            auto muxNode = transformer.AddNode<MultiplexorNode<bool, bool>>(parentIndicator, edgeSelector, numChildren);
+            for(size_t edgePosition = 0; edgePosition < numChildren; ++edgePosition)
             {
+                auto edgeIndex = node.GetFirstEdgeIndex() + edgePosition;
+                model::PortElements<bool> childOut = {muxNode->output, edgePosition};
+                edgeIndicatorSubModels[edgeIndex] = childOut;
+
                 // If this edge's target node has an outgoing edge, record ourself as its parent
                 if(childEdges[edgePosition].IsTargetInterior())
                 {
                     auto childNode = childEdges[edgePosition].GetTargetNodeIndex();
-                    incomingEdgeIndices[childNode] = static_cast<int>(firstEdgeIndex+edgePosition);
+                    incomingEdgeIndices[childNode] = static_cast<int>(edgeIndex);
                 }
             }
         }
-        // collect the entries for the indicator vector
+        // collect the individual entries for the indicator vector into a single PortElements object
         model::PortElements<bool> edgeIndicatorVectorElements(edgeIndicatorSubModels);
 
         // collect the sub-models that represent the trees of the forest
@@ -133,17 +121,17 @@ namespace nodes
             treeSubModels.Append(interiorNodeSubModels[rootIndex]);
         }
 
-        // add the bias term, but first make a copy for individual tree outputs
-        auto individualTreeOutputs = treeSubModels;
+        // make a copy and add the bias term
+        auto treesPlusBias = treeSubModels;
         auto biasNode = transformer.AddNode<ConstantNode<double>>(_forest.GetBias());
-        treeSubModels.Append(biasNode->output);
+        treesPlusBias.Append(biasNode->output);
 
         // sum all of the trees
-        auto sumNode = transformer.AddNode<SumNode<double>>(treeSubModels);
+        auto sumNode = transformer.AddNode<SumNode<double>>(treesPlusBias);
 
         // Map all the outputs from the original node to the refined graph outputs         
         transformer.MapNodeOutput(output, sumNode->output);
-        transformer.MapNodeOutput(treeOutputs, individualTreeOutputs);
+        transformer.MapNodeOutput(treeOutputs, treeSubModels);
         transformer.MapNodeOutput(edgeIndicatorVector, edgeIndicatorVectorElements);
     }
 

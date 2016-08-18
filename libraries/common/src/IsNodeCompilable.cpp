@@ -12,10 +12,12 @@ namespace common
 {
     IsNodeCompilable::IsNodeCompilable()
     {
+        _nodeNames.insert("InputNode<bool>");
         _nodeNames.insert("InputNode<double>");
+        _nodeNames.insert("ConstantNode<bool>");
         _nodeNames.insert("ConstantNode<double>");
-        _nodeNames.insert("BinaryOperationNode<double>");
         _nodeNames.insert("BinaryOperationNode<bool>");
+        _nodeNames.insert("BinaryOperationNode<double>");
         _nodeNames.insert("BinaryPredicateNode<double>");
         _nodeNames.insert("SumNode<double>");
         _nodeNames.insert("ElementSelectorNode<double>");
