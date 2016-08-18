@@ -31,7 +31,8 @@ int main()
         TestUnaryOperationNodeCompute();
         TestBinaryOperationNodeCompute();
         TestLinearPredictorNodeCompute();
-        
+        TestBinaryMultiplexorNodeCompute();
+
         TestMovingAverageNodeRefine();
         TestLinearPredictorNodeRefine();
         TestSimpleForestNodeRefine();
