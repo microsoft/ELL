@@ -13,7 +13,6 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (INCLUDE include/AccumulatorNode.h
-             include/BinaryMultiplexorNode.h
              include/BinaryOperationNode.h
              include/BinaryPredicateNode.h
              include/ConstantNode.h
@@ -25,6 +24,7 @@ set (INCLUDE include/AccumulatorNode.h
              include/L2NormNode.h
              include/MovingAverageNode.h
              include/MovingVarianceNode.h
+             include/MultiplexorNode.h
              include/SingleElementThresholdNode.h
              include/SumNode.h
              include/UnaryOperationNode.h)
@@ -34,7 +34,6 @@ set (SRC src/ConstantNode.cpp
          src/SingleElementThresholdNode.cpp)
 
 set (TCC tcc/AccumulatorNode.tcc
-         tcc/BinaryMultiplexorNode.tcc
          tcc/BinaryOperationNode.tcc
          tcc/BinaryPredicateNode.tcc
          tcc/ConstantNode.tcc
@@ -45,6 +44,7 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/L2NormNode.tcc
          tcc/MovingAverageNode.tcc
          tcc/MovingVarianceNode.tcc
+         tcc/MultiplexorNode.tcc
          tcc/SumNode.tcc
          tcc/UnaryOperationNode.tcc)
 

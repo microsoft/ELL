@@ -16,7 +16,7 @@
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
 #include "ForestNode.h"
-#include "BinaryMultiplexorNode.h"
+#include "MultiplexorNode.h"
 
 // model
 #include "ModelGraph.h"
@@ -265,28 +265,23 @@ void TestLinearPredictorNodeCompute()
     // TODO: test it
 }
 
-void TestBinaryMultiplexorNodeCompute()
+void TestMultiplexorNodeCompute()
 {
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(3);
+    auto inputNode = model.AddNode<model::InputNode<double>>(1);
     auto selectorNode = model.AddNode<model::InputNode<bool>>(1);
-    auto muxNode = model.AddNode<nodes::BinaryMultiplexorNode<double>>(inputNode->output, selectorNode->output);
+    auto muxNode = model.AddNode<nodes::MultiplexorNode<double, bool>>(inputNode->output, selectorNode->output, 2);
 
-    std::vector<double> inputValue{ 1.0, 2.0, 3.0 };
-    std::vector<double> nullValue{ 0, 0, 0 };
+    std::vector<double> inputValue{ 5.0 };
     inputNode->SetInput(inputValue);
 
-    selectorNode->SetInput(false); // output1 should get the input
-    auto outputVec1 = model.ComputeOutput(muxNode->output1);
-    auto outputVec2 = model.ComputeOutput(muxNode->output2);
-    testing::ProcessTest("Testing BinaryMultiplexorNode compute", testing::IsEqual(outputVec1, inputValue));
-    testing::ProcessTest("Testing BinaryMultiplexorNode compute", testing::IsEqual(outputVec2, nullValue));
+    selectorNode->SetInput(false); // output[0] should get the input
+    auto outputVec = model.ComputeOutput(muxNode->output);
+    testing::ProcessTest("Testing MultiplexorNode compute", testing::IsEqual(outputVec, {5.0, 0}));
 
-    selectorNode->SetInput(true);
-    outputVec1 = model.ComputeOutput(muxNode->output1);
-    outputVec2 = model.ComputeOutput(muxNode->output2);
-    testing::ProcessTest("Testing BinaryMultiplexorNode compute", testing::IsEqual(outputVec1, nullValue));
-    testing::ProcessTest("Testing BinaryMultiplexorNode compute", testing::IsEqual(outputVec2, inputValue));
+    selectorNode->SetInput(true); // output[1] should get the input
+    outputVec = model.ComputeOutput(muxNode->output);
+    testing::ProcessTest("Testing MultiplexorNode compute", testing::IsEqual(outputVec, {0.0, 5.0}));
 }
 
 //

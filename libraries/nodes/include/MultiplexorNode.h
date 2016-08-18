@@ -23,32 +23,30 @@
 /// <summary> model namespace </summary>
 namespace nodes
 {
-    /// <summary> A node that routes its input to one of its outputs, depending on a separate selector input. When `selector` is false, the input is routed
-    /// to output1, and when `selector` is true, it is routed to output2. </summary>
-    template <typename ValueType>
-    class BinaryMultiplexorNode : public model::Node
+    /// <summary> A node that routes its scalar input to one element of its outputs, depending on a separate selector input. The element at the index
+    /// provided by `selector` is set to the input value, and the rest are set to a default value. </summary>
+    template <typename ValueType, typename SelectorType>
+    class MultiplexorNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
         /// @{
         static constexpr const char* inputPortName = "input";
         static constexpr const char* selectorPortName = "selector";
-        static constexpr const char* output1PortName = "output1";
-        static constexpr const char* output2PortName = "output2";
-        const model::OutputPort<ValueType>& output1 = _output1;
-        const model::OutputPort<ValueType>& output2 = _output2;
+        static constexpr const char* outputPortName = "output";
+        const model::OutputPort<ValueType>& output = _output;
         /// @}
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The input value. </param>
         /// <param name="selector"> The index of the chosen element to recieve the value </param>
-        BinaryMultiplexorNode(const model::PortElements<ValueType>& input, const model::PortElements<bool>& selector, ValueType defaultValue=0);
+        MultiplexorNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue=0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("BinaryMultiplexorNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, SelectorType>("MultiplexorNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -64,15 +62,14 @@ namespace nodes
     private:
         // Inputs
         model::InputPort<ValueType> _input;
-        model::InputPort<bool> _selector;
+        model::InputPort<SelectorType> _selector;
 
         // Output
-        model::OutputPort<ValueType> _output1;
-        model::OutputPort<ValueType> _output2;
+        model::OutputPort<ValueType> _output;
 
         // Default value
-        std::vector<ValueType> _defaultValue;
+        ValueType _defaultValue;
     };
 }
 
-#include "../tcc/BinaryMultiplexorNode.tcc"
+#include "../tcc/MultiplexorNode.tcc"
