@@ -8,6 +8,15 @@
 
 namespace nodes
 {
+    namespace UnaryOperationNodeImplementation
+    {
+        bool sqrt(bool x)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Error: taking sqrt of a boolean value");
+        }
+    }
+
+
     template <typename ValueType>
     UnaryOperationNode<ValueType>::UnaryOperationNode() : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _operation(OperationType::none)
     {
@@ -38,7 +47,9 @@ namespace nodes
         {
             case OperationType::sqrt:
             {
-                auto sqrtOp = [](ValueType x) { return std::sqrt(x); };
+                using std::sqrt;
+                using UnaryOperationNodeImplementation::sqrt; 
+                auto sqrtOp = [](ValueType x) { return sqrt(x); };
                 output = ComputeOutput(sqrtOp);
             }
             break;
