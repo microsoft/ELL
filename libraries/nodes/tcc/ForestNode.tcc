@@ -44,8 +44,8 @@ namespace nodes
         std::vector<model::PortElements<double>> interiorNodeSubModels(interiorNodes.size());
         
         // visit interior nodes bottom-up (in reverse topological order)
-        for(size_t nodeIndex = interiorNodes.size()-1; nodeIndex >= 0; --nodeIndex)
-        {
+        for(int nodeIndex = (int)interiorNodes.size()-1; nodeIndex >= 0; --nodeIndex) // Note: index var must be signed
+        {            
             const auto& edges = interiorNodes[nodeIndex].GetOutgoingEdges();
 
             // get the sub-model that represents each outgoing edge

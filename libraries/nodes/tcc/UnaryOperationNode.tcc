@@ -8,11 +8,30 @@
 
 namespace nodes
 {
-    namespace UnaryOperationNodeImplementation
+    namespace UnaryOperations
     {
-        bool sqrt(bool x)
+        template <typename ValueType>
+        ValueType Sqrt(ValueType a)
+        {
+            return std::sqrt(a);
+        }
+
+        template <>
+        bool Sqrt(bool x)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Error: taking sqrt of a boolean value");
+        }
+
+        template <typename ValueType>
+        ValueType LogicalNot(ValueType a)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Error: taking not of a non-boolean value");
+        }
+
+        template <>
+        bool LogicalNot(bool x)
+        {
+            return !x;
         }
     }
 
@@ -47,16 +66,12 @@ namespace nodes
         {
             case OperationType::sqrt:
             {
-                using std::sqrt;
-                using UnaryOperationNodeImplementation::sqrt; 
-                auto sqrtOp = [](ValueType x) { return sqrt(x); };
-                output = ComputeOutput(sqrtOp);
+                output = ComputeOutput(UnaryOperations::Sqrt<ValueType>);
             }
             break;
             case OperationType::logicalNot:
             {
-                auto notOp = [](ValueType x) { return !x; };
-                output = ComputeOutput(notOp);
+                output = ComputeOutput(UnaryOperations::LogicalNot<ValueType>);
             }
             break;
             

@@ -8,6 +8,96 @@
 
 namespace nodes
 {
+    namespace BinaryOperations
+    {
+        template <typename ValueType>
+        ValueType Add(ValueType a, ValueType b)
+        {
+            return a+b;
+        }
+
+        template <>
+        inline bool Add(bool a, bool b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <typename ValueType>
+        ValueType Subtract(ValueType a, ValueType b)
+        {
+            return a-b;
+        }
+
+        template <>
+        inline bool Subtract(bool a, bool b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <typename ValueType>
+        ValueType Multiply(ValueType a, ValueType b)
+        {
+            return a*b;
+        }
+
+        template <>
+        inline bool Multiply(bool a, bool b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <typename ValueType>
+        ValueType Divide(ValueType a, ValueType b)
+        {
+            return a/b;
+        }
+
+        template <>
+        inline bool Divide(bool a, bool b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        //
+        // Logical operations
+        // 
+        template <typename ValueType>
+        ValueType LogicalAnd(ValueType a, ValueType b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <>
+        inline bool LogicalAnd(bool a, bool b)
+        {
+            return a&&b;
+        }
+
+        template <typename ValueType>
+        ValueType LogicalOr(ValueType a, ValueType b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <>
+        inline bool LogicalOr(bool a, bool b)
+        {
+            return a || b;
+        }
+
+        template <typename ValueType>
+        ValueType LogicalXor(ValueType a, ValueType b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <>
+        inline bool LogicalXor(bool a, bool b)
+        {
+            return (!a) != (!b);
+        }
+    }
+
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode() : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(OperationType::none)
     {
@@ -42,25 +132,25 @@ namespace nodes
         switch (_operation)
         {
             case OperationType::add:
-                output = ComputeOutput([](ValueType x, ValueType y) { return x + y; });
+                output = ComputeOutput(BinaryOperations::Add<ValueType>);
                 break;
             case OperationType::subtract:
-                output = ComputeOutput([](ValueType x, ValueType y) { return x - y; });
+                output = ComputeOutput(BinaryOperations::Subtract<ValueType>);
                 break;
             case OperationType::coordinatewiseMultiply:
-                output = ComputeOutput([](ValueType x, ValueType y) { return x * y; });
+                output = ComputeOutput(BinaryOperations::Multiply<ValueType>);
                 break;
             case OperationType::divide:
-                output = ComputeOutput([](ValueType x, ValueType y) { return x / y; });
+                output = ComputeOutput(BinaryOperations::Divide<ValueType>);
                 break;
             case OperationType::logicalAnd:
-                output = ComputeOutput([](ValueType x, ValueType y) { return x && y; });
+                output = ComputeOutput(BinaryOperations::LogicalAnd<ValueType>);
                 break;
             case OperationType::logicalOr:
-                output = ComputeOutput([](ValueType x, ValueType y) { return x || y; });
+                output = ComputeOutput(BinaryOperations::LogicalOr<ValueType>);
                 break;
             case OperationType::logicalXor:
-                output = ComputeOutput([](ValueType x, ValueType y) { return (!x) != (!y); });
+                output = ComputeOutput(BinaryOperations::LogicalXor<ValueType>);
                 break;
             default:
                 throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
