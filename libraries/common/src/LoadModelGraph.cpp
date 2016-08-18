@@ -31,6 +31,8 @@
 
 // utilities
 #include "Files.h"
+#include "Serializer.h"
+#include "XMLSerializer.h"
 
 namespace common
 {
@@ -178,7 +180,12 @@ namespace common
         }
         else
         {
-            return GetModel1();
+            auto filestream = utilities::OpenIfstream(filename);
+            utilities::SimpleXmlDeserializer deserializer(filestream);
+            utilities::SerializationContext context;
+            model::Model model;        
+            deserializer.Deserialize(model, context);
+            return model;
         }
     }
 }
