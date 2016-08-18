@@ -326,17 +326,33 @@ void TestSimpleForestNodeRefine()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{simpleForestNode->output}); // TODO: cleanup
+    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{simpleForestNode->output});
+    auto refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{simpleForestNode->treeOutputs});
+    auto refinedEdgeIndicatorVectorElements = transformer.GetCorrespondingOutputs(model::PortElements<bool>{simpleForestNode->edgeIndicatorVector});
     testing::ProcessTest("Testing SimpleForestNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
     // check equivalence
     inputNode->SetInput({ 0.2, 0.5, 0.0 });
     refinedInputNode->SetInput({ 0.2, 0.5, 0.0 });
     auto outputValue = model.ComputeOutput(simpleForestNode->output)[0];
+    auto treeOutputsValue = model.ComputeOutput(simpleForestNode->treeOutputs);
+    auto edgeIndicatorVectorValue = model.ComputeOutput(simpleForestNode->edgeIndicatorVector);
+    
     auto refinedOutputValue = refinedModel.ComputeOutput(refinedOutputElements)[0];
+    auto refinedTreeOutputsValue = refinedModel.ComputeOutput(refinedTreeOutputsElements);
+    auto refinedEdgeIndicatorVectorValue = refinedModel.ComputeOutput(refinedEdgeIndicatorVectorElements);
+
+    std::cout << "Edge indicator vectors:" << std::endl;
+    for(auto x: edgeIndicatorVectorValue) std::cout << x << " ";
+    std::cout << std::endl;
+    for(auto x: refinedEdgeIndicatorVectorValue) std::cout << x << " ";
+    std::cout << std::endl;
 
     //  expected output is -3.0
-    testing::ProcessTest("Testing SimpleForestNode refine", testing::IsEqual(outputValue, refinedOutputValue));
+    testing::ProcessTest("Testing SimpleForestNode refine (output)", testing::IsEqual(outputValue, refinedOutputValue));
+    testing::ProcessTest("Testing SimpleForestNode refine (treeOutputs)", testing::IsEqual(treeOutputsValue, refinedTreeOutputsValue));
+    testing::ProcessTest("Testing SimpleForestNode refine (edgeIndicatorVector)", testing::IsEqual(edgeIndicatorVectorValue, refinedEdgeIndicatorVectorValue));
+
 }
 
 void TestLinearPredictorNodeRefine()

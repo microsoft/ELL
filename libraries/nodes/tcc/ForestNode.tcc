@@ -40,12 +40,13 @@ namespace nodes
         const auto& interiorNodes = _forest.GetInteriorNodes();
 
         // create a place to store references to the output ports of the sub-models at each interior node
+        std::vector<model::PortElements<bool>> interiorNodeSplitIndicators(interiorNodes.size());
         std::vector<model::PortElements<double>> interiorNodeSubModels(interiorNodes.size());
         
         // visit interior nodes bottom-up (in reverse topological order)
-        for(size_t i = interiorNodes.size(); i > 0; --i)
+        for(int nodeIndex = interiorNodes.size()-1; nodeIndex >= 0; --nodeIndex)
         {
-            const auto& edges = interiorNodes[i - 1].GetOutgoingEdges();
+            const auto& edges = interiorNodes[nodeIndex].GetOutgoingEdges();
 
             // get the sub-model that represents each outgoing edge
             model::PortElements<double> edgeOutputs;
@@ -68,11 +69,65 @@ namespace nodes
             }
 
             // add the sub-model that computes the split rule
-            auto splitRuleNode = AddNodeToModelTransformer(newPortElements, interiorNodes[i - 1].GetSplitRule(), transformer);
-
+            auto splitRuleNode = AddNodeToModelTransformer(newPortElements, interiorNodes[nodeIndex].GetSplitRule(), transformer);
+            interiorNodeSplitIndicators[nodeIndex] = {splitRuleNode->output};
+            
+            // ...and selects the output value
             auto selectorNode = transformer.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleNode->output);
-            interiorNodeSubModels[i-1] = {selectorNode->output};
+            interiorNodeSubModels[nodeIndex] = {selectorNode->output};
         }
+
+        // Now compute the edge indicator vector
+        std::vector<model::PortElements<bool>> edgeIndicatorSubModels(_forest.NumEdges());
+
+        // Vector with index of the incoming edge for each internal node (-1 for tree roots)
+        std::vector<int> incomingEdgeIndices(interiorNodes.size(), -1);
+        for(size_t nodeIndex = 0; nodeIndex < interiorNodes.size(); ++nodeIndex)
+        {
+            auto parentEdgeIndex = incomingEdgeIndices[nodeIndex];
+            const auto& node = interiorNodes[nodeIndex];
+            const auto& edgeSelector = interiorNodeSplitIndicators[nodeIndex];
+
+            const auto& childEdges = node.GetOutgoingEdges();
+            for(size_t edgePosition = 0; edgePosition < childEdges.size(); ++edgePosition)
+            {
+                model::PortElements<bool> thisEdgeIndicator;
+                // TODO: if selector isn't boolean, add logic to fire when selector output == child index
+                if(edgePosition == 0) // 'negative' path
+                {
+                    // add 'not'
+                    auto notNode = transformer.AddNode<UnaryOperationNode<bool>>(edgeSelector, UnaryOperationNode<bool>::OperationType::logicalNot);
+                    thisEdgeIndicator = {notNode->output};
+                }
+                else
+                {
+                    thisEdgeIndicator = edgeSelector;
+                }
+
+                auto edgeIndex = node.GetFirstEdgeIndex() + edgePosition;
+                if(parentEdgeIndex == -1) // this node is a root
+                {
+                    assert(thisEdgeIndicator.Size() == 1);
+                    edgeIndicatorSubModels[edgeIndex] = thisEdgeIndicator;
+                }
+                else
+                {
+                    auto parentIndicator = edgeIndicatorSubModels[parentEdgeIndex];
+                    assert(parentIndicator.Size() == 1);
+                    auto andNode = transformer.AddNode<BinaryOperationNode<bool>>(parentIndicator, thisEdgeIndicator, BinaryOperationNode<bool>::OperationType::logicalAnd);
+                    edgeIndicatorSubModels[edgeIndex] = {andNode->output};
+                }
+
+                // If this edge's target node has an outgoing edge, record ourself as its parent
+                if(childEdges[edgePosition].IsTargetInterior())
+                {
+                    auto childNode = childEdges[edgePosition].GetTargetNodeIndex();
+                    incomingEdgeIndices[childNode] = edgeIndex;
+                }
+            }
+        }
+        // collect the entries for the indicator vector
+        model::PortElements<bool> edgeIndicatorVectorElements(edgeIndicatorSubModels);
 
         // collect the sub-models that represent the trees of the forest
         model::PortElements<double> treeSubModels;
@@ -91,9 +146,8 @@ namespace nodes
 
         // Map all the outputs from the original node to the refined graph outputs         
         transformer.MapNodeOutput(output, sumNode->output);
-        transformer.MapNodeOutput(treeOutputs, individualTreeOutputs); 
-        // TODO: waiting for PortElements changes:
-        //       transformer.MapNodeOutput(edgeIndicatorVector, ...);
+        transformer.MapNodeOutput(treeOutputs, individualTreeOutputs);
+        transformer.MapNodeOutput(edgeIndicatorVector, edgeIndicatorVectorElements);
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>

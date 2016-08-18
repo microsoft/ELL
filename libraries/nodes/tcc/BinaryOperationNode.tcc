@@ -53,6 +53,15 @@ namespace nodes
             case OperationType::divide:
                 output = ComputeOutput([](ValueType x, ValueType y) { return x / y; });
                 break;
+            case OperationType::logicalAnd:
+                output = ComputeOutput([](ValueType x, ValueType y) { return x && y; });
+                break;
+            case OperationType::logicalOr:
+                output = ComputeOutput([](ValueType x, ValueType y) { return x || y; });
+                break;
+            case OperationType::logicalXor:
+                output = ComputeOutput([](ValueType x, ValueType y) { return (!x) != (!y); });
+                break;
             default:
                 throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
         }

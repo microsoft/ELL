@@ -42,6 +42,12 @@ namespace nodes
                 output = ComputeOutput(sqrtOp);
             }
             break;
+            case OperationType::logicalNot:
+            {
+                auto notOp = [](ValueType x) { return !x; };
+                output = ComputeOutput(notOp);
+            }
+            break;
             
             default:
                 throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");

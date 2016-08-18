@@ -32,7 +32,15 @@ namespace model
     PortElements<ValueType>::PortElements(const PortElement<ValueType>& element)
     {
         AddRange(PortRange(*element.ReferencedPort(), element.GetIndex(), 1));
-        ComputeSize();
+    }
+
+    template <typename ValueType>
+    PortElements<ValueType>::PortElements(const std::vector<PortElement<ValueType>>& elements)
+    {
+        for(const auto& element: elements)
+        {
+            AddRange({element.ReferencedPort(), element.GetIndex()});
+        }
     }
 
     template <typename ValueType>
@@ -45,7 +53,6 @@ namespace model
                 AddRange(range);
             }
         }
-        ComputeSize();
     }
 
     template <typename ValueType>
@@ -58,7 +65,6 @@ namespace model
                 AddRange(range);
             }
         }
-        ComputeSize();
     }
 
     template <typename ValueType>

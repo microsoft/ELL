@@ -42,7 +42,10 @@ namespace nodes
             add,
             subtract,
             coordinatewiseMultiply, // coordinatewise multiplication
-            divide // coordinatewise division
+            divide, // coordinatewise division
+            logicalAnd,
+            logicalOr,
+            logicalXor
         };
 
         /// <summary> Default Constructor </summary>

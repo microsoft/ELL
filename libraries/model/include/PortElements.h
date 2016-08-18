@@ -68,6 +68,8 @@ namespace model
     class PortElement : public PortElementBase
     {
     public:
+        PortElement() = default;
+        
         /// <summary> Creates a PortElement representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
@@ -262,6 +264,11 @@ namespace model
         /// <param name="element"> The element </param>
         PortElements(const PortElement<ValueType>& element);
 
+        /// <summary> Creates a PortElements by concatenating a set of PortElement objects together </summary>
+        ///
+        /// <param name="elements"> The vector of elements to concantenate together </param>
+        PortElements(const std::vector<PortElement<ValueType>>& element);
+    
         /// <summary> Creates a PortElements by concatenating a set of them together </summary>
         ///
         /// <param name="groups"> The list of groups to concantenate together </param>

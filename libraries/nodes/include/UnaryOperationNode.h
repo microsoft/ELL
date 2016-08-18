@@ -40,7 +40,8 @@ namespace nodes
         enum class OperationType
         {
             none,
-            sqrt
+            sqrt, // real only
+            logicalNot   // bool only
         };
 
         /// <summary> Default Constructor </summary>
@@ -91,7 +92,6 @@ namespace nodes
 
         // Operation
         OperationType _operation;
-
     };
 }
 
