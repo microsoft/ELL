@@ -10,6 +10,7 @@
 #include "ConstantNode.h"
 #include "ElementSelectorNode.h"
 #include "BinaryOperationNode.h"
+#include "BinaryMultiplexorNode.h"
 #include "SingleElementThresholdNode.h"
 #include "SumNode.h"
 
@@ -35,7 +36,7 @@ namespace nodes
 
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestNode<SplitRuleType, EdgePredictorType>::RefineNode(model::ModelTransformer & transformer) const
-    {
+    {        
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());      
         const auto& interiorNodes = _forest.GetInteriorNodes();
 
@@ -44,7 +45,7 @@ namespace nodes
         std::vector<model::PortElements<double>> interiorNodeSubModels(interiorNodes.size());
         
         // visit interior nodes bottom-up (in reverse topological order)
-        for(int nodeIndex = (int)interiorNodes.size()-1; nodeIndex >= 0; --nodeIndex) // Note: index var must be signed
+        for(int nodeIndex = (int)interiorNodes.size()-1; nodeIndex >= 0; --nodeIndex) // Note: index var must be signed or else end condition is never met
         {            
             const auto& edges = interiorNodes[nodeIndex].GetOutgoingEdges();
 
@@ -85,42 +86,66 @@ namespace nodes
         for(size_t nodeIndex = 0; nodeIndex < interiorNodes.size(); ++nodeIndex)
         {
             auto parentEdgeIndex = incomingEdgeIndices[nodeIndex];
+            auto isRoot = parentEdgeIndex == -1;
             const auto& node = interiorNodes[nodeIndex];
             const auto& edgeSelector = interiorNodeSplitIndicators[nodeIndex];
 
             const auto& childEdges = node.GetOutgoingEdges();
+
+            model::PortElements<bool> child1Out;
+            model::PortElements<bool> child2Out;
+            
+            // multiplexor
+            if(isRoot)
+            {
+                auto notNode = transformer.AddNode<UnaryOperationNode<bool>>(edgeSelector, UnaryOperationNode<bool>::OperationType::logicalNot);
+                child1Out = {notNode->output};
+                child2Out = {edgeSelector};
+            }
+            else
+            {
+                auto parentIndicator = edgeIndicatorSubModels[parentEdgeIndex];
+                auto muxNode = transformer.AddNode<BinaryMultiplexorNode<bool>>(parentIndicator, edgeSelector);                
+                child1Out = {muxNode->output1};
+                child2Out = {muxNode->output2};
+            }
+
+            auto firstEdgeIndex = node.GetFirstEdgeIndex();
+            edgeIndicatorSubModels[firstEdgeIndex] = child1Out;
+            edgeIndicatorSubModels[firstEdgeIndex+1] = child2Out;
+
             for(size_t edgePosition = 0; edgePosition < childEdges.size(); ++edgePosition)
             {
-                model::PortElements<bool> thisEdgeIndicator;
-                // TODO: if selector isn't boolean, add logic to fire when selector output == child index
-                if(edgePosition == 0) // 'negative' path
-                {
-                    // add 'not'
-                    auto notNode = transformer.AddNode<UnaryOperationNode<bool>>(edgeSelector, UnaryOperationNode<bool>::OperationType::logicalNot);
-                    thisEdgeIndicator = {notNode->output};
-                }
-                else
-                {
-                    thisEdgeIndicator = edgeSelector;
-                }
+                // model::PortElements<bool> thisEdgeIndicator;
+                // // TODO: if selector isn't boolean, add logic to fire when selector output == child index
+                // if(edgePosition == 0) // 'negative' path
+                // {
+                //     // add 'not'
+                //     auto notNode = transformer.AddNode<UnaryOperationNode<bool>>(edgeSelector, UnaryOperationNode<bool>::OperationType::logicalNot);
+                //     thisEdgeIndicator = {notNode->output};
+                // }
+                // else
+                // {
+                //     thisEdgeIndicator = edgeSelector;
+                // }
 
-                auto edgeIndex = node.GetFirstEdgeIndex() + edgePosition;
-                if(parentEdgeIndex == -1) // this node is a root
-                {
-                    edgeIndicatorSubModels[edgeIndex] = thisEdgeIndicator;
-                }
-                else
-                {
-                    auto parentIndicator = edgeIndicatorSubModels[parentEdgeIndex];
-                    auto andNode = transformer.AddNode<BinaryOperationNode<bool>>(parentIndicator, thisEdgeIndicator, BinaryOperationNode<bool>::OperationType::logicalAnd);
-                    edgeIndicatorSubModels[edgeIndex] = {andNode->output};
-                }
+                // auto edgeIndex = node.GetFirstEdgeIndex() + edgePosition;
+                // if(parentEdgeIndex == -1) // this node is a root
+                // {
+                //     edgeIndicatorSubModels[edgeIndex] = thisEdgeIndicator;
+                // }
+                // else
+                // {
+                //     auto parentIndicator = edgeIndicatorSubModels[parentEdgeIndex];
+                //     auto andNode = transformer.AddNode<BinaryOperationNode<bool>>(parentIndicator, thisEdgeIndicator, BinaryOperationNode<bool>::OperationType::logicalAnd);
+                //     edgeIndicatorSubModels[edgeIndex] = {andNode->output};
+                // }
 
                 // If this edge's target node has an outgoing edge, record ourself as its parent
                 if(childEdges[edgePosition].IsTargetInterior())
                 {
                     auto childNode = childEdges[edgePosition].GetTargetNodeIndex();
-                    incomingEdgeIndices[childNode] = static_cast<int>(edgeIndex);
+                    incomingEdgeIndices[childNode] = static_cast<int>(firstEdgeIndex+edgePosition);
                 }
             }
         }

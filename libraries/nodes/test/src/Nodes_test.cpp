@@ -371,6 +371,14 @@ void TestSimpleForestNodeRefine()
     testing::ProcessTest("Testing SimpleForestNode refine (output)", testing::IsEqual(outputValue, refinedOutputValue));
     testing::ProcessTest("Testing SimpleForestNode refine (treeOutputs)", testing::IsEqual(treeOutputsValue, refinedTreeOutputsValue));
     testing::ProcessTest("Testing SimpleForestNode refine (edgeIndicatorVector)", testing::IsEqual(edgeIndicatorVectorValue, refinedEdgeIndicatorVectorValue));
+
+
+    std::cout << "original edge indicator: ";
+    for(auto x: edgeIndicatorVectorValue) std::cout << x << " ";
+    std::cout << std::endl;
+    std::cout << "refined edge indicator:  ";
+    for(auto x: refinedEdgeIndicatorVectorValue) std::cout << x << " ";
+    std::cout << std::endl;
 }
 
 void TestLinearPredictorNodeRefine()

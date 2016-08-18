@@ -21,6 +21,8 @@ namespace common
         _nodeNames.insert("ElementSelectorNode<double>");
         _nodeNames.insert("UnaryOperationNode<double>");
         _nodeNames.insert("UnaryOperationNode<bool>");
+        _nodeNames.insert("BinaryMultiplexorNode<bool>");
+        _nodeNames.insert("BinaryMultiplexorNode<double>");
     }
 
     bool IsNodeCompilable::operator()(const model::Node& node)
