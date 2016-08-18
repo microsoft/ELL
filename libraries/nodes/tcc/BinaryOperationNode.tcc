@@ -25,12 +25,12 @@ namespace nodes
 
     template <typename ValueType>
     template <typename Operation>
-    std::vector<ValueType> BinaryOperationNode<ValueType>::ComputeOutput(Operation&& fn) const
+    std::vector<ValueType> BinaryOperationNode<ValueType>::ComputeOutput(Operation&& function) const
     {
         auto output = std::vector<ValueType>(_input1.Size());
         for (size_t index = 0; index < _input1.Size(); index++)
         {
-            output[index] = fn(_input1[index], _input2[index]);
+            output[index] = function(_input1[index], _input2[index]);
         }
         return output;
     }

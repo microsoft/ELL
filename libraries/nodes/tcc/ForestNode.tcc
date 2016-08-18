@@ -44,7 +44,7 @@ namespace nodes
         std::vector<model::PortElements<double>> interiorNodeSubModels(interiorNodes.size());
         
         // visit interior nodes bottom-up (in reverse topological order)
-        for(int nodeIndex = interiorNodes.size()-1; nodeIndex >= 0; --nodeIndex)
+        for(size_t nodeIndex = interiorNodes.size()-1; nodeIndex >= 0; --nodeIndex)
         {
             const auto& edges = interiorNodes[nodeIndex].GetOutgoingEdges();
 
@@ -120,7 +120,7 @@ namespace nodes
                 if(childEdges[edgePosition].IsTargetInterior())
                 {
                     auto childNode = childEdges[edgePosition].GetTargetNodeIndex();
-                    incomingEdgeIndices[childNode] = edgeIndex;
+                    incomingEdgeIndices[childNode] = static_cast<int>(edgeIndex);
                 }
             }
         }

@@ -149,7 +149,7 @@ namespace model
         friend class Node;
 
         // Find a node that isn't compilable (if there are several, it just finds one)
-        const Node* FindFirstUncompilableNode(const Model& model, const TransformContext& context) const;
+        std::vector<const Node*> FindUncompilableNodes(const Model& model, const TransformContext& context) const;
 
         Model _model;
         TransformContext _context;

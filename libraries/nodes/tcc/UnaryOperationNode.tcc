@@ -29,12 +29,12 @@ namespace nodes
 
     template <typename ValueType>
     template <typename Operation>
-    std::vector<ValueType> UnaryOperationNode<ValueType>::ComputeOutput(Operation&& fn) const
+    std::vector<ValueType> UnaryOperationNode<ValueType>::ComputeOutput(Operation&& function) const
     {
         auto output = std::vector<ValueType>(_input.Size());
         for (size_t index = 0; index < _input.Size(); index++)
         {
-            output[index] = fn(_input[index]);
+            output[index] = function(_input[index]);
         }
         return output;
     }
