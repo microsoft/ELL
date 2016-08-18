@@ -31,6 +31,26 @@ namespace utilities
         _out << " value='" << to_string(value) << "'/>" << endOfLine;
     }
 
+    // Specialization for bool (though perhaps this should be an overload, not a specialization)
+    template <>
+    inline void SimpleXmlSerializer::WriteScalar(const char* name, const bool& value)
+    {
+        auto indent = GetCurrentIndent();
+        bool hasName = name != std::string("");
+        auto endOfLine = hasName ? "\n" : "";
+        auto typeName = XmlUtilities::EncodeTypeName(TypeName<bool>::GetName());
+
+        _out << indent;
+        _out << "<" << typeName;
+
+        if (hasName)
+        {
+            _out << " name='" << name << "'";
+        }
+
+        _out << " value='" << (value ? "true" : "false") << "'/>" << endOfLine;
+    }
+
     inline std::string XmlEncodeString(std::string s)
     {
         return s;
@@ -126,6 +146,26 @@ namespace utilities
         auto valueToken = _tokenizer.ReadNextToken();
         std::stringstream valueStream(valueToken);
         valueStream >> value;
+
+        _tokenizer.MatchTokens({"'", "/", ">"});
+    }
+
+    template <>
+    inline void SimpleXmlDeserializer::ReadScalar(const char* name, bool& value)
+    {
+        auto typeName = XmlUtilities::EncodeTypeName(TypeName<bool>::GetName());
+        bool hasName = name != std::string("");
+
+        _tokenizer.MatchTokens({"<", typeName});
+        if(hasName)
+        {
+            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
+        }
+        _tokenizer.MatchTokens({"value", "=", "'"});
+
+        // read value
+        auto valueToken = _tokenizer.ReadNextToken();
+        value = (valueToken == "true");
 
         _tokenizer.MatchTokens({"'", "/", ">"});
     }
