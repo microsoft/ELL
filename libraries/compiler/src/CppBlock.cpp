@@ -1,3 +1,11 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     CppBlock.cpp (compiler)
+//  Authors:  Umesh Madan
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "CppBlock.h"
 #include <cassert>
 
@@ -55,6 +63,8 @@ namespace emll
 		void CppBlockList::Remove(CppBlock* pBlock)
 		{
 			assert(pBlock != nullptr);
+			// Todo: This remove is inefficient. Figure out how to call erase() so we can pass a pointer to the node, else
+			// using linked lists is pointless here
 			_blocks.remove(pBlock);
 			_allocator.Free(pBlock);
 		}

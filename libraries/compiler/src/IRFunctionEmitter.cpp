@@ -148,6 +148,20 @@ namespace emll
 			return pCurrentBlock;
 		}
 
+		void IRFunctionEmitter::LinkBlocks(llvm::BasicBlock* pTopBlock, llvm::BasicBlock* pBottomBlock)
+		{
+			assert(pTopBlock != nullptr && pBottomBlock != nullptr);
+
+			auto pTerm = pTopBlock->getTerminator();
+			if (pTerm != nullptr)
+			{
+				pTerm->removeFromParent();
+			}
+			auto pPrevCurBlock = CurrentBlock(pTopBlock);
+			Branch(pBottomBlock);
+			CurrentBlock(pPrevCurBlock);
+		}
+
 		llvm::Value* IRFunctionEmitter::Store(llvm::Value* pPtr, llvm::Value* pVal)
 		{
 			return _pEmitter->Store(pPtr, pVal);

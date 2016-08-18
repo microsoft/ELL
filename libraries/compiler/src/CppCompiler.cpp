@@ -113,6 +113,7 @@ namespace emll
 		{
 			_pfn = _module.Function(functionName, ValueType::Void, args);
 		}
+
 		void CppCompiler::EndFunction()
 		{
 			if (_pfn != nullptr)

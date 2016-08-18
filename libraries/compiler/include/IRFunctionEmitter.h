@@ -141,6 +141,8 @@ namespace emll
 			///<summary>The given block is added to the end of the function's block list</summary>
 			void AppendBlock(llvm::BasicBlock* pBlock);
 
+			void LinkBlocks(llvm::BasicBlock* pTopBlock, llvm::BasicBlock* pBottomBlock);
+
 			//------------------------------------------
 			//
 			// Variables

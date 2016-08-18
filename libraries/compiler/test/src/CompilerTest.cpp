@@ -129,6 +129,42 @@ void TestLLVM()
 	module.WriteBitcodeToFile("C:\\junk\\model\\loop.bc");
 }
 
+std::vector<llvm::Instruction*> RemoveTermminators(llvm::Function* pfn)
+{
+	std::vector<llvm::Instruction*> terms;
+	auto& blocks = pfn->getBasicBlockList();
+	for (auto pBlock = blocks.begin(); pBlock != blocks.end(); ++pBlock)
+	{
+		std::cout << "##BLOCK## "; 
+		std::cout << std::string(pBlock->getName()) << std::endl;
+		auto& instructions = pBlock->getInstList();
+		for (auto pInst = instructions.begin(); pInst != instructions.end(); ++pInst)
+		{
+			if (pInst->isTerminator())
+			{
+				terms.push_back(&(*pInst));
+			}
+		}
+	}
+	for (auto pInstr : terms)
+	{
+		pInstr->removeFromParent();
+	}
+	return terms;
+}
+
+void InsertTerminators(llvm::Function* pfn, std::vector<llvm::Instruction*>& terms)
+{
+	size_t i = 0;
+	auto& blocks = pfn->getBasicBlockList();
+	for (auto pBlock = blocks.begin(); pBlock != blocks.end(); ++pBlock)
+	{
+		std::cout << "##BLOCK## ";
+		std::cout << std::string(pBlock->getName()) << std::endl;
+		auto& instructions = pBlock->getInstList();
+		instructions.push_back(terms[i++]);
+	}
+}
 
 ModelBuilder::ModelBuilder()
 {
@@ -283,7 +319,14 @@ void TestBinaryVector(bool expanded)
 	IRCompiler compiler("EMLL");
 	compiler.Settings().ShouldUnrollLoops() = expanded;
 	compiler.CompileModel("TestBinaryVector", mb.Model);
+
 	compiler.DebugDump();
+	/*
+	auto terms = RemoveTermminators(compiler.Function().Function());
+	compiler.DebugDump();
+	InsertTerminators(compiler.Function().Function(), terms);
+	compiler.DebugDump();
+	*/
 }
 
 void TestBinaryScalar()
@@ -636,12 +679,13 @@ void TestForest()
 	IRCompiler compiler;
 	compiler.CompileModel("TestForest", model);
 
+
 	auto& module = compiler.Module();
 	module.DeclarePrintf();
 
+
 	auto fnMain = module.AddMain();
 	llvm::Value* pData = module.Constant("c_data", data);
-
 	llvm::Value* pResult = fnMain.Var(ValueType::Double, 1);
 	fnMain.Call("TestForest", { fnMain.PtrOffset(pData, 0), fnMain.PtrOffset(pResult, 0) });
 

@@ -18,6 +18,7 @@ namespace emll
 		void CppModuleEmitter::Dump()
 		{
 			Write(std::cout);
+			std::cout << std::endl;
 		}
 
 		void CppModuleEmitter::Write(std::ostream& os)

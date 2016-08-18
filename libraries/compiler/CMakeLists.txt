@@ -25,6 +25,7 @@ set (SRC src/Types.cpp
 		 src/Variable.cpp
 		 src/Compiler.cpp
 		 src/IRRuntime.cpp
+		 src/IRBlockRegion.cpp
 		 src/IRCompiler.cpp
 		 src/IndentedTextWriter.cpp
 		 src/CppEmitter.cpp
@@ -41,6 +42,7 @@ set (INCLUDE include/LLVMInclude.h
 		include/IREmitter.h
 		include/IRLoopEmitter.h
 		include/IRIfEmitter.h
+		include/IRBlockRegion.h
 		include/IRFunctionEmitter.h
 		include/IRModuleEmitter.h
 		include/IRInclude.h

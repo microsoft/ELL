@@ -177,6 +177,8 @@ void TestForestCpp()
 
 	CppCompiler compiler;
 	compiler.CompileModel("TestForest", model);
+
+
 	compiler.DebugDump();
 	compiler.WriteToFile("C:\\junk\\model\\TestForest.cpp");
 }

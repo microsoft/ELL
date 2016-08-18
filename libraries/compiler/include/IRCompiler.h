@@ -12,6 +12,7 @@
 #include "ScalarVar.h"
 #include "VectorVar.h"
 #include "IRRuntime.h"
+#include "IRBlockRegion.h"
 
 #include <stdio.h>
 #include <memory>
@@ -20,32 +21,6 @@ namespace emll
 {
 	namespace compiler
 	{
-		class IRBlockRegion
-		{
-		public:
-			llvm::BasicBlock*& Start() { return _pStart; }
-			llvm::BasicBlock*& End() { return _pEnd; }
-			bool& IsTopLevel() { return _isTopLevel;}
-
-		private:
-			llvm::BasicBlock* _pStart = nullptr;
-			llvm::BasicBlock* _pEnd = nullptr;
-			bool _isTopLevel = true;
-		};
-
-		class IRBlockRegionList
-		{
-		public:
-			IRBlockRegionList(IRFunctionEmitter& fn);
-
-			IRBlockRegion* Add();
-			void Merge();
-
-		private:
-			IRFunctionEmitter& _fn;
-			std::vector<std::shared_ptr<IRBlockRegion>> _regions;
-		};
-
 		///<summary>Compiles EMLL Models to LLVM IR</summary>
 		class IRCompiler : public Compiler
 		{
@@ -68,6 +43,7 @@ namespace emll
 			void WriteBitcodeToFile(const std::string& filePath);
 		
 			IRModuleEmitter& Module() { return _module; }
+			IRFunctionEmitter& Function() { return _fn; }
 
 		protected:
 			///<summary>Compile an OutputNode</summary>

@@ -19,38 +19,6 @@ namespace emll
 {
 	namespace compiler
 	{
-		IRBlockRegionList::IRBlockRegionList(IRFunctionEmitter& fn)
-			: _fn(fn)
-		{
-		}
-
-		IRBlockRegion* IRBlockRegionList::Add()
-		{
-			auto pRegion = std::make_shared<IRBlockRegion>();
-			_regions.push_back(pRegion);
-			return pRegion.get();
-		}
-
-		void IRBlockRegionList::Merge()
-		{
-			llvm::BasicBlock* pCurBlock = _fn.CurrentBlock();
-			IRBlockRegion* pPrevRegion = nullptr;
-			for (size_t i = 0; i < _regions.size(); ++i)
-			{
-				IRBlockRegion* pRegion = _regions[i].get();
-				if (pRegion->IsTopLevel())
-				{
-					if (pPrevRegion != nullptr)
-					{
-						_fn.CurrentBlock(pPrevRegion->End());
-						_fn.Branch(pRegion->Start());
-					}
-					pPrevRegion = pRegion;
-				}
-			}
-			_fn.CurrentBlock(pCurBlock);
-		}
-
 		IRCompiler::IRCompiler()
 			: IRCompiler("EMLL")
 		{
@@ -182,13 +150,15 @@ namespace emll
 
 		void IRCompiler::NewBlockRegion(const model::Node& node)
 		{
+			/*
 			std::stringstream id;
 			id << "Node_" << node.GetId();
 			auto pBlock = _fn.Block(id.str());
 			auto pRegion = _regions.Add();
 			pRegion->Start() = pBlock;
-			pRegion->End() = nullptr;
+			pRegion->SetEnd(nullptr);
 			_fn.CurrentBlock(pBlock);
+			*/
 		}
 
 		llvm::Value* IRCompiler::LoadVar(Variable* pVar)
