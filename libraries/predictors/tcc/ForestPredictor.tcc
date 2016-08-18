@@ -207,6 +207,24 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Serialize(utilities::Serializer& serializer) const
+    {
+//        serializer.Serialize("interiorNodes", _interiorNodes);
+        serializer.Serialize("rootIndices", _rootIndices);
+        serializer.Serialize("bias", _bias);
+        serializer.Serialize("numEdges", _numEdges);
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+//        serializer.Serialize("interiorNodes", _interiorNodes);
+        serializer.Deserialize("rootIndices", _rootIndices, context);
+        serializer.Deserialize("bias", _bias, context);
+        serializer.Deserialize("numEdges", _numEdges, context);
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
     template<typename RandomAccessVectorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::SetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& output, size_t interiorNodeIndex) const
     {

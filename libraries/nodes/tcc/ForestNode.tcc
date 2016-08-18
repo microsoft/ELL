@@ -24,6 +24,32 @@ namespace nodes
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType>
+    ForestNode<SplitRuleType, EdgePredictorType>::ForestNode() : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, 0), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, 0)
+    {}
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestNode<SplitRuleType, EdgePredictorType>::Serialize(utilities::Serializer& serializer) const
+    {
+        Node::Serialize(serializer);
+        serializer.Serialize("input", _input);
+        serializer.Serialize("output", _output);
+        serializer.Serialize("treeOutputs", _treeOutputs);
+        serializer.Serialize("edgeIndicatorVector", _edgeIndicatorVector);
+        serializer.Serialize("forest", _forest);
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestNode<SplitRuleType, EdgePredictorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        Node::Deserialize(serializer, context);
+        serializer.Deserialize("input", _input, context);
+        serializer.Deserialize("output", _output, context);
+        serializer.Deserialize("treeOutputs", _treeOutputs, context);
+        serializer.Deserialize("edgeIndicatorVector", _edgeIndicatorVector, context);
+        serializer.Deserialize("forest", _forest, context);
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
     void ForestNode<SplitRuleType, EdgePredictorType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());

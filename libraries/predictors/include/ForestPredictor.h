@@ -14,6 +14,9 @@
 // dataset
 #include "DenseDataVector.h"
 
+// utilities
+#include "ISerializable.h"
+
 // stl
 #include <vector>
 #include <algorithm>
@@ -36,7 +39,7 @@ namespace predictors
     /// <typeparam name="SplitRuleType"> Type of split rule to use in interior nodes. </typeparam>
     /// <typeparam name="EdgePredictorType"> Type of predictor to associate with each edge. </typeparam>
     template<typename SplitRuleType, typename EdgePredictorType>
-    class ForestPredictor
+    class ForestPredictor : public utilities::ISerializable
     {
     public:
         /// <summary> A struct that identifies a splittable node in the forest. The splittable node can be
@@ -126,7 +129,7 @@ namespace predictors
         };
 
         /// <summary> Represents an interior node of one of the trees in the forest. </summary>
-        class InteriorNode
+        class InteriorNode // : public utilities::ISerializable
         {
         public:
             /// <summary> Gets the split rule. </summary>
@@ -289,6 +292,27 @@ namespace predictors
         /// <param name="os"> [in,out] The output stream. </param>
         /// <param name="tabs"> The number of tabs. </param>
         void PrintLine(std::ostream& os, size_t tabs=0) const;
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "ForestPredictor"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
     protected:
         //

@@ -20,8 +20,11 @@
 #include "LinearPredictorNode.h"
 #include "L2NormNode.h"
 #include "DelayNode.h"
-#include "BinaryOperationNode.h"
 #include "DotProductNode.h"
+#include "UnaryOperationNode.h"
+#include "BinaryOperationNode.h"
+#include "BinaryPredicateNode.h"
+#include "ElementSelectorNode.h"
 #include "ForestNode.h"
 
 // predictors
@@ -32,6 +35,7 @@
 // utilities
 #include "Files.h"
 #include "Serializer.h"
+#include "JsonSerializer.h"
 #include "XMLSerializer.h"
 
 namespace common
@@ -117,17 +121,9 @@ namespace common
         std::vector<size_t> interiorNodeVector;
         interiorNodeVector.push_back(root);
 
-        /*
-            auto root = forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.3 }, EdgePredictorVector{ -1.0, 1.0 } });
-            forest.Split(SplitAction{ forest.GetChildId(root, 0), SplitRule{ 1, 0.6 }, EdgePredictorVector{ -2.0, 2.0 } });
-            forest.Split(SplitAction{ forest.GetChildId(root, 1), SplitRule{ 2, 0.9 }, EdgePredictorVector{ -4.0, 4.0 } });
-            forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.2 }, EdgePredictorVector{ -3.0, 3.0 } });
-        */
-
         for (int index = 0; index < numSplits; ++index)
         {
             auto node = interiorNodeVector.back();
-            std::cout << "Splitting node " << node << std::endl;
             interiorNodeVector.pop_back();
             interiorNodeVector.push_back(forest.Split(SplitAction{ forest.GetChildId(node, 0), dummyRule, dummyEdgePredictor }));
             interiorNodeVector.push_back(forest.Split(SplitAction{ forest.GetChildId(node, 1), dummyRule, dummyEdgePredictor }));
@@ -138,7 +134,6 @@ namespace common
     model::Model GetTreeModel(int numSplits)
     {
         auto forest = CreateForest(numSplits);
-        std::cout << "Num edges in forest: " << forest.NumEdges() << std::endl;
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(3);
         auto simpleForestNode = model.AddNode<nodes::SimpleForestNode>(inputNode->output, forest);
@@ -149,25 +144,65 @@ namespace common
     model::Model GetRefinedTreeModel(int numSplits)
     {
         auto model = GetTreeModel(numSplits);
-        std::cout << "Refining" << std::endl;
         model::TransformContext context;
         model::ModelTransformer transformer;
         auto refinedModel = transformer.RefineModel(model, context);
         return refinedModel;
     }
 
+    void RegisterNodeTypes(utilities::SerializationContext& context)
+    {
+        context.GetTypeFactory().AddType<model::Node, utilities::UniqueId>();
+        context.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<double>>();
+//        context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<double>>();
+//        context.GetTypeFactory().AddType<model::Node, nodes::ElementSelectorNode<double, bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MovingAverageNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MovingVarianceNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::L2NormNode<double>>();
+        //        context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestNode>();
+        //        context.GetTypeFactory().AddType<model::Node, nodes::SingleElementThresholdNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
+    }
+
+    template <typename DeserializerType>
+    model::Model DeserializeModel(std::istream& stream)
+    {
+        DeserializerType deserializer(stream);
+        utilities::SerializationContext context;
+        RegisterNodeTypes(context);
+        model::Model model;
+        deserializer.Deserialize(model, context);
+        return model;
+    }
+
+    template <typename SerializerType>
+    void SerializeModel(const model::Model& model, std::ostream& stream)
+    {
+        SerializerType serializer(stream);
+        serializer.Serialize(model);
+    }
+
     model::Model LoadModelGraph(const std::string& filename)
     {
-        std::string treePrefix = "tree_";
-        if (filename == "1")
+        std::string treePrefix = "[tree_";
+        if (filename == "[1]")
         {
             return GetModel1();
         }
-        if (filename == "2")
+        if (filename == "[2]")
         {
             return GetModel2();
         }
-        else if (filename == "3")
+        else if (filename == "[3]")
         {
             return GetModel3();
         }
@@ -180,12 +215,40 @@ namespace common
         }
         else
         {
-            auto filestream = utilities::OpenIfstream(filename);
-            utilities::SimpleXmlDeserializer deserializer(filestream);
-            utilities::SerializationContext context;
-            model::Model model;        
-            deserializer.Deserialize(model, context);
-            return model;
+            auto ext = utilities::GetFileExtension(filename);
+            if(ext == "xml")
+            {
+                auto filestream = utilities::OpenIfstream(filename);
+                return DeserializeModel<utilities::SimpleXmlDeserializer>(filestream);
+            }
+            else if(ext == "json")
+            {
+                auto filestream = utilities::OpenIfstream(filename);
+                return DeserializeModel<utilities::JsonDeserializer>(filestream);
+            }
+            else
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");   
+            }
+        }
+    }
+
+    void SaveModelGraph(const model::Model& model, const std::string& filename)
+    {
+        auto ext = utilities::GetFileExtension(filename);
+        if(ext == "xml")
+        {
+            auto filestream = utilities::OpenOfstream(filename);
+            SerializeModel<utilities::SimpleXmlSerializer>(model, filestream);
+        }
+        else if(ext == "json")
+        {
+            auto filestream = utilities::OpenOfstream(filename);
+            SerializeModel<utilities::JsonSerializer>(model, filestream);
+        }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");   
         }
     }
 }
