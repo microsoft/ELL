@@ -33,7 +33,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to predict from </param>
         /// <param name="predictor"> The linear predictor to use when making the prediction. </param>
-        SingleElementThresholdNode(const model::OutputPortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor);
+        SingleElementThresholdNode(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -49,7 +49,7 @@ namespace nodes
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(model::ModelTransformer& transformer) const override;
+        virtual bool Refine(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;
@@ -72,5 +72,5 @@ namespace nodes
     /// <param name="transformer"> [in,out] The model transformer. </param>
     ///
     /// <returns> The node added to the model. </returns>
-    SingleElementThresholdNode* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor, model::ModelTransformer& transformer);
+    SingleElementThresholdNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor, model::ModelTransformer& transformer);
 }

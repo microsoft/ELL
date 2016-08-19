@@ -29,6 +29,11 @@ namespace model
         /// <summary> Notify this port that it is being referenced </summary>
         void ReferencePort() const { _isReferenced = true; }
 
+        /// <summary> Returns the dimensionality of the output </summary>
+        ///
+        /// <returns> The dimensionality of the output </returns>
+        virtual size_t Size() const override { return _size; }
+
         /// <summary> Indicate if this port is referenced. </summary>
         ///
         /// <returns> Returns true if the port is referenced by another node. </returns>
@@ -58,6 +63,7 @@ namespace model
     protected:
         OutputPortBase(const class Node* node, std::string name, PortType type, size_t size);
 
+        size_t _size = 0;
         mutable bool _isReferenced;
     };
 

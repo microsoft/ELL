@@ -13,7 +13,7 @@
 
 namespace nodes
 {
-    ConstantNode<double>* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::ConstantPredictor& predictor, model::ModelTransformer& transformer)
+    ConstantNode<double>* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::ConstantPredictor& predictor, model::ModelTransformer& transformer)
     {
         return transformer.AddNode<ConstantNode<double>>(predictor.GetValue());
     }

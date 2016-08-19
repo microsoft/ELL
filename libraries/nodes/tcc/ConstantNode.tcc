@@ -34,7 +34,7 @@ namespace nodes
     void ConstantNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values);
-         transformer.MapOutputPort(output, newNode->output);
+         transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>

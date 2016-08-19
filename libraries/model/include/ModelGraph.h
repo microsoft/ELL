@@ -17,11 +17,10 @@
 #include "ISerializable.h"
 
 // stl
-#include <unordered_set>
 #include <vector>
 #include <memory>
 #include <unordered_map>
-#include <exception>
+#include <unordered_set>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -81,11 +80,17 @@ namespace model
         template <typename NodeType>
         std::vector<const NodeType*> GetNodesByType();
 
-        /// <summary> Returns part of the output computed by a node </summary>
+        /// <summary> Returns part of the output computed by the model </summary>
         ///
         /// <param name="outputPort"> The output port to get the computed value form </param>
         template <typename ValueType>
-        std::vector<ValueType> ComputeNodeOutput(const OutputPort<ValueType>& outputPort) const;
+        std::vector<ValueType> ComputeOutput(const OutputPort<ValueType>& outputPort) const;
+
+        /// <summary> Returns part of the output computed by the model </summary>
+        ///
+        /// <param name="elements"> The output port elements to get the computed value form </param>
+        template <typename ValueType>
+        std::vector<ValueType> ComputeOutput(const PortElements<ValueType>& elements) const;
 
         /// <summary>
         /// Visits all the nodes in the graph in dependency order. No nodes will be visited until all
@@ -166,7 +171,8 @@ namespace model
         std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _idToNodeMap;
     };
 
-    /// <summary> A serialization context used during Model deserialization </summary>
+    /// <summary> A serialization context used during Model deserialization. Created by the
+    /// model during serialization --- clients shouldn't have to interact directly with this class. </summary>
     class ModelSerializationContext: public utilities::SerializationContext
     {
     public:

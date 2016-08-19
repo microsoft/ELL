@@ -46,7 +46,7 @@ namespace nodes
         ///
         /// <param name="input"> The predictor's input. </param>
         /// <param name="forest"> The forest predictor. </param>
-        ForestNode(const model::OutputPortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest);
+        ForestNode(const model::PortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest);
         
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -64,7 +64,7 @@ namespace nodes
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(model::ModelTransformer& transformer) const override;
+        virtual bool Refine(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;

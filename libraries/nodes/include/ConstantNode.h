@@ -95,7 +95,7 @@ namespace nodes
     /// <param name="transformer"> [in,out] The model transformer. </param>
     ///
     /// <returns> The node added to the model. </returns>
-    ConstantNode<double>* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::ConstantPredictor& predictor, model::ModelTransformer& transformer);
+    ConstantNode<double>* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::ConstantPredictor& predictor, model::ModelTransformer& transformer);
 }
 
 #include "../tcc/ConstantNode.tcc"

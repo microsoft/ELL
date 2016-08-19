@@ -36,6 +36,11 @@ namespace model
         /// <param name="dimension"> The input dimension </param>
         InputNode(size_t dimension);
 
+        /// <summary> Sets the value output by this scalar node </summary>
+        ///
+        /// <param name="inputValues"> The value for this node to output </param>
+        void SetInput(ValueType inputValue);
+
         /// <summary> Sets the value output by this node </summary>
         ///
         /// <param name="inputValues"> The values for this node to output </param>
