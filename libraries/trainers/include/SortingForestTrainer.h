@@ -39,7 +39,6 @@ namespace trainers
     private:
         void SortNodeDataset(Range range, size_t featureIndex);
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
-        double GetOutputValue(const Sums& sums) const;
 
         // member variables
         LossFunctionType _lossFunction;

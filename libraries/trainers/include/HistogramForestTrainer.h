@@ -54,7 +54,6 @@ namespace trainers
 
     private:
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
-        double GetOutputValue(const Sums& sums) const;
         std::vector<SplitRuleType> GetSplitCandidatesAtNode(Range range);
 
         // member variables
