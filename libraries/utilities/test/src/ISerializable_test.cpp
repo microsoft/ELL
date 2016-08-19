@@ -36,8 +36,8 @@
 struct TestStruct : public utilities::ISerializable
 {
     int a=0;
-    float b=0;
-    double c=0;
+    float b=0.0f;
+    double c=0.0;
     TestStruct() = default;
     TestStruct(int a, float b, double c) : a(a), b(b), c(c) {}
     static std::string GetTypeName() { return "TestStruct"; }
@@ -139,9 +139,9 @@ void TestSerializer()
     std::cout << std::endl;
 
     std::vector<TestStruct> structArray;
-    structArray.emplace_back(1, 2, 3);
-    structArray.emplace_back(4, 5, 6);
-    structArray.emplace_back(7, 8, 9);
+    structArray.emplace_back(1, 2.0f, 3.0);
+    structArray.emplace_back(4, 5.0f, 6.0);
+    structArray.emplace_back(7, 8.0f, 9.0);
     serializer.Serialize("structArray", structArray);
     std::cout << std::endl;
 }

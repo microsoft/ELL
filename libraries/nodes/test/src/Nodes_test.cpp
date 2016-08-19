@@ -16,6 +16,7 @@
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
 #include "ForestNode.h"
+#include "MultiplexorNode.h"
 
 // model
 #include "ModelGraph.h"
@@ -245,7 +246,7 @@ void TestBinaryOperationNodeCompute()
 
         for (int d = 0; d < inputValue.size(); ++d)
         {
-            auto expectedOutput = 2*inputValue[d];
+            auto expectedOutput = 2 * inputValue[d];
             testing::ProcessTest("Testing BinaryOperationNode compute", testing::IsEqual(outputVec[d], expectedOutput));
         }
     }
@@ -264,6 +265,25 @@ void TestLinearPredictorNodeCompute()
     // TODO: test it
 }
 
+void TestMultiplexorNodeCompute()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(1);
+    auto selectorNode = model.AddNode<model::InputNode<bool>>(1);
+    auto muxNode = model.AddNode<nodes::MultiplexorNode<double, bool>>(inputNode->output, selectorNode->output, 2);
+
+    std::vector<double> inputValue{ 5.0 };
+    inputNode->SetInput(inputValue);
+
+    selectorNode->SetInput(false); // output[0] should get the input
+    auto outputVec = model.ComputeOutput(muxNode->output);
+    testing::ProcessTest("Testing MultiplexorNode compute", testing::IsEqual(outputVec, {5.0, 0}));
+
+    selectorNode->SetInput(true); // output[1] should get the input
+    outputVec = model.ComputeOutput(muxNode->output);
+    testing::ProcessTest("Testing MultiplexorNode compute", testing::IsEqual(outputVec, {0.0, 5.0}));
+}
+
 //
 // Node refinements
 //
@@ -278,7 +298,7 @@ void TestMovingAverageNodeRefine()
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
     auto meanNode = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, windowSize);
 
-    std::vector<std::vector<double>> data = { { 1 },{ 2 },{ 3 },{ 4 },{ 5 },{ 6 },{ 7 },{ 8 },{ 9 },{ 10 } };
+    std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
     double expectedOutput = VectorMean({ 7.0, 8.0, 9.0, 10.0 });
 
     model::TransformContext context{ common::IsNodeCompilable() };
@@ -326,9 +346,9 @@ void TestSimpleForestNodeRefine()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{simpleForestNode->output});
-    auto refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{simpleForestNode->treeOutputs});
-    auto refinedEdgeIndicatorVectorElements = transformer.GetCorrespondingOutputs(model::PortElements<bool>{simpleForestNode->edgeIndicatorVector});
+    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestNode->output });
+    auto refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestNode->treeOutputs });
+    auto refinedEdgeIndicatorVectorElements = transformer.GetCorrespondingOutputs(model::PortElements<bool>{ simpleForestNode->edgeIndicatorVector });
     testing::ProcessTest("Testing SimpleForestNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
     // check equivalence
@@ -337,7 +357,7 @@ void TestSimpleForestNodeRefine()
     auto outputValue = model.ComputeOutput(simpleForestNode->output)[0];
     auto treeOutputsValue = model.ComputeOutput(simpleForestNode->treeOutputs);
     auto edgeIndicatorVectorValue = model.ComputeOutput(simpleForestNode->edgeIndicatorVector);
-    
+
     auto refinedOutputValue = refinedModel.ComputeOutput(refinedOutputElements)[0];
     auto refinedTreeOutputsValue = refinedModel.ComputeOutput(refinedTreeOutputsElements);
     auto refinedEdgeIndicatorVectorValue = refinedModel.ComputeOutput(refinedEdgeIndicatorVectorElements);
@@ -354,7 +374,7 @@ void TestLinearPredictorNodeRefine()
     size_t dim = 3;
     predictors::LinearPredictor predictor(dim);
     predictor.GetBias() = 2.0;
-    predictor.GetWeights() = std::vector<double>{3.0, 4.0, 5.0};
+    predictor.GetWeights() = std::vector<double>{ 3.0, 4.0, 5.0 };
 
     // make a model
     model::Model model;
@@ -369,9 +389,9 @@ void TestLinearPredictorNodeRefine()
 
     // check for equality
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{linearPredictorNode->output}); // TODO: cleanup
-    inputNode->SetInput({1.0, 1.0, 1.0});
-    newInputNode->SetInput({1.0, 1.0, 1.0});
+    auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ linearPredictorNode->output }); // TODO: cleanup
+    inputNode->SetInput({ 1.0, 1.0, 1.0 });
+    newInputNode->SetInput({ 1.0, 1.0, 1.0 });
     auto modelOutputValue = model.ComputeOutput(linearPredictorNode->output)[0];
     auto newOutputValue = newModel.ComputeOutput(newOutputElements)[0];
 

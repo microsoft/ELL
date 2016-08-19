@@ -92,10 +92,13 @@ namespace model
             // die after too many iterations
             if(++iterationCount >= maxRefinementIterations)
             {
-                std::string uncompilableNodeName;
-                auto uncompilableNode = FindFirstUncompilableNode(currentModel, context);
-                uncompilableNodeName = uncompilableNode->GetRuntimeTypeName();
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than " + std::to_string(maxRefinementIterations) + " refinement iterations, uncompilable node: " + uncompilableNodeName);
+                std::string firstUncompilableNodeName;
+                auto uncompilableNode = FindUncompilableNodes(currentModel, context);
+                if(uncompilableNode.size() > 0)
+                {
+                    firstUncompilableNodeName = uncompilableNode[0]->GetRuntimeTypeName();
+                }
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than " + std::to_string(maxRefinementIterations) + " refinement iterations, first uncompilable node: " + firstUncompilableNodeName);
             }
         }
         while(!_isModelCompilable);
@@ -105,18 +108,20 @@ namespace model
         return _model;
     }
 
-    const Node* ModelTransformer::FindFirstUncompilableNode(const Model& model, const TransformContext& context) const
+    std::vector<const Node*> ModelTransformer::FindUncompilableNodes(const Model& model, const TransformContext& context) const
     {
+        std::vector<const Node*> uncompilableNodes;
+        
         auto iter = model.GetNodeIterator();
         while(iter.IsValid())
         {
             auto node = iter.Get();
             if(!context.IsNodeCompilable(*node))
             {
-                return node;
+                uncompilableNodes.push_back(node);
             }
             iter.Next();
         }
-        return nullptr;
+        return uncompilableNodes;
     }
 }

@@ -230,7 +230,6 @@ namespace model
 
     private:
         std::vector<PortRange> _ranges;
-        // TODO: keep set of nodes (?)
         size_t _size = 0;
     };
 
