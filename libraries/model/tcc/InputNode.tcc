@@ -17,8 +17,15 @@ namespace model
     InputNode<ValueType>::InputNode(size_t dimension) : Node({}, { &_output }), _output(this, outputPortName, dimension){};
 
     template <typename ValueType>
+    void InputNode<ValueType>::SetInput(ValueType inputValue)
+    {
+        SetInput(std::vector<ValueType>{inputValue});
+    }
+
+    template <typename ValueType>
     void InputNode<ValueType>::SetInput(std::vector<ValueType> inputValues)
     {
+        assert(_output.Size() == inputValues.size());
         _inputValues = inputValues;
     }
 
@@ -32,7 +39,7 @@ namespace model
     void InputNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<InputNode<ValueType>>(_output.Size());
-        transformer.MapOutputPort(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>

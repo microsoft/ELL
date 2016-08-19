@@ -69,7 +69,7 @@ namespace std
     try { 
         $action 
     }
-    catch(std::runtime_error err) {
+    catch(const std::runtime_error& err) {
         SWIG_exception(SWIG_RuntimeError, const_cast<char*>(err.what()));        
     }    
     // TODO: catch EMLL-specific exceptions and rethrow them

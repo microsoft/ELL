@@ -39,7 +39,7 @@ namespace nodes
 
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to accumulate </param>
-        AccumulatorNode(const model::OutputPortElements<ValueType>& input);
+        AccumulatorNode(const model::PortElements<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

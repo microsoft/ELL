@@ -36,7 +36,7 @@ namespace model
         /// <param name="condition"> An input that returns a single boolean value that selects which input to use as output </param>
         /// <param name="input1"> The input to return if the condition is `true` </param>
         /// <param name="input2"> The input to return if the condition is `false` </param>
-        ValueSelectorNode(const OutputPortElements<bool>& condition, const OutputPortElements<ValueType>& input1, const OutputPortElements<ValueType>& input2);
+        ValueSelectorNode(const PortElements<bool>& condition, const PortElements<ValueType>& input1, const PortElements<ValueType>& input2);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -55,7 +55,7 @@ namespace model
         virtual void Copy(ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(ModelTransformer& transformer) const override;
+        virtual bool Refine(ModelTransformer& transformer) const override;
 
         static constexpr const char* conditionPortName = "condition";
         static constexpr const char* input1PortName = "input1";
@@ -84,7 +84,7 @@ namespace model
     class SelectIfLessNode : public Node
     {
     public:
-        SelectIfLessNode(const OutputPortElements<ValueType>& input1, const OutputPortElements<ValueType>& input2, const OutputPortElements<ValueType>& value1, const OutputPortElements<ValueType>& value2);
+        SelectIfLessNode(const PortElements<ValueType>& input1, const PortElements<ValueType>& input2, const PortElements<ValueType>& value1, const PortElements<ValueType>& value2);
         static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SelectIfLessNode"); }
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
@@ -94,7 +94,7 @@ namespace model
         virtual void Copy(ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(ModelTransformer& transformer) const override;
+        virtual bool Refine(ModelTransformer& transformer) const override;
 
         static constexpr const char* input1PortName = "input1";
         static constexpr const char* input2PortName = "input2";
@@ -121,7 +121,7 @@ namespace model
     class IfLessNode : public Node
     {
     public:
-        IfLessNode(const OutputPortElements<ValueType>& value, const OutputPortElements<ValueType>& threshold);
+        IfLessNode(const PortElements<ValueType>& value, const PortElements<ValueType>& threshold);
         static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("IfLessNode"); }
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
@@ -131,7 +131,7 @@ namespace model
         virtual void Copy(ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(ModelTransformer& transformer) const override;
+        virtual bool Refine(ModelTransformer& transformer) const override;
 
         static constexpr const char* valuePortName = "value";
         static constexpr const char* thresholdPortName = "threshold";

@@ -15,27 +15,24 @@
 
 namespace nodes
 {
-    SingleElementThresholdNode::SingleElementThresholdNode(const model::OutputPortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _predictor(predictor)
+    SingleElementThresholdNode::SingleElementThresholdNode(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _predictor(predictor)
     {
         assert(input.Size() > predictor.GetElementIndex());
     }
 
     void SingleElementThresholdNode::Copy(model::ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<SingleElementThresholdNode>(newOutputPortElements, _predictor);
-        transformer.MapOutputPort(output, newNode->output);
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        auto newNode = transformer.AddNode<SingleElementThresholdNode>(newPortElements, _predictor);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 
-    void SingleElementThresholdNode::Refine(model::ModelTransformer& transformer) const
+    bool SingleElementThresholdNode::Refine(model::ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
 
-        // get the element used in the split rule 
-        // TODO - waiting for OutputPortElements changes: the following 3 lines should be one line. 
-        auto elementAsRange = newOutputPortElements.GetElement(_predictor.GetElementIndex());
-        model::OutputPortElements<double> element;
-        element.AddRange(elementAsRange);
+        // get the element used in the split rule
+        model::PortElements<double> element{ newPortElements, _predictor.GetElementIndex() };
 
         // get the threshold.
         auto thresholdNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetThreshold());
@@ -43,7 +40,8 @@ namespace nodes
         // create a predicate that implements the split rule
         auto binaryPredicateNode = transformer.AddNode<BinaryPredicateNode<double>>(element, thresholdNode->output, BinaryPredicateNode<double>::PredicateType::greater);
 
-        transformer.MapOutputPort(output, binaryPredicateNode->output);
+        transformer.MapNodeOutput(output, binaryPredicateNode->output);
+        return true;
     }
 
     void SingleElementThresholdNode::Compute() const
@@ -55,10 +53,8 @@ namespace nodes
         _output.SetOutput({ _predictor.Predict(dataVector) == 1 ? true : false });
     }
 
-    SingleElementThresholdNode* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor, model::ModelTransformer& transformer)
+    SingleElementThresholdNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor, model::ModelTransformer& transformer)
     {
         return transformer.AddNode<SingleElementThresholdNode>(input, predictor);
     }
-
-
 }

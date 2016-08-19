@@ -227,3 +227,5 @@ ModelManifest.xml
 .vscode/
 browse.VC.db
 
+# CMake / CTest stuff
+/Testing/

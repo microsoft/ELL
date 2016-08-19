@@ -40,7 +40,7 @@ namespace nodes
         ///
         /// <param name="elements"> The input aray of values. </param>
         /// <param name="selector"> The index of the chosen element </param>
-        ElementSelectorNode(const model::OutputPortElements<ValueType>& elements, const model::OutputPortElements<SelectorType>& selector);
+        ElementSelectorNode(const model::PortElements<ValueType>& elements, const model::PortElements<SelectorType>& selector);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

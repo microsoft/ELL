@@ -13,7 +13,7 @@
 #include "Port.h"
 #include "InputPort.h"
 #include "OutputPort.h"
-#include "OutputPortElements.h"
+#include "PortElements.h"
 #include "InputNode.h"
 #include "OutputNode.h"
 %}
@@ -28,7 +28,7 @@
 
 %include "Port.h"
 %include "OutputPort.h"
-%include "OutputPortElements.h"
+%include "PortElements.h"
 %include "Node.h"
 %include "ModelGraph.h"
 %include "InputPort.h"
@@ -37,8 +37,8 @@
 
 %template (DoubleOutputPort) model::OutputPort<double>;
 %template (BoolOutputPort) model::OutputPort<bool>;
-%template () model::OutputPortElements<double>;
-%template () model::OutputPortElements<bool>;
+%template () model::PortElements<double>;
+%template () model::PortElements<bool>;
 
 #ifndef SWIGXML
 %template (NodeVector) std::vector<model::Node*>;
@@ -56,7 +56,7 @@
 
 #endif
 
-%ignore model::Model::ComputeNodeOutput;
+%ignore model::Model::ComputeOutput;
 
 %extend model::Model 
 {
@@ -75,6 +75,6 @@
     // compute output
     std::vector<double> ComputeDoubleOutput(const OutputPort<double>& outputPort) const
     {
-        return $self->ComputeNodeOutput(outputPort);
+        return $self->ComputeOutput(outputPort);
     }
 }
