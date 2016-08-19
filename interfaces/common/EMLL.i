@@ -130,9 +130,6 @@ typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<d
 // Interface includes for linear library
 %include linear.i
 
-// Interface includes for layers library
-%include layers.i
-
 // Interface includes for dataset library
 %include dataset.i
 

@@ -28,13 +28,3 @@
 
 %include "LinearPredictor.h"
 %include "DecisionTreePredictor.h"
-
-%extend predictors::LinearPredictor
-{
-    void AddToModel(interfaces::Model& model, const layers::CoordinateList& inputCoordinates) const
-    {
-        auto weightsLayerCoordinates = model.GetModel().AddLayer(std::make_unique<layers::Coordinatewise>(std::vector<double>($self->GetWeights()), inputCoordinates, layers::Coordinatewise::OperationType::multiply));
-        auto sumLayerCoordinates = model.GetModel().AddLayer(std::make_unique<layers::Sum>(weightsLayerCoordinates));
-        model.GetModel().AddLayer(std::make_unique<layers::Coordinatewise>($self->GetBias(), sumLayerCoordinates[0], layers::Coordinatewise::OperationType::add));
-    }
-}
