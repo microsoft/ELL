@@ -36,14 +36,14 @@ void TestLoadTreeModels()
     auto model2 = common::LoadModelGraph("[tree_2]");
     auto model3 = common::LoadModelGraph("[tree_3]");
 
-    std::cout << "Model 0 size: " << model0.Size() << std::endl;
-    std::cout << "Model 1 size: " << model1.Size() << std::endl;
-    std::cout << "Model 2 size: " << model2.Size() << std::endl;
-    std::cout << "Model 3 size: " << model3.Size() << std::endl;
+    std::cout << "Tree 0 size: " << model0.Size() << std::endl;
+    std::cout << "Tree 1 size: " << model1.Size() << std::endl;
+    std::cout << "Tree 2 size: " << model2.Size() << std::endl;
+    std::cout << "Tree 3 size: " << model3.Size() << std::endl;
 }
 
 void TestSaveModels(std::string ext)
-{    
+{   
     auto model1 = common::LoadModelGraph("[1]");
     auto model2 = common::LoadModelGraph("[2]");
     auto model3 = common::LoadModelGraph("[3]");
@@ -66,5 +66,5 @@ void TestSaveModels(std::string ext)
     auto newTree0 = common::LoadModelGraph("tree_0." + ext);
     auto newTree1 = common::LoadModelGraph("tree_1." + ext);
     auto newTree2 = common::LoadModelGraph("tree_2." + ext);
-    auto newTree3 = common::LoadModelGraph("tree_3." + ext);    
+    auto newTree3 = common::LoadModelGraph("tree_3." + ext);
 }

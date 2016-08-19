@@ -43,10 +43,10 @@ namespace utilities
         auto indent = GetCurrentIndent();
         if (hasName)
         {
-            _out << indent << name << ": ";
+            _out << indent << "\"" << name << "\": ";
         }
         _out << "{\n";
-        _out << indent << "  _type: " << value.GetRuntimeTypeName();
+        _out << indent << "  \"_type\": \"" << value.GetRuntimeTypeName() << "\"";
         SetEndOfLine(",\n");
     }
 
@@ -93,7 +93,7 @@ namespace utilities
         _out << indent;
         if (hasName)
         {
-            _out << name << ": ";
+            _out << "\"" << name << "\": ";
         }
 
         _out << "[";
@@ -152,11 +152,13 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            _tokenizer.MatchTokens( {name, ":"} );
+            MatchKey(name);
         }
-        _tokenizer.MatchToken("{");        
-        _tokenizer.MatchTokens({"_type", ":"});
+        _tokenizer.MatchToken("{");
+        MatchKey("_type");
+        _tokenizer.MatchToken("\"");
         auto encodedTypeName = _tokenizer.ReadNextToken();
+        _tokenizer.MatchToken("\"");
 
         if(_tokenizer.PeekNextToken() == ",")
         {
@@ -206,7 +208,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            _tokenizer.MatchTokens({name, ":"});
+            MatchKey(name);
         }
                 
         _tokenizer.MatchToken("[");
@@ -236,6 +238,17 @@ namespace utilities
     void JsonDeserializer::EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
     {
         _tokenizer.MatchToken("]");
+    }
+
+    void JsonDeserializer::MatchKey(const char* key)
+    {
+        _tokenizer.MatchToken("\"");
+        auto s = _tokenizer.ReadNextToken();
+        if(s != key)
+        {
+            throw InputException(InputExceptionErrors::badStringFormat, std::string{"Failed to match name "} + key + ", got: " + s);
+        }
+        _tokenizer.MatchTokens({"\"", ":"});
     }
 
     //

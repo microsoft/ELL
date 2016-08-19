@@ -14,6 +14,8 @@
 
 // utilities
 #include "TypeName.h"
+#include "ISerializable.h"
+#include "Serializer.h"
 
 // stl
 #include <vector>
@@ -36,6 +38,9 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
+        /// <summary> Default Constructor </summary>
+        ElementSelectorNode();
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="elements"> The input aray of values. </param>
@@ -45,12 +50,23 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("ElementSelectorNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, SelectorType>("ElementSelectorNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;

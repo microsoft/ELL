@@ -1,5 +1,5 @@
 //
-// Graph tests
+// Model tests
 // 
 
 #include "Graph_test.h"
@@ -7,22 +7,30 @@
 // testing
 #include "testing.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <iostream>
-#include <unordered_map>
-
-
 
 int main()
 {
-    TestStaticGraph();
-    TestNodeIterator();
-    TestExampleGraph();
-    TestInputRouting1();
-    TestInputRouting2();
+    try
+    {
+        TestStaticGraph();
+        TestNodeIterator();
+        TestExampleGraph();
+        TestInputRouting1();
+        TestInputRouting2();
 
-    TestCopyGraph();
-    TestRefineGraph();
+        TestCopyGraph();
+        TestRefineGraph();
+    }
+    catch(const utilities::Exception& exception)
+    {
+        std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
+        throw;
+    }
 
     if (testing::DidTestFail())
     {

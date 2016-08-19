@@ -163,13 +163,14 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<double>>();
-//        context.GetTypeFactory().AddType<model::Node, nodes::ElementSelectorNode<double, bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ElementSelectorNode<double, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MovingAverageNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MovingVarianceNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormNode<double>>();
         //        context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestNode>();
-        //        context.GetTypeFactory().AddType<model::Node, nodes::SingleElementThresholdNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SingleElementThresholdNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SumNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
     }
 

@@ -22,7 +22,7 @@ namespace utilities
         _out << indent;
         if (hasName)
         {
-            _out << name << ": ";
+            _out  << "\"" << name << "\": ";
         }
         _out << value;
         SetEndOfLine(endOfLine);
@@ -40,7 +40,7 @@ namespace utilities
         _out << indent;
         if (hasName)
         {
-            _out << name << ": ";
+            _out  << "\"" << name << "\": ";
         }
         _out << (value ? "true" : "false");
         SetEndOfLine(endOfLine);
@@ -57,7 +57,7 @@ namespace utilities
         _out << indent;
         if (hasName)
         {
-            _out << name << ": ";
+            _out  << "\"" << name << "\": ";
         }
         _out << "\"" << JsonUtilities::EncodeString(value) << "\"";
         SetEndOfLine(endOfLine);
@@ -73,7 +73,7 @@ namespace utilities
         _out << indent;
         if (hasName)
         {
-            _out << name << ": ";
+            _out  << "\"" << name << "\": ";
         }
         _out << "\"" << JsonUtilities::EncodeString(value) << "\"";
         SetEndOfLine(endOfLine);
@@ -90,7 +90,7 @@ namespace utilities
         _out << indent;
         if (hasName)
         {
-            _out << name << ": ";
+            _out  << "\"" << name << "\": ";
         }
 
         _out << "[";
@@ -119,7 +119,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            _tokenizer.MatchTokens({name, ":"});
+            MatchKey(name);
         }
 
         // read string
@@ -143,7 +143,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            _tokenizer.MatchTokens({name, ":"});
+            MatchKey(name);
         }
 
         // read string
@@ -166,7 +166,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            _tokenizer.MatchTokens({name, ":"});
+            MatchKey(name);
         }
 
         _tokenizer.MatchToken("\"");
@@ -190,7 +190,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            _tokenizer.MatchTokens({name, ":"});
+            MatchKey(name);
         }
                 
         _tokenizer.MatchToken("[");
@@ -219,7 +219,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            _tokenizer.MatchTokens({name, ":"});
+            MatchKey(name);
         }
                 
         _tokenizer.MatchToken("[");
