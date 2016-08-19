@@ -52,7 +52,7 @@ namespace common
         auto var16 = model.AddNode<nodes::MovingVarianceNode<double>>(inputNode->output, 16);
 
         // classifier
-        auto inputs = model::Concat(model::MakeOutputPortElements(mean8->output), model::MakeOutputPortElements(var8->output), model::MakeOutputPortElements(mean16->output), model::MakeOutputPortElements(var16->output));
+        auto inputs = model::Concat(model::MakePortElements(mean8->output), model::MakePortElements(var8->output), model::MakePortElements(mean16->output), model::MakePortElements(var16->output));
         predictors::LinearPredictor predictor(inputs.Size());
         // Set some values into the predictor's vector
         for (int index = 0; index < inputs.Size(); ++index)

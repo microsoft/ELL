@@ -28,7 +28,7 @@ namespace nodes
     {
     }
 
-    LinearPredictorNode::LinearPredictorNode(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor) : Node({ &_input }, { &_output, &_weightedElements }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _weightedElements(this, weightedElementsPortName, input.Size()), _predictor(predictor)
+    LinearPredictorNode::LinearPredictorNode(const model::PortElements<double>& input, const predictors::LinearPredictor& predictor) : Node({ &_input }, { &_output, &_weightedElements }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _weightedElements(this, weightedElementsPortName, input.Size()), _predictor(predictor)
     {
         assert(input.Size() == predictor.GetDimension());
     }
@@ -53,24 +53,25 @@ namespace nodes
 
     void LinearPredictorNode::Copy(model::ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<LinearPredictorNode>(newOutputPortElements, _predictor);
-        transformer.MapOutputPort(output, newNode->output);
-        transformer.MapOutputPort(weightedElements, newNode->weightedElements);
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        auto newNode = transformer.AddNode<LinearPredictorNode>(newPortElements, _predictor);
+        transformer.MapNodeOutput(output, newNode->output);
+        transformer.MapNodeOutput(weightedElements, newNode->weightedElements);
     }
 
-    void LinearPredictorNode::Refine(model::ModelTransformer& transformer) const
+    bool LinearPredictorNode::Refine(model::ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
     
         auto weightsNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetWeights());
-        auto dotProductNode = transformer.AddNode<DotProductNode<double>>(weightsNode->output, newOutputPortElements);
-        auto coordinatewiseMultiplyNode = transformer.AddNode<BinaryOperationNode<double>>(weightsNode->output, newOutputPortElements, BinaryOperationNode<double>::OperationType::coordinatewiseMultiply);
+        auto dotProductNode = transformer.AddNode<DotProductNode<double>>(weightsNode->output, newPortElements);
+        auto coordinatewiseMultiplyNode = transformer.AddNode<BinaryOperationNode<double>>(weightsNode->output, newPortElements, BinaryOperationNode<double>::OperationType::coordinatewiseMultiply);
         auto biasNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetBias());
         auto addNode = transformer.AddNode<BinaryOperationNode<double>>(dotProductNode->output, biasNode->output, BinaryOperationNode<double>::OperationType::add);
         
-        transformer.MapOutputPort(output, addNode->output);
-        transformer.MapOutputPort(weightedElements, coordinatewiseMultiplyNode->output);
+        transformer.MapNodeOutput(output, addNode->output);
+        transformer.MapNodeOutput(weightedElements, coordinatewiseMultiplyNode->output);
+        return true;
     }
 
     void LinearPredictorNode::Compute() const
@@ -83,7 +84,7 @@ namespace nodes
         _weightedElements.SetOutput(_predictor.GetWeightedElements(dataVector));
     }
 
-    LinearPredictorNode* AddNodeToModelTransformer(const model::OutputPortElements<double>& input, const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer)
+    LinearPredictorNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer)
     {
         return transformer.AddNode<LinearPredictorNode>(input, predictor);
     }

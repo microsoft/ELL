@@ -3,6 +3,7 @@
 // 
 
 #include "Graph_test.h"
+#include "PortElements_test.h"
 
 // testing
 #include "testing.h"
@@ -25,6 +26,11 @@ int main()
 
         TestCopyGraph();
         TestRefineGraph();
+        TestRefineSplitOutputs();
+
+        // PortElements tests
+        TestSlice();
+        TestAppend();
     }
     catch(const utilities::Exception& exception)
     {

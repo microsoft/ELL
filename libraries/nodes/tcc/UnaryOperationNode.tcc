@@ -8,24 +8,52 @@
 
 namespace nodes
 {
+    namespace UnaryOperations
+    {
+        template <typename ValueType>
+        ValueType Sqrt(ValueType a)
+        {
+            return std::sqrt(a);
+        }
+
+        template <>
+        inline bool Sqrt(bool x)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Error: taking sqrt of a boolean value");
+        }
+
+        template <typename ValueType>
+        ValueType LogicalNot(ValueType a)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Error: taking not of a non-boolean value");
+        }
+
+        template <>
+        inline bool LogicalNot(bool x)
+        {
+            return !x;
+        }
+    }
+
+
     template <typename ValueType>
     UnaryOperationNode<ValueType>::UnaryOperationNode() : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _operation(OperationType::none)
     {
     }
 
     template <typename ValueType>
-    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::OutputPortElements<ValueType>& input, OperationType operation) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _operation(operation)
+    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::PortElements<ValueType>& input, OperationType operation) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _operation(operation)
     {
     }
 
     template <typename ValueType>
     template <typename Operation>
-    std::vector<ValueType> UnaryOperationNode<ValueType>::ComputeOutput(Operation&& fn) const
+    std::vector<ValueType> UnaryOperationNode<ValueType>::ComputeOutput(Operation&& function) const
     {
         auto output = std::vector<ValueType>(_input.Size());
         for (size_t index = 0; index < _input.Size(); index++)
         {
-            output[index] = fn(_input[index]);
+            output[index] = function(_input[index]);
         }
         return output;
     }
@@ -38,8 +66,12 @@ namespace nodes
         {
             case OperationType::sqrt:
             {
-                auto sqrtOp = [](ValueType x) { return std::sqrt(x); };
-                output = ComputeOutput(sqrtOp);
+                output = ComputeOutput(UnaryOperations::Sqrt<ValueType>);
+            }
+            break;
+            case OperationType::logicalNot:
+            {
+                output = ComputeOutput(UnaryOperations::LogicalNot<ValueType>);
             }
             break;
             
@@ -52,9 +84,9 @@ namespace nodes
     template <typename ValueType>
     void UnaryOperationNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<UnaryOperationNode<ValueType>>(newOutputPortElements, _operation);
-        transformer.MapOutputPort(output, newNode->output);
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        auto newNode = transformer.AddNode<UnaryOperationNode<ValueType>>(newPortElements, _operation);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>

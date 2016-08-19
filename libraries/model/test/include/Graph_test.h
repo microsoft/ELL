@@ -1,6 +1,6 @@
 #pragma once
 //
-// Graph tests
+// Model tests
 // 
 
 void TestNodeIterator();
@@ -13,3 +13,5 @@ void TestInputRouting2();
 
 void TestCopyGraph();
 void TestRefineGraph();
+
+void TestRefineSplitOutputs();

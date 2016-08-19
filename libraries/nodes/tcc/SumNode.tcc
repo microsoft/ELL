@@ -14,7 +14,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    SumNode<ValueType>::SumNode(const model::OutputPortElements<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, 1)
+    SumNode<ValueType>::SumNode(const model::PortElements<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, 1)
     {
     }
 
@@ -33,9 +33,9 @@ namespace nodes
     template <typename ValueType>
     void SumNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<SumNode<ValueType>>(newOutputPortElements);
-        transformer.MapOutputPort(output, newNode->output);
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        auto newNode = transformer.AddNode<SumNode<ValueType>>(newPortElements);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>

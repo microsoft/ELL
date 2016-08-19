@@ -10,7 +10,7 @@
 
 #include "Node.h"
 #include "ModelTransformer.h"
-#include "OutputPortElements.h"
+#include "PortElements.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
@@ -40,7 +40,8 @@ namespace nodes
         enum class OperationType
         {
             none,
-            sqrt
+            sqrt, // real only
+            logicalNot   // bool only
         };
 
         /// <summary> Default Constructor </summary>
@@ -50,7 +51,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to process. </param>
         /// <param name="operation"> The function to use to process the signal. </param>
-        UnaryOperationNode(const model::OutputPortElements<ValueType>& input, OperationType operation);
+        UnaryOperationNode(const model::PortElements<ValueType>& input, OperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -81,7 +82,7 @@ namespace nodes
 
     private:
         template <typename Operation>
-        std::vector<ValueType> ComputeOutput(Operation&& fn) const;
+        std::vector<ValueType> ComputeOutput(Operation&& function) const;
  
         // Inputs
         model::InputPort<ValueType> _input;
@@ -91,7 +92,6 @@ namespace nodes
 
         // Operation
         OperationType _operation;
-
     };
 }
 

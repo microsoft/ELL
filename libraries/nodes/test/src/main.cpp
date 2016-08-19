@@ -8,6 +8,9 @@
 
 #include "Nodes_test.h"
 
+// utilities
+#include "Exception.h"
+
 // testing
 #include "testing.h"
 
@@ -31,7 +34,8 @@ int main()
         TestUnaryOperationNodeCompute();
         TestBinaryOperationNodeCompute();
         TestLinearPredictorNodeCompute();
-        
+        TestMultiplexorNodeCompute();
+
         TestMovingAverageNodeRefine();
         TestLinearPredictorNodeRefine();
         TestSimpleForestNodeRefine();
