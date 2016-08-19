@@ -119,7 +119,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            MatchKey(name);
+            MatchFieldName(name);
         }
 
         // read string
@@ -143,7 +143,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            MatchKey(name);
+            MatchFieldName(name);
         }
 
         // read string
@@ -166,7 +166,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            MatchKey(name);
+            MatchFieldName(name);
         }
 
         _tokenizer.MatchToken("\"");
@@ -190,7 +190,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            MatchKey(name);
+            MatchFieldName(name);
         }
                 
         _tokenizer.MatchToken("[");
@@ -219,7 +219,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            MatchKey(name);
+            MatchFieldName(name);
         }
                 
         _tokenizer.MatchToken("[");

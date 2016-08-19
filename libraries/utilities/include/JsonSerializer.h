@@ -136,7 +136,7 @@ namespace utilities
 
         void ReadArray(const char* name, std::vector<std::string>& array, SerializationContext& context);
 
-        void MatchKey(const char* name);
+        void MatchFieldName(const char* name);
 
         std::istream& _in;
         std::string _endOfPreviousLine;

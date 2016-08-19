@@ -152,10 +152,10 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            MatchKey(name);
+            MatchFieldName(name);
         }
         _tokenizer.MatchToken("{");
-        MatchKey("_type");
+        MatchFieldName("_type");
         _tokenizer.MatchToken("\"");
         auto encodedTypeName = _tokenizer.ReadNextToken();
         _tokenizer.MatchToken("\"");
@@ -208,7 +208,7 @@ namespace utilities
         bool hasName = name != std::string("");
         if(hasName)
         {
-            MatchKey(name);
+            MatchFieldName(name);
         }
                 
         _tokenizer.MatchToken("[");
@@ -240,7 +240,7 @@ namespace utilities
         _tokenizer.MatchToken("]");
     }
 
-    void JsonDeserializer::MatchKey(const char* key)
+    void JsonDeserializer::MatchFieldName(const char* key)
     {
         _tokenizer.MatchToken("\"");
         auto s = _tokenizer.ReadNextToken();
