@@ -170,9 +170,6 @@ wrap_unique_ptr(LayerPtr, layers::Layer)
 typedef trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType predictors::LinearPredictor;
 class trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType {};
 
-// Interface for features library
-%include features.i
-
 #if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
 // TODO: Review rules on when to apply the %shared_ptr() directive and get rid of these altogether if they're not in the right place 
 %shared_ptr(layers::Map)
