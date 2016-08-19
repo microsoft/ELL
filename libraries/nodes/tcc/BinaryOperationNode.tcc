@@ -10,8 +10,7 @@ namespace nodes
 {
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode() : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(OperationType::none)
-    {
-    }
+    {}
 
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2, OperationType operation) : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
@@ -60,21 +59,13 @@ namespace nodes
     };
 
     template <typename ValueType>
-    void BinaryOperationNode<ValueType>::Copy(model::ModelTransformer& transformer) const
-    {
-        auto OutputPortElements1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
-        auto OutputPortElements2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
-        auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(OutputPortElements1, OutputPortElements2, _operation);
-        transformer.MapOutputPort(output, newNode->output);
-    }
-
-    template <typename ValueType>
     void BinaryOperationNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);
         serializer.Serialize("operation", static_cast<int>(_operation));
         serializer.Serialize("input1", _input1);
         serializer.Serialize("input2", _input2);
+        serializer.Serialize("output", _output);
     }
 
     template <typename ValueType>
@@ -86,5 +77,15 @@ namespace nodes
         _operation = static_cast<OperationType>(op);
         serializer.Deserialize("input1", _input1, context);
         serializer.Deserialize("input2", _input2, context);
+        serializer.Deserialize("output", _output, context);
+   }
+
+    template <typename ValueType>
+    void BinaryOperationNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto OutputPortElements1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
+        auto OutputPortElements2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
+        auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(OutputPortElements1, OutputPortElements2, _operation);
+        transformer.MapOutputPort(output, newNode->output);
     }
 }

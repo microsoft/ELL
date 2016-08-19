@@ -26,7 +26,7 @@ int main()
         TestLoadSampleModels();
         TestLoadTreeModels();
 
-//        TestSaveModels("xml");
+        TestSaveModels("xml");
         TestSaveModels("json");
     }
     catch(const utilities::Exception& exception)

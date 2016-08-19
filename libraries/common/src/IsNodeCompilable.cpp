@@ -17,7 +17,7 @@ namespace common
         _nodeNames.insert("BinaryOperationNode<double>");
         _nodeNames.insert("BinaryPredicateNode<double>");
         _nodeNames.insert("SumNode<double>");
-        _nodeNames.insert("ElementSelectorNode<double>");
+        _nodeNames.insert("ElementSelectorNode<double,bool>");
     }
 
     bool IsNodeCompilable::operator()(const model::Node& node)

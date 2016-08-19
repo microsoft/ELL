@@ -158,7 +158,7 @@ namespace common
 
         context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<double>>();
-//        context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<double>>();

@@ -65,7 +65,7 @@ namespace model
             if(++iterationCount >= maxRefinementIterations)
             {
                 auto uncompilableNodeName = GetUncompilableNodeName(currentModel, context);
-                throw new utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than 10 refinement iterations, uncompilable node: " + uncompilableNodeName);
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than 10 refinement iterations, uncompilable node: " + uncompilableNodeName);
             }
         }
         while(!_isModelCompilable);
