@@ -64,15 +64,21 @@ namespace std
 %template (StringVector) std::vector<std::string>;
 #endif
 
+%{
+#include "Exception.h"
+%}
+
 // Add some primitive exception handling
 %exception {
     try { 
         $action 
     }
-    catch(std::runtime_error err) {
+    catch(const utilities::Exception&) {
+        SWIG_exception(SWIG_RuntimeError, "Got exception in EMLL library");        
+    }    
+    catch(const std::runtime_error& err) {
         SWIG_exception(SWIG_RuntimeError, const_cast<char*>(err.what()));        
     }    
-    // TODO: catch EMLL-specific exceptions and rethrow them
     catch (...) {
         SWIG_exception(SWIG_RuntimeError, "LogicException in EMLL library");
     }

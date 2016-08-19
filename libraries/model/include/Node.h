@@ -61,6 +61,10 @@ namespace model
         /// <returns> a vector of all the nodes that depend on this node </summary>
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -85,6 +89,7 @@ namespace model
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
         virtual void Refine(ModelTransformer& transformer) const;
+
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 

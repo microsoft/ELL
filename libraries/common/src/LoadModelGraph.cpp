@@ -229,6 +229,8 @@ namespace common
             }
             else
             {
+                model::Model emptyModel;
+                return emptyModel;
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");   
             }
         }
