@@ -41,7 +41,7 @@ namespace nodes
         transformer.MapNodeOutput(weightedElements, newNode->weightedElements);
     }
 
-    void LinearPredictorNode::RefineNode(model::ModelTransformer& transformer) const
+    bool LinearPredictorNode::Refine(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
     
@@ -53,6 +53,7 @@ namespace nodes
         
         transformer.MapNodeOutput(output, addNode->output);
         transformer.MapNodeOutput(weightedElements, coordinatewiseMultiplyNode->output);
+        return true;
     }
 
     void LinearPredictorNode::Compute() const

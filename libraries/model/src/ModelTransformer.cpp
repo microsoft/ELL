@@ -39,7 +39,7 @@ namespace model
         _context = context;
         _model = Model();
         _elementToElementMap.clear();
-        oldModel.Visit([this](const Node& node) { node.Copy(*this); });
+        oldModel.Visit([this](const Node& node) { node.InvokeCopy(*this); });
         _context = TransformContext();
 
         return _model;
@@ -68,7 +68,7 @@ namespace model
             bool didRefineAny = false;
             currentModel.Visit([this, &didRefineAny](const Node& node) 
             { 
-                bool didRefineNode = node.Refine(*this); 
+                bool didRefineNode = node.InvokeRefine(*this); 
                 didRefineAny |= didRefineNode;
             });
 

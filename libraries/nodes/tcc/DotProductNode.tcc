@@ -39,7 +39,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void DotProductNode<ValueType>::RefineNode(model::ModelTransformer& transformer) const
+    bool DotProductNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         // Maybe... in reality, dot product will likely want to be computed as in Compute() above
         auto newInput1 = transformer.TransformPortElements(_input1.GetPortElements());
@@ -48,6 +48,7 @@ namespace nodes
         auto sumNode = transformer.AddNode<SumNode<ValueType>>(multNode->output);
 
         transformer.MapNodeOutput(output, sumNode->output);
+        return true;
     }
 
     template <typename ValueType>

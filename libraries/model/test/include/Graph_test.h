@@ -1,6 +1,6 @@
 #pragma once
 //
-// Graph tests
+// Model tests
 // 
 
 void TestNodeIterator();

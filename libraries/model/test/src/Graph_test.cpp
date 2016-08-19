@@ -347,7 +347,7 @@ public:
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    virtual void RefineNode(model::ModelTransformer& transformer) const override
+    virtual bool Refine(model::ModelTransformer& transformer) const override
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         model::PortElements<ValueType> in1;
@@ -370,6 +370,7 @@ public:
         model::PortElements<ValueType> newOutput({ elem1, elem2 });
         
         transformer.MapNodeOutput({ output }, newOutput);
+        return true;
     }
 
     const model::OutputPort<ValueType>& output = _output;

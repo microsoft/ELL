@@ -50,7 +50,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void MovingAverageNode<ValueType>::RefineNode(model::ModelTransformer& transformer) const
+    bool MovingAverageNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto delayNode = transformer.AddNode<DelayNode<ValueType>>(newPortElements, _windowSize);
@@ -60,6 +60,7 @@ namespace nodes
         auto constNode = transformer.AddNode<ConstantNode<ValueType>>(literalN);
         auto divideNode = transformer.AddNode<BinaryOperationNode<ValueType>>(accumNode->output, constNode->output, BinaryOperationNode<ValueType>::OperationType::divide);
         transformer.MapNodeOutput(output, divideNode->output);
+        return true;
     }
 
     template <typename ValueType>

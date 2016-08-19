@@ -55,7 +55,7 @@ namespace model
         virtual void Copy(ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void RefineNode(ModelTransformer& transformer) const override;
+        virtual bool Refine(ModelTransformer& transformer) const override;
 
         static constexpr const char* conditionPortName = "condition";
         static constexpr const char* input1PortName = "input1";
@@ -94,7 +94,7 @@ namespace model
         virtual void Copy(ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void RefineNode(ModelTransformer& transformer) const override;
+        virtual bool Refine(ModelTransformer& transformer) const override;
 
         static constexpr const char* input1PortName = "input1";
         static constexpr const char* input2PortName = "input2";
@@ -131,7 +131,7 @@ namespace model
         virtual void Copy(ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void RefineNode(ModelTransformer& transformer) const override;
+        virtual bool Refine(ModelTransformer& transformer) const override;
 
         static constexpr const char* valuePortName = "value";
         static constexpr const char* thresholdPortName = "threshold";

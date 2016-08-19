@@ -60,17 +60,21 @@ namespace model
         }
     }
 
-    bool Node::Refine(ModelTransformer& transformer) const
+    void Node::InvokeCopy(ModelTransformer& transformer) const
     {
-        _didRefine = true;
-        RefineNode(transformer);
-        return _didRefine;
+        Copy(transformer);
     }
 
-    void Node::RefineNode(ModelTransformer& transformer) const
+    bool Node::InvokeRefine(ModelTransformer& transformer) const
     {
-        _didRefine = false;
+        return Refine(transformer);
+    }
+
+    // Default implementation of Refine just copies and returns false
+    bool Node::Refine(ModelTransformer& transformer) const
+    {
         Copy(transformer);
+        return false;
     }
 
     void Node::Serialize(utilities::Serializer& serializer) const

@@ -48,7 +48,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::RefineNode(ModelTransformer& transformer) const
+    bool ValueSelectorNode<ValueType>::Refine(ModelTransformer& transformer) const
     {
         auto newCondition = transformer.TransformPortElements(_condition.GetPortElements());
         auto newPortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
@@ -56,7 +56,8 @@ namespace model
 
         auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newPortElements1, newPortElements2);
 
-         transformer.MapNodeOutput(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
+        return true;
     }
 
     //
@@ -99,7 +100,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void SelectIfLessNode<ValueType>::RefineNode(ModelTransformer& transformer) const
+    bool SelectIfLessNode<ValueType>::Refine(ModelTransformer& transformer) const
     {
         auto newPortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
         auto newPortElements2 = transformer.TransformPortElements(_input2.GetPortElements());
@@ -110,6 +111,7 @@ namespace model
         auto selectNode = transformer.AddNode<ValueSelectorNode<ValueType>>(ifLessNode->output, newValue1, newValue2);
 
         transformer.MapNodeOutput(_output, selectNode->output);
+        return true;
     }
 
     //
@@ -144,13 +146,14 @@ namespace model
     }
 
     template <typename ValueType>
-    void IfLessNode<ValueType>::RefineNode(ModelTransformer& transformer) const
+    bool IfLessNode<ValueType>::Refine(ModelTransformer& transformer) const
     {
         auto newValue = transformer.TransformPortElements(_value.GetPortElements());
         auto newThreshold = transformer.TransformPortElements(_threshold.GetPortElements());
 
         auto newNode = transformer.AddNode<IfLessNode<ValueType>>(newValue, newThreshold);
 
-         transformer.MapNodeOutput(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
+        return true;
     }
 }

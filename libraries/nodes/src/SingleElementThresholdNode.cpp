@@ -27,7 +27,7 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    void SingleElementThresholdNode::RefineNode(model::ModelTransformer& transformer) const
+    bool SingleElementThresholdNode::Refine(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
 
@@ -41,6 +41,7 @@ namespace nodes
         auto binaryPredicateNode = transformer.AddNode<BinaryPredicateNode<double>>(element, thresholdNode->output, BinaryPredicateNode<double>::PredicateType::greater);
 
         transformer.MapNodeOutput(output, binaryPredicateNode->output);
+        return true;
     }
 
     void SingleElementThresholdNode::Compute() const
