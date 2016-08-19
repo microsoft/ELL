@@ -14,6 +14,7 @@
 #include <string>
 #include <sstream>
 #include <cctype>
+#include <cassert>
 
 namespace utilities
 {
@@ -158,6 +159,7 @@ namespace utilities
         MatchFieldName("_type");
         _tokenizer.MatchToken("\"");
         auto encodedTypeName = _tokenizer.ReadNextToken();
+        assert(encodedTypeName != "");
         _tokenizer.MatchToken("\"");
 
         if(_tokenizer.PeekNextToken() == ",")

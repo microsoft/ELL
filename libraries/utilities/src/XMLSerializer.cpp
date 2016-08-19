@@ -16,6 +16,7 @@
 #include <sstream>
 #include <cctype>
 #include <algorithm>
+#include <cassert>
 
 namespace utilities
 {
@@ -183,6 +184,7 @@ namespace utilities
 
         _tokenizer.MatchToken("<");
         auto readTypeName = XmlUtilities::DecodeTypeName(_tokenizer.ReadNextToken());
+        assert(readTypeName != "");
         if(hasName)
         {
             _tokenizer.MatchTokens({"name", "=", "'", name, "'"});

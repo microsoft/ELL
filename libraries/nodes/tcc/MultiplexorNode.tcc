@@ -10,6 +10,11 @@
 namespace nodes
 {
     template <typename ValueType, typename SelectorType>
+    MultiplexorNode<ValueType, SelectorType>::MultiplexorNode() : Node({ &_input, &_selector }, { &_output }), _input(this, {}, inputPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 0), _defaultValue(0)
+    {}
+
+
+    template <typename ValueType, typename SelectorType>
     MultiplexorNode<ValueType, SelectorType>::MultiplexorNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue) : Node({ &_input, &_selector }, { &_output }), _input(this, input, inputPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, outputSize), _defaultValue(defaultValue)
     {
         if (selector.Size() != 1)
@@ -29,6 +34,26 @@ namespace nodes
         int index = (int)_selector[0];
         outputValue[index] = _input[0];
         _output.SetOutput(outputValue);
+    }
+
+    template <typename ValueType, typename SelectorType>
+    void MultiplexorNode<ValueType, SelectorType>::Serialize(utilities::Serializer& serializer) const
+    {
+        Node::Serialize(serializer);
+        serializer.Serialize("input", _input);
+        serializer.Serialize("selector", _selector);
+        serializer.Serialize("output", _output);
+        serializer.Serialize("defaultValue", _defaultValue);
+    }
+
+    template <typename ValueType, typename SelectorType>
+    void MultiplexorNode<ValueType, SelectorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        Node::Deserialize(serializer, context);
+        serializer.Deserialize("input", _input, context);
+        serializer.Deserialize("selector", _selector, context);
+        serializer.Deserialize("output", _output, context);
+        serializer.Deserialize("defaultValue", _defaultValue, context);
     }
 
     template <typename ValueType, typename SelectorType>

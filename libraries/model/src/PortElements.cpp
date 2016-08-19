@@ -74,6 +74,7 @@ namespace model
         serializer.Deserialize("referencedPortName", portName, newContext);
         
         Node* newNode = newContext.GetNodeFromId(newId);
+        assert(newNode != nullptr);
 
         auto ports = newNode->GetOutputPorts();
         OutputPortBase* newPort = nullptr;

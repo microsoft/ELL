@@ -166,6 +166,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ElementSelectorNode<double, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MovingAverageNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MovingVarianceNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexorNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormNode<double>>();
         //        context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestNode>();

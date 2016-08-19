@@ -28,7 +28,7 @@ namespace nodes
         Node::Serialize(serializer);
         serializer.Serialize("input", _input);
         serializer.Serialize("output", _output);
- //       serializer.Serialize("predictor", _predictor);
+        serializer.Serialize("predictor", _predictor);
     }
 
     void SingleElementThresholdNode::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
@@ -36,7 +36,7 @@ namespace nodes
         Node::Deserialize(serializer, context);
         serializer.Deserialize("input", _input, context);
         serializer.Deserialize("output", _output, context);
-//        serializer.Deserialize("predictor", _predictor, context);
+        serializer.Deserialize("predictor", _predictor, context);
     }
     
     void SingleElementThresholdNode::Copy(model::ModelTransformer& transformer) const
