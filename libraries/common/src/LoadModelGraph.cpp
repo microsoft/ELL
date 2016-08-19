@@ -177,12 +177,19 @@ namespace common
     template <typename DeserializerType>
     model::Model DeserializeModel(std::istream& stream)
     {
-        DeserializerType deserializer(stream);
-        utilities::SerializationContext context;
-        RegisterNodeTypes(context);
-        model::Model model;
-        deserializer.Deserialize(model, context);
-        return model;
+        try
+        {
+            DeserializerType deserializer(stream);
+            utilities::SerializationContext context;
+            RegisterNodeTypes(context);
+            model::Model model;
+            deserializer.Deserialize(model, context);
+            return model;
+        }
+        catch (const std::exception&)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: couldn't read file.");
+        }
     }
 
     template <typename SerializerType>
@@ -190,6 +197,11 @@ namespace common
     {
         SerializerType serializer(stream);
         serializer.Serialize(model);
+    }
+
+    bool IsKnownExtension(const std::string& ext)
+    {
+        return ext == "xml" || ext == "json";
     }
 
     model::Model LoadModelGraph(const std::string& filename)
@@ -216,23 +228,27 @@ namespace common
         }
         else
         {
-            auto ext = utilities::GetFileExtension(filename);
-            if(ext == "xml")
+            auto ext = utilities::GetFileExtension(filename, true);
+            if (IsKnownExtension(ext))
             {
+                if (!utilities::IsFileReadable(filename))
+                {
+                    throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotFound);
+                }
+
                 auto filestream = utilities::OpenIfstream(filename);
-                return DeserializeModel<utilities::SimpleXmlDeserializer>(filestream);
+                if (ext == "xml")
+                {
+                    return DeserializeModel<utilities::SimpleXmlDeserializer>(filestream);
+                }
+                else if (ext == "json")
+                {
+                    return DeserializeModel<utilities::JsonDeserializer>(filestream);
+                }
             }
-            else if(ext == "json")
-            {
-                auto filestream = utilities::OpenIfstream(filename);
-                return DeserializeModel<utilities::JsonDeserializer>(filestream);
-            }
-            else
-            {
-                model::Model emptyModel;
-                return emptyModel;
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");   
-            }
+
+            model::Model emptyModel;
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");   
         }
     }
 
