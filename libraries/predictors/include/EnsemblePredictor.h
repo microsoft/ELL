@@ -41,14 +41,6 @@ namespace predictors
         /// <returns> A double. </returns>
         double Predict(const dataset::IDataVector& dataVector) const;
 
-        /// <summary> Adds the ensemble to a model. </summary>
-        ///
-        /// <param name="model"> [in,out] The model. </param>
-        /// <param name="inputCoordinates"> The input coordinates. </param>
-        ///
-        ///  <returns> The predictor's otuput coordinates in the model. </returns>
-        layers::CoordinateList AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
-
     private:
         std::vector<BasePredictorType> _basePredictors;
         std::vector<double> _weights;

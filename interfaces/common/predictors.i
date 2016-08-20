@@ -15,10 +15,7 @@
 #define SWIG_FILE_WITH_INIT
 #include "LinearPredictor.h"
 #include "DecisionTreePredictor.h"
-#include "Coordinatewise.h"
-#include "Sum.h"
 %}
-
 
 #if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
 %shared_ptr(predictors::LinearPredictor) 

@@ -8,11 +8,6 @@
 
 #include "DecisionTreePredictor.h"
 
-// layers
-#include "Coordinatewise.h"
-#include "DecisionTreePath.h"
-#include "Sum.h"
-
 // stl
 #include <stdexcept>
 #include <cassert>
@@ -95,29 +90,6 @@ namespace predictors
     {
         dataset::DoubleDataVector denseDataVector(dataVector.ToArray());
         return _root.Predict(denseDataVector);
-    }
-
-    layers::CoordinateList DecisionTreePredictor::AddToModel(layers::Model & model, layers::CoordinateList inputCoordinates) const
-    {
-        FlatTree flatTree;
-        BuildFlatTree(flatTree, inputCoordinates, _root._interiorNode.get());
-
-        auto thresholdsLayer = std::make_unique<layers::Coordinatewise>(std::move(flatTree.negativeThresholds), std::move(flatTree.splitRuleCoordinates), layers::Coordinatewise::OperationType::add);
-        auto thresholdsLayerCoordinates = model.AddLayer(std::move(thresholdsLayer));
-
-        auto decisionTreePathLayer = std::make_unique<layers::DecisionTreePath>(std::move(flatTree.edgeToInteriorNode), std::move(thresholdsLayerCoordinates));
-        auto decisionTreePathLayerCoordinates = model.AddLayer(std::move(decisionTreePathLayer));
-
-        auto nonRootOutputValuesLayer = std::make_unique<layers::Coordinatewise>(std::move(flatTree.nonRootOutputValues), std::move(decisionTreePathLayerCoordinates), layers::Coordinatewise::OperationType::multiply);
-        auto nonRootOutputValuesLayerCoordinates = model.AddLayer(std::move(nonRootOutputValuesLayer));
-
-        auto sumLayer = std::make_unique<layers::Sum>(std::move(nonRootOutputValuesLayerCoordinates));
-        auto sumLayerCoordinates = model.AddLayer(std::move(sumLayer));
-
-        auto biasLayer = std::make_unique<layers::Coordinatewise>(_root._outputValue, sumLayerCoordinates[0], layers::Coordinatewise::OperationType::add);
-        auto biasLayerCoordinates = model.AddLayer(std::move(biasLayer));
-
-        return biasLayerCoordinates;
     }
 
     void predictors::DecisionTreePredictor::BuildFlatTree(FlatTree& flatTree, const layers::CoordinateList& inputCoordinates, InteriorNode* interiorNodePtr) const

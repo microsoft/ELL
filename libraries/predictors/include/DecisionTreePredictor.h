@@ -166,14 +166,6 @@ namespace predictors
         /// <returns> The prediction.</returns>
         double Predict(const dataset::IDataVector& dataVector) const;
 
-        /// <summary> Adds the predictor to a model. </summary>
-        ///
-        /// <param name="model"> [in,out] The model. </param>
-        /// <param name="inputCoordinates"> The input coordinates. </param>
-        /// 
-        /// <returns> The predictor's output coordinates in the model. </returns>
-        layers::CoordinateList AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
-
     private:
         // represents a flattened version of the tree, where all parameters are in basic-type vectors
         struct FlatTree

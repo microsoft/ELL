@@ -8,12 +8,6 @@
 
 #include "LinearPredictor.h"
 
-// layers
-#include "Coordinate.h"
-#include "Coordinatewise.h"
-#include "CoordinateListTools.h"
-#include "Sum.h"
-
 // stl
 #include <memory>
 
@@ -51,20 +45,6 @@ namespace predictors
     {
         _w.Scale(scalar);
         _b *= scalar;
-    }
-
-    layers::CoordinateList LinearPredictor::AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const
-    {
-        auto weightsLayer = std::make_unique<layers::Coordinatewise>(std::vector<double>(_w), std::move(inputCoordinates), layers::Coordinatewise::OperationType::multiply);
-        auto weightsLayerCoordinates = model.AddLayer(std::move(weightsLayer));
-
-        auto sumLayer = std::make_unique<layers::Sum>(std::move(weightsLayerCoordinates));
-        auto sumLayerCoordinates = model.AddLayer(std::move(sumLayer));
-
-        auto biasLayer = std::make_unique<layers::Coordinatewise>(_b, sumLayerCoordinates[0], layers::Coordinatewise::OperationType::add);
-        auto biasLayerCoordinates = model.AddLayer(std::move(biasLayer));
-
-        return biasLayerCoordinates;
     }
 
     void LinearPredictor::Serialize(utilities::Serializer& serializer) const
