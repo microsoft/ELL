@@ -7,8 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DataLoaders.h"
-#include "CoordinateListTools.h"
-#include "LoadModel.h"
 
 // utilities
 #include "Files.h"
@@ -16,7 +14,6 @@
 // dataset
 #include "SequentialLineIterator.h"
 #include "SparseEntryParser.h"
-#include "MappedParser.h"
 #include "ParsingIterator.h"
 #include "RowDataset.h"
 

@@ -12,7 +12,6 @@
 #include "DataLoadArguments.h"
 #include "RowDatasetInterface.h"
 #include "DataLoaders.h"
-#include "LoadModel.h"
 
 // dataset
 #include "SequentialLineIterator.h"

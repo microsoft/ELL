@@ -12,9 +12,6 @@
 #include "IDataVector.h"
 #include "DenseDataVector.h"
 
-//layers
-#include "Model.h"
-
 // stl
 #include <vector>
 #include <cstdint>

@@ -11,10 +11,6 @@
 // dataset
 #include "IDataVector.h"
 
-// layers
-#include "Model.h"
-#include "CoordinateList.h"
-
 // stl
 #include <vector>
 
