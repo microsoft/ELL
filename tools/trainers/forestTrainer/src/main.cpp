@@ -19,8 +19,6 @@
 // common
 #include "ForestTrainerArguments.h"
 #include "TrainerArguments.h"
-#include "MapLoadArguments.h" 
-#include "MapSaveArguments.h" 
 #include "DataLoadArguments.h"
 #include "DataLoaders.h"
 #include "MakeTrainer.h"
@@ -46,15 +44,11 @@ int main(int argc, char* argv[])
 
         // add arguments to the command line parser
         common::ParsedTrainerArguments trainerArguments;
-        common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
-        common::ParsedMapSaveArguments mapSaveArguments;
         common::ParsedForestTrainerArguments sortingTreeTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
-        commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
-        commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(sortingTreeTrainerArguments);
         
         // parse command line

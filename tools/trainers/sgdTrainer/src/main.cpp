@@ -20,8 +20,6 @@
 #include "SGDIncrementalTrainerArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
-#include "MapLoadArguments.h" 
-#include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 
 #include "EvaluatorArguments.h"
 #include "DataLoaders.h"
@@ -57,17 +55,13 @@ int main(int argc, char* argv[])
 
         // add arguments to the command line parser
         common::ParsedTrainerArguments trainerArguments;
-        common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
-        common::ParsedMapSaveArguments mapSaveArguments;
         common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
         common::ParsedEvaluatorArguments evaluatorArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
-        commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
-        commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
         commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
         commandLineParser.AddOptionSet(evaluatorArguments);
@@ -80,9 +74,6 @@ int main(int argc, char* argv[])
             std::cout << "Stochastic Gradient Descent Trainer" << std::endl;
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
-
-        // if output file specified, replace stdout with it 
-        utilities::OutputStreamImpostor outStream(mapSaveArguments.outputModelFilename);
 
         // load dataset
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;

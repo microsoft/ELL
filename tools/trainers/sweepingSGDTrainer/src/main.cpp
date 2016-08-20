@@ -20,8 +20,6 @@
 #include "SGDIncrementalTrainerArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
-#include "MapLoadArguments.h" 
-#include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 
 #include "EvaluatorArguments.h"
 #include "DataLoaders.h"
@@ -58,16 +56,12 @@ int main(int argc, char* argv[])
 
         // add arguments to the command line parser
         common::ParsedTrainerArguments trainerArguments;
-        common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
-        common::ParsedMapSaveArguments mapSaveArguments;
         common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
-        commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
-        commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
         commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
 
