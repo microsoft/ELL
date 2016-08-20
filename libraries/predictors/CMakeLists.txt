@@ -13,12 +13,10 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/ConstantPredictor.cpp
-         src/DecisionTreePredictor.cpp
          src/LinearPredictor.cpp
          src/SingleElementThresholdPredictor.cpp)
 
 set (INCLUDE include/ConstantPredictor.h
-             include/DecisionTreePredictor.h
              include/EnsemblePredictor.h
              include/LinearPredictor.h
              include/SingleElementThresholdPredictor.h

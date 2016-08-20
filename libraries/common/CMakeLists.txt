@@ -25,7 +25,6 @@ set (SRC src/BaggingIncrementalTrainerArguments.cpp
          src/ModelLoadArguments.cpp
          src/MultiEpochIncrementalTrainerArguments.cpp
          src/SGDIncrementalTrainerArguments.cpp
-         src/SortingTreeTrainerArguments.cpp
          src/TrainerArguments.cpp
 )
 
@@ -44,7 +43,6 @@ set (INCLUDE include/BaggingIncrementalTrainerArguments.h
              include/MultiEpochIncrementalTrainerArguments.h
              include/ParametersEnumerator.h
              include/SGDIncrementalTrainerArguments.h
-             include/SortingTreeTrainerArguments.h
              include/TrainerArguments.h
 )
 

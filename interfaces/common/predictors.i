@@ -8,13 +8,10 @@
 
 %ignore predictors::LinearPredictor::GetWeights() const;
 %ignore predictors::LinearPredictor::GetBias() const;
-//%ignore predictors::DecisionTreePredictor;
-%ignore predictors::DecisionTreePredictor::InteriorNode;
 
 %{
 #define SWIG_FILE_WITH_INIT
 #include "LinearPredictor.h"
-#include "DecisionTreePredictor.h"
 %}
 
 #if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
@@ -22,4 +19,3 @@
 #endif
 
 %include "LinearPredictor.h"
-%include "DecisionTreePredictor.h"

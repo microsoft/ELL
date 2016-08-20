@@ -37,18 +37,4 @@ namespace common
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
-
-    std::unique_ptr<trainers::IBlackBoxTrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossArguments& lossArguments, const SortingTreeTrainerArguments& sortingTreeArguments)
-    {
-        using LossFunctionEnum = common::LossArguments::LossFunction;
-
-        switch(lossArguments.lossFunction)
-        {
-        case LossFunctionEnum::squared:
-            return trainers::MakeSortingTreeTrainer(lossFunctions::SquaredLoss(), sortingTreeArguments);
-
-        default:
-            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
-        }
-    }
 }
