@@ -153,7 +153,6 @@ typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<d
 // Interface for model library
 %include nodes.i
 
-wrap_unique_ptr(LayerPtr, layers::Layer)
 
 #ifndef SWIGXML
 %template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
@@ -169,7 +168,5 @@ class trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType
 
 #if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
 // TODO: Review rules on when to apply the %shared_ptr() directive and get rid of these altogether if they're not in the right place 
-%shared_ptr(layers::Map)
-%shared_ptr(layers::Model)
 %shared_ptr(RowDataset)
 #endif
