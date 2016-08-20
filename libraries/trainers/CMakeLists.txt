@@ -37,7 +37,7 @@ target_include_directories(${PROJ_NAME} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
-target_link_libraries(${PROJ_NAME} predictors)
+target_link_libraries(${PROJ_NAME} evaluators predictors)
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 #
