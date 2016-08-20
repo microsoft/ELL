@@ -13,11 +13,6 @@
 #include "RandomEngines.h"
 #include "Exception.h"
 
-// layers
-#include "Map.h"
-#include "Coordinate.h"
-#include "CoordinateListTools.h"
-
 // dataset
 #include "SupervisedExample.h"
 
@@ -90,22 +85,16 @@ int main(int argc, char* argv[])
         // if output file specified, replace stdout with it 
         utilities::OutputStreamImpostor outStream(mapSaveArguments.outputModelFilename);
 
-        // load a model
-        auto model = common::LoadModel(mapLoadArguments.modelLoadArguments);
-
-        // get output coordinate list and create the map
-        auto outputCoordinateList = layers::BuildCoordinateList(model, dataLoadArguments.parsedDataDimension, mapLoadArguments.coordinateListString);
-        layers::Map map(model, outputCoordinateList);
-
         // load dataset
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
+        auto rowDataset = common::GetRowDataset(dataLoadArguments);
+        size_t numColumns = 0; // TODO: get number of columns to use
 
         // predictor type
         using PredictorType = predictors::LinearPredictor;
 
         // create sgd trainer
-        auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
+        auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(numColumns, trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
 
         // in verbose mode, create evaluator
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
@@ -133,12 +122,6 @@ int main(int argc, char* argv[])
             evaluator->Print(std::cout);
             std::cout << std::endl;
         }
-
-        // add predictor to the model
-        predictor->AddToModel(model, outputCoordinateList);
-
-        // save the model
-        model.Save(outStream);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

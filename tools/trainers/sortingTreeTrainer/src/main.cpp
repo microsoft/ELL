@@ -13,11 +13,6 @@
 #include "RandomEngines.h"
 #include "Exception.h"
 
-// layers
-#include "Map.h"
-#include "Coordinate.h"
-#include "CoordinateListTools.h"
-
 // dataset
 #include "SupervisedExample.h"
 
@@ -75,16 +70,9 @@ int main(int argc, char* argv[])
         // if output file specified, replace stdout with it 
         utilities::OutputStreamImpostor outStream(mapSaveArguments.outputModelFilename);
 
-        // load a model
-        auto model = common::LoadModel(mapLoadArguments.modelLoadArguments);
-
-        // get output coordinate list and create the map
-        auto outputCoordinateList = layers::BuildCoordinateList(model, dataLoadArguments.parsedDataDimension, mapLoadArguments.coordinateListString);
-        layers::Map map(model, outputCoordinateList);
-
         // load dataset
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
+        auto rowDataset = common::GetRowDataset(dataLoadArguments);
 
         // create trainer
         auto trainer = common::MakeSortingTreeTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
@@ -112,13 +100,6 @@ int main(int argc, char* argv[])
             evaluator->Print(std::cout);
             std::cout << std::endl;
         }
-
-        // add tree to model
-        tree.AddToModel(model, outputCoordinateList);
-
-        // output map
-        model.Save(outStream);
-
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
