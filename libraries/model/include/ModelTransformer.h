@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ModelGraph.h"
+#include "Model.h"
 #include "Port.h"
 #include "InputPort.h"
 #include "OutputPort.h"

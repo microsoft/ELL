@@ -1,15 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     LoadModelGraph.cpp (common)
+//  File:     LoadModel.cpp (common)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "LoadModelGraph.h"
+#include "LoadModel.h"
 
 // model
-#include "ModelGraph.h"
+#include "Model.h"
 #include "InputNode.h"
 // #include "OutputNode.h"
 #include "ExtremalValueNode.h"

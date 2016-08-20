@@ -8,7 +8,7 @@
 
 #include "PortElements.h"
 #include "Node.h"
-#include "ModelGraph.h"
+#include "Model.h"
 
 #include <cassert>
 

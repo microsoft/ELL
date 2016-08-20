@@ -5,7 +5,7 @@
 #include "Graph_test.h"
 
 // model
-#include "ModelGraph.h"
+#include "Model.h"
 #include "ModelTransformer.h"
 #include "ValueSelectorNode.h"
 #include "ExtremalValueNode.h"
@@ -19,7 +19,7 @@
 #include "MovingAverageNode.h"
 
 // common
-#include "LoadModelGraph.h"
+#include "LoadModel.h"
 
 // testing
 #include "testing.h"

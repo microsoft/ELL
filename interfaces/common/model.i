@@ -9,7 +9,7 @@
 %{
 #define SWIG_FILE_WITH_INIT
 #include "Node.h"
-#include "ModelGraph.h"
+#include "Model.h"
 #include "Port.h"
 #include "InputPort.h"
 #include "OutputPort.h"
@@ -30,7 +30,7 @@
 %include "OutputPort.h"
 %include "PortElements.h"
 %include "Node.h"
-%include "ModelGraph.h"
+%include "Model.h"
 %include "InputPort.h"
 %include "InputNode.h"
 %include "OutputNode.h"

@@ -18,7 +18,7 @@ set (SRC src/BaggingIncrementalTrainerArguments.cpp
          src/DataLoaders.cpp
          src/EvaluatorArguments.cpp
          src/IsNodeCompilable.cpp
-         src/LoadModelGraph.cpp
+         src/LoadModel.cpp
          src/MakeTrainer.cpp
          src/ModelLoadArguments.cpp
          src/MultiEpochIncrementalTrainerArguments.cpp
@@ -32,7 +32,7 @@ set (INCLUDE include/BaggingIncrementalTrainerArguments.h
              include/DataLoaders.h
              include/EvaluatorArguments.h
              include/IsNodeCompilable.h
-             include/LoadModelGraph.h
+             include/LoadModel.h
              include/MakeEvaluator.h
              include/MakeTrainer.h
              include/ModelLoadArguments.h

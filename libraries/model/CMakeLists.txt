@@ -12,7 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/ModelGraph.cpp
+set (SRC src/Model.cpp
          src/ModelTransformer.cpp
          src/Node.cpp
          src/OutputPort.cpp
@@ -23,7 +23,7 @@ set (SRC src/ModelGraph.cpp
 set (INCLUDE include/ExtremalValueNode.h
              include/InputNode.h
              include/InputPort.h
-             include/ModelGraph.h
+             include/Model.h
              include/ModelTransformer.h
              include/Node.h
              include/OutputNode.h
@@ -36,7 +36,7 @@ set (INCLUDE include/ExtremalValueNode.h
 set (TCC tcc/ExtremalValueNode.tcc
          tcc/InputNode.tcc
          tcc/InputPort.tcc
-         tcc/ModelGraph.tcc
+         tcc/Model.tcc
          tcc/ModelTransformer.tcc
          tcc/OutputNode.tcc
          tcc/OutputPort.tcc

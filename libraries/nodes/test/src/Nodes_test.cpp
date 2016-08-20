@@ -19,7 +19,7 @@
 #include "MultiplexorNode.h"
 
 // model
-#include "ModelGraph.h"
+#include "Model.h"
 #include "Node.h"
 #include "InputNode.h"
 

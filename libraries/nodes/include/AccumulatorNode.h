@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Node.h"
-#include "ModelGraph.h"
+#include "Model.h"
 #include "ModelTransformer.h"
 
 // utilities

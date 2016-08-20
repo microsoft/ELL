@@ -12,12 +12,12 @@
 #include "Exception.h"
 
 // model
-#include "ModelGraph.h"
+#include "Model.h"
 #include "ModelTransformer.h"
 #include "InputNode.h"
 
 // common
-#include "LoadModelGraph.h"
+#include "LoadModel.h"
 
 // stl
 #include<iostream>

@@ -9,13 +9,13 @@
 %{
 #include "DataLoadArguments.h"
 #include "DataLoadersInterface.h"
-#include "LoadModelGraph.h"
+#include "LoadModel.h"
 %}
 
 %ignore common::GetDataset;
 
 %include "DataLoadArguments.h"
-%include "LoadModelGraph.h"
+%include "LoadModel.h"
 
 // Modified versions of interfaces
 %include "DataLoadersInterface.h"
