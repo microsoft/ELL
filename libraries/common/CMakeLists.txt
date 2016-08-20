@@ -64,7 +64,7 @@ target_include_directories(${PROJ_NAME} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
-target_link_libraries(${PROJ_NAME} dataset layers linear utilities lossFunctions model nodes predictors evaluators trainers)
+target_link_libraries(${PROJ_NAME} dataset linear utilities lossFunctions model nodes predictors evaluators trainers)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
