@@ -17,7 +17,6 @@
 #include "DecisionTreePredictor.h"
 #include "Coordinatewise.h"
 #include "Sum.h"
-#include "Model.h"
 %}
 
 
