@@ -16,4 +16,17 @@
 
 namespace utilities
 {
+    //
+    // PropertyDescription
+    //
+    PropertyDescription::PropertyDescription()
+    {}
+
+    //
+    // ObjectDescription
+    //
+    bool ObjectDescription::HasProperty(const std::string& name)
+    {
+        return _properties.find(name) != _properties.end();
+    }
 }

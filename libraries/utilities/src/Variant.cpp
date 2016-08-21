@@ -19,6 +19,10 @@ namespace utilities
     //
     // Variant implementation
     //
+    Variant::Variant() : _type(std::type_index(typeid(void)))
+    {
+        _value = nullptr;
+    }
 
     Variant::Variant(const Variant& other) : _type(other._type) { _value = other._value->Clone(); }
 

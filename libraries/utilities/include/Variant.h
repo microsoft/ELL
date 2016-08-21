@@ -78,6 +78,13 @@ namespace utilities
     class Variant
     {
     public:
+        /// <summary> Default Constructor </summary>
+        Variant();
+
+        /// <summary> Constructor from basic (non-variant) types. </summary>
+        template <typename ValueType>
+        Variant(ValueType&& value);
+
         /// <summary> Copy constructor. </summary>
         Variant(const Variant& other);
         Variant(Variant&& other) = default;

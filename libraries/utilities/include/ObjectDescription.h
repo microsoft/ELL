@@ -9,10 +9,12 @@
 #pragma once
 
 #include "Variant.h"
+#include "Exception.h"
 
 // stl
 #include <unordered_map>
 #include <string>
+#include <cassert>
 
 /// <summary> utilities namespace </summary>
 namespace utilities
@@ -21,8 +23,13 @@ namespace utilities
     class PropertyDescription
     {
     public:
-        template <typename ValueType>
         PropertyDescription();
+
+        template <typename ValueType>
+        PropertyDescription(const std::string& description, const ValueType& value);
+
+        template <typename ValueType>
+        ValueType GetValue() { return _value.GetValue<ValueType>(); }
 
     private:
         std::string _typeName;
@@ -34,10 +41,19 @@ namespace utilities
     class ObjectDescription
     {
     public:
+        // TODO: templated constructor that sets typename?
         ObjectDescription() = default;
 
         template <typename ValueType>
-        void AddProperty(std::string name, std::string description);
+        void AddProperty(const std::string& name, std::string description);
+
+        template <typename ValueType>
+        void AddProperty(const std::string& name, std::string description, const ValueType& value);
+
+        bool HasProperty(const std::string& name);
+
+        template <typename ValueType>
+        ValueType GetPropertyValue(const std::string& name);
 
     private:
         std::string _typeName; // ???
@@ -51,3 +67,5 @@ namespace utilities
         virtual ObjectDescription GetDescription() const = 0;
     };
 }
+
+#include "../tcc/ObjectDescription.tcc"
