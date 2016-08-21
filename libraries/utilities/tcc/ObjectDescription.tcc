@@ -38,11 +38,11 @@ namespace utilities
     template <typename ValueType>
     ValueType ObjectDescription::GetPropertyValue(const std::string& name) const
     {
-        if(_properties.find(name) == _properties.end())
+        auto iter = _properties.find(name); 
+        if(iter == _properties.end())
         {
             throw InputException(InputExceptionErrors::badData);
         }
-        auto property = _properties[name];
-        return property.GetValue<ValueType>();
+        return iter->second.GetValue<ValueType>();
     }
 }
