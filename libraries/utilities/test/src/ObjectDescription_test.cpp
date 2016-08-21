@@ -25,12 +25,25 @@ class TestObject: public utilities::IDescribable
 {
 public:
     TestObject(int a, double b) : _a(a), _b(b) {}
+    TestObject(const utilities::ObjectDescription& description)
+    {
+        _a = description.GetPropertyValue<int>("a");
+        _b = description.GetPropertyValue<double>("b");
+    }
 
     virtual utilities::ObjectDescription GetDescription() const override
     {
         utilities::ObjectDescription description;
         description.AddProperty("a", "Parameter a", _a);
         description.AddProperty("b", "Parameter b", _b);
+        return description;
+    }
+
+    static utilities::ObjectDescription GetEmptyDescription()
+    {
+        utilities::ObjectDescription description;
+        description.AddProperty<int>("a", "Parameter a");
+        description.AddProperty<double>("b", "Parameter b");
         return description;
     }
 

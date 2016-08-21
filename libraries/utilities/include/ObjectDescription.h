@@ -29,7 +29,7 @@ namespace utilities
         PropertyDescription(const std::string& description, const ValueType& value);
 
         template <typename ValueType>
-        ValueType GetValue() { return _value.GetValue<ValueType>(); }
+        ValueType GetValue() const { return _value.GetValue<ValueType>(); }
 
     private:
         std::string _typeName;
@@ -50,10 +50,10 @@ namespace utilities
         template <typename ValueType>
         void AddProperty(const std::string& name, std::string description, const ValueType& value);
 
-        bool HasProperty(const std::string& name);
+        bool HasProperty(const std::string& name) const;
 
         template <typename ValueType>
-        ValueType GetPropertyValue(const std::string& name);
+        ValueType GetPropertyValue(const std::string& name) const;
 
     private:
         std::string _typeName; // ???

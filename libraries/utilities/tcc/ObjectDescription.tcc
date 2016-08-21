@@ -36,7 +36,7 @@ namespace utilities
     }
 
     template <typename ValueType>
-    ValueType ObjectDescription::GetPropertyValue(const std::string& name)
+    ValueType ObjectDescription::GetPropertyValue(const std::string& name) const
     {
         if(_properties.find(name) == _properties.end())
         {
