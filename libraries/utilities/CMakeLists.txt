@@ -106,11 +106,13 @@ PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp 
               test/src/ISerializable_test.cpp
+              test/src/Iterator_test.cpp
               test/src/ObjectDescription_test.cpp
               test/src/Variant_test.cpp
               test/src/XMLSerialization_test.cpp)
 
 set (TEST_INCLUDE test/include/ISerializable_test.h
+                  test/include/Iterator_test.h
                   test/include/ObjectDescription_test.h
                   test/include/Variant_test.h
                   test/include/XMLSerialization_test.h)

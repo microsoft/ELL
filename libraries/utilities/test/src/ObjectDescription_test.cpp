@@ -52,7 +52,7 @@ private:
     double _b;
 };
 
-void TestObjectDescription()
+void TestGetObjectDescription()
 {
     TestObject obj(3, 4.5);
     auto desc = obj.GetDescription();

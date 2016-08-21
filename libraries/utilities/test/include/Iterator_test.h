@@ -1,15 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ISerializable_test.h (utilities)
+//  File:     Iterator_test.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
-
-void TestJsonSerializer();
-void TestJsonDeserializer();
-
-void TestXmlSerializer();
-void TestXmlDeserializer();
+void TestIteratorAdapter();
+void TestTransformIterator();
+void TestParallelTransformIterator();
