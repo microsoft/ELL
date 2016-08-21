@@ -74,7 +74,7 @@ namespace utilities
         ValueType _value;
     };
     
-    /// <summary> A class that can hold any kind of value and provide a type-safe way to access it
+    /// <summary> A class that can hold any kind of value and provide a type-safe way to access it </summary>
     class Variant
     {
     public:

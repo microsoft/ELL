@@ -9,6 +9,7 @@
 #include "XMLSerialization_test.h"
 #include "Variant_test.h"
 #include "ISerializable_test.h"
+#include "ObjectDescription_test.h"
 
 // utilities
 #include "IIterator.h"
@@ -28,7 +29,7 @@
 #include <numeric>
 #include <thread>
 
-void testIteratorAdapter()
+void TestIteratorAdapter()
 {
     // utilities::StlIterator test
     std::vector<int> vec { 1, 2, 3, 4, 5, 6 };
@@ -207,7 +208,7 @@ int main()
     try
     {
         // misc tests
-        testIteratorAdapter();
+        TestIteratorAdapter();
         testTransformIterator();
         testParallelTransformIterator();
         testMatchFormat();
@@ -224,6 +225,9 @@ int main()
 
         TestXmlSerializer();
         TestXmlDeserializer();
+
+        // ObjectDescription tests
+        TestObjectDescription();
     }
     catch(const utilities::Exception& exception)
     {

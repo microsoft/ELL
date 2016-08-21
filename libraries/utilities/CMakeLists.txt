@@ -19,6 +19,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/Format.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
+         src/ObjectDescription.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
          src/Serializer.cpp
@@ -39,6 +40,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/IntegerList.h
              include/IntegerStack.h
              include/ISerializable.h
+             include/ObjectDescription.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
              include/Parser.h
@@ -61,6 +63,7 @@ set (TCC tcc/AnyIterator.tcc
          tcc/CommandLineParser.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
+         tcc/ObjectDescription.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
          tcc/Serializer.tcc
@@ -103,10 +106,12 @@ PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp 
               test/src/ISerializable_test.cpp
+              test/src/ObjectDescription_test.cpp
               test/src/Variant_test.cpp
               test/src/XMLSerialization_test.cpp)
 
 set (TEST_INCLUDE test/include/ISerializable_test.h
+                  test/include/ObjectDescription_test.h
                   test/include/Variant_test.h
                   test/include/XMLSerialization_test.h)
                   

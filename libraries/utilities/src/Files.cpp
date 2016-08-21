@@ -12,7 +12,6 @@
 #include "Exception.h"
 
 // stl
-#include <stdexcept>
 #include <memory>
 
 namespace utilities
