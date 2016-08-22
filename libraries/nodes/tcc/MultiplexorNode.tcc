@@ -13,7 +13,6 @@ namespace nodes
     MultiplexorNode<ValueType, SelectorType>::MultiplexorNode() : Node({ &_input, &_selector }, { &_output }), _input(this, {}, inputPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 0), _defaultValue(0)
     {}
 
-
     template <typename ValueType, typename SelectorType>
     MultiplexorNode<ValueType, SelectorType>::MultiplexorNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue) : Node({ &_input, &_selector }, { &_output }), _input(this, input, inputPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, outputSize), _defaultValue(defaultValue)
     {
@@ -25,7 +24,7 @@ namespace nodes
         {
             throw std::runtime_error("Error: Input must be 1-D signal");
         }
-    };
+    }
 
     template <typename ValueType, typename SelectorType>
     void MultiplexorNode<ValueType, SelectorType>::Compute() const

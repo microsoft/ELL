@@ -23,7 +23,6 @@ namespace common
     ///
     /// <param name="model"> The model. </param>
     /// <param name="filename"> The filename. </param>
-    /// <returns> The loaded model. </returns>
     void SaveModelGraph(const model::Model& model, const std::string& filename);
     
 }
