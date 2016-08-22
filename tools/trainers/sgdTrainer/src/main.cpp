@@ -21,6 +21,8 @@
 #include "MultiEpochIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "DataLoadArguments.h" 
+#include "ModelLoadArguments.h"
+#include "ModelSaveArguments.h"
 #include "EvaluatorArguments.h"
 #include "DataLoaders.h"
 #include "MakeTrainer.h"
@@ -40,6 +42,13 @@
 #include "HingeLoss.h"
 #include "LogLoss.h"
 
+// model
+#include "Model.h"
+#include "InputNode.h"
+
+// nodes
+#include "LinearPredictorNode.h"
+
 // stl
 #include <iostream>
 #include <stdexcept>
@@ -56,12 +65,14 @@ int main(int argc, char* argv[])
         // add arguments to the command line parser
         common::ParsedTrainerArguments trainerArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
+        common::ParsedModelSaveArguments modelSaveArguments;
         common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
         common::ParsedEvaluatorArguments evaluatorArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
+        commandLineParser.AddOptionSet(modelSaveArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
         commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
         commandLineParser.AddOptionSet(evaluatorArguments);
@@ -78,7 +89,8 @@ int main(int argc, char* argv[])
         // load dataset
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments);
-        size_t numColumns = 0; // TODO: get number of columns to use
+
+        size_t numColumns = dataLoadArguments.parsedDataDimension; // TODO: get number of columns to use 
 
         // predictor type
         using PredictorType = predictors::LinearPredictor;
@@ -111,6 +123,15 @@ int main(int argc, char* argv[])
             std::cout << "Training error\n";
             evaluator->Print(std::cout);
             std::cout << std::endl;
+        }
+
+        if(modelSaveArguments.outputModelFilename != "")
+        {
+            // Create a model
+            model::Model model;
+            auto inputNode = model.AddNode<model::InputNode<double>>(numColumns);            
+            model.AddNode<nodes::LinearPredictorNode>(inputNode->output, *predictor);
+            // common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

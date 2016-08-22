@@ -21,6 +21,7 @@ set (SRC src/BaggingIncrementalTrainerArguments.cpp
          src/LoadModel.cpp
          src/MakeTrainer.cpp
          src/ModelLoadArguments.cpp
+         src/ModelSaveArguments.cpp
          src/MultiEpochIncrementalTrainerArguments.cpp
          src/SGDIncrementalTrainerArguments.cpp
          src/TrainerArguments.cpp
@@ -36,6 +37,7 @@ set (INCLUDE include/BaggingIncrementalTrainerArguments.h
              include/MakeEvaluator.h
              include/MakeTrainer.h
              include/ModelLoadArguments.h
+             include/ModelSaveArguments.h
              include/MultiEpochIncrementalTrainerArguments.h
              include/ParametersEnumerator.h
              include/SGDIncrementalTrainerArguments.h
@@ -45,7 +47,6 @@ set (INCLUDE include/BaggingIncrementalTrainerArguments.h
 set (TCC tcc/MakeEvaluator.tcc
          tcc/ParametersEnumerator.tcc
 )
-
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

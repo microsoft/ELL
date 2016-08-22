@@ -31,7 +31,7 @@
 		virtual void Execute() override
 		{
 			// call load model here
-			_model = common::LoadModelGraph(_filename);
+			_model = common::LoadModel(_filename);
 		}
 
 		virtual void HandleOKCallback() override

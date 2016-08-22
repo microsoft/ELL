@@ -1,5 +1,5 @@
 #
-# cmake file for sortingTreeLearner project
+# cmake file for forestTrainer project
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
@@ -31,6 +31,7 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/trainers")
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 
 # tests
-add_test(NAME forestTrainerTest
+set (TEST_NAME ${PROJ_NAME}_test)
+add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/tinyTestData.txt -dd auto -omf null -v)

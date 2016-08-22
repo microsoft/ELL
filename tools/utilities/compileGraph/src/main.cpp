@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
 
-        auto model = common::LoadModelGraph(filename);
+        auto model = common::LoadModel(filename);
         model::TransformContext context;
         model::ModelTransformer transformer;
         auto newModel = transformer.RefineModel(model, context);

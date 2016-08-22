@@ -22,7 +22,7 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC})
 target_include_directories(${PROJ_NAME} PRIVATE include)
-target_link_libraries(${PROJ_NAME} common dataset linear lossFunctions predictors trainers evaluators utilities)
+target_link_libraries(${PROJ_NAME} common dataset linear lossFunctions model predictors trainers evaluators utilities)
 
 # put this project in the trainers folder in the IDE 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/trainers")
@@ -31,6 +31,7 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/trainers")
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 
 # tests
-add_test(NAME sgdTrainerTest
+set (TEST_NAME ${PROJ_NAME}_test)
+add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto -omf null -v -ne 20)
+         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 10 -omf null -v -ne 20)

@@ -17,5 +17,5 @@ namespace common
     ///
     /// <param name="filename"> The filename. </param>
     /// <returns> The loaded model. </returns>
-    model::Model LoadModelGraph(const std::string& filename);
+    model::Model LoadModel(const std::string& filename);
 }

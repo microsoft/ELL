@@ -96,7 +96,7 @@ namespace common
         return model;
     }
 
-    model::Model LoadModelGraph(const std::string& filename)
+    model::Model LoadModel(const std::string& filename)
     {
         if (filename == "2")
         {
