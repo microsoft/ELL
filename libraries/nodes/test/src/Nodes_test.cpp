@@ -397,3 +397,33 @@ void TestLinearPredictorNodeRefine()
 
     testing::ProcessTest("Testing LinearPredictorNode refine", testing::IsEqual(modelOutputValue, newOutputValue));
 }
+
+void TestMultiplexorNodeRefine()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(1);
+    auto selectorNode = model.AddNode<model::InputNode<bool>>(1);
+    auto muxNode = model.AddNode<nodes::MultiplexorNode<double, bool>>(inputNode->output, selectorNode->output, 2);
+
+    // refine the model
+    model::TransformContext context{ common::IsNodeCompilable() };
+    model::ModelTransformer transformer;
+    auto newModel = transformer.RefineModel(model, context);
+    testing::ProcessTest("Testing MultiplexorNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
+
+    auto newSelectorNode = transformer.GetCorrespondingInputNode(selectorNode);
+    auto newMuxNodeElements = transformer.GetCorrespondingOutputs(muxNode->output); 
+
+    std::vector<double> inputValue{ 5.0 };
+    inputNode->SetInput(inputValue);
+
+    selectorNode->SetInput(false); // output[0] should get the input
+    newSelectorNode->SetInput(false); // output[0] should get the input
+    auto outputVec = model.ComputeOutput(muxNode->output);
+    auto newOutputVec = newModel.ComputeOutput(newMuxNodeElements);
+    testing::ProcessTest("Testing MultiplexorNode refine", testing::IsEqual(outputVec, newOutputVec));
+
+    selectorNode->SetInput(true); // output[1] should get the input
+    outputVec = model.ComputeOutput(muxNode->output);
+    testing::ProcessTest("Testing MultiplexorNode refine", testing::IsEqual(outputVec, newOutputVec));
+}
