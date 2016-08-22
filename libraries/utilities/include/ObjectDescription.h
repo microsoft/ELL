@@ -57,6 +57,7 @@ namespace utilities
 
     private:
         std::string _typeName; // ???
+        std::string description;
         std::unordered_map<std::string, PropertyDescription> _properties;
     };
 
