@@ -408,22 +408,29 @@ void TestMultiplexorNodeRefine()
     // refine the model
     model::TransformContext context{ common::IsNodeCompilable() };
     model::ModelTransformer transformer;
-    auto newModel = transformer.RefineModel(model, context);
+    auto refinedModel = transformer.RefineModel(model, context);
     testing::ProcessTest("Testing MultiplexorNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
+    std::cout << "Multiplexor model compilable: " << (transformer.IsModelCompilable() ? "yes" : "no") << std::endl;
+    std::cout << "Original nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
+
+    auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newSelectorNode = transformer.GetCorrespondingInputNode(selectorNode);
     auto newMuxNodeElements = transformer.GetCorrespondingOutputs(muxNode->output); 
 
     std::vector<double> inputValue{ 5.0 };
     inputNode->SetInput(inputValue);
+    newInputNode->SetInput(inputValue);
 
-    selectorNode->SetInput(false); // output[0] should get the input
+    selectorNode->SetInput(false);
     newSelectorNode->SetInput(false); // output[0] should get the input
     auto outputVec = model.ComputeOutput(muxNode->output);
-    auto newOutputVec = newModel.ComputeOutput(newMuxNodeElements);
+    auto newOutputVec = refinedModel.ComputeOutput(newMuxNodeElements);
     testing::ProcessTest("Testing MultiplexorNode refine", testing::IsEqual(outputVec, newOutputVec));
 
-    selectorNode->SetInput(true); // output[1] should get the input
+    selectorNode->SetInput(true);
+    newSelectorNode->SetInput(true);
     outputVec = model.ComputeOutput(muxNode->output);
+    newOutputVec = refinedModel.ComputeOutput(newMuxNodeElements);
     testing::ProcessTest("Testing MultiplexorNode refine", testing::IsEqual(outputVec, newOutputVec));
 }

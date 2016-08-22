@@ -63,4 +63,40 @@ namespace nodes
         auto newNode = transformer.AddNode<MultiplexorNode<ValueType, SelectorType>>(newInput, newSelector, output.Size(), _defaultValue);
         transformer.MapNodeOutput(output, newNode->output);
     }
+
+
+    template <typename ValueType>
+    model::PortElements<int> CastIfNecessary(const model::PortElements<ValueType>& values, model::ModelTransformer& transformer)
+    {
+        auto castNode = transformer.AddNode<TypeCastNode<ValueType, int>>(values);
+        return castNode->output;
+    }
+
+    template <>
+    model::PortElements<int> CastIfNecessary<int>(const model::PortElements<int>& values, model::ModelTransformer& transformer)
+    {
+        return values;
+    }
+
+    template <typename ValueType, typename SelectorType>
+    bool MultiplexorNode<ValueType, SelectorType>::Refine(model::ModelTransformer& transformer) const
+    {        
+        auto newInput= transformer.TransformPortElements(_input.GetPortElements());
+        auto newSelector = transformer.TransformPortElements(_selector.GetPortElements());
+        auto newSelectorInt = CastIfNecessary(newSelector, transformer);
+
+        auto defaultNode = transformer.AddNode<ConstantNode<ValueType>>(_defaultValue);
+        model::PortElements<ValueType> outputElements;
+        auto size = _output.Size();
+        for(size_t index = 0; index < size; ++index)
+        {
+            auto indexNode = transformer.AddNode<ConstantNode<int>>(index);
+            auto isEqualNode = transformer.AddNode<BinaryPredicateNode<int>>(newSelectorInt, indexNode->output, BinaryPredicateNode<int>::PredicateType::equal);
+            auto ifNode = transformer.AddNode<model::ValueSelectorNode<ValueType>>(isEqualNode->output, newInput, defaultNode->output);
+            outputElements.Append(ifNode->output);
+        }
+      
+        transformer.MapNodeOutput(output, outputElements);
+        return true;
+    }
 }
