@@ -53,6 +53,13 @@ namespace trainers
         virtual std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) override;
 
     private:
+
+        struct EvaluateThresholdResult
+        {
+            Sums sums0;
+            size_t size0;
+        };
+
         void SortNodeDataset(Range range, size_t featureIndex);
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
         double GetOutputValue(const Sums& sums) const;
