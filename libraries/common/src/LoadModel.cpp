@@ -61,7 +61,7 @@ namespace common
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
 
-        // one "leg"        
+        // one "leg"
         auto mean1 = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 8);
         auto mag1 = model.AddNode<nodes::L2NormNode<double>>(mean1->output);
 
@@ -72,7 +72,7 @@ namespace common
         // combine them
         auto diff = model.AddNode<nodes::BinaryOperationNode<double>>(mag1->output, mean2->output, nodes::BinaryOperationNode<double>::OperationType::subtract);
 
-//        auto output = model.AddNode<model::OutputNode<double>>(maxVal->val);
+        //        auto output = model.AddNode<model::OutputNode<double>>(maxVal->val);
         return model;
     }
 
@@ -92,7 +92,7 @@ namespace common
 
         auto dotDifference = model.AddNode<nodes::BinaryOperationNode<double>>(dot1->output, dot2->output, nodes::BinaryOperationNode<double>::OperationType::subtract);
 
-//        auto output = model.AddNode<model::OutputNode<double>>(classifierNode->output);
+        //        auto output = model.AddNode<model::OutputNode<double>>(classifierNode->output);
         return model;
     }
 
