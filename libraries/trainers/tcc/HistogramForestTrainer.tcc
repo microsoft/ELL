@@ -19,50 +19,28 @@ namespace trainers
     template<typename LossFunctionType, typename BoosterType>
     typename HistogramForestTrainer<LossFunctionType, BoosterType>::SplitCandidate HistogramForestTrainer<LossFunctionType, BoosterType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums)
     {
-        auto splitRuleCandidates = GetSplitCandidatesAtNode(range);
-
-
-
-        auto numFeatures = _dataset.GetMaxDataVectorSize();
-
         SplitCandidate bestSplitCandidate(nodeId, range, sums);
 
-        for (uint64_t inputIndex = 0; inputIndex < numFeatures; ++inputIndex)
+        auto splitRuleCandidates = GetSplitCandidatesAtNode(range);
+
+        for (const auto splitRuleCandidate : splitRuleCandidates) 
         {
-            // sort the relevant rows of dataset in ascending order by inputIndex
-            SortNodeDataset(range, inputIndex);
+            // get sums0 and sums1
 
             Sums sums0;
+            Sums sums1;
+            size_t size0;
+//            sums0.Increment(_dataset[rowIndex].GetMetaData().weak);
+//              auto sums1 = sums - sums0;
+            double gain = CalculateGain(sums, sums0, sums1);
 
-            // consider all thresholds
-            double nextFeatureValue = _dataset[range.firstIndex].GetDataVector()[inputIndex];
-            for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size - 1; ++rowIndex)
+            // find gain maximizer
+            if (gain > bestSplitCandidate.gain)
             {
-                // get friendly names
-                double currentFeatureValue = nextFeatureValue;
-                nextFeatureValue = _dataset[rowIndex + 1].GetDataVector()[inputIndex];
-
-                // increment sums 
-                sums0.Increment(_dataset[rowIndex].GetMetaData().weak);
-
-                // only split between rows with different feature values
-                if (currentFeatureValue == nextFeatureValue)
-                {
-                    continue;
-                }
-
-                // compute sums1 and gain
-                auto sums1 = sums - sums0;
-                double gain = CalculateGain(sums, sums0, sums1);
-
-                // find gain maximizer
-                if (gain > bestSplitCandidate.gain)
-                {
-                    bestSplitCandidate.gain = gain;
-                    bestSplitCandidate.splitRule = SplitRuleType{ inputIndex, 0.5 * (currentFeatureValue + nextFeatureValue) };
-                    bestSplitCandidate.ranges.SetSize0(rowIndex - range.firstIndex + 1);
-                    bestSplitCandidate.stats.SetChildSums({sums0, sums1});
-                }
+                bestSplitCandidate.gain = gain;
+                bestSplitCandidate.splitRule = splitRuleCandidate;
+                bestSplitCandidate.ranges.SetSize0(size0);
+                bestSplitCandidate.stats.SetChildSums({sums0, sums1});
             }
         }
 
@@ -72,18 +50,10 @@ namespace trainers
     template<typename LossFunctionType, typename BoosterType>
     std::vector<typename HistogramForestTrainer<LossFunctionType, BoosterType>::EdgePredictorType> HistogramForestTrainer<LossFunctionType, BoosterType>::GetEdgePredictors(const NodeStats& nodeStats)
     {
-        double output = GetOutputValue(nodeStats.GetTotalSums());
-        double output0 = GetOutputValue(nodeStats.GetChildSums(0)) - output;
-        double output1 = GetOutputValue(nodeStats.GetChildSums(1)) - output;
+        double output = nodeStats.GetTotalSums().GetMeanLabel();
+        double output0 = nodeStats.GetChildSums(0).GetMeanLabel() - output;
+        double output1 = nodeStats.GetChildSums(1).GetMeanLabel() - output;
         return std::vector<EdgePredictorType>{ output0, output1 };
-    }
-
-    template<typename LossFunctionType, typename BoosterType>
-    void HistogramForestTrainer<LossFunctionType, BoosterType>::SortNodeDataset(Range range, size_t inputIndex)
-    {
-        _dataset.Sort([inputIndex](const ForestTrainerExample& example) { return example.GetDataVector()[inputIndex]; },
-                      range.firstIndex,
-                      range.size);
     }
 
     template<typename LossFunctionType, typename BoosterType>
@@ -97,12 +67,6 @@ namespace trainers
         return sums0.sumWeights * _lossFunction.BregmanGenerator(sums0.sumWeightedLabels/sums0.sumWeights) +
             sums1.sumWeights * _lossFunction.BregmanGenerator(sums1.sumWeightedLabels/sums1.sumWeights) -
             sums.sumWeights * _lossFunction.BregmanGenerator(sums.sumWeightedLabels/sums.sumWeights);
-    }
-
-    template<typename LossFunctionType, typename BoosterType>
-    double HistogramForestTrainer<LossFunctionType, BoosterType>::GetOutputValue(const Sums& sums) const
-    {
-        return sums.sumWeightedLabels / sums.sumWeights;
     }
 
     template<typename LossFunctionType, typename BoosterType>

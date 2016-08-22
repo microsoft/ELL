@@ -16,7 +16,7 @@ set (SRC src/ModelGraph.cpp
          src/ModelTransformer.cpp
          src/Node.cpp
          src/OutputPort.cpp
-         src/OutputPortElements.cpp
+         src/PortElements.cpp
          src/Port.cpp
 )
 
@@ -28,7 +28,7 @@ set (INCLUDE include/ExtremalValueNode.h
              include/Node.h
              include/OutputNode.h
              include/OutputPort.h
-             include/OutputPortElements.h
+             include/PortElements.h
              include/Port.h
              include/ValueSelectorNode.h
 )
@@ -40,7 +40,7 @@ set (TCC tcc/ExtremalValueNode.tcc
          tcc/ModelTransformer.tcc
          tcc/OutputNode.tcc
          tcc/OutputPort.tcc
-         tcc/OutputPortElements.tcc
+         tcc/PortElements.tcc
          tcc/ValueSelectorNode.tcc
 )
 
@@ -50,6 +50,10 @@ source_group("tcc" FILES ${TCC})
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include)
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+endif()
+
 target_link_libraries(${PROJ_NAME} utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
@@ -63,8 +67,10 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp
-              test/src/Graph_test.cpp)
-set (TEST_INCLUDE test/include/Graph_test.h)
+              test/src/Graph_test.cpp
+              test/src/PortElements_test.cpp)
+set (TEST_INCLUDE test/include/PortElements_test.h
+                  test/include/Graph_test.h)
 
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})

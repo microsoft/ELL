@@ -29,7 +29,7 @@ namespace trainers
             Sums sums = SetWeakWeightsLabels();
 
             // use the computed sums to calaculate the bias term, set it in the forest and the dataset
-            double bias = sums.sumWeightedLabels / sums.sumWeights;
+            double bias = sums.GetMeanLabel();
             _forest->AddToBias(bias);
             UpdateCurrentOutputs(bias);
 
@@ -95,6 +95,17 @@ namespace trainers
         difference.sumWeights = sumWeights - other.sumWeights;
         difference.sumWeightedLabels = sumWeightedLabels - other.sumWeightedLabels;
         return difference;
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    double ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums::GetMeanLabel() const
+    {
+        if(sumWeights == 0)
+        {
+            throw utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "Can't compute mean because sum of weights equals zero");
+        }
+
+        return sumWeightedLabels / sumWeights;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>

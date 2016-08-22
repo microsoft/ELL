@@ -114,6 +114,7 @@ namespace trainers
 
             void Increment(const dataset::WeightLabel& weightLabel);
             Sums operator-(const Sums& other) const;
+            double GetMeanLabel() const;
             void Print(std::ostream& os) const;
         };
 

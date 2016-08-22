@@ -60,11 +60,7 @@ namespace trainers
             size_t size0;
         };
 
-        void SortNodeDataset(Range range, size_t featureIndex);
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
-        double GetOutputValue(const Sums& sums) const;
-
-        // new functions for the HistogramForestTrainer
         std::vector<SplitRuleType> GetSplitCandidatesAtNode(Range range);
 
         // member variables

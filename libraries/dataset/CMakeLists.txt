@@ -52,6 +52,9 @@ source_group("tcc" FILES ${TCC})
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include)
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+endif()
 target_link_libraries(${PROJ_NAME} linear utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")

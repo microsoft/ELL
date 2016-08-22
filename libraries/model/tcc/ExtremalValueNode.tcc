@@ -15,7 +15,7 @@ namespace model
     }
 
     template <typename ValueType, bool max>
-    ExtremalValueNode<ValueType, max>::ExtremalValueNode(const OutputPortElements<ValueType>& input) : Node({ &_input }, { &_val, &_argVal }), _input(this, input, inputPortName), _val(this, valPortName, 1), _argVal(this, argValPortName, 1)
+    ExtremalValueNode<ValueType, max>::ExtremalValueNode(const PortElements<ValueType>& input) : Node({ &_input }, { &_val, &_argVal }), _input(this, input, inputPortName), _val(this, valPortName, 1), _argVal(this, argValPortName, 1)
     {
     }
 
@@ -57,18 +57,18 @@ namespace model
     template <typename ValueType>
     void ArgMinNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(this->_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<ArgMinNode<ValueType>>(newOutputPortElements);
-        transformer.MapOutputPort(this->val, newNode->val);
-        transformer.MapOutputPort(this->argVal, newNode->argVal);
+        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        auto newNode = transformer.AddNode<ArgMinNode<ValueType>>(newPortElements);
+        transformer.MapNodeOutput(this->val, newNode->val);
+        transformer.MapNodeOutput(this->argVal, newNode->argVal);
     }
 
     template <typename ValueType>
     void ArgMaxNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(this->_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<ArgMaxNode<ValueType>>(newOutputPortElements);
-        transformer.MapOutputPort(this->val, newNode->val);
-        transformer.MapOutputPort(this->argVal, newNode->argVal);
+        auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
+        auto newNode = transformer.AddNode<ArgMaxNode<ValueType>>(newPortElements);
+        transformer.MapNodeOutput(this->val, newNode->val);
+        transformer.MapNodeOutput(this->argVal, newNode->argVal);
     }
 }

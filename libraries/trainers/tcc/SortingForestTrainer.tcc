@@ -64,9 +64,9 @@ namespace trainers
     template<typename LossFunctionType, typename BoosterType>
     std::vector<typename SortingForestTrainer<LossFunctionType, BoosterType>::EdgePredictorType> SortingForestTrainer<LossFunctionType, BoosterType>::GetEdgePredictors(const NodeStats& nodeStats)
     {
-        double output = GetOutputValue(nodeStats.GetTotalSums());
-        double output0 = GetOutputValue(nodeStats.GetChildSums(0)) - output;
-        double output1 = GetOutputValue(nodeStats.GetChildSums(1)) - output;
+        double output = nodeStats.GetTotalSums().GetMeanLabel();
+        double output0 = nodeStats.GetChildSums(0).GetMeanLabel() - output;
+        double output1 = nodeStats.GetChildSums(1).GetMeanLabel() - output;
         return std::vector<EdgePredictorType>{ output0, output1 };
     }
 
@@ -89,12 +89,6 @@ namespace trainers
         return sums0.sumWeights * _lossFunction.BregmanGenerator(sums0.sumWeightedLabels/sums0.sumWeights) +
             sums1.sumWeights * _lossFunction.BregmanGenerator(sums1.sumWeightedLabels/sums1.sumWeights) -
             sums.sumWeights * _lossFunction.BregmanGenerator(sums.sumWeightedLabels/sums.sumWeights);
-    }
-
-    template<typename LossFunctionType, typename BoosterType>
-    double SortingForestTrainer<LossFunctionType, BoosterType>::GetOutputValue(const Sums& sums) const
-    {
-        return sums.sumWeightedLabels / sums.sumWeights;
     }
 
     template<typename LossFunctionType, typename BoosterType>
