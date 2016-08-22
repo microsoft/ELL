@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "LoadModelGraph.h"
+#include "IsNodeCompilable.h"
 
 // model
 #include "ModelGraph.h"
@@ -144,7 +145,7 @@ namespace common
     model::Model GetRefinedTreeModel(int numSplits)
     {
         auto model = GetTreeModel(numSplits);
-        model::TransformContext context;
+        model::TransformContext context{ common::IsNodeCompilable() };
         model::ModelTransformer transformer;
         auto refinedModel = transformer.RefineModel(model, context);
         return refinedModel;
@@ -158,8 +159,10 @@ namespace common
 
         context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<double>>();
@@ -169,10 +172,14 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexorNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormNode<double>>();
-        //        context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::SingleElementThresholdNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::SumNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool,int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, model::ValueSelectorNode<bool>>();
+        context.GetTypeFactory().AddType<model::Node, model::ValueSelectorNode<int>>();
+        context.GetTypeFactory().AddType<model::Node, model::ValueSelectorNode<double>>();
     }
 
     template <typename DeserializerType>

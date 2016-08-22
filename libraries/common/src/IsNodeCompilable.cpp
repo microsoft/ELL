@@ -14,6 +14,7 @@ namespace common
     {
         _nodeNames.insert("InputNode<bool>");
         _nodeNames.insert("InputNode<double>");
+        _nodeNames.insert("OutputNode<double>");
         _nodeNames.insert("ConstantNode<bool>");
         _nodeNames.insert("ConstantNode<double>");
         _nodeNames.insert("ConstantNode<int32>");
