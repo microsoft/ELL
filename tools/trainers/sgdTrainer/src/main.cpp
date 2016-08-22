@@ -89,8 +89,7 @@ int main(int argc, char* argv[])
         // load dataset
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments);
-
-        size_t numColumns = dataLoadArguments.parsedDataDimension; // TODO: get number of columns to use 
+        size_t numColumns = dataLoadArguments.parsedDataDimension;
 
         // predictor type
         using PredictorType = predictors::LinearPredictor;
@@ -125,11 +124,12 @@ int main(int argc, char* argv[])
             std::cout << std::endl;
         }
 
+        // save predictor model
         if(modelSaveArguments.outputModelFilename != "")
         {
             // Create a model
             model::Model model;
-            auto inputNode = model.AddNode<model::InputNode<double>>(numColumns);            
+            auto inputNode = model.AddNode<model::InputNode<double>>(predictor->GetDimension());            
             model.AddNode<nodes::LinearPredictorNode>(inputNode->output, *predictor);
             // common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
