@@ -8,12 +8,17 @@
 
 #include "IsNodeCompilable.h"
 
+// model
+#include "InputNode.h"
+#include "OutputNode.h"
+
+
 namespace common
 {
     IsNodeCompilable::IsNodeCompilable()
     {
-        _nodeNames.insert("InputNode<bool>");
-        _nodeNames.insert("InputNode<double>");
+        AddNodeType<model::InputNode<bool>>();
+        AddNodeType<model::InputNode<double>>();
         _nodeNames.insert("ConstantNode<bool>");
         _nodeNames.insert("ConstantNode<double>");
         _nodeNames.insert("BinaryOperationNode<bool>");

@@ -34,5 +34,11 @@ namespace common
 
     protected:
         std::unordered_set<std::string> _nodeNames;
+    
+    private:
+        template <typename NodeType>
+        void AddNodeType();
     };
 }
+
+#include "../tcc/IsNodeCompilable.tcc"
