@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ExtremalValueNode.tcc (model)
+//  File:     ExtremalValueNode.tcc (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// <summary> model namespace </summary>
-namespace model
+/// <summary> nodes namespace </summary>
+namespace nodes
 {
     template <typename ValueType, bool max>
     ExtremalValueNode<ValueType, max>::ExtremalValueNode() : Node({ &_input }, { &_val, &_argVal }), _input(this, {}, inputPortName), _val(this, valPortName, 1), _argVal(this, argValPortName, 1)
@@ -15,7 +15,7 @@ namespace model
     }
 
     template <typename ValueType, bool max>
-    ExtremalValueNode<ValueType, max>::ExtremalValueNode(const PortElements<ValueType>& input) : Node({ &_input }, { &_val, &_argVal }), _input(this, input, inputPortName), _val(this, valPortName, 1), _argVal(this, argValPortName, 1)
+    ExtremalValueNode<ValueType, max>::ExtremalValueNode(const model::PortElements<ValueType>& input) : Node({ &_input }, { &_val, &_argVal }), _input(this, input, inputPortName), _val(this, valPortName, 1), _argVal(this, argValPortName, 1)
     {
     }
 
@@ -55,7 +55,7 @@ namespace model
     // Copy definitions for subclasses
     // 
     template <typename ValueType>
-    void ArgMinNode<ValueType>::Copy(ModelTransformer& transformer) const
+    void ArgMinNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
         auto newNode = transformer.AddNode<ArgMinNode<ValueType>>(newPortElements);
@@ -64,7 +64,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void ArgMaxNode<ValueType>::Copy(ModelTransformer& transformer) const
+    void ArgMaxNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(this->_input.GetPortElements());
         auto newNode = transformer.AddNode<ArgMaxNode<ValueType>>(newPortElements);

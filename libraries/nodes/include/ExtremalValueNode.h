@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ExtremalValueNode.h (model)
+//  File:     ExtremalValueNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,12 +19,12 @@
 #include <memory>
 #include <algorithm>
 
-/// <summary> model namespace </summary>
-namespace model
+/// <summary> nodes namespace </summary>
+namespace nodes
 {
     /// <summary> An example node that computes an extremal value (min or max) of its input, as well as the index of the extremal value. </summary>
     template <typename ValueType, bool max>
-    class ExtremalValueNode : public Node
+    class ExtremalValueNode : public model::Node
     {
     public:
         /// <summary> Default Constructor </summary>    
@@ -33,7 +33,7 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ExtremalValueNode(const PortElements<ValueType>& input);
+        ExtremalValueNode(const model::PortElements<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -46,10 +46,10 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Exposes the extremal value port as a read-only property </summary>
-        const OutputPort<ValueType>& val = _val;
+        const model::OutputPort<ValueType>& val = _val;
 
         /// <summary> Exposes the extremal value index port as a read-only property </summary>
-        const OutputPort<int>& argVal = _argVal;
+        const model::OutputPort<int>& argVal = _argVal;
 
         static constexpr const char* inputPortName = "input";
         static constexpr const char* valPortName = "val";
@@ -59,11 +59,11 @@ namespace model
         virtual void Compute() const override;
 
         // My inputs
-        InputPort<ValueType> _input;
+        model::InputPort<ValueType> _input;
 
         // My outputs
-        OutputPort<ValueType> _val;
-        OutputPort<int> _argVal;
+        model::OutputPort<ValueType> _val;
+        model::OutputPort<int> _argVal;
     };
 
     /// <summary> ArgMin node subclass </summary>
@@ -77,7 +77,7 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ArgMinNode(const PortElements<ValueType>& input) : ExtremalValueNode<ValueType, false>(input) {}
+        ArgMinNode(const model::PortElements<ValueType>& input) : ExtremalValueNode<ValueType, false>(input) {}
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -90,7 +90,7 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Copy(model::ModelTransformer& transformer) const override;
     };
 
     /// <summary> ArgMax node subclass </summary>
@@ -104,7 +104,7 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ArgMaxNode(const PortElements<ValueType>& input) : ExtremalValueNode<ValueType, true>(input) {}
+        ArgMaxNode(const model::PortElements<ValueType>& input) : ExtremalValueNode<ValueType, true>(input) {}
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -117,7 +117,7 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Copy(model::ModelTransformer& transformer) const override;
 
     };
 }

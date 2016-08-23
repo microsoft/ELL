@@ -13,9 +13,9 @@
 #include "Model.h"
 #include "InputNode.h"
 #include "OutputNode.h"
-#include "ExtremalValueNode.h"
 
 // nodes
+#include "ExtremalValueNode.h"
 #include "MovingAverageNode.h"
 #include "MovingVarianceNode.h"
 #include "LinearPredictorNode.h"

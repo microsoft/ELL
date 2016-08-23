@@ -20,8 +20,7 @@ set (SRC src/Model.cpp
          src/Port.cpp
 )
 
-set (INCLUDE include/ExtremalValueNode.h
-             include/InputNode.h
+set (INCLUDE include/InputNode.h
              include/InputPort.h
              include/Model.h
              include/ModelTransformer.h
@@ -33,8 +32,7 @@ set (INCLUDE include/ExtremalValueNode.h
              include/ValueSelectorNode.h
 )
 
-set (TCC tcc/ExtremalValueNode.tcc
-         tcc/InputNode.tcc
+set (TCC tcc/InputNode.tcc
          tcc/InputPort.tcc
          tcc/Model.tcc
          tcc/ModelTransformer.tcc
