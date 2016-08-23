@@ -26,7 +26,7 @@
 
 namespace nodes
 {
-    /// <summary> A feature that takes two vector inputs and returns their dot product </summary>
+    /// <summary> A feature that takes two vector inputs and returns their dot product. </summary>
     template <typename ValueType>
     class DotProductNode : public model::Node
     {

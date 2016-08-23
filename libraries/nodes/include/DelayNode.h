@@ -24,7 +24,7 @@
 
 namespace nodes
 {
-    /// <summary> A feature that takes a signal and returns a delayed sample of the signal </summary>
+    /// <summary> A node that returns a delayed sample from its input stream. </summary>
     template <typename ValueType>
     class DelayNode : public model::Node
     {

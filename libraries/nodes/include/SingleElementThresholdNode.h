@@ -18,7 +18,7 @@
 
 namespace nodes
 {
-    /// <summary> A node that represents a linear predictor. </summary>
+    /// <summary> A node that represents a single-element threshold predictor. </summary>
     class SingleElementThresholdNode : public model::Node
     {
     public:

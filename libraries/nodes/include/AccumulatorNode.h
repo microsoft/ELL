@@ -22,7 +22,7 @@
 
 namespace nodes
 {
-    /// <summary> A feature that accumulates its input </summary>
+    /// <summary> A node that keeps a running sum of its input values. </summary>
     template <typename ValueType>
     class AccumulatorNode : public model::Node
     {

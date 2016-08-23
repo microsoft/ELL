@@ -22,7 +22,7 @@
 
 namespace nodes
 {
-    /// <summary> A feature that takes a vector input and returns the sum of its elements </summary>
+    /// <summary> A node that takes a vector input and returns the sum of its elements. </summary>
     template <typename ValueType>
     class SumNode : public model::Node
     {

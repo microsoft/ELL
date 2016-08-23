@@ -29,7 +29,7 @@
 
 namespace nodes
 {
-    /// <summary> A feature that takes a vector input and returns its mean over some window of time </summary>
+    /// <summary> A feature that takes a vector input and returns its mean over some window of time. </summary>
     template <typename ValueType>
     class MovingAverageNode : public model::Node
     {

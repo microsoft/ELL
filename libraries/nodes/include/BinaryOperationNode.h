@@ -22,7 +22,7 @@
 
 namespace nodes
 {
-    /// <summary> A node that performs a coordinatewise binary arithmetic operation on its inputs </summary>
+    /// <summary> A node that performs a coordinatewise binary arithmetic operation on its inputs. </summary>
     template <typename ValueType>
     class BinaryOperationNode : public model::Node
     {

@@ -22,7 +22,7 @@
 
 namespace nodes
 {
-    /// <summary> A node that performs a coordinatewise binary boolean-valued operation on its inputs </summary>
+    /// <summary> A node that performs a coordinatewise binary boolean-valued operation on its inputs. </summary>
     template <typename ValueType>
     class BinaryPredicateNode : public model::Node
     {
