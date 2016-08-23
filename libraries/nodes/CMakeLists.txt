@@ -18,7 +18,7 @@ set (INCLUDE include/AccumulatorNode.h
              include/ConstantNode.h
              include/DelayNode.h
              include/DotProductNode.h
-             include/ElementSelectorNode.h
+             include/MultiplexerNode.h
              include/ForestNode.h
              include/LinearPredictorNode.h
              include/L2NormNode.h
@@ -40,7 +40,7 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/ConstantNode.tcc
          tcc/DelayNode.tcc
          tcc/DotProductNode.tcc
-         tcc/ElementSelectorNode.tcc
+         tcc/MultiplexerNode.tcc
          tcc/ForestNode.tcc
          tcc/L2NormNode.tcc
          tcc/MovingAverageNode.tcc

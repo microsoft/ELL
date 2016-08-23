@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ElementSelectorNode.h (node)
+//  File:     MultiplexerNode.h (node)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,7 @@ namespace nodes
 {
     /// <summary> A node that outputs a dynamically specified element from an input array. </summary>
     template <typename ValueType, typename SelectorType>
-    class ElementSelectorNode : public model::Node
+    class MultiplexerNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
@@ -39,18 +39,18 @@ namespace nodes
         /// @}
 
         /// <summary> Default Constructor </summary>
-        ElementSelectorNode();
+        MultiplexerNode();
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="elements"> The input aray of values. </param>
         /// <param name="selector"> The index of the chosen element </param>
-        ElementSelectorNode(const model::PortElements<ValueType>& elements, const model::PortElements<SelectorType>& selector);
+        MultiplexerNode(const model::PortElements<ValueType>& elements, const model::PortElements<SelectorType>& selector);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, SelectorType>("ElementSelectorNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, SelectorType>("MultiplexerNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -84,4 +84,4 @@ namespace nodes
     };
 }
 
-#include "../tcc/ElementSelectorNode.tcc"
+#include "../tcc/MultiplexerNode.tcc"

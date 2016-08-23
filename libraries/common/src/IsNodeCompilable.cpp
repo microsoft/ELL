@@ -23,8 +23,8 @@ namespace common
         _nodeNames.insert("BinaryPredicateNode<int32>");
         _nodeNames.insert("BinaryPredicateNode<double>");
         _nodeNames.insert("SumNode<double>");
-        _nodeNames.insert("ElementSelectorNode<bool,bool>");
-        _nodeNames.insert("ElementSelectorNode<double,bool>");
+        _nodeNames.insert("MultiplexerNode<bool,bool>");
+        _nodeNames.insert("MultiplexerNode<double,bool>");
         _nodeNames.insert("UnaryOperationNode<double>");
         _nodeNames.insert("UnaryOperationNode<bool>");
         _nodeNames.insert("TypeCastNode<bool,int32>");

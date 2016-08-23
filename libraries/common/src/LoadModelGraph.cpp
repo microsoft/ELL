@@ -25,7 +25,7 @@
 #include "UnaryOperationNode.h"
 #include "BinaryOperationNode.h"
 #include "BinaryPredicateNode.h"
-#include "ElementSelectorNode.h"
+#include "MultiplexerNode.h"
 #include "ForestNode.h"
 
 // predictors
@@ -166,8 +166,8 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ElementSelectorNode<double, bool>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ElementSelectorNode<bool, bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<double, bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MovingAverageNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MovingVarianceNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DemultiplexerNode<bool, bool>>();

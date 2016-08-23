@@ -426,13 +426,11 @@ void TestDemultiplexerNodeRefine()
     newSelectorNode->SetInput(false); // output[0] should get the input
     auto outputVec = model.ComputeOutput(muxNode->output);
     auto newOutputVec = refinedModel.ComputeOutput(newMuxNodeElements);
-    std::cout << "out: " << outputVec[0] << ", refined out: " << newOutputVec[0] << std::endl;
     testing::ProcessTest("Testing DemultiplexerNode refine", testing::IsEqual(outputVec, newOutputVec));
 
     selectorNode->SetInput(true);
-    newSelectorNode->SetInput(true);
+    newSelectorNode->SetInput(true); // output[1] should get the input
     outputVec = model.ComputeOutput(muxNode->output);
     newOutputVec = refinedModel.ComputeOutput(newMuxNodeElements);
-    std::cout << "out: " << outputVec[0] << ", refined out: " << newOutputVec[0] << std::endl;
     testing::ProcessTest("Testing DemultiplexerNode refine", testing::IsEqual(outputVec, newOutputVec));
 }

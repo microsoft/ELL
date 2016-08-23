@@ -8,7 +8,7 @@
 
 #include "ForestNode.h"
 #include "ConstantNode.h"
-#include "ElementSelectorNode.h"
+#include "MultiplexerNode.h"
 #include "BinaryOperationNode.h"
 #include "DemultiplexerNode.h"
 #include "SingleElementThresholdNode.h"
@@ -100,7 +100,7 @@ namespace nodes
             interiorNodeSplitIndicators[nodeIndex] = {splitRuleNode->output};
             
             // ...and selects the output value
-            auto selectorNode = transformer.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleNode->output);
+            auto selectorNode = transformer.AddNode<MultiplexerNode<double, bool>>(edgeOutputs, splitRuleNode->output);
             interiorNodeSubModels[nodeIndex] = {selectorNode->output};
         }
 

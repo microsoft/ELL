@@ -92,7 +92,7 @@ namespace nodes
         {
             auto indexNode = transformer.AddNode<ConstantNode<int>>(index);
             auto isEqualNode = transformer.AddNode<BinaryPredicateNode<int>>(newSelectorInt, indexNode->output, BinaryPredicateNode<int>::PredicateType::equal);
-            auto ifNode = transformer.AddNode<nodes::ElementSelectorNode<ValueType, bool>>(model::PortElements<ValueType>{defaultNode->output, newInput}, isEqualNode->output);
+            auto ifNode = transformer.AddNode<nodes::MultiplexerNode<ValueType, bool>>(model::PortElements<ValueType>{defaultNode->output, newInput}, isEqualNode->output);
             outputElements.Append(ifNode->output);
         }
       
