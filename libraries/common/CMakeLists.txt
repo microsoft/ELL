@@ -55,7 +55,6 @@ set (TCC tcc/IsNodeCompilable.tcc
          tcc/ParametersEnumerator.tcc
 )
 
-
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})

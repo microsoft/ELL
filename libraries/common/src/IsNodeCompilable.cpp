@@ -12,6 +12,14 @@
 #include "InputNode.h"
 #include "OutputNode.h"
 
+// nodes
+#include "ConstantNode.h"
+#include "BinaryOperationNode.h"
+#include "BinaryPredicateNode.h"
+#include "SumNode.h"
+#include "ElementSelectorNode.h"
+#include "UnaryOperationNode.h"
+#include "MultiplexorNode.h"
 
 namespace common
 {
@@ -19,17 +27,17 @@ namespace common
     {
         AddNodeType<model::InputNode<bool>>();
         AddNodeType<model::InputNode<double>>();
-        AddNodeType<ConstantNode<bool>();
-        AddNodeType<ConstantNode<double>();
-        AddNodeType<BinaryOperationNode<bool>();
-        AddNodeType<BinaryOperationNode<double>();
-        AddNodeType<BinaryPredicateNode<double>();
-        AddNodeType<SumNode<double>();
-        AddNodeType<ElementSelectorNode<double,bool>();
-        AddNodeType<UnaryOperationNode<double>();
-        AddNodeType<UnaryOperationNode<bool>();
-        AddNodeType<MultiplexorNode<bool,bool>();
-        AddNodeType<MultiplexorNode<double,bool>();
+        AddNodeType<nodes::ConstantNode<bool>>();
+        AddNodeType<nodes::ConstantNode<double>>();
+        AddNodeType<nodes::BinaryOperationNode<bool>>();
+        AddNodeType<nodes::BinaryOperationNode<double>>();
+        AddNodeType<nodes::BinaryPredicateNode<double>>();
+        AddNodeType<nodes::ElementSelectorNode<double,bool>>();
+        AddNodeType<nodes::SumNode<double>>();
+        AddNodeType<nodes::UnaryOperationNode<double>>();
+        AddNodeType<nodes::UnaryOperationNode<bool>>();
+        AddNodeType<nodes::MultiplexorNode<bool,bool>>();
+        AddNodeType<nodes::MultiplexorNode<double,bool>>();
     }
 
     bool IsNodeCompilable::operator()(const model::Node& node)
