@@ -19,17 +19,17 @@ namespace common
     {
         AddNodeType<model::InputNode<bool>>();
         AddNodeType<model::InputNode<double>>();
-        _nodeNames.insert("ConstantNode<bool>");
-        _nodeNames.insert("ConstantNode<double>");
-        _nodeNames.insert("BinaryOperationNode<bool>");
-        _nodeNames.insert("BinaryOperationNode<double>");
-        _nodeNames.insert("BinaryPredicateNode<double>");
-        _nodeNames.insert("SumNode<double>");
-        _nodeNames.insert("ElementSelectorNode<double,bool>");
-        _nodeNames.insert("UnaryOperationNode<double>");
-        _nodeNames.insert("UnaryOperationNode<bool>");
-        _nodeNames.insert("MultiplexorNode<bool,bool>");
-        _nodeNames.insert("MultiplexorNode<double,bool>");
+        AddNodeType<ConstantNode<bool>();
+        AddNodeType<ConstantNode<double>();
+        AddNodeType<BinaryOperationNode<bool>();
+        AddNodeType<BinaryOperationNode<double>();
+        AddNodeType<BinaryPredicateNode<double>();
+        AddNodeType<SumNode<double>();
+        AddNodeType<ElementSelectorNode<double,bool>();
+        AddNodeType<UnaryOperationNode<double>();
+        AddNodeType<UnaryOperationNode<bool>();
+        AddNodeType<MultiplexorNode<bool,bool>();
+        AddNodeType<MultiplexorNode<double,bool>();
     }
 
     bool IsNodeCompilable::operator()(const model::Node& node)
