@@ -34,4 +34,4 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (TEST_NAME ${PROJ_NAME}_test)
 add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto -omf null -v -lf log)
+         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 21 -omf sweepingSgdTrainer_model.xml -v -lf log)

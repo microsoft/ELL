@@ -24,6 +24,7 @@
 #include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
 #include "EvaluatorArguments.h"
+#include "LoadModel.h"
 #include "DataLoaders.h"
 #include "MakeTrainer.h"
 #include "MakeEvaluator.h"
@@ -140,7 +141,7 @@ int main(int argc, char* argv[])
             model::Model model;
             auto inputNode = model.AddNode<model::InputNode<double>>(predictor->GetDimension());            
             model.AddNode<nodes::LinearPredictorNode>(inputNode->output, *predictor);
-            // common::SaveModel(model, modelSaveArguments.outputModelFilename);
+            common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
