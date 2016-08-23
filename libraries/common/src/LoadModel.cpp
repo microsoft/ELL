@@ -7,11 +7,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "LoadModel.h"
+#include "IsNodeCompilable.h"
 
 // model
 #include "Model.h"
 #include "InputNode.h"
-// #include "OutputNode.h"
+#include "OutputNode.h"
 #include "ExtremalValueNode.h"
 
 // nodes
@@ -20,14 +21,23 @@
 #include "LinearPredictorNode.h"
 #include "L2NormNode.h"
 #include "DelayNode.h"
-#include "BinaryOperationNode.h"
 #include "DotProductNode.h"
+#include "UnaryOperationNode.h"
+#include "BinaryOperationNode.h"
+#include "BinaryPredicateNode.h"
+#include "MultiplexerNode.h"
+#include "ForestNode.h"
 
 // predictors
 #include "LinearPredictor.h"
+#include "ForestPredictor.h"
+#include "SingleElementThresholdPredictor.h"
 
 // utilities
 #include "Files.h"
+#include "Serializer.h"
+#include "JsonSerializer.h"
+#include "XMLSerializer.h"
 
 namespace common
 {
@@ -51,7 +61,7 @@ namespace common
             predictor.GetWeights()[index] = (double)(index % 5);
         }
         auto classifierNode = model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
-        //auto outputNode = model.AddNode<model::OutputNode<double>>(classifierNode->prediction);
+        // auto outputNode = model.AddNode<model::OutputNode<double>>(classifierNode->prediction);
         return model;
     }
 
@@ -96,19 +106,174 @@ namespace common
         return model;
     }
 
+    predictors::SimpleForestPredictor CreateForest(int numSplits)
+    {
+        // define some abbreviations
+        using SplitAction = predictors::SimpleForestPredictor::SplitAction;
+        using SplitRule = predictors::SingleElementThresholdPredictor;
+        using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
+        using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
+
+        // build a forest
+        predictors::SimpleForestPredictor forest;
+        SplitRule dummyRule{ 0, 0.0 };
+        EdgePredictorVector dummyEdgePredictor{ -1.0, 1.0 };
+        auto root = forest.Split(SplitAction{ forest.GetNewRootId(), dummyRule, dummyEdgePredictor });
+        std::vector<size_t> interiorNodeVector;
+        interiorNodeVector.push_back(root);
+
+        for (int index = 0; index < numSplits; ++index)
+        {
+            auto node = interiorNodeVector.back();
+            interiorNodeVector.pop_back();
+            interiorNodeVector.push_back(forest.Split(SplitAction{ forest.GetChildId(node, 0), dummyRule, dummyEdgePredictor }));
+            interiorNodeVector.push_back(forest.Split(SplitAction{ forest.GetChildId(node, 1), dummyRule, dummyEdgePredictor }));
+        }
+        return forest;
+    }
+
+    model::Model GetTreeModel(int numSplits)
+    {
+        auto forest = CreateForest(numSplits);
+        model::Model model;
+        auto inputNode = model.AddNode<model::InputNode<double>>(3);
+        auto simpleForestNode = model.AddNode<nodes::SimpleForestNode>(inputNode->output, forest);
+        auto outputNode = model.AddNode<model::OutputNode<double>>(simpleForestNode->output);
+        return model;
+    }
+
+    model::Model GetRefinedTreeModel(int numSplits)
+    {
+        auto model = GetTreeModel(numSplits);
+        model::TransformContext context{ common::IsNodeCompilable() };
+        model::ModelTransformer transformer;
+        auto refinedModel = transformer.RefineModel(model, context);
+        return refinedModel;
+    }
+
+    void RegisterNodeTypes(utilities::SerializationContext& context)
+    {
+        context.GetTypeFactory().AddType<model::Node, utilities::UniqueId>();
+        context.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<int>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<int>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<double, bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<bool, bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MovingAverageNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MovingVarianceNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DemultiplexerNode<bool, bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::L2NormNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SingleElementThresholdNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SumNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool,int>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
+    }
+
+    template <typename DeserializerType>
+    model::Model DeserializeModel(std::istream& stream)
+    {
+        try
+        {
+            DeserializerType deserializer(stream);
+            utilities::SerializationContext context;
+            RegisterNodeTypes(context);
+            model::Model model;
+            deserializer.Deserialize(model, context);
+            return model;
+        }
+        catch (const std::exception&)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: couldn't read file.");
+        }
+    }
+
+    template <typename SerializerType>
+    void SerializeModel(const model::Model& model, std::ostream& stream)
+    {
+        SerializerType serializer(stream);
+        serializer.Serialize(model);
+    }
+
+    bool IsKnownExtension(const std::string& ext)
+    {
+        return ext == "xml" || ext == "json";
+    }
+
     model::Model LoadModel(const std::string& filename)
     {
-        if (filename == "2")
+        std::string treePrefix = "[tree_";
+        if (filename == "[1]")
+        {
+            return GetModel1();
+        }
+        if (filename == "[2]")
         {
             return GetModel2();
         }
-        else if (filename == "3")
+        else if (filename == "[3]")
         {
             return GetModel3();
         }
+        else if (filename.find(treePrefix) == 0)
+        {
+            auto pos = filename.find(treePrefix);
+            auto suffix = filename.substr(pos + treePrefix.size());
+            auto numSplits = std::stoi(suffix);
+            return GetRefinedTreeModel(numSplits);
+        }
         else
         {
-            return GetModel1();
+            auto ext = utilities::GetFileExtension(filename, true);
+            if (IsKnownExtension(ext))
+            {
+                if (!utilities::IsFileReadable(filename))
+                {
+                    throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotFound);
+                }
+
+                auto filestream = utilities::OpenIfstream(filename);
+                if (ext == "xml")
+                {
+                    return DeserializeModel<utilities::SimpleXmlDeserializer>(filestream);
+                }
+                else if (ext == "json")
+                {
+                    return DeserializeModel<utilities::JsonDeserializer>(filestream);
+                }
+            }
+
+            model::Model emptyModel;
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");   
+        }
+    }
+
+    void SaveModel(const model::Model& model, const std::string& filename)
+    {
+        auto ext = utilities::GetFileExtension(filename);
+        if(ext == "xml")
+        {
+            auto filestream = utilities::OpenOfstream(filename);
+            SerializeModel<utilities::SimpleXmlSerializer>(model, filestream);
+        }
+        else if(ext == "json")
+        {
+            auto filestream = utilities::OpenOfstream(filename);
+            SerializeModel<utilities::JsonSerializer>(model, filestream);
+        }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");   
         }
     }
 }

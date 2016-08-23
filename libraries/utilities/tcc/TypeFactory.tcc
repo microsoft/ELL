@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <cassert>
 
 namespace utilities
 {
@@ -96,6 +97,7 @@ namespace utilities
         if (entry == _typeConstructorMap.end())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "type " + typeName + " not registered in TypeFactory<" + BaseType::GetTypeName() + ">");
+            assert(false);
         }
 
         return entry->second->Construct<BaseType>();        

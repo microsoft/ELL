@@ -105,9 +105,5 @@ namespace model
         std::vector<OutputPortBase*> _outputs;
 
         mutable std::vector<const Node*> _dependentNodes;
-
-        // After Refine() is called, this is set to false if the default base class implementation 
-        // (which copies the node) is called, otherwise true.
-        mutable bool _didRefine;
     };
 }

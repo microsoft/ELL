@@ -18,4 +18,10 @@ namespace common
     /// <param name="filename"> The filename. </param>
     /// <returns> The loaded model. </returns>
     model::Model LoadModel(const std::string& filename);
+
+    /// <summary> Saves a model to a file. </summary>
+    ///
+    /// <param name="model"> The model. </param>
+    /// <param name="filename"> The filename. </param>
+    void SaveModel(const model::Model& model, const std::string& filename);
 }

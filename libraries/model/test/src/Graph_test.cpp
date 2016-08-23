@@ -179,7 +179,7 @@ void TestNodeIterator()
 
 void TestExampleGraph()
 {
-    auto model = common::LoadModel("");
+    auto model = common::LoadModel("[1]");
     PrintGraph(model);
 
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();

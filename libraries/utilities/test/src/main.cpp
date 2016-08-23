@@ -224,7 +224,7 @@ int main()
         TestXmlSerializer();
         TestXmlDeserializer();
     }
-    catch(utilities::Exception& exception)
+    catch(const utilities::Exception& exception)
     {
         std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
         throw;

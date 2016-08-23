@@ -69,8 +69,9 @@ set (TEST_NAME ${PROJ_NAME}_test)
 
 PROJECT(${TEST_NAME})
 
-set (TEST_SRC test/src/main.cpp)
-set (TEST_INCLUDE )
+set (TEST_SRC test/src/main.cpp
+              test/src/LoadModel_test.cpp)
+set (TEST_INCLUDE test/include/LoadModel_test.h)
 
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})
@@ -78,7 +79,7 @@ source_group("include" FILES ${TEST_INCLUDE})
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} dataset linear testing utilities lossFunctions predictors trainers)
+target_link_libraries(${TEST_NAME} common dataset linear testing utilities lossFunctions predictors trainers model nodes)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

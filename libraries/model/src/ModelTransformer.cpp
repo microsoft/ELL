@@ -93,10 +93,10 @@ namespace model
             if(++iterationCount >= maxRefinementIterations)
             {
                 std::string firstUncompilableNodeName;
-                auto uncompilableNode = FindUncompilableNodes(currentModel, context);
-                if(uncompilableNode.size() > 0)
+                auto uncompilableNodes = FindUncompilableNodes(currentModel, context);
+                if(uncompilableNodes.size() > 0)
                 {
-                    firstUncompilableNodeName = uncompilableNode[0]->GetRuntimeTypeName();
+                    firstUncompilableNodeName = uncompilableNodes[0]->GetRuntimeTypeName();
                 }
                 throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than " + std::to_string(maxRefinementIterations) + " refinement iterations, first uncompilable node: " + firstUncompilableNodeName);
             }

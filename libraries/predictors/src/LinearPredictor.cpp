@@ -60,4 +60,5 @@ namespace predictors
         serializer.Deserialize("w", weights, context);
         _w = weights;
         serializer.Deserialize("b", _b, context);
-    }}
+    }
+}

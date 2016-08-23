@@ -16,15 +16,39 @@
 #include <sstream>
 #include <cctype>
 #include <algorithm>
+#include <cassert>
 
 namespace utilities
 {
     //
     // Serialization
     //
-    SimpleXmlSerializer::SimpleXmlSerializer() : _out(std::cout) {}
+    SimpleXmlSerializer::SimpleXmlSerializer() : _out(std::cout) 
+    {
+        WriteFileHeader();
+    }
 
-    SimpleXmlSerializer::SimpleXmlSerializer(std::ostream& outputStream) : _out(outputStream) {}
+    SimpleXmlSerializer::SimpleXmlSerializer(std::ostream& outputStream) : _out(outputStream) 
+    {
+        WriteFileHeader();
+    }
+
+    SimpleXmlSerializer::~SimpleXmlSerializer()
+    {
+        WriteFileFooter();
+    }
+
+    void SimpleXmlSerializer::WriteFileHeader()
+    {   
+        // Write XML declaration
+        _out << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";     
+        _out << "<emll version=\"1.0\">\n";
+    }
+
+    void SimpleXmlSerializer::WriteFileFooter()
+    {
+        _out << "</emll>\n";
+    }
 
     IMPLEMENT_SERIALIZE_VALUE(SimpleXmlSerializer, bool);
     IMPLEMENT_SERIALIZE_VALUE(SimpleXmlSerializer, char);
@@ -109,8 +133,20 @@ namespace utilities
     //
     // Deserialization
     //
-    SimpleXmlDeserializer::SimpleXmlDeserializer() : _in(std::cin), _tokenizer(std::cin, "<>=/'\"") {}
-    SimpleXmlDeserializer::SimpleXmlDeserializer(std::istream& inputStream) : _in(inputStream), _tokenizer(inputStream, "<>=/'\"") {}
+    SimpleXmlDeserializer::SimpleXmlDeserializer() : _in(std::cin), _tokenizer(std::cin, "<>=/'\"") 
+    {
+        ReadFileHeader();
+    }
+
+    SimpleXmlDeserializer::SimpleXmlDeserializer(std::istream& inputStream) : _in(inputStream), _tokenizer(inputStream, "<>?=/'\"") 
+    {
+        ReadFileHeader(); 
+    }
+
+    SimpleXmlDeserializer::~SimpleXmlDeserializer() 
+    {
+        ReadFileFooter(); 
+    }
 
     IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, bool);
     IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, char);
@@ -119,6 +155,23 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, size_t);
     IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, float);
     IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, double);
+
+    // TODO: add a "read tag"-type function
+    void SimpleXmlDeserializer::ReadFileHeader()
+    {   
+        _tokenizer.MatchTokens({"<", "?", "xml"});
+        while(_tokenizer.PeekNextToken() != "?")
+        {
+            _tokenizer.ReadNextToken();
+        }
+        _tokenizer.MatchTokens({"?", ">"});
+        _tokenizer.MatchTokens({"<", "emll", "version", "=", "\"", "1.0", "\"", ">"});
+    }
+
+    void SimpleXmlDeserializer::ReadFileFooter()
+    {
+        _tokenizer.MatchTokens({"<", "/", "emll", ">"});
+    }
 
     // strings
     void SimpleXmlDeserializer::DeserializeValue(const char* name, std::string& value, SerializationContext& context) { ReadScalar(name, value); }
@@ -131,6 +184,7 @@ namespace utilities
 
         _tokenizer.MatchToken("<");
         auto readTypeName = XmlUtilities::DecodeTypeName(_tokenizer.ReadNextToken());
+        assert(readTypeName != "");
         if(hasName)
         {
             _tokenizer.MatchTokens({"name", "=", "'", name, "'"});

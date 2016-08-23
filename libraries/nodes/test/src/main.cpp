@@ -14,6 +14,9 @@
 // testing
 #include "testing.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <iostream>
 
@@ -31,16 +34,17 @@ int main()
         TestUnaryOperationNodeCompute();
         TestBinaryOperationNodeCompute();
         TestLinearPredictorNodeCompute();
-        TestMultiplexorNodeCompute();
+        TestDemultiplexerNodeCompute();
 
         TestMovingAverageNodeRefine();
         TestLinearPredictorNodeRefine();
         TestSimpleForestNodeRefine();
+        TestDemultiplexerNodeRefine();
     }
-    catch(utilities::Exception& exception)
+    catch(const utilities::Exception& exception)
     {
         std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
-       throw;
+        throw;
     }
 
     if (testing::DidTestFail())
