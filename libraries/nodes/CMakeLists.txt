@@ -18,6 +18,7 @@ set (INCLUDE include/AccumulatorNode.h
              include/ConstantNode.h
              include/DelayNode.h
              include/DotProductNode.h
+             include/ExtremalValueNode.h
              include/MultiplexerNode.h
              include/ForestNode.h
              include/LinearPredictorNode.h
@@ -28,7 +29,8 @@ set (INCLUDE include/AccumulatorNode.h
              include/SingleElementThresholdNode.h
              include/SumNode.h
              include/TypeCastNode.h
-             include/UnaryOperationNode.h)
+             include/UnaryOperationNode.h
+             include/ValueSelectorNode.h)
 
 set (SRC src/ConstantNode.cpp
          src/LinearPredictorNode.cpp
@@ -40,6 +42,7 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/ConstantNode.tcc
          tcc/DelayNode.tcc
          tcc/DotProductNode.tcc
+         tcc/ExtremalValueNode.tcc
          tcc/MultiplexerNode.tcc
          tcc/ForestNode.tcc
          tcc/L2NormNode.tcc
@@ -48,7 +51,8 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/DemultiplexerNode.tcc
          tcc/SumNode.tcc
          tcc/TypeCastNode.tcc
-         tcc/UnaryOperationNode.tcc)
+         tcc/UnaryOperationNode.tcc
+         tcc/ValueSelectorNode.tcc)
 
 source_group("include" FILES ${INCLUDE})
 source_group("src" FILES ${SRC})

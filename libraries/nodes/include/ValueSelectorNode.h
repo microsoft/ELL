@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ValueSelectorNode.h (model)
+//  File:     ValueSelectorNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,12 +20,12 @@
 #include <memory>
 #include <exception>
 
-/// <summary> model namespace </summary>
-namespace model
+/// <summary> nodes namespace </summary>
+namespace nodes
 {
     /// <summary> An example node that selects from one of two input values depending on a third input </summary>
     template <typename ValueType>
-    class ValueSelectorNode : public Node
+    class ValueSelectorNode : public model::Node
     {
     public:
         /// <summary> Default Constructor </summary>
@@ -36,7 +36,7 @@ namespace model
         /// <param name="condition"> An input that returns a single boolean value that selects which input to use as output </param>
         /// <param name="input1"> The input to return if the condition is `true` </param>
         /// <param name="input2"> The input to return if the condition is `false` </param>
-        ValueSelectorNode(const PortElements<bool>& condition, const PortElements<ValueType>& input1, const PortElements<ValueType>& input2);
+        ValueSelectorNode(const model::PortElements<bool>& condition, const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -60,13 +60,10 @@ namespace model
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
         /// <summary> Exposes the output port as a read-only property </summary>
-        const OutputPort<ValueType>& output = _output;
+        const model::OutputPort<ValueType>& output = _output;
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(ModelTransformer& transformer) const override;
-
-        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual bool Refine(ModelTransformer& transformer) const override;
+        virtual void Copy(model::ModelTransformer& transformer) const override;
 
         static constexpr const char* conditionPortName = "condition";
         static constexpr const char* input1PortName = "input1";
@@ -78,12 +75,12 @@ namespace model
 
     private:
         // Inputs
-        InputPort<bool> _condition;
-        InputPort<ValueType> _input1;
-        InputPort<ValueType> _input2;
+        model::InputPort<bool> _condition;
+        model::InputPort<ValueType> _input1;
+        model::InputPort<ValueType> _input2;
 
         // Output
-        OutputPort<ValueType> _output;
+        model::OutputPort<ValueType> _output;
     };
 }
 

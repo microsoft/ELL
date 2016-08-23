@@ -29,7 +29,6 @@ set (INCLUDE include/InputNode.h
              include/OutputPort.h
              include/PortElements.h
              include/Port.h
-             include/ValueSelectorNode.h
 )
 
 set (TCC tcc/InputNode.tcc
@@ -39,7 +38,6 @@ set (TCC tcc/InputNode.tcc
          tcc/OutputNode.tcc
          tcc/OutputPort.tcc
          tcc/PortElements.tcc
-         tcc/ValueSelectorNode.tcc
 )
 
 source_group("src" FILES ${SRC})

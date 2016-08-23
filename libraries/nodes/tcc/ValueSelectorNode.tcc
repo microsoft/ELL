@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ValueSelectorNode.tcc (model)
+//  File:     ValueSelectorNode.tcc (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// <summary> model namespace </summary>
-namespace model
+namespace nodes
 {
     template <typename ValueType>
     ValueSelectorNode<ValueType>::ValueSelectorNode() : Node({ &_condition, &_input1, &_input2 }, { &_output }), _condition(this, {}, conditionPortName), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0)
@@ -15,7 +15,7 @@ namespace model
     }
 
     template <typename ValueType>
-    ValueSelectorNode<ValueType>::ValueSelectorNode(const PortElements<bool>& condition, const PortElements<ValueType>& input1, const PortElements<ValueType>& input2) : Node({ &_condition, &_input1, &_input2 }, { &_output }), _condition(this, condition, conditionPortName), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, input1.Size())
+    ValueSelectorNode<ValueType>::ValueSelectorNode(const model::PortElements<bool>& condition, const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2) : Node({ &_condition, &_input1, &_input2 }, { &_output }), _condition(this, condition, conditionPortName), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, input1.Size())
     {
         if (condition.Size() != 1)
         {
@@ -56,7 +56,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::Copy(ModelTransformer& transformer) const
+    void ValueSelectorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newCondition = transformer.TransformPortElements(_condition.GetPortElements());
         auto newPortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
@@ -65,18 +65,5 @@ namespace model
         auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newPortElements1, newPortElements2);
 
          transformer.MapNodeOutput(output, newNode->output);
-    }
-
-    template <typename ValueType>
-    bool ValueSelectorNode<ValueType>::Refine(ModelTransformer& transformer) const
-    {
-        auto newCondition = transformer.TransformPortElements(_condition.GetPortElements());
-        auto newPortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
-        auto newPortElements2 = transformer.TransformPortElements(_input2.GetPortElements());
-
-        auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newPortElements1, newPortElements2);
-
-        transformer.MapNodeOutput(output, newNode->output);
-        return true;
     }
 }

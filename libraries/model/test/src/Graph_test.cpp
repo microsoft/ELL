@@ -7,7 +7,6 @@
 // model
 #include "Model.h"
 #include "ModelTransformer.h"
-#include "ValueSelectorNode.h"
 #include "InputNode.h"
 #include "OutputNode.h"
 #include "InputPort.h"
@@ -17,6 +16,7 @@
 #include "ConstantNode.h"
 #include "MovingAverageNode.h"
 #include "ExtremalValueNode.h"
+#include "ValueSelectorNode.h"
 
 // common
 #include "LoadModel.h"
@@ -95,8 +95,8 @@ void TestStaticGraph()
     auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
     auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
     auto condition = g.AddNode<nodes::ConstantNode<bool>>(true);
-    auto valSelector = g.AddNode<model::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
-    auto indexSelector = g.AddNode<model::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
+    auto valSelector = g.AddNode<nodes::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
+    auto indexSelector = g.AddNode<nodes::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
     //
     // Print various subgraphs
@@ -262,8 +262,8 @@ void TestCopyGraph()
     auto maxAndArgMax = model.AddNode<nodes::ArgMaxNode<double>>(in->output);
     auto minAndArgMin = model.AddNode<nodes::ArgMinNode<double>>(in->output);
     auto condition = model.AddNode<nodes::ConstantNode<bool>>(true);
-    auto valSelector = model.AddNode<model::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
-    auto indexSelector = model.AddNode<model::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
+    auto valSelector = model.AddNode<nodes::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
+    auto indexSelector = model.AddNode<nodes::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
     // Now make a copy
     model::TransformContext context;
