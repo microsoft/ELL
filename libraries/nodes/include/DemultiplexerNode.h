@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MultiplexorNode.h (node)
+//  File:     DemultiplexerNode.h (node)
 //  Authors:  ChuckJacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,9 +11,9 @@
 #include "ConstantNode.h"
 #include "BinaryPredicateNode.h"
 #include "TypeCastNode.h"
+#include "ElementSelectorNode.h"
 
 // model
-#include "ValueSelectorNode.h"
 #include "Node.h"
 #include "InputPort.h"
 #include "OutputPort.h"
@@ -32,7 +32,7 @@ namespace nodes
     /// <summary> A node that routes its scalar input to one element of its outputs, depending on a separate selector input. The element at the index
     /// provided by `selector` is set to the input value, and the rest are set to a default value. </summary>
     template <typename ValueType, typename SelectorType>
-    class MultiplexorNode : public model::Node
+    class DemultiplexerNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
@@ -44,18 +44,18 @@ namespace nodes
         /// @}
 
         /// <summary> Default Constructor </summary>
-        MultiplexorNode();
+        DemultiplexerNode();
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The input value. </param>
         /// <param name="selector"> The index of the chosen element to recieve the value </param>
-        MultiplexorNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue=0);
+        DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue=0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, SelectorType>("MultiplexorNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, SelectorType>("DemultiplexerNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -95,4 +95,4 @@ namespace nodes
     };
 }
 
-#include "../tcc/MultiplexorNode.tcc"
+#include "../tcc/DemultiplexerNode.tcc"

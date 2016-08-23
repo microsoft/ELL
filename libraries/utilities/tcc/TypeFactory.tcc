@@ -96,8 +96,8 @@ namespace utilities
         auto entry = _typeConstructorMap.find(key);
         if (entry == _typeConstructorMap.end())
         {
-            assert(false);
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "type " + typeName + " not registered in TypeFactory<" + BaseType::GetTypeName() + ">");
+            assert(false);
         }
 
         return entry->second->Construct<BaseType>();        

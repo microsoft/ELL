@@ -34,12 +34,12 @@ int main()
         TestUnaryOperationNodeCompute();
         TestBinaryOperationNodeCompute();
         TestLinearPredictorNodeCompute();
-        TestMultiplexorNodeCompute();
+        TestDemultiplexerNodeCompute();
 
         TestMovingAverageNodeRefine();
         TestLinearPredictorNodeRefine();
         TestSimpleForestNodeRefine();
-        TestMultiplexorNodeRefine();
+        TestDemultiplexerNodeRefine();
     }
     catch(const utilities::Exception& exception)
     {

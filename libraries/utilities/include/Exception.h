@@ -17,6 +17,8 @@ namespace utilities
     class Exception : public std::exception
     {
     public:
+        virtual ~Exception() = default;
+        
         /// <summary> Gets the message. </summary>
         ///
         /// <returns> A message string; </returns>

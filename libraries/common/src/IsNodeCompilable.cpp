@@ -16,19 +16,20 @@ namespace common
         _nodeNames.insert("InputNode<double>");
         _nodeNames.insert("OutputNode<double>");
         _nodeNames.insert("ConstantNode<bool>");
-        _nodeNames.insert("ConstantNode<double>");
         _nodeNames.insert("ConstantNode<int32>");
+        _nodeNames.insert("ConstantNode<double>");
         _nodeNames.insert("BinaryOperationNode<bool>");
         _nodeNames.insert("BinaryOperationNode<double>");
-        _nodeNames.insert("BinaryPredicateNode<double>");
         _nodeNames.insert("BinaryPredicateNode<int32>");
+        _nodeNames.insert("BinaryPredicateNode<double>");
         _nodeNames.insert("SumNode<double>");
+        _nodeNames.insert("ElementSelectorNode<bool,bool>");
         _nodeNames.insert("ElementSelectorNode<double,bool>");
         _nodeNames.insert("UnaryOperationNode<double>");
         _nodeNames.insert("UnaryOperationNode<bool>");
         _nodeNames.insert("TypeCastNode<bool,int32>");
-        _nodeNames.insert("MultiplexorNode<bool,bool>");
-        _nodeNames.insert("MultiplexorNode<double,bool>");
+        _nodeNames.insert("DemultiplexerNode<bool,bool>");
+        _nodeNames.insert("DemultiplexerNode<double,bool>");
         _nodeNames.insert("ValueSelectorNode<bool>");
         _nodeNames.insert("ValueSelectorNode<double>");
     }

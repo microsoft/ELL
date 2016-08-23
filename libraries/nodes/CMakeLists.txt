@@ -24,7 +24,7 @@ set (INCLUDE include/AccumulatorNode.h
              include/L2NormNode.h
              include/MovingAverageNode.h
              include/MovingVarianceNode.h
-             include/MultiplexorNode.h
+             include/DemultiplexerNode.h
              include/SingleElementThresholdNode.h
              include/SumNode.h
              include/TypeCastNode.h
@@ -45,7 +45,7 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/L2NormNode.tcc
          tcc/MovingAverageNode.tcc
          tcc/MovingVarianceNode.tcc
-         tcc/MultiplexorNode.tcc
+         tcc/DemultiplexerNode.tcc
          tcc/SumNode.tcc
          tcc/TypeCastNode.tcc
          tcc/UnaryOperationNode.tcc)

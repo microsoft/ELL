@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MultiplexorNode.tcc (nodes)
+//  File:     DemultiplexerNode.tcc (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,11 +10,11 @@
 namespace nodes
 {
     template <typename ValueType, typename SelectorType>
-    MultiplexorNode<ValueType, SelectorType>::MultiplexorNode() : Node({ &_input, &_selector }, { &_output }), _input(this, {}, inputPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 0), _defaultValue(0)
+    DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode() : Node({ &_input, &_selector }, { &_output }), _input(this, {}, inputPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 0), _defaultValue(0)
     {}
 
     template <typename ValueType, typename SelectorType>
-    MultiplexorNode<ValueType, SelectorType>::MultiplexorNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue) : Node({ &_input, &_selector }, { &_output }), _input(this, input, inputPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, outputSize), _defaultValue(defaultValue)
+    DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue) : Node({ &_input, &_selector }, { &_output }), _input(this, input, inputPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, outputSize), _defaultValue(defaultValue)
     {
         if (selector.Size() != 1)
         {
@@ -27,7 +27,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void MultiplexorNode<ValueType, SelectorType>::Compute() const
+    void DemultiplexerNode<ValueType, SelectorType>::Compute() const
     {
         std::vector<ValueType> outputValue(_output.Size(), _defaultValue);
         int index = (int)_selector[0];
@@ -36,7 +36,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void MultiplexorNode<ValueType, SelectorType>::Serialize(utilities::Serializer& serializer) const
+    void DemultiplexerNode<ValueType, SelectorType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);
         serializer.Serialize("input", _input);
@@ -46,7 +46,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void MultiplexorNode<ValueType, SelectorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void DemultiplexerNode<ValueType, SelectorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
         Node::Deserialize(serializer, context);
         serializer.Deserialize("input", _input, context);
@@ -56,11 +56,11 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void MultiplexorNode<ValueType, SelectorType>::Copy(model::ModelTransformer& transformer) const
+    void DemultiplexerNode<ValueType, SelectorType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput= transformer.TransformPortElements(_input.GetPortElements());
         auto newSelector = transformer.TransformPortElements(_selector.GetPortElements());
-        auto newNode = transformer.AddNode<MultiplexorNode<ValueType, SelectorType>>(newInput, newSelector, output.Size(), _defaultValue);
+        auto newNode = transformer.AddNode<DemultiplexerNode<ValueType, SelectorType>>(newInput, newSelector, output.Size(), _defaultValue);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -79,9 +79,9 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    bool MultiplexorNode<ValueType, SelectorType>::Refine(model::ModelTransformer& transformer) const
+    bool DemultiplexerNode<ValueType, SelectorType>::Refine(model::ModelTransformer& transformer) const
     {        
-        auto newInput= transformer.TransformPortElements(_input.GetPortElements());
+        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
         auto newSelector = transformer.TransformPortElements(_selector.GetPortElements());
         auto newSelectorInt = CastIfNecessary(newSelector, transformer);
 
@@ -92,7 +92,7 @@ namespace nodes
         {
             auto indexNode = transformer.AddNode<ConstantNode<int>>(index);
             auto isEqualNode = transformer.AddNode<BinaryPredicateNode<int>>(newSelectorInt, indexNode->output, BinaryPredicateNode<int>::PredicateType::equal);
-            auto ifNode = transformer.AddNode<model::ValueSelectorNode<ValueType>>(isEqualNode->output, newInput, defaultNode->output);
+            auto ifNode = transformer.AddNode<nodes::ElementSelectorNode<ValueType, bool>>(model::PortElements<ValueType>{defaultNode->output, newInput}, isEqualNode->output);
             outputElements.Append(ifNode->output);
         }
       
