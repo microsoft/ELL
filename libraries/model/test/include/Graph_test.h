@@ -12,6 +12,5 @@ void TestInputRouting1();
 void TestInputRouting2();
 
 void TestCopyGraph();
-void TestRefineGraph();
 
 void TestRefineSplitOutputs();

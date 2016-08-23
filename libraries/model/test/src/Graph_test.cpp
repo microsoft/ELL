@@ -280,55 +280,6 @@ void TestCopyGraph()
     PrintGraph(newModel);
 }
 
-void TestRefineGraph()
-{
-    // Create a simple computation graph
-    model::Model model;
-
-    auto inputNode = model.AddNode<model::InputNode<double>>(2);
-    model::PortElements<double> inputValue = { inputNode->output, 0 };
-    model::PortElements<double> inputThresh = { inputNode->output, 1 };
-
-    auto value1 = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
-    auto value2 = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 100.0, 200.0, 300.0 });
-    auto outputNode = model.AddNode<model::SelectIfLessNode<double>>(inputValue, inputThresh, value1->output, value2->output);
-
-    // Now transform it
-    model::TransformContext context;
-    model::ModelTransformer transformer;
-    auto newModel = transformer.CopyModel(model, context);
-
-    // Print both graphs
-    std::cout << "\n\nOld graph" << std::endl;
-    std::cout << "---------" << std::endl;
-    PrintGraph(model);
-
-    std::cout << "\n\nRefined graph" << std::endl;
-    std::cout << "---------" << std::endl;
-    PrintGraph(newModel);
-
-    // Now run data through the graphs and make sure they agree
-    auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputs = transformer.GetCorrespondingOutputs(model::PortElements<double>{ outputNode->output });
-
-    std::vector<std::vector<double>> inputValues = { { 1.0, 2.0 }, { 1.0, 0.5 }, { 2.0, 4.0 } };
-    for (const auto& inputValue : inputValues)
-    {
-        inputNode->SetInput(inputValue);
-        auto output = model.ComputeOutput(outputNode->output);
-
-        newInputNode->SetInput(inputValue);
-        auto newOutputPortUntyped = newOutputs.GetElement(0).ReferencedPort(); // need typed port
-        auto newOutputPort = dynamic_cast<const model::OutputPort<double>*>(newOutputPortUntyped);
-        assert(newOutputPort != nullptr);
-        auto newOutput = newModel.ComputeOutput(*newOutputPort);
-
-        testing::ProcessTest("testing refined graph", testing::IsEqual(output[0], newOutput[0]));
-        testing::ProcessTest("testing refined graph", testing::IsEqual(output[1], newOutput[1]));
-        testing::ProcessTest("testing refined graph", testing::IsEqual(output[2], newOutput[2]));
-    }
-}
-
 // Define new node that splits its outputs when refined
 template <typename ValueType>
 class SplittingNode : public model::Node

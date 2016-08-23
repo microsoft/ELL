@@ -25,7 +25,6 @@ int main()
         TestInputRouting2();
 
         TestCopyGraph();
-        TestRefineGraph();
         TestRefineSplitOutputs();
 
         // PortElements tests
