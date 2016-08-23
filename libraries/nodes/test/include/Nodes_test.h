@@ -22,4 +22,5 @@ void TestMultiplexorNodeCompute();
 void TestMovingAverageNodeRefine();
 void TestLinearPredictorNodeRefine();
 void TestSimpleForestNodeRefine();
+void TestMultiplexorNodeRefine();
 

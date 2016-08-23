@@ -27,17 +27,23 @@ namespace common
     {
         AddNodeType<model::InputNode<bool>>();
         AddNodeType<model::InputNode<double>>();
+        AddNodeType<model::OutputNode<double>>();
         AddNodeType<nodes::ConstantNode<bool>>();
+        AddNodeType<nodes::ConstantNode<int>>();
         AddNodeType<nodes::ConstantNode<double>>();
         AddNodeType<nodes::BinaryOperationNode<bool>>();
         AddNodeType<nodes::BinaryOperationNode<double>>();
+        AddNodeType<nodes::BinaryPredicateNode<int>>();
         AddNodeType<nodes::BinaryPredicateNode<double>>();
         AddNodeType<nodes::ElementSelectorNode<double,bool>>();
         AddNodeType<nodes::SumNode<double>>();
-        AddNodeType<nodes::UnaryOperationNode<double>>();
+        AddNodeType<nodes::TypeCastNode<bool,int>>();
         AddNodeType<nodes::UnaryOperationNode<bool>>();
+        AddNodeType<nodes::UnaryOperationNode<double>>();
         AddNodeType<nodes::MultiplexorNode<bool,bool>>();
         AddNodeType<nodes::MultiplexorNode<double,bool>>();
+        AddNodeType<model::ValueSelectorNode<bool>>();
+        AddNodeType<model::ValueSelectorNode<double>>();
     }
 
     bool IsNodeCompilable::operator()(const model::Node& node)

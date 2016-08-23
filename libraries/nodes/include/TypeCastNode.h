@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     OutputNode.h (model)
+//  File:     TypeCastNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -16,26 +16,26 @@
 #include <memory>
 #include <string>
 
-/// <summary> model namespace </summary>
-namespace model
+/// <summary> nodes namespace </summary>
+namespace nodes
 {
     /// <summary> A node that represents an output from the system. </summary>
-    template <typename ValueType>
-    class OutputNode : public Node
+    template <typename InputValueType, typename OutputValueType>
+    class TypeCastNode : public model::Node
     {
     public:
         /// <summary> Default Constructor </summary>
-        OutputNode();
+        TypeCastNode();
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        OutputNode(const model::PortElements<ValueType>& input);
+        TypeCastNode(const model::PortElements<InputValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("OutputNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<InputValueType, OutputValueType>("TypeCastNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -54,10 +54,10 @@ namespace model
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
         /// <summary> Exposes the output port as a read-only property </summary>
-        const OutputPort<ValueType>& output = _output;
+        const model::OutputPort<OutputValueType>& output = _output;
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(ModelTransformer& transformer) const override;
+        virtual void Copy(model::ModelTransformer& transformer) const override;
 
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";
@@ -66,9 +66,9 @@ namespace model
         virtual void Compute() const override;
 
     private:
-        InputPort<ValueType> _input;
-        OutputPort<ValueType> _output;
+        model::InputPort<InputValueType> _input;
+        model::OutputPort<OutputValueType> _output;
     };
 }
 
-#include "../tcc/OutputNode.tcc"
+#include "../tcc/TypeCastNode.tcc"

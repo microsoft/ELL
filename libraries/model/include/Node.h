@@ -64,11 +64,6 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
-        /// <summary> Gets the name of this type (for serialization). </summary>
-        ///
-        /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "Node"; }
 
         /// <summary> Writes to a Serializer. </summary>

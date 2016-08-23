@@ -27,6 +27,7 @@ set (INCLUDE include/AccumulatorNode.h
              include/MultiplexorNode.h
              include/SingleElementThresholdNode.h
              include/SumNode.h
+             include/TypeCastNode.h
              include/UnaryOperationNode.h)
 
 set (SRC src/ConstantNode.cpp
@@ -46,6 +47,7 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/MovingVarianceNode.tcc
          tcc/MultiplexorNode.tcc
          tcc/SumNode.tcc
+         tcc/TypeCastNode.tcc
          tcc/UnaryOperationNode.tcc)
 
 source_group("include" FILES ${INCLUDE})

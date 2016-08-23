@@ -8,6 +8,12 @@
 
 #pragma once
 
+#include "ConstantNode.h"
+#include "BinaryPredicateNode.h"
+#include "TypeCastNode.h"
+
+// model
+#include "ValueSelectorNode.h"
 #include "Node.h"
 #include "InputPort.h"
 #include "OutputPort.h"
@@ -69,6 +75,9 @@ namespace nodes
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
+
+        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
+        virtual bool Refine(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;
