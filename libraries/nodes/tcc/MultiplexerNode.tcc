@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ElementSelectorNode.tcc (nodes)
+//  File:     MultiplexerNode.tcc (nodes)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,11 +10,11 @@
 namespace nodes
 {
     template <typename ValueType, typename SelectorType>
-    ElementSelectorNode<ValueType, SelectorType>::ElementSelectorNode() : Node({ &_elements, &_selector }, { &_output }), _elements(this, {}, elementsPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 1)
+    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode() : Node({ &_elements, &_selector }, { &_output }), _elements(this, {}, elementsPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 1)
     {}
     
     template <typename ValueType, typename SelectorType>
-    ElementSelectorNode<ValueType, SelectorType>::ElementSelectorNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector) : Node({ &_elements, &_selector }, { &_output }), _elements(this, input, elementsPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, 1)
+    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector) : Node({ &_elements, &_selector }, { &_output }), _elements(this, input, elementsPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, 1)
     {
         if (selector.Size() != 1)
         {
@@ -23,14 +23,14 @@ namespace nodes
     };
 
     template <typename ValueType, typename SelectorType>
-    void ElementSelectorNode<ValueType, SelectorType>::Compute() const
+    void MultiplexerNode<ValueType, SelectorType>::Compute() const
     {
         int index = static_cast<int>(_selector[0]);
         _output.SetOutput({ _elements[index] });
     }
 
     template <typename ValueType, typename SelectorType>
-    void ElementSelectorNode<ValueType, SelectorType>::Serialize(utilities::Serializer& serializer) const
+    void MultiplexerNode<ValueType, SelectorType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);
         serializer.Serialize("elements", _elements);
@@ -39,7 +39,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void ElementSelectorNode<ValueType, SelectorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void MultiplexerNode<ValueType, SelectorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
         Node::Deserialize(serializer, context);
         serializer.Deserialize("elements", _elements, context);
@@ -48,11 +48,11 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void ElementSelectorNode<ValueType, SelectorType>::Copy(model::ModelTransformer& transformer) const
+    void MultiplexerNode<ValueType, SelectorType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newElements = transformer.TransformPortElements(_elements.GetPortElements());
         auto newSelector = transformer.TransformPortElements(_selector.GetPortElements());
-        auto newNode = transformer.AddNode<ElementSelectorNode<ValueType, SelectorType>>(newElements, newSelector);
+        auto newNode = transformer.AddNode<MultiplexerNode<ValueType, SelectorType>>(newElements, newSelector);
         transformer.MapNodeOutput(output, newNode->output);
     }
 }

@@ -25,7 +25,7 @@
 #include "UnaryOperationNode.h"
 #include "BinaryOperationNode.h"
 #include "BinaryPredicateNode.h"
-#include "ElementSelectorNode.h"
+#include "MultiplexerNode.h"
 #include "ForestNode.h"
 
 // predictors
@@ -166,10 +166,11 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DelayNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::ElementSelectorNode<double, bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<double, bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MovingAverageNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MovingVarianceNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::MultiplexorNode<bool, bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::DemultiplexerNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestNode>();
@@ -177,9 +178,6 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::SumNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool,int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, model::ValueSelectorNode<bool>>();
-        context.GetTypeFactory().AddType<model::Node, model::ValueSelectorNode<int>>();
-        context.GetTypeFactory().AddType<model::Node, model::ValueSelectorNode<double>>();
     }
 
     template <typename DeserializerType>

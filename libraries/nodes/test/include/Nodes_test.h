@@ -16,11 +16,11 @@ void TestMovingVarianceNodeCompute();
 void TestUnaryOperationNodeCompute();
 void TestBinaryOperationNodeCompute();
 void TestLinearPredictorNodeCompute();
-void TestMultiplexorNodeCompute();
+void TestDemultiplexerNodeCompute();
 
 // Refinement
 void TestMovingAverageNodeRefine();
 void TestLinearPredictorNodeRefine();
 void TestSimpleForestNodeRefine();
-void TestMultiplexorNodeRefine();
+void TestDemultiplexerNodeRefine();
 

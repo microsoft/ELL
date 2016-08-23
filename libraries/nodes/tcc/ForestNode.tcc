@@ -8,9 +8,9 @@
 
 #include "ForestNode.h"
 #include "ConstantNode.h"
-#include "ElementSelectorNode.h"
+#include "MultiplexerNode.h"
 #include "BinaryOperationNode.h"
-#include "MultiplexorNode.h"
+#include "DemultiplexerNode.h"
 #include "SingleElementThresholdNode.h"
 #include "SumNode.h"
 
@@ -100,7 +100,7 @@ namespace nodes
             interiorNodeSplitIndicators[nodeIndex] = {splitRuleNode->output};
             
             // ...and selects the output value
-            auto selectorNode = transformer.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleNode->output);
+            auto selectorNode = transformer.AddNode<MultiplexerNode<double, bool>>(edgeOutputs, splitRuleNode->output);
             interiorNodeSubModels[nodeIndex] = {selectorNode->output};
         }
 
@@ -120,9 +120,9 @@ namespace nodes
             auto numChildren = childEdges.size();
             model::PortElements<bool> parentIndicator = isRoot ? trueNode->output : edgeIndicatorSubModels[parentEdgeIndex];
 
-            // The multiplexor node computes the indicator value for all the children at once, by copying its input value (a '1' if it's the root)
+            // The Demultiplexer node computes the indicator value for all the children at once, by copying its input value (a '1' if it's the root)
             // to the selected child.
-            auto muxNode = transformer.AddNode<MultiplexorNode<bool, bool>>(parentIndicator, edgeSelector, numChildren);
+            auto muxNode = transformer.AddNode<DemultiplexerNode<bool, bool>>(parentIndicator, edgeSelector, numChildren);
             for(size_t edgePosition = 0; edgePosition < numChildren; ++edgePosition)
             {
                 auto edgeIndex = node.GetFirstEdgeIndex() + edgePosition;

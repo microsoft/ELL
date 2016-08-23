@@ -1,21 +1,25 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ElementSelectorNode.h (node)
-//  Authors:  Ofer Dekel
+//  File:     DemultiplexerNode.h (node)
+//  Authors:  ChuckJacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
+#include "ConstantNode.h"
+#include "BinaryPredicateNode.h"
+#include "TypeCastNode.h"
+#include "MultiplexerNode.h"
+
+// model
 #include "Node.h"
 #include "InputPort.h"
 #include "OutputPort.h"
 
 // utilities
 #include "TypeName.h"
-#include "ISerializable.h"
-#include "Serializer.h"
 
 // stl
 #include <vector>
@@ -25,32 +29,33 @@
 /// <summary> model namespace </summary>
 namespace nodes
 {
-    /// <summary> A node that outputs a dynamically specified element from an input array. </summary>
+    /// <summary> A node that routes its scalar input to one element of its outputs, depending on a separate selector input. The element at the index
+    /// provided by `selector` is set to the input value, and the rest are set to a default value. </summary>
     template <typename ValueType, typename SelectorType>
-    class ElementSelectorNode : public model::Node
+    class DemultiplexerNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr const char* elementsPortName = "elements";
+        static constexpr const char* inputPortName = "input";
         static constexpr const char* selectorPortName = "selector";
         static constexpr const char* outputPortName = "output";
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
         /// <summary> Default Constructor </summary>
-        ElementSelectorNode();
+        DemultiplexerNode();
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="elements"> The input aray of values. </param>
-        /// <param name="selector"> The index of the chosen element </param>
-        ElementSelectorNode(const model::PortElements<ValueType>& elements, const model::PortElements<SelectorType>& selector);
+        /// <param name="input"> The input value. </param>
+        /// <param name="selector"> The index of the chosen element to recieve the value </param>
+        DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue=0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, SelectorType>("ElementSelectorNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, SelectorType>("DemultiplexerNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -71,17 +76,23 @@ namespace nodes
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
+        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
+        virtual bool Refine(model::ModelTransformer& transformer) const override;
+
     protected:
         virtual void Compute() const override;
 
     private:
         // Inputs
-        model::InputPort<ValueType> _elements;
+        model::InputPort<ValueType> _input;
         model::InputPort<SelectorType> _selector;
 
         // Output
         model::OutputPort<ValueType> _output;
+
+        // Default value
+        ValueType _defaultValue;
     };
 }
 
-#include "../tcc/ElementSelectorNode.tcc"
+#include "../tcc/DemultiplexerNode.tcc"
