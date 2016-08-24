@@ -57,8 +57,8 @@ namespace nodes
     utilities::ObjectDescription ConstantNode<ValueType>::GetTypeDescription()
     {
         utilities::ObjectDescription description("Constant node");
-        description.AddProperty<decltype(_values)>("values", "Constant values");
-//        description.AddProperty<decltype(_output)>("output", "Output port");
+        description.AddProperty<const decltype(_values)&>("values", "Constant values");
+        description.AddProperty<const decltype(_output)&>("output", "Output port");
         return description;
     }
 
@@ -67,6 +67,7 @@ namespace nodes
     {
         utilities::ObjectDescription description = GetTypeDescription();
         description["values"] = _values;
+//        description["output"] = _output; // ugh
         return description;
     }
 }

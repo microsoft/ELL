@@ -69,7 +69,7 @@ namespace utilities
         PropertyDescription& operator[](const std::string& propertyName);        
 
     private:
-        std::string _typeName; // ???
+        std::string _typeName;
         std::string _description;
         std::unordered_map<std::string, PropertyDescription> _properties;
     };

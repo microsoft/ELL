@@ -33,9 +33,7 @@ namespace utilities
     template <typename ValueType>
     void PropertyDescription::SetValue(ValueType&& value)
     {
-        // Ensure ValueType == _value's ValueType
         assert(_typeName == TypeName<typename std::decay<ValueType>::type>::GetName());
-//        assert(_value.IsType<ValueType>());
         _value = value;
     }
 
