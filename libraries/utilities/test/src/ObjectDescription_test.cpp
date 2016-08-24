@@ -39,7 +39,7 @@ public:
         return description;
     }
 
-    static utilities::ObjectDescription GetEmptyDescription()
+    static utilities::ObjectDescription GetTypeDescription()
     {
         utilities::ObjectDescription description;
         description.AddProperty<int>("a", "Parameter a");

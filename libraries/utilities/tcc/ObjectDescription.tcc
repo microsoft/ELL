@@ -18,6 +18,18 @@ namespace utilities
         _value = MakeVariant<ValueType>(value);
     }
 
+    template <typename ValueType>
+    void PropertyDescription::SetValue(const ValueType& value)
+    {
+        _value = value;
+    }
+
+    template <typename ValueType>
+    void PropertyDescription::operator=(const ValueType& value)
+    {
+        SetValue(value);
+    }
+
     //
     // ObjectDescription
     //
@@ -44,5 +56,19 @@ namespace utilities
             throw InputException(InputExceptionErrors::badData);
         }
         return iter->second.GetValue<ValueType>();
+    }
+
+    template <typename ValueType>
+    void ObjectDescription::SetPropertyValue(const std::string& name, const ValueType& value)
+    {
+        auto iter = _properties.find(name); 
+        if(iter == _properties.end())
+        {
+            _properties[name] = PropertyDescription("", value);
+        }
+        else
+        {
+            iter->second.SetValue(value);
+        }
     }
 }

@@ -31,6 +31,12 @@ namespace utilities
         template <typename ValueType>
         ValueType GetValue() const { return _value.GetValue<ValueType>(); }
 
+        template <typename ValueType>
+        void SetValue(const ValueType& value);
+
+        template <typename ValueType>
+        void operator=(const ValueType& value);
+
     private:
         std::string _typeName;
         std::string _description;
@@ -54,6 +60,11 @@ namespace utilities
 
         template <typename ValueType>
         ValueType GetPropertyValue(const std::string& name) const;
+
+        template <typename ValueType>
+        void SetPropertyValue(const std::string& name, const ValueType& value);
+
+        PropertyDescription& operator[](const std::string& propertyName);        
 
     private:
         std::string _typeName; // ???

@@ -115,6 +115,6 @@ namespace utilities
     template <typename ValueType>
     inline std::string VariantDerived<ValueType>::GetStoredTypeName() const
     {
-        return TypeName<ValueType>::GetName();
+        return TypeName<typename std::decay<ValueType>::type>::GetName();
     }
 }

@@ -8,18 +8,23 @@
 
 #pragma once
 
+// model
+#include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
-#include "ModelTransformer.h"
 
 // predictors
 #include "ConstantPredictor.h"
 
 // utilities
+#include "Serializer.h"
 #include "TypeName.h"
+#include "ObjectDescription.h"
 
-#include <vector>
+// stl
 #include <memory>
+#include <vector>
+
 
 /// <summary> nodes namespace </summary>
 namespace nodes
@@ -73,6 +78,9 @@ namespace nodes
         /// <param name="deserializer"> The deserializer. </param>
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
+        static utilities::ObjectDescription GetTypeDescription();
+        virtual utilities::ObjectDescription GetDescription() const;
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;

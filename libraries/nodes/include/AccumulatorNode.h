@@ -8,9 +8,10 @@
 
 #pragma once
 
-#include "Node.h"
+// model
 #include "ModelGraph.h"
 #include "ModelTransformer.h"
+#include "Node.h"
 
 // utilities
 #include "Exception.h"

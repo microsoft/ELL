@@ -29,4 +29,9 @@ namespace utilities
     {
         return _properties.find(name) != _properties.end();
     }
+
+    PropertyDescription& ObjectDescription::operator[](const std::string& propertyName)
+    {
+        return _properties[propertyName];
+    }
 }

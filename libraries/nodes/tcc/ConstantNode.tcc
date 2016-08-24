@@ -52,4 +52,20 @@ namespace nodes
         serializer.Deserialize("output", _output, context);
         serializer.Deserialize("values", _values, context);
     }
+
+    template <typename ValueType>
+    utilities::ObjectDescription ConstantNode<ValueType>::GetTypeDescription()
+    {
+        utilities::ObjectDescription description;
+        description.AddProperty<decltype(_values)>("values", "Constant values");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription ConstantNode<ValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetTypeDescription();
+        description["values"] = _values;
+        return description;
+    }
 }

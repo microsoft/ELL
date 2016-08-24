@@ -104,7 +104,8 @@ int main()
         TypeFactoryTest();
 
         // Variant tests
-        TestVariant();
+        TestScalarVariant();
+        TestVectorVariant();
 
         // Serialization tests
         TestJsonSerializer();
