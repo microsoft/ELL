@@ -1,47 +1,61 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SingleElementThresholdNode.h (nodes)
-//  Authors:  Ofer Dekel
+//  File:     DemultiplexerNode.h (node)
+//  Authors:  ChuckJacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
+#include "ConstantNode.h"
+#include "BinaryPredicateNode.h"
+#include "TypeCastNode.h"
+#include "MultiplexerNode.h"
+
 // model
 #include "Node.h"
-#include "ModelGraph.h"
-#include "ModelTransformer.h"
+#include "InputPort.h"
+#include "OutputPort.h"
 
-// predictors
-#include "SingleElementThresholdPredictor.h"
+// utilities
+#include "TypeName.h"
 
+// stl
+#include <vector>
+#include <memory>
+#include <exception>
+
+/// <summary> model namespace </summary>
 namespace nodes
 {
-    /// <summary> A node that represents a linear predictor. </summary>
-    class SingleElementThresholdNode : public model::Node
+    /// <summary> A node that routes its scalar input to one element of its outputs, depending on a separate selector input. The element at the index
+    /// provided by `selector` is set to the input value, and the rest are set to a default value. </summary>
+    template <typename ValueType, typename SelectorType>
+    class DemultiplexerNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
         /// @{
         static constexpr const char* inputPortName = "input";
+        static constexpr const char* selectorPortName = "selector";
         static constexpr const char* outputPortName = "output";
-        const model::OutputPort<bool>& output = _output;
+        const model::OutputPort<ValueType>& output = _output;
         /// @}
 
         /// <summary> Default Constructor </summary>
-        SingleElementThresholdNode();
+        DemultiplexerNode();
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="input"> The signal to predict from </param>
-        /// <param name="predictor"> The linear predictor to use when making the prediction. </param>
-        SingleElementThresholdNode(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor);
+        /// <param name="input"> The input value. </param>
+        /// <param name="selector"> The index of the chosen element to recieve the value </param>
+        DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue=0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "SingleElementThresholdNode"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, SelectorType>("DemultiplexerNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -70,21 +84,15 @@ namespace nodes
 
     private:
         // Inputs
-        model::InputPort<double> _input;
+        model::InputPort<ValueType> _input;
+        model::InputPort<SelectorType> _selector;
 
         // Output
-        model::OutputPort<bool> _output;
+        model::OutputPort<ValueType> _output;
 
-        // Linear predictor
-        predictors::SingleElementThresholdPredictor _predictor;
+        // Default value
+        ValueType _defaultValue;
     };
-
-    /// <summary> Adds a SingleElementThreshold predictor node to a model transformer. </summary>
-    ///
-    /// <param name="input"> The input to the predictor. </param>
-    /// <param name="predictor"> The SingleElementThreshold predictor. </param>
-    /// <param name="transformer"> [in,out] The model transformer. </param>
-    ///
-    /// <returns> The node added to the model. </returns>
-    SingleElementThresholdNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor, model::ModelTransformer& transformer);
 }
+
+#include "../tcc/DemultiplexerNode.tcc"

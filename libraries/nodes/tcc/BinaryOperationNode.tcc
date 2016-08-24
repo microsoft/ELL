@@ -100,8 +100,7 @@ namespace nodes
 
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode() : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(OperationType::none)
-    {
-    }
+    {}
 
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, OperationType operation) : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
@@ -174,6 +173,7 @@ namespace nodes
         serializer.Serialize("operation", static_cast<int>(_operation));
         serializer.Serialize("input1", _input1);
         serializer.Serialize("input2", _input2);
+        serializer.Serialize("output", _output);
     }
 
     template <typename ValueType>
@@ -185,5 +185,6 @@ namespace nodes
         _operation = static_cast<OperationType>(op);
         serializer.Deserialize("input1", _input1, context);
         serializer.Deserialize("input2", _input2, context);
-    }
+        serializer.Deserialize("output", _output, context);
+   }
 }

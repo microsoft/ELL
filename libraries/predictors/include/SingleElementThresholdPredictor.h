@@ -8,13 +8,16 @@
 
 #pragma once
 
+// utilities
+#include "ISerializable.h"
+
 // stl
 #include <iostream>
 
 namespace predictors
 {
     /// <summary> A split rule that compares a single feature to a threshold. </summary>
-    class SingleElementThresholdPredictor
+    class SingleElementThresholdPredictor : public utilities::ISerializable
     {
     public:
         /// <summary> Constructs a single-element threshold rule. </summary>
@@ -31,7 +34,18 @@ namespace predictors
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        std::string GetRuntimeTypeName() const { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
         /// <summary> Gets the index of the element used to define the rule. </summary>
         ///

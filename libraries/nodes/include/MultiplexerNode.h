@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MultiplexorNode.h (node)
-//  Authors:  ChuckJacobs
+//  File:     MultiplexerNode.h (node)
+//  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -14,6 +14,8 @@
 
 // utilities
 #include "TypeName.h"
+#include "ISerializable.h"
+#include "Serializer.h"
 
 // stl
 #include <vector>
@@ -23,35 +25,48 @@
 /// <summary> model namespace </summary>
 namespace nodes
 {
-    /// <summary> A node that routes its scalar input to one element of its outputs, depending on a separate selector input. The element at the index
-    /// provided by `selector` is set to the input value, and the rest are set to a default value. </summary>
+    /// <summary> A node that outputs a dynamically specified element from an input array. </summary>
     template <typename ValueType, typename SelectorType>
-    class MultiplexorNode : public model::Node
+    class MultiplexerNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
         /// @{
-        static constexpr const char* inputPortName = "input";
+        static constexpr const char* elementsPortName = "elements";
         static constexpr const char* selectorPortName = "selector";
         static constexpr const char* outputPortName = "output";
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
+        /// <summary> Default Constructor </summary>
+        MultiplexerNode();
+
         /// <summary> Constructor </summary>
         ///
-        /// <param name="input"> The input value. </param>
-        /// <param name="selector"> The index of the chosen element to recieve the value </param>
-        MultiplexorNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue=0);
+        /// <param name="elements"> The input aray of values. </param>
+        /// <param name="selector"> The index of the chosen element </param>
+        MultiplexerNode(const model::PortElements<ValueType>& elements, const model::PortElements<SelectorType>& selector);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, SelectorType>("MultiplexorNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, SelectorType>("MultiplexerNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
         /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
@@ -61,15 +76,12 @@ namespace nodes
 
     private:
         // Inputs
-        model::InputPort<ValueType> _input;
+        model::InputPort<ValueType> _elements;
         model::InputPort<SelectorType> _selector;
 
         // Output
         model::OutputPort<ValueType> _output;
-
-        // Default value
-        ValueType _defaultValue;
     };
 }
 
-#include "../tcc/MultiplexorNode.tcc"
+#include "../tcc/MultiplexerNode.tcc"

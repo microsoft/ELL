@@ -74,6 +74,10 @@ namespace model
         serializer.Deserialize("referencedPortName", portName, newContext);
         
         Node* newNode = newContext.GetNodeFromId(newId);
+        if(newNode == nullptr)
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Could not find deserialized node.");
+        }
 
         auto ports = newNode->GetOutputPorts();
         OutputPortBase* newPort = nullptr;
@@ -85,7 +89,10 @@ namespace model
                 break;
             }
         }
-        assert(_referencedPort != newPort);
+        if(_referencedPort == newPort)
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error deserializing port.");        
+        }
         _referencedPort = newPort;
         if(newPort == nullptr)
         {

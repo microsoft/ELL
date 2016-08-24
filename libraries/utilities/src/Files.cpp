@@ -58,4 +58,25 @@ namespace utilities
 
         return false;
     }
+
+    std::string GetFileExtension(std::string filepath, bool toLowercase)
+    {
+        auto dotPos = filepath.find_last_of('.');
+        if(dotPos == std::string::npos)
+        {
+            return "";
+        }
+        else
+        {
+            auto ext = filepath.substr(dotPos+1);
+            if(toLowercase)
+            {
+                return ext;
+            }
+            else
+            {
+                return ext;
+            }
+        }
+    }
 }
