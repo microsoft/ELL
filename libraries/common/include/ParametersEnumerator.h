@@ -28,12 +28,16 @@ namespace common
         /// <summary> Constructs an instance of ParametersEnumerator. </summary>
         ///
         /// <param name="parameterValues"> Variable number of parameter value vectors. The number and order of these types should match the constructor of ParametersType. </param>
-        ParametersEnumerator(std::vector<ValueTypes>... parameterValues);
+        ParametersEnumerator(std::vector<ValueTypes>... parameterValues) : _valueVectorTuple(std::make_tuple(parameterValues...))
+        {}
 
         /// <summary> Gets the number of different parameter configurations. </summary>
         ///
         /// <returns> The size. </returns>
-        size_t Size() const;
+        size_t Size() const
+        {
+            return Size(std::make_index_sequence<std::tuple_size<ValueTupleType>::value>{});
+        }
 
         /// <summary> Generates the desired a parameters struct.</summary>
         ///
@@ -58,7 +62,16 @@ namespace common
         ParametersType GenerateParameters(const ValueTupleType& valueTuple, std::index_sequence<Sequence...>) const;
 
         template <size_t... Sequence>
-        size_t Size(std::index_sequence<Sequence...>) const;
+        size_t Size(std::index_sequence<Sequence...>) const
+        {
+            auto sizes = { std::get<Sequence>(_valueVectorTuple).size()... };
+            size_t totalSize = 0;
+            for (auto size : sizes)
+            {
+                totalSize += size;
+            }
+            return totalSize;
+        }
 
         // members
         ValueVectorTupleType _valueVectorTuple;
@@ -71,7 +84,10 @@ namespace common
     /// <param name="parameterValues"> Variable number of parameter value vectors. The number and order of these types should match the constructor of ParametersType. </param>
     /// <returns> A parameters generator. </returns>
     template <typename ParametersType, typename... ValueTypes>
-    ParametersEnumerator<ParametersType, ValueTypes...> MakeParametersEnumerator(std::vector<ValueTypes>... parameterValues);
+    ParametersEnumerator<ParametersType, ValueTypes...> MakeParametersEnumerator(std::vector<ValueTypes>... parameterValues)
+    {
+        return ParametersEnumerator<ParametersType, ValueTypes...>(parameterValues...);
+    }
 }
 
 #include "../tcc/ParametersEnumerator.tcc"
