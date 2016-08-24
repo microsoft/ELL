@@ -17,7 +17,8 @@ namespace utilities
         auto thisPtr = dynamic_cast<const VariantDerived<ValueType>*>(this);
         if (thisPtr == nullptr)
         {
-            throw InputException(InputExceptionErrors::typeMismatch, "Variant::GetValue called with wrong type.");
+            assert(false);
+            throw InputException(InputExceptionErrors::typeMismatch, std::string{"Variant::GetValue called with wrong type. Type: " + TypeName<ValueType>::GetName()});
         }
 
         return thisPtr->GetValue();
@@ -44,7 +45,8 @@ namespace utilities
     template <typename ValueType>
     Variant::Variant(ValueType&& value) : _type(std::type_index(typeid(ValueType)))
     {
-        auto derivedPtr = new VariantDerived<ValueType>(std::forward<ValueType>(value));
+        auto derivedPtr = new VariantDerived<std::decay<ValueType>::type>(std::forward<ValueType>(value));
+//        auto derivedPtr = new VariantDerived<ValueType>(std::forward<ValueType>(value));
         auto basePtr = static_cast<VariantBase*>(derivedPtr);
         _value = std::unique_ptr<VariantBase>(basePtr);
     }
@@ -54,6 +56,7 @@ namespace utilities
     {
         if (std::type_index(typeid(ValueType)) != _type)
         {
+            assert(false);
             throw std::runtime_error("Bad variant access");
         }
 
@@ -64,10 +67,16 @@ namespace utilities
     Variant& Variant::operator=(ValueType&& value)
     {
         _type = std::type_index(typeid(ValueType));
-        auto derivedPtr = new VariantDerived<ValueType>(std::forward<ValueType>(value));
+        auto derivedPtr = new VariantDerived<std::decay<ValueType>::type>(std::forward<ValueType>(value));
         auto basePtr = static_cast<VariantBase*>(derivedPtr);
         _value = std::unique_ptr<VariantBase>(basePtr);
         return *this;
+    }
+
+    template <typename ValueType>
+    bool Variant::IsEmpty() const
+    {
+        return _value == nullptr;
     }
 
     template <typename ValueType>
@@ -79,7 +88,7 @@ namespace utilities
     template <typename ValueType, typename... Args>
     Variant MakeVariant(Args&&... args)
     {
-        auto derivedPtr = new VariantDerived<ValueType>(std::forward<Args>(args)...);
+        auto derivedPtr = new VariantDerived<typename std::decay<ValueType>::type>(std::forward<Args>(args)...);
         auto basePtr = static_cast<VariantBase*>(derivedPtr);
         return Variant(std::type_index(typeid(ValueType)), std::unique_ptr<VariantBase>(basePtr));
     }

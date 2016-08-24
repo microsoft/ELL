@@ -33,15 +33,15 @@ public:
 
     virtual utilities::ObjectDescription GetDescription() const override
     {
-        utilities::ObjectDescription description;
-        description.AddProperty("a", "Parameter a", _a);
-        description.AddProperty("b", "Parameter b", _b);
+        utilities::ObjectDescription description = GetTypeDescription();
+        description["a"] = _a;
+        description["b"] = _b;
         return description;
     }
 
     static utilities::ObjectDescription GetTypeDescription()
     {
-        utilities::ObjectDescription description;
+        utilities::ObjectDescription description; //("Test object");
         description.AddProperty<int>("a", "Parameter a");
         description.AddProperty<double>("b", "Parameter b");
         return description;

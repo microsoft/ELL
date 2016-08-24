@@ -12,20 +12,35 @@ namespace utilities
     // PropertyDescription
     //
     template <typename ValueType>
-    PropertyDescription::PropertyDescription(const std::string& description, const ValueType& value)
+    PropertyDescription PropertyDescription::MakePropertyDescription(const std::string& description)
     {
-        _description = description;
-        _value = MakeVariant<ValueType>(value);
+        PropertyDescription result;
+        result._description = description;
+        result._typeName = TypeName<ValueType>::GetName();
+        return result;
     }
 
     template <typename ValueType>
-    void PropertyDescription::SetValue(const ValueType& value)
+    PropertyDescription PropertyDescription::MakePropertyDescription(const std::string& description, const ValueType& value)
     {
+        PropertyDescription result;
+        result._description = description;
+        result._typeName = TypeName<ValueType>::GetName();
+        result._value = MakeVariant<typename std::decay<ValueType>::type>(value);
+        return result;
+    }
+
+    template <typename ValueType>
+    void PropertyDescription::SetValue(ValueType&& value)
+    {
+        // Ensure ValueType == _value's ValueType
+        assert(_typeName == TypeName<typename std::decay<ValueType>::type>::GetName());
+//        assert(_value.IsType<ValueType>());
         _value = value;
     }
 
     template <typename ValueType>
-    void PropertyDescription::operator=(const ValueType& value)
+    void PropertyDescription::operator=(ValueType&& value)
     {
         SetValue(value);
     }
@@ -36,15 +51,8 @@ namespace utilities
     template <typename ValueType>
     void ObjectDescription::AddProperty(const std::string& name, std::string description)
     {
-        ValueType dummyValue;
-        AddProperty(name, description, dummyValue);
-    }
-
-    template <typename ValueType>
-    void ObjectDescription::AddProperty(const std::string& name, std::string description, const ValueType& value)
-    {
         assert(_properties.find(name) == _properties.end());
-        _properties[name] = PropertyDescription(description, value);
+        _properties[name] = PropertyDescription::MakePropertyDescription<ValueType>(description);
     }
 
     template <typename ValueType>

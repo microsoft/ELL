@@ -17,6 +17,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <cassert>
 
 class ISerializable;
 
@@ -103,6 +104,12 @@ namespace utilities
         template <typename ValueType>
         ValueType GetValue() const;
     
+        /// <summary> Checks if the variant has a value assigned to it. </summary>
+        ///
+        /// <returns> True if the variant currently holds a value. </returns>
+        template <typename ValueType>
+        bool IsEmpty() const;
+
         /// <summary> Checks the current type of the variant. </summary>
         ///
         /// <returns> True if the variant currently holds a value of type `ValueType`. </returns>

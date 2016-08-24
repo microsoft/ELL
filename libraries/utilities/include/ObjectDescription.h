@@ -26,16 +26,19 @@ namespace utilities
         PropertyDescription();
 
         template <typename ValueType>
-        PropertyDescription(const std::string& description, const ValueType& value);
+        static PropertyDescription MakePropertyDescription(const std::string& description);
+
+        template <typename ValueType>
+        static PropertyDescription MakePropertyDescription(const std::string& description, const ValueType& value);
 
         template <typename ValueType>
         ValueType GetValue() const { return _value.GetValue<ValueType>(); }
 
         template <typename ValueType>
-        void SetValue(const ValueType& value);
+        void SetValue(ValueType&& value);
 
         template <typename ValueType>
-        void operator=(const ValueType& value);
+        void operator=(ValueType&& value);
 
     private:
         std::string _typeName;
@@ -50,11 +53,10 @@ namespace utilities
         // TODO: templated constructor that sets typename?
         ObjectDescription() = default;
 
-        template <typename ValueType>
-        void AddProperty(const std::string& name, std::string description);
+        ObjectDescription(const std::string& description) : _description(description) {};
 
         template <typename ValueType>
-        void AddProperty(const std::string& name, std::string description, const ValueType& value);
+        void AddProperty(const std::string& name, std::string description);
 
         bool HasProperty(const std::string& name) const;
 
@@ -68,7 +70,7 @@ namespace utilities
 
     private:
         std::string _typeName; // ???
-        std::string description;
+        std::string _description;
         std::unordered_map<std::string, PropertyDescription> _properties;
     };
 
