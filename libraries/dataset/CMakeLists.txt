@@ -23,7 +23,6 @@ set (SRC src/DenseDataVector.cpp
 set (INCLUDE include/DataVectorBuilder.h
              include/DenseDataVector.h
              include/IDataVector.h
-             include/MappedParser.h
              include/OnesDataVector.h
              include/ParsingIterator.h
              include/RowDataset.h
@@ -37,7 +36,6 @@ set (INCLUDE include/DataVectorBuilder.h
 
 set (TCC tcc/DataVectorBuilder.tcc
          tcc/DenseDataVector.tcc
-         tcc/MappedParser.tcc
          tcc/ParsingIterator.tcc
          tcc/RowDataset.tcc
          tcc/SparseBinaryDataVector.tcc

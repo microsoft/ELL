@@ -17,7 +17,7 @@
 #include "XMLSerializer.h"
 
 // model
-#include "ModelGraph.h"
+#include "Model.h"
 #include "InputNode.h"
 #include "OutputNode.h"
 

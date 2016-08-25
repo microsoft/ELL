@@ -1,0 +1,20 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     PrintModel.h (print)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+// model
+#include "Model.h"
+
+// utilities
+#include "OutputStreamImpostor.h"
+
+// stl
+#include <ostream>
+
+void PrintModel(const model::Model& model, std::ostream& out);

@@ -7,17 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 %{
-#include "LoadModelInterface.h"
-
 #include <node.h>
 #include <v8.h>
 #include <nan.h>
 #include <string>
 #include <functional>
 #include <iostream>
+#include "RowDatasetInterface.h"
 %}
-
-%include "LoadModelInterface.h"
 
 %{
 	class GetDatasetWorker : public Nan::AsyncWorker

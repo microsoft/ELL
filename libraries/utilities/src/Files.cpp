@@ -14,6 +14,8 @@
 // stl
 #include <stdexcept>
 #include <memory>
+#include <locale>
+#include <ios>
 
 namespace utilities
 {

@@ -27,8 +27,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/XMLSerializer.cpp
          src/TypeName.cpp
          src/UniqueId.cpp
-         src/Variant.cpp
-         src/XMLSerialization.cpp)
+         src/Variant.cpp)
 
 set (INCLUDE include/CompressedIntegerList.h
              include/CommandLineParser.h
@@ -54,8 +53,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/TypeName.h
              include/TypeTraits.h
              include/UniqueId.h
-             include/Variant.h
-             include/XMLSerialization.h)
+             include/Variant.h)
 
 set (TCC tcc/AnyIterator.tcc
          tcc/CommandLineParser.tcc
@@ -72,8 +70,7 @@ set (TCC tcc/AnyIterator.tcc
          tcc/TypeFactory.tcc
          tcc/TypeName.tcc
          tcc/TypeTraits.tcc
-         tcc/Variant.tcc
-         tcc/XMLSerialization.tcc)
+         tcc/Variant.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -103,12 +100,12 @@ PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp 
               test/src/ISerializable_test.cpp
-              test/src/Variant_test.cpp
-              test/src/XMLSerialization_test.cpp)
+              test/src/TypeFactory_test.cpp
+              test/src/Variant_test.cpp)
 
 set (TEST_INCLUDE test/include/ISerializable_test.h
-                  test/include/Variant_test.h
-                  test/include/XMLSerialization_test.h)
+                  test/include/TypeFactory_test.h
+                  test/include/Variant_test.h)
                   
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})
@@ -117,9 +114,9 @@ add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-target_link_libraries(utilities_test utilities dataset linear layers model nodes testing -pthread)
+target_link_libraries(utilities_test utilities dataset linear model nodes testing -pthread)
 else()
-target_link_libraries(utilities_test utilities dataset linear layers model nodes testing)
+target_link_libraries(utilities_test utilities dataset linear model nodes testing)
 endif()
 set_property(TARGET utilities_test PROPERTY FOLDER "tests")
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})

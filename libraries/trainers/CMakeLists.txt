@@ -19,14 +19,12 @@ set (INCLUDE include/BaggingIncrementalTrainer.h
              include/IIncrementalTrainer.h
              include/IBlackBoxTrainer.h
              include/MultiEpochIncrementalTrainer.h
-             include/SortingTreeTrainer.h
              include/SweepingIncrementalTrainer.h
              include/SGDIncrementalTrainer.h)
 
 set (TCC tcc/BaggingIncrementalTrainer.tcc
          tcc/EvaluatingIncrementalTrainer.tcc         
          tcc/MultiEpochIncrementalTrainer.tcc
-         tcc/SortingTreeTrainer.tcc
          tcc/SweepingIncrementalTrainer.tcc
          tcc/SGDIncrementalTrainer.tcc)
 
@@ -39,7 +37,7 @@ target_include_directories(${PROJ_NAME} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
-target_link_libraries(${PROJ_NAME} predictors)
+target_link_libraries(${PROJ_NAME} evaluators predictors)
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 #

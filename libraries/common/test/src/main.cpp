@@ -6,7 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "LoadModelGraph_test.h"
+#include "LoadModel_test.h"
 
 // testing
 #include "testing.h"
@@ -27,7 +27,7 @@ int main()
         TestLoadTreeModels();
         
         TestSaveModels("xml");
-        // TestSaveModels("json");
+        TestSaveModels("json");
     }
     catch(const utilities::Exception& exception)
     {

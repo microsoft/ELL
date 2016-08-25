@@ -30,11 +30,11 @@ namespace model
 
         enum class PortType
         {
-            None,
-            Real,
-            Integer,
-            Categorical,
-            Boolean
+            none,
+            real,
+            integer,
+            categorical,
+            boolean
         };
 
         /// <summary> Returns the node the output port connected to this port belongs to </summary>
@@ -93,6 +93,6 @@ namespace model
         // _node keeps info on where the input is coming from
         const class Node* _node = nullptr;
         std::string _name;
-        PortType _type = PortType::None;
+        PortType _type = PortType::none;
     };
 }

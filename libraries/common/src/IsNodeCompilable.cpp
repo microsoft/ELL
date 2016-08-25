@@ -37,7 +37,7 @@ namespace common
     bool IsNodeCompilable::operator()(const model::Node& node)
     {
         const auto& nodeName = node.GetRuntimeTypeName();
-        if(_nodeNames.find(nodeName) != _nodeNames.end())
+        if (_nodeNames.find(nodeName) != _nodeNames.end())
         {
             return true;
         }

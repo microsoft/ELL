@@ -2,23 +2,26 @@
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     LoadModel.h (common)
-//  Authors:  Ofer Dekel
+//  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include "ModelLoadArguments.h"
-
-//layers
+// model
 #include "Model.h"
 
 namespace common
 {
     /// <summary> Loads a model from a file, or creates a new one if given an empty filename. </summary>
     ///
-    /// <param name="modelLoadArguments"> Model load arguments. </param>
+    /// <param name="filename"> The filename. </param>
+    /// <returns> The loaded model. </returns>
+    model::Model LoadModel(const std::string& filename);
+
+    /// <summary> Saves a model to a file. </summary>
     ///
-    /// <returns> A unique pointer to the model. </returns>
-    layers::Model LoadModel(const ModelLoadArguments& modelLoadArguments);
+    /// <param name="model"> The model. </param>
+    /// <param name="filename"> The filename. </param>
+    void SaveModel(const model::Model& model, const std::string& filename);
 }

@@ -19,14 +19,11 @@ set (SRC src/BaggingIncrementalTrainerArguments.cpp
          src/EvaluatorArguments.cpp
          src/IsNodeCompilable.cpp
          src/LoadModel.cpp
-         src/LoadModelGraph.cpp
          src/MakeTrainer.cpp
-         src/MapLoadArguments.cpp
-         src/MapSaveArguments.cpp
          src/ModelLoadArguments.cpp
+         src/ModelSaveArguments.cpp
          src/MultiEpochIncrementalTrainerArguments.cpp
          src/SGDIncrementalTrainerArguments.cpp
-         src/SortingTreeTrainerArguments.cpp
          src/TrainerArguments.cpp
 )
 
@@ -37,23 +34,19 @@ set (INCLUDE include/BaggingIncrementalTrainerArguments.h
              include/EvaluatorArguments.h
              include/IsNodeCompilable.h
              include/LoadModel.h
-             include/LoadModelGraph.h
              include/MakeEvaluator.h
              include/MakeTrainer.h
-             include/MapLoadArguments.h
-             include/MapSaveArguments.h
              include/ModelLoadArguments.h
+             include/ModelSaveArguments.h
              include/MultiEpochIncrementalTrainerArguments.h
              include/ParametersEnumerator.h
              include/SGDIncrementalTrainerArguments.h
-             include/SortingTreeTrainerArguments.h
              include/TrainerArguments.h
 )
 
 set (TCC tcc/MakeEvaluator.tcc
          tcc/ParametersEnumerator.tcc
 )
-
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -64,7 +57,7 @@ target_include_directories(${PROJ_NAME} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
-target_link_libraries(${PROJ_NAME} dataset layers linear utilities lossFunctions model nodes predictors evaluators trainers)
+target_link_libraries(${PROJ_NAME} dataset linear utilities lossFunctions model nodes predictors evaluators trainers)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
@@ -77,8 +70,8 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp
-              test/src/LoadModelGraph_test.cpp)
-set (TEST_INCLUDE test/include/LoadModelGraph_test.h)
+              test/src/LoadModel_test.cpp)
+set (TEST_INCLUDE test/include/LoadModel_test.h)
 
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})

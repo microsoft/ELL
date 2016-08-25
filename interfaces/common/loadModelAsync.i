@@ -8,7 +8,7 @@
 
 // Our interface classes
 %{
-#include "LoadModelGraph.h"
+#include "LoadModel.h"
 
 #include <node.h>
 #include <v8.h>
@@ -18,7 +18,7 @@
 #include <iostream>
 %}
 
-%include "LoadModelGraph.h"
+%include "LoadModel.h"
 
 %{
 	class LoadModelWorker : public Nan::AsyncWorker
@@ -31,7 +31,7 @@
 		virtual void Execute() override
 		{
 			// call load model here
-			_model = common::LoadModelGraph(_filename);
+			_model = common::LoadModel(_filename);
 		}
 
 		virtual void HandleOKCallback() override
