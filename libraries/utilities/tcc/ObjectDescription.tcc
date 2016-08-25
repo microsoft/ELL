@@ -16,7 +16,7 @@ namespace utilities
     {
         PropertyDescription result;
         result._description = description;
-        result._typeName = TypeName<ValueType>::GetName();
+        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
         return result;
     }
 
@@ -25,7 +25,7 @@ namespace utilities
     {
         PropertyDescription result;
         result._description = description;
-        result._typeName = TypeName<ValueType>::GetName();
+        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
         result._value = MakeVariant<typename std::decay<ValueType>::type>(value);
         return result;
     }
@@ -33,7 +33,8 @@ namespace utilities
     template <typename ValueType>
     void PropertyDescription::SetValue(ValueType&& value)
     {
-        assert(_typeName == TypeName<typename std::decay<ValueType>::type>::GetName());
+        // TODO: if valuetype is IDescribable, allow it to be a pointer (??)
+//        assert(_typeName == TypeName<typename std::decay<ValueType>::type>::GetName());
         _value = value;
     }
 

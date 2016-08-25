@@ -31,6 +31,10 @@ namespace utilities
         template <typename ValueType>
         static PropertyDescription MakePropertyDescription(const std::string& description, const ValueType& value);
 
+        std::string GetPropertyTypeName() { return _typeName; }
+
+        std::string GetDescription() { return _description; }
+
         template <typename ValueType>
         ValueType GetValue() const { return _value.GetValue<ValueType>(); }
 
@@ -59,6 +63,11 @@ namespace utilities
         void AddProperty(const std::string& name, std::string description);
 
         bool HasProperty(const std::string& name) const;
+
+        // TODO: need a way to look through properties
+        using PropertyCollection = std::unordered_map<std::string, PropertyDescription>;
+
+         const PropertyCollection& Properties() const { return _properties; }
 
         template <typename ValueType>
         ValueType GetPropertyValue(const std::string& name) const;

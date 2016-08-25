@@ -20,23 +20,14 @@
 #include <vector>
 #include <sstream>
 
-
-class TestObject: public utilities::IDescribable
+class ChildObject : public utilities::IDescribable
 {
 public:
-    TestObject(int a, double b) : _a(a), _b(b) {}
-    TestObject(const utilities::ObjectDescription& description)
+    ChildObject(int a, double b) : _a(a), _b(b) {}
+    ChildObject(const utilities::ObjectDescription& description)
     {
         _a = description.GetPropertyValue<int>("a");
         _b = description.GetPropertyValue<double>("b");
-    }
-
-    virtual utilities::ObjectDescription GetDescription() const override
-    {
-        utilities::ObjectDescription description = GetTypeDescription();
-        description["a"] = _a;
-        description["b"] = _b;
-        return description;
     }
 
     static utilities::ObjectDescription GetTypeDescription()
@@ -47,19 +38,81 @@ public:
         return description;
     }
 
+    virtual utilities::ObjectDescription GetDescription() const override
+    {
+        utilities::ObjectDescription description = GetTypeDescription();
+        description["a"] = _a;
+        description["b"] = _b;
+        return description;
+    }
+
+    static std::string GetTypeName() { return "ChildObject"; }
+    virtual std::string GetRuntimeTypeName() { return GetTypeName(); }
+
 private:
     int _a;
     double _b;
 };
 
+class ParentObject : public utilities::IDescribable
+{
+public:
+    ParentObject(std::string name, int a, double b) : _name(name), _child(a, b) {}
+    //ParentObject(const utilities::ObjectDescription& description)
+    //{
+    //}
+
+    static utilities::ObjectDescription GetTypeDescription()
+    {
+        utilities::ObjectDescription description("Test object");
+        description.AddProperty<decltype(_name)>("name", "Name");
+        description.AddProperty<decltype(_child)>("child", "Child object");
+        return description;
+    }
+
+    virtual utilities::ObjectDescription GetDescription() const override
+    {
+        utilities::ObjectDescription description = GetTypeDescription();
+        description["name"] = _name;
+        description["child"] = &_child;
+        return description;
+    }
+
+    static std::string GetTypeName() { return "ParentObject"; }
+    virtual std::string GetRuntimeTypeName() { return GetTypeName(); }
+
+
+private:
+    std::string _name;
+    ChildObject _child;
+};
+
 void TestGetObjectDescription()
 {
-    TestObject obj(3, 4.5);
-    auto desc = obj.GetDescription();
+    ChildObject childObj(3, 4.5);
+    auto childDescription = childObj.GetDescription();
 
-    std::cout << "TestObject has property a: " << desc.HasProperty("a") << std::endl;
-    std::cout << "TestObject has property b: " << desc.HasProperty("b") << std::endl;
-    std::cout << "TestObject has property c: " << desc.HasProperty("c") << std::endl;
-    std::cout << "TestObject.a = " << desc.GetPropertyValue<int>("a") << std::endl;
-    std::cout << "TestObject.b = " << desc.GetPropertyValue<double>("b") << std::endl;
+    std::cout << "ChildObject has property a: " << childDescription.HasProperty("a") << std::endl;
+    std::cout << "ChildObject has property b: " << childDescription.HasProperty("b") << std::endl;
+    std::cout << "ChildObject has property c: " << childDescription.HasProperty("c") << std::endl;
+    std::cout << "ChildObject.a = " << childDescription.GetPropertyValue<int>("a") << std::endl;
+    std::cout << "ChildObject.b = " << childDescription.GetPropertyValue<double>("b") << std::endl;
+
+    std::cout << "ChildObject properties" << std::endl;
+    for(const auto& iter: childDescription.Properties())
+    {
+        auto name = iter.first;
+        auto prop = iter.second;
+        std::cout << name << " -- " << prop.GetPropertyTypeName() << ": " << prop.GetDescription() << std::endl;
+    }
+
+    ParentObject parentObj("Parent", 5, 6.5);
+    auto parentDescription = parentObj.GetDescription();
+    std::cout << "ParentObject properties" << std::endl;
+    for(const auto& iter: parentDescription.Properties())
+    {
+        auto name = iter.first;
+        auto prop = iter.second;
+        std::cout << name << " -- " << prop.GetPropertyTypeName() << ": " << prop.GetDescription() << std::endl;
+    }
 }
