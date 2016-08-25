@@ -32,7 +32,7 @@ public:
 
     static utilities::ObjectDescription GetTypeDescription()
     {
-        utilities::ObjectDescription description("Child object");
+        utilities::ObjectDescription description = utilities::ObjectDescription::MakeObjectDescription<ChildObject>("Child object");
         description.AddProperty<int>("a", "Parameter a");
         description.AddProperty<double>("b", "Parameter b");
         return description;
@@ -64,7 +64,7 @@ public:
 
     static utilities::ObjectDescription GetTypeDescription()
     {
-        utilities::ObjectDescription description("Parent object");
+        utilities::ObjectDescription description = utilities::ObjectDescription::MakeObjectDescription<ParentObject>("Parent object");
         description.AddProperty<decltype(_name)>("name", "Name");
         description.AddProperty<decltype(_child)>("child", "Child object");
         return description;
@@ -87,30 +87,30 @@ private:
     ChildObject _child;
 };
 
+void PrintDescription(const utilities::ObjectDescription& description, size_t indentCount = 0)
+{
+    std::string indent(4*indentCount, ' ');
+    std::cout << indent << "Type: " << description.GetObjectTypeName() << " description: " << description.GetDescription() << std::endl;    
+    indent += "    ";
+    for(const auto& iter: description.Properties())
+    {
+        auto name = iter.first;
+        auto prop = iter.second;
+        std::cout << indent << name << " -- " << prop.GetPropertyTypeName() << ": " << prop.GetDescription() << std::endl;
+
+        // TODO: if this property is describable, get its description and print it (recursively)
+    }
+}
+
 void TestGetObjectDescription()
 {
     ChildObject childObj(3, 4.5);
     auto childDescription = childObj.GetDescription();
-
-    std::cout << "ChildObject description: " << childDescription.GetDescription() << std::endl;
-    std::cout << "ChildObject properties" << std::endl;
-    for(const auto& iter: childDescription.Properties())
-    {
-        auto name = iter.first;
-        auto prop = iter.second;
-        std::cout << name << " -- " << prop.GetPropertyTypeName() << ": " << prop.GetDescription() << std::endl;
-    }
+    PrintDescription(childDescription);
 
     ParentObject parentObj("Parent", 5, 6.5);
     auto parentDescription = parentObj.GetDescription();
-    std::cout << "ParentObject description: " << parentDescription.GetDescription() << std::endl;
-    std::cout << "ParentObject properties" << std::endl;
-    for(const auto& iter: parentDescription.Properties())
-    {
-        auto name = iter.first;
-        auto prop = iter.second;
-        std::cout << name << " -- " << prop.GetPropertyTypeName() << ": " << prop.GetDescription() << std::endl;
-    }
+    PrintDescription(parentDescription);
 
     testing::ProcessTest("ObjectDescription", childDescription.HasProperty("a"));
     testing::ProcessTest("ObjectDescription", childDescription.HasProperty("b"));

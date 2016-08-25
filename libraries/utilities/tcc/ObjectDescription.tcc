@@ -48,6 +48,15 @@ namespace utilities
     // ObjectDescription
     //
     template <typename ValueType>
+    ObjectDescription ObjectDescription::MakeObjectDescription(const std::string& description)
+    {
+        ObjectDescription result;
+        result._description = description;
+        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
+        return result;
+    }
+
+    template <typename ValueType>
     void ObjectDescription::AddProperty(const std::string& name, std::string description)
     {
         assert(_properties.find(name) == _properties.end());
