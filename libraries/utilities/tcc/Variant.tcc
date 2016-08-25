@@ -45,7 +45,7 @@ namespace utilities
     template <typename ValueType>
     Variant::Variant(ValueType&& value) : _type(std::type_index(typeid(ValueType)))
     {
-        auto derivedPtr = new VariantDerived<std::decay<ValueType>::type>(std::forward<ValueType>(value));
+        auto derivedPtr = new VariantDerived<typename std::decay<ValueType>::type>(std::forward<ValueType>(value));
 //        auto derivedPtr = new VariantDerived<ValueType>(std::forward<ValueType>(value));
         auto basePtr = static_cast<VariantBase*>(derivedPtr);
         _value = std::unique_ptr<VariantBase>(basePtr);
@@ -67,7 +67,7 @@ namespace utilities
     Variant& Variant::operator=(ValueType&& value)
     {
         _type = std::type_index(typeid(ValueType));
-        auto derivedPtr = new VariantDerived<std::decay<ValueType>::type>(std::forward<ValueType>(value));
+        auto derivedPtr = new VariantDerived<typename std::decay<ValueType>::type>(std::forward<ValueType>(value));
         auto basePtr = static_cast<VariantBase*>(derivedPtr);
         _value = std::unique_ptr<VariantBase>(basePtr);
         return *this;
