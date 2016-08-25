@@ -107,7 +107,7 @@ namespace model
     // Visitors
     //
 
-    // Visits the entire graph
+    // Visits the entire model
     template <typename Visitor>
     void Model::Visit(Visitor&& visitor) const
     {

@@ -4,13 +4,13 @@
 // 
 
 void TestNodeIterator();
-void TestStaticGraph();
+void TestStaticModel();
 void TestNodeIterator();
-void TestExampleGraph();
+void TestExampleModel();
 
 void TestInputRouting1();
 void TestInputRouting2();
 
-void TestCopyGraph();
+void TestCopyModel();
 
 void TestRefineSplitOutputs();

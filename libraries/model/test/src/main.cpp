@@ -2,7 +2,7 @@
 // Model tests
 // 
 
-#include "Graph_test.h"
+#include "Model_test.h"
 #include "PortElements_test.h"
 
 // testing
@@ -18,13 +18,13 @@ int main()
 {
     try
     {
-        TestStaticGraph();
+        TestStaticModel();
         TestNodeIterator();
-        TestExampleGraph();
+        TestExampleModel();
         TestInputRouting1();
         TestInputRouting2();
 
-        TestCopyGraph();
+        TestCopyModel();
         TestRefineSplitOutputs();
 
         // PortElements tests

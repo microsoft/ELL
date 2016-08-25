@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <emll version="1.0">
-<ModelGraph>
+<Model>
   <Array name='nodes' type='Node'>
     <ConstantNode(double)>
       <UniqueId name='id'>
@@ -3786,5 +3786,5 @@
       </OutputPort(bool)>
     </MultiplexerNode(bool,bool)>
   </Array>
-</ModelGraph>
+</Model>
 </emll>

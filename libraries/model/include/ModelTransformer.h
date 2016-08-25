@@ -103,12 +103,12 @@ namespace model
 
         /// <summary> Transforms a set of output port references from the input model space to the output model space. Called by node implementors. </summary>
         ///
-        /// <param name="elements"> The elements in the input model graph to transform to the output model space. </param>
+        /// <param name="elements"> The elements in the input model to transform to the output model space. </param>
         /// <returns> An PortElements object representing the transformed elements in the space of the new model. </returns>
         template <typename ValueType>
         PortElements<ValueType> TransformPortElements(const PortElements<ValueType>& elements);
 
-        /// <summary> Creates a new node in the transformed model graph. Called by node implementors. </summary>
+        /// <summary> Creates a new node in the transformed model. Called by node implementors. </summary>
         ///
         /// <typeparam name="Args"> The arguments to the constructor of NodeType. </typeparam>
         template <typename NodeType, typename... Args>

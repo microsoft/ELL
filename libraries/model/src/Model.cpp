@@ -53,13 +53,13 @@ namespace model
 
     void Model::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) 
     {
-        ModelSerializationContext graphContext(context, this);
+        ModelSerializationContext modelContext(context, this);
         
         // Deserialize nodes into big array
         std::vector<std::unique_ptr<Node>> nodes;
-        serializer.Deserialize("nodes", nodes, graphContext);
+        serializer.Deserialize("nodes", nodes, modelContext);
 
-        // Now add them to the model graph
+        // Now add them to the model
         for(auto& node: nodes)
         {
             std::shared_ptr<Node> sharedNode = std::shared_ptr<Node>(node.release());
@@ -75,7 +75,7 @@ namespace model
     NodeIterator::NodeIterator(const Model* model, const std::vector<const Node*>& outputNodes) : _model(model)
     {
         _currentNode = nullptr;
-        _visitFullGraph = false;
+        _visitFullModel = false;
         if (_model->Size() == 0)
         {
             return;
@@ -84,7 +84,7 @@ namespace model
         // start with output nodes in the stack
         _stack = outputNodes;
 
-        if (_stack.size() == 0) // Visit full graph
+        if (_stack.size() == 0) // Visit full model
         {
             // helper function to find a terminal (output) node
             auto IsLeaf = [](const Node* node) { return node->GetDependentNodes().size() == 0; };
@@ -99,7 +99,7 @@ namespace model
                 anOutputNode = anOutputNode->GetDependentNodes()[0];
             }
             _stack.push_back(anOutputNode);
-            _visitFullGraph = true;
+            _visitFullModel = true;
         }
 
         Next();
@@ -135,12 +135,12 @@ namespace model
                 _stack.pop_back();
                 _visitedNodes.insert(node);
 
-                // In "visit whole graph" mode, we want to add dependent nodes, so we can get to parts of the graph
+                // In "visit whole model" mode, we want to add dependent nodes, so we can get to parts of the model
                 // that the original leaf node doesn't depend on
-                if (_visitFullGraph)
+                if (_visitFullModel)
                 {
 
-                    // now add all our children (Note: this part is the only difference between visit-all and visit-active-graph
+                    // now add all our children (Note: this part is the only difference between visit-all and visit-active-model
                     const auto& dependentNodes = node->GetDependentNodes();
                     for (const auto& child : ModelImpl::Reverse(dependentNodes)) // Visiting the children in reverse order more closely retains the order the features were originally created
                     {

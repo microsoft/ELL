@@ -288,7 +288,7 @@ void TestDemultiplexerNodeCompute()
 // Node refinements
 //
 
-// TODO: make a generic TestGraphsEqual function that takes 2 graphs, 2 output nodes, and a test message string
+// TODO: make a generic TestModelsEqual function that takes 2 models, 2 output nodes, and a test message string
 
 void TestMovingAverageNodeRefine()
 {

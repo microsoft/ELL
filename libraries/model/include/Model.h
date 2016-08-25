@@ -25,7 +25,7 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-    /// <summary> An iterator over the nodes in a Model graph </summary>
+    /// <summary> An iterator over the nodes in a Model </summary>
     class NodeIterator : public utilities::IIterator<const Node*>
     {
     public:
@@ -50,7 +50,7 @@ namespace model
         std::unordered_set<const Node*> _visitedNodes;
         std::vector<const Node*> _stack;
 
-        bool _visitFullGraph = false;
+        bool _visitFullModel = false;
         const Node* _currentNode = nullptr;
     };
 
@@ -58,7 +58,7 @@ namespace model
     class Model : public utilities::ISerializable
     {
     public:
-        /// <summary> Factory method used to create nodes and add them to the graph. </summary>
+        /// <summary> Factory method used to create nodes and add them to the model. </summary>
         template <typename NodeType, typename... Args>
         NodeType* AddNode(Args&&... args);
 
@@ -93,7 +93,7 @@ namespace model
         std::vector<ValueType> ComputeOutput(const PortElements<ValueType>& elements) const;
 
         /// <summary>
-        /// Visits all the nodes in the graph in dependency order. No nodes will be visited until all
+        /// Visits all the nodes in the model in dependency order. No nodes will be visited until all
         /// its inputs have first been visited.
         /// </summary>
         ///
@@ -102,7 +102,7 @@ namespace model
         void Visit(Visitor&& visitor) const;
 
         /// <summary>
-        /// Visits the nodes in the graph necessary to compute the output of a given node. Visits the nodes
+        /// Visits the nodes in the model necessary to compute the output of a given node. Visits the nodes
         /// in dependency order. No nodes will be visited until all its inputs have first been visited.
         /// </summary>
         ///
@@ -112,7 +112,7 @@ namespace model
         void Visit(Visitor&& visitor, const Node* outputNode) const;
 
         /// <summary>
-        /// Visits the nodes in the graph necessary to compute the outputs of the given nodes. Visits the nodes
+        /// Visits the nodes in the model necessary to compute the outputs of the given nodes. Visits the nodes
         /// in dependency order. No nodes will be visited until all its inputs have first been visited.
         /// </summary>
         ///
@@ -122,13 +122,13 @@ namespace model
         void Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodes) const;
 
         /// <summary>
-        /// Gets an iterator over all the nodes in the graph in dependency order. No nodes will be visited until all
+        /// Gets an iterator over all the nodes in the model in dependency order. No nodes will be visited until all
         /// its inputs have first been visited.
         /// </summary>
         NodeIterator GetNodeIterator() const { return GetNodeIterator(std::vector<const Node*>{}); }
 
         /// <summary>
-        /// Gets an iterator over the nodes in the graph necessary to compute the output of a given node. Visits the nodes
+        /// Gets an iterator over the nodes in the model necessary to compute the output of a given node. Visits the nodes
         /// in dependency order. No nodes will be visited until all its inputs have first been visited.
         /// </summary>
         ///
@@ -136,7 +136,7 @@ namespace model
         NodeIterator GetNodeIterator(const Node* outputNode) const { return GetNodeIterator(std::vector<const Node*>{ outputNode }); }
 
         /// <summary>
-        /// Gets an iterator over the nodes in the graph necessary to compute the outputs of the given nodes. Visits the nodes
+        /// Gets an iterator over the nodes in the model necessary to compute the outputs of the given nodes. Visits the nodes
         /// in dependency order. No nodes will be visited until all its inputs have first been visited.
         /// </summary>
         ///

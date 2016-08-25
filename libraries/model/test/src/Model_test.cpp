@@ -1,8 +1,8 @@
 //
-// Graph tests
+// Model tests
 //
 
-#include "Graph_test.h"
+#include "Model_test.h"
 
 // model
 #include "Model.h"
@@ -67,19 +67,19 @@ void NodePrinter(const model::Node& node)
     std::cout << ")" << std::endl;
 };
 
-void PrintGraph(const model::Model& graph)
+void PrintModel(const model::Model& model)
 {
-    graph.Visit(NodePrinter);
+    model.Visit(NodePrinter);
 }
 
-void PrintGraph(const model::Model& graph, const model::Node* output)
+void PrintModel(const model::Model& model, const model::Node* output)
 {
-    graph.Visit(NodePrinter, output);
+    model.Visit(NodePrinter, output);
 }
 
-void TestStaticGraph()
+void TestStaticModel()
 {
-    // Create a simple computation graph
+    // Create a simple computation model
     model::Model g;
     auto in = g.AddNode<model::InputNode<double>>(3);
     auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
@@ -89,16 +89,16 @@ void TestStaticGraph()
     auto indexSelector = g.AddNode<nodes::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
     //
-    // Print various subgraphs
+    // Print various submodels
     //
-    std::cout << "\nFullGraph:" << std::endl;
-    PrintGraph(g);
+    std::cout << "\nFullModel:" << std::endl;
+    PrintModel(g);
 
-    std::cout << "\nGraph necessary for selected value:" << std::endl;
-    PrintGraph(g, valSelector);
+    std::cout << "\nModel necessary for selected value:" << std::endl;
+    PrintModel(g, valSelector);
 
-    std::cout << "\nGraph necessary for selected index:" << std::endl;
-    PrintGraph(g, indexSelector);
+    std::cout << "\nModel necessary for selected index:" << std::endl;
+    PrintModel(g, indexSelector);
 
     //
     // Compute outputs of various nodes
@@ -139,7 +139,7 @@ void TestStaticGraph()
     testing::ProcessTest("Testing min index", testing::IsEqual(output4[0], 2));
 }
 
-model::Model GetCompoundGraph()
+model::Model GetCompoundModel()
 {
     model::Model g;
     auto in = g.AddNode<model::InputNode<double>>(3);
@@ -152,7 +152,7 @@ model::Model GetCompoundGraph()
 
 void TestNodeIterator()
 {
-    auto model = GetCompoundGraph();
+    auto model = GetCompoundModel();
     auto size1 = model.Size();
     auto size2 = 0;
     auto iter = model.GetNodeIterator();
@@ -167,10 +167,10 @@ void TestNodeIterator()
     std::cout << std::endl << std::endl;
 }
 
-void TestExampleGraph()
+void TestExampleModel()
 {
     auto model = common::LoadModel("[1]");
-    PrintGraph(model);
+    PrintModel(model);
 
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     std::cout << "# input nodes: " << inputNodes.size() << std::endl;
@@ -178,7 +178,7 @@ void TestExampleGraph()
 
 void TestInputRouting1()
 {
-    // Create a simple computation graph that computes both min and max and concatenates them
+    // Create a simple model that computes both min and max and concatenates them
     // model::Model model;
 
     // auto in = model.AddNode<model::InputNode<double>>(3);
@@ -207,7 +207,7 @@ void TestInputRouting1()
 
 void TestInputRouting2()
 {
-    // Create a simple computation graph that computes both min and max and concatenates them
+    // Create a simple computation model that computes both min and max and concatenates them
     model::Model model;
 
     auto in = model.AddNode<model::InputNode<double>>(3);
@@ -241,12 +241,12 @@ void TestInputRouting2()
 }
 
 //
-// Placeholder for test function that creates a graph using dynamic-creation routines
+// Placeholder for test function that creates a model using dynamic-creation routines
 //
 
-void TestCopyGraph()
+void TestCopyModel()
 {
-    // Create a simple computation graph
+    // Create a simple computation model
     model::Model model;
     auto in = model.AddNode<model::InputNode<double>>(3);
     auto maxAndArgMax = model.AddNode<nodes::ArgMaxNode<double>>(in->output);
@@ -261,13 +261,13 @@ void TestCopyGraph()
     auto newModel = transformer.CopyModel(model, context);
 
     // Print them both:
-    std::cout << "\n\nOld graph" << std::endl;
+    std::cout << "\n\nOld model" << std::endl;
     std::cout << "---------" << std::endl;
-    PrintGraph(model);
+    PrintModel(model);
 
-    std::cout << "\n\nCopied graph" << std::endl;
+    std::cout << "\n\nCopied model" << std::endl;
     std::cout << "---------" << std::endl;
-    PrintGraph(newModel);
+    PrintModel(newModel);
 }
 
 // Define new node that splits its outputs when refined
@@ -328,7 +328,7 @@ private:
 
 void TestRefineSplitOutputs()
 {
-    // Create a simple computation graph
+    // Create a simple computation model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(2);
     auto outputNode = model.AddNode<SplittingNode<double>>(inputNode->output);
@@ -337,7 +337,7 @@ void TestRefineSplitOutputs()
     model::ModelTransformer transformer;
     auto newModel = transformer.RefineModel(model, context);
 
-    // Now run data through the graphs and make sure they agree
+    // Now run data through the models and make sure they agree
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newOutputs = transformer.GetCorrespondingOutputs(model::PortElements<double>{ outputNode->output });
 
@@ -350,7 +350,7 @@ void TestRefineSplitOutputs()
         newInputNode->SetInput(inputValue);
         auto newOutput = newModel.ComputeOutput(newOutputs);
 
-        testing::ProcessTest("testing refined splitting graph", testing::IsEqual(output[0], newOutput[0]));
-        testing::ProcessTest("testing refined splitting graph", testing::IsEqual(output[1], newOutput[1]));
+        testing::ProcessTest("testing refined splitting model", testing::IsEqual(output[0], newOutput[0]));
+        testing::ProcessTest("testing refined splitting model", testing::IsEqual(output[1], newOutput[1]));
     }
 }

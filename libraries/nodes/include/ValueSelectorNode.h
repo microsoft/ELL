@@ -62,7 +62,7 @@ namespace nodes
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<ValueType>& output = _output;
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         static constexpr const char* conditionPortName = "condition";
