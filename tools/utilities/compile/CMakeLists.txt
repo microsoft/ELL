@@ -5,7 +5,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 # define project
-set (PROJ_NAME compileGraph)
+set (PROJ_NAME compile)
 PROJECT(${PROJ_NAME})
 
 #enable C++11 in GCC, etc.
