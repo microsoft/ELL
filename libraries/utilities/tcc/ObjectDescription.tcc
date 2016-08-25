@@ -16,7 +16,7 @@ namespace utilities
     {
         PropertyDescription result;
         result._description = description;
-        result._typeName = TypeName<ValueType>::GetName();
+        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
         return result;
     }
 
@@ -25,7 +25,7 @@ namespace utilities
     {
         PropertyDescription result;
         result._description = description;
-        result._typeName = TypeName<ValueType>::GetName();
+        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
         result._value = MakeVariant<typename std::decay<ValueType>::type>(value);
         return result;
     }
