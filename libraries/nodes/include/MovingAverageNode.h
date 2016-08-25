@@ -70,10 +70,10 @@ namespace nodes
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
+        /// <summary> Refines this node in the model being constructed by the transformer </summary>
         virtual bool Refine(model::ModelTransformer& transformer) const override;
 
     protected:

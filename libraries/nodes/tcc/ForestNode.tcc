@@ -155,7 +155,7 @@ namespace nodes
         // sum all of the trees
         auto sumNode = transformer.AddNode<SumNode<double>>(treesPlusBias);
 
-        // Map all the outputs from the original node to the refined graph outputs         
+        // Map all the outputs from the original node to the refined model outputs         
         transformer.MapNodeOutput(output, sumNode->output);
         transformer.MapNodeOutput(treeOutputs, treeSubModels);
         transformer.MapNodeOutput(edgeIndicatorVector, edgeIndicatorVectorElements);

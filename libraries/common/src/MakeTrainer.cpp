@@ -22,33 +22,19 @@ namespace common
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
-        switch(lossArguments.lossFunction)
+        switch (lossArguments.lossFunction)
         {
-        case LossFunctionEnum::squared:
-            return trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::SquaredLoss(), sgdArguments);
+            case LossFunctionEnum::squared:
+                return trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::SquaredLoss(), sgdArguments);
 
-        case LossFunctionEnum::log:
-            return trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::LogLoss(lossArguments.lossFunctionParameter), sgdArguments);
+            case LossFunctionEnum::log:
+                return trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::LogLoss(lossArguments.lossFunctionParameter), sgdArguments);
 
-        case LossFunctionEnum::hinge:
-            return trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::HingeLoss(), sgdArguments);
+            case LossFunctionEnum::hinge:
+                return trainers::MakeSGDIncrementalTrainer(dim, lossFunctions::HingeLoss(), sgdArguments);
 
-        default:
-            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
-        }
-    }
-
-    std::unique_ptr<trainers::IBlackBoxTrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossArguments& lossArguments, const SortingTreeTrainerArguments& sortingTreeArguments)
-    {
-        using LossFunctionEnum = common::LossArguments::LossFunction;
-
-        switch(lossArguments.lossFunction)
-        {
-        case LossFunctionEnum::squared:
-            return trainers::MakeSortingTreeTrainer(lossFunctions::SquaredLoss(), sortingTreeArguments);
-
-        default:
-            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+            default:
+                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 }

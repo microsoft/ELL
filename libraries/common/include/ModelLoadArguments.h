@@ -16,14 +16,14 @@
 
 namespace common
 {
-    /// <summary> A struct that holds command line parameters for loading maps. </summary>
+    /// <summary> A struct that holds command line parameters for loading models. </summary>
     struct ModelLoadArguments
     {
         /// <summary> The file to read a model from. </summary>
         std::string inputModelFile = "";
     };
 
-    /// <summary> A version of MapLoadArguments that adds its members to the command line parser. </summary>
+    /// <summary> A version of ModelLoadArguments that adds its members to the command line parser. </summary>
     struct ParsedModelLoadArguments : public ModelLoadArguments, public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>

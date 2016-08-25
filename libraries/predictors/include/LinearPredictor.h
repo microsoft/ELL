@@ -8,10 +8,6 @@
 
 #pragma once
 
-// layers
-#include "Model.h"
-#include "Coordinate.h"
-
 // linear
 #include "DoubleVector.h"
 
@@ -86,14 +82,6 @@ namespace predictors
 
         /// <summary> Resets the linear predictor to the zero vector with zero bias. </summary>
         void Reset();
-
-        /// <summary> Adds the predictor to a model. </summary>
-        ///
-        /// <param name="model"> [in,out] The model. </param>
-        /// <param name="inputCoordinates"> The input coordinates. </param>
-        ///
-        /// <returns> The predictor's output coordinates in the model. </returns>
-        layers::CoordinateList AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

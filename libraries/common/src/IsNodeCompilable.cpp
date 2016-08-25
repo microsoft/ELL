@@ -44,14 +44,12 @@ namespace common
         AddNodeType<nodes::UnaryOperationNode<double>>();
         AddNodeType<nodes::MultiplexerNode<bool,bool>>();
         AddNodeType<nodes::MultiplexerNode<double,bool>>();
-        AddNodeType<model::ValueSelectorNode<bool>>();
-        AddNodeType<model::ValueSelectorNode<double>>();
     }
 
     bool IsNodeCompilable::operator()(const model::Node& node)
     {
         const auto& nodeName = node.GetRuntimeTypeName();
-        if(_nodeNames.find(nodeName) != _nodeNames.end())
+        if (_nodeNames.find(nodeName) != _nodeNames.end())
         {
             return true;
         }

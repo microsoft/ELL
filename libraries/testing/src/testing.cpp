@@ -14,19 +14,71 @@
 
 namespace testing
 {
+    template <typename ValueType>
+    bool IsScalarEqual(const ValueType& a, const ValueType& b)
+    {
+        return a == b;
+    }
+
+    bool IsEqual(bool a, bool b)
+    {
+        return IsScalarEqual(a, b);
+    }
+    
+    bool IsEqual(char a, char b)
+    {
+        return IsScalarEqual(a, b);
+    }
+    
+    bool IsEqual(int a, int b)
+    {
+        return IsScalarEqual(a, b);
+    }
+    
+    bool IsEqual(size_t a, size_t b)
+    {
+        return IsScalarEqual(a, b);
+    }
+    
+    bool IsEqual(const std::string& a, const std::string& b)
+    {
+        return IsScalarEqual(a, b);
+    }
+
+    bool IsEqual(float a, float b, float tolerance)
+    {
+        return (a - b < tolerance && b - a < tolerance);
+    }
+
     bool IsEqual(double a, double b, double tolerance)
     {
-        if (a - b < tolerance && b - a < tolerance)
-        {
-            return true;
-        }
-        else
+        return (a - b < tolerance && b - a < tolerance);
+    }
+
+    //
+    // vectors
+    //
+
+    template <typename ValueType>
+    bool IsVectorEqual(const std::vector<ValueType>& a, const std::vector<ValueType>& b)
+    {
+        auto size = a.size();
+        if (size != b.size())
         {
             return false;
         }
-    }
 
-    bool IsEqual(const std::vector<double>& a, const std::vector<double>& b, double tolerance)
+        for (size_t index = 0; index < size; ++index)
+        {
+            if (a[index] != b[index])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+        template <typename ValueType>
+    bool IsVectorApproxEqual(const std::vector<ValueType>& a, const std::vector<ValueType>& b, ValueType tolerance)
     {
         // allow vectors of different size, provided that they differ by a suffix of zeros
         uint64_t size = a.size();
@@ -65,14 +117,22 @@ namespace testing
 
     bool IsEqual(const std::vector<bool>& a, const std::vector<bool>& b)
     {
-        for (uint64_t i = 0; i < a.size(); ++i)
-        {
-            if (a[i] != b[i])
-            {
-                return false;
-            }
-        }
-        return true;
+        return IsVectorEqual(a, b);
+    }
+
+    bool IsEqual(const std::vector<int>& a, const std::vector<int>& b)
+    {
+        return IsVectorEqual(a, b);
+    }
+
+    bool IsEqual(const std::vector<float>& a, const std::vector<float>& b, float tolerance)
+    {
+        return IsVectorApproxEqual(a, b, tolerance);
+    }
+
+    bool IsEqual(const std::vector<double>& a, const std::vector<double>& b, double tolerance)
+    {
+        return IsVectorApproxEqual(a, b, tolerance);
     }
 
     bool testFailedFlag = false;

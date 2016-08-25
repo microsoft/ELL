@@ -12,7 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/ModelGraph.cpp
+set (SRC src/Model.cpp
          src/ModelTransformer.cpp
          src/Node.cpp
          src/OutputPort.cpp
@@ -20,28 +20,24 @@ set (SRC src/ModelGraph.cpp
          src/Port.cpp
 )
 
-set (INCLUDE include/ExtremalValueNode.h
-             include/InputNode.h
+set (INCLUDE include/InputNode.h
              include/InputPort.h
-             include/ModelGraph.h
+             include/Model.h
              include/ModelTransformer.h
              include/Node.h
              include/OutputNode.h
              include/OutputPort.h
              include/PortElements.h
              include/Port.h
-             include/ValueSelectorNode.h
 )
 
-set (TCC tcc/ExtremalValueNode.tcc
-         tcc/InputNode.tcc
+set (TCC tcc/InputNode.tcc
          tcc/InputPort.tcc
-         tcc/ModelGraph.tcc
+         tcc/Model.tcc
          tcc/ModelTransformer.tcc
          tcc/OutputNode.tcc
          tcc/OutputPort.tcc
          tcc/PortElements.tcc
-         tcc/ValueSelectorNode.tcc
 )
 
 source_group("src" FILES ${SRC})
@@ -67,10 +63,10 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp
-              test/src/Graph_test.cpp
+              test/src/Model_test.cpp
               test/src/PortElements_test.cpp)
 set (TEST_INCLUDE test/include/PortElements_test.h
-                  test/include/Graph_test.h)
+                  test/include/Model_test.h)
 
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})

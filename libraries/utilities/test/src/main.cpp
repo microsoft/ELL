@@ -6,11 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "XMLSerialization_test.h"
 #include "Iterator_test.h"
-#include "Variant_test.h"
 #include "ISerializable_test.h"
 #include "ObjectDescription_test.h"
+#include "TypeFactory_test.h"
+#include "Variant_test.h"
 
 // utilities
 #include "Format.h"
