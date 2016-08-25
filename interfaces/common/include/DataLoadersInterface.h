@@ -14,7 +14,7 @@
 #include "DataLoadArguments.h"
 #include "SupervisedExample.h"
 #include "AnyIterator.h"
-\
+
 namespace interfaces
 {
     /// <summary> Gets a data iterator from a data file, based on data load arguments. </summary>
