@@ -72,16 +72,6 @@ void PrintGraph(const model::Model& graph)
     graph.Visit(NodePrinter);
 }
 
-void PrintGraphIterator(const model::Model& graph)
-{
-    auto iter = graph.GetNodeIterator();
-    while (iter.IsValid())
-    {
-        NodePrinter(*iter.Get());
-        iter.Next();
-    }
-}
-
 void PrintGraph(const model::Model& graph, const model::Node* output)
 {
     graph.Visit(NodePrinter, output);

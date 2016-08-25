@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PrintArguments.h"
+#include "PrintModel.h"
 
 // common
 #include "ModelLoadArguments.h"
@@ -27,50 +28,6 @@
 #include <stdexcept>
 #include <memory>
 
-void PrintNode(const model::Node& node, utilities::OutputStreamImpostor& out)
-{
-    bool isFirstInputPort = true;
-    std::cout << "node_" << node.GetId() << " = " << node.GetRuntimeTypeName() << "(";
-    for (const auto& inputPort : node.GetInputPorts())
-    {
-        std::cout << (isFirstInputPort ? "" : ", ");
-        isFirstInputPort = false;
-
-        auto elements = inputPort->GetInputElements();
-        if (elements.NumRanges() > 1)
-        {
-            std::cout << "{";
-        }
-
-        bool isFirstRange = true;
-        for (const auto& range : elements.GetRanges())
-        {
-            std::cout << (isFirstRange ? "" : ", ");
-            isFirstRange = false;
-
-            auto port = range.ReferencedPort();
-            std::cout << "node_" << port->GetNode()->GetId() << "." << port->GetName();
-            if (!range.IsFullPortRange())
-            {
-                auto start = range.GetStartIndex();
-                auto size = range.Size();
-                std::cout << "[" << start << ":" << (start + size) << "]";
-            }
-        }
-
-        if (elements.NumRanges() > 1)
-        {
-            std::cout << "}";
-        }
-    }
-    std::cout << ")" << std::endl;
-};
-
-void PrintModel(const model::Model& model, utilities::OutputStreamImpostor& out)
-{
-    model.Visit([&out](const model::Node& node) { PrintNode(node, out); });
-}
-
 int main(int argc, char* argv[])
 {
     try
@@ -85,14 +42,12 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(printArguments);
         commandLineParser.Parse();
 
-        // if output file specified, use it, otherwise use std::cout
-        utilities::OutputStreamImpostor outStream(printArguments.outputFilename);
-
         // open model file
         auto model = common::LoadModel(modelLoadArguments.inputModelFile);
         
         // print model
-        PrintModel(model, outStream);
+        utilities::OutputStreamImpostor out = printArguments.outputStream;
+        PrintModel(model, out);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

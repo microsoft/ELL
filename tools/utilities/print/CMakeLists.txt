@@ -14,9 +14,11 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/PrintArguments.cpp
+         src/PrintModel.cpp
          src/main.cpp)
 
-set (INCLUDE include/PrintArguments.h)
+set (INCLUDE include/PrintArguments.h
+             include/PrintModel.h)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
