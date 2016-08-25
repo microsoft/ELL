@@ -64,10 +64,11 @@ namespace utilities
 
         bool HasProperty(const std::string& name) const;
 
+        std::string GetDescription() { return _description; }
+
         // TODO: need a way to look through properties
         using PropertyCollection = std::unordered_map<std::string, PropertyDescription>;
-
-         const PropertyCollection& Properties() const { return _properties; }
+        const PropertyCollection& Properties() const { return _properties; }
 
         template <typename ValueType>
         ValueType GetPropertyValue(const std::string& name) const;

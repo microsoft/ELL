@@ -111,8 +111,8 @@ set (TEST_SRC test/src/main.cpp
 set (TEST_INCLUDE test/include/ISerializable_test.h
                   test/include/Iterator_test.h
                   test/include/ObjectDescription_test.h
-              test/src/TypeFactory_test.cpp
-              test/src/Variant_test.cpp)
+                  test/src/TypeFactory_test.cpp
+                  test/src/Variant_test.cpp)
                   
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})

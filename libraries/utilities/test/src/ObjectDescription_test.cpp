@@ -32,7 +32,7 @@ public:
 
     static utilities::ObjectDescription GetTypeDescription()
     {
-        utilities::ObjectDescription description; //("Test object");
+        utilities::ObjectDescription description("Child object");
         description.AddProperty<int>("a", "Parameter a");
         description.AddProperty<double>("b", "Parameter b");
         return description;
@@ -64,7 +64,7 @@ public:
 
     static utilities::ObjectDescription GetTypeDescription()
     {
-        utilities::ObjectDescription description("Test object");
+        utilities::ObjectDescription description("Parent object");
         description.AddProperty<decltype(_name)>("name", "Name");
         description.AddProperty<decltype(_child)>("child", "Child object");
         return description;
@@ -92,12 +92,7 @@ void TestGetObjectDescription()
     ChildObject childObj(3, 4.5);
     auto childDescription = childObj.GetDescription();
 
-    std::cout << "ChildObject has property a: " << childDescription.HasProperty("a") << std::endl;
-    std::cout << "ChildObject has property b: " << childDescription.HasProperty("b") << std::endl;
-    std::cout << "ChildObject has property c: " << childDescription.HasProperty("c") << std::endl;
-    std::cout << "ChildObject.a = " << childDescription.GetPropertyValue<int>("a") << std::endl;
-    std::cout << "ChildObject.b = " << childDescription.GetPropertyValue<double>("b") << std::endl;
-
+    std::cout << "ChildObject description: " << childDescription.GetDescription() << std::endl;
     std::cout << "ChildObject properties" << std::endl;
     for(const auto& iter: childDescription.Properties())
     {
@@ -108,6 +103,7 @@ void TestGetObjectDescription()
 
     ParentObject parentObj("Parent", 5, 6.5);
     auto parentDescription = parentObj.GetDescription();
+    std::cout << "ParentObject description: " << parentDescription.GetDescription() << std::endl;
     std::cout << "ParentObject properties" << std::endl;
     for(const auto& iter: parentDescription.Properties())
     {
@@ -115,4 +111,10 @@ void TestGetObjectDescription()
         auto prop = iter.second;
         std::cout << name << " -- " << prop.GetPropertyTypeName() << ": " << prop.GetDescription() << std::endl;
     }
+
+    testing::ProcessTest("ObjectDescription", childDescription.HasProperty("a"));
+    testing::ProcessTest("ObjectDescription", childDescription.HasProperty("b"));
+    testing::ProcessTest("ObjectDescription", !childDescription.HasProperty("c"));
+    testing::ProcessTest("ObjectDescription", childDescription.GetPropertyValue<int>("a") == 3);
+    testing::ProcessTest("ObjectDescription", childDescription.GetPropertyValue<double>("b") == 4.5);
 }
