@@ -12,24 +12,14 @@
 #include "DataLoadArguments.h"
 #include "RowDatasetInterface.h"
 #include "DataLoaders.h"
-#include "LoadModel.h"
 
 // dataset
 #include "SequentialLineIterator.h"
 #include "SparseEntryParser.h"
-#include "MappedParser.h"
 #include "ParsingIterator.h"
-
-// layers
-#include "Map.h"
-#include "Coordinate.h"
-#include "CoordinateListTools.h"
 
 // utilties
 #include "Files.h"
-
-// interface
-#include "MapInterface.h"
 
 namespace
 {
@@ -37,31 +27,6 @@ namespace
     dataset::ParsingIterator<RowIteratorType, VectorEntryParserType> MakeParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser)
     {
         return dataset::ParsingIterator<RowIteratorType, VectorEntryParserType>(std::move(row_iter), std::move(parser));
-    }
-
-    std::unique_ptr<dataset::IParsingIterator> GetMappedDataIterator(const common::DataLoadArguments& dataLoadArguments, layers::Map map)
-    {
-        // create mapped parser for sparse vectors (SVMLight format)
-        dataset::MappedParser<dataset::SparseEntryParser> mappedParser(dataset::SparseEntryParser(), map);
-
-        // create line iterator - read line by line sequentially
-        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFilename);
-
-        // Create iterator
-        return dataset::GetParsingIterator(std::move(lineIterator), std::move(mappedParser));
-    }
-
-    utilities::AnyIterator<dataset::GenericSupervisedExample> GetMappedDataIterator(const common::DataLoadArguments& dataLoadArguments, const interfaces::Map& map)
-    {
-        // create mapped parser for sparse vectors (SVMLight format)
-        dataset::MappedParser<dataset::SparseEntryParser> mappedParser(dataset::SparseEntryParser(), map.GetMap());
-
-        // create line iterator - read line by line sequentially
-        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFilename);
-
-        // Create iterator
-        auto parsingIterator = MakeParsingIterator(std::move(lineIterator), std::move(mappedParser));
-        return utilities::MakeAnyIterator(parsingIterator); // TODO: investigate why this works, but using std::move(parsingIterator) doesn't (shouldn't a ParsingIterator with a SequentialLineIterator uncopyable?)
     }
     
     // (Temporary) dense file I/O
@@ -137,23 +102,6 @@ namespace interfaces
         return utilities::MakeAnyIterator(parsingIterator); // Why does this work?
     }
 
-    utilities::AnyIterator<dataset::GenericSupervisedExample> GetDataIterator(const std::string& dataFilename, int dimension, const std::string coordinateListString, const std::string& modelFilename)
-    {
-        common::DataLoadArguments dataLoadArguments;
-        dataLoadArguments.inputDataFilename = dataFilename;
-        
-        // read model file
-        common::ModelLoadArguments modelLoadArguments;
-        modelLoadArguments.inputModelFile = modelFilename;
-        auto model = common::LoadModel(modelLoadArguments);
-
-        // get map output coordinate list
-        auto mapOutputCoordinates = layers::BuildCoordinateList(model, dimension, coordinateListString);
-
-        // get a data iterator
-        return GetMappedDataIterator(dataLoadArguments, interfaces::Map(layers::Map(model, mapOutputCoordinates)));
-    }
-
     interfaces::GenericRowDataset GetDataset(const std::string& dataFilename)
     {
         dataset::GenericRowDataset rowDataset;
@@ -175,49 +123,6 @@ namespace interfaces
             }
         }
         
-
-        return interfaces::GenericRowDataset(std::move(rowDataset));
-    }
-
-    interfaces::GenericRowDataset GetDataset(const common::DataLoadArguments& dataLoadArguments, const interfaces::Map& map)
-    {
-        dataset::GenericRowDataset rowDataset;
-
-        auto dataIterator = GetMappedDataIterator(dataLoadArguments, map.GetMap());
-        while (dataIterator->IsValid())
-        {
-            rowDataset.AddExample(dataIterator->Get());
-            dataIterator->Next();
-        }
-
-        return interfaces::GenericRowDataset(std::move(rowDataset));
-    }
-
-    interfaces::GenericRowDataset GetMappedDataset(const std::string& dataFilename, const interfaces::Map& map)
-    {
-       common::DataLoadArguments dataLoadArguments;
-       dataLoadArguments.inputDataFilename = dataFilename;
-       return interfaces::GetDataset(dataLoadArguments, map);
-    }
-    
-    interfaces::GenericRowDataset GetDataset(const std::string& dataFilename, const std::string& mapFilename)
-    {
-       common::DataLoadArguments dataLoadArguments;
-       common::MapLoadArguments mapLoadArguments;
-    
-       dataLoadArguments.inputDataFilename = dataFilename;
-       mapLoadArguments.modelLoadArguments.inputModelFile = mapFilename;
-
-       auto dataIterator = common::GetDataIterator(dataLoadArguments, mapLoadArguments);
-
-        dataset::GenericRowDataset rowDataset;
-
-        while (dataIterator->IsValid())
-        {
-            rowDataset.AddExample(dataIterator->Get());
-            dataIterator->Next();
-        }
-
         return interfaces::GenericRowDataset(std::move(rowDataset));
     }
 }

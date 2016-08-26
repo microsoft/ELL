@@ -82,7 +82,7 @@ namespace nodes
         static utilities::ObjectDescription GetTypeDescription();
         virtual utilities::ObjectDescription GetDescription() const;
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
     protected:

@@ -31,6 +31,10 @@ namespace utilities
         template <typename ValueType>
         static PropertyDescription MakePropertyDescription(const std::string& description, const ValueType& value);
 
+        std::string GetPropertyTypeName() { return _typeName; }
+
+        std::string GetDescription() { return _description; }
+
         template <typename ValueType>
         ValueType GetValue() const { return _value.GetValue<ValueType>(); }
 
@@ -56,9 +60,19 @@ namespace utilities
         ObjectDescription(const std::string& description) : _description(description) {};
 
         template <typename ValueType>
+        static ObjectDescription MakeObjectDescription(const std::string& description);
+
+        template <typename ValueType>
         void AddProperty(const std::string& name, std::string description);
 
         bool HasProperty(const std::string& name) const;
+
+        std::string GetDescription() const { return _description; }
+        std::string GetObjectTypeName() const { return _typeName; }
+
+        // TODO: need a way to look through properties
+        using PropertyCollection = std::unordered_map<std::string, PropertyDescription>;
+        const PropertyCollection& Properties() const { return _properties; }
 
         template <typename ValueType>
         ValueType GetPropertyValue(const std::string& name) const;
@@ -72,6 +86,11 @@ namespace utilities
         std::string _typeName;
         std::string _description;
         std::unordered_map<std::string, PropertyDescription> _properties;
+
+        // for unifying ObjectDescription and PropertyDescription...
+        Variant _value; // null if this is an IDescribable or a type description
+        // something to get description from type (a std::function, perhaps --- if empty, we're a non-describable thing)
+
     };
 
     /// <summary> Base class for describable objects </summary>

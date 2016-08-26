@@ -33,7 +33,8 @@ namespace utilities
     template <typename ValueType>
     void PropertyDescription::SetValue(ValueType&& value)
     {
-        assert(_typeName == TypeName<typename std::decay<ValueType>::type>::GetName());
+        // TODO: if valuetype is IDescribable, allow it to be a pointer (??)
+//        assert(_typeName == TypeName<typename std::decay<ValueType>::type>::GetName());
         _value = value;
     }
 
@@ -46,6 +47,15 @@ namespace utilities
     //
     // ObjectDescription
     //
+    template <typename ValueType>
+    ObjectDescription ObjectDescription::MakeObjectDescription(const std::string& description)
+    {
+        ObjectDescription result;
+        result._description = description;
+        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
+        return result;
+    }
+
     template <typename ValueType>
     void ObjectDescription::AddProperty(const std::string& name, std::string description)
     {

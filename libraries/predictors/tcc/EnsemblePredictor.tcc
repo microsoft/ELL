@@ -6,10 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// layers
-#include "Coordinatewise.h"
-#include "Sum.h"
-
 namespace predictors
 {
     template <typename BasePredictorType>
@@ -28,25 +24,5 @@ namespace predictors
             output += _weights[i] * _basePredictors[i].Predict(dataVector);
         }
         return output;
-    }
-
-    template<typename BasePredictorType>
-    layers::CoordinateList predictors::EnsemblePredictor<BasePredictorType>::AddToModel(layers::Model& model, layers::CoordinateList inputCoordinates) const 
-    {
-        layers::CoordinateList basePredictorOutputCoordinateList;
-
-        for(uint64_t i = 0; i<_basePredictors.size(); ++i)
-        {
-            auto outputCoordinates = _basePredictors[i].AddToModel(model, inputCoordinates);
-            basePredictorOutputCoordinateList.AddCoordinate(outputCoordinates[0]);
-        }
-
-        auto weightsLayer = std::make_unique<layers::Coordinatewise>(std::vector<double>(_weights), std::move(basePredictorOutputCoordinateList), layers::Coordinatewise::OperationType::multiply);
-        auto weightsLayerCoordinates = model.AddLayer(std::move(weightsLayer));
-
-        auto sumLayer = std::make_unique<layers::Sum>(std::move(weightsLayerCoordinates));
-        auto sumLayerCoordinates = model.AddLayer(std::move(sumLayer));
-
-        return sumLayerCoordinates;
     }
 }

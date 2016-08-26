@@ -10,8 +10,9 @@
 
 namespace common
 {
-    void ParsedBaggingIncrementalTrainerArguments::AddArgs(utilities::CommandLineParser & parser) 
+    void ParsedBaggingIncrementalTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
     {
+        // clang-format off
         parser.AddOption(numIterations,
                          "numIterations",
                          "ni",
@@ -29,6 +30,6 @@ namespace common
                          "dprs",
                          "Seed for the random generator that controls data permutation between epochs.",
                          "123456");
-
+        // clang-format on                        
     }
 }

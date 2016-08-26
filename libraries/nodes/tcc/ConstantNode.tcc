@@ -67,7 +67,7 @@ namespace nodes
     {
         utilities::ObjectDescription description = GetTypeDescription();
         description["values"] = _values;
-//        description["output"] = _output; // ugh
+        description["output"] = &_output; // ugh
         return description;
     }
 }
