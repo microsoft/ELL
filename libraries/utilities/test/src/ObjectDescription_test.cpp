@@ -96,7 +96,7 @@ void PrintDescription(const utilities::ObjectDescription& description, size_t in
     {
         auto name = iter.first;
         auto prop = iter.second;
-        std::cout << indent << name << " -- " << prop.GetPropertyTypeName() << ": " << prop.GetDescription() << std::endl;
+        std::cout << indent << name << " -- " << prop.GetObjectTypeName() << ": " << prop.GetDescription() << std::endl;
 
         // TODO: if this property is describable, get its description and print it (recursively)
     }

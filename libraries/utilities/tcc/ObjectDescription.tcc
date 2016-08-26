@@ -9,42 +9,6 @@
 namespace utilities
 {
     //
-    // PropertyDescription
-    //
-    template <typename ValueType>
-    PropertyDescription PropertyDescription::MakePropertyDescription(const std::string& description)
-    {
-        PropertyDescription result;
-        result._description = description;
-        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
-        return result;
-    }
-
-    template <typename ValueType>
-    PropertyDescription PropertyDescription::MakePropertyDescription(const std::string& description, const ValueType& value)
-    {
-        PropertyDescription result;
-        result._description = description;
-        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
-        result._value = MakeVariant<typename std::decay<ValueType>::type>(value);
-        return result;
-    }
-
-    template <typename ValueType>
-    void PropertyDescription::SetValue(ValueType&& value)
-    {
-        // TODO: if valuetype is IDescribable, allow it to be a pointer (??)
-//        assert(_typeName == TypeName<typename std::decay<ValueType>::type>::GetName());
-        _value = value;
-    }
-
-    template <typename ValueType>
-    void PropertyDescription::operator=(ValueType&& value)
-    {
-        SetValue(value);
-    }
-
-    //
     // ObjectDescription
     //
     template <typename ValueType>
@@ -60,7 +24,7 @@ namespace utilities
     void ObjectDescription::AddProperty(const std::string& name, std::string description)
     {
         assert(_properties.find(name) == _properties.end());
-        _properties[name] = PropertyDescription::MakePropertyDescription<ValueType>(description);
+        _properties[name] = ObjectDescription::MakeObjectDescription<ValueType>(description);
     }
 
     template <typename ValueType>
@@ -80,11 +44,26 @@ namespace utilities
         auto iter = _properties.find(name); 
         if(iter == _properties.end())
         {
-            _properties[name] = PropertyDescription("", value);
+            _properties[name] = MakeObjectDescription("", value);
         }
         else
         {
             iter->second.SetValue(value);
         }
     }
+
+    template <typename ValueType>
+    void ObjectDescription::SetValue(ValueType&& value)
+    {
+        // TODO: if valuetype is IDescribable, allow it to be a pointer (??)
+//        assert(_typeName == TypeName<typename std::decay<ValueType>::type>::GetName());
+        _value = value;
+    }
+
+    template <typename ValueType>
+    void ObjectDescription::operator=(ValueType&& value)
+    {
+        SetValue(value);
+    }
+
 }

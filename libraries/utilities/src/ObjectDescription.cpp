@@ -17,12 +17,6 @@
 namespace utilities
 {
     //
-    // PropertyDescription
-    //
-    PropertyDescription::PropertyDescription()
-    {}
-
-    //
     // ObjectDescription
     //
     bool ObjectDescription::HasProperty(const std::string& name) const
@@ -30,7 +24,7 @@ namespace utilities
         return _properties.find(name) != _properties.end();
     }
 
-    PropertyDescription& ObjectDescription::operator[](const std::string& propertyName)
+    ObjectDescription& ObjectDescription::operator[](const std::string& propertyName)
     {
         return _properties[propertyName];
     }

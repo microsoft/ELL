@@ -19,42 +19,10 @@
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
-    /// <summary> Holds information describing a property of an object </summary>
-    class PropertyDescription
-    {
-    public:
-        PropertyDescription();
-
-        template <typename ValueType>
-        static PropertyDescription MakePropertyDescription(const std::string& description);
-
-        template <typename ValueType>
-        static PropertyDescription MakePropertyDescription(const std::string& description, const ValueType& value);
-
-        std::string GetPropertyTypeName() { return _typeName; }
-
-        std::string GetDescription() { return _description; }
-
-        template <typename ValueType>
-        ValueType GetValue() const { return _value.GetValue<ValueType>(); }
-
-        template <typename ValueType>
-        void SetValue(ValueType&& value);
-
-        template <typename ValueType>
-        void operator=(ValueType&& value);
-
-    private:
-        std::string _typeName;
-        std::string _description;
-        Variant _value;
-    };
-
     /// <summary> Holds information describing the properties (fields) of an object </summary>
     class ObjectDescription
     {
     public:
-        // TODO: templated constructor that sets typename?
         ObjectDescription() = default;
 
         ObjectDescription(const std::string& description) : _description(description) {};
@@ -70,8 +38,7 @@ namespace utilities
         std::string GetDescription() const { return _description; }
         std::string GetObjectTypeName() const { return _typeName; }
 
-        // TODO: need a way to look through properties
-        using PropertyCollection = std::unordered_map<std::string, PropertyDescription>;
+        using PropertyCollection = std::unordered_map<std::string, ObjectDescription>;
         const PropertyCollection& Properties() const { return _properties; }
 
         template <typename ValueType>
@@ -80,12 +47,21 @@ namespace utilities
         template <typename ValueType>
         void SetPropertyValue(const std::string& name, const ValueType& value);
 
-        PropertyDescription& operator[](const std::string& propertyName);        
+        ObjectDescription& operator[](const std::string& propertyName);        
+
+        template <typename ValueType>
+        ValueType GetValue() const { return _value.GetValue<ValueType>(); }
+
+        template <typename ValueType>
+        void SetValue(ValueType&& value);
+
+        template <typename ValueType>
+        void operator=(ValueType&& value);
 
     private:
         std::string _typeName;
         std::string _description;
-        std::unordered_map<std::string, PropertyDescription> _properties;
+        std::unordered_map<std::string, ObjectDescription> _properties; // empty for non-describable objects
 
         // for unifying ObjectDescription and PropertyDescription...
         Variant _value; // null if this is an IDescribable or a type description
