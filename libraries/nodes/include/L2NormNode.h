@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     L2NormNode.h (features)
+//  File:     L2NormNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@
 
 namespace nodes
 {
-    /// <summary> A feature that takes a vector input and returns its magnitude </summary>
+    /// <summary> A node that takes a vector input and returns its magnitude </summary>
     template <typename ValueType>
     class L2NormNode : public model::Node
     {
