@@ -1,5 +1,5 @@
 #
-# cmake file for sortingTreeLearner project
+# cmake file for forestTrainer project
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
@@ -22,7 +22,7 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
 target_include_directories(${PROJ_NAME} PRIVATE include)
-target_link_libraries(${PROJ_NAME} common dataset layers linear lossFunctions predictors trainers utilities)
+target_link_libraries(${PROJ_NAME} common dataset linear lossFunctions predictors trainers utilities)
 
 # put this project in the trainers folder in the IDE 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/trainers")
@@ -31,6 +31,7 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/trainers")
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 
 # tests
-add_test(NAME forestTrainerTest
+set (TEST_NAME ${PROJ_NAME}_test)
+add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/tinyTestData.txt -dd auto -omf null -v)

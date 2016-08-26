@@ -6,31 +6,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-%ignore predictors::LinearPredictor::AddToModel(layers::Model&, const layers::CoordinateList& ) const;
 %ignore predictors::LinearPredictor::GetWeights() const;
 %ignore predictors::LinearPredictor::GetBias() const;
 
 %{
 #define SWIG_FILE_WITH_INIT
 #include "LinearPredictor.h"
-#include "Coordinatewise.h"
-#include "Sum.h"
-#include "Model.h"
 %}
-
 
 #if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
 %shared_ptr(predictors::LinearPredictor) 
 #endif
 
 %include "LinearPredictor.h"
-
-%extend predictors::LinearPredictor
-{
-    void AddToModel(interfaces::Model& model, const layers::CoordinateList& inputCoordinates) const
-    {
-        auto weightsLayerCoordinates = model.GetModel().AddLayer(std::make_unique<layers::Coordinatewise>(std::vector<double>($self->GetWeights()), inputCoordinates, layers::Coordinatewise::OperationType::multiply));
-        auto sumLayerCoordinates = model.GetModel().AddLayer(std::make_unique<layers::Sum>(weightsLayerCoordinates));
-        model.GetModel().AddLayer(std::make_unique<layers::Coordinatewise>($self->GetBias(), sumLayerCoordinates[0], layers::Coordinatewise::OperationType::add));
-    }
-}

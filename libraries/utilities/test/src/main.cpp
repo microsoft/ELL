@@ -6,9 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "XMLSerialization_test.h"
 #include "Variant_test.h"
 #include "ISerializable_test.h"
+#include "TypeFactory_test.h"
 
 // utilities
 #include "IIterator.h"
@@ -213,7 +213,6 @@ int main()
         testMatchFormat();
 
         // XMLSerialization tests
-        XMLSerializationTest();
         TypeFactoryTest();
 
         // Variant tests
@@ -225,7 +224,7 @@ int main()
         TestXmlSerializer();
         TestXmlDeserializer();
     }
-    catch(utilities::Exception& exception)
+    catch(const utilities::Exception& exception)
     {
         std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
         throw;

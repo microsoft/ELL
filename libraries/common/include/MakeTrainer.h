@@ -39,7 +39,7 @@ namespace common
     /// <param name="trainerArguments"> Trainer command line arguments. </param>
     ///
     /// <returns> A unique_ptr to a forest trainer. </returns>
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& sortingTreeArguments);
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments);
 
     /// <summary> Makes a simple forest trainerr. </summary>
     ///

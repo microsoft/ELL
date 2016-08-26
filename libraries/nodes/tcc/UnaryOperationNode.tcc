@@ -17,7 +17,7 @@ namespace nodes
         }
 
         template <>
-        bool Sqrt(bool x)
+        inline bool Sqrt(bool x)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Error: taking sqrt of a boolean value");
         }
@@ -29,7 +29,7 @@ namespace nodes
         }
 
         template <>
-        bool LogicalNot(bool x)
+        inline bool LogicalNot(bool x)
         {
             return !x;
         }

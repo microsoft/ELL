@@ -5,7 +5,7 @@
 #include "PortElements_test.h"
 
 // model
-#include "ModelGraph.h"
+#include "Model.h"
 #include "InputNode.h"
 #include "PortElements.h"
 
@@ -44,9 +44,9 @@ void TestSlice()
     auto element2_6 = model::PortElements<double>(allElements, 2, 5);
     model::PortElements<double> element2_6_prime = { allElements, 2, 5 };
 
-    testing::ProcessTest("Testing slice and append", testing::IsEqual(allElements.Size(), 9));
-    testing::ProcessTest("Testing slice and append", testing::IsEqual(element0.Size(), 1));
-    testing::ProcessTest("Testing slice and append", testing::IsEqual(element4.Size(), 1));
+    testing::ProcessTest("Testing slice and append", testing::IsEqual(allElements.Size(), (size_t)9));
+    testing::ProcessTest("Testing slice and append", testing::IsEqual(element0.Size(), (size_t)1));
+    testing::ProcessTest("Testing slice and append", testing::IsEqual(element4.Size(), (size_t)1));
 }
 
 void TestAppend()
@@ -63,6 +63,6 @@ void TestAppend()
     elements2.Append({ in3->output, 1, 2 });
     elements2.Append({ elements1 });
 
-    testing::ProcessTest("Testing Append", testing::IsEqual(elements1.Size(), 5));
-    testing::ProcessTest("Testing Append", testing::IsEqual(elements2.Size(), 7));
+    testing::ProcessTest("Testing Append", testing::IsEqual(elements1.Size(), (size_t)5));
+    testing::ProcessTest("Testing Append", testing::IsEqual(elements2.Size(), (size_t)7));
 }

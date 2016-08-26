@@ -18,19 +18,19 @@ namespace model
     template <>
     Port::PortType Port::GetPortType<double>()
     {
-        return Port::PortType::Real;
+        return Port::PortType::real;
     }
 
     template <>
     Port::PortType Port::GetPortType<int>()
     {
-        return Port::PortType::Integer;
+        return Port::PortType::integer;
     }
 
     template <>
     Port::PortType Port::GetPortType<bool>()
     {
-        return Port::PortType::Boolean;
+        return Port::PortType::boolean;
     }
 
     void Port::Serialize(utilities::Serializer& serializer) const

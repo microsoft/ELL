@@ -64,17 +64,24 @@ namespace std
 %template (StringVector) std::vector<std::string>;
 #endif
 
+%{
+#include "Exception.h"
+%}
+
 // Add some primitive exception handling
 %exception {
     try { 
         $action 
     }
+    catch(const utilities::Exception& err) {
+        std::string errorMessage = std::string("Got exception in EMLL library: ") + err.GetMessage();
+        SWIG_exception(SWIG_RuntimeError, errorMessage.c_str());
+    }    
     catch(const std::runtime_error& err) {
         SWIG_exception(SWIG_RuntimeError, const_cast<char*>(err.what()));        
     }    
-    // TODO: catch EMLL-specific exceptions and rethrow them
     catch (...) {
-        SWIG_exception(SWIG_RuntimeError, "LogicException in EMLL library");
+        SWIG_exception(SWIG_RuntimeError, "Unknown exception in EMLL library");
     }
 }
 
@@ -130,9 +137,6 @@ typedef utilities::StlIterator<typename std::vector<dataset::GenericSupervisedEx
 // Interface includes for linear library
 %include linear.i
 
-// Interface includes for layers library
-%include layers.i
-
 // Interface includes for dataset library
 %include dataset.i
 
@@ -156,7 +160,6 @@ typedef utilities::StlIterator<typename std::vector<dataset::GenericSupervisedEx
 // Interface for model library
 %include nodes.i
 
-wrap_unique_ptr(LayerPtr, layers::Layer)
 
 #ifndef SWIGXML
 %template () std::vector<dataset::GenericSupervisedExample>;
@@ -169,12 +172,7 @@ wrap_unique_ptr(LayerPtr, layers::Layer)
 typedef trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType predictors::LinearPredictor;
 class trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType {};
 
-// Interface for features library
-%include features.i
-
 #if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
 // TODO: Review rules on when to apply the %shared_ptr() directive and get rid of these altogether if they're not in the right place 
-%shared_ptr(layers::Map)
-%shared_ptr(layers::Model)
 %shared_ptr(RowDataset)
 #endif

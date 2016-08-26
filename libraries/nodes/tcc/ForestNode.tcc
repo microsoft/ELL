@@ -8,9 +8,9 @@
 
 #include "ForestNode.h"
 #include "ConstantNode.h"
-#include "ElementSelectorNode.h"
+#include "MultiplexerNode.h"
 #include "BinaryOperationNode.h"
-#include "MultiplexorNode.h"
+#include "DemultiplexerNode.h"
 #include "SingleElementThresholdNode.h"
 #include "SumNode.h"
 
@@ -23,6 +23,32 @@ namespace nodes
     template<typename SplitRuleType, typename EdgePredictorType>
     ForestNode<SplitRuleType, EdgePredictorType>::ForestNode(const model::PortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest) : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, forest.NumTrees()), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()), _forest(forest)
     {}
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    ForestNode<SplitRuleType, EdgePredictorType>::ForestNode() : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, 0), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, 0)
+    {}
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestNode<SplitRuleType, EdgePredictorType>::Serialize(utilities::Serializer& serializer) const
+    {
+        Node::Serialize(serializer);
+        serializer.Serialize("input", _input);
+        serializer.Serialize("output", _output);
+        serializer.Serialize("treeOutputs", _treeOutputs);
+        serializer.Serialize("edgeIndicatorVector", _edgeIndicatorVector);
+        serializer.Serialize("forest", _forest);
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestNode<SplitRuleType, EdgePredictorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        Node::Deserialize(serializer, context);
+        serializer.Deserialize("input", _input, context);
+        serializer.Deserialize("output", _output, context);
+        serializer.Deserialize("treeOutputs", _treeOutputs, context);
+        serializer.Deserialize("edgeIndicatorVector", _edgeIndicatorVector, context);
+        serializer.Deserialize("forest", _forest, context);
+    }
 
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestNode<SplitRuleType, EdgePredictorType>::Copy(model::ModelTransformer& transformer) const
@@ -74,7 +100,7 @@ namespace nodes
             interiorNodeSplitIndicators[nodeIndex] = {splitRuleNode->output};
             
             // ...and selects the output value
-            auto selectorNode = transformer.AddNode<ElementSelectorNode<double, bool>>(edgeOutputs, splitRuleNode->output);
+            auto selectorNode = transformer.AddNode<MultiplexerNode<double, bool>>(edgeOutputs, splitRuleNode->output);
             interiorNodeSubModels[nodeIndex] = {selectorNode->output};
         }
 
@@ -94,9 +120,9 @@ namespace nodes
             auto numChildren = childEdges.size();
             model::PortElements<bool> parentIndicator = isRoot ? trueNode->output : edgeIndicatorSubModels[parentEdgeIndex];
 
-            // The multiplexor node computes the indicator value for all the children at once, by copying its input value (a '1' if it's the root)
+            // The Demultiplexer node computes the indicator value for all the children at once, by copying its input value (a '1' if it's the root)
             // to the selected child.
-            auto muxNode = transformer.AddNode<MultiplexorNode<bool, bool>>(parentIndicator, edgeSelector, numChildren);
+            auto muxNode = transformer.AddNode<DemultiplexerNode<bool, bool>>(parentIndicator, edgeSelector, numChildren);
             for(size_t edgePosition = 0; edgePosition < numChildren; ++edgePosition)
             {
                 auto edgeIndex = node.GetFirstEdgeIndex() + edgePosition;
@@ -129,7 +155,7 @@ namespace nodes
         // sum all of the trees
         auto sumNode = transformer.AddNode<SumNode<double>>(treesPlusBias);
 
-        // Map all the outputs from the original node to the refined graph outputs         
+        // Map all the outputs from the original node to the refined model outputs         
         transformer.MapNodeOutput(output, sumNode->output);
         transformer.MapNodeOutput(treeOutputs, treeSubModels);
         transformer.MapNodeOutput(edgeIndicatorVector, edgeIndicatorVectorElements);

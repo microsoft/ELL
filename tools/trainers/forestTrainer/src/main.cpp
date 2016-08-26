@@ -13,22 +13,14 @@
 #include "RandomEngines.h"
 #include "Exception.h"
 
-// layers
-#include "Map.h"
-#include "Coordinate.h"
-#include "CoordinateListTools.h"
-
 // dataset
 #include "Example.h"
 
 // common
 #include "ForestTrainerArguments.h"
 #include "TrainerArguments.h"
-#include "MapLoadArguments.h" 
-#include "MapSaveArguments.h" 
 #include "DataLoadArguments.h"
 #include "DataLoaders.h"
-#include "LoadModel.h"
 #include "MakeTrainer.h"
 #include "MakeEvaluator.h"
 
@@ -52,15 +44,11 @@ int main(int argc, char* argv[])
 
         // add arguments to the command line parser
         common::ParsedTrainerArguments trainerArguments;
-        common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
-        common::ParsedMapSaveArguments mapSaveArguments;
         common::ParsedHistogramForestTrainerArguments histogramForestTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
-        commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
-        commandLineParser.AddOptionSet(mapSaveArguments);
         commandLineParser.AddOptionSet(histogramForestTrainerArguments);
         
         // parse command line
@@ -71,16 +59,6 @@ int main(int argc, char* argv[])
             std::cout << "Sorting Tree Trainer" << std::endl;
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
-
-        // if output file specified, replace stdout with it 
-        auto& outStream = mapSaveArguments.outputModelStream;
-
-        // load a model
-        auto model = common::LoadModel(mapLoadArguments.modelLoadArguments);
-
-        // get output coordinate list and create the map
-        auto outputCoordinateList = layers::BuildCoordinateList(model, dataLoadArguments.parsedDataDimension, mapLoadArguments.coordinateListString);
-        layers::Map map(model, outputCoordinateList);
 
         // load dataset
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
@@ -112,12 +90,6 @@ int main(int argc, char* argv[])
             //evaluator->Print(std::cout);
             //std::cout << std::endl;
         }
-
-        // add tree to model
-      //  tree.AddToModel(model, outputCoordinateList);
-
-        // output map
-        model.Save(outStream);
 
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

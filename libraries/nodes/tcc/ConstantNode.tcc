@@ -41,6 +41,7 @@ namespace nodes
     void ConstantNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);
+        serializer.Serialize("output", _output);
         serializer.Serialize("values", _values);
     }
 
@@ -48,6 +49,7 @@ namespace nodes
     void ConstantNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
         Node::Deserialize(serializer, context);
+        serializer.Deserialize("output", _output, context);
         serializer.Deserialize("values", _values, context);
     }
 }
