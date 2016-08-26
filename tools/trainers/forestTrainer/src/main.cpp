@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 
         // load dataset
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
+        auto rowDataset = common::GetRowDataset(dataLoadArguments);
 
         // create trainer
         auto trainer = common::MakeHistogramForestTrainer(trainerArguments.lossArguments, histogramForestTrainerArguments);
