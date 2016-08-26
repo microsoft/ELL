@@ -97,9 +97,27 @@ void PrintDescription(const utilities::ObjectDescription& description, size_t in
         auto name = iter.first;
         auto prop = iter.second;
         std::cout << indent << name << " -- " << prop.GetObjectTypeName() << ": " << prop.GetDescription() << std::endl;
-
+         
         // TODO: if this property is describable, get its description and print it (recursively)
+        if(prop.IsDescribable())
+        {
+            prop.FillInDescription();
+            PrintDescription(prop, indentCount+1);
+        }
     }
+}
+
+void TestGetTypeDescription()
+{
+    auto childDescription = ChildObject::GetTypeDescription();
+    PrintDescription(childDescription);
+
+    auto parentDescription = ParentObject::GetTypeDescription();
+    PrintDescription(parentDescription);
+
+    testing::ProcessTest("ObjectDescription", childDescription.HasProperty("a"));
+    testing::ProcessTest("ObjectDescription", childDescription.HasProperty("b"));
+    testing::ProcessTest("ObjectDescription", !childDescription.HasProperty("c"));
 }
 
 void TestGetObjectDescription()

@@ -18,7 +18,7 @@ namespace utilities
         if (thisPtr == nullptr)
         {
             assert(false);
-            throw InputException(InputExceptionErrors::typeMismatch, std::string{"Variant::GetValue called with wrong type. Type: " + TypeName<ValueType>::GetName()});
+            throw InputException(InputExceptionErrors::typeMismatch, std::string{ "VariantBase::GetValue called with wrong type. Type: " + TypeName<ValueType>::GetName() });
         }
 
         return thisPtr->GetValue();
@@ -29,8 +29,9 @@ namespace utilities
     //
 
     template <typename ValueType>
-    VariantDerived<ValueType>::VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) 
-    {}
+    VariantDerived<ValueType>::VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val)
+    {
+    }
 
     template <typename ValueType>
     std::unique_ptr<VariantBase> VariantDerived<ValueType>::Clone() const
@@ -46,7 +47,7 @@ namespace utilities
     Variant::Variant(ValueType&& value) : _type(std::type_index(typeid(ValueType)))
     {
         auto derivedPtr = new VariantDerived<typename std::decay<ValueType>::type>(std::forward<ValueType>(value));
-//        auto derivedPtr = new VariantDerived<ValueType>(std::forward<ValueType>(value));
+        //        auto derivedPtr = new VariantDerived<ValueType>(std::forward<ValueType>(value));
         auto basePtr = static_cast<VariantBase*>(derivedPtr);
         _value = std::unique_ptr<VariantBase>(basePtr);
     }
@@ -54,10 +55,16 @@ namespace utilities
     template <typename ValueType>
     ValueType Variant::GetValue() const
     {
+        if (!_value)
+        {
+            assert(false);
+            throw InputException(InputExceptionErrors::nullReference, std::string{ "Variant::GetValue called on empty Variant" });
+        }
+
         if (std::type_index(typeid(ValueType)) != _type)
         {
             assert(false);
-            throw std::runtime_error("Bad variant access");
+            throw InputException(InputExceptionErrors::typeMismatch, std::string{ "Variant::GetValue called with wrong type. Type: " + TypeName<ValueType>::GetName() });
         }
 
         return _value->GetValue<ValueType>();
@@ -71,12 +78,6 @@ namespace utilities
         auto basePtr = static_cast<VariantBase*>(derivedPtr);
         _value = std::unique_ptr<VariantBase>(basePtr);
         return *this;
-    }
-
-    template <typename ValueType>
-    bool Variant::IsEmpty() const
-    {
-        return _value == nullptr;
     }
 
     template <typename ValueType>
@@ -107,7 +108,7 @@ namespace utilities
         using std::to_string;
         using utilities::to_string;
         inline std::string to_string(const std::string& str) { return str; }
-        
+
         template <typename ValueType>
         auto GetValueString(const ValueType& value, int) -> decltype(to_string(value), std::string())
         {

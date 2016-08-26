@@ -115,6 +115,7 @@ int main()
         TestXmlDeserializer();
 
         // ObjectDescription tests
+        TestGetTypeDescription();
         TestGetObjectDescription();
     }
     catch(const utilities::Exception& exception)

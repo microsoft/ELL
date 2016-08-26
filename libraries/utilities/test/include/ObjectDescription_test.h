@@ -8,4 +8,5 @@
 
 #pragma once
 
+void TestGetTypeDescription();
 void TestGetObjectDescription();
