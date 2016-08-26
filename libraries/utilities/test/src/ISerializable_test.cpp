@@ -75,74 +75,47 @@ void TestSerializer()
     auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
     auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
-    SerializerType serializer;
-    std::cout << "--Serializing bool--" << std::endl;
+
+    std::stringstream strstream;
+    SerializerType serializer(strstream);
     serializer.Serialize(boolVal);
-    std::cout << std::endl;
 
-    std::cout << "--Serializing int--" << std::endl;
     serializer.Serialize(intVal);
-    std::cout << std::endl;
 
-    std::cout << "--Serializing float--" << std::endl;
     serializer.Serialize(floatVal);
-    std::cout << std::endl;
 
-    std::cout << "--Serializing double--" << std::endl;
     serializer.Serialize(doubleVal);
-    std::cout << std::endl;
 
-    std::cout << "--Serializing TestStruct--" << std::endl;
     serializer.Serialize(testStruct);
-    std::cout << std::endl;
 
-    std::cout << "--Serializing UniqueId--" << std::endl;
     serializer.Serialize(id);
-    std::cout << std::endl;
 
-    std::cout << "--Serializing input node--" << std::endl;
     serializer.Serialize(*in);
-    std::cout << std::endl;
 
-    std::cout << "\n--Serializing output node--" << std::endl;
     serializer.Serialize(*out);
-    std::cout << std::endl;
 
-    std::cout << "\n--Serializing constant node--" << std::endl;
     serializer.Serialize(*constNode);
-    std::cout << std::endl;
 
-    std::cout << "\n--Serializing binary operation node--" << std::endl;
     serializer.Serialize(*binaryOpNode);
-    std::cout << std::endl;
 
-    std::cout << "\n--Serializing model--" << std::endl;
     serializer.Serialize(g);
-    std::cout << std::endl;
-    std::cout << "------------------------" << std::endl;
-    std::cout << std::endl;
 
     // simple stuff
     serializer.Serialize(5);
-    std::cout << std::endl;
 
     serializer.Serialize(3.1415);
-    std::cout << std::endl;
 
     std::vector<int> intArray{ 1, 2, 3 };
     serializer.Serialize("intArray", intArray);
-    std::cout << std::endl;
 
     std::vector<bool> boolArray{ true, false, true };
     serializer.Serialize("boolArray", boolArray);
-    std::cout << std::endl;
 
     std::vector<TestStruct> structArray;
     structArray.emplace_back(1, 2.0f, 3.0);
     structArray.emplace_back(4, 5.0f, 6.0);
     structArray.emplace_back(7, 8.0f, 9.0);
     serializer.Serialize("structArray", structArray);
-    std::cout << std::endl;
 }
 
 template <typename SerializerType, typename DeserializerType>
@@ -274,16 +247,12 @@ void TestDeserializer()
             serializer.Serialize("vec1", doubleVector);
             serializer.Serialize("vec2", structVector);
         }
-        std::cout << "Serialized string:" << std::endl;
-        std::cout << strstream.str() << std::endl;
 
         DeserializerType deserializer(strstream);
         std::vector<double> newDoubleVector;
         std::vector<TestStruct> newStructVector;
         deserializer.Deserialize("vec1", newDoubleVector, context);
-        std::cout << "Done with vec1" << std::endl;
         deserializer.Deserialize("vec2", newStructVector, context);
-        std::cout << "Done with vec2" << std::endl;
 
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(doubleVector, newDoubleVector));
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].a, newStructVector[0].a));
