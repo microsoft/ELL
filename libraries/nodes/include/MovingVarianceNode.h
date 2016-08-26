@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MovingVarianceNode.h (features)
+//  File:     MovingVarianceNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@
 
 namespace nodes
 {
-    /// <summary> A feature that takes a vector input and returns its variance over some window of time </summary>
+    /// <summary> A node that takes a vector input and returns its variance over some window of time </summary>
     template <typename ValueType>
     class MovingVarianceNode : public model::Node
     {
