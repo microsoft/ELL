@@ -12,38 +12,44 @@ namespace utilities
     // ObjectDescription
     //
     template <typename ValueType>
-    ObjectDescription ObjectDescription::MakeObjectDescription(const std::string& description)
+    ObjectDescription ObjectDescription::MakeObjectDescription(const std::string& documentation)
     {
         ObjectDescription result;
-        result._description = description;
+        result._documentation = documentation;
         result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
         return result;
     }
 
     template <typename ValueType>
-    void ObjectDescription::SetFillInDescriptionFunction(std::true_type)
+    void ObjectDescription::SetGetPropertiesFunction(std::true_type)
     {
-        _getPropertyDescription = [this]() 
+        _getPropertiesFunction = [this]() 
         {
-            auto ptr = this;
-            auto typeDesc = ValueType::GetTypeDescription();
-            return typeDesc;
+            if(HasValue())
+            {
+                auto ptr = _value.GetValue<const ValueType*>();
+                return ptr->GetDescription();
+            }
+            else
+            {
+                return ValueType::GetTypeDescription();
+            }
         };
     }
 
     template <typename ValueType>
-    void ObjectDescription::SetFillInDescriptionFunction(std::false_type)
+    void ObjectDescription::SetGetPropertiesFunction(std::false_type)
     {
-        _getPropertyDescription = nullptr;
+        _getPropertiesFunction = nullptr;
     }
 
     template <typename ValueType>
-    void ObjectDescription::AddProperty(const std::string& name, std::string description)
+    void ObjectDescription::AddProperty(const std::string& name, std::string documentation)
     {
         assert(_properties.find(name) == _properties.end());
-        auto propertyDescription = ObjectDescription::MakeObjectDescription<ValueType>(description); // Here, add lambda to fill in description
+        auto propertyDescription = ObjectDescription::MakeObjectDescription<ValueType>(documentation); // Here, add lambda to fill in description
         _properties[name] = std::move(propertyDescription);
-        _properties[name].SetFillInDescriptionFunction<ValueType>(std::is_base_of<utilities::IDescribable, ValueType>());
+        _properties[name].SetGetPropertiesFunction<ValueType>(std::is_base_of<utilities::IDescribable, ValueType>());
     }
 
     template <typename ValueType>

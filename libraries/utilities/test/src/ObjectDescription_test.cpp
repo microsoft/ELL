@@ -90,20 +90,19 @@ private:
 void PrintDescription(const utilities::ObjectDescription& description, size_t indentCount = 0)
 {
     std::string indent(4*indentCount, ' ');
-    std::cout << indent << "Type: " << description.GetObjectTypeName() << " description: " << description.GetDescription() << std::endl;    
-    indent += "    ";
+    std::cout << indent << "Type: " << description.GetObjectTypeName() << " -- " << description.GetDocumentation(); 
+    if(description.HasValue())
+    {
+        std::cout << " = " << description.GetValueString();
+    }
+    std::cout << std::endl;    
+
     for(const auto& iter: description.Properties())
     {
         auto name = iter.first;
         auto prop = iter.second;
-        std::cout << indent << name << " -- " << prop.GetObjectTypeName() << ": " << prop.GetDescription() << std::endl;
-         
-        // TODO: if this property is describable, get its description and print it (recursively)
-        if(prop.IsDescribable())
-        {
-            prop.FillInDescription();
-            PrintDescription(prop, indentCount+1);
-        }
+        prop.FillInDescription(); // TODO: get rid of this
+        PrintDescription(prop, indentCount+1);
     }
 }
 

@@ -84,7 +84,7 @@ namespace utilities
 
         /// <summary> Constructor from basic (non-variant) types. </summary>
         template <typename ValueType>
-        Variant(ValueType&& value);
+        explicit Variant(ValueType&& value);
 
         /// <summary> Copy constructor. </summary>
         Variant(const Variant& other);

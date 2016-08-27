@@ -19,23 +19,31 @@ namespace utilities
     //
     // ObjectDescription
     //
+    ObjectDescription::ObjectDescription(const std::string& documentation) : _documentation(documentation) 
+    {};
+
     bool ObjectDescription::HasProperty(const std::string& name) const
     {
         return _properties.find(name) != _properties.end();
     }
 
-    bool ObjectDescription::IsDescribable() const
+    std::string ObjectDescription::GetValueString() const
     {
-        return static_cast<bool>(_getPropertyDescription);
+        if(HasValue())
+        {
+            return _value.ToString();
+        }
+        else
+        {
+            return "";
+        }
     }
 
     void ObjectDescription::FillInDescription() 
     { 
-        if(_getPropertyDescription) 
+        if(_getPropertiesFunction)
         {
-            auto newProperties = _getPropertyDescription(); 
-            _properties = newProperties._properties;
-            int x = 5;
+            auto newProperties = _getPropertiesFunction(); 
         }
     }
 

@@ -47,26 +47,27 @@ namespace utilities
 
         ObjectDescription() = default;
 
-        ObjectDescription(const std::string& description) : _description(description) {};
-
         template <typename ValueType>
         static ObjectDescription MakeObjectDescription(const std::string& description);
 
-        std::string GetDescription() const { return _description; }
+        /// <summary> Gets the documentation string for this object, if present </summary>
+        std::string GetDocumentation() const { return _documentation; }
+
+        /// <summary> Gets the string representing the type name of this object </summary>
         std::string GetObjectTypeName() const { return _typeName; }
 
         /// <summary> Adds a new property to the object </summary>
         template <typename ValueType>
-        void AddProperty(const std::string& name, std::string description);
+        void AddProperty(const std::string& name, std::string documentation);
 
         /// <summary> Gets the properties of this object </summary>
-        const PropertyCollection& Properties() const { return _properties; }
+        const PropertyCollection& Properties() const { return _properties; } // TODO: dynamically add the properties for the children if necessary
 
         /// <summary> Checks if object has a property of a given name </summary>
         bool HasProperty(const std::string& name) const;
 
         template <typename ValueType>
-        ValueType GetPropertyValue(const std::string& name) const;
+        ValueType GetPropertyValue(const std::string& name) const; // necessary?
 
         template <typename ValueType>
         void SetPropertyValue(const std::string& name, const ValueType& value);
@@ -75,13 +76,13 @@ namespace utilities
         ObjectDescription& operator[](const std::string& propertyName);        
 
         /// <summary> Tells if the object description has a value associated with in </summary>
-        bool HasValue() const { return _value.IsEmpty(); }
+        bool HasValue() const { return !_value.IsEmpty(); }
 
-        bool IsDescribable() const;        
-
-        /// <summary> Gets the value of an object </summary>
+        /// <summary> Gets the value of this object </summary>
         template <typename ValueType>
         ValueType GetValue() const { return _value.GetValue<ValueType>(); }
+
+        std::string GetValueString() const;
 
         /// <summary> Sets the value of an object </summary>
         template <typename ValueType>
@@ -95,18 +96,20 @@ namespace utilities
 
     private:
         std::string _typeName;
-        std::string _description;
+        std::string _documentation;
         std::unordered_map<std::string, ObjectDescription> _properties; // empty for non-describable objects
 
         // _value is empty (? or should it still be the object) if this object is an IDescribable, or a type description
         Variant _value; // null if this is an IDescribable or a type description
         // something to get description from type (a std::function, perhaps --- if empty, we're a non-describable thing)
-        std::function<ObjectDescription()> _getPropertyDescription; 
+        std::function<ObjectDescription()> _getPropertiesFunction; 
+
+        ObjectDescription(const std::string& documentation);
 
         template <typename ValueType>
-        void SetFillInDescriptionFunction(std::true_type);
+        void SetGetPropertiesFunction(std::true_type);
         template <typename ValueType>
-        void SetFillInDescriptionFunction(std::false_type);
+        void SetGetPropertiesFunction(std::false_type);
     };
 
     /// <summary> Base class for describable objects </summary>
@@ -114,6 +117,7 @@ namespace utilities
     {
     public:
         virtual ObjectDescription GetDescription() const = 0;
+        static std::string GetTypeName() {return "IDescribable"; }
     };
 }
 

@@ -47,7 +47,6 @@ namespace utilities
     Variant::Variant(ValueType&& value) : _type(std::type_index(typeid(ValueType)))
     {
         auto derivedPtr = new VariantDerived<typename std::decay<ValueType>::type>(std::forward<ValueType>(value));
-        //        auto derivedPtr = new VariantDerived<ValueType>(std::forward<ValueType>(value));
         auto basePtr = static_cast<VariantBase*>(derivedPtr);
         _value = std::unique_ptr<VariantBase>(basePtr);
     }
@@ -100,7 +99,7 @@ namespace utilities
     namespace variantNamespace
     {
         template <typename ValueType>
-        auto GetValueString(const ValueType& value, double) -> std::string
+        auto GetValueString(const ValueType& value, ...) -> std::string
         {
             return std::string("[No to_string for type ") + typeid(ValueType).name() + "]";
         }

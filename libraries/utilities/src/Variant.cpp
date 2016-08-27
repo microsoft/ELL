@@ -50,8 +50,6 @@ namespace utilities
 
     std::string Variant::ToString() const
     {
-        using std::to_string;
-        using utilities::to_string;
         return _value->ToString();
     }
 
