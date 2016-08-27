@@ -32,7 +32,7 @@ public:
 
     static utilities::ObjectDescription GetTypeDescription()
     {
-        utilities::ObjectDescription description = utilities::ObjectDescription::MakeObjectDescription<ChildObject>("Child object");
+        utilities::ObjectDescription description = utilities::MakeObjectDescription<ChildObject>("Child object");
         description.AddProperty<int>("a", "Parameter a");
         description.AddProperty<double>("b", "Parameter b");
         return description;
@@ -64,7 +64,7 @@ public:
 
     static utilities::ObjectDescription GetTypeDescription()
     {
-        utilities::ObjectDescription description = utilities::ObjectDescription::MakeObjectDescription<ParentObject>("Parent object");
+        utilities::ObjectDescription description = utilities::MakeObjectDescription<ParentObject>("Parent object");
         description.AddProperty<decltype(_name)>("name", "Name");
         description.AddProperty<decltype(_child)>("child", "Child object");
         return description;
