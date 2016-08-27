@@ -57,8 +57,8 @@ namespace nodes
     utilities::ObjectDescription ConstantNode<ValueType>::GetTypeDescription()
     {
         auto description = utilities::ObjectDescription::MakeObjectDescription<ConstantNode<ValueType>>("Constant node");
-        description.AddProperty<const decltype(_values)&>("values", "Constant values");
-        description.AddProperty<const decltype(_output)&>("output", "Output port");
+        description.template AddProperty<decltype(_values)>("values", "Constant values");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
         return description;
     }
 
