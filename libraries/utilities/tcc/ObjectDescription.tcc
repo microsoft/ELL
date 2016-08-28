@@ -47,43 +47,16 @@ namespace utilities
     void ObjectDescription::AddProperty(const std::string& name, std::string documentation)
     {
         assert(_properties.find(name) == _properties.end());
-        auto propertyDescription = MakeObjectDescription<ValueType>(documentation); // Here, add lambda to fill in description
+        auto propertyDescription = MakeObjectDescription<ValueType>(documentation);
         _properties[name] = std::move(propertyDescription);
         _properties[name].SetGetPropertiesFunction<ValueType>(std::is_base_of<utilities::IDescribable, ValueType>());
     }
 
     template <typename ValueType>
-    ValueType ObjectDescription::GetPropertyValue(const std::string& name) const
-    {
-        auto iter = _properties.find(name);
-        if (iter == _properties.end())
-        {
-            throw InputException(InputExceptionErrors::badData);
-        }
-        return iter->second.GetValue<ValueType>();
-    }
-
-    template <typename ValueType>
-    void ObjectDescription::SetPropertyValue(const std::string& name, const ValueType& value)
-    {
-        auto iter = _properties.find(name);
-        if (iter == _properties.end())
-        {
-            _properties[name] = MakeObjectDescription("", value);
-        }
-        else
-        {
-            iter->second.SetValue(value);
-        }
-    }
-
-    template <typename ValueType>
     void ObjectDescription::SetValue(ValueType&& value)
     {
-        FillInDescription();
-        // TODO: if valuetype is IDescribable, allow it to be a pointer (??)
-        //        assert(_typeName == TypeName<typename std::decay<ValueType>::type>::GetName());
         _value = value;
+        FillInDescription();
     }
 
     template <typename ValueType>

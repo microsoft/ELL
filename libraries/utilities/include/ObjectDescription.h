@@ -54,19 +54,14 @@ namespace utilities
         bool HasProperty(const std::string& name) const;
 
         /// <summary> Gets the properties of this object </summary>
-        const PropertyCollection& Properties() const { return _properties; } // TODO: dynamically add the properties for the children if necessary
+        const PropertyCollection& Properties() const;
 
         /// <summary> Adds a new property to the object </summary>
         template <typename ValueType>
         void AddProperty(const std::string& name, std::string documentation);
 
-        template <typename ValueType>
-        ValueType GetPropertyValue(const std::string& name) const; // necessary?
-
-        template <typename ValueType>
-        void SetPropertyValue(const std::string& name, const ValueType& value);
-
         /// <summary> Retrieves an object property given its name </summary>
+        const ObjectDescription& operator[](const std::string& propertyName) const;        
         ObjectDescription& operator[](const std::string& propertyName);        
 
         /// <summary> Tells if the object description has a value associated with it. </summary>
@@ -94,28 +89,29 @@ namespace utilities
         template <typename ValueType>
         void operator=(ValueType&& value);
 
-        void FillInDescription();
-
     private:
         std::string _typeName;
         std::string _documentation;
-        std::unordered_map<std::string, ObjectDescription> _properties; // empty for non-describable objects
+        mutable std::unordered_map<std::string, ObjectDescription> _properties;
 
-        // _value is empty (? or should it still be the object) if this object is an IDescribable, or a type description
-        Variant _value; // null if this is an IDescribable or a type description
-        // something to get description from type (a std::function, perhaps --- if empty, we're a non-describable thing)
-        std::function<ObjectDescription()> _getPropertiesFunction; 
+        Variant _value;
+
+        mutable std::function<ObjectDescription()> _getPropertiesFunction; 
 
         template <typename ValueType>
         friend ObjectDescription MakeObjectDescription(const std::string& description);
 
         ObjectDescription(const std::string& documentation);
 
+        // overload that gets called for IDescribable properties
         template <typename ValueType>
         void SetGetPropertiesFunction(std::true_type);
 
+        // overload that gets called for non-IDescribable properties
         template <typename ValueType>
         void SetGetPropertiesFunction(std::false_type);
+
+        void FillInDescription() const;
     };
 
     /// <summary> Base class for describable objects </summary>

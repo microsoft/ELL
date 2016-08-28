@@ -26,8 +26,8 @@ public:
     ChildObject(int a, double b) : _a(a), _b(b) {}
     ChildObject(const utilities::ObjectDescription& description)
     {
-        _a = description.GetPropertyValue<int>("a");
-        _b = description.GetPropertyValue<double>("b");
+        _a = description["a"].GetValue<int>();
+        _b = description["b"].GetValue<double>();
     }
 
     static utilities::ObjectDescription GetTypeDescription()
@@ -100,7 +100,6 @@ void PrintDescription(const utilities::ObjectDescription& description, size_t in
     {
         auto name = iter.first;
         auto prop = iter.second;
-        prop.FillInDescription(); // TODO: get rid of this
         PrintDescription(prop, indentCount+1);
     }
 }
@@ -116,6 +115,9 @@ void TestGetTypeDescription()
     testing::ProcessTest("ObjectDescription", childDescription.HasProperty("a"));
     testing::ProcessTest("ObjectDescription", childDescription.HasProperty("b"));
     testing::ProcessTest("ObjectDescription", !childDescription.HasProperty("c"));
+
+    testing::ProcessTest("ObjectDescription", parentDescription.HasProperty("name"));
+    testing::ProcessTest("ObjectDescription", parentDescription.HasProperty("child"));
 }
 
 void TestGetObjectDescription()
@@ -131,6 +133,14 @@ void TestGetObjectDescription()
     testing::ProcessTest("ObjectDescription", childDescription.HasProperty("a"));
     testing::ProcessTest("ObjectDescription", childDescription.HasProperty("b"));
     testing::ProcessTest("ObjectDescription", !childDescription.HasProperty("c"));
-    testing::ProcessTest("ObjectDescription", childDescription.GetPropertyValue<int>("a") == 3);
-    testing::ProcessTest("ObjectDescription", childDescription.GetPropertyValue<double>("b") == 4.5);
+    testing::ProcessTest("ObjectDescription", childDescription["a"].GetValue<int>() == 3);
+    testing::ProcessTest("ObjectDescription", childDescription["b"].GetValue<double>() == 4.5);
+
+    testing::ProcessTest("ObjectDescription", parentDescription.HasProperty("name"));
+    testing::ProcessTest("ObjectDescription", parentDescription.HasProperty("child"));
+    testing::ProcessTest("ObjectDescription", parentDescription.HasProperty("name"));
+    testing::ProcessTest("ObjectDescription", parentDescription["name"].GetValue<std::string>() == "Parent");
+    auto parentChildDescription = parentDescription["child"];
+    testing::ProcessTest("ObjectDescription", parentChildDescription["a"].GetValue<int>() == 5);
+    testing::ProcessTest("ObjectDescription", parentChildDescription["b"].GetValue<double>() == 6.5);
 }
