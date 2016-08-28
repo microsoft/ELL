@@ -81,7 +81,6 @@ public:
     static std::string GetTypeName() { return "ParentObject"; }
     virtual std::string GetRuntimeTypeName() { return GetTypeName(); }
 
-
 private:
     std::string _name;
     ChildObject _child;

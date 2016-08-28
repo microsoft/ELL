@@ -49,6 +49,7 @@ namespace utilities
 
     ObjectDescription& ObjectDescription::operator[](const std::string& propertyName)
     {
+        FillInDescription();
         return _properties[propertyName];
     }
 }

@@ -80,6 +80,7 @@ namespace utilities
     template <typename ValueType>
     void ObjectDescription::SetValue(ValueType&& value)
     {
+        FillInDescription();
         // TODO: if valuetype is IDescribable, allow it to be a pointer (??)
         //        assert(_typeName == TypeName<typename std::decay<ValueType>::type>::GetName());
         _value = value;

@@ -50,15 +50,15 @@ namespace utilities
         /// <summary> Gets the string representing the type name of this object </summary>
         std::string GetObjectTypeName() const { return _typeName; }
 
-        /// <summary> Adds a new property to the object </summary>
-        template <typename ValueType>
-        void AddProperty(const std::string& name, std::string documentation);
+        /// <summary> Checks if object has a property of a given name </summary>
+        bool HasProperty(const std::string& name) const;
 
         /// <summary> Gets the properties of this object </summary>
         const PropertyCollection& Properties() const { return _properties; } // TODO: dynamically add the properties for the children if necessary
 
-        /// <summary> Checks if object has a property of a given name </summary>
-        bool HasProperty(const std::string& name) const;
+        /// <summary> Adds a new property to the object </summary>
+        template <typename ValueType>
+        void AddProperty(const std::string& name, std::string documentation);
 
         template <typename ValueType>
         ValueType GetPropertyValue(const std::string& name) const; // necessary?
