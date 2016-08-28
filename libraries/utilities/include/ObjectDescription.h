@@ -36,9 +36,6 @@ namespace utilities
         std::unordered_map<KeyType, std::function<ValueType()>> _creators;
     };
 
-
-
-
     /// <summary> Holds information describing the properties (fields) of an object </summary>
     class ObjectDescription
     {
@@ -46,9 +43,6 @@ namespace utilities
         using PropertyCollection = std::unordered_map<std::string, ObjectDescription>;
 
         ObjectDescription() = default;
-
-        template <typename ValueType>
-        static ObjectDescription MakeObjectDescription(const std::string& description);
 
         /// <summary> Gets the documentation string for this object, if present </summary>
         std::string GetDocumentation() const { return _documentation; }
@@ -75,13 +69,21 @@ namespace utilities
         /// <summary> Retrieves an object property given its name </summary>
         ObjectDescription& operator[](const std::string& propertyName);        
 
-        /// <summary> Tells if the object description has a value associated with in </summary>
+        /// <summary> Tells if the object description has a value associated with it. </summary>
+        ///
+        /// <returns> `true` if the object description has a value, `false` otherwise. </returns>
         bool HasValue() const { return !_value.IsEmpty(); }
 
-        /// <summary> Gets the value of this object </summary>
+        /// <summary> Gets the value of this object. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type of the return value. </typeparam>
+        /// <returns> The value of this object. </returns>
         template <typename ValueType>
         ValueType GetValue() const { return _value.GetValue<ValueType>(); }
 
+        /// <summary> Gets the value of this object as a string </summary>
+        ///
+        /// <returns> The value of this object as a string </returns>
         std::string GetValueString() const;
 
         /// <summary> Sets the value of an object </summary>
@@ -104,10 +106,14 @@ namespace utilities
         // something to get description from type (a std::function, perhaps --- if empty, we're a non-describable thing)
         std::function<ObjectDescription()> _getPropertiesFunction; 
 
+        template <typename ValueType>
+        friend ObjectDescription MakeObjectDescription(const std::string& description);
+
         ObjectDescription(const std::string& documentation);
 
         template <typename ValueType>
         void SetGetPropertiesFunction(std::true_type);
+
         template <typename ValueType>
         void SetGetPropertiesFunction(std::false_type);
     };
@@ -119,6 +125,10 @@ namespace utilities
         virtual ObjectDescription GetDescription() const = 0;
         static std::string GetTypeName() {return "IDescribable"; }
     };
+
+    /// <summary> Factory method to create an ObjectDescription </summary>
+    template <typename ValueType>
+    ObjectDescription MakeObjectDescription(const std::string& description);
 }
 
 #include "../tcc/ObjectDescription.tcc"

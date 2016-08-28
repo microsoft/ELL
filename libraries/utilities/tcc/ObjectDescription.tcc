@@ -12,7 +12,7 @@ namespace utilities
     // ObjectDescription
     //
     template <typename ValueType>
-    ObjectDescription ObjectDescription::MakeObjectDescription(const std::string& documentation)
+    ObjectDescription MakeObjectDescription(const std::string& documentation)
     {
         ObjectDescription result;
         result._documentation = documentation;
@@ -47,7 +47,7 @@ namespace utilities
     void ObjectDescription::AddProperty(const std::string& name, std::string documentation)
     {
         assert(_properties.find(name) == _properties.end());
-        auto propertyDescription = ObjectDescription::MakeObjectDescription<ValueType>(documentation); // Here, add lambda to fill in description
+        auto propertyDescription = MakeObjectDescription<ValueType>(documentation); // Here, add lambda to fill in description
         _properties[name] = std::move(propertyDescription);
         _properties[name].SetGetPropertiesFunction<ValueType>(std::is_base_of<utilities::IDescribable, ValueType>());
     }

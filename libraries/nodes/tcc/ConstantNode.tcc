@@ -56,7 +56,7 @@ namespace nodes
     template <typename ValueType>
     utilities::ObjectDescription ConstantNode<ValueType>::GetTypeDescription()
     {
-        auto description = utilities::ObjectDescription::MakeObjectDescription<ConstantNode<ValueType>>("Constant node");
+        auto description = utilities::MakeObjectDescription<ConstantNode<ValueType>>("Constant node");
         description.template AddProperty<decltype(_values)>("values", "Constant values");
         description.template AddProperty<decltype(_output)>("output", "Output port");
         return description;
