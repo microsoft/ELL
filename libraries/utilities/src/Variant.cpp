@@ -36,7 +36,7 @@ namespace utilities
         }
     }
 
-    Variant::Variant(std::type_index type, std::unique_ptr<VariantBase>&& variantValue) : _type(type) { _value = std::move(variantValue); }
+    Variant::Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue) : _type(type) { _value = std::move(variantValue); }
 
     Variant& Variant::operator=(const Variant& other)
     {

@@ -47,6 +47,9 @@ namespace utilities
         template <typename ValueType>
         ValueType GetValue() const;
 
+        template <typename CastValueType>
+        CastValueType GetValueAs() const;
+
         std::type_index _type; // redundant with type in Variant class.
     };
 
@@ -146,7 +149,7 @@ namespace utilities
         template <typename ValueType, typename... Args>
         friend Variant MakeVariant(Args&&... args);
 
-        Variant(std::type_index type, std::unique_ptr<VariantBase>&& variantValue);
+        Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue);
 
         std::type_index _type;
         std::unique_ptr<VariantBase> _value;

@@ -141,12 +141,23 @@ namespace utilities
         void FillInDescription() const;
     };
 
-    /// <summary> Base class for describable objects </summary>
+    /// <summary> 
+    /// IDescribable is the Base class for describable objects. In order to be able to use the
+    /// IDescribable interface for serialization, you must also implement GetRuntimeTypeName, GetTypeName,
+    /// and the static GetTypeDescription functions.
+    /// </summary>
     class IDescribable
     {
     public:
+        /// <summary> Gets an ObjectDescription for the object </summary>
+        ///
+        /// <returns> An ObjectDescription for the object </returns>
         virtual ObjectDescription GetDescription() const = 0;
-        static std::string GetTypeName() {return "IDescribable"; }
+
+        /// <summary> Gets the name of this type. </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "IDescribable"; }
     };
 
     /// <summary> Factory method to create an ObjectDescription </summary>
