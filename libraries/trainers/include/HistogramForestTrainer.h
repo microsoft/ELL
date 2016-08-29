@@ -18,6 +18,7 @@
 
 // stl
 #include <random>
+#include <tuple>
 
 namespace trainers
 {
@@ -54,7 +55,7 @@ namespace trainers
 
     private:
 
-        struct EvaluateThresholdResult
+        struct EvaluateSplitRuleResult
         {
             Sums sums0;
             size_t size0;
@@ -62,6 +63,7 @@ namespace trainers
 
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
         std::vector<SplitRuleType> GetSplitCandidatesAtNode(Range range);
+        std::tuple<Sums, size_t> EvaluateSplitRule(const SplitRuleType& splitRule, const Range& range) const;
 
         // member variables
         LossFunctionType _lossFunction;

@@ -81,7 +81,8 @@ int main(int argc, char* argv[])
         // print loss and errors
         if(trainerArguments.verbose)
         {
-            //std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
+            const auto& predictor = trainer->GetPredictor();
+            std::cout << "Finished training forest with " << predictor->NumTrees() << " trees." << std::endl; 
 
             // evaluate
             //auto evaluator = common::MakeEvaluator<predictors::DecisionTreePredictor>(rowDataset.GetIterator(), evaluators::EvaluatorParameters{1, false}, trainerArguments.lossArguments);

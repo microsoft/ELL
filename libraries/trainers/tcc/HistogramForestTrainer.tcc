@@ -23,15 +23,14 @@ namespace trainers
 
         auto splitRuleCandidates = GetSplitCandidatesAtNode(range);
 
-        for (const auto splitRuleCandidate : splitRuleCandidates) 
+        for (const auto& splitRuleCandidate : splitRuleCandidates) 
         {
-            // get sums0 and sums1
-
             Sums sums0;
-            Sums sums1;
             size_t size0;
-//            sums0.Increment(_dataset[rowIndex].GetMetaData().weak);
-//              auto sums1 = sums - sums0;
+
+            std::tie(sums0, size0) = EvaluateSplitRule(splitRuleCandidate, range);
+
+            Sums sums1 = sums - sums0;
             double gain = CalculateGain(sums, sums0, sums1);
 
             // find gain maximizer
@@ -79,6 +78,27 @@ namespace trainers
         auto thresholds = _thresholdFinder.GetThresholds(exampleIterator);
         return thresholds;
     }
+
+    template<typename LossFunctionType, typename BoosterType>
+    std::tuple<ForestTrainerBase::Sums, size_t> HistogramForestTrainer<LossFunctionType, BoosterType>::EvaluateSplitRule(const SplitRuleType& splitRule, const Range& range) const
+    {
+        Sums sums0;
+        size_t size0 = 0;
+
+        auto exampleIterator = _dataset.GetIterator(range.firstIndex, range.size);
+        while(exampleIterator.IsValid())
+        {
+            const auto& example = exampleIterator.Get();
+            if(splitRule.Predict(example.GetDataVector()) == 0)
+            {
+                sums0.Increment(example.GetMetaData().weak);
+                ++size0;
+            }
+            exampleIterator.Next();
+        }
+
+        return std::make_tuple(sums0, size0);
+    };
 
     template<typename LossFunctionType, typename BoosterType>
     std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const HistogramForestTrainerParameters& parameters)

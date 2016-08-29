@@ -40,13 +40,36 @@ namespace trainers
         size_t numRounds = 0;
     };
 
+    class ForestTrainerBase
+    {
+    protected:
+        // keeps track of the total weight and total weight-weak-label in a set of examples
+        struct Sums
+        {
+            double sumWeights = 0;
+            double sumWeightedLabels = 0;
+
+            void Increment(const dataset::WeightLabel& weightLabel);
+            Sums operator-(const Sums& other) const;
+            double GetMeanLabel() const;
+            void Print(std::ostream& os) const;
+        };
+
+        // represents a range in an array
+        struct Range
+        {
+            size_t firstIndex;
+            size_t size;
+        };
+    };
+
     /// <summary>
     /// Implements a greedy forest growing algorithm.
     /// </summary>
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType> 
-    class ForestTrainer : public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> 
+    class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> 
     { 
     public:
         /// <summary> Constructs an instance of ForestTrainer. </summary>
@@ -70,12 +93,6 @@ namespace trainers
         // Private internal structs 
         //
 
-        // represents a range in an array
-        struct Range
-        {
-            size_t firstIndex;
-            size_t size;
-        };
 
         // describes the range of training examples associated with a given node and its children
         class NodeRanges 
@@ -104,18 +121,6 @@ namespace trainers
 
             // the output of the forest on this example
             double currentOutput = 0;
-        };
-
-        // keeps track of the total weight and total weight-weak-label in a set of examples
-        struct Sums
-        {
-            double sumWeights = 0;
-            double sumWeightedLabels = 0;
-
-            void Increment(const dataset::WeightLabel& weightLabel);
-            Sums operator-(const Sums& other) const;
-            double GetMeanLabel() const;
-            void Print(std::ostream& os) const;
         };
 
         // keeps statistics about tree nodes

@@ -82,33 +82,6 @@ namespace trainers
     }
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums::Increment(const dataset::WeightLabel& weightLabel)
-    {
-        sumWeights += weightLabel.weight;
-        sumWeightedLabels += weightLabel.weight * weightLabel.label;
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums::operator-(const Sums& other) const
-    {
-        Sums difference;
-        difference.sumWeights = sumWeights - other.sumWeights;
-        difference.sumWeightedLabels = sumWeightedLabels - other.sumWeightedLabels;
-        return difference;
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    double ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums::GetMeanLabel() const
-    {
-        if(sumWeights == 0)
-        {
-            throw utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "Can't compute mean because sum of weights equals zero");
-        }
-
-        return sumWeightedLabels / sumWeights;
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::SetChildSums(std::vector<Sums> childSums) 
     { 
         _childSums = childSums; 
@@ -268,12 +241,6 @@ namespace trainers
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ExampleMetaData::Print(std::ostream & os) const
     {
         os << "(" << strong.weight << ", " << strong.label << ", " << weak.weight << ", " << weak.label << ", " << currentOutput << ")";
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums::Print(std::ostream& os) const
-    {
-        os << "sumWeights = " << sumWeights << ", sumWeightedLabels = " << sumWeightedLabels;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
