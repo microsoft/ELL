@@ -30,7 +30,7 @@ namespace utilities
         // op[]
         // op[] const
         // add? -- with creator function
-        // iterator?
+        // iterator? iterator deref calls fillin function
     private:
         std::unordered_map<KeyType, ValueType> _values;
         std::unordered_map<KeyType, std::function<ValueType()>> _creators;
@@ -45,23 +45,44 @@ namespace utilities
         ObjectDescription() = default;
 
         /// <summary> Gets the documentation string for this object, if present </summary>
+        ///
+        /// <returns> The documentation string for this object, if present </returns>
         std::string GetDocumentation() const { return _documentation; }
 
         /// <summary> Gets the string representing the type name of this object </summary>
+        ///
+        /// <returns> The string representing the type name of this object </returns>
         std::string GetObjectTypeName() const { return _typeName; }
 
         /// <summary> Checks if object has a property of a given name </summary>
+        ///
+        /// <param name="name"> The name of the property </param>
+        /// <returns> `true` if the object has a property of the given name, `false` otherwise </returns>
         bool HasProperty(const std::string& name) const;
 
         /// <summary> Gets the properties of this object </summary>
+        ///
+        /// <returns> The properties of this object </returns>
         const PropertyCollection& Properties() const;
 
         /// <summary> Adds a new property to the object </summary>
+        ///
+        /// <typeparam name="ValueType"> The type this property's value will take </typeparam>
+        /// <param name="name"> The name of the property </param>
+        /// <param name="documentation"> The documentation string from the property </param>        
         template <typename ValueType>
         void AddProperty(const std::string& name, std::string documentation);
 
         /// <summary> Retrieves an object property given its name </summary>
+        ///
+        /// <param name="propertyName"> The name of the property to retrieve </param>
+        /// <returns> The property's description </returns>
         const ObjectDescription& operator[](const std::string& propertyName) const;        
+
+        /// <summary> Retrieves an object property given its name </summary>
+        ///
+        /// <param name="propertyName"> The name of the property to retrieve </param>
+        /// <returns> The property's description </returns>
         ObjectDescription& operator[](const std::string& propertyName);        
 
         /// <summary> Tells if the object description has a value associated with it. </summary>
@@ -82,10 +103,16 @@ namespace utilities
         std::string GetValueString() const;
 
         /// <summary> Sets the value of an object </summary>
+        ///
+        /// <typeparam name="ValueType"> The type of the value to set </typeparam>
+        /// <param name="value"> The value to set the parameter to </param>
         template <typename ValueType>
         void SetValue(ValueType&& value);
 
         /// <summary> Sets the value of an object </summary>
+        ///
+        /// <typeparam name="ValueType"> The type of the value to set </typeparam>
+        /// <param name="value"> The value to set the parameter to </param>
         template <typename ValueType>
         void operator=(ValueType&& value);
 
