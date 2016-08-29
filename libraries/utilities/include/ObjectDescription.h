@@ -22,20 +22,6 @@
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
-
-    template <typename KeyType, typename ValueType>
-    class OnDemandMap
-    {
-    public:
-        // op[]
-        // op[] const
-        // add? -- with creator function
-        // iterator? iterator deref calls fillin function
-    private:
-        std::unordered_map<KeyType, ValueType> _values;
-        std::unordered_map<KeyType, std::function<ValueType()>> _creators;
-    };
-
     /// <summary> Holds information describing the properties (fields) of an object </summary>
     class ObjectDescription
     {
