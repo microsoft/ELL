@@ -50,7 +50,7 @@ public:
     }
 
     static std::string GetTypeName() { return "ChildObject"; }
-    virtual std::string GetRuntimeTypeName() { return GetTypeName(); }
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     int GetA() { return _a; }
     double GetB() { return _b; }
@@ -86,7 +86,7 @@ public:
     }
 
     static std::string GetTypeName() { return "ParentObject"; }
-    virtual std::string GetRuntimeTypeName() { return GetTypeName(); }
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
 private:
     std::string _name;

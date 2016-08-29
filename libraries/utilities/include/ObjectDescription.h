@@ -10,6 +10,7 @@
 
 #include "Variant.h"
 #include "Exception.h"
+#include "ISerializable.h"
 
 // stl
 #include <unordered_map>
@@ -113,6 +114,7 @@ namespace utilities
 
         template <typename ValueType>
         friend ObjectDescription MakeObjectDescription(const std::string& description);
+        friend class IDescribable;
 
         ObjectDescription(const std::string& documentation);
 
@@ -133,9 +135,10 @@ namespace utilities
     /// and the static GetTypeDescription functions. Also, a constructor that takes an ObjectDescription 
     /// (or const ObjectDescription&) must be implemented.
     /// </summary>
-    class IDescribable
+    class IDescribable : public ISerializable
     {
     public:
+        virtual ~IDescribable() = default;
         /// <summary> Gets an ObjectDescription for the object </summary>
         ///
         /// <returns> An ObjectDescription for the object </returns>
@@ -145,6 +148,20 @@ namespace utilities
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "IDescribable"; }
+
+        virtual std::string GetRuntimeTypeName() const = 0;
+
+        /// <summary> Serializes the object. </summary>
+        ///
+        /// <param name="serializer">  The serializer. </param>
+        virtual void Serialize(Serializer& serializer) const;
+
+        /// <summary> Deserializes the object. </summary>
+        ///
+        /// <param name="serializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(Deserializer& serializer, SerializationContext& context);
+
     };
 
     /// <summary> Factory method to create an ObjectDescription </summary>

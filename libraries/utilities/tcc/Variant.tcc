@@ -116,14 +116,28 @@ namespace utilities
     }
 
     template <typename ValueType>
-    inline std::string VariantDerived<ValueType>::ToString() const
+    std::string VariantDerived<ValueType>::ToString() const
     {
         return variantNamespace::GetValueString(_value, (int)0);
     }
 
     template <typename ValueType>
-    inline std::string VariantDerived<ValueType>::GetStoredTypeName() const
+    std::string VariantDerived<ValueType>::GetStoredTypeName() const
     {
         return TypeName<typename std::decay<ValueType>::type>::GetName();
+    }
+
+    template <typename ValueType>
+    void VariantDerived<ValueType>::Serialize(const char* name, Serializer& serializer) const
+    {
+        serializer.Serialize(name, GetValue());
+    }
+
+    template <typename ValueType>
+    void VariantDerived<ValueType>::Deserialize(const char* name, Deserializer& serializer, SerializationContext& context) 
+    {
+        ValueType value;
+        serializer.Deserialize(name, value, context);
+        _value = value;
     }
 }

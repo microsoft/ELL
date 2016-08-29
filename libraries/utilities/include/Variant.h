@@ -10,6 +10,7 @@
 
 #include "Exception.h"
 #include "TypeName.h"
+#include "Serializer.h"
 
 // stl
 #include <memory>
@@ -40,15 +41,14 @@ namespace utilities
         virtual bool IsPrimitiveType() const = 0;
         virtual bool IsSerializable() const = 0;
         virtual bool IsPointer() const = 0;
+        virtual void Serialize(const char* name, Serializer& serializer) const = 0;
+        virtual void Deserialize(const char* name, Deserializer& serializer, SerializationContext& context) = 0;
 
     private:
         friend class Variant;
 
         template <typename ValueType>
         ValueType GetValue() const;
-
-        template <typename CastValueType>
-        CastValueType GetValueAs() const;
 
         std::type_index _type; // redundant with type in Variant class.
     };
@@ -70,6 +70,8 @@ namespace utilities
         virtual bool IsPrimitiveType() const override { return std::is_fundamental<ValueType>::value; }
         virtual bool IsSerializable() const override { return !IsPrimitiveType(); }
         virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
+        virtual void Serialize(const char* name, Serializer& serializer) const override;
+        virtual void Deserialize(const char* name, Deserializer& serializer, SerializationContext& context) override;
 
     private:
         friend class Variant;
@@ -142,6 +144,12 @@ namespace utilities
         ///
         /// <returns> The type name of the value stored in the variant. </returns>
         std::string GetStoredTypeName() const;
+
+        ///
+        ///
+        /// 
+        void Serialize(const char* name, Serializer& serializer) const;
+        void Deserialize(const char* name, Deserializer& serializer, SerializationContext& context);
 
     private:
         friend std::string to_string(const Variant& variant);

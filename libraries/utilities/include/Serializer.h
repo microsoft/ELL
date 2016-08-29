@@ -22,7 +22,7 @@
 namespace utilities
 {
     class ISerializable;
-    class IDescribable;
+
     /// <summary> Enabled if ValueType inherits from ISerializable. </summary>
     template <typename ValueType>
     using IsSerializable = typename std::enable_if_t<std::is_base_of<ISerializable, typename std::decay<ValueType>::type>::value, int>;

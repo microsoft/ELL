@@ -75,4 +75,33 @@ namespace utilities
         prop.FillInDescription();
         return prop;
     }
+
+    //
+    // IDescribable
+    //
+
+    void IDescribable::Serialize(Serializer& serializer) const
+    {
+        // for each thing, serialize it
+        const auto& description = GetDescription();
+//                     Node::Serialize(serializer); // crap --- I think nodes will have to do custom serialization no matter what. :(
+        for(const auto& property: description.Properties())
+        {
+            auto name = property.first;
+            property.second._value.Serialize(name.c_str(), serializer);
+        }
+    }
+
+    void IDescribable::Deserialize(Deserializer& serializer, SerializationContext& context)
+    {
+        auto description = GetDescription(); // will call GetDescription on a default-constructed object
+        for(const auto& property: description.Properties())
+        {
+            auto name = property.first;
+            auto variant = property.second._value;
+            variant.Deserialize(name.c_str(), serializer, context);
+        }
+        // crap... we need to set the value of the actual object. :( need to call the constructor somehow
+    }
+
 }

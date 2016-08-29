@@ -36,7 +36,10 @@ namespace utilities
         }
     }
 
-    Variant::Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue) : _type(type) { _value = std::move(variantValue); }
+    Variant::Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue) : _type(type) 
+    { 
+        _value = std::move(variantValue); 
+    }
 
     Variant& Variant::operator=(const Variant& other)
     {
@@ -76,6 +79,16 @@ namespace utilities
     bool Variant::IsPointer() const
     {
         return _value->IsPointer();
+    }
+
+    void Variant::Serialize(const char* name, Serializer& serializer) const
+    {
+        _value->Serialize(name, serializer);
+    }
+
+    void Variant::Deserialize(const char* name, Deserializer& serializer, SerializationContext& context)
+    {
+        _value->Deserialize(name, serializer, context);
     }
 
     std::string to_string(const Variant& variant)
