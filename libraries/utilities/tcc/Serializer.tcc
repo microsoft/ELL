@@ -25,6 +25,9 @@ namespace utilities
         SerializeItem(name, value);
     }
 
+    //
+    // Implementations
+    //
     template <typename ValueType, IsNotVector<ValueType> concept>
     void Serializer::SerializeItem(const char* name, ValueType&& value)
     {

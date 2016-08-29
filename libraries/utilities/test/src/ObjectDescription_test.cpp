@@ -11,6 +11,8 @@
 
 // utilities
 #include "ObjectDescription.h"
+#include "Serializer.h"
+#include "XmlSerializer.h"
 
 // testing
 #include "testing.h"
@@ -23,6 +25,7 @@
 class ChildObject : public utilities::IDescribable
 {
 public:
+    ChildObject() = default;
     ChildObject(int a, double b) : _a(a), _b(b) {}
     ChildObject(const utilities::ObjectDescription& description)
     {
@@ -49,6 +52,9 @@ public:
     static std::string GetTypeName() { return "ChildObject"; }
     virtual std::string GetRuntimeTypeName() { return GetTypeName(); }
 
+    int GetA() { return _a; }
+    double GetB() { return _b; }
+
 private:
     int _a;
     double _b;
@@ -57,6 +63,7 @@ private:
 class ParentObject : public utilities::IDescribable
 {
 public:
+    ParentObject() = default;
     ParentObject(std::string name, int a, double b) : _name(name), _child(a, b) {}
     //ParentObject(const utilities::ObjectDescription& description)
     //{
@@ -143,4 +150,23 @@ void TestGetObjectDescription()
     auto parentChildDescription = parentDescription["child"];
     testing::ProcessTest("ObjectDescription", parentChildDescription["a"].GetValue<int>() == 5);
     testing::ProcessTest("ObjectDescription", parentChildDescription["b"].GetValue<double>() == 6.5);
+}
+
+void TestSerializeIDescribable()
+{
+    utilities::SerializationContext context;
+    std::stringstream strstream;
+    {
+        utilities::SimpleXmlSerializer serializer(strstream);
+        ChildObject childObj(3, 4.5);
+        serializer.Serialize("child", childObj);
+        // print
+        std::cout << "Serialized stream:" << std::endl;
+        std::cout << strstream.str() << std::endl;
+    }
+
+    utilities::SimpleXmlDeserializer deserializer(strstream);
+    ChildObject val;
+    deserializer.Deserialize("child", val, context);
+    testing::ProcessTest("Deserialize IDescribable check",  val.GetA() == 3 && val.GetB() == 4.5f);        
 }

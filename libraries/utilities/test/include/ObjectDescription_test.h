@@ -10,3 +10,4 @@
 
 void TestGetTypeDescription();
 void TestGetObjectDescription();
+void TestSerializeIDescribable();

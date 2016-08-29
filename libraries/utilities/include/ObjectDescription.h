@@ -130,7 +130,8 @@ namespace utilities
     /// <summary> 
     /// IDescribable is the Base class for describable objects. In order to be able to use the
     /// IDescribable interface for serialization, you must also implement GetRuntimeTypeName, GetTypeName,
-    /// and the static GetTypeDescription functions.
+    /// and the static GetTypeDescription functions. Also, a constructor that takes an ObjectDescription 
+    /// (or const ObjectDescription&) must be implemented.
     /// </summary>
     class IDescribable
     {
@@ -149,6 +150,14 @@ namespace utilities
     /// <summary> Factory method to create an ObjectDescription </summary>
     template <typename ValueType>
     ObjectDescription MakeObjectDescription(const std::string& description);
+
+    /// <summary> Enabled if ValueType inherits from IDescribable. </summary>
+    template <typename ValueType>
+    using IsDescribable = typename std::enable_if_t<std::is_base_of<IDescribable, typename std::decay<ValueType>::type>::value, int>;
+
+    /// <summary> Enabled if ValueType does not inherit from IDescribable. </summary>
+    template <typename ValueType>
+    using IsNotDescribable = typename std::enable_if_t<(!std::is_base_of<IDescribable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
 }
 
 #include "../tcc/ObjectDescription.tcc"
