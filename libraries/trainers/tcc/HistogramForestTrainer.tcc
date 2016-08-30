@@ -89,7 +89,8 @@ namespace trainers
         while(exampleIterator.IsValid())
         {
             const auto& example = exampleIterator.Get();
-            if(splitRule.Predict(example.GetDataVector()) == 0)
+            auto prediction = splitRule.Predict(example.GetDataVector());
+            if(prediction == 0)
             {
                 sums0.Increment(example.GetMetaData().weak);
                 ++size0;

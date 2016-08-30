@@ -184,10 +184,8 @@ namespace trainers
 
             // update current output field in metadata
             auto edgePredictors = GetEdgePredictors(stats);
-            for (size_t i = 0; i<2; ++i)
-            {
-                UpdateCurrentOutputs(ranges.GetChildRange(i), edgePredictors[i]);
-            }
+            UpdateCurrentOutputs(ranges.GetChildRange(0), edgePredictors[0]);
+            UpdateCurrentOutputs(ranges.GetChildRange(1), edgePredictors[1]);
 
             // have the forest perform the split
             using SplitAction = predictors::SimpleForestPredictor::SplitAction;

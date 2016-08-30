@@ -22,7 +22,8 @@ namespace common
                          "maxSplitsPerRound",
                          "ms",
                          "The number of split operations to perform on each boosting round",
-                         "1");
+                         "10");
+
         parser.AddOption(numRounds,
                          "numRounds",
                          "nr",
@@ -32,6 +33,9 @@ namespace common
 
     void ParsedHistogramForestTrainerArguments::AddArgs(utilities::CommandLineParser& parser) 
     {
+
+
+
         parser.AddOption(minSplitGain,
                          "minSplitGain",
                          "msg",
@@ -42,12 +46,14 @@ namespace common
                          "maxSplitsPerRound",
                          "ms",
                          "The number of split operations to perform on each boosting round",
-                         "1");
+                         "10");
+
         parser.AddOption(numRounds,
                          "numRounds",
                          "nr",
                          "The number of boosting rounds to perform",
                          "10");
+
         parser.AddOption(randomSeed,
                          "randomSeed",
                          "rs",
