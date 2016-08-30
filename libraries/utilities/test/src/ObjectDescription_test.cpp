@@ -56,8 +56,8 @@ public:
     double GetB() { return _b; }
 
 private:
-    int _a;
-    double _b;
+    int _a = 0;
+    double _b = 0.0;
 };
 
 class ParentObject : public utilities::IDescribable
@@ -171,9 +171,10 @@ void TestSerializeIDescribable()
 
     utilities::SimpleXmlDeserializer deserializer(strstream);
     ChildObject deserializedChild;
-    deserializer.Deserialize("child", deserializedChild, context);
-    // testing::ProcessTest("Deserialize IDescribable check",  deserializedChild.GetA() == 3 && deserializedChild.GetB() == 4.5f);        
 
-    // ParentObject deserializedParent;
-    // deserializer.Deserialize("parent", deserializedParent, context);
+    deserializer.Deserialize("child", deserializedChild, context);
+    testing::ProcessTest("Deserialize IDescribable check",  deserializedChild.GetA() == 3 && deserializedChild.GetB() == 4.5f);        
+
+    ParentObject deserializedParent;
+    deserializer.Deserialize("parent", deserializedParent, context);
 }
