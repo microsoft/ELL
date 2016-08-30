@@ -112,12 +112,12 @@ namespace utilities
         std::string _typeName;
         std::string _documentation;
         mutable std::unordered_map<std::string, ObjectDescription> _properties;
-
         Variant _value;
-
         mutable std::function<ObjectDescription()> _getPropertiesFunction; 
 
         template <typename ValueType>
+        friend ObjectDescription MakeObjectDescription(const std::string& description);
+        template <typename BaseType, typename ValueType>
         friend ObjectDescription MakeObjectDescription(const std::string& description);
         friend class IDescribable;
 
@@ -172,10 +172,15 @@ namespace utilities
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(Deserializer& serializer, SerializationContext& context);
 
+        template <typename BaseType, typename ValueType>
+        ObjectDescription GetParentDescription() const;
     };
 
     /// <summary> Factory method to create an ObjectDescription </summary>
     template <typename ValueType>
+    ObjectDescription MakeObjectDescription(const std::string& description);
+
+    template <typename BaseType, typename ValueType>
     ObjectDescription MakeObjectDescription(const std::string& description);
 
     /// <summary> Enabled if ValueType inherits from IDescribable. </summary>

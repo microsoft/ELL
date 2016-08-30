@@ -107,10 +107,8 @@ namespace utilities
         for(auto& property: description.Properties())
         {
             auto name = property.first;
-//            auto variant = property.second._value;
-            property.second._value.DeserializeProperty(name.c_str(), serializer, context);  // TODO: need to pass in description and have Variant::Deserialize set the description ... ugh
-//            property.second._value = variant;
-//            property.second.SetVariantValue(variant);
+            std::cout << "Deserializing property " << name << std::endl;
+            property.second._value.DeserializeProperty(name.c_str(), serializer, context);
         }
         SetObjectState(description);
     }

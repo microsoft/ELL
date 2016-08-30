@@ -20,6 +20,29 @@ namespace utilities
         return result;
     }
 
+    template <typename BaseType, typename ValueType>
+    ObjectDescription MakeObjectDescription(const std::string& documentation)
+    {
+        ObjectDescription result = BaseType::GetTypeDescription();
+        result._documentation = documentation;
+        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
+        return result;
+    }
+
+    template <typename BaseType, typename ValueType>
+    ObjectDescription IDescribable::GetParentDescription() const
+    {
+        auto baseDescription = dynamic_cast<const BaseType*>(this)->BaseType::GetDescription();
+        auto thisTypeDescription = ValueType::GetTypeDescription();
+
+        // merge all properties values from base->this
+        for(const auto& prop: baseDescription.Properties())
+        {
+            thisTypeDescription[prop.first] = prop.second;
+        }
+        return thisTypeDescription;
+    }
+
     template <typename ValueType>
     void ObjectDescription::SetGetPropertiesFunction(std::true_type)
     {

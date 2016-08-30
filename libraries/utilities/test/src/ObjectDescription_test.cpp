@@ -22,20 +22,17 @@
 #include <vector>
 #include <sstream>
 
-class ChildObject : public utilities::IDescribable
+class InnerObject : public utilities::IDescribable
 {
 public:
-    ChildObject() = default;
-    ChildObject(int a, double b) : _a(a), _b(b) {}
-    ChildObject(const utilities::ObjectDescription& description)
-    {
-        _a = description["a"].GetValue<int>();
-        _b = description["b"].GetValue<double>();
-    }
+    InnerObject() = default;
+    InnerObject(int a, double b) : _a(a), _b(b) {}
+    int GetA() const { return _a; }
+    double GetB() const { return _b; }
 
     static utilities::ObjectDescription GetTypeDescription()
     {
-        utilities::ObjectDescription description = utilities::MakeObjectDescription<ChildObject>("Child object");
+        utilities::ObjectDescription description = utilities::MakeObjectDescription<InnerObject>("Inner object");
         description.AddProperty<int>("a", "Parameter a");
         description.AddProperty<double>("b", "Parameter b");
         return description;
@@ -53,33 +50,63 @@ public:
     {
         _a = description["a"].GetValue<int>();
         _b = description["b"].GetValue<double>();
-        std::cout << "Setting object state, a = " << _a << " b = " << _b << std::endl;
     }
 
-    static std::string GetTypeName() { return "ChildObject"; }
+    static std::string GetTypeName() { return "InnerObject"; }
     virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
-    int GetA() { return _a; }
-    double GetB() { return _b; }
 
 private:
     int _a = 0;
     double _b = 0.0;
 };
 
-class ParentObject : public utilities::IDescribable
+class DerivedObject : public InnerObject
 {
 public:
-    ParentObject() = default;
-    ParentObject(std::string name, int a, double b) : _name(name), _child(a, b) {}
-    std::string GetName() { return _name; }
-    ChildObject GetChild() { return _child; }
+    DerivedObject() = default;
+    DerivedObject(int a, double b, std::string c) : InnerObject(a, b), _c(c) {}
+    std::string GetC() { return _c; }
 
     static utilities::ObjectDescription GetTypeDescription()
     {
-        utilities::ObjectDescription description = utilities::MakeObjectDescription<ParentObject>("Parent object");
+        utilities::ObjectDescription description = utilities::MakeObjectDescription<InnerObject, DerivedObject>("Derived object");
+        description.AddProperty<std::string>("c", "Parameter c");
+        return description;
+    }
+
+    virtual utilities::ObjectDescription GetDescription() const override
+    {
+        auto description = GetParentDescription<InnerObject, DerivedObject>();
+        description["c"] = _c;
+        return description;
+    }
+
+    virtual void SetObjectState(const utilities::ObjectDescription& description) override
+    {
+        InnerObject::SetObjectState(description);
+        _c = description["c"].GetValue<std::string>();
+    }
+
+    static std::string GetTypeName() { return "DerivedObject"; }
+    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+private:
+    std::string _c = "";
+};
+
+class OuterObject : public utilities::IDescribable
+{
+public:
+    OuterObject() = default;
+    OuterObject(std::string name, int a, double b) : _name(name), _inner(a, b) {}
+    std::string GetName() { return _name; }
+    InnerObject GetInner() { return _inner; }
+
+    static utilities::ObjectDescription GetTypeDescription()
+    {
+        utilities::ObjectDescription description = utilities::MakeObjectDescription<OuterObject>("Outer object");
         description.AddProperty<decltype(_name)>("name", "Name");
-        description.AddProperty<decltype(_child)>("child", "Child object");
+        description.AddProperty<decltype(_inner)>("obj", "Inner object");
         return description;
     }
 
@@ -87,23 +114,22 @@ public:
     {
         utilities::ObjectDescription description = GetTypeDescription();
         description["name"] = _name;
-        description["child"] = _child;
+        description["obj"] = _inner;
         return description;
     }
 
     virtual void SetObjectState(const utilities::ObjectDescription& description) override
     {
         _name = description["name"].GetValue<std::string>();
-        _child = description["child"].GetValue<ChildObject>();   
-        std::cout << "Setting object state, name = " << _name << std::endl;
+        _inner = description["obj"].GetValue<InnerObject>();   
     }
 
-    static std::string GetTypeName() { return "ParentObject"; }
+    static std::string GetTypeName() { return "OuterObject"; }
     virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
 private:
     std::string _name;
-    ChildObject _child;
+    InnerObject _inner;
 };
 
 void PrintDescription(const utilities::ObjectDescription& description, size_t indentCount = 0)
@@ -126,43 +152,64 @@ void PrintDescription(const utilities::ObjectDescription& description, size_t in
 
 void TestGetTypeDescription()
 {
-    auto childDescription = ChildObject::GetTypeDescription();
-    PrintDescription(childDescription);
+    auto innerDescription = InnerObject::GetTypeDescription();
+    PrintDescription(innerDescription);
 
-    auto parentDescription = ParentObject::GetTypeDescription();
-    PrintDescription(parentDescription);
+    auto outerDescription = OuterObject::GetTypeDescription();
+    PrintDescription(outerDescription);
 
-    testing::ProcessTest("ObjectDescription", childDescription.HasProperty("a"));
-    testing::ProcessTest("ObjectDescription", childDescription.HasProperty("b"));
-    testing::ProcessTest("ObjectDescription", !childDescription.HasProperty("c"));
+    auto derivedDescription = DerivedObject::GetTypeDescription();
+    PrintDescription(derivedDescription);
 
-    testing::ProcessTest("ObjectDescription", parentDescription.HasProperty("name"));
-    testing::ProcessTest("ObjectDescription", parentDescription.HasProperty("child"));
+    testing::ProcessTest("ObjectDescription", innerDescription.HasProperty("a"));
+    testing::ProcessTest("ObjectDescription", innerDescription.HasProperty("b"));
+    testing::ProcessTest("ObjectDescription", !innerDescription.HasProperty("c"));
+
+    testing::ProcessTest("ObjectDescription", outerDescription.HasProperty("name"));
+    testing::ProcessTest("ObjectDescription", outerDescription.HasProperty("obj"));
+
+    testing::ProcessTest("ObjectDescription", derivedDescription.HasProperty("a"));
+    testing::ProcessTest("ObjectDescription", derivedDescription.HasProperty("b"));
+    testing::ProcessTest("ObjectDescription", derivedDescription.HasProperty("c"));
 }
 
 void TestGetObjectDescription()
 {
-    ChildObject childObj(3, 4.5);
-    auto childDescription = childObj.GetDescription();
-    PrintDescription(childDescription);
+    InnerObject innerObj(3, 4.5);
+    auto innerDescription = innerObj.GetDescription();
+    PrintDescription(innerDescription);
 
-    ParentObject parentObj("Parent", 5, 6.5);
-    auto parentDescription = parentObj.GetDescription();
-    PrintDescription(parentDescription);
+    OuterObject outerObj("Outer", 5, 6.5);
+    auto outerDescription = outerObj.GetDescription();
+    PrintDescription(outerDescription);
 
-    testing::ProcessTest("ObjectDescription", childDescription.HasProperty("a"));
-    testing::ProcessTest("ObjectDescription", childDescription.HasProperty("b"));
-    testing::ProcessTest("ObjectDescription", !childDescription.HasProperty("c"));
-    testing::ProcessTest("ObjectDescription", childDescription["a"].GetValue<int>() == 3);
-    testing::ProcessTest("ObjectDescription", childDescription["b"].GetValue<double>() == 4.5);
+    DerivedObject derivedObj(8, 9.5, "derived");
+    auto derivedDescription = derivedObj.GetDescription();
+    PrintDescription(derivedDescription);
 
-    testing::ProcessTest("ObjectDescription", parentDescription.HasProperty("name"));
-    testing::ProcessTest("ObjectDescription", parentDescription.HasProperty("child"));
-    testing::ProcessTest("ObjectDescription", parentDescription.HasProperty("name"));
-    testing::ProcessTest("ObjectDescription", parentDescription["name"].GetValue<std::string>() == "Parent");
-    auto parentChildDescription = parentDescription["child"];
-    testing::ProcessTest("ObjectDescription", parentChildDescription["a"].GetValue<int>() == 5);
-    testing::ProcessTest("ObjectDescription", parentChildDescription["b"].GetValue<double>() == 6.5);
+    // Inner
+    testing::ProcessTest("ObjectDescription", innerDescription.HasProperty("a"));
+    testing::ProcessTest("ObjectDescription", innerDescription.HasProperty("b"));
+    testing::ProcessTest("ObjectDescription", !innerDescription.HasProperty("c"));
+    testing::ProcessTest("ObjectDescription", innerDescription["a"].GetValue<int>() == 3);
+    testing::ProcessTest("ObjectDescription", innerDescription["b"].GetValue<double>() == 4.5);
+
+    // Outer
+    testing::ProcessTest("ObjectDescription", outerDescription.HasProperty("name"));
+    testing::ProcessTest("ObjectDescription", outerDescription.HasProperty("obj"));
+    testing::ProcessTest("ObjectDescription", outerDescription.HasProperty("name"));
+    testing::ProcessTest("ObjectDescription", outerDescription["name"].GetValue<std::string>() == "Outer");
+    auto outerInnerDescription = outerDescription["obj"];
+    testing::ProcessTest("ObjectDescription", outerInnerDescription["a"].GetValue<int>() == 5);
+    testing::ProcessTest("ObjectDescription", outerInnerDescription["b"].GetValue<double>() == 6.5);
+
+    // Derived
+    testing::ProcessTest("ObjectDescription", derivedDescription.HasProperty("a"));
+    testing::ProcessTest("ObjectDescription", derivedDescription.HasProperty("b"));
+    testing::ProcessTest("ObjectDescription", derivedDescription.HasProperty("c"));
+    testing::ProcessTest("ObjectDescription", derivedDescription["a"].GetValue<int>() == 8);
+    testing::ProcessTest("ObjectDescription", derivedDescription["b"].GetValue<double>() == 9.5);
+    testing::ProcessTest("ObjectDescription", derivedDescription["c"].GetValue<std::string>() == "derived");
 }
 
 void TestSerializeIDescribable()
@@ -171,11 +218,15 @@ void TestSerializeIDescribable()
     std::stringstream strstream;
     {
         utilities::SimpleXmlSerializer serializer(strstream);
-        ChildObject childObj(3, 4.5);
-        serializer.Serialize("child", childObj);
+     
+        InnerObject innerObj(3, 4.5);
+        serializer.Serialize("inner", innerObj);
 
-        ParentObject parentObj("Parent", 5, 6.5);
-        serializer.Serialize("parent", parentObj);
+        OuterObject outerObj("Outer", 5, 6.5);
+        serializer.Serialize("outer", outerObj);
+
+        DerivedObject derivedObj(8, 9.5, "derived");
+        serializer.Serialize("derived", derivedObj);
 
         // print
         std::cout << "Serialized stream:" << std::endl;
@@ -183,12 +234,16 @@ void TestSerializeIDescribable()
     }
 
     utilities::SimpleXmlDeserializer deserializer(strstream);
-    ChildObject deserializedChild;
+    InnerObject deserializedInner;
 
-    deserializer.Deserialize("child", deserializedChild, context);
-    testing::ProcessTest("Deserialize IDescribable check",  deserializedChild.GetA() == 3 && deserializedChild.GetB() == 4.5f);        
+    deserializer.Deserialize("inner", deserializedInner, context);
+    testing::ProcessTest("Deserialize IDescribable check",  deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);        
 
-    ParentObject deserializedParent;
-    deserializer.Deserialize("parent", deserializedParent, context);
-    testing::ProcessTest("Deserialize IDescribable check",  deserializedParent.GetName() == "Parent" && deserializedParent.GetChild().GetA() == 5);        
+    OuterObject deserializedOuter;
+    deserializer.Deserialize("outer", deserializedOuter, context);
+    testing::ProcessTest("Deserialize IDescribable check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
+
+    DerivedObject deserializedDerived;
+    deserializer.Deserialize("derived", deserializedDerived, context);
+    testing::ProcessTest("Deserialize IDescribable check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
 }
