@@ -10,7 +10,6 @@
 
 #include "ForestTrainer.h"
 #include "LogitBooster.h"
-#include "ThresholdFinder.h"
 
 // predictors
 #include "SingleElementThresholdPredictor.h"
@@ -34,7 +33,8 @@ namespace trainers
     ///
     /// <typeparam name="LossFunctionType"> The loss function type. </typeparam>
     /// <typeparam name="BoosterType"> The booster type. </typeparam>
-    template <typename LossFunctionType, typename BoosterType> 
+    /// <typeparam name="ThresholdFinderType"> Type of the threshold finder to use. </typeparam>
+    template <typename LossFunctionType, typename BoosterType, typename ThresholdFinderType> 
     class HistogramForestTrainer : public ForestTrainer<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor, BoosterType>
     {
     public:
@@ -42,8 +42,9 @@ namespace trainers
         ///
         /// <param name="lossFunction"> The loss function. </param>
         /// <param name="booster"> The booster. </param>
+        /// <param name="thresholdFinder"> The threshold finder. </param>
         /// <param name="parameters"> Training Parameters. </param>
-        HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const HistogramForestTrainerParameters& parameters);
+        HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ThresholdFinderType& thresholdFinder, const HistogramForestTrainerParameters& parameters);
 
         using SplitRuleType = predictors::SingleElementThresholdPredictor;
         using EdgePredictorType = predictors::ConstantPredictor;
@@ -67,10 +68,10 @@ namespace trainers
 
         // member variables
         LossFunctionType _lossFunction;
+        ThresholdFinderType _thresholdFinder;
         std::default_random_engine _random;
         size_t _thresholdFinderSampleSize;
         size_t _candidatesPerInput;
-        ExhaustiveThresholdFinder _thresholdFinder;
     };
 
     /// <summary> Makes a simple forest trainer. </summary>
@@ -80,8 +81,8 @@ namespace trainers
     /// <param name="parameters"> The trainer parameters. </param>
     ///
     /// <returns> A unique_ptr to a simple forest trainer. </returns>
-    template<typename LossFunctionType, typename BoosterType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const HistogramForestTrainerParameters& parameters);
+    template<typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
+    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ThresholdFinderType& thresholdFinder, const HistogramForestTrainerParameters& parameters);
 }
 
 #include "../tcc/HistogramForestTrainer.tcc"

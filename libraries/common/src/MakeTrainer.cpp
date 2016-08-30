@@ -19,6 +19,7 @@
 // trainers
 #include "HistogramForestTrainer.h"
 #include "SortingForestTrainer.h"
+#include "ThresholdFinder.h"
 #include "LogitBooster.h"
 
 namespace common
@@ -64,7 +65,7 @@ namespace common
         switch(lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return trainers::MakeHistogramForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainerArguments);
+            return trainers::MakeHistogramForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), trainerArguments);
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");

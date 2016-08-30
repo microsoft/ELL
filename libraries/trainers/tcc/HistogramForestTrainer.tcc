@@ -11,13 +11,13 @@
 
 namespace trainers
 {
-    template<typename LossFunctionType, typename BoosterType>
-    HistogramForestTrainer<LossFunctionType, BoosterType>::HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const HistogramForestTrainerParameters& parameters) 
-        : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction), _random(utilities::GetRandomEngine(parameters.randomSeed)), _candidatesPerInput(parameters.candidatesPerInput), _thresholdFinderSampleSize(parameters.thresholdFinderSampleSize)
+    template<typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
+    HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::HistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ThresholdFinderType& thresholdFinder, const HistogramForestTrainerParameters& parameters) 
+        : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction), _thresholdFinder(thresholdFinder), _random(utilities::GetRandomEngine(parameters.randomSeed)), _candidatesPerInput(parameters.candidatesPerInput), _thresholdFinderSampleSize(parameters.thresholdFinderSampleSize)
     {}
 
-    template<typename LossFunctionType, typename BoosterType>
-    typename HistogramForestTrainer<LossFunctionType, BoosterType>::SplitCandidate HistogramForestTrainer<LossFunctionType, BoosterType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums)
+    template<typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
+    typename HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::SplitCandidate HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums)
     {
         SplitCandidate bestSplitCandidate(nodeId, range, sums);
 
@@ -46,8 +46,8 @@ namespace trainers
         return bestSplitCandidate;
     }
 
-    template<typename LossFunctionType, typename BoosterType>
-    std::vector<typename HistogramForestTrainer<LossFunctionType, BoosterType>::EdgePredictorType> HistogramForestTrainer<LossFunctionType, BoosterType>::GetEdgePredictors(const NodeStats& nodeStats)
+    template<typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
+    std::vector<typename HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::EdgePredictorType> HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::GetEdgePredictors(const NodeStats& nodeStats)
     {
         double output = nodeStats.GetTotalSums().GetMeanLabel();
         double output0 = nodeStats.GetChildSums(0).GetMeanLabel() - output;
@@ -55,8 +55,8 @@ namespace trainers
         return std::vector<EdgePredictorType>{ output0, output1 };
     }
 
-    template<typename LossFunctionType, typename BoosterType>
-    double HistogramForestTrainer<LossFunctionType, BoosterType>::CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const
+    template<typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
+    double HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const
     {
         if(sums0.sumWeights == 0 || sums1.sumWeights == 0)
         {
@@ -68,8 +68,8 @@ namespace trainers
             sums.sumWeights * _lossFunction.BregmanGenerator(sums.sumWeightedLabels/sums.sumWeights);
     }
 
-    template<typename LossFunctionType, typename BoosterType>
-    std::vector<typename HistogramForestTrainer<LossFunctionType, BoosterType>::SplitRuleType> HistogramForestTrainer<LossFunctionType, BoosterType>::GetSplitCandidatesAtNode(Range range)
+    template<typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
+    std::vector<typename HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::SplitRuleType> HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::GetSplitCandidatesAtNode(Range range)
     {
         // uniformly choose _candidatesPerInput from the range, without replacement
         _dataset.RandomPermute(_random, range.firstIndex, range.size, _thresholdFinderSampleSize);
@@ -79,8 +79,8 @@ namespace trainers
         return thresholds;
     }
 
-    template<typename LossFunctionType, typename BoosterType>
-    std::tuple<ForestTrainerBase::Sums, size_t> HistogramForestTrainer<LossFunctionType, BoosterType>::EvaluateSplitRule(const SplitRuleType& splitRule, const Range& range) const
+    template<typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
+    std::tuple<ForestTrainerBase::Sums, size_t> HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::EvaluateSplitRule(const SplitRuleType& splitRule, const Range& range) const
     {
         Sums sums0;
         size_t size0 = 0;
@@ -101,9 +101,9 @@ namespace trainers
         return std::make_tuple(sums0, size0);
     };
 
-    template<typename LossFunctionType, typename BoosterType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const HistogramForestTrainerParameters& parameters)
+    template<typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
+    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ThresholdFinderType& thresholdFinder, const HistogramForestTrainerParameters& parameters)
     {
-        return std::make_unique<HistogramForestTrainer<LossFunctionType, BoosterType>>(lossFunction, booster, parameters);
+        return std::make_unique<HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>>(lossFunction, booster, thresholdFinder, parameters);
     }
 }
