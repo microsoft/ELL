@@ -113,7 +113,7 @@ namespace utilities
         std::string _documentation;
         Variant _value;
         mutable std::unordered_map<std::string, ObjectDescription> _properties;
-        mutable std::function<ObjectDescription()> _getPropertiesFunction; 
+        mutable std::function<ObjectDescription(const ObjectDescription* self)> _getPropertiesFunction;
 
         // friends
         template <typename ValueType>
@@ -146,6 +146,7 @@ namespace utilities
     {
     public:
         virtual ~IDescribable() = default;
+        
         /// <summary> Gets an ObjectDescription for the object </summary>
         ///
         /// <returns> An ObjectDescription for the object </returns>
@@ -156,17 +157,20 @@ namespace utilities
         /// <param name="description"> The `ObjectDescription` to get state from </param>
         virtual void SetObjectState(const ObjectDescription& description, SerializationContext& context) = 0;
 
+        /// <summary> Utility function for polymorphic types to get parent's description as starting point </summary>
+        template <typename BaseType, typename ValueType>
+        ObjectDescription GetParentDescription() const;
+
         /// <summary> Gets the name of this type. </summary>
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "IDescribable"; }
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const = 0;
-
-        /// <summary> Utility function for polymorphic types to get parent's description as starting point </summary>
-        template <typename BaseType, typename ValueType>
-        ObjectDescription GetParentDescription() const;
-
+        
         /// <summary> Serializes the object. </summary>
         ///
         /// <param name="serializer">  The serializer. </param>

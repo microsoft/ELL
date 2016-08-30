@@ -36,22 +36,43 @@ namespace utilities
         auto thisTypeDescription = ValueType::GetTypeDescription();
 
         // merge all properties values from base->this
-        for(const auto& prop: baseDescription.GetProperties())
+        const auto& props = baseDescription.GetProperties();
+        for (const auto& prop : props)
         {
-            thisTypeDescription[prop.first] = prop.second;
+            thisTypeDescription._properties[prop.first] = prop.second;
         }
+
+        // value?
+        // what about _getPropertiesFunction?? --- need to compose them (?)
+        auto baseGetPropertiesFunction = baseDescription._getPropertiesFunction;
+        auto newGetPropertiesFunction = thisTypeDescription._getPropertiesFunction;
+        // For some reason I don't understand, we need to pass in the pointer to this object
+        // Somehow, the captured value of 'this' is incorrect
+        thisTypeDescription._getPropertiesFunction = [=](const ObjectDescription* self)
+        {
+            std::cout << "Combining functions" << std::endl;
+            ObjectDescription baseProperties = baseGetPropertiesFunction(&baseDescription);
+            ObjectDescription newProperties = newGetPropertiesFunction(&thisTypeDescription);
+            for (const auto& prop : baseProperties.GetProperties())
+            {
+                newProperties._properties[prop.first] = prop.second;
+            }
+            return newProperties;
+        };
         return thisTypeDescription;
     }
 
     template <typename ValueType>
     void ObjectDescription::SetGetPropertiesFunction(std::true_type)
     {
-        _getPropertiesFunction = [this]() 
+        // For some reason I don't understand, we need to pass in the pointer to this object
+        // Somehow, the captured value of 'this' is incorrect
+        _getPropertiesFunction = [](const ObjectDescription* self) 
         {
-            if(HasValue())
+            if(self->HasValue())
             {
-                auto ptr = _value.GetValue<ValueType>();
-                return ptr.GetDescription();
+                auto value = self->_value.GetValue<ValueType>();
+                return value.GetDescription();
             }
             else
             {

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "ISerializable.h"
+#include "ObjectDescription.h"
 
 #include <functional>
 #include <ostream>
@@ -18,7 +19,7 @@
 namespace utilities
 {
     /// <summary> UniqueId: A placeholder for a real GUID-type class </summary>
-    class UniqueId : public ISerializable
+    class UniqueId : public IDescribable
     {
     public:
         /// <summary> Constructor </summary>
@@ -46,20 +47,24 @@ namespace utilities
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Gets an ObjectDescription for the type </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <returns> An ObjectDescription for the type </returns>
+        static ObjectDescription GetTypeDescription();
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Gets an ObjectDescription for the object </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, SerializationContext& context) override;
-        
+        /// <returns> An ObjectDescription for the object </returns>
+        virtual ObjectDescription GetDescription() const;
+
+        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        ///
+        /// <param name="description"> The `ObjectDescription` to get state from </param>
+        virtual void SetObjectState(const ObjectDescription& description, SerializationContext& context);
+   
     private:
         friend std::hash<UniqueId>;
-        size_t _id;
+        size_t _id = 0;
         static size_t _nextId;
     };
 }
