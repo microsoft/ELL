@@ -97,9 +97,10 @@ namespace dataset
             prefixSize = rangeSize;
         }
 
-        for (size_t i = rangeFirstIndex; i < rangeFirstIndex + prefixSize; ++i)
+        for (size_t s = 0; s < prefixSize; ++s)
         {
-            RandomSwap(rng, i, i, _examples.size() - i);
+            size_t index = rangeFirstIndex + s;
+            RandomSwap(rng, index, index, rangeSize - s);
         }
     }
 

@@ -129,7 +129,7 @@ namespace trainers
         for (uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
         {
             auto& metaData = _dataset[rowIndex].GetMetaData();
-            metaData.weak = _booster.GetWeakWeightLabel(metaData.strong, metaData.currentOutput);           
+            metaData.weak = _booster.GetWeakWeightLabel(metaData.strong, metaData.currentOutput);
             sums.Increment(metaData.weak);
         }
 

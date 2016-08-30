@@ -59,6 +59,13 @@ namespace common
                          "rs",
                          "Random seed used to choose random split threshold candidates",
                          "123456");
+
+        parser.AddOption(thresholdFinderSampleSize,
+                         "thresholdFinderSampleSize",
+                         "tfss",
+                         "The maximum number of samples to give the threshold finder",
+                         10000);
+
         parser.AddOption(candidatesPerInput,
                          "candidatesPerInput",
                          "cpi",
