@@ -27,8 +27,8 @@ namespace utilities
         {
             if(HasValue())
             {
-                auto ptr = _value.GetValue<const ValueType*>();
-                return ptr->GetDescription();
+                auto ptr = _value.GetValue<ValueType>();
+                return ptr.GetDescription();
             }
             else
             {
@@ -47,8 +47,7 @@ namespace utilities
     void ObjectDescription::AddProperty(const std::string& name, std::string documentation)
     {
         assert(_properties.find(name) == _properties.end());
-        auto propertyDescription = MakeObjectDescription<ValueType>(documentation);
-        _properties[name] = std::move(propertyDescription);
+        _properties[name] = MakeObjectDescription<ValueType>(documentation);
         _properties[name].SetGetPropertiesFunction<ValueType>(std::is_base_of<utilities::IDescribable, ValueType>());
     }
 

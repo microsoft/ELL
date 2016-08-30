@@ -81,7 +81,7 @@ public:
     {
         utilities::ObjectDescription description = GetTypeDescription();
         description["name"] = _name;
-        description["child"] = &_child;
+        description["child"] = _child;
         return description;
     }
 

@@ -17,7 +17,7 @@ namespace utilities
         auto thisPtr = dynamic_cast<const VariantDerived<ValueType>*>(this);
         if (thisPtr == nullptr)
         {
-            assert(false);
+//            assert(false);
             throw InputException(InputExceptionErrors::typeMismatch, std::string{ "VariantBase::GetValue called with wrong type. Type: " + TypeName<ValueType>::GetName() });
         }
 
@@ -62,8 +62,8 @@ namespace utilities
 
         if (std::type_index(typeid(ValueType)) != _type)
         {
-            assert(false);
-            throw InputException(InputExceptionErrors::typeMismatch, std::string{ "Variant::GetValue called with wrong type. Type: " + TypeName<ValueType>::GetName() });
+//            assert(false);
+//            throw InputException(InputExceptionErrors::typeMismatch, std::string{ "Variant::GetValue called with wrong type. Type: " + TypeName<ValueType>::GetName() });
         }
 
         return _value->GetValue<ValueType>();

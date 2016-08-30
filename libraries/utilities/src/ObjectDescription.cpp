@@ -54,7 +54,7 @@ namespace utilities
         {
             auto newProperties = _getPropertiesFunction();
             _properties = newProperties._properties;
-            // _getPropertiesFunction = nullptr;
+            // _getPropertiesFunction = nullptr; // Note: can't nullify function here --- it needs to get called more than once (why?)
         }
     }
 
