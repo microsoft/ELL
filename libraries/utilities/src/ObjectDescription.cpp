@@ -105,7 +105,7 @@ namespace utilities
         for(auto& property: description.GetProperties())
         {
             auto name = property.first;
-            std::cout << "Deserializing property " << name << std::endl;
+            // std::cout << "Deserializing property " << name << std::endl;
             property.second._value.DeserializeProperty(name.c_str(), serializer, context);
         }
         SetObjectState(description, context);

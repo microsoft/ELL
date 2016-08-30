@@ -22,10 +22,7 @@ namespace model
     //
     PortElementBase::PortElementBase(const OutputPortBase& port, size_t index) : _referencedPort(&port), _index(index) {}
 
-    bool PortElementBase::operator==(const PortElementBase& other) const
-    {
-        return (_referencedPort == other._referencedPort) && (_index == other._index);
-    }
+    bool PortElementBase::operator==(const PortElementBase& other) const { return (_referencedPort == other._referencedPort) && (_index == other._index); }
 
     //
     // PortRange
@@ -48,10 +45,7 @@ namespace model
         }
     }
 
-    bool PortRange::IsFullPortRange() const
-    {
-        return GetStartIndex() == 0 && Size() == ReferencedPort()->Size();
-    }
+    bool PortRange::IsFullPortRange() const { return GetStartIndex() == 0 && Size() == ReferencedPort()->Size(); }
 
     utilities::ObjectDescription PortRange::GetTypeDescription()
     {
@@ -75,10 +69,6 @@ namespace model
         return description;
     }
 
-    void PortRange::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
-    { 
-    }
-
     void PortRange::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
@@ -89,38 +79,71 @@ namespace model
         serializer.Deserialize("referencedNodeId", newId, newContext);
         std::string portName;
         serializer.Deserialize("referencedPortName", portName, newContext);
-        
+
         Node* newNode = newContext.GetNodeFromId(newId);
-        if(newNode == nullptr)
+        if (newNode == nullptr)
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Could not find deserialized node.");
         }
 
         auto ports = newNode->GetOutputPorts();
         OutputPortBase* newPort = nullptr;
-        for(auto port: ports)
+        for (auto port : ports)
         {
-            if(port->GetName() == portName)
+            if (port->GetName() == portName)
             {
                 newPort = port;
                 break;
             }
         }
-        if(_referencedPort == newPort)
+        if (_referencedPort == newPort)
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error deserializing port.");        
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error deserializing port.");
         }
         _referencedPort = newPort;
-        if(newPort == nullptr)
+        if (newPort == nullptr)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't deserialize model::PortRange port");
         }
     }
 
-    bool PortRange::operator==(const PortRange& other) const
+    void PortRange::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        return (_referencedPort == other._referencedPort) && (_startIndex == other._startIndex) && (_numValues == other._numValues);
+        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
+        _startIndex = description["startIndex"].GetValue<size_t>();
+        _numValues = description["numValues"].GetValue<size_t>();
+        _isFixedSize = description["isFixedSize"].GetValue<bool>();
+        Node::NodeId newId = description["referencedNodeId"].GetValue<utilities::UniqueId>();
+        std::string portName = description["referencedPortName"].GetValue<std::string>();
+
+        Node* newNode = newContext.GetNodeFromId(newId);
+        if (newNode == nullptr)
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Could not find deserialized node.");
+        }
+
+        auto ports = newNode->GetOutputPorts();
+        OutputPortBase* newPort = nullptr;
+        for (auto port : ports)
+        {
+            if (port->GetName() == portName)
+            {
+                newPort = port;
+                break;
+            }
+        }
+        if (_referencedPort == newPort)
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error deserializing port.");
+        }
+        _referencedPort = newPort;
+        if (newPort == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't deserialize model::PortRange port");
+        }
     }
+
+    bool PortRange::operator==(const PortRange& other) const { return (_referencedPort == other._referencedPort) && (_startIndex == other._startIndex) && (_numValues == other._numValues); }
 
     //
     // PortElementsBase
@@ -154,11 +177,8 @@ namespace model
         _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
         ComputeSize();
     }
-    
-    void PortElementsBase::Reserve(size_t numRanges)
-    {
-        _ranges.reserve(numRanges);
-    }
+
+    void PortElementsBase::Reserve(size_t numRanges) { _ranges.reserve(numRanges); }
 
     void PortElementsBase::AddRange(const PortRange& range)
     {

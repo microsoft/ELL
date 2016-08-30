@@ -202,10 +202,6 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-//        virtual void Serialize(utilities::Serializer& serializer) const override;
-
-//        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
-
         static utilities::ObjectDescription GetTypeDescription();
         virtual utilities::ObjectDescription GetDescription() const override;
         virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
