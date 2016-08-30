@@ -108,7 +108,6 @@ namespace trainers
         {
             const auto& example = exampleIterator.Get();
 
-            // TODO this code breaks encapsulation - give ForestTrainer a ctor that takes an IDataVector
             auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
 
             ExampleMetaData metaData;

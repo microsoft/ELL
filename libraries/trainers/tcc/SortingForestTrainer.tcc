@@ -9,7 +9,7 @@
 namespace trainers
 {
     template<typename LossFunctionType, typename BoosterType>
-    SortingForestTrainer<LossFunctionType, BoosterType>::SortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters) : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction)
+    SortingForestTrainer<LossFunctionType, BoosterType>::SortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const SortingForestTrainerParameters& parameters) : ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>(booster, parameters), _lossFunction(lossFunction)
     {}
 
     template<typename LossFunctionType, typename BoosterType>
@@ -92,7 +92,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType, typename BoosterType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters)
+    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const SortingForestTrainerParameters& parameters)
     {
         return std::make_unique<SortingForestTrainer<LossFunctionType, BoosterType>>(lossFunction, booster, parameters);
     }

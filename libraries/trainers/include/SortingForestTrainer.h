@@ -17,6 +17,11 @@
 
 namespace trainers
 {
+    /// <summary> Parameters for the sorting forest trainer. </summary>
+    struct SortingForestTrainerParameters : public virtual ForestTrainerParameters
+    {
+    };
+
     template <typename LossFunctionType, typename BoosterType> 
     class SortingForestTrainer : public ForestTrainer<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor, BoosterType>
     {
@@ -26,7 +31,7 @@ namespace trainers
         /// <param name="lossFunction"> The loss function. </param>
         /// <param name="booster"> The booster. </param>
         /// <param name="parameters"> Training Parameters. </param>
-        SortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters);
+        SortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const SortingForestTrainerParameters& parameters);
 
         using SplitRuleType = predictors::SingleElementThresholdPredictor;
         using EdgePredictorType = predictors::ConstantPredictor;
@@ -52,7 +57,7 @@ namespace trainers
     ///
     /// <returns> A unique_ptr to a simple forest trainer. </returns>
     template<typename LossFunctionType, typename BoosterType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ForestTrainerParameters& parameters);
+    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const SortingForestTrainerParameters& parameters);
 }
 
 #include "../tcc/SortingForestTrainer.tcc"

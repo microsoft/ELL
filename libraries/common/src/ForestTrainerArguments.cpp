@@ -29,30 +29,6 @@ namespace common
                          "nr",
                          "The number of boosting rounds to perform",
                          "10");
-    }
-
-    void ParsedHistogramForestTrainerArguments::AddArgs(utilities::CommandLineParser& parser) 
-    {
-
-
-
-        parser.AddOption(minSplitGain,
-                         "minSplitGain",
-                         "msg",
-                         "The minimal gain required to split a leaf node",
-                         0.0);
-
-        parser.AddOption(maxSplitsPerRound,
-                         "maxSplitsPerRound",
-                         "ms",
-                         "The number of split operations to perform on each boosting round",
-                         "10");
-
-        parser.AddOption(numRounds,
-                         "numRounds",
-                         "nr",
-                         "The number of boosting rounds to perform",
-                         "10");
 
         parser.AddOption(randomSeed,
                          "randomSeed",
@@ -71,5 +47,11 @@ namespace common
                          "cpi",
                          "The number of split candidates to create per input element",
                          8);
+        
+        parser.AddOption(sortingTrainer,
+                         "sortingTrainer",
+                         "st",
+                         "Use the sorting trainer instead of the histogram trainer",
+                         false);
     }
 }

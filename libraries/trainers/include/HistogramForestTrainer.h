@@ -23,7 +23,7 @@
 namespace trainers
 {
     /// <summary> Parameters for the forest trainer. </summary>
-    struct HistogramForestTrainerParameters : public ForestTrainerParameters
+    struct HistogramForestTrainerParameters : public virtual ForestTrainerParameters
     {
         std::string randomSeed;
         size_t thresholdFinderSampleSize;
