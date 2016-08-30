@@ -104,6 +104,10 @@ namespace trainers
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::LoadData(dataset::GenericRowDataset::Iterator exampleIterator)
     {
+        // reset the dataset
+        _dataset = dataset::RowDataset<ForestTrainerExample>();
+
+        // create the dataset from the example iterator
         while (exampleIterator.IsValid())
         {
             const auto& example = exampleIterator.Get();

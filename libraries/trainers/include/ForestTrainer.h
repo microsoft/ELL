@@ -6,10 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// TODO - second call to Update should run data through the forest and update the "currentOutput"
-// 
-// TODO - bucket sort
-
 #pragma once
 
 #include "IIncrementalTrainer.h"
