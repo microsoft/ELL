@@ -99,8 +99,9 @@ namespace utilities
         {
             auto name = property.first;
             auto variant = property.second._value;
-            variant.Deserialize(name.c_str(), serializer, context);
+            variant.Deserialize(name.c_str(), serializer, context);  // TODO: need to pass in description and have Variant::Deserialize set the description ... ugh
         }
+        GetProperties(description);
         // crap... we need to set the value of the actual object. :( need to call the constructor somehow, or just set the properties. :(
     }
 

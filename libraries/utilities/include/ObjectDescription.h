@@ -144,6 +144,11 @@ namespace utilities
         /// <returns> An ObjectDescription for the object </returns>
         virtual ObjectDescription GetDescription() const = 0;
 
+        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        ///
+        /// <param name="description"> The `ObjectDescription` to get state from </param>
+        virtual void GetProperties(const ObjectDescription& description) = 0;
+
         /// <summary> Gets the name of this type. </summary>
         ///
         /// <returns> The name of this type. </returns>

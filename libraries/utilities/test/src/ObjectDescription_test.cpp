@@ -49,6 +49,12 @@ public:
         return description;
     }
 
+    virtual void GetProperties(const utilities::ObjectDescription& description) override
+    {
+        _a = description["a"].GetValue<int>();
+        _b = description["b"].GetValue<double>();
+    }
+
     static std::string GetTypeName() { return "ChildObject"; }
     virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
@@ -83,6 +89,12 @@ public:
         description["name"] = _name;
         description["child"] = _child;
         return description;
+    }
+
+    virtual void GetProperties(const utilities::ObjectDescription& description) override
+    {
+        _name = description["name"].GetValue<std::string>();
+        _child = description["child"].GetValue<ChildObject>();   
     }
 
     static std::string GetTypeName() { return "ParentObject"; }
