@@ -38,6 +38,7 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 %include "SGDIncrementalTrainer_wrap.h"
 
 %import "Serializer.h"
+%import "ObjectDescription.h"
 %include "ISerializable.h"
 %include "UniqueId.h"
 %include "Variant.h"
