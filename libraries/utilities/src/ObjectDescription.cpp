@@ -88,12 +88,10 @@ namespace utilities
     //
     // IDescribable
     //
-
     void IDescribable::Serialize(Serializer& serializer) const
     {
         // for each thing, serialize it
         const auto& description = GetDescription();
-//                     Node::Serialize(serializer); // crap --- I think nodes will have to do custom serialization no matter what. :(
         for(const auto& property: description.GetProperties())
         {
             auto name = property.first;
@@ -112,5 +110,4 @@ namespace utilities
         }
         SetObjectState(description);
     }
-
 }
