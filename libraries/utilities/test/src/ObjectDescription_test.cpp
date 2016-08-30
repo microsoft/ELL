@@ -46,7 +46,7 @@ public:
         return description;
     }
 
-    virtual void SetObjectState(const utilities::ObjectDescription& description) override
+    virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override
     {
         _a = description["a"].GetValue<int>();
         _b = description["b"].GetValue<double>();
@@ -81,9 +81,9 @@ public:
         return description;
     }
 
-    virtual void SetObjectState(const utilities::ObjectDescription& description) override
+    virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override
     {
-        InnerObject::SetObjectState(description);
+        InnerObject::SetObjectState(description, context);
         _c = description["c"].GetValue<std::string>();
     }
 
@@ -118,7 +118,7 @@ public:
         return description;
     }
 
-    virtual void SetObjectState(const utilities::ObjectDescription& description) override
+    virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override
     {
         _name = description["name"].GetValue<std::string>();
         _inner = description["obj"].GetValue<InnerObject>();   

@@ -79,21 +79,21 @@ namespace model
         return _input;
     }
 
-    template <typename ValueType>
-    void InputPort<ValueType>::Serialize(utilities::Serializer& serializer) const
-    {
-        InputPortBase::Serialize(serializer);
-        serializer.Serialize("input", _input);
-    }
+    // template <typename ValueType>
+    // void InputPort<ValueType>::Serialize(utilities::Serializer& serializer) const
+    // {
+    //     InputPortBase::Serialize(serializer);
+    //     serializer.Serialize("input", _input);
+    // }
 
-    template <typename ValueType>
-    void InputPort<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        InputPortBase::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
+    // template <typename ValueType>
+    // void InputPort<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    // {
+    //     InputPortBase::Deserialize(serializer, context);
+    //     serializer.Deserialize("input", _input, context);
 
-        ComputeParents();
-    }
+    //     ComputeParents();
+    // }
 
     template <typename ValueType>
     utilities::ObjectDescription InputPort<ValueType>::GetTypeDescription()
@@ -112,9 +112,11 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputPort<ValueType>::SetObjectState(const utilities::ObjectDescription& description)
+    void InputPort<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        Port::SetObjectState(description);
+        Port::SetObjectState(description, context);
         _input = description["input"].GetValue<decltype(_input)>();
+
+        ComputeParents();
     }  
 }

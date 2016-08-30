@@ -53,13 +53,30 @@ namespace model
         return GetStartIndex() == 0 && Size() == ReferencedPort()->Size();
     }
 
-    void PortRange::Serialize(utilities::Serializer& serializer) const
+    utilities::ObjectDescription PortRange::GetTypeDescription()
     {
-        serializer.Serialize("startIndex", _startIndex);
-        serializer.Serialize("numValues", _numValues);
-        serializer.Serialize("isFixedSize", _isFixedSize);
-        serializer.Serialize("referencedNodeId", _referencedPort->GetNode()->GetId());
-        serializer.Serialize("referencedPortName", _referencedPort->GetName());
+        utilities::ObjectDescription description = utilities::MakeObjectDescription<Port>("PortRange");
+        description.AddProperty<size_t>("startIndex", "");
+        description.AddProperty<size_t>("numValues", "");
+        description.AddProperty<bool>("isFixedSize", "");
+        description.AddProperty<utilities::UniqueId>("referencedNodeId", "");
+        description.AddProperty<std::string>("referencedPortName", "");
+        return description;
+    }
+
+    utilities::ObjectDescription PortRange::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetTypeDescription();
+        description["startIndex"] = _startIndex;
+        description["numValues"] = _numValues;
+        description["isFixedSize"] = _isFixedSize;
+        description["referencedNodeId"] = _referencedPort->GetNode()->GetId();
+        description["referencedPortName"] = _referencedPort->GetName();
+        return description;
+    }
+
+    void PortRange::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    { 
     }
 
     void PortRange::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
@@ -172,17 +189,37 @@ namespace model
         }
     }
 
-    void PortElementsBase::Serialize(utilities::Serializer& serializer) const
+    //void PortElementsBase::Serialize(utilities::Serializer& serializer) const
+    //{
+    //    serializer.Serialize("ranges", _ranges);
+    //}
+
+    //void PortElementsBase::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    //{
+    //    model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
+    //    std::vector<PortRange> ranges;
+    //    serializer.Deserialize("ranges", ranges, newContext);
+    //    _ranges = ranges;
+    //    ComputeSize();
+    //}
+
+    utilities::ObjectDescription PortElementsBase::GetTypeDescription()
     {
-        serializer.Serialize("ranges", _ranges);
+        utilities::ObjectDescription description = utilities::MakeObjectDescription<Port>("PortRange");
+        description.AddProperty<decltype(_ranges)>("ranges", "");
+        return description;
     }
 
-    void PortElementsBase::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    utilities::ObjectDescription PortElementsBase::GetDescription() const
     {
-        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
-        std::vector<PortRange> ranges;
-        serializer.Deserialize("ranges", ranges, newContext);
-        _ranges = ranges;
+        utilities::ObjectDescription description = GetTypeDescription();
+        description["ranges"] = _ranges;
+        return description;
+    }
+
+    void PortElementsBase::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        _ranges = description["ranges"].GetValue<decltype(_ranges)>();
         ComputeSize();
     }
 }

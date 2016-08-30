@@ -108,6 +108,6 @@ namespace utilities
             std::cout << "Deserializing property " << name << std::endl;
             property.second._value.DeserializeProperty(name.c_str(), serializer, context);
         }
-        SetObjectState(description);
+        SetObjectState(description, context);
     }
 }

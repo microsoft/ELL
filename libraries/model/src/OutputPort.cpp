@@ -14,18 +14,6 @@ namespace model
     OutputPortBase::OutputPortBase(const class Node* node, std::string name, PortType type, size_t size) : Port(node, name, type), _size(size), _isReferenced(false) 
     {}
 
-    void OutputPortBase::Serialize(utilities::Serializer& serializer) const
-    {
-        Port::Serialize(serializer);
-        serializer.Serialize("size", _size);
-    }
-
-    void OutputPortBase::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Port::Deserialize(serializer, context);
-        serializer.Deserialize("size", _size, context);
-    }
-
     utilities::ObjectDescription OutputPortBase::GetTypeDescription()
     {
         utilities::ObjectDescription description = utilities::MakeObjectDescription<Port, OutputPortBase>("OutputPortBase");
@@ -40,9 +28,9 @@ namespace model
         return description;
     }
 
-    void OutputPortBase::SetObjectState(const utilities::ObjectDescription& description)
+    void OutputPortBase::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        Port::SetObjectState(description);
+        Port::SetObjectState(description, context);
         _size = description["size"].GetValue<size_t>();
     }    
 }

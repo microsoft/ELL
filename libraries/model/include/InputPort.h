@@ -14,6 +14,7 @@
 
 // utilities
 #include "Exception.h"
+#include "ObjectDescription.h"
 
 // stl
 #include <vector>
@@ -112,20 +113,9 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
-        ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
-
-        /// <summary> Reads from a Deserializer. </summary>
-        ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
-
         static utilities::ObjectDescription GetTypeDescription();
         virtual utilities::ObjectDescription GetDescription() const override;
-        virtual void SetObjectState(const utilities::ObjectDescription& description) override;
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
     private:
         PortElements<ValueType> _input;
     };

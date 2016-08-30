@@ -28,17 +28,17 @@ namespace model
         _cachedOutput = values;
     }
 
-    template <typename ValueType>
-    void OutputPort<ValueType>::Serialize(utilities::Serializer& serializer) const
-    {
-        OutputPortBase::Serialize(serializer);
-    }
+    // template <typename ValueType>
+    // void OutputPort<ValueType>::Serialize(utilities::Serializer& serializer) const
+    // {
+    //     OutputPortBase::Serialize(serializer);
+    // }
 
-    template <typename ValueType>
-    void OutputPort<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        OutputPortBase::Deserialize(serializer, context);
-    }
+    // template <typename ValueType>
+    // void OutputPort<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    // {
+    //     OutputPortBase::Deserialize(serializer, context);
+    // }
 
     template <typename ValueType>
     utilities::ObjectDescription OutputPort<ValueType>::GetTypeDescription()
@@ -55,8 +55,8 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputPort<ValueType>::SetObjectState(const utilities::ObjectDescription& description)
+    void OutputPort<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        OutputPortBase::SetObjectState(description);
+        OutputPortBase::SetObjectState(description, context);
     }    
 }

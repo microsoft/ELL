@@ -33,23 +33,6 @@ namespace model
         return Port::PortType::boolean;
     }
 
-    void Port::Serialize(utilities::Serializer& serializer) const
-    {
-        serializer.Serialize("nodeId", _node->GetId());
-        serializer.Serialize("name", _name);
-        serializer.Serialize("type", static_cast<int>(_type));
-    }
-
-    void Port::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::NodeId id;
-        serializer.Deserialize("nodeId", id, context); // drop it on the floor
-        serializer.Deserialize("name", _name, context);
-        int typeCode = 0;
-        serializer.Deserialize("type", typeCode, context);
-        _type = static_cast<PortType>(typeCode);
-    }
-
     utilities::ObjectDescription Port::GetTypeDescription()
     {
         utilities::ObjectDescription description = utilities::MakeObjectDescription<Port>("Port");
@@ -68,7 +51,7 @@ namespace model
         return description;
     }
 
-    void Port::SetObjectState(const utilities::ObjectDescription& description)
+    void Port::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         auto nodeId = description["nodeId"].GetValue<utilities::UniqueId>();
         _name = description["name"].GetValue<std::string>();

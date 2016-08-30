@@ -14,6 +14,7 @@
 // utilities
 #include "Exception.h"
 #include "ISerializable.h"
+#include "ObjectDescription.h"
 
 // stl
 #include <vector>
@@ -83,7 +84,7 @@ namespace model
     };
 
     /// <summary> Represents a contiguous set of values from an output port </summary>
-    class PortRange : public utilities::ISerializable
+    class PortRange : public utilities::IDescribable
     {
     public:
         PortRange() = default;
@@ -141,16 +142,11 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
-        ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
-
-        /// <summary> Reads from a Deserializer. </summary>
-        ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
+        static utilities::ObjectDescription GetTypeDescription();
+        virtual utilities::ObjectDescription GetDescription() const override;
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
 
         /// <summary> Equality operator. </summary>
         ///
@@ -165,7 +161,7 @@ namespace model
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>
-    class PortElementsBase : public utilities::ISerializable
+    class PortElementsBase : public utilities::IDescribable
     {
     public:
         virtual ~PortElementsBase() = default;
@@ -206,16 +202,13 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
-        ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+//        virtual void Serialize(utilities::Serializer& serializer) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
-        ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+//        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
+        static utilities::ObjectDescription GetTypeDescription();
+        virtual utilities::ObjectDescription GetDescription() const override;
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
 
     protected:
         PortElementsBase(const OutputPortBase& port);
