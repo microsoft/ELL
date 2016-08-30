@@ -19,9 +19,10 @@
 
 namespace trainers
 {
+    /// <summary> Base class for threshold predictor finders. </summary>
     class ThresholdFinder
     {
-    public:
+    protected:
         struct ValueWeight
         {
             double value;
@@ -30,8 +31,7 @@ namespace trainers
             operator double() { return value; }
         };
 
-    protected:
-
+        // the result of a call to UniqueValues
         struct UniqueValuesResult
         {
             std::vector<std::vector<ThresholdFinder::ValueWeight>> weightedValues;
@@ -46,13 +46,20 @@ namespace trainers
         size_t SortReduceDuplicates(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const;
     };
 
+    /// <summary> A threshold finder that finds all possible thresholds. </summary>
     class ExhaustiveThresholdFinder : public ThresholdFinder
     {
     public:
+
+        /// <summary> Returns a vector of SingleElementThresholdPredictor. </summary>
+        ///
+        /// <typeparam name="ExampleIteratorType"> Type of example iterator. </typeparam>
+        /// <param name="exampleIterator"> The example iterator. </param>
+        ///
+        /// <returns> The thresholds. </returns>
         template<typename ExampleIteratorType>
         std::vector<predictors::SingleElementThresholdPredictor> GetThresholds(ExampleIteratorType exampleIterator) const;
     };
-
 }
 
 #include "../tcc/ThresholdFinder.tcc"
