@@ -88,7 +88,7 @@ namespace utilities
 
     void Variant::Deserialize(const char* name, Deserializer& serializer, SerializationContext& context)
     {
-        _value->Deserialize(name, serializer, context);
+//        _value->Deserialize(name, serializer, context);
     }
 
     std::string to_string(const Variant& variant)

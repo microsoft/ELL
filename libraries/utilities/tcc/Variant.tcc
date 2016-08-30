@@ -137,7 +137,7 @@ namespace utilities
     void VariantDerived<ValueType>::Deserialize(const char* name, Deserializer& serializer, SerializationContext& context) 
     {
         ValueType value;
-        serializer.Deserialize(name, value, context);
+//        serializer.Deserialize(name, value, context);
         _value = value;
     }
 }

@@ -53,21 +53,21 @@ namespace nodes
         serializer.Deserialize("values", _values, context);
     }
 
-    template <typename ValueType>
-    utilities::ObjectDescription ConstantNode<ValueType>::GetTypeDescription()
-    {
-        auto description = utilities::MakeObjectDescription<ConstantNode<ValueType>>("Constant node");
-        description.template AddProperty<decltype(_values)>("values", "Constant values");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
-        return description;
-    }
+    // template <typename ValueType>
+    // utilities::ObjectDescription ConstantNode<ValueType>::GetTypeDescription()
+    // {
+    //     auto description = utilities::MakeObjectDescription<ConstantNode<ValueType>>("Constant node");
+    //     description.template AddProperty<decltype(_values)>("values", "Constant values");
+    //     description.template AddProperty<decltype(_output)>("output", "Output port");
+    //     return description;
+    // }
 
-    template <typename ValueType>
-    utilities::ObjectDescription ConstantNode<ValueType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetTypeDescription();
-        description["values"] = _values;
-        description["output"] = &_output; // ugh
-        return description;
-    }
+    // template <typename ValueType>
+    // utilities::ObjectDescription ConstantNode<ValueType>::GetDescription() const
+    // {
+    //     utilities::ObjectDescription description = GetTypeDescription();
+    //     description["values"] = _values;
+    //     description["output"] = &_output; // ugh
+    //     return description;
+    // }
 }

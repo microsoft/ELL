@@ -19,7 +19,7 @@
 // utilities
 #include "Serializer.h"
 #include "TypeName.h"
-#include "ObjectDescription.h"
+//#include "ObjectDescription.h"
 
 // stl
 #include <memory>
@@ -79,8 +79,8 @@ namespace nodes
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
-        static utilities::ObjectDescription GetTypeDescription();
-        virtual utilities::ObjectDescription GetDescription() const;
+        // static utilities::ObjectDescription GetTypeDescription();
+        // virtual utilities::ObjectDescription GetDescription() const;
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;

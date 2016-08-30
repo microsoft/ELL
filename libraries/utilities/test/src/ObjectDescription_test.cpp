@@ -160,13 +160,20 @@ void TestSerializeIDescribable()
         utilities::SimpleXmlSerializer serializer(strstream);
         ChildObject childObj(3, 4.5);
         serializer.Serialize("child", childObj);
+
+        ParentObject parentObj("Parent", 5, 6.5);
+        serializer.Serialize("parent", parentObj);
+
         // print
         std::cout << "Serialized stream:" << std::endl;
         std::cout << strstream.str() << std::endl;
     }
 
     utilities::SimpleXmlDeserializer deserializer(strstream);
-    ChildObject val;
-    deserializer.Deserialize("child", val, context);
-    testing::ProcessTest("Deserialize IDescribable check",  val.GetA() == 3 && val.GetB() == 4.5f);        
+    ChildObject deserializedChild;
+    deserializer.Deserialize("child", deserializedChild, context);
+    testing::ProcessTest("Deserialize IDescribable check",  deserializedChild.GetA() == 3 && deserializedChild.GetB() == 4.5f);        
+
+    ParentObject deserializedParent;
+    deserializer.Deserialize("parent", deserializedParent, context);
 }
