@@ -124,7 +124,7 @@ int main()
         std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
         throw;
     }
-
+  
     if (testing::DidTestFail())
     {
         return 1;

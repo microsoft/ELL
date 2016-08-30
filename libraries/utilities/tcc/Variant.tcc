@@ -62,8 +62,8 @@ namespace utilities
 
         if (std::type_index(typeid(ValueType)) != _type)
         {
-//            assert(false);
-//            throw InputException(InputExceptionErrors::typeMismatch, std::string{ "Variant::GetValue called with wrong type. Type: " + TypeName<ValueType>::GetName() });
+            assert(false);
+            throw InputException(InputExceptionErrors::typeMismatch, std::string{ "Variant::GetValue called with wrong type. Type: " + TypeName<ValueType>::GetName() });
         }
 
         return _value->GetValue<ValueType>();
@@ -137,7 +137,7 @@ namespace utilities
     void VariantDerived<ValueType>::Deserialize(const char* name, Deserializer& serializer, SerializationContext& context) 
     {
         ValueType value;
-//        serializer.Deserialize(name, value, context);
+        serializer.Deserialize(name, value, context);
         _value = value;
     }
 }
