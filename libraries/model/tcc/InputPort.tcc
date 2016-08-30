@@ -94,4 +94,27 @@ namespace model
 
         ComputeParents();
     }
+
+    template <typename ValueType>
+    utilities::ObjectDescription InputPort<ValueType>::GetTypeDescription()
+    {
+        utilities::ObjectDescription description = utilities::MakeObjectDescription<Port, InputPort<ValueType>>("OutputPort");
+        description.AddProperty<decltype(_input)>("input", "Input referenced for this input port");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription InputPort<ValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Port, InputPort<ValueType>>();
+        description["input"] = _input;
+        return description;
+    }
+
+    template <typename ValueType>
+    void InputPort<ValueType>::SetObjectState(const utilities::ObjectDescription& description)
+    {
+        Port::SetObjectState(description);
+        _input = description["input"].GetValue<decltype(_input)>();
+    }  
 }

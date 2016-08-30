@@ -123,6 +123,9 @@ namespace model
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
+        static utilities::ObjectDescription GetTypeDescription();
+        virtual utilities::ObjectDescription GetDescription() const override;
+        virtual void SetObjectState(const utilities::ObjectDescription& description) override;
     private:
         PortElements<ValueType> _input;
     };

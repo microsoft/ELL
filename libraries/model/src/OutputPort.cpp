@@ -25,4 +25,24 @@ namespace model
         Port::Deserialize(serializer, context);
         serializer.Deserialize("size", _size, context);
     }
+
+    utilities::ObjectDescription OutputPortBase::GetTypeDescription()
+    {
+        utilities::ObjectDescription description = utilities::MakeObjectDescription<Port, OutputPortBase>("OutputPortBase");
+        description.AddProperty<size_t>("size", "Dimension of the output port");
+        return description;
+    }
+
+    utilities::ObjectDescription OutputPortBase::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Port, OutputPortBase>();
+        description["size"] = _size;
+        return description;
+    }
+
+    void OutputPortBase::SetObjectState(const utilities::ObjectDescription& description)
+    {
+        Port::SetObjectState(description);
+        _size = description["size"].GetValue<size_t>();
+    }    
 }

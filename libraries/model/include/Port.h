@@ -11,6 +11,7 @@
 // utilities
 #include "UniqueId.h"
 #include "ISerializable.h"
+#include "ObjectDescription.h"
 
 // stl
 #include <vector>
@@ -23,7 +24,7 @@ namespace model
     class Node;
 
     /// <summary> Port is the common base class for InputPort and OutputPort. </summary>
-    class Port: public utilities::ISerializable
+    class Port: public utilities::IDescribable
     {
     public:
         virtual ~Port() = default;
@@ -85,6 +86,10 @@ namespace model
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
         
+        static utilities::ObjectDescription GetTypeDescription();
+        virtual utilities::ObjectDescription GetDescription() const override;
+        virtual void SetObjectState(const utilities::ObjectDescription& description) override;
+
     protected:
         Port(const class Node* node, std::string name, PortType type) : _node(node), _name(name), _type(type) {}
         Port(const Port& other) = delete;

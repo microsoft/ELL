@@ -60,6 +60,10 @@ namespace model
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
+        static utilities::ObjectDescription GetTypeDescription();
+        virtual utilities::ObjectDescription GetDescription() const override;
+        virtual void SetObjectState(const utilities::ObjectDescription& description) override;
+
     protected:
         OutputPortBase(const class Node* node, std::string name, PortType type, size_t size);
 
@@ -72,7 +76,8 @@ namespace model
     class OutputPort : public OutputPortBase
     {
     public:
-        OutputPort(const OutputPort&) = delete;
+        OutputPort() = default;
+        OutputPort(const OutputPort&) = default; //delete;// why??
 
         /// <summary> Constructor </summary>
         ///
@@ -117,6 +122,10 @@ namespace model
         /// <param name="deserializer"> The deserializer. </param>
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
+        static utilities::ObjectDescription GetTypeDescription();
+        virtual utilities::ObjectDescription GetDescription() const override;
+        virtual void SetObjectState(const utilities::ObjectDescription& description) override;
 
     private:
         mutable std::vector<ValueType> _cachedOutput;

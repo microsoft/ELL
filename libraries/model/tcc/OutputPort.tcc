@@ -39,4 +39,24 @@ namespace model
     {
         OutputPortBase::Deserialize(serializer, context);
     }
+
+    template <typename ValueType>
+    utilities::ObjectDescription OutputPort<ValueType>::GetTypeDescription()
+    {
+        utilities::ObjectDescription description = utilities::MakeObjectDescription<OutputPortBase, OutputPort<ValueType>>("OutputPort");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription OutputPort<ValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<OutputPortBase, OutputPort<ValueType>>();
+        return description;
+    }
+
+    template <typename ValueType>
+    void OutputPort<ValueType>::SetObjectState(const utilities::ObjectDescription& description)
+    {
+        OutputPortBase::SetObjectState(description);
+    }    
 }
