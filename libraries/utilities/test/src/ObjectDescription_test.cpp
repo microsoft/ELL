@@ -142,7 +142,7 @@ void PrintDescription(const utilities::ObjectDescription& description, size_t in
     }
     std::cout << std::endl;    
 
-    for(const auto& iter: description.Properties())
+    for(const auto& iter: description.GetProperties())
     {
         auto name = iter.first;
         auto prop = iter.second;
@@ -153,13 +153,13 @@ void PrintDescription(const utilities::ObjectDescription& description, size_t in
 void TestGetTypeDescription()
 {
     auto innerDescription = InnerObject::GetTypeDescription();
-    PrintDescription(innerDescription);
+//    PrintDescription(innerDescription);
 
     auto outerDescription = OuterObject::GetTypeDescription();
-    PrintDescription(outerDescription);
+//    PrintDescription(outerDescription);
 
     auto derivedDescription = DerivedObject::GetTypeDescription();
-    PrintDescription(derivedDescription);
+//    PrintDescription(derivedDescription);
 
     testing::ProcessTest("ObjectDescription", innerDescription.HasProperty("a"));
     testing::ProcessTest("ObjectDescription", innerDescription.HasProperty("b"));
@@ -177,15 +177,15 @@ void TestGetObjectDescription()
 {
     InnerObject innerObj(3, 4.5);
     auto innerDescription = innerObj.GetDescription();
-    PrintDescription(innerDescription);
+//    PrintDescription(innerDescription);
 
     OuterObject outerObj("Outer", 5, 6.5);
     auto outerDescription = outerObj.GetDescription();
-    PrintDescription(outerDescription);
+//    PrintDescription(outerDescription);
 
     DerivedObject derivedObj(8, 9.5, "derived");
     auto derivedDescription = derivedObj.GetDescription();
-    PrintDescription(derivedDescription);
+//    PrintDescription(derivedDescription);
 
     // Inner
     testing::ProcessTest("ObjectDescription", innerDescription.HasProperty("a"));

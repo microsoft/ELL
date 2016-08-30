@@ -22,7 +22,7 @@ namespace utilities
     ObjectDescription::ObjectDescription(const std::string& documentation) : _documentation(documentation) 
     {};
 
-    const ObjectDescription::PropertyCollection& ObjectDescription::Properties() const
+    const ObjectDescription::PropertyCollection& ObjectDescription::GetProperties() const
     {
         for(const auto& prop: _properties)
         {
@@ -31,7 +31,7 @@ namespace utilities
         return _properties;
     }
 
-    ObjectDescription::PropertyCollection& ObjectDescription::Properties()
+    ObjectDescription::PropertyCollection& ObjectDescription::GetProperties()
     {
         for(const auto& prop: _properties)
         {
@@ -94,7 +94,7 @@ namespace utilities
         // for each thing, serialize it
         const auto& description = GetDescription();
 //                     Node::Serialize(serializer); // crap --- I think nodes will have to do custom serialization no matter what. :(
-        for(const auto& property: description.Properties())
+        for(const auto& property: description.GetProperties())
         {
             auto name = property.first;
             property.second._value.SerializeProperty(name.c_str(), serializer);
@@ -104,7 +104,7 @@ namespace utilities
     void IDescribable::Deserialize(Deserializer& serializer, SerializationContext& context)
     {
         auto description = GetDescription(); // will call GetDescription on a default-constructed object
-        for(auto& property: description.Properties())
+        for(auto& property: description.GetProperties())
         {
             auto name = property.first;
             std::cout << "Deserializing property " << name << std::endl;

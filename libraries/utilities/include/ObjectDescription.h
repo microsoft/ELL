@@ -50,12 +50,12 @@ namespace utilities
         /// <summary> Gets the properties of this object </summary>
         ///
         /// <returns> The properties of this object </returns>
-        const PropertyCollection& Properties() const;
+        const PropertyCollection& GetProperties() const;
 
         /// <summary> Gets the properties of this object </summary>
         ///
         /// <returns> The properties of this object </returns>
-        PropertyCollection& Properties();
+        PropertyCollection& GetProperties();
 
         /// <summary> Adds a new property to the object </summary>
         ///
@@ -111,16 +111,18 @@ namespace utilities
     private:
         std::string _typeName;
         std::string _documentation;
-        mutable std::unordered_map<std::string, ObjectDescription> _properties;
         Variant _value;
+        mutable std::unordered_map<std::string, ObjectDescription> _properties;
         mutable std::function<ObjectDescription()> _getPropertiesFunction; 
 
+        // friends
         template <typename ValueType>
         friend ObjectDescription MakeObjectDescription(const std::string& description);
         template <typename BaseType, typename ValueType>
         friend ObjectDescription MakeObjectDescription(const std::string& description);
         friend class IDescribable;
 
+        // internal private constructor
         ObjectDescription(const std::string& documentation);
 
         // overload that gets called for IDescribable properties
@@ -161,6 +163,10 @@ namespace utilities
 
         virtual std::string GetRuntimeTypeName() const = 0;
 
+        /// <summary> Utility function for polymorphic types to get parent's description as starting point </summary>
+        template <typename BaseType, typename ValueType>
+        ObjectDescription GetParentDescription() const;
+
         /// <summary> Serializes the object. </summary>
         ///
         /// <param name="serializer">  The serializer. </param>
@@ -171,9 +177,6 @@ namespace utilities
         /// <param name="serializer"> The deserializer. </param>
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(Deserializer& serializer, SerializationContext& context);
-
-        template <typename BaseType, typename ValueType>
-        ObjectDescription GetParentDescription() const;
     };
 
     /// <summary> Factory method to create an ObjectDescription </summary>

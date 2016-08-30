@@ -36,7 +36,7 @@ namespace utilities
         auto thisTypeDescription = ValueType::GetTypeDescription();
 
         // merge all properties values from base->this
-        for(const auto& prop: baseDescription.Properties())
+        for(const auto& prop: baseDescription.GetProperties())
         {
             thisTypeDescription[prop.first] = prop.second;
         }
