@@ -31,6 +31,15 @@ namespace utilities
         return _properties;
     }
 
+    ObjectDescription::PropertyCollection& ObjectDescription::Properties()
+    {
+        for(const auto& prop: _properties)
+        {
+            prop.second.FillInDescription();
+        }
+        return _properties;
+    }
+
     bool ObjectDescription::HasProperty(const std::string& name) const
     {
         return _properties.find(name) != _properties.end();
@@ -88,21 +97,22 @@ namespace utilities
         for(const auto& property: description.Properties())
         {
             auto name = property.first;
-            property.second._value.Serialize(name.c_str(), serializer);
+            property.second._value.SerializeProperty(name.c_str(), serializer);
         }
     }
 
     void IDescribable::Deserialize(Deserializer& serializer, SerializationContext& context)
     {
         auto description = GetDescription(); // will call GetDescription on a default-constructed object
-        for(const auto& property: description.Properties())
+        for(auto& property: description.Properties())
         {
             auto name = property.first;
-            auto variant = property.second._value;
-            variant.Deserialize(name.c_str(), serializer, context);  // TODO: need to pass in description and have Variant::Deserialize set the description ... ugh
+//            auto variant = property.second._value;
+            property.second._value.DeserializeProperty(name.c_str(), serializer, context);  // TODO: need to pass in description and have Variant::Deserialize set the description ... ugh
+//            property.second._value = variant;
+//            property.second.SetVariantValue(variant);
         }
-        GetProperties(description);
-        // crap... we need to set the value of the actual object. :( need to call the constructor somehow, or just set the properties. :(
+        SetObjectState(description);
     }
 
 }

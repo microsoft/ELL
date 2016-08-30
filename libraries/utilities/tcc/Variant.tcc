@@ -128,13 +128,13 @@ namespace utilities
     }
 
     template <typename ValueType>
-    void VariantDerived<ValueType>::Serialize(const char* name, Serializer& serializer) const
+    void VariantDerived<ValueType>::SerializeProperty(const char* name, Serializer& serializer) const
     {
         serializer.Serialize(name, GetValue());
     }
 
     template <typename ValueType>
-    void VariantDerived<ValueType>::Deserialize(const char* name, Deserializer& serializer, SerializationContext& context) 
+    void VariantDerived<ValueType>::DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context) 
     {
         ValueType value;
         serializer.Deserialize(name, value, context);

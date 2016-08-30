@@ -41,8 +41,8 @@ namespace utilities
         virtual bool IsPrimitiveType() const = 0;
         virtual bool IsSerializable() const = 0;
         virtual bool IsPointer() const = 0;
-        virtual void Serialize(const char* name, Serializer& serializer) const = 0;
-        virtual void Deserialize(const char* name, Deserializer& serializer, SerializationContext& context) = 0;
+        virtual void SerializeProperty(const char* name, Serializer& serializer) const = 0;
+        virtual void DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context) = 0;
 
     private:
         friend class Variant;
@@ -70,8 +70,8 @@ namespace utilities
         virtual bool IsPrimitiveType() const override { return std::is_fundamental<ValueType>::value; }
         virtual bool IsSerializable() const override { return !IsPrimitiveType(); }
         virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
-        virtual void Serialize(const char* name, Serializer& serializer) const override;
-        virtual void Deserialize(const char* name, Deserializer& serializer, SerializationContext& context) override;
+        virtual void SerializeProperty(const char* name, Serializer& serializer) const override;
+        virtual void DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context) override;
 
     private:
         friend class Variant;
@@ -148,8 +148,9 @@ namespace utilities
         ///
         ///
         /// 
-        void Serialize(const char* name, Serializer& serializer) const;
-        void Deserialize(const char* name, Deserializer& serializer, SerializationContext& context);
+        void SerializeProperty(const char* name, Serializer& serializer) const;
+        void DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context);
+        void SetVariantValue(const Variant& value);
 
     private:
         friend std::string to_string(const Variant& variant);

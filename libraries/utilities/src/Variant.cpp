@@ -81,14 +81,14 @@ namespace utilities
         return _value->IsPointer();
     }
 
-    void Variant::Serialize(const char* name, Serializer& serializer) const
+    void Variant::SerializeProperty(const char* name, Serializer& serializer) const
     {
-        _value->Serialize(name, serializer);
+        _value->SerializeProperty(name, serializer);
     }
 
-    void Variant::Deserialize(const char* name, Deserializer& serializer, SerializationContext& context)
+    void Variant::DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context)
     {
-        _value->Deserialize(name, serializer, context);
+        _value->DeserializeProperty(name, serializer, context);
     }
 
     std::string to_string(const Variant& variant)

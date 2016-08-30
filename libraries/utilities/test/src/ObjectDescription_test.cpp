@@ -49,10 +49,11 @@ public:
         return description;
     }
 
-    virtual void GetProperties(const utilities::ObjectDescription& description) override
+    virtual void SetObjectState(const utilities::ObjectDescription& description) override
     {
         _a = description["a"].GetValue<int>();
         _b = description["b"].GetValue<double>();
+        std::cout << "Setting object state, a = " << _a << " b = " << _b << std::endl;
     }
 
     static std::string GetTypeName() { return "ChildObject"; }
@@ -71,9 +72,8 @@ class ParentObject : public utilities::IDescribable
 public:
     ParentObject() = default;
     ParentObject(std::string name, int a, double b) : _name(name), _child(a, b) {}
-    //ParentObject(const utilities::ObjectDescription& description)
-    //{
-    //}
+    std::string GetName() { return _name; }
+    ChildObject GetChild() { return _child; }
 
     static utilities::ObjectDescription GetTypeDescription()
     {
@@ -91,10 +91,11 @@ public:
         return description;
     }
 
-    virtual void GetProperties(const utilities::ObjectDescription& description) override
+    virtual void SetObjectState(const utilities::ObjectDescription& description) override
     {
         _name = description["name"].GetValue<std::string>();
         _child = description["child"].GetValue<ChildObject>();   
+        std::cout << "Setting object state, name = " << _name << std::endl;
     }
 
     static std::string GetTypeName() { return "ParentObject"; }
@@ -189,4 +190,5 @@ void TestSerializeIDescribable()
 
     ParentObject deserializedParent;
     deserializer.Deserialize("parent", deserializedParent, context);
+    testing::ProcessTest("Deserialize IDescribable check",  deserializedParent.GetName() == "Parent" && deserializedParent.GetChild().GetA() == 5);        
 }

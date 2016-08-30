@@ -52,6 +52,11 @@ namespace utilities
         /// <returns> The properties of this object </returns>
         const PropertyCollection& Properties() const;
 
+        /// <summary> Gets the properties of this object </summary>
+        ///
+        /// <returns> The properties of this object </returns>
+        PropertyCollection& Properties();
+
         /// <summary> Adds a new property to the object </summary>
         ///
         /// <typeparam name="ValueType"> The type this property's value will take </typeparam>
@@ -147,7 +152,7 @@ namespace utilities
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///
         /// <param name="description"> The `ObjectDescription` to get state from </param>
-        virtual void GetProperties(const ObjectDescription& description) = 0;
+        virtual void SetObjectState(const ObjectDescription& description) = 0;
 
         /// <summary> Gets the name of this type. </summary>
         ///
