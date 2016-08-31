@@ -63,7 +63,7 @@ namespace trainers
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Range ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeRanges::GetChildRange(size_t childPosition) const
+    ForestTrainerBase::Range ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeRanges::GetChildRange(size_t childPosition) const
     {
         if (childPosition == 0)
         {
@@ -92,7 +92,7 @@ namespace trainers
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    typename const ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums& ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::GetChildSums(size_t position) const
+    const ForestTrainerBase::Sums& ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::GetChildSums(size_t position) const
     {
         return _childSums[position];
     }
@@ -125,7 +125,7 @@ namespace trainers
     }
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SetWeakWeightsLabels()
+    ForestTrainerBase::Sums ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SetWeakWeightsLabels()
     {
         Sums sums;
 

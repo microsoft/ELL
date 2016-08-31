@@ -35,9 +35,15 @@ namespace trainers
 
         using SplitRuleType = predictors::SingleElementThresholdPredictor;
         using EdgePredictorType = predictors::ConstantPredictor;
-        using SplitCandidate = ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate;
+        using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate;
+        using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplittableNodeId;
+        using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats;
+        using ForestTrainerBase::Range;
+        using ForestTrainerBase::Sums;
+        using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ForestTrainerExample;
 
     protected:
+        using ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::_dataset;
         virtual SplitCandidate GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums) override;
         virtual std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) override;
 

@@ -82,7 +82,7 @@ namespace trainers
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
         /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> GetPredictor() const { return _forest; };
+        virtual const std::shared_ptr<const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> GetPredictor() const override { return _forest; };
 
     protected:       
         //
@@ -199,9 +199,8 @@ namespace trainers
         PriorityQueue _queue;
 
         // the dataset
-        typedef dataset::Example<dataset::DoubleDataVector, ExampleMetaData> ForestTrainerExample; 
+        using ForestTrainerExample = dataset::Example<dataset::DoubleDataVector, ExampleMetaData>; 
         dataset::RowDataset<ForestTrainerExample> _dataset;
-
     };
 }
 
