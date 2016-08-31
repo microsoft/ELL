@@ -42,8 +42,8 @@ namespace nodes
     utilities::ObjectDescription AccumulatorNode<ValueType>::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<Node, AccumulatorNode<ValueType>>("Accumulator node");
-        description.template AddProperty<decltype(_input)>("input", "Input port");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_input)>(inputPortName, "Input port");
+        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
         return description;
     }
 
@@ -51,8 +51,8 @@ namespace nodes
     utilities::ObjectDescription AccumulatorNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, AccumulatorNode<ValueType>>();
-        description["input"] = _input;
-        description["output"] = _output;
+        description[inputPortName] = _input;
+        description[outputPortName] = _output;
         return description;
     }
 
@@ -60,8 +60,8 @@ namespace nodes
     void AccumulatorNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
-        description["input"] >> _input;
-        description["output"] >> _output;
+        description[inputPortName] >> _input;
+        description[outputPortName] >> _output;
 
         auto dimension = _input.Size();
         _accumulator = std::vector<ValueType>(dimension);

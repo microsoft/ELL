@@ -35,7 +35,7 @@ namespace nodes
         auto description = utilities::MakeObjectDescription<Node,  MultiplexerNode<ValueType, SelectorType>>("Multiplexer node");
         description.template AddProperty<decltype(_elements)>("elements", "Input elements");
         description.template AddProperty<decltype(_selector)>("selector", "Selector value");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
         return description;
     }
 
@@ -45,7 +45,7 @@ namespace nodes
         utilities::ObjectDescription description = GetParentDescription<Node,  MultiplexerNode<ValueType, SelectorType>>();
         description["elements"] = _elements;
         description["selector"] = _selector;
-        description["output"] = _output;
+        description[outputPortName] = _output;
         return description;
     }
 
@@ -55,7 +55,7 @@ namespace nodes
         Node::SetObjectState(description, context);
         description["elements"] >> _elements;
         description["selector"] >> _selector;
-        description["output"] >> _output;
+        description[outputPortName] >> _output;
     }
 
     template <typename ValueType, typename SelectorType>

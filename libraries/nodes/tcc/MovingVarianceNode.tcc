@@ -57,8 +57,8 @@ namespace nodes
     utilities::ObjectDescription MovingVarianceNode<ValueType>::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<Node, MovingVarianceNode<ValueType>>("Moving variance node");
-        description.template AddProperty<decltype(_input)>("input", "Input port");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_input)>(inputPortName, "Input port");
+        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
         description.template AddProperty<decltype(_windowSize)>("windowSize", "Delay window size");
         return description;
     }
@@ -67,8 +67,8 @@ namespace nodes
     utilities::ObjectDescription MovingVarianceNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, MovingVarianceNode<ValueType>>();
-        description["input"] = _input;
-        description["output"] = _output;
+        description[inputPortName] = _input;
+        description[outputPortName] = _output;
         description["windowSize"] = _windowSize;
         return description;
     }
@@ -77,8 +77,8 @@ namespace nodes
     void MovingVarianceNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
-        description["input"] >> _input;
-        description["output"] >> _output;
+        description[inputPortName] >> _input;
+        description[outputPortName] >> _output;
         description["windowSize"] >> _windowSize;
 
         auto dimension = _input.Size();

@@ -39,9 +39,9 @@ namespace nodes
     utilities::ObjectDescription  DemultiplexerNode<ValueType, SelectorType>::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<Node,  DemultiplexerNode<ValueType, SelectorType>>("Demultiplexer node");
-        description.template AddProperty<decltype(_input)>("input", "Input elements");
-        description.template AddProperty<decltype(_selector)>("selector", "Selector value");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_input)>(inputPortName, "Input elements");
+        description.template AddProperty<decltype(_selector)>(selectorPortName, "Selector value");
+        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
         description.template AddProperty<decltype(_defaultValue)>("defaultValue", "Default value");
         return description;
     }
@@ -50,9 +50,9 @@ namespace nodes
     utilities::ObjectDescription  DemultiplexerNode<ValueType, SelectorType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node,  DemultiplexerNode<ValueType, SelectorType>>();
-        description["input"] = _input;
-        description["selector"] = _selector;
-        description["output"] = _output;
+        description[inputPortName] = _input;
+        description[selectorPortName] = _selector;
+        description[outputPortName] = _output;
         description["defaultValue"] = _defaultValue;
         return description;
     }
@@ -61,9 +61,9 @@ namespace nodes
     void DemultiplexerNode<ValueType, SelectorType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
-        description["input"] >> _input;
-        description["selector"] >> _selector;
-        description["output"] >> _output;
+        description[inputPortName] >> _input;
+        description[selectorPortName] >> _selector;
+        description[outputPortName] >> _output;
         description["defaultValue"] >> _defaultValue;
     }
     

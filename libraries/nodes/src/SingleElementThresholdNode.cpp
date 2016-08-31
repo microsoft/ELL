@@ -35,8 +35,8 @@ namespace nodes
     utilities::ObjectDescription SingleElementThresholdNode::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, SingleElementThresholdNode>();
-        description["input"] = _input;
-        description["output"] = _output;
+        description[inputPortName] = _input;
+        description[outputPortName] = _output;
         description["predictor"] = _predictor;
         return description;
     }
@@ -44,8 +44,8 @@ namespace nodes
     void SingleElementThresholdNode::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
-        description["input"] >> _input;
-        description["output"] >> _output;
+        description[inputPortName] >> _input;
+        description[outputPortName] >> _output;
         description["predictor"] >> _predictor;
     }
     

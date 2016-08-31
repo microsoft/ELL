@@ -36,9 +36,9 @@ namespace nodes
     utilities::ObjectDescription ExtremalValueNode<ValueType, max>::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<Node, ExtremalValueNode<ValueType, max>>("Binary operation node");
-        description.template AddProperty<decltype(_input)>("input", "Input port");
-        description.template AddProperty<decltype(_val)>("val", "Extremal value");
-        description.template AddProperty<decltype(_argVal)>("argVal", "Index of extremal value");
+        description.template AddProperty<decltype(_input)>(inputPortName, "Input port");
+        description.template AddProperty<decltype(_val)>(valPortName, "Extremal value");
+        description.template AddProperty<decltype(_argVal)>(argValPortName, "Index of extremal value");
         description.template AddProperty<int>("operation", "Operation code");
         return description;
     }
@@ -47,9 +47,9 @@ namespace nodes
     utilities::ObjectDescription ExtremalValueNode<ValueType, max>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, ExtremalValueNode<ValueType, max>>();
-        description["input"] = _input;
-        description["val"] = _val;
-        description["argVal"] = _argVal;
+        description[inputPortName] = _input;
+        description[valPortName] = _val;
+        description[argValPortName] = _argVal;
         return description;
     }
 
@@ -57,9 +57,9 @@ namespace nodes
     void ExtremalValueNode<ValueType, max>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
-        description["input"] >> _input;
-        description["val"] >> _val;
-        description["argVal"] >> _argVal;
+        description[inputPortName] >> _input;
+        description[valPortName] >> _val;
+        description[argValPortName] >> _argVal;
     }
     
     template <typename ValueType, bool max>

@@ -46,8 +46,8 @@ namespace nodes
     utilities::ObjectDescription LinearPredictorNode::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, LinearPredictorNode>();
-        description["input"] = _input;
-        description["output"] = _output;
+        description[inputPortName] = _input;
+        description[outputPortName] = _output;
         description["weightedElements"] = _weightedElements;
         description["predictor"] = _predictor;
         return description;
@@ -56,8 +56,8 @@ namespace nodes
     void LinearPredictorNode::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
-        description["input"] >> _input;
-        description["output"] >> _output;
+        description[inputPortName] >> _input;
+        description[outputPortName] >> _output;
         description["weightedElements"] >> _weightedElements;
         description["predictor"] >> _predictor;
     }

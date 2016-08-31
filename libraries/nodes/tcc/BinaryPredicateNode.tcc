@@ -107,9 +107,9 @@ namespace nodes
     utilities::ObjectDescription BinaryPredicateNode<ValueType>::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<Node, BinaryPredicateNode<ValueType>>("Binary predicate node");
-        description.template AddProperty<decltype(_input1)>("input1", "Input port 1");
-        description.template AddProperty<decltype(_input2)>("input2", "Input port 2");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_input1)>(input1PortName, "Input port 1");
+        description.template AddProperty<decltype(_input2)>(input2PortName, "Input port 2");
+        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
         description.template AddProperty<int>("predicate", "Predicate code");
         return description;
     }
@@ -118,9 +118,9 @@ namespace nodes
     utilities::ObjectDescription BinaryPredicateNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, BinaryPredicateNode<ValueType>>();
-        description["input1"] = _input1;
-        description["input2"] = _input2;
-        description["output"] = _output;
+        description[input1PortName] = _input1;
+        description[input2PortName] = _input2;
+        description[outputPortName] = _output;
         description["predicate"] = static_cast<int>(_predicate);
         return description;
     }
@@ -129,9 +129,9 @@ namespace nodes
     void BinaryPredicateNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
-        description["input1"] >> _input1;
-        description["input2"] >> _input2;
-        description["output"] >> _output;
+        description[input1PortName] >> _input1;
+        description[input2PortName] >> _input2;
+        description[outputPortName] >> _output;
         int predicate = 0;
         description["predicate"] >> predicate;
         _predicate = static_cast<PredicateType>(predicate);

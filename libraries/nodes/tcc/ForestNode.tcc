@@ -33,10 +33,10 @@ namespace nodes
     utilities::ObjectDescription ForestNode<SplitRuleType, EdgePredictorType>::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<Node, ForestNode<SplitRuleType, EdgePredictorType>>("Linear predictor node");
-        description.template AddProperty<decltype(_input)>("input", "Input port");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
-        description.template AddProperty<decltype(_treeOutputs)>("treeOutputs", "The individual tree outputs");
-        description.template AddProperty<decltype(_edgeIndicatorVector)>("edgeIndicatorVector", "The edge indicator vector");
+        description.template AddProperty<decltype(_input)>(inputPortName, "Input port");
+        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
+        description.template AddProperty<decltype(_treeOutputs)>(treeOutputsPortName, "The individual tree outputs");
+        description.template AddProperty<decltype(_edgeIndicatorVector)>(edgeIndicatorVectorPortName, "The edge indicator vector");
         description.template AddProperty<decltype(_forest)>("forest", "The forest");
         return description;
     }
@@ -45,10 +45,10 @@ namespace nodes
     utilities::ObjectDescription ForestNode<SplitRuleType, EdgePredictorType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, ForestNode<SplitRuleType, EdgePredictorType>>();
-        description["input"] = _input;
-        description["output"] = _output;
-        description["treeOutputs"] = _treeOutputs;
-        description["edgeIndicatorVector"] = _edgeIndicatorVector;
+        description[inputPortName] = _input;
+        description[outputPortName] = _output;
+        description[treeOutputsPortName] = _treeOutputs;
+        description[edgeIndicatorVectorPortName] = _edgeIndicatorVector;
         description["forest"] = _forest;
         return description;
     }
@@ -57,10 +57,10 @@ namespace nodes
     void ForestNode<SplitRuleType, EdgePredictorType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
-        description["input"] >> _input;
-        description["output"] >> _output;
-        description["treeOutputs"] >> _treeOutputs;
-        description["edgeIndicatorVector"] >> _edgeIndicatorVector;
+        description[inputPortName] >> _input;
+        description[outputPortName] >> _output;
+        description[treeOutputsPortName] >> _treeOutputs;
+        description[edgeIndicatorVectorPortName] >> _edgeIndicatorVector;
         description["forest"] >> _forest;
     }
 

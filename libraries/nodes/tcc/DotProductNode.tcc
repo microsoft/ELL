@@ -55,9 +55,9 @@ namespace nodes
     utilities::ObjectDescription DotProductNode<ValueType>::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<Node, DotProductNode<ValueType>>("Binary operation node");
-        description.template AddProperty<decltype(_input1)>("input1", "Input port 1");
-        description.template AddProperty<decltype(_input2)>("input2", "Input port 2");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_input1)>(input1PortName, "Input port 1");
+        description.template AddProperty<decltype(_input2)>(input2PortName, "Input port 2");
+        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
         return description;
     }
 
@@ -65,9 +65,9 @@ namespace nodes
     utilities::ObjectDescription DotProductNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, DotProductNode<ValueType>>();
-        description["input1"] = _input1;
-        description["input2"] = _input2;
-        description["output"] = _output;
+        description[input1PortName] = _input1;
+        description[input2PortName] = _input2;
+        description[outputPortName] = _output;
         return description;
     }
 
@@ -75,8 +75,8 @@ namespace nodes
     void DotProductNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
-        description["input1"] >> _input1;
-        description["input2"] >> _input2;
-        description["output"] >> _output;
+        description[input1PortName] >> _input1;
+        description[input2PortName] >> _input2;
+        description[outputPortName] >> _output;
     }
 }

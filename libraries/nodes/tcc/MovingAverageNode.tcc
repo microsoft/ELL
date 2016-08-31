@@ -66,8 +66,8 @@ namespace nodes
     utilities::ObjectDescription MovingAverageNode<ValueType>::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<Node, MovingAverageNode<ValueType>>("Moving average node");
-        description.template AddProperty<decltype(_input)>("input", "Input port");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_input)>(inputPortName, "Input port");
+        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
         description.template AddProperty<decltype(_windowSize)>("windowSize", "Delay window size");
         return description;
     }
@@ -76,8 +76,8 @@ namespace nodes
     utilities::ObjectDescription MovingAverageNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, MovingAverageNode<ValueType>>();
-        description["input"] = _input;
-        description["output"] = _output;
+        description[inputPortName] = _input;
+        description[outputPortName] = _output;
         description["windowSize"] = _windowSize;
         return description;
     }
@@ -86,8 +86,8 @@ namespace nodes
     void MovingAverageNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
-        description["input"] >> _input;
-        description["output"] >> _output;
+        description[inputPortName] >> _input;
+        description[outputPortName] >> _output;
         description["windowSize"] >> _windowSize;
 
         auto dimension = _input.Size();

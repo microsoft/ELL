@@ -39,10 +39,10 @@ namespace nodes
     utilities::ObjectDescription ValueSelectorNode<ValueType>::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<Node, ValueSelectorNode<ValueType>>("Value selector node");
-        description.template AddProperty<decltype(_input1)>("input1", "Input port 1");
-        description.template AddProperty<decltype(_input2)>("input2", "Input port 2");
-        description.template AddProperty<decltype(_condition)>("condition", "Condition port");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_input1)>(input1PortName, "Input port 1");
+        description.template AddProperty<decltype(_input2)>(input2PortName, "Input port 2");
+        description.template AddProperty<decltype(_condition)>(conditionPortName, "Condition port");
+        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
         return description;
     }
 
@@ -50,10 +50,10 @@ namespace nodes
     utilities::ObjectDescription ValueSelectorNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, ValueSelectorNode<ValueType>>();
-        description["input1"] = _input1;
-        description["input2"] = _input2;
-        description["condition"] = _condition;
-        description["output"] = _output;
+        description[input1PortName] = _input1;
+        description[input2PortName] = _input2;
+        description[conditionPortName] = _condition;
+        description[outputPortName] = _output;
         return description;
     }
 
@@ -61,10 +61,10 @@ namespace nodes
     void ValueSelectorNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
-        description["input1"] >> _input1;
-        description["input2"] >> _input2;
-        description["condition"] >> _condition;
-        description["output"] >> _output;
+        description[input1PortName] >> _input1;
+        description[input2PortName] >> _input2;
+        description[conditionPortName] >> _condition;
+        description[outputPortName] >> _output;
     }
 
     template <typename ValueType>

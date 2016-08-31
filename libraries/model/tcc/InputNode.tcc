@@ -46,7 +46,7 @@ namespace model
     utilities::ObjectDescription InputNode<ValueType>::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<Node, InputNode<ValueType>>("Input node");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
         return description;
     }
 
@@ -54,7 +54,7 @@ namespace model
     utilities::ObjectDescription InputNode<ValueType>::GetDescription() const
     {
         auto description = GetParentDescription<Node, InputNode<ValueType>>();
-        description["output"] = _output;
+        description[outputPortName] = _output;
         return description;
     }
 
@@ -62,6 +62,6 @@ namespace model
     void InputNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
-        description["output"] >> _output;
+        description[outputPortName] >> _output;
     }
 }
