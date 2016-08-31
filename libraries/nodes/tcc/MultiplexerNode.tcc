@@ -30,6 +30,35 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
+    utilities::ObjectDescription  MultiplexerNode<ValueType, SelectorType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node,  MultiplexerNode<ValueType, SelectorType>>("Multiplexer node");
+        description.template AddProperty<decltype(_elements)>("elements", "Input elements");
+        description.template AddProperty<decltype(_selector)>("selector", "Selector value");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        return description;
+    }
+
+    template <typename ValueType, typename SelectorType>
+    utilities::ObjectDescription  MultiplexerNode<ValueType, SelectorType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node,  MultiplexerNode<ValueType, SelectorType>>();
+        description["elements"] = _elements;
+        description["selector"] = _selector;
+        description["output"] = _output;
+        return description;
+    }
+
+    template <typename ValueType, typename SelectorType>
+    void  MultiplexerNode<ValueType, SelectorType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["elements"] >> _elements;
+        description["selector"] >> _selector;
+        description["output"] >> _output;
+    }
+
+    template <typename ValueType, typename SelectorType>
     void MultiplexerNode<ValueType, SelectorType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);

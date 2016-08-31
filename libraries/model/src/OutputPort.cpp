@@ -16,14 +16,14 @@ namespace model
 
     utilities::ObjectDescription OutputPortBase::GetTypeDescription()
     {
-        utilities::ObjectDescription description = utilities::MakeObjectDescription<Port, OutputPortBase>("OutputPortBase");
+        auto description = utilities::MakeObjectDescription<Port, OutputPortBase>("OutputPortBase");
         description.AddProperty<size_t>("size", "Dimension of the output port");
         return description;
     }
 
     utilities::ObjectDescription OutputPortBase::GetDescription() const
     {
-        utilities::ObjectDescription description = GetParentDescription<Port, OutputPortBase>();
+        auto description = GetParentDescription<Port, OutputPortBase>();
         description["size"] = _size;
         return description;
     }

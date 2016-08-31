@@ -34,7 +34,7 @@ namespace model
     template <typename ValueType>
     utilities::ObjectDescription OutputNode<ValueType>::GetTypeDescription()
     {
-        auto description = utilities::MakeObjectDescription<OutputNode<ValueType>>("Output node");
+        auto description = utilities::MakeObjectDescription<Node, OutputNode<ValueType>>("Output node");
         description.template AddProperty<decltype(_input)>("input", "Input port");
         description.template AddProperty<decltype(_output)>("output", "Output port");
         return description;
@@ -43,7 +43,8 @@ namespace model
     template <typename ValueType>
     utilities::ObjectDescription OutputNode<ValueType>::GetDescription() const
     {
-        utilities::ObjectDescription description = GetTypeDescription();
+        utilities::ObjectDescription description = GetParentDescription<Node, OutputNode<ValueType>>();
+
         description["input"] = _input;
         description["output"] = _output;
         return description;
@@ -52,6 +53,7 @@ namespace model
     template <typename ValueType>
     void OutputNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
+        Node::SetObjectState(description, context);
         description["input"] >> _input;
         description["output"] >> _output;
     }

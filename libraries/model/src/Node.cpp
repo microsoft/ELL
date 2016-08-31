@@ -12,6 +12,7 @@
 
 // utilities
 #include "ISerializable.h"
+#include "ObjectDescription.h"
 
 // stl
 #include <unordered_set>

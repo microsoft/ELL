@@ -43,6 +43,29 @@ namespace model
     }
 
     template <typename ValueType>
+    utilities::ObjectDescription InputNode<ValueType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, InputNode<ValueType>>("Input node");
+        description.AddProperty<decltype(_output)>("output", "Output port");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription InputNode<ValueType>::GetDescription() const
+    {
+        auto description = GetParentDescription<Node, InputNode<ValueType>>();
+        description["output"] = _output;
+        return description;
+    }
+
+    template <typename ValueType>
+    void InputNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["output"] >> _output;
+    }
+
+    template <typename ValueType>
     void InputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);
@@ -52,8 +75,7 @@ namespace model
     template <typename ValueType>
     void InputNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
     {
-        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
-        Node::Deserialize(serializer, newContext);
+        Node::Deserialize(serializer, context);
         serializer.Deserialize("output", _output, context);
     }
 }

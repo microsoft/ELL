@@ -38,6 +38,32 @@ namespace nodes
     }
 
     template <typename ValueType>
+    utilities::ObjectDescription ConstantNode<ValueType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, ConstantNode<ValueType>>("Constant node");
+        description.template AddProperty<decltype(_values)>("values", "Constant values");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription ConstantNode<ValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node, ConstantNode<ValueType>>();
+        description["output"] = _output;
+        description["values"] = _values;
+        return description;
+    }
+
+    template <typename ValueType>
+    void ConstantNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["values"] >> _values;
+        description["output"] >> _output;
+    }
+    
+    template <typename ValueType>
     void ConstantNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);
@@ -51,30 +77,5 @@ namespace nodes
         Node::Deserialize(serializer, context);
         serializer.Deserialize("output", _output, context);
         serializer.Deserialize("values", _values, context);
-    }
-
-    template <typename ValueType>
-    utilities::ObjectDescription ConstantNode<ValueType>::GetTypeDescription()
-    {
-        auto description = utilities::MakeObjectDescription<ConstantNode<ValueType>>("Constant node");
-        description.template AddProperty<decltype(_values)>("values", "Constant values");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
-        return description;
-    }
-
-    template <typename ValueType>
-    utilities::ObjectDescription ConstantNode<ValueType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetTypeDescription();
-        description["output"] = _output;
-        description["values"] = _values;
-        return description;
-    }
-
-    template <typename ValueType>
-    void ConstantNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
-    {
-        description["values"] >> _values;
-        description["output"] >> _output;
     }
 }
