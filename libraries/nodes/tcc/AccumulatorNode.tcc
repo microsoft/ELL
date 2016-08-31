@@ -38,7 +38,6 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-
     template <typename ValueType>
     utilities::ObjectDescription AccumulatorNode<ValueType>::GetTypeDescription()
     {

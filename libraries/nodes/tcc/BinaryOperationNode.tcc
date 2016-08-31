@@ -166,7 +166,6 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-
     template <typename ValueType>
     utilities::ObjectDescription BinaryOperationNode<ValueType>::GetTypeDescription()
     {

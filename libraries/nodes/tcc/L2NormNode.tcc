@@ -37,6 +37,32 @@ namespace nodes
         auto newNode = transformer.AddNode<L2NormNode<ValueType>>(newPortElements);
         transformer.MapNodeOutput(output, newNode->output);
     }
+
+    template <typename ValueType>
+    utilities::ObjectDescription L2NormNode<ValueType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, L2NormNode<ValueType>>("Accumulator node");
+        description.template AddProperty<decltype(_input)>("input", "Input port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription L2NormNode<ValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node, L2NormNode<ValueType>>();
+        description["input"] = _input;
+        description["output"] = _output;
+        return description;
+    }
+
+    template <typename ValueType>
+    void L2NormNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["input"] >> _input;
+        description["output"] >> _output;
+    }
     
     template <typename ValueType>
     void L2NormNode<ValueType>::Serialize(utilities::Serializer& serializer) const

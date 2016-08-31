@@ -39,6 +39,32 @@ namespace nodes
     }
 
     template <typename ValueType>
+    utilities::ObjectDescription SumNode<ValueType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, SumNode<ValueType>>("Accumulator node");
+        description.template AddProperty<decltype(_input)>("input", "Input port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription SumNode<ValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node, SumNode<ValueType>>();
+        description["input"] = _input;
+        description["output"] = _output;
+        return description;
+    }
+
+    template <typename ValueType>
+    void SumNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["input"] >> _input;
+        description["output"] >> _output;
+    }
+
+    template <typename ValueType>
     void SumNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);

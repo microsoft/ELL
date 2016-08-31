@@ -90,6 +90,37 @@ namespace nodes
     }
 
     template <typename ValueType>
+    utilities::ObjectDescription UnaryOperationNode<ValueType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, UnaryOperationNode<ValueType>>("Accumulator node");
+        description.template AddProperty<decltype(_input)>("input", "Input port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<int>("operation", "Operation code");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription UnaryOperationNode<ValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node, UnaryOperationNode<ValueType>>();
+        description["input"] = _input;
+        description["output"] = _output;
+        description["operation"] = static_cast<int>(_operation);
+        return description;
+    }
+
+    template <typename ValueType>
+    void UnaryOperationNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["input"] >> _input;
+        description["output"] >> _output;
+        int operation = 0;
+        description["operation"] >> operation;
+        _operation = static_cast<OperationType>(operation);
+    }
+
+    template <typename ValueType>
     void UnaryOperationNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);

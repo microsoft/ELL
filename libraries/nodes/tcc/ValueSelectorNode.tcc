@@ -36,6 +36,37 @@ namespace nodes
     };
 
     template <typename ValueType>
+    utilities::ObjectDescription ValueSelectorNode<ValueType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, ValueSelectorNode<ValueType>>("Value selector node");
+        description.template AddProperty<decltype(_input1)>("input1", "Input port 1");
+        description.template AddProperty<decltype(_input2)>("input2", "Input port 2");
+        description.template AddProperty<decltype(_condition)>("condition", "Condition port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription ValueSelectorNode<ValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node, ValueSelectorNode<ValueType>>();
+        description["input1"] = _input1;
+        description["input2"] = _input2;
+        description["condition"] = _condition;
+        description["output"] = _output;
+        return description;
+    }
+
+    template <typename ValueType>
+    void ValueSelectorNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["input1"] >> _input1;
+        description["input2"] >> _input2;
+        description["condition"] >> _condition;
+        description["output"] >> _output;
+    }
+    template <typename ValueType>
     void ValueSelectorNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);

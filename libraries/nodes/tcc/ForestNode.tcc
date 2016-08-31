@@ -28,6 +28,42 @@ namespace nodes
     ForestNode<SplitRuleType, EdgePredictorType>::ForestNode() : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, 0), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, 0)
     {}
 
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    utilities::ObjectDescription ForestNode<SplitRuleType, EdgePredictorType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, ForestNode<SplitRuleType, EdgePredictorType>>("Linear predictor node");
+        description.template AddProperty<decltype(_input)>("input", "Input port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_treeOutputs)>("treeOutputs", "The individual tree outputs");
+        description.template AddProperty<decltype(_edgeIndicatorVector)>("edgeIndicatorVector", "The edge indicator vector");
+        description.template AddProperty<decltype(_forest)>("forest", "The forest");
+        return description;
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    utilities::ObjectDescription ForestNode<SplitRuleType, EdgePredictorType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node, ForestNode<SplitRuleType, EdgePredictorType>>();
+        description["input"] = _input;
+        description["output"] = _output;
+        description["treeOutputs"] = _treeOutputs;
+        description["edgeIndicatorVector"] = _edgeIndicatorVector;
+        description["forest"] = _forest;
+        return description;
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestNode<SplitRuleType, EdgePredictorType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["input"] >> _input;
+        description["output"] >> _output;
+        description["treeOutputs"] >> _treeOutputs;
+        description["edgeIndicatorVector"] >> _edgeIndicatorVector;
+        description["forest"] >> _forest;
+    }
+    
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestNode<SplitRuleType, EdgePredictorType>::Serialize(utilities::Serializer& serializer) const
     {

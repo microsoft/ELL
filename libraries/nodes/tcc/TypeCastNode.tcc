@@ -38,6 +38,32 @@ namespace nodes
     }
 
     template <typename InputValueType, typename OutputValueType>
+    utilities::ObjectDescription TypeCastNode<InputValueType, OutputValueType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, TypeCastNode<InputValueType, OutputValueType>>("Type-cast node");
+        description.template AddProperty<decltype(_input)>("input", "Input port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        return description;
+    }
+
+    template <typename InputValueType, typename OutputValueType>
+    utilities::ObjectDescription TypeCastNode<InputValueType, OutputValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node, TypeCastNode<InputValueType, OutputValueType>>();
+        description["input"] = _input;
+        description["output"] = _output;
+        return description;
+    }
+
+    template <typename InputValueType, typename OutputValueType>
+    void TypeCastNode<InputValueType, OutputValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["input"] >> _input;
+        description["output"] >> _output;
+    }
+
+    template <typename InputValueType, typename OutputValueType>
     void TypeCastNode<InputValueType, OutputValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);

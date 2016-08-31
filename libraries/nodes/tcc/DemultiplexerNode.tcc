@@ -36,6 +36,38 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
+    utilities::ObjectDescription  DemultiplexerNode<ValueType, SelectorType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node,  DemultiplexerNode<ValueType, SelectorType>>("Demultiplexer node");
+        description.template AddProperty<decltype(_input)>("input", "Input elements");
+        description.template AddProperty<decltype(_selector)>("selector", "Selector value");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_defaultValue)>("defaultValue", "Default value");
+        return description;
+    }
+
+    template <typename ValueType, typename SelectorType>
+    utilities::ObjectDescription  DemultiplexerNode<ValueType, SelectorType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node,  DemultiplexerNode<ValueType, SelectorType>>();
+        description["input"] = _input;
+        description["selector"] = _selector;
+        description["output"] = _output;
+        description["defaultValue"] = _defaultValue;
+        return description;
+    }
+
+    template <typename ValueType, typename SelectorType>
+    void DemultiplexerNode<ValueType, SelectorType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["input"] >> _input;
+        description["selector"] >> _selector;
+        description["output"] >> _output;
+        description["defaultValue"] >> _defaultValue;
+    }
+
+    template <typename ValueType, typename SelectorType>
     void DemultiplexerNode<ValueType, SelectorType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);

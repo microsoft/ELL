@@ -52,6 +52,35 @@ namespace nodes
     }
 
     template <typename ValueType>
+    utilities::ObjectDescription DotProductNode<ValueType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, DotProductNode<ValueType>>("Binary operation node");
+        description.template AddProperty<decltype(_input1)>("input1", "Input port 1");
+        description.template AddProperty<decltype(_input2)>("input2", "Input port 2");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription DotProductNode<ValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node, DotProductNode<ValueType>>();
+        description["input1"] = _input1;
+        description["input2"] = _input2;
+        description["output"] = _output;
+        return description;
+    }
+
+    template <typename ValueType>
+    void DotProductNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["input1"] >> _input1;
+        description["input2"] >> _input2;
+        description["output"] >> _output;
+    }
+    
+    template <typename ValueType>
     void DotProductNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);
