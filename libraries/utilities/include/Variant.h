@@ -145,20 +145,17 @@ namespace utilities
         /// <returns> The type name of the value stored in the variant. </returns>
         std::string GetStoredTypeName() const;
 
-        ///
-        ///
-        /// 
-        void SerializeProperty(const char* name, Serializer& serializer) const;
-        void DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context);
-        void SetVariantValue(const Variant& value);
-
     private:
         friend std::string to_string(const Variant& variant);
+        friend class IDescribable;
 
         template <typename ValueType, typename... Args>
         friend Variant MakeVariant(Args&&... args);
 
         Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue);
+        void SerializeProperty(const char* name, Serializer& serializer) const;
+        void DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context);
+        void SetVariantValue(const Variant& value);
 
         std::type_index _type;
         std::unique_ptr<VariantBase> _value;

@@ -17,7 +17,6 @@
 #include <string>
 #include <cassert>
 #include <functional>
-#include <iostream>
 #include <type_traits>
 
 /// <summary> utilities namespace </summary>

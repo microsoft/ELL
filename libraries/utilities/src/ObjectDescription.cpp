@@ -102,7 +102,7 @@ namespace utilities
 
     void IDescribable::Deserialize(Deserializer& serializer, SerializationContext& context)
     {
-        // #### TODO: special-case vectors of pointers to return vectors of unique_ptrs (how??)
+        // #### TODO: special-case vectors of pointers to return vectors of unique_ptrs
 
         auto description = GetDescription(); // will call GetDescription on a default-constructed object
         for(auto& property: description.GetProperties())
