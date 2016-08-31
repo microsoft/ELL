@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "ISerializable.h"
 #include "ObjectDescription.h"
 
 #include <functional>

@@ -9,7 +9,7 @@
 #pragma once
 
 // utilities
-#include "ISerializable.h"
+#include "ObjectDescription.h"
 
 // stl
 #include <iostream>
@@ -17,7 +17,7 @@
 namespace predictors
 {
     /// <summary> A split rule that compares a single feature to a threshold. </summary>
-    class SingleElementThresholdPredictor : public utilities::ISerializable
+    class SingleElementThresholdPredictor : public utilities::IDescribable
     {
     public:
         /// <summary> Constructs a single-element threshold rule. </summary>
@@ -36,16 +36,20 @@ namespace predictors
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Gets an ObjectDescription for the type </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <returns> An ObjectDescription for the type </returns>
+        static utilities::ObjectDescription GetTypeDescription();
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Gets an ObjectDescription for the object </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        /// <returns> An ObjectDescription for the object </returns>
+        virtual utilities::ObjectDescription GetDescription() const;
+
+        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        ///
+        /// <param name="description"> The `ObjectDescription` to get state from </param>
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
 
         /// <summary> Gets the index of the element used to define the rule. </summary>
         ///

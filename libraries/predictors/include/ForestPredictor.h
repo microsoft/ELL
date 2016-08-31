@@ -15,7 +15,7 @@
 #include "DenseDataVector.h"
 
 // utilities
-#include "ISerializable.h"
+#include "ObjectDescription.h"
 
 // stl
 #include <vector>
@@ -39,7 +39,7 @@ namespace predictors
     /// <typeparam name="SplitRuleType"> Type of split rule to use in interior nodes. </typeparam>
     /// <typeparam name="EdgePredictorType"> Type of predictor to associate with each edge. </typeparam>
     template<typename SplitRuleType, typename EdgePredictorType>
-    class ForestPredictor : public utilities::ISerializable
+    class ForestPredictor : public utilities::IDescribable
     {
     public:
         /// <summary> A struct that identifies a splittable node in the forest. The splittable node can be
@@ -92,7 +92,7 @@ namespace predictors
             std::vector<EdgePredictorType> _edgePredictors;
         };
 
-        class Edge : public utilities::ISerializable
+        class Edge : public utilities::IDescribable
         {
         public:            
             Edge() = default;
@@ -127,16 +127,20 @@ namespace predictors
             /// <returns> The name of this type. </returns>
             virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-            /// <summary> Writes to a Serializer. </summary>
+            /// <summary> Gets an ObjectDescription for the type </summary>
             ///
-            /// <param name="serializer"> The serializer. </param>
-            virtual void Serialize(utilities::Serializer& serializer) const override;
+            /// <returns> An ObjectDescription for the type </returns>
+            static utilities::ObjectDescription GetTypeDescription();
 
-            /// <summary> Reads from a Deserializer. </summary>
+            /// <summary> Gets an ObjectDescription for the object </summary>
             ///
-            /// <param name="deserializer"> The deserializer. </param>
-            /// <param name="context"> The serialization context. </param>
-            virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+            /// <returns> An ObjectDescription for the object </returns>
+            virtual utilities::ObjectDescription GetDescription() const;
+
+            /// <summary> Sets the internal state of the object according to the description passed in </summary>
+            ///
+            /// <param name="description"> The `ObjectDescription` to get state from </param>
+            virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
 
             /// <summary> Prints a human readable description of the edge, indented by a given number of tabs - used for debugging. </summary>
             ///
@@ -152,7 +156,7 @@ namespace predictors
         };
 
         /// <summary> Represents an interior node of one of the trees in the forest. </summary>
-        class InteriorNode : public utilities::ISerializable
+        class InteriorNode : public utilities::IDescribable
         {
         public:
             InteriorNode() = default;
@@ -188,16 +192,20 @@ namespace predictors
             /// <returns> The name of this type. </returns>
             virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-            /// <summary> Writes to a Serializer. </summary>
+            /// <summary> Gets an ObjectDescription for the type </summary>
             ///
-            /// <param name="serializer"> The serializer. </param>
-            virtual void Serialize(utilities::Serializer& serializer) const override;
+            /// <returns> An ObjectDescription for the type </returns>
+            static utilities::ObjectDescription GetTypeDescription();
 
-            /// <summary> Reads from a Deserializer. </summary>
+            /// <summary> Gets an ObjectDescription for the object </summary>
             ///
-            /// <param name="deserializer"> The deserializer. </param>
-            /// <param name="context"> The serialization context. </param>
-            virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+            /// <returns> An ObjectDescription for the object </returns>
+            virtual utilities::ObjectDescription GetDescription() const;
+
+            /// <summary> Sets the internal state of the object according to the description passed in </summary>
+            ///
+            /// <param name="description"> The `ObjectDescription` to get state from </param>
+            virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
 
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
@@ -349,16 +357,20 @@ namespace predictors
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Gets an ObjectDescription for the type </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <returns> An ObjectDescription for the type </returns>
+        static utilities::ObjectDescription GetTypeDescription();
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Gets an ObjectDescription for the object </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        /// <returns> An ObjectDescription for the object </returns>
+        virtual utilities::ObjectDescription GetDescription() const;
+
+        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        ///
+        /// <param name="description"> The `ObjectDescription` to get state from </param>
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
 
     protected:
         //

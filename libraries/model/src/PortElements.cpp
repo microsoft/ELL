@@ -209,20 +209,6 @@ namespace model
         }
     }
 
-    //void PortElementsBase::Serialize(utilities::Serializer& serializer) const
-    //{
-    //    serializer.Serialize("ranges", _ranges);
-    //}
-
-    //void PortElementsBase::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    //{
-    //    model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
-    //    std::vector<PortRange> ranges;
-    //    serializer.Deserialize("ranges", ranges, newContext);
-    //    _ranges = ranges;
-    //    ComputeSize();
-    //}
-
     utilities::ObjectDescription PortElementsBase::GetTypeDescription()
     {
         utilities::ObjectDescription description = utilities::MakeObjectDescription<Port>("PortRange");

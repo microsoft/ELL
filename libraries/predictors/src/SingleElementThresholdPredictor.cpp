@@ -13,16 +13,26 @@ namespace predictors
     SingleElementThresholdPredictor::SingleElementThresholdPredictor(size_t index, double threshold) : _index(index), _threshold(threshold)
     {}
 
-    void SingleElementThresholdPredictor::Serialize(utilities::Serializer& serializer) const
+    utilities::ObjectDescription SingleElementThresholdPredictor::GetTypeDescription()
     {
-        serializer.Serialize("index", _index);
-        serializer.Serialize("threshold", _threshold);
+        auto description = utilities::MakeObjectDescription<SingleElementThresholdPredictor>("Single-element threshold predictor");
+        description.AddProperty<decltype(_index)>("index", "The index of the element");
+        description.AddProperty<decltype(_threshold)>("threshold", "The threshold");
+        return description;
     }
 
-    void SingleElementThresholdPredictor::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    utilities::ObjectDescription SingleElementThresholdPredictor::GetDescription() const
     {
-        serializer.Deserialize("index", _index, context);
-        serializer.Deserialize("threshold", _threshold, context);
+        auto description = GetTypeDescription();
+        description["index"] = _index;
+        description["threshold"] = _threshold;
+        return description;
+    }
+
+    void SingleElementThresholdPredictor::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        _index = description["index"].GetValue<decltype(_index)>();
+        _threshold = description["threshold"].GetValue<decltype(_threshold)>();
     }
 
     void SingleElementThresholdPredictor::PrintLine(std::ostream & os, size_t tabs) const

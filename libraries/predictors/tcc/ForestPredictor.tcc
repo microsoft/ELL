@@ -207,21 +207,34 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::Serialize(utilities::Serializer& serializer) const
+    utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::GetTypeDescription()
     {
-        serializer.Serialize("interiorNodes", _interiorNodes);
-        serializer.Serialize("rootIndices", _rootIndices);
-        serializer.Serialize("bias", _bias);
-        serializer.Serialize("numEdges", _numEdges);
+        auto description = utilities::MakeObjectDescription<ForestPredictor<SplitRuleType, EdgePredictorType>>("Forest predictor");
+        description.AddProperty<decltype(_interiorNodes)>("interiorNodes", "The interior nodes");
+        description.AddProperty<decltype(_rootIndices)>("rootIndices", "The indices of the tree roots");
+        description.AddProperty<decltype(_bias)>("bias", "bias");
+        description.AddProperty<decltype(_numEdges)>("numEdges", "Number of edges");
+        return description;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::GetDescription() const
     {
-        serializer.Deserialize("interiorNodes", _interiorNodes, context);
-        serializer.Deserialize("rootIndices", _rootIndices, context);
-        serializer.Deserialize("bias", _bias, context);
-        serializer.Deserialize("numEdges", _numEdges, context);
+        auto description = GetTypeDescription();
+        description["interiorNodes"] = _interiorNodes;
+        description["rootIndices"] = _rootIndices;
+        description["bias"] = _bias;
+        description["numEdges"] = _numEdges;
+        return description;
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        _interiorNodes = description["interiorNodes"].GetValue<decltype(_interiorNodes)>();
+        _rootIndices = description["rootIndices"].GetValue<decltype(_rootIndices)>();
+        _bias = description["bias"].GetValue<decltype(_bias)>();
+        _numEdges = description["numEdges"].GetValue<decltype(_numEdges)>();
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
@@ -298,19 +311,31 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::Serialize(utilities::Serializer& serializer) const
+    utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::GetTypeDescription()
     {
-        serializer.Serialize("splitRule", _splitRule);
-        serializer.Serialize("outgoingEdges", _outgoingEdges);
-        serializer.Serialize("firstEdgeIndex", _firstEdgeIndex);
+        auto description = utilities::MakeObjectDescription<ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode>("Interior node");
+        description.AddProperty<decltype(_splitRule)>("splitRule", "The split rule");
+        description.AddProperty<decltype(_outgoingEdges)>("outgoingEdges", "The outgoing edges");
+        description.AddProperty<decltype(_firstEdgeIndex)>("firstEdgeIndex", "The index of the first edge");
+        return description;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::GetDescription() const
     {
-        serializer.Deserialize("splitRule", _splitRule, context);
-        serializer.Deserialize("outgoingEdges", _outgoingEdges, context);
-        serializer.Deserialize("firstEdgeIndex", _firstEdgeIndex, context);
+        auto description = GetTypeDescription();
+        description["splitRule"] = _splitRule;
+        description["outgoingEdges"] = _outgoingEdges;
+        description["firstEdgeIndex"] = _firstEdgeIndex;
+        return description;
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        _splitRule = description["splitRule"].GetValue<decltype(_splitRule)>();
+        _outgoingEdges = description["outgoingEdges"].GetValue<decltype(_outgoingEdges)>();
+        _firstEdgeIndex = description["firstEdgeIndex"].GetValue<decltype(_firstEdgeIndex)>();
     }
 
     //
@@ -394,16 +419,27 @@ namespace predictors
 
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::Serialize(utilities::Serializer& serializer) const
+    utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::GetTypeDescription()
     {
-        serializer.Serialize("predictor", _predictor);
-        serializer.Serialize("targetNodeIndex", _targetNodeIndex);
+        auto description = utilities::MakeObjectDescription<ForestPredictor<SplitRuleType, EdgePredictorType>::Edge>("Tree edge");
+        description.AddProperty<decltype(_predictor)>("predictor", "The edge predictor");
+        description.AddProperty<decltype(_targetNodeIndex)>("targetNodeIndex", "The index of the node this edge connects to");
+        return description;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::GetDescription() const
     {
-        serializer.Deserialize("predictor", _predictor, context);
-        serializer.Deserialize("targetNodeIndex", _targetNodeIndex, context);
+        auto description = GetTypeDescription();
+        description["predictor"] = _predictor;
+        description["targetNodeIndex"] = _targetNodeIndex;
+        return description;
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType>
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        _predictor = description["predictor"].GetValue<decltype(_predictor)>();
+        _targetNodeIndex = description["targetNodeIndex"].GetValue<decltype(_targetNodeIndex)>();
     }
 }
