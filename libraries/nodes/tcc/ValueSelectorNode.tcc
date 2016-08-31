@@ -95,6 +95,6 @@ namespace nodes
 
         auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newPortElements1, newPortElements2);
 
-         transformer.MapNodeOutput(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 }

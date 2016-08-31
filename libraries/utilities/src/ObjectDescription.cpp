@@ -90,7 +90,7 @@ namespace utilities
     //
     void IDescribable::Serialize(Serializer& serializer) const
     {
-        // for each thing, serialize it
+        // for each property, serialize it
         const auto& description = GetDescription();
         for(const auto& property: description.GetProperties())
         {

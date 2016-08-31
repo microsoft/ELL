@@ -67,6 +67,14 @@ namespace nodes
         description["input"] >> _input;
         description["output"] >> _output;
         description["windowSize"] >> _windowSize;
+
+        auto dimension = _input.Size();
+        _samples.clear();
+        _samples.reserve(_windowSize);
+        for(size_t index = 0; index < _windowSize; ++index)
+        {
+            _samples.push_back(std::vector<ValueType>(dimension));
+        }
     }
     
     template <typename ValueType>
