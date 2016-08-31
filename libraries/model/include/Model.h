@@ -168,12 +168,7 @@ namespace model
         /// <param name="description"> The `ObjectDescription` to get state from </param>
         virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
 
-        /// <summary> Writes to a Serializer. </summary>
-        ///
-        /// <param name="serializer"> The serializer. </param>
-    //    virtual void Serialize(utilities::Serializer& serializer) const override;
-
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Reads from a Deserializer. Deserialization is handled explicitly because we need to modify the SerializationContext. </summary>
         ///
         /// <param name="deserializer"> The deserializer. </param>
         /// <param name="context"> The serialization context. </param>

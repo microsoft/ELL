@@ -77,20 +77,6 @@ namespace model
         }
     }
 
-    // void Model::Serialize(utilities::Serializer& serializer) const
-    // {
-    //     std::vector<const Node*> nodes;
-    //     auto nodeIter = GetNodeIterator();
-    //     while(nodeIter.IsValid())
-    //     {
-    //         const auto& node = nodeIter.Get();
-    //         nodes.push_back(node);
-    //         nodeIter.Next();
-    //     }
-
-    //     serializer.Serialize("nodes", nodes);
-    // }
-
     void Model::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) 
     {
         ModelSerializationContext modelContext(context, this);
