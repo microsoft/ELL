@@ -231,10 +231,10 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        _interiorNodes = description["interiorNodes"].GetValue<decltype(_interiorNodes)>();
-        _rootIndices = description["rootIndices"].GetValue<decltype(_rootIndices)>();
-        _bias = description["bias"].GetValue<decltype(_bias)>();
-        _numEdges = description["numEdges"].GetValue<decltype(_numEdges)>();
+        description["interiorNodes"] >> _interiorNodes;
+        description["rootIndices"] >> _rootIndices;
+        description["bias"] >> _bias;
+        description["numEdges"] >> _numEdges;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
@@ -333,9 +333,9 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        _splitRule = description["splitRule"].GetValue<decltype(_splitRule)>();
-        _outgoingEdges = description["outgoingEdges"].GetValue<decltype(_outgoingEdges)>();
-        _firstEdgeIndex = description["firstEdgeIndex"].GetValue<decltype(_firstEdgeIndex)>();
+         description["splitRule"] >> _splitRule;
+        description["outgoingEdges"] >> _outgoingEdges;
+        description["firstEdgeIndex"] >> _firstEdgeIndex;
     }
 
     //
@@ -439,7 +439,7 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        _predictor = description["predictor"].GetValue<decltype(_predictor)>();
-        _targetNodeIndex = description["targetNodeIndex"].GetValue<decltype(_targetNodeIndex)>();
+        description["predictor"] >> _predictor;
+        description["targetNodeIndex"] >> _targetNodeIndex;
     }
 }

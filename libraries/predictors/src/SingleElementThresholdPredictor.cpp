@@ -31,8 +31,8 @@ namespace predictors
 
     void SingleElementThresholdPredictor::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        _index = description["index"].GetValue<decltype(_index)>();
-        _threshold = description["threshold"].GetValue<decltype(_threshold)>();
+        description["index"] >> _index;
+        description["threshold"] >> _threshold;
     }
 
     void SingleElementThresholdPredictor::PrintLine(std::ostream & os, size_t tabs) const

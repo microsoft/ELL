@@ -13,6 +13,7 @@
 
 // utilities
 #include "ISerializable.h"
+#include "ObjectDescription.h"
 
 // stl
 #include <string>
@@ -27,7 +28,7 @@ namespace model
     class ModelTransformer;
 
     /// <summary> Superclass for all node types. </summary>
-    class Node : public utilities::ISerializable
+    class Node : public utilities::IDescribable
     {
     public:
         Node() = default;
@@ -65,6 +66,21 @@ namespace model
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "Node"; }
+
+        /// <summary> Gets an ObjectDescription for the type </summary>
+        ///
+        /// <returns> An ObjectDescription for the type </returns>
+        static utilities::ObjectDescription GetTypeDescription();
+
+        /// <summary> Gets an ObjectDescription for the object </summary>
+        ///
+        /// <returns> An ObjectDescription for the object </returns>
+        virtual utilities::ObjectDescription GetDescription() const;
+
+        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        ///
+        /// <param name="description"> The `ObjectDescription` to get state from </param>
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
 
         /// <summary> Writes to a Serializer. </summary>
         ///

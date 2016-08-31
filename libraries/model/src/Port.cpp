@@ -53,8 +53,8 @@ namespace model
 
     void Port::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        auto nodeId = description["nodeId"].GetValue<utilities::UniqueId>();
-        _name = description["name"].GetValue<std::string>();
+        auto nodeId = description["nodeId"].GetValue<utilities::UniqueId>(); // ignore it
+        description["name"] >> _name;
         int typeCode = description["type"].GetValue<int>();
         _type = static_cast<PortType>(typeCode);
     }

@@ -79,8 +79,20 @@ namespace nodes
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
 
+        /// <summary> Gets an ObjectDescription for the type </summary>
+        ///
+        /// <returns> An ObjectDescription for the type </returns>
         static utilities::ObjectDescription GetTypeDescription();
+
+        /// <summary> Gets an ObjectDescription for the object </summary>
+        ///
+        /// <returns> An ObjectDescription for the object </returns>
         virtual utilities::ObjectDescription GetDescription() const;
+
+        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        ///
+        /// <param name="description"> The `ObjectDescription` to get state from </param>
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;

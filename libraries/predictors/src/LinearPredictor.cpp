@@ -65,7 +65,9 @@ namespace predictors
 
     void LinearPredictor::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        _w = description["w"].GetValue<std::vector<double>>();
-        _b = description["b"].GetValue<decltype(_b)>();
+        std::vector<double> w;
+        description["w"] >> w;
+        _w = w;
+        description["b"] >> _b;
     }
 }

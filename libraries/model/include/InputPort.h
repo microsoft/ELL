@@ -75,6 +75,9 @@ namespace model
     class InputPort : public InputPortBase
     {
     public:
+        InputPort();
+        InputPort& operator=(const InputPort& other);
+        
         /// <summary> Creates an input port </summary>
         ///
         /// <param name="owningNode"> The node this port belongs to </param>
@@ -113,9 +116,21 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Gets an ObjectDescription for the type </summary>
+        ///
+        /// <returns> An ObjectDescription for the type </returns>
         static utilities::ObjectDescription GetTypeDescription();
-        virtual utilities::ObjectDescription GetDescription() const override;
-        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
+
+        /// <summary> Gets an ObjectDescription for the object </summary>
+        ///
+        /// <returns> An ObjectDescription for the object </returns>
+        virtual utilities::ObjectDescription GetDescription() const;
+
+        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        ///
+        /// <param name="description"> The `ObjectDescription` to get state from </param>
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
+
     private:
         PortElements<ValueType> _input;
     };

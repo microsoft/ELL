@@ -64,57 +64,29 @@ namespace model
         description["startIndex"] = _startIndex;
         description["numValues"] = _numValues;
         description["isFixedSize"] = _isFixedSize;
-        description["referencedNodeId"] = _referencedPort->GetNode()->GetId();
-        description["referencedPortName"] = _referencedPort->GetName();
+        if (_referencedPort != nullptr)
+        {
+            description["referencedNodeId"] = _referencedPort->GetNode()->GetId();
+            description["referencedPortName"] = _referencedPort->GetName();
+        }
+        else
+        {
+            description["referencedNodeId"] = utilities::UniqueId();
+            description["referencedPortName"] = std::string{ "" };
+        }
         return description;
-    }
-
-    void PortRange::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
-        serializer.Deserialize("startIndex", _startIndex, newContext);
-        serializer.Deserialize("numValues", _numValues, newContext);
-        serializer.Deserialize("isFixedSize", _isFixedSize, newContext);
-        Node::NodeId newId;
-        serializer.Deserialize("referencedNodeId", newId, newContext);
-        std::string portName;
-        serializer.Deserialize("referencedPortName", portName, newContext);
-
-        Node* newNode = newContext.GetNodeFromId(newId);
-        if (newNode == nullptr)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Could not find deserialized node.");
-        }
-
-        auto ports = newNode->GetOutputPorts();
-        OutputPortBase* newPort = nullptr;
-        for (auto port : ports)
-        {
-            if (port->GetName() == portName)
-            {
-                newPort = port;
-                break;
-            }
-        }
-        if (_referencedPort == newPort)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error deserializing port.");
-        }
-        _referencedPort = newPort;
-        if (newPort == nullptr)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't deserialize model::PortRange port");
-        }
     }
 
     void PortRange::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
-        _startIndex = description["startIndex"].GetValue<size_t>();
-        _numValues = description["numValues"].GetValue<size_t>();
-        _isFixedSize = description["isFixedSize"].GetValue<bool>();
-        Node::NodeId newId = description["referencedNodeId"].GetValue<utilities::UniqueId>();
-        std::string portName = description["referencedPortName"].GetValue<std::string>();
+        description["startIndex"] >> _startIndex;
+        description["numValues"] >> _numValues;
+        description["isFixedSize"] >> _isFixedSize;
+        Node::NodeId newId;
+        description["referencedNodeId"] >> newId;
+        std::string portName;
+        description["referencedPortName"] >> portName;
 
         Node* newNode = newContext.GetNodeFromId(newId);
         if (newNode == nullptr)
@@ -225,7 +197,7 @@ namespace model
 
     void PortElementsBase::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        _ranges = description["ranges"].GetValue<decltype(_ranges)>();
+        description["ranges"] >> _ranges;
         ComputeSize();
     }
 }

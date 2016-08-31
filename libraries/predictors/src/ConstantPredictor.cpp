@@ -32,7 +32,7 @@ namespace predictors
 
     void ConstantPredictor::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        _value = description["value"].GetValue<decltype(_value)>();
+        description["value"] >> _value;
     }
 
     void ConstantPredictor::Print(std::ostream& os) const

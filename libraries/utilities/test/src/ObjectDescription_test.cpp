@@ -48,8 +48,8 @@ public:
 
     virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override
     {
-        _a = description["a"].GetValue<int>();
-        _b = description["b"].GetValue<double>();
+        description["a"] >> _a;
+        description["b"] >> _b;
     }
 
     static std::string GetTypeName() { return "InnerObject"; }
@@ -84,7 +84,7 @@ public:
     virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override
     {
         InnerObject::SetObjectState(description, context);
-        _c = description["c"].GetValue<std::string>();
+        description["c"] >> _c;
     }
 
     static std::string GetTypeName() { return "DerivedObject"; }
@@ -120,8 +120,8 @@ public:
 
     virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override
     {
-        _name = description["name"].GetValue<std::string>();
-        _inner = description["obj"].GetValue<InnerObject>();   
+        description["name"] >> _name;
+        description["obj"] >> _inner;
     }
 
     static std::string GetTypeName() { return "OuterObject"; }

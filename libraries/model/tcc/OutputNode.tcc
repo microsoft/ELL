@@ -32,6 +32,31 @@ namespace model
     }
 
     template <typename ValueType>
+    utilities::ObjectDescription OutputNode<ValueType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<OutputNode<ValueType>>("Output node");
+        description.template AddProperty<decltype(_input)>("input", "Input port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription OutputNode<ValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetTypeDescription();
+        description["input"] = _input;
+        description["output"] = _output;
+        return description;
+    }
+
+    template <typename ValueType>
+    void OutputNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        description["input"] >> _input;
+        description["output"] >> _output;
+    }
+    
+    template <typename ValueType>
     void OutputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);

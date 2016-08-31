@@ -77,6 +77,25 @@ namespace model
         return false;
     }
 
+    utilities::ObjectDescription Node::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node>("Node");
+        description.AddProperty<decltype(_id)>("id", "The node's ID'");
+        return description;
+    }
+
+    utilities::ObjectDescription Node::GetDescription() const
+    {
+        auto description = GetTypeDescription();
+        description["id"] = _id;
+        return description;
+    }
+
+    void Node::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        description["id"] >> _id;
+    }
+
     void Node::Serialize(utilities::Serializer& serializer) const
     {
         serializer.Serialize("id", _id);

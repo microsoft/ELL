@@ -26,8 +26,6 @@ namespace model
     class Port: public utilities::IDescribable
     {
     public:
-        virtual ~Port() = default;
-
         enum class PortType
         {
             none,
@@ -36,6 +34,10 @@ namespace model
             categorical,
             boolean
         };
+
+        Port() = default;
+        Port(const Port& other) = default;
+        virtual ~Port() = default;
 
         /// <summary> Returns the node the output port connected to this port belongs to </summary>
         ///
@@ -74,13 +76,23 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
         
+        /// <summary> Gets an ObjectDescription for the type </summary>
+        ///
+        /// <returns> An ObjectDescription for the type </returns>
         static utilities::ObjectDescription GetTypeDescription();
-        virtual utilities::ObjectDescription GetDescription() const override;
-        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
+
+        /// <summary> Gets an ObjectDescription for the object </summary>
+        ///
+        /// <returns> An ObjectDescription for the object </returns>
+        virtual utilities::ObjectDescription GetDescription() const;
+
+        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        ///
+        /// <param name="description"> The `ObjectDescription` to get state from </param>
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
 
     protected:
         Port(const class Node* node, std::string name, PortType type) : _node(node), _name(name), _type(type) {}
-        Port(const Port& other) = delete;
 
     private:
         // _node keeps info on where the input is coming from

@@ -26,6 +26,9 @@ namespace model
     class OutputPortBase : public Port
     {
     public:
+        OutputPortBase() = default;
+        OutputPortBase(const OutputPortBase& other) = default;
+
         /// <summary> Notify this port that it is being referenced </summary>
         void ReferencePort() const { _isReferenced = true; }
 
@@ -49,9 +52,20 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Gets an ObjectDescription for the type </summary>
+        ///
+        /// <returns> An ObjectDescription for the type </returns>
         static utilities::ObjectDescription GetTypeDescription();
-        virtual utilities::ObjectDescription GetDescription() const override;
-        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
+
+        /// <summary> Gets an ObjectDescription for the object </summary>
+        ///
+        /// <returns> An ObjectDescription for the object </returns>
+        virtual utilities::ObjectDescription GetDescription() const;
+
+        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        ///
+        /// <param name="description"> The `ObjectDescription` to get state from </param>
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
 
     protected:
         OutputPortBase(const class Node* node, std::string name, PortType type, size_t size);
@@ -66,7 +80,7 @@ namespace model
     {
     public:
         OutputPort() = default;
-        OutputPort(const OutputPort&) = default; //delete;// why??
+        OutputPort(const OutputPort&) = default; 
 
         /// <summary> Constructor </summary>
         ///
@@ -101,9 +115,20 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Gets an ObjectDescription for the type </summary>
+        ///
+        /// <returns> An ObjectDescription for the type </returns>
         static utilities::ObjectDescription GetTypeDescription();
-        virtual utilities::ObjectDescription GetDescription() const override;
-        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
+
+        /// <summary> Gets an ObjectDescription for the object </summary>
+        ///
+        /// <returns> An ObjectDescription for the object </returns>
+        virtual utilities::ObjectDescription GetDescription() const;
+
+        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        ///
+        /// <param name="description"> The `ObjectDescription` to get state from </param>
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
 
     private:
         mutable std::vector<ValueType> _cachedOutput;

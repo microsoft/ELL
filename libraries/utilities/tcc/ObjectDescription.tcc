@@ -96,10 +96,28 @@ namespace utilities
     }
 
     template <typename ValueType>
+    void ObjectDescription::CopyValueTo(ValueType&& value) const
+    {
+        value = _value.GetValue<typename std::decay<ValueType>::type>();
+    }
+
+    template <typename ValueType>
+    void ObjectDescription::operator>>(ValueType&& value) const
+    {
+        value = _value.GetValue<typename std::decay<ValueType>::type>();
+    }
+
+    template <typename ValueType>
     void ObjectDescription::SetValue(ValueType&& value)
     {
         _value = value;
         FillInDescription();
+    }
+
+    template <typename ValueType>
+    void ObjectDescription::operator<<(ValueType&& value) const
+    {
+        SetValue(value);
     }
 
     template <typename ValueType>

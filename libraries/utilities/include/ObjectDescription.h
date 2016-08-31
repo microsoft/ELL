@@ -61,7 +61,7 @@ namespace utilities
         ///
         /// <typeparam name="ValueType"> The type this property's value will take </typeparam>
         /// <param name="name"> The name of the property </param>
-        /// <param name="documentation"> The documentation string from the property </param>        
+        /// <param name="documentation"> The documentation string from the property </param>
         template <typename ValueType>
         void AddProperty(const std::string& name, std::string documentation);
 
@@ -69,13 +69,13 @@ namespace utilities
         ///
         /// <param name="propertyName"> The name of the property to retrieve </param>
         /// <returns> The property's description </returns>
-        const ObjectDescription& operator[](const std::string& propertyName) const;        
+        const ObjectDescription& operator[](const std::string& propertyName) const;
 
         /// <summary> Retrieves an object property given its name </summary>
         ///
         /// <param name="propertyName"> The name of the property to retrieve </param>
         /// <returns> The property's description </returns>
-        ObjectDescription& operator[](const std::string& propertyName);        
+        ObjectDescription& operator[](const std::string& propertyName);
 
         /// <summary> Tells if the object description has a value associated with it. </summary>
         ///
@@ -89,6 +89,12 @@ namespace utilities
         template <typename ValueType>
         ValueType GetValue() const { return _value.GetValue<ValueType>(); }
 
+        template <typename ValueType>
+        void CopyValueTo(ValueType&& value) const;
+
+        template <typename ValueType>
+        void ObjectDescription::operator>>(ValueType&& value) const;
+
         /// <summary> Gets the value of this object as a string </summary>
         ///
         /// <returns> The value of this object as a string </returns>
@@ -100,6 +106,9 @@ namespace utilities
         /// <param name="value"> The value to set the parameter to </param>
         template <typename ValueType>
         void SetValue(ValueType&& value);
+
+        template <typename ValueType>
+        void ObjectDescription::operator<<(ValueType&& value) const;
 
         /// <summary> Sets the value of an object </summary>
         ///
@@ -136,17 +145,17 @@ namespace utilities
         void FillInDescription() const;
     };
 
-    /// <summary> 
+    /// <summary>
     /// IDescribable is the Base class for describable objects. In order to be able to use the
     /// IDescribable interface for serialization, you must also implement GetRuntimeTypeName, GetTypeName,
-    /// and the static GetTypeDescription functions. Also, a constructor that takes an ObjectDescription 
+    /// and the static GetTypeDescription functions. Also, a constructor that takes an ObjectDescription
     /// (or const ObjectDescription&) must be implemented.
     /// </summary>
     class IDescribable : public ISerializable
     {
     public:
         virtual ~IDescribable() = default;
-        
+
         /// <summary> Gets an ObjectDescription for the object </summary>
         ///
         /// <returns> An ObjectDescription for the object </returns>
@@ -170,7 +179,7 @@ namespace utilities
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const = 0;
-        
+
         /// <summary> Serializes the object. </summary>
         ///
         /// <param name="serializer">  The serializer. </param>

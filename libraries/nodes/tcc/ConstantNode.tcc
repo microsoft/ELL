@@ -58,7 +58,7 @@ namespace nodes
     {
         auto description = utilities::MakeObjectDescription<ConstantNode<ValueType>>("Constant node");
         description.template AddProperty<decltype(_values)>("values", "Constant values");
-//        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
         return description;
     }
 
@@ -66,8 +66,15 @@ namespace nodes
     utilities::ObjectDescription ConstantNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetTypeDescription();
-//        description["output"] = _output; // ugh -- won't work
+        description["output"] = _output;
         description["values"] = _values;
         return description;
+    }
+
+    template <typename ValueType>
+    void ConstantNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        description["values"] >> _values;
+        description["output"] >> _output;
     }
 }

@@ -31,6 +31,6 @@ namespace model
     void OutputPortBase::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
         Port::SetObjectState(description, context);
-        _size = description["size"].GetValue<size_t>();
+        description["size"] >> _size;
     }    
 }
