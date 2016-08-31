@@ -93,7 +93,7 @@ namespace utilities
         void CopyValueTo(ValueType&& value) const;
 
         template <typename ValueType>
-        void ObjectDescription::operator>>(ValueType&& value) const;
+        void operator>>(ValueType&& value) const;
 
         /// <summary> Gets the value of this object as a string </summary>
         ///
@@ -108,7 +108,7 @@ namespace utilities
         void SetValue(ValueType&& value);
 
         template <typename ValueType>
-        void ObjectDescription::operator<<(ValueType&& value) const;
+        void operator<<(ValueType&& value) const;
 
         /// <summary> Sets the value of an object </summary>
         ///

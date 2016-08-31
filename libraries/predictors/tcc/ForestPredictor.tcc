@@ -210,10 +210,10 @@ namespace predictors
     utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<ForestPredictor<SplitRuleType, EdgePredictorType>>("Forest predictor");
-        description.AddProperty<decltype(_interiorNodes)>("interiorNodes", "The interior nodes");
-        description.AddProperty<decltype(_rootIndices)>("rootIndices", "The indices of the tree roots");
-        description.AddProperty<decltype(_bias)>("bias", "bias");
-        description.AddProperty<decltype(_numEdges)>("numEdges", "Number of edges");
+        description.template AddProperty<decltype(_interiorNodes)>("interiorNodes", "The interior nodes");
+        description.template AddProperty<decltype(_rootIndices)>("rootIndices", "The indices of the tree roots");
+        description.template AddProperty<decltype(_bias)>("bias", "bias");
+        description.template AddProperty<decltype(_numEdges)>("numEdges", "Number of edges");
         return description;
     }
 
@@ -314,9 +314,9 @@ namespace predictors
     utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode>("Interior node");
-        description.AddProperty<decltype(_splitRule)>("splitRule", "The split rule");
-        description.AddProperty<decltype(_outgoingEdges)>("outgoingEdges", "The outgoing edges");
-        description.AddProperty<decltype(_firstEdgeIndex)>("firstEdgeIndex", "The index of the first edge");
+        description.template AddProperty<decltype(_splitRule)>("splitRule", "The split rule");
+        description.template AddProperty<decltype(_outgoingEdges)>("outgoingEdges", "The outgoing edges");
+        description.template AddProperty<decltype(_firstEdgeIndex)>("firstEdgeIndex", "The index of the first edge");
         return description;
     }
 
@@ -333,7 +333,7 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-         description["splitRule"] >> _splitRule;
+        description["splitRule"] >> _splitRule;
         description["outgoingEdges"] >> _outgoingEdges;
         description["firstEdgeIndex"] >> _firstEdgeIndex;
     }
@@ -422,8 +422,8 @@ namespace predictors
     utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<ForestPredictor<SplitRuleType, EdgePredictorType>::Edge>("Tree edge");
-        description.AddProperty<decltype(_predictor)>("predictor", "The edge predictor");
-        description.AddProperty<decltype(_targetNodeIndex)>("targetNodeIndex", "The index of the node this edge connects to");
+        description.template AddProperty<decltype(_predictor)>("predictor", "The edge predictor");
+        description.template AddProperty<decltype(_targetNodeIndex)>("targetNodeIndex", "The index of the node this edge connects to");
         return description;
     }
 

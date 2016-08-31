@@ -60,12 +60,12 @@ namespace model
         /// <summary> Gets an ObjectDescription for the object </summary>
         ///
         /// <returns> An ObjectDescription for the object </returns>
-        virtual utilities::ObjectDescription GetDescription() const;
+        virtual utilities::ObjectDescription GetDescription() const override;
 
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///
         /// <param name="description"> The `ObjectDescription` to get state from </param>
-        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
 
     protected:
         OutputPortBase(const class Node* node, std::string name, PortType type, size_t size);
@@ -123,12 +123,12 @@ namespace model
         /// <summary> Gets an ObjectDescription for the object </summary>
         ///
         /// <returns> An ObjectDescription for the object </returns>
-        virtual utilities::ObjectDescription GetDescription() const;
+        virtual utilities::ObjectDescription GetDescription() const override;
 
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///
         /// <param name="description"> The `ObjectDescription` to get state from </param>
-        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
 
     private:
         mutable std::vector<ValueType> _cachedOutput;

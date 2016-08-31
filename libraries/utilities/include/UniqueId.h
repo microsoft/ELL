@@ -54,12 +54,12 @@ namespace utilities
         /// <summary> Gets an ObjectDescription for the object </summary>
         ///
         /// <returns> An ObjectDescription for the object </returns>
-        virtual ObjectDescription GetDescription() const;
+        virtual ObjectDescription GetDescription() const override;
 
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///
         /// <param name="description"> The `ObjectDescription` to get state from </param>
-        virtual void SetObjectState(const ObjectDescription& description, SerializationContext& context);
+        virtual void SetObjectState(const ObjectDescription& description, SerializationContext& context) override;
    
     private:
         friend std::hash<UniqueId>;

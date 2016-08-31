@@ -84,12 +84,12 @@ namespace model
         /// <summary> Gets an ObjectDescription for the object </summary>
         ///
         /// <returns> An ObjectDescription for the object </returns>
-        virtual utilities::ObjectDescription GetDescription() const;
+        virtual utilities::ObjectDescription GetDescription() const override;
 
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///
         /// <param name="description"> The `ObjectDescription` to get state from </param>
-        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
 
     protected:
         Port(const class Node* node, std::string name, PortType type) : _node(node), _name(name), _type(type) {}

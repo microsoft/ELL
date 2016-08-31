@@ -46,7 +46,7 @@ namespace model
     utilities::ObjectDescription InputNode<ValueType>::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<Node, InputNode<ValueType>>("Input node");
-        description.AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
         return description;
     }
 

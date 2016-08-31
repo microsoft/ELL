@@ -31,7 +31,7 @@ namespace model
     // InputPort
     //
     template <typename ValueType>
-    InputPort<ValueType>::InputPort() : InputPortBase(nullptr, _input, ""), _input(input)
+    InputPort<ValueType>::InputPort() : InputPortBase(nullptr, _input, "")
     {
         ComputeParents();
     }
