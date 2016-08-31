@@ -43,12 +43,12 @@ namespace utilities
         }
 
         // value?
-        // what about _getPropertiesFunction?? --- need to compose them (?)
-        auto baseGetPropertiesFunction = baseDescription._getPropertiesFunction;
-        auto newGetPropertiesFunction = thisTypeDescription._getPropertiesFunction;
+        // what about _fillInPropertiesFunction?? --- need to compose them (?)
+        auto baseGetPropertiesFunction = baseDescription._fillInPropertiesFunction;
+        auto newGetPropertiesFunction = thisTypeDescription._fillInPropertiesFunction;
         // For some reason I don't understand, we need to pass in the pointer to this object
         // Somehow, the captured value of 'this' is incorrect
-        thisTypeDescription._getPropertiesFunction = [=](const ObjectDescription* self)
+        thisTypeDescription._fillInPropertiesFunction = [=](const ObjectDescription* self)
         {
             std::cout << "Combining functions" << std::endl;
             ObjectDescription baseProperties = baseGetPropertiesFunction(&baseDescription);
@@ -67,7 +67,7 @@ namespace utilities
     {
         // For some reason I don't understand, we need to pass in the pointer to this object
         // Somehow, the captured value of 'this' is incorrect
-        _getPropertiesFunction = [](const ObjectDescription* self) 
+        _fillInPropertiesFunction = [](const ObjectDescription* self) 
         {
             if(self->HasValue())
             {
@@ -84,7 +84,7 @@ namespace utilities
     template <typename ValueType>
     void ObjectDescription::SetGetPropertiesFunction(std::false_type)
     {
-        _getPropertiesFunction = nullptr;
+        _fillInPropertiesFunction = nullptr;
     }
 
     template <typename ValueType>

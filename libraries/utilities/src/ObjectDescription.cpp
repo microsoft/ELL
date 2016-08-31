@@ -59,11 +59,11 @@ namespace utilities
 
     void ObjectDescription::FillInDescription() const 
     { 
-        if(_getPropertiesFunction)
+        if(_fillInPropertiesFunction)
         {
-            auto newProperties = _getPropertiesFunction(this);
+            auto newProperties = _fillInPropertiesFunction(this);
             _properties = newProperties._properties;
-            // _getPropertiesFunction = nullptr; // Note: can't nullify function here --- it needs to get called more than once (why?)
+            // _fillInPropertiesFunction = nullptr; // Note: can't nullify function here --- it needs to get called more than once (why?)
         }
     }
 

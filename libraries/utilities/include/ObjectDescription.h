@@ -89,9 +89,17 @@ namespace utilities
         template <typename ValueType>
         ValueType GetValue() const { return _value.GetValue<ValueType>(); }
 
+        /// <summary> Copies this object's value to a variable. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type of the value value. </typeparam>
+        /// <param name="value"> The variable to copy the value to. </param>
         template <typename ValueType>
         void CopyValueTo(ValueType&& value) const;
 
+        /// <summary> Copies this object's value to a variable. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type of the value value. </typeparam>
+        /// <param name="value"> The variable to copy the value to. </param>
         template <typename ValueType>
         void operator>>(ValueType&& value) const;
 
@@ -107,6 +115,10 @@ namespace utilities
         template <typename ValueType>
         void SetValue(ValueType&& value);
 
+        /// <summary> Sets the value of an object </summary>
+        ///
+        /// <typeparam name="ValueType"> The type of the value to set </typeparam>
+        /// <param name="value"> The value to set the parameter to </param>
         template <typename ValueType>
         void operator<<(ValueType&& value) const;
 
@@ -122,7 +134,7 @@ namespace utilities
         std::string _documentation;
         Variant _value;
         mutable std::unordered_map<std::string, ObjectDescription> _properties;
-        mutable std::function<ObjectDescription(const ObjectDescription* self)> _getPropertiesFunction;
+        mutable std::function<ObjectDescription(const ObjectDescription* self)> _fillInPropertiesFunction;
 
         // friends
         template <typename ValueType>
@@ -148,8 +160,7 @@ namespace utilities
     /// <summary>
     /// IDescribable is the Base class for describable objects. In order to be able to use the
     /// IDescribable interface for serialization, you must also implement GetRuntimeTypeName, GetTypeName,
-    /// and the static GetTypeDescription functions. Also, a constructor that takes an ObjectDescription
-    /// (or const ObjectDescription&) must be implemented.
+    /// and the static GetTypeDescription functions.
     /// </summary>
     class IDescribable : public ISerializable
     {
