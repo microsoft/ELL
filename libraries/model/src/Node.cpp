@@ -81,7 +81,7 @@ namespace model
     utilities::ObjectDescription Node::GetTypeDescription()
     {
         auto description = utilities::MakeObjectDescription<Node>("Node");
-        description.AddProperty<decltype(_id)>("id", "The node's ID'");
+        description.AddProperty<decltype(_id)>("id", "The node's ID");
         return description;
     }
 

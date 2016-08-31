@@ -250,9 +250,13 @@ namespace utilities
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
         void DeserializeItem(const char* name, std::vector<ValueType>& value, SerializationContext& context);
 
-        // vector of pointers to ISerializable
+        // vector of unique pointers to ISerializable
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
         void DeserializeItem(const char* name, std::vector<std::unique_ptr<ValueType>>& value, SerializationContext& context);
+
+        // vector of pointers to ISerializable
+        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        void DeserializeItem(const char* name, std::vector<const ValueType*>& value, SerializationContext& context);
     };
 }
 

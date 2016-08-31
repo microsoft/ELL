@@ -14,7 +14,7 @@
 
 // utilities
 #include "IIterator.h"
-#include "ISerializable.h"
+#include "ObjectDescription.h"
 
 // stl
 #include <vector>
@@ -55,7 +55,7 @@ namespace model
     };
 
     /// <summary> Model class. Represents a graph of computation </summary>
-    class Model : public utilities::ISerializable
+    class Model : public utilities::IDescribable
     {
     public:
         /// <summary> Factory method used to create nodes and add them to the model. </summary>
@@ -153,10 +153,25 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Gets an ObjectDescription for the type </summary>
+        ///
+        /// <returns> An ObjectDescription for the type </returns>
+        static utilities::ObjectDescription GetTypeDescription();
+
+        /// <summary> Gets an ObjectDescription for the object </summary>
+        ///
+        /// <returns> An ObjectDescription for the object </returns>
+        virtual utilities::ObjectDescription GetDescription() const override;
+
+        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        ///
+        /// <param name="description"> The `ObjectDescription` to get state from </param>
+        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
+
         /// <summary> Writes to a Serializer. </summary>
         ///
         /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+    //    virtual void Serialize(utilities::Serializer& serializer) const override;
 
         /// <summary> Reads from a Deserializer. </summary>
         ///

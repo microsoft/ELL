@@ -86,6 +86,7 @@ namespace utilities
         _value->SerializeProperty(name, serializer);
     }
 
+    // #### TODO: special-case vectors of pointers 
     void Variant::DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context)
     {
         _value->DeserializeProperty(name, serializer, context);

@@ -88,6 +88,7 @@ namespace utilities
     //
     // IDescribable
     //
+
     void IDescribable::Serialize(Serializer& serializer) const
     {
         // for each property, serialize it
@@ -101,6 +102,8 @@ namespace utilities
 
     void IDescribable::Deserialize(Deserializer& serializer, SerializationContext& context)
     {
+        // #### TODO: special-case vectors of pointers to return vectors of unique_ptrs (how??)
+
         auto description = GetDescription(); // will call GetDescription on a default-constructed object
         for(auto& property: description.GetProperties())
         {

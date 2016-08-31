@@ -37,7 +37,14 @@ namespace model
         return NodeIterator(this, outputNodes);
     }
 
-    void Model::Serialize(utilities::Serializer& serializer) const
+    utilities::ObjectDescription Model::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Model>("Model");
+        description.AddProperty<std::vector<const Node*>>("nodes", "The nodes");
+        return description;
+    }
+
+    utilities::ObjectDescription Model::GetDescription() const
     {
         std::vector<const Node*> nodes;
         auto nodeIter = GetNodeIterator();
@@ -48,8 +55,41 @@ namespace model
             nodeIter.Next();
         }
 
-        serializer.Serialize("nodes", nodes);
+        auto description = GetTypeDescription();
+        description["nodes"] = nodes;
+        return description;
     }
+
+    void Model::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        ModelSerializationContext modelContext(context, this);
+        
+        // Deserialize nodes into big array
+        std::vector<const Node*> nodes;
+        description["nodes"] >> nodes;
+
+        // Now add them to the model
+        for(auto& node: nodes)
+        {
+            auto sharedNode = std::shared_ptr<Node>(const_cast<Node*>(node));
+            sharedNode->RegisterDependencies();
+            _idToNodeMap[sharedNode->GetId()] = sharedNode;
+        }
+    }
+
+    // void Model::Serialize(utilities::Serializer& serializer) const
+    // {
+    //     std::vector<const Node*> nodes;
+    //     auto nodeIter = GetNodeIterator();
+    //     while(nodeIter.IsValid())
+    //     {
+    //         const auto& node = nodeIter.Get();
+    //         nodes.push_back(node);
+    //         nodeIter.Next();
+    //     }
+
+    //     serializer.Serialize("nodes", nodes);
+    // }
 
     void Model::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) 
     {
