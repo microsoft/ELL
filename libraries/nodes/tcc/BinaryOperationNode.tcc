@@ -199,26 +199,4 @@ namespace nodes
         description["operation"] >> operation;
         _operation = static_cast<OperationType>(operation);
     }
-    
-    template <typename ValueType>
-    void BinaryOperationNode<ValueType>::Serialize(utilities::Serializer& serializer) const
-    {
-        Node::Serialize(serializer);
-        serializer.Serialize("operation", static_cast<int>(_operation));
-        serializer.Serialize("input1", _input1);
-        serializer.Serialize("input2", _input2);
-        serializer.Serialize("output", _output);
-    }
-
-    template <typename ValueType>
-    void BinaryOperationNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::Deserialize(serializer, context);
-        int op = 0;
-        serializer.Deserialize("operation", op, context);
-        _operation = static_cast<OperationType>(op);
-        serializer.Deserialize("input1", _input1, context);
-        serializer.Deserialize("input2", _input2, context);
-        serializer.Deserialize("output", _output, context);
-   }
 }

@@ -61,24 +61,6 @@ namespace nodes
         description["weightedElements"] >> _weightedElements;
         description["predictor"] >> _predictor;
     }
-    
-    void LinearPredictorNode::Serialize(utilities::Serializer& serializer) const
-    {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
-        serializer.Serialize("weightedElements", _weightedElements);
-        serializer.Serialize("predictor", _predictor);
-    }
-
-    void LinearPredictorNode::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
-        serializer.Deserialize("weightedElements", _weightedElements, context);
-        serializer.Deserialize("predictor", _predictor, context);
-    }
 
     void LinearPredictorNode::Copy(model::ModelTransformer& transformer) const
     {

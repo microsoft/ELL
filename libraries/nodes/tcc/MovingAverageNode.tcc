@@ -99,31 +99,4 @@ namespace nodes
         }
         _runningSum = std::vector<ValueType>(dimension);
     }
-    
-    template <typename ValueType>
-    void MovingAverageNode<ValueType>::Serialize(utilities::Serializer& serializer) const
-    {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
-        serializer.Serialize("windowSize", _windowSize);
-    }
-
-    template <typename ValueType>
-    void MovingAverageNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
-        serializer.Deserialize("windowSize", _windowSize, context);
-
-        auto dimension = _input.Size();
-        _samples.clear();
-        _samples.reserve(_windowSize);
-        for(size_t index = 0; index < _windowSize; ++index)
-        {
-            _samples.push_back(std::vector<ValueType>(dimension));
-        }
-        _runningSum = std::vector<ValueType>(dimension);
-    }
 }

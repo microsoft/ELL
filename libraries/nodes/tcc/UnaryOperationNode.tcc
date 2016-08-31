@@ -119,24 +119,4 @@ namespace nodes
         description["operation"] >> operation;
         _operation = static_cast<OperationType>(operation);
     }
-
-    template <typename ValueType>
-    void UnaryOperationNode<ValueType>::Serialize(utilities::Serializer& serializer) const
-    {
-        Node::Serialize(serializer);
-        serializer.Serialize("operation", static_cast<int>(_operation));
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
-    }
-
-    template <typename ValueType>
-    void UnaryOperationNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::Deserialize(serializer, context);
-        int op = 0;
-        serializer.Deserialize("operation", op, context);
-        _operation = static_cast<OperationType>(op);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
-    }
 }

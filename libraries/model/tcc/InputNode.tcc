@@ -64,18 +64,4 @@ namespace model
         Node::SetObjectState(description, context);
         description["output"] >> _output;
     }
-
-    template <typename ValueType>
-    void InputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
-    {
-        Node::Serialize(serializer);
-        serializer.Serialize("output", _output);
-    }
-
-    template <typename ValueType>
-    void InputNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("output", _output, context);
-    }
 }

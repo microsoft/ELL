@@ -66,25 +66,6 @@ namespace nodes
         description["condition"] >> _condition;
         description["output"] >> _output;
     }
-    template <typename ValueType>
-    void ValueSelectorNode<ValueType>::Serialize(utilities::Serializer& serializer) const
-    {
-        Node::Serialize(serializer);
-        serializer.Serialize("condition", _condition);
-        serializer.Serialize("input1", _input1);
-        serializer.Serialize("input2", _input2);
-        serializer.Serialize("output", _output);
-    }
-
-    template <typename ValueType>
-    void ValueSelectorNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("condition", _condition, context);
-        serializer.Deserialize("input1", _input1, context);
-        serializer.Deserialize("input2", _input2, context);
-        serializer.Deserialize("output", _output, context);
-    }
 
     template <typename ValueType>
     void ValueSelectorNode<ValueType>::Copy(model::ModelTransformer& transformer) const

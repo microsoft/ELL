@@ -63,20 +63,4 @@ namespace nodes
         description["input"] >> _input;
         description["output"] >> _output;
     }
-
-    template <typename ValueType>
-    void SumNode<ValueType>::Serialize(utilities::Serializer& serializer) const
-    {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
-    }
-
-    template <typename ValueType>
-    void SumNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
-    }
 }

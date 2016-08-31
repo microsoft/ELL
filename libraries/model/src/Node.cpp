@@ -94,19 +94,9 @@ namespace model
 
     void Node::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        description["id"] >> _id;
-    }
-
-    void Node::Serialize(utilities::Serializer& serializer) const
-    {
-        serializer.Serialize("id", _id);
-    }
-
-    void Node::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         NodeId oldId;
-        serializer.Deserialize("id", oldId, context);
+        description["id"] >> oldId;
+        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         newContext.MapNode(oldId, this);
     }
 }

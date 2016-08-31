@@ -59,24 +59,6 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void MultiplexerNode<ValueType, SelectorType>::Serialize(utilities::Serializer& serializer) const
-    {
-        Node::Serialize(serializer);
-        serializer.Serialize("elements", _elements);
-        serializer.Serialize("selector", _selector);
-        serializer.Serialize("output", _output);
-    }
-
-    template <typename ValueType, typename SelectorType>
-    void MultiplexerNode<ValueType, SelectorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("elements", _elements, context);
-        serializer.Deserialize("selector", _selector, context);
-        serializer.Deserialize("output", _output, context);
-    }
-
-    template <typename ValueType, typename SelectorType>
     void MultiplexerNode<ValueType, SelectorType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newElements = transformer.TransformPortElements(_elements.GetPortElements());

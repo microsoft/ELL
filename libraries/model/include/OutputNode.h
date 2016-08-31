@@ -61,17 +61,6 @@ namespace model
         /// <param name="description"> The `ObjectDescription` to get state from </param>
         virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context);
 
-        /// <summary> Writes to a Serializer. </summary>
-        ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
-
-        /// <summary> Reads from a Deserializer. </summary>
-        ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
-
         /// <summary> Exposes the output port as a read-only property </summary>
         const OutputPort<ValueType>& output = _output;
 

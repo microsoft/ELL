@@ -66,27 +66,7 @@ namespace nodes
         description["output"] >> _output;
         description["defaultValue"] >> _defaultValue;
     }
-
-    template <typename ValueType, typename SelectorType>
-    void DemultiplexerNode<ValueType, SelectorType>::Serialize(utilities::Serializer& serializer) const
-    {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("selector", _selector);
-        serializer.Serialize("output", _output);
-        serializer.Serialize("defaultValue", _defaultValue);
-    }
-
-    template <typename ValueType, typename SelectorType>
-    void DemultiplexerNode<ValueType, SelectorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("selector", _selector, context);
-        serializer.Deserialize("output", _output, context);
-        serializer.Deserialize("defaultValue", _defaultValue, context);
-    }
-
+    
     template <typename ValueType, typename SelectorType>
     void DemultiplexerNode<ValueType, SelectorType>::Copy(model::ModelTransformer& transformer) const
     {

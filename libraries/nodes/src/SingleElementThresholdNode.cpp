@@ -49,22 +49,6 @@ namespace nodes
         description["predictor"] >> _predictor;
     }
     
-    void SingleElementThresholdNode::Serialize(utilities::Serializer& serializer) const
-    {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
-        serializer.Serialize("predictor", _predictor);
-    }
-
-    void SingleElementThresholdNode::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
-        serializer.Deserialize("predictor", _predictor, context);
-    }
-    
     void SingleElementThresholdNode::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());

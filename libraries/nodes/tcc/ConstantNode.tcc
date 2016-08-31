@@ -62,20 +62,4 @@ namespace nodes
         description["values"] >> _values;
         description["output"] >> _output;
     }
-    
-    template <typename ValueType>
-    void ConstantNode<ValueType>::Serialize(utilities::Serializer& serializer) const
-    {
-        Node::Serialize(serializer);
-        serializer.Serialize("output", _output);
-        serializer.Serialize("values", _values);
-    }
-
-    template <typename ValueType>
-    void ConstantNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("output", _output, context);
-        serializer.Deserialize("values", _values, context);
-    }
 }

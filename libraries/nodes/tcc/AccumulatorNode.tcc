@@ -66,23 +66,4 @@ namespace nodes
         auto dimension = _input.Size();
         _accumulator = std::vector<ValueType>(dimension);
     }
-    
-    template <typename ValueType>
-    void AccumulatorNode<ValueType>::Serialize(utilities::Serializer& serializer) const
-    {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
-    }
-
-    template <typename ValueType>
-    void AccumulatorNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
-
-        auto dimension = _input.Size();
-        _accumulator = std::vector<ValueType>(dimension);
-    }
 }
