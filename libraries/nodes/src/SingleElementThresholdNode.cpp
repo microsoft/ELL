@@ -23,6 +23,32 @@ namespace nodes
         assert(input.Size() > predictor.GetElementIndex());
     }
 
+    utilities::ObjectDescription SingleElementThresholdNode::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, SingleElementThresholdNode>("Single-element threshold predictor node");
+        description.template AddProperty<decltype(_input)>("input", "Input port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_predictor)>("predictor", "The predictor");
+        return description;
+    }
+
+    utilities::ObjectDescription SingleElementThresholdNode::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node, SingleElementThresholdNode>();
+        description["input"] = _input;
+        description["output"] = _output;
+        description["predictor"] = _predictor;
+        return description;
+    }
+
+    void SingleElementThresholdNode::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["input"] >> _input;
+        description["output"] >> _output;
+        description["predictor"] >> _predictor;
+    }
+    
     void SingleElementThresholdNode::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);

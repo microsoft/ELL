@@ -40,6 +40,36 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
+
+    template <typename ValueType>
+    utilities::ObjectDescription DelayNode<ValueType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, DelayNode<ValueType>>("Delay node");
+        description.template AddProperty<decltype(_input)>("input", "Input port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_windowSize)>("windowSize", "Delay window size");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription DelayNode<ValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node, DelayNode<ValueType>>();
+        description["input"] = _input;
+        description["output"] = _output;
+        description["windowSize"] = _windowSize;
+        return description;
+    }
+
+    template <typename ValueType>
+    void DelayNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["input"] >> _input;
+        description["output"] >> _output;
+        description["windowSize"] >> _windowSize;
+    }
+    
     template <typename ValueType>
     void DelayNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {

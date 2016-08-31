@@ -33,6 +33,35 @@ namespace nodes
         assert(input.Size() == predictor.GetDimension());
     }
 
+    utilities::ObjectDescription LinearPredictorNode::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, LinearPredictorNode>("Linear predictor node");
+        description.template AddProperty<decltype(_input)>("input", "Input port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        description.template AddProperty<decltype(_weightedElements)>("weightedElements", "The weighted elements");
+        description.template AddProperty<decltype(_predictor)>("predictor", "The predictor");
+        return description;
+    }
+
+    utilities::ObjectDescription LinearPredictorNode::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node, LinearPredictorNode>();
+        description["input"] = _input;
+        description["output"] = _output;
+        description["weightedElements"] = _weightedElements;
+        description["predictor"] = _predictor;
+        return description;
+    }
+
+    void LinearPredictorNode::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["input"] >> _input;
+        description["output"] >> _output;
+        description["weightedElements"] >> _weightedElements;
+        description["predictor"] >> _predictor;
+    }
+    
     void LinearPredictorNode::Serialize(utilities::Serializer& serializer) const
     {
         Node::Serialize(serializer);

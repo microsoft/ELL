@@ -17,7 +17,7 @@
 #include "ConstantPredictor.h"
 
 // utilities
-#include "Serializer.h"
+#include "Exception.h"
 #include "TypeName.h"
 #include "ObjectDescription.h"
 

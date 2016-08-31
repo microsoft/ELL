@@ -38,6 +38,36 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
+
+    template <typename ValueType>
+    utilities::ObjectDescription AccumulatorNode<ValueType>::GetTypeDescription()
+    {
+        auto description = utilities::MakeObjectDescription<Node, AccumulatorNode<ValueType>>("Accumulator node");
+        description.template AddProperty<decltype(_input)>("input", "Input port");
+        description.template AddProperty<decltype(_output)>("output", "Output port");
+        return description;
+    }
+
+    template <typename ValueType>
+    utilities::ObjectDescription AccumulatorNode<ValueType>::GetDescription() const
+    {
+        utilities::ObjectDescription description = GetParentDescription<Node, AccumulatorNode<ValueType>>();
+        description["input"] = _input;
+        description["output"] = _output;
+        return description;
+    }
+
+    template <typename ValueType>
+    void AccumulatorNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    {
+        Node::SetObjectState(description, context);
+        description["input"] >> _input;
+        description["output"] >> _output;
+
+        auto dimension = _input.Size();
+        _accumulator = std::vector<ValueType>(dimension);
+    }
+    
     template <typename ValueType>
     void AccumulatorNode<ValueType>::Serialize(utilities::Serializer& serializer) const
     {
