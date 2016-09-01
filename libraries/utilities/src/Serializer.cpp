@@ -38,6 +38,16 @@ namespace utilities
     //
     // Deserializer
     //
+    Deserializer::Deserializer(SerializationContext context) : _baseContext(context)
+    {        
+        _contexts.push_back(_baseContext);
+    }
+
+    void Deserializer::PushContext(SerializationContext& context)
+    {
+        _contexts.push_back(context);
+    }
+    
     void Deserializer::DeserializeValue(const char* name, ISerializable& value, SerializationContext& context)
     {
         auto typeName = value.GetRuntimeTypeName();

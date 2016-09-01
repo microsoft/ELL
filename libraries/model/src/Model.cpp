@@ -55,7 +55,7 @@ namespace model
         }
 
         auto description = GetTypeDescription();
-        description["nodes"] = nodes;
+        description["nodes"] << nodes;
         return description;
     }
 
@@ -76,13 +76,13 @@ namespace model
         }
     }
 
-    void Model::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) 
+    void Model::Deserialize(utilities::Deserializer& serializer) 
     {
-        ModelSerializationContext modelContext(context, this);
-        
+        ModelSerializationContext modelContext(serializer.GetContext(), this);
+        serializer.PushContext(modelContext);
         // Deserialize nodes into big array
         std::vector<std::unique_ptr<Node>> nodes;
-        serializer.Deserialize("nodes", nodes, modelContext);
+        serializer.Deserialize("nodes", nodes);
 
         // Now add them to the model
         for(auto& node: nodes)
@@ -91,6 +91,7 @@ namespace model
             sharedNode->RegisterDependencies();
             _idToNodeMap[sharedNode->GetId()] = sharedNode;
         }
+        serializer.PopContext();
     }
 
     //

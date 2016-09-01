@@ -49,12 +49,12 @@ struct TestStruct : public utilities::ISerializable
         serializer.Serialize("c", c);
     }
 
-    virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override
+    virtual void Deserialize(utilities::Deserializer& serializer) override
     {
         // what about _type?
-        serializer.Deserialize("a", a, context);
-        serializer.Deserialize("b", b, context);
-        serializer.Deserialize("c", c, context);
+        serializer.Deserialize("a", a);
+        serializer.Deserialize("b", b);
+        serializer.Deserialize("c", c);
     }
 };
 
@@ -130,9 +130,9 @@ void TestDeserializer()
             serializer.Serialize("true", true);
         }
 
-        DeserializerType deserializer(strstream);
+        DeserializerType deserializer(strstream, context);
         bool val = false;
-        deserializer.Deserialize("true", val, context);
+        deserializer.Deserialize("true", val);
         testing::ProcessTest("Deserialize bool check", val == true);
     }
 
@@ -143,9 +143,9 @@ void TestDeserializer()
             serializer.Serialize("pi", 3.14159);
         }
 
-        DeserializerType deserializer(strstream);
+        DeserializerType deserializer(strstream, context);
         double val = 0;
-        deserializer.Deserialize("pi", val, context);
+        deserializer.Deserialize("pi", val);
         testing::ProcessTest("Deserialize float check", val == 3.14159);
     }
 
@@ -156,9 +156,9 @@ void TestDeserializer()
             serializer.Serialize("pie", std::string{ "cherry pie" });
         }
 
-        DeserializerType deserializer(strstream);
+        DeserializerType deserializer(strstream, context);
         std::string val;
-        deserializer.Deserialize("pie", val, context);
+        deserializer.Deserialize("pie", val);
         testing::ProcessTest("Deserialize string check", val == "cherry pie");
     }
 
@@ -170,9 +170,9 @@ void TestDeserializer()
             serializer.Serialize("arr", arr);
         }
 
-        DeserializerType deserializer(strstream);
+        DeserializerType deserializer(strstream, context);
         std::vector<int> val;
-        deserializer.Deserialize("arr", val, context);
+        deserializer.Deserialize("arr", val);
         testing::ProcessTest("Deserialize vector<int> check", val[0] == 1 && val[1] == 2 && val[2] == 3);
     }
 
@@ -184,9 +184,9 @@ void TestDeserializer()
             serializer.Serialize("s", testStruct);
         }
 
-        DeserializerType deserializer(strstream);
+        DeserializerType deserializer(strstream, context);
         TestStruct val;
-        deserializer.Deserialize("s", val, context);
+        deserializer.Deserialize("s", val);
         testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);        
     }
 
@@ -217,19 +217,20 @@ void TestDeserializer()
             serializer.Serialize("node5", binaryOpNode);
         }
 
-        DeserializerType deserializer(strstream);
+        DeserializerType deserializer(strstream, context);
+        deserializer.PushContext(modelContext);
         nodes::ConstantNode<double> newConstNode;
         model::InputNode<double> newIn;
         nodes::BinaryOperationNode<double> newBinaryOpNode;
         std::unique_ptr<nodes::ConstantNode<double>> newConstNodePtr = nullptr;
         std::unique_ptr<model::Node> newNodePtr = nullptr;
         std::unique_ptr<nodes::BinaryOperationNode<double>> newBinaryOpNodePtr = nullptr;
-        deserializer.Deserialize("node1", newConstNode, modelContext);
-        deserializer.Deserialize("node2", newIn, modelContext);
-        deserializer.Deserialize("node3", newConstNodePtr, modelContext);
-        deserializer.Deserialize("node4", newNodePtr, modelContext);
-        deserializer.Deserialize("node5", newBinaryOpNode, modelContext);
-
+        deserializer.Deserialize("node1", newConstNode);
+        deserializer.Deserialize("node2", newIn);
+        deserializer.Deserialize("node3", newConstNodePtr);
+        deserializer.Deserialize("node4", newNodePtr);
+        deserializer.Deserialize("node5", newBinaryOpNode);
+        deserializer.PopContext();
         testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNode.GetValues()));
         testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNodePtr->GetValues()));
     }
@@ -248,11 +249,11 @@ void TestDeserializer()
             serializer.Serialize("vec2", structVector);
         }
 
-        DeserializerType deserializer(strstream);
+        DeserializerType deserializer(strstream, context);
         std::vector<double> newDoubleVector;
         std::vector<TestStruct> newStructVector;
-        deserializer.Deserialize("vec1", newDoubleVector, context);
-        deserializer.Deserialize("vec2", newStructVector, context);
+        deserializer.Deserialize("vec1", newDoubleVector);
+        deserializer.Deserialize("vec2", newStructVector);
 
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(doubleVector, newDoubleVector));
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].a, newStructVector[0].a));
@@ -287,9 +288,10 @@ void TestDeserializer()
             // std::cout << strstream.str() << std::endl;
         }
 
-        DeserializerType deserializer(strstream);
+        DeserializerType deserializer(strstream, context);
+        deserializer.PushContext(modelContext);
         model::Model newGraph;
-        deserializer.Deserialize(newGraph, modelContext);
+        deserializer.Deserialize(newGraph);
 
         std::stringstream strstream2;
         SerializerType serializer2(strstream2);
@@ -307,9 +309,9 @@ void TestDeserializer()
             serializer.Serialize("str", stringVal);
         }
         
-        DeserializerType deserializer(strstream);
+        DeserializerType deserializer(strstream, context);
         std::string val;
-        deserializer.Deserialize("str", val, context);
+        deserializer.Deserialize("str", val);
         testing::ProcessTest("Deserialize string check", val == stringVal);    
     }
 }

@@ -130,8 +130,8 @@ namespace utilities
     //
     // Deserialization
     //
-    JsonDeserializer::JsonDeserializer() : _in(std::cin), _tokenizer(std::cin, ",:{}[]'\"") {}
-    JsonDeserializer::JsonDeserializer(std::istream& inputStream) : _in(inputStream), _tokenizer(inputStream, ",:{}[]'\"") {}
+    JsonDeserializer::JsonDeserializer(SerializationContext context) : Deserializer(std::move(context)), _in(std::cin), _tokenizer(std::cin, ",:{}[]'\"") {}
+    JsonDeserializer::JsonDeserializer(std::istream& inputStream, SerializationContext context) : Deserializer(std::move(context)), _in(inputStream), _tokenizer(inputStream, ",:{}[]'\"") {}
 
     IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, bool);
     IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, char);
@@ -171,7 +171,7 @@ namespace utilities
 
     void JsonDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
-        value.Deserialize(*this, context);
+        value.Deserialize(*this);
     }
 
     void JsonDeserializer::EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) 

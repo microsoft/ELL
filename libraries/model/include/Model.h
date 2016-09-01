@@ -172,7 +172,7 @@ namespace model
         ///
         /// <param name="deserializer"> The deserializer. </param>
         /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        virtual void Deserialize(utilities::Deserializer& serializer) override;
 
     private:
         friend class NodeIterator;

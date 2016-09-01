@@ -203,7 +203,7 @@ namespace utilities
             }
 
             ValueType obj;
-            Deserialize(obj, context);
+            Deserialize(obj);
             array.push_back(obj);
 
             if(_tokenizer.PeekNextToken() == ",")
@@ -232,7 +232,7 @@ namespace utilities
             }
 
             std::string obj;
-            Deserialize(obj, context);
+            Deserialize(obj);
             array.push_back(obj);
 
             if(_tokenizer.PeekNextToken() == ",")

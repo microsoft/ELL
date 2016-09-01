@@ -90,12 +90,12 @@ namespace utilities
     {
     public:
         /// <summary> Default Constructor --- reads from standard input. </summary>
-        JsonDeserializer();
+        JsonDeserializer(SerializationContext context);
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="inputStream"> The stream to deserialize data from. </summary>
-        JsonDeserializer(std::istream& inputStream);
+        JsonDeserializer(std::istream& inputStream, SerializationContext context);
 
     protected:
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(bool);

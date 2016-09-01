@@ -133,12 +133,12 @@ namespace utilities
     //
     // Deserialization
     //
-    SimpleXmlDeserializer::SimpleXmlDeserializer() : _in(std::cin), _tokenizer(std::cin, "<>=/'\"") 
+    SimpleXmlDeserializer::SimpleXmlDeserializer(SerializationContext context) : Deserializer(std::move(context)), _in(std::cin), _tokenizer(std::cin, "<>=/'\"") 
     {
         ReadFileHeader();
     }
 
-    SimpleXmlDeserializer::SimpleXmlDeserializer(std::istream& inputStream) : _in(inputStream), _tokenizer(inputStream, "<>?=/'\"") 
+    SimpleXmlDeserializer::SimpleXmlDeserializer(std::istream& inputStream, SerializationContext context) : Deserializer(std::move(context)), _in(inputStream), _tokenizer(inputStream, "<>?=/'\"") 
     {
         ReadFileHeader(); 
     }
@@ -195,7 +195,7 @@ namespace utilities
 
     void SimpleXmlDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
     {
-        value.Deserialize(*this, context);
+        value.Deserialize(*this);
     }
 
     void SimpleXmlDeserializer::EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) 

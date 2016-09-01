@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <functional>
 
 namespace utilities
 {
@@ -185,18 +186,29 @@ namespace utilities
     class Deserializer
     {
     public:
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="context"> The initial `SerializationContext` to use </param>
+        Deserializer(SerializationContext context);
+
         /// <summary> Serialize unnamed values of any serializable type. </summary>
         ///
         /// <param name="value"> The value to deserialize. </param>
         template <typename ValueType>
-        void Deserialize(ValueType&& value, SerializationContext& context);
+        void Deserialize(ValueType&& value);
 
         /// <summary> Serialize named values of various serializable types. </summary>
         ///
         /// <param name="name"> The name of the value to deserialize. </param>
         /// <param name="value"> The value to deserialize. </param>
         template <typename ValueType>
-        void Deserialize(const char* name, ValueType&& value, SerializationContext& context);
+        void Deserialize(const char* name, ValueType&& value);
+        
+        void PushContext(SerializationContext& context);
+
+        void PopContext() { _contexts.pop_back(); }
+
+        SerializationContext& GetContext() { return _contexts.back(); }
 
     protected:
         DECLARE_DESERIALIZE_VALUE_BASE(bool);
@@ -230,6 +242,9 @@ namespace utilities
         virtual void EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context);
 
     private:
+        SerializationContext _baseContext;
+        std::vector<std::reference_wrapper<SerializationContext>> _contexts;
+
         // non-vector
         template <typename ValueType, IsNotVector<ValueType> concept = 0>
         void DeserializeItem(const char* name, ValueType&& value, SerializationContext& context);

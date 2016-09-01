@@ -136,6 +136,6 @@ namespace utilities
     template <typename ValueType>
     void VariantDerived<ValueType>::DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context) 
     {
-        serializer.Deserialize(name, _value, context);
+        serializer.Deserialize(name, _value);
     }
 }

@@ -115,7 +115,7 @@ namespace utilities
     }
 
     template <typename ValueType>
-    void ObjectDescription::operator<<(ValueType&& value) const
+    void ObjectDescription::operator<<(ValueType&& value)
     {
         SetValue(value);
     }

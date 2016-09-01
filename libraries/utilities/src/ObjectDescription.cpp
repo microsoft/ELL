@@ -100,7 +100,7 @@ namespace utilities
         }
     }
 
-    void IDescribable::Deserialize(Deserializer& serializer, SerializationContext& context)
+    void IDescribable::Deserialize(Deserializer& serializer)
     {
         // #### TODO: special-case vectors of pointers to return vectors of unique_ptrs
 
@@ -109,8 +109,8 @@ namespace utilities
         {
             auto name = property.first;
             // std::cout << "Deserializing property " << name << std::endl;
-            property.second._value.DeserializeProperty(name.c_str(), serializer, context);
+            property.second._value.DeserializeProperty(name.c_str(), serializer, serializer.GetContext());
         }
-        SetObjectState(description, context);
+        SetObjectState(description, serializer.GetContext());
     }
 }

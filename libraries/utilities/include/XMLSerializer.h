@@ -87,12 +87,12 @@ namespace utilities
     {
     public:
         /// <summary> Default Constructor --- reads from standard input. </summary>
-        SimpleXmlDeserializer();
+        SimpleXmlDeserializer(SerializationContext context);
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="inputStream"> The stream to deserialize data from. </summary>
-        SimpleXmlDeserializer(std::istream& inputStream);
+        SimpleXmlDeserializer(std::istream& inputStream, SerializationContext context);
 
         /// <summary> Default Destructor </summary>
         ~SimpleXmlDeserializer();

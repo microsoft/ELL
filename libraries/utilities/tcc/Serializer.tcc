@@ -78,15 +78,15 @@ namespace utilities
     // Deserialization
     //
     template <typename ValueType>
-    void Deserializer::Deserialize(ValueType&& value, SerializationContext& context)
+    void Deserializer::Deserialize(ValueType&& value)
     {
-        Deserialize("", value, context);
+        Deserialize("", value);
     }
 
     template <typename ValueType>
-    void Deserializer::Deserialize(const char* name, ValueType&& value, SerializationContext& context)
+    void Deserializer::Deserialize(const char* name, ValueType&& value)
     {
-        DeserializeItem(name, value, context);
+        DeserializeItem(name, value, GetContext());
     }
 
     template <typename ValueType, IsNotVector<ValueType> concept>
@@ -139,7 +139,7 @@ namespace utilities
                 break;
             }
             ValueType value;
-            Deserialize(value, context);
+            Deserialize(value);
             arr.push_back(value);
             EndDeserializeArrayItem(typeName, context);            
         }
@@ -161,7 +161,7 @@ namespace utilities
                 break;
             }
             std::unique_ptr<ValueType> newPtr;
-            Deserialize(newPtr, context);
+            Deserialize(newPtr);
             arr.push_back(std::move(newPtr));
             EndDeserializeArrayItem(typeName, context);            
         }
@@ -183,7 +183,7 @@ namespace utilities
                 break;
             }
             std::unique_ptr<ValueType> newPtr;
-            Deserialize(newPtr, context);
+            Deserialize(newPtr);
             arr.push_back(newPtr.release());
             EndDeserializeArrayItem(typeName, context);            
         }

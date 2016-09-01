@@ -233,17 +233,17 @@ void TestSerializeIDescribable()
         std::cout << strstream.str() << std::endl;
     }
 
-    utilities::SimpleXmlDeserializer deserializer(strstream);
+    utilities::SimpleXmlDeserializer deserializer(strstream, context);
     InnerObject deserializedInner;
 
-    deserializer.Deserialize("inner", deserializedInner, context);
+    deserializer.Deserialize("inner", deserializedInner);
     testing::ProcessTest("Deserialize IDescribable check",  deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);        
 
     OuterObject deserializedOuter;
-    deserializer.Deserialize("outer", deserializedOuter, context);
+    deserializer.Deserialize("outer", deserializedOuter);
     testing::ProcessTest("Deserialize IDescribable check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
 
     DerivedObject deserializedDerived;
-    deserializer.Deserialize("derived", deserializedDerived, context);
+    deserializer.Deserialize("derived", deserializedDerived);
     testing::ProcessTest("Deserialize IDescribable check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
 }

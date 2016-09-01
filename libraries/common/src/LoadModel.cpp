@@ -185,11 +185,11 @@ namespace common
     {
         try
         {
-            DeserializerType deserializer(stream);
             utilities::SerializationContext context;
             RegisterNodeTypes(context);
+            DeserializerType deserializer(stream, context);
             model::Model model;
-            deserializer.Deserialize(model, context);
+            deserializer.Deserialize(model);
             return model;
         }
         catch (const std::exception&)

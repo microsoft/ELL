@@ -206,7 +206,7 @@ namespace utilities
         while(true)
         {
             ValueType obj;
-            Deserialize(obj, context);
+            Deserialize(obj);
             array.push_back(obj);
             
             // check for '</'
@@ -240,7 +240,7 @@ namespace utilities
         while(true)
         {
             std::string obj;
-            Deserialize(obj, context);
+            Deserialize(obj);
             array.push_back(obj);
             
             // check for '</'

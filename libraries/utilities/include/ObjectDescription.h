@@ -119,7 +119,7 @@ namespace utilities
         /// <typeparam name="ValueType"> The type of the value to set </typeparam>
         /// <param name="value"> The value to set the parameter to </param>
         template <typename ValueType>
-        void operator<<(ValueType&& value) const;
+        void operator<<(ValueType&& value);
 
         /// <summary> Sets the value of an object </summary>
         ///
@@ -188,18 +188,18 @@ namespace utilities
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const = 0;
+        virtual std::string GetRuntimeTypeName() const override = 0;
 
         /// <summary> Serializes the object. </summary>
         ///
         /// <param name="serializer">  The serializer. </param>
-        virtual void Serialize(Serializer& serializer) const;
+        virtual void Serialize(Serializer& serializer) const override;
 
         /// <summary> Deserializes the object. </summary>
         ///
         /// <param name="serializer"> The deserializer. </param>
         /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(Deserializer& serializer, SerializationContext& context);
+        virtual void Deserialize(Deserializer& serializer) override;
     };
 
     /// <summary> Factory method to create an ObjectDescription </summary>
