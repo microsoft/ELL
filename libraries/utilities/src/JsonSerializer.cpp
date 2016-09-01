@@ -142,13 +142,13 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, double);
 
     // strings
-    void JsonDeserializer::DeserializeValue(const char* name, std::string& value, SerializationContext& context) 
+    void JsonDeserializer::DeserializeValue(const char* name, std::string& value) 
     { 
         ReadScalar(name, value); 
     }
 
     // ISerializable
-    std::string JsonDeserializer::BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) 
+    std::string JsonDeserializer::BeginDeserializeObject(const char* name, const std::string& typeName) 
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -169,12 +169,12 @@ namespace utilities
         return encodedTypeName;
     }
 
-    void JsonDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
+    void JsonDeserializer::DeserializeObject(const char* name, ISerializable& value) 
     {
         value.Deserialize(*this);
     }
 
-    void JsonDeserializer::EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) 
+    void JsonDeserializer::EndDeserializeObject(const char* name, const std::string& typeName) 
     {
         bool hasName = name != std::string("");
         _tokenizer.MatchToken("}");
@@ -200,12 +200,12 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY(JsonDeserializer, float);
     IMPLEMENT_DESERIALIZE_ARRAY(JsonDeserializer, double);
 
-    void JsonDeserializer::DeserializeArray(const char* name, std::vector<std::string>& array, SerializationContext& context)
+    void JsonDeserializer::DeserializeArray(const char* name, std::vector<std::string>& array)
     {
-        ReadArray(name, array, context);
+        ReadArray(name, array);
     }
 
-    void JsonDeserializer::BeginDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
+    void JsonDeserializer::BeginDeserializeArray(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -216,7 +216,7 @@ namespace utilities
         _tokenizer.MatchToken("[");
     }
 
-    bool JsonDeserializer::BeginDeserializeArrayItem(const std::string& typeName, SerializationContext& context)
+    bool JsonDeserializer::BeginDeserializeArrayItem(const std::string& typeName)
     {
         auto maybeEndArray = _tokenizer.PeekNextToken();
         if(maybeEndArray == "]")
@@ -229,7 +229,7 @@ namespace utilities
         }
     }
 
-    void JsonDeserializer::EndDeserializeArrayItem(const std::string& typeName, SerializationContext& context)
+    void JsonDeserializer::EndDeserializeArrayItem(const std::string& typeName)
     {
         if(_tokenizer.PeekNextToken() == ",")
         {
@@ -237,7 +237,7 @@ namespace utilities
         }
     }
     
-    void JsonDeserializer::EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
+    void JsonDeserializer::EndDeserializeArray(const char* name, const std::string& typeName)
     {
         _tokenizer.MatchToken("]");
     }

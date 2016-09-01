@@ -191,7 +191,7 @@ namespace utilities
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<ValueType>& array, SerializationContext& context)
+    void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<ValueType>& array)
     {
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
@@ -223,7 +223,7 @@ namespace utilities
         _tokenizer.MatchTokens({"<", "/", "Array", ">"});
     }
 
-    inline void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<std::string>& array, SerializationContext& context)
+    inline void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<std::string>& array)
     {
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<std::string>::GetName());
         bool hasName = name != std::string("");

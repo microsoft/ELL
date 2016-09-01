@@ -105,7 +105,7 @@ namespace utilities
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(size_t);
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(float);
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(double);
-        virtual void DeserializeValue(const char* name, std::string& value, SerializationContext& context) override;
+        virtual void DeserializeValue(const char* name, std::string& value) override;
 
         DECLARE_DESERIALIZE_ARRAY_OVERRIDE(bool);
         DECLARE_DESERIALIZE_ARRAY_OVERRIDE(char);
@@ -114,15 +114,15 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_OVERRIDE(size_t);
         DECLARE_DESERIALIZE_ARRAY_OVERRIDE(float);
         DECLARE_DESERIALIZE_ARRAY_OVERRIDE(double);
-        virtual void DeserializeArray(const char* name, std::vector<std::string>& array, SerializationContext& context) override;
-        virtual void BeginDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context) override;
-        virtual bool BeginDeserializeArrayItem(const std::string& typeName, SerializationContext& context) override;
-        virtual void EndDeserializeArrayItem(const std::string& typeName, SerializationContext& context) override;
-        virtual void EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context) override;
+        virtual void DeserializeArray(const char* name, std::vector<std::string>& array) override;
+        virtual void BeginDeserializeArray(const char* name, const std::string& typeName) override;
+        virtual bool BeginDeserializeArrayItem(const std::string& typeName) override;
+        virtual void EndDeserializeArrayItem(const std::string& typeName) override;
+        virtual void EndDeserializeArray(const char* name, const std::string& typeName) override;
 
-        virtual std::string BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) override;
-        virtual void DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) override;
-        virtual void EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) override;
+        virtual std::string BeginDeserializeObject(const char* name, const std::string& typeName) override;
+        virtual void DeserializeObject(const char* name, ISerializable& value) override;
+        virtual void EndDeserializeObject(const char* name, const std::string& typeName) override;
 
 
     private:
@@ -132,9 +132,9 @@ namespace utilities
         void ReadScalar(const char* name, std::string& value);
 
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
-        void ReadArray(const char* name, std::vector<ValueType>& array, SerializationContext& context);
+        void ReadArray(const char* name, std::vector<ValueType>& array);
 
-        void ReadArray(const char* name, std::vector<std::string>& array, SerializationContext& context);
+        void ReadArray(const char* name, std::vector<std::string>& array);
 
         void MatchFieldName(const char* name);
 

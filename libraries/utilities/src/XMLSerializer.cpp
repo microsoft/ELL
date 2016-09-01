@@ -174,10 +174,13 @@ namespace utilities
     }
 
     // strings
-    void SimpleXmlDeserializer::DeserializeValue(const char* name, std::string& value, SerializationContext& context) { ReadScalar(name, value); }
+    void SimpleXmlDeserializer::DeserializeValue(const char* name, std::string& value) 
+    { 
+        ReadScalar(name, value); 
+    }
 
     // ISerializable
-    std::string SimpleXmlDeserializer::BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) 
+    std::string SimpleXmlDeserializer::BeginDeserializeObject(const char* name, const std::string& typeName) 
     {
         bool hasName = name != std::string("");
         auto rawTypeName = typeName;
@@ -193,12 +196,12 @@ namespace utilities
         return readTypeName;
     }
 
-    void SimpleXmlDeserializer::DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) 
+    void SimpleXmlDeserializer::DeserializeObject(const char* name, ISerializable& value) 
     {
         value.Deserialize(*this);
     }
 
-    void SimpleXmlDeserializer::EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context) 
+    void SimpleXmlDeserializer::EndDeserializeObject(const char* name, const std::string& typeName) 
     {
         auto EncodedTypeName = XmlUtilities::EncodeTypeName(typeName);
         _tokenizer.MatchTokens({"<", "/", EncodedTypeName, ">"});
@@ -215,12 +218,12 @@ namespace utilities
     IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, float);
     IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, double);
 
-    void SimpleXmlDeserializer::DeserializeArray(const char* name, std::vector<std::string>& array, SerializationContext& context)
+    void SimpleXmlDeserializer::DeserializeArray(const char* name, std::vector<std::string>& array)
     {
-        ReadArray(name, array, context);
+        ReadArray(name, array);
     }
 
-    void SimpleXmlDeserializer::BeginDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
+    void SimpleXmlDeserializer::BeginDeserializeArray(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
 
@@ -233,7 +236,7 @@ namespace utilities
         _tokenizer.MatchTokens({"type", "=", "'", typeName, "'", ">"});
     }
 
-    bool SimpleXmlDeserializer::BeginDeserializeArrayItem(const std::string& typeName, SerializationContext& context)
+    bool SimpleXmlDeserializer::BeginDeserializeArrayItem(const std::string& typeName)
     {
         // check for '</'
         auto token1 = _tokenizer.ReadNextToken();
@@ -250,11 +253,11 @@ namespace utilities
         }
     }
 
-    void SimpleXmlDeserializer::EndDeserializeArrayItem(const std::string& typeName, SerializationContext& context)
+    void SimpleXmlDeserializer::EndDeserializeArrayItem(const std::string& typeName)
     {
     }
 
-    void SimpleXmlDeserializer::EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
+    void SimpleXmlDeserializer::EndDeserializeArray(const char* name, const std::string& typeName)
     {
         _tokenizer.MatchTokens({"<", "/", "Array", ">"});
     }

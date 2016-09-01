@@ -80,9 +80,9 @@ namespace model
     {
         ModelSerializationContext modelContext(serializer.GetContext(), this);
         serializer.PushContext(modelContext);
+
         // Deserialize nodes into big array
         std::vector<std::unique_ptr<Node>> nodes;
-//        serializer.Deserialize("nodes", nodes);
         serializer["nodes"] >> nodes;
 
         // Now add them to the model

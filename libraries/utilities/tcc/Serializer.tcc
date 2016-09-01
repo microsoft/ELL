@@ -86,54 +86,54 @@ namespace utilities
     template <typename ValueType>
     void Deserializer::Deserialize(const char* name, ValueType&& value)
     {
-        DeserializeItem(name, value, GetContext());
+        DeserializeItem(name, value);
     }
 
     template <typename ValueType, IsNotVector<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, ValueType&& value, SerializationContext& context)
+    void Deserializer::DeserializeItem(const char* name, ValueType&& value)
     {
-        DeserializeValue(name, value, context);
+        DeserializeValue(name, value);
     }
 
     // pointer to non-serializable type
     template <typename ValueType, IsNotSerializable<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::unique_ptr<ValueType>& value, SerializationContext& context)
+    void Deserializer::DeserializeItem(const char* name, std::unique_ptr<ValueType>& value)
     {
         auto ptr = std::make_unique<ValueType>();
-        DeserializeValue(name, *ptr, context);
+        DeserializeValue(name, *ptr);
         value = std::move(ptr);
     }
 
     // pointer to serializable type
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::unique_ptr<ValueType>& value, SerializationContext& context)
+    void Deserializer::DeserializeItem(const char* name, std::unique_ptr<ValueType>& value)
     {
         auto baseTypeName = ValueType::GetTypeName();
-        auto encodedTypeName = BeginDeserializeObject(name, baseTypeName, context);
+        auto encodedTypeName = BeginDeserializeObject(name, baseTypeName);
 
-        std::unique_ptr<ValueType> newPtr = context.GetTypeFactory().Construct<ValueType>(encodedTypeName);
-        DeserializeObject(name, *newPtr, context);
-        EndDeserializeObject(name, encodedTypeName, context);
+        std::unique_ptr<ValueType> newPtr = GetContext().GetTypeFactory().Construct<ValueType>(encodedTypeName);
+        DeserializeObject(name, *newPtr);
+        EndDeserializeObject(name, encodedTypeName);
         value = std::move(newPtr);
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::vector<ValueType>& arr, SerializationContext& context)
+    void Deserializer::DeserializeItem(const char* name, std::vector<ValueType>& arr)
     {
         arr.clear();
-        DeserializeArray(name, arr, context);
+        DeserializeArray(name, arr);
     }
 
     // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::vector<ValueType>& arr, SerializationContext& context)
+    void Deserializer::DeserializeItem(const char* name, std::vector<ValueType>& arr)
     {
         arr.clear();
         auto typeName = ValueType::GetTypeName();
-        BeginDeserializeArray(name, typeName, context);
+        BeginDeserializeArray(name, typeName);
         while(true)
         {
-            auto good = BeginDeserializeArrayItem(typeName, context);
+            auto good = BeginDeserializeArrayItem(typeName);
             if(!good)
             {
                 break;
@@ -141,21 +141,21 @@ namespace utilities
             ValueType value;
             Deserialize(value);
             arr.push_back(value);
-            EndDeserializeArrayItem(typeName, context);            
+            EndDeserializeArrayItem(typeName);            
         }
-        EndDeserializeArray(name, typeName, context);
+        EndDeserializeArray(name, typeName);
     }
 
     // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::vector<std::unique_ptr<ValueType>>& arr, SerializationContext& context)
+    void Deserializer::DeserializeItem(const char* name, std::vector<std::unique_ptr<ValueType>>& arr)
     {
         arr.clear();
         auto typeName = ValueType::GetTypeName();
-        BeginDeserializeArray(name, typeName, context);
+        BeginDeserializeArray(name, typeName);
         while(true)
         {
-            auto good = BeginDeserializeArrayItem(typeName, context);            
+            auto good = BeginDeserializeArrayItem(typeName);            
             if(!good)
             {
                 break;
@@ -163,21 +163,21 @@ namespace utilities
             std::unique_ptr<ValueType> newPtr;
             Deserialize(newPtr);
             arr.push_back(std::move(newPtr));
-            EndDeserializeArrayItem(typeName, context);            
+            EndDeserializeArrayItem(typeName);            
         }
-        EndDeserializeArray(name, typeName, context);
+        EndDeserializeArray(name, typeName);
     }
 
     // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::vector<const ValueType*>& arr, SerializationContext& context)
+    void Deserializer::DeserializeItem(const char* name, std::vector<const ValueType*>& arr)
     {
         arr.clear();
         auto typeName = ValueType::GetTypeName();
-        BeginDeserializeArray(name, typeName, context);
+        BeginDeserializeArray(name, typeName);
         while(true)
         {
-            auto good = BeginDeserializeArrayItem(typeName, context);            
+            auto good = BeginDeserializeArrayItem(typeName);            
             if(!good)
             {
                 break;
@@ -185,8 +185,8 @@ namespace utilities
             std::unique_ptr<ValueType> newPtr;
             Deserialize(newPtr);
             arr.push_back(newPtr.release());
-            EndDeserializeArrayItem(typeName, context);            
+            EndDeserializeArrayItem(typeName);            
         }
-        EndDeserializeArray(name, typeName, context);
+        EndDeserializeArray(name, typeName);
     }
 }

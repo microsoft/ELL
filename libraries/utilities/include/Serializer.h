@@ -96,7 +96,7 @@ namespace utilities
     ///     public:
     ///         Bar();
     ///         void Serialize(utilities::Deserializer&amp; deserializer) const
-    ///         void Deserialize(utilities::Serializer&amp; serializer, utilities::SerializationContext& context);
+    ///         void Deserialize(utilities::Serializer&amp; serializer);
     ///         virtual std::string GetRuntimeTypeName() const;
     ///
     ///         static std::string GetTypeName();
@@ -177,10 +177,10 @@ namespace utilities
     };
 
 /// <summary> Macros to make repetitive boilerplate code in deserializer implementations easier to implement. </summary>
-#define DECLARE_DESERIALIZE_VALUE_BASE(type) virtual void DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy = 0) = 0;
-#define DECLARE_DESERIALIZE_ARRAY_BASE(type) virtual void DeserializeArray(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy = 0) = 0;
-#define DECLARE_DESERIALIZE_VALUE_OVERRIDE(type) virtual void DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy = 0) override;
-#define DECLARE_DESERIALIZE_ARRAY_OVERRIDE(type) virtual void DeserializeArray(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy = 0) override;
+#define DECLARE_DESERIALIZE_VALUE_BASE(type) virtual void DeserializeValue(const char* name, type& value, IsFundamental<type> dummy = 0) = 0;
+#define DECLARE_DESERIALIZE_ARRAY_BASE(type) virtual void DeserializeArray(const char* name, std::vector<type>& value, IsFundamental<type> dummy = 0) = 0;
+#define DECLARE_DESERIALIZE_VALUE_OVERRIDE(type) virtual void DeserializeValue(const char* name, type& value, IsFundamental<type> dummy = 0) override;
+#define DECLARE_DESERIALIZE_ARRAY_OVERRIDE(type) virtual void DeserializeArray(const char* name, std::vector<type>& value, IsFundamental<type> dummy = 0) override;
 
     /// <summary> Deserializer class </summary>
     class Deserializer
@@ -236,8 +236,8 @@ namespace utilities
         DECLARE_DESERIALIZE_VALUE_BASE(size_t);
         DECLARE_DESERIALIZE_VALUE_BASE(float);
         DECLARE_DESERIALIZE_VALUE_BASE(double);
-        virtual void DeserializeValue(const char* name, std::string& value, SerializationContext& context) = 0;
-        virtual void DeserializeValue(const char* name, ISerializable& value, SerializationContext& context);
+        virtual void DeserializeValue(const char* name, std::string& value) = 0;
+        virtual void DeserializeValue(const char* name, ISerializable& value);
 
         DECLARE_DESERIALIZE_ARRAY_BASE(bool);
         DECLARE_DESERIALIZE_ARRAY_BASE(char);
@@ -248,16 +248,16 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_BASE(double);
 
         // Extra functions needed for deserializing arrays.
-        virtual void DeserializeArray(const char* name, std::vector<std::string>& array, SerializationContext& context) = 0;
-        virtual void BeginDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context);
-        virtual bool BeginDeserializeArrayItem(const std::string& typeName, SerializationContext& context) = 0;
-        virtual void EndDeserializeArrayItem(const std::string& typeName, SerializationContext& context) = 0;
-        virtual void EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context);
+        virtual void DeserializeArray(const char* name, std::vector<std::string>& array) = 0;
+        virtual void BeginDeserializeArray(const char* name, const std::string& typeName);
+        virtual bool BeginDeserializeArrayItem(const std::string& typeName) = 0;
+        virtual void EndDeserializeArrayItem(const std::string& typeName) = 0;
+        virtual void EndDeserializeArray(const char* name, const std::string& typeName);
 
         // Extra functions needed for deserializing ISerializable objects.
-        virtual std::string BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context);
-        virtual void DeserializeObject(const char* name, ISerializable& value, SerializationContext& context) = 0;
-        virtual void EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context);
+        virtual std::string BeginDeserializeObject(const char* name, const std::string& typeName);
+        virtual void DeserializeObject(const char* name, ISerializable& value) = 0;
+        virtual void EndDeserializeObject(const char* name, const std::string& typeName);
 
     private:
         SerializationContext _baseContext;
@@ -265,44 +265,40 @@ namespace utilities
 
         // non-vector
         template <typename ValueType, IsNotVector<ValueType> concept = 0>
-        void DeserializeItem(const char* name, ValueType&& value, SerializationContext& context);
+        void DeserializeItem(const char* name, ValueType&& value);
 
         // pointer to non-serializable object
         template <typename ValueType, IsNotSerializable<ValueType> concept = 0>
-        void DeserializeItem(const char* name, std::unique_ptr<ValueType>& value, SerializationContext& context);
+        void DeserializeItem(const char* name, std::unique_ptr<ValueType>& value);
 
         // pointer to serializable object
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
-        void DeserializeItem(const char* name, std::unique_ptr<ValueType>& value, SerializationContext& context);
+        void DeserializeItem(const char* name, std::unique_ptr<ValueType>& value);
 
         // vector of fundamental values
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
-        void DeserializeItem(const char* name, std::vector<ValueType>& value, SerializationContext& context);
+        void DeserializeItem(const char* name, std::vector<ValueType>& value);
 
         // vector of ISerializable values
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
-        void DeserializeItem(const char* name, std::vector<ValueType>& value, SerializationContext& context);
+        void DeserializeItem(const char* name, std::vector<ValueType>& value);
 
         // vector of unique pointers to ISerializable
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
-        void DeserializeItem(const char* name, std::vector<std::unique_ptr<ValueType>>& value, SerializationContext& context);
+        void DeserializeItem(const char* name, std::vector<std::unique_ptr<ValueType>>& value);
 
         // vector of pointers to ISerializable
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
-        void DeserializeItem(const char* name, std::vector<const ValueType*>& value, SerializationContext& context);
+        void DeserializeItem(const char* name, std::vector<const ValueType*>& value);
     };
 }
 
 /// <summary> Macros to make repetitive boilerplate code in serializer implementations easier to implement. </summary>
-#define IMPLEMENT_SERIALIZE_VALUE(base, type)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \
-    void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
-#define IMPLEMENT_SERIALIZE_ARRAY(base, type)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \
-    void base::SerializeArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
+#define IMPLEMENT_SERIALIZE_VALUE(base, type) void base::SerializeValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
+#define IMPLEMENT_SERIALIZE_ARRAY(base, type) void base::SerializeArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
 
 /// <summary> Macros to make repetitive boilerplate code in deserializer implementations easier to implement. </summary>
-#define IMPLEMENT_DESERIALIZE_VALUE(base, type)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \
-    void base::DeserializeValue(const char* name, type& value, SerializationContext& context, IsFundamental<type> dummy) { ReadScalar(name, value); }
-#define IMPLEMENT_DESERIALIZE_ARRAY(base, type)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \
-    void base::DeserializeArray(const char* name, std::vector<type>& value, SerializationContext& context, IsFundamental<type> dummy) { ReadArray(name, value, context); }
+#define IMPLEMENT_DESERIALIZE_VALUE(base, type) void base::DeserializeValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name, value); }
+#define IMPLEMENT_DESERIALIZE_ARRAY(base, type) void base::DeserializeArray(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name, value); }
 
 #include "../tcc/Serializer.tcc"

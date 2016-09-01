@@ -185,7 +185,7 @@ namespace utilities
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void JsonDeserializer::ReadArray(const char* name, std::vector<ValueType>& array, SerializationContext& context)
+    void JsonDeserializer::ReadArray(const char* name, std::vector<ValueType>& array)
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -214,7 +214,7 @@ namespace utilities
         _tokenizer.MatchToken("]");
     }
 
-    inline void JsonDeserializer::ReadArray(const char* name, std::vector<std::string>& array, SerializationContext& context)
+    inline void JsonDeserializer::ReadArray(const char* name, std::vector<std::string>& array)
     {
         bool hasName = name != std::string("");
         if(hasName)

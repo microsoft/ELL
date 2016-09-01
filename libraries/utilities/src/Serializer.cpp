@@ -48,29 +48,29 @@ namespace utilities
         _contexts.push_back(context);
     }
     
-    void Deserializer::DeserializeValue(const char* name, ISerializable& value, SerializationContext& context)
+    void Deserializer::DeserializeValue(const char* name, ISerializable& value)
     {
         auto typeName = value.GetRuntimeTypeName();
-        typeName = BeginDeserializeObject(name, "", context);
-        DeserializeObject(name, value, context);
-        EndDeserializeObject(name, typeName, context);
+        typeName = BeginDeserializeObject(name, "");
+        DeserializeObject(name, value);
+        EndDeserializeObject(name, typeName);
     }
 
-    std::string Deserializer::BeginDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context)
+    std::string Deserializer::BeginDeserializeObject(const char* name, const std::string& typeName)
     {
         return "";
     }
 
-    void Deserializer::EndDeserializeObject(const char* name, const std::string& typeName, SerializationContext& context)
+    void Deserializer::EndDeserializeObject(const char* name, const std::string& typeName)
     {
         // nothing
     }
 
-    void Deserializer::BeginDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
+    void Deserializer::BeginDeserializeArray(const char* name, const std::string& typeName)
     {
     }
 
-    void Deserializer::EndDeserializeArray(const char* name, const std::string& typeName, SerializationContext& context)
+    void Deserializer::EndDeserializeArray(const char* name, const std::string& typeName)
     {
     }
 }
