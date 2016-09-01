@@ -13,7 +13,7 @@ namespace trainers
     {}
 
     template<typename LossFunctionType, typename BoosterType>
-    typename SortingForestTrainer<LossFunctionType, BoosterType>::SplitCandidate SortingForestTrainer<LossFunctionType, BoosterType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums)
+    auto SortingForestTrainer<LossFunctionType, BoosterType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums) -> SplitCandidate
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 
@@ -62,7 +62,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType, typename BoosterType>
-    std::vector<typename SortingForestTrainer<LossFunctionType, BoosterType>::EdgePredictorType> SortingForestTrainer<LossFunctionType, BoosterType>::GetEdgePredictors(const NodeStats& nodeStats)
+    auto SortingForestTrainer<LossFunctionType, BoosterType>::GetEdgePredictors(const NodeStats& nodeStats) -> std::vector<EdgePredictorType>
     {
         double output = nodeStats.GetTotalSums().GetMeanLabel();
         double output0 = nodeStats.GetChildSums(0).GetMeanLabel() - output;
