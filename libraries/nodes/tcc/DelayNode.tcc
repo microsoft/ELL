@@ -41,9 +41,9 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void DelayNode<ValueType>::GetDescription(utilities::ObjectDescription& description) const
+    void DelayNode<ValueType>::AddProperties(utilities::ObjectDescription& description) const
     {
-        Node::GetDescription(description);
+        Node::AddProperties(description);
         description.SetType(*this);
         description[inputPortName] << _input;
         description[outputPortName] << _output;

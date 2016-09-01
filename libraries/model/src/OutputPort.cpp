@@ -14,9 +14,9 @@ namespace model
     OutputPortBase::OutputPortBase(const class Node* node, std::string name, PortType type, size_t size) : Port(node, name, type), _size(size), _isReferenced(false) 
     {}
 
-    void OutputPortBase::GetDescription(utilities::ObjectDescription& description) const
+    void OutputPortBase::AddProperties(utilities::ObjectDescription& description) const
     {
-        Port::GetDescription(description);
+        Port::AddProperties(description);
         description.SetType(*this);
         description["size"] << _size;
 

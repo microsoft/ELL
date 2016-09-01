@@ -33,9 +33,9 @@ namespace nodes
         assert(input.Size() == predictor.GetDimension());
     }
 
-    void LinearPredictorNode::GetDescription(utilities::ObjectDescription& description) const
+    void LinearPredictorNode::AddProperties(utilities::ObjectDescription& description) const
     {
-        Node::GetDescription(description);
+        Node::AddProperties(description);
         description.SetType(*this);
         description[inputPortName] << _input;
         description[outputPortName] << _output;

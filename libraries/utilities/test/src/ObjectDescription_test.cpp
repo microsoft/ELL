@@ -30,7 +30,7 @@ public:
     int GetA() const { return _a; }
     double GetB() const { return _b; }
 
-    virtual void GetDescription(utilities::ObjectDescription& description) const override
+    virtual void AddProperties(utilities::ObjectDescription& description) const override
     {
         description.SetType(*this);
         description["a"] = _a;
@@ -58,9 +58,9 @@ public:
     DerivedObject(int a, double b, std::string c) : InnerObject(a, b), _c(c) {}
     std::string GetC() { return _c; }
 
-    virtual void GetDescription(utilities::ObjectDescription& description) const override
+    virtual void AddProperties(utilities::ObjectDescription& description) const override
     {
-        InnerObject::GetDescription(description);
+        InnerObject::AddProperties(description);
         description.SetType(*this);
         description["c"] = _c;
     }
@@ -86,7 +86,7 @@ public:
     std::string GetName() { return _name; }
     InnerObject GetInner() { return _inner; }
 
-    virtual void GetDescription(utilities::ObjectDescription& description) const override
+    virtual void AddProperties(utilities::ObjectDescription& description) const override
     {
         description.SetType(*this);
         description["name"] = _name;
@@ -110,7 +110,7 @@ private:
 void PrintDescription(const utilities::ObjectDescription& description, size_t indentCount = 0)
 {
     std::string indent(4*indentCount, ' ');
-    std::cout << indent << "Type: " << description.GetObjectTypeName() << " -- " << description.GetDocumentation(); 
+    std::cout << indent << "Type: " << description.GetObjectTypeName(); 
     if(description.HasValue())
     {
         std::cout << " = " << description.GetValueString();
@@ -128,15 +128,15 @@ void PrintDescription(const utilities::ObjectDescription& description, size_t in
 void TestGetTypeDescription()
 {
     InnerObject innerObj;
-    auto innerDescription = innerObj.GetNewDescription();
+    auto innerDescription = innerObj.GetDescription();
 //    PrintDescription(innerDescription);
 
     OuterObject outerObj;
-    auto outerDescription = outerObj.GetNewDescription();
+    auto outerDescription = outerObj.GetDescription();
 //    PrintDescription(outerDescription);
 
     DerivedObject derivedObj;
-    auto derivedDescription = derivedObj.GetNewDescription();
+    auto derivedDescription = derivedObj.GetDescription();
 //    PrintDescription(derivedDescription);
 
     testing::ProcessTest("ObjectDescription", innerDescription.HasProperty("a"));
@@ -154,15 +154,15 @@ void TestGetTypeDescription()
 void TestGetObjectDescription()
 {
     InnerObject innerObj(3, 4.5);
-    auto innerDescription = innerObj.GetNewDescription();
+    auto innerDescription = innerObj.GetDescription();
 //    PrintDescription(innerDescription);
 
     OuterObject outerObj("Outer", 5, 6.5);
-    auto outerDescription = outerObj.GetNewDescription();
+    auto outerDescription = outerObj.GetDescription();
 //    PrintDescription(outerDescription);
 
     DerivedObject derivedObj(8, 9.5, "derived");
-    auto derivedDescription = derivedObj.GetNewDescription();
+    auto derivedDescription = derivedObj.GetDescription();
 //    PrintDescription(derivedDescription);
 
     // Inner

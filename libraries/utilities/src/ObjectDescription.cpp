@@ -19,9 +19,6 @@ namespace utilities
     //
     // ObjectDescription
     //
-    ObjectDescription::ObjectDescription(const std::string& documentation) : _documentation(documentation) 
-    {};
-
     const ObjectDescription::PropertyCollection& ObjectDescription::GetProperties() const
     {
         for(const auto& prop: _properties)
@@ -89,10 +86,10 @@ namespace utilities
     // IDescribable
     //
 
-    ObjectDescription IDescribable::GetNewDescription() const
+    ObjectDescription IDescribable::GetDescription() const
     {
         ObjectDescription description;
-        GetDescription(description);
+        AddProperties(description);
         return description;
     }
 
@@ -100,7 +97,7 @@ namespace utilities
     {
         // for each property, serialize it
         ObjectDescription description;
-        GetDescription(description);
+        AddProperties(description);
         for(const auto& property: description.GetProperties())
         {
             auto name = property.first;
@@ -113,7 +110,7 @@ namespace utilities
         // #### TODO: special-case vectors of pointers to return vectors of unique_ptrs
 
         ObjectDescription description;
-        GetDescription(description);
+        AddProperties(description);
         for(auto& property: description.GetProperties())
         {
             auto name = property.first;

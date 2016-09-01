@@ -78,7 +78,7 @@ namespace model
         return false;
     }
 
-    void Node::GetDescription(utilities::ObjectDescription& description) const
+    void Node::AddProperties(utilities::ObjectDescription& description) const
     {
         description.SetType(*this);
         description["id"] << _id;

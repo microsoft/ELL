@@ -31,7 +31,7 @@ namespace utilities
         return stream;
     }
 
-    void UniqueId::GetDescription(ObjectDescription& description) const
+    void UniqueId::AddProperties(ObjectDescription& description) const
     {
         description.SetType(*this);
         description["id"] << _id;

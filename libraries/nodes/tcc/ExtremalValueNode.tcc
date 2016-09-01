@@ -33,9 +33,9 @@ namespace nodes
     }
 
     template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::GetDescription(utilities::ObjectDescription& description) const
+    void ExtremalValueNode<ValueType, max>::AddProperties(utilities::ObjectDescription& description) const
     {
-        Node::GetDescription(description);
+        Node::AddProperties(description);
         description.SetType(*this);
         description[inputPortName] << _input;
         description[valPortName] << _val;

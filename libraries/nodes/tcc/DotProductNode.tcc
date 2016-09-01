@@ -52,9 +52,9 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void DotProductNode<ValueType>::GetDescription(utilities::ObjectDescription& description) const
+    void DotProductNode<ValueType>::AddProperties(utilities::ObjectDescription& description) const
     {
-        Node::GetDescription(description);
+        Node::AddProperties(description);
         description.SetType(*this);
         description[input1PortName] << _input1;
         description[input2PortName] << _input2;

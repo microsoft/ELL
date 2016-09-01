@@ -13,7 +13,7 @@ namespace predictors
     SingleElementThresholdPredictor::SingleElementThresholdPredictor(size_t index, double threshold) : _index(index), _threshold(threshold)
     {}
 
-    void SingleElementThresholdPredictor::GetDescription(utilities::ObjectDescription& description) const
+    void SingleElementThresholdPredictor::AddProperties(utilities::ObjectDescription& description) const
     {
         description.SetType(*this);
         description["index"] << _index;

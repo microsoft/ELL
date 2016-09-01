@@ -94,9 +94,9 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputPort<ValueType>::GetDescription(utilities::ObjectDescription& description) const
+    void InputPort<ValueType>::AddProperties(utilities::ObjectDescription& description) const
     {
-        Port::GetDescription(description);
+        Port::AddProperties(description);
         description.SetType(*this);
         description["input"] << _input;
     }

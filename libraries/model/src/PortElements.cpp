@@ -47,7 +47,7 @@ namespace model
 
     bool PortRange::IsFullPortRange() const { return GetStartIndex() == 0 && Size() == ReferencedPort()->Size(); }
 
-    void PortRange::GetDescription(utilities::ObjectDescription& description) const
+    void PortRange::AddProperties(utilities::ObjectDescription& description) const
     {
         description.SetType(*this);
         description["startIndex"] << _startIndex;
@@ -169,7 +169,7 @@ namespace model
         }
     }
 
-    void PortElementsBase::GetDescription(utilities::ObjectDescription& description) const
+    void PortElementsBase::AddProperties(utilities::ObjectDescription& description) const
     {
         description.SetType(*this);
         description["ranges"] << _ranges;

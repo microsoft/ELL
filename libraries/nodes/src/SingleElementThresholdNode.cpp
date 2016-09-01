@@ -23,9 +23,9 @@ namespace nodes
         assert(input.Size() > predictor.GetElementIndex());
     }
 
-    void SingleElementThresholdNode::GetDescription(utilities::ObjectDescription& description) const
+    void SingleElementThresholdNode::AddProperties(utilities::ObjectDescription& description) const
     {
-        Node::GetDescription(description);
+        Node::AddProperties(description);
         description.SetType(*this);
         description[inputPortName] << _input;
         description[outputPortName] << _output;

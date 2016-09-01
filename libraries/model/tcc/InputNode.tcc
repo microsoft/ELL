@@ -43,9 +43,9 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputNode<ValueType>::GetDescription(utilities::ObjectDescription& description) const
+    void InputNode<ValueType>::AddProperties(utilities::ObjectDescription& description) const
     {
-        Node::GetDescription(description);
+        Node::AddProperties(description);
         description.SetType(*this);
         description[outputPortName] << _output;
     }

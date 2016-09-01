@@ -16,7 +16,7 @@ namespace predictors
     ConstantPredictor::ConstantPredictor(double value) : _value(value)
     {}
 
-    void ConstantPredictor::GetDescription(utilities::ObjectDescription& description) const
+    void ConstantPredictor::AddProperties(utilities::ObjectDescription& description) const
     {
         description.SetType(*this);
         description["value"] << _value;

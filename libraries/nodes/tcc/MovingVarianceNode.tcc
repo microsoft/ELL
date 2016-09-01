@@ -54,9 +54,9 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void MovingVarianceNode<ValueType>::GetDescription(utilities::ObjectDescription& description) const
+    void MovingVarianceNode<ValueType>::AddProperties(utilities::ObjectDescription& description) const
     {
-        Node::GetDescription(description);
+        Node::AddProperties(description);
         description.SetType(*this);
         description[inputPortName] << _input;
         description[outputPortName] << _output;

@@ -29,9 +29,9 @@ namespace nodes
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::GetDescription(utilities::ObjectDescription& description) const
+    void ForestNode<SplitRuleType, EdgePredictorType>::AddProperties(utilities::ObjectDescription& description) const
     {
-        Node::GetDescription(description);
+        Node::AddProperties(description);
         description.SetType(*this);
         description[inputPortName] << _input;
         description[outputPortName] << _output;

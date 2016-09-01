@@ -16,60 +16,7 @@ namespace utilities
     {
         _typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
     }
-/*
-    template <typename ValueType>
-    ObjectDescription MakeObjectDescription(const std::string& documentation)
-    {
-        ObjectDescription result;
-        result._documentation = documentation;
-        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
-        return result;
-    }
 
-    template <typename BaseType, typename ValueType>
-    ObjectDescription MakeObjectDescription(const std::string& documentation)
-    {
-        BaseType obj;
-        ObjectDescription result = obj.GetDescription();
-        result._documentation = documentation;
-        result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
-        return result;
-    }
-
-    template <typename BaseType, typename ValueType>
-    ObjectDescription IDescribable::GetParentDescription() const
-    {
-        auto baseDescription = dynamic_cast<const BaseType*>(this)->BaseType::GetDescription();
-        ValueType obj;
-        auto thisTypeDescription = obj.GetDescription(baseDescription);
-
-        // merge all properties values from base->this
-        const auto& props = baseDescription.GetProperties();
-        for (const auto& prop : props)
-        {
-            thisTypeDescription._properties[prop.first] = prop.second;
-        }
-
-        // value?
-        // what about _fillInPropertiesFunction?? --- need to compose them (?)
-        auto baseGetPropertiesFunction = baseDescription._fillInPropertiesFunction;
-        auto newGetPropertiesFunction = thisTypeDescription._fillInPropertiesFunction;
-        // For some reason I don't understand, we need to pass in the pointer to this object
-        // Somehow, the captured value of 'this' is incorrect
-        thisTypeDescription._fillInPropertiesFunction = [=](const ObjectDescription* self)
-        {
-            std::cout << "Combining functions" << std::endl;
-            ObjectDescription baseProperties = baseGetPropertiesFunction(&baseDescription);
-            ObjectDescription newProperties = newGetPropertiesFunction(&thisTypeDescription);
-            for (const auto& prop : baseProperties.GetProperties())
-            {
-                newProperties._properties[prop.first] = prop.second;
-            }
-            return newProperties;
-        };
-        return thisTypeDescription;
-    }
-*/
     template <typename ValueType>
     void ObjectDescription::SetGetPropertiesFunction(std::true_type)
     {
@@ -81,14 +28,14 @@ namespace utilities
             {
                 ObjectDescription description;
                 auto value = self->_value.GetValue<ValueType>();
-                value.GetDescription(description);
+                value.AddProperties(description);
                 return description;
             }
             else
             {
                 ObjectDescription description;
                 ValueType value;
-                value.GetDescription(description);
+                value.AddProperties(description);
                 return description;
             }
         };
@@ -98,14 +45,6 @@ namespace utilities
     void ObjectDescription::SetGetPropertiesFunction(std::false_type)
     {
         _fillInPropertiesFunction = nullptr;
-    }
-
-    template <typename ValueType>
-    void ObjectDescription::AddProperty(const std::string& name, std::string documentation)
-    {
-        assert(_properties.find(name) == _properties.end());
-        _properties[name] = MakeObjectDescription<ValueType>(documentation);
-        _properties[name].SetGetPropertiesFunction<ValueType>(std::is_base_of<utilities::IDescribable, ValueType>());
     }
 
     template <typename ValueType>

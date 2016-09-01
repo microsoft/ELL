@@ -46,10 +46,10 @@ namespace utilities
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Gets an ObjectDescription for the object </summary>
+        /// <summary> Adds an object's properties to an ObjectDescription </summary>
         ///
         /// <param name="description"> The ObjectDescription for the object </param>
-        virtual void GetDescription(ObjectDescription& description) const override;
+        virtual void AddProperties(ObjectDescription& description) const override;
 
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///

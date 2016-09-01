@@ -29,9 +29,9 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputPort<ValueType>::GetDescription(utilities::ObjectDescription& description) const
+    void OutputPort<ValueType>::AddProperties(utilities::ObjectDescription& description) const
     {
-        OutputPortBase::GetDescription(description);
+        OutputPortBase::AddProperties(description);
     }
 
     template <typename ValueType>

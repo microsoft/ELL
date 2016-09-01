@@ -38,9 +38,9 @@ namespace nodes
     }
 
     template <typename InputValueType, typename OutputValueType>
-    void TypeCastNode<InputValueType, OutputValueType>::GetDescription(utilities::ObjectDescription& description) const
+    void TypeCastNode<InputValueType, OutputValueType>::AddProperties(utilities::ObjectDescription& description) const
     {
-        Node::GetDescription(description);
+        Node::AddProperties(description);
         description.SetType(*this);
         description[inputPortName] << _input;
         description[outputPortName] << _output;

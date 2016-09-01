@@ -30,11 +30,6 @@ namespace utilities
 
         ObjectDescription() = default;
 
-        /// <summary> Gets the documentation string for this object, if present </summary>
-        ///
-        /// <returns> The documentation string for this object, if present </returns>
-        std::string GetDocumentation() const { return _documentation; }
-
         /// <summary> Gets the string representing the type name of this object </summary>
         ///
         /// <returns> The string representing the type name of this object </returns>
@@ -62,14 +57,6 @@ namespace utilities
         ///
         /// <returns> The properties of this object </returns>
         PropertyCollection& GetProperties();
-
-        /// <summary> Adds a new property to the object </summary>
-        ///
-        /// <typeparam name="ValueType"> The type this property's value will take </typeparam>
-        /// <param name="name"> The name of the property </param>
-        /// <param name="documentation"> The documentation string from the property </param>
-        template <typename ValueType>
-        void AddProperty(const std::string& name, std::string documentation);
 
         /// <summary> Retrieves an object property given its name </summary>
         ///
@@ -137,20 +124,12 @@ namespace utilities
 
     private:
         std::string _typeName;
-        std::string _documentation;
         Variant _value;
         mutable std::unordered_map<std::string, ObjectDescription> _properties;
         mutable std::function<ObjectDescription(const ObjectDescription* self)> _fillInPropertiesFunction;
 
         // friends
-        template <typename ValueType>
-        friend ObjectDescription MakeObjectDescription(const std::string& description);
-        template <typename BaseType, typename ValueType>
-        friend ObjectDescription MakeObjectDescription(const std::string& description);
         friend class IDescribable;
-
-        // internal private constructor
-        ObjectDescription(const std::string& documentation);
 
         // overload that gets called for IDescribable properties
         template <typename ValueType>
@@ -173,15 +152,15 @@ namespace utilities
     public:
         virtual ~IDescribable() = default;
 
-        /// <summary> Gets an ObjectDescription for the object </summary>
+        /// <summary> Adds an object's properties to an ObjectDescription </summary>
         ///
         /// <returns> The ObjectDescription for the object </returns>
-        virtual ObjectDescription GetNewDescription() const;
+        virtual ObjectDescription GetDescription() const;
 
-        /// <summary> Gets an ObjectDescription for the object </summary>
+        /// <summary> Adds an objects properties to an ObjectDescription </summary>
         ///
         /// <param name="description"> The ObjectDescription for the object </param>
-        virtual void GetDescription(ObjectDescription& description) const = 0;
+        virtual void AddProperties(ObjectDescription& description) const = 0;
 
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///
@@ -213,13 +192,6 @@ namespace utilities
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(Deserializer& serializer) override;
     };
-
-    /// <summary> Factory method to create an ObjectDescription </summary>
-    template <typename ValueType>
-    ObjectDescription MakeObjectDescription(const std::string& description);
-
-    template <typename BaseType, typename ValueType>
-    ObjectDescription MakeObjectDescription(const std::string& description);
 
     /// <summary> Enabled if ValueType inherits from IDescribable. </summary>
     template <typename ValueType>

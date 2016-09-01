@@ -36,9 +36,9 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void  DemultiplexerNode<ValueType, SelectorType>::GetDescription(utilities::ObjectDescription& description) const
+    void  DemultiplexerNode<ValueType, SelectorType>::AddProperties(utilities::ObjectDescription& description) const
     {
-        Node::GetDescription(description);
+        Node::AddProperties(description);
         description.SetType(*this);
         description[inputPortName] << _input;
         description[selectorPortName] << _selector;

@@ -33,7 +33,7 @@ namespace model
         return Port::PortType::boolean;
     }
 
-    void Port::GetDescription(utilities::ObjectDescription& description) const
+    void Port::AddProperties(utilities::ObjectDescription& description) const
     {
         description.SetType(*this);
         description["nodeId"] << _node->GetId();

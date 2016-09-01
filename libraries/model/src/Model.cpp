@@ -37,7 +37,7 @@ namespace model
         return NodeIterator(this, outputNodes);
     }
 
-    void Model::GetDescription(utilities::ObjectDescription& description) const
+    void Model::AddProperties(utilities::ObjectDescription& description) const
     {
         description.SetType(*this);
         std::vector<const Node*> nodes;

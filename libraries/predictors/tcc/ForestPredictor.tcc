@@ -207,7 +207,7 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::GetDescription(utilities::ObjectDescription& description) const
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::AddProperties(utilities::ObjectDescription& description) const
     {
         description.SetType(*this);
         description["interiorNodes"] << _interiorNodes;
@@ -299,7 +299,7 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::GetDescription(utilities::ObjectDescription& description) const
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::AddProperties(utilities::ObjectDescription& description) const
     {
         description.SetType(*this);
         description["splitRule"] << _splitRule;
@@ -395,7 +395,7 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::GetDescription(utilities::ObjectDescription& description) const
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::AddProperties(utilities::ObjectDescription& description) const
     {
         description.SetType(*this);
         description["predictor"] << _predictor;

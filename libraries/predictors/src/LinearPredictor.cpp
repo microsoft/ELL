@@ -47,7 +47,7 @@ namespace predictors
         _b *= scalar;
     }
 
-    void LinearPredictor::GetDescription(utilities::ObjectDescription& description) const
+    void LinearPredictor::AddProperties(utilities::ObjectDescription& description) const
     {
         description.SetType(*this);
         description["w"] << static_cast<std::vector<double>>(_w);

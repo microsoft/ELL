@@ -30,9 +30,9 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void  MultiplexerNode<ValueType, SelectorType>::GetDescription(utilities::ObjectDescription& description) const
+    void  MultiplexerNode<ValueType, SelectorType>::AddProperties(utilities::ObjectDescription& description) const
     {
-        Node::GetDescription(description);
+        Node::AddProperties(description);
         description.SetType(*this);
         description["elements"] << _elements;
         description["selector"] << _selector;
