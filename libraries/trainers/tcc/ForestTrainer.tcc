@@ -58,44 +58,6 @@ namespace trainers
         }
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeRanges::NodeRanges(const Range& totalRange) : _total(totalRange)
-    {}
-
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    ForestTrainerBase::Range ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeRanges::GetChildRange(size_t childPosition) const
-    {
-        if (childPosition == 0)
-        {
-            return Range{ _total.firstIndex, _size0 };
-        }
-        else
-        {
-            return Range{ _total.firstIndex+_size0, _total.size-_size0 };
-        }
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeRanges::SetSize0(size_t value)
-    {
-        _size0 = value;
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::SetChildSums(std::vector<Sums> childSums) 
-    { 
-        _childSums = childSums; 
-    } 
-
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::NodeStats(const Sums& totalSums) : _totalSums(totalSums), _childSums(2)
-    {}
-
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    const ForestTrainerBase::Sums& ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::GetChildSums(size_t position) const
-    {
-        return _childSums[position];
-    }
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums) : gain(0), nodeId(nodeId), ranges(totalRange), stats(totalSums)
@@ -239,27 +201,16 @@ namespace trainers
     //
  
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ExampleMetadata::Print(std::ostream & os) const
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::PriorityQueue::PrintLine(std::ostream& os, size_t tabs) const
     {
-        os << "(" << strong.weight << ", " << strong.label << ", " << weak.weight << ", " << weak.label << ", " << currentOutput << ")";
-    }
+        os << std::string(tabs * 4, ' ') << "Priority Queue Size: " << size() << "\n";
 
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::PrintLine(std::ostream& os, size_t tabs) const
-    {
-        os << std::string(tabs * 4, ' ') << "stats:\n";
-
-        os << std::string((tabs+1) * 4, ' ') <<  "sums:\t";
-        _totalSums.Print(os);
-        os << "\n";
-
-        os << std::string((tabs+1) * 4, ' ') <<  "sums0:\t";
-        _childSums[0].Print(os);
-        os << "\n";
-
-        os << std::string((tabs+1) * 4, ' ') <<  "sums1:\t";
-        _childSums[1].Print(os);
-        os << "\n";
+        for(const auto& candidate : std::priority_queue<SplitCandidate>::c) // c is a protected member of std::priority_queue
+        {
+            os << "\n";
+            candidate.PrintLine(os, tabs + 1);
+            os << "\n";
+        }
     }
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
@@ -271,18 +222,5 @@ namespace trainers
         os << "\n";
         splitRule.PrintLine(os, tabs);
         stats.PrintLine(os, tabs);
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::PriorityQueue::PrintLine(std::ostream& os, size_t tabs) const
-    {
-        os << std::string(tabs * 4, ' ') << "Priority Queue Size: " << size() << "\n";
-
-        for(const auto& candidate : std::priority_queue<SplitCandidate>::c) // c is a protected member of std::priority_queue
-        {
-            os << "\n";
-            candidate.PrintLine(os, tabs + 1);
-            os << "\n";
-        }
     }
 }

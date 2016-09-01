@@ -57,38 +57,6 @@ namespace trainers
             size_t firstIndex;
             size_t size;
         };
-    };
-
-    /// <summary>
-    /// Implements a greedy forest growing algorithm.
-    /// </summary>
-    ///
-    /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
-    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType> 
-    class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> 
-    { 
-    public:
-        /// <summary> Constructs an instance of ForestTrainer. </summary>
-        ///
-        /// <param name="booster"> The booster. </param>
-        /// <param name="parameters"> Training Parameters. </param>
-        ForestTrainer(const BoosterType& booster, const ForestTrainerParameters& parameters);
-
-        /// <summary> Grows the decision forest. </summary>
-        ///
-        /// <param name="exampleIterator"> An example iterator that represents the training set.  </param>
-        virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
-
-        /// <summary> Gets a const reference to the current predictor. </summary>
-        ///
-        /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> GetPredictor() const override { return _forest; };
-
-    protected:       
-        //
-        // Private internal structs 
-        //
-
 
         // describes the range of training examples associated with a given node and its children
         class NodeRanges 
@@ -132,6 +100,37 @@ namespace trainers
             Sums _totalSums; 
             std::vector<Sums> _childSums;
         };
+    };
+
+    /// <summary>
+    /// Implements a greedy forest growing algorithm.
+    /// </summary>
+    ///
+    /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType> 
+    class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> 
+    { 
+    public:
+        /// <summary> Constructs an instance of ForestTrainer. </summary>
+        ///
+        /// <param name="booster"> The booster. </param>
+        /// <param name="parameters"> Training Parameters. </param>
+        ForestTrainer(const BoosterType& booster, const ForestTrainerParameters& parameters);
+
+        /// <summary> Grows the decision forest. </summary>
+        ///
+        /// <param name="exampleIterator"> An example iterator that represents the training set.  </param>
+        virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
+
+        /// <summary> Gets a const reference to the current predictor. </summary>
+        ///
+        /// <returns> A shared pointer to the current predictor. </returns>
+        virtual const std::shared_ptr<const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> GetPredictor() const override { return _forest; };
+
+    protected:       
+        //
+        // Private internal structs 
+        //
         
         // node identifier - borrowed from the forest predictor class 
         using SplittableNodeId = predictors::SimpleForestPredictor::SplittableNodeId;

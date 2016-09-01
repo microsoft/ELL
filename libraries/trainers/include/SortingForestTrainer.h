@@ -38,8 +38,8 @@ namespace trainers
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate;
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplittableNodeId;
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats;
-        using ForestTrainerBase::Range;
-        using ForestTrainerBase::Sums;
+        using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Range;
+        using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums;
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ForestTrainerExample;
 
     protected:
