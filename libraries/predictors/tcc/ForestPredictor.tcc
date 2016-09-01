@@ -207,25 +207,13 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::GetTypeDescription()
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<ForestPredictor<SplitRuleType, EdgePredictorType>>("Forest predictor");
-        description.template AddProperty<decltype(_interiorNodes)>("interiorNodes", "The interior nodes");
-        description.template AddProperty<decltype(_rootIndices)>("rootIndices", "The indices of the tree roots");
-        description.template AddProperty<decltype(_bias)>("bias", "bias");
-        description.template AddProperty<decltype(_numEdges)>("numEdges", "Number of edges");
-        return description;
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType>
-    utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::GetDescription() const
-    {
-        auto description = GetTypeDescription();
+        description.SetType(*this);
         description["interiorNodes"] << _interiorNodes;
         description["rootIndices"] << _rootIndices;
         description["bias"] << _bias;
         description["numEdges"] << _numEdges;
-        return description;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
@@ -311,23 +299,12 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::GetTypeDescription()
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode>("Interior node");
-        description.template AddProperty<decltype(_splitRule)>("splitRule", "The split rule");
-        description.template AddProperty<decltype(_outgoingEdges)>("outgoingEdges", "The outgoing edges");
-        description.template AddProperty<decltype(_firstEdgeIndex)>("firstEdgeIndex", "The index of the first edge");
-        return description;
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType>
-    utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::GetDescription() const
-    {
-        auto description = GetTypeDescription();
+        description.SetType(*this);
         description["splitRule"] << _splitRule;
         description["outgoingEdges"] << _outgoingEdges;
         description["firstEdgeIndex"] << _firstEdgeIndex;
-        return description;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
@@ -417,23 +394,12 @@ namespace predictors
         return _targetNodeIndex == 0 ? false : true;
     }
 
-
     template<typename SplitRuleType, typename EdgePredictorType>
-    utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::GetTypeDescription()
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<ForestPredictor<SplitRuleType, EdgePredictorType>::Edge>("Tree edge");
-        description.template AddProperty<decltype(_predictor)>("predictor", "The edge predictor");
-        description.template AddProperty<decltype(_targetNodeIndex)>("targetNodeIndex", "The index of the node this edge connects to");
-        return description;
-    }
-
-    template<typename SplitRuleType, typename EdgePredictorType>
-    utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::GetDescription() const
-    {
-        auto description = GetTypeDescription();
+        description.SetType(*this);
         description["predictor"] << _predictor;
         description["targetNodeIndex"] << _targetNodeIndex;
-        return description;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>

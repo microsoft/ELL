@@ -47,20 +47,11 @@ namespace predictors
         _b *= scalar;
     }
 
-    utilities::ObjectDescription LinearPredictor::GetTypeDescription()
+    void LinearPredictor::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<LinearPredictor>("Linear predictor");
-        description.AddProperty<std::vector<double>>("w", "The weights");
-        description.AddProperty<decltype(_b)>("b", "The bias");
-        return description;
-    }
-
-    utilities::ObjectDescription LinearPredictor::GetDescription() const
-    {
-        auto description = GetTypeDescription();
+        description.SetType(*this);
         description["w"] << static_cast<std::vector<double>>(_w);
         description["b"] << _b;
-        return description;
     }
 
     void LinearPredictor::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)

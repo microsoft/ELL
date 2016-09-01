@@ -14,18 +14,12 @@ namespace model
     OutputPortBase::OutputPortBase(const class Node* node, std::string name, PortType type, size_t size) : Port(node, name, type), _size(size), _isReferenced(false) 
     {}
 
-    utilities::ObjectDescription OutputPortBase::GetTypeDescription()
+    void OutputPortBase::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Port, OutputPortBase>("OutputPortBase");
-        description.AddProperty<size_t>("size", "Dimension of the output port");
-        return description;
-    }
-
-    utilities::ObjectDescription OutputPortBase::GetDescription() const
-    {
-        auto description = GetParentDescription<Port, OutputPortBase>();
+        Port::GetDescription(description);
+        description.SetType(*this);
         description["size"] << _size;
-        return description;
+
     }
 
     void OutputPortBase::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)

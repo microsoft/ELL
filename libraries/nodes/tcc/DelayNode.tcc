@@ -41,23 +41,13 @@ namespace nodes
     }
 
     template <typename ValueType>
-    utilities::ObjectDescription DelayNode<ValueType>::GetTypeDescription()
+    void DelayNode<ValueType>::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Node, DelayNode<ValueType>>("Delay node");
-        description.template AddProperty<decltype(_input)>(inputPortName, "Input port");
-        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
-        description.template AddProperty<decltype(_windowSize)>("windowSize", "Delay window size");
-        return description;
-    }
-
-    template <typename ValueType>
-    utilities::ObjectDescription DelayNode<ValueType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<Node, DelayNode<ValueType>>();
+        Node::GetDescription(description);
+        description.SetType(*this);
         description[inputPortName] << _input;
         description[outputPortName] << _output;
         description["windowSize"] << _windowSize;
-        return description;
     }
 
     template <typename ValueType>

@@ -37,15 +37,9 @@ namespace model
         return NodeIterator(this, outputNodes);
     }
 
-    utilities::ObjectDescription Model::GetTypeDescription()
+    void Model::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Model>("Model");
-        description.AddProperty<std::vector<const Node*>>("nodes", "The nodes");
-        return description;
-    }
-
-    utilities::ObjectDescription Model::GetDescription() const
-    {
+        description.SetType(*this);
         std::vector<const Node*> nodes;
         auto nodeIter = GetNodeIterator();
         while(nodeIter.IsValid())
@@ -54,9 +48,8 @@ namespace model
             nodeIter.Next();
         }
 
-        auto description = GetTypeDescription();
+        description.SetType(*this);
         description["nodes"] << nodes;
-        return description;
     }
 
     void Model::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)

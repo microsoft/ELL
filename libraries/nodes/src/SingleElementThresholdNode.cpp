@@ -23,22 +23,13 @@ namespace nodes
         assert(input.Size() > predictor.GetElementIndex());
     }
 
-    utilities::ObjectDescription SingleElementThresholdNode::GetTypeDescription()
+    void SingleElementThresholdNode::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Node, SingleElementThresholdNode>("Single-element threshold predictor node");
-        description.template AddProperty<decltype(_input)>("input", "Input port");
-        description.template AddProperty<decltype(_output)>("output", "Output port");
-        description.template AddProperty<decltype(_predictor)>("predictor", "The predictor");
-        return description;
-    }
-
-    utilities::ObjectDescription SingleElementThresholdNode::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<Node, SingleElementThresholdNode>();
+        Node::GetDescription(description);
+        description.SetType(*this);
         description[inputPortName] << _input;
         description[outputPortName] << _output;
         description["predictor"] << _predictor;
-        return description;
     }
 
     void SingleElementThresholdNode::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)

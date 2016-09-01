@@ -32,22 +32,12 @@ namespace model
     }
 
     template <typename ValueType>
-    utilities::ObjectDescription OutputNode<ValueType>::GetTypeDescription()
+    void OutputNode<ValueType>::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Node, OutputNode<ValueType>>("Output node");
-        description.template AddProperty<decltype(_input)>(inputPortName, "Input port");
-        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
-        return description;
-    }
-
-    template <typename ValueType>
-    utilities::ObjectDescription OutputNode<ValueType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<Node, OutputNode<ValueType>>();
-
+        Node::GetDescription(description);
+        description.SetType(*this);
         description[inputPortName] << _input;
         description[outputPortName] << _output;
-        return description;
     }
 
     template <typename ValueType>

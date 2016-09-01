@@ -31,23 +31,15 @@ namespace utilities
         return stream;
     }
 
-    ObjectDescription UniqueId::GetTypeDescription()
+    void UniqueId::GetDescription(ObjectDescription& description) const
     {
-        auto description = MakeObjectDescription<UniqueId>("Unique identifier");
-        description.AddProperty<size_t>("id", "The ID");
-        return description;
-    }
-
-    ObjectDescription UniqueId::GetDescription() const
-    {
-        auto description = GetTypeDescription();
-        description["id"] = _id;
-        return description;
+        description.SetType(*this);
+        description["id"] << _id;
     }
 
     void UniqueId::SetObjectState(const ObjectDescription& description, SerializationContext& context)
     {
-        _id = description["id"].GetValue<size_t>();
+        description["id"] >> _id;
     }
 
     std::string to_string(const UniqueId& id)

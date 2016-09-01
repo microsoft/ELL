@@ -69,7 +69,7 @@ namespace model
     {
     public:
         PortElement() = default;
-        
+
         /// <summary> Creates a PortElement representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
@@ -141,15 +141,10 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Gets an ObjectDescription for the type </summary>
-        ///
-        /// <returns> An ObjectDescription for the type </returns>
-        static utilities::ObjectDescription GetTypeDescription();
-
         /// <summary> Gets an ObjectDescription for the object </summary>
         ///
-        /// <returns> An ObjectDescription for the object </returns>
-        virtual utilities::ObjectDescription GetDescription() const override;
+        /// <param name="description"> The ObjectDescription for the object </param>
+        virtual void GetDescription(utilities::ObjectDescription& description) const override;
 
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///
@@ -193,7 +188,7 @@ namespace model
         ///
         /// <param name="numRanges"> The number of ranges to reserve space for </param>
         void Reserve(size_t numRanges);
-                
+
         /// <summary> Gets an element in the elements. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
@@ -210,15 +205,10 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Gets an ObjectDescription for the type </summary>
-        ///
-        /// <returns> An ObjectDescription for the type </returns>
-        static utilities::ObjectDescription GetTypeDescription();
-
         /// <summary> Gets an ObjectDescription for the object </summary>
         ///
-        /// <returns> An ObjectDescription for the object </returns>
-        virtual utilities::ObjectDescription GetDescription() const override;
+        /// <param name="description"> The ObjectDescription for the object </param>
+        virtual void GetDescription(utilities::ObjectDescription& description) const override;
 
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///
@@ -232,7 +222,7 @@ namespace model
         PortElementsBase(const PortRange& range);
         PortElementsBase(const std::vector<PortRange>& ranges);
         PortElementsBase(){};
-        
+
         void ComputeSize();
         void AddRange(const PortRange& range);
 
@@ -275,7 +265,7 @@ namespace model
         ///
         /// <param name="elements"> The vector of elements to concantenate together </param>
         PortElements(const std::vector<PortElement<ValueType>>& element);
-    
+
         /// <summary> Creates a PortElements by concatenating a set of them together </summary>
         ///
         /// <param name="groups"> The list of groups to concantenate together </param>
@@ -285,7 +275,7 @@ namespace model
         ///
         /// <param name="groups"> The vector of groups to concantenate together </param>
         PortElements(const std::vector<PortElements<ValueType>>& groups);
-    
+
         /// <summary> Creates a PortElements representing a single value from a given PortElements </summary>
         ///
         /// <param name="elements"> The PortElements to take a value from </param>

@@ -36,25 +36,14 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    utilities::ObjectDescription  DemultiplexerNode<ValueType, SelectorType>::GetTypeDescription()
+    void  DemultiplexerNode<ValueType, SelectorType>::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Node,  DemultiplexerNode<ValueType, SelectorType>>("Demultiplexer node");
-        description.template AddProperty<decltype(_input)>(inputPortName, "Input elements");
-        description.template AddProperty<decltype(_selector)>(selectorPortName, "Selector value");
-        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
-        description.template AddProperty<decltype(_defaultValue)>("defaultValue", "Default value");
-        return description;
-    }
-
-    template <typename ValueType, typename SelectorType>
-    utilities::ObjectDescription  DemultiplexerNode<ValueType, SelectorType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<Node,  DemultiplexerNode<ValueType, SelectorType>>();
+        Node::GetDescription(description);
+        description.SetType(*this);
         description[inputPortName] << _input;
         description[selectorPortName] << _selector;
         description[outputPortName] << _output;
         description["defaultValue"] << _defaultValue;
-        return description;
     }
 
     template <typename ValueType, typename SelectorType>

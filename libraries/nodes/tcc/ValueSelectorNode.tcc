@@ -36,25 +36,14 @@ namespace nodes
     };
 
     template <typename ValueType>
-    utilities::ObjectDescription ValueSelectorNode<ValueType>::GetTypeDescription()
+    void ValueSelectorNode<ValueType>::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Node, ValueSelectorNode<ValueType>>("Value selector node");
-        description.template AddProperty<decltype(_input1)>(input1PortName, "Input port 1");
-        description.template AddProperty<decltype(_input2)>(input2PortName, "Input port 2");
-        description.template AddProperty<decltype(_condition)>(conditionPortName, "Condition port");
-        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
-        return description;
-    }
-
-    template <typename ValueType>
-    utilities::ObjectDescription ValueSelectorNode<ValueType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<Node, ValueSelectorNode<ValueType>>();
+        Node::GetDescription(description);
+        description.SetType(*this);
         description[input1PortName] << _input1;
         description[input2PortName] << _input2;
         description[conditionPortName] << _condition;
         description[outputPortName] << _output;
-        return description;
     }
 
     template <typename ValueType>

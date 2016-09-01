@@ -94,19 +94,11 @@ namespace model
     }
 
     template <typename ValueType>
-    utilities::ObjectDescription InputPort<ValueType>::GetTypeDescription()
+    void InputPort<ValueType>::GetDescription(utilities::ObjectDescription& description) const
     {
-        utilities::ObjectDescription description = utilities::MakeObjectDescription<Port, InputPort<ValueType>>("OutputPort");
-        description.AddProperty<decltype(_input)>("input", "Input referenced for this input port");
-        return description;
-    }
-
-    template <typename ValueType>
-    utilities::ObjectDescription InputPort<ValueType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<Port, InputPort<ValueType>>();
+        Port::GetDescription(description);
+        description.SetType(*this);
         description["input"] << _input;
-        return description;
     }
 
     template <typename ValueType>

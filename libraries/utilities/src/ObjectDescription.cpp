@@ -89,10 +89,18 @@ namespace utilities
     // IDescribable
     //
 
+    ObjectDescription IDescribable::GetNewDescription() const
+    {
+        ObjectDescription description;
+        GetDescription(description);
+        return description;
+    }
+
     void IDescribable::Serialize(Serializer& serializer) const
     {
         // for each property, serialize it
-        const auto& description = GetDescription();
+        ObjectDescription description;
+        GetDescription(description);
         for(const auto& property: description.GetProperties())
         {
             auto name = property.first;
@@ -104,7 +112,8 @@ namespace utilities
     {
         // #### TODO: special-case vectors of pointers to return vectors of unique_ptrs
 
-        auto description = GetDescription(); // will call GetDescription on a default-constructed object
+        ObjectDescription description;
+        GetDescription(description);
         for(auto& property: description.GetProperties())
         {
             auto name = property.first;

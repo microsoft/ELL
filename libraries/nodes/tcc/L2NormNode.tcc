@@ -39,21 +39,12 @@ namespace nodes
     }
 
     template <typename ValueType>
-    utilities::ObjectDescription L2NormNode<ValueType>::GetTypeDescription()
+    void L2NormNode<ValueType>::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Node, L2NormNode<ValueType>>("Accumulator node");
-        description.template AddProperty<decltype(_input)>(inputPortName, "Input port");
-        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
-        return description;
-    }
-
-    template <typename ValueType>
-    utilities::ObjectDescription L2NormNode<ValueType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<Node, L2NormNode<ValueType>>();
+        Node::GetDescription(description);
+        description.SetType(*this);
         description[inputPortName] << _input;
         description[outputPortName] << _output;
-        return description;
     }
 
     template <typename ValueType>

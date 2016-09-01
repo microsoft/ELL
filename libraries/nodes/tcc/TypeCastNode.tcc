@@ -38,21 +38,12 @@ namespace nodes
     }
 
     template <typename InputValueType, typename OutputValueType>
-    utilities::ObjectDescription TypeCastNode<InputValueType, OutputValueType>::GetTypeDescription()
+    void TypeCastNode<InputValueType, OutputValueType>::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Node, TypeCastNode<InputValueType, OutputValueType>>("Type-cast node");
-        description.template AddProperty<decltype(_input)>(inputPortName, "Input port");
-        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
-        return description;
-    }
-
-    template <typename InputValueType, typename OutputValueType>
-    utilities::ObjectDescription TypeCastNode<InputValueType, OutputValueType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<Node, TypeCastNode<InputValueType, OutputValueType>>();
+        Node::GetDescription(description);
+        description.SetType(*this);
         description[inputPortName] << _input;
         description[outputPortName] << _output;
-        return description;
     }
 
     template <typename InputValueType, typename OutputValueType>

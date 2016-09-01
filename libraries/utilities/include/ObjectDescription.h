@@ -40,6 +40,13 @@ namespace utilities
         /// <returns> The string representing the type name of this object </returns>
         std::string GetObjectTypeName() const { return _typeName; }
 
+        /// <summary> Sets the type of this object </summary>
+        ///
+        /// <typeparam name="ValueType"> The type of the object </typeparam>
+        /// <param name="object"> The object whose type to use </param>
+        template <typename ValueType>
+        void SetType(const ValueType& object);
+
         /// <summary> Checks if object has a property of a given name </summary>
         ///
         /// <param name="name"> The name of the property </param>
@@ -168,8 +175,13 @@ namespace utilities
 
         /// <summary> Gets an ObjectDescription for the object </summary>
         ///
-        /// <returns> An ObjectDescription for the object </returns>
-        virtual ObjectDescription GetDescription() const = 0;
+        /// <returns> The ObjectDescription for the object </returns>
+        virtual ObjectDescription GetNewDescription() const;
+
+        /// <summary> Gets an ObjectDescription for the object </summary>
+        ///
+        /// <param name="description"> The ObjectDescription for the object </param>
+        virtual void GetDescription(ObjectDescription& description) const = 0;
 
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///

@@ -12,6 +12,12 @@ namespace utilities
     // ObjectDescription
     //
     template <typename ValueType>
+    void ObjectDescription::SetType(const ValueType& object)
+    {
+        _typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
+    }
+/*
+    template <typename ValueType>
     ObjectDescription MakeObjectDescription(const std::string& documentation)
     {
         ObjectDescription result;
@@ -23,7 +29,8 @@ namespace utilities
     template <typename BaseType, typename ValueType>
     ObjectDescription MakeObjectDescription(const std::string& documentation)
     {
-        ObjectDescription result = BaseType::GetTypeDescription();
+        BaseType obj;
+        ObjectDescription result = obj.GetDescription();
         result._documentation = documentation;
         result._typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
         return result;
@@ -33,7 +40,8 @@ namespace utilities
     ObjectDescription IDescribable::GetParentDescription() const
     {
         auto baseDescription = dynamic_cast<const BaseType*>(this)->BaseType::GetDescription();
-        auto thisTypeDescription = ValueType::GetTypeDescription();
+        ValueType obj;
+        auto thisTypeDescription = obj.GetDescription(baseDescription);
 
         // merge all properties values from base->this
         const auto& props = baseDescription.GetProperties();
@@ -61,7 +69,7 @@ namespace utilities
         };
         return thisTypeDescription;
     }
-
+*/
     template <typename ValueType>
     void ObjectDescription::SetGetPropertiesFunction(std::true_type)
     {
@@ -71,12 +79,17 @@ namespace utilities
         {
             if(self->HasValue())
             {
+                ObjectDescription description;
                 auto value = self->_value.GetValue<ValueType>();
-                return value.GetDescription();
+                value.GetDescription(description);
+                return description;
             }
             else
             {
-                return ValueType::GetTypeDescription();
+                ObjectDescription description;
+                ValueType value;
+                value.GetDescription(description);
+                return description;
             }
         };
     }

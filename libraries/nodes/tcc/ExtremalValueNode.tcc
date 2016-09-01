@@ -33,24 +33,13 @@ namespace nodes
     }
 
     template <typename ValueType, bool max>
-    utilities::ObjectDescription ExtremalValueNode<ValueType, max>::GetTypeDescription()
+    void ExtremalValueNode<ValueType, max>::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Node, ExtremalValueNode<ValueType, max>>("Binary operation node");
-        description.template AddProperty<decltype(_input)>(inputPortName, "Input port");
-        description.template AddProperty<decltype(_val)>(valPortName, "Extremal value");
-        description.template AddProperty<decltype(_argVal)>(argValPortName, "Index of extremal value");
-        description.template AddProperty<int>("operation", "Operation code");
-        return description;
-    }
-
-    template <typename ValueType, bool max>
-    utilities::ObjectDescription ExtremalValueNode<ValueType, max>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<Node, ExtremalValueNode<ValueType, max>>();
+        Node::GetDescription(description);
+        description.SetType(*this);
         description[inputPortName] << _input;
         description[valPortName] << _val;
         description[argValPortName] << _argVal;
-        return description;
     }
 
     template <typename ValueType, bool max>

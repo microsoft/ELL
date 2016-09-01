@@ -33,22 +33,12 @@ namespace model
         return Port::PortType::boolean;
     }
 
-    utilities::ObjectDescription Port::GetTypeDescription()
+    void Port::GetDescription(utilities::ObjectDescription& description) const
     {
-        utilities::ObjectDescription description = utilities::MakeObjectDescription<Port>("Port");
-        description.AddProperty<utilities::UniqueId>("nodeId", "ID of port's node");
-        description.AddProperty<std::string>("name", "Name of this port");
-        description.AddProperty<int>("type", "Type code for the port");
-        return description;
-    }
-
-    utilities::ObjectDescription Port::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetTypeDescription();
+        description.SetType(*this);
         description["nodeId"] << _node->GetId();
         description["name"] << _name;
         description["type"] << static_cast<int>(_type);
-        return description;
     }
 
     void Port::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)

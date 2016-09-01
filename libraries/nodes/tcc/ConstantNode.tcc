@@ -38,21 +38,12 @@ namespace nodes
     }
 
     template <typename ValueType>
-    utilities::ObjectDescription ConstantNode<ValueType>::GetTypeDescription()
+    void ConstantNode<ValueType>::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Node, ConstantNode<ValueType>>("Constant node");
-        description.template AddProperty<decltype(_values)>("values", "Constant values");
-        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
-        return description;
-    }
-
-    template <typename ValueType>
-    utilities::ObjectDescription ConstantNode<ValueType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<Node, ConstantNode<ValueType>>();
+        Node::GetDescription(description);
+        description.SetType(*this);
         description[outputPortName] << _output;
         description["values"] << _values;
-        return description;
     }
 
     template <typename ValueType>

@@ -16,18 +16,10 @@ namespace predictors
     ConstantPredictor::ConstantPredictor(double value) : _value(value)
     {}
 
-    utilities::ObjectDescription ConstantPredictor::GetTypeDescription()
+    void ConstantPredictor::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<ConstantPredictor>("Constant predictor");
-        description.AddProperty<decltype(_value)>("value", "The value");
-        return description;
-    }
-
-    utilities::ObjectDescription ConstantPredictor::GetDescription() const
-    {
-        auto description = GetTypeDescription();
+        description.SetType(*this);
         description["value"] << _value;
-        return description;
     }
 
     void ConstantPredictor::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)

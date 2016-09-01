@@ -29,17 +29,9 @@ namespace model
     }
 
     template <typename ValueType>
-    utilities::ObjectDescription OutputPort<ValueType>::GetTypeDescription()
+    void OutputPort<ValueType>::GetDescription(utilities::ObjectDescription& description) const
     {
-        utilities::ObjectDescription description = utilities::MakeObjectDescription<OutputPortBase, OutputPort<ValueType>>("OutputPort");
-        return description;
-    }
-
-    template <typename ValueType>
-    utilities::ObjectDescription OutputPort<ValueType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<OutputPortBase, OutputPort<ValueType>>();
-        return description;
+        OutputPortBase::GetDescription(description);
     }
 
     template <typename ValueType>

@@ -30,20 +30,11 @@ public:
     int GetA() const { return _a; }
     double GetB() const { return _b; }
 
-    static utilities::ObjectDescription GetTypeDescription()
+    virtual void GetDescription(utilities::ObjectDescription& description) const override
     {
-        utilities::ObjectDescription description = utilities::MakeObjectDescription<InnerObject>("Inner object");
-        description.AddProperty<int>("a", "Parameter a");
-        description.AddProperty<double>("b", "Parameter b");
-        return description;
-    }
-
-    virtual utilities::ObjectDescription GetDescription() const override
-    {
-        utilities::ObjectDescription description = GetTypeDescription();
+        description.SetType(*this);
         description["a"] = _a;
         description["b"] = _b;
-        return description;
     }
 
     virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override
@@ -67,18 +58,11 @@ public:
     DerivedObject(int a, double b, std::string c) : InnerObject(a, b), _c(c) {}
     std::string GetC() { return _c; }
 
-    static utilities::ObjectDescription GetTypeDescription()
+    virtual void GetDescription(utilities::ObjectDescription& description) const override
     {
-        utilities::ObjectDescription description = utilities::MakeObjectDescription<InnerObject, DerivedObject>("Derived object");
-        description.AddProperty<std::string>("c", "Parameter c");
-        return description;
-    }
-
-    virtual utilities::ObjectDescription GetDescription() const override
-    {
-        auto description = GetParentDescription<InnerObject, DerivedObject>();
+        InnerObject::GetDescription(description);
+        description.SetType(*this);
         description["c"] = _c;
-        return description;
     }
 
     virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override
@@ -102,20 +86,11 @@ public:
     std::string GetName() { return _name; }
     InnerObject GetInner() { return _inner; }
 
-    static utilities::ObjectDescription GetTypeDescription()
+    virtual void GetDescription(utilities::ObjectDescription& description) const override
     {
-        utilities::ObjectDescription description = utilities::MakeObjectDescription<OuterObject>("Outer object");
-        description.AddProperty<decltype(_name)>("name", "Name");
-        description.AddProperty<decltype(_inner)>("obj", "Inner object");
-        return description;
-    }
-
-    virtual utilities::ObjectDescription GetDescription() const override
-    {
-        utilities::ObjectDescription description = GetTypeDescription();
+        description.SetType(*this);
         description["name"] = _name;
         description["obj"] = _inner;
-        return description;
     }
 
     virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override
@@ -152,13 +127,16 @@ void PrintDescription(const utilities::ObjectDescription& description, size_t in
 
 void TestGetTypeDescription()
 {
-    auto innerDescription = InnerObject::GetTypeDescription();
+    InnerObject innerObj;
+    auto innerDescription = innerObj.GetNewDescription();
 //    PrintDescription(innerDescription);
 
-    auto outerDescription = OuterObject::GetTypeDescription();
+    OuterObject outerObj;
+    auto outerDescription = outerObj.GetNewDescription();
 //    PrintDescription(outerDescription);
 
-    auto derivedDescription = DerivedObject::GetTypeDescription();
+    DerivedObject derivedObj;
+    auto derivedDescription = derivedObj.GetNewDescription();
 //    PrintDescription(derivedDescription);
 
     testing::ProcessTest("ObjectDescription", innerDescription.HasProperty("a"));
@@ -176,15 +154,15 @@ void TestGetTypeDescription()
 void TestGetObjectDescription()
 {
     InnerObject innerObj(3, 4.5);
-    auto innerDescription = innerObj.GetDescription();
+    auto innerDescription = innerObj.GetNewDescription();
 //    PrintDescription(innerDescription);
 
     OuterObject outerObj("Outer", 5, 6.5);
-    auto outerDescription = outerObj.GetDescription();
+    auto outerDescription = outerObj.GetNewDescription();
 //    PrintDescription(outerDescription);
 
     DerivedObject derivedObj(8, 9.5, "derived");
-    auto derivedDescription = derivedObj.GetDescription();
+    auto derivedDescription = derivedObj.GetNewDescription();
 //    PrintDescription(derivedDescription);
 
     // Inner

@@ -167,25 +167,14 @@ namespace nodes
     }
 
     template <typename ValueType>
-    utilities::ObjectDescription BinaryOperationNode<ValueType>::GetTypeDescription()
+    void BinaryOperationNode<ValueType>::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Node, BinaryOperationNode<ValueType>>("Binary operation node");
-        description.template AddProperty<decltype(_input1)>(input1PortName, "Input port 1");
-        description.template AddProperty<decltype(_input2)>(input2PortName, "Input port 2");
-        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
-        description.template AddProperty<int>("operation", "Operation code");
-        return description;
-    }
-
-    template <typename ValueType>
-    utilities::ObjectDescription BinaryOperationNode<ValueType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<Node, BinaryOperationNode<ValueType>>();
+        Node::GetDescription(description);
+        description.SetType(*this);
         description[input1PortName] << _input1;
         description[input2PortName] << _input2;
         description[outputPortName] << _output;
         description["operation"] << static_cast<int>(_operation);
-        return description;
     }
 
     template <typename ValueType>

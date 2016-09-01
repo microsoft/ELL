@@ -53,15 +53,10 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Gets an ObjectDescription for the type </summary>
-        ///
-        /// <returns> An ObjectDescription for the type </returns>
-        static utilities::ObjectDescription GetTypeDescription();
-
         /// <summary> Gets an ObjectDescription for the object </summary>
         ///
-        /// <returns> An ObjectDescription for the object </returns>
-        virtual utilities::ObjectDescription GetDescription() const override;
+        /// <param name="description"> The ObjectDescription for the object </param>
+        virtual void GetDescription(utilities::ObjectDescription& description) const override;
 
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///

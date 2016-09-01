@@ -47,20 +47,9 @@ namespace model
 
     bool PortRange::IsFullPortRange() const { return GetStartIndex() == 0 && Size() == ReferencedPort()->Size(); }
 
-    utilities::ObjectDescription PortRange::GetTypeDescription()
+    void PortRange::GetDescription(utilities::ObjectDescription& description) const
     {
-        utilities::ObjectDescription description = utilities::MakeObjectDescription<Port>("PortRange");
-        description.AddProperty<size_t>("startIndex", "");
-        description.AddProperty<size_t>("numValues", "");
-        description.AddProperty<bool>("isFixedSize", "");
-        description.AddProperty<utilities::UniqueId>("referencedNodeId", "");
-        description.AddProperty<std::string>("referencedPortName", "");
-        return description;
-    }
-
-    utilities::ObjectDescription PortRange::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetTypeDescription();
+        description.SetType(*this);
         description["startIndex"] << _startIndex;
         description["numValues"] << _numValues;
         description["isFixedSize"] << _isFixedSize;
@@ -74,7 +63,6 @@ namespace model
             description["referencedNodeId"] << utilities::UniqueId();
             description["referencedPortName"] << std::string{ "" };
         }
-        return description;
     }
 
     void PortRange::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
@@ -181,18 +169,10 @@ namespace model
         }
     }
 
-    utilities::ObjectDescription PortElementsBase::GetTypeDescription()
+    void PortElementsBase::GetDescription(utilities::ObjectDescription& description) const
     {
-        utilities::ObjectDescription description = utilities::MakeObjectDescription<Port>("PortRange");
-        description.AddProperty<decltype(_ranges)>("ranges", "");
-        return description;
-    }
-
-    utilities::ObjectDescription PortElementsBase::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetTypeDescription();
+        description.SetType(*this);
         description["ranges"] << _ranges;
-        return description;
     }
 
     void PortElementsBase::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)

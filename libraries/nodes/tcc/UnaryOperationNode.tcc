@@ -90,23 +90,13 @@ namespace nodes
     }
 
     template <typename ValueType>
-    utilities::ObjectDescription UnaryOperationNode<ValueType>::GetTypeDescription()
+    void UnaryOperationNode<ValueType>::GetDescription(utilities::ObjectDescription& description) const
     {
-        auto description = utilities::MakeObjectDescription<Node, UnaryOperationNode<ValueType>>("Accumulator node");
-        description.template AddProperty<decltype(_input)>(inputPortName, "Input port");
-        description.template AddProperty<decltype(_output)>(outputPortName, "Output port");
-        description.template AddProperty<int>("operation", "Operation code");
-        return description;
-    }
-
-    template <typename ValueType>
-    utilities::ObjectDescription UnaryOperationNode<ValueType>::GetDescription() const
-    {
-        utilities::ObjectDescription description = GetParentDescription<Node, UnaryOperationNode<ValueType>>();
+        Node::GetDescription(description);
+        description.SetType(*this);
         description[inputPortName] << _input;
         description[outputPortName] << _output;
         description["operation"] << static_cast<int>(_operation);
-        return description;
     }
 
     template <typename ValueType>
