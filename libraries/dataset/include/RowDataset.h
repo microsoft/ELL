@@ -99,21 +99,21 @@ namespace dataset
         /// <summary> Erases all of the examples in the RowDataset. </summary>
         void Reset();
 
-        /// <summary> Randomly permutes the rows of the dataset. </summary>
+        /// <summary> Permutes the rows of the matrix so that a prefix of them is uniformly distributed. </summary>
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
-        /// <param name="prefixSize"> Size of the prefix to permute, zero to permute the entire dataset. </param>
+        /// <param name="prefixSize"> Size of the prefix that should be uniformly distributed, zero to permute the entire dataset. </param>
         void RandomPermute(std::default_random_engine& rng, size_t prefixSize=0);
 
-        /// <summary> Randomly permutes a range of rows in the dataset. </summary>
+        /// <summary> Randomly permutes a range of rows in the dataset so that a prefix of them is uniformly distributed. </summary>
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
         /// <param name="rangeFirstIndex"> Zero-based index of the firest example in the range. </param>
         /// <param name="rangeSize"> Size of the range. </param>
-        /// <param name="prefixSize"> Size of the prefix to permute, zero to permute the entire range. </param>
+        /// <param name="prefixSize"> Size of the prefix that should be uniformly distributed, zero to permute the entire range. </param>
         void RandomPermute(std::default_random_engine& rng, size_t rangeFirstIndex, size_t rangeSize, size_t prefixSize=0);
 
-        /// <summary> Choses an example uniformly from a given range and swaps it with a given example (which can either be insode or outside of the range).
+        /// <summary> Choses an example uniformly from a given range and swaps it with a given example (which can either be inside or outside of the range).
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
         /// <param name="targetExampleIndex"> Zero-based index of the target example. </param>

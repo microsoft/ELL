@@ -18,6 +18,6 @@ namespace predictors
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
         }
 
-        return inputVector[_index] > _threshold ? true : false;
+        return inputVector[_index] > _threshold;
     }
 }
