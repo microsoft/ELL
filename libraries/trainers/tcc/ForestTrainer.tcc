@@ -87,7 +87,7 @@ namespace trainers
     }
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    ForestTrainerBase::Sums ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SetWeakWeightsLabels()
+    auto ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SetWeakWeightsLabels() -> Sums
     {
         Sums sums;
 
