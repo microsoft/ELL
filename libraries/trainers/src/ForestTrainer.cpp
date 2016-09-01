@@ -47,24 +47,41 @@ namespace trainers
     //
     // NodeRanges
     //
-    ForestTrainerBase::NodeRanges::NodeRanges(const Range& totalRange) : _total(totalRange)
-    {}
+    ForestTrainerBase::NodeRanges::NodeRanges(const Range& totalRange) : _firstIndex(2)
+    {
+        _firstIndex[0] = totalRange.firstIndex;
+        _firstIndex[1] = totalRange.firstIndex + totalRange.size;
+    }
+
+    ForestTrainerBase::Range ForestTrainerBase::NodeRanges::GetTotalRange() const
+    {
+        return Range{ _firstIndex.front(), _firstIndex.back() - _firstIndex.front() };
+    }
 
     ForestTrainerBase::Range ForestTrainerBase::NodeRanges::GetChildRange(size_t childPosition) const
     {
-        if (childPosition == 0)
+        if(childPosition+1 >= _firstIndex.size())
         {
-            return Range{ _total.firstIndex, _size0 };
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
         }
-        else
-        {
-            return Range{ _total.firstIndex+_size0, _total.size-_size0 };
-        }
+
+        return Range{ _firstIndex[childPosition], _firstIndex[childPosition+1] - _firstIndex[childPosition] };
     }
 
-    void ForestTrainerBase::NodeRanges::SetSize0(size_t value)
+    void ForestTrainerBase::NodeRanges::SplitChildRange(size_t childPosition, size_t size)
     {
-        _size0 = value;
+        if(childPosition+1 >= _firstIndex.size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
+        }
+
+        auto childIterator = _firstIndex.begin() + childPosition;
+        if(*childIterator + size > *(childIterator+1))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "size too big");
+        }
+
+        _firstIndex.insert(childIterator+1, *childIterator + size);
     }
 
     //

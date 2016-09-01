@@ -52,7 +52,7 @@ namespace trainers
                 {
                     bestSplitCandidate.gain = gain;
                     bestSplitCandidate.splitRule = SplitRuleType{ inputIndex, 0.5 * (currentFeatureValue + nextFeatureValue) };
-                    bestSplitCandidate.ranges.SetSize0(rowIndex - range.firstIndex + 1);
+                    bestSplitCandidate.ranges.SplitChildRange(0, rowIndex - range.firstIndex + 1);
                     bestSplitCandidate.stats.SetChildSums({sums0, sums1});
                 }
             }

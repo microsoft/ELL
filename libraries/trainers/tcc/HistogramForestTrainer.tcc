@@ -38,7 +38,7 @@ namespace trainers
             {
                 bestSplitCandidate.gain = gain;
                 bestSplitCandidate.splitRule = splitRuleCandidate;
-                bestSplitCandidate.ranges.SetSize0(size0);
+                bestSplitCandidate.ranges.SplitChildRange(0, size0);
                 bestSplitCandidate.stats.SetChildSums({sums0, sums1});
             }
         }

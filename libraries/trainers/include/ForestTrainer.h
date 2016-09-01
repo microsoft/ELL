@@ -36,6 +36,7 @@ namespace trainers
         size_t numRounds = 0;
     };
 
+    /// <summary> Nontemplated base class for forest trainers, provides some reusable internal classes. </summary>
     class ForestTrainerBase
     {
     protected:
@@ -63,13 +64,12 @@ namespace trainers
         {
         public:
             NodeRanges(const Range& totalRange);
-            Range GetTotalRange() const { return _total; }
+            Range GetTotalRange() const;
             Range GetChildRange(size_t childPosition) const;
-            void SetSize0(size_t value);
+            void SplitChildRange(size_t childPosition, size_t size);
 
         private:
-            Range _total;
-            size_t _size0;
+            std::vector<size_t> _firstIndex;
         };
 
         // metadata that the forest trainer keeps with each example
