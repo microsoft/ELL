@@ -34,7 +34,7 @@ namespace utilities
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="outputStream"> The stream to serialize data to. </summary>
+        /// <param name="outputStream"> The stream to serialize data to. </param>
         JsonSerializer(std::ostream& outputStream);
 
     protected:
@@ -138,7 +138,6 @@ namespace utilities
 
         void MatchFieldName(const char* name);
 
-        std::istream& _in;
         std::string _endOfPreviousLine;
         Tokenizer _tokenizer;
     };

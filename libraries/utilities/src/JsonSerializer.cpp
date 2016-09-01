@@ -130,8 +130,8 @@ namespace utilities
     //
     // Deserialization
     //
-    JsonDeserializer::JsonDeserializer(SerializationContext context) : Deserializer(std::move(context)), _in(std::cin), _tokenizer(std::cin, ",:{}[]'\"") {}
-    JsonDeserializer::JsonDeserializer(std::istream& inputStream, SerializationContext context) : Deserializer(std::move(context)), _in(inputStream), _tokenizer(inputStream, ",:{}[]'\"") {}
+    JsonDeserializer::JsonDeserializer(SerializationContext context) : Deserializer(std::move(context)), _tokenizer(std::cin, ",:{}[]'\"") {}
+    JsonDeserializer::JsonDeserializer(std::istream& inputStream, SerializationContext context) : Deserializer(std::move(context)), _tokenizer(inputStream, ",:{}[]'\"") {}
 
     IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, bool);
     IMPLEMENT_DESERIALIZE_VALUE(JsonDeserializer, char);

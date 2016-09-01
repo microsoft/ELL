@@ -96,8 +96,6 @@ namespace utilities
     {
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
-        auto endOfLine = "\n";
-        auto size = array.size();
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
 
         _out << indent;

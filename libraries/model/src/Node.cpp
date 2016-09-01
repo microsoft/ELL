@@ -20,7 +20,7 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-    Node::Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) : _inputs(inputs), _outputs(outputs), _id(NodeId())
+    Node::Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) : _id(NodeId()), _inputs(inputs), _outputs(outputs)
     {};
 
     void Node::AddInputPort(InputPortBase* input)

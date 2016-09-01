@@ -136,7 +136,6 @@ namespace utilities
         void ReadArray(const char* name, std::vector<ValueType>& array);
         void ReadArray(const char* name, std::vector<std::string>& array);
 
-        std::istream& _in;
         Tokenizer _tokenizer;
     };
 

@@ -21,7 +21,7 @@ namespace dataset
     }
 
     template<typename ValueType>
-    DenseDataVector<ValueType>::DenseDataVector(std::vector<ValueType> data) : _data(std::move(data)), _numNonzeros(0)
+    DenseDataVector<ValueType>::DenseDataVector(std::vector<ValueType> data) : _numNonzeros(0), _data(std::move(data))
     {
         for (auto value : _data)
         {

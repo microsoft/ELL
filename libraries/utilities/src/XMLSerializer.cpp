@@ -110,8 +110,6 @@ namespace utilities
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
         auto endOfLine = "\n";
-        auto size = array.size();
-        auto typeName = "ISerializable"; //?
 
         _out << indent;
         _out << "<Array";
@@ -133,12 +131,12 @@ namespace utilities
     //
     // Deserialization
     //
-    SimpleXmlDeserializer::SimpleXmlDeserializer(SerializationContext context) : Deserializer(std::move(context)), _in(std::cin), _tokenizer(std::cin, "<>=/'\"") 
+    SimpleXmlDeserializer::SimpleXmlDeserializer(SerializationContext context) : Deserializer(std::move(context)), _tokenizer(std::cin, "<>=/'\"")
     {
         ReadFileHeader();
     }
 
-    SimpleXmlDeserializer::SimpleXmlDeserializer(std::istream& inputStream, SerializationContext context) : Deserializer(std::move(context)), _in(inputStream), _tokenizer(inputStream, "<>?=/'\"") 
+    SimpleXmlDeserializer::SimpleXmlDeserializer(std::istream& inputStream, SerializationContext context) : Deserializer(std::move(context)), _tokenizer(inputStream, "<>?=/'\"") 
     {
         ReadFileHeader(); 
     }

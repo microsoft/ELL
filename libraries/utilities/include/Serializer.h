@@ -186,9 +186,14 @@ namespace utilities
     class Deserializer
     {
     public:
+        /// <summary> Represents a serializer that is scoped to a partticular property. </summary>
         class PropertyDeserializer
         {
         public:
+            /// <summary> Deserializes the property. </summary>
+            ///
+            /// <typeparam name="ValueType"> The type of the property. </typeparam>
+            /// <param name="value"> The variable to deserialize the property into. </param>
             template <typename ValueType>
             void operator>>(ValueType&& value)
             {
@@ -198,8 +203,8 @@ namespace utilities
         private:
             friend class Deserializer;
             PropertyDeserializer(Deserializer& deserializer, const std::string& name) : _deserializer(deserializer), _propertyName(name){};
-            std::string _propertyName;
             Deserializer& _deserializer;
+            std::string _propertyName;
         };
 
         /// <summary> Constructor </summary>
