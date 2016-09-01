@@ -79,7 +79,6 @@ namespace model
 
     void PortRange::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
     {
-        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         description["startIndex"] >> _startIndex;
         description["numValues"] >> _numValues;
         description["isFixedSize"] >> _isFixedSize;
@@ -88,6 +87,7 @@ namespace model
         std::string portName;
         description["referencedPortName"] >> portName;
 
+        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         Node* newNode = newContext.GetNodeFromId(newId);
         if (newNode == nullptr)
         {

@@ -186,7 +186,7 @@ namespace model
     class ModelSerializationContext: public utilities::SerializationContext
     {
     public:
-        ModelSerializationContext(utilities::SerializationContext& otherContext, Model* model);
+        ModelSerializationContext(utilities::SerializationContext& otherContext, const Model* model);
 
         /// <summary> Gets the type factory associated with this context. </summary>
         ///
@@ -196,7 +196,7 @@ namespace model
         /// <summary> Returns the Model currently being deserialized. </summary>
         ///
         /// <returns> The Model currently being deserialized. </returns>
-        Model* GetModel() { return _model; }
+        const Model* GetModel() { return _model; }
 
         /// <summary> Returns a pointer to an already-deserialized node, given its serialized ID </summary>
         ///
@@ -211,7 +211,7 @@ namespace model
     
     private:
         utilities::SerializationContext& _originalContext;
-        Model* _model;
+        const Model* _model;
         std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;
     };
 }

@@ -50,8 +50,7 @@ namespace model
         auto nodeIter = GetNodeIterator();
         while(nodeIter.IsValid())
         {
-            const auto& node = nodeIter.Get();
-            nodes.push_back(node);
+            nodes.push_back(nodeIter.Get());
             nodeIter.Next();
         }
 
@@ -196,7 +195,7 @@ namespace model
     //
     // ModelSerializationContext
     //    
-    ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& otherContext, Model* model) : _originalContext(otherContext), _model(model) 
+    ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& otherContext, const Model* model) : _originalContext(otherContext), _model(model) 
     {
     }
     
