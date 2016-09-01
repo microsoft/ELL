@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     MovingAverageNode.h (features)
+//  File:     MovingAverageNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -29,7 +29,7 @@
 
 namespace nodes
 {
-    /// <summary> A feature that takes a vector input and returns its mean over some window of time. </summary>
+    /// <summary> A node that takes a vector input and returns its mean over some window of time. </summary>
     template <typename ValueType>
     class MovingAverageNode : public model::Node
     {

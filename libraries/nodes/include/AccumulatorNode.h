@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     AccumulatorNode.h (features)
+//  File:     AccumulatorNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@
 
 namespace nodes
 {
-    /// <summary> A node that keeps a running sum of its input values. </summary>
+    /// <summary> A node that accumulates a running sum of its input. </summary>
     template <typename ValueType>
     class AccumulatorNode : public model::Node
     {

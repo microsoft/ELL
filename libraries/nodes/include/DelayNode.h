@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     DelayNode.h (features)
+//  File:     DelayNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@
 
 namespace nodes
 {
-    /// <summary> A node that returns a delayed sample from its input stream. </summary>
+    /// <summary> A node that returns a delayed sample of the input signal. </summary>
     template <typename ValueType>
     class DelayNode : public model::Node
     {
