@@ -8,6 +8,8 @@
 
 #include "LogitBooster.h"
 
+#include <cmath>
+
 namespace trainers
 {
     LogitBooster::LogitBooster(double scale) : _scale(scale)

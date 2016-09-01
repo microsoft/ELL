@@ -92,7 +92,7 @@ namespace trainers
             auto prediction = splitRule.Predict(example.GetDataVector());
             if(prediction == 0)
             {
-                sums0.Increment(example.GetMetaData().weak);
+                sums0.Increment(example.GetMetadata().weak);
                 ++size0;
             }
             exampleIterator.Next();

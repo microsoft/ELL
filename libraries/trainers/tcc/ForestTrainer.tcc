@@ -63,7 +63,7 @@ namespace trainers
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Range ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeRanges::GetChildRange(size_t childPosition) const
+    ForestTrainerBase::Range ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeRanges::GetChildRange(size_t childPosition) const
     {
         if (childPosition == 0)
         {
@@ -92,7 +92,7 @@ namespace trainers
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    typename const ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums& ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::GetChildSums(size_t position) const
+    const ForestTrainerBase::Sums& ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats::GetChildSums(size_t position) const
     {
         return _childSums[position];
     }
@@ -114,26 +114,26 @@ namespace trainers
 
             auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
 
-            ExampleMetaData metaData;
-            metaData.strong = example.GetMetaData();
-            metaData.currentOutput = _forest->Predict(*denseDataVector);
+            ExampleMetadata metadata;
+            metadata.strong = example.GetMetadata();
+            metadata.currentOutput = _forest->Predict(*denseDataVector);
 
-            _dataset.AddExample(ForestTrainerExample(std::move(denseDataVector), metaData));
+            _dataset.AddExample(ForestTrainerExample(std::move(denseDataVector), metadata));
 
             exampleIterator.Next();
         }
     }
 
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SetWeakWeightsLabels()
+    ForestTrainerBase::Sums ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SetWeakWeightsLabels()
     {
         Sums sums;
 
         for (uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
         {
-            auto& metaData = _dataset[rowIndex].GetMetaData();
-            metaData.weak = _booster.GetWeakWeightLabel(metaData.strong, metaData.currentOutput);
-            sums.Increment(metaData.weak);
+            auto& metadata = _dataset[rowIndex].GetMetadata();
+            metadata.weak = _booster.GetWeakWeightLabel(metadata.strong, metadata.currentOutput);
+            sums.Increment(metadata.weak);
         }
 
         if(sums.sumWeights == 0.0)
@@ -150,7 +150,7 @@ namespace trainers
         for (uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
         {
             auto& example = _dataset[rowIndex];
-            example.GetMetaData().currentOutput += value;
+            example.GetMetadata().currentOutput += value;
         }
     }
 
@@ -160,7 +160,7 @@ namespace trainers
         for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size; ++rowIndex)
         {
             auto& example = _dataset[rowIndex];
-            example.GetMetaData().currentOutput += edgePredictor.Predict(example.GetDataVector());
+            example.GetMetadata().currentOutput += edgePredictor.Predict(example.GetDataVector());
         }
     }
 
@@ -239,7 +239,7 @@ namespace trainers
     //
  
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ExampleMetaData::Print(std::ostream & os) const
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ExampleMetadata::Print(std::ostream & os) const
     {
         os << "(" << strong.weight << ", " << strong.label << ", " << weak.weight << ", " << weak.label << ", " << currentOutput << ")";
     }

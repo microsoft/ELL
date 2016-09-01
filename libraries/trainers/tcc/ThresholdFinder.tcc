@@ -24,7 +24,7 @@ namespace trainers
         {
             const auto& example = exampleIterator.Get();
             const auto& denseDataVector = example.GetDataVector();
-            double weight = example.GetMetaData().weak.weight;
+            double weight = example.GetMetadata().weak.weight;
 
             totalWeight += weight;
 

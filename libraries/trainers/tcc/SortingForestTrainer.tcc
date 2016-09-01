@@ -35,7 +35,7 @@ namespace trainers
                 nextFeatureValue = _dataset[rowIndex + 1].GetDataVector()[inputIndex];
 
                 // increment sums 
-                sums0.Increment(_dataset[rowIndex].GetMetaData().weak);
+                sums0.Increment(_dataset[rowIndex].GetMetadata().weak);
 
                 // only split between rows with different feature values
                 if (currentFeatureValue == nextFeatureValue)

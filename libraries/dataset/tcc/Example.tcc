@@ -8,20 +8,20 @@
 
 namespace dataset
 {
-    template<typename DataVectorType, typename MetaDataType>
-    Example<DataVectorType, MetaDataType>::Example(const std::shared_ptr<DataVectorType>& dataVector, const MetaDataType& metaData) : _dataVector(dataVector), _metaData(metaData)
+    template<typename DataVectorType, typename MetadataType>
+    Example<DataVectorType, MetadataType>::Example(const std::shared_ptr<DataVectorType>& dataVector, const MetadataType& metadata) : _dataVector(dataVector), _metadata(metadata)
     {}
 
-    template<typename DataVectorType, typename MetaDataType>
-    void Example<DataVectorType, MetaDataType>::Print(std::ostream & os) const
+    template<typename DataVectorType, typename MetadataType>
+    void Example<DataVectorType, MetadataType>::Print(std::ostream & os) const
     {
-        _metaData.Print(os);
+        _metadata.Print(os);
         os << "\t";
         _dataVector->Print(os);
     }
 
-    template<typename DataVectorType, typename MetaDataType>
-    std::ostream & operator<<(std::ostream & ostream, const Example<DataVectorType, MetaDataType>& example)
+    template<typename DataVectorType, typename MetadataType>
+    std::ostream & operator<<(std::ostream & ostream, const Example<DataVectorType, MetadataType>& example)
     {
         example.Print(ostream);
         return ostream;

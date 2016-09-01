@@ -8,12 +8,16 @@
 
 #include "ThresholdFinder.h"
 
+#include <algorithm>
+#include <vector>
+#include <functional>
+
 namespace trainers
 {
     size_t ThresholdFinder::SortReduceDuplicates(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const
     {
         // sort the values
-        std::sort(begin, end);
+        std::sort(begin, end, std::less<double>());
 
         auto iter = begin;
         auto current = begin;

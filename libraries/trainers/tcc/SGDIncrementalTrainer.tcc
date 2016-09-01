@@ -59,8 +59,8 @@ namespace trainers
 
             // get the Next example
             const auto& example = exampleIterator.Get();
-            double label = example.GetMetaData().label;
-            double weight = example.GetMetaData().weight;
+            double label = example.GetMetadata().label;
+            double weight = example.GetMetadata().weight;
             const auto& dataVector = example.GetDataVector();
 
             // calculate the prediction 
@@ -108,8 +108,8 @@ namespace trainers
 
             // get the Next example
             const auto& example = exampleIterator.Get();
-            double label = example.GetMetaData().label;
-            double weight = example.weight;
+            double label = example.GetMetadata().label;
+            double weight = example.GetMetadata().weight;
             const auto& dataVector = example.GetDataVector();
 
             // predict

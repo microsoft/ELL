@@ -19,36 +19,36 @@
 namespace dataset
 {
     /// <summary> A supervised example. </summary>
-    template<typename DataVectorType, typename MetaDataType>
+    template<typename DataVectorType, typename MetadataType>
     class Example 
     {
     public:
 
         Example() = default;
 
-        explicit Example(const Example<DataVectorType, MetaDataType>& other) = default;
+        explicit Example(const Example<DataVectorType, MetadataType>& other) = default;
 
-        Example(Example<DataVectorType, MetaDataType>&& other) = default;
+        Example(Example<DataVectorType, MetadataType>&& other) = default;
 
         /// <summary> Constructs a supervised example. </summary>
         ///
         /// <param name="dataVector"> The data vector. </param>
-        /// <param name="metaDataType"> The metadata. </param>
-        Example(const std::shared_ptr<DataVectorType>& dataVector, const MetaDataType& metaData);
+        /// <param name="metadataType"> The metadata. </param>
+        Example(const std::shared_ptr<DataVectorType>& dataVector, const MetadataType& metadata);
 
         /// <summary> Assignment operator. </summary>
         ///
         /// <param name="other"> The other. </param>
         ///
         /// <returns> A reference to this Example. </returns>
-        Example& operator=(const Example<DataVectorType, MetaDataType>& other) = delete;
+        Example& operator=(const Example<DataVectorType, MetadataType>& other) = delete;
 
         /// <summary> Move assignment operator. </summary>
         ///
         /// <param name="other"> [in,out] The other. </param>
         ///
         /// <returns> A reference to this Example. </returns>
-        Example& operator=(Example<DataVectorType, MetaDataType>&& other) = default;
+        Example& operator=(Example<DataVectorType, MetadataType>&& other) = default;
 
         /// <summary> Gets the data vector. </summary>
         ///
@@ -58,12 +58,12 @@ namespace dataset
         /// <summary> Gets the metadata. </summary>
         ///
         /// <returns> The metadata. </returns>
-        MetaDataType& GetMetaData() { return _metaData; }
+        MetadataType& GetMetadata() { return _metadata; }
 
         /// <summary> Gets the metadata. </summary>
         ///
         /// <returns> The metadata. </returns>
-        const MetaDataType& GetMetaData() const { return _metaData; }
+        const MetadataType& GetMetadata() const { return _metadata; }
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///
@@ -72,7 +72,7 @@ namespace dataset
 
     private:
         std::shared_ptr<const DataVectorType> _dataVector;
-        MetaDataType _metaData;
+        MetadataType _metadata;
     };
 
     struct WeightLabel
@@ -95,8 +95,8 @@ namespace dataset
     /// <param name="example"> The example. </param>
     ///
     /// <returns> The shifted ostream. </returns>
-    template<typename DataVectorType, typename MetaDataType>
-    std::ostream& operator<<(std::ostream& ostream, const Example<DataVectorType, MetaDataType>& example);
+    template<typename DataVectorType, typename MetadataType>
+    std::ostream& operator<<(std::ostream& ostream, const Example<DataVectorType, MetadataType>& example);
 }
 
 #include "../tcc/Example.tcc"
