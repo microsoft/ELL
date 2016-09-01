@@ -59,7 +59,7 @@ namespace interfaces
         const auto& exampleData = example.GetDataVector();
         auto exampleDataArray = exampleData.ToArray();        
         auto resultData = std::make_shared<dataset::DoubleDataVector>(exampleDataArray);
-        dataset::DenseSupervisedExample result(resultData, example.GetMetaData());
+        dataset::DenseSupervisedExample result(resultData, example.GetMetadata());
         return result;
     }
 

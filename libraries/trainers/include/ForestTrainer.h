@@ -105,7 +105,7 @@ namespace trainers
         };
 
         // metadata that the forest trainer keeps with each example
-        struct ExampleMetaData 
+        struct ExampleMetadata 
         {
             void Print(std::ostream& os) const;
 
@@ -199,7 +199,7 @@ namespace trainers
         PriorityQueue _queue;
 
         // the dataset
-        using ForestTrainerExample = dataset::Example<dataset::DoubleDataVector, ExampleMetaData>; 
+        using ForestTrainerExample = dataset::Example<dataset::DoubleDataVector, ExampleMetadata>; 
         dataset::RowDataset<ForestTrainerExample> _dataset;
     };
 }
