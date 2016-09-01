@@ -45,8 +45,8 @@ namespace model
     {
         utilities::ObjectDescription description = GetParentDescription<Node, OutputNode<ValueType>>();
 
-        description[inputPortName] = _input;
-        description[outputPortName] = _output;
+        description[inputPortName] << _input;
+        description[outputPortName] << _output;
         return description;
     }
 

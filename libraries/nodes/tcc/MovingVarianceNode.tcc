@@ -67,9 +67,9 @@ namespace nodes
     utilities::ObjectDescription MovingVarianceNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, MovingVarianceNode<ValueType>>();
-        description[inputPortName] = _input;
-        description[outputPortName] = _output;
-        description["windowSize"] = _windowSize;
+        description[inputPortName] << _input;
+        description[outputPortName] << _output;
+        description["windowSize"] << _windowSize;
         return description;
     }
 

@@ -45,9 +45,9 @@ namespace model
     utilities::ObjectDescription Port::GetDescription() const
     {
         utilities::ObjectDescription description = GetTypeDescription();
-        description["nodeId"] = _node->GetId();
-        description["name"] = _name;
-        description["type"] = static_cast<int>(_type);
+        description["nodeId"] << _node->GetId();
+        description["name"] << _name;
+        description["type"] << static_cast<int>(_type);
         return description;
     }
 
@@ -55,7 +55,8 @@ namespace model
     {
         auto nodeId = description["nodeId"].GetValue<utilities::UniqueId>(); // ignore it
         description["name"] >> _name;
-        int typeCode = description["type"].GetValue<int>();
+        int typeCode;
+        description["type"] >> typeCode;
         _type = static_cast<PortType>(typeCode);
     }
 }

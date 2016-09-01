@@ -105,7 +105,7 @@ namespace model
     utilities::ObjectDescription InputPort<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Port, InputPort<ValueType>>();
-        description["input"] = _input;
+        description["input"] << _input;
         return description;
     }
 

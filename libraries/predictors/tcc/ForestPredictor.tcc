@@ -221,10 +221,10 @@ namespace predictors
     utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::GetDescription() const
     {
         auto description = GetTypeDescription();
-        description["interiorNodes"] = _interiorNodes;
-        description["rootIndices"] = _rootIndices;
-        description["bias"] = _bias;
-        description["numEdges"] = _numEdges;
+        description["interiorNodes"] << _interiorNodes;
+        description["rootIndices"] << _rootIndices;
+        description["bias"] << _bias;
+        description["numEdges"] << _numEdges;
         return description;
     }
 
@@ -324,9 +324,9 @@ namespace predictors
     utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::GetDescription() const
     {
         auto description = GetTypeDescription();
-        description["splitRule"] = _splitRule;
-        description["outgoingEdges"] = _outgoingEdges;
-        description["firstEdgeIndex"] = _firstEdgeIndex;
+        description["splitRule"] << _splitRule;
+        description["outgoingEdges"] << _outgoingEdges;
+        description["firstEdgeIndex"] << _firstEdgeIndex;
         return description;
     }
 
@@ -431,8 +431,8 @@ namespace predictors
     utilities::ObjectDescription ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::GetDescription() const
     {
         auto description = GetTypeDescription();
-        description["predictor"] = _predictor;
-        description["targetNodeIndex"] = _targetNodeIndex;
+        description["predictor"] << _predictor;
+        description["targetNodeIndex"] << _targetNodeIndex;
         return description;
     }
 

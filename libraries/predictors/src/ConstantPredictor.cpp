@@ -26,7 +26,7 @@ namespace predictors
     utilities::ObjectDescription ConstantPredictor::GetDescription() const
     {
         auto description = GetTypeDescription();
-        description["value"] = _value;
+        description["value"] << _value;
         return description;
     }
 

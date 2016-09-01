@@ -45,11 +45,11 @@ namespace nodes
     utilities::ObjectDescription ForestNode<SplitRuleType, EdgePredictorType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, ForestNode<SplitRuleType, EdgePredictorType>>();
-        description[inputPortName] = _input;
-        description[outputPortName] = _output;
-        description[treeOutputsPortName] = _treeOutputs;
-        description[edgeIndicatorVectorPortName] = _edgeIndicatorVector;
-        description["forest"] = _forest;
+        description[inputPortName] << _input;
+        description[outputPortName] << _output;
+        description[treeOutputsPortName] << _treeOutputs;
+        description[edgeIndicatorVectorPortName] << _edgeIndicatorVector;
+        description["forest"] << _forest;
         return description;
     }
 

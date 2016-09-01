@@ -65,9 +65,9 @@ namespace nodes
     utilities::ObjectDescription DotProductNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, DotProductNode<ValueType>>();
-        description[input1PortName] = _input1;
-        description[input2PortName] = _input2;
-        description[outputPortName] = _output;
+        description[input1PortName] << _input1;
+        description[input2PortName] << _input2;
+        description[outputPortName] << _output;
         return description;
     }
 

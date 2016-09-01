@@ -50,8 +50,8 @@ namespace nodes
     utilities::ObjectDescription ConstantNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, ConstantNode<ValueType>>();
-        description[outputPortName] = _output;
-        description["values"] = _values;
+        description[outputPortName] << _output;
+        description["values"] << _values;
         return description;
     }
 

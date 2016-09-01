@@ -118,10 +118,10 @@ namespace nodes
     utilities::ObjectDescription BinaryPredicateNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, BinaryPredicateNode<ValueType>>();
-        description[input1PortName] = _input1;
-        description[input2PortName] = _input2;
-        description[outputPortName] = _output;
-        description["predicate"] = static_cast<int>(_predicate);
+        description[input1PortName] << _input1;
+        description[input2PortName] << _input2;
+        description[outputPortName] << _output;
+        description["predicate"] << static_cast<int>(_predicate);
         return description;
     }
 

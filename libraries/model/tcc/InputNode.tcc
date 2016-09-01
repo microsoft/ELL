@@ -54,7 +54,7 @@ namespace model
     utilities::ObjectDescription InputNode<ValueType>::GetDescription() const
     {
         auto description = GetParentDescription<Node, InputNode<ValueType>>();
-        description[outputPortName] = _output;
+        description[outputPortName] << _output;
         return description;
     }
 

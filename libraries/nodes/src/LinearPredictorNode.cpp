@@ -46,10 +46,10 @@ namespace nodes
     utilities::ObjectDescription LinearPredictorNode::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, LinearPredictorNode>();
-        description[inputPortName] = _input;
-        description[outputPortName] = _output;
-        description["weightedElements"] = _weightedElements;
-        description["predictor"] = _predictor;
+        description[inputPortName] << _input;
+        description[outputPortName] << _output;
+        description["weightedElements"] << _weightedElements;
+        description["predictor"] << _predictor;
         return description;
     }
 

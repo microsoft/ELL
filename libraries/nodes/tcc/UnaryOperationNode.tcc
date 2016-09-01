@@ -103,9 +103,9 @@ namespace nodes
     utilities::ObjectDescription UnaryOperationNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, UnaryOperationNode<ValueType>>();
-        description[inputPortName] = _input;
-        description[outputPortName] = _output;
-        description["operation"] = static_cast<int>(_operation);
+        description[inputPortName] << _input;
+        description[outputPortName] << _output;
+        description["operation"] << static_cast<int>(_operation);
         return description;
     }
 

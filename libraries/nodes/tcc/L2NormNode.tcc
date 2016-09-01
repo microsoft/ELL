@@ -51,8 +51,8 @@ namespace nodes
     utilities::ObjectDescription L2NormNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, L2NormNode<ValueType>>();
-        description[inputPortName] = _input;
-        description[outputPortName] = _output;
+        description[inputPortName] << _input;
+        description[outputPortName] << _output;
         return description;
     }
 

@@ -61,18 +61,18 @@ namespace model
     utilities::ObjectDescription PortRange::GetDescription() const
     {
         utilities::ObjectDescription description = GetTypeDescription();
-        description["startIndex"] = _startIndex;
-        description["numValues"] = _numValues;
-        description["isFixedSize"] = _isFixedSize;
+        description["startIndex"] << _startIndex;
+        description["numValues"] << _numValues;
+        description["isFixedSize"] << _isFixedSize;
         if (_referencedPort != nullptr)
         {
-            description["referencedNodeId"] = _referencedPort->GetNode()->GetId();
-            description["referencedPortName"] = _referencedPort->GetName();
+            description["referencedNodeId"] << _referencedPort->GetNode()->GetId();
+            description["referencedPortName"] << _referencedPort->GetName();
         }
         else
         {
-            description["referencedNodeId"] = utilities::UniqueId();
-            description["referencedPortName"] = std::string{ "" };
+            description["referencedNodeId"] << utilities::UniqueId();
+            description["referencedPortName"] << std::string{ "" };
         }
         return description;
     }
@@ -191,7 +191,7 @@ namespace model
     utilities::ObjectDescription PortElementsBase::GetDescription() const
     {
         utilities::ObjectDescription description = GetTypeDescription();
-        description["ranges"] = _ranges;
+        description["ranges"] << _ranges;
         return description;
     }
 

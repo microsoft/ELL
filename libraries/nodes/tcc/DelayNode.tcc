@@ -54,9 +54,9 @@ namespace nodes
     utilities::ObjectDescription DelayNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, DelayNode<ValueType>>();
-        description[inputPortName] = _input;
-        description[outputPortName] = _output;
-        description["windowSize"] = _windowSize;
+        description[inputPortName] << _input;
+        description[outputPortName] << _output;
+        description["windowSize"] << _windowSize;
         return description;
     }
 

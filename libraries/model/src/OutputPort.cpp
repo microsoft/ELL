@@ -24,7 +24,7 @@ namespace model
     utilities::ObjectDescription OutputPortBase::GetDescription() const
     {
         auto description = GetParentDescription<Port, OutputPortBase>();
-        description["size"] = _size;
+        description["size"] << _size;
         return description;
     }
 

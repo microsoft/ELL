@@ -76,9 +76,9 @@ namespace nodes
     utilities::ObjectDescription MovingAverageNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, MovingAverageNode<ValueType>>();
-        description[inputPortName] = _input;
-        description[outputPortName] = _output;
-        description["windowSize"] = _windowSize;
+        description[inputPortName] << _input;
+        description[outputPortName] << _output;
+        description["windowSize"] << _windowSize;
         return description;
     }
 

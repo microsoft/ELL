@@ -181,10 +181,10 @@ namespace nodes
     utilities::ObjectDescription BinaryOperationNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, BinaryOperationNode<ValueType>>();
-        description[input1PortName] = _input1;
-        description[input2PortName] = _input2;
-        description[outputPortName] = _output;
-        description["operation"] = static_cast<int>(_operation);
+        description[input1PortName] << _input1;
+        description[input2PortName] << _input2;
+        description[outputPortName] << _output;
+        description["operation"] << static_cast<int>(_operation);
         return description;
     }
 

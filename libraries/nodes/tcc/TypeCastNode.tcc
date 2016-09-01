@@ -50,8 +50,8 @@ namespace nodes
     utilities::ObjectDescription TypeCastNode<InputValueType, OutputValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, TypeCastNode<InputValueType, OutputValueType>>();
-        description[inputPortName] = _input;
-        description[outputPortName] = _output;
+        description[inputPortName] << _input;
+        description[outputPortName] << _output;
         return description;
     }
 

@@ -50,10 +50,10 @@ namespace nodes
     utilities::ObjectDescription  DemultiplexerNode<ValueType, SelectorType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node,  DemultiplexerNode<ValueType, SelectorType>>();
-        description[inputPortName] = _input;
-        description[selectorPortName] = _selector;
-        description[outputPortName] = _output;
-        description["defaultValue"] = _defaultValue;
+        description[inputPortName] << _input;
+        description[selectorPortName] << _selector;
+        description[outputPortName] << _output;
+        description["defaultValue"] << _defaultValue;
         return description;
     }
 

@@ -50,10 +50,10 @@ namespace nodes
     utilities::ObjectDescription ValueSelectorNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, ValueSelectorNode<ValueType>>();
-        description[input1PortName] = _input1;
-        description[input2PortName] = _input2;
-        description[conditionPortName] = _condition;
-        description[outputPortName] = _output;
+        description[input1PortName] << _input1;
+        description[input2PortName] << _input2;
+        description[conditionPortName] << _condition;
+        description[outputPortName] << _output;
         return description;
     }
 

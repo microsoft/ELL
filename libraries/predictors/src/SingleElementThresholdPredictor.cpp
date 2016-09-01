@@ -24,8 +24,8 @@ namespace predictors
     utilities::ObjectDescription SingleElementThresholdPredictor::GetDescription() const
     {
         auto description = GetTypeDescription();
-        description["index"] = _index;
-        description["threshold"] = _threshold;
+        description["index"] << _index;
+        description["threshold"] << _threshold;
         return description;
     }
 

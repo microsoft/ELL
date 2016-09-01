@@ -88,7 +88,7 @@ namespace model
     utilities::ObjectDescription Node::GetDescription() const
     {
         auto description = GetTypeDescription();
-        description["id"] = _id;
+        description["id"] << _id;
         return description;
     }
 

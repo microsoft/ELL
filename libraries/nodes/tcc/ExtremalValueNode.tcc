@@ -47,9 +47,9 @@ namespace nodes
     utilities::ObjectDescription ExtremalValueNode<ValueType, max>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, ExtremalValueNode<ValueType, max>>();
-        description[inputPortName] = _input;
-        description[valPortName] = _val;
-        description[argValPortName] = _argVal;
+        description[inputPortName] << _input;
+        description[valPortName] << _val;
+        description[argValPortName] << _argVal;
         return description;
     }
 

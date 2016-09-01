@@ -51,8 +51,8 @@ namespace nodes
     utilities::ObjectDescription AccumulatorNode<ValueType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, AccumulatorNode<ValueType>>();
-        description[inputPortName] = _input;
-        description[outputPortName] = _output;
+        description[inputPortName] << _input;
+        description[outputPortName] << _output;
         return description;
     }
 

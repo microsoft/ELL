@@ -43,9 +43,9 @@ namespace nodes
     utilities::ObjectDescription  MultiplexerNode<ValueType, SelectorType>::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node,  MultiplexerNode<ValueType, SelectorType>>();
-        description["elements"] = _elements;
-        description["selector"] = _selector;
-        description[outputPortName] = _output;
+        description["elements"] << _elements;
+        description["selector"] << _selector;
+        description[outputPortName] << _output;
         return description;
     }
 

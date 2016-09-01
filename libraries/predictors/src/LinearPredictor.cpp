@@ -58,8 +58,8 @@ namespace predictors
     utilities::ObjectDescription LinearPredictor::GetDescription() const
     {
         auto description = GetTypeDescription();
-        description["w"] = static_cast<std::vector<double>>(_w);
-        description["b"] = _b;
+        description["w"] << static_cast<std::vector<double>>(_w);
+        description["b"] << _b;
         return description;
     }
 

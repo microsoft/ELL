@@ -35,9 +35,9 @@ namespace nodes
     utilities::ObjectDescription SingleElementThresholdNode::GetDescription() const
     {
         utilities::ObjectDescription description = GetParentDescription<Node, SingleElementThresholdNode>();
-        description[inputPortName] = _input;
-        description[outputPortName] = _output;
-        description["predictor"] = _predictor;
+        description[inputPortName] << _input;
+        description[outputPortName] << _output;
+        description["predictor"] << _predictor;
         return description;
     }
 
