@@ -29,7 +29,7 @@ namespace trainers
         size_t candidatesPerInput;
     };
 
-    /// <summary> A histogram forest trainer. </summary>
+    /// <summary> A histogram trainer for binary decision forests with threshold split rules and constant outputs. </summary>
     ///
     /// <typeparam name="LossFunctionType"> The loss function type. </typeparam>
     /// <typeparam name="BoosterType"> The booster type. </typeparam>
