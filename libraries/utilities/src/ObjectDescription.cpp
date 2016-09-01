@@ -77,8 +77,7 @@ namespace utilities
 
     ObjectDescription& ObjectDescription::operator[](const std::string& propertyName)
     {
-        auto& prop = _properties[propertyName];        
-        prop.FillInDescription();
+        auto& prop = _properties[propertyName];
         return prop;
     }
 

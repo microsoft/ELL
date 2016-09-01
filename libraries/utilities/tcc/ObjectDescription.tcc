@@ -34,7 +34,7 @@ namespace utilities
             else
             {
                 ObjectDescription description;
-                ValueType value;
+                typename std::decay<ValueType>::type value;
                 value.AddProperties(description);
                 return description;
             }
@@ -62,7 +62,9 @@ namespace utilities
     template <typename ValueType>
     void ObjectDescription::SetValue(ValueType&& value)
     {
+        SetType(value);
         _value = value;
+        SetGetPropertiesFunction<typename std::decay<ValueType>::type>(std::is_base_of<utilities::IDescribable, typename std::decay<ValueType>::type>());
         FillInDescription();
     }
 
