@@ -150,7 +150,7 @@ namespace trainers
         };
 
         // a priority queue of SplitCandidates
-        struct PriorityQueue : public std::priority_queue<SplitCandidate>
+        struct SplitCandidatePriorityQueue : public std::priority_queue<SplitCandidate>
         {
             void PrintLine(std::ostream& os, size_t tabs=0) const;
             using std::priority_queue<SplitCandidate>::size;
@@ -195,7 +195,7 @@ namespace trainers
         std::shared_ptr<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> _forest;
 
         // the priority queue that holds the split candidates
-        PriorityQueue _queue;
+        SplitCandidatePriorityQueue _queue;
 
         // the dataset
         using ForestTrainerExample = dataset::Example<dataset::DoubleDataVector, ExampleMetadata>; 

@@ -49,7 +49,7 @@ namespace trainers
             // reset the queue and add the root split from the graph
             if(_queue.size() > 0)
             {
-                _queue = PriorityQueue();
+                _queue = SplitCandidatePriorityQueue();
             }
             _queue.push(std::move(rootSplit));
 
@@ -201,7 +201,7 @@ namespace trainers
     //
  
     template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::PriorityQueue::PrintLine(std::ostream& os, size_t tabs) const
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidatePriorityQueue::PrintLine(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "Priority Queue Size: " << size() << "\n";
 
