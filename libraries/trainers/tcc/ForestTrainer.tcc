@@ -38,7 +38,7 @@ namespace trainers
             VERBOSE_MODE(_forest->PrintLine(std::cout, 1));
 
             // find split candidate for root node and push it onto the priority queue
-            auto rootSplit = GetBestSplitCandidateAtNode(_forest->GetNewRootId(), Range{0, _dataset.NumExamples()}, sums);
+            auto rootSplit = GetBestSplitRuleAtNode(_forest->GetNewRootId(), Range{0, _dataset.NumExamples()}, sums);
 
             // check for positive gain 
             if(rootSplit.gain < _parameters.minSplitGain || _parameters.maxSplitsPerRound == 0)
@@ -149,8 +149,10 @@ namespace trainers
 
             // update current output field in metadata
             auto edgePredictors = GetEdgePredictors(stats);
-            UpdateCurrentOutputs(ranges.GetChildRange(0), edgePredictors[0]);
-            UpdateCurrentOutputs(ranges.GetChildRange(1), edgePredictors[1]);
+            for(size_t i = 0; i<splitCandidate.splitRule.NumOutputs(); ++i)
+            {
+                UpdateCurrentOutputs(ranges.GetChildRange(i), edgePredictors[i]);
+            }
 
             // have the forest perform the split
             using SplitAction = predictors::SimpleForestPredictor::SplitAction;
@@ -168,9 +170,9 @@ namespace trainers
             }
 
             // queue new split candidates
-            for (size_t i = 0; i<2; ++i)
+            for (size_t i = 0; i<splitCandidate.splitRule.NumOutputs(); ++i)
             {
-                auto splitCandidate = GetBestSplitCandidateAtNode(_forest->GetChildId(interiorNodeIndex, i), ranges.GetChildRange(i), stats.GetChildSums(i));
+                auto splitCandidate = GetBestSplitRuleAtNode(_forest->GetChildId(interiorNodeIndex, i), ranges.GetChildRange(i), stats.GetChildSums(i));
                 if (splitCandidate.gain > _parameters.minSplitGain)
                 {
                     _queue.push(std::move(splitCandidate));
@@ -184,7 +186,7 @@ namespace trainers
     {
         if(splitRule.NumOutputs() == 2)
         {
-            _dataset.Partition([splitRule](const ForestTrainerExample& example) { return splitRule.Predict(example.GetDataVector()) == 0 ? true : false; },
+            _dataset.Partition([splitRule](const ForestTrainerExample& example) { return splitRule.Predict(example.GetDataVector()) == 0; },
                                range.firstIndex,
                                range.size);
         }

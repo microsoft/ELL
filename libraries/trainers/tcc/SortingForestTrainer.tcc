@@ -13,7 +13,7 @@ namespace trainers
     {}
 
     template<typename LossFunctionType, typename BoosterType>
-    auto SortingForestTrainer<LossFunctionType, BoosterType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums) -> SplitCandidate
+    auto SortingForestTrainer<LossFunctionType, BoosterType>::GetBestSplitRuleAtNode(SplittableNodeId nodeId, Range range, Sums sums) -> SplitCandidate
     {
         auto numFeatures = _dataset.GetMaxDataVectorSize();
 

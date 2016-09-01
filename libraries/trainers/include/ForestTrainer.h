@@ -180,7 +180,7 @@ namespace trainers
         // implementation specific functions that must be implemented by a derived class
         // 
 
-        virtual SplitCandidate GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums) = 0;
+        virtual SplitCandidate GetBestSplitRuleAtNode(SplittableNodeId nodeId, Range range, Sums sums) = 0;
         virtual std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) = 0;
         
         //

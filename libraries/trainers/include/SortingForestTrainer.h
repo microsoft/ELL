@@ -22,6 +22,11 @@ namespace trainers
     {
     };
 
+    /// <summary> A trainer for binary decision forests with threshold split rules and constant outputs
+    /// that operates by sorting the dataset by each feature. </summary>
+    ///
+    /// <typeparam name="LossFunctionType"> Loss function type. </typeparam>
+    /// <typeparam name="BoosterType"> Booster type. </typeparam>
     template <typename LossFunctionType, typename BoosterType> 
     class SortingForestTrainer : public ForestTrainer<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor, BoosterType>
     {
@@ -44,7 +49,7 @@ namespace trainers
 
     protected:
         using ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::_dataset;
-        virtual SplitCandidate GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums) override;
+        virtual SplitCandidate GetBestSplitRuleAtNode(SplittableNodeId nodeId, Range range, Sums sums) override;
         virtual std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) override;
 
     private:

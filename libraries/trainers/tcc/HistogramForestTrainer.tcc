@@ -17,11 +17,11 @@ namespace trainers
     {}
 
     template<typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
-    auto HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums) -> SplitCandidate
+    auto HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::GetBestSplitRuleAtNode(SplittableNodeId nodeId, Range range, Sums sums) -> SplitCandidate
     {
         SplitCandidate bestSplitCandidate(nodeId, range, sums);
 
-        auto splitRuleCandidates = GetSplitCandidatesAtNode(range);
+        auto splitRuleCandidates = CallThresholdFinder(range);
 
         for (const auto& splitRuleCandidate : splitRuleCandidates) 
         {
@@ -69,7 +69,7 @@ namespace trainers
     }
 
     template<typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
-    auto HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::GetSplitCandidatesAtNode(Range range) -> std::vector<SplitRuleType>
+    auto HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>::CallThresholdFinder(Range range) -> std::vector<SplitRuleType>
     {
         // uniformly choose _candidatesPerInput from the range, without replacement
         _dataset.RandomPermute(_random, range.firstIndex, range.size, _thresholdFinderSampleSize);

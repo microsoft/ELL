@@ -56,7 +56,7 @@ namespace trainers
 
     protected:
         using ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::_dataset;
-        virtual SplitCandidate GetBestSplitCandidateAtNode(SplittableNodeId nodeId, Range range, Sums sums) override;
+        virtual SplitCandidate GetBestSplitRuleAtNode(SplittableNodeId nodeId, Range range, Sums sums) override;
         virtual std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) override;
 
     private:
@@ -68,7 +68,7 @@ namespace trainers
         };
 
         double CalculateGain(const Sums& sums, const Sums& sums0, const Sums& sums1) const;
-        std::vector<SplitRuleType> GetSplitCandidatesAtNode(Range range);
+        std::vector<SplitRuleType> CallThresholdFinder(Range range);
         std::tuple<Sums, size_t> EvaluateSplitRule(const SplitRuleType& splitRule, const Range& range) const;
 
         // member variables
