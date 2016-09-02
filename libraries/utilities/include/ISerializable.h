@@ -39,5 +39,10 @@ namespace utilities
         /// <param name="serializer"> The deserializer. </param>
         /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(Deserializer& serializer) { throw LogicException(LogicExceptionErrors::notImplemented); }
+
+        /// <summary> Gets the name of this type. </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "ISerializable"; }
     };
 }

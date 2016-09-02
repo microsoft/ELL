@@ -119,6 +119,24 @@ namespace utilities
     class Serializer
     {
     public:
+        /// <summary> Represents a serializer that is scoped to a partticular property. </summary>
+        class PropertySerializer
+        {
+        public:
+            /// <summary> Serializes the property. </summary>
+            ///
+            /// <typeparam name="ValueType"> The type of the property. </typeparam>
+            /// <param name="value"> The property to serialize. </param>
+            template <typename ValueType>
+            void operator<<(ValueType&& value);
+
+        private:
+            friend class Serializer;
+            PropertySerializer(Serializer& serializer, const std::string& name);
+            Serializer& _serializer;
+            std::string _propertyName;
+        };
+
         /// <summary> Serialize unnamed values of any serializable type. </summary>
         ///
         /// <param name="value"> The value to serialize. </param>
@@ -137,6 +155,8 @@ namespace utilities
         ///
         /// <param name="name"> The name to serialize the value under. </param>
         /// <param name="value"> The value to serialize. </param>
+
+        PropertySerializer operator[](const std::string& name) { return PropertySerializer{ *this, name }; }
 
     protected:
         // These are all the virtual function that need to be implemented by serializers
@@ -192,7 +212,7 @@ namespace utilities
     class Deserializer
     {
     public:
-        /// <summary> Represents a serializer that is scoped to a partticular property. </summary>
+        /// <summary> Represents a deserializer that is scoped to a partticular property. </summary>
         class PropertyDeserializer
         {
         public:
@@ -201,14 +221,11 @@ namespace utilities
             /// <typeparam name="ValueType"> The type of the property. </typeparam>
             /// <param name="value"> The variable to deserialize the property into. </param>
             template <typename ValueType>
-            void operator>>(ValueType&& value)
-            {
-                _deserializer.Deserialize(_propertyName.c_str(), value);
-            }
+            void operator>>(ValueType&& value);
 
         private:
             friend class Deserializer;
-            PropertyDeserializer(Deserializer& deserializer, const std::string& name) : _deserializer(deserializer), _propertyName(name){};
+            PropertyDeserializer(Deserializer& deserializer, const std::string& name);
             Deserializer& _deserializer;
             std::string _propertyName;
         };

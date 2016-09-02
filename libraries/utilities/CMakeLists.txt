@@ -20,17 +20,19 @@ set (SRC src/CompressedIntegerList.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
          src/ObjectDescription.cpp
+         src/ObjectDescriptionSerializer.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
          src/Serializer.cpp
          src/JsonSerializer.cpp
          src/Tokenizer.cpp
-         src/XMLSerializer.cpp
          src/TypeName.cpp
          src/UniqueId.cpp
-         src/Variant.cpp)
+         src/Variant.cpp
+         src/XMLSerializer.cpp)
 
-set (INCLUDE include/CompressedIntegerList.h
+set (INCLUDE include/Archiver.h
+             include/CompressedIntegerList.h
              include/CommandLineParser.h
              include/Exception.h
              include/Files.h
@@ -39,41 +41,43 @@ set (INCLUDE include/CompressedIntegerList.h
              include/IntegerList.h
              include/IntegerStack.h
              include/ISerializable.h
+             include/JsonSerializer.h
              include/ObjectDescription.h
+             include/ObjectDescriptionSerializer.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
              include/Parser.h
              include/RandomEngines.h
              include/Serializer.h
-             include/JsonSerializer.h
-             include/Tokenizer.h
-             include/XMLSerializer.h
              include/StlIndexValueIterator.h
              include/StlIterator.h
+             include/Tokenizer.h
              include/TransformIterator.h
              include/TypeFactory.h
              include/TypeName.h
              include/TypeTraits.h
              include/UniqueId.h
-             include/Variant.h)
+             include/Variant.h
+             include/XMLSerializer.h)
 
 set (TCC tcc/AnyIterator.tcc
          tcc/CommandLineParser.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
+         tcc/JsonSerializer.tcc
          tcc/ObjectDescription.tcc
+         tcc/ObjectDescriptionSerializer.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
          tcc/Serializer.tcc
-         tcc/JsonSerializer.tcc
-         tcc/XMLSerializer.tcc
          tcc/StlIndexValueIterator.tcc
          tcc/StlIterator.tcc
          tcc/TransformIterator.tcc
          tcc/TypeFactory.tcc
          tcc/TypeName.tcc
          tcc/TypeTraits.tcc
-         tcc/Variant.tcc)
+         tcc/Variant.tcc
+         tcc/XMLSerializer.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

@@ -15,7 +15,13 @@
 namespace utilities
 {
     //
-    // Serializer
+    // PropertySerializer class
+    //
+    Serializer::PropertySerializer::PropertySerializer(Serializer& serializer, const std::string& name) : _serializer(serializer), _propertyName(name)
+    {};
+
+    //
+    // Serializer class
     //
     void Serializer::SerializeValue(const char* name, const ISerializable& value)
     {
@@ -34,9 +40,14 @@ namespace utilities
         // nothing
     }
 
+    //
+    // PropertySerializer class
+    //
+    Deserializer::PropertyDeserializer::PropertyDeserializer(Deserializer& deserializer, const std::string& name) : _deserializer(deserializer), _propertyName(name)
+    {};
 
     //
-    // Deserializer
+    // Deserializer class
     //
     Deserializer::Deserializer(SerializationContext context) : _baseContext(context)
     {        

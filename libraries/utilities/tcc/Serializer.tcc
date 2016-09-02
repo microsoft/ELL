@@ -9,6 +9,17 @@
 namespace utilities
 {
     //
+    // PropertySerializer class
+    //
+
+    template <typename ValueType>
+    void Serializer::PropertySerializer::operator<<(ValueType&& value)
+    {
+        _serializer.Serialize(_propertyName.c_str(), value);
+    }
+
+
+    //
     // Serializer class
     //
 
@@ -80,8 +91,18 @@ namespace utilities
         SerializeArray(name, baseTypeName, tmpArray);
     }
 
+
     //
-    // Deserialization
+    // PropertyDeserializer class
+    //
+    template <typename ValueType>
+    void Deserializer::PropertyDeserializer::operator>>(ValueType&& value)
+    {
+        _deserializer.Deserialize(_propertyName.c_str(), value);
+    }
+
+    //
+    // Deserializer class
     //
     template <typename ValueType>
     void Deserializer::Deserialize(ValueType&& value)
