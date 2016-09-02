@@ -30,22 +30,22 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void  MultiplexerNode<ValueType, SelectorType>::AddProperties(utilities::Archiver& description) const
+    void  MultiplexerNode<ValueType, SelectorType>::AddProperties(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(description);
-        description.SetType(*this);
-        description["elements"] << _elements;
-        description["selector"] << _selector;
-        description[outputPortName] << _output;
+        Node::AddProperties(archiver);
+        archiver.SetType(*this);
+        archiver["elements"] << _elements;
+        archiver["selector"] << _selector;
+        archiver[outputPortName] << _output;
     }
 
     template <typename ValueType, typename SelectorType>
-    void  MultiplexerNode<ValueType, SelectorType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void  MultiplexerNode<ValueType, SelectorType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        Node::SetObjectState(description, context);
-        description["elements"] >> _elements;
-        description["selector"] >> _selector;
-        description[outputPortName] >> _output;
+        Node::SetObjectState(archiver, context);
+        archiver["elements"] >> _elements;
+        archiver["selector"] >> _selector;
+        archiver[outputPortName] >> _output;
     }
 
     template <typename ValueType, typename SelectorType>

@@ -38,19 +38,19 @@ namespace nodes
     }
 
     template <typename InputValueType, typename OutputValueType>
-    void TypeCastNode<InputValueType, OutputValueType>::AddProperties(utilities::Archiver& description) const
+    void TypeCastNode<InputValueType, OutputValueType>::AddProperties(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(description);
-        description.SetType(*this);
-        description[inputPortName] << _input;
-        description[outputPortName] << _output;
+        Node::AddProperties(archiver);
+        archiver.SetType(*this);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
     }
 
     template <typename InputValueType, typename OutputValueType>
-    void TypeCastNode<InputValueType, OutputValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void TypeCastNode<InputValueType, OutputValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        Node::SetObjectState(description, context);
-        description[inputPortName] >> _input;
-        description[outputPortName] >> _output;
+        Node::SetObjectState(archiver, context);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
     }
 }

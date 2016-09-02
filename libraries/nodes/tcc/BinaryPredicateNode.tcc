@@ -104,25 +104,25 @@ namespace nodes
     };
 
     template <typename ValueType>
-    void BinaryPredicateNode<ValueType>::AddProperties(utilities::Archiver& description) const
+    void BinaryPredicateNode<ValueType>::AddProperties(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(description);
-        description.SetType(*this);
-        description[input1PortName] << _input1;
-        description[input2PortName] << _input2;
-        description[outputPortName] << _output;
-        description["predicate"] << static_cast<int>(_predicate);
+        Node::AddProperties(archiver);
+        archiver.SetType(*this);
+        archiver[input1PortName] << _input1;
+        archiver[input2PortName] << _input2;
+        archiver[outputPortName] << _output;
+        archiver["predicate"] << static_cast<int>(_predicate);
     }
 
     template <typename ValueType>
-    void BinaryPredicateNode<ValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void BinaryPredicateNode<ValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        Node::SetObjectState(description, context);
-        description[input1PortName] >> _input1;
-        description[input2PortName] >> _input2;
-        description[outputPortName] >> _output;
+        Node::SetObjectState(archiver, context);
+        archiver[input1PortName] >> _input1;
+        archiver[input2PortName] >> _input2;
+        archiver[outputPortName] >> _output;
         int predicate = 0;
-        description["predicate"] >> predicate;
+        archiver["predicate"] >> predicate;
         _predicate = static_cast<PredicateType>(predicate);
     }
     

@@ -94,18 +94,18 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputPort<ValueType>::AddProperties(utilities::Archiver& description) const
+    void InputPort<ValueType>::AddProperties(utilities::Archiver& archiver) const
     {
-        Port::AddProperties(description);
-        description.SetType(*this);
-        description["input"] << _input;
+        Port::AddProperties(archiver);
+        archiver.SetType(*this);
+        archiver["input"] << _input;
     }
 
     template <typename ValueType>
-    void InputPort<ValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void InputPort<ValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        Port::SetObjectState(description, context);
-        description["input"] >> _input;
+        Port::SetObjectState(archiver, context);
+        archiver["input"] >> _input;
         ComputeParents();
     }  
 }

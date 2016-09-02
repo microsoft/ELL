@@ -33,22 +33,22 @@ namespace nodes
     }
 
     template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::AddProperties(utilities::Archiver& description) const
+    void ExtremalValueNode<ValueType, max>::AddProperties(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(description);
-        description.SetType(*this);
-        description[inputPortName] << _input;
-        description[valPortName] << _val;
-        description[argValPortName] << _argVal;
+        Node::AddProperties(archiver);
+        archiver.SetType(*this);
+        archiver[inputPortName] << _input;
+        archiver[valPortName] << _val;
+        archiver[argValPortName] << _argVal;
     }
 
     template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void ExtremalValueNode<ValueType, max>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        Node::SetObjectState(description, context);
-        description[inputPortName] >> _input;
-        description[valPortName] >> _val;
-        description[argValPortName] >> _argVal;
+        Node::SetObjectState(archiver, context);
+        archiver[inputPortName] >> _input;
+        archiver[valPortName] >> _val;
+        archiver[argValPortName] >> _argVal;
     }
     
     template <typename ValueType, bool max>

@@ -31,15 +31,15 @@ namespace utilities
         return stream;
     }
 
-    void UniqueId::AddProperties(Archiver& description) const
+    void UniqueId::AddProperties(Archiver& archiver) const
     {
-        description.SetType(*this);
-        description["id"] << _id;
+        archiver.SetType(*this);
+        archiver["id"] << _id;
     }
 
-    void UniqueId::SetObjectState(const Archiver& description, SerializationContext& context)
+    void UniqueId::SetObjectState(const Archiver& archiver, SerializationContext& context)
     {
-        description["id"] >> _id;
+        archiver["id"] >> _id;
     }
 
     std::string to_string(const UniqueId& id)

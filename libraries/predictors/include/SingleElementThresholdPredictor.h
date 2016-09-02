@@ -38,15 +38,15 @@ namespace predictors
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Adds an object's properties to an ObjectDescription </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="description"> The ObjectDescription for the object </param>
-        virtual void AddProperties(utilities::Archiver& description) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void AddProperties(utilities::Archiver& archiver) const override;
 
-        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="description"> The `ObjectDescription` to get state from </param>
-        virtual void SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context) override;
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context) override;
 
         /// <summary> Gets the index of the element used to define the rule. </summary>
         ///

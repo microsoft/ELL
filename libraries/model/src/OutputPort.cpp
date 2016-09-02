@@ -14,17 +14,17 @@ namespace model
     OutputPortBase::OutputPortBase(const class Node* node, std::string name, PortType type, size_t size) : Port(node, name, type), _size(size), _isReferenced(false) 
     {}
 
-    void OutputPortBase::AddProperties(utilities::Archiver& description) const
+    void OutputPortBase::AddProperties(utilities::Archiver& archiver) const
     {
-        Port::AddProperties(description);
-        description.SetType(*this);
-        description["size"] << _size;
+        Port::AddProperties(archiver);
+        archiver.SetType(*this);
+        archiver["size"] << _size;
 
     }
 
-    void OutputPortBase::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void OutputPortBase::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        Port::SetObjectState(description, context);
-        description["size"] >> _size;
+        Port::SetObjectState(archiver, context);
+        archiver["size"] >> _size;
     }    
 }

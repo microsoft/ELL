@@ -63,22 +63,22 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void MovingAverageNode<ValueType>::AddProperties(utilities::Archiver& description) const
+    void MovingAverageNode<ValueType>::AddProperties(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(description);
-        description.SetType(*this);
-        description[inputPortName] << _input;
-        description[outputPortName] << _output;
-        description["windowSize"] << _windowSize;
+        Node::AddProperties(archiver);
+        archiver.SetType(*this);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
+        archiver["windowSize"] << _windowSize;
     }
 
     template <typename ValueType>
-    void MovingAverageNode<ValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void MovingAverageNode<ValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        Node::SetObjectState(description, context);
-        description[inputPortName] >> _input;
-        description[outputPortName] >> _output;
-        description["windowSize"] >> _windowSize;
+        Node::SetObjectState(archiver, context);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
+        archiver["windowSize"] >> _windowSize;
 
         auto dimension = _input.Size();
         _samples.clear();

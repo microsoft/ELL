@@ -29,14 +29,14 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputPort<ValueType>::AddProperties(utilities::Archiver& description) const
+    void OutputPort<ValueType>::AddProperties(utilities::Archiver& archiver) const
     {
-        OutputPortBase::AddProperties(description);
+        OutputPortBase::AddProperties(archiver);
     }
 
     template <typename ValueType>
-    void OutputPort<ValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void OutputPort<ValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        OutputPortBase::SetObjectState(description, context);
+        OutputPortBase::SetObjectState(archiver, context);
     }    
 }

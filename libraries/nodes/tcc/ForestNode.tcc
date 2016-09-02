@@ -29,26 +29,26 @@ namespace nodes
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::AddProperties(utilities::Archiver& description) const
+    void ForestNode<SplitRuleType, EdgePredictorType>::AddProperties(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(description);
-        description.SetType(*this);
-        description[inputPortName] << _input;
-        description[outputPortName] << _output;
-        description[treeOutputsPortName] << _treeOutputs;
-        description[edgeIndicatorVectorPortName] << _edgeIndicatorVector;
-        description["forest"] << _forest;
+        Node::AddProperties(archiver);
+        archiver.SetType(*this);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
+        archiver[treeOutputsPortName] << _treeOutputs;
+        archiver[edgeIndicatorVectorPortName] << _edgeIndicatorVector;
+        archiver["forest"] << _forest;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void ForestNode<SplitRuleType, EdgePredictorType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        Node::SetObjectState(description, context);
-        description[inputPortName] >> _input;
-        description[outputPortName] >> _output;
-        description[treeOutputsPortName] >> _treeOutputs;
-        description[edgeIndicatorVectorPortName] >> _edgeIndicatorVector;
-        description["forest"] >> _forest;
+        Node::SetObjectState(archiver, context);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
+        archiver[treeOutputsPortName] >> _treeOutputs;
+        archiver[edgeIndicatorVectorPortName] >> _edgeIndicatorVector;
+        archiver["forest"] >> _forest;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>

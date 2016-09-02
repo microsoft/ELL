@@ -37,9 +37,8 @@ namespace model
         return NodeIterator(this, outputNodes);
     }
 
-    void Model::AddProperties(utilities::Archiver& description) const
+    void Model::AddProperties(utilities::Archiver& archiver) const
     {
-        description.SetType(*this);
         std::vector<const Node*> nodes;
         auto nodeIter = GetNodeIterator();
         while(nodeIter.IsValid())
@@ -48,17 +47,17 @@ namespace model
             nodeIter.Next();
         }
 
-        description.SetType(*this);
-        description["nodes"] << nodes;
+        archiver.SetType(*this);
+        archiver["nodes"] << nodes;
     }
 
-    void Model::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void Model::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
         ModelSerializationContext modelContext(context, this);
         
         // Deserialize nodes into big array
         std::vector<const Node*> nodes;
-        description["nodes"] >> nodes;
+        archiver["nodes"] >> nodes;
 
         // Now add them to the model
         for(auto& node: nodes)

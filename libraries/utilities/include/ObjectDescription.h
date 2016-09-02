@@ -152,19 +152,19 @@ namespace utilities
     public:
         virtual ~IDescribable() = default;
 
-        /// <summary> Adds an object's properties to an ObjectDescription </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <returns> The ObjectDescription for the object </returns>
         virtual ObjectDescription GetDescription() const;
 
         /// <summary> Adds an objects properties to an ObjectDescription </summary>
         ///
-        /// <param name="description"> The ObjectDescription for the object </param>
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
         virtual void AddProperties(ObjectDescription& description) const = 0;
 
-        /// <summary> Sets the internal state of the object according to the description passed in </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="description"> The `ObjectDescription` to get state from </param>
+        /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void SetObjectState(const ObjectDescription& description, SerializationContext& context) = 0;
 
         /// <summary> Utility function for polymorphic types to get parent's description as starting point </summary>
@@ -201,11 +201,8 @@ namespace utilities
     template <typename ValueType>
     using IsNotDescribable = typename std::enable_if_t<(!std::is_base_of<IDescribable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
 
-
-
-// Temporary
-using Archiver = ObjectDescription;
+    // Temporary
+    using Archiver = ObjectDescription;
 }
-
 
 #include "../tcc/ObjectDescription.tcc"

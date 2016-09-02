@@ -47,33 +47,33 @@ namespace model
 
     bool PortRange::IsFullPortRange() const { return GetStartIndex() == 0 && Size() == ReferencedPort()->Size(); }
 
-    void PortRange::AddProperties(utilities::Archiver& description) const
+    void PortRange::AddProperties(utilities::Archiver& archiver) const
     {
-        description.SetType(*this);
-        description["startIndex"] << _startIndex;
-        description["numValues"] << _numValues;
-        description["isFixedSize"] << _isFixedSize;
+        archiver.SetType(*this);
+        archiver["startIndex"] << _startIndex;
+        archiver["numValues"] << _numValues;
+        archiver["isFixedSize"] << _isFixedSize;
         if (_referencedPort != nullptr)
         {
-            description["referencedNodeId"] << _referencedPort->GetNode()->GetId();
-            description["referencedPortName"] << _referencedPort->GetName();
+            archiver["referencedNodeId"] << _referencedPort->GetNode()->GetId();
+            archiver["referencedPortName"] << _referencedPort->GetName();
         }
         else
         {
-            description["referencedNodeId"] << utilities::UniqueId();
-            description["referencedPortName"] << std::string{ "" };
+            archiver["referencedNodeId"] << utilities::UniqueId();
+            archiver["referencedPortName"] << std::string{ "" };
         }
     }
 
-    void PortRange::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void PortRange::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        description["startIndex"] >> _startIndex;
-        description["numValues"] >> _numValues;
-        description["isFixedSize"] >> _isFixedSize;
+        archiver["startIndex"] >> _startIndex;
+        archiver["numValues"] >> _numValues;
+        archiver["isFixedSize"] >> _isFixedSize;
         Node::NodeId newId;
-        description["referencedNodeId"] >> newId;
+        archiver["referencedNodeId"] >> newId;
         std::string portName;
-        description["referencedPortName"] >> portName;
+        archiver["referencedPortName"] >> portName;
 
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         Node* newNode = newContext.GetNodeFromId(newId);
@@ -169,15 +169,15 @@ namespace model
         }
     }
 
-    void PortElementsBase::AddProperties(utilities::Archiver& description) const
+    void PortElementsBase::AddProperties(utilities::Archiver& archiver) const
     {
-        description.SetType(*this);
-        description["ranges"] << _ranges;
+        archiver.SetType(*this);
+        archiver["ranges"] << _ranges;
     }
 
-    void PortElementsBase::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void PortElementsBase::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        description["ranges"] >> _ranges;
+        archiver["ranges"] >> _ranges;
         ComputeSize();
     }
 }

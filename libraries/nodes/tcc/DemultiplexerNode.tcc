@@ -36,24 +36,24 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void  DemultiplexerNode<ValueType, SelectorType>::AddProperties(utilities::Archiver& description) const
+    void  DemultiplexerNode<ValueType, SelectorType>::AddProperties(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(description);
-        description.SetType(*this);
-        description[inputPortName] << _input;
-        description[selectorPortName] << _selector;
-        description[outputPortName] << _output;
-        description["defaultValue"] << _defaultValue;
+        Node::AddProperties(archiver);
+        archiver.SetType(*this);
+        archiver[inputPortName] << _input;
+        archiver[selectorPortName] << _selector;
+        archiver[outputPortName] << _output;
+        archiver["defaultValue"] << _defaultValue;
     }
 
     template <typename ValueType, typename SelectorType>
-    void DemultiplexerNode<ValueType, SelectorType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void DemultiplexerNode<ValueType, SelectorType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        Node::SetObjectState(description, context);
-        description[inputPortName] >> _input;
-        description[selectorPortName] >> _selector;
-        description[outputPortName] >> _output;
-        description["defaultValue"] >> _defaultValue;
+        Node::SetObjectState(archiver, context);
+        archiver[inputPortName] >> _input;
+        archiver[selectorPortName] >> _selector;
+        archiver[outputPortName] >> _output;
+        archiver["defaultValue"] >> _defaultValue;
     }
     
     template <typename ValueType, typename SelectorType>

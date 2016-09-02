@@ -31,17 +31,17 @@ public:
     int GetA() const { return _a; }
     double GetB() const { return _b; }
 
-    virtual void AddProperties(utilities::Archiver& description) const override
+    virtual void AddProperties(utilities::Archiver& archiver) const override
     {
-        description.SetType(*this);
-        description["a"] = _a;
-        description["b"] = _b;
+        archiver.SetType(*this);
+        archiver["a"] = _a;
+        archiver["b"] = _b;
     }
 
-    virtual void SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context) override
+    virtual void SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context) override
     {
-        description["a"] >> _a;
-        description["b"] >> _b;
+        archiver["a"] >> _a;
+        archiver["b"] >> _b;
     }
 
     static std::string GetTypeName() { return "InnerObject"; }
@@ -59,17 +59,17 @@ public:
     DerivedObject(int a, double b, std::string c) : InnerObject(a, b), _c(c) {}
     std::string GetC() { return _c; }
 
-    virtual void AddProperties(utilities::Archiver& description) const override
+    virtual void AddProperties(utilities::Archiver& archiver) const override
     {
-        InnerObject::AddProperties(description);
-        description.SetType(*this);
-        description["c"] = _c;
+        InnerObject::AddProperties(archiver);
+        archiver.SetType(*this);
+        archiver["c"] = _c;
     }
 
-    virtual void SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context) override
+    virtual void SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context) override
     {
-        InnerObject::SetObjectState(description, context);
-        description["c"] >> _c;
+        InnerObject::SetObjectState(archiver, context);
+        archiver["c"] >> _c;
     }
 
     static std::string GetTypeName() { return "DerivedObject"; }
@@ -87,17 +87,17 @@ public:
     std::string GetName() { return _name; }
     InnerObject GetInner() { return _inner; }
 
-    virtual void AddProperties(utilities::Archiver& description) const override
+    virtual void AddProperties(utilities::Archiver& archiver) const override
     {
-        description.SetType(*this);
-        description["name"] = _name;
-        description["obj"] = _inner;
+        archiver.SetType(*this);
+        archiver["name"] = _name;
+        archiver["obj"] = _inner;
     }
 
-    virtual void SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context) override
+    virtual void SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context) override
     {
-        description["name"] >> _name;
-        description["obj"] >> _inner;
+        archiver["name"] >> _name;
+        archiver["obj"] >> _inner;
     }
 
     static std::string GetTypeName() { return "OuterObject"; }

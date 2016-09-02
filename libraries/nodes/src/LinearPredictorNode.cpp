@@ -33,23 +33,23 @@ namespace nodes
         assert(input.Size() == predictor.GetDimension());
     }
 
-    void LinearPredictorNode::AddProperties(utilities::Archiver& description) const
+    void LinearPredictorNode::AddProperties(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(description);
-        description.SetType(*this);
-        description[inputPortName] << _input;
-        description[outputPortName] << _output;
-        description["weightedElements"] << _weightedElements;
-        description["predictor"] << _predictor;
+        Node::AddProperties(archiver);
+        archiver.SetType(*this);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
+        archiver["weightedElements"] << _weightedElements;
+        archiver["predictor"] << _predictor;
     }
 
-    void LinearPredictorNode::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
+    void LinearPredictorNode::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
     {
-        Node::SetObjectState(description, context);
-        description[inputPortName] >> _input;
-        description[outputPortName] >> _output;
-        description["weightedElements"] >> _weightedElements;
-        description["predictor"] >> _predictor;
+        Node::SetObjectState(archiver, context);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
+        archiver["weightedElements"] >> _weightedElements;
+        archiver["predictor"] >> _predictor;
     }
 
     void LinearPredictorNode::Copy(model::ModelTransformer& transformer) const
