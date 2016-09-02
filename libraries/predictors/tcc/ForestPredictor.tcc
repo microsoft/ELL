@@ -271,7 +271,7 @@ namespace predictors
             const auto& interiorNode = _interiorNodes[nodeIndex];
 
             // which way do we go?
-            int edgePosition = interiorNode._splitRule.Predict(input);
+            int edgePosition = static_cast<int>(interiorNode._splitRule.Predict(input));
 
             // check for early eject
             if (edgePosition < 0)
@@ -283,7 +283,7 @@ namespace predictors
             operation(interiorNode, edgePosition);
             
             //follow the edge to the next node
-            auto edge = interiorNode._outgoingEdges[edgePosition];
+            const auto& edge = interiorNode._outgoingEdges[edgePosition];
             nodeIndex = edge.GetTargetNodeIndex();
         }
         while (nodeIndex != 0);

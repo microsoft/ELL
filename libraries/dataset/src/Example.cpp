@@ -1,9 +1,17 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Nothing.cpp (trainers)
+//  File:     Example.cpp (dataset)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Empty file, to ensure that CMake creates a project for this library
+#include "Example.h"
+
+namespace dataset
+{
+    void dataset::WeightLabel::Print(std::ostream & os) const
+    {
+        os << "(" << weight << ", " << label << ")";
+    }
+}

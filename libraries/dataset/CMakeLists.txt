@@ -18,10 +18,12 @@ set (SRC src/DenseDataVector.cpp
          src/SparseBinaryDataVector.cpp
          src/SparseDataVector.cpp
          src/SparseEntryParser.cpp
+         src/Example.cpp
          src/ZeroDataVector.cpp)
 
 set (INCLUDE include/DataVectorBuilder.h
              include/DenseDataVector.h
+             include/Example.h
              include/IDataVector.h
              include/OnesDataVector.h
              include/ParsingIterator.h
@@ -30,17 +32,16 @@ set (INCLUDE include/DataVectorBuilder.h
              include/SparseBinaryDataVector.h
              include/SparseDataVector.h
              include/SparseEntryParser.h
-             include/SupervisedExample.h
              include/SupervisedExampleBuilder.h
              include/ZeroDataVector.h)
 
 set (TCC tcc/DataVectorBuilder.tcc
          tcc/DenseDataVector.tcc
+         tcc/Example.tcc
          tcc/ParsingIterator.tcc
          tcc/RowDataset.tcc
          tcc/SparseBinaryDataVector.tcc
          tcc/SparseDataVector.tcc
-         tcc/SupervisedExample.tcc
          tcc/SupervisedExampleBuilder.tcc)
 
 source_group("src" FILES ${SRC})

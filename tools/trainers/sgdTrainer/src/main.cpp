@@ -14,7 +14,7 @@
 #include "Exception.h"
 
 // dataset
-#include "SupervisedExample.h"
+#include "Example.h"
 
 // common
 #include "SGDIncrementalTrainerArguments.h"

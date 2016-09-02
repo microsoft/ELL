@@ -17,6 +17,7 @@
 #include "SequentialLineIterator.h"
 #include "SparseEntryParser.h"
 #include "ParsingIterator.h"
+#include "Example.h"
 
 // utilties
 #include "Files.h"
@@ -74,7 +75,7 @@ namespace
             {
                 auto labelValue = label == "Other" ? 0.0 : 1.0;
                 auto dataVector = std::static_pointer_cast<dataset::IDataVector>(std::make_shared<dataset::DoubleDataVector>(features));
-                dataset::GenericSupervisedExample example(dataVector, labelValue);
+                dataset::GenericSupervisedExample example(dataVector, dataset::WeightLabel{1, labelValue});
                 dataset.AddExample(std::move(example));
 //                _rows.emplace_back(label, timestamp, features);
             }

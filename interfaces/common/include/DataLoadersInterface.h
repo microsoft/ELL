@@ -12,7 +12,7 @@
 #include "RowDatasetInterface.h"
 
 #include "DataLoadArguments.h"
-#include "SupervisedExample.h"
+#include "Example.h"
 #include "AnyIterator.h"
 
 namespace interfaces

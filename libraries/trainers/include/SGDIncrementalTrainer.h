@@ -18,7 +18,7 @@
 #include "DoubleVector.h"
 
 // dataset
-#include "SupervisedExample.h"
+#include "Example.h"
 #include "RowDataset.h"
 
 // stl

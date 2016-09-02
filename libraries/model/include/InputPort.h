@@ -75,14 +75,20 @@ namespace model
     class InputPort : public InputPortBase
     {
     public:
+        /// <summary> Default Constructor </summary>
         InputPort();
-        InputPort& operator=(const InputPort& other);
         
         /// <summary> Creates an input port </summary>
         ///
         /// <param name="owningNode"> The node this port belongs to </param>
         /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
         InputPort(const class Node* owningNode, const PortElements<ValueType>& input, std::string name);
+
+        /// <summary> Assignment operator </summary>
+        ///
+        /// <param name="other"> The port to assign to this one </param>
+        /// <returns> A reference to this port </returns>
+        InputPort& operator=(const InputPort& other);
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         ///

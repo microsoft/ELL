@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "IPredictor.h"
+
 // utilities
 #include "ObjectDescription.h"
 
@@ -17,7 +19,7 @@
 namespace predictors
 {
     /// <summary> A predictor that ignores its input and outputs a constant number. This class is used to define decision trees. </summary>
-    class ConstantPredictor : public utilities::IDescribable
+    class ConstantPredictor : public IPredictor<double>, public utilities::IDescribable
     {
     public:
         ConstantPredictor() = default;

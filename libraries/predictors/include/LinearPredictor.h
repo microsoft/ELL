@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "IPredictor.h"
+
 // linear
 #include "DoubleVector.h"
 
@@ -24,7 +26,7 @@
 namespace predictors
 {
     /// <summary> A linear binary predictor. </summary>
-    class LinearPredictor : public utilities::IDescribable
+    class LinearPredictor : public IPredictor<double>, public utilities::IDescribable
     {
     public:
         /// <summary> Default Constructor. </summary>
