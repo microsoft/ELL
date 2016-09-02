@@ -83,5 +83,4 @@ namespace utilities
         // TODO: force archiver to "deserialize" if necessary (?)
         return archiver.GetValue<ValueType>();
     }
-
 }

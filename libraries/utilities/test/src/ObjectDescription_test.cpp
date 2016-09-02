@@ -262,8 +262,8 @@ void TestObjectDescriptionArchiver()
     // TODO: fix error with deserializing compound objects
     utilities::ObjectDescriptionUnarchiver deserializer2(objectDescription2, context);
     OuterObject deserializedOuter;
-//    deserializer2.Deserialize(deserializedOuter);
-//    testing::ProcessTest("Deserialize with ObjectDescriptionArchiver check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
+    deserializer2.Deserialize(deserializedOuter);
+    testing::ProcessTest("Deserialize with ObjectDescriptionArchiver check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
 
     utilities::ObjectDescriptionUnarchiver deserializer3(objectDescription3, context);
     DerivedObject deserializedDerived;

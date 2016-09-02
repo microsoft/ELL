@@ -95,7 +95,6 @@ namespace utilities
     //
     ObjectDescriptionUnarchiver::ObjectDescriptionUnarchiver(const ObjectDescription& objectDescription, SerializationContext context) : Deserializer(std::move(context)), _objectDescription(objectDescription) 
     {
-        int x = 5;
     }
 
     IMPLEMENT_DESERIALIZE_VALUE(ObjectDescriptionUnarchiver, bool);
@@ -122,7 +121,15 @@ namespace utilities
     // ISerializable
     void ObjectDescriptionUnarchiver::DeserializeObject(const char* name, ISerializable& value) 
     {
-        value.Deserialize(*this);
+        if (std::string{ "" } == name)
+        {
+            value.Deserialize(*this);
+        }
+        else
+        {
+            ObjectDescriptionUnarchiver propertyUnarchiver(_objectDescription[name], GetContext());
+            value.Deserialize(propertyUnarchiver);
+        }
     }
 
     //

@@ -66,15 +66,14 @@ namespace utilities
     
     void Deserializer::DeserializeValue(const char* name, ISerializable& value)
     {
-        auto typeName = value.GetRuntimeTypeName();
-        typeName = BeginDeserializeObject(name, "");
+        auto typeName = BeginDeserializeObject(name, value.GetRuntimeTypeName());
         DeserializeObject(name, value);
         EndDeserializeObject(name, typeName);
     }
 
     std::string Deserializer::BeginDeserializeObject(const char* name, const std::string& typeName)
     {
-        return "";
+        return typeName;
     }
 
     void Deserializer::EndDeserializeObject(const char* name, const std::string& typeName)

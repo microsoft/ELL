@@ -50,31 +50,14 @@ namespace model
         archiver["nodes"] << nodes;
     }
 
-    //void Model::Deserialize(utilities::Unarchiver& archiver)
-    //{
-    //    ModelSerializationContext modelContext(context, this);
-    //    
-    //    // Deserialize nodes into big array
-    //    std::vector<const Node*> nodes;
-    //    archiver["nodes"] >> nodes;
-
-    //    // Now add them to the model
-    //    for(auto& node: nodes)
-    //    {
-    //        auto sharedNode = std::shared_ptr<Node>(const_cast<Node*>(node));
-    //        sharedNode->RegisterDependencies();
-    //        _idToNodeMap[sharedNode->GetId()] = sharedNode;
-    //    }
-    //}
-
-    void Model::Deserialize(utilities::Deserializer& serializer) 
+    void Model::Deserialize(utilities::Unarchiver& archiver) 
     {
-        ModelSerializationContext modelContext(serializer.GetContext(), this);
-        serializer.PushContext(modelContext);
+        ModelSerializationContext modelContext(archiver.GetContext(), this);
+        archiver.PushContext(modelContext);
 
         // Deserialize nodes into big array
         std::vector<std::unique_ptr<Node>> nodes;
-        serializer["nodes"] >> nodes;
+        archiver["nodes"] >> nodes;
 
         // Now add them to the model
         for(auto& node: nodes)
@@ -83,7 +66,7 @@ namespace model
             sharedNode->RegisterDependencies();
             _idToNodeMap[sharedNode->GetId()] = sharedNode;
         }
-        serializer.PopContext();
+        archiver.PopContext();
     }
 
     //
