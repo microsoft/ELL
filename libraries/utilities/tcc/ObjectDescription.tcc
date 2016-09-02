@@ -74,9 +74,14 @@ namespace utilities
         SetValue(value);
     }
 
+    //
+    // IDescribable
+    //
     template <typename ValueType>
-    void ObjectDescription::operator=(ValueType&& value)
+    static ValueType CreateObject(const Archiver& archiver)
     {
-        SetValue(value);
+        // TODO: force archiver to "deserialize" if necessary (?)
+        return archiver.GetValue<ValueType>();
     }
+
 }

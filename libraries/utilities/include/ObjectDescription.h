@@ -115,12 +115,6 @@ namespace utilities
         template <typename ValueType>
         void operator<<(ValueType&& value);
 
-        /// <summary> Sets the value of an object </summary>
-        ///
-        /// <typeparam name="ValueType"> The type of the value to set </typeparam>
-        /// <param name="value"> The value to set the parameter to </param>
-        template <typename ValueType>
-        void operator=(ValueType&& value);
 
     private:
         std::string _typeName;
@@ -141,6 +135,7 @@ namespace utilities
 
         void FillInDescription() const;
     };
+    
     // Temporary
     using Archiver = ObjectDescription;
 
@@ -157,7 +152,15 @@ namespace utilities
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <returns> The ObjectDescription for the object </returns>
-        virtual ObjectDescription GetDescription() const;
+        ObjectDescription GetDescription() const;
+
+        /// <summary> Creates an object from an `Archiver` </summary>
+        ///
+        /// <typeparam name="ValueType"> The type of the object to retrieve </typeparam>
+        /// <param name="archiver"> The `Archiver` to get the object from </param>
+        /// <returns> The new object </returns>
+        template <typename ValueType>
+        static ValueType CreateObject(const Archiver& archiver);
 
         /// <summary> Adds an objects properties to an archiver </summary>
         ///
