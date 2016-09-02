@@ -45,40 +45,31 @@ namespace dataset
 %include "Example.h"
 %include "RowDataset.h"
 
-%template() dataset::RowDataset<dataset::GenericSupervisedExample>;
-%template() dataset::DenseDataVector<double>;
-
 %include "RowDatasetInterface.h"
 %import "RowDataset.h"
 
 %include "unique_ptr.i"
 wrap_unique_ptr(IDataVectorPtr, dataset::IDataVector)
 
+%template() dataset::RowDataset<dataset::GenericSupervisedExample>;
+%template() dataset::DenseDataVector<double>;
 
-namespace dataset
-{
-    // The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
-    %template () DenseDataVector<double>;
-    %template () DenseDataVector<float>;
-    %template () SparseDataVector<double, utilities::CompressedIntegerList>;
-    %template () SparseDataVector<float, utilities::CompressedIntegerList>;
-    %template () SparseDataVector<short, utilities::CompressedIntegerList>;
-    %template () RowDataset<GenericSupervisedExample>;
-    
-    // Bafflingly, the below causes SWIG to give an error about no default constructor for SparseDataVector<>
-    // %template (SparseDoubleDataVectorBase) SparseDataVector<double, utilities::CompressedIntegerList>;
-    // %template (SparseFloatDataVectorBase) SparseDataVector<float, utilities::CompressedIntegerList>;
-    // %template (SparseShortDataVectorBase) SparseDataVector<short, utilities::CompressedIntegerList>;
+// The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
+%template () dataset::DenseDataVector<double>;
+%template () dataset::DenseDataVector<float>;
+%template () dataset::SparseDataVector<double, utilities::CompressedIntegerList>;
+%template () dataset::SparseDataVector<float, utilities::CompressedIntegerList>;
+%template () dataset::SparseDataVector<short, utilities::CompressedIntegerList>;
+%template () dataset::RowDataset<GenericSupervisedExample>;
 
-    // wrap operator[] for python
-    WRAP_OP_AT(DoubleDataVector, double)
+// wrap operator[] for python
+WRAP_OP_AT(dataset::DoubleDataVector, double)
 
-    // wrap "Print" method for python
+// wrap "Print" method for python
 //    WRAP_PRINT_TO_STR(GenericSupervisedExample)
-    WRAP_PRINT_TO_STR(FloatDataVector)
-    WRAP_PRINT_TO_STR(DoubleDataVector)
+WRAP_PRINT_TO_STR(dataset::FloatDataVector)
+WRAP_PRINT_TO_STR(dataset::DoubleDataVector)
 
-    WRAP_PRINT_TO_STR(SparseDoubleDataVector)
-    WRAP_PRINT_TO_STR(SparseFloatDataVector) 
-    WRAP_PRINT_TO_STR(SparseShortDataVector)
-}
+WRAP_PRINT_TO_STR(dataset::SparseDoubleDataVector)
+WRAP_PRINT_TO_STR(dataset::SparseFloatDataVector) 
+WRAP_PRINT_TO_STR(dataset::SparseShortDataVector)
