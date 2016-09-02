@@ -165,11 +165,7 @@ namespace utilities
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void SetObjectState(const ObjectDescription& description, SerializationContext& context) = 0;
-
-        /// <summary> Utility function for polymorphic types to get parent's description as starting point </summary>
-        template <typename BaseType, typename ValueType>
-        ObjectDescription GetParentDescription() const;
+        virtual void SetObjectState(const Archiver& archiver, SerializationContext& context) = 0;
 
         /// <summary> Gets the name of this type. </summary>
         ///
