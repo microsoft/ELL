@@ -20,6 +20,7 @@
 #include "ForestTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "DataLoadArguments.h"
+#include "ModelSaveArguments.h"
 #include "DataLoaders.h"
 #include "MakeTrainer.h"
 #include "MakeEvaluator.h"
@@ -46,10 +47,12 @@ int main(int argc, char* argv[])
         // add arguments to the command line parser
         common::ParsedTrainerArguments trainerArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
+        common::ParsedModelSaveArguments modelSaveArguments;
         common::ParsedForestTrainerArguments forestTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
+        commandLineParser.AddOptionSet(modelSaveArguments);
         commandLineParser.AddOptionSet(forestTrainerArguments);
 
         // parse command line
