@@ -37,8 +37,7 @@ namespace utilities
         /// <summary> Deserializes the object. </summary>
         ///
         /// <param name="serializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(Deserializer& serializer) { throw LogicException(LogicExceptionErrors::notImplemented); }
+        virtual void Deserialize(Deserializer& serializer) = 0;
 
         /// <summary> Gets the name of this type. </summary>
         ///

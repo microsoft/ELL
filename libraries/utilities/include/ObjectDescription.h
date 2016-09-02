@@ -159,10 +159,10 @@ namespace utilities
         /// <returns> The ObjectDescription for the object </returns>
         virtual ObjectDescription GetDescription() const;
 
-        /// <summary> Adds an objects properties to an ObjectDescription </summary>
+        /// <summary> Adds an objects properties to an archiver </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void AddProperties(ObjectDescription& description) const = 0;
+        virtual void AddProperties(Archiver& archiver) const = 0;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
@@ -187,7 +187,6 @@ namespace utilities
         /// <summary> Deserializes the object. </summary>
         ///
         /// <param name="serializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
         virtual void Deserialize(Deserializer& serializer) override;
     };
 

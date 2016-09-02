@@ -254,12 +254,22 @@ namespace utilities
         template <typename ValueType>
         void Deserialize(const char* name, ValueType&& value);
 
-        PropertyDeserializer operator[](const std::string& name) { return PropertyDeserializer{ *this, name }; }
+        /// <summary> Get a deserializer for a named property </summary>
+        ///
+        /// <param name="name"> The name of the property </param>
+        PropertyDeserializer operator[](const std::string& name);
 
+        /// <summary> Set a new serialization context to be current </summary>
+        ///
+        /// <param name="context"> The context </param>
         void PushContext(SerializationContext& context);
 
+        /// <summary> Remove the current serialization context and use the previous one </summary>
         void PopContext() { _contexts.pop_back(); }
 
+        /// <summary> Get the current serialization context </summary>
+        ///
+        /// <returns> The current serialization context </returns>
         SerializationContext& GetContext() { return _contexts.back(); }
 
     protected:

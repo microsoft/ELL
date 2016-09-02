@@ -54,6 +54,11 @@ namespace utilities
         _contexts.push_back(_baseContext);
     }
 
+    Deserializer::PropertyDeserializer Deserializer::operator[](const std::string& name) 
+    { 
+        return PropertyDeserializer{ *this, name }; 
+    }
+
     void Deserializer::PushContext(SerializationContext& context)
     {
         _contexts.push_back(context);
@@ -74,7 +79,6 @@ namespace utilities
 
     void Deserializer::EndDeserializeObject(const char* name, const std::string& typeName)
     {
-        // nothing
     }
 
     void Deserializer::BeginDeserializeArray(const char* name, const std::string& typeName)
