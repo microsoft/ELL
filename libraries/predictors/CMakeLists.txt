@@ -17,13 +17,12 @@ set (SRC src/ConstantPredictor.cpp
          src/SingleElementThresholdPredictor.cpp)
 
 set (INCLUDE include/ConstantPredictor.h
-             include/EnsemblePredictor.h
+             include/IPredictor.h
              include/LinearPredictor.h
              include/SingleElementThresholdPredictor.h
              include/ForestPredictor.h)
 
-set (TCC tcc/EnsemblePredictor.tcc
-         tcc/SingleElementThresholdPredictor.tcc
+set (TCC tcc/SingleElementThresholdPredictor.tcc
          tcc/ForestPredictor.tcc)
 
 source_group("src" FILES ${SRC})

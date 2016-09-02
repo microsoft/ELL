@@ -20,12 +20,14 @@
 #include "ForestTrainerArguments.h"
 #include "TrainerArguments.h"
 #include "DataLoadArguments.h"
+#include "ModelSaveArguments.h"
 #include "DataLoaders.h"
 #include "MakeTrainer.h"
 #include "MakeEvaluator.h"
 
 // trainers
-#include "ForestTrainer.h"
+#include "HistogramForestTrainer.h"
+#include "SortingForestTrainer.h"
 
 // lossFunctions
 #include "SquaredLoss.h"
@@ -45,12 +47,14 @@ int main(int argc, char* argv[])
         // add arguments to the command line parser
         common::ParsedTrainerArguments trainerArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
-        common::ParsedForestTrainerArguments sortingTreeTrainerArguments;
+        common::ParsedModelSaveArguments modelSaveArguments;
+        common::ParsedForestTrainerArguments forestTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
-        commandLineParser.AddOptionSet(sortingTreeTrainerArguments);
-        
+        commandLineParser.AddOptionSet(modelSaveArguments);
+        commandLineParser.AddOptionSet(forestTrainerArguments);
+
         // parse command line
         commandLineParser.Parse();
                 
@@ -62,10 +66,18 @@ int main(int argc, char* argv[])
 
         // load dataset
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto rowDataset = common::GetRowDataset(dataLoadArguments, std::move(map));
+        auto rowDataset = common::GetRowDataset(dataLoadArguments);
 
         // create trainer
-        auto trainer = common::MakeSimpleForestTrainer(trainerArguments.lossArguments, sortingTreeTrainerArguments);
+        std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> trainer;
+        if(true)
+        {
+            trainer = common::MakeSortingForestTrainer(trainerArguments.lossArguments, forestTrainerArguments);
+        }
+        else
+        {
+            trainer = common::MakeHistogramForestTrainer(trainerArguments.lossArguments, forestTrainerArguments);
+        }
 
         // create random number generator
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
@@ -81,10 +93,11 @@ int main(int argc, char* argv[])
         // print loss and errors
         if(trainerArguments.verbose)
         {
-            //std::cout << "Finished training tree with " << tree.NumNodes() << " nodes." << std::endl; 
+            const auto& predictor = trainer->GetPredictor();
+            std::cout << "Finished training forest with " << predictor->NumTrees() << " trees." << std::endl; 
 
             // evaluate
-            //auto evaluator = common::MakeEvaluator<predictors::DecisionTreePredictor>(rowDataset.GetIterator(), evaluators::EvaluatorParameters{1, false}, trainerArguments.lossArguments);
+            // auto evaluator = common::MakeEvaluator<predictors::SimpleForestPredictor>(rowDataset.GetIterator(), evaluators::EvaluatorParameters{1, false}, trainerArguments.lossArguments);
             //evaluator->Evaluate(tree);
             //std::cout << "Training error\n";
             //evaluator->Print(std::cout);

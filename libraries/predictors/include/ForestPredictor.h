@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "IPredictor.h"
 #include "SingleElementThresholdPredictor.h"
 #include "ConstantPredictor.h"
 
@@ -39,7 +40,7 @@ namespace predictors
     /// <typeparam name="SplitRuleType"> Type of split rule to use in interior nodes. </typeparam>
     /// <typeparam name="EdgePredictorType"> Type of predictor to associate with each edge. </typeparam>
     template<typename SplitRuleType, typename EdgePredictorType>
-    class ForestPredictor : public utilities::ISerializable
+    class ForestPredictor : public IPredictor<double>, public utilities::ISerializable
     {
     public:
         /// <summary> A struct that identifies a splittable node in the forest. The splittable node can be

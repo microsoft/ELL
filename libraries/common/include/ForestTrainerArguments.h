@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     BaggingIncrementalTrainerArguments.h (common)
+//  File:     ForestTrainerArguments.h (common)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,14 +12,18 @@
 #include "CommandLineParser.h"
 
 // trainers
-#include "BaggingIncrementalTrainer.h"
+#include "HistogramForestTrainer.h"
+#include "SortingForestTrainer.h"
 
 namespace common
 {
-    using BaggingIncrementalTrainerArguments = trainers::BaggingIncrementalTrainerParameters;
+    struct ForestTrainerArguments : public trainers::SortingForestTrainerParameters, public trainers::HistogramForestTrainerParameters
+    {
+        bool sortingTrainer;
+    };
 
-    /// <summary> Parsed version of bagging parameters. </summary>
-    struct ParsedBaggingIncrementalTrainerArguments : public BaggingIncrementalTrainerArguments, public utilities::ParsedArgSet
+    /// <summary> Parsed version of sorting tree trainer parameters. </summary>
+    struct ParsedForestTrainerArguments : public ForestTrainerArguments, public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///
