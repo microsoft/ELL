@@ -37,7 +37,7 @@ namespace model
         return NodeIterator(this, outputNodes);
     }
 
-    void Model::AddProperties(utilities::Archiver& archiver) const
+    void Model::Serialize(utilities::Archiver& archiver) const
     {
         std::vector<const Node*> nodes;
         auto nodeIter = GetNodeIterator();
@@ -50,22 +50,22 @@ namespace model
         archiver["nodes"] << nodes;
     }
 
-    void Model::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
-    {
-        ModelSerializationContext modelContext(context, this);
-        
-        // Deserialize nodes into big array
-        std::vector<const Node*> nodes;
-        archiver["nodes"] >> nodes;
+    //void Model::Deserialize(utilities::Unarchiver& archiver)
+    //{
+    //    ModelSerializationContext modelContext(context, this);
+    //    
+    //    // Deserialize nodes into big array
+    //    std::vector<const Node*> nodes;
+    //    archiver["nodes"] >> nodes;
 
-        // Now add them to the model
-        for(auto& node: nodes)
-        {
-            auto sharedNode = std::shared_ptr<Node>(const_cast<Node*>(node));
-            sharedNode->RegisterDependencies();
-            _idToNodeMap[sharedNode->GetId()] = sharedNode;
-        }
-    }
+    //    // Now add them to the model
+    //    for(auto& node: nodes)
+    //    {
+    //        auto sharedNode = std::shared_ptr<Node>(const_cast<Node*>(node));
+    //        sharedNode->RegisterDependencies();
+    //        _idToNodeMap[sharedNode->GetId()] = sharedNode;
+    //    }
+    //}
 
     void Model::Deserialize(utilities::Deserializer& serializer) 
     {

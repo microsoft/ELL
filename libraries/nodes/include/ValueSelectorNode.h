@@ -51,12 +51,12 @@ namespace nodes
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void AddProperties(utilities::Archiver& archiver) const override;
+        virtual void Serialize(utilities::Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context) override;
+        virtual void Deserialize(utilities::Unarchiver& archiver) override;
 
         /// <summary> Exposes the output port as a read-only property </summary>
         const model::OutputPort<ValueType>& output = _output;

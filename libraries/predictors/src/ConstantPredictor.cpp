@@ -16,12 +16,12 @@ namespace predictors
     ConstantPredictor::ConstantPredictor(double value) : _value(value)
     {}
 
-    void ConstantPredictor::AddProperties(utilities::Archiver& archiver) const
+    void ConstantPredictor::Serialize(utilities::Archiver& archiver) const
     {
         archiver["value"] << _value;
     }
 
-    void ConstantPredictor::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void ConstantPredictor::Deserialize(utilities::Unarchiver& archiver)
     {
         archiver["value"] >> _value;
     }

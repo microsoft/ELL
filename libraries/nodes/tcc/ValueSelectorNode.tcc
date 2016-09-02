@@ -36,9 +36,9 @@ namespace nodes
     };
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::AddProperties(utilities::Archiver& archiver) const
+    void ValueSelectorNode<ValueType>::Serialize(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(archiver);
+        Node::Serialize(archiver);
         archiver[input1PortName] << _input1;
         archiver[input2PortName] << _input2;
         archiver[conditionPortName] << _condition;
@@ -46,9 +46,9 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void ValueSelectorNode<ValueType>::Deserialize(utilities::Unarchiver& archiver)
     {
-        Node::SetObjectState(archiver, context);
+        Node::Deserialize(archiver);
         archiver[input1PortName] >> _input1;
         archiver[input2PortName] >> _input2;
         archiver[conditionPortName] >> _condition;

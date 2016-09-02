@@ -49,12 +49,12 @@ namespace utilities
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void AddProperties(Archiver& archiver) const override;
+        virtual void Serialize(Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void SetObjectState(const Archiver& archiver, SerializationContext& context) override;
+        virtual void Deserialize(Unarchiver& archiver) override;
    
     private:
         friend std::hash<UniqueId>;

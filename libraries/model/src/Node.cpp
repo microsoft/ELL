@@ -78,15 +78,16 @@ namespace model
         return false;
     }
 
-    void Node::AddProperties(utilities::Archiver& archiver) const
+    void Node::Serialize(utilities::Archiver& archiver) const
     {
         archiver["id"] << _id;
     }
 
-    void Node::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void Node::Deserialize(utilities::Unarchiver& archiver)
     {
         NodeId oldId;
         archiver["id"] >> oldId;
+        auto& context = archiver.GetContext();
         ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         newContext.MapNode(oldId, this);
     }

@@ -39,17 +39,17 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void L2NormNode<ValueType>::AddProperties(utilities::Archiver& archiver) const
+    void L2NormNode<ValueType>::Serialize(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(archiver);
+        Node::Serialize(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
     }
 
     template <typename ValueType>
-    void L2NormNode<ValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void L2NormNode<ValueType>::Deserialize(utilities::Unarchiver& archiver)
     {
-        Node::SetObjectState(archiver, context);
+        Node::Deserialize(archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
     }

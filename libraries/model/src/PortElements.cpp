@@ -47,7 +47,7 @@ namespace model
 
     bool PortRange::IsFullPortRange() const { return GetStartIndex() == 0 && Size() == ReferencedPort()->Size(); }
 
-    void PortRange::AddProperties(utilities::Archiver& archiver) const
+    void PortRange::Serialize(utilities::Archiver& archiver) const
     {
         archiver["startIndex"] << _startIndex;
         archiver["numValues"] << _numValues;
@@ -64,7 +64,7 @@ namespace model
         }
     }
 
-    void PortRange::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void PortRange::Deserialize(utilities::Unarchiver& archiver)
     {
         archiver["startIndex"] >> _startIndex;
         archiver["numValues"] >> _numValues;
@@ -74,6 +74,7 @@ namespace model
         std::string portName;
         archiver["referencedPortName"] >> portName;
 
+        auto& context = archiver.GetContext();
         model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
         Node* newNode = newContext.GetNodeFromId(newId);
         if (newNode == nullptr)
@@ -168,12 +169,12 @@ namespace model
         }
     }
 
-    void PortElementsBase::AddProperties(utilities::Archiver& archiver) const
+    void PortElementsBase::Serialize(utilities::Archiver& archiver) const
     {
         archiver["ranges"] << _ranges;
     }
 
-    void PortElementsBase::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void PortElementsBase::Deserialize(utilities::Unarchiver& archiver)
     {
         archiver["ranges"] >> _ranges;
         ComputeSize();

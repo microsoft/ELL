@@ -38,18 +38,18 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void ConstantNode<ValueType>::AddProperties(utilities::Archiver& archiver) const
+    void ConstantNode<ValueType>::Serialize(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(archiver);
+        Node::Serialize(archiver);
         archiver[outputPortName] << _output;
         archiver["values"] << _values;
     }
 
     template <typename ValueType>
-    void ConstantNode<ValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void ConstantNode<ValueType>::Deserialize(utilities::Unarchiver& archiver)
     {
-        Node::SetObjectState(archiver, context);
-        archiver["values"] >> _values;
+        Node::Deserialize(archiver);
         archiver[outputPortName] >> _output;
+        archiver["values"] >> _values;
     }
 }

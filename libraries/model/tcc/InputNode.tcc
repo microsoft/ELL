@@ -43,16 +43,16 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputNode<ValueType>::AddProperties(utilities::Archiver& archiver) const
+    void InputNode<ValueType>::Serialize(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(archiver);
+        Node::Serialize(archiver);
         archiver[outputPortName] << _output;
     }
 
     template <typename ValueType>
-    void InputNode<ValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void InputNode<ValueType>::Deserialize(utilities::Unarchiver& archiver)
     {
-        Node::SetObjectState(archiver, context);
+        Node::Deserialize(archiver);
         archiver[outputPortName] >> _output;
     }
 }

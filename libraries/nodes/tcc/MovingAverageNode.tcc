@@ -63,18 +63,18 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void MovingAverageNode<ValueType>::AddProperties(utilities::Archiver& archiver) const
+    void MovingAverageNode<ValueType>::Serialize(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(archiver);
+        Node::Serialize(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
         archiver["windowSize"] << _windowSize;
     }
 
     template <typename ValueType>
-    void MovingAverageNode<ValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void MovingAverageNode<ValueType>::Deserialize(utilities::Unarchiver& archiver)
     {
-        Node::SetObjectState(archiver, context);
+        Node::Deserialize(archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
         archiver["windowSize"] >> _windowSize;

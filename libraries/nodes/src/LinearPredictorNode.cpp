@@ -33,18 +33,18 @@ namespace nodes
         assert(input.Size() == predictor.GetDimension());
     }
 
-    void LinearPredictorNode::AddProperties(utilities::Archiver& archiver) const
+    void LinearPredictorNode::Serialize(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(archiver);
+        Node::Serialize(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
         archiver["weightedElements"] << _weightedElements;
         archiver["predictor"] << _predictor;
     }
 
-    void LinearPredictorNode::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void LinearPredictorNode::Deserialize(utilities::Unarchiver& archiver)
     {
-        Node::SetObjectState(archiver, context);
+        Node::Deserialize(archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
         archiver["weightedElements"] >> _weightedElements;

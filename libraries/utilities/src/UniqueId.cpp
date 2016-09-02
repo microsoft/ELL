@@ -31,12 +31,12 @@ namespace utilities
         return stream;
     }
 
-    void UniqueId::AddProperties(Archiver& archiver) const
+    void UniqueId::Serialize(Archiver& archiver) const
     {
         archiver["id"] << _id;
     }
 
-    void UniqueId::SetObjectState(const Archiver& archiver, SerializationContext& context)
+    void UniqueId::Deserialize(Unarchiver& archiver)
     {
         archiver["id"] >> _id;
     }

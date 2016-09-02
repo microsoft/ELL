@@ -54,18 +54,18 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void MovingVarianceNode<ValueType>::AddProperties(utilities::Archiver& archiver) const
+    void MovingVarianceNode<ValueType>::Serialize(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(archiver);
+        Node::Serialize(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
         archiver["windowSize"] << _windowSize;
     }
 
     template <typename ValueType>
-    void MovingVarianceNode<ValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void MovingVarianceNode<ValueType>::Deserialize(utilities::Unarchiver& archiver)
     {
-        Node::SetObjectState(archiver, context);
+        Node::Deserialize(archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
         archiver["windowSize"] >> _windowSize;

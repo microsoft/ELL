@@ -28,14 +28,14 @@ namespace utilities
             {
                 ObjectDescription description;
                 auto value = self->_value.GetValue<ValueType>();
-                value.AddProperties(description);
+                value.Serialize(description);
                 return description;
             }
             else
             {
                 ObjectDescription description;
                 typename std::decay<ValueType>::type value;
-                value.AddProperties(description);
+                value.Serialize(description);
                 return description;
             }
         };

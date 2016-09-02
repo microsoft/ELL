@@ -33,16 +33,17 @@ namespace model
         return Port::PortType::boolean;
     }
 
-    void Port::AddProperties(utilities::Archiver& archiver) const
+    void Port::Serialize(utilities::Archiver& archiver) const
     {
         archiver["nodeId"] << _node->GetId();
         archiver["name"] << _name;
         archiver["type"] << static_cast<int>(_type);
     }
 
-    void Port::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void Port::Deserialize(utilities::Unarchiver& archiver)
     {
-        auto nodeId = archiver["nodeId"].GetValue<utilities::UniqueId>(); // ignore it
+        Node::NodeId id;
+        archiver["nodeId"] >> id; // ignore it
         archiver["name"] >> _name;
         int typeCode;
         archiver["type"] >> typeCode;

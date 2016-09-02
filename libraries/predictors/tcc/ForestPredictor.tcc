@@ -207,7 +207,7 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::AddProperties(utilities::Archiver& archiver) const
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Serialize(utilities::Archiver& archiver) const
     {
         archiver["interiorNodes"] << _interiorNodes;
         archiver["rootIndices"] << _rootIndices;
@@ -216,7 +216,7 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Deserialize(utilities::Unarchiver& archiver)
     {
         archiver["interiorNodes"] >> _interiorNodes;
         archiver["rootIndices"] >> _rootIndices;
@@ -298,7 +298,7 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::AddProperties(utilities::Archiver& archiver) const
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::Serialize(utilities::Archiver& archiver) const
     {
         archiver["splitRule"] << _splitRule;
         archiver["outgoingEdges"] << _outgoingEdges;
@@ -306,7 +306,7 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::Deserialize(utilities::Unarchiver& archiver)
     {
         archiver["splitRule"] >> _splitRule;
         archiver["outgoingEdges"] >> _outgoingEdges;
@@ -393,14 +393,14 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::AddProperties(utilities::Archiver& archiver) const
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::Serialize(utilities::Archiver& archiver) const
     {
         archiver["predictor"] << _predictor;
         archiver["targetNodeIndex"] << _targetNodeIndex;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::Deserialize(utilities::Unarchiver& archiver)
     {
         archiver["predictor"] >> _predictor;
         archiver["targetNodeIndex"] >> _targetNodeIndex;

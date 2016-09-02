@@ -29,9 +29,9 @@ namespace nodes
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::AddProperties(utilities::Archiver& archiver) const
+    void ForestNode<SplitRuleType, EdgePredictorType>::Serialize(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(archiver);
+        Node::Serialize(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
         archiver[treeOutputsPortName] << _treeOutputs;
@@ -40,9 +40,9 @@ namespace nodes
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void ForestNode<SplitRuleType, EdgePredictorType>::Deserialize(utilities::Unarchiver& archiver)
     {
-        Node::SetObjectState(archiver, context);
+        Node::Deserialize(archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
         archiver[treeOutputsPortName] >> _treeOutputs;

@@ -41,18 +41,18 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void DelayNode<ValueType>::AddProperties(utilities::Archiver& archiver) const
+    void DelayNode<ValueType>::Serialize(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(archiver);
+        Node::Serialize(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
         archiver["windowSize"] << _windowSize;
     }
 
     template <typename ValueType>
-    void DelayNode<ValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void DelayNode<ValueType>::Deserialize(utilities::Unarchiver& archiver)
     {
-        Node::SetObjectState(archiver, context);
+        Node::Deserialize(archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
         archiver["windowSize"] >> _windowSize;

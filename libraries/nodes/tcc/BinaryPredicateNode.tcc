@@ -104,9 +104,9 @@ namespace nodes
     };
 
     template <typename ValueType>
-    void BinaryPredicateNode<ValueType>::AddProperties(utilities::Archiver& archiver) const
+    void BinaryPredicateNode<ValueType>::Serialize(utilities::Archiver& archiver) const
     {
-        Node::AddProperties(archiver);
+        Node::Serialize(archiver);
         archiver[input1PortName] << _input1;
         archiver[input2PortName] << _input2;
         archiver[outputPortName] << _output;
@@ -114,9 +114,9 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void BinaryPredicateNode<ValueType>::SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context)
+    void BinaryPredicateNode<ValueType>::Deserialize(utilities::Unarchiver& archiver)
     {
-        Node::SetObjectState(archiver, context);
+        Node::Deserialize(archiver);
         archiver[input1PortName] >> _input1;
         archiver[input2PortName] >> _input2;
         archiver[outputPortName] >> _output;
