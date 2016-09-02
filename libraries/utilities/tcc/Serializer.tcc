@@ -20,6 +20,12 @@ namespace utilities
     }
 
     template <typename ValueType>
+    void Serializer::operator<<(ValueType&& value)
+    {
+        Serialize(std::forward<ValueType>(value));
+    }
+
+    template <typename ValueType>
     void Serializer::Serialize(const char* name, ValueType&& value)
     {
         SerializeItem(name, value);
@@ -81,6 +87,12 @@ namespace utilities
     void Deserializer::Deserialize(ValueType&& value)
     {
         Deserialize("", value);
+    }
+
+    template <typename ValueType>
+    void Deserializer::operator>>(ValueType&& value)
+    {
+        Deserialize(std::forward<ValueType>(value));
     }
 
     template <typename ValueType>

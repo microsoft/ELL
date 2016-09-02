@@ -125,6 +125,12 @@ namespace utilities
         template <typename ValueType>
         void Serialize(ValueType&& value);
 
+        /// <summary> Serialize unnamed values of any serializable type. </summary>
+        ///
+        /// <param name="value"> The value to serialize. </param>
+        template <typename ValueType>
+        void operator<<(ValueType&& value);
+
         /// <summary> Serialize named values of any serializable type. </summary>
         template <typename ValueType>
         void Serialize(const char* name, ValueType&& value);
@@ -217,6 +223,12 @@ namespace utilities
         /// <param name="value"> The value to deserialize. </param>
         template <typename ValueType>
         void Deserialize(ValueType&& value);
+
+        /// <summary> Serialize unnamed values of any serializable type. </summary>
+        ///
+        /// <param name="value"> The value to deserialize. </param>
+        template <typename ValueType>
+        void operator>>(ValueType&& value);
 
         /// <summary> Serialize named values of various serializable types. </summary>
         ///
