@@ -13,6 +13,7 @@
 #include "ObjectDescription.h"
 #include "Serializer.h"
 #include "XmlSerializer.h"
+#include "ObjectDescriptionSerializer.h"
 
 // testing
 #include "testing.h"
@@ -224,4 +225,42 @@ void TestSerializeIDescribable()
     DerivedObject deserializedDerived;
     deserializer.Deserialize("derived", deserializedDerived);
     testing::ProcessTest("Deserialize IDescribable check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
+}
+
+void TestObjectDescriptionSerializer()
+{
+    utilities::SerializationContext context;
+
+    utilities::ObjectDescriptionSerializer serializer1;
+    utilities::ObjectDescriptionSerializer serializer2;
+    utilities::ObjectDescriptionSerializer serializer3;
+    
+    InnerObject innerObj(3, 4.5);
+    serializer1.Serialize("inner", innerObj);
+
+    OuterObject outerObj("Outer", 5, 6.5);
+    serializer2.Serialize("outer", outerObj);
+
+    DerivedObject derivedObj(8, 9.5, "derived");
+    serializer3.Serialize("derived", derivedObj);
+
+    auto objectDescription1 = serializer1.GetObjectDescription();
+    auto objectDescription2 = serializer2.GetObjectDescription();
+    auto objectDescription3 = serializer3.GetObjectDescription();
+
+
+    utilities::ObjectDescriptionDeserializer deserializer1(objectDescription1, context);
+    InnerObject deserializedInner;
+    deserializer1.Deserialize("inner", deserializedInner);
+    testing::ProcessTest("Deserialize with ObjectDescriptionSerializer check",  deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);        
+
+    utilities::ObjectDescriptionDeserializer deserializer2(objectDescription2, context);
+    OuterObject deserializedOuter;
+    deserializer2.Deserialize("outer", deserializedOuter);
+    testing::ProcessTest("Deserialize with ObjectDescriptionSerializer check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
+
+    utilities::ObjectDescriptionDeserializer deserializer3(objectDescription3, context);
+    DerivedObject deserializedDerived;
+    deserializer3.Deserialize("derived", deserializedDerived);
+    testing::ProcessTest("Deserialize with ObjectDescriptionSerializer check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
 }

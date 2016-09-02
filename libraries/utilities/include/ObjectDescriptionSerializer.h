@@ -31,7 +31,7 @@ namespace utilities
     public:
         /// <summary> Default Constructor. </summary>
         ObjectDescriptionSerializer() = default;
-        ObjectDescription GetObjectDescription();
+        ObjectDescription GetObjectDescription() { return _objectDescription; }
 
     protected:
         DECLARE_SERIALIZE_VALUE_OVERRIDE(bool);
@@ -98,14 +98,9 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_OVERRIDE(float);
         DECLARE_DESERIALIZE_ARRAY_OVERRIDE(double);
         virtual void DeserializeArray(const char* name, std::vector<std::string>& array) override;
-        virtual void BeginDeserializeArray(const char* name, const std::string& typeName) override;
+        virtual void DeserializeObject(const char* name, ISerializable& value) override;
         virtual bool BeginDeserializeArrayItem(const std::string& typeName) override;
         virtual void EndDeserializeArrayItem(const std::string& typeName) override;
-        virtual void EndDeserializeArray(const char* name, const std::string& typeName) override;
-
-        virtual std::string BeginDeserializeObject(const char* name, const std::string& typeName) override;
-        virtual void DeserializeObject(const char* name, ISerializable& value) override;
-        virtual void EndDeserializeObject(const char* name, const std::string& typeName) override;
 
     private:
         template <typename ValueType, IsFundamental<ValueType> concept = 0>

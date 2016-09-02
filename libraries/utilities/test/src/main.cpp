@@ -118,6 +118,7 @@ int main()
         TestGetTypeDescription();
         TestGetObjectDescription();
         TestSerializeIDescribable();
+        TestObjectDescriptionSerializer();
     }
     catch(const utilities::Exception& exception)
     {

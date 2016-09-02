@@ -127,4 +127,14 @@ namespace utilities
         }
     }
 
+    bool ObjectDescriptionDeserializer::BeginDeserializeArrayItem(const std::string& typeName)
+    {
+        return true;
+    }
+
+    void ObjectDescriptionDeserializer::EndDeserializeArrayItem(const std::string& typeName)
+    {        
+    }
+
+
 }
