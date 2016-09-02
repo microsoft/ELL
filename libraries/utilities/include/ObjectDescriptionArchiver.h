@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ObjectDescriptionSerializer.h (utilities)
+//  File:     ObjectDescriptionArchiver.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,11 +26,11 @@
 namespace utilities
 {
     /// <summary> A serializer that encodes data in an ObjectDescription </summary>
-    class ObjectDescriptionSerializer : public Serializer
+    class ObjectDescriptionArchiver : public Serializer
     {
     public:
         /// <summary> Default Constructor. </summary>
-        ObjectDescriptionSerializer() = default;
+        ObjectDescriptionArchiver() = default;
         ObjectDescription GetObjectDescription() { return _objectDescription; }
 
     protected:
@@ -73,13 +73,13 @@ namespace utilities
     };
 
     /// <summary> A deserializer that reads data encoded in JSON-formatted text. </summary>
-    class ObjectDescriptionDeserializer : public Deserializer
+    class ObjectDescriptionUnarchiver : public Deserializer
     {
     public:
         /// <summary> Constructor </summary>
         ///
         /// <param name="objectDescription"> The description to deserialize data from. </summary>
-        ObjectDescriptionDeserializer(const ObjectDescription& objectDescription, SerializationContext context);
+        ObjectDescriptionUnarchiver(const ObjectDescription& objectDescription, SerializationContext context);
 
     protected:
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(bool);
@@ -119,4 +119,4 @@ namespace utilities
 
 }
 
-#include "../tcc/ObjectDescriptionSerializer.tcc"
+#include "../tcc/ObjectDescriptionArchiver.tcc"

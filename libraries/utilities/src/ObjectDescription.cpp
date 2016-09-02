@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ObjectDescription.h"
+#include "ObjectDescriptionArchiver.h"
 
 // utiliites
 #include "Exception.h"
@@ -85,37 +86,11 @@ namespace utilities
     // IDescribable
     //
 
-    // ObjectDescription IDescribable::GetDescription() const
-    // {
-    //     ObjectDescription description;
-    //     Serialize(description);
-    //     return description;
-    // }
-
-    // void IDescribable::Serialize(Serializer& serializer) const
-    // {
-    //     // for each property, serialize it
-    //     ObjectDescription description;
-    //     Serialize(description);
-    //     for(const auto& property: description.GetProperties())
-    //     {
-    //         auto name = property.first;
-    //         property.second._value.SerializeProperty(name.c_str(), serializer);
-    //     }
-    // }
-
-    // void IDescribable::Deserialize(Deserializer& serializer)
-    // {
-    //     // #### TODO: special-case vectors of pointers to return vectors of unique_ptrs
-
-    //     ObjectDescription description;
-    //     Serialize(description);
-    //     for(auto& property: description.GetProperties())
-    //     {
-    //         auto name = property.first;
-    //         // std::cout << "Deserializing property " << name << std::endl;
-    //         property.second._value.DeserializeProperty(name.c_str(), serializer, serializer.GetContext());
-    //     }
-    //     SetObjectState(description, serializer.GetContext());
-    // }
+    ObjectDescription IDescribable::GetDescription() const
+    {
+        utilities::SerializationContext context;
+        utilities::ObjectDescriptionArchiver serializer;
+        serializer.Serialize(*this);
+        return serializer.GetObjectDescription();
+    }
 }

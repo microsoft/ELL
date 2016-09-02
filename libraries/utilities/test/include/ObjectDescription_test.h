@@ -11,4 +11,4 @@
 void TestGetTypeDescription();
 void TestGetObjectDescription();
 void TestSerializeIDescribable();
-void TestObjectDescriptionSerializer();
+void TestObjectDescriptionArchiver();

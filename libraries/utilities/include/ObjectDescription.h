@@ -163,16 +163,6 @@ namespace utilities
         template <typename ValueType>
         static ValueType CreateObject(const Archiver& archiver);
 
-        /// <summary> Adds an objects properties to an archiver </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-//        virtual void AddProperties(Archiver& archiver) const = 0;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
-//        virtual void SetObjectState(const Archiver& archiver, SerializationContext& context) = 0;
-
         /// <summary> Gets the name of this type. </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -182,16 +172,6 @@ namespace utilities
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override = 0;
-
-        /// <summary> Serializes the object. </summary>
-        ///
-        /// <param name="serializer">  The serializer. </param>
-//        virtual void Serialize(Serializer& serializer) const override;
-
-        /// <summary> Deserializes the object. </summary>
-        ///
-        /// <param name="serializer"> The deserializer. </param>
-//        virtual void Deserialize(Deserializer& serializer) override;
     };
 
     /// <summary> Enabled if ValueType inherits from IDescribable. </summary>

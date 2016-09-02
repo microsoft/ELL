@@ -18,12 +18,10 @@ namespace utilities
         _serializer.Serialize(_propertyName.c_str(), value);
     }
 
-
     //
     // Serializer class
     //
 
-    // TODO: split out scalar vs. array here (or is it fundamental vs. ISerializable?)
     template <typename ValueType>
     void Serializer::Serialize(ValueType&& value)
     {
@@ -45,6 +43,8 @@ namespace utilities
     //
     // Implementations
     //
+
+    // Non-vectors
     template <typename ValueType, IsNotVector<ValueType> concept>
     void Serializer::SerializeItem(const char* name, ValueType&& value)
     {
@@ -96,7 +96,6 @@ namespace utilities
         }
         SerializeArray(name, baseTypeName, tmpArray);
     }
-
 
     //
     // PropertyDeserializer class
