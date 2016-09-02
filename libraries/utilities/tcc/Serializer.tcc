@@ -65,6 +65,12 @@ namespace utilities
         SerializeArray(name, array);
     }
 
+    // Vector of strings
+    inline void Serializer::SerializeItem(const char* name, const std::vector<std::string>& array)
+    {
+        SerializeArray(name, array);
+    }
+
     // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Serializer::SerializeItem(const char* name, const std::vector<ValueType>& array)
@@ -150,8 +156,16 @@ namespace utilities
         value = std::move(newPtr);
     }
 
+    // Vector of fundamental types
     template <typename ValueType, IsFundamental<ValueType> concept>
     void Deserializer::DeserializeItem(const char* name, std::vector<ValueType>& arr)
+    {
+        arr.clear();
+        DeserializeArray(name, arr);
+    }
+
+    // Vector of strings
+    inline void Deserializer::DeserializeItem(const char* name, std::vector<std::string>& arr)
     {
         arr.clear();
         DeserializeArray(name, arr);
@@ -179,7 +193,7 @@ namespace utilities
         EndDeserializeArray(name, typeName);
     }
 
-    // Vector of serializable objects
+    // Vector of unique pointers to serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Deserializer::DeserializeItem(const char* name, std::vector<std::unique_ptr<ValueType>>& arr)
     {
@@ -201,7 +215,7 @@ namespace utilities
         EndDeserializeArray(name, typeName);
     }
 
-    // Vector of serializable objects
+    // Vector of raw pointers to serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
     void Deserializer::DeserializeItem(const char* name, std::vector<const ValueType*>& arr)
     {

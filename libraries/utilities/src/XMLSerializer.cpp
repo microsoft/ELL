@@ -103,6 +103,11 @@ namespace utilities
     IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, float);
     IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, double);
 
+    void SimpleXmlSerializer::SerializeArray(const char* name, const std::vector<std::string>& array)
+    {
+        WriteArray(name, array);
+    }
+
     // Array of pointers-to-ISerializable
     // TOOD: pass in compile-time type name
     void SimpleXmlSerializer::SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)

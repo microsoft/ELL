@@ -85,6 +85,11 @@ namespace utilities
     IMPLEMENT_SERIALIZE_ARRAY(JsonSerializer, float);
     IMPLEMENT_SERIALIZE_ARRAY(JsonSerializer, double);
 
+    void JsonSerializer::SerializeArray(const char* name, const std::vector<std::string>& array)
+    {
+        WriteArray(name, array);
+    }
+
     void JsonSerializer::SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
     {
         FinishPreviousLine();

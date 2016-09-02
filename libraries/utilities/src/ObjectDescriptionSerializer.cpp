@@ -60,6 +60,11 @@ namespace utilities
     IMPLEMENT_SERIALIZE_ARRAY(ObjectDescriptionSerializer, float);
     IMPLEMENT_SERIALIZE_ARRAY(ObjectDescriptionSerializer, double);
 
+    void ObjectDescriptionSerializer::SerializeArray(const char* name, const std::vector<std::string>& array)
+    {
+        WriteArray(name, array);
+    }
+
     void ObjectDescriptionSerializer::SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
     {
         if(std::string{""} == name)

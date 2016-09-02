@@ -57,6 +57,7 @@ namespace utilities
         DECLARE_SERIALIZE_ARRAY_OVERRIDE(size_t);
         DECLARE_SERIALIZE_ARRAY_OVERRIDE(float);
         DECLARE_SERIALIZE_ARRAY_OVERRIDE(double);
+        virtual void SerializeArray(const char* name, const std::vector<std::string>& array) override;
         virtual void SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array) override;
 
         virtual void BeginSerializeObject(const char* name, const ISerializable& value) override;

@@ -177,6 +177,7 @@ namespace utilities
         DECLARE_SERIALIZE_ARRAY_BASE(size_t);
         DECLARE_SERIALIZE_ARRAY_BASE(float);
         DECLARE_SERIALIZE_ARRAY_BASE(double);
+        virtual void SerializeArray(const char* name, const std::vector<std::string>& array) = 0;
         virtual void SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array) = 0;
 
         virtual void BeginSerializeObject(const char* name, const ISerializable& value);
@@ -195,6 +196,8 @@ namespace utilities
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void SerializeItem(const char* name, const std::vector<ValueType>& value);
 
+        void SerializeItem(const char* name, const std::vector<std::string>& value);
+
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
         void SerializeItem(const char* name, const std::vector<ValueType>& value);
 
@@ -212,7 +215,7 @@ namespace utilities
     class Deserializer
     {
     public:
-        /// <summary> Represents a deserializer that is scoped to a partticular property. </summary>
+        /// <summary> Represents a deserializer that is scoped to a particular property. </summary>
         class PropertyDeserializer
         {
         public:
@@ -290,9 +293,9 @@ namespace utilities
         DECLARE_DESERIALIZE_ARRAY_BASE(size_t);
         DECLARE_DESERIALIZE_ARRAY_BASE(float);
         DECLARE_DESERIALIZE_ARRAY_BASE(double);
+        virtual void DeserializeArray(const char* name, std::vector<std::string>& array) = 0;
 
         // Extra functions needed for deserializing arrays.
-        virtual void DeserializeArray(const char* name, std::vector<std::string>& array) = 0;
         virtual void BeginDeserializeArray(const char* name, const std::string& typeName);
         virtual bool BeginDeserializeArrayItem(const std::string& typeName) = 0;
         virtual void EndDeserializeArrayItem(const std::string& typeName) = 0;
@@ -322,6 +325,9 @@ namespace utilities
         // vector of fundamental values
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void DeserializeItem(const char* name, std::vector<ValueType>& value);
+
+        // vector of strings
+        void DeserializeItem(const char* name, std::vector<std::string>& value);
 
         // vector of ISerializable values
         template <typename ValueType, IsSerializable<ValueType> concept = 0>
