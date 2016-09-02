@@ -38,7 +38,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void ConstantNode<ValueType>::AddProperties(utilities::ObjectDescription& description) const
+    void ConstantNode<ValueType>::AddProperties(utilities::Archiver& description) const
     {
         Node::AddProperties(description);
         description.SetType(*this);
@@ -47,7 +47,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void ConstantNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void ConstantNode<ValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
         description["values"] >> _values;

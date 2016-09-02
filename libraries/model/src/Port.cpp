@@ -33,7 +33,7 @@ namespace model
         return Port::PortType::boolean;
     }
 
-    void Port::AddProperties(utilities::ObjectDescription& description) const
+    void Port::AddProperties(utilities::Archiver& description) const
     {
         description.SetType(*this);
         description["nodeId"] << _node->GetId();
@@ -41,7 +41,7 @@ namespace model
         description["type"] << static_cast<int>(_type);
     }
 
-    void Port::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void Port::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         auto nodeId = description["nodeId"].GetValue<utilities::UniqueId>(); // ignore it
         description["name"] >> _name;

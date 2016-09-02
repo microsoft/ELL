@@ -49,12 +49,12 @@ namespace utilities
         /// <summary> Adds an object's properties to an ObjectDescription </summary>
         ///
         /// <param name="description"> The ObjectDescription for the object </param>
-        virtual void AddProperties(ObjectDescription& description) const override;
+        virtual void AddProperties(Archiver& description) const override;
 
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///
         /// <param name="description"> The `ObjectDescription` to get state from </param>
-        virtual void SetObjectState(const ObjectDescription& description, SerializationContext& context) override;
+        virtual void SetObjectState(const Archiver& description, SerializationContext& context) override;
    
     private:
         friend std::hash<UniqueId>;

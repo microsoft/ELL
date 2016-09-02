@@ -78,13 +78,13 @@ namespace model
         return false;
     }
 
-    void Node::AddProperties(utilities::ObjectDescription& description) const
+    void Node::AddProperties(utilities::Archiver& description) const
     {
         description.SetType(*this);
         description["id"] << _id;
     }
 
-    void Node::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void Node::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         NodeId oldId;
         description["id"] >> oldId;

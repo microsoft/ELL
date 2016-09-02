@@ -36,7 +36,7 @@ namespace nodes
     };
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::AddProperties(utilities::ObjectDescription& description) const
+    void ValueSelectorNode<ValueType>::AddProperties(utilities::Archiver& description) const
     {
         Node::AddProperties(description);
         description.SetType(*this);
@@ -47,7 +47,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void ValueSelectorNode<ValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
         description[input1PortName] >> _input1;

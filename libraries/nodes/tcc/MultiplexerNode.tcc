@@ -30,7 +30,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void  MultiplexerNode<ValueType, SelectorType>::AddProperties(utilities::ObjectDescription& description) const
+    void  MultiplexerNode<ValueType, SelectorType>::AddProperties(utilities::Archiver& description) const
     {
         Node::AddProperties(description);
         description.SetType(*this);
@@ -40,7 +40,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void  MultiplexerNode<ValueType, SelectorType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void  MultiplexerNode<ValueType, SelectorType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
         description["elements"] >> _elements;

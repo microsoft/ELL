@@ -156,12 +156,12 @@ namespace model
         /// <summary> Adds an object's properties to an ObjectDescription </summary>
         ///
         /// <param name="description"> The ObjectDescription for the object </param>
-        virtual void AddProperties(utilities::ObjectDescription& description) const override;
+        virtual void AddProperties(utilities::Archiver& description) const override;
 
         /// <summary> Sets the internal state of the object according to the description passed in </summary>
         ///
         /// <param name="description"> The `ObjectDescription` to get state from </param>
-        virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override;
+        virtual void SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context) override;
 
         /// <summary> Reads from a Deserializer. Deserialization is handled explicitly because we need to modify the SerializationContext. </summary>
         ///

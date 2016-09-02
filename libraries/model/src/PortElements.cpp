@@ -47,7 +47,7 @@ namespace model
 
     bool PortRange::IsFullPortRange() const { return GetStartIndex() == 0 && Size() == ReferencedPort()->Size(); }
 
-    void PortRange::AddProperties(utilities::ObjectDescription& description) const
+    void PortRange::AddProperties(utilities::Archiver& description) const
     {
         description.SetType(*this);
         description["startIndex"] << _startIndex;
@@ -65,7 +65,7 @@ namespace model
         }
     }
 
-    void PortRange::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void PortRange::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         description["startIndex"] >> _startIndex;
         description["numValues"] >> _numValues;
@@ -169,13 +169,13 @@ namespace model
         }
     }
 
-    void PortElementsBase::AddProperties(utilities::ObjectDescription& description) const
+    void PortElementsBase::AddProperties(utilities::Archiver& description) const
     {
         description.SetType(*this);
         description["ranges"] << _ranges;
     }
 
-    void PortElementsBase::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void PortElementsBase::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         description["ranges"] >> _ranges;
         ComputeSize();

@@ -31,13 +31,13 @@ namespace utilities
         return stream;
     }
 
-    void UniqueId::AddProperties(ObjectDescription& description) const
+    void UniqueId::AddProperties(Archiver& description) const
     {
         description.SetType(*this);
         description["id"] << _id;
     }
 
-    void UniqueId::SetObjectState(const ObjectDescription& description, SerializationContext& context)
+    void UniqueId::SetObjectState(const Archiver& description, SerializationContext& context)
     {
         description["id"] >> _id;
     }

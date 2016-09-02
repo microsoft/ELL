@@ -13,10 +13,10 @@
 namespace utilities
 {
     /// <summary> Archiver class. Superclass to Serializer and ObjectDescription. </summary>
-    class Archiver
+    class ArchiverX
     {
     public:
-        virtual ~Archiver() = default;
+        virtual ~ArchiverX() = default;
 
         // crud. we need to expose op>> and op<<, but they're templated. Rats.
     };

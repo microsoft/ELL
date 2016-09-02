@@ -47,14 +47,14 @@ namespace predictors
         _b *= scalar;
     }
 
-    void LinearPredictor::AddProperties(utilities::ObjectDescription& description) const
+    void LinearPredictor::AddProperties(utilities::Archiver& description) const
     {
         description.SetType(*this);
         description["w"] << static_cast<std::vector<double>>(_w);
         description["b"] << _b;
     }
 
-    void LinearPredictor::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void LinearPredictor::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         std::vector<double> w;
         description["w"] >> w;

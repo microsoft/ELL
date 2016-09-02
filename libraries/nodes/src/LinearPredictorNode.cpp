@@ -33,7 +33,7 @@ namespace nodes
         assert(input.Size() == predictor.GetDimension());
     }
 
-    void LinearPredictorNode::AddProperties(utilities::ObjectDescription& description) const
+    void LinearPredictorNode::AddProperties(utilities::Archiver& description) const
     {
         Node::AddProperties(description);
         description.SetType(*this);
@@ -43,7 +43,7 @@ namespace nodes
         description["predictor"] << _predictor;
     }
 
-    void LinearPredictorNode::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void LinearPredictorNode::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
         description[inputPortName] >> _input;

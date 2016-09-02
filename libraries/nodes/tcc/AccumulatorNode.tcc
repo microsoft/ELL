@@ -39,7 +39,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void AccumulatorNode<ValueType>::AddProperties(utilities::ObjectDescription& description) const
+    void AccumulatorNode<ValueType>::AddProperties(utilities::Archiver& description) const
     {
         Node::AddProperties(description);
         description.SetType(*this);
@@ -48,7 +48,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void AccumulatorNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void AccumulatorNode<ValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
         description[inputPortName] >> _input;

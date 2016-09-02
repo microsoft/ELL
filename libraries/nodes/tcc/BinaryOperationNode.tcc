@@ -167,7 +167,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void BinaryOperationNode<ValueType>::AddProperties(utilities::ObjectDescription& description) const
+    void BinaryOperationNode<ValueType>::AddProperties(utilities::Archiver& description) const
     {
         Node::AddProperties(description);
         description.SetType(*this);
@@ -178,7 +178,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void BinaryOperationNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void BinaryOperationNode<ValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
         description[input1PortName] >> _input1;

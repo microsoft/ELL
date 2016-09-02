@@ -200,6 +200,12 @@ namespace utilities
     /// <summary> Enabled if ValueType does not inherit from IDescribable. </summary>
     template <typename ValueType>
     using IsNotDescribable = typename std::enable_if_t<(!std::is_base_of<IDescribable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
+
+
+
+// Temporary
+using Archiver = ObjectDescription;
 }
+
 
 #include "../tcc/ObjectDescription.tcc"

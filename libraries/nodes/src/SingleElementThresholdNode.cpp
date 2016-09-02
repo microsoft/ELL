@@ -23,7 +23,7 @@ namespace nodes
         assert(input.Size() > predictor.GetElementIndex());
     }
 
-    void SingleElementThresholdNode::AddProperties(utilities::ObjectDescription& description) const
+    void SingleElementThresholdNode::AddProperties(utilities::Archiver& description) const
     {
         Node::AddProperties(description);
         description.SetType(*this);
@@ -32,7 +32,7 @@ namespace nodes
         description["predictor"] << _predictor;
     }
 
-    void SingleElementThresholdNode::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void SingleElementThresholdNode::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
         description[inputPortName] >> _input;

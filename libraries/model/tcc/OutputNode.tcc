@@ -32,7 +32,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputNode<ValueType>::AddProperties(utilities::ObjectDescription& description) const
+    void OutputNode<ValueType>::AddProperties(utilities::Archiver& description) const
     {
         Node::AddProperties(description);
         description.SetType(*this);
@@ -41,7 +41,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputNode<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void OutputNode<ValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
         description[inputPortName] >> _input;

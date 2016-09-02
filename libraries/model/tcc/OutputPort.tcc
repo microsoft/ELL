@@ -29,13 +29,13 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputPort<ValueType>::AddProperties(utilities::ObjectDescription& description) const
+    void OutputPort<ValueType>::AddProperties(utilities::Archiver& description) const
     {
         OutputPortBase::AddProperties(description);
     }
 
     template <typename ValueType>
-    void OutputPort<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void OutputPort<ValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         OutputPortBase::SetObjectState(description, context);
     }    

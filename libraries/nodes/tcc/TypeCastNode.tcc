@@ -38,7 +38,7 @@ namespace nodes
     }
 
     template <typename InputValueType, typename OutputValueType>
-    void TypeCastNode<InputValueType, OutputValueType>::AddProperties(utilities::ObjectDescription& description) const
+    void TypeCastNode<InputValueType, OutputValueType>::AddProperties(utilities::Archiver& description) const
     {
         Node::AddProperties(description);
         description.SetType(*this);
@@ -47,7 +47,7 @@ namespace nodes
     }
 
     template <typename InputValueType, typename OutputValueType>
-    void TypeCastNode<InputValueType, OutputValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void TypeCastNode<InputValueType, OutputValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
         description[inputPortName] >> _input;

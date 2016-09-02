@@ -94,7 +94,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputPort<ValueType>::AddProperties(utilities::ObjectDescription& description) const
+    void InputPort<ValueType>::AddProperties(utilities::Archiver& description) const
     {
         Port::AddProperties(description);
         description.SetType(*this);
@@ -102,7 +102,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputPort<ValueType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void InputPort<ValueType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         Port::SetObjectState(description, context);
         description["input"] >> _input;

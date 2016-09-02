@@ -29,7 +29,7 @@ namespace nodes
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::AddProperties(utilities::ObjectDescription& description) const
+    void ForestNode<SplitRuleType, EdgePredictorType>::AddProperties(utilities::Archiver& description) const
     {
         Node::AddProperties(description);
         description.SetType(*this);
@@ -41,7 +41,7 @@ namespace nodes
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void ForestNode<SplitRuleType, EdgePredictorType>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
         description[inputPortName] >> _input;

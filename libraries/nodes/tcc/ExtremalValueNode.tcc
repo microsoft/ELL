@@ -33,7 +33,7 @@ namespace nodes
     }
 
     template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::AddProperties(utilities::ObjectDescription& description) const
+    void ExtremalValueNode<ValueType, max>::AddProperties(utilities::Archiver& description) const
     {
         Node::AddProperties(description);
         description.SetType(*this);
@@ -43,7 +43,7 @@ namespace nodes
     }
 
     template <typename ValueType, bool max>
-    void ExtremalValueNode<ValueType, max>::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void ExtremalValueNode<ValueType, max>::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         Node::SetObjectState(description, context);
         description[inputPortName] >> _input;

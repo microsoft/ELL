@@ -31,14 +31,14 @@ public:
     int GetA() const { return _a; }
     double GetB() const { return _b; }
 
-    virtual void AddProperties(utilities::ObjectDescription& description) const override
+    virtual void AddProperties(utilities::Archiver& description) const override
     {
         description.SetType(*this);
         description["a"] = _a;
         description["b"] = _b;
     }
 
-    virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override
+    virtual void SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context) override
     {
         description["a"] >> _a;
         description["b"] >> _b;
@@ -59,14 +59,14 @@ public:
     DerivedObject(int a, double b, std::string c) : InnerObject(a, b), _c(c) {}
     std::string GetC() { return _c; }
 
-    virtual void AddProperties(utilities::ObjectDescription& description) const override
+    virtual void AddProperties(utilities::Archiver& description) const override
     {
         InnerObject::AddProperties(description);
         description.SetType(*this);
         description["c"] = _c;
     }
 
-    virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override
+    virtual void SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context) override
     {
         InnerObject::SetObjectState(description, context);
         description["c"] >> _c;
@@ -87,14 +87,14 @@ public:
     std::string GetName() { return _name; }
     InnerObject GetInner() { return _inner; }
 
-    virtual void AddProperties(utilities::ObjectDescription& description) const override
+    virtual void AddProperties(utilities::Archiver& description) const override
     {
         description.SetType(*this);
         description["name"] = _name;
         description["obj"] = _inner;
     }
 
-    virtual void SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context) override
+    virtual void SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context) override
     {
         description["name"] >> _name;
         description["obj"] >> _inner;

@@ -37,7 +37,7 @@ namespace model
         return NodeIterator(this, outputNodes);
     }
 
-    void Model::AddProperties(utilities::ObjectDescription& description) const
+    void Model::AddProperties(utilities::Archiver& description) const
     {
         description.SetType(*this);
         std::vector<const Node*> nodes;
@@ -52,7 +52,7 @@ namespace model
         description["nodes"] << nodes;
     }
 
-    void Model::SetObjectState(const utilities::ObjectDescription& description, utilities::SerializationContext& context)
+    void Model::SetObjectState(const utilities::Archiver& description, utilities::SerializationContext& context)
     {
         ModelSerializationContext modelContext(context, this);
         
