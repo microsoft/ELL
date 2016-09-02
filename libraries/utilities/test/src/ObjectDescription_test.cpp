@@ -33,9 +33,8 @@ public:
 
     virtual void AddProperties(utilities::Archiver& archiver) const override
     {
-        archiver.SetType(*this);
-        archiver["a"] = _a;
-        archiver["b"] = _b;
+        archiver["a"] << _a;
+        archiver["b"] << _b;
     }
 
     virtual void SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context) override
@@ -62,8 +61,7 @@ public:
     virtual void AddProperties(utilities::Archiver& archiver) const override
     {
         InnerObject::AddProperties(archiver);
-        archiver.SetType(*this);
-        archiver["c"] = _c;
+        archiver["c"] << _c;
     }
 
     virtual void SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context) override
@@ -89,9 +87,8 @@ public:
 
     virtual void AddProperties(utilities::Archiver& archiver) const override
     {
-        archiver.SetType(*this);
-        archiver["name"] = _name;
-        archiver["obj"] = _inner;
+        archiver["name"] << _name;
+        archiver["obj"] << _inner;
     }
 
     virtual void SetObjectState(const utilities::Archiver& archiver, utilities::SerializationContext& context) override

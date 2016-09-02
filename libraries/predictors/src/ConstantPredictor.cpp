@@ -18,7 +18,6 @@ namespace predictors
 
     void ConstantPredictor::AddProperties(utilities::Archiver& archiver) const
     {
-        archiver.SetType(*this);
         archiver["value"] << _value;
     }
 

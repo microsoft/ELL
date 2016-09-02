@@ -41,7 +41,6 @@ namespace nodes
     void TypeCastNode<InputValueType, OutputValueType>::AddProperties(utilities::Archiver& archiver) const
     {
         Node::AddProperties(archiver);
-        archiver.SetType(*this);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
     }

@@ -49,7 +49,6 @@ namespace predictors
 
     void LinearPredictor::AddProperties(utilities::Archiver& archiver) const
     {
-        archiver.SetType(*this);
         archiver["w"] << static_cast<std::vector<double>>(_w);
         archiver["b"] << _b;
     }

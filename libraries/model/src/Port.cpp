@@ -35,7 +35,6 @@ namespace model
 
     void Port::AddProperties(utilities::Archiver& archiver) const
     {
-        archiver.SetType(*this);
         archiver["nodeId"] << _node->GetId();
         archiver["name"] << _name;
         archiver["type"] << static_cast<int>(_type);

@@ -49,7 +49,6 @@ namespace model
 
     void PortRange::AddProperties(utilities::Archiver& archiver) const
     {
-        archiver.SetType(*this);
         archiver["startIndex"] << _startIndex;
         archiver["numValues"] << _numValues;
         archiver["isFixedSize"] << _isFixedSize;
@@ -171,7 +170,6 @@ namespace model
 
     void PortElementsBase::AddProperties(utilities::Archiver& archiver) const
     {
-        archiver.SetType(*this);
         archiver["ranges"] << _ranges;
     }
 

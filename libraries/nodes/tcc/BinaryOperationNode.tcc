@@ -170,7 +170,6 @@ namespace nodes
     void BinaryOperationNode<ValueType>::AddProperties(utilities::Archiver& archiver) const
     {
         Node::AddProperties(archiver);
-        archiver.SetType(*this);
         archiver[input1PortName] << _input1;
         archiver[input2PortName] << _input2;
         archiver[outputPortName] << _output;

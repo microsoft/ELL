@@ -33,7 +33,6 @@ namespace utilities
 
     void UniqueId::AddProperties(Archiver& archiver) const
     {
-        archiver.SetType(*this);
         archiver["id"] << _id;
     }
 

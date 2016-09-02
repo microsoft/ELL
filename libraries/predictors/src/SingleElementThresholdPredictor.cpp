@@ -15,7 +15,6 @@ namespace predictors
 
     void SingleElementThresholdPredictor::AddProperties(utilities::Archiver& archiver) const
     {
-        archiver.SetType(*this);
         archiver["index"] << _index;
         archiver["threshold"] << _threshold;
     }

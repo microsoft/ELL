@@ -17,7 +17,6 @@ namespace model
     void OutputPortBase::AddProperties(utilities::Archiver& archiver) const
     {
         Port::AddProperties(archiver);
-        archiver.SetType(*this);
         archiver["size"] << _size;
 
     }

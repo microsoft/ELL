@@ -39,7 +39,6 @@ namespace nodes
     void  DemultiplexerNode<ValueType, SelectorType>::AddProperties(utilities::Archiver& archiver) const
     {
         Node::AddProperties(archiver);
-        archiver.SetType(*this);
         archiver[inputPortName] << _input;
         archiver[selectorPortName] << _selector;
         archiver[outputPortName] << _output;

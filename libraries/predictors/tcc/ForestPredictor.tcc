@@ -209,7 +209,6 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::AddProperties(utilities::Archiver& archiver) const
     {
-        archiver.SetType(*this);
         archiver["interiorNodes"] << _interiorNodes;
         archiver["rootIndices"] << _rootIndices;
         archiver["bias"] << _bias;
@@ -301,7 +300,6 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::AddProperties(utilities::Archiver& archiver) const
     {
-        archiver.SetType(*this);
         archiver["splitRule"] << _splitRule;
         archiver["outgoingEdges"] << _outgoingEdges;
         archiver["firstEdgeIndex"] << _firstEdgeIndex;
@@ -397,7 +395,6 @@ namespace predictors
     template<typename SplitRuleType, typename EdgePredictorType>
     void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::AddProperties(utilities::Archiver& archiver) const
     {
-        archiver.SetType(*this);
         archiver["predictor"] << _predictor;
         archiver["targetNodeIndex"] << _targetNodeIndex;
     }

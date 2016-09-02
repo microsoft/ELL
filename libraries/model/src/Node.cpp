@@ -80,7 +80,6 @@ namespace model
 
     void Node::AddProperties(utilities::Archiver& archiver) const
     {
-        archiver.SetType(*this);
         archiver["id"] << _id;
     }
 

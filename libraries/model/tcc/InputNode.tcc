@@ -46,7 +46,6 @@ namespace model
     void InputNode<ValueType>::AddProperties(utilities::Archiver& archiver) const
     {
         Node::AddProperties(archiver);
-        archiver.SetType(*this);
         archiver[outputPortName] << _output;
     }
 

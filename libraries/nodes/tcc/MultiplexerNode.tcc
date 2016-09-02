@@ -33,7 +33,6 @@ namespace nodes
     void  MultiplexerNode<ValueType, SelectorType>::AddProperties(utilities::Archiver& archiver) const
     {
         Node::AddProperties(archiver);
-        archiver.SetType(*this);
         archiver["elements"] << _elements;
         archiver["selector"] << _selector;
         archiver[outputPortName] << _output;

@@ -97,7 +97,6 @@ namespace model
     void InputPort<ValueType>::AddProperties(utilities::Archiver& archiver) const
     {
         Port::AddProperties(archiver);
-        archiver.SetType(*this);
         archiver["input"] << _input;
     }
 

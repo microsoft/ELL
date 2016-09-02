@@ -141,6 +141,8 @@ namespace utilities
 
         void FillInDescription() const;
     };
+    // Temporary
+    using Archiver = ObjectDescription;
 
     /// <summary>
     /// IDescribable is the Base class for describable objects. In order to be able to use the
@@ -196,9 +198,6 @@ namespace utilities
     /// <summary> Enabled if ValueType does not inherit from IDescribable. </summary>
     template <typename ValueType>
     using IsNotDescribable = typename std::enable_if_t<(!std::is_base_of<IDescribable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
-
-    // Temporary
-    using Archiver = ObjectDescription;
 }
 
 #include "../tcc/ObjectDescription.tcc"

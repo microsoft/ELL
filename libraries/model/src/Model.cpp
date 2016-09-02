@@ -47,7 +47,6 @@ namespace model
             nodeIter.Next();
         }
 
-        archiver.SetType(*this);
         archiver["nodes"] << nodes;
     }
 

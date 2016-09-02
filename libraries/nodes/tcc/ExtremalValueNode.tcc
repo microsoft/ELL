@@ -36,7 +36,6 @@ namespace nodes
     void ExtremalValueNode<ValueType, max>::AddProperties(utilities::Archiver& archiver) const
     {
         Node::AddProperties(archiver);
-        archiver.SetType(*this);
         archiver[inputPortName] << _input;
         archiver[valPortName] << _val;
         archiver[argValPortName] << _argVal;

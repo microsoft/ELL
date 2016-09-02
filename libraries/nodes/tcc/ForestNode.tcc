@@ -32,7 +32,6 @@ namespace nodes
     void ForestNode<SplitRuleType, EdgePredictorType>::AddProperties(utilities::Archiver& archiver) const
     {
         Node::AddProperties(archiver);
-        archiver.SetType(*this);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
         archiver[treeOutputsPortName] << _treeOutputs;
