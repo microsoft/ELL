@@ -78,15 +78,17 @@ namespace math
 
     protected:
         // protected ctor accessible only through derived classes
-        TensorReferenceBase(ElementPointerType pData);
+        TensorReferenceBase(ElementPointerType pData, size_t stride);
 
         // allow operations defined in the TensorOperations struct to access raw data vector
         friend struct TensorOperations;
         ElementPointerType GetDataPointer() { return _pData; }
         const ElementPointerType GetDataPointer() const { return _pData; }
+        size_t GetStride()const { return _stride; }
 
         // member variables
         ElementPointerType _pData;
+        size_t _stride;
     };
 
     //
@@ -235,28 +237,28 @@ namespace math
         /// <param name="index"> Zero-based index of the element. </param>
         /// 
         /// <returns> Reference to the element at the given index. </returns>
-        ElementType& operator() (size_t index) { return _pData[index*_stride]; }
+        ElementType& operator() (size_t index);
 
         /// <summary> Tensor indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
         /// 
         /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator() (size_t index) const { return _pData[index*_stride]; }
+        ElementType operator() (size_t index) const;
 
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
         /// 
         /// <returns> Reference to the element at the given index. </returns>
-        ElementType& operator[] (size_t index) { return operator()(index); }
+        ElementType& operator[] (size_t index);
 
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
         /// 
         /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator[] (size_t index) const { return operator()(index); }
+        ElementType operator[] (size_t index) const;
 
         /// <summary> Resets all the tensor elements to zero. </summary>
         void Reset();
@@ -294,9 +296,6 @@ namespace math
         friend Tensor<ElementType, 1, ColumnOrientation>;
         friend TensorReference<ElementType, 1, !ColumnOrientation>;
         TensorReference(ElementType* pData, size_t size, size_t stride);
-
-        friend TensorOperations;
-        size_t _stride;
     };
 
     /// <summary> A const reference to a 1st order tensor. </summary>
@@ -312,14 +311,14 @@ namespace math
         /// <param name="index"> Zero-based index of the element. </param>
         /// 
         /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator() (size_t index) const { return _data[index*_stride]; }
+        ElementType operator() (size_t index) const;
 
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
         /// 
         /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator[] (size_t index) const { return operator()(index); }
+        ElementType operator[] (size_t index) const;
 
         /// <summary> Gets a const reference to a sub-vector. </summary>
         ///
@@ -341,9 +340,6 @@ namespace math
         friend TensorReference<ElementType, 1, ColumnOrientation>;
         friend TensorConstReference<ElementType, 1, !ColumnOrientation>;
         TensorConstReference(const ElementType* pData, size_t size, size_t stride);
-
-        friend TensorOperations;
-        size_t _stride;
     };
 
     /// <summary> A 1st order tensor (vector). </summary>
@@ -374,28 +370,28 @@ namespace math
         /// <param name="index"> Zero-based index of the element. </param>
         /// 
         /// <returns> Reference to the element at the given index. </returns>
-        ElementType& operator() (size_t index) { return _data[index]; }
+        ElementType& operator() (size_t index);
 
         /// <summary> Tensor indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
         /// 
         /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator() (size_t index) const { return _data[index]; }
+        ElementType operator() (size_t index) const;
 
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
         /// 
         /// <returns> Reference to the element at the given index. </returns>
-        ElementType& operator[] (size_t index) { return operator()(index); }
+        ElementType& operator[] (size_t index);
 
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
         /// 
         /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator[] (size_t index) const { return operator()(index); }
+        ElementType operator[] (size_t index) const;
 
         /// <summary> Gets a non-constant reference to this sub-vector. </summary>
         ///
@@ -421,26 +417,26 @@ namespace math
         /// <summary> Calculates a vector dot product (between vectors in any orientation). </summary>
         ///
         /// <typeparam name="ElementType"> Element type. </typeparam>
-        /// <typeparam name="LeftOrientation"> Left vector orientation. </typeparam>
-        /// <typeparam name="RightOrientation"> Right vector orientation. </typeparam>
-        /// <param name="left"> The left vector, in any orientation. </param>
-        /// <param name="right"> The right vector, in any orientation. </param>
+        /// <typeparam name="Orientation1"> First vector orientation. </typeparam>
+        /// <typeparam name="Orientation2"> Second vector orientation. </typeparam>
+        /// <param name="vector1"> The first vector, in any orientation. </param>
+        /// <param name="vector2"> The second vector, in any orientation. </param>
         ///
         /// <returns> The dot product result. </returns>
-        template<typename ElementType, bool LeftOrientation, bool RightOrientation>
-        static ElementType Dot(const Tensor<ElementType, 1, LeftOrientation>& left, const Tensor<ElementType, 1, RightOrientation>& right);
+        template<typename ElementType, bool Orientation1, bool Orientation2>
+        static ElementType Dot(const Tensor<ElementType, 1, Orientation1>& vector1, const Tensor<ElementType, 1, Orientation2>& vector2);
 
         /// <summary> Calculates a vector dot product (between vectors in any orientation). </summary>
         ///
         /// <typeparam name="ElementType"> Element type. </typeparam>
-        /// <typeparam name="LeftOrientation"> Left vector orientation. </typeparam>
-        /// <typeparam name="RightOrientation"> Right vector orientation. </typeparam>
-        /// <param name="left"> The left vector, in any orientation. </param>
-        /// <param name="right"> The right vector, in any orientation. </param>
+        /// <typeparam name="Orientation1"> First vector orientation. </typeparam>
+        /// <typeparam name="Orientation2"> Second vector orientation. </typeparam>
+        /// <param name="vector1"> The first vector, in any orientation. </param>
+        /// <param name="vector2"> The second vector, in any orientation. </param>
         ///
         /// <returns> The dot product result. </returns>
-        template<typename ElementType, bool LeftOrientation, bool RightOrientation>
-        static ElementType Dot(const TensorConstReference<ElementType, 1, LeftOrientation>& left, const TensorConstReference<ElementType, 1, RightOrientation>& right);
+        template<typename ElementType, bool Orientation1, bool Orientation2>
+        static ElementType Dot(const TensorConstReference<ElementType, 1, Orientation1>& vector1, const TensorConstReference<ElementType, 1, Orientation2>& vector2);
 
         /// <summary> Calculates the product of a row vector with a column vector. </summary>
         ///
@@ -470,6 +466,13 @@ namespace math
     typedef TensorReference<double, 1, false> DoubleRowVectorReference;
     typedef TensorConstReference<double, 1, true> DoubleColumnVectorConstReference;
     typedef TensorConstReference<double, 1, false> DoubleRowVectorConstReference;
+
+    typedef Tensor<float, 1, true> SingleColumnVector;
+    typedef Tensor<float, 1, false> SingleRowVector;
+    typedef TensorReference<float, 1, true> SingleColumnVectorReference;
+    typedef TensorReference<float, 1, false> SingleRowVectorReference;
+    typedef TensorConstReference<float, 1, true> SingleColumnVectorConstReference;
+    typedef TensorConstReference<float, 1, false> SingleRowVectorConstReference;
 }
 
 #include "../tcc/Tensor.tcc"

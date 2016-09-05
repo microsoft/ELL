@@ -6,6 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "BlasWrapper.h"
+//#define USE_BLAS
+
 // utilities
 #include "Exception.h"
 
@@ -16,7 +19,7 @@
 namespace math
 {
     template<typename ElementPointerType>
-    TensorReferenceBase<ElementPointerType>::TensorReferenceBase(ElementPointerType pData) : _pData(pData)
+    TensorReferenceBase<ElementPointerType>::TensorReferenceBase(ElementPointerType pData, size_t stride) : _pData(pData), _stride(stride)
     {
         // TODO check inputs
     }
@@ -33,7 +36,7 @@ namespace math
     template<typename ElementType>
     void TensorBase<ElementType>::Reset() 
     { 
-        std::fill(_data.begin(), _data.end(), 0); 
+        std::fill(_data.begin(), _data.end(), static_cast<ElementType>(0)); 
     }
 
     template<typename ElementType>
@@ -80,9 +83,37 @@ namespace math
     }
 
     template<typename ElementType, bool ColumnOrientation>
+    ElementType& TensorReference<ElementType, 1, ColumnOrientation>::operator() (size_t index) 
+    {
+        // TODO check index
+        // 
+        return _pData[index*_stride]; 
+    }
+
+    template<typename ElementType, bool ColumnOrientation>
+    ElementType TensorReference<ElementType, 1, ColumnOrientation>::operator() (size_t index) const
+    {
+        // TODO check index
+        // 
+        return _pData[index*_stride];
+    }
+
+    template<typename ElementType, bool ColumnOrientation>
+    ElementType& TensorReference<ElementType, 1, ColumnOrientation>::operator[] (size_t index)
+    {
+        return operator()(index);
+    }
+
+    template<typename ElementType, bool ColumnOrientation>
+    ElementType TensorReference<ElementType, 1, ColumnOrientation>::operator[] (size_t index) const
+    { 
+        return operator()(index);
+    }
+
+    template<typename ElementType, bool ColumnOrientation>
     void TensorReference<ElementType, 1, ColumnOrientation>::Reset() 
     { 
-        Fill(0);
+        Fill(static_cast<ElementType>(0));
     }
 
     template<typename ElementType, bool ColumnOrientation>
@@ -118,9 +149,22 @@ namespace math
     }
 
     template<typename ElementType, bool ColumnOrientation>
-    TensorReference<ElementType, 1, ColumnOrientation>::TensorReference(ElementType* pData, size_t size, size_t stride) : TensorReferenceBase<ElementType*>(pData), TensorDimensions<1>(size), _stride(stride)
+    TensorReference<ElementType, 1, ColumnOrientation>::TensorReference(ElementType* pData, size_t size, size_t stride) : TensorReferenceBase<ElementType*>(pData, stride), TensorDimensions<1>(size)
     {
         // TODO check pData != 0
+    }
+
+    template<typename ElementType, bool ColumnOrientation>
+    ElementType TensorConstReference<ElementType, 1, ColumnOrientation>::operator() (size_t index) const
+    {
+        // check input
+        return _data[index*_stride];
+    }
+
+    template<typename ElementType, bool ColumnOrientation>
+    ElementType TensorConstReference<ElementType, 1, ColumnOrientation>::operator[] (size_t index) const
+    {
+        return operator()(index);
     }
 
     template<typename ElementType, bool ColumnOrientation>
@@ -138,7 +182,7 @@ namespace math
     }
 
     template<typename ElementType, bool ColumnOrientation>
-    TensorConstReference<ElementType, 1, ColumnOrientation>::TensorConstReference(const ElementType* pData, size_t size, size_t stride) : TensorReferenceBase<const ElementType*>(pData), TensorDimensions<1>(size), _stride(stride)
+    TensorConstReference<ElementType, 1, ColumnOrientation>::TensorConstReference(const ElementType* pData, size_t size, size_t stride) : TensorReferenceBase<const ElementType*>(pData, stride), TensorDimensions<1>(size)
     {
         // TODO check pData != 0
     }
@@ -154,6 +198,32 @@ namespace math
     template<typename ElementType, bool ColumnOrientation>
     Tensor<ElementType, 1, ColumnOrientation>::Tensor(std::initializer_list<ElementType> list) : TensorBase<ElementType>(list.begin(), list.end()), TensorDimensions<1>(list.size()) 
     {}
+
+    template<typename ElementType, bool ColumnOrientation>
+    ElementType& Tensor<ElementType, 1, ColumnOrientation>::operator() (size_t index)
+    {
+        // TODO check input
+        return _data[index];
+    }
+
+    template<typename ElementType, bool ColumnOrientation>
+    ElementType Tensor<ElementType, 1, ColumnOrientation>::operator() (size_t index) const
+    {
+        // TODO check input 
+        return _data[index];
+    }
+
+    template<typename ElementType, bool ColumnOrientation>
+    ElementType& Tensor<ElementType, 1, ColumnOrientation>::operator[] (size_t index)
+    {
+        return operator()(index);
+    }
+
+    template<typename ElementType, bool ColumnOrientation>
+    ElementType Tensor<ElementType, 1, ColumnOrientation>::operator[] (size_t index) const
+    {
+        return operator()(index); 
+    }
 
     template<typename ElementType, bool ColumnOrientation>
     TensorReference<ElementType, 1, ColumnOrientation> Tensor<ElementType, 1, ColumnOrientation>::GetReference()
@@ -175,62 +245,76 @@ namespace math
             return false;
         }
 
-        const ElementType* pLeft = GetDataPointer();
-        const ElementType* pLeftEnd = pLeft + Size();
-        const ElementType* pRight = other.GetDataPointer();
+        const ElementType* pThis = GetDataPointer();
+        const ElementType* pThisEnd = pThis + Size();
+        const ElementType* pOther = other.GetDataPointer();
 
-        while (pLeft < pLeftEnd)
+        while (pThis < pThisEnd)
         {
-            if ((*pLeft) != (*pRight))
+            if ((*pThis) != (*pOther))
             {
                 return false;
             }
-            ++pLeft;
-            ++pRight;
+            ++pThis;
+            ++pOther;
         }
         return true;
     }
 
-    template<typename ElementType, bool LeftOrientation, bool RightOrientation>
-    ElementType TensorOperations::Dot(const Tensor<ElementType, 1, LeftOrientation>& left, const Tensor<ElementType, 1, RightOrientation>& right)
+    template<typename ElementType, bool Orientation1, bool Orientation2>
+    ElementType TensorOperations::Dot(const Tensor<ElementType, 1, Orientation1>& vector1, const Tensor<ElementType, 1, Orientation2>& vector2)
     {
+        size_t size1 = vector1.Size();
+        size_t size2 = vector2.Size();
+
         // TODO check inputs for equal size
 
+        const ElementType* ptr1 = vector1.GetDataPointer();
+        const ElementType* ptr2 = vector2.GetDataPointer();
+
+#ifdef USE_BLAS
+        return Blas::Dot(size1, ptr1, 1, ptr2, 1);
+#else
         ElementType result = 0;
-        const ElementType* pLeft = left.GetDataPointer();
-        const ElementType* pLeftEnd = pLeft + left.Size();
-        const ElementType* pRight = right.GetDataPointer();
+        const ElementType* end1 = ptr1 + size1;
 
-        while (pLeft < pLeftEnd)
+        while (ptr1 < end1)
         {
-            result += (*pLeft) * (*pRight);
-            ++pLeft;
-            ++pRight;
+            result += (*ptr1) * (*ptr2);
+            ++ptr1;
+            ++ptr2;
         }
-
         return result;
+#endif
     }
 
-    template<typename ElementType, bool LeftOrientation, bool RightOrientation>
-    ElementType TensorOperations::Dot(const TensorConstReference<ElementType, 1, LeftOrientation>& left, const TensorConstReference<ElementType, 1, RightOrientation>& right)
+    template<typename ElementType, bool Orientation1, bool Orientation2>
+    ElementType TensorOperations::Dot(const TensorConstReference<ElementType, 1, Orientation1>& vector1, const TensorConstReference<ElementType, 1, Orientation2>& vector2)
     {
+        size_t size1 = vector1.Size();
+        size_t size2 = vector2.Size();
+        
         // TODO check inputs for equal size
 
+        const ElementType* ptr1 = vector1.GetDataPointer();
+        size_t stride1 = vector1.GetStride();
+        const ElementType* ptr2 = vector2.GetDataPointer();
+        size_t stride2 = vector2.GetStride();
+
+#ifdef USE_BLAS
+        return Blas::Dot(size1, ptr1, stride1, ptr2, stride2);
+#else
         ElementType result = 0;
-        const ElementType* pLeft = left.GetDataPointer();
-        const ElementType* pLeftEnd = pLeft + left.Size();
-        const ElementType* pRight = right.GetDataPointer();
-        size_t leftStride = left._stride;
-        size_t rightStride = left._stride;
+        const ElementType* end1 = ptr1 + size1;
 
-        while (pLeft < pLeftEnd)
+        while (ptr1 < end1)
         {
-            result += (*pLeft) * (*pRight);
-            pLeft += leftStride;
-            pRight += rightStride;
+            result += (*ptr1) * (*ptr2);
+            ptr1 += stride1;
+            ptr2 += stride2;
         }
-
         return result;
+#endif
     }
 
     template<typename ElementType>
