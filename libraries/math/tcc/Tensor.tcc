@@ -9,6 +9,10 @@
 // utilities
 #include "Exception.h"
 
+// stl
+#include <memory> // for std::move
+#include <algorithm> // for std::generate
+
 namespace math
 {
     template<typename ElementPointerType>
@@ -16,6 +20,15 @@ namespace math
     {
         // TODO check inputs
     }
+
+    template<typename ElementType>
+    TensorBase<ElementType>::TensorBase(std::vector<ElementType> data) : _data(std::move(data))
+    {}
+
+    template<typename ElementType>
+    template<class StlIteratorType>
+    TensorBase<ElementType>::TensorBase(StlIteratorType begin, StlIteratorType end) : _data(begin, end)
+    {}
 
     template<typename ElementType>
     void TensorBase<ElementType>::Reset() 
@@ -58,7 +71,7 @@ namespace math
     void TensorReference<ElementType, 1, ColumnOrientation>::Fill(ElementType value)
     {
         ElementType* current = _pData;
-        ElementType* end = _pData + _size;
+        ElementType* end = _pData + _size * _stride;
         while (current < end)
         {
             *current = value;
@@ -76,7 +89,7 @@ namespace math
     void TensorReference<ElementType, 1, ColumnOrientation>::Generate(std::function<ElementType()> generator)
     {
         ElementType* current = _pData;
-        ElementType* end = _pData + _size;
+        ElementType* end = _pData + _size * _stride;
         while (current < end)
         {
             *current = generator();
@@ -135,6 +148,14 @@ namespace math
     {}
 
     template<typename ElementType, bool ColumnOrientation>
+    Tensor<ElementType, 1, ColumnOrientation>::Tensor(std::vector<ElementType> data) : TensorBase<ElementType>(std::move(data)), TensorDimensions<1>(data.size()) 
+    {}
+    
+    template<typename ElementType, bool ColumnOrientation>
+    Tensor<ElementType, 1, ColumnOrientation>::Tensor(std::initializer_list<ElementType> list) : TensorBase<ElementType>(list.begin(), list.end()), TensorDimensions<1>(list.size()) 
+    {}
+
+    template<typename ElementType, bool ColumnOrientation>
     TensorReference<ElementType, 1, ColumnOrientation> Tensor<ElementType, 1, ColumnOrientation>::GetReference()
     {
         return TensorReference<ElementType, 1, ColumnOrientation>(_data.data(), _data.size(), 1);
@@ -144,6 +165,30 @@ namespace math
     TensorConstReference<ElementType, 1, ColumnOrientation> Tensor<ElementType, 1, ColumnOrientation>::GetConstReference() const
     {
         return TensorConstReference<ElementType, 1, ColumnOrientation>(_data.data(), _data.size(), 1);
+    }
+
+    template<typename ElementType, bool ColumnOrientation>
+    bool Tensor<ElementType, 1, ColumnOrientation>::operator==(const Tensor<ElementType, 1, ColumnOrientation>& other) const
+    {
+        if (Size() != other.Size())
+        {
+            return false;
+        }
+
+        const ElementType* pLeft = GetDataPointer();
+        const ElementType* pLeftEnd = pLeft + Size();
+        const ElementType* pRight = other.GetDataPointer();
+
+        while (pLeft < pLeftEnd)
+        {
+            if ((*pLeft) != (*pRight))
+            {
+                return false;
+            }
+            ++pLeft;
+            ++pRight;
+        }
+        return true;
     }
 
     template<typename ElementType, bool LeftOrientation, bool RightOrientation>
@@ -191,7 +236,7 @@ namespace math
     template<typename ElementType>
     void TensorOperations::Product(const Tensor<ElementType, 1, false>& left, const Tensor<ElementType, 1, true>& right, ElementType & result)
     {
-        result = return Dot(left, right);
+        result = Dot(left, right);
     }
 
     template<typename ElementType>

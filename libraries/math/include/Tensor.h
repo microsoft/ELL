@@ -50,8 +50,12 @@ namespace math
         void Generate(std::function<ElementType()> generator);
 
     protected:
-        // protected ctor accessible only through derived classes
+        // protected ctors accessible only through derived classes
         TensorBase(size_t size);
+        TensorBase(std::vector<ElementType> data);
+
+        template<class StlIteratorType>
+        TensorBase(StlIteratorType begin, StlIteratorType end);
 
         // allow operations defined in the TensorOperations struct to access raw data vector
         friend struct TensorOperations;
@@ -342,7 +346,7 @@ namespace math
         size_t _stride;
     };
 
-    /// <summary> A 1st order tensor. </summary>
+    /// <summary> A 1st order tensor (vector). </summary>
     ///
     /// <typeparam name="ElementType"> Element type. </typeparam>
     /// <typeparam name="ColumnOrientation"> true if the tensor has column major orientation. </typeparam>
@@ -350,11 +354,20 @@ namespace math
     class Tensor<ElementType, 1, ColumnOrientation> : public TensorBase<ElementType>, public TensorDimensions<1>
     {
     public:
-
-        /// <summary> Constructs a 1st order tensor of a given size. </summary>
+        /// <summary> Constructs a 1st order tensor (vector) of a given size. </summary>
         ///
         /// <param name="size"> The size. </param>
         Tensor(size_t size);
+
+        /// <summary> Constructs a 1st order tensor (vector) from a std::vector. </summary>
+        ///
+        /// <param name="data"> The vector. </param>
+        Tensor(std::vector<ElementType> data);
+
+        /// <summary> Constructs a 1st order tensor (vector) from an initializer list. </summary>
+        ///
+        /// <param name="list"> The initializer list. </param>
+        Tensor(std::initializer_list<ElementType> list);
 
         /// <summary> Tensor indexer operator. </summary>
         ///
@@ -393,6 +406,13 @@ namespace math
         ///
         /// <returns> A constant reference to this sub-vector. </returns>
         TensorConstReference<ElementType, 1, ColumnOrientation> GetConstReference() const;
+
+        /// <summary> Equality operator. </summary>
+        ///
+        /// <param name="other"> The other tensor. </param>
+        ///
+        /// <returns> true if the tensors are equal. </returns>
+        bool operator==(const Tensor<ElementType, 1, ColumnOrientation>& other) const;
     };
 
     /// <summary> A struct that holds all of the binary tensor operations. </summary>
@@ -452,4 +472,4 @@ namespace math
     typedef TensorConstReference<double, 1, false> DoubleRowVectorConstReference;
 }
 
-#include "../tcc/Matrix.tcc"
+#include "../tcc/Tensor.tcc"
