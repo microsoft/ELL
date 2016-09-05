@@ -70,8 +70,8 @@ namespace math
         // TODO check inputs
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    void TensorReference<ElementType, 1, ColumnOrientation>::Fill(ElementType value)
+    template<typename ElementType, TensorOrientation Orientation>
+    void TensorReference<ElementType, 1, Orientation>::Fill(ElementType value)
     {
         ElementType* current = _pData;
         ElementType* end = _pData + _size * _stride;
@@ -82,42 +82,42 @@ namespace math
         }
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    ElementType& TensorReference<ElementType, 1, ColumnOrientation>::operator() (size_t index) 
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType& TensorReference<ElementType, 1, Orientation>::operator() (size_t index) 
     {
         // TODO check index
         // 
         return _pData[index*_stride]; 
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    ElementType TensorReference<ElementType, 1, ColumnOrientation>::operator() (size_t index) const
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType TensorReference<ElementType, 1, Orientation>::operator() (size_t index) const
     {
         // TODO check index
         // 
         return _pData[index*_stride];
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    ElementType& TensorReference<ElementType, 1, ColumnOrientation>::operator[] (size_t index)
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType& TensorReference<ElementType, 1, Orientation>::operator[] (size_t index)
     {
         return operator()(index);
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    ElementType TensorReference<ElementType, 1, ColumnOrientation>::operator[] (size_t index) const
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType TensorReference<ElementType, 1, Orientation>::operator[] (size_t index) const
     { 
         return operator()(index);
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    void TensorReference<ElementType, 1, ColumnOrientation>::Reset() 
+    template<typename ElementType, TensorOrientation Orientation>
+    void TensorReference<ElementType, 1, Orientation>::Reset() 
     { 
         Fill(static_cast<ElementType>(0));
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    void TensorReference<ElementType, 1, ColumnOrientation>::Generate(std::function<ElementType()> generator)
+    template<typename ElementType, TensorOrientation Orientation>
+    void TensorReference<ElementType, 1, Orientation>::Generate(std::function<ElementType()> generator)
     {
         ElementType* current = _pData;
         ElementType* end = _pData + _size * _stride;
@@ -128,117 +128,117 @@ namespace math
         }
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    TensorReference<ElementType, 1, ColumnOrientation> TensorReference<ElementType, 1, ColumnOrientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier)
+    template<typename ElementType, TensorOrientation Orientation>
+    TensorReference<ElementType, 1, Orientation> TensorReference<ElementType, 1, Orientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier)
     {
         // TODO check inputs
 
-        return TensorReference<ElementType, 1, ColumnOrientation>(_pData + offset * _stride, size, strideMultiplier * _stride);
+        return TensorReference<ElementType, 1, Orientation>(_pData + offset * _stride, size, strideMultiplier * _stride);
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    TensorReference<ElementType, 1, !ColumnOrientation> TensorReference<ElementType, 1, ColumnOrientation>::Transpose() 
+    template<typename ElementType, TensorOrientation Orientation>
+    TensorReference<ElementType, 1, FlipOrientation<Orientation>::value> TensorReference<ElementType, 1, Orientation>::Transpose() 
     { 
-        return TensorReference<ElementType, 1, !ColumnOrientation>(_pData, _size, _stride);
+        return TensorReference<ElementType, 1, FlipOrientation<Orientation>::value>(_pData, _size, _stride);
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    TensorConstReference<ElementType, 1, ColumnOrientation> TensorReference<ElementType, 1, ColumnOrientation>::GetConstReference()
+    template<typename ElementType, TensorOrientation Orientation>
+    TensorConstReference<ElementType, 1, Orientation> TensorReference<ElementType, 1, Orientation>::GetConstReference()
     {
-        return TensorConstReference<ElementType, 1, ColumnOrientation>(_pData, _size, _stride);
+        return TensorConstReference<ElementType, 1, Orientation>(_pData, _size, _stride);
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    TensorReference<ElementType, 1, ColumnOrientation>::TensorReference(ElementType* pData, size_t size, size_t stride) : TensorReferenceBase<ElementType*>(pData, stride), TensorDimensions<1>(size)
+    template<typename ElementType, TensorOrientation Orientation>
+    TensorReference<ElementType, 1, Orientation>::TensorReference(ElementType* pData, size_t size, size_t stride) : TensorReferenceBase<ElementType*>(pData, stride), TensorDimensions<1>(size)
     {
         // TODO check pData != 0
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    ElementType TensorConstReference<ElementType, 1, ColumnOrientation>::operator() (size_t index) const
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType TensorConstReference<ElementType, 1, Orientation>::operator() (size_t index) const
     {
         // check input
         return _data[index*_stride];
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    ElementType TensorConstReference<ElementType, 1, ColumnOrientation>::operator[] (size_t index) const
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType TensorConstReference<ElementType, 1, Orientation>::operator[] (size_t index) const
     {
         return operator()(index);
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    TensorConstReference<ElementType, 1, ColumnOrientation> TensorConstReference<ElementType, 1, ColumnOrientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier)
+    template<typename ElementType, TensorOrientation Orientation>
+    TensorConstReference<ElementType, 1, Orientation> TensorConstReference<ElementType, 1, Orientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier)
     {
         // TODO check inputs
 
-        return TensorConstReference<ElementType, 1, ColumnOrientation>(_pData + offset * _stride, size, strideMultiplier * _stride);
+        return TensorConstReference<ElementType, 1, Orientation>(_pData + offset * _stride, size, strideMultiplier * _stride);
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    TensorConstReference<ElementType, 1, !ColumnOrientation> TensorConstReference<ElementType, 1, ColumnOrientation>::Transpose()
+    template<typename ElementType, TensorOrientation Orientation>
+    TensorConstReference<ElementType, 1, FlipOrientation<Orientation>::value> TensorConstReference<ElementType, 1, Orientation>::Transpose()
     {
-        return TensorConstReference<ElementType, 1, !ColumnOrientation>(_pData, _size, _stride);
+        return TensorConstReference<ElementType, 1, FlipOrientation<Orientation>::value>(_pData, _size, _stride);
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    TensorConstReference<ElementType, 1, ColumnOrientation>::TensorConstReference(const ElementType* pData, size_t size, size_t stride) : TensorReferenceBase<const ElementType*>(pData, stride), TensorDimensions<1>(size)
+    template<typename ElementType, TensorOrientation Orientation>
+    TensorConstReference<ElementType, 1, Orientation>::TensorConstReference(const ElementType* pData, size_t size, size_t stride) : TensorReferenceBase<const ElementType*>(pData, stride), TensorDimensions<1>(size)
     {
         // TODO check pData != 0
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    Tensor<ElementType, 1, ColumnOrientation>::Tensor(size_t size) : TensorBase<ElementType>(size), TensorDimensions<1>(size)
+    template<typename ElementType, TensorOrientation Orientation>
+    Tensor<ElementType, 1, Orientation>::Tensor(size_t size) : TensorBase<ElementType>(size), TensorDimensions<1>(size)
     {}
 
-    template<typename ElementType, bool ColumnOrientation>
-    Tensor<ElementType, 1, ColumnOrientation>::Tensor(std::vector<ElementType> data) : TensorBase<ElementType>(std::move(data)), TensorDimensions<1>(data.size()) 
+    template<typename ElementType, TensorOrientation Orientation>
+    Tensor<ElementType, 1, Orientation>::Tensor(std::vector<ElementType> data) : TensorBase<ElementType>(std::move(data)), TensorDimensions<1>(data.size()) 
     {}
     
-    template<typename ElementType, bool ColumnOrientation>
-    Tensor<ElementType, 1, ColumnOrientation>::Tensor(std::initializer_list<ElementType> list) : TensorBase<ElementType>(list.begin(), list.end()), TensorDimensions<1>(list.size()) 
+    template<typename ElementType, TensorOrientation Orientation>
+    Tensor<ElementType, 1, Orientation>::Tensor(std::initializer_list<ElementType> list) : TensorBase<ElementType>(list.begin(), list.end()), TensorDimensions<1>(list.size()) 
     {}
 
-    template<typename ElementType, bool ColumnOrientation>
-    ElementType& Tensor<ElementType, 1, ColumnOrientation>::operator() (size_t index)
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType& Tensor<ElementType, 1, Orientation>::operator() (size_t index)
     {
         // TODO check input
         return _data[index];
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    ElementType Tensor<ElementType, 1, ColumnOrientation>::operator() (size_t index) const
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType Tensor<ElementType, 1, Orientation>::operator() (size_t index) const
     {
         // TODO check input 
         return _data[index];
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    ElementType& Tensor<ElementType, 1, ColumnOrientation>::operator[] (size_t index)
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType& Tensor<ElementType, 1, Orientation>::operator[] (size_t index)
     {
         return operator()(index);
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    ElementType Tensor<ElementType, 1, ColumnOrientation>::operator[] (size_t index) const
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType Tensor<ElementType, 1, Orientation>::operator[] (size_t index) const
     {
         return operator()(index); 
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    TensorReference<ElementType, 1, ColumnOrientation> Tensor<ElementType, 1, ColumnOrientation>::GetReference()
+    template<typename ElementType, TensorOrientation Orientation>
+    TensorReference<ElementType, 1, Orientation> Tensor<ElementType, 1, Orientation>::GetReference()
     {
-        return TensorReference<ElementType, 1, ColumnOrientation>(_data.data(), _data.size(), 1);
+        return TensorReference<ElementType, 1, Orientation>(_data.data(), _data.size(), 1);
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    TensorConstReference<ElementType, 1, ColumnOrientation> Tensor<ElementType, 1, ColumnOrientation>::GetConstReference() const
+    template<typename ElementType, TensorOrientation Orientation>
+    TensorConstReference<ElementType, 1, Orientation> Tensor<ElementType, 1, Orientation>::GetConstReference() const
     {
-        return TensorConstReference<ElementType, 1, ColumnOrientation>(_data.data(), _data.size(), 1);
+        return TensorConstReference<ElementType, 1, Orientation>(_data.data(), _data.size(), 1);
     }
 
-    template<typename ElementType, bool ColumnOrientation>
-    bool Tensor<ElementType, 1, ColumnOrientation>::operator==(const Tensor<ElementType, 1, ColumnOrientation>& other) const
+    template<typename ElementType, TensorOrientation Orientation>
+    bool Tensor<ElementType, 1, Orientation>::operator==(const Tensor<ElementType, 1, Orientation>& other) const
     {
         if (Size() != other.Size())
         {
@@ -261,7 +261,7 @@ namespace math
         return true;
     }
 
-    template<typename ElementType, bool Orientation1, bool Orientation2>
+    template<typename ElementType, TensorOrientation Orientation1, TensorOrientation Orientation2>
     ElementType TensorOperations::Dot(const Tensor<ElementType, 1, Orientation1>& vector1, const Tensor<ElementType, 1, Orientation2>& vector2)
     {
         size_t size1 = vector1.Size();
@@ -288,7 +288,7 @@ namespace math
 #endif
     }
 
-    template<typename ElementType, bool Orientation1, bool Orientation2>
+    template<typename ElementType, TensorOrientation Orientation1, TensorOrientation Orientation2>
     ElementType TensorOperations::Dot(const TensorConstReference<ElementType, 1, Orientation1>& vector1, const TensorConstReference<ElementType, 1, Orientation2>& vector2)
     {
         size_t size1 = vector1.Size();
@@ -318,13 +318,13 @@ namespace math
     }
 
     template<typename ElementType>
-    void TensorOperations::Product(const Tensor<ElementType, 1, false>& left, const Tensor<ElementType, 1, true>& right, ElementType & result)
+    void TensorOperations::Product(const Tensor<ElementType, 1, TensorOrientation::rowMajor>& left, const Tensor<ElementType, 1, TensorOrientation::columnMajor>& right, ElementType & result)
     {
         result = Dot(left, right);
     }
 
     template<typename ElementType>
-    void TensorOperations::Product(const TensorConstReference<ElementType, 1, false>& left, const TensorConstReference<ElementType, 1, true>& right, ElementType & result)
+    void TensorOperations::Product(const TensorConstReference<ElementType, 1, TensorOrientation::rowMajor>& left, const TensorConstReference<ElementType, 1, TensorOrientation::columnMajor>& right, ElementType & result)
     {
         result = Dot(left, right);
     }

@@ -193,6 +193,36 @@ namespace math
     };
 
     //
+    // Utility classes used to control matrix and vector orientation
+    // 
+
+    /// <summary> Enum of possible matrix and vector orientations. </summary>
+    enum class TensorOrientation { rowMajor, columnMajor };
+
+    /// <summary> Helper class that flips orientation at compile time. </summary>
+    ///
+    /// <typeparam name="Orientation"> The original orientation. </typeparam>
+    template<TensorOrientation Orientation>
+    struct FlipOrientation 
+    {};
+
+    /// <summary> Helper class that flips rowMajor to columnMajor at compile time.  </summary>
+    template<>
+    struct FlipOrientation<TensorOrientation::rowMajor>
+    {
+        /// <summary> The flipped orientation value. </summary>
+        static constexpr TensorOrientation value = TensorOrientation::columnMajor;
+    };
+
+    /// <summary> Helper class that flips columnMajor to rowMajor at compile time.  </summary>
+    template<>
+    struct FlipOrientation<TensorOrientation::columnMajor>
+    {
+        /// <summary> The flipped orientation value. </summary>
+        static constexpr TensorOrientation value = TensorOrientation::rowMajor;
+    };
+
+    //
     // Tensor, TensorReference, TensorConstReference classes
     // 
 
@@ -200,8 +230,8 @@ namespace math
     ///
     /// <typeparam name="ElementType"> Element type. </typeparam>
     /// <typeparam name="TensorOrder"> The order of the tensor: 1, 2, or 3. </typeparam>
-    /// <typeparam name="ColumnOrientation"> true if the tensor has column major orientation. </typeparam>
-    template<typename ElementType, size_t TensorOrder, bool ColumnOrientation>
+    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
+    template<typename ElementType, size_t TensorOrder, TensorOrientation Orientation>
     class Tensor
     {};
 
@@ -209,8 +239,8 @@ namespace math
     ///
     /// <typeparam name="ElementType"> Element type. </typeparam>
     /// <typeparam name="TensorOrder"> The order of the tensor: 1, 2, or 3. </typeparam>
-    /// <typeparam name="ColumnOrientation"> true if the tensor has column major orientation. </typeparam>
-    template<typename ElementType, size_t TensorOrder, bool ColumnOrientation>
+    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
+    template<typename ElementType, size_t TensorOrder, TensorOrientation Orientation>
     class TensorReference
     {};
 
@@ -218,17 +248,17 @@ namespace math
     ///
     /// <typeparam name="ElementType"> Element type. </typeparam>
     /// <typeparam name="TensorOrder"> The order of the tensor: 1, 2, or 3. </typeparam>
-    /// <typeparam name="ColumnOrientation"> true if the tensor has column major orientation. </typeparam>
-    template<typename ElementType, size_t TensorOrder, bool ColumnOrientation>
+    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
+    template<typename ElementType, size_t TensorOrder, TensorOrientation Orientation>
     class TensorConstReference
     {};
 
     /// <summary> A non-const reference to a 1st order tensor. </summary>
     ///
     /// <typeparam name="ElementType"> Element type. </typeparam>
-    /// <typeparam name="ColumnOrientation"> true if the tensor has column major orientation. </typeparam>
-    template<typename ElementType, bool ColumnOrientation>
-    class TensorReference<ElementType, 1, ColumnOrientation> : public TensorReferenceBase<ElementType*>, public TensorDimensions<1>
+    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
+    template<typename ElementType, TensorOrientation Orientation>
+    class TensorReference<ElementType, 1, Orientation> : public TensorReferenceBase<ElementType*>, public TensorDimensions<1>
     {
     public:
 
@@ -279,31 +309,31 @@ namespace math
         /// <param name="strideMultiplier"> The stride multiplier. </param>
         ///
         /// <returns> Reference to the sub-vector. </returns>
-        TensorReference<ElementType, 1, ColumnOrientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier = 1);
+        TensorReference<ElementType, 1, Orientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier = 1);
 
         /// <summary> Gets a reference to the transpose of the current vector. </summary>
         ///
         /// <returns> A reference to the transpose of the vector. </returns>
-        TensorReference<ElementType, 1, !ColumnOrientation> Transpose();
+        TensorReference<ElementType, 1, FlipOrientation<Orientation>::value> Transpose();
 
         /// <summary> Gets constant reference to this sub-vector. </summary>
         ///
         /// <returns> The constant reference to this sub-vector. </returns>
-        TensorConstReference<ElementType, 1, ColumnOrientation> GetConstReference();
+        TensorConstReference<ElementType, 1, Orientation> GetConstReference();
 
     private:
         // private ctor can only be called by friends
-        friend Tensor<ElementType, 1, ColumnOrientation>;
-        friend TensorReference<ElementType, 1, !ColumnOrientation>;
+        friend Tensor<ElementType, 1, Orientation>;
+        friend TensorReference<ElementType, 1, FlipOrientation<Orientation>::value>;
         TensorReference(ElementType* pData, size_t size, size_t stride);
     };
 
     /// <summary> A const reference to a 1st order tensor. </summary>
     ///
     /// <typeparam name="ElementType"> Element type. </typeparam>
-    /// <typeparam name="ColumnOrientation"> true if the tensor has column major orientation. </typeparam>
-    template<typename ElementType, bool ColumnOrientation>
-    class TensorConstReference<ElementType, 1, ColumnOrientation> : public TensorReferenceBase<const ElementType*>, public TensorDimensions<1>
+    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
+    template<typename ElementType, TensorOrientation Orientation>
+    class TensorConstReference<ElementType, 1, Orientation> : public TensorReferenceBase<const ElementType*>, public TensorDimensions<1>
     {
     public:
         /// <summary> Tensor indexer operator. </summary>
@@ -327,27 +357,27 @@ namespace math
         /// <param name="strideMultiplier"> The stride multiplier. </param>
         ///
         /// <returns> Const reference to the sub-vector. </returns>
-        TensorConstReference<ElementType, 1, ColumnOrientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier = 1);
+        TensorConstReference<ElementType, 1, Orientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier = 1);
 
         /// <summary> Gets a const reference to the transpose of the current vector. </summary>
         ///
         /// <returns> A const reference to the transpose of the vector. </returns>
-        TensorConstReference<ElementType, 1, !ColumnOrientation> Transpose();
+        TensorConstReference<ElementType, 1, FlipOrientation<Orientation>::value> Transpose();
 
     private:
         // private ctor can only be called by friends
-        friend Tensor<ElementType, 1, ColumnOrientation>;
-        friend TensorReference<ElementType, 1, ColumnOrientation>;
-        friend TensorConstReference<ElementType, 1, !ColumnOrientation>;
+        friend Tensor<ElementType, 1, Orientation>;
+        friend TensorReference<ElementType, 1, Orientation>;
+        friend TensorConstReference<ElementType, 1, FlipOrientation<Orientation>::value>;
         TensorConstReference(const ElementType* pData, size_t size, size_t stride);
     };
 
     /// <summary> A 1st order tensor (vector). </summary>
     ///
     /// <typeparam name="ElementType"> Element type. </typeparam>
-    /// <typeparam name="ColumnOrientation"> true if the tensor has column major orientation. </typeparam>
-    template<typename ElementType, bool ColumnOrientation>
-    class Tensor<ElementType, 1, ColumnOrientation> : public TensorBase<ElementType>, public TensorDimensions<1>
+    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
+    template<typename ElementType, TensorOrientation Orientation>
+    class Tensor<ElementType, 1, Orientation> : public TensorBase<ElementType>, public TensorDimensions<1>
     {
     public:
         /// <summary> Constructs a 1st order tensor (vector) of a given size. </summary>
@@ -396,19 +426,19 @@ namespace math
         /// <summary> Gets a non-constant reference to this sub-vector. </summary>
         ///
         /// <returns> A reference to this sub-vector. </returns>
-        TensorReference<ElementType, 1, ColumnOrientation> GetReference();
+        TensorReference<ElementType, 1, Orientation> GetReference();
 
         /// <summary> Gets constant reference to this sub-vector. </summary>
         ///
         /// <returns> A constant reference to this sub-vector. </returns>
-        TensorConstReference<ElementType, 1, ColumnOrientation> GetConstReference() const;
+        TensorConstReference<ElementType, 1, Orientation> GetConstReference() const;
 
         /// <summary> Equality operator. </summary>
         ///
         /// <param name="other"> The other tensor. </param>
         ///
         /// <returns> true if the tensors are equal. </returns>
-        bool operator==(const Tensor<ElementType, 1, ColumnOrientation>& other) const;
+        bool operator==(const Tensor<ElementType, 1, Orientation>& other) const;
     };
 
     /// <summary> A struct that holds all of the binary tensor operations. </summary>
@@ -423,7 +453,7 @@ namespace math
         /// <param name="vector2"> The second vector, in any orientation. </param>
         ///
         /// <returns> The dot product result. </returns>
-        template<typename ElementType, bool Orientation1, bool Orientation2>
+        template<typename ElementType, TensorOrientation Orientation1, TensorOrientation Orientation2>
         static ElementType Dot(const Tensor<ElementType, 1, Orientation1>& vector1, const Tensor<ElementType, 1, Orientation2>& vector2);
 
         /// <summary> Calculates a vector dot product (between vectors in any orientation). </summary>
@@ -435,7 +465,7 @@ namespace math
         /// <param name="vector2"> The second vector, in any orientation. </param>
         ///
         /// <returns> The dot product result. </returns>
-        template<typename ElementType, bool Orientation1, bool Orientation2>
+        template<typename ElementType, TensorOrientation Orientation1, TensorOrientation Orientation2>
         static ElementType Dot(const TensorConstReference<ElementType, 1, Orientation1>& vector1, const TensorConstReference<ElementType, 1, Orientation2>& vector2);
 
         /// <summary> Calculates the product of a row vector with a column vector. </summary>
@@ -445,7 +475,7 @@ namespace math
         /// <param name="right"> The right vector, in column orientation. </param>
         /// <param name="result"> [out] The result. </param>
         template<typename ElementType>
-        static void Product(const Tensor<ElementType, 1, false>& left, const Tensor<ElementType, 1, true>& right, ElementType& result);
+        static void Product(const Tensor<ElementType, 1, TensorOrientation::rowMajor>& left, const Tensor<ElementType, 1, TensorOrientation::columnMajor>& right, ElementType& result);
 
         /// <summary> Calculates the product of a row vector with a column vector. </summary>
         ///
@@ -454,25 +484,25 @@ namespace math
         /// <param name="right"> The right vector, in column orientation. </param>
         /// <param name="result"> [out] The result. </param>
         template<typename ElementType>
-        static void Product(const TensorConstReference<ElementType, 1, false>& left, const TensorConstReference<ElementType, 1, true>& right, ElementType& result);
+        static void Product(const TensorConstReference<ElementType, 1, TensorOrientation::rowMajor>& left, const TensorConstReference<ElementType, 1, TensorOrientation::columnMajor>& right, ElementType& result);
     };
 
     //
     // typedefs
     // 
-    typedef Tensor<double, 1, true> DoubleColumnVector;
-    typedef Tensor<double, 1, false> DoubleRowVector;
-    typedef TensorReference<double, 1, true> DoubleColumnVectorReference;
-    typedef TensorReference<double, 1, false> DoubleRowVectorReference;
-    typedef TensorConstReference<double, 1, true> DoubleColumnVectorConstReference;
-    typedef TensorConstReference<double, 1, false> DoubleRowVectorConstReference;
+    typedef Tensor<double, 1, TensorOrientation::columnMajor> DoubleColumnVector;
+    typedef Tensor<double, 1, TensorOrientation::rowMajor> DoubleRowVector;
+    typedef TensorReference<double, 1, TensorOrientation::columnMajor> DoubleColumnVectorReference;
+    typedef TensorReference<double, 1, TensorOrientation::rowMajor> DoubleRowVectorReference;
+    typedef TensorConstReference<double, 1, TensorOrientation::columnMajor> DoubleColumnVectorConstReference;
+    typedef TensorConstReference<double, 1, TensorOrientation::rowMajor> DoubleRowVectorConstReference;
 
-    typedef Tensor<float, 1, true> SingleColumnVector;
-    typedef Tensor<float, 1, false> SingleRowVector;
-    typedef TensorReference<float, 1, true> SingleColumnVectorReference;
-    typedef TensorReference<float, 1, false> SingleRowVectorReference;
-    typedef TensorConstReference<float, 1, true> SingleColumnVectorConstReference;
-    typedef TensorConstReference<float, 1, false> SingleRowVectorConstReference;
+    typedef Tensor<float, 1, TensorOrientation::columnMajor> SingleColumnVector;
+    typedef Tensor<float, 1, TensorOrientation::rowMajor> SingleRowVector;
+    typedef TensorReference<float, 1, TensorOrientation::columnMajor> SingleColumnVectorReference;
+    typedef TensorReference<float, 1, TensorOrientation::rowMajor> SingleRowVectorReference;
+    typedef TensorConstReference<float, 1, TensorOrientation::columnMajor> SingleColumnVectorConstReference;
+    typedef TensorConstReference<float, 1, TensorOrientation::rowMajor> SingleRowVectorConstReference;
 }
 
 #include "../tcc/Tensor.tcc"
