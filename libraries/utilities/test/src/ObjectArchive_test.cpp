@@ -195,7 +195,7 @@ void TestSerializeIDescribable()
     utilities::SerializationContext context;
     std::stringstream strstream;
     {
-        utilities::SimpleXmlArchiver archiver(strstream);
+        utilities::XmlArchiver archiver(strstream);
      
         InnerObject innerObj(3, 4.5);
         archiver.Serialize("inner", innerObj);

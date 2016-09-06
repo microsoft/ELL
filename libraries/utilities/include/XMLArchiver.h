@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleXmlArchiver.h (utilities)
+//  File:     XmlArchiver.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,19 +26,19 @@
 namespace utilities
 {
     /// <summary> An archiver that encodes data in an XML format. </summary>
-    class SimpleXmlArchiver : public Archiver
+    class XmlArchiver : public Archiver
     {
     public:
         /// <summary> Default Constructor --- writes to standard output. </summary>
-        SimpleXmlArchiver();
+        XmlArchiver();
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="outputStream"> The stream to serialize data to. </summary>
-        SimpleXmlArchiver(std::ostream& outputStream);
+        XmlArchiver(std::ostream& outputStream);
 
         /// <summary> Default Destructor </summary>
-        ~SimpleXmlArchiver();
+        ~XmlArchiver();
 
     protected:
         DECLARE_SERIALIZE_VALUE_OVERRIDE(bool);

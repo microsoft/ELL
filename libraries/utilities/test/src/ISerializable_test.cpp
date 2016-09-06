@@ -328,10 +328,10 @@ void TestJsonUnarchiver()
 
 void TestXmlArchiver()
 {
-    TestArchiver<utilities::SimpleXmlArchiver>();
+    TestArchiver<utilities::XmlArchiver>();
 }
 
 void TestXmlUnarchiver()
 {
-    TestUnarchiver<utilities::SimpleXmlArchiver, utilities::SimpleXmlUnarchiver>();
+    TestUnarchiver<utilities::XmlArchiver, utilities::SimpleXmlUnarchiver>();
 }

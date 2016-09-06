@@ -264,7 +264,7 @@ namespace common
         if(ext == "xml")
         {
             auto filestream = utilities::OpenOfstream(filename);
-            SerializeModel<utilities::SimpleXmlArchiver>(model, filestream);
+            SerializeModel<utilities::XmlArchiver>(model, filestream);
         }
         else if(ext == "json")
         {

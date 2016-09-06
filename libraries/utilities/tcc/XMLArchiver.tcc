@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleXmlArchiver.tcc (utilities)
+//  File:     XmlArchiver.tcc (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,7 +12,7 @@ namespace utilities
     // Serialization
     //
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleXmlArchiver::WriteScalar(const char* name, const ValueType& value)
+    void XmlArchiver::WriteScalar(const char* name, const ValueType& value)
     {
         using std::to_string;
         auto indent = GetCurrentIndent();
@@ -33,7 +33,7 @@ namespace utilities
 
     // Specialization for bool (though perhaps this should be an overload, not a specialization)
     template <>
-    inline void SimpleXmlArchiver::WriteScalar(const char* name, const bool& value)
+    inline void XmlArchiver::WriteScalar(const char* name, const bool& value)
     {
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
@@ -57,7 +57,7 @@ namespace utilities
     }
 
     // This function is inline just so it appears next to the other Write* functions
-    inline void SimpleXmlArchiver::WriteScalar(const char* name, const char* value)
+    inline void XmlArchiver::WriteScalar(const char* name, const char* value)
     {
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
@@ -74,7 +74,7 @@ namespace utilities
         _out << " value='" << XmlUtilities::EncodeAttributeString(value) << "'/>" << endOfLine;
     }
 
-    inline void SimpleXmlArchiver::WriteScalar(const char* name, const std::string& value)
+    inline void XmlArchiver::WriteScalar(const char* name, const std::string& value)
     {
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
@@ -92,7 +92,7 @@ namespace utilities
     }
 
     template <typename ValueType>
-    void SimpleXmlArchiver::WriteArray(const char* name, const std::vector<ValueType>& array)
+    void XmlArchiver::WriteArray(const char* name, const std::vector<ValueType>& array)
     {
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();

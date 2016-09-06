@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleXmlArchiver.cpp (utilities)
+//  File:     XmlArchiver.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,46 +23,46 @@ namespace utilities
     //
     // Serialization
     //
-    SimpleXmlArchiver::SimpleXmlArchiver() : _out(std::cout) 
+    XmlArchiver::XmlArchiver() : _out(std::cout) 
     {
         WriteFileHeader();
     }
 
-    SimpleXmlArchiver::SimpleXmlArchiver(std::ostream& outputStream) : _out(outputStream) 
+    XmlArchiver::XmlArchiver(std::ostream& outputStream) : _out(outputStream) 
     {
         WriteFileHeader();
     }
 
-    SimpleXmlArchiver::~SimpleXmlArchiver()
+    XmlArchiver::~XmlArchiver()
     {
         WriteFileFooter();
     }
 
-    void SimpleXmlArchiver::WriteFileHeader()
+    void XmlArchiver::WriteFileHeader()
     {   
         // Write XML declaration
         _out << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";     
         _out << "<emll version=\"1.0\">\n";
     }
 
-    void SimpleXmlArchiver::WriteFileFooter()
+    void XmlArchiver::WriteFileFooter()
     {
         _out << "</emll>\n";
     }
 
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, bool);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, char);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, short);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, int);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, size_t);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, float);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, double);
+    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, bool);
+    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, char);
+    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, short);
+    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, int);
+    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, size_t);
+    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, float);
+    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, double);
 
     // strings
-    void SimpleXmlArchiver::SerializeValue(const char* name, const std::string& value) { WriteScalar(name, value); }
+    void XmlArchiver::SerializeValue(const char* name, const std::string& value) { WriteScalar(name, value); }
 
     // ISerializable
-    void SimpleXmlArchiver::BeginSerializeObject(const char* name, const ISerializable& value)
+    void XmlArchiver::BeginSerializeObject(const char* name, const ISerializable& value)
     {
         auto indent = GetCurrentIndent();
         auto typeName = XmlUtilities::EncodeTypeName(value.GetRuntimeTypeName());
@@ -77,14 +77,14 @@ namespace utilities
         _out << ">" << std::endl;
     }
 
-    void SimpleXmlArchiver::SerializeObject(const char* name, const ISerializable& value)
+    void XmlArchiver::SerializeObject(const char* name, const ISerializable& value)
     {
         ++_indent;
         value.Serialize(*this); // TODO: need to somehow know if we're in an indenting context or not for the subsequent calls to WriteScalar
         --_indent;
     }
 
-    void SimpleXmlArchiver::EndSerializeObject(const char* name, const ISerializable& value)
+    void XmlArchiver::EndSerializeObject(const char* name, const ISerializable& value)
     {
         auto indent = GetCurrentIndent();
         auto typeName = XmlUtilities::EncodeTypeName(value.GetRuntimeTypeName());
@@ -95,22 +95,22 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, bool);
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, char);
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, short);
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, int);
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, size_t);
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, float);
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, double);
+    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, bool);
+    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, char);
+    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, short);
+    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, int);
+    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, size_t);
+    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, float);
+    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, double);
 
-    void SimpleXmlArchiver::SerializeArray(const char* name, const std::vector<std::string>& array)
+    void XmlArchiver::SerializeArray(const char* name, const std::vector<std::string>& array)
     {
         WriteArray(name, array);
     }
 
     // Array of pointers-to-ISerializable
     // TOOD: pass in compile-time type name
-    void SimpleXmlArchiver::SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
+    void XmlArchiver::SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
     {
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
