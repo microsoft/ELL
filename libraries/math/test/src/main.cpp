@@ -34,6 +34,12 @@ void TestDoubleVector()
     std::normal_distribution<double> normal(0, 1.0);
     auto generator = [&]() { return normal(rng); };
     v.Generate(generator);
+
+    testing::ProcessTest("DoubleColumnVector::Norm2", a.Norm2() == 7*7+9*9);
+    testing::ProcessTest("DoubleColumnVector::Norm1", a.Norm1() == 7+9);
+    testing::ProcessTest("DoubleColumnVector::Norm0", a.Norm0() == 2);
+    testing::ProcessTest("DoubleColumnVector::Min", a.Min() == 0);
+    testing::ProcessTest("DoubleColumnVector::Max", a.Max() == 9);
 }
 
 void TestSingleVector()
@@ -56,6 +62,12 @@ void TestSingleVector()
     std::normal_distribution<float> normal(0, 1.0);
     auto generator = [&]() { return normal(rng); };
     v.Generate(generator);
+
+    testing::ProcessTest("SingleColumnVector::Norm2", a.Norm2() == 7*7+9*9);
+    testing::ProcessTest("SingleColumnVector::Norm1", a.Norm1() == 7+9);
+    testing::ProcessTest("SingleColumnVector::Norm0", a.Norm0() == 2);
+    testing::ProcessTest("SingleColumnVector::Min", a.Min() == 0);
+    testing::ProcessTest("SingleColumnVector::Max", a.Max() == 9);
 }
 
 void TestDoubleVectorReference()

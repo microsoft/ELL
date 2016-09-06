@@ -110,36 +110,84 @@ namespace math
     template<typename ElementType>
     inline ElementType VectorReferenceBase<ElementType>::Norm2() const
     {
-        // TODO
-        return 0;
+#ifdef USE_BLAS
+        return Blas::Nrm2(_size, _pData, _stride);
+#else
+        ElementType result = 0;
+        const ElementType* ptr = _pData;
+        const ElementType* end = _pData + _size;
+        while(ptr < end)
+        {
+            result += (*ptr) * (*ptr);
+            ++ptr;
+        }
+        return result;
+#endif
     }
 
     template<typename ElementType>
     inline ElementType VectorReferenceBase<ElementType>::Norm1() const
     {
-        // TODO
-        return 0;
+        ElementType result = 0;
+        const ElementType* ptr = _pData;
+        const ElementType* end = _pData + _size;
+        while(ptr < end)
+        {
+            result += std::abs(*ptr);
+            ++ptr;
+        }
+        return result;
     }
 
     template<typename ElementType>
     inline ElementType VectorReferenceBase<ElementType>::Norm0() const
     {
-        // TODO
-        return 0;
+        ElementType result = 0;
+        const ElementType* ptr = _pData;
+        const ElementType* end = _pData + _size;
+        while(ptr < end)
+        {
+            if((*ptr) != 0)
+            {
+                result += 1;
+            }
+            ++ptr;
+        }
+        return result;
     }
 
     template<typename ElementType>
     inline ElementType VectorReferenceBase<ElementType>::Min() const
     {
-        // TODO
-        return 0;
+        ElementType result = *_pData;
+        const ElementType* ptr = _pData+1;
+        const ElementType* end = _pData + _size;
+        while(ptr < end)
+        {
+            if((*ptr) < result)
+            {
+                result = *ptr;
+            }
+            ++ptr;
+        }
+        return result;
     }
 
     template<typename ElementType>
     inline ElementType VectorReferenceBase<ElementType>::Max() const
     {
-        // TODO
-        return 0;
+        ElementType result = *_pData;
+        const ElementType* ptr = _pData+1;
+        const ElementType* end = _pData + _size;
+        while(ptr < end)
+        {
+            if((*ptr) > result)
+            {
+                result = *ptr;
+            }
+            ++ptr;
+        }
+        return result;
     }
 
     //
