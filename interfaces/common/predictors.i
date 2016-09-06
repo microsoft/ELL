@@ -9,7 +9,6 @@
 %ignore predictors::LinearPredictor::AddToModel(layers::Model&, const layers::CoordinateList& ) const;
 %ignore predictors::LinearPredictor::GetWeights() const;
 %ignore predictors::LinearPredictor::GetBias() const;
-//%ignore predictors::DecisionTreePredictor;
 %ignore predictors::DecisionTreePredictor::InteriorNode;
 
 %{

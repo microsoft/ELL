@@ -109,18 +109,9 @@ namespace dataset {};
 
 namespace utilities
 {
-//    template <typename ValueType>
-//    class IIterator {}; 
-    
-//    template <typename IteratorType, typename ValueType> class StlIterator {};
-//    %template () StlIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
-
     template <typename IteratorType, typename ValueType> class StlIndexValueIterator {};
     %template () StlIndexValueIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
 }
-
-//%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>,std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
-//typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> dataset::GenericRowIterator;
 
 // Interface includes for lossFunctions library
 %include lossFunctions.i
@@ -158,8 +149,6 @@ wrap_unique_ptr(LayerPtr, layers::Layer)
 
 #ifndef SWIGXML
 %template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
-//%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
-//%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>, std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
 
 %template () dataset::RowDataset<dataset::IDataVector>;
 %template () trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
