@@ -8,7 +8,7 @@
 
 #include "ObjectArchiver.h"
 #include "Archiver.h"
-#include "ISerializable.h"
+#include "IArchivable.h"
 
 #include <iostream>
 #include <string>
@@ -29,16 +29,16 @@ namespace utilities
     //
     // Serialization
     //
-    IMPLEMENT_SERIALIZE_VALUE(ObjectArchiver, bool);
-    IMPLEMENT_SERIALIZE_VALUE(ObjectArchiver, char);
-    IMPLEMENT_SERIALIZE_VALUE(ObjectArchiver, short);
-    IMPLEMENT_SERIALIZE_VALUE(ObjectArchiver, int);
-    IMPLEMENT_SERIALIZE_VALUE(ObjectArchiver, size_t);
-    IMPLEMENT_SERIALIZE_VALUE(ObjectArchiver, float);
-    IMPLEMENT_SERIALIZE_VALUE(ObjectArchiver, double);
+    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, bool);
+    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, char);
+    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, short);
+    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, int);
+    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, size_t);
+    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, float);
+    IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, double);
 
     // strings
-    void ObjectArchiver::SerializeValue(const char* name, const std::string& value) 
+    void ObjectArchiver::ArchiveValue(const char* name, const std::string& value) 
     {
         if(std::string{""} == name)
         {
@@ -51,9 +51,9 @@ namespace utilities
         }
     }
 
-    // ISerializable
+    // IArchivable
 
-    void ObjectArchiver::SerializeObject(const char* name, const ISerializable& value)
+    void ObjectArchiver::ArchiveObject(const char* name, const IArchivable& value)
     {
         if(std::string{""} == name)
         {
@@ -72,20 +72,20 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_SERIALIZE_ARRAY(ObjectArchiver, bool);
-    IMPLEMENT_SERIALIZE_ARRAY(ObjectArchiver, char);
-    IMPLEMENT_SERIALIZE_ARRAY(ObjectArchiver, short);
-    IMPLEMENT_SERIALIZE_ARRAY(ObjectArchiver, int);
-    IMPLEMENT_SERIALIZE_ARRAY(ObjectArchiver, size_t);
-    IMPLEMENT_SERIALIZE_ARRAY(ObjectArchiver, float);
-    IMPLEMENT_SERIALIZE_ARRAY(ObjectArchiver, double);
+    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, bool);
+    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, char);
+    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, short);
+    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, int);
+    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, size_t);
+    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, float);
+    IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, double);
 
-    void ObjectArchiver::SerializeArray(const char* name, const std::vector<std::string>& array)
+    void ObjectArchiver::ArchiveArray(const char* name, const std::vector<std::string>& array)
     {
         WriteArray(name, array);
     }
 
-    void ObjectArchiver::SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
+    void ObjectArchiver::ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array)
     {
         if(std::string{""} == name)
         {
@@ -101,16 +101,16 @@ namespace utilities
     //
     // Deserialization
     //
-    IMPLEMENT_DESERIALIZE_VALUE(ObjectArchiver, bool);
-    IMPLEMENT_DESERIALIZE_VALUE(ObjectArchiver, char);
-    IMPLEMENT_DESERIALIZE_VALUE(ObjectArchiver, short);
-    IMPLEMENT_DESERIALIZE_VALUE(ObjectArchiver, int);
-    IMPLEMENT_DESERIALIZE_VALUE(ObjectArchiver, size_t);
-    IMPLEMENT_DESERIALIZE_VALUE(ObjectArchiver, float);
-    IMPLEMENT_DESERIALIZE_VALUE(ObjectArchiver, double);
+    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, bool);
+    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, char);
+    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, short);
+    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, int);
+    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, size_t);
+    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, float);
+    IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, double);
 
     // strings
-    void ObjectArchiver::DeserializeValue(const char* name, std::string& value) 
+    void ObjectArchiver::UnarchiveValue(const char* name, std::string& value) 
     { 
         if(std::string{""} == name)
         {
@@ -122,8 +122,8 @@ namespace utilities
         }
     }
 
-    // ISerializable
-    void ObjectArchiver::DeserializeObject(const char* name, ISerializable& value) 
+    // IArchivable
+    void ObjectArchiver::UnarchiveObject(const char* name, IArchivable& value) 
     {
         if (std::string{ "" } == name)
         {
@@ -139,15 +139,15 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_DESERIALIZE_ARRAY(ObjectArchiver, bool);
-    IMPLEMENT_DESERIALIZE_ARRAY(ObjectArchiver, char);
-    IMPLEMENT_DESERIALIZE_ARRAY(ObjectArchiver, short);
-    IMPLEMENT_DESERIALIZE_ARRAY(ObjectArchiver, int);
-    IMPLEMENT_DESERIALIZE_ARRAY(ObjectArchiver, size_t);
-    IMPLEMENT_DESERIALIZE_ARRAY(ObjectArchiver, float);
-    IMPLEMENT_DESERIALIZE_ARRAY(ObjectArchiver, double);
+    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, bool);
+    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, char);
+    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, short);
+    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, int);
+    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, size_t);
+    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, float);
+    IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, double);
 
-    void ObjectArchiver::DeserializeArray(const char* name, std::vector<std::string>& array)
+    void ObjectArchiver::UnarchiveArray(const char* name, std::vector<std::string>& array)
     {
         if(std::string{""} == name)
         {
@@ -159,12 +159,12 @@ namespace utilities
         }
     }
 
-    bool ObjectArchiver::BeginDeserializeArrayItem(const std::string& typeName)
+    bool ObjectArchiver::BeginUnarchiveArrayItem(const std::string& typeName)
     {
         return true;
     }
 
-    void ObjectArchiver::EndDeserializeArrayItem(const std::string& typeName)
+    void ObjectArchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {        
     }
 

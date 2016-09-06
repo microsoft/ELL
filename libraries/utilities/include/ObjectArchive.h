@@ -10,7 +10,7 @@
 
 #include "Variant.h"
 #include "Exception.h"
-#include "ISerializable.h"
+#include "IArchivable.h"
 
 // stl
 #include <unordered_map>
@@ -145,7 +145,7 @@ namespace utilities
     /// IDescribable interface for serialization, you must also implement GetRuntimeTypeName, GetTypeName,
     /// and the static GetTypeDescription functions.
     /// </summary>
-    class IDescribable : public ISerializable
+    class IDescribable : public IArchivable
     {
     public:
         virtual ~IDescribable() = default;

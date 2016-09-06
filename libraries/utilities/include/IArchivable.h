@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ISerializable.h (utilities)
+//  File:     IArchivable.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,16 +18,16 @@
 
 namespace utilities
 {
-    /// <summary> ISerializable interface </summary>
-    class ISerializable
+    /// <summary> IArchivable interface </summary>
+    class IArchivable
     {
     public:
-        virtual ~ISerializable() = default;
+        virtual ~IArchivable() = default;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const { return "ISerializable"; }
+        virtual std::string GetRuntimeTypeName() const { return "IArchivable"; }
 
         /// <summary> Serializes the object. </summary>
         ///
@@ -42,6 +42,6 @@ namespace utilities
         /// <summary> Gets the name of this type. </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "ISerializable"; }
+        static std::string GetTypeName() { return "IArchivable"; }
     };
 }

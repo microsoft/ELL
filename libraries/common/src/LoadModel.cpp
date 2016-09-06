@@ -181,7 +181,7 @@ namespace common
     }
 
     template <typename UnarchiverType>
-    model::Model DeserializeModel(std::istream& stream)
+    model::Model LoadArchviedModel(std::istream& stream)
     {
         try
         {
@@ -189,7 +189,7 @@ namespace common
             RegisterNodeTypes(context);
             UnarchiverType deserializer(stream, context);
             model::Model model;
-            deserializer.Deserialize(model);
+            deserializer.Unarchive(model);
             return model;
         }
         catch (const std::exception&)
@@ -199,10 +199,10 @@ namespace common
     }
 
     template <typename ArchiverType>
-    void SerializeModel(const model::Model& model, std::ostream& stream)
+    void SaveArchivedModel(const model::Model& model, std::ostream& stream)
     {
         ArchiverType archiver(stream);
-        archiver.Serialize(model);
+        archiver.Archive(model);
     }
 
     bool IsKnownExtension(const std::string& ext)
@@ -245,11 +245,11 @@ namespace common
                 auto filestream = utilities::OpenIfstream(filename);
                 if (ext == "xml")
                 {
-                    return DeserializeModel<utilities::SimpleXmlUnarchiver>(filestream);
+                    return LoadArchviedModel<utilities::SimpleXmlUnarchiver>(filestream);
                 }
                 else if (ext == "json")
                 {
-                    return DeserializeModel<utilities::JsonUnarchiver>(filestream);
+                    return LoadArchviedModel<utilities::JsonUnarchiver>(filestream);
                 }
             }
 
@@ -264,12 +264,12 @@ namespace common
         if(ext == "xml")
         {
             auto filestream = utilities::OpenOfstream(filename);
-            SerializeModel<utilities::XmlArchiver>(model, filestream);
+            SaveArchivedModel<utilities::XmlArchiver>(model, filestream);
         }
         else if(ext == "json")
         {
             auto filestream = utilities::OpenOfstream(filename);
-            SerializeModel<utilities::JsonArchiver>(model, filestream);
+            SaveArchivedModel<utilities::JsonArchiver>(model, filestream);
         }
         else
         {

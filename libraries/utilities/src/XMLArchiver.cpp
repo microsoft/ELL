@@ -8,7 +8,7 @@
 
 #include "XMLArchiver.h"
 #include "Archiver.h"
-#include "ISerializable.h"
+#include "IArchivable.h"
 
 // stl
 #include <iostream>
@@ -50,19 +50,19 @@ namespace utilities
         _out << "</emll>\n";
     }
 
-    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, bool);
-    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, char);
-    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, short);
-    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, int);
-    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, size_t);
-    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, float);
-    IMPLEMENT_SERIALIZE_VALUE(XmlArchiver, double);
+    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, bool);
+    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, char);
+    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, short);
+    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, int);
+    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, size_t);
+    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, float);
+    IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, double);
 
     // strings
-    void XmlArchiver::SerializeValue(const char* name, const std::string& value) { WriteScalar(name, value); }
+    void XmlArchiver::ArchiveValue(const char* name, const std::string& value) { WriteScalar(name, value); }
 
-    // ISerializable
-    void XmlArchiver::BeginSerializeObject(const char* name, const ISerializable& value)
+    // IArchivable
+    void XmlArchiver::BeginArchiveObject(const char* name, const IArchivable& value)
     {
         auto indent = GetCurrentIndent();
         auto typeName = XmlUtilities::EncodeTypeName(value.GetRuntimeTypeName());
@@ -77,14 +77,14 @@ namespace utilities
         _out << ">" << std::endl;
     }
 
-    void XmlArchiver::SerializeObject(const char* name, const ISerializable& value)
+    void XmlArchiver::ArchiveObject(const char* name, const IArchivable& value)
     {
         ++_indent;
         value.Serialize(*this); // TODO: need to somehow know if we're in an indenting context or not for the subsequent calls to WriteScalar
         --_indent;
     }
 
-    void XmlArchiver::EndSerializeObject(const char* name, const ISerializable& value)
+    void XmlArchiver::EndArchiveObject(const char* name, const IArchivable& value)
     {
         auto indent = GetCurrentIndent();
         auto typeName = XmlUtilities::EncodeTypeName(value.GetRuntimeTypeName());
@@ -95,22 +95,22 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, bool);
-    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, char);
-    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, short);
-    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, int);
-    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, size_t);
-    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, float);
-    IMPLEMENT_SERIALIZE_ARRAY(XmlArchiver, double);
+    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, bool);
+    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, char);
+    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, short);
+    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, int);
+    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, size_t);
+    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, float);
+    IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, double);
 
-    void XmlArchiver::SerializeArray(const char* name, const std::vector<std::string>& array)
+    void XmlArchiver::ArchiveArray(const char* name, const std::vector<std::string>& array)
     {
         WriteArray(name, array);
     }
 
-    // Array of pointers-to-ISerializable
+    // Array of pointers-to-IArchivable
     // TOOD: pass in compile-time type name
-    void XmlArchiver::SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
+    void XmlArchiver::ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array)
     {
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
@@ -126,7 +126,7 @@ namespace utilities
         ++_indent;
         for (const auto& item : array)
         {
-            Serialize(*item);
+            Archive(*item);
         }
         --_indent;
         _out << indent;
@@ -151,13 +151,13 @@ namespace utilities
         ReadFileFooter(); 
     }
 
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, bool);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, char);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, short);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, int);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, size_t);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, float);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, double);
+    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, bool);
+    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, char);
+    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, short);
+    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, int);
+    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, size_t);
+    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, float);
+    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, double);
 
     // TODO: add a "read tag"-type function
     void SimpleXmlUnarchiver::ReadFileHeader()
@@ -177,13 +177,13 @@ namespace utilities
     }
 
     // strings
-    void SimpleXmlUnarchiver::DeserializeValue(const char* name, std::string& value) 
+    void SimpleXmlUnarchiver::UnarchiveValue(const char* name, std::string& value) 
     { 
         ReadScalar(name, value); 
     }
 
-    // ISerializable
-    std::string SimpleXmlUnarchiver::BeginDeserializeObject(const char* name, const std::string& typeName) 
+    // IArchivable
+    std::string SimpleXmlUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName) 
     {
         bool hasName = name != std::string("");
         auto rawTypeName = typeName;
@@ -199,12 +199,12 @@ namespace utilities
         return readTypeName;
     }
 
-    void SimpleXmlUnarchiver::DeserializeObject(const char* name, ISerializable& value) 
+    void SimpleXmlUnarchiver::UnarchiveObject(const char* name, IArchivable& value) 
     {
         value.Deserialize(*this);
     }
 
-    void SimpleXmlUnarchiver::EndDeserializeObject(const char* name, const std::string& typeName) 
+    void SimpleXmlUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName) 
     {
         auto EncodedTypeName = XmlUtilities::EncodeTypeName(typeName);
         _tokenizer.MatchTokens({"<", "/", EncodedTypeName, ">"});
@@ -213,20 +213,20 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, bool);
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, char);
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, short);
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, int);
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, size_t);
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, float);
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, double);
+    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, bool);
+    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, char);
+    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, short);
+    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, int);
+    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, size_t);
+    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, float);
+    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, double);
 
-    void SimpleXmlUnarchiver::DeserializeArray(const char* name, std::vector<std::string>& array)
+    void SimpleXmlUnarchiver::UnarchiveArray(const char* name, std::vector<std::string>& array)
     {
         ReadArray(name, array);
     }
 
-    void SimpleXmlUnarchiver::BeginDeserializeArray(const char* name, const std::string& typeName)
+    void SimpleXmlUnarchiver::BeginUnarchiveArray(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
 
@@ -239,7 +239,7 @@ namespace utilities
         _tokenizer.MatchTokens({"type", "=", "'", typeName, "'", ">"});
     }
 
-    bool SimpleXmlUnarchiver::BeginDeserializeArrayItem(const std::string& typeName)
+    bool SimpleXmlUnarchiver::BeginUnarchiveArrayItem(const std::string& typeName)
     {
         // check for '</'
         auto token1 = _tokenizer.ReadNextToken();
@@ -256,11 +256,11 @@ namespace utilities
         }
     }
 
-    void SimpleXmlUnarchiver::EndDeserializeArrayItem(const std::string& typeName)
+    void SimpleXmlUnarchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {
     }
 
-    void SimpleXmlUnarchiver::EndDeserializeArray(const char* name, const std::string& typeName)
+    void SimpleXmlUnarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
         _tokenizer.MatchTokens({"<", "/", "Array", ">"});
     }

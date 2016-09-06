@@ -99,7 +99,7 @@ namespace utilities
         auto numItems = array.size();
         for(size_t index = 0; index < numItems; ++index)
         {
-            Serialize(array[index]);
+            Archive(array[index]);
             if(index != numItems-1)
             {
                 _out << ", ";
@@ -203,7 +203,7 @@ namespace utilities
             }
 
             ValueType obj;
-            Deserialize(obj);
+            Unarchive(obj);
             array.push_back(obj);
 
             if(_tokenizer.PeekNextToken() == ",")
@@ -232,7 +232,7 @@ namespace utilities
             }
 
             std::string obj;
-            Deserialize(obj);
+            Unarchive(obj);
             array.push_back(obj);
 
             if(_tokenizer.PeekNextToken() == ",")

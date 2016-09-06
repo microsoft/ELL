@@ -15,7 +15,7 @@ namespace utilities
     template <typename ValueType>
     void Archiver::PropertyArchiver::operator<<(ValueType&& value)
     {
-        _serializer.Serialize(_propertyName.c_str(), value);
+        _archiver.Archive(_propertyName.c_str(), value);
     }
 
     //
@@ -23,21 +23,21 @@ namespace utilities
     //
 
     template <typename ValueType>
-    void Archiver::Serialize(ValueType&& value)
+    void Archiver::Archive(ValueType&& value)
     {
-        Serialize("", value);
+        Archive("", std::forward<ValueType>(value));
     }
 
     template <typename ValueType>
     void Archiver::operator<<(ValueType&& value)
     {
-        Serialize(std::forward<ValueType>(value));
+        Archive(std::forward<ValueType>(value));
     }
 
     template <typename ValueType>
-    void Archiver::Serialize(const char* name, ValueType&& value)
+    void Archiver::Archive(const char* name, ValueType&& value)
     {
-        SerializeItem(name, value);
+        ArchiveItem(name, value);
     }
 
     //
@@ -46,55 +46,55 @@ namespace utilities
 
     // Non-vectors
     template <typename ValueType, IsNotVector<ValueType> concept>
-    void Archiver::SerializeItem(const char* name, ValueType&& value)
+    void Archiver::ArchiveItem(const char* name, ValueType&& value)
     {
-        SerializeValue(name, value);
+        ArchiveValue(name, value);
     }
 
     // Pointers
     template <typename ValueType>
-    void Archiver::SerializeItem(const char* name, ValueType* value)
+    void Archiver::ArchiveItem(const char* name, ValueType* value)
     {
-        Serialize(name, *value);
+        Archive(name, *value);
     }
 
     // Vector of fundamental types
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void Archiver::SerializeItem(const char* name, const std::vector<ValueType>& array)
+    void Archiver::ArchiveItem(const char* name, const std::vector<ValueType>& array)
     {
-        SerializeArray(name, array);
+        ArchiveArray(name, array);
     }
 
     // Vector of strings
-    inline void Archiver::SerializeItem(const char* name, const std::vector<std::string>& array)
+    inline void Archiver::ArchiveItem(const char* name, const std::vector<std::string>& array)
     {
-        SerializeArray(name, array);
+        ArchiveArray(name, array);
     }
 
     // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Archiver::SerializeItem(const char* name, const std::vector<ValueType>& array)
+    void Archiver::ArchiveItem(const char* name, const std::vector<ValueType>& array)
     {
         auto baseTypeName = ValueType::GetTypeName();
-        std::vector<const utilities::ISerializable*> tmpArray;
+        std::vector<const utilities::IArchivable*> tmpArray;
         for (const auto& item : array)
         {
             tmpArray.push_back(&item);
         }
-        SerializeArray(name, baseTypeName, tmpArray);
+        ArchiveArray(name, baseTypeName, tmpArray);
     }
 
     // Vector of serializable pointers
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Archiver::SerializeItem(const char* name, const std::vector<const ValueType*>& array)
+    void Archiver::ArchiveItem(const char* name, const std::vector<const ValueType*>& array)
     {
         auto baseTypeName = ValueType::GetTypeName();
-        std::vector<const utilities::ISerializable*> tmpArray;
+        std::vector<const utilities::IArchivable*> tmpArray;
         for (const auto& item : array)
         {
             tmpArray.push_back(item);
         }
-        SerializeArray(name, baseTypeName, tmpArray);
+        ArchiveArray(name, baseTypeName, tmpArray);
     }
 
     //
@@ -103,136 +103,136 @@ namespace utilities
     template <typename ValueType>
     void Unarchiver::PropertyUnarchiver::operator>>(ValueType&& value)
     {
-        _deserializer.Deserialize(_propertyName.c_str(), value);
+        _unarchiver.Unarchive(_propertyName.c_str(), value);
     }
 
     //
     // Unarchiver class
     //
     template <typename ValueType>
-    void Unarchiver::Deserialize(ValueType&& value)
+    void Unarchiver::Unarchive(ValueType&& value)
     {
-        Deserialize("", value);
+        Unarchive("", value);
     }
 
     template <typename ValueType>
     void Unarchiver::operator>>(ValueType&& value)
     {
-        Deserialize(std::forward<ValueType>(value));
+        Unarchive(std::forward<ValueType>(value));
     }
 
     template <typename ValueType>
-    void Unarchiver::Deserialize(const char* name, ValueType&& value)
+    void Unarchiver::Unarchive(const char* name, ValueType&& value)
     {
-        DeserializeItem(name, value);
+        UnarchiveItem(name, value);
     }
 
     template <typename ValueType, IsNotVector<ValueType> concept>
-    void Unarchiver::DeserializeItem(const char* name, ValueType&& value)
+    void Unarchiver::UnarchiveItem(const char* name, ValueType&& value)
     {
-        DeserializeValue(name, value);
+        UnarchiveValue(name, value);
     }
 
     // pointer to non-serializable type
     template <typename ValueType, IsNotSerializable<ValueType> concept>
-    void Unarchiver::DeserializeItem(const char* name, std::unique_ptr<ValueType>& value)
+    void Unarchiver::UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value)
     {
         auto ptr = std::make_unique<ValueType>();
-        DeserializeValue(name, *ptr);
+        UnarchiveValue(name, *ptr);
         value = std::move(ptr);
     }
 
     // pointer to serializable type
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Unarchiver::DeserializeItem(const char* name, std::unique_ptr<ValueType>& value)
+    void Unarchiver::UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value)
     {
         auto baseTypeName = ValueType::GetTypeName();
-        auto encodedTypeName = BeginDeserializeObject(name, baseTypeName);
+        auto encodedTypeName = BeginUnarchiveObject(name, baseTypeName);
 
         std::unique_ptr<ValueType> newPtr = GetContext().GetTypeFactory().Construct<ValueType>(encodedTypeName);
-        DeserializeObject(name, *newPtr);
-        EndDeserializeObject(name, encodedTypeName);
+        UnarchiveObject(name, *newPtr);
+        EndUnarchiveObject(name, encodedTypeName);
         value = std::move(newPtr);
     }
 
     // Vector of fundamental types
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void Unarchiver::DeserializeItem(const char* name, std::vector<ValueType>& arr)
+    void Unarchiver::UnarchiveItem(const char* name, std::vector<ValueType>& arr)
     {
         arr.clear();
-        DeserializeArray(name, arr);
+        UnarchiveArray(name, arr);
     }
 
     // Vector of strings
-    inline void Unarchiver::DeserializeItem(const char* name, std::vector<std::string>& arr)
+    inline void Unarchiver::UnarchiveItem(const char* name, std::vector<std::string>& arr)
     {
         arr.clear();
-        DeserializeArray(name, arr);
+        UnarchiveArray(name, arr);
     }
 
     // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Unarchiver::DeserializeItem(const char* name, std::vector<ValueType>& arr)
+    void Unarchiver::UnarchiveItem(const char* name, std::vector<ValueType>& arr)
     {
         arr.clear();
         auto typeName = ValueType::GetTypeName();
-        BeginDeserializeArray(name, typeName);
+        BeginUnarchiveArray(name, typeName);
         while(true)
         {
-            auto good = BeginDeserializeArrayItem(typeName);
+            auto good = BeginUnarchiveArrayItem(typeName);
             if(!good)
             {
                 break;
             }
             ValueType value;
-            Deserialize(value);
+            Unarchive(value);
             arr.push_back(value);
-            EndDeserializeArrayItem(typeName);            
+            EndUnarchiveArrayItem(typeName);            
         }
-        EndDeserializeArray(name, typeName);
+        EndUnarchiveArray(name, typeName);
     }
 
     // Vector of unique pointers to serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Unarchiver::DeserializeItem(const char* name, std::vector<std::unique_ptr<ValueType>>& arr)
+    void Unarchiver::UnarchiveItem(const char* name, std::vector<std::unique_ptr<ValueType>>& arr)
     {
         arr.clear();
         auto typeName = ValueType::GetTypeName();
-        BeginDeserializeArray(name, typeName);
+        BeginUnarchiveArray(name, typeName);
         while(true)
         {
-            auto good = BeginDeserializeArrayItem(typeName);            
+            auto good = BeginUnarchiveArrayItem(typeName);            
             if(!good)
             {
                 break;
             }
             std::unique_ptr<ValueType> newPtr;
-            Deserialize(newPtr);
+            Unarchive(newPtr);
             arr.push_back(std::move(newPtr));
-            EndDeserializeArrayItem(typeName);            
+            EndUnarchiveArrayItem(typeName);            
         }
-        EndDeserializeArray(name, typeName);
+        EndUnarchiveArray(name, typeName);
     }
 
     // Vector of raw pointers to serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Unarchiver::DeserializeItem(const char* name, std::vector<const ValueType*>& arr)
+    void Unarchiver::UnarchiveItem(const char* name, std::vector<const ValueType*>& arr)
     {
         arr.clear();
         auto typeName = ValueType::GetTypeName();
-        BeginDeserializeArray(name, typeName);
+        BeginUnarchiveArray(name, typeName);
         while(true)
         {
-            auto good = BeginDeserializeArrayItem(typeName);            
+            auto good = BeginUnarchiveArrayItem(typeName);            
             if(!good)
             {
                 break;
             }
             std::unique_ptr<ValueType> newPtr;
-            Deserialize(newPtr);
+            Unarchive(newPtr);
             arr.push_back(newPtr.release());
-            EndDeserializeArrayItem(typeName);            
+            EndUnarchiveArrayItem(typeName);            
         }
-        EndDeserializeArray(name, typeName);
+        EndUnarchiveArray(name, typeName);
     }
 }

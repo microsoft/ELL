@@ -40,7 +40,7 @@ set (INCLUDE include/Archiver.h
              include/IIterator.h
              include/IntegerList.h
              include/IntegerStack.h
-             include/ISerializable.h
+             include/IArchivable.h
              include/JsonArchiver.h
              include/ObjectArchive.h
              include/ObjectArchiver.h
@@ -106,13 +106,13 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp 
-              test/src/ISerializable_test.cpp
+              test/src/IArchivable_test.cpp
               test/src/Iterator_test.cpp
               test/src/ObjectArchive_test.cpp
               test/src/TypeFactory_test.cpp
               test/src/Variant_test.cpp)
 
-set (TEST_INCLUDE test/include/ISerializable_test.h
+set (TEST_INCLUDE test/include/IArchivable_test.h
                   test/include/Iterator_test.h
                   test/include/ObjectArchive_test.h
                   test/src/TypeFactory_test.cpp

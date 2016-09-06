@@ -90,7 +90,7 @@ namespace utilities
     {
         utilities::SerializationContext context;
         utilities::ObjectArchiver archiver(context);
-        archiver.Serialize(*this);
+        archiver.Archive(*this);
         return archiver.GetObjectArchive();
     }
 }

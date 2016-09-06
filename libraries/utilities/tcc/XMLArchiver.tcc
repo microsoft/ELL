@@ -115,7 +115,7 @@ namespace utilities
         _indent = 0;
         for (const auto& item : array)
         {
-            Serialize(item);
+            Archive(item);
             _out << " ";
         }
         _indent = oldIndent;
@@ -204,7 +204,7 @@ namespace utilities
         while(true)
         {
             ValueType obj;
-            Deserialize(obj);
+            Unarchive(obj);
             array.push_back(obj);
             
             // check for '</'
@@ -238,7 +238,7 @@ namespace utilities
         while(true)
         {
             std::string obj;
-            Deserialize(obj);
+            Unarchive(obj);
             array.push_back(obj);
             
             // check for '</'

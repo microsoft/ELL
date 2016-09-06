@@ -12,7 +12,7 @@
 #include "UniqueId.h"
 
 // utilities
-#include "ISerializable.h"
+#include "IArchivable.h"
 #include "ObjectArchive.h"
 
 // stl

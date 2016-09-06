@@ -8,7 +8,7 @@
 
 #include "JsonArchiver.h"
 #include "Archiver.h"
-#include "ISerializable.h"
+#include "IArchivable.h"
 
 #include <iostream>
 #include <string>
@@ -25,19 +25,19 @@ namespace utilities
 
     JsonArchiver::JsonArchiver(std::ostream& outputStream) : _out(outputStream) {}
 
-    IMPLEMENT_SERIALIZE_VALUE(JsonArchiver, bool);
-    IMPLEMENT_SERIALIZE_VALUE(JsonArchiver, char);
-    IMPLEMENT_SERIALIZE_VALUE(JsonArchiver, short);
-    IMPLEMENT_SERIALIZE_VALUE(JsonArchiver, int);
-    IMPLEMENT_SERIALIZE_VALUE(JsonArchiver, size_t);
-    IMPLEMENT_SERIALIZE_VALUE(JsonArchiver, float);
-    IMPLEMENT_SERIALIZE_VALUE(JsonArchiver, double);
+    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, bool);
+    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, char);
+    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, short);
+    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, int);
+    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, size_t);
+    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, float);
+    IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, double);
 
     // strings
-    void JsonArchiver::SerializeValue(const char* name, const std::string& value) { WriteScalar(name, value); }
+    void JsonArchiver::ArchiveValue(const char* name, const std::string& value) { WriteScalar(name, value); }
 
-    // ISerializable
-    void JsonArchiver::BeginSerializeObject(const char* name, const ISerializable& value)
+    // IArchivable
+    void JsonArchiver::BeginArchiveObject(const char* name, const IArchivable& value)
     {
         bool hasName = name != std::string("");
         FinishPreviousLine();
@@ -51,7 +51,7 @@ namespace utilities
         SetEndOfLine(",\n");
     }
 
-    void JsonArchiver::SerializeObject(const char* name, const ISerializable& value)
+    void JsonArchiver::ArchiveObject(const char* name, const IArchivable& value)
     {
         FinishPreviousLine();
         ++_indent;
@@ -59,7 +59,7 @@ namespace utilities
         --_indent;
     }
 
-    void JsonArchiver::EndSerializeObject(const char* name, const ISerializable& value)
+    void JsonArchiver::EndArchiveObject(const char* name, const IArchivable& value)
     {
         bool hasName = name != std::string("");
         _out << "\n"; // Output newline instead of calling "FinishPreviousLine"
@@ -69,7 +69,7 @@ namespace utilities
         SetEndOfLine(hasName ? ",\n" : "\n");
     }
 
-    void JsonArchiver::EndSerialization()
+    void JsonArchiver::EndArchiving()
     {
         FinishPreviousLine();
     }
@@ -77,20 +77,20 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_SERIALIZE_ARRAY(JsonArchiver, bool);
-    IMPLEMENT_SERIALIZE_ARRAY(JsonArchiver, char);
-    IMPLEMENT_SERIALIZE_ARRAY(JsonArchiver, short);
-    IMPLEMENT_SERIALIZE_ARRAY(JsonArchiver, int);
-    IMPLEMENT_SERIALIZE_ARRAY(JsonArchiver, size_t);
-    IMPLEMENT_SERIALIZE_ARRAY(JsonArchiver, float);
-    IMPLEMENT_SERIALIZE_ARRAY(JsonArchiver, double);
+    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, bool);
+    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, char);
+    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, short);
+    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, int);
+    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, size_t);
+    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, float);
+    IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, double);
 
-    void JsonArchiver::SerializeArray(const char* name, const std::vector<std::string>& array)
+    void JsonArchiver::ArchiveArray(const char* name, const std::vector<std::string>& array)
     {
         WriteArray(name, array);
     }
 
-    void JsonArchiver::SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
+    void JsonArchiver::ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array)
     {
         FinishPreviousLine();
         auto indent = GetCurrentIndent();
@@ -107,7 +107,7 @@ namespace utilities
         auto numItems = array.size();
         for(size_t index = 0; index < numItems; ++index)
         {
-            Serialize(*array[index]);
+            Archive(*array[index]);
             if(index != numItems-1)
             {
                 _out << ", ";
@@ -138,22 +138,22 @@ namespace utilities
     JsonUnarchiver::JsonUnarchiver(SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(std::cin, ",:{}[]'\"") {}
     JsonUnarchiver::JsonUnarchiver(std::istream& inputStream, SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(inputStream, ",:{}[]'\"") {}
 
-    IMPLEMENT_DESERIALIZE_VALUE(JsonUnarchiver, bool);
-    IMPLEMENT_DESERIALIZE_VALUE(JsonUnarchiver, char);
-    IMPLEMENT_DESERIALIZE_VALUE(JsonUnarchiver, short);
-    IMPLEMENT_DESERIALIZE_VALUE(JsonUnarchiver, int);
-    IMPLEMENT_DESERIALIZE_VALUE(JsonUnarchiver, size_t);
-    IMPLEMENT_DESERIALIZE_VALUE(JsonUnarchiver, float);
-    IMPLEMENT_DESERIALIZE_VALUE(JsonUnarchiver, double);
+    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, bool);
+    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, char);
+    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, short);
+    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, int);
+    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, size_t);
+    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, float);
+    IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, double);
 
     // strings
-    void JsonUnarchiver::DeserializeValue(const char* name, std::string& value) 
+    void JsonUnarchiver::UnarchiveValue(const char* name, std::string& value) 
     { 
         ReadScalar(name, value); 
     }
 
-    // ISerializable
-    std::string JsonUnarchiver::BeginDeserializeObject(const char* name, const std::string& typeName) 
+    // IArchivable
+    std::string JsonUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName) 
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -174,12 +174,12 @@ namespace utilities
         return encodedTypeName;
     }
 
-    void JsonUnarchiver::DeserializeObject(const char* name, ISerializable& value) 
+    void JsonUnarchiver::UnarchiveObject(const char* name, IArchivable& value) 
     {
         value.Deserialize(*this);
     }
 
-    void JsonUnarchiver::EndDeserializeObject(const char* name, const std::string& typeName) 
+    void JsonUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName) 
     {
         bool hasName = name != std::string("");
         _tokenizer.MatchToken("}");
@@ -197,20 +197,20 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_DESERIALIZE_ARRAY(JsonUnarchiver, bool);
-    IMPLEMENT_DESERIALIZE_ARRAY(JsonUnarchiver, char);
-    IMPLEMENT_DESERIALIZE_ARRAY(JsonUnarchiver, short);
-    IMPLEMENT_DESERIALIZE_ARRAY(JsonUnarchiver, int);
-    IMPLEMENT_DESERIALIZE_ARRAY(JsonUnarchiver, size_t);
-    IMPLEMENT_DESERIALIZE_ARRAY(JsonUnarchiver, float);
-    IMPLEMENT_DESERIALIZE_ARRAY(JsonUnarchiver, double);
+    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, bool);
+    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, char);
+    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, short);
+    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, int);
+    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, size_t);
+    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, float);
+    IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, double);
 
-    void JsonUnarchiver::DeserializeArray(const char* name, std::vector<std::string>& array)
+    void JsonUnarchiver::UnarchiveArray(const char* name, std::vector<std::string>& array)
     {
         ReadArray(name, array);
     }
 
-    void JsonUnarchiver::BeginDeserializeArray(const char* name, const std::string& typeName)
+    void JsonUnarchiver::BeginUnarchiveArray(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -221,7 +221,7 @@ namespace utilities
         _tokenizer.MatchToken("[");
     }
 
-    bool JsonUnarchiver::BeginDeserializeArrayItem(const std::string& typeName)
+    bool JsonUnarchiver::BeginUnarchiveArrayItem(const std::string& typeName)
     {
         auto maybeEndArray = _tokenizer.PeekNextToken();
         if(maybeEndArray == "]")
@@ -234,7 +234,7 @@ namespace utilities
         }
     }
 
-    void JsonUnarchiver::EndDeserializeArrayItem(const std::string& typeName)
+    void JsonUnarchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {
         if(_tokenizer.PeekNextToken() == ",")
         {
@@ -242,7 +242,7 @@ namespace utilities
         }
     }
     
-    void JsonUnarchiver::EndDeserializeArray(const char* name, const std::string& typeName)
+    void JsonUnarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
         _tokenizer.MatchToken("]");
     }

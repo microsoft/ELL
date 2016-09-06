@@ -8,7 +8,7 @@
 
 #include "Archiver.h"
 #include "Format.h"
-#include "ISerializable.h"
+#include "IArchivable.h"
 
 #include <string>
 
@@ -17,25 +17,30 @@ namespace utilities
     //
     // PropertyArchiver class
     //
-    Archiver::PropertyArchiver::PropertyArchiver(Archiver& archiver, const std::string& name) : _serializer(archiver), _propertyName(name)
+    Archiver::PropertyArchiver::PropertyArchiver(Archiver& archiver, const std::string& name) : _archiver(archiver), _propertyName(name)
     {};
 
     //
     // Archiver class
     //
-    void Archiver::SerializeValue(const char* name, const ISerializable& value)
-    {
-        BeginSerializeObject(name, value);
-        SerializeObject(name, value);
-        EndSerializeObject(name, value);
+    Archiver::PropertyArchiver Archiver::operator[](const std::string& name) 
+    { 
+        return PropertyArchiver{ *this, name }; 
     }
 
-    void Archiver::BeginSerializeObject(const char* name, const ISerializable& value)
+    void Archiver::ArchiveValue(const char* name, const IArchivable& value)
+    {
+        BeginArchiveObject(name, value);
+        ArchiveObject(name, value);
+        EndArchiveObject(name, value);
+    }
+
+    void Archiver::BeginArchiveObject(const char* name, const IArchivable& value)
     {
         // nothing
     }
 
-    void Archiver::EndSerializeObject(const char* name, const ISerializable& value)
+    void Archiver::EndArchiveObject(const char* name, const IArchivable& value)
     {
         // nothing
     }
@@ -43,7 +48,7 @@ namespace utilities
     //
     // PropertyArchiver class
     //
-    Unarchiver::PropertyUnarchiver::PropertyUnarchiver(Unarchiver& deserializer, const std::string& name) : _deserializer(deserializer), _propertyName(name)
+    Unarchiver::PropertyUnarchiver::PropertyUnarchiver(Unarchiver& deserializer, const std::string& name) : _unarchiver(deserializer), _propertyName(name)
     {};
 
     //
@@ -64,27 +69,27 @@ namespace utilities
         _contexts.push_back(context);
     }
     
-    void Unarchiver::DeserializeValue(const char* name, ISerializable& value)
+    void Unarchiver::UnarchiveValue(const char* name, IArchivable& value)
     {
-        auto typeName = BeginDeserializeObject(name, value.GetRuntimeTypeName());
-        DeserializeObject(name, value);
-        EndDeserializeObject(name, typeName);
+        auto typeName = BeginUnarchiveObject(name, value.GetRuntimeTypeName());
+        UnarchiveObject(name, value);
+        EndUnarchiveObject(name, typeName);
     }
 
-    std::string Unarchiver::BeginDeserializeObject(const char* name, const std::string& typeName)
+    std::string Unarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
     {
         return typeName;
     }
 
-    void Unarchiver::EndDeserializeObject(const char* name, const std::string& typeName)
+    void Unarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
     {
     }
 
-    void Unarchiver::BeginDeserializeArray(const char* name, const std::string& typeName)
+    void Unarchiver::BeginUnarchiveArray(const char* name, const std::string& typeName)
     {
     }
 
-    void Unarchiver::EndDeserializeArray(const char* name, const std::string& typeName)
+    void Unarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
     }
 }

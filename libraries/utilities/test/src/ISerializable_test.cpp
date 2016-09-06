@@ -1,16 +1,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ISerializable_test.cpp (utilities)
+//  File:     IArchivable_test.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ISerializable_test.h"
+#include "IArchivable_test.h"
 
 // utilities
 #include "UniqueId.h"
-#include "ISerializable.h"
+#include "IArchivable.h"
 #include "Archiver.h"
 #include "JsonArchiver.h"
 #include "XMLArchiver.h"
@@ -32,7 +32,7 @@
 #include <vector>
 #include <sstream>
 
-struct TestStruct : public utilities::ISerializable
+struct TestStruct : public utilities::IArchivable
 {
     int a=0;
     float b=0.0f;
@@ -187,7 +187,7 @@ void TestUnarchiver()
         UnarchiverType deserializer(strstream, context);
         TestStruct val;
         deserializer.Deserialize("s", val);
-        testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);        
+        testing::ProcessTest("Deserialize IArchivable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);        
     }
 
     {

@@ -46,49 +46,49 @@ namespace utilities
 
     protected:
         // Serialization
-        DECLARE_SERIALIZE_VALUE_OVERRIDE(bool);
-        DECLARE_SERIALIZE_VALUE_OVERRIDE(char);
-        DECLARE_SERIALIZE_VALUE_OVERRIDE(short);
-        DECLARE_SERIALIZE_VALUE_OVERRIDE(int);
-        DECLARE_SERIALIZE_VALUE_OVERRIDE(size_t);
-        DECLARE_SERIALIZE_VALUE_OVERRIDE(float);
-        DECLARE_SERIALIZE_VALUE_OVERRIDE(double);
-        virtual void SerializeValue(const char* name, const std::string& value) override;
+        DECLARE_ARCHIVE_VALUE_OVERRIDE(bool);
+        DECLARE_ARCHIVE_VALUE_OVERRIDE(char);
+        DECLARE_ARCHIVE_VALUE_OVERRIDE(short);
+        DECLARE_ARCHIVE_VALUE_OVERRIDE(int);
+        DECLARE_ARCHIVE_VALUE_OVERRIDE(size_t);
+        DECLARE_ARCHIVE_VALUE_OVERRIDE(float);
+        DECLARE_ARCHIVE_VALUE_OVERRIDE(double);
+        virtual void ArchiveValue(const char* name, const std::string& value) override;
 
-        DECLARE_SERIALIZE_ARRAY_OVERRIDE(bool);
-        DECLARE_SERIALIZE_ARRAY_OVERRIDE(char);
-        DECLARE_SERIALIZE_ARRAY_OVERRIDE(short);
-        DECLARE_SERIALIZE_ARRAY_OVERRIDE(int);
-        DECLARE_SERIALIZE_ARRAY_OVERRIDE(size_t);
-        DECLARE_SERIALIZE_ARRAY_OVERRIDE(float);
-        DECLARE_SERIALIZE_ARRAY_OVERRIDE(double);
-        virtual void SerializeArray(const char* name, const std::vector<std::string>& array) override;
-        virtual void SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array) override;
+        DECLARE_ARCHIVE_ARRAY_OVERRIDE(bool);
+        DECLARE_ARCHIVE_ARRAY_OVERRIDE(char);
+        DECLARE_ARCHIVE_ARRAY_OVERRIDE(short);
+        DECLARE_ARCHIVE_ARRAY_OVERRIDE(int);
+        DECLARE_ARCHIVE_ARRAY_OVERRIDE(size_t);
+        DECLARE_ARCHIVE_ARRAY_OVERRIDE(float);
+        DECLARE_ARCHIVE_ARRAY_OVERRIDE(double);
+        virtual void ArchiveArray(const char* name, const std::vector<std::string>& array) override;
+        virtual void ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array) override;
 
-        virtual void SerializeObject(const char* name, const ISerializable& value) override;
+        virtual void ArchiveObject(const char* name, const IArchivable& value) override;
 
         // Deserialization
-        DECLARE_DESERIALIZE_VALUE_OVERRIDE(bool);
-        DECLARE_DESERIALIZE_VALUE_OVERRIDE(char);
-        DECLARE_DESERIALIZE_VALUE_OVERRIDE(short);
-        DECLARE_DESERIALIZE_VALUE_OVERRIDE(int);
-        DECLARE_DESERIALIZE_VALUE_OVERRIDE(size_t);
-        DECLARE_DESERIALIZE_VALUE_OVERRIDE(float);
-        DECLARE_DESERIALIZE_VALUE_OVERRIDE(double);
-        virtual void DeserializeValue(const char* name, std::string& value) override;
+        DECLARE_UNARCHIVE_VALUE_OVERRIDE(bool);
+        DECLARE_UNARCHIVE_VALUE_OVERRIDE(char);
+        DECLARE_UNARCHIVE_VALUE_OVERRIDE(short);
+        DECLARE_UNARCHIVE_VALUE_OVERRIDE(int);
+        DECLARE_UNARCHIVE_VALUE_OVERRIDE(size_t);
+        DECLARE_UNARCHIVE_VALUE_OVERRIDE(float);
+        DECLARE_UNARCHIVE_VALUE_OVERRIDE(double);
+        virtual void UnarchiveValue(const char* name, std::string& value) override;
 
-        DECLARE_DESERIALIZE_ARRAY_OVERRIDE(bool);
-        DECLARE_DESERIALIZE_ARRAY_OVERRIDE(char);
-        DECLARE_DESERIALIZE_ARRAY_OVERRIDE(short);
-        DECLARE_DESERIALIZE_ARRAY_OVERRIDE(int);
-        DECLARE_DESERIALIZE_ARRAY_OVERRIDE(size_t);
-        DECLARE_DESERIALIZE_ARRAY_OVERRIDE(float);
-        DECLARE_DESERIALIZE_ARRAY_OVERRIDE(double);
-        virtual void DeserializeArray(const char* name, std::vector<std::string>& array) override;
+        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(bool);
+        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(char);
+        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(short);
+        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(int);
+        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(size_t);
+        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(float);
+        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(double);
+        virtual void UnarchiveArray(const char* name, std::vector<std::string>& array) override;
         
-        virtual void DeserializeObject(const char* name, ISerializable& value) override;
-        virtual bool BeginDeserializeArrayItem(const std::string& typeName) override;
-        virtual void EndDeserializeArrayItem(const std::string& typeName) override;
+        virtual void UnarchiveObject(const char* name, IArchivable& value) override;
+        virtual bool BeginUnarchiveArrayItem(const std::string& typeName) override;
+        virtual void EndUnarchiveArrayItem(const std::string& typeName) override;
 
    private:
         // Serialization

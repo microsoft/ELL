@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Iterator_test.h"
-#include "ISerializable_test.h"
+#include "IArchivable_test.h"
 #include "ObjectArchive_test.h"
 #include "TypeFactory_test.h"
 #include "Variant_test.h"

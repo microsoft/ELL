@@ -102,7 +102,7 @@ namespace dataset {};
 %import "IDataVector.h"
 %import "ObjectArchive.h"
 %import "Variant.h"
-%import "ISerializable.h"
+%import "IArchivable.h"
 
 #ifndef SWIGXML
 %template () std::vector<dataset::IDataVector>;

@@ -20,7 +20,7 @@
 #include <utility>
 #include <cassert>
 
-class ISerializable;
+class IArchivable;
 
 /// <summary> utilities namespace </summary>
 namespace utilities
