@@ -116,12 +116,6 @@ void TestDoubleVectorProduct()
     double result;
     math::TensorOperations::Product(u, v, result);
     testing::ProcessTest("TensorOperations::Product(Vector, Vector)", result == 6);
-
-    dot = math::TensorOperations::Dot(u.GetConstReference(), v.GetConstReference());
-    testing::ProcessTest("TensorOperations::Dot(VectorConstReference, VectorConstReference)", dot == 6);
-
-    math::TensorOperations::Product(u.GetConstReference(), v.GetConstReference(), result);
-    testing::ProcessTest("TensorOperations::Product(VectorConstReference, VectorConstReference)", result == 6);
 }
 
 void TestSingleVectorProduct()
@@ -134,12 +128,6 @@ void TestSingleVectorProduct()
     float result;
     math::TensorOperations::Product(u, v, result);
     testing::ProcessTest("TensorOperations::Product(Vector, Vector)", result == 6);
-
-    dot = math::TensorOperations::Dot(u.GetConstReference(), v.GetConstReference());
-    testing::ProcessTest("TensorOperations::Dot(VectorConstReference, VectorConstReference)", dot == 6);
-
-    math::TensorOperations::Product(u.GetConstReference(), v.GetConstReference(), result);
-    testing::ProcessTest("TensorOperations::Product(VectorConstReference, VectorConstReference)", result == 6);
 }
 
 /// Runs all tests

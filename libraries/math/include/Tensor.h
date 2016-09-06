@@ -13,63 +13,12 @@
 #include <iostream>
 #include <functional>
 
-/*
-Questions:
-
-1. There are two reference classes: TensorReference and TensorConstReference. I couldn't figure out how to have a single class that can be "const" or not, and does the right thing.
-2. Product is either between two Tensor, or between two TensorConstReference. No support for TensorReference. No support for combinations. All classes have a GetConstReference() member, so technically all of the tensor classes can become TensorConstReference and therefore the design is not limiting. The reason that products of raw `Tensor` are treated separately is the potential for a more efficient implementation without strides. 
-3. Product of row vector and column vector produces a scalar, but instead of returning it, the Product function puts the result in the third argument (non-const reference to double). This is ugly, but the idea was that all of the Product functions have a similar signature.
-*/
-
 namespace math
 {
-    //
-    // TensorBase and TensorReferenceBase classes
-    // 
-
-    /// <summary> Base class for tensors. </summary>
+    /// <summary> Base class for tensor reference classes. </summary>
     ///
-    /// <typeparam name="ElementType"> Tensor element type. </typeparam>
-    template<typename ElementType>
-    class TensorBase
-    {
-    public:
-        TensorBase(TensorBase&&) = default;
-        TensorBase(const TensorBase&) = delete;
-
-        /// <summary> Resets all the tensor elements to zero. </summary>
-        void Reset();
-
-        /// <summary> Fills all of the tensor elements with a given value. </summary>
-        ///
-        /// <param name="value"> The value. </param>
-        void Fill(ElementType value);
-
-        /// <summary> Generates elements of the tensor by repeatedly calling a generator function (such as a random number generator). </summary>
-        /// <param name="generator"> The generator function. </param>
-        void Generate(std::function<ElementType()> generator);
-
-    protected:
-        // protected ctors accessible only through derived classes
-        TensorBase(size_t size);
-        TensorBase(std::vector<ElementType> data);
-
-        template<class StlIteratorType>
-        TensorBase(StlIteratorType begin, StlIteratorType end);
-
-        // allow operations defined in the TensorOperations struct to access raw data vector
-        friend struct TensorOperations;
-        ElementType* GetDataPointer() { return _data.data(); }
-        const ElementType* GetDataPointer() const { return _data.data(); }
-
-        // member variables
-        std::vector<ElementType> _data;
-    };
-
-    /// <summary> Base class for references to tensors. </summary>
-    ///
-    /// <typeparam name="ElementPointerType"> Type of the pointer to a tensor element. </typeparam>
-    template<typename ElementPointerType>
+    /// <typeparam name="ElementPointerType"> Tensor element type. </typeparam>
+    template <typename ElementType>
     class TensorReferenceBase
     {
     public:
@@ -78,123 +27,111 @@ namespace math
 
     protected:
         // protected ctor accessible only through derived classes
-        TensorReferenceBase(ElementPointerType pData, size_t stride);
+        TensorReferenceBase(ElementType* pData);
 
         // allow operations defined in the TensorOperations struct to access raw data vector
         friend struct TensorOperations;
-        ElementPointerType GetDataPointer() { return _pData; }
-        const ElementPointerType GetDataPointer() const { return _pData; }
-        size_t GetStride()const { return _stride; }
+        ElementType* GetDataPointer() { return _pData; }
+        const ElementType* GetDataPointer() const { return _pData; }
 
-        // member variables
-        ElementPointerType _pData;
-        size_t _stride;
+        ElementType* _pData;
     };
 
-    //
-    // TensorDimensions classes
-    // 
-
-    /// <summary> Declaration of class used to represents the dimensions of the tensor. </summary>
+    /// <summary> Base class for vector references. </summary>
     ///
-    /// <typeparam name="TensorOrder"> The order of the tensor, the number of dimensions. </typeparam>
-    template<size_t TensorOrder>
-    class TensorDimensions {};
-
-    /// <summary> Represents the dimension of a 1st order tensor, which is a vector. </summary>
-    template<>
-    class TensorDimensions<1>
+    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
+    template <typename ElementType>
+    class VectorReferenceBase : public TensorReferenceBase<ElementType>
     {
     public:
 
-        /// <summary> Constructor. </summary>
-        ///
-        /// <param name="size"> The size of the 1st order tensor. </param>
-        TensorDimensions(size_t size);
+        /// <summary> Resets all the vector elements to zero. </summary>
+        void Reset();
 
-        /// <summary> Gets the size of the 1st order tensor, which is also the total number of elements. </summary>
+        /// <summary> Fills all of the vector elements with a given value. </summary>
         ///
-        /// <returns> The tensor size. </returns>
+        /// <param name="value"> The value. </param>
+        void Fill(ElementType value);
+
+        /// <summary> Generates elements of the vector by repeatedly calling a generator function (such as a random number generator). </summary>
+        /// <param name="generator"> The generator function. </param>
+        void Generate(std::function<ElementType()> generator);
+
+        /// <summary> Array indexer operator. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the element. </param>
+        ///
+        /// <returns> Reference to the specified element. </returns>
+        ElementType& operator[] (size_t index);
+
+        /// <summary> Array indexer operator. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the element. </param>
+        ///
+        /// <returns> A copy of the specified element. </returns>
+        ElementType operator[] (size_t index) const;
+
+        /// <summary> Gets the vector size. </summary>
+        ///
+        /// <returns> The vector size. </returns>
         size_t Size() const { return _size; }
 
+        /// <summary> Addition assignment operator. </summary>
+        ///
+        /// <param name="scalar"> The scalar. </param>
+        void operator+=(ElementType scalar);
+
+        /// <summary> Subtraction assignment operator. </summary>
+        ///
+        /// <param name="scalar"> The scalar. </param>
+        void operator-=(ElementType scalar);
+
+        /// <summary> Multiplication assignment operator. </summary>
+        ///
+        /// <param name="scalar"> The scalar. </param>
+        void operator*=(ElementType scalar);
+
+        /// <summary> Division assignment operator. </summary>
+        ///
+        /// <param name="scalar"> The scalar. </param>
+        void operator/=(ElementType scalar);
+
+        /// <summary> Gets the squared 2-norm of the vector. </summary>
+        ///
+        /// <returns> The squared 2-norm. </returns>
+        ElementType Norm2() const;
+
+        /// <summary> Gets the squared 1-norm of the vector. </summary>
+        ///
+        /// <returns> The squared 1-norm. </returns>
+        ElementType Norm1() const;
+
+        /// <summary> Gets the squared 0-norm of the vector. </summary>
+        ///
+        /// <returns> The squared 0-norm. </returns>
+        ElementType Norm0() const;
+
+        /// <summary> Gets the minimal element in the vector. </summary>
+        ///
+        /// <returns> The minimal element. </returns>
+        ElementType Min() const;
+
+        /// <summary> Gets the maximal element in the vector. </summary>
+        ///
+        /// <returns> The maximal element. </returns>
+        ElementType Max() const;
+
     protected:
+        // protected ctor accessible only through derived classes
+        VectorReferenceBase(ElementType* pData, size_t size, size_t stride);
+
+        // allow operations defined in the TensorOperations struct to access stride
+        friend struct TensorOperations;
+        size_t GetStride() const { return _stride; }
+
         size_t _size;
+        size_t _stride;
     };
-
-    /// <summary> Represents the dimensions of a 2nd order tensor, which is a matrix. </summary>
-    template<>
-    class TensorDimensions<2>
-    {
-    public:
-
-        /// <summary> Constructor. </summary>
-        ///
-        /// <param name="numRows"> The number of rows. </param>
-        /// <param name="numColumns"> The number of columns. </param>
-        TensorDimensions(size_t numRows, size_t numColumns);
-
-        /// <summary> Gets the number of rows. </summary>
-        ///
-        /// <returns> The number of rows. </returns>
-        size_t NumRows() const { return _numRows; }
-
-        /// <summary> Gets the number of of columns. </summary>
-        ///
-        /// <returns> The number of columns. </returns>
-        size_t NumColumns() const { return _numColumns; }
-
-        /// <summary> Gets the total number of elements. </summary>
-        ///
-        /// <returns> A number of elements. </returns>
-        size_t Size() const { return _numRows * _numColumns; }
-
-    protected:
-        size_t _numRows;
-        size_t _numColumns;
-    };
-
-    /// <summary> Represents the dimensions of a 3nd order tensor. </summary>
-    template<>
-    class TensorDimensions<3>
-    {
-    public:
-
-        /// <summary> Constructor. </summary>
-        ///
-        /// <param name="size1"> The size of dimension 1. </param>
-        /// <param name="size2"> The size of dimension 2. </param>
-        /// <param name="size3"> The size of dimension 3. </param>
-        TensorDimensions(size_t size1, size_t size2, size_t size3);
-
-        /// <summary> Gets the size of dimension 1. </summary>
-        ///
-        /// <returns> The size of dimension 1. </returns>
-        size_t GetSize1() const { return _size1; }
-
-        /// <summary> Gets the size of dimension 2. </summary>
-        ///
-        /// <returns> The size of dimension  2. </returns>
-        size_t GetSize2() const { return _size2; }
-
-        /// <summary> Gets the size of dimension 3. </summary>
-        ///
-        /// <returns> The size of dimension 3. </returns>
-        size_t GetSize3() const { return _size3; }
-
-        /// <summary> Gets the total number of elements. </summary>
-        ///
-        /// <returns> Total number of elements. </returns>
-        size_t Size() const { return _size1 * _size2 * _size3; }
-
-    protected:
-        size_t _size1;
-        size_t _size2;
-        size_t _size3;
-    };
-
-    //
-    // Utility classes used to control matrix and vector orientation
-    // 
 
     /// <summary> Enum of possible matrix and vector orientations. </summary>
     enum class TensorOrientation { rowMajor, columnMajor };
@@ -222,251 +159,123 @@ namespace math
         static constexpr TensorOrientation value = TensorOrientation::rowMajor;
     };
 
-    //
-    // Tensor, TensorReference, TensorConstReference classes
-    // 
-
-    /// <summary> Forward declaration of the tensor class (for subsequent specialization). </summary>
+    /// <summary> A reference to an algebraic vector. </summary>
     ///
-    /// <typeparam name="ElementType"> Element type. </typeparam>
-    /// <typeparam name="TensorOrder"> The order of the tensor: 1, 2, or 3. </typeparam>
-    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
-    template<typename ElementType, size_t TensorOrder, TensorOrientation Orientation>
-    class Tensor
-    {};
-
-    /// <summary> Forward declaration of the non-const tensor reference class (for subsequent specialization). </summary>
-    ///
-    /// <typeparam name="ElementType"> Element type. </typeparam>
-    /// <typeparam name="TensorOrder"> The order of the tensor: 1, 2, or 3. </typeparam>
-    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
-    template<typename ElementType, size_t TensorOrder, TensorOrientation Orientation>
-    class TensorReference
-    {};
-
-    /// <summary> Forward declaration of the const tensor reference class (for subsequent specialization). </summary>
-    ///
-    /// <typeparam name="ElementType"> Element type. </typeparam>
-    /// <typeparam name="TensorOrder"> The order of the tensor: 1, 2, or 3. </typeparam>
-    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
-    template<typename ElementType, size_t TensorOrder, TensorOrientation Orientation>
-    class TensorConstReference
-    {};
-
-    /// <summary> A 1st order tensor (vector). </summary>
-    ///
-    /// <typeparam name="ElementType"> Element type. </typeparam>
-    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
-    template<typename ElementType, TensorOrientation Orientation>
-    class Tensor<ElementType, 1, Orientation> : public TensorBase<ElementType>, public TensorDimensions<1>
+    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
+    /// <typeparam name="Orientation"> The orientation. </typeparam>
+    template <typename ElementType, TensorOrientation Orientation>
+    class VectorReference : public VectorReferenceBase<ElementType>
     {
     public:
-        /// <summary> Constructs a 1st order tensor (vector) of a given size. </summary>
+        /// <summary> Gets a reference to this vector. </summary>
         ///
-        /// <param name="size"> The size. </param>
-        Tensor(size_t size);
+        /// <returns> A reference to this vector. </returns>
+        VectorReference<ElementType, Orientation> GetReference();
 
-        /// <summary> Constructs a 1st order tensor (vector) from a std::vector. </summary>
+        /// <summary> Gets a reference to this vector. </summary>
         ///
-        /// <param name="data"> The vector. </param>
-        Tensor(std::vector<ElementType> data);
+        /// <returns> A reference to this vector. </returns>
+        const VectorReference<ElementType, Orientation> GetReference() const;
 
-        /// <summary> Constructs a 1st order tensor (vector) from an initializer list. </summary>
+        /// <summary> Gets a reference to a sub-vector. </summary>
         ///
-        /// <param name="list"> The initializer list. </param>
-        Tensor(std::initializer_list<ElementType> list);
+        /// <param name="offset"> The index of the first element in the sub-vector. </param>
+        /// <param name="size"> The size of the sub-vector. </param>
+        /// <param name="strideMultiplier"> The stride multiplier of the sub-vector, defaults to 1. </param>
+        ///
+        /// <returns> The sub vector. </returns>
+        VectorReference<ElementType, Orientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier=1);
 
-        /// <summary> Tensor indexer operator. </summary>
+        /// <summary> Gets a reference to a sub-vector. </summary>
         ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Reference to the element at the given index. </returns>
-        ElementType& operator() (size_t index);
+        /// <param name="offset"> The index of the first element in the sub-vector. </param>
+        /// <param name="size"> The size of the sub-vector. </param>
+        /// <param name="strideMultiplier"> The stride multiplier of the sub-vector, defaults to 1. </param>
+        ///
+        /// <returns> The sub vector. </returns>
+        const VectorReference<ElementType, Orientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier=1) const;
 
-        /// <summary> Tensor indexer operator. </summary>
+        /// <summary> Gets a reference to the transpose of this vector. </summary>
         ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator() (size_t index) const;
+        /// <returns> A reference to the transpose of this vector. </returns>
+        VectorReference<ElementType, FlipOrientation<Orientation>::value> Transpose();
 
-        /// <summary> Array indexer operator. </summary>
+        /// <summary> Gets a reference to the transpose of this vector. </summary>
         ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Reference to the element at the given index. </returns>
-        ElementType& operator[] (size_t index);
-
-        /// <summary> Array indexer operator. </summary>
-        ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator[] (size_t index) const;
-
-        /// <summary> Gets a non-constant reference to this sub-vector. </summary>
-        ///
-        /// <returns> A reference to this sub-vector. </returns>
-        TensorReference<ElementType, 1, Orientation> GetReference();
-
-        /// <summary> Gets constant reference to this sub-vector. </summary>
-        ///
-        /// <returns> A constant reference to this sub-vector. </returns>
-        TensorConstReference<ElementType, 1, Orientation> GetConstReference() const;
+        /// <returns> A reference to the transpose of this vector. </returns>
+        const VectorReference<ElementType, FlipOrientation<Orientation>::value> Transpose() const;
 
         /// <summary> Equality operator. </summary>
         ///
-        /// <param name="other"> The other tensor. </param>
+        /// <param name="other"> The other vector. </param>
         ///
-        /// <returns> true if the tensors are equal. </returns>
-        bool operator==(const Tensor<ElementType, 1, Orientation>& other) const;
+        /// <returns> true if the vectors are considered equivalent. </returns>
+        bool operator==(const VectorReference<ElementType, Orientation>& other) const;
+
+    protected:
+        // protected ctor accessible only through derived classes
+        using VectorReferenceBase<ElementType>::VectorReferenceBase;
     };
 
-    /// <summary> A non-const reference to a 1st order tensor. </summary>
+    /// <summary> An algebraic vector. </summary>
     ///
-    /// <typeparam name="ElementType"> Element type. </typeparam>
-    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
-    template<typename ElementType, TensorOrientation Orientation>
-    class TensorReference<ElementType, 1, Orientation> : public TensorReferenceBase<ElementType*>, public TensorDimensions<1>
+    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
+    /// <typeparam name="Orientation"> The orientationL rowMajor or colMajor. </typeparam>
+    template <typename ElementType, TensorOrientation Orientation>
+    class Vector : public VectorReference<ElementType, Orientation>
     {
     public:
 
-        /// <summary> Tensor indexer operator. </summary>
+        /// <summary> Constructs an all-zeros vector of a given size. </summary>
         ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Reference to the element at the given index. </returns>
-        ElementType& operator() (size_t index);
+        /// <param name="size"> The vector size. </param>
+        Vector(size_t size);
 
-        /// <summary> Tensor indexer operator. </summary>
+        /// <summary> Constructs a vector from an initializer list. </summary>
         ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator() (size_t index) const;
+        /// <param name="list"> The initalizer list. </param>
+        Vector(std::initializer_list<ElementType> list);
 
-        /// <summary> Array indexer operator. </summary>
-        ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Reference to the element at the given index. </returns>
-        ElementType& operator[] (size_t index);
-
-        /// <summary> Array indexer operator. </summary>
-        ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator[] (size_t index) const;
-
-        /// <summary> Resets all the tensor elements to zero. </summary>
+        /// <summary> Resets all the vector elements to zero. </summary>
         void Reset();
 
-        /// <summary> Fills all of the tensor elements with a given value. </summary>
+        /// <summary> Fills all of the vector elements with a given value. </summary>
         ///
         /// <param name="value"> The value. </param>
         void Fill(ElementType value);
 
-        /// <summary> Generates elements of the tensor by repeatedly calling a generator function (such as a random number generator). </summary>
-        /// <param name="generator"> The generator function. </param>
-        void Generate(std::function<ElementType()> generator);
-
-        /// <summary> Gets a reference to a sub-vector. </summary>
-        ///
-        /// <param name="offset"> Zero-based offset to the first element of the sub-vector. </param>
-        /// <param name="size"> The number of elements in the sub-vector. </param>
-        /// <param name="strideMultiplier"> The stride multiplier. </param>
-        ///
-        /// <returns> Reference to the sub-vector. </returns>
-        TensorReference<ElementType, 1, Orientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier = 1);
-
-        /// <summary> Gets a reference to the transpose of the current vector. </summary>
-        ///
-        /// <returns> A reference to the transpose of the vector. </returns>
-        TensorReference<ElementType, 1, FlipOrientation<Orientation>::value> Transpose();
-
-        /// <summary> Gets constant reference to this sub-vector. </summary>
-        ///
-        /// <returns> The constant reference to this sub-vector. </returns>
-        TensorConstReference<ElementType, 1, Orientation> GetConstReference();
-
-    private:
-        // private ctor can only be called by friends
-        friend Tensor<ElementType, 1, Orientation>;
-        friend TensorReference<ElementType, 1, FlipOrientation<Orientation>::value>;
-        TensorReference(ElementType* pData, size_t size, size_t stride);
-    };
-
-    /// <summary> A const reference to a 1st order tensor. </summary>
-    ///
-    /// <typeparam name="ElementType"> Element type. </typeparam>
-    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
-    template<typename ElementType, TensorOrientation Orientation>
-    class TensorConstReference<ElementType, 1, Orientation> : public TensorReferenceBase<const ElementType*>, public TensorDimensions<1>
-    {
-    public:
-        /// <summary> Tensor indexer operator. </summary>
+        /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator() (size_t index) const;
+        ///
+        /// <returns> Reference to the specified element. </returns>
+        ElementType& operator[] (size_t index);
 
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Copy of the element at the given index. </returns>
+        ///
+        /// <returns> A copy of the specified element. </returns>
         ElementType operator[] (size_t index) const;
 
-        /// <summary> Gets a const reference to a sub-vector. </summary>
-        ///
-        /// <param name="offset"> Zero-based offset to the first element of the sub-vector. </param>
-        /// <param name="size"> The number of elements in the sub-vector. </param>
-        /// <param name="strideMultiplier"> The stride multiplier. </param>
-        ///
-        /// <returns> Const reference to the sub-vector. </returns>
-        TensorConstReference<ElementType, 1, Orientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier = 1);
-
-        /// <summary> Gets a const reference to the transpose of the current vector. </summary>
-        ///
-        /// <returns> A const reference to the transpose of the vector. </returns>
-        TensorConstReference<ElementType, 1, FlipOrientation<Orientation>::value> Transpose();
-
     private:
-        // private ctor can only be called by friends
-        friend Tensor<ElementType, 1, Orientation>;
-        friend TensorReference<ElementType, 1, Orientation>;
-        friend TensorConstReference<ElementType, 1, FlipOrientation<Orientation>::value>;
-        TensorConstReference(const ElementType* pData, size_t size, size_t stride);
+        // member variables
+        std::vector<ElementType> _data;
     };
 
+    // TODO move to separate file
     /// <summary> A struct that holds all of the binary tensor operations. </summary>
     struct TensorOperations
     {
         /// <summary> Calculates a vector dot product (between vectors in any orientation). </summary>
         ///
         /// <typeparam name="ElementType"> Element type. </typeparam>
-        /// <typeparam name="Orientation1"> First vector orientation. </typeparam>
-        /// <typeparam name="Orientation2"> Second vector orientation. </typeparam>
         /// <param name="vector1"> The first vector, in any orientation. </param>
         /// <param name="vector2"> The second vector, in any orientation. </param>
         ///
         /// <returns> The dot product result. </returns>
-        template<typename ElementType, TensorOrientation Orientation1, TensorOrientation Orientation2>
-        static ElementType Dot(const Tensor<ElementType, 1, Orientation1>& vector1, const Tensor<ElementType, 1, Orientation2>& vector2);
-
-        /// <summary> Calculates a vector dot product (between vectors in any orientation). </summary>
-        ///
-        /// <typeparam name="ElementType"> Element type. </typeparam>
-        /// <typeparam name="Orientation1"> First vector orientation. </typeparam>
-        /// <typeparam name="Orientation2"> Second vector orientation. </typeparam>
-        /// <param name="vector1"> The first vector, in any orientation. </param>
-        /// <param name="vector2"> The second vector, in any orientation. </param>
-        ///
-        /// <returns> The dot product result. </returns>
-        template<typename ElementType, TensorOrientation Orientation1, TensorOrientation Orientation2>
-        static ElementType Dot(const TensorConstReference<ElementType, 1, Orientation1>& vector1, const TensorConstReference<ElementType, 1, Orientation2>& vector2);
+        template<typename ElementType>
+        static ElementType Dot(const VectorReferenceBase<ElementType>& vector1, const VectorReferenceBase<ElementType>& vector2);
 
         /// <summary> Calculates the product of a row vector with a column vector. </summary>
         ///
@@ -475,34 +284,18 @@ namespace math
         /// <param name="right"> The right vector, in column orientation. </param>
         /// <param name="result"> [out] The result. </param>
         template<typename ElementType>
-        static void Product(const Tensor<ElementType, 1, TensorOrientation::rowMajor>& left, const Tensor<ElementType, 1, TensorOrientation::columnMajor>& right, ElementType& result);
-
-        /// <summary> Calculates the product of a row vector with a column vector. </summary>
-        ///
-        /// <typeparam name="ElementType"> Element type. </typeparam>
-        /// <param name="left"> The left vector, in row orientation. </param>
-        /// <param name="right"> The right vector, in column orientation. </param>
-        /// <param name="result"> [out] The result. </param>
-        template<typename ElementType>
-        static void Product(const TensorConstReference<ElementType, 1, TensorOrientation::rowMajor>& left, const TensorConstReference<ElementType, 1, TensorOrientation::columnMajor>& right, ElementType& result);
+        static void Product(const VectorReference<ElementType, TensorOrientation::rowMajor>& left, const VectorReference<ElementType, TensorOrientation::columnMajor>& right, ElementType& result);
     };
 
-    //
-    // typedefs
-    // 
-    typedef Tensor<double, 1, TensorOrientation::columnMajor> DoubleColumnVector;
-    typedef Tensor<double, 1, TensorOrientation::rowMajor> DoubleRowVector;
-    typedef TensorReference<double, 1, TensorOrientation::columnMajor> DoubleColumnVectorReference;
-    typedef TensorReference<double, 1, TensorOrientation::rowMajor> DoubleRowVectorReference;
-    typedef TensorConstReference<double, 1, TensorOrientation::columnMajor> DoubleColumnVectorConstReference;
-    typedef TensorConstReference<double, 1, TensorOrientation::rowMajor> DoubleRowVectorConstReference;
+    typedef Vector<double, TensorOrientation::columnMajor> DoubleColumnVector;
+    typedef Vector<double, TensorOrientation::rowMajor> DoubleRowVector;
+    typedef VectorReference<double, TensorOrientation::columnMajor> DoubleColumnVectorReference;
+    typedef VectorReference<double, TensorOrientation::rowMajor> DoubleRowVectorReference;
 
-    typedef Tensor<float, 1, TensorOrientation::columnMajor> SingleColumnVector;
-    typedef Tensor<float, 1, TensorOrientation::rowMajor> SingleRowVector;
-    typedef TensorReference<float, 1, TensorOrientation::columnMajor> SingleColumnVectorReference;
-    typedef TensorReference<float, 1, TensorOrientation::rowMajor> SingleRowVectorReference;
-    typedef TensorConstReference<float, 1, TensorOrientation::columnMajor> SingleColumnVectorConstReference;
-    typedef TensorConstReference<float, 1, TensorOrientation::rowMajor> SingleRowVectorConstReference;
+    typedef Vector<float, TensorOrientation::columnMajor> SingleColumnVector;
+    typedef Vector<float, TensorOrientation::rowMajor> SingleRowVector;
+    typedef VectorReference<float, TensorOrientation::columnMajor> SingleColumnVectorReference;
+    typedef VectorReference<float, TensorOrientation::rowMajor> SingleRowVectorReference;
 }
 
 #include "../tcc/Tensor.tcc"
