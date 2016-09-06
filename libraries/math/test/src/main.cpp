@@ -30,16 +30,19 @@ void TestDoubleVector()
     math::DoubleColumnVector a{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
     testing::ProcessTest("DoubleColumnVector::operator[]", v == a);
 
-    std::default_random_engine rng;
-    std::normal_distribution<double> normal(0, 1.0);
-    auto generator = [&]() { return normal(rng); };
-    v.Generate(generator);
-
     testing::ProcessTest("DoubleColumnVector::Norm2", a.Norm2() == 7*7+9*9);
     testing::ProcessTest("DoubleColumnVector::Norm1", a.Norm1() == 7+9);
     testing::ProcessTest("DoubleColumnVector::Norm0", a.Norm0() == 2);
     testing::ProcessTest("DoubleColumnVector::Min", a.Min() == 0);
     testing::ProcessTest("DoubleColumnVector::Max", a.Max() == 9);
+
+    std::default_random_engine rng;
+    std::normal_distribution<double> normal(0, 1.0);
+    auto generator = [&]() { return normal(rng); };
+    v.Generate(generator);
+
+    v *= 0;
+    testing::ProcessTest("DoubleColumnVector::operator *=", v == z);
 }
 
 void TestSingleVector()
@@ -58,16 +61,19 @@ void TestSingleVector()
     math::SingleColumnVector a{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
     testing::ProcessTest("SingleColumnVector::operator[]", v == a);
 
-    std::default_random_engine rng;
-    std::normal_distribution<float> normal(0, 1.0);
-    auto generator = [&]() { return normal(rng); };
-    v.Generate(generator);
-
     testing::ProcessTest("SingleColumnVector::Norm2", a.Norm2() == 7*7+9*9);
     testing::ProcessTest("SingleColumnVector::Norm1", a.Norm1() == 7+9);
     testing::ProcessTest("SingleColumnVector::Norm0", a.Norm0() == 2);
     testing::ProcessTest("SingleColumnVector::Min", a.Min() == 0);
     testing::ProcessTest("SingleColumnVector::Max", a.Max() == 9);
+
+    std::default_random_engine rng;
+    std::normal_distribution<float> normal(0, 1.0);
+    auto generator = [&]() { return normal(rng); };
+    v.Generate(generator);
+
+    v *= 0;
+    testing::ProcessTest("SingleColumnVector::operator *=", v == z);
 }
 
 void TestDoubleVectorReference()
@@ -88,10 +94,20 @@ void TestDoubleVectorReference()
     math::DoubleColumnVector a{ 0, 7, 0, 0, 0, 9, 0, 0, 0, 0 };
     testing::ProcessTest("DoubleColumnVectorReference::operator[]", u == a);
 
+    auto b = w.GetSubVector(0, 2);
+    testing::ProcessTest("DoubleColumnVectorReference::Norm2", b.Norm2() == 7*7);
+    testing::ProcessTest("DoubleColumnVectorReference::Norm1", b.Norm1() == 7);
+    testing::ProcessTest("DoubleColumnVectorReference::Norm0", b.Norm0() == 1);
+    testing::ProcessTest("DoubleColumnVectorReference::Min", b.Min() == 0);
+    testing::ProcessTest("DoubleColumnVectorReference::Max", b.Max() == 7);
+
     std::default_random_engine rng;
     std::normal_distribution<double> normal(0, 1.0);
     auto generator = [&]() { return normal(rng); };
     w.Generate(generator);
+
+    v *= 0;
+    testing::ProcessTest("DoubleColumnVectorReference::operator *=", v == z);
 }
 
 void TestSingleVectorReference()
@@ -112,10 +128,20 @@ void TestSingleVectorReference()
     math::SingleColumnVector a{ 0, 7, 0, 0, 0, 9, 0, 0, 0, 0 };
     testing::ProcessTest("SingleColumnVectorReference::operator[]", u == a);
 
+    auto b = w.GetSubVector(0, 2);
+    testing::ProcessTest("SingleColumnVectorReference::Norm2", b.Norm2() == 7*7);
+    testing::ProcessTest("SingleColumnVectorReference::Norm1", b.Norm1() == 7);
+    testing::ProcessTest("SingleColumnVectorReference::Norm0", b.Norm0() == 1);
+    testing::ProcessTest("SingleColumnVectorReference::Min", b.Min() == 0);
+    testing::ProcessTest("SingleColumnVectorReference::Max", b.Max() == 7);
+
     std::default_random_engine rng;
     std::normal_distribution<float> normal(0, 1.0);
     auto generator = [&]() { return normal(rng); };
     w.Generate(generator);
+
+    v *= 0;
+    testing::ProcessTest("SingleColumnVectorReference::operator *=", v == z);
 }
 
 void TestDoubleVectorProduct()
@@ -142,6 +168,12 @@ void TestSingleVectorProduct()
     testing::ProcessTest("TensorOperations::Product(Vector, Vector)", result == 6);
 }
 
+void TestConstDoubleVector()
+{
+
+}
+
+
 /// Runs all tests
 ///
 int main()
@@ -152,6 +184,7 @@ int main()
     TestSingleVector();
     TestSingleVectorReference();
     TestSingleVectorProduct();
+    TestConstDoubleVector();
 
     if(testing::DidTestFail())
     {

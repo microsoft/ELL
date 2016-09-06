@@ -86,25 +86,19 @@ namespace math
     template<typename ElementType>
     void VectorReferenceBase<ElementType>::operator+=(ElementType scalar)
     {
-        // TODO
+        ForEach([scalar](ElementType x) { return x+scalar; });
     }
 
     template<typename ElementType>
     void VectorReferenceBase<ElementType>::operator-=(ElementType scalar)
     {
-        // TODO
+        ForEach([scalar](ElementType x) { return x-scalar; });
     }
 
     template<typename ElementType>
     void VectorReferenceBase<ElementType>::operator*=(ElementType scalar)
     {
-        // TODO
-    }
-
-    template<typename ElementType>
-    void VectorReferenceBase<ElementType>::operator/=(ElementType scalar)
-    {
-        // TODO
+        ForEach([scalar](ElementType x) { return x*scalar; });
     }
 
     template<typename ElementType>
@@ -113,47 +107,20 @@ namespace math
 #ifdef USE_BLAS
         return Blas::Nrm2(_size, _pData, _stride);
 #else
-        ElementType result = 0;
-        const ElementType* ptr = _pData;
-        const ElementType* end = _pData + _size;
-        while(ptr < end)
-        {
-            result += (*ptr) * (*ptr);
-            ++ptr;
-        }
-        return result;
+        return Aggregate([](ElementType x){ return x*x; });
 #endif
     }
 
     template<typename ElementType>
     inline ElementType VectorReferenceBase<ElementType>::Norm1() const
     {
-        ElementType result = 0;
-        const ElementType* ptr = _pData;
-        const ElementType* end = _pData + _size;
-        while(ptr < end)
-        {
-            result += std::abs(*ptr);
-            ++ptr;
-        }
-        return result;
+        return Aggregate([](ElementType x) { return std::abs(x); });
     }
 
     template<typename ElementType>
     inline ElementType VectorReferenceBase<ElementType>::Norm0() const
     {
-        ElementType result = 0;
-        const ElementType* ptr = _pData;
-        const ElementType* end = _pData + _size;
-        while(ptr < end)
-        {
-            if((*ptr) != 0)
-            {
-                result += 1;
-            }
-            ++ptr;
-        }
-        return result;
+        return Aggregate([](ElementType x) { return x!=0 ? 1 : 0; });
     }
 
     template<typename ElementType>
@@ -161,14 +128,14 @@ namespace math
     {
         ElementType result = *_pData;
         const ElementType* ptr = _pData+1;
-        const ElementType* end = _pData + _size;
+        const ElementType* end = _pData + _size * _stride;
         while(ptr < end)
         {
             if((*ptr) < result)
             {
                 result = *ptr;
             }
-            ++ptr;
+            ptr += _stride;
         }
         return result;
     }
@@ -178,16 +145,44 @@ namespace math
     {
         ElementType result = *_pData;
         const ElementType* ptr = _pData+1;
-        const ElementType* end = _pData + _size;
+        const ElementType* end = _pData + _size * _stride;
         while(ptr < end)
         {
             if((*ptr) > result)
             {
                 result = *ptr;
             }
-            ++ptr;
+            ptr += _stride;
         }
         return result;
+    }
+
+    template<typename ElementType>
+    template<typename MapperType>
+    ElementType VectorReferenceBase<ElementType>::Aggregate(MapperType mapper) const
+    {
+        ElementType result = 0;
+        const ElementType* ptr = _pData;
+        const ElementType* end = _pData + _size * _stride;
+        while(ptr < end)
+        {
+            result += mapper(*ptr);
+            ptr += _stride;
+        }
+        return result;
+    }
+
+    template<typename ElementType>
+    template<typename MapperType>
+    void VectorReferenceBase<ElementType>::ForEach(MapperType mapper)
+    {
+        ElementType* ptr = _pData;
+        const ElementType* end = _pData + _size * _stride;
+        while(ptr < end)
+        {
+            *ptr = mapper(*ptr);
+            ptr += _stride;
+        }
     }
 
     //

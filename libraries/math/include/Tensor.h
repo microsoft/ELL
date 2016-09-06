@@ -91,22 +91,17 @@ namespace math
         /// <param name="scalar"> The scalar. </param>
         void operator*=(ElementType scalar);
 
-        /// <summary> Division assignment operator. </summary>
-        ///
-        /// <param name="scalar"> The scalar. </param>
-        void operator/=(ElementType scalar);
-
-        /// <summary> Gets the squared 2-norm of the vector. </summary>
+        /// <summary> Computes the squared 2-norm of the vector. </summary>
         ///
         /// <returns> The squared 2-norm. </returns>
         ElementType Norm2() const;
 
-        /// <summary> Gets the squared 1-norm of the vector. </summary>
+        /// <summary> Computes the 1-norm of the vector. </summary>
         ///
         /// <returns> The squared 1-norm. </returns>
         ElementType Norm1() const;
 
-        /// <summary> Gets the squared 0-norm of the vector. </summary>
+        /// <summary> Computes the 0-norm of the vector. </summary>
         ///
         /// <returns> The squared 0-norm. </returns>
         ElementType Norm0() const;
@@ -131,6 +126,13 @@ namespace math
 
         size_t _size;
         size_t _stride;
+
+    private:
+        template<typename MapperType>
+        void ForEach(MapperType mapper);
+
+        template<typename MapperType>
+        ElementType Aggregate(MapperType mapper) const;
     };
 
     /// <summary> Enum of possible matrix and vector orientations. </summary>
