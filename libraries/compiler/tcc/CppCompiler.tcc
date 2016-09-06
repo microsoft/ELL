@@ -155,7 +155,7 @@ namespace emll
 			Variable* pOutputVar = EnsureVariableFor(node.GetOutputPorts()[0]);
 			for (size_t i = 0; i < pInput->Size(); ++i)
 			{
-				auto outputElt = pInput->GetOutputPortElement(i);
+				auto outputElt = pInput->GetInputElement(i);
 				_pfn->AssignValueAt(pOutputVar->EmittedName(), i, [&outputElt, this]() {LoadVar(outputElt); });
 			}
 		}
@@ -208,8 +208,8 @@ namespace emll
 			Variable& resultVar = *(EnsureEmitted(pOutput));
 			for (size_t i = 0; i < pInput1->Size(); ++i)
 			{
-				auto lInput = pInput1->GetOutputPortElement(i);
-				auto rInput = pInput2->GetOutputPortElement(i);
+				auto lInput = pInput1->GetInputElement(i);
+				auto rInput = pInput2->GetInputElement(i);
 				_pfn->AssignValue(resultVar, i);
 				{
 					_pfn->Op(GetOperator<T>(node), [&lInput, this]() {LoadVar(lInput); },[&rInput, this]() {LoadVar(rInput); });
@@ -268,7 +268,7 @@ namespace emll
 			_pfn->Assign(resultVar.EmittedName(), GetDefaultForValueType<T>());
 			for (size_t i = 0; i < pInput->Size(); ++i)
 			{
-				auto pRInput = pInput->GetOutputPortElement(i);
+				auto pRInput = pInput->GetInputElement(i);
 				_pfn->IncrementUpdate(resultVar.EmittedName());
 				{
 					LoadVar(pRInput);
@@ -328,8 +328,8 @@ namespace emll
 			_pfn->Assign(resultVar.EmittedName(), 0);
 			for (size_t i = 0; i < pInput1->Size(); ++i)
 			{
-				auto lInput = pInput1->GetOutputPortElement(i);
-				auto rInput = pInput2->GetOutputPortElement(i);
+				auto lInput = pInput1->GetInputElement(i);
+				auto rInput = pInput2->GetInputElement(i);
 				_pfn->IncrementUpdate(resultVar.EmittedName())
 					 .Op(GetMultiplyForValueType<T>(), [&lInput, this]() {LoadVar(lInput); }, [&rInput, this]() {LoadVar(rInput); })
 					 .EndStatement();
@@ -386,7 +386,7 @@ namespace emll
 			{
 				_pfn->IncrementValueAt(pAccumulatorVector->EmittedName(), i);
 				{
-					LoadVar(pInput->GetOutputPortElement(i));
+					LoadVar(pInput->GetInputElement(i));
 				}
 				_pfn->EndStatement();
 			}
@@ -406,8 +406,8 @@ namespace emll
 			VerifyIsScalar(*pOutput);
 
 			Variable& resultVar = *(EnsureEmitted(pOutput));
-			auto lInput = pInput1->GetOutputPortElement(0);
-			auto rInput = pInput2->GetOutputPortElement(0);
+			auto lInput = pInput1->GetInputElement(0);
+			auto rInput = pInput2->GetInputElement(0);
 			_pfn->Assign(resultVar.EmittedName());
 			_pfn->Cmp(GetComparison<T>(node), [&lInput, this](){LoadVar(lInput); }, [&rInput, this](){LoadVar(rInput); });
 			_pfn->EndStatement();
@@ -416,7 +416,7 @@ namespace emll
 		}
 
 		template<typename T, typename SelectorType>
-		void CppCompiler::CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node)
+		void CppCompiler::CompileMultiplexer(const nodes::MultiplexerNode<T, SelectorType>& node)
 		{
 			// Only support binary right now
 			VerifyIsPureBinary(node);
@@ -424,12 +424,12 @@ namespace emll
 			NewCodeBlock(node);
 
 			auto pElements = node.GetInputPorts()[0];
-			CompileElementSelectorBinary<T, SelectorType>(node);
+			CompileMultiplexerBinary<T, SelectorType>(node);
 		}
 
 		///<summary>Compile an element selector node</summary>
 		template<typename T, typename SelectorType>
-		void CppCompiler::CompileElementSelectorBinary(const nodes::ElementSelectorNode<T, SelectorType>& node)
+		void CppCompiler::CompileMultiplexerBinary(const nodes::MultiplexerNode<T, SelectorType>& node)
 		{
 			auto pElements = node.GetInputPorts()[0];
 			auto pSelector = node.GetInputPorts()[1];
@@ -439,8 +439,8 @@ namespace emll
 			VerifyIsScalar(*pOutput);
 
 			Variable* pResult = EnsureEmitted(pOutput);
-			auto lVal = pElements->GetOutputPortElement(1);  // lval is selected if the result of the "if" comparison is NON-zero
-			auto rVal = pElements->GetOutputPortElement(0);
+			auto lVal = pElements->GetInputElement(1);  // lval is selected if the result of the "if" comparison is NON-zero
+			auto rVal = pElements->GetInputElement(0);
 			auto lMergeableSrc = GetMergeableNode(lVal);
 			auto rMergeableSrc = GetMergeableNode(rVal);
 			if (lMergeableSrc == nullptr && rMergeableSrc == nullptr)

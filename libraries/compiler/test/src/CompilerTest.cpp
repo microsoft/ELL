@@ -249,9 +249,9 @@ nodes::BinaryPredicateNode<T>* ModelBuilder::Gt(const model::OutputPort<T>& x, c
 }
 
 template<typename T, typename S>
-nodes::ElementSelectorNode<T, S>* ModelBuilder::Select(const model::OutputPort<T>& elts, const model::OutputPort<S>& selector)
+nodes::MultiplexerNode<T, S>* ModelBuilder::Select(const model::OutputPort<T>& elts, const model::OutputPort<S>& selector)
 {
-	auto node = _model.AddNode<nodes::ElementSelectorNode<T, S>>(elts, selector);
+	auto node = _model.AddNode<nodes::MultiplexerNode<T, S>>(elts, selector);
 	return node;
 }
 
@@ -290,7 +290,7 @@ nodes::ConstantNode<T>* ModelBuilder::Constant(const std::vector<T>& values)
 {
 	auto *pNode = _model.AddNode<nodes::ConstantNode<T>>(values);
 	// Work around a bug. Make sure literal values are propagated to outputs
-	_model.ComputeNodeOutput<T>(pNode->output);
+	_model.ComputeOutput<T>(pNode->output);
 	return pNode;
 }
 
@@ -552,11 +552,11 @@ model::Model MakeLinearPredictor()
 
 	// check for equality
 	auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-	auto newOutputPort = transformer.GetCorrespondingOutputPort(linearPredictorNode->prediction);
+	auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ linearPredictorNode->output }); // TODO: cleanup
 	inputNode->SetInput({ 1.0, 1.0, 1.0 });
 	newInputNode->SetInput({ 1.0, 1.0, 1.0 });
-	auto modelOutputValue = model.ComputeNodeOutput(linearPredictorNode->prediction)[0];
-	auto newOutputValue = newModel.ComputeNodeOutput(*newOutputPort)[0];
+	auto modelOutputValue = model.ComputeOutput(linearPredictorNode->output)[0];
+	auto newOutputValue = newModel.ComputeOutput(newOutputElements)[0];
 
 	testing::ProcessTest("Testing LinearPredictorNode refine", testing::IsEqual(modelOutputValue, newOutputValue));
 	return newModel;
@@ -595,7 +595,7 @@ model::Model MakeForest()
 {
 	// define some abbreviations
 	using SplitAction = predictors::SimpleForestPredictor::SplitAction;
-	using SplitRule = predictors::SingleElementThresholdRule;
+	using SplitRule = predictors::SingleElementThresholdPredictor;
 	using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
 	using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
@@ -616,17 +616,25 @@ model::Model MakeForest()
 	model::ModelTransformer transformer;
 	auto refinedModel = transformer.RefineModel(model, context);
 
-	// check equivalence
 	auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-	auto refinedOutputPort = transformer.GetCorrespondingOutputPort(simpleForestNode->prediction);
+	auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestNode->output });
+	auto refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestNode->treeOutputs });
+	auto refinedEdgeIndicatorVectorElements = transformer.GetCorrespondingOutputs(model::PortElements<bool>{ simpleForestNode->edgeIndicatorVector });
+	testing::ProcessTest("Testing SimpleForestNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
+	// check equivalence
 	inputNode->SetInput({ 0.2, 0.5, 0.0 });
 	refinedInputNode->SetInput({ 0.2, 0.5, 0.0 });
-	auto outputValue = model.ComputeNodeOutput(simpleForestNode->prediction)[0];
-	auto refinedOutputValue = refinedModel.ComputeNodeOutput(*refinedOutputPort)[0];
+	auto outputValue = model.ComputeOutput(simpleForestNode->output)[0];
+	auto treeOutputsValue = model.ComputeOutput(simpleForestNode->treeOutputs);
+	auto edgeIndicatorVectorValue = model.ComputeOutput(simpleForestNode->edgeIndicatorVector);
+
+	auto refinedOutputValue = refinedModel.ComputeOutput(refinedOutputElements)[0];
+	auto refinedTreeOutputsValue = refinedModel.ComputeOutput(refinedTreeOutputsElements);
+	auto refinedEdgeIndicatorVectorValue = refinedModel.ComputeOutput(refinedEdgeIndicatorVectorElements);
 
 	//  expected output is -3.0
-	testing::ProcessTest("Testing SimpleForestNode refine", testing::IsEqual(outputValue, refinedOutputValue));
+	testing::ProcessTest("Testing SimpleForestNode refine (output)", testing::IsEqual(outputValue, refinedOutputValue));
 
 	return refinedModel;
 }
@@ -635,7 +643,7 @@ model::Model MakeForestDeep()
 {
 	// define some abbreviations
 	using SplitAction = predictors::SimpleForestPredictor::SplitAction;
-	using SplitRule = predictors::SingleElementThresholdRule;
+	using SplitRule = predictors::SingleElementThresholdPredictor;
 	using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
 	using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
@@ -661,10 +669,24 @@ model::Model MakeForestDeep()
 	model::ModelTransformer transformer;
 	auto refinedModel =  transformer.RefineModel(model, context);
 	auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-	auto refinedOutputPort = transformer.GetCorrespondingOutputPort(simpleForestNode->prediction);
+	auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestNode->output });
+	auto refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestNode->treeOutputs });
+	auto refinedEdgeIndicatorVectorElements = transformer.GetCorrespondingOutputs(model::PortElements<bool>{ simpleForestNode->edgeIndicatorVector });
+	testing::ProcessTest("Testing SimpleForestNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
+	// check equivalence
+	inputNode->SetInput({ 0.2, 0.5, 0.0 });
 	refinedInputNode->SetInput({ 0.2, 0.5, 0.0 });
-	auto refinedOutputValue = refinedModel.ComputeNodeOutput(*refinedOutputPort)[0];
+	auto outputValue = model.ComputeOutput(simpleForestNode->output)[0];
+	auto treeOutputsValue = model.ComputeOutput(simpleForestNode->treeOutputs);
+	auto edgeIndicatorVectorValue = model.ComputeOutput(simpleForestNode->edgeIndicatorVector);
+
+	auto refinedOutputValue = refinedModel.ComputeOutput(refinedOutputElements)[0];
+	auto refinedTreeOutputsValue = refinedModel.ComputeOutput(refinedTreeOutputsElements);
+	auto refinedEdgeIndicatorVectorValue = refinedModel.ComputeOutput(refinedEdgeIndicatorVectorElements);
+
+	//  expected output is -3.0
+	testing::ProcessTest("Testing SimpleForestNode refine (output)", testing::IsEqual(outputValue, refinedOutputValue));
 
 	return refinedModel;
 }

@@ -61,6 +61,11 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+		/// <summary>Gets the port element at the specified index</summary>
+		///
+		/// <returns> The name of this type. </returns>
+		model::PortElementBase GetInputElement(size_t index) const { return _inputElements.GetElement(index); }
+
     protected:
         /// Subclasses _must_ call this method in their constructor
         void ComputeParents();

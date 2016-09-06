@@ -35,22 +35,3 @@ utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilit
     return parseErrorMessages;
 }
 
-utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilities::CommandLineParser & parser)
-{
-    if(outputSvgFilename == "null")
-    {
-        outputSvgStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
-    }
-    else if(outputSvgFilename == "cout")
-    {
-        outputSvgStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
-    }
-    else // treat argument as filename
-    {
-        outputSvgStream = utilities::OutputStreamImpostor(outputSvgFilename);
-    }
-
-    std::vector<std::string> parseErrorMessages;
-    return parseErrorMessages;
-}
-

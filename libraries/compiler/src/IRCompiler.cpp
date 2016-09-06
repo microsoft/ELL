@@ -106,7 +106,7 @@ namespace emll
 			return pVal;
 		}
 
-		llvm::Value* IRCompiler::EnsureEmitted(model::OutputPortElement elt)
+		llvm::Value* IRCompiler::EnsureEmitted(model::PortElementBase& elt)
 		{
 			return EnsureEmitted(EnsureVariableFor(elt));
 		}
@@ -126,7 +126,7 @@ namespace emll
 		llvm::Value* IRCompiler::EnsureEmitted(model::InputPortBase* pPort)
 		{
 			assert(pPort != nullptr);
-			return EnsureEmitted(pPort->GetOutputPortElement(0));
+			return EnsureEmitted(pPort->GetInputElement(0));
 		}
 
 		llvm::Value* IRCompiler::Emit(Variable& var)
@@ -177,7 +177,7 @@ namespace emll
 			return pVal;
 		}
 
-		llvm::Value* IRCompiler::LoadVar(const model::OutputPortElement elt)
+		llvm::Value* IRCompiler::LoadVar(const model::PortElementBase& elt)
 		{
 			Variable* pVar = EnsureVariableFor(elt);
 			llvm::Value* pVal = EnsureEmitted(pVar);
@@ -204,7 +204,7 @@ namespace emll
 		llvm::Value* IRCompiler::LoadVar(model::InputPortBase* pPort)
 		{
 			assert(pPort != nullptr);
-			return LoadVar(pPort->GetOutputPortElement(0));
+			return LoadVar(pPort->GetInputElement(0));
 		}
 
 		void IRCompiler::SetVar(Variable& var, llvm::Value* pDest, int offset, llvm::Value* pValue)

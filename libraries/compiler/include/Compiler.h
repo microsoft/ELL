@@ -25,7 +25,7 @@
 #include "AccumulatorNode.h"
 #include "DelayNode.h"
 #include "UnaryOperationNode.h"
-#include "ElementSelectorNode.h"
+#include "MultiplexerNode.h"
 #include "BinaryPredicateNode.h"
 
 #include <functional>
@@ -136,8 +136,8 @@ namespace emll
 			virtual void CompileUnaryNode(const nodes::UnaryOperationNode<int>& node) { NotSupported(); }
 
 			///<summary>Compile an ElementSelectorNode</summary>
-			virtual void CompileElementSelectorNode(const model::Node& node);
-			virtual void CompileElementSelectorNode(const nodes::ElementSelectorNode<double, bool>& node) = 0;
+			virtual void CompileMultiplexerNode(const model::Node& node);
+			virtual void CompileMultiplexerNode(const nodes::MultiplexerNode<double, bool>& node) = 0;
 
 			///<summary>Ensure a variable is emitted</summary>
 			virtual void EnsureVarEmitted(Variable* pVar) = 0;
@@ -157,9 +157,9 @@ namespace emll
 			///<summary>Ensure the variable for output port element exists</summary>
 			Variable* EnsureVariableFor(const model::OutputPortBase* pPort);
 			///<summary>Get the variable for output port element</summary>
-			Variable* GetVariableFor(const model::OutputPortElement elt);
+			Variable* GetVariableFor(const model::PortElementBase& elt);
 			///<summary>Ensure the variable for output port element exists</summary>
-			Variable* EnsureVariableFor(const model::OutputPortElement elt);
+			Variable* EnsureVariableFor(const model::PortElementBase& elt);
 			///<summary>Associate the given variable with the output port</summary>
 			void SetVariableFor(const model::OutputPortBase* pPort, Variable* pVar);
 

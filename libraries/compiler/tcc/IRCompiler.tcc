@@ -160,7 +160,7 @@ namespace emll
 			llvm::Value* pOutputVar = EnsureEmitted(node.GetOutputPorts()[0]);
 			for (size_t i = 0; i < pInput->Size(); ++i)
 			{
-				llvm::Value* pVal = LoadVar(pInput->GetOutputPortElement(i));
+				llvm::Value* pVal = LoadVar(pInput->GetInputElement(i));
 				_fn.SetValueAt(pOutputVar, _fn.Literal((int)i), pVal);
 			}
 		}
@@ -205,8 +205,8 @@ namespace emll
 			Variable& resultVar = *(GetVariableFor(pOutput));
 			for (size_t i = 0; i < pInput1->Size(); ++i)
 			{
-				llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(i));
-				llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(i));
+				llvm::Value* pLVal = LoadVar(pInput1->GetInputElement(i));
+				llvm::Value* pRVal = LoadVar(pInput2->GetInputElement(i));
 				llvm::Value* pOpResult = _fn.Op(GetOperator<T>(node), pLVal, pRVal);
 				SetVar(resultVar, pResult, i, pOpResult);
 			}
@@ -258,8 +258,8 @@ namespace emll
 			_fn.Store(pResult, _fn.Literal(0.0));
 			for (size_t i = 0; i < pInput1->Size(); ++i)
 			{
-				llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(i));
-				llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(i));
+				llvm::Value* pLVal = LoadVar(pInput1->GetInputElement(i));
+				llvm::Value* pRVal = LoadVar(pInput2->GetInputElement(i));
 				llvm::Value* pMultiplyResult = _fn.Op(GetMultiplyForValueType<T>(), pLVal, pRVal);
 				_fn.OpAndUpdate(pResult, GetAddForValueType<T>(), pMultiplyResult);
 			}
@@ -314,7 +314,7 @@ namespace emll
 			_fn.Store(pResult, _fn.Literal(0.0));
 			for (size_t i = 0; i < pInput->Size(); ++i)
 			{
-				llvm::Value* pValue = LoadVar(pInput->GetOutputPortElement(i));
+				llvm::Value* pValue = LoadVar(pInput->GetInputElement(i));
 				_fn.OpAndUpdate(pResult, GetAddForValueType<T>(), pValue);
 			}
 		}
@@ -364,7 +364,7 @@ namespace emll
 
 			for (size_t i = 0; i < pInput->Size(); ++i)
 			{
-				llvm::Value* pVal = LoadVar(pInput->GetOutputPortElement(i));
+				llvm::Value* pVal = LoadVar(pInput->GetInputElement(i));
 				_fn.OpAndUpdate(_fn.PtrOffset(pAccumulatorVector, _fn.Literal((int) i)), GetAddForValueType<T>(), pVal);
 			}
 		}
@@ -431,15 +431,15 @@ namespace emll
 			Variable& resultVar = *(GetVariableFor(pOutput));
 			ComparisonType cmp = GetComparison<T>(node);
 
-			llvm::Value* pLVal = LoadVar(pInput1->GetOutputPortElement(0));
-			llvm::Value* pRVal = LoadVar(pInput2->GetOutputPortElement(0));
+			llvm::Value* pLVal = LoadVar(pInput1->GetInputElement(0));
+			llvm::Value* pRVal = LoadVar(pInput2->GetInputElement(0));
 			llvm::Value* pOpResult = _fn.Cmp(cmp, pLVal, pRVal);
 			// LLVM internally uses 1 bit for boolean. We use integers to store boolean results (see CompileElementSelector). That requires a typecast in LLVM
 			_fn.Store(pResult, _fn.CastBoolToInt(pOpResult));
 		}
 
 		template<typename T, typename SelectorType>
-		void IRCompiler::CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node)
+		void IRCompiler::CompileMultiplexer(const nodes::MultiplexerNode<T, SelectorType>& node)
 		{
 			NewBlockRegion(node);
 
@@ -449,12 +449,12 @@ namespace emll
 				// Only support binary right now
 				throw new CompilerException(CompilerError::binaryInputsExpected);
 			}
-			CompileElementSelectorBinary<T, SelectorType>(node);
+			CompileMultiplexerBinary<T, SelectorType>(node);
 		}
 
 		///<summary>Compile an element selector node</summary>
 		template<typename T, typename SelectorType>
-		void IRCompiler::CompileElementSelectorBinary(const nodes::ElementSelectorNode<T, SelectorType>& node)
+		void IRCompiler::CompileMultiplexerBinary(const nodes::MultiplexerNode<T, SelectorType>& node)
 		{
 			auto pElements = node.GetInputPorts()[0];
 			auto pSelector = node.GetInputPorts()[1];
@@ -476,11 +476,11 @@ namespace emll
 				IRIfEmitter ife = _fn.If();
 				ife.If(ComparisonType::Eq, pSelectorVal, _fn.Literal(0));
 				{
-					_fn.Store(pResult, LoadVar(pElements->GetOutputPortElement(0)));
+					_fn.Store(pResult, LoadVar(pElements->GetInputElement(0)));
 				}
 				ife.Else();
 				{
-					_fn.Store(pResult, LoadVar(pElements->GetOutputPortElement(1)));
+					_fn.Store(pResult, LoadVar(pElements->GetInputElement(1)));
 				}
 				ife.End();
 			}

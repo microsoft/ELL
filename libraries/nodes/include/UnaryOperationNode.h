@@ -77,6 +77,9 @@ namespace nodes
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
+		/// <summary>Gets the operation type</summary>
+		OperationType GetOperationType() const { return _operation; }
+
     protected:
         virtual void Compute() const override;
 

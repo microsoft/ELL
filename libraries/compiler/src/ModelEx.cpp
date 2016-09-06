@@ -18,7 +18,7 @@ namespace emll
 			return node.GetOutputPorts()[0]->GetType();
 		}
 
-		const model::Node* ModelEx::GetSourceNode(const model::OutputPortElement& elt)
+		const model::Node* ModelEx::GetSourceNode(const model::PortElementBase& elt)
 		{
 			return elt.ReferencedPort()->GetNode();
 		}
@@ -30,8 +30,8 @@ namespace emll
 
 		bool ModelEx::IsPureVector(const model::InputPortBase& port)
 		{
-			auto inputs = port.GetInputRanges();
-			return (inputs.NumRanges() == 1 && (inputs.begin()->Size() > 1));
+			const model::PortElementsBase& inputs = port.GetInputElements();
+			return (inputs.NumRanges() == 1 && (inputs.GetRanges().size() > 1));
 		}
 
 		bool ModelEx::IsPureBinary(const model::Node& node)
@@ -55,7 +55,7 @@ namespace emll
 			return (node.GetDependentNodes().size() == 1);
 		}
 
-		bool ModelEx::HasSingleDescendant(const model::OutputPortElement& elt)
+		bool ModelEx::HasSingleDescendant(const model::PortElementBase& elt)
 		{
 			return HasSingleDescendant(*GetSourceNode(elt));
 		}

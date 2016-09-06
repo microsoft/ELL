@@ -100,7 +100,7 @@ namespace emll
 				}
 				else if (IsNodeType(typeName, c_ElementSelectorNodeType))
 				{
-					CompileElementSelectorNode(node);
+					CompileMultiplexerNode(node);
 				}
 				else
 				{
@@ -233,12 +233,12 @@ namespace emll
 			return pVar;
 		}
 
-		Variable* Compiler::GetVariableFor(const model::OutputPortElement elt)
+		Variable* Compiler::GetVariableFor(const model::PortElementBase& elt)
 		{
 			return GetVariableFor(elt.ReferencedPort());
 		}
 
-		Variable* Compiler::EnsureVariableFor(const model::OutputPortElement elt)
+		Variable* Compiler::EnsureVariableFor(const model::PortElementBase& elt)
 		{
 			return EnsureVariableFor(elt.ReferencedPort());
 		}
@@ -257,11 +257,11 @@ namespace emll
 		{
 			switch (type)
 			{
-				case model::Port::PortType::Real:
+				case model::Port::PortType::real:
 					return ValueType::Double;
-				case model::Port::PortType::Integer:
+				case model::Port::PortType::integer:
 					return ValueType::Int32;
-				case model::Port::PortType::Boolean:
+				case model::Port::PortType::boolean:
 					return ValueType::Int32;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);
@@ -330,13 +330,13 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-				case model::Port::PortType::Real:
+				case model::Port::PortType::real:
 					CompileOutputNode(static_cast<const model::OutputNode<double>&>(node));
 					break;
-				case model::Port::PortType::Integer:
+				case model::Port::PortType::integer:
 					CompileOutputNode(static_cast<const model::OutputNode<int>&>(node));
 					break;
-				case model::Port::PortType::Boolean:
+				case model::Port::PortType::boolean:
 					CompileOutputNode(static_cast<const model::OutputNode<bool>&>(node));
 					break;
 				default:
@@ -348,13 +348,13 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-				case model::Port::PortType::Real:
+				case model::Port::PortType::real:
 					CompileConstant<double>(static_cast<const nodes::ConstantNode<double>&>(node));
 					break;
-				case model::Port::PortType::Integer:
+				case model::Port::PortType::integer:
 					CompileConstant<int>(static_cast<const nodes::ConstantNode<int>&>(node));
 					break;
-				case model::Port::PortType::Boolean:
+				case model::Port::PortType::boolean:
 					CompileConstantBool(static_cast<const nodes::ConstantNode<bool>&>(node));
 					break;
 				default:
@@ -379,10 +379,10 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-				case model::Port::PortType::Real:
+				case model::Port::PortType::real:
 					CompileBinaryNode(static_cast<const nodes::BinaryOperationNode<double>&>(node));
 					break;
-				case model::Port::PortType::Integer:
+				case model::Port::PortType::integer:
 					CompileBinaryNode(static_cast<const nodes::BinaryOperationNode<int>&>(node));
 					break;
 				default:
@@ -394,10 +394,10 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-				case model::Port::PortType::Real:
+				case model::Port::PortType::real:
 					CompileSumNode(static_cast<const nodes::SumNode<double>&>(node));
 					break;
-				case model::Port::PortType::Integer:
+				case model::Port::PortType::integer:
 					CompileSumNode(static_cast<const nodes::SumNode<int>&>(node));
 					break;
 				default:
@@ -410,7 +410,7 @@ namespace emll
 			auto input = node.GetInputPorts()[0];
 			switch (input->GetType())
 			{
-				case model::Port::PortType::Real:
+				case model::Port::PortType::real:
 					CompileBinaryPredicateNode(static_cast<const nodes::BinaryPredicateNode<double>&>(node));
 					break;
 				default:
@@ -422,7 +422,7 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-			case model::Port::PortType::Real:
+			case model::Port::PortType::real:
 				CompileDotProductNode(static_cast<const nodes::DotProductNode<double>&>(node));
 				break;
 			default:
@@ -434,10 +434,10 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-				case model::Port::PortType::Real:
+				case model::Port::PortType::real:
 					CompileAccumulatorNode(static_cast<const nodes::AccumulatorNode<double>&>(node));
 					break;
-				case model::Port::PortType::Integer:
+				case model::Port::PortType::integer:
 					CompileAccumulatorNode(static_cast<const nodes::AccumulatorNode<int>&>(node));
 					break;
 				default:
@@ -449,10 +449,10 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-				case model::Port::PortType::Real:
+				case model::Port::PortType::real:
 					CompileDelayNode(static_cast<const nodes::DelayNode<double>&>(node));
 					break;
-				case model::Port::PortType::Integer:
+				case model::Port::PortType::integer:
 					CompileDelayNode(static_cast<const nodes::DelayNode<int>&>(node));
 					break;
 				default:
@@ -464,10 +464,10 @@ namespace emll
 		{
 			switch (ModelEx::GetNodeDataType(node))
 			{
-				case model::Port::PortType::Real:
+				case model::Port::PortType::real:
 					CompileUnaryNode(static_cast<const nodes::UnaryOperationNode<double>&>(node));
 					break;
-				case model::Port::PortType::Integer:
+				case model::Port::PortType::integer:
 					CompileUnaryNode(static_cast<const nodes::UnaryOperationNode<int>&>(node));
 					break;
 				default:
@@ -475,14 +475,14 @@ namespace emll
 			}
 		}
 
-		void Compiler::CompileElementSelectorNode(const model::Node& node)
+		void Compiler::CompileMultiplexerNode(const model::Node& node)
 		{
 			auto value = node.GetInputPorts()[0];
 			auto selector = node.GetInputPorts()[1];
-			if (value->GetType() == model::Port::PortType::Real &&
-				selector->GetType() == model::Port::PortType::Boolean)
+			if (value->GetType() == model::Port::PortType::real &&
+				selector->GetType() == model::Port::PortType::boolean)
 			{
-				CompileElementSelectorNode(static_cast<const nodes::ElementSelectorNode<double, bool>&>(node));
+				CompileMultiplexerNode(static_cast<const nodes::MultiplexerNode<double, bool>&>(node));
 			}
 			else
 			{

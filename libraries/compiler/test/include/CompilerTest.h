@@ -39,7 +39,7 @@ public:
 	template<typename T>
 	nodes::BinaryPredicateNode<T>* Gt(const model::OutputPort<T>& x, const model::OutputPort<T>& y);
 	template<typename T, typename S>
-	nodes::ElementSelectorNode<T, S>* Select(const model::OutputPort<T>& elts, const model::OutputPort<S>& selector);
+	nodes::MultiplexerNode<T, S>* Select(const model::OutputPort<T>& elts, const model::OutputPort<S>& selector);
 	template<typename T>
 	nodes::AccumulatorNode<T>* Accumulate(const model::OutputPort<T>& x);
 	template<typename T>

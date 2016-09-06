@@ -87,7 +87,7 @@ namespace emll
 		private:
 
 			Variable* EnsureEmitted(model::OutputPortBase* pPort);
-			Variable* EnsureEmitted(model::OutputPortElement elt);
+			Variable* EnsureEmitted(model::PortElementBase& elt);
 			Variable* EnsureEmitted(model::InputPortBase* pPort);
 
 			///<summary>Emit a variable</summary>
@@ -133,7 +133,7 @@ namespace emll
 
 			///<summary>Ensure that the variable for this outport port element is loaded into a register. SThis will automatically
 			/// dereference any pointers it needs to.</summary>
-			Variable* LoadVar(const model::OutputPortElement elt);
+			Variable* LoadVar(const model::PortElementBase& elt);
 			///<summary>Load the variable for the outport port referenced by this input port</summary>
 			Variable* LoadVar(model::InputPortBase* pPort);
 
@@ -185,17 +185,17 @@ namespace emll
 			void CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node);
 
 			///<summary>Compile an elementselectorNode</summary>
-			virtual void CompileElementSelectorNode(const nodes::ElementSelectorNode<double, bool>& node) override
+			virtual void CompileMultiplexerNode(const nodes::MultiplexerNode<double, bool>& node) override
 			{
-				CompileElementSelector<double, bool>(node);
+				CompileMultiplexer<double, bool>(node);
 			}
 			///<summary>Compile an element selector node</summary>
 			template<typename T, typename SelectorType>
-			void CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node);
+			void CompileMultiplexer(const nodes::MultiplexerNode<T, SelectorType>& node);
 			///<summary>Compile an element selector node</summary>
 			template<typename T, typename SelectorType>
-			void CompileElementSelectorBinary(const nodes::ElementSelectorNode<T, SelectorType>& node);
-			const model::Node* GetMergeableNode(const model::OutputPortElement& elt);
+			void CompileMultiplexerBinary(const nodes::MultiplexerNode<T, SelectorType>& node);
+			const model::Node* GetMergeableNode(const model::PortElementBase& elt);
 
 		private:
 			CppModuleEmitter _module;

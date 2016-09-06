@@ -95,7 +95,7 @@ namespace emll
 			return true;
 		}
 
-		const model::Node* CppCompiler::GetMergeableNode(const model::OutputPortElement& elt)
+		const model::Node* CppCompiler::GetMergeableNode(const model::PortElementBase& elt)
 		{
 			if (ModelEx::HasSingleDescendant(elt))
 			{
@@ -149,7 +149,7 @@ namespace emll
 			return pVar;
 		}
 
-		Variable* CppCompiler::EnsureEmitted(model::OutputPortElement elt)
+		Variable* CppCompiler::EnsureEmitted(model::PortElementBase& elt)
 		{
 			Variable* pVar = EnsureVariableFor(elt);
 			EnsureEmitted(pVar);
@@ -159,7 +159,7 @@ namespace emll
 		Variable* CppCompiler::EnsureEmitted(model::InputPortBase* pPort)
 		{
 			assert(pPort != nullptr);
-			return EnsureEmitted(pPort->GetOutputPortElement(0));
+			return EnsureEmitted(pPort->GetInputElement(0));
 		}
 
 		void CppCompiler::Emit(Variable& var)
@@ -181,7 +181,7 @@ namespace emll
 			throw new CompilerException(CompilerError::variableTypeNotSupported);
 		}
 
-		Variable* CppCompiler::LoadVar(const model::OutputPortElement elt)
+		Variable* CppCompiler::LoadVar(const model::PortElementBase& elt)
 		{
 			Variable* pVar = EnsureVariableFor(elt);
 			EnsureEmitted(pVar);
@@ -192,7 +192,7 @@ namespace emll
 		Variable* CppCompiler::LoadVar(model::InputPortBase* pPort)
 		{
 			assert(pPort != nullptr);
-			return LoadVar(pPort->GetOutputPortElement(0));
+			return LoadVar(pPort->GetInputElement(0));
 		}
 
 		const std::string& CppCompiler::LoopVarName()

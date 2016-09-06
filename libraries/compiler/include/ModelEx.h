@@ -7,11 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "ModelGraph.h"
+#include "Model.h"
 #include "Node.h"
 #include "InputNode.h"
 #include "OutputPort.h"
-#include "OutputPortElements.h"
+#include "PortElements.h"
 #include <functional>
 
 namespace emll
@@ -27,7 +27,7 @@ namespace emll
 			static model::Port::PortType GetNodeDataType(const model::Node& node);
 
 			/// <summary>Return the source node</summary>
-			static const model::Node* GetSourceNode(const model::OutputPortElement& elt);
+			static const model::Node* GetSourceNode(const model::PortElementBase& elt);
 
 			/// <summary>Returns true if a node is a leaf node</summary>
 			static bool IsLeafNode(const model::Node& node);
@@ -48,7 +48,7 @@ namespace emll
 			static bool HasSingleDescendant(const model::Node& node);
 
 			/// <summary>Does this node have a single descendant?</summary>
-			static bool HasSingleDescendant(const model::OutputPortElement& elt);
+			static bool HasSingleDescendant(const model::PortElementBase& elt);
 		};
 	}
 }

@@ -141,7 +141,7 @@ namespace emll
 			///<summary>Ensure that variable for the given port has been declared in IR</summary>
 			llvm::Value* EnsureEmitted(model::OutputPortBase* pPort);
 			///<summary>Ensure that variable for the given port element has been declared in IR</summary>
-			llvm::Value* EnsureEmitted(model::OutputPortElement elt);
+			llvm::Value* EnsureEmitted(model::PortElementBase& elt);
 			///<summary>Ensure that variable for the outport port referenced by this input port has been declared in IR</summary>
 			llvm::Value* EnsureEmitted(model::InputPortBase* pPort);
 
@@ -151,7 +151,7 @@ namespace emll
 			llvm::Value* LoadVar(Variable& var);
 			///<summary>Ensure that the variable for this outport port element is loaded into a register. SThis will automatically
 			/// dereference any pointers it needs to.</summary>
-			llvm::Value* LoadVar(const model::OutputPortElement elt);
+			llvm::Value* LoadVar(const model::PortElementBase& elt);
 			///<summary>Load the variable for the outport port referenced by this input port</summary>
 			llvm::Value* LoadVar(model::InputPortBase* pPort);
 			///<summary>Updates the value at a given offset of the given variable. Checks for index out of range etc.</summary>
@@ -216,16 +216,16 @@ namespace emll
 			void CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node);
 
 			///<summary>Compile an elementselectorNode</summary>
-			virtual void CompileElementSelectorNode(const nodes::ElementSelectorNode<double, bool>& node) override
+			virtual void CompileMultiplexerNode(const nodes::MultiplexerNode<double, bool>& node) override
 			{
-				CompileElementSelector<double, bool>(node);
+				CompileMultiplexer<double, bool>(node);
 			}
 			///<summary>Compile an element selector node</summary>
 			template<typename T, typename SelectorType>
-			void CompileElementSelector(const nodes::ElementSelectorNode<T, SelectorType>& node);
+			void CompileMultiplexer(const nodes::MultiplexerNode<T, SelectorType>& node);
 			///<summary>Compile an element selector node</summary>
 			template<typename T, typename SelectorType>
-			void CompileElementSelectorBinary(const nodes::ElementSelectorNode<T, SelectorType>& node);
+			void CompileMultiplexerBinary(const nodes::MultiplexerNode<T, SelectorType>& node);
 
 		private:
 			IREmitter _emitter;			// Object that makes lower level LLVM calls
