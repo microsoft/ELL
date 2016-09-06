@@ -8,55 +8,38 @@
 
 namespace utilities
 {
-    // Forward declaration of derived class
+    //
+    // VariantBase implementation
+    //
     template <typename ValueType>
-    class VariantDerived;
-
-    /// <summary> Base class for value holder </summary>
-    class VariantBase
+    ValueType VariantBase::GetValue() const
     {
-    public:
-        VariantBase(std::type_index type) : _type(type){};
-        virtual ~VariantBase() = default;
-
-        template <typename ValueType>
-        ValueType GetValue() const
+        auto thisPtr = dynamic_cast<const VariantDerived<ValueType>*>(this);
+        if (thisPtr == nullptr)
         {
-            auto thisPtr = dynamic_cast<const VariantDerived<ValueType>*>(this);
-            if (thisPtr == nullptr)
-            {
-                throw InputException(InputExceptionErrors::typeMismatch, "Variant::GetValue called with wrong type.");
-            }
-
-            return thisPtr->GetValue();
+            throw InputException(InputExceptionErrors::typeMismatch, "Variant::GetValue called with wrong type.");
         }
 
-        virtual std::unique_ptr<VariantBase> Clone() const = 0;
-
-    private:
-        std::type_index _type; // redundant with type in Variant class.
-    };
-
-    /// <summary>
-    template <typename ValueType>
-    class VariantDerived : public VariantBase
-    {
-    public:
-        VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) {}
-        const ValueType& GetValue() const { return _value; }
-
-        virtual std::unique_ptr<VariantBase> Clone() const
-        {
-            auto ptr = static_cast<VariantBase*>(new VariantDerived<ValueType>(_value));
-            return std::unique_ptr<VariantBase>(ptr);
-        }
-
-    private:
-        ValueType _value;
-    };
+        return thisPtr->GetValue();
+    }
 
     //
-    // Variant
+    // VariantDerived implementation
+    //
+
+    template <typename ValueType>
+    VariantDerived<ValueType>::VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val) 
+    {}
+
+    template <typename ValueType>
+    std::unique_ptr<VariantBase> VariantDerived<ValueType>::Clone() const
+    {
+        auto ptr = static_cast<VariantBase*>(new VariantDerived<ValueType>(_value));
+        return std::unique_ptr<VariantBase>(ptr);
+    }
+
+    //
+    // Variant implementation
     //
 
     template <typename ValueType>
@@ -92,5 +75,39 @@ namespace utilities
         auto derivedPtr = new VariantDerived<ValueType>(std::forward<Args>(args)...);
         auto basePtr = static_cast<VariantBase*>(derivedPtr);
         return Variant(std::type_index(typeid(ValueType)), std::unique_ptr<VariantBase>(basePtr));
+    }
+
+    //
+    // Private code we'd like to hide:
+    //
+    namespace variantNamespace
+    {
+        template <typename ValueType>
+        auto GetValueString(const ValueType& value, double) -> std::string
+        {
+            return std::string("[No to_string for type ") + typeid(ValueType).name() + "]";
+        }
+
+        using std::to_string;
+        using utilities::to_string;
+        inline std::string to_string(const std::string& str) { return str; }
+        
+        template <typename ValueType>
+        auto GetValueString(const ValueType& value, int) -> decltype(to_string(value), std::string())
+        {
+            return to_string(value);
+        }
+    }
+
+    template <typename ValueType>
+    inline std::string VariantDerived<ValueType>::ToString() const
+    {
+        return variantNamespace::GetValueString(_value, (int)0);
+    }
+
+    template <typename ValueType>
+    inline std::string VariantDerived<ValueType>::GetStoredTypeName() const
+    {
+        return TypeName<ValueType>::GetName();
     }
 }

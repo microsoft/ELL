@@ -8,24 +8,44 @@
 
 #include "Nodes_test.h"
 
+// utilities
+#include "Exception.h"
+
 // testing
 #include "testing.h"
+
+// utilities
+#include "Exception.h"
+
+// stl
+#include <iostream>
 
 /// Runs all tests
 ///
 int main()
 {
-    TestL2NormNodeCompute();
-    TestAccumulatorNodeCompute();
-    TestDelayNodeCompute();
-    TestMovingAverageNodeCompute();
-    TestMovingVarianceNodeCompute(); 
-    TestUnaryOperationNodeCompute();
-    TestBinaryOperationNodeCompute();
-    TestLinearPredictorNodeCompute();
-    
-    TestMovingAverageNodeRefine();
-    TestLinearPredictorNodeRefine();
+    try
+    {
+        TestL2NormNodeCompute();
+        TestAccumulatorNodeCompute();
+        TestDelayNodeCompute();
+        TestMovingAverageNodeCompute();
+        TestMovingVarianceNodeCompute(); 
+        TestUnaryOperationNodeCompute();
+        TestBinaryOperationNodeCompute();
+        TestLinearPredictorNodeCompute();
+        TestDemultiplexerNodeCompute();
+
+        TestMovingAverageNodeRefine();
+        TestLinearPredictorNodeRefine();
+        TestSimpleForestNodeRefine();
+        TestDemultiplexerNodeRefine();
+    }
+    catch(const utilities::Exception& exception)
+    {
+        std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
+        throw;
+    }
 
     if (testing::DidTestFail())
     {

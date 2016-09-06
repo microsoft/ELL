@@ -7,18 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 %{
-#include "LoadModelInterface.h"
-
 #include <node.h>
 #include <v8.h>
 #include <nan.h>
 #include <string>
 #include <functional>
 #include <iostream>
+#include "RowDatasetInterface.h"
 %}
-
-%include "LoadModelInterface.h"
-%template(GenSupervisedExampleIterator) utilities::AnyIterator<dataset::GenericSupervisedExample>;
 
 %{
 	class GetDatasetWorker : public Nan::AsyncWorker

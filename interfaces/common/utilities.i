@@ -17,7 +17,10 @@
 #include "AnyIterator.h"
 #include "RandomEngines.h"
 #include "StlIterator.h"
+#include "ISerializable.h"
+#include "Serializer.h"
 #include "UniqueId.h"
+#include "Variant.h"
 
 #include "LogLoss.h"
 #include "HingeLoss.h"
@@ -41,22 +44,23 @@ public:
     const ValueType& Get() const;
 };
 
-
 %include "AnyIterator.h"
 %include "RandomEngines.h"
 %include "RowDataset.h"
 
 %include "SGDIncrementalTrainer_wrap.h"
 
+%import "Serializer.h"
+%include "ISerializable.h"
 %include "UniqueId.h"
+%include "Variant.h"
 
 WRAP_OSTREAM_OUT_TO_STR(utilities::UniqueId)
 
 // This is necessary for us to avoid leaking memory:
 #ifndef SWIGXML
-%template () dataset::SupervisedExample<dataset::IDataVector>;
-%template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
-%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
+%template () std::vector<dataset::GenericSupervisedExample>;
+%template () utilities::StlIterator<typename std::vector<dataset::GenericSupervisedExample>::const_iterator, dataset::GenericSupervisedExample>;
 #endif
 
 %include "LogLoss.h"

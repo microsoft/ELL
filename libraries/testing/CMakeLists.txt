@@ -13,12 +13,12 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 set (SRC src/testing.cpp)
-
 set (INCLUDE include/testing.h)
+set (TCC )
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
-#source_group("tcc" FILES ${TCC})
+source_group("tcc" FILES ${TCC})
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include)

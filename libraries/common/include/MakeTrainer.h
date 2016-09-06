@@ -11,13 +11,12 @@
 #include "TrainerArguments.h"
 #include "SGDIncrementalTrainerArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
-#include "SortingTreeTrainerArguments.h"
+#include "ForestTrainerArguments.h"
 
 // predictors
 #include "LinearPredictor.h"
 
 // trainers
-#include "IBlackBoxTrainer.h"
 #include "IIncrementalTrainer.h"
 
 // stl
@@ -28,20 +27,25 @@ namespace common
     /// <summary> Makes a stochastic gradient descent incremental trainer. </summary>
     ///
     /// <param name="dim"> The dimension. </param>
-    /// <param name="lossArguments"> The loss arguments. </param>
-    /// <param name="parameters"> SGD parameters. </param>
+    /// <param name="lossArguments"> loss arguments. </param>
+    /// <param name="trainerArguments"> trainer arguments. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& sgdArguments);
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& trainerArguments);
 
-    /// <summary> Makes a sorting tree trainer. </summary>
+    /// <summary> Makes a sorting forest trainer. </summary>
     ///
-    /// <param name="parameters"> Trainer parameters. </param>
-    /// <param name="trainerArguments"> Trainer command line arguments. </param>
+    /// <param name="lossArguments"> loss arguments. </param>
+    /// <param name="trainerArguments"> trainer arguments. </param>
     ///
-    /// <returns> A unique_ptr to a sorting tree trainer. </returns>
-    std::unique_ptr<trainers::IBlackBoxTrainer<predictors::DecisionTreePredictor>> MakeSortingTreeTrainer(const LossArguments& lossArguments, const SortingTreeTrainerArguments& sortingTreeArguments);
+    /// <returns> A unique_ptr to a forest trainer. </returns>
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments);
 
-
-
+    /// <summary> Makes a histogram forest trainer. </summary>
+    ///
+    /// <param name="lossArguments"> loss arguments. </param>
+    /// <param name="trainerArguments"> trainer arguments. </param>
+    ///
+    /// <returns> A unique_ptr to a forest trainer. </returns>
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments);
 }

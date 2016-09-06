@@ -26,6 +26,9 @@ source_group("include" FILES ${INCLUDE})
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE})
 target_include_directories(${PROJ_NAME} PUBLIC include)
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+endif()
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 

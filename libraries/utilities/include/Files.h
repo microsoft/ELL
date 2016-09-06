@@ -34,4 +34,11 @@ namespace utilities
     ///
     /// <returns> true if the file exists and is readable. </returns>
     bool IsFileReadable(std::string filepath);
+
+    /// <summary> Returns the file extension, optionally converted to lower-case. </summary>
+    ///
+    /// <param name="filepath"> The path. </param>
+    ///
+    /// <returns> The file extension, not including the ".". </returns>
+    std::string GetFileExtension(std::string filepath, bool toLowercase=false);
 }

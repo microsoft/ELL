@@ -21,11 +21,15 @@ namespace utilities
             return baseType;
         }
         std::string result = baseType + "<";
-        for (auto t : subtypes)
+        for(size_t index = 0; index < subtypes.size(); ++index)
         {
-            result += t + ",";
+            if(index != 0)
+            {
+                result += ",";
+            }
+            result += subtypes[index];
         }
-        result.back() = '>';
+        result += ">";
         return result;
     }
 }

@@ -25,30 +25,21 @@ def sgd():
 
     # Parameters
     dataFilename = getArg(1)
-    inMapFilename = getArg(2)
-    outMapFilename = getArg(3, 'mapOut.xml')
-    coordinateString = getArg(4, 'e')
+    outModelFilename = getArg(2, 'modelOut.xml')
     randomSeed = 'abcdefg'
     numEpochs = 3
     epochSize = 0 # 0 means "all"
     l2Regularization = 0.01
-    dataDimension = 3
-
-    # Read model from file
-    model = LoadModel(inMapFilename);
+    dataDimension = 21
     
-    # get output coordinate list and create the map
-    outputCoordinates = BuildCoordinateList(model, dataDimension, coordinateString);
-    map = Map(model, outputCoordinates);
-
     #  Get the dataset
-    dataset = GetMappedDataset(dataFilename, map);
+    dataset = GetDataset(dataFilename);
 
     # create sgd trainer    
     loss = LogLoss()
     params = SGDIncrementalTrainerParameters()
     params.regularization = l2Regularization
-    trainer = LogLossSGDTrainer(outputCoordinates.Size(), loss, params)
+    trainer = LogLossSGDTrainer(dataDimension, loss, params)
 
     # TODO: create evaluator
     # evaluator = LinearLogLossClassificationEvaluator(loss)
@@ -57,8 +48,7 @@ def sgd():
     if not epochSize or epochSize >= numExamples:
         epochSize = numExamples
 
-    print "Running SGD over dataset of size {0} x {1}".format(numExamples, outputCoordinates.Size())
-    print "Output coordinates: {0}".format(outputCoordinates)
+    print "Running SGD over dataset of size {0} x {1}".format(numExamples, dataDimension)
     rng = GetRandomEngine(randomSeed)
 
     for epoch in xrange(numEpochs):
@@ -79,10 +69,13 @@ def sgd():
     
     # update the map with the newly learned layers
     predictor = trainer.GetPredictor()
-    predictor.AddToModel(model, map.GetOutputCoordinateList())
     
-    # output the map
-    model.Save(outMapFilename)
+    # output the model
+    # if outModelFilename:
+    #     model = Model()
+    #     inputNode = model.AddNode<model::InputNode<double>>(predictor.GetDimension())
+    #     model.AddNode<nodes::LinearPredictorNode>(inputNode.output, predictor)
+    #     SaveModel(model, outModelFilename)
     
 sgd()
 

@@ -18,12 +18,13 @@ set (SRC src/DenseDataVector.cpp
          src/SparseBinaryDataVector.cpp
          src/SparseDataVector.cpp
          src/SparseEntryParser.cpp
+         src/Example.cpp
          src/ZeroDataVector.cpp)
 
 set (INCLUDE include/DataVectorBuilder.h
              include/DenseDataVector.h
+             include/Example.h
              include/IDataVector.h
-             include/MappedParser.h
              include/OnesDataVector.h
              include/ParsingIterator.h
              include/RowDataset.h
@@ -31,18 +32,16 @@ set (INCLUDE include/DataVectorBuilder.h
              include/SparseBinaryDataVector.h
              include/SparseDataVector.h
              include/SparseEntryParser.h
-             include/SupervisedExample.h
              include/SupervisedExampleBuilder.h
              include/ZeroDataVector.h)
 
 set (TCC tcc/DataVectorBuilder.tcc
          tcc/DenseDataVector.tcc
-         tcc/MappedParser.tcc
+         tcc/Example.tcc
          tcc/ParsingIterator.tcc
          tcc/RowDataset.tcc
          tcc/SparseBinaryDataVector.tcc
          tcc/SparseDataVector.tcc
-         tcc/SupervisedExample.tcc
          tcc/SupervisedExampleBuilder.tcc)
 
 source_group("src" FILES ${SRC})
@@ -51,6 +50,9 @@ source_group("tcc" FILES ${TCC})
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include)
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+endif()
 target_link_libraries(${PROJ_NAME} linear utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")

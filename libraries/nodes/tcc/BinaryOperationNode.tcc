@@ -8,8 +8,102 @@
 
 namespace nodes
 {
+    namespace BinaryOperations
+    {
+        template <typename ValueType>
+        ValueType Add(ValueType a, ValueType b)
+        {
+            return a+b;
+        }
+
+        template <>
+        inline bool Add(bool a, bool b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <typename ValueType>
+        ValueType Subtract(ValueType a, ValueType b)
+        {
+            return a-b;
+        }
+
+        template <>
+        inline bool Subtract(bool a, bool b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <typename ValueType>
+        ValueType Multiply(ValueType a, ValueType b)
+        {
+            return a*b;
+        }
+
+        template <>
+        inline bool Multiply(bool a, bool b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <typename ValueType>
+        ValueType Divide(ValueType a, ValueType b)
+        {
+            return a/b;
+        }
+
+        template <>
+        inline bool Divide(bool a, bool b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        //
+        // Logical operations
+        // 
+        template <typename ValueType>
+        ValueType LogicalAnd(ValueType a, ValueType b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <>
+        inline bool LogicalAnd(bool a, bool b)
+        {
+            return a&&b;
+        }
+
+        template <typename ValueType>
+        ValueType LogicalOr(ValueType a, ValueType b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <>
+        inline bool LogicalOr(bool a, bool b)
+        {
+            return a || b;
+        }
+
+        template <typename ValueType>
+        ValueType LogicalXor(ValueType a, ValueType b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <>
+        inline bool LogicalXor(bool a, bool b)
+        {
+            return (!a) != (!b);
+        }
+    }
+
     template <typename ValueType>
-    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2, OperationType operation) : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
+    BinaryOperationNode<ValueType>::BinaryOperationNode() : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(OperationType::none)
+    {}
+
+    template <typename ValueType>
+    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, OperationType operation) : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
     {
         if (input1.Size() != input2.Size())
         {
@@ -20,12 +114,12 @@ namespace nodes
 
     template <typename ValueType>
     template <typename Operation>
-    std::vector<ValueType> BinaryOperationNode<ValueType>::ComputeOutput(Operation&& fn) const
+    std::vector<ValueType> BinaryOperationNode<ValueType>::ComputeOutput(Operation&& function) const
     {
         auto output = std::vector<ValueType>(_input1.Size());
         for (size_t index = 0; index < _input1.Size(); index++)
         {
-            output[index] = fn(_input1[index], _input2[index]);
+            output[index] = function(_input1[index], _input2[index]);
         }
         return output;
     }
@@ -37,16 +131,25 @@ namespace nodes
         switch (_operation)
         {
             case OperationType::add:
-                output = ComputeOutput([](ValueType x, ValueType y) { return x + y; });
+                output = ComputeOutput(BinaryOperations::Add<ValueType>);
                 break;
             case OperationType::subtract:
-                output = ComputeOutput([](ValueType x, ValueType y) { return x - y; });
+                output = ComputeOutput(BinaryOperations::Subtract<ValueType>);
                 break;
             case OperationType::coordinatewiseMultiply:
-                output = ComputeOutput([](ValueType x, ValueType y) { return x * y; });
+                output = ComputeOutput(BinaryOperations::Multiply<ValueType>);
                 break;
             case OperationType::divide:
-                output = ComputeOutput([](ValueType x, ValueType y) { return x / y; });
+                output = ComputeOutput(BinaryOperations::Divide<ValueType>);
+                break;
+            case OperationType::logicalAnd:
+                output = ComputeOutput(BinaryOperations::LogicalAnd<ValueType>);
+                break;
+            case OperationType::logicalOr:
+                output = ComputeOutput(BinaryOperations::LogicalOr<ValueType>);
+                break;
+            case OperationType::logicalXor:
+                output = ComputeOutput(BinaryOperations::LogicalXor<ValueType>);
                 break;
             default:
                 throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
@@ -57,9 +160,31 @@ namespace nodes
     template <typename ValueType>
     void BinaryOperationNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto OutputPortElements1 = transformer.TransformOutputPortElements(_input1.GetOutputPortElements());
-        auto OutputPortElements2 = transformer.TransformOutputPortElements(_input2.GetOutputPortElements());
-        auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(OutputPortElements1, OutputPortElements2, _operation);
-        transformer.MapOutputPort(output, newNode->output);
+        auto PortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
+        auto PortElements2 = transformer.TransformPortElements(_input2.GetPortElements());
+        auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(PortElements1, PortElements2, _operation);
+        transformer.MapNodeOutput(output, newNode->output);
     }
+
+    template <typename ValueType>
+    void BinaryOperationNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    {
+        Node::Serialize(serializer);
+        serializer.Serialize("operation", static_cast<int>(_operation));
+        serializer.Serialize("input1", _input1);
+        serializer.Serialize("input2", _input2);
+        serializer.Serialize("output", _output);
+    }
+
+    template <typename ValueType>
+    void BinaryOperationNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        Node::Deserialize(serializer, context);
+        int op = 0;
+        serializer.Deserialize("operation", op, context);
+        _operation = static_cast<OperationType>(op);
+        serializer.Deserialize("input1", _input1, context);
+        serializer.Deserialize("input2", _input2, context);
+        serializer.Deserialize("output", _output, context);
+   }
 }

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     BinaryOperationNode.h (features)
+//  File:     BinaryOperationNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Node.h"
-#include "ModelGraph.h"
+#include "Model.h"
 #include "ModelTransformer.h"
 
 // utilities
@@ -27,18 +27,36 @@ namespace nodes
     class BinaryOperationNode : public model::Node
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr const char* input1PortName = "input1";
+        static constexpr const char* input2PortName = "input2";
+        static constexpr const char* outputPortName = "output";
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
+
+        /// <summary> Types of coordinatewise operations supported by this node type. </summary>
         enum class OperationType
         {
+            none,
             add,
             subtract,
             coordinatewiseMultiply, // coordinatewise multiplication
-            divide // coordinatewise division
+            divide, // coordinatewise division
+            logicalAnd,
+            logicalOr,
+            logicalXor
         };
 
-        /// <summary> Constructor </summary>
-        /// <param name="input1"> The left-hand input of the arithmetic expression </param>
-        /// <param name="input2"> The right-hand input of the arithmetic expression </param>
-        BinaryOperationNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2, OperationType operation);
+        /// <summary> Default Constructor </summary>
+        BinaryOperationNode();
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
+        /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
+        /// <param name="operation"> The type of operation to perform. </param>
+        BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, OperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -50,24 +68,26 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<ValueType>& output = _output;
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
+        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
-
-        static constexpr char* input1PortName = "input1";
-        static constexpr char* input2PortName = "input2";
-        static constexpr char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;
 
     private:
         template <typename Operation>
-        std::vector<ValueType> ComputeOutput(Operation&& fn) const;
-
-        OperationType _operation;
+        std::vector<ValueType> ComputeOutput(Operation&& function) const;
 
         // Inputs
         model::InputPort<ValueType> _input1;
@@ -75,6 +95,9 @@ namespace nodes
 
         // Output
         model::OutputPort<ValueType> _output;
+
+        // Operation
+        OperationType _operation;
     };
 }
 

@@ -22,8 +22,8 @@ namespace common
     void ParsedDataLoadArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
-            inputDataFile,
-            "inputDataFile", 
+            inputDataFilename,
+            "inputDataFilename", 
             "idf",
             "Path to the input data file",
             "");
@@ -36,36 +36,36 @@ namespace common
             "");
     }
 
-    utilities::CommandLineParseResult ParsedDataLoadArguments::PostProcess(const utilities::CommandLineParser & parser)
+    utilities::CommandLineParseResult ParsedDataLoadArguments::PostProcess(const utilities::CommandLineParser& parser)
     {
         std::vector<std::string> parseErrorMessages;
-        
-        // inputDataFile
-        if(inputDataFile == "")
+
+        // inputDataFilename
+        if (inputDataFilename == "")
         {
-            parseErrorMessages.push_back("-inputDataFile (or -idf) is required");
+            parseErrorMessages.push_back("-inputDataFilename (or -idf) is required");
         }
         else
         {
-            if(!utilities::IsFileReadable(inputDataFile))
+            if (!utilities::IsFileReadable(inputDataFilename))
             {
-                parseErrorMessages.push_back("cannot read from specified input data file: " + inputDataFile);
+                parseErrorMessages.push_back("cannot read from specified input data file: " + inputDataFilename);
             }
         }
 
         // dataDimension
         const char* ptr = dataDimension.c_str();
-        if(dataDimension == "auto")
+        if (dataDimension == "auto")
         {
             auto dataIterator = GetDataIterator(*this);
-            while(dataIterator->IsValid())
+            while (dataIterator->IsValid())
             {
                 auto size = dataIterator->Get().GetDataVector().Size();
                 parsedDataDimension = std::max(parsedDataDimension, size);
                 dataIterator->Next();
             }
         }
-        else if(dataDimension != "")
+        else if (dataDimension != "")
         {
             utilities::Parse(ptr, parsedDataDimension);
         }

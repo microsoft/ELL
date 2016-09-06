@@ -10,6 +10,9 @@
 #include "InputPort.h"
 #include "ModelTransformer.h"
 
+// utilities
+#include "ISerializable.h"
+
 // stl
 #include <unordered_set>
 
@@ -50,15 +53,40 @@ namespace model
             {
                 node->AddDependent(this);
             }
-            for (const auto& range : input->GetInputRanges())
+            for (const auto& range : input->GetInputElements().GetRanges())
             {
                 range.ReferencedPort()->ReferencePort();
             }
         }
     }
 
-    void Node::Refine(ModelTransformer& transformer) const
+    void Node::InvokeCopy(ModelTransformer& transformer) const
     {
         Copy(transformer);
+    }
+
+    bool Node::InvokeRefine(ModelTransformer& transformer) const
+    {
+        return Refine(transformer);
+    }
+
+    // Default implementation of Refine just copies and returns false
+    bool Node::Refine(ModelTransformer& transformer) const
+    {
+        Copy(transformer);
+        return false;
+    }
+
+    void Node::Serialize(utilities::Serializer& serializer) const
+    {
+        serializer.Serialize("id", _id);
+    }
+
+    void Node::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
+        NodeId oldId;
+        serializer.Deserialize("id", oldId, context);
+        newContext.MapNode(oldId, this);
     }
 }

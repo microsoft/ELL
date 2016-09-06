@@ -17,12 +17,12 @@
 /// <summary> common namespace </summary>
 namespace common
 {
-    /// <summary> A struct that holds command line parameters for loading maps. </summary>
+    /// <summary> A struct that holds command line parameters for loading data. </summary>
     struct DataLoadArguments
     {
         /// <summary> The filename for the input data file. </summary>
-        std::string inputDataFile = "";
-        
+        std::string inputDataFilename = "";
+
         /// <summary> The number of elements in an input data vector. </summary>
         std::string dataDimension = "";
 

@@ -26,5 +26,4 @@ namespace common
         /// <param name="parser"> [in,out] The command line parser. </param>
         virtual void AddArgs(utilities::CommandLineParser& parser);
     };
-
 }

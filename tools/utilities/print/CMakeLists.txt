@@ -13,26 +13,12 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/LayerLayout.cpp
-         src/PrintableBinaryOperationLayer.cpp
-         src/PrintableCoordinatewise.cpp
-         src/PrintableLayer.cpp
-         src/PrintableModel.cpp
-         src/PrintableSum.cpp
-         src/PrintableUnaryOperationLayer.cpp
-         src/PrintArguments.cpp
-         src/main.cpp
-         src/SvgHelpers.cpp)
+set (SRC src/PrintArguments.cpp
+         src/PrintModel.cpp
+         src/main.cpp)
 
-set (INCLUDE include/LayerLayout.h
-             include/PrintableBinaryOperationLayer.h
-             include/PrintableCoordinatewise.h
-             include/PrintableLayer.h
-             include/PrintableModel.h
-             include/PrintableSum.h
-             include/PrintableUnaryOperationLayer.h
-             include/PrintArguments.h
-             include/SvgHelpers.h)
+set (INCLUDE include/PrintArguments.h
+             include/PrintModel.h)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -42,6 +28,6 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
 target_include_directories(${PROJ_NAME} PRIVATE include)
-target_link_libraries(${PROJ_NAME} utilities layers common)
+target_link_libraries(${PROJ_NAME} utilities model nodes common)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")

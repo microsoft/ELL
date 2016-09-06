@@ -13,36 +13,44 @@ namespace model
     // InputPortBase
     //
     template <typename ValueType>
-    InputPortBase::InputPortBase(const class Node* owningNode, const OutputPortElements<ValueType>& inputRef, const OutputPortElements<ValueType>& inputValues, std::string name) : Port(owningNode, name, Port::GetPortType<ValueType>(), inputValues.Size()), _inputRanges(inputRef)
+    InputPortBase::InputPortBase(const class Node* owningNode, const PortElements<ValueType>& inputs, std::string name) : Port(owningNode, name, Port::GetPortType<ValueType>()), _inputElements(inputs)
     {
-        assert(owningNode != nullptr);
-        for (const auto& range : inputValues)
+    }
+
+    inline void InputPortBase::ComputeParents()
+    {
+        for (const auto& range : _inputElements.GetRanges())
         {
             auto port = range.ReferencedPort();
             auto node = port->GetNode();
-            auto start = range.GetStartIndex();
-            auto numElements = range.Size();
-            for (size_t index = 0; index < numElements; ++index)
-            {
-                _individualElements.emplace_back(*port, index + start);
-            }
             _parentNodes.push_back(node);
         }
     }
 
+    //
+    // InputPort
+    //
     template <typename ValueType>
-    std::vector<ValueType> InputPortBase::GetTypedValue() const
+    InputPort<ValueType>::InputPort(const class Node* owningNode, const PortElements<ValueType>& input, std::string name) : InputPortBase(owningNode, _input, name), _input(input)
+    {
+        ComputeParents();
+    }
+
+    template <typename ValueType>
+    std::vector<ValueType> InputPort<ValueType>::GetValue() const
     {
         std::vector<ValueType> result;
-        result.reserve(Size());
-        for (const auto& element : _individualElements)
+        size_t size = Size();
+        result.reserve(size);
+        for(size_t index = 0; index < size; ++index)
         {
+            auto element = _input.GetElement(index);
             auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
             auto temp = typedOutput->GetOutput(element.GetIndex());
             result.push_back(temp);
         }
 
-        if(Size() != result.size())
+        if (Size() != result.size())
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
         }
@@ -50,36 +58,40 @@ namespace model
     }
 
     template <typename ValueType>
-    ValueType InputPortBase::GetTypedValue(size_t index) const
-    {
-        const auto& element = _individualElements[index];
-        auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
-        return typedOutput->GetOutput(element.GetIndex());
-    }
-
-    //
-    // InputPort
-    //
-    template <typename ValueType>
-    InputPort<ValueType>::InputPort(const class Node* owningNode, const OutputPortElements<ValueType>& input, std::string name) : InputPortBase(owningNode, _input, input, name), _input(input)
-    {
-    }
-
-    template <typename ValueType>
     ValueType InputPort<ValueType>::GetValue(size_t index) const
     {
-        return GetTypedValue<ValueType>(index);
+        const auto& element = _input.GetElement(index);
+        auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
+        return typedOutput->GetOutput(element.GetIndex());
     }
 
     template <typename ValueType>
     ValueType InputPort<ValueType>::operator[](size_t index) const
     {
-        return GetTypedValue<ValueType>(index);
+        const auto& element = _input.GetElement(index);
+        auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
+        return typedOutput->GetOutput(element.GetIndex());
     }
 
     template <typename ValueType>
-    OutputPortElements<ValueType> InputPort<ValueType>::GetOutputPortElements() const
+    PortElements<ValueType> InputPort<ValueType>::GetPortElements() const
     {
         return _input;
+    }
+
+    template <typename ValueType>
+    void InputPort<ValueType>::Serialize(utilities::Serializer& serializer) const
+    {
+        InputPortBase::Serialize(serializer);
+        serializer.Serialize("input", _input);
+    }
+
+    template <typename ValueType>
+    void InputPort<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        InputPortBase::Deserialize(serializer, context);
+        serializer.Deserialize("input", _input, context);
+
+        ComputeParents();
     }
 }
