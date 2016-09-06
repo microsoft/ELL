@@ -11,6 +11,9 @@
 #include "OutputPort.h"
 #include "UniqueId.h"
 
+// utilities
+#include "ISerializable.h"
+
 // stl
 #include <string>
 #include <memory>
@@ -24,7 +27,7 @@ namespace model
     class ModelTransformer;
 
     /// <summary> Superclass for all node types. </summary>
-    class Node
+    class Node : public utilities::ISerializable
     {
     public:
         Node() = default;
@@ -48,11 +51,6 @@ namespace model
         /// <returns> The output "ports" for this node </returns>
         const std::vector<OutputPortBase*>& GetOutputPorts() const { return _outputs; }
 
-        /// <summary> Gets the name of this type (for serialization). </summary>
-        ///
-        /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const = 0;
-
         /// <summary> Get all nodes that this nodes uses for input (and therefore depends on) </summary>
         ///
         /// <returns> a vector of all the nodes used for input </summary>
@@ -63,16 +61,32 @@ namespace model
         /// <returns> a vector of all the nodes that depend on this node </summary>
         const std::vector<const Node*>& GetDependentNodes() const { return _dependentNodes; }
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer. </summary>
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "Node"; }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        
+    protected:
+        Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
+
+        /// <summary> Makes a copy of this node in the model being constructed by the transformer. </summary>
         ///
         /// <param name="transformer"> [in,out] The transformer. </param>
         virtual void Copy(ModelTransformer& transformer) const = 0;
 
-        /// <summary> Refines this node in the graph being constructed by the transformer </summary>
-        virtual void Refine(ModelTransformer& transformer) const;
-
-    protected:
-        Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
+        /// <summary> Refines this node in the model being constructed by the transformer </summary>
+        virtual bool Refine(ModelTransformer& transformer) const;
 
         /// <summary> Computes the output of this node and stores it in the output ports </summary>
         virtual void Compute() const = 0;
@@ -83,6 +97,8 @@ namespace model
         friend class ModelTransformer;
         void AddDependent(const Node* dependent) const;
         void RegisterDependencies() const;
+        void InvokeCopy(ModelTransformer& transformer) const;
+        bool InvokeRefine(ModelTransformer& transformer) const;
 
         NodeId _id;
         std::vector<InputPortBase*> _inputs;

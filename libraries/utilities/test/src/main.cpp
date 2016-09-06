@@ -6,8 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "XMLSerialization_test.h"
 #include "Variant_test.h"
+#include "ISerializable_test.h"
+#include "TypeFactory_test.h"
 
 // utilities
 #include "IIterator.h"
@@ -203,19 +204,31 @@ void testMatchFormat()
 ///
 int main()
 {
-    // misc tests
-    testIteratorAdapter();
-    testTransformIterator();
-    testParallelTransformIterator();
-    testMatchFormat();
-    
+    try
+    {
+        // misc tests
+        testIteratorAdapter();
+        testTransformIterator();
+        testParallelTransformIterator();
+        testMatchFormat();
 
-    // XMLSerialization tests
-    XMLSerializationTest();
-    TypeFactoryTest();
+        // XMLSerialization tests
+        TypeFactoryTest();
 
-    // Variant tests
-    TestVariant();
+        // Variant tests
+        TestVariant();
+
+        TestJsonSerializer();
+        TestJsonDeserializer();
+
+        TestXmlSerializer();
+        TestXmlDeserializer();
+    }
+    catch(const utilities::Exception& exception)
+    {
+        std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
+        throw;
+    }
 
     if (testing::DidTestFail())
     {

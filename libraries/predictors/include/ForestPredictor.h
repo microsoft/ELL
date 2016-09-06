@@ -8,11 +8,15 @@
 
 #pragma once
 
-#include "SingleElementThresholdRule.h"
+#include "IPredictor.h"
+#include "SingleElementThresholdPredictor.h"
 #include "ConstantPredictor.h"
 
 // dataset
 #include "DenseDataVector.h"
+
+// utilities
+#include "ISerializable.h"
 
 // stl
 #include <vector>
@@ -36,7 +40,7 @@ namespace predictors
     /// <typeparam name="SplitRuleType"> Type of split rule to use in interior nodes. </typeparam>
     /// <typeparam name="EdgePredictorType"> Type of predictor to associate with each edge. </typeparam>
     template<typename SplitRuleType, typename EdgePredictorType>
-    class ForestPredictor
+    class ForestPredictor : public IPredictor<double>, public utilities::ISerializable
     {
     public:
         /// <summary> A struct that identifies a splittable node in the forest. The splittable node can be
@@ -89,9 +93,11 @@ namespace predictors
             std::vector<EdgePredictorType> _edgePredictors;
         };
 
-        class Edge
+        class Edge : public utilities::ISerializable
         {
-        public:
+        public:            
+            Edge() = default;
+
             /// <summary> Constructs an instance of Edge. </summary>
             ///
             /// <param name="predictor"> The predictor. </param>
@@ -112,6 +118,27 @@ namespace predictors
             /// <returns> true if the target is an interior node. </returns>
             bool IsTargetInterior() const;
 
+            /// <summary> Gets the name of this type (for serialization). </summary>
+            ///
+            /// <returns> The name of this type. </returns>
+            static std::string GetTypeName() { return "Edge"; }
+
+            /// <summary> Gets the name of this type (for serialization). </summary>
+            ///
+            /// <returns> The name of this type. </returns>
+            virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+            /// <summary> Writes to a Serializer. </summary>
+            ///
+            /// <param name="serializer"> The serializer. </param>
+            virtual void Serialize(utilities::Serializer& serializer) const override;
+
+            /// <summary> Reads from a Deserializer. </summary>
+            ///
+            /// <param name="deserializer"> The deserializer. </param>
+            /// <param name="context"> The serialization context. </param>
+            virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
             /// <summary> Prints a human readable description of the edge, indented by a given number of tabs - used for debugging. </summary>
             ///
             /// <param name="os"> [in,out] Stream to write data to. </param>
@@ -122,13 +149,15 @@ namespace predictors
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
             void SetTargetNodeIndex(size_t targetNodeIndex);
             EdgePredictorType _predictor;
-            size_t _targetNodeIndex;
+            size_t _targetNodeIndex = 0;
         };
 
         /// <summary> Represents an interior node of one of the trees in the forest. </summary>
-        class InteriorNode
+        class InteriorNode : public utilities::ISerializable
         {
         public:
+            InteriorNode() = default;
+            
             /// <summary> Gets the split rule. </summary>
             ///
             /// <returns> The split rule. </returns>
@@ -150,12 +179,33 @@ namespace predictors
             /// <param name="tabs"> The number of tabs. </param>
             void PrintLine(std::ostream& os, size_t tabs=0) const;
 
+            /// <summary> Gets the name of this type (for serialization). </summary>
+            ///
+            /// <returns> The name of this type. </returns>
+            static std::string GetTypeName() { return "InteriorNode"; }
+
+            /// <summary> Gets the name of this type (for serialization). </summary>
+            ///
+            /// <returns> The name of this type. </returns>
+            virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+            /// <summary> Writes to a Serializer. </summary>
+            ///
+            /// <param name="serializer"> The serializer. </param>
+            virtual void Serialize(utilities::Serializer& serializer) const override;
+
+            /// <summary> Reads from a Deserializer. </summary>
+            ///
+            /// <param name="deserializer"> The deserializer. </param>
+            /// <param name="context"> The serialization context. </param>
+            virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
             InteriorNode(const SplitAction& splitAction, size_t _firstEdgeIndex);
             SplitRuleType _splitRule;
             std::vector<Edge> _outgoingEdges;
-            size_t _firstEdgeIndex;
+            size_t _firstEdgeIndex = 0;
         };
 
         /// <summary> Query if this forest has no trees and a zero bias. </summary>
@@ -290,6 +340,27 @@ namespace predictors
         /// <param name="tabs"> The number of tabs. </param>
         void PrintLine(std::ostream& os, size_t tabs=0) const;
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<SplitRuleType, EdgePredictorType>("ForestPredictor"); }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
     protected:
         //
         // protected member functions
@@ -312,7 +383,7 @@ namespace predictors
     };
 
     /// <summary> A simple binary tree with single-input threshold rules and constant predictors in its edges. </summary>
-    typedef ForestPredictor<SingleElementThresholdRule, ConstantPredictor> SimpleForestPredictor;
+    typedef ForestPredictor<SingleElementThresholdPredictor, ConstantPredictor> SimpleForestPredictor;
 }
 
 #include "../tcc/ForestPredictor.tcc"

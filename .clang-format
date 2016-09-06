@@ -1,3 +1,4 @@
+---
 # clang-format documentation
 # http://clang.llvm.org/docs/ClangFormat.html
 # http://clang.llvm.org/docs/ClangFormatStyleOptions.html
@@ -12,16 +13,21 @@
 Language:        Cpp
 BasedOnStyle:  Mozilla
 
+AlignAfterOpenBracket: Align
+AlignTrailingComments: false
+AllowShortBlocksOnASingleLine: false
+#AllowShortFunctionsOnASingleLine: Inline
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 AccessModifierOffset: -4
 IndentWidth: 4
-BinPackArguments: true
+BinPackArguments: false
 BinPackParameters: true
 ContinuationIndentWidth: 4
 ConstructorInitializerIndentWidth: 4
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ColumnLimit: 2000
+MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
 BreakBeforeBraces: Custom
 BraceWrapping:
@@ -36,5 +42,10 @@ BraceWrapping:
   BeforeCatch:     true
   BeforeElse:      true
   IndentBraces:    false
-
+ReflowComments: false
+PenaltyBreakBeforeFirstCallParameter: 100000
+PenaltyBreakComment: 100000
+# Standard: Cpp11
 SortIncludes: false
+UseTab: Never
+...

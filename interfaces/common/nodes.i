@@ -24,8 +24,6 @@
 %ignore nodes::LinearPredictorSubModelOutputs;
 %ignore nodes::BuildSubModel;
 
-%rename (ModelGraph) model::Model;
-
 %include "AccumulatorNode.h"
 %include "BinaryOperationNode.h"
 %include "ConstantNode.h"

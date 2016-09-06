@@ -5,7 +5,7 @@
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
+ 
 %module "EMLL"
 
 // Common stuff
@@ -32,7 +32,7 @@
 %include typemaps.i
 %include "std_string.i"
 %include "std_vector.i"
-#endif
+#endif 
 
 #if !defined(SWIGJAVASCRIPT) && !defined(SWIGXML)
 %include "std_shared_ptr.i"
@@ -64,17 +64,24 @@ namespace std
 %template (StringVector) std::vector<std::string>;
 #endif
 
+%{
+#include "Exception.h"
+%}
+
 // Add some primitive exception handling
 %exception {
     try { 
         $action 
     }
-    catch(std::runtime_error err) {
+    catch(const utilities::Exception& err) {
+        std::string errorMessage = std::string("Got exception in EMLL library: ") + err.GetMessage();
+        SWIG_exception(SWIG_RuntimeError, errorMessage.c_str());
+    }    
+    catch(const std::runtime_error& err) {
         SWIG_exception(SWIG_RuntimeError, const_cast<char*>(err.what()));        
     }    
-    // TODO: catch EMLL-specific exceptions and rethrow them
     catch (...) {
-        SWIG_exception(SWIG_RuntimeError, "LogicException in EMLL library");
+        SWIG_exception(SWIG_RuntimeError, "Unknown exception in EMLL library");
     }
 }
 
@@ -90,9 +97,12 @@ namespace lossFunctions {};
 namespace predictors {};
 namespace dataset {};
 
+// import some types early so SWIG puts them in the correct namespace or something
 %ignore dataset::RowDataset::operator[];
 %import "RowDataset.h"
 %import "IDataVector.h"
+%import "Variant.h"
+%import "ISerializable.h"
 
 #ifndef SWIGXML
 %template () std::vector<dataset::IDataVector>;
@@ -103,13 +113,13 @@ namespace dataset
     class GenericRowIterator {}; // This is necessary to prevent memory leak of datasets::GenericRowIterator
 }
 
-typedef dataset::RowDataset<IDataVector> dataset::GenericRowDataset;
+typedef dataset::RowDataset<dataset::GenericSupervisedExample> dataset::GenericRowDataset;
 typedef dataset::GenericRowDataset::Iterator dataset::GenericRowIterator;
 
 namespace utilities
 {
-    template <typename ValueType>
-    class IIterator {}; 
+//    template <typename ValueType>
+//    class IIterator {}; 
     
     template <typename IteratorType, typename ValueType> class StlIterator {};
     %template () StlIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
@@ -118,17 +128,14 @@ namespace utilities
     %template () StlIndexValueIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
 }
 
-%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>,std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
-typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>> dataset::GenericRowIterator;
+%template () utilities::StlIterator<typename std::vector<dataset::GenericSupervisedExample,std::allocator<dataset::GenericSupervisedExample>>::const_iterator, dataset::GenericSupervisedExample>;
+typedef utilities::StlIterator<typename std::vector<dataset::GenericSupervisedExample>::const_iterator, dataset::GenericSupervisedExample> dataset::GenericRowIterator;
 
 // Interface includes for lossFunctions library
 %include lossFunctions.i
 
 // Interface includes for linear library
 %include linear.i
-
-// Interface includes for layers library
-%include layers.i
 
 // Interface includes for dataset library
 %include dataset.i
@@ -153,26 +160,19 @@ typedef utilities::StlIterator<typename std::vector<dataset::SupervisedExample<d
 // Interface for model library
 %include nodes.i
 
-wrap_unique_ptr(LayerPtr, layers::Layer)
 
 #ifndef SWIGXML
-%template () std::vector<dataset::SupervisedExample<dataset::IDataVector>>;
-%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
-%template () utilities::StlIterator<typename std::vector<dataset::SupervisedExample<dataset::IDataVector>, std::allocator<dataset::SupervisedExample<dataset::IDataVector>>>::const_iterator, dataset::SupervisedExample<dataset::IDataVector>>;
+%template () std::vector<dataset::GenericSupervisedExample>;
+%template () utilities::StlIterator<typename std::vector<dataset::GenericSupervisedExample>::const_iterator, dataset::GenericSupervisedExample>;
+%template () utilities::StlIterator<typename std::vector<dataset::GenericSupervisedExample, std::allocator<dataset::GenericSupervisedExample>>::const_iterator, dataset::GenericSupervisedExample>;
 
-%template () dataset::RowDataset<dataset::IDataVector>;
 %template () trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
 #endif
 
 typedef trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType predictors::LinearPredictor;
 class trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::PredictorType {};
 
-// Interface for features library
-%include features.i
-
 #if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
 // TODO: Review rules on when to apply the %shared_ptr() directive and get rid of these altogether if they're not in the right place 
-%shared_ptr(layers::Map)
-%shared_ptr(layers::Model)
 %shared_ptr(RowDataset)
 #endif

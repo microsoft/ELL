@@ -21,19 +21,19 @@
 void hingeLossTest()
 {
     lossFunctions::HingeLoss hingeLoss;
-    testing::ProcessTest("Testing lossFunctions::HingeLoss::Evaluate(2,1)", testing::IsEqual(hingeLoss.Evaluate(2, 1), 0));
-    testing::ProcessTest("Testing lossFunctions::HingeLoss::Evaluate(-2,-1)", testing::IsEqual(hingeLoss.Evaluate(-2, -1), 0));
-    testing::ProcessTest("Testing lossFunctions::HingeLoss::Evaluate(2,-1)", testing::IsEqual(hingeLoss.Evaluate(2, -1), 3));
-    testing::ProcessTest("Testing lossFunctions::HingeLoss::Evaluate(-2,1)", testing::IsEqual(hingeLoss.Evaluate(-2, 1), 3));
-    testing::ProcessTest("Testing lossFunctions::HingeLoss::Evaluate(0,1)", testing::IsEqual(hingeLoss.Evaluate(0, 1), 1));
-    testing::ProcessTest("Testing lossFunctions::HingeLoss::Evaluate(0,-1)", testing::IsEqual(hingeLoss.Evaluate(0, -1), 1));
+    testing::ProcessTest("Testing lossFunctions::HingeLoss::Evaluate(2,1)", testing::IsEqual(hingeLoss.Evaluate(2, 1), 0.0));
+    testing::ProcessTest("Testing lossFunctions::HingeLoss::Evaluate(-2,-1)", testing::IsEqual(hingeLoss.Evaluate(-2, -1), 0.0));
+    testing::ProcessTest("Testing lossFunctions::HingeLoss::Evaluate(2,-1)", testing::IsEqual(hingeLoss.Evaluate(2, -1), 3.0));
+    testing::ProcessTest("Testing lossFunctions::HingeLoss::Evaluate(-2,1)", testing::IsEqual(hingeLoss.Evaluate(-2, 1), 3.0));
+    testing::ProcessTest("Testing lossFunctions::HingeLoss::Evaluate(0,1)", testing::IsEqual(hingeLoss.Evaluate(0, 1), 1.0));
+    testing::ProcessTest("Testing lossFunctions::HingeLoss::Evaluate(0,-1)", testing::IsEqual(hingeLoss.Evaluate(0, -1), 1.0));
 
-    testing::ProcessTest("Testing lossFunctions::HingeLoss::GetDerivative(2,1)", testing::IsEqual(hingeLoss.GetDerivative(2, 1), 0));
-    testing::ProcessTest("Testing lossFunctions::HingeLoss::GetDerivative(-2,-1)", testing::IsEqual(hingeLoss.GetDerivative(-2, -1), 0));
-    testing::ProcessTest("Testing lossFunctions::HingeLoss::GetDerivative(2,-1)", testing::IsEqual(hingeLoss.GetDerivative(2, -1), 1));
-    testing::ProcessTest("Testing lossFunctions::HingeLoss::GetDerivative(-2,1)", testing::IsEqual(hingeLoss.GetDerivative(-2, 1), -1));
-    testing::ProcessTest("Testing lossFunctions::HingeLoss::GetDerivative(0,1)", testing::IsEqual(hingeLoss.GetDerivative(0, 1), -1));
-    testing::ProcessTest("Testing lossFunctions::HingeLoss::GetDerivative(0,-1)", testing::IsEqual(hingeLoss.GetDerivative(0, -1), 1));
+    testing::ProcessTest("Testing lossFunctions::HingeLoss::GetDerivative(2,1)", testing::IsEqual(hingeLoss.GetDerivative(2, 1), 0.0));
+    testing::ProcessTest("Testing lossFunctions::HingeLoss::GetDerivative(-2,-1)", testing::IsEqual(hingeLoss.GetDerivative(-2, -1), 0.0));
+    testing::ProcessTest("Testing lossFunctions::HingeLoss::GetDerivative(2,-1)", testing::IsEqual(hingeLoss.GetDerivative(2, -1), 1.0));
+    testing::ProcessTest("Testing lossFunctions::HingeLoss::GetDerivative(-2,1)", testing::IsEqual(hingeLoss.GetDerivative(-2, 1), -1.0));
+    testing::ProcessTest("Testing lossFunctions::HingeLoss::GetDerivative(0,1)", testing::IsEqual(hingeLoss.GetDerivative(0, 1), -1.0));
+    testing::ProcessTest("Testing lossFunctions::HingeLoss::GetDerivative(0,-1)", testing::IsEqual(hingeLoss.GetDerivative(0, -1), 1.0));
 }
 
 void logLossTest()
@@ -57,13 +57,13 @@ void logLossTest()
 void squaredLossTest()
 {
     lossFunctions::SquaredLoss squaredLoss;
-    testing::ProcessTest("Testing lossFunctions::SquaredLoss::Evaluate(4,4)", testing::IsEqual(squaredLoss.Evaluate(4, 4), 0));
-    testing::ProcessTest("Testing lossFunctions::SquaredLoss::Evaluate(4,2)", testing::IsEqual(squaredLoss.Evaluate(4, 2), 2));
-    testing::ProcessTest("Testing lossFunctions::SquaredLoss::Evaluate(2,4)", testing::IsEqual(squaredLoss.Evaluate(2, 4), 2));
+    testing::ProcessTest("Testing lossFunctions::SquaredLoss::Evaluate(4,4)", testing::IsEqual(squaredLoss.Evaluate(4, 4), 0.0));
+    testing::ProcessTest("Testing lossFunctions::SquaredLoss::Evaluate(4,2)", testing::IsEqual(squaredLoss.Evaluate(4, 2), 2.0));
+    testing::ProcessTest("Testing lossFunctions::SquaredLoss::Evaluate(2,4)", testing::IsEqual(squaredLoss.Evaluate(2, 4), 2.0));
 
-    testing::ProcessTest("Testing lossFunctions::SquaredLoss::GetDerivative(4,4)", testing::IsEqual(squaredLoss.GetDerivative(4, 4), 0));
-    testing::ProcessTest("Testing lossFunctions::SquaredLoss::GetDerivative(4,2)", testing::IsEqual(squaredLoss.GetDerivative(4, 2), 2));
-    testing::ProcessTest("Testing lossFunctions::SquaredLoss::GetDerivative(2,4)", testing::IsEqual(squaredLoss.GetDerivative(2, 4), -2));
+    testing::ProcessTest("Testing lossFunctions::SquaredLoss::GetDerivative(4,4)", testing::IsEqual(squaredLoss.GetDerivative(4, 4), 0.0));
+    testing::ProcessTest("Testing lossFunctions::SquaredLoss::GetDerivative(4,2)", testing::IsEqual(squaredLoss.GetDerivative(4, 2), 2.0));
+    testing::ProcessTest("Testing lossFunctions::SquaredLoss::GetDerivative(2,4)", testing::IsEqual(squaredLoss.GetDerivative(2, 4), -2.0));
 }
 
 /// Runs all tests

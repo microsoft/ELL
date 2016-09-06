@@ -13,24 +13,19 @@
 #include "RandomEngines.h"
 #include "Exception.h"
 
-// layers
-#include "Map.h"
-#include "Coordinate.h"
-#include "CoordinateListTools.h"
-
 // dataset
-#include "SupervisedExample.h"
+#include "Example.h"
 
 // common
 #include "SGDIncrementalTrainerArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
-#include "MapLoadArguments.h" 
-#include "MapSaveArguments.h" 
 #include "DataLoadArguments.h" 
+#include "ModelLoadArguments.h"
+#include "ModelSaveArguments.h"
 #include "EvaluatorArguments.h"
-#include "DataLoaders.h"
 #include "LoadModel.h"
+#include "DataLoaders.h"
 #include "MakeTrainer.h"
 #include "MakeEvaluator.h"
 
@@ -48,6 +43,13 @@
 #include "HingeLoss.h"
 #include "LogLoss.h"
 
+// model
+#include "Model.h"
+#include "InputNode.h"
+
+// nodes
+#include "LinearPredictorNode.h"
+
 // stl
 #include <iostream>
 #include <stdexcept>
@@ -63,17 +65,15 @@ int main(int argc, char* argv[])
 
         // add arguments to the command line parser
         common::ParsedTrainerArguments trainerArguments;
-        common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
-        common::ParsedMapSaveArguments mapSaveArguments;
+        common::ParsedModelSaveArguments modelSaveArguments;
         common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
         common::ParsedEvaluatorArguments evaluatorArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
-        commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
-        commandLineParser.AddOptionSet(mapSaveArguments);
+        commandLineParser.AddOptionSet(modelSaveArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
         commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
         commandLineParser.AddOptionSet(evaluatorArguments);
@@ -87,25 +87,16 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
-        // if output file specified, replace stdout with it 
-        utilities::OutputStreamImpostor outStream(mapSaveArguments.outputModelFilename);
-
-        // load a model
-        auto model = common::LoadModel(mapLoadArguments.modelLoadArguments);
-
-        // get output coordinate list and create the map
-        auto outputCoordinateList = layers::BuildCoordinateList(model, dataLoadArguments.parsedDataDimension, mapLoadArguments.coordinateListString);
-        layers::Map map(model, outputCoordinateList);
-
         // load dataset
         if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto rowDataset = common::GetRowDataset(dataLoadArguments, map);
+        auto rowDataset = common::GetRowDataset(dataLoadArguments);
+        size_t numColumns = dataLoadArguments.parsedDataDimension;
 
         // predictor type
         using PredictorType = predictors::LinearPredictor;
 
         // create sgd trainer
-        auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(outputCoordinateList.Size(), trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
+        auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(numColumns, trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
 
         // in verbose mode, create evaluator
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
@@ -134,11 +125,15 @@ int main(int argc, char* argv[])
             std::cout << std::endl;
         }
 
-        // add predictor to the model
-        predictor->AddToModel(model, outputCoordinateList);
-
-        // save the model
-        model.Save(outStream);
+        // save predictor model
+        if(modelSaveArguments.outputModelFilename != "")
+        {
+            // Create a model
+            model::Model model;
+            auto inputNode = model.AddNode<model::InputNode<double>>(predictor->GetDimension());            
+            model.AddNode<nodes::LinearPredictorNode>(inputNode->output, *predictor);
+            common::SaveModel(model, modelSaveArguments.outputModelFilename);
+        }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

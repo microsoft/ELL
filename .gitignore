@@ -229,6 +229,8 @@ ModelManifest.xml
 .vscode/
 browse.VC.db
 
+# CMake / CTest stuff
+/Testing/
 # EMLL External Dependencies
 external/llvm/include/
 external/llvm/lib/

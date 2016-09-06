@@ -7,25 +7,18 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 %{
-#define SWIG_FILE_WITH_INIT
 #include "DataLoadArguments.h"
-#include "ModelLoadArguments.h"
-#include "MapLoadArguments.h"
 #include "DataLoadersInterface.h"
-#include "LoadModelInterface.h"
-#include "LoadModelGraph.h"
+#include "LoadModel.h"
 %}
 
 %ignore common::GetDataset;
 
 %include "DataLoadArguments.h"
-%include "ModelLoadArguments.h"
-%include "MapLoadArguments.h"
-%include "LoadModelGraph.h"
+%include "LoadModel.h"
 
 // Modified versions of interfaces
 %include "DataLoadersInterface.h"
-%include "LoadModelInterface.h" 
 
 #if defined(SWIGJAVASCRIPT)
 %include "loadModelAsync.i"

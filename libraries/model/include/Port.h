@@ -10,6 +10,7 @@
 
 // utilities
 #include "UniqueId.h"
+#include "ISerializable.h"
 
 // stl
 #include <vector>
@@ -22,18 +23,18 @@ namespace model
     class Node;
 
     /// <summary> Port is the common base class for InputPort and OutputPort. </summary>
-    class Port
+    class Port: public utilities::ISerializable
     {
     public:
         virtual ~Port() = default;
 
         enum class PortType
         {
-            None,
-            Real,
-            Integer,
-            Categorical,
-            Boolean
+            none,
+            real,
+            integer,
+            categorical,
+            boolean
         };
 
         /// <summary> Returns the node the output port connected to this port belongs to </summary>
@@ -49,7 +50,7 @@ namespace model
         /// <summary> Returns the dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
-        size_t Size() const { return _size; } // dimension
+        virtual size_t Size() const = 0;
 
         /// <summary> Returns the name of this port </summary>
         ///
@@ -63,14 +64,35 @@ namespace model
         template <typename ValueType>
         static PortType GetPortType();
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "Port"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        
     protected:
-        Port(const class Node* node, std::string name, PortType type, size_t size) : _node(node), _name(name), _type(type), _size(size) {}
+        Port(const class Node* node, std::string name, PortType type) : _node(node), _name(name), _type(type) {}
+        Port(const Port& other) = delete;
 
     private:
         // _node keeps info on where the input is coming from
         const class Node* _node = nullptr;
         std::string _name;
-        PortType _type = PortType::None;
-        size_t _size = 0;
+        PortType _type = PortType::none;
     };
 }

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     AccumulatorNode.h (features)
+//  File:     AccumulatorNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Node.h"
-#include "ModelGraph.h"
+#include "Model.h"
 #include "ModelTransformer.h"
 
 // utilities
@@ -22,7 +22,7 @@
 
 namespace nodes
 {
-    /// <summary> A feature that accumulates its input </summary>
+    /// <summary> A node that accumulates its input </summary>
     template <typename ValueType>
     class AccumulatorNode : public model::Node
     {
@@ -34,10 +34,13 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
+        /// <summary> Default Constructor </summary>
+        AccumulatorNode();
+
         /// <summary> Constructor </summary>
         /// <param name="input"> The signal to accumulate </param>
-        AccumulatorNode(const model::OutputPortElements<ValueType>& input);
-        
+        AccumulatorNode(const model::PortElements<ValueType>& input);
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -48,7 +51,18 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
+
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
+        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
     protected:

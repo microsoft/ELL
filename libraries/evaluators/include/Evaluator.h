@@ -9,8 +9,7 @@
 #pragma once
 
 // dataset
-#include "RowDataset.h"
-#include "SupervisedExample.h"
+#include "RowDataset.h" 
 
 // stl
 #include <memory>

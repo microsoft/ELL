@@ -63,7 +63,7 @@ add_subdirectory(private)
 # Add SWIG-generated interfaces
 
 if(SWIG_ENABLED)
-  find_package(SWIG)
+  find_package(SWIG 3.0)
   if(SWIG_FOUND)
     add_subdirectory(interfaces)
 

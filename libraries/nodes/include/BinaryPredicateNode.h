@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     BinaryPredicateNode.h (features)
+//  File:     BinaryPredicateNode.h (nodes)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Node.h"
-#include "ModelGraph.h"
+#include "Model.h"
 #include "ModelTransformer.h"
 
 // utilities
@@ -38,17 +38,24 @@ namespace nodes
         /// <summary> Types of coordinatewise operations supported by this node type. </summary>
         enum class PredicateType
         {
+            none,
             equal,
             less,
-            greater
+            greater,
+            notEqual,
+            lessOrEqual,
+            greaterOrEqual
         };
+
+        /// <summary> Default Constructor </summary>
+        BinaryPredicateNode();
 
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
         /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
         /// <param name="predicate"> The type of predicate to apply. </param>
-        BinaryPredicateNode(const model::OutputPortElements<ValueType>& input1, const model::OutputPortElements<ValueType>& input2, PredicateType predicate);
+        BinaryPredicateNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, PredicateType predicate);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -60,10 +67,19 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the graph being constructed by the transformer </summary>
-        virtual void Copy(model::ModelTransformer& transformer) const override;
+        /// <summary> Writes to a Serializer. </summary>
+        ///
+        /// <param name="serializer"> The serializer. </param>
+        virtual void Serialize(utilities::Serializer& serializer) const override;
 
-		PredicateType GetPredicateType() const { return _predicate; }
+        /// <summary> Reads from a Deserializer. </summary>
+        ///
+        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+
+        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
+        virtual void Copy(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "SupervisedExample.h"
+#include "Example.h"
 
 // utilities
 #include "IIterator.h"

@@ -2,24 +2,21 @@
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     main.cpp (compile)
-//  Authors:  Ofer Dekel
+//  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "CompilableMap.h"
-#include "CompileArguments.h"
 
 // utilities
 #include "CommandLineParser.h" 
 #include "OutputStreamImpostor.h"
 #include "Exception.h"
 
-// layers
-#include "Map.h"
-#include "CoordinateListTools.h"
+// model
+#include "Model.h"
+#include "ModelTransformer.h"
+#include "InputNode.h"
 
 // common
-#include "MapLoadArguments.h"
 #include "LoadModel.h"
 
 // stl
@@ -31,34 +28,24 @@ int main(int argc, char* argv[])
 {
     try
     {
+        std::string filename = "";
+
         // create a command line parser
         utilities::CommandLineParser commandLineParser(argc, argv);
-
-        // add arguments to the command line parser
-        common::ParsedMapLoadArguments mapLoadArguments;
-        ParsedCompileArguments compileArguments;
-
-        commandLineParser.AddOptionSet(mapLoadArguments);
-        commandLineParser.AddOptionSet(compileArguments); 
+        commandLineParser.AddOption(filename, "filename", "f", "Name of model file", "");
 
         // parse command line
         commandLineParser.Parse();
 
-        // if output file specified, replace stdout with it 
-        auto& outStream = compileArguments.outputCodeStream;
+        auto model = common::LoadModel(filename);
+        model::TransformContext context;
+        model::ModelTransformer transformer;
+        auto newModel = transformer.RefineModel(model, context);
+        // TODO: need to get the output port we care about somehow
 
-        // load the model, coordinates, and map
-        auto model = common::LoadModel(mapLoadArguments.modelLoadArguments);
-        auto mapOutputCoordinates = layers::BuildCoordinateList(model, 0, mapLoadArguments.coordinateListString);
-
-        // load the map
-        layers::Map map(model, mapOutputCoordinates);
-
-        // convert map to compilable map
-        CompilableMap compilableMap(map);
-
-        // output the code
-        compilableMap.ToCode(outStream);
+        auto inputNodes = newModel.GetNodesByType<model::InputNode<double>>();
+        // auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
+        // auto newOutputPort = transformer.GetCorrespondingOutputPort(meanNode->output);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

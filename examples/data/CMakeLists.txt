@@ -2,7 +2,7 @@
 # SWIG example projects
 #
 
-set (DATA_FILES testData.txt)
+set (DATA_FILES model_1.json model_1.xml tree_3.json tree_3.xml)
 add_custom_target(datafiles ALL DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
 
 

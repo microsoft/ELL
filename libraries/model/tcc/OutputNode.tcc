@@ -10,7 +10,11 @@
 namespace model
 {
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::OutputPortElements<ValueType>& input) : Node({&_input}, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size())
+    OutputNode<ValueType>::OutputNode() : Node({&_input}, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
+    {};
+
+    template <typename ValueType>
+    OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input) : Node({&_input}, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size())
     {};
 
     template <typename ValueType>
@@ -22,8 +26,24 @@ namespace model
     template <typename ValueType>
     void OutputNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newOutputPortElements = transformer.TransformOutputPortElements(_input.GetOutputPortElements());
-        auto newNode = transformer.AddNode<OutputNode<ValueType>>(newOutputPortElements);
-        transformer.MapOutputPort(output, newNode->output);
+        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        auto newNode = transformer.AddNode<OutputNode<ValueType>>(newPortElements);
+        transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    template <typename ValueType>
+    void OutputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    {
+        Node::Serialize(serializer);
+        serializer.Serialize("input", _input);
+        serializer.Serialize("output", _output);
+    }
+
+    template <typename ValueType>
+    void OutputNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    {
+        Node::Deserialize(serializer, context);
+        serializer.Deserialize("input", _input, context);
+        serializer.Deserialize("output", _output, context);
     }
 }

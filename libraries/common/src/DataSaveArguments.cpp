@@ -29,7 +29,7 @@ namespace common
         {
             outputDataStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
         }
-        else if(outputDataFilename == "cout")
+        else if(outputDataFilename == "")
         {
             outputDataStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
         }

@@ -10,58 +10,95 @@
 namespace model
 {
     template <typename ValueType>
-    OutputPortElements<ValueType> ModelTransformer::TransformOutputPortElements(const OutputPortElements<ValueType>& elements)
+    PortElements<ValueType> ModelTransformer::TransformPortElements(const PortElements<ValueType>& elements)
     {
-        std::vector<OutputPortElements<ValueType>> newRanges;
-        for (const auto& range : elements)
+        // TODO: verify elements in `elements` param are from input model, and result elements are from output model
+        auto size = elements.Size();
+        PortElements<ValueType> result;
+        result.Reserve(size);
+        for (size_t index = 0; index < size; ++index)
         {
-            auto oldPort = range.ReferencedPort();
-            assert(_portToPortMap.find(oldPort) != _portToPortMap.end());
-            if(_portToPortMap.find(oldPort) == _portToPortMap.end())
+            auto oldElement = elements.GetElement(index);
+            assert(_elementToElementMap.find(oldElement) != _elementToElementMap.end());
+            if (_elementToElementMap.find(oldElement) == _elementToElementMap.end())
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element in new model.");
             }
-            auto newPort = _portToPortMap[oldPort];
-            auto outputPort = dynamic_cast<const OutputPort<ValueType>*>(newPort);
-            assert(outputPort != nullptr);
-
-            auto start = range.GetStartIndex();
-            auto size = range.Size();
-            newRanges.emplace_back(*outputPort, start, size);
+            auto newElement = _elementToElementMap[oldElement];
+            auto newPort = static_cast<const OutputPort<ValueType>*>(newElement.ReferencedPort());
+            result.Append({ *newPort, newElement.GetIndex() });
         }
-        return OutputPortElements<ValueType>(newRanges);
+        // result.Consolidate();
+        return result;
     }
 
     template <typename ValueType>
-    const OutputPort<ValueType>* ModelTransformer::GetCorrespondingOutputPort(const OutputPort<ValueType>& port)
+    PortElements<ValueType> ModelTransformer::GetCorrespondingOutputs(const OutputPort<ValueType>& port)
     {
-        auto correspondingPort = GetCorrespondingPort(port);
-        auto result = dynamic_cast<const model::OutputPort<ValueType>*>(correspondingPort);
-        assert(result != nullptr);
-        return result;
+        // TODO: verify `port` is from old model and result is from new model
+        PortElements<ValueType> elements(port);
+        return GetCorrespondingOutputs(elements);
+    }
+
+    template <typename ValueType>
+    PortElements<ValueType> ModelTransformer::GetCorrespondingOutputs(const PortElements<ValueType>& elements)
+    {
+        return TransformPortElements(elements);
     }
 
     template <typename ValueType>
     InputNode<ValueType>* ModelTransformer::GetCorrespondingInputNode(const InputNode<ValueType>* inputNode)
     {
-        // This sucks:
-        const auto inputNodeOutputPort = inputNode->GetOutputPorts()[0];
-        auto newInputNodeOutputPort = GetCorrespondingPort(*inputNodeOutputPort);
-        auto newInputNodeConst = dynamic_cast<const model::InputNode<ValueType>*>(newInputNodeOutputPort->GetNode());
+        // TODO: verify `inputNode` is from old model and result is from new model
+        auto newNodeOutputs = GetCorrespondingOutputs(inputNode->output);
+        auto newNodeConst = newNodeOutputs.GetElement(0).ReferencedPort()->GetNode();
+        auto newInputNodeConst = dynamic_cast<const model::InputNode<ValueType>*>(newNodeConst);
         assert(newInputNodeConst != nullptr);
         auto newInputNode = const_cast<model::InputNode<ValueType>*>(newInputNodeConst);
         return newInputNode;
     }
 
     template <typename ValueType>
-    void ModelTransformer::MapOutputPort(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort)
+    void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort)
     {
-        MapPort(oldPort, newPort);
+        // TODO: verify `oldPort` is from old model and `newPort` is from new model
+        auto size = oldPort.Size();
+        assert(newPort.Size() == size);
+        for(size_t index = 0; index < size; ++index)
+        {
+            _elementToElementMap[{oldPort, index}] = {newPort, index};
+        }
+    }
+
+    template <typename ValueType>
+    void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElements<ValueType>& newElements)
+    {
+        // TODO: verify `oldPort` is from old model and `newElements` are from new model
+        auto size = oldPort.Size(); 
+        assert(newElements.Size() == size);
+        for(size_t index = 0; index < size; ++index)
+        {
+            _elementToElementMap[{oldPort, index}] = newElements.GetElement(index);
+        }
+    }
+
+    template <typename ValueType>
+    void ModelTransformer::MapNodeOutput(const PortElements<ValueType>& oldElements, const PortElements<ValueType>& newElements)
+    {
+        // TODO: verify `oldElements` are from old model and `newElements` are from new model
+         auto size = oldElements.Size();
+         assert(oldElements.Size() == size);
+         for(size_t index = 0; index < size; ++index)
+         {
+             _elementToElementMap[oldElements.GetElement(index)] = newElements.GetElement(index);
+         }
     }
 
     template <typename NodeType, typename... Args>
     NodeType* ModelTransformer::AddNode(Args&&... args)
     {
-        return _model.AddNode<NodeType>(std::forward<Args>(args)...);
+        auto newNode = _model.AddNode<NodeType>(std::forward<Args>(args)...);
+        _isModelCompilable &= _context.IsNodeCompilable(*newNode);
+        return newNode;
     }
 }

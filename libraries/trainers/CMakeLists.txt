@@ -12,23 +12,29 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/Nothing.cpp)
+set (SRC src/ForestTrainer.cpp
+         src/LogitBooster.cpp
+         src/ThresholdFinder.cpp)
 
-set (INCLUDE include/BaggingIncrementalTrainer.h
-             include/EvaluatingIncrementalTrainer.h
+set (INCLUDE include/EvaluatingIncrementalTrainer.h
+             include/ForestTrainer.h
+             include/HistogramForestTrainer.h
              include/IIncrementalTrainer.h
-             include/IBlackBoxTrainer.h
+             include/LogitBooster.h
              include/MultiEpochIncrementalTrainer.h
-             include/SortingTreeTrainer.h
+             include/SortingForestTrainer.h
              include/SweepingIncrementalTrainer.h
-             include/SGDIncrementalTrainer.h)
+             include/SGDIncrementalTrainer.h
+             include/ThresholdFinder.h)
 
-set (TCC tcc/BaggingIncrementalTrainer.tcc
-         tcc/EvaluatingIncrementalTrainer.tcc         
+set (TCC tcc/EvaluatingIncrementalTrainer.tcc
+         tcc/ForestTrainer.tcc
+         tcc/HistogramForestTrainer.tcc
          tcc/MultiEpochIncrementalTrainer.tcc
-         tcc/SortingTreeTrainer.tcc
+         tcc/SortingForestTrainer.tcc
          tcc/SweepingIncrementalTrainer.tcc
-         tcc/SGDIncrementalTrainer.tcc)
+         tcc/SGDIncrementalTrainer.tcc
+         tcc/ThresholdFinder.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -36,7 +42,10 @@ source_group("tcc" FILES ${TCC})
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include)
-target_link_libraries(${PROJ_NAME} predictors)
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+endif()
+target_link_libraries(${PROJ_NAME} evaluators predictors)
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 #

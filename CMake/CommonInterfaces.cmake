@@ -16,7 +16,7 @@ macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INT
 string(TOLOWER "${LANGUAGE_NAME}" language)
   
 cmake_minimum_required(VERSION 2.8.11)
-find_package(SWIG REQUIRED)
+find_package(SWIG 3.0 REQUIRED)
 include(${SWIG_USE_FILE})
 
 # set compiler SWIG generated cxx compiler flags
@@ -97,7 +97,7 @@ if( ((${language} STREQUAL "xml") OR (${language} STREQUAL "javascript")))
 else()
     swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC}) # ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
 
-    swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset evaluators features layers linear lossFunctions trainers predictors utilities)
+    swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset evaluators linear lossFunctions model nodes predictors trainers utilities)
     set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}EMLL)
     add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} EMLL_common)
 endif()

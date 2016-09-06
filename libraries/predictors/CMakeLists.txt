@@ -13,19 +13,16 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/ConstantPredictor.cpp
-         src/DecisionTreePredictor.cpp
          src/LinearPredictor.cpp
-         src/SingleElementThresholdRule.cpp)
+         src/SingleElementThresholdPredictor.cpp)
 
 set (INCLUDE include/ConstantPredictor.h
-             include/DecisionTreePredictor.h
-             include/EnsemblePredictor.h
+             include/IPredictor.h
              include/LinearPredictor.h
-             include/SingleElementThresholdRule.h
+             include/SingleElementThresholdPredictor.h
              include/ForestPredictor.h)
 
-set (TCC tcc/EnsemblePredictor.tcc
-         tcc/SingleElementThresholdRule.tcc
+set (TCC tcc/SingleElementThresholdPredictor.tcc
          tcc/ForestPredictor.tcc)
 
 source_group("src" FILES ${SRC})
@@ -34,7 +31,10 @@ source_group("tcc" FILES ${TCC})
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include)
-target_link_libraries(${PROJ_NAME} dataset layers)
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+endif()
+target_link_libraries(${PROJ_NAME} dataset utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 

@@ -2,13 +2,12 @@
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     main.cpp (print)
-//  Authors:  Ofer Dekel
+//  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "PrintableLayer.h"
-#include "PrintableModel.h"
 #include "PrintArguments.h"
+#include "PrintModel.h"
 
 // common
 #include "ModelLoadArguments.h"
@@ -20,8 +19,7 @@
 #include "CommandLineParser.h"
 #include "Exception.h"
 
-// layers
-#include "Map.h"
+// model
 #include "Model.h"
 
 // stl
@@ -44,17 +42,12 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(printArguments);
         commandLineParser.Parse();
 
-        // if output file specified, use it, otherwise use std::cout
-        utilities::OutputStreamImpostor outStream(printArguments.outputSvgFilename);
-
         // open model file
-        auto model = common::LoadModel(modelLoadArguments);
-
-        // convert model to printable model
-        PrintableModel printableModel(model);
+        auto model = common::LoadModel(modelLoadArguments.inputModelFile);
         
-        // print to svg file
-        printableModel.Print(outStream, printArguments);
+        // print model
+        utilities::OutputStreamImpostor out = printArguments.outputStream;
+        PrintModel(model, out);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
