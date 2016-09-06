@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleXmlSerializer.cpp (utilities)
+//  File:     SimpleXmlArchiver.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "XMLSerializer.h"
-#include "Serializer.h"
+#include "XMLArchiver.h"
+#include "Archiver.h"
 #include "ISerializable.h"
 
 // stl
@@ -23,46 +23,46 @@ namespace utilities
     //
     // Serialization
     //
-    SimpleXmlSerializer::SimpleXmlSerializer() : _out(std::cout) 
+    SimpleXmlArchiver::SimpleXmlArchiver() : _out(std::cout) 
     {
         WriteFileHeader();
     }
 
-    SimpleXmlSerializer::SimpleXmlSerializer(std::ostream& outputStream) : _out(outputStream) 
+    SimpleXmlArchiver::SimpleXmlArchiver(std::ostream& outputStream) : _out(outputStream) 
     {
         WriteFileHeader();
     }
 
-    SimpleXmlSerializer::~SimpleXmlSerializer()
+    SimpleXmlArchiver::~SimpleXmlArchiver()
     {
         WriteFileFooter();
     }
 
-    void SimpleXmlSerializer::WriteFileHeader()
+    void SimpleXmlArchiver::WriteFileHeader()
     {   
         // Write XML declaration
         _out << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";     
         _out << "<emll version=\"1.0\">\n";
     }
 
-    void SimpleXmlSerializer::WriteFileFooter()
+    void SimpleXmlArchiver::WriteFileFooter()
     {
         _out << "</emll>\n";
     }
 
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlSerializer, bool);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlSerializer, char);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlSerializer, short);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlSerializer, int);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlSerializer, size_t);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlSerializer, float);
-    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlSerializer, double);
+    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, bool);
+    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, char);
+    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, short);
+    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, int);
+    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, size_t);
+    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, float);
+    IMPLEMENT_SERIALIZE_VALUE(SimpleXmlArchiver, double);
 
     // strings
-    void SimpleXmlSerializer::SerializeValue(const char* name, const std::string& value) { WriteScalar(name, value); }
+    void SimpleXmlArchiver::SerializeValue(const char* name, const std::string& value) { WriteScalar(name, value); }
 
     // ISerializable
-    void SimpleXmlSerializer::BeginSerializeObject(const char* name, const ISerializable& value)
+    void SimpleXmlArchiver::BeginSerializeObject(const char* name, const ISerializable& value)
     {
         auto indent = GetCurrentIndent();
         auto typeName = XmlUtilities::EncodeTypeName(value.GetRuntimeTypeName());
@@ -77,14 +77,14 @@ namespace utilities
         _out << ">" << std::endl;
     }
 
-    void SimpleXmlSerializer::SerializeObject(const char* name, const ISerializable& value)
+    void SimpleXmlArchiver::SerializeObject(const char* name, const ISerializable& value)
     {
         ++_indent;
         value.Serialize(*this); // TODO: need to somehow know if we're in an indenting context or not for the subsequent calls to WriteScalar
         --_indent;
     }
 
-    void SimpleXmlSerializer::EndSerializeObject(const char* name, const ISerializable& value)
+    void SimpleXmlArchiver::EndSerializeObject(const char* name, const ISerializable& value)
     {
         auto indent = GetCurrentIndent();
         auto typeName = XmlUtilities::EncodeTypeName(value.GetRuntimeTypeName());
@@ -95,22 +95,22 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, bool);
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, char);
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, short);
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, int);
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, size_t);
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, float);
-    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlSerializer, double);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, bool);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, char);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, short);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, int);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, size_t);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, float);
+    IMPLEMENT_SERIALIZE_ARRAY(SimpleXmlArchiver, double);
 
-    void SimpleXmlSerializer::SerializeArray(const char* name, const std::vector<std::string>& array)
+    void SimpleXmlArchiver::SerializeArray(const char* name, const std::vector<std::string>& array)
     {
         WriteArray(name, array);
     }
 
     // Array of pointers-to-ISerializable
     // TOOD: pass in compile-time type name
-    void SimpleXmlSerializer::SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
+    void SimpleXmlArchiver::SerializeArray(const char* name, const std::string& baseTypeName, const std::vector<const ISerializable*>& array)
     {
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
@@ -136,31 +136,31 @@ namespace utilities
     //
     // Deserialization
     //
-    SimpleXmlDeserializer::SimpleXmlDeserializer(SerializationContext context) : Deserializer(std::move(context)), _tokenizer(std::cin, "<>=/'\"")
+    SimpleXmlUnarchiver::SimpleXmlUnarchiver(SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(std::cin, "<>=/'\"")
     {
         ReadFileHeader();
     }
 
-    SimpleXmlDeserializer::SimpleXmlDeserializer(std::istream& inputStream, SerializationContext context) : Deserializer(std::move(context)), _tokenizer(inputStream, "<>?=/'\"") 
+    SimpleXmlUnarchiver::SimpleXmlUnarchiver(std::istream& inputStream, SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(inputStream, "<>?=/'\"") 
     {
         ReadFileHeader(); 
     }
 
-    SimpleXmlDeserializer::~SimpleXmlDeserializer() 
+    SimpleXmlUnarchiver::~SimpleXmlUnarchiver() 
     {
         ReadFileFooter(); 
     }
 
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, bool);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, char);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, short);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, int);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, size_t);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, float);
-    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlDeserializer, double);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, bool);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, char);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, short);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, int);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, size_t);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, float);
+    IMPLEMENT_DESERIALIZE_VALUE(SimpleXmlUnarchiver, double);
 
     // TODO: add a "read tag"-type function
-    void SimpleXmlDeserializer::ReadFileHeader()
+    void SimpleXmlUnarchiver::ReadFileHeader()
     {   
         _tokenizer.MatchTokens({"<", "?", "xml"});
         while(_tokenizer.PeekNextToken() != "?")
@@ -171,19 +171,19 @@ namespace utilities
         _tokenizer.MatchTokens({"<", "emll", "version", "=", "\"", "1.0", "\"", ">"});
     }
 
-    void SimpleXmlDeserializer::ReadFileFooter()
+    void SimpleXmlUnarchiver::ReadFileFooter()
     {
         _tokenizer.MatchTokens({"<", "/", "emll", ">"});
     }
 
     // strings
-    void SimpleXmlDeserializer::DeserializeValue(const char* name, std::string& value) 
+    void SimpleXmlUnarchiver::DeserializeValue(const char* name, std::string& value) 
     { 
         ReadScalar(name, value); 
     }
 
     // ISerializable
-    std::string SimpleXmlDeserializer::BeginDeserializeObject(const char* name, const std::string& typeName) 
+    std::string SimpleXmlUnarchiver::BeginDeserializeObject(const char* name, const std::string& typeName) 
     {
         bool hasName = name != std::string("");
         auto rawTypeName = typeName;
@@ -199,12 +199,12 @@ namespace utilities
         return readTypeName;
     }
 
-    void SimpleXmlDeserializer::DeserializeObject(const char* name, ISerializable& value) 
+    void SimpleXmlUnarchiver::DeserializeObject(const char* name, ISerializable& value) 
     {
         value.Deserialize(*this);
     }
 
-    void SimpleXmlDeserializer::EndDeserializeObject(const char* name, const std::string& typeName) 
+    void SimpleXmlUnarchiver::EndDeserializeObject(const char* name, const std::string& typeName) 
     {
         auto EncodedTypeName = XmlUtilities::EncodeTypeName(typeName);
         _tokenizer.MatchTokens({"<", "/", EncodedTypeName, ">"});
@@ -213,20 +213,20 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, bool);
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, char);
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, short);
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, int);
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, size_t);
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, float);
-    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlDeserializer, double);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, bool);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, char);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, short);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, int);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, size_t);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, float);
+    IMPLEMENT_DESERIALIZE_ARRAY(SimpleXmlUnarchiver, double);
 
-    void SimpleXmlDeserializer::DeserializeArray(const char* name, std::vector<std::string>& array)
+    void SimpleXmlUnarchiver::DeserializeArray(const char* name, std::vector<std::string>& array)
     {
         ReadArray(name, array);
     }
 
-    void SimpleXmlDeserializer::BeginDeserializeArray(const char* name, const std::string& typeName)
+    void SimpleXmlUnarchiver::BeginDeserializeArray(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
 
@@ -239,7 +239,7 @@ namespace utilities
         _tokenizer.MatchTokens({"type", "=", "'", typeName, "'", ">"});
     }
 
-    bool SimpleXmlDeserializer::BeginDeserializeArrayItem(const std::string& typeName)
+    bool SimpleXmlUnarchiver::BeginDeserializeArrayItem(const std::string& typeName)
     {
         // check for '</'
         auto token1 = _tokenizer.ReadNextToken();
@@ -256,11 +256,11 @@ namespace utilities
         }
     }
 
-    void SimpleXmlDeserializer::EndDeserializeArrayItem(const std::string& typeName)
+    void SimpleXmlUnarchiver::EndDeserializeArrayItem(const std::string& typeName)
     {
     }
 
-    void SimpleXmlDeserializer::EndDeserializeArray(const char* name, const std::string& typeName)
+    void SimpleXmlUnarchiver::EndDeserializeArray(const char* name, const std::string& typeName)
     {
         _tokenizer.MatchTokens({"<", "/", "Array", ">"});
     }

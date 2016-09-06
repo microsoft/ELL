@@ -108,17 +108,17 @@ int main()
         TestVectorVariant();
 
         // Serialization tests
-        TestJsonSerializer();
-        TestJsonDeserializer();
+        TestJsonArchiver();
+        TestJsonUnarchiver();
 
-        TestXmlSerializer();
-        TestXmlDeserializer();
+        TestXmlArchiver();
+        TestXmlUnarchiver();
 
         // ObjectArchive tests
         TestGetTypeDescription();
         TestGetObjectArchive();
         TestSerializeIDescribable();
-        TestObjectArchiveSerializer();
+        TestObjectArchiver();
     }
     catch(const utilities::Exception& exception)
     {

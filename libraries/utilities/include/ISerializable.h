@@ -9,7 +9,7 @@
 #pragma once
 
 #include "TypeName.h"
-#include "Serializer.h"
+#include "Archiver.h"
 #include "Exception.h"
 
 // stl
@@ -31,13 +31,13 @@ namespace utilities
 
         /// <summary> Serializes the object. </summary>
         ///
-        /// <param name="serializer">  The serializer. </param>
-        virtual void Serialize(Serializer& serializer) const = 0;
+        /// <param name="archiver">  The archiver. </param>
+        virtual void Serialize(Archiver& archiver) const = 0;
 
         /// <summary> Deserializes the object. </summary>
         ///
-        /// <param name="serializer"> The deserializer. </param>
-        virtual void Deserialize(Deserializer& serializer) = 0;
+        /// <param name="archiver"> The unarchiver. </param>
+        virtual void Deserialize(Unarchiver& archiver) = 0;
 
         /// <summary> Gets the name of this type. </summary>
         ///

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Serializer.tcc (utilities)
+//  File:     Archiver.tcc (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,33 +9,33 @@
 namespace utilities
 {
     //
-    // PropertySerializer class
+    // PropertyArchiver class
     //
 
     template <typename ValueType>
-    void Serializer::PropertySerializer::operator<<(ValueType&& value)
+    void Archiver::PropertyArchiver::operator<<(ValueType&& value)
     {
         _serializer.Serialize(_propertyName.c_str(), value);
     }
 
     //
-    // Serializer class
+    // Archiver class
     //
 
     template <typename ValueType>
-    void Serializer::Serialize(ValueType&& value)
+    void Archiver::Serialize(ValueType&& value)
     {
         Serialize("", value);
     }
 
     template <typename ValueType>
-    void Serializer::operator<<(ValueType&& value)
+    void Archiver::operator<<(ValueType&& value)
     {
         Serialize(std::forward<ValueType>(value));
     }
 
     template <typename ValueType>
-    void Serializer::Serialize(const char* name, ValueType&& value)
+    void Archiver::Serialize(const char* name, ValueType&& value)
     {
         SerializeItem(name, value);
     }
@@ -46,34 +46,34 @@ namespace utilities
 
     // Non-vectors
     template <typename ValueType, IsNotVector<ValueType> concept>
-    void Serializer::SerializeItem(const char* name, ValueType&& value)
+    void Archiver::SerializeItem(const char* name, ValueType&& value)
     {
         SerializeValue(name, value);
     }
 
     // Pointers
     template <typename ValueType>
-    void Serializer::SerializeItem(const char* name, ValueType* value)
+    void Archiver::SerializeItem(const char* name, ValueType* value)
     {
         Serialize(name, *value);
     }
 
     // Vector of fundamental types
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void Serializer::SerializeItem(const char* name, const std::vector<ValueType>& array)
+    void Archiver::SerializeItem(const char* name, const std::vector<ValueType>& array)
     {
         SerializeArray(name, array);
     }
 
     // Vector of strings
-    inline void Serializer::SerializeItem(const char* name, const std::vector<std::string>& array)
+    inline void Archiver::SerializeItem(const char* name, const std::vector<std::string>& array)
     {
         SerializeArray(name, array);
     }
 
     // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Serializer::SerializeItem(const char* name, const std::vector<ValueType>& array)
+    void Archiver::SerializeItem(const char* name, const std::vector<ValueType>& array)
     {
         auto baseTypeName = ValueType::GetTypeName();
         std::vector<const utilities::ISerializable*> tmpArray;
@@ -86,7 +86,7 @@ namespace utilities
 
     // Vector of serializable pointers
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Serializer::SerializeItem(const char* name, const std::vector<const ValueType*>& array)
+    void Archiver::SerializeItem(const char* name, const std::vector<const ValueType*>& array)
     {
         auto baseTypeName = ValueType::GetTypeName();
         std::vector<const utilities::ISerializable*> tmpArray;
@@ -98,44 +98,44 @@ namespace utilities
     }
 
     //
-    // PropertyDeserializer class
+    // PropertyUnarchiver class
     //
     template <typename ValueType>
-    void Deserializer::PropertyDeserializer::operator>>(ValueType&& value)
+    void Unarchiver::PropertyUnarchiver::operator>>(ValueType&& value)
     {
         _deserializer.Deserialize(_propertyName.c_str(), value);
     }
 
     //
-    // Deserializer class
+    // Unarchiver class
     //
     template <typename ValueType>
-    void Deserializer::Deserialize(ValueType&& value)
+    void Unarchiver::Deserialize(ValueType&& value)
     {
         Deserialize("", value);
     }
 
     template <typename ValueType>
-    void Deserializer::operator>>(ValueType&& value)
+    void Unarchiver::operator>>(ValueType&& value)
     {
         Deserialize(std::forward<ValueType>(value));
     }
 
     template <typename ValueType>
-    void Deserializer::Deserialize(const char* name, ValueType&& value)
+    void Unarchiver::Deserialize(const char* name, ValueType&& value)
     {
         DeserializeItem(name, value);
     }
 
     template <typename ValueType, IsNotVector<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, ValueType&& value)
+    void Unarchiver::DeserializeItem(const char* name, ValueType&& value)
     {
         DeserializeValue(name, value);
     }
 
     // pointer to non-serializable type
     template <typename ValueType, IsNotSerializable<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::unique_ptr<ValueType>& value)
+    void Unarchiver::DeserializeItem(const char* name, std::unique_ptr<ValueType>& value)
     {
         auto ptr = std::make_unique<ValueType>();
         DeserializeValue(name, *ptr);
@@ -144,7 +144,7 @@ namespace utilities
 
     // pointer to serializable type
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::unique_ptr<ValueType>& value)
+    void Unarchiver::DeserializeItem(const char* name, std::unique_ptr<ValueType>& value)
     {
         auto baseTypeName = ValueType::GetTypeName();
         auto encodedTypeName = BeginDeserializeObject(name, baseTypeName);
@@ -157,14 +157,14 @@ namespace utilities
 
     // Vector of fundamental types
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::vector<ValueType>& arr)
+    void Unarchiver::DeserializeItem(const char* name, std::vector<ValueType>& arr)
     {
         arr.clear();
         DeserializeArray(name, arr);
     }
 
     // Vector of strings
-    inline void Deserializer::DeserializeItem(const char* name, std::vector<std::string>& arr)
+    inline void Unarchiver::DeserializeItem(const char* name, std::vector<std::string>& arr)
     {
         arr.clear();
         DeserializeArray(name, arr);
@@ -172,7 +172,7 @@ namespace utilities
 
     // Vector of serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::vector<ValueType>& arr)
+    void Unarchiver::DeserializeItem(const char* name, std::vector<ValueType>& arr)
     {
         arr.clear();
         auto typeName = ValueType::GetTypeName();
@@ -194,7 +194,7 @@ namespace utilities
 
     // Vector of unique pointers to serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::vector<std::unique_ptr<ValueType>>& arr)
+    void Unarchiver::DeserializeItem(const char* name, std::vector<std::unique_ptr<ValueType>>& arr)
     {
         arr.clear();
         auto typeName = ValueType::GetTypeName();
@@ -216,7 +216,7 @@ namespace utilities
 
     // Vector of raw pointers to serializable objects
     template <typename ValueType, IsSerializable<ValueType> concept>
-    void Deserializer::DeserializeItem(const char* name, std::vector<const ValueType*>& arr)
+    void Unarchiver::DeserializeItem(const char* name, std::vector<const ValueType*>& arr)
     {
         arr.clear();
         auto typeName = ValueType::GetTypeName();

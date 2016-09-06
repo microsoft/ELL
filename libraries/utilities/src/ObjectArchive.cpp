@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ObjectArchive.h"
-#include "ObjectArchiveSerializer.h"
+#include "ObjectArchiver.h"
 
 // utiliites
 #include "Exception.h"
@@ -89,8 +89,8 @@ namespace utilities
     ObjectArchive IDescribable::GetDescription() const
     {
         utilities::SerializationContext context;
-        utilities::ObjectArchiveSerializer serializer(context);
-        serializer.Serialize(*this);
-        return serializer.GetObjectArchive();
+        utilities::ObjectArchiver archiver(context);
+        archiver.Serialize(*this);
+        return archiver.GetObjectArchive();
     }
 }

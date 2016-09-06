@@ -23,8 +23,8 @@
 namespace utilities
 {
     // Temporary
-    using Archiver = Serializer; // ObjectArchive;
-    using Unarchiver = Deserializer; // ObjectArchive;
+    using Archiver = Archiver; // ObjectArchive;
+    using Unarchiver = Unarchiver; // ObjectArchive;
 
     /// <summary> Holds information describing the properties (fields) of an object </summary>
     class ObjectArchive

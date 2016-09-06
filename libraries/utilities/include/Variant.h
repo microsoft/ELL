@@ -10,7 +10,7 @@
 
 #include "Exception.h"
 #include "TypeName.h"
-#include "Serializer.h"
+#include "Archiver.h"
 
 // stl
 #include <memory>
@@ -41,8 +41,8 @@ namespace utilities
         virtual bool IsPrimitiveType() const = 0;
         virtual bool IsSerializable() const = 0;
         virtual bool IsPointer() const = 0;
-        virtual void SerializeProperty(const char* name, Serializer& serializer) const = 0;
-        virtual void DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context) = 0;
+        virtual void SerializeProperty(const char* name, Archiver& archiver) const = 0;
+        virtual void DeserializeProperty(const char* name, Unarchiver& archiver, SerializationContext& context) = 0;
 
     private:
         friend class Variant;
@@ -70,8 +70,8 @@ namespace utilities
         virtual bool IsPrimitiveType() const override { return std::is_fundamental<ValueType>::value; }
         virtual bool IsSerializable() const override { return !IsPrimitiveType(); }
         virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
-        virtual void SerializeProperty(const char* name, Serializer& serializer) const override;
-        virtual void DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context) override;
+        virtual void SerializeProperty(const char* name, Archiver& archiver) const override;
+        virtual void DeserializeProperty(const char* name, Unarchiver& archiver, SerializationContext& context) override;
 
     private:
         friend class Variant;
@@ -153,8 +153,8 @@ namespace utilities
         friend Variant MakeVariant(Args&&... args);
 
         Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue);
-        void SerializeProperty(const char* name, Serializer& serializer) const;
-        void DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context);
+        void SerializeProperty(const char* name, Archiver& archiver) const;
+        void DeserializeProperty(const char* name, Unarchiver& archiver, SerializationContext& context);
         void SetVariantValue(const Variant& value);
 
         std::type_index _type;

@@ -35,9 +35,9 @@
 
 // utilities
 #include "Files.h"
-#include "Serializer.h"
-#include "JsonSerializer.h"
-#include "XMLSerializer.h"
+#include "Archiver.h"
+#include "JsonArchiver.h"
+#include "XMLArchiver.h"
 
 namespace common
 {
@@ -180,14 +180,14 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
     }
 
-    template <typename DeserializerType>
+    template <typename UnarchiverType>
     model::Model DeserializeModel(std::istream& stream)
     {
         try
         {
             utilities::SerializationContext context;
             RegisterNodeTypes(context);
-            DeserializerType deserializer(stream, context);
+            UnarchiverType deserializer(stream, context);
             model::Model model;
             deserializer.Deserialize(model);
             return model;
@@ -198,11 +198,11 @@ namespace common
         }
     }
 
-    template <typename SerializerType>
+    template <typename ArchiverType>
     void SerializeModel(const model::Model& model, std::ostream& stream)
     {
-        SerializerType serializer(stream);
-        serializer.Serialize(model);
+        ArchiverType archiver(stream);
+        archiver.Serialize(model);
     }
 
     bool IsKnownExtension(const std::string& ext)
@@ -245,11 +245,11 @@ namespace common
                 auto filestream = utilities::OpenIfstream(filename);
                 if (ext == "xml")
                 {
-                    return DeserializeModel<utilities::SimpleXmlDeserializer>(filestream);
+                    return DeserializeModel<utilities::SimpleXmlUnarchiver>(filestream);
                 }
                 else if (ext == "json")
                 {
-                    return DeserializeModel<utilities::JsonDeserializer>(filestream);
+                    return DeserializeModel<utilities::JsonUnarchiver>(filestream);
                 }
             }
 
@@ -264,12 +264,12 @@ namespace common
         if(ext == "xml")
         {
             auto filestream = utilities::OpenOfstream(filename);
-            SerializeModel<utilities::SimpleXmlSerializer>(model, filestream);
+            SerializeModel<utilities::SimpleXmlArchiver>(model, filestream);
         }
         else if(ext == "json")
         {
             auto filestream = utilities::OpenOfstream(filename);
-            SerializeModel<utilities::JsonSerializer>(model, filestream);
+            SerializeModel<utilities::JsonArchiver>(model, filestream);
         }
         else
         {

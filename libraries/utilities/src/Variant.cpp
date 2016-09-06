@@ -81,15 +81,15 @@ namespace utilities
         return _value->IsPointer();
     }
 
-    void Variant::SerializeProperty(const char* name, Serializer& serializer) const
+    void Variant::SerializeProperty(const char* name, Archiver& archiver) const
     {
-        _value->SerializeProperty(name, serializer);
+        _value->SerializeProperty(name, archiver);
     }
 
     // #### TODO: special-case vectors of pointers 
-    void Variant::DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context)
+    void Variant::DeserializeProperty(const char* name, Unarchiver& archiver, SerializationContext& context)
     {
-        _value->DeserializeProperty(name, serializer, context);
+        _value->DeserializeProperty(name, archiver, context);
     }
 
     std::string to_string(const Variant& variant)

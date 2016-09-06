@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleXmlSerializer.h (utilities)
+//  File:     SimpleXmlArchiver.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include "Serializer.h"
+#include "Archiver.h"
 #include "TypeFactory.h"
 #include "TypeName.h"
 #include "Exception.h"
@@ -25,20 +25,20 @@
 
 namespace utilities
 {
-    /// <summary> A serializer that encodes data in an XML format. </summary>
-    class SimpleXmlSerializer : public Serializer
+    /// <summary> An archiver that encodes data in an XML format. </summary>
+    class SimpleXmlArchiver : public Archiver
     {
     public:
         /// <summary> Default Constructor --- writes to standard output. </summary>
-        SimpleXmlSerializer();
+        SimpleXmlArchiver();
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="outputStream"> The stream to serialize data to. </summary>
-        SimpleXmlSerializer(std::ostream& outputStream);
+        SimpleXmlArchiver(std::ostream& outputStream);
 
         /// <summary> Default Destructor </summary>
-        ~SimpleXmlSerializer();
+        ~SimpleXmlArchiver();
 
     protected:
         DECLARE_SERIALIZE_VALUE_OVERRIDE(bool);
@@ -84,19 +84,19 @@ namespace utilities
     };
 
     /// <summary> A deserializer that reads data encoded in an XML format. </summary>
-    class SimpleXmlDeserializer : public Deserializer
+    class SimpleXmlUnarchiver : public Unarchiver
     {
     public:
         /// <summary> Default Constructor --- reads from standard input. </summary>
-        SimpleXmlDeserializer(SerializationContext context);
+        SimpleXmlUnarchiver(SerializationContext context);
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="inputStream"> The stream to deserialize data from. </summary>
-        SimpleXmlDeserializer(std::istream& inputStream, SerializationContext context);
+        SimpleXmlUnarchiver(std::istream& inputStream, SerializationContext context);
 
         /// <summary> Default Destructor </summary>
-        ~SimpleXmlDeserializer();
+        ~SimpleXmlUnarchiver();
 
     protected:
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(bool);
@@ -151,4 +151,4 @@ namespace utilities
     };
 }
 
-#include "../tcc/XMLSerializer.tcc"
+#include "../tcc/XMLArchiver.tcc"

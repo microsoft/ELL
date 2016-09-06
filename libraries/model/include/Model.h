@@ -158,7 +158,7 @@ namespace model
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
         virtual void Serialize(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. Deserialization is handled explicitly because we need to modify the SerializationContext. </summary>
+        /// <summary> Reads from a Unarchiver. Deserialization is handled explicitly because we need to modify the SerializationContext. </summary>
         ///
         /// <param name="deserializer"> The deserializer. </param>
         /// <param name="context"> The serialization context. </param>

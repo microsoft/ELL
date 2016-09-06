@@ -11,9 +11,9 @@
 
 // utilities
 #include "ObjectArchive.h"
-#include "Serializer.h"
-#include "XmlSerializer.h"
-#include "ObjectArchiveSerializer.h"
+#include "Archiver.h"
+#include "XmlArchiver.h"
+#include "ObjectArchiver.h"
 
 // testing
 #include "testing.h"
@@ -195,23 +195,23 @@ void TestSerializeIDescribable()
     utilities::SerializationContext context;
     std::stringstream strstream;
     {
-        utilities::SimpleXmlSerializer serializer(strstream);
+        utilities::SimpleXmlArchiver archiver(strstream);
      
         InnerObject innerObj(3, 4.5);
-        serializer.Serialize("inner", innerObj);
+        archiver.Serialize("inner", innerObj);
 
         OuterObject outerObj("Outer", 5, 6.5);
-        serializer.Serialize("outer", outerObj);
+        archiver.Serialize("outer", outerObj);
 
         DerivedObject derivedObj(8, 9.5, "derived");
-        serializer.Serialize("derived", derivedObj);
+        archiver.Serialize("derived", derivedObj);
 
         // print
         std::cout << "Serialized stream:" << std::endl;
         std::cout << strstream.str() << std::endl;
     }
 
-    utilities::SimpleXmlDeserializer deserializer(strstream, context);
+    utilities::SimpleXmlUnarchiver deserializer(strstream, context);
     InnerObject deserializedInner;
 
     deserializer.Deserialize("inner", deserializedInner);
@@ -226,12 +226,12 @@ void TestSerializeIDescribable()
     testing::ProcessTest("Deserialize IDescribable check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
 }
 
-void TestObjectArchiveSerializer()
+void TestObjectArchiver()
 {
     utilities::SerializationContext context;
-    utilities::ObjectArchiveSerializer serializer1(context);
-    utilities::ObjectArchiveSerializer serializer2(context);
-    utilities::ObjectArchiveSerializer serializer3(context);
+    utilities::ObjectArchiver serializer1(context);
+    utilities::ObjectArchiver serializer2(context);
+    utilities::ObjectArchiver serializer3(context);
     
     InnerObject innerObj(3, 4.5);
     serializer1.Serialize(innerObj);
@@ -254,19 +254,19 @@ void TestObjectArchiveSerializer()
     PrintDescription(objectDescription3);
     std::cout << std::endl;
 
-    utilities::ObjectArchiveSerializer deserializer1(objectDescription1, context);
+    utilities::ObjectArchiver deserializer1(objectDescription1, context);
     InnerObject deserializedInner;
     deserializer1.Deserialize(deserializedInner);
-    testing::ProcessTest("Deserialize with ObjectArchiveSerializer check",  deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);        
+    testing::ProcessTest("Deserialize with ObjectArchiver check",  deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);        
 
     // TODO: fix error with deserializing compound objects
-    utilities::ObjectArchiveSerializer deserializer2(objectDescription2, context);
+    utilities::ObjectArchiver deserializer2(objectDescription2, context);
     OuterObject deserializedOuter;
     deserializer2.Deserialize(deserializedOuter);
-    testing::ProcessTest("Deserialize with ObjectArchiveSerializer check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
+    testing::ProcessTest("Deserialize with ObjectArchiver check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
 
-    utilities::ObjectArchiveSerializer deserializer3(objectDescription3, context);
+    utilities::ObjectArchiver deserializer3(objectDescription3, context);
     DerivedObject deserializedDerived;
     deserializer3.Deserialize(deserializedDerived);
-    testing::ProcessTest("Deserialize with ObjectArchiveSerializer check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
+    testing::ProcessTest("Deserialize with ObjectArchiver check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
 }
