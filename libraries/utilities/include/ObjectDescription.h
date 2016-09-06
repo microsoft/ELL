@@ -150,18 +150,18 @@ namespace utilities
     public:
         virtual ~IDescribable() = default;
 
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
+        /// <summary> Creates an `ObjectDescription` from the object </summary>
         ///
         /// <returns> The ObjectDescription for the object </returns>
         ObjectDescription GetDescription() const;
 
-        /// <summary> Creates an object from an `Archiver` </summary>
+        /// <summary> Creates an object from an `ObjectDescription` </summary>
         ///
         /// <typeparam name="ValueType"> The type of the object to retrieve </typeparam>
-        /// <param name="archiver"> The `Archiver` to get the object from </param>
+        /// <param name="description"> The `ObjectDescription` to get the object from </param>
         /// <returns> The new object </returns>
         template <typename ValueType>
-        static ValueType CreateObject(const Archiver& archiver);
+        static ValueType CreateObject(const ObjectDescription& description);
 
         /// <summary> Gets the name of this type. </summary>
         ///

@@ -78,9 +78,9 @@ namespace utilities
     // IDescribable
     //
     template <typename ValueType>
-    static ValueType CreateObject(const Archiver& archiver)
+    static ValueType CreateObject(const ObjectDescription& description)
     {
         // TODO: force archiver to "deserialize" if necessary (?)
-        return archiver.GetValue<ValueType>();
+        return description.GetValue<ValueType>();
     }
 }
