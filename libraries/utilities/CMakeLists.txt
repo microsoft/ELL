@@ -31,8 +31,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/Variant.cpp
          src/XMLSerializer.cpp)
 
-set (INCLUDE include/Archiver.h
-             include/CompressedIntegerList.h
+set (INCLUDE include/CompressedIntegerList.h
              include/CommandLineParser.h
              include/Exception.h
              include/Files.h
