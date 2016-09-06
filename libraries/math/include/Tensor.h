@@ -253,6 +253,75 @@ namespace math
     class TensorConstReference
     {};
 
+    /// <summary> A 1st order tensor (vector). </summary>
+    ///
+    /// <typeparam name="ElementType"> Element type. </typeparam>
+    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
+    template<typename ElementType, TensorOrientation Orientation>
+    class Tensor<ElementType, 1, Orientation> : public TensorBase<ElementType>, public TensorDimensions<1>
+    {
+    public:
+        /// <summary> Constructs a 1st order tensor (vector) of a given size. </summary>
+        ///
+        /// <param name="size"> The size. </param>
+        Tensor(size_t size);
+
+        /// <summary> Constructs a 1st order tensor (vector) from a std::vector. </summary>
+        ///
+        /// <param name="data"> The vector. </param>
+        Tensor(std::vector<ElementType> data);
+
+        /// <summary> Constructs a 1st order tensor (vector) from an initializer list. </summary>
+        ///
+        /// <param name="list"> The initializer list. </param>
+        Tensor(std::initializer_list<ElementType> list);
+
+        /// <summary> Tensor indexer operator. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the element. </param>
+        /// 
+        /// <returns> Reference to the element at the given index. </returns>
+        ElementType& operator() (size_t index);
+
+        /// <summary> Tensor indexer operator. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the element. </param>
+        /// 
+        /// <returns> Copy of the element at the given index. </returns>
+        ElementType operator() (size_t index) const;
+
+        /// <summary> Array indexer operator. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the element. </param>
+        /// 
+        /// <returns> Reference to the element at the given index. </returns>
+        ElementType& operator[] (size_t index);
+
+        /// <summary> Array indexer operator. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the element. </param>
+        /// 
+        /// <returns> Copy of the element at the given index. </returns>
+        ElementType operator[] (size_t index) const;
+
+        /// <summary> Gets a non-constant reference to this sub-vector. </summary>
+        ///
+        /// <returns> A reference to this sub-vector. </returns>
+        TensorReference<ElementType, 1, Orientation> GetReference();
+
+        /// <summary> Gets constant reference to this sub-vector. </summary>
+        ///
+        /// <returns> A constant reference to this sub-vector. </returns>
+        TensorConstReference<ElementType, 1, Orientation> GetConstReference() const;
+
+        /// <summary> Equality operator. </summary>
+        ///
+        /// <param name="other"> The other tensor. </param>
+        ///
+        /// <returns> true if the tensors are equal. </returns>
+        bool operator==(const Tensor<ElementType, 1, Orientation>& other) const;
+    };
+
     /// <summary> A non-const reference to a 1st order tensor. </summary>
     ///
     /// <typeparam name="ElementType"> Element type. </typeparam>
@@ -370,75 +439,6 @@ namespace math
         friend TensorReference<ElementType, 1, Orientation>;
         friend TensorConstReference<ElementType, 1, FlipOrientation<Orientation>::value>;
         TensorConstReference(const ElementType* pData, size_t size, size_t stride);
-    };
-
-    /// <summary> A 1st order tensor (vector). </summary>
-    ///
-    /// <typeparam name="ElementType"> Element type. </typeparam>
-    /// <typeparam name="Orientation"> Tensor orientation (rowMajor, colMajor). </typeparam>
-    template<typename ElementType, TensorOrientation Orientation>
-    class Tensor<ElementType, 1, Orientation> : public TensorBase<ElementType>, public TensorDimensions<1>
-    {
-    public:
-        /// <summary> Constructs a 1st order tensor (vector) of a given size. </summary>
-        ///
-        /// <param name="size"> The size. </param>
-        Tensor(size_t size);
-
-        /// <summary> Constructs a 1st order tensor (vector) from a std::vector. </summary>
-        ///
-        /// <param name="data"> The vector. </param>
-        Tensor(std::vector<ElementType> data);
-
-        /// <summary> Constructs a 1st order tensor (vector) from an initializer list. </summary>
-        ///
-        /// <param name="list"> The initializer list. </param>
-        Tensor(std::initializer_list<ElementType> list);
-
-        /// <summary> Tensor indexer operator. </summary>
-        ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Reference to the element at the given index. </returns>
-        ElementType& operator() (size_t index);
-
-        /// <summary> Tensor indexer operator. </summary>
-        ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator() (size_t index) const;
-
-        /// <summary> Array indexer operator. </summary>
-        ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Reference to the element at the given index. </returns>
-        ElementType& operator[] (size_t index);
-
-        /// <summary> Array indexer operator. </summary>
-        ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        /// 
-        /// <returns> Copy of the element at the given index. </returns>
-        ElementType operator[] (size_t index) const;
-
-        /// <summary> Gets a non-constant reference to this sub-vector. </summary>
-        ///
-        /// <returns> A reference to this sub-vector. </returns>
-        TensorReference<ElementType, 1, Orientation> GetReference();
-
-        /// <summary> Gets constant reference to this sub-vector. </summary>
-        ///
-        /// <returns> A constant reference to this sub-vector. </returns>
-        TensorConstReference<ElementType, 1, Orientation> GetConstReference() const;
-
-        /// <summary> Equality operator. </summary>
-        ///
-        /// <param name="other"> The other tensor. </param>
-        ///
-        /// <returns> true if the tensors are equal. </returns>
-        bool operator==(const Tensor<ElementType, 1, Orientation>& other) const;
     };
 
     /// <summary> A struct that holds all of the binary tensor operations. </summary>

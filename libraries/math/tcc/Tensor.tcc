@@ -71,6 +71,80 @@ namespace math
     }
 
     template<typename ElementType, TensorOrientation Orientation>
+    Tensor<ElementType, 1, Orientation>::Tensor(size_t size) : TensorBase<ElementType>(size), TensorDimensions<1>(size)
+    {}
+
+    template<typename ElementType, TensorOrientation Orientation>
+    Tensor<ElementType, 1, Orientation>::Tensor(std::vector<ElementType> data) : TensorBase<ElementType>(std::move(data)), TensorDimensions<1>(data.size())
+    {}
+
+    template<typename ElementType, TensorOrientation Orientation>
+    Tensor<ElementType, 1, Orientation>::Tensor(std::initializer_list<ElementType> list) : TensorBase<ElementType>(list.begin(), list.end()), TensorDimensions<1>(list.size())
+    {}
+
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType& Tensor<ElementType, 1, Orientation>::operator() (size_t index)
+    {
+        // TODO check input
+        return _data[index];
+    }
+
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType Tensor<ElementType, 1, Orientation>::operator() (size_t index) const
+    {
+        // TODO check input 
+        return _data[index];
+    }
+
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType& Tensor<ElementType, 1, Orientation>::operator[] (size_t index)
+    {
+        return operator()(index);
+    }
+
+    template<typename ElementType, TensorOrientation Orientation>
+    ElementType Tensor<ElementType, 1, Orientation>::operator[] (size_t index) const
+    {
+        return operator()(index);
+    }
+
+    template<typename ElementType, TensorOrientation Orientation>
+    TensorReference<ElementType, 1, Orientation> Tensor<ElementType, 1, Orientation>::GetReference()
+    {
+        return TensorReference<ElementType, 1, Orientation>(_data.data(), _data.size(), 1);
+    }
+
+    template<typename ElementType, TensorOrientation Orientation>
+    TensorConstReference<ElementType, 1, Orientation> Tensor<ElementType, 1, Orientation>::GetConstReference() const
+    {
+        return TensorConstReference<ElementType, 1, Orientation>(_data.data(), _data.size(), 1);
+    }
+
+    template<typename ElementType, TensorOrientation Orientation>
+    bool Tensor<ElementType, 1, Orientation>::operator==(const Tensor<ElementType, 1, Orientation>& other) const
+    {
+        if (Size() != other.Size())
+        {
+            return false;
+        }
+
+        const ElementType* pThis = GetDataPointer();
+        const ElementType* pThisEnd = pThis + Size();
+        const ElementType* pOther = other.GetDataPointer();
+
+        while (pThis < pThisEnd)
+        {
+            if ((*pThis) != (*pOther))
+            {
+                return false;
+            }
+            ++pThis;
+            ++pOther;
+        }
+        return true;
+    }
+
+    template<typename ElementType, TensorOrientation Orientation>
     void TensorReference<ElementType, 1, Orientation>::Fill(ElementType value)
     {
         ElementType* current = _pData;
@@ -185,80 +259,6 @@ namespace math
     TensorConstReference<ElementType, 1, Orientation>::TensorConstReference(const ElementType* pData, size_t size, size_t stride) : TensorReferenceBase<const ElementType*>(pData, stride), TensorDimensions<1>(size)
     {
         // TODO check pData != 0
-    }
-
-    template<typename ElementType, TensorOrientation Orientation>
-    Tensor<ElementType, 1, Orientation>::Tensor(size_t size) : TensorBase<ElementType>(size), TensorDimensions<1>(size)
-    {}
-
-    template<typename ElementType, TensorOrientation Orientation>
-    Tensor<ElementType, 1, Orientation>::Tensor(std::vector<ElementType> data) : TensorBase<ElementType>(std::move(data)), TensorDimensions<1>(data.size()) 
-    {}
-    
-    template<typename ElementType, TensorOrientation Orientation>
-    Tensor<ElementType, 1, Orientation>::Tensor(std::initializer_list<ElementType> list) : TensorBase<ElementType>(list.begin(), list.end()), TensorDimensions<1>(list.size()) 
-    {}
-
-    template<typename ElementType, TensorOrientation Orientation>
-    ElementType& Tensor<ElementType, 1, Orientation>::operator() (size_t index)
-    {
-        // TODO check input
-        return _data[index];
-    }
-
-    template<typename ElementType, TensorOrientation Orientation>
-    ElementType Tensor<ElementType, 1, Orientation>::operator() (size_t index) const
-    {
-        // TODO check input 
-        return _data[index];
-    }
-
-    template<typename ElementType, TensorOrientation Orientation>
-    ElementType& Tensor<ElementType, 1, Orientation>::operator[] (size_t index)
-    {
-        return operator()(index);
-    }
-
-    template<typename ElementType, TensorOrientation Orientation>
-    ElementType Tensor<ElementType, 1, Orientation>::operator[] (size_t index) const
-    {
-        return operator()(index); 
-    }
-
-    template<typename ElementType, TensorOrientation Orientation>
-    TensorReference<ElementType, 1, Orientation> Tensor<ElementType, 1, Orientation>::GetReference()
-    {
-        return TensorReference<ElementType, 1, Orientation>(_data.data(), _data.size(), 1);
-    }
-
-    template<typename ElementType, TensorOrientation Orientation>
-    TensorConstReference<ElementType, 1, Orientation> Tensor<ElementType, 1, Orientation>::GetConstReference() const
-    {
-        return TensorConstReference<ElementType, 1, Orientation>(_data.data(), _data.size(), 1);
-    }
-
-    template<typename ElementType, TensorOrientation Orientation>
-    bool Tensor<ElementType, 1, Orientation>::operator==(const Tensor<ElementType, 1, Orientation>& other) const
-    {
-        if (Size() != other.Size())
-        {
-            return false;
-        }
-
-        const ElementType* pThis = GetDataPointer();
-        const ElementType* pThisEnd = pThis + Size();
-        const ElementType* pOther = other.GetDataPointer();
-
-        while (pThis < pThisEnd)
-        {
-            if ((*pThis) != (*pOther))
-            {
-                return false;
-            }
-            ++pThis;
-            ++pOther;
-        }
-        return true;
     }
 
     template<typename ElementType, TensorOrientation Orientation1, TensorOrientation Orientation2>
