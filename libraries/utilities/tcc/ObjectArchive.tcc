@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ObjectDescription.tcc (utilities)
+//  File:     ObjectArchive.tcc (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,31 +9,31 @@
 namespace utilities
 {
     //
-    // ObjectDescription
+    // ObjectArchive
     //
     template <typename ValueType>
-    void ObjectDescription::SetType(const ValueType& object)
+    void ObjectArchive::SetType(const ValueType& object)
     {
         _typeName = TypeName<typename std::decay<ValueType>::type>::GetName();
     }
 
     template <typename ValueType>
-    void ObjectDescription::SetGetPropertiesFunction(std::true_type)
+    void ObjectArchive::SetGetPropertiesFunction(std::true_type)
     {
         // For some reason I don't understand, we need to pass in the pointer to this object
         // Somehow, the captured value of 'this' is incorrect
-        _fillInPropertiesFunction = [](const ObjectDescription* self) 
+        _fillInPropertiesFunction = [](const ObjectArchive* self) 
         {
             if(self->HasValue())
             {
-                ObjectDescription description;
+                ObjectArchive description;
                 auto value = self->_value.GetValue<ValueType>();
                 value.Serialize(description);
                 return description;
             }
             else
             {
-                ObjectDescription description;
+                ObjectArchive description;
                 typename std::decay<ValueType>::type value;
                 value.Serialize(description);
                 return description;
@@ -42,25 +42,25 @@ namespace utilities
     }
 
     template <typename ValueType>
-    void ObjectDescription::SetGetPropertiesFunction(std::false_type)
+    void ObjectArchive::SetGetPropertiesFunction(std::false_type)
     {
         _fillInPropertiesFunction = nullptr;
     }
 
     template <typename ValueType>
-    void ObjectDescription::CopyValueTo(ValueType&& value) const
+    void ObjectArchive::CopyValueTo(ValueType&& value) const
     {
         value = _value.GetValue<typename std::decay<ValueType>::type>();
     }
 
     template <typename ValueType>
-    void ObjectDescription::operator>>(ValueType&& value) const
+    void ObjectArchive::operator>>(ValueType&& value) const
     {
         value = _value.GetValue<typename std::decay<ValueType>::type>();
     }
 
     template <typename ValueType>
-    void ObjectDescription::SetValue(ValueType&& value)
+    void ObjectArchive::SetValue(ValueType&& value)
     {
         SetType(value);
         _value = value;
@@ -69,7 +69,7 @@ namespace utilities
     }
 
     template <typename ValueType>
-    void ObjectDescription::operator<<(ValueType&& value)
+    void ObjectArchive::operator<<(ValueType&& value)
     {
         SetValue(value);
     }

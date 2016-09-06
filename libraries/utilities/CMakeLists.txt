@@ -19,8 +19,8 @@ set (SRC src/CompressedIntegerList.cpp
          src/Format.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
-         src/ObjectDescription.cpp
-         src/ObjectDescriptionArchiver.cpp
+         src/ObjectArchive.cpp
+         src/ObjectArchiveSerializer.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
          src/Serializer.cpp
@@ -42,8 +42,8 @@ set (INCLUDE include/Archiver.h
              include/IntegerStack.h
              include/ISerializable.h
              include/JsonSerializer.h
-             include/ObjectDescription.h
-             include/ObjectDescriptionArchiver.h
+             include/ObjectArchive.h
+             include/ObjectArchiveSerializer.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
              include/Parser.h
@@ -65,8 +65,8 @@ set (TCC tcc/AnyIterator.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
          tcc/JsonSerializer.tcc
-         tcc/ObjectDescription.tcc
-         tcc/ObjectDescriptionArchiver.tcc
+         tcc/ObjectArchive.tcc
+         tcc/ObjectArchiveSerializer.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
          tcc/Serializer.tcc
@@ -108,13 +108,13 @@ PROJECT(${TEST_NAME})
 set (TEST_SRC test/src/main.cpp 
               test/src/ISerializable_test.cpp
               test/src/Iterator_test.cpp
-              test/src/ObjectDescription_test.cpp
+              test/src/ObjectArchive_test.cpp
               test/src/TypeFactory_test.cpp
               test/src/Variant_test.cpp)
 
 set (TEST_INCLUDE test/include/ISerializable_test.h
                   test/include/Iterator_test.h
-                  test/include/ObjectDescription_test.h
+                  test/include/ObjectArchive_test.h
                   test/src/TypeFactory_test.cpp
                   test/src/Variant_test.cpp)
                   

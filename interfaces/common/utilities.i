@@ -17,7 +17,7 @@
 #include "AnyIterator.h"
 #include "RandomEngines.h"
 #include "StlIterator.h"
-#include "ObjectDescription.h"
+#include "ObjectArchive.h"
 #include "ISerializable.h"
 #include "Serializer.h"
 #include "UniqueId.h"
@@ -33,7 +33,7 @@
 template <typename IteratorType, typename ValueType> class StlIterator {};
 
 %import "UniqueId.h"
-%import "ObjectDescription.h"
+%import "ObjectArchive.h"
 %import "Serializer.h"
 
 %include "AnyIterator.h"

@@ -8,7 +8,7 @@
 
 #include "Iterator_test.h"
 #include "ISerializable_test.h"
-#include "ObjectDescription_test.h"
+#include "ObjectArchive_test.h"
 #include "TypeFactory_test.h"
 #include "Variant_test.h"
 
@@ -114,11 +114,11 @@ int main()
         TestXmlSerializer();
         TestXmlDeserializer();
 
-        // ObjectDescription tests
+        // ObjectArchive tests
         TestGetTypeDescription();
-        TestGetObjectDescription();
+        TestGetObjectArchive();
         TestSerializeIDescribable();
-        TestObjectDescriptionArchiver();
+        TestObjectArchiveSerializer();
     }
     catch(const utilities::Exception& exception)
     {

@@ -9,6 +9,6 @@
 #pragma once
 
 void TestGetTypeDescription();
-void TestGetObjectDescription();
+void TestGetObjectArchive();
 void TestSerializeIDescribable();
-void TestObjectDescriptionArchiver();
+void TestObjectArchiveSerializer();

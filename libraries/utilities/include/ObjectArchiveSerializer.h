@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ObjectDescriptionArchiver.h (utilities)
+//  File:     ObjectArchiveSerializer.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,7 +12,7 @@
 #include "TypeFactory.h"
 #include "TypeName.h"
 #include "Exception.h"
-#include "ObjectDescription.h"
+#include "ObjectArchive.h"
 
 // stl
 #include <cstdint>
@@ -25,23 +25,27 @@
 
 namespace utilities
 {
-    /// <summary> A serializer that encodes data in an ObjectDescription </summary>
-    class ObjectDescriptionArchiver : public Serializer, public Deserializer
+    /// <summary> A serializer that encodes data in an ObjectArchive </summary>
+    class ObjectArchiveSerializer : public Serializer, public Deserializer
     {
     public:
         /// <summary> Constructor for writing </summary>
         /// <param name="context"> The `SerializationContext` to use </param>
-        ObjectDescriptionArchiver(SerializationContext context) : Deserializer(context) {}
+        ObjectArchiveSerializer(SerializationContext context);
  
         /// <summary> Constructor for reading </summary>
         ///
         /// <param name="objectDescription"> The description to deserialize data from. </summary>
         /// <param name="context"> The `SerializationContext` to use </param>
-        ObjectDescriptionArchiver(const ObjectDescription& objectDescription, SerializationContext context);
+        ObjectArchiveSerializer(const ObjectArchive& objectDescription, SerializationContext context);
 
-        ObjectDescription GetObjectDescription() { return _objectDescription; }
+        /// <summary> Gets the `ObjectArchive` containing the information for the archived object </summary>
+        ///
+        /// <returns> The `ObjectArchive` containing the information  for the archived object </returns>
+        ObjectArchive GetObjectArchive() { return _objectDescription; }
 
     protected:
+        // Serialization
         DECLARE_SERIALIZE_VALUE_OVERRIDE(bool);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(char);
         DECLARE_SERIALIZE_VALUE_OVERRIDE(short);
@@ -63,23 +67,7 @@ namespace utilities
 
         virtual void SerializeObject(const char* name, const ISerializable& value) override;
 
-    private:
-        // Serialization
-        template <typename ValueType, IsFundamental<ValueType> concept = 0>
-        void WriteScalar(const char* name, const ValueType& value);
-
-        void WriteScalar(const char* name, const char* value);
-        void WriteScalar(const char* name, const std::string& value);
-
-        template <typename ValueType>
-        void WriteArray(const char* name, const std::vector<ValueType>& array);
-
-        template <typename ValueType, IsSerializable<ValueType> concept = 0>
-        void WriteArray(const char* name, const std::vector<ValueType>& array);
-
-        ObjectDescription _objectDescription;
-
-    protected:
+        // Deserialization
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(bool);
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(char);
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(short);
@@ -102,7 +90,21 @@ namespace utilities
         virtual bool BeginDeserializeArrayItem(const std::string& typeName) override;
         virtual void EndDeserializeArrayItem(const std::string& typeName) override;
 
-    private:
+   private:
+        // Serialization
+        template <typename ValueType, IsFundamental<ValueType> concept = 0>
+        void WriteScalar(const char* name, const ValueType& value);
+
+        void WriteScalar(const char* name, const char* value);
+        void WriteScalar(const char* name, const std::string& value);
+
+        template <typename ValueType>
+        void WriteArray(const char* name, const std::vector<ValueType>& array);
+
+        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        void WriteArray(const char* name, const std::vector<ValueType>& array);
+
+        // Deserialization
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void ReadScalar(const char* name, ValueType& value);
 
@@ -112,8 +114,10 @@ namespace utilities
         void ReadArray(const char* name, std::vector<ValueType>& array);
 
         void ReadArray(const char* name, std::vector<std::string>& array);
-    };
 
+        // The object description
+        ObjectArchive _objectDescription;
+    };
 }
 
-#include "../tcc/ObjectDescriptionArchiver.tcc"
+#include "../tcc/ObjectArchiveSerializer.tcc"

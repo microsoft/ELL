@@ -8,16 +8,14 @@
 
 #pragma once
 
-// stl
+#include "Serializer.h"
 
 namespace utilities
 {
-    /// <summary> Archiver class. Superclass to Serializer and ObjectDescription. </summary>
-    class ArchiverX
+    /// <summary> Archiver class. Superclass to Serializer and Deserializer. </summary>
+    class Archiver : public Serializer, public Deserializer`
     {
     public:
-        virtual ~ArchiverX() = default;
-
-        // crud. we need to expose op>> and op<<, but they're templated. Rats.
+        virtual ~Archiver() = default;
     };
 }

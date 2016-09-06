@@ -16,7 +16,7 @@
 #include "DenseDataVector.h"
 
 // utilities
-#include "ObjectDescription.h"
+#include "ObjectArchive.h"
 
 // stl
 #include <vector>

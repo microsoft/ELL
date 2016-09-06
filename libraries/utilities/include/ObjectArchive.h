@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ObjectDescription.h (utilities)
+//  File:     ObjectArchive.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,13 +22,17 @@
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
+    // Temporary
+    using Archiver = Serializer; // ObjectArchive;
+    using Unarchiver = Deserializer; // ObjectArchive;
+
     /// <summary> Holds information describing the properties (fields) of an object </summary>
-    class ObjectDescription
+    class ObjectArchive
     {
     public:
-        using PropertyCollection = std::unordered_map<std::string, ObjectDescription>;
+        using PropertyCollection = std::unordered_map<std::string, ObjectArchive>;
 
-        ObjectDescription() = default;
+        ObjectArchive() = default;
 
         /// <summary> Gets the string representing the type name of this object </summary>
         ///
@@ -62,13 +66,13 @@ namespace utilities
         ///
         /// <param name="propertyName"> The name of the property to retrieve </param>
         /// <returns> The property's description </returns>
-        const ObjectDescription& operator[](const std::string& propertyName) const;
+        const ObjectArchive& operator[](const std::string& propertyName) const;
 
         /// <summary> Retrieves an object property given its name </summary>
         ///
         /// <param name="propertyName"> The name of the property to retrieve </param>
         /// <returns> The property's description </returns>
-        ObjectDescription& operator[](const std::string& propertyName);
+        ObjectArchive& operator[](const std::string& propertyName);
 
         /// <summary> Tells if the object description has a value associated with it. </summary>
         ///
@@ -119,8 +123,8 @@ namespace utilities
     private:
         std::string _typeName;
         Variant _value;
-        mutable std::unordered_map<std::string, ObjectDescription> _properties;
-        mutable std::function<ObjectDescription(const ObjectDescription* self)> _fillInPropertiesFunction;
+        mutable std::unordered_map<std::string, ObjectArchive> _properties;
+        mutable std::function<ObjectArchive(const ObjectArchive* self)> _fillInPropertiesFunction;
 
         // friends
         friend class IDescribable;
@@ -136,10 +140,6 @@ namespace utilities
         void FillInDescription() const;
     };
     
-    // Temporary
-    using Archiver = Serializer; // ObjectDescription;
-    using Unarchiver = Deserializer; // ObjectDescription;
-
     /// <summary>
     /// IDescribable is the Base class for describable objects. In order to be able to use the
     /// IDescribable interface for serialization, you must also implement GetRuntimeTypeName, GetTypeName,
@@ -152,8 +152,8 @@ namespace utilities
 
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <returns> The ObjectDescription for the object </returns>
-        ObjectDescription GetDescription() const;
+        /// <returns> The ObjectArchive for the object </returns>
+        ObjectArchive GetDescription() const;
 
         /// <summary> Creates an object from an `Archiver` </summary>
         ///
@@ -170,4 +170,4 @@ namespace utilities
     };
 }
 
-#include "../tcc/ObjectDescription.tcc"
+#include "../tcc/ObjectArchive.tcc"

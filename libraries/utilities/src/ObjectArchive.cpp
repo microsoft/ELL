@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ObjectDescription.cpp (utilities)
+//  File:     ObjectArchive.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ObjectDescription.h"
-#include "ObjectDescriptionArchiver.h"
+#include "ObjectArchive.h"
+#include "ObjectArchiveSerializer.h"
 
 // utiliites
 #include "Exception.h"
@@ -18,9 +18,9 @@
 namespace utilities
 {
     //
-    // ObjectDescription
+    // ObjectArchive
     //
-    const ObjectDescription::PropertyCollection& ObjectDescription::GetProperties() const
+    const ObjectArchive::PropertyCollection& ObjectArchive::GetProperties() const
     {
         for(const auto& prop: _properties)
         {
@@ -29,7 +29,7 @@ namespace utilities
         return _properties;
     }
 
-    ObjectDescription::PropertyCollection& ObjectDescription::GetProperties()
+    ObjectArchive::PropertyCollection& ObjectArchive::GetProperties()
     {
         for(const auto& prop: _properties)
         {
@@ -38,12 +38,12 @@ namespace utilities
         return _properties;
     }
 
-    bool ObjectDescription::HasProperty(const std::string& name) const
+    bool ObjectArchive::HasProperty(const std::string& name) const
     {
         return _properties.find(name) != _properties.end();
     }
 
-    std::string ObjectDescription::GetValueString() const
+    std::string ObjectArchive::GetValueString() const
     {
         if(HasValue())
         {
@@ -55,7 +55,7 @@ namespace utilities
         }
     }
 
-    void ObjectDescription::FillInDescription() const 
+    void ObjectArchive::FillInDescription() const 
     { 
         if(_fillInPropertiesFunction)
         {
@@ -65,7 +65,7 @@ namespace utilities
         }
     }
 
-    const ObjectDescription& ObjectDescription::operator[](const std::string& propertyName) const
+    const ObjectArchive& ObjectArchive::operator[](const std::string& propertyName) const
     {
         auto iter = _properties.find(propertyName); 
         if (iter == _properties.end())
@@ -76,7 +76,7 @@ namespace utilities
         return iter->second;
     }
 
-    ObjectDescription& ObjectDescription::operator[](const std::string& propertyName)
+    ObjectArchive& ObjectArchive::operator[](const std::string& propertyName)
     {
         auto& prop = _properties[propertyName];
         return prop;
@@ -86,11 +86,11 @@ namespace utilities
     // IDescribable
     //
 
-    ObjectDescription IDescribable::GetDescription() const
+    ObjectArchive IDescribable::GetDescription() const
     {
         utilities::SerializationContext context;
-        utilities::ObjectDescriptionArchiver serializer(context);
+        utilities::ObjectArchiveSerializer serializer(context);
         serializer.Serialize(*this);
-        return serializer.GetObjectDescription();
+        return serializer.GetObjectArchive();
     }
 }
