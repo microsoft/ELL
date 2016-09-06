@@ -26,11 +26,19 @@
 namespace utilities
 {
     /// <summary> A serializer that encodes data in an ObjectDescription </summary>
-    class ObjectDescriptionArchiver : public Serializer
+    class ObjectDescriptionArchiver : public Serializer, public Deserializer
     {
     public:
-        /// <summary> Default Constructor. </summary>
-        ObjectDescriptionArchiver() = default;
+        /// <summary> Constructor for writing </summary>
+        /// <param name="context"> The `SerializationContext` to use </param>
+        ObjectDescriptionArchiver(SerializationContext context) : Deserializer(context) {}
+ 
+        /// <summary> Constructor for reading </summary>
+        ///
+        /// <param name="objectDescription"> The description to deserialize data from. </summary>
+        /// <param name="context"> The `SerializationContext` to use </param>
+        ObjectDescriptionArchiver(const ObjectDescription& objectDescription, SerializationContext context);
+
         ObjectDescription GetObjectDescription() { return _objectDescription; }
 
     protected:
@@ -70,16 +78,6 @@ namespace utilities
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
         ObjectDescription _objectDescription;
-    };
-
-    /// <summary> A deserializer that reads data encoded in JSON-formatted text. </summary>
-    class ObjectDescriptionUnarchiver : public Deserializer
-    {
-    public:
-        /// <summary> Constructor </summary>
-        ///
-        /// <param name="objectDescription"> The description to deserialize data from. </summary>
-        ObjectDescriptionUnarchiver(const ObjectDescription& objectDescription, SerializationContext context);
 
     protected:
         DECLARE_DESERIALIZE_VALUE_OVERRIDE(bool);
@@ -114,7 +112,6 @@ namespace utilities
         void ReadArray(const char* name, std::vector<ValueType>& array);
 
         void ReadArray(const char* name, std::vector<std::string>& array);
-        ObjectDescription _objectDescription;
     };
 
 }

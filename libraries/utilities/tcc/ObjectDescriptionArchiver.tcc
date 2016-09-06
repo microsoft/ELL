@@ -80,7 +80,7 @@ namespace utilities
     // Deserialization
     //
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void ObjectDescriptionUnarchiver::ReadScalar(const char* name, ValueType& value)
+    void ObjectDescriptionArchiver::ReadScalar(const char* name, ValueType& value)
     {
         if(std::string{""} == name)
         {
@@ -93,7 +93,7 @@ namespace utilities
     }
 
     template <>
-    inline void ObjectDescriptionUnarchiver::ReadScalar(const char* name, bool& value)
+    inline void ObjectDescriptionArchiver::ReadScalar(const char* name, bool& value)
     {
         if(std::string{""} == name)
         {
@@ -106,7 +106,7 @@ namespace utilities
     }
 
     // This function is inline just so it appears next to the other Read* functions
-    inline void ObjectDescriptionUnarchiver::ReadScalar(const char* name, std::string& value) 
+    inline void ObjectDescriptionArchiver::ReadScalar(const char* name, std::string& value) 
     {
         if(std::string{""} == name)
         {
@@ -119,7 +119,7 @@ namespace utilities
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void ObjectDescriptionUnarchiver::ReadArray(const char* name, std::vector<ValueType>& array)
+    void ObjectDescriptionArchiver::ReadArray(const char* name, std::vector<ValueType>& array)
     {
         if(std::string{""} == name)
         {
@@ -131,7 +131,7 @@ namespace utilities
         }
     }
 
-    inline void ObjectDescriptionUnarchiver::ReadArray(const char* name, std::vector<std::string>& array)
+    inline void ObjectDescriptionArchiver::ReadArray(const char* name, std::vector<std::string>& array)
     {
         if(std::string{""} == name)
         {

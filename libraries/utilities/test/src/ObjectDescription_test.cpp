@@ -229,9 +229,9 @@ void TestSerializeIDescribable()
 void TestObjectDescriptionArchiver()
 {
     utilities::SerializationContext context;
-    utilities::ObjectDescriptionArchiver serializer1;
-    utilities::ObjectDescriptionArchiver serializer2;
-    utilities::ObjectDescriptionArchiver serializer3;
+    utilities::ObjectDescriptionArchiver serializer1(context);
+    utilities::ObjectDescriptionArchiver serializer2(context);
+    utilities::ObjectDescriptionArchiver serializer3(context);
     
     InnerObject innerObj(3, 4.5);
     serializer1.Serialize(innerObj);
@@ -254,18 +254,18 @@ void TestObjectDescriptionArchiver()
     PrintDescription(objectDescription3);
     std::cout << std::endl;
 
-    utilities::ObjectDescriptionUnarchiver deserializer1(objectDescription1, context);
+    utilities::ObjectDescriptionArchiver deserializer1(objectDescription1, context);
     InnerObject deserializedInner;
     deserializer1.Deserialize(deserializedInner);
     testing::ProcessTest("Deserialize with ObjectDescriptionArchiver check",  deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);        
 
     // TODO: fix error with deserializing compound objects
-    utilities::ObjectDescriptionUnarchiver deserializer2(objectDescription2, context);
+    utilities::ObjectDescriptionArchiver deserializer2(objectDescription2, context);
     OuterObject deserializedOuter;
     deserializer2.Deserialize(deserializedOuter);
     testing::ProcessTest("Deserialize with ObjectDescriptionArchiver check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
 
-    utilities::ObjectDescriptionUnarchiver deserializer3(objectDescription3, context);
+    utilities::ObjectDescriptionArchiver deserializer3(objectDescription3, context);
     DerivedObject deserializedDerived;
     deserializer3.Deserialize(deserializedDerived);
     testing::ProcessTest("Deserialize with ObjectDescriptionArchiver check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        

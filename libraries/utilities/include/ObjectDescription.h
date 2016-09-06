@@ -167,20 +167,7 @@ namespace utilities
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "IDescribable"; }
-
-        /// <summary> Gets the name of this type (for serialization). </summary>
-        ///
-        /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override = 0;
     };
-
-    /// <summary> Enabled if ValueType inherits from IDescribable. </summary>
-    template <typename ValueType>
-    using IsDescribable = typename std::enable_if_t<std::is_base_of<IDescribable, typename std::decay<ValueType>::type>::value, int>;
-
-    /// <summary> Enabled if ValueType does not inherit from IDescribable. </summary>
-    template <typename ValueType>
-    using IsNotDescribable = typename std::enable_if_t<(!std::is_base_of<IDescribable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
 }
 
 #include "../tcc/ObjectDescription.tcc"

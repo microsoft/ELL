@@ -89,7 +89,7 @@ namespace utilities
     ObjectDescription IDescribable::GetDescription() const
     {
         utilities::SerializationContext context;
-        utilities::ObjectDescriptionArchiver serializer;
+        utilities::ObjectDescriptionArchiver serializer(context);
         serializer.Serialize(*this);
         return serializer.GetObjectDescription();
     }
