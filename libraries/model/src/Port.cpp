@@ -33,14 +33,14 @@ namespace model
         return Port::PortType::boolean;
     }
 
-    void Port::Serialize(utilities::Archiver& archiver) const
+    void Port::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["nodeId"] << _node->GetId();
         archiver["name"] << _name;
         archiver["type"] << static_cast<int>(_type);
     }
 
-    void Port::Deserialize(utilities::Unarchiver& archiver)
+    void Port::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::NodeId id;
         archiver["nodeId"] >> id; // ignore it

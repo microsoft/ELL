@@ -13,13 +13,13 @@ namespace predictors
     SingleElementThresholdPredictor::SingleElementThresholdPredictor(size_t index, double threshold) : _index(index), _threshold(threshold)
     {}
 
-    void SingleElementThresholdPredictor::Serialize(utilities::Archiver& archiver) const
+    void SingleElementThresholdPredictor::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["index"] << _index;
         archiver["threshold"] << _threshold;
     }
 
-    void SingleElementThresholdPredictor::Deserialize(utilities::Unarchiver& archiver)
+    void SingleElementThresholdPredictor::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         archiver["index"] >> _index;
         archiver["threshold"] >> _threshold;

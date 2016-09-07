@@ -156,13 +156,13 @@ namespace model
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void Serialize(utilities::Archiver& archiver) const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
         /// <summary> Reads from a Unarchiver. Deserialization is handled explicitly because we need to modify the SerializationContext. </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="archiver"> The archiver. </param>
         /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Unarchiver& archiver) override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         friend class NodeIterator;

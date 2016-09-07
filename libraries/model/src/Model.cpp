@@ -37,7 +37,7 @@ namespace model
         return NodeIterator(this, outputNodes);
     }
 
-    void Model::Serialize(utilities::Archiver& archiver) const
+    void Model::WriteToArchive(utilities::Archiver& archiver) const
     {
         std::vector<const Node*> nodes;
         auto nodeIter = GetNodeIterator();
@@ -50,7 +50,7 @@ namespace model
         archiver["nodes"] << nodes;
     }
 
-    void Model::Deserialize(utilities::Unarchiver& archiver) 
+    void Model::ReadFromArchive(utilities::Unarchiver& archiver) 
     {
         ModelSerializationContext modelContext(archiver.GetContext(), this);
         archiver.PushContext(modelContext);

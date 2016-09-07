@@ -65,16 +65,16 @@ namespace utilities
     ///     uint64_t y = 12;
     ///     std::stringstream stream;
     ///     ArchiverType archiver(stream);
-    ///     archiver.Serialize(x);
-    ///     archiver.Serialize(y);
+    ///     archiver.WriteToArchive(x);
+    ///     archiver.WriteToArchive(y);
     ///
     /// Deserialization must occur in the same order.
     ///
-    ///     UnarchiverType deserializer(stream);
+    ///     UnarchiverType unarchiver(stream);
     ///     double xx;
     ///     uint64_t yy;
-    ///     deserializer.deserialize(xx);
-    ///     deserializer.deserialize(yy);
+    ///     unarchiver.deserialize(xx);
+    ///     unarchiver.deserialize(yy);
     ///     assert(x == xx &amp;&amp; y == yy);
     ///
     /// The Archiver subclasses support serialization of named variables, in which case the
@@ -82,8 +82,8 @@ namespace utilities
     /// serializing named fields in objects.
     ///
     ///     x = 0.4;
-    ///     archiver.Serialize("x", x);
-    ///     deserializer.deserialize("x", xx);
+    ///     archiver.WriteToArchive("x", x);
+    ///     unarchiver.deserialize("x", xx);
     ///     assert(x == xx);
     ///
     /// Serialization of `std::string`s and `std::vector`s of fundamental types is similar.
@@ -95,21 +95,21 @@ namespace utilities
     ///     {
     ///     public:
     ///         Bar();
-    ///         void Deserialize(utilities::Unarchiver&amp; deserializer) const
-    ///         void Serialize(utilities::Archiver&amp; archiver);
+    ///         void ReadFromArchive(utilities::Unarchiver&amp; unarchiver) const
+    ///         void WriteToArchive(utilities::Archiver&amp; archiver);
     ///         virtual std::string GetRuntimeTypeName() const;
     ///
     ///         static std::string GetTypeName();
     ///     }
     ///
     /// A typical implementation of Serialize will include a sequence of
-    /// calls to archiver.Serialize(), in the same order. To serialize the class, call:
+    /// calls to archiver.WriteToArchive(), in the same order. To serialize the class, call:
     ///
     ///     Bar z;
-    ///     archiver.Serialize("z", z);
+    ///     archiver.WriteToArchive("z", z);
     ///
-    /// A typical implementation of Deserialize() will include a similar sequence of calls to
-    /// deserializer.Deserialize().
+    /// A typical implementation of ReadFromArchive() will include a similar sequence of calls to
+    /// archiver.ReadFromArchive().
     ///
     /// Serialization and deserialization of std::unique_pointers to archivable objects
     /// (that is, classes that derive from IArchivable, have a default constructor, and implement
@@ -163,7 +163,7 @@ namespace utilities
         PropertyArchiver operator[](const std::string& name);
 
     protected:
-        // These are all the virtual function that need to be implemented by serializers
+        // These are all the virtual function that need to be implemented by archivers
         DECLARE_ARCHIVE_VALUE_BASE(bool);
         DECLARE_ARCHIVE_VALUE_BASE(char);
         DECLARE_ARCHIVE_VALUE_BASE(short);
@@ -209,7 +209,7 @@ namespace utilities
         void ArchiveItem(const char* name, const std::vector<const ValueType*>& value);
     };
 
-/// <summary> Macros to make repetitive boilerplate code in deserializer implementations easier to implement. </summary>
+/// <summary> Macros to make repetitive boilerplate code in unarchiver implementations easier to implement. </summary>
 #define DECLARE_UNARCHIVE_VALUE_BASE(type) virtual void UnarchiveValue(const char* name, type& value, IsFundamental<type> dummy = 0) = 0;
 #define DECLARE_UNARCHIVE_ARRAY_BASE(type) virtual void UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type> dummy = 0) = 0;
 #define DECLARE_UNARCHIVE_VALUE_OVERRIDE(type) virtual void UnarchiveValue(const char* name, type& value, IsFundamental<type> dummy = 0) override;
@@ -219,7 +219,7 @@ namespace utilities
     class Unarchiver
     {
     public:
-        /// <summary> Represents a deserializer that is scoped to a particular property. </summary>
+        /// <summary> Represents an unarchiver that is scoped to a particular property. </summary>
         class PropertyUnarchiver
         {
         public:
@@ -232,7 +232,7 @@ namespace utilities
 
         private:
             friend class Unarchiver;
-            PropertyUnarchiver(Unarchiver& deserializer, const std::string& name);
+            PropertyUnarchiver(Unarchiver& unarchiver, const std::string& name);
             Unarchiver& _unarchiver;
             std::string _propertyName;
         };
@@ -351,7 +351,7 @@ namespace utilities
 #define IMPLEMENT_ARCHIVE_VALUE(base, type) void base::ArchiveValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
 #define IMPLEMENT_ARCHIVE_ARRAY(base, type) void base::ArchiveArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
 
-/// <summary> Macros to make repetitive boilerplate code in deserializer implementations easier to implement. </summary>
+/// <summary> Macros to make repetitive boilerplate code in unarchiver implementations easier to implement. </summary>
 #define IMPLEMENT_UNARCHIVE_VALUE(base, type) void base::UnarchiveValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name, value); }
 #define IMPLEMENT_UNARCHIVE_ARRAY(base, type) void base::UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name, value); }
 

@@ -32,12 +32,12 @@ namespace utilities
         /// <summary> Serializes the object. </summary>
         ///
         /// <param name="archiver">  The archiver. </param>
-        virtual void Serialize(Archiver& archiver) const = 0;
+        virtual void WriteToArchive(Archiver& archiver) const = 0;
 
         /// <summary> Deserializes the object. </summary>
         ///
         /// <param name="archiver"> The unarchiver. </param>
-        virtual void Deserialize(Unarchiver& archiver) = 0;
+        virtual void ReadFromArchive(Unarchiver& archiver) = 0;
 
         /// <summary> Gets the name of this type. </summary>
         ///

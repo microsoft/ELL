@@ -83,7 +83,7 @@ namespace utilities
         std::string GetCurrentIndent() { return std::string(2 * _indent, ' '); }
     };
 
-    /// <summary> A deserializer that reads data encoded in an XML format. </summary>
+    /// <summary> An unarchiver that reads data encoded in an XML format. </summary>
     class SimpleXmlUnarchiver : public Unarchiver
     {
     public:

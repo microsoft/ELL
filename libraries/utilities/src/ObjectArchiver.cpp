@@ -57,7 +57,7 @@ namespace utilities
     {
         if(std::string{""} == name)
         {
-            value.Serialize(*this);
+            value.WriteToArchive(*this);
         }
         else
         {
@@ -127,12 +127,12 @@ namespace utilities
     {
         if (std::string{ "" } == name)
         {
-            value.Deserialize(*this);
+            value.ReadFromArchive(*this);
         }
         else
         {
             ObjectArchiver propertyUnarchiver(_objectDescription[name], GetContext());
-            value.Deserialize(propertyUnarchiver);
+            value.ReadFromArchive(propertyUnarchiver);
         }
     }
 

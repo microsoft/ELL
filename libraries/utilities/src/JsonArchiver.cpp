@@ -55,7 +55,7 @@ namespace utilities
     {
         FinishPreviousLine();
         ++_indent;
-        value.Serialize(*this); // TODO: need to somehow know if we're in an indenting context or not for the subsequent calls to WriteScalar
+        value.WriteToArchive(*this); // TODO: need to somehow know if we're in an indenting context or not for the subsequent calls to WriteScalar
         --_indent;
     }
 
@@ -176,7 +176,7 @@ namespace utilities
 
     void JsonUnarchiver::UnarchiveObject(const char* name, IArchivable& value) 
     {
-        value.Deserialize(*this);
+        value.ReadFromArchive(*this);
     }
 
     void JsonUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName) 

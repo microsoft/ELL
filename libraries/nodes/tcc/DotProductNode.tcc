@@ -52,18 +52,18 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void DotProductNode<ValueType>::Serialize(utilities::Archiver& archiver) const
+    void DotProductNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(archiver);
+        Node::WriteToArchive(archiver);
         archiver[input1PortName] << _input1;
         archiver[input2PortName] << _input2;
         archiver[outputPortName] << _output;
     }
 
     template <typename ValueType>
-    void DotProductNode<ValueType>::Deserialize(utilities::Unarchiver& archiver)
+    void DotProductNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(archiver);
+        Node::ReadFromArchive(archiver);
         archiver[input1PortName] >> _input1;
         archiver[input2PortName] >> _input2;
         archiver[outputPortName] >> _output;

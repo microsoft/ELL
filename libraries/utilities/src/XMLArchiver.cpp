@@ -80,7 +80,7 @@ namespace utilities
     void XmlArchiver::ArchiveObject(const char* name, const IArchivable& value)
     {
         ++_indent;
-        value.Serialize(*this); // TODO: need to somehow know if we're in an indenting context or not for the subsequent calls to WriteScalar
+        value.WriteToArchive(*this); // TODO: need to somehow know if we're in an indenting context or not for the subsequent calls to WriteScalar
         --_indent;
     }
 
@@ -201,7 +201,7 @@ namespace utilities
 
     void SimpleXmlUnarchiver::UnarchiveObject(const char* name, IArchivable& value) 
     {
-        value.Deserialize(*this);
+        value.ReadFromArchive(*this);
     }
 
     void SimpleXmlUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName) 

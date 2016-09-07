@@ -86,7 +86,7 @@ namespace utilities
         void SetEndOfLine(std::string endOfLine);
     };
 
-    /// <summary> A deserializer that reads data encoded in JSON-formatted text. </summary>
+    /// <summary> An unarchiver that reads data encoded in JSON-formatted text. </summary>
     class JsonUnarchiver : public Unarchiver
     {
     public:

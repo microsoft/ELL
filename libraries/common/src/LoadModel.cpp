@@ -187,9 +187,9 @@ namespace common
         {
             utilities::SerializationContext context;
             RegisterNodeTypes(context);
-            UnarchiverType deserializer(stream, context);
+            UnarchiverType unarchiver(stream, context);
             model::Model model;
-            deserializer.Unarchive(model);
+            unarchiver.Unarchive(model);
             return model;
         }
         catch (const std::exception&)

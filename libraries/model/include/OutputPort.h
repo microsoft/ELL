@@ -55,12 +55,12 @@ namespace model
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void Serialize(utilities::Archiver& archiver) const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void Deserialize(utilities::Unarchiver& archiver) override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
         OutputPortBase(const class Node* node, std::string name, PortType type, size_t size);
@@ -113,12 +113,12 @@ namespace model
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void Serialize(utilities::Archiver& archiver) const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void Deserialize(utilities::Unarchiver& archiver) override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         mutable std::vector<ValueType> _cachedOutput;

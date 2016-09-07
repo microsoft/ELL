@@ -47,13 +47,13 @@ namespace predictors
         _b *= scalar;
     }
 
-    void LinearPredictor::Serialize(utilities::Archiver& archiver) const
+    void LinearPredictor::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["w"] << static_cast<std::vector<double>>(_w);
         archiver["b"] << _b;
     }
 
-    void LinearPredictor::Deserialize(utilities::Unarchiver& archiver)
+    void LinearPredictor::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         std::vector<double> w;
         archiver["w"] >> w;

@@ -48,7 +48,7 @@ namespace utilities
     //
     // PropertyArchiver class
     //
-    Unarchiver::PropertyUnarchiver::PropertyUnarchiver(Unarchiver& deserializer, const std::string& name) : _unarchiver(deserializer), _propertyName(name)
+    Unarchiver::PropertyUnarchiver::PropertyUnarchiver(Unarchiver& archiver, const std::string& name) : _unarchiver(archiver), _propertyName(name)
     {};
 
     //
