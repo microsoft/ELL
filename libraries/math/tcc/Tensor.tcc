@@ -102,7 +102,7 @@ namespace math
     }
 
     template<typename ElementType>
-    inline ElementType VectorReferenceBase<ElementType>::Norm2() const
+    ElementType VectorReferenceBase<ElementType>::Norm2() const
     {
 #ifdef USE_BLAS
         return Blas::Nrm2(_size, _pData, _stride);
@@ -112,19 +112,19 @@ namespace math
     }
 
     template<typename ElementType>
-    inline ElementType VectorReferenceBase<ElementType>::Norm1() const
+    ElementType VectorReferenceBase<ElementType>::Norm1() const
     {
         return Aggregate([](ElementType x) { return std::abs(x); });
     }
 
     template<typename ElementType>
-    inline ElementType VectorReferenceBase<ElementType>::Norm0() const
+    ElementType VectorReferenceBase<ElementType>::Norm0() const
     {
         return Aggregate([](ElementType x) { return x!=0 ? 1 : 0; });
     }
 
     template<typename ElementType>
-    inline ElementType VectorReferenceBase<ElementType>::Min() const
+    ElementType VectorReferenceBase<ElementType>::Min() const
     {
         ElementType result = *_pData;
         const ElementType* ptr = _pData+1;
@@ -141,7 +141,7 @@ namespace math
     }
 
     template<typename ElementType>
-    inline ElementType VectorReferenceBase<ElementType>::Max() const
+    ElementType VectorReferenceBase<ElementType>::Max() const
     {
         ElementType result = *_pData;
         const ElementType* ptr = _pData+1;
@@ -190,37 +190,37 @@ namespace math
     //
 
     template<typename ElementType, TensorOrientation Orientation>
-    inline VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetReference()
+    VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetReference()
     {
         return VectorReference<ElementType, Orientation>(_pData, _size, _stride);
     }
 
     template<typename ElementType, TensorOrientation Orientation>
-    inline const VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetReference() const
+    const VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetReference() const
     {
         return VectorReference<ElementType, Orientation>(_pData, _size, _stride);
     }
 
     template<typename ElementType, TensorOrientation Orientation>
-    inline VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier)
+    VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier)
     {
         return VectorReference<ElementType, Orientation>(_pData + offset * _stride, size, strideMultiplier * _stride);
     }
 
     template<typename ElementType, TensorOrientation Orientation>
-    inline const VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier) const
+    const VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier) const
     {
         return VectorReference<ElementType, Orientation>(_pData + offset * _stride, size, strideMultiplier * _stride);
     }
 
     template<typename ElementType, TensorOrientation Orientation>
-    inline VectorReference<ElementType, FlipOrientation<Orientation>::value> VectorReference<ElementType, Orientation>::Transpose()
+    VectorReference<ElementType, FlipOrientation<Orientation>::value> VectorReference<ElementType, Orientation>::Transpose()
     {
         return VectorReference<ElementType, FlipOrientation<Orientation>::value>(_pData, _size, _stride);
     }
 
     template<typename ElementType, TensorOrientation Orientation>
-    inline const VectorReference<ElementType, FlipOrientation<Orientation>::value> VectorReference<ElementType, Orientation>::Transpose() const
+    const VectorReference<ElementType, FlipOrientation<Orientation>::value> VectorReference<ElementType, Orientation>::Transpose() const
     {
         return VectorReference<ElementType, FlipOrientation<Orientation>::value>(_pData, _size, _stride);
     }
@@ -254,13 +254,13 @@ namespace math
     //
 
     template<typename ElementType, TensorOrientation Orientation>
-    inline Vector<ElementType, Orientation>::Vector(size_t size) : _data(size), VectorReference<ElementType, Orientation>(nullptr, size, 1)
+    Vector<ElementType, Orientation>::Vector(size_t size) : _data(size), VectorReference<ElementType, Orientation>(nullptr, size, 1)
     {
         _pData = _data.data();
     }
 
     template<typename ElementType, TensorOrientation Orientation>
-    inline Vector<ElementType, Orientation>::Vector(std::initializer_list<ElementType> list) : _data(list.begin(), list.end()), VectorReference<ElementType, Orientation>(nullptr, list.size(), 1)
+    Vector<ElementType, Orientation>::Vector(std::initializer_list<ElementType> list) : _data(list.begin(), list.end()), VectorReference<ElementType, Orientation>(nullptr, list.size(), 1)
     {
         _pData = _data.data(); // TODO do this in a privat emember called setDataPointer
     }

@@ -170,7 +170,9 @@ void TestSingleVectorProduct()
 
 void TestConstDoubleVector()
 {
-
+    const math::DoubleRowVector u{ 0, 1, 0, 1, 0 };
+    auto v = u.GetReference();
+    v += 3; // how does this compile and work?
 }
 
 
