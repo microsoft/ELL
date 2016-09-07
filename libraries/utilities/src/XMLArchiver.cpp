@@ -23,12 +23,12 @@ namespace utilities
     //
     // Serialization
     //
-    XmlArchiver::XmlArchiver() : _out(std::cout) 
+    XmlArchiver::XmlArchiver() : _out(std::cout)
     {
         WriteFileHeader();
     }
 
-    XmlArchiver::XmlArchiver(std::ostream& outputStream) : _out(outputStream) 
+    XmlArchiver::XmlArchiver(std::ostream& outputStream) : _out(outputStream)
     {
         WriteFileHeader();
     }
@@ -39,9 +39,9 @@ namespace utilities
     }
 
     void XmlArchiver::WriteFileHeader()
-    {   
+    {
         // Write XML declaration
-        _out << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";     
+        _out << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
         _out << "<emll version=\"1.0\">\n";
     }
 
@@ -59,7 +59,10 @@ namespace utilities
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, double);
 
     // strings
-    void XmlArchiver::ArchiveValue(const char* name, const std::string& value) { WriteScalar(name, value); }
+    void XmlArchiver::ArchiveValue(const char* name, const std::string& value)
+    {
+        WriteScalar(name, value);
+    }
 
     // IArchivable
     void XmlArchiver::BeginArchiveObject(const char* name, const IArchivable& value)
@@ -122,7 +125,7 @@ namespace utilities
         {
             _out << " name='" << name << "'";
         }
-        _out << " type='" << baseTypeName <<  "'>" << std::endl;
+        _out << " type='" << baseTypeName << "'>" << std::endl;
         ++_indent;
         for (const auto& item : array)
         {
@@ -141,14 +144,14 @@ namespace utilities
         ReadFileHeader();
     }
 
-    SimpleXmlUnarchiver::SimpleXmlUnarchiver(std::istream& inputStream, SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(inputStream, "<>?=/'\"") 
+    SimpleXmlUnarchiver::SimpleXmlUnarchiver(std::istream& inputStream, SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(inputStream, "<>?=/'\"")
     {
-        ReadFileHeader(); 
+        ReadFileHeader();
     }
 
-    SimpleXmlUnarchiver::~SimpleXmlUnarchiver() 
+    SimpleXmlUnarchiver::~SimpleXmlUnarchiver()
     {
-        ReadFileFooter(); 
+        ReadFileFooter();
     }
 
     IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, bool);
@@ -161,29 +164,29 @@ namespace utilities
 
     // TODO: add a "read tag"-type function
     void SimpleXmlUnarchiver::ReadFileHeader()
-    {   
-        _tokenizer.MatchTokens({"<", "?", "xml"});
-        while(_tokenizer.PeekNextToken() != "?")
+    {
+        _tokenizer.MatchTokens({ "<", "?", "xml" });
+        while (_tokenizer.PeekNextToken() != "?")
         {
             _tokenizer.ReadNextToken();
         }
-        _tokenizer.MatchTokens({"?", ">"});
-        _tokenizer.MatchTokens({"<", "emll", "version", "=", "\"", "1.0", "\"", ">"});
+        _tokenizer.MatchTokens({ "?", ">" });
+        _tokenizer.MatchTokens({ "<", "emll", "version", "=", "\"", "1.0", "\"", ">" });
     }
 
     void SimpleXmlUnarchiver::ReadFileFooter()
     {
-        _tokenizer.MatchTokens({"<", "/", "emll", ">"});
+        _tokenizer.MatchTokens({ "<", "/", "emll", ">" });
     }
 
     // strings
-    void SimpleXmlUnarchiver::UnarchiveValue(const char* name, std::string& value) 
-    { 
-        ReadScalar(name, value); 
+    void SimpleXmlUnarchiver::UnarchiveValue(const char* name, std::string& value)
+    {
+        ReadScalar(name, value);
     }
 
     // IArchivable
-    std::string SimpleXmlUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName) 
+    std::string SimpleXmlUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
         auto rawTypeName = typeName;
@@ -191,23 +194,23 @@ namespace utilities
         _tokenizer.MatchToken("<");
         auto readTypeName = XmlUtilities::DecodeTypeName(_tokenizer.ReadNextToken());
         assert(readTypeName != "");
-        if(hasName)
+        if (hasName)
         {
-            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
+            _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
         }
         _tokenizer.MatchToken(">");
         return readTypeName;
     }
 
-    void SimpleXmlUnarchiver::UnarchiveObject(const char* name, IArchivable& value) 
+    void SimpleXmlUnarchiver::UnarchiveObject(const char* name, IArchivable& value)
     {
         value.ReadFromArchive(*this);
     }
 
-    void SimpleXmlUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName) 
+    void SimpleXmlUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
     {
         auto EncodedTypeName = XmlUtilities::EncodeTypeName(typeName);
-        _tokenizer.MatchTokens({"<", "/", EncodedTypeName, ">"});
+        _tokenizer.MatchTokens({ "<", "/", EncodedTypeName, ">" });
     }
 
     //
@@ -230,13 +233,13 @@ namespace utilities
     {
         bool hasName = name != std::string("");
 
-        _tokenizer.MatchTokens({"<", "Array"});
-        if(hasName)
+        _tokenizer.MatchTokens({ "<", "Array" });
+        if (hasName)
         {
-            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
+            _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
         }
 
-        _tokenizer.MatchTokens({"type", "=", "'", typeName, "'", ">"});
+        _tokenizer.MatchTokens({ "type", "=", "'", typeName, "'", ">" });
     }
 
     bool SimpleXmlUnarchiver::BeginUnarchiveArrayItem(const std::string& typeName)
@@ -246,7 +249,7 @@ namespace utilities
         auto token2 = _tokenizer.ReadNextToken();
         _tokenizer.PutBackToken(token2);
         _tokenizer.PutBackToken(token1);
-        if(token1+token2 == "</")
+        if (token1 + token2 == "</")
         {
             return false;
         }
@@ -262,7 +265,7 @@ namespace utilities
 
     void SimpleXmlUnarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
-        _tokenizer.MatchTokens({"<", "/", "Array", ">"});
+        _tokenizer.MatchTokens({ "<", "/", "Array", ">" });
     }
 
     //
@@ -282,10 +285,10 @@ namespace utilities
 
         // copy characters from str until we hit an escaped character, then prepend it with a backslash
         std::stringstream s;
-        for(auto ch: str)
+        for (auto ch : str)
         {
             auto encoding = charCodes[ch];
-            if(encoding == '\0') // no encoding
+            if (encoding == '\0') // no encoding
             {
                 s.put(ch);
             }
@@ -312,12 +315,12 @@ namespace utilities
 
         std::stringstream s;
         bool prevWasBackslash = false;
-        for(auto ch: str)
+        for (auto ch : str)
         {
-            if(prevWasBackslash)
+            if (prevWasBackslash)
             {
                 auto encoding = charCodes[ch];
-                if(encoding == '\0') // nothing special
+                if (encoding == '\0') // nothing special
                 {
                     s.put('\\'); // emit previous backslash
                     s.put(ch); // emit character
@@ -330,7 +333,7 @@ namespace utilities
             }
             else
             {
-                if(ch == '\\')
+                if (ch == '\\')
                 {
                     prevWasBackslash = true;
                 }
@@ -342,13 +345,13 @@ namespace utilities
             }
         }
 
-        if(prevWasBackslash)
+        if (prevWasBackslash)
         {
             s.put('\\');
         }
         return s.str();
     }
-        std::string XmlUtilities::EncodeTypeName(const std::string& str)
+    std::string XmlUtilities::EncodeTypeName(const std::string& str)
     {
         // convert '<' into '(' etc.
         auto result = str;

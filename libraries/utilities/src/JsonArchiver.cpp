@@ -21,9 +21,13 @@ namespace utilities
     //
     // Serialization
     //
-    JsonArchiver::JsonArchiver() : _out(std::cout) {}
+    JsonArchiver::JsonArchiver() : _out(std::cout)
+    {
+    }
 
-    JsonArchiver::JsonArchiver(std::ostream& outputStream) : _out(outputStream) {}
+    JsonArchiver::JsonArchiver(std::ostream& outputStream) : _out(outputStream)
+    {
+    }
 
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, bool);
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, char);
@@ -34,7 +38,10 @@ namespace utilities
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, double);
 
     // strings
-    void JsonArchiver::ArchiveValue(const char* name, const std::string& value) { WriteScalar(name, value); }
+    void JsonArchiver::ArchiveValue(const char* name, const std::string& value)
+    {
+        WriteScalar(name, value);
+    }
 
     // IArchivable
     void JsonArchiver::BeginArchiveObject(const char* name, const IArchivable& value)
@@ -105,10 +112,10 @@ namespace utilities
         _out << "[";
 
         auto numItems = array.size();
-        for(size_t index = 0; index < numItems; ++index)
+        for (size_t index = 0; index < numItems; ++index)
         {
             Archive(*array[index]);
-            if(index != numItems-1)
+            if (index != numItems - 1)
             {
                 _out << ", ";
             }
@@ -135,8 +142,13 @@ namespace utilities
     //
     // Deserialization
     //
-    JsonUnarchiver::JsonUnarchiver(SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(std::cin, ",:{}[]'\"") {}
-    JsonUnarchiver::JsonUnarchiver(std::istream& inputStream, SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(inputStream, ",:{}[]'\"") {}
+    JsonUnarchiver::JsonUnarchiver(SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(std::cin, ",:{}[]'\"")
+    {
+    }
+
+    JsonUnarchiver::JsonUnarchiver(std::istream& inputStream, SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(inputStream, ",:{}[]'\"")
+    {
+    }
 
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, bool);
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, char);
@@ -147,16 +159,16 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, double);
 
     // strings
-    void JsonUnarchiver::UnarchiveValue(const char* name, std::string& value) 
-    { 
-        ReadScalar(name, value); 
+    void JsonUnarchiver::UnarchiveValue(const char* name, std::string& value)
+    {
+        ReadScalar(name, value);
     }
 
     // IArchivable
-    std::string JsonUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName) 
+    std::string JsonUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
-        if(hasName)
+        if (hasName)
         {
             MatchFieldName(name);
         }
@@ -167,27 +179,27 @@ namespace utilities
         assert(encodedTypeName != "");
         _tokenizer.MatchToken("\"");
 
-        if(_tokenizer.PeekNextToken() == ",")
+        if (_tokenizer.PeekNextToken() == ",")
         {
             _tokenizer.ReadNextToken();
         }
         return encodedTypeName;
     }
 
-    void JsonUnarchiver::UnarchiveObject(const char* name, IArchivable& value) 
+    void JsonUnarchiver::UnarchiveObject(const char* name, IArchivable& value)
     {
         value.ReadFromArchive(*this);
     }
 
-    void JsonUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName) 
+    void JsonUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
         _tokenizer.MatchToken("}");
 
         // eat a comma if it exists
-        if(hasName)
+        if (hasName)
         {
-            if(_tokenizer.PeekNextToken() == ",")
+            if (_tokenizer.PeekNextToken() == ",")
             {
                 _tokenizer.ReadNextToken();
             }
@@ -213,18 +225,18 @@ namespace utilities
     void JsonUnarchiver::BeginUnarchiveArray(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
-        if(hasName)
+        if (hasName)
         {
             MatchFieldName(name);
         }
-                
+
         _tokenizer.MatchToken("[");
     }
 
     bool JsonUnarchiver::BeginUnarchiveArrayItem(const std::string& typeName)
     {
         auto maybeEndArray = _tokenizer.PeekNextToken();
-        if(maybeEndArray == "]")
+        if (maybeEndArray == "]")
         {
             return false;
         }
@@ -236,12 +248,12 @@ namespace utilities
 
     void JsonUnarchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {
-        if(_tokenizer.PeekNextToken() == ",")
+        if (_tokenizer.PeekNextToken() == ",")
         {
             _tokenizer.ReadNextToken();
         }
     }
-    
+
     void JsonUnarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
         _tokenizer.MatchToken("]");
@@ -251,11 +263,11 @@ namespace utilities
     {
         _tokenizer.MatchToken("\"");
         auto s = _tokenizer.ReadNextToken();
-        if(s != key)
+        if (s != key)
         {
-            throw InputException(InputExceptionErrors::badStringFormat, std::string{"Failed to match name "} + key + ", got: " + s);
+            throw InputException(InputExceptionErrors::badStringFormat, std::string{ "Failed to match name " } + key + ", got: " + s);
         }
-        _tokenizer.MatchTokens({"\"", ":"});
+        _tokenizer.MatchTokens({ "\"", ":" });
     }
 
     //
@@ -277,10 +289,10 @@ namespace utilities
 
         // copy characters from str until we hit an escaped character, then prepend it with a backslash
         std::stringstream s;
-        for(auto ch: str)
+        for (auto ch : str)
         {
             auto encoding = charCodes[ch];
-            if(encoding == '\0') // no encoding
+            if (encoding == '\0') // no encoding
             {
                 s.put(ch);
             }
@@ -307,12 +319,12 @@ namespace utilities
 
         std::stringstream s;
         bool prevWasBackslash = false;
-        for(auto ch: str)
+        for (auto ch : str)
         {
-            if(prevWasBackslash)
+            if (prevWasBackslash)
             {
                 auto encoding = charCodes[ch];
-                if(encoding == '\0') // nothing special
+                if (encoding == '\0') // nothing special
                 {
                     s.put('\\'); // emit previous backslash
                     s.put(ch); // emit character
@@ -325,7 +337,7 @@ namespace utilities
             }
             else
             {
-                if(ch == '\\')
+                if (ch == '\\')
                 {
                     prevWasBackslash = true;
                 }
@@ -337,7 +349,7 @@ namespace utilities
             }
         }
 
-        if(prevWasBackslash)
+        if (prevWasBackslash)
         {
             s.put('\\');
         }

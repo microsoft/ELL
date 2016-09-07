@@ -17,7 +17,7 @@ namespace utilities
         auto thisPtr = dynamic_cast<const VariantDerived<ValueType>*>(this);
         if (thisPtr == nullptr)
         {
-//            assert(false);
+            //            assert(false);
             throw InputException(InputExceptionErrors::typeMismatch, std::string{ "VariantBase::GetValue called with wrong type. Type: " + TypeName<ValueType>::GetName() });
         }
 
@@ -106,7 +106,10 @@ namespace utilities
 
         using std::to_string;
         using utilities::to_string;
-        inline std::string to_string(const std::string& str) { return str; }
+        inline std::string to_string(const std::string& str)
+        {
+            return str;
+        }
 
         template <typename ValueType>
         auto GetValueString(const ValueType& value, int) -> decltype(to_string(value), std::string())
@@ -134,7 +137,7 @@ namespace utilities
     }
 
     template <typename ValueType>
-    void VariantDerived<ValueType>::UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context) 
+    void VariantDerived<ValueType>::UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context)
     {
         archiver.Unarchive(name, _value);
     }

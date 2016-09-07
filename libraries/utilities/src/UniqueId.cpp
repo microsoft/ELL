@@ -21,9 +21,15 @@ namespace utilities
         ++_nextId;
     }
 
-    bool UniqueId::operator==(const UniqueId& other) const { return _id == other._id; }
+    bool UniqueId::operator==(const UniqueId& other) const
+    {
+        return _id == other._id;
+    }
 
-    bool UniqueId::operator!=(const UniqueId& other) const { return !(other == *this); }
+    bool UniqueId::operator!=(const UniqueId& other) const
+    {
+        return !(other == *this);
+    }
 
     std::ostream& operator<<(std::ostream& stream, const UniqueId& id)
     {

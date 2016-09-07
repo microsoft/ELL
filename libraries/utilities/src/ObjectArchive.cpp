@@ -37,7 +37,7 @@ namespace utilities
 
     std::string ObjectArchive::GetValueString() const
     {
-        if(HasValue())
+        if (HasValue())
         {
             return _value.ToString();
         }
@@ -49,7 +49,7 @@ namespace utilities
 
     const ObjectArchive& ObjectArchive::operator[](const std::string& propertyName) const
     {
-        auto iter = _properties.find(propertyName); 
+        auto iter = _properties.find(propertyName);
         if (iter == _properties.end())
         {
             throw InputException(InputExceptionErrors::badData);

@@ -18,11 +18,11 @@
 
 namespace utilities
 {
-    ObjectArchiver::ObjectArchiver(SerializationContext context) : Unarchiver(context) 
-    {        
+    ObjectArchiver::ObjectArchiver(SerializationContext context) : Unarchiver(context)
+    {
     }
 
-    ObjectArchiver::ObjectArchiver(const ObjectArchive& objectDescription, SerializationContext context) : Unarchiver(std::move(context)), _objectDescription(objectDescription) 
+    ObjectArchiver::ObjectArchiver(const ObjectArchive& objectDescription, SerializationContext context) : Unarchiver(std::move(context)), _objectDescription(objectDescription)
     {
     }
 
@@ -38,9 +38,9 @@ namespace utilities
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, double);
 
     // strings
-    void ObjectArchiver::ArchiveValue(const char* name, const std::string& value) 
+    void ObjectArchiver::ArchiveValue(const char* name, const std::string& value)
     {
-        if(std::string{""} == name)
+        if (std::string{ "" } == name)
         {
             _objectDescription.SetValue(value);
             _objectDescription << value;
@@ -55,7 +55,7 @@ namespace utilities
 
     void ObjectArchiver::ArchiveObject(const char* name, const IArchivable& value)
     {
-        if(std::string{""} == name)
+        if (std::string{ "" } == name)
         {
             value.WriteToArchive(*this);
         }
@@ -87,7 +87,7 @@ namespace utilities
 
     void ObjectArchiver::ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array)
     {
-        if(std::string{""} == name)
+        if (std::string{ "" } == name)
         {
             _objectDescription.SetValue(array);
             _objectDescription << array;
@@ -110,9 +110,9 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, double);
 
     // strings
-    void ObjectArchiver::UnarchiveValue(const char* name, std::string& value) 
-    { 
-        if(std::string{""} == name)
+    void ObjectArchiver::UnarchiveValue(const char* name, std::string& value)
+    {
+        if (std::string{ "" } == name)
         {
             _objectDescription >> value;
         }
@@ -123,7 +123,7 @@ namespace utilities
     }
 
     // IArchivable
-    void ObjectArchiver::UnarchiveObject(const char* name, IArchivable& value) 
+    void ObjectArchiver::UnarchiveObject(const char* name, IArchivable& value)
     {
         if (std::string{ "" } == name)
         {
@@ -149,7 +149,7 @@ namespace utilities
 
     void ObjectArchiver::UnarchiveArray(const char* name, std::vector<std::string>& array)
     {
-        if(std::string{""} == name)
+        if (std::string{ "" } == name)
         {
             _objectDescription >> array;
         }
@@ -165,8 +165,6 @@ namespace utilities
     }
 
     void ObjectArchiver::EndUnarchiveArrayItem(const std::string& typeName)
-    {        
+    {
     }
-
-
 }
