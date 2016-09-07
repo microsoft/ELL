@@ -23,19 +23,19 @@ namespace utilities
     //
     // Serialization
     //
-    XmlArchiver::XmlArchiver() : _out(std::cout)
-    {
+    XmlArchiver::XmlArchiver() : _out(std::cout), _ready(true)
+    {        
         WriteFileHeader();
     }
 
-    XmlArchiver::XmlArchiver(std::ostream& outputStream) : _out(outputStream)
+    XmlArchiver::XmlArchiver(std::ostream& outputStream) : _out(outputStream), _ready(true)
     {
         WriteFileHeader();
     }
 
     XmlArchiver::~XmlArchiver()
     {
-        WriteFileFooter();
+        CloseStream();
     }
 
     void XmlArchiver::WriteFileHeader()
@@ -78,17 +78,12 @@ namespace utilities
             _out << " name='" << name << "'";
         }
         _out << ">" << std::endl;
-    }
-
-    void XmlArchiver::ArchiveObject(const char* name, const IArchivable& value)
-    {
-        ++_indent;
-        value.WriteToArchive(*this); // TODO: need to somehow know if we're in an indenting context or not for the subsequent calls to WriteScalar
-        --_indent;
+        IncrementIndent();
     }
 
     void XmlArchiver::EndArchiveObject(const char* name, const IArchivable& value)
     {
+        DecrementIndent();
         auto indent = GetCurrentIndent();
         auto typeName = XmlUtilities::EncodeTypeName(value.GetRuntimeTypeName());
         _out << indent;
@@ -126,14 +121,29 @@ namespace utilities
             _out << " name='" << name << "'";
         }
         _out << " type='" << baseTypeName << "'>" << std::endl;
-        ++_indent;
+        IncrementIndent();
         for (const auto& item : array)
         {
             Archive(*item);
         }
-        --_indent;
+        DecrementIndent();
         _out << indent;
         _out << "</Array>" << endOfLine;
+    }
+
+    void XmlArchiver::SetIndent(int indent)
+    {
+        _indent = indent;
+    }
+
+    void XmlArchiver::CloseStream()
+    {
+        if(_ready)
+        {
+            WriteFileFooter();
+            _out.flush();
+            _ready = false;
+        }
     }
 
     //
@@ -200,11 +210,6 @@ namespace utilities
         }
         _tokenizer.MatchToken(">");
         return readTypeName;
-    }
-
-    void SimpleXmlUnarchiver::UnarchiveObject(const char* name, IArchivable& value)
-    {
-        value.ReadFromArchive(*this);
     }
 
     void SimpleXmlUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)

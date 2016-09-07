@@ -56,18 +56,13 @@ namespace utilities
         _out << "{\n";
         _out << indent << "  \"_type\": \"" << value.GetRuntimeTypeName() << "\"";
         SetEndOfLine(",\n");
-    }
-
-    void JsonArchiver::ArchiveObject(const char* name, const IArchivable& value)
-    {
         FinishPreviousLine();
-        ++_indent;
-        value.WriteToArchive(*this); // TODO: need to somehow know if we're in an indenting context or not for the subsequent calls to WriteScalar
-        --_indent;
+        IncrementIndent();
     }
 
     void JsonArchiver::EndArchiveObject(const char* name, const IArchivable& value)
     {
+        DecrementIndent();
         bool hasName = name != std::string("");
         _out << "\n"; // Output newline instead of calling "FinishPreviousLine"
         auto indent = GetCurrentIndent();
@@ -184,11 +179,6 @@ namespace utilities
             _tokenizer.ReadNextToken();
         }
         return encodedTypeName;
-    }
-
-    void JsonUnarchiver::UnarchiveObject(const char* name, IArchivable& value)
-    {
-        value.ReadFromArchive(*this);
     }
 
     void JsonUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)

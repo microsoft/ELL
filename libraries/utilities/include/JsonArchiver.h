@@ -58,7 +58,6 @@ namespace utilities
         virtual void ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array) override;
 
         virtual void BeginArchiveObject(const char* name, const IArchivable& value) override;
-        virtual void ArchiveObject(const char* name, const IArchivable& value) override;
         virtual void EndArchiveObject(const char* name, const IArchivable& value) override;
 
         virtual void EndArchiving() override;
@@ -80,6 +79,8 @@ namespace utilities
         std::ostream& _out;
         int _indent = 0;
         std::string _endOfPreviousLine;
+        void IncrementIndent() { ++_indent; }
+        void DecrementIndent() { --_indent; }
         std::string GetCurrentIndent() { return std::string(2 * _indent, ' '); }
         void Indent();
         void FinishPreviousLine();
@@ -123,7 +124,6 @@ namespace utilities
         virtual void EndUnarchiveArray(const char* name, const std::string& typeName) override;
 
         virtual std::string BeginUnarchiveObject(const char* name, const std::string& typeName) override;
-        virtual void UnarchiveObject(const char* name, IArchivable& value) override;
         virtual void EndUnarchiveObject(const char* name, const std::string& typeName) override;
 
     private:

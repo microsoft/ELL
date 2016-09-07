@@ -185,7 +185,7 @@ namespace utilities
         virtual void ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array) = 0;
 
         virtual void BeginArchiveObject(const char* name, const IArchivable& value);
-        virtual void ArchiveObject(const char* name, const IArchivable& value) = 0;
+        virtual void ArchiveObject(const char* name, const IArchivable& value);
         virtual void EndArchiveObject(const char* name, const IArchivable& value);
 
         virtual void EndArchiving() {}
@@ -307,7 +307,7 @@ namespace utilities
 
         // Extra functions needed for deserializing IArchivable objects.
         virtual std::string BeginUnarchiveObject(const char* name, const std::string& typeName);
-        virtual void UnarchiveObject(const char* name, IArchivable& value) = 0;
+        virtual void UnarchiveObject(const char* name, IArchivable& value);
         virtual void EndUnarchiveObject(const char* name, const std::string& typeName);
 
     private:

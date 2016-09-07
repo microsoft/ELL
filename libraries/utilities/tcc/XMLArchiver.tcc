@@ -108,17 +108,18 @@ namespace utilities
 
         // Indent the next line (the line with the array elements), and then 
         // set the indent to 0 (so there isn't indentation inside the line)
-        ++_indent;
-        _out << GetCurrentIndent();
+        auto oldIndent = _indent;
+        IncrementIndent();
+        indent = GetCurrentIndent();
+        _out << indent;
 
-        auto oldIndent = _indent-1;
-        _indent = 0;
+        SetIndent(0);
         for (const auto& item : array)
         {
             Archive(item);
             _out << " ";
         }
-        _indent = oldIndent;
+        SetIndent(oldIndent);
         _out << std::endl;
         _out << indent;
         _out << "</Array>" << std::endl;

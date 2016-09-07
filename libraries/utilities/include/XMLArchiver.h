@@ -61,7 +61,6 @@ namespace utilities
         virtual void ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array) override;
 
         virtual void BeginArchiveObject(const char* name, const IArchivable& value) override;
-        virtual void ArchiveObject(const char* name, const IArchivable& value) override;
         virtual void EndArchiveObject(const char* name, const IArchivable& value) override;
 
     private:
@@ -78,9 +77,16 @@ namespace utilities
         template <typename ValueType>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
-        std::ostream& _out;
-        int _indent = 0;
+        void CloseStream();
+
         std::string GetCurrentIndent() { return std::string(2 * _indent, ' '); }
+        void IncrementIndent() { ++_indent; }
+        void DecrementIndent() { --_indent; }
+        void SetIndent(int indent);
+
+        std::ostream& _out;
+        bool _ready = false;
+        int _indent = 0;
     };
 
     /// <summary> An unarchiver that reads data encoded in an XML format. </summary>
@@ -122,7 +128,6 @@ namespace utilities
         virtual void EndUnarchiveArray(const char* name, const std::string& typeName) override;
 
         virtual std::string BeginUnarchiveObject(const char* name, const std::string& typeName) override;
-        virtual void UnarchiveObject(const char* name, IArchivable& value) override;
         virtual void EndUnarchiveObject(const char* name, const std::string& typeName) override;
 
     private:

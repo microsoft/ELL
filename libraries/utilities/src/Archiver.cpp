@@ -40,6 +40,11 @@ namespace utilities
         // nothing
     }
 
+    void Archiver::ArchiveObject(const char* name, const IArchivable& value)
+    {
+        value.WriteToArchive(*this);
+    }
+
     void Archiver::EndArchiveObject(const char* name, const IArchivable& value)
     {
         // nothing
@@ -79,6 +84,11 @@ namespace utilities
     std::string Unarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
     {
         return typeName;
+    }
+
+    void Unarchiver::UnarchiveObject(const char* name, IArchivable& value)
+    {
+        value.ReadFromArchive(*this);
     }
 
     void Unarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)

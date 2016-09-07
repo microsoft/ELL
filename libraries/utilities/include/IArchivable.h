@@ -39,10 +39,19 @@ namespace utilities
         template <typename ValueType>
         static ValueType CreateObject(const ObjectArchive& archiver);
 
+        /// <summary> Gets the name of this type. </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "IArchivable"; }
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const { return "IArchivable"; }
+
+    protected:
+        friend class Archiver;
+        friend class Unarchiver;
 
         /// <summary> Writes the object to an archiver. </summary>
         ///
@@ -53,11 +62,6 @@ namespace utilities
         ///
         /// <param name="archiver"> The unarchiver. </param>
         virtual void ReadFromArchive(Unarchiver& archiver) = 0;
-
-        /// <summary> Gets the name of this type. </summary>
-        ///
-        /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "IArchivable"; }
     };
 }
 
