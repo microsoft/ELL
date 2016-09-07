@@ -30,8 +30,8 @@ namespace emll
 
 		bool ModelEx::IsPureVector(const model::InputPortBase& port)
 		{
-			const model::PortElementsBase& inputs = port.GetInputElements();
-			return (inputs.NumRanges() == 1 && (inputs.GetRanges().size() > 1));
+			auto ranges = port.GetInputElements().GetRanges();
+			return (ranges.size() == 1 && ranges[0].Size() > 1);
 		}
 
 		bool ModelEx::IsPureBinary(const model::Node& node)

@@ -41,7 +41,7 @@ namespace emll
 		static const std::string c_DelayNodeType = "DelayNode";
 		static const std::string c_UnaryNodeType = "UnaryOperationNode";
 		static const std::string c_BinaryPredicateNodeType = "BinaryPredicateNode";
-		static const std::string c_ElementSelectorNodeType = "ElementSelectorNode";
+		static const std::string c_MultiplexerNodeType = "MultiplexerNode";
 
 		/// <summary>Base class for ML Compiler.</summary>
 		Compiler::Compiler()
@@ -98,13 +98,14 @@ namespace emll
 				{
 					CompileBinaryPredicateNode(node);
 				}
-				else if (IsNodeType(typeName, c_ElementSelectorNodeType))
+				else if (IsNodeType(typeName, c_MultiplexerNodeType))
 				{
 					CompileMultiplexerNode(node);
 				}
 				else
 				{
-					throw new CompilerException(CompilerError::modelNodeTypeNotSupported);
+					//throw new CompilerException(CompilerError::modelNodeTypeNotSupported);
+					std::cout << typeName << std::endl;
 				}
 			});
 			EndFunction();
@@ -412,6 +413,9 @@ namespace emll
 			{
 				case model::Port::PortType::real:
 					CompileBinaryPredicateNode(static_cast<const nodes::BinaryPredicateNode<double>&>(node));
+					break;
+				case model::Port::PortType::integer:
+					CompileBinaryPredicateNode(static_cast<const nodes::BinaryPredicateNode<int>&>(node));
 					break;
 				default:
 					throw new CompilerException(CompilerError::portTypeNotSupported);

@@ -5,7 +5,7 @@ void TestCppCompilerGeneral();
 void TestBinaryVectorCpp(bool expanded);
 void TestSumCpp(bool expanded);
 void TestBinaryPredicateCpp();
-void TestElementSelectorCpp();
+void TestMultiplexerCpp();
 void TestForestCpp();
 void TestDotProductCpp();
 void TestAccumulatorCpp(bool expanded);

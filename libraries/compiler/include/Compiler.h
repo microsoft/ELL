@@ -120,6 +120,8 @@ namespace emll
 			virtual void CompileSumNode(const nodes::SumNode<int>& node) { NotSupported(); }
 			///<summary>Compile a binary predicate</summary>
 			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) { NotSupported(); }
+			///<summary>Compile a binary predicate</summary>
+			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<int>& node) { NotSupported(); }
 			///<summary>Compile a DotProductNode</summary>
 			virtual void CompileDotProductNode(const nodes::DotProductNode<double>& node) { NotSupported(); }
 			///<summary>Compile a AccumulatorNode</summary>

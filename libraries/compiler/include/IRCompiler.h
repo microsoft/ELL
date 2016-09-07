@@ -71,6 +71,8 @@ namespace emll
 			virtual void CompileAccumulatorNode(const nodes::AccumulatorNode<int>& node) override { CompileAccumulator<int>(node); }
 			///<summary>Compile a binary predicate</summary>
 			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) override { CompileBinaryPredicate<double>(node); };
+			///<summary>Compile a binary predicate</summary>
+			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<int>& node) override { CompileBinaryPredicate<int>(node);}
 			///<summary>Compile a DelayNode</summary>
 			virtual void CompileDelayNode(const nodes::DelayNode<double>& node) override { CompileDelay<double>(node); }
 			///<summary>Compile a DelayNode</summary>

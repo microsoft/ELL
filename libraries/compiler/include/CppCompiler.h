@@ -72,16 +72,11 @@ namespace emll
 			virtual void CompileAccumulatorNode(const nodes::AccumulatorNode<int>& node) { CompileAccumulator<int>(node); }
 
 			///<summary>Compile a binary predicate</summary>
-			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) override 
-			{ 
-				CompileBinaryPredicate<double>(node); 
-			}
-
+			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) override { CompileBinaryPredicate<double>(node); }
+			///<summary>Compile a binary predicate</summary>
+			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<int>& node) override { CompileBinaryPredicate<int>(node);}
 			///<summary>Ensure a variable is emitted</summary>
-			virtual void EnsureVarEmitted(Variable* pVar) override
-			{
-				EnsureEmitted(*pVar);
-			}
+			virtual void EnsureVarEmitted(Variable* pVar) override { EnsureEmitted(*pVar);}
 			virtual void HandleLeafNode(const model::Node& node) override {}
 
 		private:

@@ -42,7 +42,7 @@ void TestEmptyModelCpp()
 	CppCompiler compiler;
 	compiler.CompileModel("TestEmpty", mb.Model);
 	compiler.DebugDump();
-	compiler.WriteToFile("C:\\junk\\model\\TestEmpty.cpp");
+	compiler.WriteToFile("C:\\temp\\emll\\TestEmpty.cpp");
 }
 
 void TestBinaryVectorCpp(bool expanded)
@@ -64,7 +64,7 @@ void TestBinaryVectorCpp(bool expanded)
 	compiler.Settings().ShouldUnrollLoops() = expanded;
 	compiler.CompileModel("TestBinaryVector", mb.Model);
 	compiler.DebugDump();
-	compiler.WriteToFile("C:\\junk\\model\\TestBinary.cpp");
+	compiler.WriteToFile("C:\\temp\\emll\\TestBinary.cpp");
 }
 
 void TestSumCpp(bool expanded)
@@ -82,7 +82,7 @@ void TestSumCpp(bool expanded)
 	compiler.Settings().ShouldUnrollLoops() = expanded;
 	compiler.CompileModel("TestSum", mb.Model);
 	compiler.DebugDump();
-	compiler.WriteToFile("C:\\junk\\model\\TestSum.cpp");
+	compiler.WriteToFile("C:\\temp\\emll\\TestSum.cpp");
 }
 
 void TestBinaryPredicateCpp()
@@ -98,10 +98,10 @@ void TestBinaryPredicateCpp()
 	CppCompiler compiler;
 	compiler.CompileModel("TestPredicate", mb.Model);
 	compiler.DebugDump();
-	compiler.WriteToFile("C:\\junk\\model\\TestPredicate.cpp");
+	compiler.WriteToFile("C:\\temp\\emll\\TestPredicate.cpp");
 }
 
-void TestElementSelectorCpp()
+void TestMultiplexerCpp()
 {
 	ModelBuilder mb;
 
@@ -115,7 +115,7 @@ void TestElementSelectorCpp()
 	CppCompiler compiler;
 	compiler.CompileModel("TestElementSelector", mb.Model);
 	compiler.DebugDump();
-	compiler.WriteToFile("C:\\junk\\model\\TestElementSelector.cpp");
+	compiler.WriteToFile("C:\\temp\\emll\\TestElementSelector.cpp");
 }
 
 void TestDotProductCpp(CompilerSettings& settings)
@@ -180,7 +180,7 @@ void TestForestCpp()
 
 
 	compiler.DebugDump();
-	compiler.WriteToFile("C:\\junk\\model\\TestForest.cpp");
+	compiler.WriteToFile("C:\\temp\\emll\\TestForest.cpp");
 }
 
 

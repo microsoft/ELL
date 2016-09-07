@@ -80,7 +80,7 @@ void TestAccumulator(bool expanded);
 void TestDelay();
 void TestSqrt();
 void TestBinaryPredicate(bool expanded);
-void TestElementSelector();
+void TestMultiplexer();
 void TestSlidingAverage();
 void TestDotProductOutput();
 void TestLinearPredictor();

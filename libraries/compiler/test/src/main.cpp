@@ -6,9 +6,6 @@ using namespace emll::compiler;
 
 void TestIRCompiler()
 {
-	_mkdir("C:/junk");
-	_mkdir("C:/junk/model");
-
 	TestBinaryVector(false);
 	TestBinaryVector(true);
 	TestBinaryScalar();
@@ -20,12 +17,12 @@ void TestIRCompiler()
 	TestDelay();
 	TestSqrt();
 	TestBinaryPredicate(false);
-	TestElementSelector();
+	TestMultiplexer();
 	TestSlidingAverage();
 	TestDotProductOutput();
 
 	TestLinearPredictor();
-	TestForest();
+	//TestForest();
 
 	TestLLVM();
 	TestLLVMShiftRegister();
@@ -39,7 +36,7 @@ void TestCppCompiler()
 	TestForestCpp();
 	TestSumCpp(true);
 	TestSumCpp(false);
-	TestElementSelectorCpp();
+	TestMultiplexerCpp();
 	TestBinaryPredicateCpp();
 	TestBinaryVectorCpp(true);
 	TestBinaryVectorCpp(false);
@@ -50,6 +47,9 @@ void TestCppCompiler()
 
 int main(int argc, char* argv[])
 {
+	_mkdir("C:/temp");
+	_mkdir("C:/temp/emll");
+
 	TestCppCompiler();
 	TestIRCompiler();
 

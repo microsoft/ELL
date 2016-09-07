@@ -47,7 +47,7 @@ void TestLLVMShiftRegister()
 	fn.Verify();
 
 	module.Dump();
-	module.WriteBitcodeToFile("C:\\junk\\model\\shift.bc");
+	module.WriteBitcodeToFile("C:\\temp\\emll\\shift.bc");
 }
 
 void TestLLVM()
@@ -126,7 +126,7 @@ void TestLLVM()
 
 	fnMain.Verify();
 	module.Dump();
-	module.WriteBitcodeToFile("C:\\junk\\model\\loop.bc");
+	module.WriteBitcodeToFile("C:\\temp\\emll\\loop.bc");
 }
 
 std::vector<llvm::Instruction*> RemoveTermminators(llvm::Function* pfn)
@@ -455,7 +455,7 @@ void TestBinaryPredicate(bool expanded)
 	compiler.DebugDump();
 }
 
-void TestElementSelector()
+void TestMultiplexer()
 {
 	ModelBuilder mb;
 
@@ -500,7 +500,7 @@ void TestSlidingAverage()
 	fnMain.Verify();
 
 	compiler.DebugDump();
-	module.WriteBitcodeToFile("C:\\junk\\model\\avg.bc");
+	module.WriteBitcodeToFile("C:\\temp\\emll\\avg.bc");
 }
 
 void TestDotProductOutput()
@@ -529,7 +529,7 @@ void TestDotProductOutput()
 	fnMain.Verify();
 
 	compiler.DebugDump();
-	module.WriteBitcodeToFile("C:\\junk\\model\\dot.bc");
+	module.WriteBitcodeToFile("C:\\temp\\emll\\dot.bc");
 }
 
 model::Model MakeLinearPredictor()
@@ -587,7 +587,7 @@ void TestLinearPredictor()
 	fnMain.Verify();
 
 	compiler.DebugDump();
-	module.WriteBitcodeToFile("C:\\junk\\model\\linear.bc");
+	module.WriteBitcodeToFile("C:\\temp\\emll\\linear.bc");
 
 }
 
@@ -715,7 +715,7 @@ void TestForest()
 	fnMain.Ret();
 	fnMain.Verify();
 	compiler.DebugDump();
-	module.WriteBitcodeToFile("C:\\junk\\model\\forest.bc");
-	module.WriteAsmToFile("C:\\junk\\model\\forest.asm");
+	module.WriteBitcodeToFile("C:\\temp\\emll\\forest.bc");
+	module.WriteAsmToFile("C:\\temp\\emll\\forest.asm");
 }
 
