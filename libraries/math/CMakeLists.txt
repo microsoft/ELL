@@ -25,12 +25,23 @@ source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
+if(${APPLE})
+  set (BLASDirectory /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/)
+  set (BLASLibrary cblas)
+elseif(${WIN32})
+  set (BLASDirectory ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include)
+  set (BLASLibrary ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/libopenblas.a)
+endif()
+
+
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_include_directories(${PROJ_NAME} PUBLIC include ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include)
+target_include_directories(${PROJ_NAME} PUBLIC include ${BLASDirectory})
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
-target_link_libraries(${PROJ_NAME} utilities ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/libopenblas.a)
+
+#target_link_libraries(${PROJ_NAME} utilities )
+target_link_libraries(${PROJ_NAME} utilities ${BLASLibrary})
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 

@@ -12,6 +12,7 @@
 #include <vector>
 #include <iostream>
 #include <functional>
+#include <cmath>
 
 namespace math
 {
@@ -133,6 +134,8 @@ namespace math
 
         template<typename MapperType>
         ElementType Aggregate(MapperType mapper) const;
+
+        using TensorReferenceBase<ElementType>::_pData;
     };
 
     /// <summary> Enum of possible matrix and vector orientations. </summary>
@@ -217,6 +220,9 @@ namespace math
     protected:
         // protected ctor accessible only through derived classes
         using VectorReferenceBase<ElementType>::VectorReferenceBase;
+        using TensorReferenceBase<ElementType>::_pData;
+        using VectorReferenceBase<ElementType>::_size;
+        using VectorReferenceBase<ElementType>::_stride;
     };
 
     /// <summary> An algebraic vector. </summary>
@@ -263,6 +269,7 @@ namespace math
     private:
         // member variables
         std::vector<ElementType> _data;
+        using TensorReferenceBase<ElementType>::_pData;
     };
 
     typedef Vector<double, TensorOrientation::columnMajor> DoubleColumnVector;
